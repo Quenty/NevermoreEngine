@@ -10,32 +10,43 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local afterEach = Jest.Globals.afterEach
+
+-- Each ServiceBag (and the DataStore it owns) is torn down in afterEach so its auto-save loop can
+-- never outlive the test. These specs share one Roblox place across all packages, so a leaked
+-- background task throws in a later package's window.
+local maid = Maid.new()
+
+afterEach(function()
+	maid:DoCleaning()
+end)
 
 -- Builds a real ServiceBag with GameDataStoreService and injects the given mock between Init and
--- Start, before any PromiseDataStore call. Returns the service and bag for teardown.
+-- Start, before any PromiseDataStore call. Returns the service and bag.
 local function newService(mock)
 	local serviceBag = ServiceBag.new()
 	local service = serviceBag:GetService(require("GameDataStoreService"))
 	serviceBag:Init()
 	service:SetRobloxDataStore(mock)
 	serviceBag:Start()
+	maid:Add(serviceBag)
 	return service, serviceBag
 end
 
 describe("GameDataStoreService.PromiseDataStore", function()
 	it("should resolve a datastore that loads successfully against a healthy mock", function()
-		local service, serviceBag = newService(DataStoreMock.new())
+		local service = newService(DataStoreMock.new())
 
 		local promise = service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 
@@ -46,34 +57,28 @@ describe("GameDataStoreService.PromiseDataStore", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 		expect((select(2, loadPromise:Yield()))).toEqual(true)
-
-		serviceBag:Destroy()
 	end)
 
 	it("should return the same cached promise on repeated calls", function()
-		local service, serviceBag = newService(DataStoreMock.new())
+		local service = newService(DataStoreMock.new())
 
 		local first = service:PromiseDataStore()
 		local second = service:PromiseDataStore()
 		expect((first == second)).toEqual(true)
-
-		serviceBag:Destroy()
 	end)
 end)
 
 describe("GameDataStoreService persistence", function()
 	it("should round-trip a stored value into the mock under the version1 key", function()
 		local mock = DataStoreMock.new()
-		local service, serviceBag = newService(mock)
+		local service = newService(mock)
 
 		local promise = service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 
@@ -85,7 +90,6 @@ describe("GameDataStoreService persistence", function()
 		local savePromise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(savePromise) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 		expect((savePromise:Yield())).toEqual(true)
@@ -94,24 +98,20 @@ describe("GameDataStoreService persistence", function()
 		local raw = mock:GetRaw("version1")
 		expect(raw).never.toBeNil()
 		expect(raw.motd).toEqual("hello")
-
-		serviceBag:Destroy()
 	end)
 end)
 
 describe("GameDataStoreService.SetRobloxDataStore", function()
 	it("should throw when injected twice (already resolved)", function()
-		local service, serviceBag = newService(DataStoreMock.new())
+		local service = newService(DataStoreMock.new())
 
 		expect(function()
 			service:SetRobloxDataStore(DataStoreMock.new())
 		end).toThrow("Already resolved robloxDataStore")
-
-		serviceBag:Destroy()
 	end)
 
 	it("should throw on a non-datastore argument", function()
-		local service, serviceBag = newService(DataStoreMock.new())
+		local service = newService(DataStoreMock.new())
 
 		-- isDataStore is validated before the already-resolved check, so a bad arg throws regardless.
 		expect(function()
@@ -121,8 +121,6 @@ describe("GameDataStoreService.SetRobloxDataStore", function()
 		expect(function()
 			service:SetRobloxDataStore(nil)
 		end).toThrow("Bad robloxDataStore")
-
-		serviceBag:Destroy()
 	end)
 end)
 
@@ -131,12 +129,11 @@ describe("GameDataStoreService failure handling", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local service, serviceBag = newService(mock)
+		local service = newService(mock)
 
 		local promise = service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 
@@ -147,14 +144,11 @@ describe("GameDataStoreService failure handling", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 5) then
 			expect("hung").toEqual("settled")
-			serviceBag:Destroy()
 			return
 		end
 
 		local loadOk, loadedOk = loadPromise:Yield()
 		expect(loadOk).toEqual(true)
 		expect(loadedOk).toEqual(false)
-
-		serviceBag:Destroy()
 	end)
 end)

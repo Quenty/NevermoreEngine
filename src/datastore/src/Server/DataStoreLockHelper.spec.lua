@@ -12,17 +12,28 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local afterEach = Jest.Globals.afterEach
+
+-- Every DataStore a test creates is tracked here and torn down in afterEach, so its auto-save loop
+-- can never outlive the test. These specs share one Roblox place across all packages, so a leaked
+-- background task throws in a later package's window.
+local maid = Maid.new()
+
+afterEach(function()
+	maid:DoCleaning()
+end)
 
 describe("DataStore session locking", function()
 	it("wraps the stored profile in a lock envelope on a healthy acquire", function()
 		local mock = DataStoreMock.new()
 
-		local dataStore = DataStore.new(mock, "player_1")
+		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
@@ -41,14 +52,12 @@ describe("DataStore session locking", function()
 		expect(type(raw.lock)).toEqual("table")
 		expect(raw.lock.ActiveSession).never.toBeNil()
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
-
-		dataStore:Destroy()
 	end)
 
 	it("releases the lock on SaveAndCloseSession so a new session can load", function()
 		local mock = DataStoreMock.new()
 
-		local sessionA = DataStore.new(mock, "player_1")
+		local sessionA = maid:Add(DataStore.new(mock, "player_1"))
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
 
@@ -71,9 +80,7 @@ describe("DataStore session locking", function()
 		expect(type(raw)).toEqual("table")
 		expect(raw.lock).toEqual(nil)
 
-		sessionA:Destroy()
-
-		local sessionB = DataStore.new(mock, "player_1")
+		local sessionB = maid:Add(DataStore.new(mock, "player_1"))
 		sessionB:SetSessionLockingEnabled(true)
 		sessionB:SetUserIdList({ 1 })
 
@@ -83,14 +90,12 @@ describe("DataStore session locking", function()
 			return
 		end
 		expect((loadB:Yield())).toEqual(true)
-
-		sessionB:Destroy()
 	end)
 
 	it("preserves user data across a lock/unlock round-trip", function()
 		local mock = DataStoreMock.new()
 
-		local sessionA = DataStore.new(mock, "player_1")
+		local sessionA = maid:Add(DataStore.new(mock, "player_1"))
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
 		sessionA:Store("coins", 5)
@@ -101,9 +106,8 @@ describe("DataStore session locking", function()
 			return
 		end
 		expect((closePromise:Yield())).toEqual(true)
-		sessionA:Destroy()
 
-		local sessionB = DataStore.new(mock, "player_1")
+		local sessionB = maid:Add(DataStore.new(mock, "player_1"))
 		sessionB:SetSessionLockingEnabled(true)
 		sessionB:SetUserIdList({ 1 })
 
@@ -116,8 +120,6 @@ describe("DataStore session locking", function()
 		local ok, value = loadPromise:Yield()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(5)
-
-		sessionB:Destroy()
 	end)
 
 	it("steals a stale lock left by a dead session", function()
@@ -139,7 +141,7 @@ describe("DataStore session locking", function()
 			},
 		})
 
-		local dataStore = DataStore.new(mock, "player_1")
+		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
@@ -160,14 +162,12 @@ describe("DataStore session locking", function()
 			return
 		end
 		expect((select(2, loadPromise:Yield()))).toEqual(7)
-
-		dataStore:Destroy()
 	end)
 
 	it("fires SessionStolen when saving over a lock held by another session", function()
 		local mock = DataStoreMock.new()
 
-		local dataStore = DataStore.new(mock, "player_1")
+		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
@@ -205,15 +205,13 @@ describe("DataStore session locking", function()
 
 		expect(stolenBy).never.toBeNil()
 		expect(stolenBy.SessionId).toEqual("thief-session-id")
-
-		dataStore:Destroy()
 	end)
 
 	it("surfaces a locked-load datastore failure fast instead of hanging", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local dataStore = DataStore.new(mock, "player_1")
+		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
@@ -226,7 +224,5 @@ describe("DataStore session locking", function()
 		local ok, loadedOk = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(false)
-
-		dataStore:Destroy()
 	end)
 end)

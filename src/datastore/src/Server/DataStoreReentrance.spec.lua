@@ -12,17 +12,29 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local afterEach = Jest.Globals.afterEach
+
+-- Every DataStore a test creates is tracked here and torn down in afterEach, so its auto-save loop
+-- can never outlive the test. Tests that destroy a store mid-test (the cancellation under test) stay
+-- as-is; the maid simply skips an already-destroyed store. These specs share one Roblox place across
+-- all packages, so a leaked background task throws in a later package's window.
+local maid = Maid.new()
+
+afterEach(function()
+	maid:DoCleaning()
+end)
 
 local function newSessionLockedStore(mock)
 	local dataStore = DataStore.new(mock, "player_1")
 	dataStore:SetSessionLockingEnabled(true)
 	dataStore:SetUserIdList({ 1 })
-	return dataStore
+	return maid:Add(dataStore)
 end
 
 describe("in-flight request cancellation (maid teardown)", function()
@@ -55,7 +67,6 @@ describe("in-flight request cancellation (maid teardown)", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("load hung").toEqual("load settled")
-			dataStore:Destroy()
 			return
 		end
 
@@ -90,12 +101,9 @@ describe("lock command that does not settle", function()
 		mock:UnblockRequests()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung after unblock").toEqual("settled")
-			dataStore:Destroy()
 			return
 		end
 		expect((select(2, promise:Yield()))).toEqual(true)
-
-		dataStore:Destroy()
 	end)
 
 	it("re-loads cleanly on a fresh session after a cancelled in-flight lock command", function()
@@ -113,11 +121,8 @@ describe("lock command that does not settle", function()
 		local secondPromise = second:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("hung").toEqual("settled")
-			second:Destroy()
 			return
 		end
 		expect((select(2, secondPromise:Yield()))).toEqual(true)
-
-		second:Destroy()
 	end)
 end)

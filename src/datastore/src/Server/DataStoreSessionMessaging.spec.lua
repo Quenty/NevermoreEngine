@@ -14,6 +14,7 @@ local DataStore = require("DataStore")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local MessagingServiceMock = require("MessagingServiceMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -21,6 +22,16 @@ local ServiceBag = require("ServiceBag")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local afterEach = Jest.Globals.afterEach
+
+-- Every object a test creates is tracked here and torn down in afterEach, so a DataStore's auto-save
+-- loop (or a helper's subscription) can never outlive the test. These specs share one Roblox place
+-- across all packages, so a leaked background task throws in a later package's window.
+local maid = Maid.new()
+
+afterEach(function()
+	maid:DoCleaning()
+end)
 
 local function newServiceBag(messagingService)
 	local serviceBag = ServiceBag.new()
@@ -43,6 +54,15 @@ describe("cross-server session messaging (close-session kick-out)", function()
 		local helperA = DataStoreMessageHelper.new(serviceBag, sessionA)
 		local helperB = DataStoreMessageHelper.new(serviceBag, sessionB)
 
+		-- Helpers and sessions are torn down before the bag they borrow PlaceMessagingService from.
+		maid:GiveTask(function()
+			helperA:Destroy()
+			helperB:Destroy()
+			sessionA:Destroy()
+			sessionB:Destroy()
+			serviceBag:Destroy()
+		end)
+
 		local closeRequested = false
 		sessionA.SessionCloseRequested:Connect(function()
 			closeRequested = true
@@ -56,11 +76,6 @@ describe("cross-server session messaging (close-session kick-out)", function()
 
 		if not PromiseTestUtils.awaitSettled(sendPromise, 10) then
 			expect("message send hung").toEqual("message send settled")
-			helperA:Destroy()
-			helperB:Destroy()
-			sessionA:Destroy()
-			sessionB:Destroy()
-			serviceBag:Destroy()
 			return
 		end
 
@@ -68,12 +83,6 @@ describe("cross-server session messaging (close-session kick-out)", function()
 			return closeRequested
 		end, 15)
 		expect(received).toEqual(true)
-
-		helperA:Destroy()
-		helperB:Destroy()
-		sessionA:Destroy()
-		sessionB:Destroy()
-		serviceBag:Destroy()
 	end)
 
 	it("rejects sending a message to our own session", function()
@@ -82,15 +91,17 @@ describe("cross-server session messaging (close-session kick-out)", function()
 		local sessionA = DataStore.new(dataStoreMock, "player_1")
 		local helperA = DataStoreMessageHelper.new(serviceBag, sessionA)
 
+		maid:GiveTask(function()
+			helperA:Destroy()
+			sessionA:Destroy()
+			serviceBag:Destroy()
+		end)
+
 		expect(function()
 			helperA:PromiseSendSessionMessage(game.PlaceId, game.JobId, sessionA:GetSessionId(), {
 				type = "close-session",
 				requesterSessionId = sessionA:GetSessionId(),
 			})
 		end).toThrow("Cannot message self")
-
-		helperA:Destroy()
-		sessionA:Destroy()
-		serviceBag:Destroy()
 	end)
 end)

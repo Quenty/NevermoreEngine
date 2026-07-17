@@ -14,15 +14,26 @@ local DataStore = require("DataStore")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local MessagingServiceUtils = require("MessagingServiceUtils")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local afterEach = Jest.Globals.afterEach
 
--- Builds a real ServiceBag, a DataStore over a fresh mock, and a helper wired to both.
--- Returns all of them plus a cleanup so each test tears its own world down.
+-- Every object a test creates is tracked here and torn down in afterEach, so nothing (a helper's
+-- subscription, a store's auto-save loop) can outlive the test. These specs share one Roblox place
+-- across all packages, so a leaked background task throws in a later package's window.
+local maid = Maid.new()
+
+afterEach(function()
+	maid:DoCleaning()
+end)
+
+-- Builds a real ServiceBag, a DataStore over a fresh mock, and a helper wired to both. The helper and
+-- store are torn down before the bag they borrow PlaceMessagingService from.
 local function newHelper()
 	local serviceBag = ServiceBag.new()
 	-- The helper pulls PlaceMessagingService off the bag; register it before Start.
@@ -37,22 +48,20 @@ local function newHelper()
 	-- DataStore provides (the session id is a GUID assigned in DataStore.new).
 	local helper = DataStoreMessageHelper.new(serviceBag, dataStore)
 
-	local function cleanup()
+	maid:GiveTask(function()
 		helper:Destroy()
 		dataStore:Destroy()
 		serviceBag:Destroy()
-	end
+	end)
 
-	return helper, dataStore, cleanup
+	return helper, dataStore
 end
 
 describe("DataStoreMessageHelper.new", function()
 	it("should construct against a real ServiceBag and DataStore", function()
-		local helper, _, cleanup = newHelper()
+		local helper = newHelper()
 
 		expect(helper).never.toBeNil()
-
-		cleanup()
 	end)
 
 	it("should expose the ServiceBag it was built with", function()
@@ -64,21 +73,21 @@ describe("DataStoreMessageHelper.new", function()
 		local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 		local helper = DataStoreMessageHelper.new(serviceBag, dataStore)
 
-		expect((helper:GetServiceBag() == serviceBag)).toEqual(true)
+		maid:GiveTask(function()
+			helper:Destroy()
+			dataStore:Destroy()
+			serviceBag:Destroy()
+		end)
 
-		helper:Destroy()
-		dataStore:Destroy()
-		serviceBag:Destroy()
+		expect((helper:GetServiceBag() == serviceBag)).toEqual(true)
 	end)
 
 	it("should reject a nil serviceBag", function()
-		local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
+		local dataStore = maid:Add(DataStore.new(DataStoreMock.new(), "player_1"))
 
 		expect(function()
 			DataStoreMessageHelper.new(nil, dataStore)
 		end).toThrow("No serviceBag")
-
-		dataStore:Destroy()
 	end)
 
 	it("should not error on construct then Destroy", function()
@@ -91,18 +100,21 @@ describe("DataStoreMessageHelper.new", function()
 		local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 		local helper = DataStoreMessageHelper.new(serviceBag, dataStore)
 
+		-- This test destroys the helper itself, so the maid only owns the store and the bag.
+		maid:GiveTask(function()
+			dataStore:Destroy()
+			serviceBag:Destroy()
+		end)
+
 		expect(function()
 			helper:Destroy()
 		end).never.toThrow()
-
-		dataStore:Destroy()
-		serviceBag:Destroy()
 	end)
 end)
 
 describe("DataStoreMessageHelper.PromiseSendSessionMessage", function()
 	it("should refuse to message its own session synchronously", function()
-		local helper, dataStore, cleanup = newHelper()
+		local helper, dataStore = newHelper()
 
 		local ownSessionId = dataStore:GetSessionId()
 		expect(function()
@@ -111,8 +123,6 @@ describe("DataStoreMessageHelper.PromiseSendSessionMessage", function()
 				requesterSessionId = ownSessionId,
 			})
 		end).toThrow("Cannot message self")
-
-		cleanup()
 	end)
 end)
 
@@ -120,12 +130,10 @@ describe("DataStoreMessageHelper.PromiseCloseSessionGraceful", function()
 	it("should return a promise (cross-server outcome is not unit-testable single-server)", function()
 		-- The graceful handshake needs a second server to answer, so we only assert it returns a
 		-- promise; its settlement is environment dependent and covered by real multi-server usage.
-		local helper, _, cleanup = newHelper()
+		local helper = newHelper()
 
 		local promise = helper:PromiseCloseSessionGraceful(1, "some-other-job", "some-other-session")
 		expect(promise).never.toBeNil()
-
-		cleanup()
 	end)
 end)
 
@@ -137,6 +145,10 @@ describe("DataStore.SetSessionMessagingEnabled wiring", function()
 		serviceBag:Start()
 
 		local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
+		maid:GiveTask(function()
+			dataStore:Destroy()
+			serviceBag:Destroy()
+		end)
 		-- Messaging is documented to work alongside session locking; enable both like real usage.
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
@@ -148,9 +160,6 @@ describe("DataStore.SetSessionMessagingEnabled wiring", function()
 		expect(function()
 			dataStore:SetSessionMessagingEnabled(false)
 		end).never.toThrow()
-
-		dataStore:Destroy()
-		serviceBag:Destroy()
 	end)
 end)
 
