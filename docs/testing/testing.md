@@ -47,25 +47,26 @@ throwing during the `secrets` suite is a real example we hit.
 
 So every object a test constructs must be torn down. Use the **`setup()` / `destroy()` controller
 pattern** — the standard across the codebase (see the `rogue-properties` specs and
-`saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` builds the `ServiceBag` and any objects and
-returns a controller: named fields plus factory functions, and a `destroy` that tears everything
-down. Each test calls `setup()`, does its work, and calls `controller:destroy()` at the end.
+`saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` creates a `Maid`, `maid:Add`s the
+`ServiceBag` and every object it builds, and returns a controller: named fields plus factory
+functions, and a `destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
+`controller:destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
 
 ```luau
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("SomeService"))
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local thing = SomeClass.new(serviceBag)
+	local thing = maid:Add(SomeClass.new(serviceBag))
 
 	return {
 		thing = thing,
 		destroy = function()
-			-- Destroy children before the ServiceBag they borrowed services from.
-			thing:Destroy()
-			serviceBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
 end
@@ -79,15 +80,16 @@ end)
 
 Guidelines:
 
-- `destroy` must tear down **every** object `setup()` created, not just the `ServiceBag`. A standalone
-  object the bag does not own — a manager, a `DataStore`, a bound class — keeps its background work
-  (an auto-save loop, a subscription) running otherwise. This is the exact bug that leaked into the
-  `secrets` suite.
-- Destroy children **before** the `ServiceBag` they pulled services off of.
+- `maid:Add` **every** object `setup()` creates, not just the `ServiceBag`. A standalone object the
+  bag does not own — a manager, a `DataStore`, a bound class — keeps its background work (an auto-save
+  loop, a subscription) running otherwise. This is the exact bug that leaked into the `secrets` suite.
+- For objects a test builds on demand (multiple stores, per-test config), expose a factory that
+  returns `maid:Add(X.new(...))` — e.g. a `newDataStore()` on the controller.
 - In a hung-promise guard that returns early, call `controller:destroy()` before the `return` so the
   early exit still cleans up.
-- When a test deliberately destroys an object mid-test (that teardown *is* the behavior under test),
-  don't also destroy it in `destroy` — a second `:Destroy()` on the same object throws.
+- A test may still `:Destroy()` an object mid-test when that teardown *is* the behavior under test —
+  the maid safely skips an already-destroyed object at `DoCleaning` (a destroyed `BaseObject` has its
+  metatable nil'd), so there is no double-destroy.
 - A plain object with no `ServiceBag` can skip the controller: create it in the test and
   `object:Destroy()` at the end (and in any early-return guard).
 
