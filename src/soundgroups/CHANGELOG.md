@@ -1,3 +1,15 @@
+# v1.42.2 (Fri Jul 17 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix some types that need to be fixed [#733](https://github.com/Quenty/NevermoreEngine/pull/733) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
