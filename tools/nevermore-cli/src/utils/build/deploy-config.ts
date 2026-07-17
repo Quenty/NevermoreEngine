@@ -4,6 +4,14 @@ import * as path from 'path';
 export interface BasePlaceConfig {
   universeId: number;
   placeId: number;
+  /**
+   * Pin the base place to a specific published version. When set, the deploy
+   * downloads exactly this version instead of whatever is currently live, so
+   * builds are reproducible and a broken Studio edit can't leak into a deploy.
+   * Omit to always pull the latest version. Bump it with
+   * `nevermore deploy version upgrade`.
+   */
+  version?: number;
 }
 
 export interface DeployTarget {
@@ -52,6 +60,15 @@ function _validatePlace(label: string, place: DeployTarget): void {
     }
     if (typeof place.basePlace.placeId !== 'number') {
       throw new Error(`${label} basePlace is missing or has invalid "placeId"`);
+    }
+    if (
+      place.basePlace.version != null &&
+      (!Number.isInteger(place.basePlace.version) ||
+        place.basePlace.version < 1)
+    ) {
+      throw new Error(
+        `${label} basePlace "version" must be a positive integer when set`
+      );
     }
   }
 }

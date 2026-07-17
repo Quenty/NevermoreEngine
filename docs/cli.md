@@ -157,13 +157,14 @@ nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to de
 
 ### `nevermore deploy`
 
-Builds a Rojo project and uploads it to a Roblox place. `deploy` has two subcommands; `run` is the default, so `nevermore deploy` and `nevermore deploy <target>` both deploy. Full walkthrough in [Deploying with the CLI](deploy.md).
+Builds a Rojo project and uploads it to a Roblox place. `run` is the default subcommand, so `nevermore deploy` and `nevermore deploy <target>` both deploy. Full walkthrough in [Deploying with the CLI](deploy.md).
 
 ```bash
-nevermore deploy init                  # create deploy.nevermore.json (interactive)
-nevermore deploy run                   # build + upload, saved (not live)
-nevermore deploy run --publish         # build + upload and publish live
-nevermore deploy production --publish  # 'run' is implied; deploy the 'production' target
+nevermore deploy init                    # create deploy.nevermore.json (interactive)
+nevermore deploy run                     # build + upload, saved (not live)
+nevermore deploy run --publish           # build + upload and publish live
+nevermore deploy production --publish    # 'run' is implied; deploy the 'production' target
+nevermore deploy version upgrade         # re-pin base place versions to latest
 ```
 
 **`nevermore deploy init`** — writes a `deploy.nevermore.json` for the current package.
@@ -187,6 +188,16 @@ nevermore deploy production --publish  # 'run' is implied; deploy the 'productio
 | `--place-file <path>` | Upload a pre-built `.rbxl` instead of building via rojo (single-place targets only). |
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
+
+**`nevermore deploy version upgrade [target]`** — re-pins every `basePlace` in `deploy.nevermore.json` to its current latest published version, so deploys pull a fixed, git-tracked base place instead of whatever is live. Without a target it walks every target. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
+
+| Flag | Description |
+|------|-------------|
+| `--dryrun` | Print the old → new version table without writing. |
+| `--yes` | Skip the confirmation prompt (for scripting/CI). |
+| `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
+
+**`nevermore deploy version promote <from> <to>`** — copies base-place version pins from one target to another (e.g. promote validated `production-demo` pins to `production`). Places are matched by base place id, so content lines up even when the targets name their places differently. Pure config edit — no network. Supports `--dryrun` and `--yes`. See [Promoting pins between targets](deploy.md#promoting-pins-between-targets).
 
 ### `nevermore batch`
 
