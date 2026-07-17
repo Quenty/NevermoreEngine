@@ -171,13 +171,13 @@ end)
 
 describe("TranslatorService localization write cost", function()
 	-- Each raw write to a LocalizationTable invalidates every AutoLocalize entry in the
-	-- engine, so the number of writes per flush is what we want to minimize. This pins the
-	-- current behavior: a flush issues one write per queued value/example.
-	it("issues a separate table write per queued value and example", function()
+	-- engine, so the number of writes per flush is what we minimize: a whole frame's worth
+	-- of queued values/examples is coalesced into a single SetEntries call.
+	it("coalesces a batch of value and example writes into a single table write", function()
 		local controller = setup()
 		local service = controller.translatorService
 
-		-- Three entries, each with one locale value plus an example.
+		-- Three entries, each with one locale value plus an example (six queued writes).
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
 		service:SetEntryExample("k.one", "One", "c1", "One")
 		service:SetEntryValue("k.two", "Two", "c2", "en", "Two")
@@ -187,8 +187,33 @@ describe("TranslatorService localization write cost", function()
 
 		controller.awaitEntriesWritten()
 
-		-- BAD: six separate writes, each invalidating every AutoLocalize entry.
-		expect(service:GetLocalizationWriteCount()).toBe(6)
+		-- One write for the whole batch, so one AutoLocalize invalidation instead of six.
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+
+		-- The entries still land correctly.
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		expect(entries["k.one"].Values["en"]).toBe("One")
+		expect(entries["k.one"].Example).toBe("One")
+		expect(entries["k.two"].Values["en"]).toBe("Two")
+		expect(entries["k.three"].Values["en"]).toBe("Three")
+		controller:destroy()
+	end)
+
+	it("merges a later write into the existing entries without dropping them", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		controller.awaitEntriesWritten()
+
+		-- A second, separate flush should preserve the first entry and add the new one.
+		service:SetEntryValue("k.two", "Two", "c2", "en", "Two")
+		controller.awaitEntriesWritten()
+
+		expect(service:GetLocalizationWriteCount()).toBe(2)
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		expect(entries["k.one"].Values["en"]).toBe("One")
+		expect(entries["k.two"].Values["en"]).toBe("Two")
 		controller:destroy()
 	end)
 end)

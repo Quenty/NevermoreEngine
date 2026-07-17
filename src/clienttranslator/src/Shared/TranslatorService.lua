@@ -23,6 +23,16 @@ local ValueObject = require("ValueObject")
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
 
+-- An accumulated localization entry delta, keyed by Key+Source+Context, that is merged
+-- into the table and applied in a single SetEntries call on flush.
+type PendingEntry = {
+	Key: string,
+	Source: string,
+	Context: string,
+	Example: string?,
+	Values: { [string]: string },
+}
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
@@ -33,7 +43,7 @@ export type TranslatorService = typeof(setmetatable(
 		_localeIdValue: ValueObject.ValueObject<string>?,
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
-		_pendingWrites: { (localizationTable: LocalizationTable) -> () },
+		_pendingEntries: { [string]: PendingEntry },
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
@@ -46,7 +56,7 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._pendingWrites = {}
+	self._pendingEntries = {}
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
 
@@ -103,9 +113,8 @@ function TranslatorService.SetEntryValue(
 	localeId: string,
 	text: string
 )
-	table.insert(self._pendingWrites, function(localizationTable)
-		localizationTable:SetEntryValue(translationKey, source, context, localeId, text)
-	end)
+	local entry = self:_getPendingEntry(translationKey, source, context)
+	entry.Values[localeId] = text
 	self:_scheduleFlush()
 end
 
@@ -124,10 +133,29 @@ function TranslatorService.SetEntryExample(
 	context: string,
 	example: string
 )
-	table.insert(self._pendingWrites, function(localizationTable)
-		localizationTable:SetEntryExample(translationKey, source, context, example)
-	end)
+	local entry = self:_getPendingEntry(translationKey, source, context)
+	entry.Example = example
 	self:_scheduleFlush()
+end
+
+function TranslatorService._getPendingEntry(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string
+): PendingEntry
+	local id = string.format("%s\0%s\0%s", translationKey, source, context)
+	local entry = self._pendingEntries[id]
+	if not entry then
+		entry = {
+			Key = translationKey,
+			Source = source,
+			Context = context,
+			Values = {},
+		}
+		self._pendingEntries[id] = entry
+	end
+	return entry
 end
 
 --[=[
@@ -190,15 +218,11 @@ function TranslatorService._flushWrites(self: TranslatorService)
 
 	self._flushScheduled = false
 
-	local writes = self._pendingWrites
-	self._pendingWrites = {}
+	local pendingEntries = self._pendingEntries
+	self._pendingEntries = {}
 
-	local localizationTable = self:GetLocalizationTable()
-	for _, write in writes do
-		write(localizationTable)
-		-- Each mutating call invalidates every AutoLocalize entry in the engine, so we
-		-- track how many raw table writes a flush performs.
-		self._localizationWriteCount += 1
+	if next(pendingEntries) then
+		self:_applyPendingEntries(pendingEntries)
 	end
 
 	local promise = self._pendingFlushPromise
@@ -206,6 +230,45 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	if promise then
 		promise:Resolve()
 	end
+end
+
+-- Merges the pending entry deltas into the table's current entries and writes them back
+-- in a single SetEntries call, so a whole frame's worth of translation entries costs one
+-- AutoLocalize invalidation instead of one per value/example.
+function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: { [string]: PendingEntry })
+	local localizationTable = self:GetLocalizationTable()
+
+	local existingById: { [string]: any } = {}
+	local entries = localizationTable:GetEntries()
+	for _, entry in entries do
+		local id = string.format("%s\0%s\0%s", entry.Key, entry.Source, entry.Context)
+		existingById[id] = entry
+	end
+
+	for id, delta in pendingEntries do
+		local entry = existingById[id]
+		if not entry then
+			entry = {
+				Key = delta.Key,
+				Source = delta.Source,
+				Context = delta.Context,
+				Example = "",
+				Values = {},
+			}
+			existingById[id] = entry
+			table.insert(entries, entry)
+		end
+
+		if delta.Example ~= nil then
+			entry.Example = delta.Example
+		end
+		for localeId, text in delta.Values do
+			entry.Values[localeId] = text
+		end
+	end
+
+	localizationTable:SetEntries(entries)
+	self._localizationWriteCount += 1
 end
 
 --[=[
