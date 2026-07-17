@@ -168,3 +168,27 @@ describe("TranslatorService entry writes (deferred)", function()
 		controller:destroy()
 	end)
 end)
+
+describe("TranslatorService localization write cost", function()
+	-- Each raw write to a LocalizationTable invalidates every AutoLocalize entry in the
+	-- engine, so the number of writes per flush is what we want to minimize. This pins the
+	-- current behavior: a flush issues one write per queued value/example.
+	it("issues a separate table write per queued value and example", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		-- Three entries, each with one locale value plus an example.
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		service:SetEntryExample("k.one", "One", "c1", "One")
+		service:SetEntryValue("k.two", "Two", "c2", "en", "Two")
+		service:SetEntryExample("k.two", "Two", "c2", "Two")
+		service:SetEntryValue("k.three", "Three", "c3", "en", "Three")
+		service:SetEntryExample("k.three", "Three", "c3", "Three")
+
+		controller.awaitEntriesWritten()
+
+		-- BAD: six separate writes, each invalidating every AutoLocalize entry.
+		expect(service:GetLocalizationWriteCount()).toBe(6)
+		controller:destroy()
+	end)
+end)

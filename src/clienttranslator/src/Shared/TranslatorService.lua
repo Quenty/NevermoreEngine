@@ -36,6 +36,7 @@ export type TranslatorService = typeof(setmetatable(
 		_pendingWrites: { (localizationTable: LocalizationTable) -> () },
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
+		_localizationWriteCount: number,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
@@ -47,6 +48,7 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 
 	self._pendingWrites = {}
 	self._flushScheduled = false
+	self._localizationWriteCount = 0
 
 	self._translator = self._maid:Add(ValueObject.new(nil))
 	self._translator:Mount(self:_observeTranslatorImpl())
@@ -154,6 +156,17 @@ function TranslatorService.FlushEntries(self: TranslatorService)
 	end
 end
 
+--[=[
+	Returns the total number of raw mutating calls made to the localization table. Each
+	such call invalidates every AutoLocalize entry in the engine, so this is the cost we
+	want to keep low. Primarily useful for diagnostics and regression tests.
+
+	@return number
+]=]
+function TranslatorService.GetLocalizationWriteCount(self: TranslatorService): number
+	return self._localizationWriteCount
+end
+
 function TranslatorService._scheduleFlush(self: TranslatorService)
 	if self._flushScheduled then
 		return
@@ -183,6 +196,9 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	local localizationTable = self:GetLocalizationTable()
 	for _, write in writes do
 		write(localizationTable)
+		-- Each mutating call invalidates every AutoLocalize entry in the engine, so we
+		-- track how many raw table writes a flush performs.
+		self._localizationWriteCount += 1
 	end
 
 	local promise = self._pendingFlushPromise
