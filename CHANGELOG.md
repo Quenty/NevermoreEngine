@@ -1,5 +1,18 @@
 # (Fri Jul 17 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.38.0`
+  - feat(nevermore-cli): pin and promote base place versions in deploy config [#734](https://github.com/Quenty/NevermoreEngine/pull/734) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 17 2026)
+
 #### 🐛 Bug Fix
 
 - Add Claude Code format-on-edit and pre-push luau lint hooks [#732](https://github.com/Quenty/NevermoreEngine/pull/732) ([@Quenty](https://github.com/Quenty))
