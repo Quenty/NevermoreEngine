@@ -11,6 +11,7 @@ import {
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   type BasePlaceConfig,
+  type DeployConfig,
 } from '../../utils/build/deploy-config.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
@@ -22,11 +23,111 @@ interface BasePlaceRef {
   basePlace: BasePlaceConfig;
 }
 
-interface UpgradeRow {
+/** A pending change: set `ref.basePlace.version` to `to`. */
+interface PinChange {
   ref: BasePlaceRef;
   from?: number;
   to: number;
-  changed: boolean;
+}
+
+export interface VersionPromoteArgs extends DeployArgs {
+  from?: string;
+  to?: string;
+}
+
+function _plural(count: number): string {
+  return count === 1 ? '' : 's';
+}
+
+function _requireTarget(config: DeployConfig, targetName: string): void {
+  if (!config.targets[targetName]) {
+    throw new Error(
+      [
+        `Target "${targetName}" not found in deploy.nevermore.json.`,
+        `Available targets: ${Object.keys(config.targets).join(', ')}`,
+      ].join('\n')
+    );
+  }
+}
+
+/** Collect every basePlace across the given targets, keeping live references. */
+function _collectBasePlaceRefs(
+  config: DeployConfig,
+  targetNames: string[]
+): BasePlaceRef[] {
+  const refs: BasePlaceRef[] = [];
+  for (const targetName of targetNames) {
+    for (const place of resolveDeployTargetPlaces(config, targetName)) {
+      if (place.basePlace) {
+        refs.push({
+          targetName,
+          placeLabel: place.name ?? targetName,
+          basePlace: place.basePlace,
+        });
+      }
+    }
+  }
+  return refs;
+}
+
+/**
+ * Gate the change set on --dryrun / confirmation, apply it in place, and write
+ * the config back. `changes` may include no-op entries; only entries whose
+ * version actually differs are counted and applied. Returns nothing — messaging
+ * is handled here so the two commands stay consistent.
+ */
+async function _commitPinChangesAsync(
+  configPath: string,
+  config: DeployConfig,
+  changes: PinChange[],
+  args: { dryrun?: boolean; yes?: boolean }
+): Promise<void> {
+  const changed = changes.filter((c) => c.from !== c.to);
+  if (changed.length === 0) {
+    OutputHelper.info('Nothing to change — pins are already up to date.');
+    return;
+  }
+
+  if (args.dryrun) {
+    OutputHelper.info(
+      `[DRYRUN] Would update ${changed.length} pin${_plural(
+        changed.length
+      )} in ${configPath}`
+    );
+    return;
+  }
+
+  if (!args.yes) {
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: `Update ${changed.length} version pin${_plural(
+          changed.length
+        )} in deploy.nevermore.json?`,
+        default: true,
+      },
+    ]);
+    if (!confirm) {
+      OutputHelper.info('Aborted — no changes written.');
+      return;
+    }
+  }
+
+  // Mutate in place — every ref.basePlace points into `config`.
+  for (const change of changed) {
+    change.ref.basePlace.version = change.to;
+  }
+
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2) + '\n');
+  OutputHelper.info(
+    `Updated ${changed.length} version pin${_plural(
+      changed.length
+    )} in ${configPath}`
+  );
+  OutputHelper.hint(
+    'Commit deploy.nevermore.json, then deploy to roll base places forward.'
+  );
 }
 
 /**
@@ -42,31 +143,12 @@ export async function handleVersionUpgradeAsync(
   const configPath = resolveDeployConfigPath(cwd);
   const config = await loadDeployConfigAsync(configPath);
 
-  if (args.target && !config.targets[args.target]) {
-    throw new Error(
-      [
-        `Target "${args.target}" not found in deploy.nevermore.json.`,
-        `Available targets: ${Object.keys(config.targets).join(', ')}`,
-      ].join('\n')
-    );
+  if (args.target) {
+    _requireTarget(config, args.target);
   }
 
   const targetNames = args.target ? [args.target] : Object.keys(config.targets);
-
-  // Collect every basePlace across the selected targets. Each entry keeps a
-  // live reference into the parsed config so we can mutate it in place.
-  const refs: BasePlaceRef[] = [];
-  for (const targetName of targetNames) {
-    for (const place of resolveDeployTargetPlaces(config, targetName)) {
-      if (place.basePlace) {
-        refs.push({
-          targetName,
-          placeLabel: place.name ?? targetName,
-          basePlace: place.basePlace,
-        });
-      }
-    }
-  }
+  const refs = _collectBasePlaceRefs(config, targetNames);
 
   if (refs.length === 0) {
     OutputHelper.warn(
@@ -81,9 +163,9 @@ export async function handleVersionUpgradeAsync(
   // (e.g. integration/prod) commonly point at the same base place.
   const uniquePlaceIds = [...new Set(refs.map((r) => r.basePlace.placeId))];
   OutputHelper.info(
-    `Resolving latest version for ${uniquePlaceIds.length} base place${
-      uniquePlaceIds.length === 1 ? '' : 's'
-    }...`
+    `Resolving latest version for ${uniquePlaceIds.length} base place${_plural(
+      uniquePlaceIds.length
+    )}...`
   );
 
   const apiKey = await getApiKeyAsync(args);
@@ -104,75 +186,126 @@ export async function handleVersionUpgradeAsync(
     })
   );
 
-  const rows: UpgradeRow[] = refs.map((ref) => {
-    const to = latestByPlaceId.get(ref.basePlace.placeId)!;
-    const from = ref.basePlace.version;
-    return { ref, from, to, changed: from !== to };
-  });
+  const changes: PinChange[] = refs.map((ref) => ({
+    ref,
+    from: ref.basePlace.version,
+    to: latestByPlaceId.get(ref.basePlace.placeId)!,
+  }));
 
-  const columns: TableColumn<UpgradeRow>[] = [
-    { header: 'Target', value: (r) => r.ref.targetName },
-    { header: 'Place', value: (r) => r.ref.placeLabel },
-    { header: 'Base place', value: (r) => String(r.ref.basePlace.placeId) },
-    {
-      header: 'Version',
-      value: (r) =>
-        `${r.from != null ? `v${r.from}` : '(latest)'} → v${r.to}${
-          r.changed ? '' : '  (unchanged)'
-        }`,
-    },
+  const columns: TableColumn<PinChange>[] = [
+    { header: 'Target', value: (c) => c.ref.targetName },
+    { header: 'Place', value: (c) => c.ref.placeLabel },
+    { header: 'Base place', value: (c) => String(c.ref.basePlace.placeId) },
+    { header: 'Version', value: (c) => _formatChange(c) },
   ];
 
   console.log('');
-  console.log(formatTable(rows, columns, { indent: '  ' }));
+  console.log(formatTable(changes, columns, { indent: '  ' }));
   console.log('');
 
-  const changedRows = rows.filter((r) => r.changed);
-  if (changedRows.length === 0) {
-    OutputHelper.info(
-      'All base places are already pinned to their latest version.'
+  await _commitPinChangesAsync(configPath, config, changes, args);
+}
+
+/**
+ * `nevermore deploy version promote <from> <to>` — copy the base-place version
+ * pins from one target to another (e.g. promote validated `production-demo`
+ * pins to `production`). Places are matched by their base place id, so the same
+ * source content lines up even when the two targets name their places
+ * differently. Pure config edit — no network. `--dryrun` previews.
+ */
+export async function handleVersionPromoteAsync(
+  args: VersionPromoteArgs
+): Promise<void> {
+  const fromTarget = args.from;
+  const toTarget = args.to;
+  if (!fromTarget || !toTarget) {
+    throw new Error(
+      'Usage: nevermore deploy version copy <from-target> <to-target>'
     );
-    return;
+  }
+  if (fromTarget === toTarget) {
+    throw new Error('The <from> and <to> targets must be different.');
   }
 
-  if (args.dryrun) {
-    OutputHelper.info(
-      `[DRYRUN] Would update ${changedRows.length} pin${
-        changedRows.length === 1 ? '' : 's'
-      } in ${configPath}`
-    );
-    return;
-  }
+  const cwd = process.cwd();
+  const configPath = resolveDeployConfigPath(cwd);
+  const config = await loadDeployConfigAsync(configPath);
 
-  if (!args.yes) {
-    const { confirm } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirm',
-        message: `Update ${changedRows.length} version pin${
-          changedRows.length === 1 ? '' : 's'
-        } in deploy.nevermore.json?`,
-        default: true,
-      },
-    ]);
-    if (!confirm) {
-      OutputHelper.info('Aborted — no changes written.');
-      return;
+  _requireTarget(config, fromTarget);
+  _requireTarget(config, toTarget);
+
+  // Map base place id -> pinned version from the source target. A source with
+  // the same base place pinned to two different versions is inconsistent, so
+  // fail loudly rather than pick one arbitrarily.
+  const versionByPlaceId = new Map<number, number>();
+  for (const ref of _collectBasePlaceRefs(config, [fromTarget])) {
+    const version = ref.basePlace.version;
+    if (version == null) {
+      continue;
     }
+    const existing = versionByPlaceId.get(ref.basePlace.placeId);
+    if (existing != null && existing !== version) {
+      throw new Error(
+        `Target "${fromTarget}" pins base place ${ref.basePlace.placeId} to ` +
+          `two different versions (v${existing} and v${version}). ` +
+          `Run "nevermore deploy version upgrade ${fromTarget}" to make it consistent first.`
+      );
+    }
+    versionByPlaceId.set(ref.basePlace.placeId, version);
   }
 
-  // Mutate in place — every ref.basePlace points into `config`.
-  for (const row of changedRows) {
-    row.ref.basePlace.version = row.to;
+  if (versionByPlaceId.size === 0) {
+    OutputHelper.warn(
+      `Target "${fromTarget}" has no pinned base place versions to copy. ` +
+        `Run "nevermore deploy version upgrade ${fromTarget}" first.`
+    );
+    return;
   }
 
-  await fs.writeFile(configPath, JSON.stringify(config, null, 2) + '\n');
-  OutputHelper.info(
-    `Updated ${changedRows.length} version pin${
-      changedRows.length === 1 ? '' : 's'
-    } in ${configPath}`
-  );
-  OutputHelper.hint(
-    'Commit deploy.nevermore.json, then deploy to roll base places forward.'
-  );
+  const toRefs = _collectBasePlaceRefs(config, [toTarget]);
+  if (toRefs.length === 0) {
+    OutputHelper.warn(`Target "${toTarget}" has no basePlace to copy pins to.`);
+    return;
+  }
+
+  const changes: PinChange[] = [];
+  const unmatched: BasePlaceRef[] = [];
+  for (const ref of toRefs) {
+    const source = versionByPlaceId.get(ref.basePlace.placeId);
+    if (source == null) {
+      unmatched.push(ref);
+      continue;
+    }
+    changes.push({ ref, from: ref.basePlace.version, to: source });
+  }
+
+  const columns: TableColumn<PinChange>[] = [
+    { header: 'Place', value: (c) => c.ref.placeLabel },
+    { header: 'Base place', value: (c) => String(c.ref.basePlace.placeId) },
+    { header: 'Version', value: (c) => _formatChange(c) },
+  ];
+
+  console.log('');
+  OutputHelper.info(`Promoting pins from "${fromTarget}" to "${toTarget}":`);
+  console.log(formatTable(changes, columns, { indent: '  ' }));
+  console.log('');
+
+  if (unmatched.length > 0) {
+    OutputHelper.warn(
+      `${unmatched.length} place${_plural(
+        unmatched.length
+      )} in "${toTarget}" had no matching pin in "${fromTarget}" (left unchanged): ` +
+        unmatched
+          .map((r) => `${r.placeLabel} (${r.basePlace.placeId})`)
+          .join(', ')
+    );
+  }
+
+  await _commitPinChangesAsync(configPath, config, changes, args);
+}
+
+function _formatChange(change: PinChange): string {
+  const from = change.from != null ? `v${change.from}` : '(latest)';
+  const unchanged = change.from === change.to ? '  (unchanged)' : '';
+  return `${from} → v${change.to}${unchanged}`;
 }

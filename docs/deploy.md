@@ -277,6 +277,20 @@ Commit the updated `deploy.nevermore.json`, then deploy as usual. This gives you
 
 Resolving the latest version uses the same `legacy-asset:manage` scope already required for `basePlace` downloads, so no extra credentials are needed.
 
+### Promoting pins between targets
+
+Once you've validated a target — say a `production-demo` universe — you usually want to ship those exact same base-place versions to `production`, not re-pin to whatever is newest. `promote` copies the pins across:
+
+```bash
+# Copy every base place pin from production-demo onto production
+nevermore deploy version promote production-demo production
+
+# Preview without writing
+nevermore deploy version promote production-demo production --dryrun
+```
+
+Places are matched by **base place id**, not by name, so the same source content lines up even when the two targets name their places differently (e.g. a demo `chapter6` and a prod `chapter8` that share one base place). Places in the destination with no matching pin in the source are left untouched and reported. This is a pure edit of `deploy.nevermore.json` — no network calls — so it's safe to run offline and review as a diff.
+
 ## Batch deploys
 
 If you want to deploy every game affected by a code change (for example, on every PR), use `nevermore batch deploy` instead. It scans the pnpm workspace for packages with a matching deploy target, uses `pnpm ls --filter` to figure out which ones changed since `origin/main`, and runs them in parallel.

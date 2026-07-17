@@ -36,7 +36,11 @@ import {
   resolveDeployTargetPlaces,
 } from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
-import { handleVersionUpgradeAsync } from './version-command.js';
+import {
+  handleVersionUpgradeAsync,
+  handleVersionPromoteAsync,
+  type VersionPromoteArgs,
+} from './version-command.js';
 import { selectTargetAsync } from './select-target.js';
 
 const MULTI_PLACE_CONCURRENCY = 10;
@@ -134,6 +138,34 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
               try {
                 await handleVersionUpgradeAsync(
                   upgradeArgs as unknown as DeployArgs
+                );
+              } catch (err) {
+                OutputHelper.error(
+                  err instanceof Error ? err.message : String(err)
+                );
+                process.exit(1);
+              }
+            }
+          )
+          .command(
+            'promote <from> <to>',
+            'Promote base place version pins from one target to another',
+            (promoteYargs) => {
+              return promoteYargs
+                .positional('from', {
+                  describe:
+                    'Target to promote pins from (e.g. production-demo)',
+                  type: 'string',
+                })
+                .positional('to', {
+                  describe: 'Target to promote pins to (e.g. production)',
+                  type: 'string',
+                });
+            },
+            async (promoteArgs) => {
+              try {
+                await handleVersionPromoteAsync(
+                  promoteArgs as unknown as VersionPromoteArgs
                 );
               } catch (err) {
                 OutputHelper.error(

@@ -197,6 +197,8 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--yes` | Skip the confirmation prompt (for scripting/CI). |
 | `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
 
+**`nevermore deploy version promote <from> <to>`** — copies base-place version pins from one target to another (e.g. promote validated `production-demo` pins to `production`). Places are matched by base place id, so content lines up even when the targets name their places differently. Pure config edit — no network. Supports `--dryrun` and `--yes`. See [Promoting pins between targets](deploy.md#promoting-pins-between-targets).
+
 ### `nevermore batch`
 
 Runs `test` or `deploy` across many packages at once, using git change detection so PRs only touch what changed. Scans the pnpm workspace for packages with a matching deploy target. See [Test Infrastructure](testing/testing.md) and [Deploying](deploy.md) for how targets are configured.
