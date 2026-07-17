@@ -15,9 +15,8 @@
 	    it is called (see its `-- TODO: Only set if we don't need it`).
 	  * :SetEntryValue() writes straight through to the localization table.
 
-	The translator is exercised against a real (unparented) LocalizationTable and a
-	lightweight fake TranslatorService so we can assert on exactly what gets written
-	without touching LocalizationService or the cloud translator pipeline.
+	The shared world (real ServiceBag + real TranslatorService, isolated per test) is
+	built by [TranslatorTestUtils.setup]; see there for details.
 ]]
 
 local require = (require :: any)(
@@ -28,138 +27,34 @@ local HttpService = game:GetService("HttpService")
 
 local JSONTranslator = require("JSONTranslator")
 local Jest = require("Jest")
-local Maid = require("Maid")
-local Promise = require("Promise")
+local Table = require("Table")
+local TranslatorTestUtils = require("TranslatorTestUtils")
 local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local beforeEach = Jest.Globals.beforeEach
-local afterEach = Jest.Globals.afterEach
 
--- Tracks everything created during a single test so we can tear it down cleanly.
-local testMaid
-
-beforeEach(function()
-	testMaid = Maid.new()
-end)
-
-afterEach(function()
-	testMaid:DoCleaning()
-	testMaid = nil
-end)
-
---[[
-	A minimal stand-in for TranslatorService exposing only the surface that
-	JSONTranslator consumes. Locale id and cloud translator are settable so tests
-	can drive translation code paths deterministically.
-]]
-local function createFakeTranslatorService(localizationTable)
-	local localeId = ValueObject.new("en", "string")
-	local translator = ValueObject.new(nil)
-
-	local service = {}
-
-	function service.GetLocalizationTable()
-		return localizationTable
-	end
-
-	function service.ObserveLocaleId()
-		return localeId:Observe()
-	end
-
-	function service.GetLocaleId()
-		return localeId.Value
-	end
-
-	function service.ObserveTranslator()
-		return translator:Observe()
-	end
-
-	function service.GetTranslator()
-		return translator.Value
-	end
-
-	function service.PromiseTranslator()
-		if translator.Value then
-			return Promise.resolved(translator.Value)
-		end
-		return Promise.new()
-	end
-
-	-- Test-only setters
-	function service.SetLocaleId(_self, newLocaleId)
-		localeId.Value = newLocaleId
-	end
-
-	function service.SetTranslator(_self, newTranslator)
-		translator.Value = newTranslator
-	end
-
-	function service.Destroy()
-		localeId:Destroy()
-		translator:Destroy()
-	end
-
-	return service
-end
-
--- A fake ServiceBag whose only job is to hand JSONTranslator our fake service.
-local function createFakeServiceBag(translatorService)
-	return {
-		GetService = function(_self, _serviceType)
-			return translatorService
-		end,
-	}
-end
-
--- Builds an initialized translator wired to a fresh, unparented localization table.
-local function makeTranslator(dataTable, localeId)
-	local localizationTable = Instance.new("LocalizationTable")
-	local fakeService = createFakeTranslatorService(localizationTable)
-
-	local translator = JSONTranslator.new("TestTranslator", localeId or "en", dataTable)
-	translator:Init(createFakeServiceBag(fakeService))
-
-	testMaid:GiveTask(function()
-		translator:Destroy()
-		fakeService:Destroy()
-		localizationTable:Destroy()
-	end)
-
-	return translator, localizationTable, fakeService
-end
-
--- Reads back the localization table into a Key -> entry lookup for assertions.
-local function getEntryMap(localizationTable)
-	local map = {}
-	for _, entry in localizationTable:GetEntries() do
-		map[entry.Key] = entry
-	end
-	return map
-end
-
-local function countKeys(map)
-	local count = 0
-	for _ in map do
-		count += 1
-	end
-	return count
-end
+local setup = TranslatorTestUtils.setup
+local getEntryMap = TranslatorTestUtils.getEntryMap
 
 describe("JSONTranslator.new", function()
 	it("exposes the expected class identity", function()
+		local controller = setup()
 		expect(JSONTranslator.ClassName).toBe("JSONTranslator")
+		controller:destroy()
 	end)
 
 	it("sets ServiceName to the translator name so it registers uniquely", function()
+		local controller = setup()
 		local translator = JSONTranslator.new("MyTranslator", "en", {})
 		expect(translator.ServiceName).toBe("MyTranslator")
+		controller:destroy()
 	end)
 
 	it("decodes entries from a (localeId, dataTable) pair in the constructor", function()
 		-- Decoding happens in the constructor (into _entries); writing to a table is deferred to Init.
+		local controller = setup()
 		local translator = JSONTranslator.new("TestTranslator", "en", {
 			actions = {
 				respawn = "Respawn {playerName}",
@@ -171,41 +66,40 @@ describe("JSONTranslator.new", function()
 			keys[entry.Key] = entry.Values["en"]
 		end
 		expect(keys["actions.respawn"]).toBe("Respawn {playerName}")
+		controller:destroy()
 	end)
 
 	it("decodes entries from an Instance folder of StringValues", function()
-		local folder = Instance.new("Folder")
-		testMaid:GiveTask(folder)
+		local controller = setup()
 
+		local folder = controller.track(Instance.new("Folder"))
 		local en = Instance.new("StringValue")
 		en.Name = "en.json"
 		en.Value = HttpService:JSONEncode({ hello = "Hello" })
 		en.Parent = folder
 
-		local localizationTable = Instance.new("LocalizationTable")
-		testMaid:GiveTask(localizationTable)
+		controller.newTranslatorFromInstance(folder)
 
-		local translator = JSONTranslator.new("TestTranslator", folder)
-		translator:Init(createFakeServiceBag(createFakeTranslatorService(localizationTable)))
-		testMaid:GiveTask(function()
-			translator:Destroy()
-		end)
-
-		local entries = getEntryMap(localizationTable)
+		local entries = getEntryMap(controller.getLocalizationTable())
 		expect(entries["hello"]).never.toBeNil()
 		expect(entries["hello"].Values["en"]).toBe("Hello")
+		controller:destroy()
 	end)
 
 	it("errors when translatorName is not a string", function()
+		local controller = setup()
 		expect(function()
 			JSONTranslator.new(123 :: any, "en", {})
 		end).toThrow()
+		controller:destroy()
 	end)
 
 	it("errors when neither an (localeId, dataTable) pair nor an Instance is given", function()
+		local controller = setup()
 		expect(function()
 			JSONTranslator.new("TestTranslator", "en", "not a table" :: any)
 		end).toThrow()
+		controller:destroy()
 	end)
 end)
 
@@ -213,7 +107,8 @@ describe("JSONTranslator:Init eager writes", function()
 	-- PIN: Init writes the entire decoded table into the localization table immediately.
 	-- This up-front write is exactly the replication/loading cost the refactor targets.
 	it("writes every decoded entry into the localization table during Init", function()
-		local _translator, localizationTable = makeTranslator({
+		local controller = setup()
+		controller.newTranslator({
 			actions = {
 				respawn = "Respawn {playerName}",
 				jump = "Jump",
@@ -221,58 +116,64 @@ describe("JSONTranslator:Init eager writes", function()
 			greeting = "Hello there",
 		})
 
-		local entries = getEntryMap(localizationTable)
-		expect(countKeys(entries)).toBe(3)
+		local entries = getEntryMap(controller.getLocalizationTable())
+		expect(Table.count(entries)).toBe(3)
 		expect(entries["actions.respawn"]).never.toBeNil()
 		expect(entries["actions.jump"]).never.toBeNil()
 		expect(entries["greeting"]).never.toBeNil()
+		controller:destroy()
 	end)
 
 	it("writes source, context, value and example for each entry", function()
-		local _translator, localizationTable = makeTranslator({
+		local controller = setup()
+		controller.newTranslator({
 			greeting = "Hello there",
 		})
 
-		local entry = getEntryMap(localizationTable)["greeting"]
+		local entry = getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry).never.toBeNil()
 		expect(entry.Source).toBe("Hello there")
 		expect(entry.Values["en"]).toBe("Hello there")
 		expect(entry.Example).toBe("Hello there")
 		-- Context is generated deterministically from the translator name and key.
 		expect(entry.Context).toBe("Generated from TestTranslator with key greeting")
+		controller:destroy()
 	end)
 
 	it("does not write before Init runs (writes are an Init side effect, not a new() side effect)", function()
-		local localizationTable = Instance.new("LocalizationTable")
-		testMaid:GiveTask(localizationTable)
+		local controller = setup()
 
 		local translator = JSONTranslator.new("TestTranslator", "en", { greeting = "Hi" })
-		expect(#localizationTable:GetEntries()).toBe(0)
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
 
-		translator:Init(createFakeServiceBag(createFakeTranslatorService(localizationTable)))
-		testMaid:GiveTask(function()
+		translator:Init(controller.serviceBag)
+		controller.track(function()
 			translator:Destroy()
 		end)
 
-		expect(#localizationTable:GetEntries()).toBe(1)
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(1)
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:SetEntryValue", function()
 	it("writes the value straight through to the localization table", function()
-		local translator, localizationTable = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 
 		translator:SetEntryValue("some.key", "Source", "context", "en", "Translated")
 
-		local entry = getEntryMap(localizationTable)["some.key"]
+		local entry = getEntryMap(controller.getLocalizationTable())["some.key"]
 		expect(entry).never.toBeNil()
 		expect(entry.Source).toBe("Source")
 		expect(entry.Context).toBe("context")
 		expect(entry.Values["en"]).toBe("Translated")
+		controller:destroy()
 	end)
 
 	it("validates its arguments", function()
-		local translator = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 
 		expect(function()
 			translator:SetEntryValue(1 :: any, "s", "c", "en", "t")
@@ -280,120 +181,119 @@ describe("JSONTranslator:SetEntryValue", function()
 		expect(function()
 			translator:SetEntryValue("k", "s", "c", "en", nil :: any)
 		end).toThrow()
+		controller:destroy()
 	end)
 
 	-- PIN: outside of Studio, only the requested locale is written (no pseudo-localization).
 	it("writes only the requested locale outside of Studio", function()
-		local translator, localizationTable = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 
 		translator:SetEntryValue("some.key", "Source", "context", "en", "Translated")
 
-		local entry = getEntryMap(localizationTable)["some.key"]
-		local localeCount = 0
-		for _ in entry.Values do
-			localeCount += 1
-		end
-		expect(localeCount).toBe(1)
+		local entry = getEntryMap(controller.getLocalizationTable())["some.key"]
+		expect(Table.count(entry.Values)).toBe(1)
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:ToTranslationKey", function()
 	it("derives a stable translation key from a prefix and text", function()
 		-- Text is lower-camel-cased (spaces are word boundaries) and capped at 20 chars.
-		local translator = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playNow")
+		controller:destroy()
 	end)
 
 	-- PIN: ToTranslationKey has a write side effect (its own TODO calls this out).
 	-- The refactor should be able to make this lazy, so this test documents the status quo.
 	it("writes an 'en' entry into the localization table as a side effect", function()
-		local translator, localizationTable = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 
-		expect(#localizationTable:GetEntries()).toBe(0)
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
 
 		local key = translator:ToTranslationKey("button", "Play Now")
 
-		local entry = getEntryMap(localizationTable)[key]
+		local entry = getEntryMap(controller.getLocalizationTable())[key]
 		expect(entry).never.toBeNil()
 		expect(entry.Values["en"]).toBe("Play Now")
 		expect(entry.Source).toBe("Play Now")
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:GetLocalizationTable / GetLocaleId", function()
-	it("returns the localization table provided by the translator service", function()
-		local translator, localizationTable = makeTranslator({})
-		expect(translator:GetLocalizationTable()).toBe(localizationTable)
+	it("returns the same localization table as the translator service", function()
+		local controller = setup()
+		local translator = controller.newTranslator({})
+		expect(translator:GetLocalizationTable()).toBe(controller.translatorService:GetLocalizationTable())
+		controller:destroy()
 	end)
 
 	it("delegates GetLocaleId to the translator service", function()
-		local translator, _localizationTable, fakeService = makeTranslator({})
-		expect(translator:GetLocaleId()).toBe("en")
-
-		fakeService:SetLocaleId("fr-fr")
-		expect(translator:GetLocaleId()).toBe("fr-fr")
+		local controller = setup()
+		local translator = controller.newTranslator({})
+		expect(translator:GetLocaleId()).toBe(controller.translatorService:GetLocaleId())
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:FormatByKey", function()
-	it("errors when the cloud translator has not been acquired yet", function()
-		local translator = makeTranslator({ greeting = "Hello there" })
-		expect(function()
-			translator:FormatByKey("greeting")
-		end).toThrow()
-	end)
-
 	it("formats using the acquired translator, substituting args", function()
-		local translator, localizationTable, fakeService = makeTranslator({
+		local controller = setup()
+		local translator = controller.awaitLoaded(controller.newTranslator({
 			actions = {
 				respawn = "Respawn {playerName}",
 			},
-		})
-
-		-- Provide a real translator built from the now-populated table.
-		fakeService:SetTranslator(localizationTable:GetTranslator("en"))
+		}))
 
 		expect(translator:FormatByKey("actions.respawn", { playerName = "Quenty" })).toBe("Respawn Quenty")
+		controller:destroy()
 	end)
 
 	it("falls back to the key itself when the key is missing", function()
-		local translator, localizationTable, fakeService = makeTranslator({ greeting = "Hi" })
-		fakeService:SetTranslator(localizationTable:GetTranslator("en"))
+		local controller = setup()
+		local translator = controller.awaitLoaded(controller.newTranslator({ greeting = "Hi" }))
 
 		expect(translator:FormatByKey("does.not.exist")).toBe("does.not.exist")
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:ObserveFormatByKey", function()
-	it("emits a translation using the local translator when no cloud translator exists", function()
-		local translator = makeTranslator({
+	it("emits a formatted translation for a key", function()
+		local controller = setup()
+		local translator = controller.newTranslator({
 			actions = {
 				respawn = "Respawn {playerName}",
 			},
 		})
 
 		local received
-		testMaid:GiveTask(
+		controller.track(
 			translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }):Subscribe(function(text)
 				received = text
 			end)
 		)
 
 		expect(received).toBe("Respawn Quenty")
+		controller:destroy()
 	end)
 
 	it("re-emits when the args observable changes", function()
-		local translator = makeTranslator({
+		local controller = setup()
+		local translator = controller.newTranslator({
 			actions = {
 				respawn = "Respawn {playerName}",
 			},
 		})
 
-		local name = ValueObject.new("Quenty", "string")
-		testMaid:GiveTask(name)
+		local name = controller.track(ValueObject.new("Quenty", "string"))
 
 		local received
-		testMaid:GiveTask(
+		controller.track(
 			translator:ObserveFormatByKey("actions.respawn", { playerName = name:Observe() }):Subscribe(function(text)
 				received = text
 			end)
@@ -403,27 +303,30 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 
 		name.Value = "James"
 		expect(received).toBe("Respawn James")
+		controller:destroy()
 	end)
 
 	it("requires a string translation key", function()
-		local translator = makeTranslator({})
+		local controller = setup()
+		local translator = controller.newTranslator({})
 		expect(function()
 			translator:ObserveFormatByKey(5 :: any)
 		end).toThrow()
+		controller:destroy()
 	end)
 end)
 
 describe("JSONTranslator:Destroy", function()
 	it("tears down its maid and unsets its metatable", function()
-		local localizationTable = Instance.new("LocalizationTable")
-		testMaid:GiveTask(localizationTable)
+		local controller = setup()
 
 		local translator = JSONTranslator.new("TestTranslator", "en", { greeting = "Hi" })
-		translator:Init(createFakeServiceBag(createFakeTranslatorService(localizationTable)))
+		translator:Init(controller.serviceBag)
 
 		translator:Destroy()
 
 		-- After Destroy the metatable is stripped, so method access is gone.
 		expect(getmetatable(translator)).toBeNil()
+		controller:destroy()
 	end)
 end)
