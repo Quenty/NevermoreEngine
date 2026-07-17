@@ -26,8 +26,11 @@ local require = (require :: any)(
 local LocalizationService = game:GetService("LocalizationService")
 
 local Jest = require("Jest")
+local Table = require("Table")
 local TranslatorService = require("TranslatorService")
 local TranslatorTestUtils = require("TranslatorTestUtils")
+
+local getEntryMap = TranslatorTestUtils.getEntryMap
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -149,7 +152,7 @@ describe("TranslatorService entry writes (deferred)", function()
 
 		controller.awaitEntriesWritten()
 
-		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		local entries = getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"]).never.toBeNil()
 		expect(entries["k.two"]).never.toBeNil()
 		controller:destroy()
@@ -191,7 +194,7 @@ describe("TranslatorService localization write cost", function()
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
 		-- The entries still land correctly.
-		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		local entries = getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.one"].Example).toBe("One")
 		expect(entries["k.two"].Values["en"]).toBe("Two")
@@ -211,9 +214,89 @@ describe("TranslatorService localization write cost", function()
 		controller.awaitEntriesWritten()
 
 		expect(service:GetLocalizationWriteCount()).toBe(2)
-		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		local entries = getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.two"].Values["en"]).toBe("Two")
+		controller:destroy()
+	end)
+
+	it("does not write when a queued entry already matches the table", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		service:SetEntryExample("k.one", "One", "c1", "One")
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+
+		-- Re-queue the identical entry: no net change, so no write and no invalidation.
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		service:SetEntryExample("k.one", "One", "c1", "One")
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+		controller:destroy()
+	end)
+
+	it("writes when a queued entry changes an existing value", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+
+		-- A genuinely different value must still write.
+		service:SetEntryValue("k.one", "One", "c1", "en", "Uno")
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationWriteCount()).toBe(2)
+		expect(getEntryMap(service:GetLocalizationTable())["k.one"].Values["en"]).toBe("Uno")
+		controller:destroy()
+	end)
+end)
+
+describe("TranslatorService entry merging", function()
+	-- The common package-driven case: several translators register on one ServiceBag and
+	-- initialize together. Their entries must all land, merged, in a single write.
+	it("coalesces three translators initializing together into one write with no drops", function()
+		local controller = setup()
+
+		local service = controller.newPackageServiceBag({
+			{ name = "AlphaTranslator", data = { alpha = { one = "A1", two = "A2" } } },
+			{ name = "BetaTranslator", data = { beta = "B" } },
+			{ name = "GammaTranslator", data = { gamma = { deep = "G" } } },
+		})
+
+		controller.awaitEntriesWritten(service)
+
+		-- All three translators' entries flushed together as a single SetEntries.
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+
+		local entries = getEntryMap(service:GetLocalizationTable())
+		expect(Table.count(entries)).toBe(4)
+		expect(entries["alpha.one"].Values["en"]).toBe("A1")
+		expect(entries["alpha.two"].Values["en"]).toBe("A2")
+		expect(entries["beta"].Values["en"]).toBe("B")
+		expect(entries["gamma.deep"].Values["en"]).toBe("G")
+		controller:destroy()
+	end)
+
+	it("preserves entries written directly to the table by an external writer", function()
+		local controller = setup()
+		local service = controller.translatorService
+		local localizationTable = service:GetLocalizationTable()
+
+		-- External writer mutates the table directly, not through the service.
+		localizationTable:SetEntryValue("external.key", "External", "extctx", "en", "External")
+
+		-- Internal writer goes through the service and triggers a merged flush.
+		service:SetEntryValue("internal.key", "Internal", "intctx", "en", "Internal")
+		controller.awaitEntriesWritten()
+
+		local entries = getEntryMap(localizationTable)
+		-- The external entry survives the SetEntries merge rather than being clobbered.
+		expect(entries["external.key"].Values["en"]).toBe("External")
+		expect(entries["internal.key"].Values["en"]).toBe("Internal")
+		expect(service:GetLocalizationWriteCount()).toBe(1)
 		controller:destroy()
 	end)
 end)

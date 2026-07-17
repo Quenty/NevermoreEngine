@@ -245,6 +245,7 @@ function TranslatorService._applyPendingEntries(self: TranslatorService, pending
 		existingById[id] = entry
 	end
 
+	local changed = false
 	for id, delta in pendingEntries do
 		local entry = existingById[id]
 		if not entry then
@@ -257,14 +258,26 @@ function TranslatorService._applyPendingEntries(self: TranslatorService, pending
 			}
 			existingById[id] = entry
 			table.insert(entries, entry)
+			changed = true
 		end
 
-		if delta.Example ~= nil then
+		if delta.Example ~= nil and entry.Example ~= delta.Example then
 			entry.Example = delta.Example
+			changed = true
 		end
 		for localeId, text in delta.Values do
-			entry.Values[localeId] = text
+			if entry.Values[localeId] ~= text then
+				entry.Values[localeId] = text
+				changed = true
+			end
 		end
+	end
+
+	-- If every queued write already matched the table there is nothing to do. Skipping the
+	-- SetEntries call avoids invalidating every AutoLocalize entry for no reason (there is
+	-- no partial-update API that invalidates once, so a redundant SetEntries is pure cost).
+	if not changed then
+		return
 	end
 
 	localizationTable:SetEntries(entries)

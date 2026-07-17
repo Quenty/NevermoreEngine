@@ -69,6 +69,19 @@ function TranslatorTestUtils.setup()
 
 	local translatorService, serviceBag = newTranslatorService()
 
+	-- Builds a fresh ServiceBag and registers translators the package-driven way
+	-- (serviceBag:GetService(translator) before Init/Start, exactly how games wire up
+	-- their JSONTranslators), then returns that bag's shared TranslatorService.
+	local function newPackageServiceBag(defs)
+		local bag = maid:Add(ServiceBag.new())
+		for _, def in defs do
+			bag:GetService(JSONTranslator.new(def.name, def.localeId or "en", def.data))
+		end
+		bag:Init()
+		bag:Start()
+		return bag:GetService(TranslatorService)
+	end
+
 	-- Creates a JSONTranslator initialized against the real service bag. The translator
 	-- is initialized directly (like a service consuming it during its own Init) rather
 	-- than registered on the bag, which is already started.
@@ -108,9 +121,9 @@ function TranslatorTestUtils.setup()
 		return translator
 	end
 
-	-- Waits for the deferred localization writes to flush to the table.
-	local function awaitEntriesWritten()
-		local ok = translatorService:PromiseEntriesWritten():Yield()
+	-- Waits for the given (or default) service's deferred localization writes to flush.
+	local function awaitEntriesWritten(service)
+		local ok = (service or translatorService):PromiseEntriesWritten():Yield()
 		assert(ok, "Entries were never written")
 	end
 
@@ -127,6 +140,7 @@ function TranslatorTestUtils.setup()
 		end,
 		newTranslator = newTranslator,
 		newTranslatorFromInstance = newTranslatorFromInstance,
+		newPackageServiceBag = newPackageServiceBag,
 		awaitLoaded = awaitLoaded,
 		awaitTranslator = awaitTranslator,
 		awaitEntriesWritten = awaitEntriesWritten,
