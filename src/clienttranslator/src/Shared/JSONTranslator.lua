@@ -19,13 +19,13 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
+local InstanceLocaleLoader = require("InstanceLocaleLoader")
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 local Maid = require("Maid")
 local NumberLocalizationUtils = require("NumberLocalizationUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local PseudoLocalize = require("PseudoLocalize")
-local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
@@ -48,11 +48,7 @@ export type JSONTranslator = typeof(setmetatable(
 		_tieRealmService: TieRealmService.TieRealmService,
 		_translatorName: string,
 		_entries: { any }?,
-		_sourceInstance: Instance?,
-		_sourceLocaleId: string,
-		_lookupTable: { [string]: any },
-		_loadedLocales: { [string]: true },
-		_availableLocales: { [string]: true },
+		_localeLoader: InstanceLocaleLoader.InstanceLocaleLoader?,
 		_localizationTable: any,
 		_localTranslator: ValueObject.ValueObject<any>,
 		_sourceTranslator: ValueObject.ValueObject<any>,
@@ -98,15 +94,13 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	self._translatorName = translatorName
 	self.ServiceName = translatorName
 
-	self._sourceLocaleId = "en"
-
 	if type(localeId) == "string" and type(dataTable) == "table" then
 		-- Table-driven translators are always loaded eagerly (the data is already in memory).
 		self._entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
 	elseif typeof(localeId) == "Instance" then
-		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) are
-		-- decoded lazily on the client -- see Init -- so we only keep the reference here.
-		self._sourceInstance = localeId
+		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) defer
+		-- decoding to a loader; see Init for how locales are loaded.
+		self._localeLoader = InstanceLocaleLoader.new(self._translatorName, "en", localeId)
 	else
 		error("Must pass a localeId and dataTable")
 	end
@@ -122,16 +116,13 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 	self._maid = Maid.new()
 	self._localTranslator = self._maid:Add(ValueObject.new(nil))
 	self._sourceTranslator = self._maid:Add(ValueObject.new(nil))
-	self._lookupTable = {}
-	self._loadedLocales = {}
-	self._availableLocales = {}
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
 	if self._entries then
 		-- Table case: queue everything up front.
 		self:_queueEntries(self._entries)
-	elseif self._sourceInstance then
+	elseif self._localeLoader then
 		self:_initFromInstance()
 	end
 
@@ -158,53 +149,22 @@ function JSONTranslator._queueEntries(self: JSONTranslator, entries)
 end
 
 function JSONTranslator._initFromInstance(self: JSONTranslator)
-	local folder = assert(self._sourceInstance, "No sourceInstance")
+	local localeLoader = assert(self._localeLoader, "No localeLoader")
+	local writer = self._translatorService :: any
 
 	if self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT then
 		-- Off the client there is no player locale to key off, so load every locale eagerly.
-		self:_queueEntries(
-			LocalizationEntryParserUtils.decodeFromInstance(self._translatorName, self._sourceLocaleId, folder)
-		)
+		localeLoader:LoadAllLocales(writer)
 		return
 	end
 
-	-- On the client, defer decoding each locale's JSON until that locale is actually the
-	-- target. The source locale is always loaded (it is the fallback for every key).
-	self._availableLocales = LocalizationEntryParserUtils.getAvailableLocales(folder)
-	self:_loadLocale(self._sourceLocaleId)
+	-- On the client, the loader defers decoding each locale's JSON until that locale is
+	-- the target. The source locale is always loaded (it is the fallback for every key).
+	localeLoader:LoadSourceLocale(writer)
 
 	self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
-		self:_loadLocale(localeId)
+		localeLoader:LoadLocale(localeId, writer)
 	end))
-end
-
--- Decodes and queues a single locale's entries the first time it is needed, resolving the
--- requested locale to the closest available file (e.g. "fr-fr" -> "fr"). Idempotent: a
--- locale already loaded is never decoded or written again.
-function JSONTranslator._loadLocale(self: JSONTranslator, localeId: string)
-	local resolved = ResolveLocaleUtils.resolveClosestKey(localeId, self._availableLocales)
-	if not resolved or self._loadedLocales[resolved] then
-		return
-	end
-	self._loadedLocales[resolved] = true
-
-	local entries = LocalizationEntryParserUtils.decodeLocaleFromInstance(
-		self._translatorName,
-		self._sourceLocaleId,
-		resolved,
-		assert(self._sourceInstance, "No sourceInstance"),
-		self._lookupTable
-	)
-
-	for _, item in entries do
-		local text = item.Values[resolved]
-		if text ~= nil then
-			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, resolved, text)
-		end
-		if resolved == self._sourceLocaleId then
-			self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
-		end
-	end
 end
 
 function JSONTranslator.ObserveNumber(self: JSONTranslator, number: number): Observable.Observable<string>
