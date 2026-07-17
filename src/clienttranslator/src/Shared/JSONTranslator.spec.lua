@@ -8,12 +8,15 @@
 	(deferring/centralizing those writes to avoid replicating megabytes of
 	localization data) can be validated against a known baseline.
 
-	Notable behaviors pinned here that the refactor is expected to change:
-	  * :Init() eagerly writes *every* entry (value + example) into the
-	    localization table up-front. This is the write amplification we want to defer.
-	  * :ToTranslationKey() has a side effect: it writes an "en" entry every time
-	    it is called (see its `-- TODO: Only set if we don't need it`).
-	  * :SetEntryValue() writes straight through to the localization table.
+	Writes into the localization table are deferred: JSONTranslator queues them with
+	the centralized TranslatorService, which batches and flushes them at the end of
+	the frame (via task.defer). So:
+	  * :Init() does NOT write synchronously; entries appear after the deferred flush.
+	  * :SetEntryValue() and :ToTranslationKey() queue writes the same way.
+	  * Read paths (ObserveFormatByKey / PromiseFormatByKey / FormatByKey) wait for
+	    the flush so a key is never read before it has been written.
+
+	Tests drive the flush explicitly via controller.awaitEntriesWritten().
 
 	The shared world (real ServiceBag + real TranslatorService, isolated per test) is
 	built by [TranslatorTestUtils.setup]; see there for details.
@@ -79,6 +82,7 @@ describe("JSONTranslator.new", function()
 		en.Parent = folder
 
 		controller.newTranslatorFromInstance(folder)
+		controller.awaitEntriesWritten()
 
 		local entries = getEntryMap(controller.getLocalizationTable())
 		expect(entries["hello"]).never.toBeNil()
@@ -103,10 +107,29 @@ describe("JSONTranslator.new", function()
 	end)
 end)
 
-describe("JSONTranslator:Init eager writes", function()
-	-- PIN: Init writes the entire decoded table into the localization table immediately.
-	-- This up-front write is exactly the replication/loading cost the refactor targets.
-	it("writes every decoded entry into the localization table during Init", function()
+describe("JSONTranslator:Init deferred writes", function()
+	-- PIN: entries are queued, not written synchronously. new() writes nothing, Init
+	-- writes nothing synchronously, and the entries only land after the deferred flush.
+	it("does not write during new() or synchronously during Init, then flushes on defer", function()
+		local controller = setup()
+
+		local translator = JSONTranslator.new("TestTranslator", "en", { greeting = "Hi" })
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
+
+		translator:Init(controller.serviceBag)
+		controller.track(function()
+			translator:Destroy()
+		end)
+
+		-- Still nothing: the write is deferred to the end of the frame.
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
+
+		controller.awaitEntriesWritten()
+		expect(#controller.getLocalizationTable():GetEntries()).toBe(1)
+		controller:destroy()
+	end)
+
+	it("flushes every decoded entry after the deferred flush", function()
 		local controller = setup()
 		controller.newTranslator({
 			actions = {
@@ -115,6 +138,8 @@ describe("JSONTranslator:Init eager writes", function()
 			},
 			greeting = "Hello there",
 		})
+
+		controller.awaitEntriesWritten()
 
 		local entries = getEntryMap(controller.getLocalizationTable())
 		expect(Table.count(entries)).toBe(3)
@@ -130,6 +155,8 @@ describe("JSONTranslator:Init eager writes", function()
 			greeting = "Hello there",
 		})
 
+		controller.awaitEntriesWritten()
+
 		local entry = getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry).never.toBeNil()
 		expect(entry.Source).toBe("Hello there")
@@ -139,29 +166,19 @@ describe("JSONTranslator:Init eager writes", function()
 		expect(entry.Context).toBe("Generated from TestTranslator with key greeting")
 		controller:destroy()
 	end)
-
-	it("does not write before Init runs (writes are an Init side effect, not a new() side effect)", function()
-		local controller = setup()
-
-		local translator = JSONTranslator.new("TestTranslator", "en", { greeting = "Hi" })
-		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
-
-		translator:Init(controller.serviceBag)
-		controller.track(function()
-			translator:Destroy()
-		end)
-
-		expect(#controller.getLocalizationTable():GetEntries()).toBe(1)
-		controller:destroy()
-	end)
 end)
 
 describe("JSONTranslator:SetEntryValue", function()
-	it("writes the value straight through to the localization table", function()
+	it("defers the write, then applies it on the flush", function()
 		local controller = setup()
 		local translator = controller.newTranslator({})
 
 		translator:SetEntryValue("some.key", "Source", "context", "en", "Translated")
+
+		-- Deferred: nothing in the table yet.
+		expect(getEntryMap(controller.getLocalizationTable())["some.key"]).toBeNil()
+
+		controller.awaitEntriesWritten()
 
 		local entry = getEntryMap(controller.getLocalizationTable())["some.key"]
 		expect(entry).never.toBeNil()
@@ -190,6 +207,7 @@ describe("JSONTranslator:SetEntryValue", function()
 		local translator = controller.newTranslator({})
 
 		translator:SetEntryValue("some.key", "Source", "context", "en", "Translated")
+		controller.awaitEntriesWritten()
 
 		local entry = getEntryMap(controller.getLocalizationTable())["some.key"]
 		expect(Table.count(entry.Values)).toBe(1)
@@ -206,15 +224,17 @@ describe("JSONTranslator:ToTranslationKey", function()
 		controller:destroy()
 	end)
 
-	-- PIN: ToTranslationKey has a write side effect (its own TODO calls this out).
-	-- The refactor should be able to make this lazy, so this test documents the status quo.
-	it("writes an 'en' entry into the localization table as a side effect", function()
+	-- ToTranslationKey queues an "en" entry as a side effect; like other writes it is deferred.
+	it("queues an 'en' entry as a side effect, written after the flush", function()
 		local controller = setup()
 		local translator = controller.newTranslator({})
 
+		local key = translator:ToTranslationKey("button", "Play Now")
+
+		-- Deferred: nothing written yet.
 		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
 
-		local key = translator:ToTranslationKey("button", "Play Now")
+		controller.awaitEntriesWritten()
 
 		local entry = getEntryMap(controller.getLocalizationTable())[key]
 		expect(entry).never.toBeNil()
@@ -263,13 +283,39 @@ describe("JSONTranslator:FormatByKey", function()
 end)
 
 describe("JSONTranslator:ObserveFormatByKey", function()
-	it("emits a formatted translation for a key", function()
+	-- The key read-before-write guarantee: with entry writes still pending, the
+	-- observable does not emit until the deferred flush has landed the entries.
+	it("does not emit until the deferred entry writes have flushed", function()
 		local controller = setup()
 		local translator = controller.newTranslator({
 			actions = {
 				respawn = "Respawn {playerName}",
 			},
 		})
+
+		local received
+		controller.track(
+			translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }):Subscribe(function(text)
+				received = text
+			end)
+		)
+
+		-- Writes are still pending, so nothing has been emitted yet.
+		expect(received).toBeNil()
+
+		controller.awaitEntriesWritten()
+		expect(received).toBe("Respawn Quenty")
+		controller:destroy()
+	end)
+
+	it("emits synchronously once entries are written", function()
+		local controller = setup()
+		local translator = controller.newTranslator({
+			actions = {
+				respawn = "Respawn {playerName}",
+			},
+		})
+		controller.awaitEntriesWritten()
 
 		local received
 		controller.track(
@@ -289,6 +335,7 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 				respawn = "Respawn {playerName}",
 			},
 		})
+		controller.awaitEntriesWritten()
 
 		local name = controller.track(ValueObject.new("Quenty", "string"))
 

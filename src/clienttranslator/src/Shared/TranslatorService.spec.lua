@@ -114,3 +114,57 @@ describe("TranslatorService:GetTranslator / PromiseTranslator", function()
 		controller:destroy()
 	end)
 end)
+
+describe("TranslatorService entry writes (deferred)", function()
+	it("resolves PromiseEntriesWritten immediately when nothing is pending", function()
+		local controller = setup()
+		expect(controller.translatorService:PromiseEntriesWritten():IsFulfilled()).toBe(true)
+		controller:destroy()
+	end)
+
+	it("defers a SetEntryValue write until the flush", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
+
+		-- Pending: not yet applied to the table.
+		expect(#service:GetLocalizationTable():GetEntries()).toBe(0)
+		expect(service:PromiseEntriesWritten():IsPending()).toBe(true)
+
+		controller.awaitEntriesWritten()
+		expect(#service:GetLocalizationTable():GetEntries()).toBe(1)
+		controller:destroy()
+	end)
+
+	it("batches multiple writes into a single flush", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx1", "en", "One")
+		service:SetEntryValue("k.two", "Two", "ctx2", "en", "Two")
+		service:SetEntryExample("k.one", "One", "ctx1", "One")
+
+		expect(#service:GetLocalizationTable():GetEntries()).toBe(0)
+
+		controller.awaitEntriesWritten()
+
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		expect(entries["k.one"]).never.toBeNil()
+		expect(entries["k.two"]).never.toBeNil()
+		controller:destroy()
+	end)
+
+	it("FlushEntries applies the pending writes synchronously", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		controller.flushEntries()
+
+		-- No yield needed; the entry is present immediately after the synchronous flush.
+		expect(#service:GetLocalizationTable():GetEntries()).toBe(1)
+		expect(service:PromiseEntriesWritten():IsFulfilled()).toBe(true)
+		controller:destroy()
+	end)
+end)

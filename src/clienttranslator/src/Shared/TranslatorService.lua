@@ -33,6 +33,9 @@ export type TranslatorService = typeof(setmetatable(
 		_localeIdValue: ValueObject.ValueObject<string>?,
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
+		_pendingWrites: { (localizationTable: LocalizationTable) -> () },
+		_flushScheduled: boolean,
+		_pendingFlushPromise: Promise.Promise<()>?,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
@@ -41,6 +44,9 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+
+	self._pendingWrites = {}
+	self._flushScheduled = false
 
 	self._translator = self._maid:Add(ValueObject.new(nil))
 	self._translator:Mount(self:_observeTranslatorImpl())
@@ -69,6 +75,120 @@ function TranslatorService._getLocalizationTableName(_self: TranslatorService): 
 		return "GeneratedJSONTable_Server"
 	else
 		return "GeneratedJSONTable_Client"
+	end
+end
+
+--[=[
+	Queues a localization table entry value write. Writes are batched and flushed
+	together at the end of the frame (via `task.defer`) instead of being applied
+	synchronously, so a burst of translators loading does not each pay the cost of
+	mutating (and re-replicating) the shared localization table in the load path.
+
+	Await [TranslatorService.PromiseEntriesWritten] before reading a translation to
+	guarantee the pending writes have landed.
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param localeId string
+	@param text string
+]=]
+function TranslatorService.SetEntryValue(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	localeId: string,
+	text: string
+)
+	table.insert(self._pendingWrites, function(localizationTable)
+		localizationTable:SetEntryValue(translationKey, source, context, localeId, text)
+	end)
+	self:_scheduleFlush()
+end
+
+--[=[
+	Queues a localization table entry example write. See [TranslatorService.SetEntryValue].
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param example string
+]=]
+function TranslatorService.SetEntryExample(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	example: string
+)
+	table.insert(self._pendingWrites, function(localizationTable)
+		localizationTable:SetEntryExample(translationKey, source, context, example)
+	end)
+	self:_scheduleFlush()
+end
+
+--[=[
+	Returns a promise that resolves once all currently-queued localization writes
+	have been flushed to the table. Resolves immediately if nothing is pending.
+
+	Read paths should await this so translation never reads before the writes land.
+
+	@return Promise
+]=]
+function TranslatorService.PromiseEntriesWritten(self: TranslatorService): Promise.Promise<()>
+	if not self._flushScheduled then
+		return Promise.resolved()
+	end
+
+	return assert(self._pendingFlushPromise, "Flush scheduled without a pending promise")
+end
+
+--[=[
+	Flushes any pending localization writes synchronously, for callers that need the
+	table updated immediately rather than at the end of the frame.
+]=]
+function TranslatorService.FlushEntries(self: TranslatorService)
+	if self._flushScheduled then
+		self:_flushWrites()
+	end
+end
+
+function TranslatorService._scheduleFlush(self: TranslatorService)
+	if self._flushScheduled then
+		return
+	end
+
+	self._flushScheduled = true
+	self._pendingFlushPromise = Promise.new()
+
+	-- Grouped to the end of the frame. Destroy sets `_flushScheduled = false`, so a
+	-- pending flush no-ops (below) if the service is torn down before this runs, rather
+	-- than recreating the table.
+	task.defer(function()
+		self:_flushWrites()
+	end)
+end
+
+function TranslatorService._flushWrites(self: TranslatorService)
+	if not self._flushScheduled then
+		return
+	end
+
+	self._flushScheduled = false
+
+	local writes = self._pendingWrites
+	self._pendingWrites = {}
+
+	local localizationTable = self:GetLocalizationTable()
+	for _, write in writes do
+		write(localizationTable)
+	end
+
+	local promise = self._pendingFlushPromise
+	self._pendingFlushPromise = nil
+	if promise then
+		promise:Resolve()
 	end
 end
 
@@ -232,6 +352,8 @@ function TranslatorService._observeLoadedPlayer(self: TranslatorService): Observ
 end
 
 function TranslatorService.Destroy(self: TranslatorService)
+	-- Ensures a still-pending deferred flush no-ops instead of recreating the table.
+	self._flushScheduled = false
 	self._maid:DoCleaning()
 end
 

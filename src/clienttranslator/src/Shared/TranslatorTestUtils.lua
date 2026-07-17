@@ -108,6 +108,17 @@ function TranslatorTestUtils.setup()
 		return translator
 	end
 
+	-- Waits for the deferred localization writes to flush to the table.
+	local function awaitEntriesWritten()
+		local ok = translatorService:PromiseEntriesWritten():Yield()
+		assert(ok, "Entries were never written")
+	end
+
+	-- Flushes the deferred localization writes synchronously.
+	local function flushEntries()
+		translatorService:FlushEntries()
+	end
+
 	return {
 		serviceBag = serviceBag,
 		translatorService = translatorService,
@@ -118,6 +129,8 @@ function TranslatorTestUtils.setup()
 		newTranslatorFromInstance = newTranslatorFromInstance,
 		awaitLoaded = awaitLoaded,
 		awaitTranslator = awaitTranslator,
+		awaitEntriesWritten = awaitEntriesWritten,
+		flushEntries = flushEntries,
 		getLocalizationTable = function()
 			return translatorService:GetLocalizationTable()
 		end,

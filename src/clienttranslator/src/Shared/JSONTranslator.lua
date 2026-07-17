@@ -112,11 +112,14 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
+	-- Queue the entries with the centralized service, which batches the writes and
+	-- flushes them at the end of the frame instead of mutating (and re-replicating)
+	-- the shared table synchronously in the load path.
 	for _, item in self._entries do
 		for localeId, text in item.Values do
-			self._localizationTable:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
+			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
 		end
-		self._localizationTable:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+		self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
 	end
 
 	-- TODO: Maybe don't hold these unless needed
@@ -178,7 +181,7 @@ function JSONTranslator.ObserveFormatByKey(
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	return Rx.combineLatest({
+	local translationObservable = Rx.combineLatest({
 		cloudTranslator = self:ObserveTranslator(),
 		translationKey = translationKey,
 		translationArgs = self:_observeArgs(translationArgs),
@@ -223,6 +226,14 @@ function JSONTranslator.ObserveFormatByKey(
 				end) :: any,
 			})
 		end) :: any,
+	})
+
+	-- Wait for the deferred entry writes to land before translating, so we never read a
+	-- key before it has been written.
+	return Rx.fromPromise(self._translatorService:PromiseEntriesWritten()):Pipe({
+		Rx.switchMap(function(): any
+			return translationObservable
+		end) :: any,
 	}) :: any
 end
 
@@ -242,10 +253,16 @@ function JSONTranslator.PromiseFormatByKey(self: JSONTranslator, translationKey:
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	-- Always waits for full translator to be loaded since we only get one shot
-	return self:PromiseTranslator():Then(function(translator)
-		return self:_doTranslation(translator, translationKey, args)
-	end)
+	-- Wait for the deferred entry writes to land, then for the translator, so we never
+	-- read a key before it has been written.
+	return self._translatorService
+		:PromiseEntriesWritten()
+		:Then(function()
+			return self:PromiseTranslator()
+		end)
+		:Then(function(translator)
+			return self:_doTranslation(translator, translationKey, args)
+		end)
 end
 
 --[=[
@@ -299,10 +316,10 @@ function JSONTranslator.SetEntryValue(
 	assert(type(localeId) == "string", "Bad localeId")
 	assert(type(text) == "string", "Bad text")
 
-	self._localizationTable:SetEntryValue(translationKey, source, context, localeId, text or source)
+	self._translatorService:SetEntryValue(translationKey, source, context, localeId, text or source)
 
 	if RunService:IsStudio() then
-		self._localizationTable:SetEntryValue(
+		self._translatorService:SetEntryValue(
 			translationKey,
 			source,
 			context,
@@ -393,6 +410,9 @@ end
 function JSONTranslator.FormatByKey(self: JSONTranslator, translationKey: string, args): string
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
+
+	-- Synchronous read: force any deferred writes to land before we read the table.
+	self._translatorService:FlushEntries()
 
 	local translator = self._translatorService:GetTranslator()
 	if not translator then
