@@ -25,9 +25,12 @@ local NumberLocalizationUtils = require("NumberLocalizationUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local PseudoLocalize = require("PseudoLocalize")
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 local TranslationKeyUtils = require("TranslationKeyUtils")
 local TranslatorService = require("TranslatorService")
 local ValueObject = require("ValueObject")
@@ -42,8 +45,14 @@ export type JSONTranslator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
 		_translatorService: TranslatorService.TranslatorService,
+		_tieRealmService: TieRealmService.TieRealmService,
 		_translatorName: string,
-		_entries: { [string]: any },
+		_entries: { any }?,
+		_sourceInstance: Instance?,
+		_sourceLocaleId: string,
+		_lookupTable: { [string]: any },
+		_loadedLocales: { [string]: true },
+		_availableLocales: { [string]: true },
 		_localizationTable: any,
 		_localTranslator: ValueObject.ValueObject<any>,
 		_sourceTranslator: ValueObject.ValueObject<any>,
@@ -89,12 +98,15 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	self._translatorName = translatorName
 	self.ServiceName = translatorName
 
+	self._sourceLocaleId = "en"
+
 	if type(localeId) == "string" and type(dataTable) == "table" then
+		-- Table-driven translators are always loaded eagerly (the data is already in memory).
 		self._entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
 	elseif typeof(localeId) == "Instance" then
-		local parent = localeId
-		local sourceLocaleId = "en"
-		self._entries = LocalizationEntryParserUtils.decodeFromInstance(self._translatorName, sourceLocaleId, parent)
+		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) are
+		-- decoded lazily on the client -- see Init -- so we only keep the reference here.
+		self._sourceInstance = localeId
 	else
 		error("Must pass a localeId and dataTable")
 	end
@@ -105,21 +117,22 @@ end
 function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._translatorService = self._serviceBag:GetService(TranslatorService) :: any
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._maid = Maid.new()
 	self._localTranslator = self._maid:Add(ValueObject.new(nil))
 	self._sourceTranslator = self._maid:Add(ValueObject.new(nil))
+	self._lookupTable = {}
+	self._loadedLocales = {}
+	self._availableLocales = {}
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
-	-- Queue the entries with the centralized service, which batches the writes and
-	-- flushes them at the end of the frame instead of mutating (and re-replicating)
-	-- the shared table synchronously in the load path.
-	for _, item in self._entries do
-		for localeId, text in item.Values do
-			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
-		end
-		self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+	if self._entries then
+		-- Table case: queue everything up front.
+		self:_queueEntries(self._entries)
+	elseif self._sourceInstance then
+		self:_initFromInstance()
 	end
 
 	-- TODO: Maybe don't hold these unless needed
@@ -131,6 +144,67 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 			self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
 		end)
 	)
+end
+
+-- Queues a decoded entry list with the centralized service, which batches the writes and
+-- flushes them at the end of the frame instead of mutating the shared table synchronously.
+function JSONTranslator._queueEntries(self: JSONTranslator, entries)
+	for _, item in entries do
+		for localeId, text in item.Values do
+			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
+		end
+		self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+	end
+end
+
+function JSONTranslator._initFromInstance(self: JSONTranslator)
+	local folder = assert(self._sourceInstance, "No sourceInstance")
+
+	if self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT then
+		-- Off the client there is no player locale to key off, so load every locale eagerly.
+		self:_queueEntries(
+			LocalizationEntryParserUtils.decodeFromInstance(self._translatorName, self._sourceLocaleId, folder)
+		)
+		return
+	end
+
+	-- On the client, defer decoding each locale's JSON until that locale is actually the
+	-- target. The source locale is always loaded (it is the fallback for every key).
+	self._availableLocales = LocalizationEntryParserUtils.getAvailableLocales(folder)
+	self:_loadLocale(self._sourceLocaleId)
+
+	self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
+		self:_loadLocale(localeId)
+	end))
+end
+
+-- Decodes and queues a single locale's entries the first time it is needed, resolving the
+-- requested locale to the closest available file (e.g. "fr-fr" -> "fr"). Idempotent: a
+-- locale already loaded is never decoded or written again.
+function JSONTranslator._loadLocale(self: JSONTranslator, localeId: string)
+	local resolved = ResolveLocaleUtils.resolveClosestKey(localeId, self._availableLocales)
+	if not resolved or self._loadedLocales[resolved] then
+		return
+	end
+	self._loadedLocales[resolved] = true
+
+	local entries = LocalizationEntryParserUtils.decodeLocaleFromInstance(
+		self._translatorName,
+		self._sourceLocaleId,
+		resolved,
+		assert(self._sourceInstance, "No sourceInstance"),
+		self._lookupTable
+	)
+
+	for _, item in entries do
+		local text = item.Values[resolved]
+		if text ~= nil then
+			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, resolved, text)
+		end
+		if resolved == self._sourceLocaleId then
+			self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+		end
+	end
 end
 
 function JSONTranslator.ObserveNumber(self: JSONTranslator, number: number): Observable.Observable<string>

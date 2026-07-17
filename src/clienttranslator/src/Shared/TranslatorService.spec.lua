@@ -27,7 +27,7 @@ local LocalizationService = game:GetService("LocalizationService")
 
 local Jest = require("Jest")
 local Table = require("Table")
-local TranslatorService = require("TranslatorService")
+local TieRealms = require("TieRealms")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 
 local getEntryMap = TranslatorTestUtils.getEntryMap
@@ -78,7 +78,47 @@ end)
 describe("TranslatorService._getLocalizationTableName", function()
 	it("names the table by server/client role", function()
 		local controller = setup()
-		expect(TranslatorService._getLocalizationTableName({})).toBe(EXPECTED_TABLE_NAME)
+		expect(controller.translatorService:_getLocalizationTableName()).toBe(EXPECTED_TABLE_NAME)
+		controller:destroy()
+	end)
+
+	it("uses the client table when the realm is injected as client", function()
+		local controller = setup({ tieRealm = TieRealms.CLIENT })
+		expect(controller.translatorService:GetLocalizationTable().Name).toBe("GeneratedJSONTable_Client")
+		controller:destroy()
+	end)
+end)
+
+describe("TranslatorService forced locale", function()
+	it("overrides GetLocaleId when a locale is forced", function()
+		local controller = setup()
+		controller.translatorService:SetForcedLocaleId("de-de")
+		expect(controller.translatorService:GetLocaleId()).toBe("de-de")
+		controller:destroy()
+	end)
+
+	it("reverts to the inferred locale when the override is cleared", function()
+		local controller = setup()
+		local service = controller.translatorService
+
+		service:SetForcedLocaleId("de-de")
+		service:SetForcedLocaleId(nil)
+
+		expect(service:GetLocaleId()).toBe(LocalizationService.RobloxLocaleId)
+		controller:destroy()
+	end)
+
+	it("emits the forced locale from ObserveLocaleId", function()
+		local controller = setup()
+		local service = controller.translatorService
+		service:SetForcedLocaleId("de-de")
+
+		local received
+		controller.track(service:ObserveLocaleId():Subscribe(function(localeId)
+			received = localeId
+		end))
+
+		expect(received).toBe("de-de")
 		controller:destroy()
 	end)
 end)

@@ -1163,6 +1163,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject

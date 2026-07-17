@@ -9,7 +9,6 @@ local require = require(script.Parent.loader).load(script)
 
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")
@@ -18,6 +17,8 @@ local Promise = require("Promise")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
 
 local TranslatorService = {}
@@ -37,9 +38,11 @@ export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
+		_tieRealmService: TieRealmService.TieRealmService,
 		_translator: ValueObject.ValueObject<Translator>,
 		_localizationTable: LocalizationTable?,
 		_pendingTranslatorPromise: Promise.Promise<Translator>?,
+		_forcedLocaleId: ValueObject.ValueObject<string?>,
 		_localeIdValue: ValueObject.ValueObject<string>?,
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
@@ -56,9 +59,13 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
+	self._tieRealmService = serviceBag:GetService(TieRealmService) :: any
+
 	self._pendingEntries = {}
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
+
+	self._forcedLocaleId = self._maid:Add(ValueObject.new(nil))
 
 	self._translator = self._maid:Add(ValueObject.new(nil))
 	self._translator:Mount(self:_observeTranslatorImpl())
@@ -82,12 +89,25 @@ function TranslatorService.GetLocalizationTable(self: TranslatorService): Locali
 	return localizationTable
 end
 
-function TranslatorService._getLocalizationTableName(_self: TranslatorService): string
-	if RunService:IsServer() then
+function TranslatorService._getLocalizationTableName(self: TranslatorService): string
+	if self._tieRealmService:GetTieRealm() == TieRealms.SERVER then
 		return "GeneratedJSONTable_Server"
 	else
 		return "GeneratedJSONTable_Client"
 	end
+end
+
+--[=[
+	Forces the locale id used for translation, overriding the inferred player/Roblox
+	locale. Pass nil to clear the override and fall back to the inferred locale. Useful
+	for an in-game language selector.
+
+	@param localeId string?
+]=]
+function TranslatorService.SetForcedLocaleId(self: TranslatorService, localeId: string?)
+	assert(localeId == nil or type(localeId) == "string", "Bad localeId")
+
+	self._forcedLocaleId.Value = localeId
 end
 
 --[=[
@@ -354,7 +374,22 @@ function TranslatorService.ObserveLocaleId(self: TranslatorService): Observable.
 
 	local valueObject = self._maid:Add(ValueObject.new("en-us", "string"))
 
-	valueObject:Mount(self._translator:Observe():Pipe({
+	valueObject:Mount(self._forcedLocaleId:Observe():Pipe({
+		Rx.switchMap(function(forcedLocaleId: string?): any
+			if forcedLocaleId ~= nil then
+				return Rx.of(forcedLocaleId)
+			end
+
+			return self:_observeInferredLocaleId()
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any)
+	self._localeIdValue = valueObject
+	return valueObject:Observe()
+end
+
+function TranslatorService._observeInferredLocaleId(self: TranslatorService): Observable.Observable<string>
+	return self._translator:Observe():Pipe({
 		Rx.switchMap(function(translator: Translator): any
 			if translator then
 				return RxInstanceUtils.observeProperty(translator, "LocaleId")
@@ -371,10 +406,7 @@ function TranslatorService.ObserveLocaleId(self: TranslatorService): Observable.
 				})
 			end
 		end) :: any,
-		Rx.distinct() :: any,
-	}) :: any)
-	self._localeIdValue = valueObject
-	return valueObject:Observe()
+	}) :: any
 end
 
 --[=[
@@ -383,6 +415,11 @@ end
 	@return string
 ]=]
 function TranslatorService.GetLocaleId(self: TranslatorService): string
+	local forced = self._forcedLocaleId.Value
+	if forced ~= nil then
+		return forced
+	end
+
 	local found = self._translator.Value
 	if found then
 		return found.LocaleId

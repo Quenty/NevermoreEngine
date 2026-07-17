@@ -13,12 +13,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
 local LocalizationService = game:GetService("LocalizationService")
 local RunService = game:GetService("RunService")
 
 local JSONTranslator = require("JSONTranslator")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
 local TranslatorService = require("TranslatorService")
 
 local TranslatorTestUtils = {}
@@ -48,8 +50,14 @@ end
 
 --[[
 	Builds an isolated test world. Call once per test and pair with controller:destroy().
+
+	`options.tieRealm` (a TieRealms value) injects the realm on the service bag, exactly
+	like the Raven stories do, so client-only behavior can be exercised on the server test
+	runner.
 ]]
-function TranslatorTestUtils.setup()
+function TranslatorTestUtils.setup(options)
+	options = options or {}
+
 	local maid = Maid.new()
 
 	local function giveTask(item)
@@ -59,27 +67,46 @@ function TranslatorTestUtils.setup()
 
 	TranslatorTestUtils.clearGeneratedTables()
 
-	local function newTranslatorService()
+	local function newTranslatorService(tieRealm)
 		local serviceBag = maid:Add(ServiceBag.new())
+		if tieRealm then
+			serviceBag:GetService(TieRealmService):SetTieRealm(tieRealm)
+		end
 		serviceBag:GetService(TranslatorService)
 		serviceBag:Init()
 		serviceBag:Start()
 		return serviceBag:GetService(TranslatorService), serviceBag
 	end
 
-	local translatorService, serviceBag = newTranslatorService()
+	local translatorService, serviceBag = newTranslatorService(options.tieRealm)
 
 	-- Builds a fresh ServiceBag and registers translators the package-driven way
 	-- (serviceBag:GetService(translator) before Init/Start, exactly how games wire up
 	-- their JSONTranslators), then returns that bag's shared TranslatorService.
-	local function newPackageServiceBag(defs)
+	local function newPackageServiceBag(defs, tieRealm)
 		local bag = maid:Add(ServiceBag.new())
+		if tieRealm then
+			bag:GetService(TieRealmService):SetTieRealm(tieRealm)
+		end
 		for _, def in defs do
 			bag:GetService(JSONTranslator.new(def.name, def.localeId or "en", def.data))
 		end
 		bag:Init()
 		bag:Start()
 		return bag:GetService(TranslatorService)
+	end
+
+	-- Builds a Folder of per-locale StringValues (named "<locale>.json") whose values are
+	-- the JSON-encoded tables, matching the instance-decoded translator layout.
+	local function newInstanceFolder(jsonByLocale)
+		local folder = giveTask(Instance.new("Folder"))
+		for localeId, dataTable in jsonByLocale do
+			local stringValue = Instance.new("StringValue")
+			stringValue.Name = localeId .. ".json"
+			stringValue.Value = HttpService:JSONEncode(dataTable)
+			stringValue.Parent = folder
+		end
+		return folder
 	end
 
 	-- Creates a JSONTranslator initialized against the real service bag. The translator
@@ -141,10 +168,14 @@ function TranslatorTestUtils.setup()
 		newTranslator = newTranslator,
 		newTranslatorFromInstance = newTranslatorFromInstance,
 		newPackageServiceBag = newPackageServiceBag,
+		newInstanceFolder = newInstanceFolder,
 		awaitLoaded = awaitLoaded,
 		awaitTranslator = awaitTranslator,
 		awaitEntriesWritten = awaitEntriesWritten,
 		flushEntries = flushEntries,
+		setForcedLocaleId = function(localeId)
+			translatorService:SetForcedLocaleId(localeId)
+		end,
 		getLocalizationTable = function()
 			return translatorService:GetLocalizationTable()
 		end,
