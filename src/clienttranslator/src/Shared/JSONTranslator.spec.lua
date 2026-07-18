@@ -55,23 +55,6 @@ describe("JSONTranslator.new", function()
 		controller:destroy()
 	end)
 
-	it("decodes entries from a (localeId, dataTable) pair in the constructor", function()
-		-- Decoding happens in the constructor (into _entries); writing to a table is deferred to Init.
-		local controller = setup()
-		local translator = JSONTranslator.new("TestTranslator", "en", {
-			actions = {
-				respawn = "Respawn {playerName}",
-			},
-		})
-
-		local keys = {}
-		for _, entry in translator._entries do
-			keys[entry.Key] = entry.Values["en"]
-		end
-		expect(keys["actions.respawn"]).toBe("Respawn {playerName}")
-		controller:destroy()
-	end)
-
 	it("decodes entries from an Instance folder of StringValues", function()
 		local controller = setup()
 
