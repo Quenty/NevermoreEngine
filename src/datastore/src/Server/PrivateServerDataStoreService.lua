@@ -51,7 +51,7 @@ function PrivateServerDataStoreService.PromiseDataStore(
 	end
 
 	self._dataStorePromise = self:_promiseRobloxDataStore():Then(function(robloxDataStore)
-		local dataStore = self._maid:Add(DataStore.new(robloxDataStore, self:_getKey()))
+		local dataStore = DataStore.new(robloxDataStore, self:_getKey())
 
 		if game.PrivateServerOwnerId ~= 0 then
 			dataStore:Store("LastPrivateServerOwnerId", game.PrivateServerOwnerId)
@@ -60,6 +60,14 @@ function PrivateServerDataStoreService.PromiseDataStore(
 		self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
 			return dataStore:Save()
 		end))
+
+		-- On service teardown (hot reload / tests) flush and destroy the store. Save() is a best-effort
+		-- synchronous write before Destroy() cancels it.
+		self._maid:GiveTask(function()
+			-- Best-effort: swallow a rejection (e.g. the load failed) so it is not uncaught.
+			dataStore:Save():Catch(function() end)
+			dataStore:Destroy()
+		end)
 
 		return dataStore
 	end)

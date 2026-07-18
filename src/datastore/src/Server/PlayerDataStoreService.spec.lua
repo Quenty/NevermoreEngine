@@ -164,3 +164,55 @@ describe("PlayerDataStoreService failure handling", function()
 		controller:destroy()
 	end)
 end)
+
+describe("PlayerDataStoreService teardown", function()
+	it("destroys the datastore its manager owns when the service is destroyed", function()
+		local controller = setup(DataStoreMock.new())
+
+		local promise = controller.service:PromiseDataStore(1)
+		if not PromiseTestUtils.awaitSettled(promise, 10) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10) then
+			expect("load hung").toEqual("load settled")
+			controller:destroy()
+			return
+		end
+
+		controller:destroy()
+
+		expect(getmetatable(dataStore)).toBeNil()
+	end)
+
+	it("flushes staged data synchronously to the underlying store when destroyed", function()
+		local controller = setup(DataStoreMock.new())
+
+		local promise = controller.service:PromiseDataStore(1)
+		if not PromiseTestUtils.awaitSettled(promise, 10) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10) then
+			expect("load hung").toEqual("load settled")
+			controller:destroy()
+			return
+		end
+
+		dataStore:Store("coins", 7)
+
+		-- Destroy must fire a synchronous Save before tearing the store down.
+		controller:destroy()
+
+		-- keyGenerator maps userId 1 -> "1"
+		local raw = controller.mock:GetRaw("1")
+		expect(raw).never.toBeNil()
+		expect(raw.coins).toEqual(7)
+	end)
+end)

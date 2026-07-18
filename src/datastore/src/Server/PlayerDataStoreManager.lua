@@ -129,6 +129,12 @@ function PlayerDataStoreManager.new(
 		self:_removePlayerDataStore(player.UserId)
 	end))
 
+	-- On teardown (e.g. a hot-reloaded ServiceBag, or unit tests) flush and destroy any datastores we
+	-- still own. See _flushAndDestroyAll.
+	self._maid:GiveTask(function()
+		self:_flushAndDestroyAll()
+	end)
+
 	if skipBindingToClose ~= true then
 		-- Route through BindToCloseService so the callback is unregistered on :Destroy()
 		-- (unlike a raw game:BindToClose, which can never be unbound and would leak on hot reload).
@@ -143,6 +149,25 @@ function PlayerDataStoreManager.new(
 	end
 
 	return self
+end
+
+--[=[
+	Flushes and tears down every datastore we still own. Runs on manager teardown (a hot-reloaded
+	ServiceBag, or a unit test). Save() is a best-effort synchronous write: the underlying UpdateAsync
+	request is dispatched before Destroy() cancels the promise, so a live server usually honors it, but
+	it is not guaranteed. A store whose load failed rejects, so the rejection is swallowed. Stores handed
+	off gracefully via _removePlayerDataStore have already been pulled out of _datastores, so this only
+	covers the ones nothing else cleaned up.
+]=]
+function PlayerDataStoreManager._flushAndDestroyAll(self: PlayerDataStoreManager): ()
+	for userId, datastore in self._datastores do
+		-- Cast past the DataStore intersection type: the solver otherwise blows up ("code too complex")
+		-- resolving :Save()/:Destroy() through it.
+		local store = datastore :: any
+		store:Save():Catch(function() end)
+		store:Destroy()
+		self._datastores[userId] = nil
+	end
 end
 
 --[=[

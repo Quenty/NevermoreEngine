@@ -159,3 +159,44 @@ describe("PlayerDataStoreManager.PromiseAllSaves", function()
 		controller:destroy()
 	end)
 end)
+
+describe("PlayerDataStoreManager teardown", function()
+	it("destroys the datastores it still owns when the manager is destroyed", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local dataStore = controller.manager:GetDataStore(1)
+		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
+			controller:destroy()
+			return
+		end
+
+		controller.manager:Destroy()
+
+		-- BaseObject.Destroy clears the metatable, so a torn-down store reads a nil metatable.
+		expect(getmetatable(dataStore)).toBeNil()
+
+		controller:destroy()
+	end)
+
+	it("flushes staged data synchronously to the underlying store when destroyed", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local dataStore = controller.manager:GetDataStore(1)
+		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
+			controller:destroy()
+			return
+		end
+
+		dataStore:Store("coins", 5)
+
+		-- Destroy must fire a synchronous Save before tearing each store down, so the staged value is
+		-- already persisted the instant Destroy() returns -- asserted with no awaiting.
+		controller.manager:Destroy()
+
+		local raw = controller.mock:GetRaw("user_1")
+		expect(raw).never.toBeNil()
+		expect(raw.coins).toEqual(5)
+
+		controller:destroy()
+	end)
+end)

@@ -191,3 +191,52 @@ describe("PrivateServerDataStoreService failure handling", function()
 		controller:destroy()
 	end)
 end)
+
+describe("PrivateServerDataStoreService teardown", function()
+	it("destroys its inner datastore when the service is destroyed", function()
+		local controller = setup()
+
+		local promise = controller.service:PromiseDataStore()
+		if not PromiseTestUtils.awaitSettled(promise, 5) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		controller:destroy()
+
+		expect(getmetatable(dataStore)).toBeNil()
+	end)
+
+	it("flushes staged data synchronously to the underlying store when destroyed", function()
+		local controller = setup()
+
+		-- The cloud test place has a PrivateServerId, so pin the key rather than assuming "main".
+		controller.service:SetCustomKey("mykey")
+
+		local promise = controller.service:PromiseDataStore()
+		if not PromiseTestUtils.awaitSettled(promise, 5) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5) then
+			expect("load hung").toEqual("load settled")
+			controller:destroy()
+			return
+		end
+
+		local key = dataStore:GetKey()
+		dataStore:Store("region", "us")
+
+		-- Destroy must fire a synchronous Save before tearing the store down.
+		controller:destroy()
+
+		local raw = controller.mock:GetRaw(key)
+		expect(raw).never.toBeNil()
+		expect(raw.region).toEqual("us")
+	end)
+end)

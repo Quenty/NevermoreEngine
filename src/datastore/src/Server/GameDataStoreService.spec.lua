@@ -166,3 +166,50 @@ describe("GameDataStoreService failure handling", function()
 		controller:destroy()
 	end)
 end)
+
+describe("GameDataStoreService teardown", function()
+	it("destroys its inner datastore when the service is destroyed", function()
+		local controller = setup()
+
+		local promise = controller.service:PromiseDataStore()
+		if not PromiseTestUtils.awaitSettled(promise, 5) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		controller:destroy()
+
+		-- BaseObject.Destroy clears the metatable, so a torn-down store reads a nil metatable.
+		expect(getmetatable(dataStore)).toBeNil()
+	end)
+
+	it("flushes staged data synchronously to the underlying store when destroyed", function()
+		local controller = setup()
+
+		local promise = controller.service:PromiseDataStore()
+		if not PromiseTestUtils.awaitSettled(promise, 5) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5) then
+			expect("load hung").toEqual("load settled")
+			controller:destroy()
+			return
+		end
+
+		dataStore:Store("motd", "goodbye")
+
+		-- Destroy must fire a synchronous Save before tearing the store down, so the value is
+		-- already in the store the instant destroy() returns -- asserted with no awaiting.
+		controller:destroy()
+
+		local raw = controller.mock:GetRaw("version1")
+		expect(raw).never.toBeNil()
+		expect(raw.motd).toEqual("goodbye")
+	end)
+end)
