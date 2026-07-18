@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class BinderProvider.spec.lua
 ]]
@@ -47,7 +47,7 @@ describe("BinderProvider.new()", function()
 
 		provider:Init()
 
-		expect(provider.Test).toEqual(expect.any("table"))
+		expect((provider :: any).Test).toEqual(expect.any("table"))
 
 		provider:Destroy()
 		if binder then

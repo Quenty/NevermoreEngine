@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class ExperienceUtils.spec.lua
 ]]
@@ -14,7 +14,7 @@ local it = Jest.Globals.it
 
 local config = ExperienceUtils.createExperienceConfig({
 	factor = 200,
-})
+} :: any)
 
 describe("ExperienceUtils.getLevel", function()
 	it("should return a level", function()

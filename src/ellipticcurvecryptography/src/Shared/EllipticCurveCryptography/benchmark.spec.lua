@@ -1,15 +1,15 @@
---!nonstrict
+--!strict
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
-local ecc = require(script.Parent)
+local ecc = require("EllipticCurveCryptography")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 -- helper function
-local function generateTestData(size)
+local function generateTestData(size: number)
 	local data = table.create(size)
 	for x = 1, size do
 		data[x] = math.random(35, 120)

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class NevermoreCLIManifestUtils.spec.lua
 ]]
@@ -28,14 +28,14 @@ describe("NevermoreCLIManifestUtils injection", function()
 
 		-- A real git commit was injected, not a placeholder.
 		expect(type(metadata.commit)).toEqual("string")
-		expect(#metadata.commit >= 7).toEqual(true)
-		expect(string.match(metadata.commit, "^%x+$")).never.toBeNil()
+		expect(#(metadata.commit :: string) >= 7).toEqual(true)
+		expect(string.match(metadata.commit :: string, "^%x+$")).never.toBeNil()
 
 		expect(metadata.target).toEqual("test")
 		expect(metadata.published).toEqual(false)
 
 		expect(type(metadata.timestamp)).toEqual("string")
-		expect(#metadata.timestamp > 0).toEqual(true)
+		expect(#(metadata.timestamp :: string) > 0).toEqual(true)
 
 		-- IDs round-trip through string attributes back to exact numbers.
 		expect(type(metadata.placeId)).toEqual("number")

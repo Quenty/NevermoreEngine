@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class OctreeRegionUtils.spec.lua
 ]]
@@ -302,7 +302,7 @@ describe("OctreeRegionUtils.removeNode", function()
 		expect(lowest.node_count).toBe(0)
 		expect(top.node_count).toBe(0)
 		-- The now-empty lowest region should be detached from its parent
-		expect(lowest.parent.subRegions[lowest.parentIndex]).toBeNil()
+		expect((lowest.parent :: any).subRegions[lowest.parentIndex]).toBeNil()
 	end)
 
 	it("keeps shared ancestors alive when a sibling still holds a node", function()

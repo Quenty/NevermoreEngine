@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class ObservableList.spec.lua
 ]]
@@ -35,7 +35,7 @@ describe("ObservableList.new()", function()
 
 	it("should allow false as a value", function()
 		expect(observableList:Get(2)).toEqual(nil)
-		observableList:Add(false)
+		observableList:Add(false :: any)
 		expect(observableList:Get(2)).toEqual(false)
 	end)
 

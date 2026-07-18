@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RobloxApiDump.spec.lua
 ]]
@@ -6,7 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local RobloxApiClass = require("RobloxApiClass")
 local RobloxApiDump = require("RobloxApiDump")
+local RobloxApiMember = require("RobloxApiMember")
 local RobloxApiUtils = require("RobloxApiUtils")
 
 local afterAll = Jest.Globals.afterAll
@@ -108,9 +110,9 @@ describe("RobloxApiDump", function()
 end)
 
 describe("RobloxApiClass", function()
-	local partClass
-	local instanceClass
-	local workspaceClass
+	local partClass: RobloxApiClass.RobloxApiClass
+	local instanceClass: RobloxApiClass.RobloxApiClass
+	local workspaceClass: RobloxApiClass.RobloxApiClass
 
 	beforeAll(function()
 		partClass = dump:PromiseClass("Part"):Wait()
@@ -183,7 +185,7 @@ describe("RobloxApiClass", function()
 
 	describe("PromiseProperties / PromiseEvents / PromiseFunctions", function()
 		it("should filter to only properties", function()
-			local props = instanceClass:PromiseProperties():Wait()
+			local props: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseProperties():Wait()
 			expect(#props > 0).toEqual(true)
 			for _, prop in props do
 				expect(prop:IsProperty()).toEqual(true)
@@ -191,7 +193,7 @@ describe("RobloxApiClass", function()
 		end)
 
 		it("should filter to only events", function()
-			local events = instanceClass:PromiseEvents():Wait()
+			local events: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseEvents():Wait()
 			expect(#events > 0).toEqual(true)
 			for _, event in events do
 				expect(event:IsEvent()).toEqual(true)
@@ -199,7 +201,7 @@ describe("RobloxApiClass", function()
 		end)
 
 		it("should filter to only functions", function()
-			local funcs = instanceClass:PromiseFunctions():Wait()
+			local funcs: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseFunctions():Wait()
 			expect(#funcs > 0).toEqual(true)
 			for _, func in funcs do
 				expect(func:IsFunction()).toEqual(true)

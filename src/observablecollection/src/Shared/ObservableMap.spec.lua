@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class ObservableMap.spec.lua
 ]]
@@ -37,9 +37,9 @@ describe("ObservableMap.new()", function()
 	end)
 
 	it("should allow false as a key", function()
-		expect(observableMap:Get(false)).toEqual(nil)
-		observableMap:Set(false, "Hello")
-		expect(observableMap:Get(false)).toEqual("Hello")
+		expect(observableMap:Get(false :: any)).toEqual(nil)
+		observableMap:Set(false :: any, "Hello")
+		expect(observableMap:Get(false :: any)).toEqual("Hello")
 	end)
 
 	it("should fire off events for a specific key", function()

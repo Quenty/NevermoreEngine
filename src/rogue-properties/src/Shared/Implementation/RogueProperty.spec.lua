@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RogueProperty.spec.lua
 
@@ -130,7 +130,7 @@ local function setup()
 		addAdditive = addAdditive,
 		addSetter = addSetter,
 		awaitValue = awaitValue,
-		destroy = function()
+		destroy = function(_self: any)
 			serviceBag:Destroy()
 			container:Destroy()
 		end,

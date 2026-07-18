@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Unit tests for RxCharacterUtils.lua
 ]]
@@ -37,8 +37,8 @@ local originalObserveLocalPlayerCharacter = RxCharacterUtils.observeLocalPlayerC
 	Returns setCharacter(char) to change the character and cleanup() to restore.
 ]]
 local function createMockEnvironment()
-	local currentCharacter = nil
-	local subscribers = {}
+	local currentCharacter: Model? = nil
+	local subscribers: { any } = {}
 
 	-- Mock Players: only needs .LocalPlayer to be truthy to pass the nil-check
 	-- in observeIsOfLocalCharacter. We never pass this to RxInstanceUtils.
@@ -66,10 +66,10 @@ local function createMockEnvironment()
 					table.remove(subscribers, idx)
 				end
 			end
-		end)
+		end) :: any
 	end
 
-	local function setCharacter(char)
+	local function setCharacter(char: Model?)
 		currentCharacter = char
 		for _, sub in subscribers do
 			sub:Fire(char)

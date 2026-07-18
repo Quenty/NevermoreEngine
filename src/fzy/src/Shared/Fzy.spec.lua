@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Tests for fzy-lua
 
@@ -47,7 +47,9 @@ local it = Jest.Globals.it
 local MIN_SCORE = Fzy.getMinScore()
 local MAX_SCORE = Fzy.getMaxScore()
 
-local function compareTables(a, b)
+-- Fzy.positions returns (positions, score); callers pass it as the second arg, so the
+-- trailing score expands into this ignored third parameter.
+local function compareTables(a: { [any]: any }, b: { [any]: any }, _score: any?)
 	for key, value in a do
 		if b[key] ~= value then
 			return false
@@ -219,7 +221,7 @@ describe("positioning", function()
 		expect(Fzy.score(config, longstring, longstring)).toBe(MIN_SCORE)
 	end)
 	it("is case-sensitive when requested", function()
-		expect(compareTables({ 2, 5 }, Fzy.positions(caseSensitiveConfig, "AB", "aAabBb", true))).toBe(true)
+		expect(compareTables({ 2, 5 }, (Fzy.positions :: any)(caseSensitiveConfig, "AB", "aAabBb", true))).toBe(true)
 	end)
 	it("returns the same score as `score()`", function()
 		local _, s = Fzy.positions(config, "ab", "aaabbb")
@@ -234,15 +236,15 @@ end)
 describe("filtering", function()
 	it("repeats application of hasMatch and positions", function()
 		-- compare the result of `filter` with repeated calls to `positions`
-		local function check_filter(needle, haystacks, case)
-			local result = Fzy.filter(config, needle, haystacks, case)
+		local function check_filter(needle: string, haystacks: { string }, case: boolean?)
+			local result = (Fzy.filter :: any)(config, needle, haystacks, case)
 			local r = 0
 			for i, line in ipairs(haystacks) do
-				local match = Fzy.hasMatch(config, needle, line, case)
+				local match = (Fzy.hasMatch :: any)(config, needle, line, case)
 				if match then
 					r = r + 1
 					expect(i).toBe(result[r][1])
-					local p, s = Fzy.positions(config, needle, line, case)
+					local p, s = (Fzy.positions :: any)(config, needle, line, case)
 					expect(compareTables(p, result[r][2])).toBe(true)
 					expect(s).toBe(result[r][3])
 				end

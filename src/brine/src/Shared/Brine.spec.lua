@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class Brine.spec.lua
 ]]
@@ -57,7 +57,7 @@ describe("Brine.deserialize", function()
 
 	it("preserves the class of the original instance", function()
 		local original = Instance.new("Folder")
-		local result = Brine.deserialize(Brine.serialize(original))
+		local result = Brine.deserialize((Brine.serialize(original))) :: Folder
 
 		expect(result.ClassName).toEqual("Folder")
 	end)
@@ -73,7 +73,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 		part.Anchored = true
 		part.CanCollide = false
 
-		local result = Brine.deserialize(Brine.serialize(part))
+		local result = Brine.deserialize((Brine.serialize(part))) :: Part
 
 		it("preserves the class name", function()
 			expect(result.ClassName).toEqual("Part")
@@ -109,7 +109,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			local original = Instance.new("StringValue")
 			original.Value = "hello, brine"
 
-			local result = Brine.deserialize(Brine.serialize(original))
+			local result = Brine.deserialize((Brine.serialize(original))) :: StringValue
 
 			expect(result.ClassName).toEqual("StringValue")
 			expect(result.Value).toEqual("hello, brine")
@@ -119,7 +119,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			local original = Instance.new("IntValue")
 			original.Value = 42
 
-			local result = Brine.deserialize(Brine.serialize(original))
+			local result = Brine.deserialize((Brine.serialize(original))) :: IntValue
 
 			expect(result.ClassName).toEqual("IntValue")
 			expect(result.Value).toEqual(42)
@@ -129,7 +129,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			local original = Instance.new("BoolValue")
 			original.Value = true
 
-			local result = Brine.deserialize(Brine.serialize(original))
+			local result = Brine.deserialize((Brine.serialize(original))) :: BoolValue
 
 			expect(result.Value).toEqual(true)
 		end)
@@ -148,7 +148,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 		second.Value = "child value"
 		second.Parent = folder
 
-		local result = Brine.deserialize(Brine.serialize(folder))
+		local result = Brine.deserialize((Brine.serialize(folder))) :: Folder
 
 		it("preserves the parent name", function()
 			expect(result.Name).toEqual("Container")
@@ -159,13 +159,13 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 		end)
 
 		it("preserves the Part child", function()
-			local child = result:FindFirstChild("First")
+			local child = result:FindFirstChild("First") :: Instance
 			expect(child).never.toEqual(nil)
 			expect(child.ClassName).toEqual("Part")
 		end)
 
 		it("preserves the StringValue child and its Value", function()
-			local child = result:FindFirstChild("Second")
+			local child = result:FindFirstChild("Second") :: StringValue
 			expect(child).never.toEqual(nil)
 			expect(child.ClassName).toEqual("StringValue")
 			expect(child.Value).toEqual("child value")
@@ -186,13 +186,13 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			inner.Value = "deep"
 			inner.Parent = middle
 
-			local result = Brine.deserialize(Brine.serialize(outer))
+			local result = Brine.deserialize((Brine.serialize(outer))) :: Folder
 			local resolvedMiddle = result:FindFirstChild("Middle")
 			local resolvedInner = if resolvedMiddle then resolvedMiddle:FindFirstChild("Inner") else nil
 
 			expect(resolvedMiddle).never.toEqual(nil)
 			expect(resolvedInner).never.toEqual(nil)
-			expect(resolvedInner.Value).toEqual("deep")
+			expect((resolvedInner :: any).Value).toEqual("deep")
 		end)
 	end)
 
@@ -203,7 +203,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			part:SetAttribute("Label", "tagged")
 			part:SetAttribute("Enabled", true)
 
-			local result = Brine.deserialize(Brine.serialize(part))
+			local result = Brine.deserialize((Brine.serialize(part))) :: Instance
 
 			expect(result:GetAttribute("Count")).toEqual(7)
 			expect(result:GetAttribute("Label")).toEqual("tagged")
@@ -217,11 +217,11 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			part:AddTag("First")
 			part:AddTag("Second")
 
-			local result = Brine.deserialize(Brine.serialize(part, {
+			local result = Brine.deserialize((Brine.serialize(part, {
 				includeTags = true,
 				includeAttributes = false,
 				includeDescendants = false,
-			}))
+			}))) :: Instance
 			local tags = result:GetTags()
 
 			expect(#tags).toEqual(2)
@@ -239,7 +239,7 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			child.Parent = folder
 
 			local serialized = Brine.serialize(folder, { includeDescendants = false })
-			local result = Brine.deserialize(serialized, { includeDescendants = false })
+			local result = Brine.deserialize(serialized, { includeDescendants = false }) :: Folder
 
 			expect(result.Name).toEqual("Empty")
 			expect(#result:GetChildren()).toEqual(0)
@@ -303,7 +303,7 @@ describe("Brine.observeDeserialize", function()
 		end)
 
 		local emitted = false
-		local sub = Brine.observeDeserialize(source):Subscribe(function()
+		local sub = Brine.observeDeserialize(source :: any):Subscribe(function()
 			emitted = true
 		end)
 
@@ -316,7 +316,7 @@ describe("Brine.observeDeserialize", function()
 		original.Name = "Source"
 		original.Value = "hello observable"
 
-		local result
+		local result: any
 		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
 			result = instance
 		end)
@@ -332,7 +332,7 @@ describe("Brine.observeDeserialize", function()
 		local original = Instance.new("StringValue")
 		original.Value = "first"
 
-		local result
+		local result: any
 		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
 			result = instance
 		end)
@@ -382,7 +382,7 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		child.Parent = original
 
 		expect(result).never.toEqual(nil)
-		local resolvedChild = result:FindFirstChild("AddedAfterSubscribe")
+		local resolvedChild = result:FindFirstChild("AddedAfterSubscribe") :: StringValue
 		expect(resolvedChild).never.toEqual(nil)
 		expect(resolvedChild.Value).toEqual("fresh")
 		sub:Destroy()
@@ -432,8 +432,8 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		item.Parent = second
 		StepUtils.deferWait()
 
-		local resolvedFirst = result:FindFirstChild("First")
-		local resolvedSecond = result:FindFirstChild("Second")
+		local resolvedFirst = result:FindFirstChild("First") :: Instance
+		local resolvedSecond = result:FindFirstChild("Second") :: Instance
 		expect(resolvedFirst).never.toEqual(nil)
 		expect(resolvedSecond).never.toEqual(nil)
 		expect(resolvedFirst:FindFirstChild("Item")).toEqual(nil)
@@ -460,7 +460,7 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 
 		pointer.Value = target
 
-		local resolvedPointer = result:FindFirstChild("Pointer")
+		local resolvedPointer = result:FindFirstChild("Pointer") :: ObjectValue
 		local resolvedTarget = result:FindFirstChild("Target")
 		expect(resolvedPointer).never.toEqual(nil)
 		expect(resolvedTarget).never.toEqual(nil)
@@ -487,7 +487,7 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 
 		pointer.Value = nil
 
-		local resolvedPointer = result:FindFirstChild("Pointer")
+		local resolvedPointer = result:FindFirstChild("Pointer") :: ObjectValue
 		expect(resolvedPointer).never.toEqual(nil)
 		expect(resolvedPointer.Value).toEqual(nil)
 		sub:Destroy()
@@ -575,9 +575,9 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		grandchild.Value = "deep"
 		grandchild.Parent = middle
 
-		local resolvedMiddle = result:FindFirstChild("Middle")
+		local resolvedMiddle = result:FindFirstChild("Middle") :: Instance
 		expect(resolvedMiddle).never.toEqual(nil)
-		local resolvedGrandchild = resolvedMiddle:FindFirstChild("Grandchild")
+		local resolvedGrandchild = resolvedMiddle:FindFirstChild("Grandchild") :: StringValue
 		expect(resolvedGrandchild).never.toEqual(nil)
 		expect(resolvedGrandchild.Value).toEqual("deep")
 		sub:Destroy()
@@ -842,7 +842,7 @@ describe("Brine direct packet roundtrip (non-Rx)", function()
 		first.Parent = root
 
 		local rawPackets = {}
-		local sub = Brine.observeSerialize(root):Subscribe(function(stream, _encodedReferences)
+		local sub = (Brine.observeSerialize(root) :: any):Subscribe(function(stream, _encodedReferences)
 			table.insert(rawPackets, stream)
 		end)
 		sub:Destroy()
@@ -860,7 +860,7 @@ describe("Brine direct packet roundtrip (non-Rx)", function()
 		second.Parent = root
 
 		local rawPackets = {}
-		local sub = Brine.observeSerialize(root):Subscribe(function(stream, _encodedReferences)
+		local sub = (Brine.observeSerialize(root) :: any):Subscribe(function(stream, _encodedReferences)
 			table.insert(rawPackets, stream)
 		end)
 		sub:Destroy()

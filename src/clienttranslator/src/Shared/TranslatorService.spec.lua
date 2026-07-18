@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class TranslatorService.spec.lua
 
@@ -331,7 +331,7 @@ describe("TranslatorService entry merging", function()
 			{ name = "AlphaTranslator", data = { alpha = { one = "A1", two = "A2" } } },
 			{ name = "BetaTranslator", data = { beta = "B" } },
 			{ name = "GammaTranslator", data = { gamma = { deep = "G" } } },
-		})
+		} :: { { name: string, data: any } })
 
 		controller.awaitEntriesWritten(service)
 

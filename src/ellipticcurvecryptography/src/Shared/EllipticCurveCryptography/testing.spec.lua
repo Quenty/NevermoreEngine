@@ -1,8 +1,8 @@
---!nonstrict
+--!strict
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
-local ecc = require(script.Parent)
+local ecc = require("EllipticCurveCryptography")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
