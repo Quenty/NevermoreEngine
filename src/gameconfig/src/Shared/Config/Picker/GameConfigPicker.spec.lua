@@ -16,6 +16,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local GameConfigBindersServer = require("GameConfigBindersServer")
+local GameConfigUtils = require("GameConfigUtils")
 local Jest = require("Jest")
 local ServiceBag = require("ServiceBag")
 
@@ -99,6 +102,56 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 
 		expect(picker:FindFirstActiveAssetOfKey(PLACE, "specDefinitelyMissing")).toBeNil()
 
+		serviceBag:Destroy()
+	end)
+end)
+
+describe("GameConfigPicker gameId gate dominates priority", function()
+	-- Builds a config whose GameId is NOT the running place's, containing one
+	-- PLACE asset. Such a config is never active, so its assets must never be
+	-- returned -- no matter how high their priority. Returns the config folder so
+	-- the caller can destroy it.
+	local function addInactiveConfigPlace(
+		serviceBag: any,
+		gameConfigService: any,
+		assetKey: string,
+		placeId: number,
+		priority: number
+	): Instance
+		local binders = serviceBag:GetService(GameConfigBindersServer)
+		local config = GameConfigUtils.create(binders.GameConfig, game.GameId + 1)
+		config.Parent = gameConfigService:GetPreferredParent()
+
+		local asset = GameConfigAssetUtils.create(binders.GameConfigAsset, PLACE, assetKey, placeId, priority)
+		asset.Parent = GameConfigUtils.getOrCreateAssetFolder(config, PLACE)
+
+		return config
+	end
+
+	it("excludes a high-priority asset whose config gameId does not match", function()
+		local serviceBag, gameConfigService, picker = newPicker()
+
+		local inactive = addInactiveConfigPlace(serviceBag, gameConfigService, "specGateOnly", 888, 5000)
+
+		expect(picker:FindFirstActiveAssetOfKey(PLACE, "specGateOnly")).toBeNil()
+
+		inactive:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("keeps a lower-priority active asset over a higher-priority wrong-gameId one", function()
+		local serviceBag, gameConfigService, picker = newPicker()
+
+		-- Wrong-gameId asset with a far higher priority than the active one.
+		local inactive = addInactiveConfigPlace(serviceBag, gameConfigService, "specGateBeatsPriority", 888, 5000)
+		-- Correct-gameId asset at the default priority.
+		gameConfigService:AddPlace("specGateBeatsPriority", 111)
+
+		local resolved = picker:FindFirstActiveAssetOfKey(PLACE, "specGateBeatsPriority")
+		expect(resolved).never.toBeNil()
+		expect(resolved:GetAssetId()).toEqual(111)
+
+		inactive:Destroy()
 		serviceBag:Destroy()
 	end)
 end)
