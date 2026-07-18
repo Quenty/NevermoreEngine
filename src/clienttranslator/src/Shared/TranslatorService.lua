@@ -25,8 +25,8 @@ local ValueObject = require("ValueObject")
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
 
--- An accumulated localization entry delta, keyed by Key+Source+Context, that is merged
--- into the table and applied in a single SetEntries call on flush.
+-- An accumulated localization entry delta that is merged into the table and applied in a
+-- single SetEntries call on flush.
 type PendingEntry = {
 	Key: string,
 	Source: string,
@@ -35,11 +35,14 @@ type PendingEntry = {
 	Values: { [string]: string },
 }
 
--- Pending deltas indexed first by translation key, then by a Source+Context id. The outer
--- key index lets a single-key flush ([TranslatorService.FlushEntryForKey]) find an entry in
--- O(1) instead of scanning the whole batch; the inner index still separates entries that
--- share a key but differ in source/context.
-type PendingEntries = { [string]: { [string]: PendingEntry } }
+-- Pending deltas indexed by translation key. A LocalizationTable keys its entries by the
+-- translation key alone -- SetEntries rejects two entries that share a key even when their
+-- source/context differ, and SetEntryValue overwrites in place -- so we hold at most one
+-- pending delta per key. A later write for the same key with a different source/context
+-- overwrites the source/context (last write wins) rather than queueing a second entry, which
+-- would make the flush feed SetEntries a duplicate key and throw. Keying by translation key
+-- also lets a single-key flush ([TranslatorService.FlushEntryForKey]) find its entry in O(1).
+type PendingEntries = { [string]: PendingEntry }
 
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
@@ -171,14 +174,7 @@ function TranslatorService._getPendingEntry(
 	source: string,
 	context: string
 ): PendingEntry
-	local byKey = self._pendingEntries[translationKey]
-	if not byKey then
-		byKey = {}
-		self._pendingEntries[translationKey] = byKey
-	end
-
-	local id = string.format("%s\0%s", source, context)
-	local entry = byKey[id]
+	local entry = self._pendingEntries[translationKey]
 	if not entry then
 		entry = {
 			Key = translationKey,
@@ -186,7 +182,13 @@ function TranslatorService._getPendingEntry(
 			Context = context,
 			Values = {},
 		}
-		byKey[id] = entry
+		self._pendingEntries[translationKey] = entry
+	else
+		-- The table keys entries by translation key alone, so a second write for the same key
+		-- with a different source/context overwrites in place (as SetEntryValue would) rather
+		-- than queueing a duplicate that SetEntries would reject. Accumulated values are kept.
+		entry.Source = source
+		entry.Context = context
 	end
 	return entry
 end
@@ -238,8 +240,8 @@ function TranslatorService.FlushEntryForKey(self: TranslatorService, translation
 		return
 	end
 
-	local byKey = self._pendingEntries[translationKey]
-	if not byKey then
+	local entry = self._pendingEntries[translationKey]
+	if not entry then
 		return
 	end
 
@@ -261,13 +263,10 @@ function TranslatorService.FlushEntryForKey(self: TranslatorService, translation
 		table.insert(readLocales, sourceSubtag)
 	end
 
-	-- A key may have more than one pending entry (different source/context); land each. A
-	-- landed locale is dequeued, so a repeated read locale (e.g. localeId already its own
-	-- subtag) just no-ops the second time.
-	for _, entry in byKey do
-		for _, readLocale in readLocales do
-			self:_landEntryLocale(localizationTable, entry, readLocale)
-		end
+	-- Land each read locale for this key's pending entry. A landed locale is dequeued, so a
+	-- repeated read locale (e.g. localeId already its own subtag) just no-ops the second time.
+	for _, readLocale in readLocales do
+		self:_landEntryLocale(localizationTable, entry, readLocale)
 	end
 end
 
@@ -344,40 +343,49 @@ end
 function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: PendingEntries)
 	local localizationTable = self:GetLocalizationTable()
 
-	local existingById: { [string]: any } = {}
+	-- A LocalizationTable keys its entries by translation key alone: SetEntries rejects two
+	-- entries sharing a key even when their source/context differ, so we index existing
+	-- entries by key and merge each delta into the one entry for its key.
+	local existingByKey: { [string]: any } = {}
 	local entries = localizationTable:GetEntries()
 	for _, entry in entries do
-		local id = string.format("%s\0%s\0%s", entry.Key, entry.Source, entry.Context)
-		existingById[id] = entry
+		existingByKey[entry.Key] = entry
 	end
 
 	local changed = false
-	for _, byKey in pendingEntries do
-		for _, delta in byKey do
-			local id = string.format("%s\0%s\0%s", delta.Key, delta.Source, delta.Context)
-			local entry = existingById[id]
-			if not entry then
-				entry = {
-					Key = delta.Key,
-					Source = delta.Source,
-					Context = delta.Context,
-					Example = "",
-					Values = {},
-				}
-				existingById[id] = entry
-				table.insert(entries, entry)
-				changed = true
-			end
+	for _, delta in pendingEntries do
+		local entry = existingByKey[delta.Key]
+		if not entry then
+			entry = {
+				Key = delta.Key,
+				Source = delta.Source,
+				Context = delta.Context,
+				Example = "",
+				Values = {},
+			}
+			existingByKey[delta.Key] = entry
+			table.insert(entries, entry)
+			changed = true
+		end
 
-			if delta.Example ~= nil and entry.Example ~= delta.Example then
-				entry.Example = delta.Example
+		-- Keep the source/context in step with the latest write for this key, mirroring how
+		-- SetEntryValue overwrites them in place.
+		if entry.Source ~= delta.Source then
+			entry.Source = delta.Source
+			changed = true
+		end
+		if entry.Context ~= delta.Context then
+			entry.Context = delta.Context
+			changed = true
+		end
+		if delta.Example ~= nil and entry.Example ~= delta.Example then
+			entry.Example = delta.Example
+			changed = true
+		end
+		for localeId, text in delta.Values do
+			if entry.Values[localeId] ~= text then
+				entry.Values[localeId] = text
 				changed = true
-			end
-			for localeId, text in delta.Values do
-				if entry.Values[localeId] ~= text then
-					entry.Values[localeId] = text
-					changed = true
-				end
 			end
 		end
 	end

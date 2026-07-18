@@ -347,6 +347,66 @@ describe("TranslatorService entry merging", function()
 		controller:destroy()
 	end)
 
+	-- Regression: a LocalizationTable keys its entries by translation key alone. SetEntries
+	-- rejects two entries that share a key even when their source/context differ, throwing
+	-- "Entry at index N has the same (key) or (key,source,context) tuple as another entry".
+	-- The deferred writer used to queue one entry per (key, source, context), so two writes
+	-- for the same key with different source/context fed SetEntries a duplicate key and blew
+	-- up the flush. Seen in the wild: "collectable.toolUnlocked" written both as a collectable
+	-- name and again "Generated from DialogLineLocalization with key collectable.toolUnlocked".
+	it("collapses two writes for one key with differing source/context into a single entry", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		local key = "collectable.toolUnlocked"
+		service:SetEntryValue(key, "Tool unlocked!", "Generated from a collectable name", "en", "Tool unlocked!")
+		service:SetEntryValue(
+			key,
+			"Tool unlocked!",
+			"Generated from DialogLineLocalization with key collectable.toolUnlocked",
+			"en",
+			"Tool unlocked!"
+		)
+
+		-- Before the fix this flush threw inside SetEntries (duplicate key) and never resolved.
+		controller.awaitEntriesWritten()
+
+		local entries = service:GetLocalizationTable():GetEntries()
+		-- Exactly one entry lands for the key -- the second write overwrote the first in place.
+		local matching = 0
+		for _, entry in entries do
+			if entry.Key == key then
+				matching += 1
+			end
+		end
+		expect(matching).toBe(1)
+		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())[key].Values["en"]).toBe("Tool unlocked!")
+		controller:destroy()
+	end)
+
+	it("rewrites a key with a new source/context across flushes without duplicating it", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx-a", "en", "One")
+		controller.awaitEntriesWritten()
+
+		-- A later flush re-registers the same key under a different source/context. The table
+		-- still holds a single entry for the key rather than crashing on a duplicate.
+		service:SetEntryValue("k.one", "One", "ctx-b", "en", "Uno")
+		controller.awaitEntriesWritten()
+
+		local matching = 0
+		for _, entry in service:GetLocalizationTable():GetEntries() do
+			if entry.Key == "k.one" then
+				matching += 1
+			end
+		end
+		expect(matching).toBe(1)
+		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.one"].Values["en"]).toBe("Uno")
+		controller:destroy()
+	end)
+
 	it("preserves entries written directly to the table by an external writer", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
