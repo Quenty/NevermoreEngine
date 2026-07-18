@@ -38,16 +38,12 @@ local it = Jest.Globals.it
 
 describe("JSONTranslator.new", function()
 	it("exposes the expected class identity", function()
-		local controller = TranslatorTestUtils.setup()
 		expect(JSONTranslator.ClassName).toBe("JSONTranslator")
-		controller:destroy()
 	end)
 
 	it("sets ServiceName to the translator name so it registers uniquely", function()
-		local controller = TranslatorTestUtils.setup()
 		local translator = JSONTranslator.new("MyTranslator", "en", {})
 		expect(translator.ServiceName).toBe("MyTranslator")
-		controller:destroy()
 	end)
 
 	it("decodes entries from an Instance folder of StringValues", function()

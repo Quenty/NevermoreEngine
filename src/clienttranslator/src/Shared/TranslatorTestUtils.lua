@@ -116,7 +116,7 @@ function TranslatorTestUtils.setup(options)
 		local translator = JSONTranslator.new("TestTranslator", localeId or "en", dataTable)
 		translator:Init(serviceBag)
 		giveTask(function()
-			if getmetatable(translator) then
+			if translator.Destroy then
 				translator:Destroy()
 			end
 		end)
@@ -127,7 +127,7 @@ function TranslatorTestUtils.setup(options)
 		local translator = JSONTranslator.new("TestTranslator", folder)
 		translator:Init(serviceBag)
 		giveTask(function()
-			if getmetatable(translator) then
+			if translator.Destroy then
 				translator:Destroy()
 			end
 		end)
