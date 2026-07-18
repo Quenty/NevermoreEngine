@@ -222,6 +222,35 @@ function MarketplaceUtils.promisePlayerOwnsAsset(player: Player, assetId: number
 end
 
 --[=[
+	Retrieves whether a player owns an asset via the async variant. Unlike
+	[MarketplaceUtils.promisePlayerOwnsAsset], this queries whether the player owns
+	paid access to a game (universe), which is the mechanism paid-access games use.
+	See [MarketplaceService.PlayerOwnsAssetAsync].
+
+	@param player Player
+	@param assetId number
+	@return Promise<boolean>
+]=]
+function MarketplaceUtils.promisePlayerOwnsAssetAsync(player: Player, assetId: number): Promise.Promise<boolean>
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(type(assetId) == "number", "Bad assetId")
+
+	return Promise.spawn(function(resolve, reject)
+		local result
+		local ok, err = pcall(function()
+			result = MarketplaceService:PlayerOwnsAssetAsync(player, assetId)
+		end)
+		if not ok then
+			return reject(err)
+		end
+		if type(result) ~= "boolean" then
+			return reject("Bad result type")
+		end
+		return resolve(result)
+	end)
+end
+
+--[=[
 	Retrieves whether a player owns a bundle
 	@param player Player
 	@param bundleId number

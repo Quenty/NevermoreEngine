@@ -69,6 +69,8 @@ function GameConfigAssetUtils.promiseCloudDataForAssetType(
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.GamePass)
 	elseif assetType == GameConfigAssetTypes.PLACE then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)
+	elseif assetType == GameConfigAssetTypes.GAME then
+		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)
 	elseif assetType == GameConfigAssetTypes.ASSET then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)
 	elseif assetType == GameConfigAssetTypes.BUNDLE then

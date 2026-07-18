@@ -65,6 +65,19 @@ local function setup()
 	}
 end
 
+-- Builds a non-promptable tracker (as used for the game asset type), which should reject
+-- prompts instead of surfacing them.
+local function setupNonPromptable()
+	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.GAME, convertIds, observeIdsBrio, false)
+
+	return {
+		tracker = tracker,
+		destroy = function()
+			tracker:Destroy()
+		end,
+	}
+end
+
 -- Drives a full prompt: fires PromisePromptPurchase, waits for ShowPromptRequested to surface the
 -- resolved id, then feeds the purchase result back in. Returns the tracking promise and the id.
 local function promptAndCapture(tracker, idOrKey)
@@ -105,6 +118,45 @@ describe("PlayerAssetMarketTracker basics", function()
 
 		context.tracker:SetOwnershipTracker(nil)
 		expect(context.tracker:GetOwnershipTracker()).toBeNil()
+		context.destroy()
+	end)
+
+	it("should be promptable by default", function()
+		local context = setup()
+		expect(context.tracker:IsPromptable()).toEqual(true)
+		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetMarketTracker non-promptable asset types", function()
+	it("should report IsPromptable() as false", function()
+		local context = setupNonPromptable()
+		expect(context.tracker:IsPromptable()).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should reject PromisePromptPurchase for a known id without opening a prompt", function()
+		local context = setupNonPromptable()
+
+		local promptRequested = false
+		local conn = context.tracker.ShowPromptRequested:Connect(function()
+			promptRequested = true
+		end)
+
+		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("swordKey"), 5)
+		conn:Disconnect()
+
+		expect(outcome).toEqual("rejected")
+		expect(promptRequested).toEqual(false)
+		expect(context.tracker:IsPromptOpen()).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should reject PromisePromptPurchase for an unknown key too", function()
+		local context = setupNonPromptable()
+
+		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("doesNotExist"), 5)
+		expect(outcome).toEqual("rejected")
 		context.destroy()
 	end)
 end)
