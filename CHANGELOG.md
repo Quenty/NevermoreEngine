@@ -1,3 +1,16 @@
+# (Sat Jul 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.41.0`, `@quenty/messagingserviceutils@7.23.0`, `@quenty/nevermoreclimanifest@1.2.0`, `@quenty/promise@10.19.0`, `@quenty/saveslot@1.5.0`
+  - datastore: fix session-locked load hang + comprehensive session-lock tests [#736](https://github.com/Quenty/NevermoreEngine/pull/736) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jul 17 2026)
 
 #### 🚀 Enhancement
