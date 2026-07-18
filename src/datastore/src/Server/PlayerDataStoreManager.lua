@@ -55,6 +55,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
@@ -89,6 +90,9 @@ export type PlayerDataStoreManager =
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
+
+	Unless `skipBindingToClose` is true, this resolves [BindToCloseService] from the serviceBag to
+	save on game close, so that service must be registered before the serviceBag starts.
 
 	@param robloxDataStore DataStore
 	@param keyGenerator (player) -> string -- Function that takes in a player, and outputs a key
@@ -126,13 +130,16 @@ function PlayerDataStoreManager.new(
 	end))
 
 	if skipBindingToClose ~= true then
-		game:BindToClose(function()
+		-- Route through BindToCloseService so the callback is unregistered on :Destroy()
+		-- (unlike a raw game:BindToClose, which can never be unbound and would leak on hot reload).
+		local bindToCloseService = self._serviceBag:GetService(BindToCloseService) :: any
+		self._maid:GiveTask(bindToCloseService:RegisterPromiseOnCloseCallback(function()
 			if self._disableSavingInStudio then
-				return
+				return Promise.resolved()
 			end
 
-			self:PromiseAllSaves():Wait()
-		end)
+			return self:PromiseAllSaves()
+		end))
 	end
 
 	return self
