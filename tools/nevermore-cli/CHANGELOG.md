@@ -1,19 +1,13 @@
-# v4.39.0 (Sat Jul 18 2026)
-
-#### 🚀 Enhancement
-
-- fix: pin translation behavior with tests and fix camelCase key generation [#737](https://github.com/Quenty/NevermoreEngine/pull/737) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.39.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.38.0...@quenty/nevermore-cli@4.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/Nevermore/issues/737)) ([1b7a536](https://github.com/Quenty/Nevermore/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
 
 # [4.38.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.37.0...@quenty/nevermore-cli@4.38.0) (2026-07-17)
 

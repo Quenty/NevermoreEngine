@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.23.0...@quenty/camerastoryutils@10.24.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
 # [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.22.0...@quenty/camerastoryutils@10.23.0) (2026-07-18)
 
 **Note:** Version bump only for package @quenty/camerastoryutils

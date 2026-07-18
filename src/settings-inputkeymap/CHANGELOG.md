@@ -1,19 +1,13 @@
-# v10.60.0 (Sat Jul 18 2026)
-
-#### 🚀 Enhancement
-
-- fix: pin translation behavior with tests and fix camelCase key generation [#737](https://github.com/Quenty/NevermoreEngine/pull/737) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.59.0...@quenty/settings-inputkeymap@10.60.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
 
 # [10.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.58.1...@quenty/settings-inputkeymap@10.59.0) (2026-07-18)
 
