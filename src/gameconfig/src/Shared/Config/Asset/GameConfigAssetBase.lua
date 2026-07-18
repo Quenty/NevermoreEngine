@@ -127,6 +127,20 @@ function GameConfigAssetBase:GetAssetType(): string?
 end
 
 --[=[
+	Gets the asset's selection priority. Higher wins when several active assets
+	share a type and key. Assets that never set it read back as
+	[GameConfigAssetConstants.DEFAULT_PRIORITY].
+	@return number
+]=]
+function GameConfigAssetBase:GetPriority(): number
+	local priority = self._obj:GetAttribute(GameConfigAssetConstants.PRIORITY_ATTRIBUTE)
+	if type(priority) == "number" then
+		return priority
+	end
+	return GameConfigAssetConstants.DEFAULT_PRIORITY
+end
+
+--[=[
 	Observes the asset type
 	@return Observable<string?>
 ]=]
