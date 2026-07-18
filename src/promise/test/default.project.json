@@ -1,5 +1,5 @@
 {
-  "name": "SaveSlotTest",
+  "name": "PromiseTest",
   "globIgnorePaths": [
     "**/.package-lock.json",
     "**/.pnpm",
@@ -14,18 +14,11 @@
       "$properties": {
         "LoadStringEnabled": true
       },
-      "saveslot": {
+      "promise": {
         "$path": ".."
       },
       "Script": {
         "$path": "scripts/Server"
-      }
-    },
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "Main": {
-          "$path": "scripts/Client"
-        }
       }
     }
   }
