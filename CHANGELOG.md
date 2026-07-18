@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/animations@8.35.0`, `@quenty/binder@14.39.0`, `@quenty/blend@12.39.0`, `@quenty/brine@1.8.0`, `@quenty/brio@14.32.0`, `@quenty/camera@14.45.0`, `@quenty/characterutils@12.35.0`, `@quenty/chatproviderservice@9.57.0`, `@quenty/clienttranslator@14.41.0`, `@quenty/clipcharacters@12.44.0`, `@quenty/datastore@13.42.0`, `@quenty/deathreport@10.49.0`, `@quenty/elo@7.40.0`, `@quenty/experiencecalculator@2.12.0`, `@quenty/fakeskybox@11.21.0`, `@quenty/fzy@5.16.0`, `@quenty/ik@15.57.0`, `@quenty/influxdbclient@7.37.0`, `@quenty/inputkeymaputils@14.47.0`, `@quenty/instanceutils@13.32.0`, `@quenty/lipsum@14.39.0`, `@quenty/maid@3.10.0`, `@quenty/nevermoreclimanifest@1.3.0`, `@quenty/observablecollection@12.41.0`, `@quenty/octree@11.15.0`, `@quenty/permissionprovider@14.42.0`, `@quenty/randomutils@6.18.0`, `@quenty/roblox-api-dump@8.24.0`, `@quenty/rogue-properties@11.49.0`, `@quenty/rx@13.30.0`, `@quenty/secrets@7.54.0`, `@quenty/settings-inputkeymap@10.60.0`, `@quenty/settings@11.57.0`, `@quenty/snackbar@11.45.0`, `@quenty/soundgroup@1.44.0`, `@quenty/throttle@10.13.0`, `@quenty/tie@10.43.0`, `@quenty/nevermore-cli@4.39.0`
+  - fix: pin translation behavior with tests and fix camelCase key generation [#737](https://github.com/Quenty/NevermoreEngine/pull/737) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jul 18 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/datastore@13.41.0`, `@quenty/messagingserviceutils@7.23.0`, `@quenty/nevermoreclimanifest@1.2.0`, `@quenty/promise@10.19.0`, `@quenty/saveslot@1.5.0`
   - datastore: fix session-locked load hang + comprehensive session-lock tests [#736](https://github.com/Quenty/NevermoreEngine/pull/736) ([@Quenty](https://github.com/Quenty))
 

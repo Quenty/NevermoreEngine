@@ -1,3 +1,15 @@
+# v1.3.0 (Sat Jul 18 2026)
+
+#### 🚀 Enhancement
+
+- fix: pin translation behavior with tests and fix camelCase key generation [#737](https://github.com/Quenty/NevermoreEngine/pull/737) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
