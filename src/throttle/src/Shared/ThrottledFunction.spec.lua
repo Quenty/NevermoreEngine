@@ -16,10 +16,12 @@ local jest = Jest.Globals.jest
 local TIMEOUT = 1
 local TIMEOUT_MS = TIMEOUT * 1000
 
-local function recordCalls<T...>()
+local function recordCalls()
 	local calls = {}
 
-	local function callback(...: T...)
+	-- Variadic-any so a single throttled function can be called with different arities
+	-- across the test (a generic T... would bind to the first call's shape).
+	local function callback(...: any)
 		table.insert(calls, table.pack(...))
 	end
 
