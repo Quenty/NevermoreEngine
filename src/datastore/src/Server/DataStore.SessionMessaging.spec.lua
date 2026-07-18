@@ -10,60 +10,24 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreMessageHelper = require("DataStoreMessageHelper")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
-local MessagingServiceMock = require("MessagingServiceMock")
 local PromiseTestUtils = require("PromiseTestUtils")
-local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a ServiceBag with an in-process MessagingServiceMock plus sessions and helpers over a shared
--- DataStoreMock, all owned by a Maid, so destroy() tears down every object the test created.
--- newSession() builds a session store; newHelper(session) wires a message helper to it off the bag.
-local function setup()
-	local maid = Maid.new()
-
-	local serviceBag = maid:Add(ServiceBag.new())
-	local placeMessagingService = serviceBag:GetService(require("PlaceMessagingService"))
-	serviceBag:Init()
-	placeMessagingService:SetRobloxMessagingService(MessagingServiceMock.new())
-	serviceBag:Start()
-
-	local dataStoreMock = DataStoreMock.new()
-
-	local function newSession()
-		return maid:Add(DataStore.new(dataStoreMock, "player_1"))
-	end
-
-	local function newHelper(session)
-		return maid:Add(DataStoreMessageHelper.new(serviceBag, session))
-	end
-
-	return {
-		newSession = newSession,
-		newHelper = newHelper,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("cross-server session messaging (close-session kick-out)", function()
 	it("fires SessionCloseRequested on the session that receives a close-session message", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- Two sessions on the same key, each with its own message helper (subscribes to its own topic).
-		local sessionA = controller.newSession()
-		local sessionB = controller.newSession()
+		local sessionA = controller.newDataStore()
+		local sessionB = controller.newDataStore()
 
-		local _helperA = controller.newHelper(sessionA)
-		local helperB = controller.newHelper(sessionB)
+		local _helperA = controller.newMessageHelper(sessionA)
+		local helperB = controller.newMessageHelper(sessionB)
 
 		local closeRequested = false
 		sessionA.SessionCloseRequested:Connect(function()
@@ -91,9 +55,9 @@ describe("cross-server session messaging (close-session kick-out)", function()
 	end)
 
 	it("rejects sending a message to our own session", function()
-		local controller = setup()
-		local sessionA = controller.newSession()
-		local helperA = controller.newHelper(sessionA)
+		local controller = DataStoreTestUtils.setup()
+		local sessionA = controller.newDataStore()
+		local helperA = controller.newMessageHelper(sessionA)
 
 		expect(function()
 			helperA:PromiseSendSessionMessage(game.PlaceId, game.JobId, sessionA:GetSessionId(), {

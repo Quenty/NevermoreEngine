@@ -19,9 +19,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a real ServiceBag with PrivateServerDataStoreService, injects the given mock between Init and
--- Start, and owns the bag with a Maid, so destroy() tears down the service (and the DataStore it
--- owns) the test created. Read controller.mock to inspect persisted values.
 local function setup(mock)
 	local maid = Maid.new()
 	mock = mock or DataStoreMock.new()
@@ -62,7 +59,7 @@ describe("PrivateServerDataStoreService.PromiseDataStore", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, loadPromise:Yield()))).toEqual(true)
+		expect((loadPromise:Wait())).toEqual(true)
 
 		controller:destroy()
 	end)

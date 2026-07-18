@@ -72,6 +72,7 @@ local HttpService = game:GetService("HttpService")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreLockHelper = require("DataStoreLockHelper")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
+local DataStoreNonRetryableLoadError = require("DataStoreNonRetryableLoadError")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
@@ -103,31 +104,6 @@ local DEFAULT_LOAD_RETRY_OPTIONS = {
 
 -- After a graceful session-close request we wait for Roblox to replicate the release before retrying.
 local DEFAULT_SESSION_MESSAGING_CLOSE_DELAY_SECONDS = 5
-
--- Wraps a datastore-operation failure during a session-locked load so it is distinguishable from
--- lock contention. Op failures (e.g. 509) will not resolve by retrying -- Roblox already retries
--- internally -- so we fail fast rather than grinding the acquire backoff, while lock contention (a
--- successful op that returns a locked profile) keeps retrying. The original error is preserved.
-local NonRetryableLoadError = {}
-NonRetryableLoadError.__index = NonRetryableLoadError
-function NonRetryableLoadError.__tostring(self)
-	return tostring(self.innerError)
-end
-
-local function newNonRetryableLoadError(innerError: any)
-	return setmetatable({ innerError = innerError }, NonRetryableLoadError)
-end
-
-local function isNonRetryableLoadError(err: any): boolean
-	return type(err) == "table" and getmetatable(err) == NonRetryableLoadError
-end
-
-local function unwrapLoadError(err: any): any
-	if isNonRetryableLoadError(err) then
-		return err.innerError
-	end
-	return err
-end
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -362,7 +338,7 @@ end
 
 	@param options { exponential: number?, initialWaitTime: number, maxAttempts: number, printWarning: boolean }
 ]=]
-function DataStore.SetLoadRetryOptions(self: DataStore, options)
+function DataStore.SetLoadRetryOptions(self: DataStore, options: PromiseRetryUtils.RetryOptions): ()
 	assert(not self._firstLoadPromise, "Must set load retry options before the datastore is loaded")
 	assert(type(options) == "table", "Bad options")
 
@@ -375,7 +351,7 @@ end
 
 	@param seconds number
 ]=]
-function DataStore.SetSessionMessagingCloseDelaySeconds(self: DataStore, seconds: number)
+function DataStore.SetSessionMessagingCloseDelaySeconds(self: DataStore, seconds: number): ()
 	assert(type(seconds) == "number" and seconds >= 0, "Bad seconds")
 
 	self._sessionMessagingCloseDelaySeconds = seconds
@@ -761,7 +737,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 					-- The datastore operation itself failed (e.g. 509), which is NOT lock contention and
 					-- will not resolve by retrying. Fail the load fast, preserving the original error.
 					if loadPromise:IsPending() then
-						loadPromise:Reject(newNonRetryableLoadError(opError))
+						loadPromise:Reject(DataStoreNonRetryableLoadError.new(opError))
 					end
 				end)
 			end)
@@ -780,7 +756,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			printWarning = self._loadRetryOptions.printWarning,
 			-- Retry lock contention (the holder may release); fail fast on a fatal op failure.
 			shouldRetry = function(err)
-				return not isNonRetryableLoadError(err)
+				return not DataStoreNonRetryableLoadError.isNonRetryableLoadError(err)
 			end,
 		}
 
@@ -790,7 +766,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			end, retryOptions))
 			:Catch(function(err)
 				-- A fatal op failure is not made loadable by stealing the lock; propagate it.
-				if isNonRetryableLoadError(err) then
+				if DataStoreNonRetryableLoadError.isNonRetryableLoadError(err) then
 					return Promise.rejected(err)
 				end
 
@@ -814,7 +790,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 				)
 
 				self._promiseSessionLockingFailed:Resolve()
-				return Promise.rejected(unwrapLoadError(err))
+				return Promise.rejected(DataStoreNonRetryableLoadError.unwrapLoadError(err))
 			end)
 	else
 		promise = self._maid

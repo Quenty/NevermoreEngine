@@ -7,10 +7,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
@@ -23,29 +22,9 @@ local function expectSettled(promise, timeout: number?)
 	expect(PromiseTestUtils.awaitSettled(promise, timeout)).toEqual(true)
 end
 
--- Builds DataStores over a shared mock and owns them with a Maid, so destroy() tears down every store
--- (and the auto-save loop each starts once loaded) the test created. Pass a pre-configured mock for
--- failure-injection tests, or read controller.mock to configure it before creating a store.
-local function setup(mock)
-	local maid = Maid.new()
-	mock = mock or DataStoreMock.new()
-
-	local function newDataStore()
-		return maid:Add(DataStore.new(mock, "player_1"))
-	end
-
-	return {
-		mock = mock,
-		newDataStore = newDataStore,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("DataStore without session locking", function()
 	it("should load the default value when the key is empty", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
 		local promise = dataStore:Load("coins", 99)
@@ -59,7 +38,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should round-trip a stored value through the datastore", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local writer = controller.newDataStore()
 		writer:Store("coins", 5)
@@ -80,7 +59,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should round-trip multiple keys and load defaults for missing ones", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local writer = controller.newDataStore()
 		writer:Store("coins", 5)
@@ -98,13 +77,13 @@ describe("DataStore without session locking", function()
 
 		local missingPromise = reader:Load("missing", "default")
 		expectSettled(missingPromise)
-		expect((select(2, missingPromise:Yield()))).toEqual("default")
+		expect((missingPromise:Wait())).toEqual("default")
 
 		controller:destroy()
 	end)
 
 	it("should round-trip substore values", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local writer = controller.newDataStore()
 		writer:GetSubStore("inventory"):Store("sword", true)
@@ -122,7 +101,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should delete a key so it no longer loads", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local writer = controller.newDataStore()
 		writer:Store("a", 1)
@@ -145,7 +124,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should resolve a save when nothing is staged", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
 		expectSettled(dataStore:Load("x"))
@@ -158,7 +137,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should report load failure (not hang) when the datastore is unavailable", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests()
 		local dataStore = controller.newDataStore()
 
@@ -173,7 +152,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should reject a save when the datastore goes down after loading", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
 		expectSettled(dataStore:Load("x"))
@@ -189,7 +168,7 @@ describe("DataStore without session locking", function()
 	end)
 
 	it("should mark DidLoadFail after a failed load", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests()
 		local dataStore = controller.newDataStore()
 
@@ -204,7 +183,7 @@ end)
 
 describe("DataStore with session locking", function()
 	it("should load successfully against a healthy datastore", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
@@ -221,7 +200,7 @@ describe("DataStore with session locking", function()
 	end)
 
 	it("surfaces a persistent datastore failure fast instead of hanging", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests()
 
 		local dataStore = controller.newDataStore()
@@ -239,7 +218,7 @@ describe("DataStore with session locking", function()
 	end)
 
 	it("rejects a failed session-locked load with the preserved datastore error", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests(DataStoreMock.OPERATION_NOT_ALLOWED_509)
 
 		local dataStore = controller.newDataStore()

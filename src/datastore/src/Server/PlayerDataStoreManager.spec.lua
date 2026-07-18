@@ -8,12 +8,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
-local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PromiseTestUtils = require("PromiseTestUtils")
-local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -27,38 +24,9 @@ local function expectSettled(promise, timeout: number?): boolean
 	return settled
 end
 
-local function keyGenerator(userId)
-	return "user_" .. tostring(userId)
-end
-
--- Builds a real ServiceBag plus a session-locked manager wired to a fresh mock. Everything is owned by
--- a Maid, so destroy() tears down the manager (and the loaded stores whose auto-save loops it owns)
--- along with the bag, and nothing keeps running after the test.
-local function setup()
-	local maid = Maid.new()
-
-	-- The manager enables session messaging on each DataStore, which pulls PlaceMessagingService
-	-- off the bag. Services must be registered before Start, so register it up front.
-	local serviceBag = maid:Add(ServiceBag.new())
-	serviceBag:GetService(require("PlaceMessagingService"))
-	serviceBag:Init()
-	serviceBag:Start()
-
-	local mock = DataStoreMock.new()
-	local manager = maid:Add(PlayerDataStoreManager.new(serviceBag, mock, keyGenerator, true))
-
-	return {
-		manager = manager,
-		mock = mock,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("PlayerDataStoreManager.GetDataStore", function()
 	it("should return a datastore for a fresh user", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local dataStore = controller.manager:GetDataStore(1)
 		expect(dataStore).never.toBeNil()
@@ -67,7 +35,7 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 	end)
 
 	it("should cache the datastore per user", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local first = controller.manager:GetDataStore(1)
 		local second = controller.manager:GetDataStore(1)
@@ -80,7 +48,7 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 	end)
 
 	it("should apply the key generator", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetKey())).toEqual("user_1")
@@ -91,7 +59,7 @@ end)
 
 describe("PlayerDataStoreManager.PromiseDataStore", function()
 	it("should resolve the datastore and load successfully against a healthy mock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
@@ -108,7 +76,7 @@ describe("PlayerDataStoreManager.PromiseDataStore", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, loadPromise:Yield()))).toEqual(true)
+		expect((loadPromise:Wait())).toEqual(true)
 
 		controller:destroy()
 	end)
@@ -116,7 +84,7 @@ end)
 
 describe("PlayerDataStoreManager persistence", function()
 	it("should round-trip a stored value across a removal/reload", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local dataStore = controller.manager:GetDataStore(1)
 		dataStore:Store("coins", 5)
@@ -151,7 +119,7 @@ end)
 
 describe("PlayerDataStoreManager.AddRemovingCallback", function()
 	it("should invoke the removing callback when a user's datastore is removed", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local ran = false
 		controller.manager:AddRemovingCallback(function()
@@ -176,7 +144,7 @@ end)
 
 describe("PlayerDataStoreManager.PromiseAllSaves", function()
 	it("should resolve after removing all datastores and flushing pending saves", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		controller.manager:GetDataStore(1):Store("coins", 1)
 		controller.manager:GetDataStore(2):Store("coins", 2)

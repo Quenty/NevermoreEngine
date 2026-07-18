@@ -65,7 +65,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				return
 			end
 
-			expect((select(2, promise:Yield()))).toEqual("fallback")
+			expect((promise:Wait())).toEqual("fallback")
 
 			dataStore:Destroy()
 		end)
@@ -99,7 +99,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				return
 			end
 
-			expect((select(2, promise:Yield()))).toEqual("empty")
+			expect((promise:Wait())).toEqual("empty")
 
 			dataStore:Destroy()
 		end)
@@ -165,7 +165,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				expect("hung").toEqual("settled")
 				return
 			end
-			expect((select(2, basePromise:Yield()))).toEqual(1)
+			expect((basePromise:Wait())).toEqual(1)
 
 			-- Staged value overrides base; untouched base key stays visible
 			dataStore:Store("coins", 999)
@@ -217,7 +217,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				return
 			end
 
-			expect((select(2, promise:Yield()))).toEqual("cleared")
+			expect((promise:Wait())).toEqual("cleared")
 
 			dataStore:Destroy()
 		end)
@@ -234,7 +234,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				expect("hung").toEqual("settled")
 				return
 			end
-			expect((select(2, basePromise:Yield()))).toEqual(5)
+			expect((basePromise:Wait())).toEqual(5)
 
 			dataStore:Wipe()
 
@@ -244,7 +244,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				return
 			end
 
-			expect((select(2, promise:Yield()))).toEqual("wiped")
+			expect((promise:Wait())).toEqual("wiped")
 
 			dataStore:Destroy()
 		end)
@@ -321,7 +321,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 				return
 			end
 
-			expect((select(2, promise:Yield()))).toEqual(0)
+			expect((promise:Wait())).toEqual(0)
 
 			dataStore:Destroy()
 		end)

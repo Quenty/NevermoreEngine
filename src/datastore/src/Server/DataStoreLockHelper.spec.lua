@@ -9,39 +9,17 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds session-locked DataStores over a shared mock and owns them with a Maid, so destroy() tears
--- down every store (and the auto-save loop each starts once loaded) the test created. Read
--- controller.mock to seed or fail the datastore before creating a store.
-local function setup(mock)
-	local maid = Maid.new()
-	mock = mock or DataStoreMock.new()
-
-	local function newDataStore()
-		return maid:Add(DataStore.new(mock, "player_1"))
-	end
-
-	return {
-		mock = mock,
-		newDataStore = newDataStore,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("DataStore session locking", function()
 	it("wraps the stored profile in a lock envelope on a healthy acquire", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
@@ -68,7 +46,7 @@ describe("DataStore session locking", function()
 	end)
 
 	it("releases the lock on SaveAndCloseSession so a new session can load", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
@@ -111,7 +89,7 @@ describe("DataStore session locking", function()
 	end)
 
 	it("preserves user data across a lock/unlock round-trip", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
@@ -145,7 +123,7 @@ describe("DataStore session locking", function()
 	end)
 
 	it("steals a stale lock left by a dead session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- Seed a lock owned by a long-dead session. LastUpdateTime is far enough in the past that
 		-- os.time() - LastUpdateTime exceeds GetAutoSaveTimeSeconds() * 2.1 (default 300 * 2.1 = 630s),
@@ -185,13 +163,13 @@ describe("DataStore session locking", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, loadPromise:Yield()))).toEqual(7)
+		expect((loadPromise:Wait())).toEqual(7)
 
 		controller:destroy()
 	end)
 
 	it("fires SessionStolen when saving over a lock held by another session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
@@ -238,7 +216,7 @@ describe("DataStore session locking", function()
 	end)
 
 	it("surfaces a locked-load datastore failure fast instead of hanging", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests()
 
 		local dataStore = controller.newDataStore()

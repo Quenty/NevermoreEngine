@@ -9,43 +9,17 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds session-locked DataStores over a shared mock and owns them with a Maid, so destroy() tears
--- down every store the test created. A test that destroys a store mid-test (the cancellation under
--- test) stays as-is; the maid simply skips an already-destroyed store. Read controller.mock to
--- block/unblock requests before creating a store.
-local function setup(mock)
-	local maid = Maid.new()
-	mock = mock or DataStoreMock.new()
-
-	local function newSessionLockedStore()
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
-		dataStore:SetSessionLockingEnabled(true)
-		dataStore:SetUserIdList({ 1 })
-		return dataStore
-	end
-
-	return {
-		mock = mock,
-		newSessionLockedStore = newSessionLockedStore,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("in-flight request cancellation (maid teardown)", function()
 	it("cancels a yielding load thread when the DataStore is destroyed (no leaked thread)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:BlockRequests() -- the lock-acquire request hangs, so the load is stuck in flight
 
 		local dataStore = controller.newSessionLockedStore()
@@ -68,7 +42,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 	end)
 
 	it("cancels a yielding save thread when the DataStore is destroyed", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- Load cleanly first (acquires the lock), then block so the SAVE request hangs in flight.
 		local dataStore = controller.newSessionLockedStore()
@@ -100,7 +74,7 @@ end)
 
 describe("lock command that does not settle", function()
 	it("keeps the load pending while the lock command is outstanding, then completes when it settles", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:BlockRequests() -- simulate a lock command that hasn't propagated yet (up to ~30s)
 
 		local dataStore = controller.newSessionLockedStore()
@@ -115,13 +89,13 @@ describe("lock command that does not settle", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, promise:Yield()))).toEqual(true)
+		expect((promise:Wait())).toEqual(true)
 
 		controller:destroy()
 	end)
 
 	it("re-loads cleanly on a fresh session after a cancelled in-flight lock command", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:BlockRequests()
 
 		local first = controller.newSessionLockedStore()
@@ -138,7 +112,7 @@ describe("lock command that does not settle", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, secondPromise:Yield()))).toEqual(true)
+		expect((secondPromise:Wait())).toEqual(true)
 
 		controller:destroy()
 	end)

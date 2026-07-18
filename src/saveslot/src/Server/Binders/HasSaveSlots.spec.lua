@@ -21,14 +21,15 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 local afterEach = Jest.Globals.afterEach
+local jest = Jest.Globals.jest
 
 local FAKE_USER_ID = 424242
 
--- Intercept only the UserId read so a Folder can stand in for a Player. Restored after each test.
+-- Real implementation, captured at load so the spy can fall through for anything but the fake player.
 local originalToUserId = PlayerDataStoreManager._toPlayerUserIdOrError
 
 afterEach(function()
-	PlayerDataStoreManager._toPlayerUserIdOrError = originalToUserId
+	jest.restoreAllMocks()
 end)
 
 local function setup(mock)
@@ -45,12 +46,13 @@ local function setup(mock)
 	fakePlayer.Name = "FakePlayer"
 	fakePlayer.Parent = Workspace
 
-	PlayerDataStoreManager._toPlayerUserIdOrError = function(self, playerOrUserId)
+	-- Intercept only the UserId read so a Folder can stand in for a Player. Restored after each test.
+	jest.spyOn(PlayerDataStoreManager, "_toPlayerUserIdOrError").mockImplementation(function(self, playerOrUserId)
 		if playerOrUserId == fakePlayer then
 			return FAKE_USER_ID
 		end
 		return originalToUserId(self, playerOrUserId)
-	end
+	end)
 
 	local hasSaveSlots = binder:Bind(fakePlayer)
 	if hasSaveSlots then
@@ -107,7 +109,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			context.destroy()
 			return
 		end
-		expect((select(2, hasPromise:Yield()))).toEqual(true)
+		expect((hasPromise:Wait())).toEqual(true)
 
 		local indexPromise = context.hasSaveSlots:PromiseSlotIdFromIndex(1)
 		if not PromiseTestUtils.awaitSettled(indexPromise, 10) then
@@ -115,7 +117,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			context.destroy()
 			return
 		end
-		expect((select(2, indexPromise:Yield()))).toEqual(slotId)
+		expect((indexPromise:Wait())).toEqual(slotId)
 
 		context.destroy()
 	end)
@@ -147,7 +149,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			context.destroy()
 			return
 		end
-		expect((select(2, lastPromise:Yield()))).toEqual(slotId)
+		expect((lastPromise:Wait())).toEqual(slotId)
 
 		context.destroy()
 	end)

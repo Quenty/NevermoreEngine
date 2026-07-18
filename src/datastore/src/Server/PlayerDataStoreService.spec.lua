@@ -19,10 +19,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a real ServiceBag with PlayerDataStoreService, owned by a Maid so destroy() tears down the
--- service (and the session-locked stores its manager owns). Pass a mock to inject it and Start (the
--- ready-to-use case); omit it to get the service initialized-but-not-started, for configuration-guard
--- tests that must run before Start / before a datastore is resolved.
 local function setup(mock)
 	local maid = Maid.new()
 
@@ -65,7 +61,7 @@ describe("PlayerDataStoreService.PromiseDataStore", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, loadPromise:Yield()))).toEqual(true)
+		expect((loadPromise:Wait())).toEqual(true)
 
 		controller:destroy()
 	end)
@@ -163,7 +159,7 @@ describe("PlayerDataStoreService failure handling", function()
 
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(loadPromise, 5)).toEqual(true)
-		expect((select(2, loadPromise:Yield()))).toEqual(false)
+		expect((loadPromise:Wait())).toEqual(false)
 
 		controller:destroy()
 	end)

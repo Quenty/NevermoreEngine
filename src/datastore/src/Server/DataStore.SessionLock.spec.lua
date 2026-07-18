@@ -11,44 +11,13 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreLockHelper = require("DataStoreLockHelper")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
--- Builds DataStores (and lock helpers) over a shared mock and owns them with a Maid, so destroy()
--- tears down every store (and the auto-save loop each starts once loaded) the test created. Read
--- controller.mock to seed the datastore; newDataStore() for a raw store and newLockHelper() for a
--- store wrapped in a DataStoreLockHelper.
-local function setup(mock)
-	local maid = Maid.new()
-	mock = mock or DataStoreMock.new()
-
-	local function newDataStore()
-		return maid:Add(DataStore.new(mock, "player_1"))
-	end
-
-	local function newLockHelper()
-		local dataStore = maid:Add(DataStore.new(mock, "player_1"))
-		local helper = maid:Add(DataStoreLockHelper.new(dataStore))
-		return helper, dataStore
-	end
-
-	return {
-		mock = mock,
-		newDataStore = newDataStore,
-		newLockHelper = newLockHelper,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
 
 local function foreignSession(sessionId: string?)
 	return {
@@ -75,7 +44,7 @@ end
 
 describe("DataStoreLockHelper.AcquireLock", function()
 	it("acquires an unlocked (nil) profile", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(nil, false)
 		expect(result.isValid).toEqual(true)
@@ -84,7 +53,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("acquires a profile that has no lock, preserving its data", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock({ coins = 5 }, false)
 		expect(result.isValid).toEqual(true)
@@ -94,7 +63,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("re-acquires a profile locked by our own session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper, dataStore = controller.newLockHelper()
 		local ownProfile = helper:ToLockedProfile({ coins = 3 })
 		local result = helper:AcquireLock(ownProfile, false)
@@ -105,7 +74,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("is blocked by a fresh lock held by another session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time()), false)
 		expect(result.isValid).toEqual(false)
@@ -114,7 +83,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("steals a foreign lock when canStealLock is true", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time()), true)
 		expect(result.isValid).toEqual(true)
@@ -123,7 +92,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("steals a stale foreign lock (crashed session) without stealing explicitly", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		-- Older than GetAutoSaveTimeSeconds() * 2.1 (300 * 2.1 = 630s).
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time() - 700, { coins = 9 }), false)
@@ -135,7 +104,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("does NOT steal a foreign lock that is only slightly old", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time() - 100, {}), false)
 		expect(result.isValid).toEqual(false)
@@ -143,7 +112,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("is blocked by a foreign lock that has no LastUpdateTime (cannot judge staleness)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), nil, {}), false)
 		expect(result.isValid).toEqual(false)
@@ -151,7 +120,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("acquires when the lock envelope has no ActiveSession", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock({ coins = 1, lock = { LastUpdateTime = os.time() } }, false)
 		expect(result.isValid).toEqual(true)
@@ -159,7 +128,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("acquires when the lock field is malformed (not a table)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock({ coins = 1, lock = "not a table" }, false)
 		expect(result.isValid).toEqual(true)
@@ -167,7 +136,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 	end)
 
 	it("passes through non-table data (locking not applicable)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock("a raw string", false)
 		expect(result.isValid).toEqual(true)
@@ -178,7 +147,7 @@ end)
 
 describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", function()
 	it("validates a nil profile", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:ToUnlockedProfile(nil)
 		expect(result.isValid).toEqual(true)
@@ -187,7 +156,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 	end)
 
 	it("validates a profile locked by our own session and strips the lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local ownProfile = helper:ToLockedProfile({ coins = 5 })
 		local result = helper:ToUnlockedProfile(ownProfile)
@@ -198,7 +167,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 	end)
 
 	it("invalidates a profile whose lock was stolen by another session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:ToUnlockedProfile(lockedBy(foreignSession(), os.time(), { coins = 5 }))
 		expect(result.isValid).toEqual(false)
@@ -207,7 +176,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 	end)
 
 	it("validates a profile that has no lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:ToUnlockedProfile({ coins = 5 })
 		expect(result.isValid).toEqual(true)
@@ -215,7 +184,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 	end)
 
 	it("passes through non-table data", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local result = helper:ToUnlockedProfile("raw")
 		expect(result.isValid).toEqual(true)
@@ -226,7 +195,7 @@ end)
 
 describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function()
 	it("adds our lock and preserves user data", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper, dataStore = controller.newLockHelper()
 		local locked = helper:ToLockedProfile({ coins = 5 })
 		expect(locked.coins).toEqual(5)
@@ -236,7 +205,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 	end)
 
 	it("releases the lock (doCloseSession) and preserves user data", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local released = helper:ToLockedProfile({ coins = 5 }, true)
 		expect(released.coins).toEqual(5)
@@ -245,7 +214,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 	end)
 
 	it("does not mutate the original profile", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local original: { coins: number, lock: any? } = { coins = 5 }
 		helper:ToLockedProfile(original)
@@ -254,7 +223,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 	end)
 
 	it("strips the lock via ToRawUnlockedProfile without mutating the original", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local original = { coins = 5, lock = { LastUpdateTime = os.time() } }
 		local raw = helper:ToRawUnlockedProfile(original)
@@ -265,7 +234,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 	end)
 
 	it("locks nil to an envelope, and closes nil to an empty profile", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		expect(type(helper:ToLockedProfile(nil).lock)).toEqual("table")
 		expect(helper:ToLockedProfile(nil, true)).toEqual({})
@@ -273,7 +242,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 	end)
 
 	it("round-trips user data through lock then unlock with no corruption", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local data = { coins = 5, nested = { a = 1, b = { 2, 3 } } }
 		local roundTripped = helper:ToRawUnlockedProfile(helper:ToLockedProfile(data))
@@ -284,14 +253,14 @@ end)
 
 describe("DataStoreLockHelper.PromiseCloseSession", function()
 	it("is pending until the session is closed", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		expect(helper:PromiseCloseSession():IsPending()).toEqual(true)
 		controller:destroy()
 	end)
 
 	it("resolves once ToLockedProfile closes the session", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		local promise = helper:PromiseCloseSession()
 		helper:ToLockedProfile({ coins = 5 }, true)
@@ -303,7 +272,7 @@ end)
 
 describe("session lock cross-server scenarios (full DataStore)", function()
 	it("blocks a new session's load while another session holds a fresh lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- A fresh, live foreign lock is present in the datastore.
 		controller.mock:SetRaw("player_1", lockedBy(foreignSession(), os.time(), { coins = 1 }))
@@ -323,7 +292,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		-- GUARD for the load-hang fix: a blocked load must still RESOLVE via retry when the holder
 		-- releases -- only genuine op FAILURES should fail fast, not lock contention (a successful op
 		-- that returns a locked profile).
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- Session A acquires and holds the lock.
 		local sessionA = controller.newDataStore()
@@ -365,7 +334,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 	end)
 
 	it("prevents data duplication: a stolen session's save is cancelled and the owner's data wins", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
@@ -403,7 +372,7 @@ end)
 
 describe("session lock edge cases and failure modes", function()
 	it("acquires the lock only once across repeated loads (no double-acquire)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
@@ -426,7 +395,7 @@ describe("session lock edge cases and failure modes", function()
 	end)
 
 	it("keeps stored data consistent under two concurrent saves", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
@@ -467,7 +436,7 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		-- trades an item away and saves, but the other loaded BEFORE that save (or is a crashed
 		-- server's stale session) and writes its stale view back -- restoring the traded-away item.
 		-- This is EXPECTED behavior for unlocked stores; it is the whole motivation for locking.
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:SetRaw("player_1", { items = { "rare_sword" } })
 
 		-- Two servers, NO session locking, both load the same starting state (B reads before A stores).
@@ -481,8 +450,8 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 			controller:destroy()
 			return
 		end
-		expect((select(2, aLoad:Yield()))).toEqual({ "rare_sword" })
-		expect((select(2, bLoad:Yield()))).toEqual({ "rare_sword" })
+		expect((aLoad:Wait())).toEqual({ "rare_sword" })
+		expect((bLoad:Wait())).toEqual({ "rare_sword" })
 
 		-- Server A: the player trades the sword away, and A saves it gone.
 		serverA:Store("items", {})

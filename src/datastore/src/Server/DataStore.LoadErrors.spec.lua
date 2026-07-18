@@ -9,41 +9,19 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds DataStores over a shared mock and owns them with a Maid, so destroy() tears down every store
--- (and the auto-save loop each starts once loaded) the test created. Read controller.mock to
--- configure it before creating a store.
-local function setup(mock)
-	local maid = Maid.new()
-	mock = mock or DataStoreMock.new()
-
-	local function newDataStore()
-		return maid:Add(DataStore.new(mock, "key"))
-	end
-
-	return {
-		mock = mock,
-		newDataStore = newDataStore,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("shared load promise fan-out", function()
 	it("delivers the resolution to every consumer of the shared load", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:SetRaw("key", { a = 1, b = 2 })
-		local dataStore = controller.newDataStore()
+		local dataStore = controller.newDataStore("key")
 
 		local valueA, valueB, all
 		dataStore:Load("a"):Then(function(value)
@@ -67,10 +45,10 @@ describe("shared load promise fan-out", function()
 	end)
 
 	it("resolves all consumers of a slow (yielding) load attached during the yield", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:SetRaw("key", { a = 1 })
 		controller.mock:SetYieldTime(0.3)
-		local dataStore = controller.newDataStore()
+		local dataStore = controller.newDataStore("key")
 
 		local results = {}
 		for i = 1, 3 do
@@ -90,9 +68,9 @@ describe("shared load promise fan-out", function()
 	end)
 
 	it("delivers the rejection to every consumer when the shared load fails", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 		controller.mock:FailAllRequests()
-		local dataStore = controller.newDataStore()
+		local dataStore = controller.newDataStore("key")
 
 		local aRejected, bRejected = false, false
 		dataStore:Load("a"):Then(nil, function()
@@ -112,8 +90,8 @@ end)
 
 describe("auto-save loop", function()
 	it("persists staged data on the auto-save schedule without an explicit Save", function()
-		local controller = setup()
-		local dataStore = controller.newDataStore()
+		local controller = DataStoreTestUtils.setup()
+		local dataStore = controller.newDataStore("key")
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 
 		-- Store triggers the initial load; once loaded, the auto-save loop starts and flushes.
@@ -129,8 +107,8 @@ describe("auto-save loop", function()
 	end)
 
 	it("stops auto-saving after the datastore is destroyed", function()
-		local controller = setup()
-		local dataStore = controller.newDataStore()
+		local controller = DataStoreTestUtils.setup()
+		local dataStore = controller.newDataStore("key")
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 		dataStore:Store("coins", 5)
 

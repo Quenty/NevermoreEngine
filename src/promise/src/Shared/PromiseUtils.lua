@@ -12,9 +12,11 @@ local Signal = require("Signal")
 local PromiseUtils = {}
 
 --[=[
-	Returns the value of the first promise resolved
-	@param promises { Promise<T> }
-	@return Promise<T> -- Promise that resolves with first result
+	Settles with the first of the given promises to settle, resolving if it resolved or rejecting if
+	it rejected. Also available as [PromiseUtils.race].
+
+	@param promises { Promise<T...> }
+	@return Promise<T...> -- Promise that settles with the first result
 ]=]
 function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Promise<T...>
 	local returnPromise = Promise.new()
@@ -35,25 +37,15 @@ function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Pr
 end
 
 --[=[
-	Returns a promise that settles with the first of the given promises to settle, resolving if it
-	resolved or rejecting if it rejected. Unlike [PromiseUtils.any], a rejection can win the race.
+	Alias for [PromiseUtils.any]. Settles with the first of the given promises to settle, resolving
+	if it resolved or rejecting if it rejected.
 
+	@function race
+	@within PromiseUtils
 	@param promises { Promise<T...> }
 	@return Promise<T...>
 ]=]
-function PromiseUtils.race<T...>(promises: { Promise.Promise<T...> }): Promise.Promise<T...>
-	local returnPromise = Promise.new()
-
-	for _, promise: any in promises do
-		promise:Then(function(...)
-			returnPromise:Resolve(...)
-		end, function(...)
-			returnPromise:Reject(...)
-		end)
-	end
-
-	return returnPromise
-end
+PromiseUtils.race = PromiseUtils.any
 
 --[=[
 	Returns a promise that will resolve after the set amount of seconds

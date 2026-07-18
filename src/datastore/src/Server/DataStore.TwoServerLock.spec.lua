@@ -10,13 +10,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
-local DataStore = require("DataStore")
-local DataStoreMessageHelper = require("DataStoreMessageHelper")
-local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
-local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
-local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -24,61 +20,12 @@ local it = Jest.Globals.it
 
 local KEY = "player_1"
 
-local function awaitOwn(dataStore)
-	local promise = dataStore:PromiseLoadSuccessful()
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		return false
-	end
-	local ok, loadedOk = promise:Yield()
-	return ok and loadedOk
-end
-
--- Builds session-locked servers over a shared mock and ServiceBag, all owned by a Maid, so destroy()
--- tears down every server (and the auto-save loop each starts once loaded), its message helper, and
--- the bag. newServer(opts) mirrors a live game server; read controller.mock to seed or inspect state.
-local function setup()
-	local maid = Maid.new()
-
-	local mock = DataStoreMock.new()
-
-	local serviceBag = maid:Add(ServiceBag.new())
-	serviceBag:GetService(require("PlaceMessagingService"))
-	serviceBag:Init()
-	serviceBag:Start()
-
-	local function newServer(opts)
-		opts = opts or {}
-		local dataStore = maid:Add(DataStore.new(mock, KEY))
-		dataStore:SetSessionLockingEnabled(true)
-		dataStore:SetUserIdList({ 1 })
-		local helper
-		if opts.messaging then
-			dataStore:SetSessionMessagingEnabled(true, serviceBag)
-			helper = maid:Add(DataStoreMessageHelper.new(serviceBag, dataStore))
-		end
-		if opts.autoCloseOnRequest then
-			dataStore.SessionCloseRequested:Connect(function()
-				dataStore:SaveAndCloseSession()
-			end)
-		end
-		return dataStore, helper
-	end
-
-	return {
-		mock = mock,
-		newServer = newServer,
-		destroy = function()
-			maid:DoCleaning()
-		end,
-	}
-end
-
 describe("two servers: clean handoff and crash recovery", function()
 	it("hands a player off cleanly: A saves and closes, B loads A's data and owns the lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local serverA = controller.newServer()
-		expect(awaitOwn(serverA)).toEqual(true)
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 		serverA:Store("coins", 42)
 		if not PromiseTestUtils.awaitSettled(serverA:SaveAndCloseSession(), 10) then
 			expect("A close hung").toEqual("settled")
@@ -93,18 +40,18 @@ describe("two servers: clean handoff and crash recovery", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, coins:Yield()))).toEqual(42)
+		expect((coins:Wait())).toEqual(42)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:destroy()
 	end)
 
 	it("recovers a crashed server's saved data by stealing its stale lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- A acquires, saves coins under its lock, then "crashes" (no clean close).
 		local serverA = controller.newServer()
-		expect(awaitOwn(serverA)).toEqual(true)
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 		serverA:Store("coins", 7)
 		if not PromiseTestUtils.awaitSettled(serverA:Save(), 10) then
 			expect("A save hung").toEqual("settled")
@@ -125,14 +72,14 @@ describe("two servers: clean handoff and crash recovery", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, coins:Yield()))).toEqual(7)
+		expect((coins:Wait())).toEqual(7)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:destroy()
 	end)
 
 	it("lets exactly one of two concurrent loads acquire the lock; the other stays blocked", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local serverA = controller.newServer()
 		local serverB = controller.newServer()
@@ -156,10 +103,10 @@ describe("two servers: clean handoff and crash recovery", function()
 	end)
 
 	it("cancels the loser's write when a session is stolen (no duplication)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local serverA = controller.newServer()
-		expect(awaitOwn(serverA)).toEqual(true)
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 
 		-- B takes over by writing its own lock + data directly (as if it stole the session).
 		controller.mock:SetRaw(KEY, {
@@ -191,10 +138,10 @@ end)
 
 describe("two servers: MessagingService graceful close", function()
 	it("completes the close handshake: B asks A to close, A closes and releases the lock", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		local serverA = controller.newServer({ messaging = true, autoCloseOnRequest = true })
-		expect(awaitOwn(serverA)).toEqual(true)
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 
 		local _serverB, helperB = controller.newServer({ messaging = true })
 
@@ -217,11 +164,11 @@ describe("two servers: MessagingService graceful close", function()
 	end, 30000) -- MessagingService round-trip, beyond jest's 5s default
 
 	it("evicts the holder during a messaging-enabled load and then acquires (production flow)", function()
-		local controller = setup()
+		local controller = DataStoreTestUtils.setup()
 
 		-- A holds the lock and will honor a graceful close request.
 		local serverA = controller.newServer({ messaging = true, autoCloseOnRequest = true })
-		expect(awaitOwn(serverA)).toEqual(true)
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 
 		-- B loads with messaging enabled: blocked by A's fresh lock, its load asks A to close, then
 		-- (after the propagation delay) retries and acquires. This is the real cross-server handoff.
@@ -235,7 +182,7 @@ describe("two servers: MessagingService graceful close", function()
 			controller:destroy()
 			return
 		end
-		expect((select(2, loadB:Yield()))).toEqual(true)
+		expect((loadB:Wait())).toEqual(true)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:destroy()
