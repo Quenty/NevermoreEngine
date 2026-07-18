@@ -34,6 +34,7 @@ import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
+  toManifestPlaceInfo,
 } from '../../utils/build/deploy-config.js';
 import { handleInitAsync } from './deploy-init.js';
 import {
@@ -256,6 +257,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
     const places = resolveDeployTargetPlaces(config, targetName);
+    const manifestPlaces = places.map(toManifestPlaceInfo);
     const isMultiPlace = places.length > 1;
 
     if (isMultiPlace) {
@@ -279,6 +281,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             packageName,
             path: cwd,
             target: place,
+            manifestPlaces,
           };
         })
       : [
@@ -287,6 +290,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             packageName,
             path: cwd,
             target: places[0]!,
+            manifestPlaces,
           },
         ];
 
@@ -402,13 +406,17 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
           const injected = await injectDeployMetadataAsync(
             builtPlace,
-            buildDeployMetadataAttributes(deployGitInfo, {
-              target: targetName,
-              published: publish,
-              timestamp: deployTimestamp,
-              universeId: args.universeId ?? buildTarget.target.universeId,
-              placeId: args.placeId ?? buildTarget.target.placeId,
-            })
+            buildDeployMetadataAttributes(
+              deployGitInfo,
+              {
+                target: targetName,
+                published: publish,
+                timestamp: deployTimestamp,
+                universeId: args.universeId ?? buildTarget.target.universeId,
+                placeId: args.placeId ?? buildTarget.target.placeId,
+              },
+              buildTarget.manifestPlaces
+            )
           );
 
           let uploadResult: Awaited<ReturnType<typeof uploadPlaceAsync>>;

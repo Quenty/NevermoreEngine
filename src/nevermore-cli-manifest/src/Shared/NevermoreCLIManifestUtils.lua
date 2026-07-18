@@ -29,6 +29,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local Observable = require("Observable")
 
 local NevermoreCLIManifestUtils = {}
@@ -62,6 +64,27 @@ export type GameMetadata = {
 	universeId: number?,
 }
 
+--[=[
+	One place in the deployed target's place table. Deploying a multi-place
+	target (e.g. a game with `chapter0`..`chapterN` places) bakes every place's
+	IDs into the running place, so it can resolve a sibling's `placeId` without
+	hard-coding it -- for example to teleport between chapters.
+
+	`name` is the place name from the deploy target (e.g. "chapter0"); it is
+	absent for single-place targets.
+
+	@interface ManifestPlace
+	.name string?
+	.placeId number
+	.universeId number
+	@within NevermoreCLIManifestUtils
+]=]
+export type ManifestPlace = {
+	name: string?,
+	placeId: number,
+	universeId: number,
+}
+
 -- Attribute names written by the nevermore CLI. These MUST stay in sync with
 -- tools/nevermore-cli/build-scripts/transform-inject-deploy-metadata.luau
 local ATTRIBUTE = {
@@ -74,6 +97,8 @@ local ATTRIBUTE = {
 	published = "Published",
 	placeId = "PlaceId",
 	universeId = "UniverseId",
+	-- JSON-encoded array of the whole target's places (see getPlaces).
+	places = "Places",
 }
 
 -- Place and universe IDs are stored as string attributes (the CLI stringifies
@@ -101,6 +126,37 @@ local function readMetadata(instance: Instance): GameMetadata
 		placeId = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.placeId)),
 		universeId = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.universeId)),
 	}
+end
+
+-- The place table is a JSON string (not per-place attributes) so the whole
+-- target travels as one value. IDs stay numeric inside the JSON: it is exact
+-- text and JSONDecode yields 64-bit numbers, so the float32 hazard that forces
+-- the scalar PlaceId/UniverseId attributes to be strings does not apply here.
+-- Anything malformed degrades to an empty list rather than erroring.
+local function readPlaces(instance: Instance): { ManifestPlace }
+	local raw = instance:GetAttribute(ATTRIBUTE.places)
+	if type(raw) ~= "string" then
+		return {}
+	end
+
+	local ok, decoded = pcall(function()
+		return HttpService:JSONDecode(raw)
+	end)
+	if not ok or type(decoded) ~= "table" then
+		return {}
+	end
+
+	local places: { ManifestPlace } = {}
+	for _, entry in decoded :: { any } do
+		if type(entry) == "table" and type(entry.placeId) == "number" and type(entry.universeId) == "number" then
+			table.insert(places, {
+				name = if type(entry.name) == "string" then entry.name else nil,
+				placeId = entry.placeId,
+				universeId = entry.universeId,
+			})
+		end
+	end
+	return places
 end
 
 --[=[
@@ -145,6 +201,46 @@ function NevermoreCLIManifestUtils.observeGameMetadata(instance: Instance?): Obs
 	return Observable.new(function(sub)
 		local function handleChanged()
 			sub:Fire(readMetadata(target))
+		end
+
+		local connection = target.AttributeChanged:Connect(handleChanged)
+		handleChanged()
+
+		return connection
+	end) :: any
+end
+
+--[=[
+	Returns every place in the deployed target, so a running place can look up a
+	sibling place's `placeId` (for example to teleport between chapters) without
+	hard-coding IDs. The order matches the deploy target's `places` list.
+
+	Returns an empty list in Studio, in an undeployed build, or if the older CLI
+	that deployed the place did not stamp the place table.
+
+	`instance` defaults to the manifest module itself; pass an instance to parse
+	the place table off somewhere else.
+
+	@param instance Instance?
+	@return { ManifestPlace }
+]=]
+function NevermoreCLIManifestUtils.getPlaces(instance: Instance?): { ManifestPlace }
+	return readPlaces(instance or script)
+end
+
+--[=[
+	Observes the deployed target's place table, firing immediately with the
+	current list and again whenever attributes change (for example when the
+	metadata first replicates to a client).
+
+	@param instance Instance?
+	@return Observable<{ ManifestPlace }>
+]=]
+function NevermoreCLIManifestUtils.observePlaces(instance: Instance?): Observable.Observable<{ ManifestPlace }>
+	local target = instance or script
+	return Observable.new(function(sub)
+		local function handleChanged()
+			sub:Fire(readPlaces(target))
 		end
 
 		local connection = target.AttributeChanged:Connect(handleChanged)
