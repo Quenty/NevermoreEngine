@@ -44,6 +44,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/nevermoreclimanifest": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/preferredparentutils": "workspace:*",

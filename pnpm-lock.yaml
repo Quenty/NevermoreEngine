@@ -2061,6 +2061,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/nevermoreclimanifest':
+        specifier: workspace:*
+        version: link:../nevermore-cli-manifest
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection

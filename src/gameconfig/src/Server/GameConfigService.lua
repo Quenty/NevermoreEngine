@@ -106,7 +106,7 @@ end
 	@param priority number? -- Selection priority; higher wins on a key clash
 ]=]
 function GameConfigService:AddPlace(assetKey: string, placeId: number, priority: number?)
-	self:AddTypedAsset(GameConfigAssetTypes.PLACE, assetKey, placeId, priority)
+	return self:AddTypedAsset(GameConfigAssetTypes.PLACE, assetKey, placeId, priority)
 end
 
 --[=[
