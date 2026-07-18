@@ -710,8 +710,14 @@ function DataStoreStage.PromiseInvokeSavingCallbacks(self: DataStoreStage)
 	local removingPromises: { Promise.Promise<()> } = {}
 
 	for _, func in self._savingCallbacks do
-		local result = func()
-		if Promise.isPromise(result) then
+		-- Isolate the callback so a throw fails the save cleanly, preserving the stack trace.
+		local ok, result = xpcall(func, function(err)
+			return debug.traceback(tostring(err), 2)
+		end)
+		if not ok then
+			warn(`[DataStoreStage] - Saving callback errored: {result}`)
+			table.insert(removingPromises, Promise.rejected(result) :: any)
+		elseif Promise.isPromise(result) then
 			table.insert(removingPromises, result :: any)
 		end
 	end

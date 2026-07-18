@@ -72,6 +72,7 @@ local HttpService = game:GetService("HttpService")
 local DataStoreDeleteToken = require("DataStoreDeleteToken")
 local DataStoreLockHelper = require("DataStoreLockHelper")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
+local DataStoreNonRetryableLoadError = require("DataStoreNonRetryableLoadError")
 local DataStorePromises = require("DataStorePromises")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
@@ -91,6 +92,18 @@ local DEFAULT_DEBUG_WRITING = false
 
 local DEFAULT_AUTO_SAVE_TIME_SECONDS = 60 * 5
 local DEFAULT_JITTER_PROPORTION = 0.1 -- Randomly assign jitter so if a ton of players join at once we don't hit the datastore at once
+
+-- Retry backoff for the session-locked load (~49s total); tunable so tests need not wait it out.
+-- https://exponentialbackoffcalculator.com/
+local DEFAULT_LOAD_RETRY_OPTIONS = {
+	exponential = 1.25,
+	initialWaitTime = 6,
+	maxAttempts = 6,
+	printWarning = true,
+}
+
+-- After a graceful session-close request we wait for Roblox to replicate the release before retrying.
+local DEFAULT_SESSION_MESSAGING_CLOSE_DELAY_SECONDS = 5
 
 local DataStore = setmetatable({}, DataStoreStage)
 DataStore.ClassName = "DataStore"
@@ -113,6 +126,8 @@ export type DataStore =
 			_loadedOk: ValueObject.ValueObject<boolean>,
 			_firstLoadPromise: Promise.Promise<()>,
 			_promiseSessionLockingFailed: Promise.Promise<()>,
+			_loadRetryOptions: PromiseRetryUtils.RetryOptions,
+			_sessionMessagingCloseDelaySeconds: number,
 
 			-- Events
 			Saving: Signal.Signal<Promise.Promise<()>>,
@@ -147,6 +162,8 @@ function DataStore.new(robloxDataStore: DataStorePromises.RobloxDataStore, key: 
 	self._syncOnSave = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._loadedOk = self._maid:Add(ValueObject.new(false, "boolean"))
 	self._promiseSessionLockingFailed = self._maid:Add(Promise.new())
+	self._loadRetryOptions = DEFAULT_LOAD_RETRY_OPTIONS
+	self._sessionMessagingCloseDelaySeconds = DEFAULT_SESSION_MESSAGING_CLOSE_DELAY_SECONDS
 
 	self._userIdList = nil
 
@@ -315,6 +332,32 @@ function DataStore.SetSyncOnSave(self: DataStore, syncEnabled: boolean)
 end
 
 --[=[
+	Overrides the retry backoff used while acquiring a session-locked load. Defaults to ~49s of
+	exponential backoff. Mainly useful for tests, which set a tiny backoff so they need not wait it
+	out. Must be set before the datastore loads.
+
+	@param options { exponential: number?, initialWaitTime: number, maxAttempts: number, printWarning: boolean }
+]=]
+function DataStore.SetLoadRetryOptions(self: DataStore, options: PromiseRetryUtils.RetryOptions): ()
+	assert(not self._firstLoadPromise, "Must set load retry options before the datastore is loaded")
+	assert(type(options) == "table", "Bad options")
+
+	self._loadRetryOptions = options
+end
+
+--[=[
+	Overrides how long to wait for Roblox to replicate a released lock after a graceful session-close
+	request before retrying the load. Defaults to 5 seconds. Mainly useful for tests.
+
+	@param seconds number
+]=]
+function DataStore.SetSessionMessagingCloseDelaySeconds(self: DataStore, seconds: number): ()
+	assert(type(seconds) == "number" and seconds >= 0, "Bad seconds")
+
+	self._sessionMessagingCloseDelaySeconds = seconds
+end
+
+--[=[
 	Returns whether the datastore failed.
 	@return boolean
 ]=]
@@ -405,9 +448,13 @@ function DataStore.PromiseViewUpToDate(self: DataStore): Promise.Promise<()>
 	local promise = self:_promiseGetAsyncNoCache()
 	self._firstLoadPromise = promise
 
-	promise:Tap(function()
-		self._loadedOk.Value = true
-	end)
+	-- Fire-and-forget side effect; Catch so a failed/cancelled load is not surfaced as an uncaught
+	-- rejection on this discarded branch (the load result itself is handled by callers).
+	promise
+		:Tap(function()
+			self._loadedOk.Value = true
+		end)
+		:Catch(function() end)
 
 	return promise
 end
@@ -599,10 +646,12 @@ function DataStore._doDataSync(
 		)
 	end
 
-	promise:Tap(nil, function(err)
-		-- Might be caused by Maid rejecting state
-		warn("[DataStore] - Failed to sync data", err)
-	end)
+	promise
+		:Tap(nil, function(err)
+			-- Might be caused by Maid rejecting state
+			warn("[DataStore] - Failed to sync data", err)
+		end)
+		:Catch(function() end)
 
 	self._maid._saveMaid = maid
 
@@ -653,7 +702,9 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 									:Then(function()
 										-- Give enough time for Roblox to replicate changes
 										-- We probably could bump back to the loop but this has slightly better error messages
-										return maid:GivePromise(PromiseUtils.delayed(5))
+										return maid:GivePromise(
+											PromiseUtils.delayed(self._sessionMessagingCloseDelaySeconds)
+										)
 									end)
 									:Then(function()
 										return maid:GivePromise(promiseLoadUnlockedProfile(canStealLock, false))
@@ -682,7 +733,13 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 
 						return lockResult.lockedProfile, userIdList, metadata
 					end)
-				)
+				):Catch(function(opError)
+					-- The datastore operation itself failed (e.g. 509), which is NOT lock contention and
+					-- will not resolve by retrying. Fail the load fast, preserving the original error.
+					if loadPromise:IsPending() then
+						loadPromise:Reject(DataStoreNonRetryableLoadError.new(opError))
+					end
+				end)
 			end)
 
 			loadPromise:Finally(function()
@@ -692,18 +749,27 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			return loadPromise
 		end
 
+		local retryOptions = {
+			exponential = self._loadRetryOptions.exponential,
+			initialWaitTime = self._loadRetryOptions.initialWaitTime,
+			maxAttempts = self._loadRetryOptions.maxAttempts,
+			printWarning = self._loadRetryOptions.printWarning,
+			-- Retry lock contention (the holder may release); fail fast on a fatal op failure.
+			shouldRetry = function(err)
+				return not DataStoreNonRetryableLoadError.isNonRetryableLoadError(err)
+			end,
+		}
+
 		promise = self._maid
 			:Add(PromiseRetryUtils.retry(function()
 				return promiseLoadUnlockedProfile(false, true)
-			end, {
-				-- https://exponentialbackoffcalculator.com/
-				-- 49.242 seconds
-				exponential = 1.25,
-				initialWaitTime = 6,
-				maxAttempts = 6,
-				printWarning = true,
-			}))
+			end, retryOptions))
 			:Catch(function(err)
+				-- A fatal op failure is not made loadable by stealing the lock; propagate it.
+				if DataStoreNonRetryableLoadError.isNonRetryableLoadError(err) then
+					return Promise.rejected(err)
+				end
+
 				warn(
 					string.format(
 						"DataStorePromises.updateAsync(%q) (will steal session) -> warning - %s",
@@ -724,7 +790,7 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 				)
 
 				self._promiseSessionLockingFailed:Resolve()
-				return Promise.rejected(err)
+				return Promise.rejected(DataStoreNonRetryableLoadError.unwrapLoadError(err))
 			end)
 	else
 		promise = self._maid
@@ -758,6 +824,11 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			)
 			-- print(string.format("DataStorePromises.getAsync(%q) -> Got ", self._key), data)
 		end
+	end, function(err)
+		-- Propagate the load failure. The explicit onRejected also marks the upstream promise as
+		-- consumed, so a cancellation rejection (e.g. the store destroyed mid-load) is not surfaced
+		-- as an uncaught exception on this branch.
+		return Promise.rejected(err)
 	end)
 end
 

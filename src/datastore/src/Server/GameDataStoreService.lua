@@ -38,6 +38,20 @@ function GameDataStoreService.Init(self: GameDataStoreService, serviceBag: Servi
 end
 
 --[=[
+	Injects the underlying datastore to use instead of resolving a real one. Accepts a real
+	datastore or a [DataStoreMock]. Intended for testing; must be called before the datastore
+	is first resolved.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function GameDataStoreService.SetRobloxDataStore(self: GameDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._robloxDataStorePromise, "Already resolved robloxDataStore, cannot override")
+
+	self._robloxDataStorePromise = Promise.resolved(robloxDataStore)
+end
+
+--[=[
 	Promises a DataStore for the current game that is synchronized every 5 seconds.
 
 	@return Promise<DataStore>
@@ -60,6 +74,18 @@ function GameDataStoreService.PromiseDataStore(self: GameDataStoreService): Prom
 				dataStore:Destroy()
 			end)
 		end))
+
+		-- On service teardown (hot reload / tests) flush and destroy the store. Save() is a best-effort
+		-- synchronous write before Destroy() cancels it. The guard skips it if the game-close callback
+		-- above already tore the store down.
+		self._maid:GiveTask(function()
+			if not dataStore.Destroy then
+				return
+			end
+			-- Best-effort: swallow a rejection (e.g. the load failed) so it is not uncaught.
+			dataStore:Save():Catch(function() end)
+			dataStore:Destroy()
+		end)
 
 		return dataStore
 	end)

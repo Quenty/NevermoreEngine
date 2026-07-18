@@ -55,6 +55,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
+local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
@@ -89,6 +90,9 @@ export type PlayerDataStoreManager =
 
 --[=[
 	Constructs a new PlayerDataStoreManager.
+
+	Unless `skipBindingToClose` is true, this resolves [BindToCloseService] from the serviceBag to
+	save on game close, so that service must be registered before the serviceBag starts.
 
 	@param robloxDataStore DataStore
 	@param keyGenerator (player) -> string -- Function that takes in a player, and outputs a key
@@ -125,17 +129,45 @@ function PlayerDataStoreManager.new(
 		self:_removePlayerDataStore(player.UserId)
 	end))
 
+	-- On teardown (e.g. a hot-reloaded ServiceBag, or unit tests) flush and destroy any datastores we
+	-- still own. See _flushAndDestroyAll.
+	self._maid:GiveTask(function()
+		self:_flushAndDestroyAll()
+	end)
+
 	if skipBindingToClose ~= true then
-		game:BindToClose(function()
+		-- Route through BindToCloseService so the callback is unregistered on :Destroy()
+		-- (unlike a raw game:BindToClose, which can never be unbound and would leak on hot reload).
+		local bindToCloseService = self._serviceBag:GetService(BindToCloseService) :: any
+		self._maid:GiveTask(bindToCloseService:RegisterPromiseOnCloseCallback(function()
 			if self._disableSavingInStudio then
-				return
+				return Promise.resolved()
 			end
 
-			self:PromiseAllSaves():Wait()
-		end)
+			return self:PromiseAllSaves()
+		end))
 	end
 
 	return self
+end
+
+--[=[
+	Flushes and tears down every datastore we still own. Runs on manager teardown (a hot-reloaded
+	ServiceBag, or a unit test). Save() is a best-effort synchronous write: the underlying UpdateAsync
+	request is dispatched before Destroy() cancels the promise, so a live server usually honors it, but
+	it is not guaranteed. A store whose load failed rejects, so the rejection is swallowed. Stores handed
+	off gracefully via _removePlayerDataStore have already been pulled out of _datastores, so this only
+	covers the ones nothing else cleaned up.
+]=]
+function PlayerDataStoreManager._flushAndDestroyAll(self: PlayerDataStoreManager): ()
+	for userId, datastore in self._datastores do
+		-- Cast past the DataStore intersection type: the solver otherwise blows up ("code too complex")
+		-- resolving :Save()/:Destroy() through it.
+		local store = datastore :: any
+		store:Save():Catch(function() end)
+		store:Destroy()
+		self._datastores[userId] = nil
+	end
 end
 
 --[=[

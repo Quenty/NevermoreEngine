@@ -19,10 +19,13 @@ local MessagingServiceUtils = {}
 	Wraps MessagingService:PublishAsync(topic, message)
 	@param topic string
 	@param message any
+	@param messagingService any? -- Injection seam; defaults to the real MessagingService
 	@return Promise
 ]=]
-function MessagingServiceUtils.promisePublish(topic: string, message: any?): Promise.Promise<()>
+function MessagingServiceUtils.promisePublish(topic: string, message: any?, messagingService: any?): Promise.Promise<()>
 	assert(type(topic) == "string", "Bad topic")
+
+	local robloxMessagingService = messagingService or MessagingService
 
 	return Promise.spawn(function(resolve, reject)
 		if DEBUG_PUBLISH then
@@ -30,7 +33,7 @@ function MessagingServiceUtils.promisePublish(topic: string, message: any?): Pro
 		end
 
 		local ok, err = pcall(function()
-			MessagingService:PublishAsync(topic, message)
+			robloxMessagingService:PublishAsync(topic, message)
 		end)
 		if not ok then
 			if DEBUG_PUBLISH then
@@ -51,14 +54,18 @@ export type SubscriptionData = {
 	Wraps MessagingService:SubscribeAsync(topic, callback)
 	@param topic string
 	@param callback callback
+	@param messagingService any? -- Injection seam; defaults to the real MessagingService
 	@return Promise<RBXScriptConnection>
 ]=]
 function MessagingServiceUtils.promiseSubscribe(
 	topic: string,
-	callback: (SubscriptionData) -> ()
+	callback: (SubscriptionData) -> (),
+	messagingService: any?
 ): Promise.Promise<RBXScriptConnection>
 	assert(type(topic) == "string", "Bad topic")
 	assert(type(callback) == "function", "Bad callback")
+
+	local robloxMessagingService = messagingService or MessagingService
 
 	if DEBUG_SUBSCRIBE then
 		print(string.format("Listening on %q", topic))
@@ -73,7 +80,7 @@ function MessagingServiceUtils.promiseSubscribe(
 	return Promise.spawn(function(resolve, reject)
 		local connection
 		local ok, err = pcall(function()
-			connection = MessagingService:SubscribeAsync(topic, callback)
+			connection = robloxMessagingService:SubscribeAsync(topic, callback)
 		end)
 		if not ok then
 			if DEBUG_PUBLISH then

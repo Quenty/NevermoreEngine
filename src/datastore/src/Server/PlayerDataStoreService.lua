@@ -27,6 +27,7 @@ export type PlayerDataStoreService = typeof(setmetatable(
 		_dataStoreManagerPromise: Promise.Promise<PlayerDataStoreManager.PlayerDataStoreManager>,
 		_bindToCloseService: any,
 		_promiseStarted: Promise.Promise<()>,
+		_robloxDataStoreOverride: any?,
 	},
 	{} :: typeof({ __index = PlayerDataStoreService })
 ))
@@ -92,6 +93,20 @@ function PlayerDataStoreService.SetDataStoreScope(self: PlayerDataStoreService, 
 end
 
 --[=[
+	Injects the underlying datastore the manager wraps, instead of resolving a real one. Accepts
+	a real datastore or a [DataStoreMock]. Intended for testing; must be called before the manager
+	is first built.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function PlayerDataStoreService.SetRobloxDataStore(self: PlayerDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._dataStoreManagerPromise, "Already built manager, cannot override")
+
+	self._robloxDataStoreOverride = robloxDataStore
+end
+
+--[=[
 	Gets the datastore for the player.
 
 	:::tip
@@ -138,6 +153,9 @@ function PlayerDataStoreService.PromiseManager(
 
 	self._dataStoreManagerPromise = self._promiseStarted
 		:Then(function()
+			if self._robloxDataStoreOverride then
+				return self._robloxDataStoreOverride
+			end
 			return DataStorePromises.promiseDataStore(self._dataStoreName, self._dataStoreScope)
 		end)
 		:Then(function(dataStore)
