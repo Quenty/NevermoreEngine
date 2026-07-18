@@ -16,12 +16,10 @@
 	  * PromiseTranslator() / GetTranslator() acquire the Roblox translator.
 
 	The shared world (real ServiceBag + real TranslatorService, isolated per test) is
-	built by [TranslatorTestUtils.setup]; see there for details.
+	built by [TranslatorTestUtils.TranslatorTestUtils.setup]; see there for details.
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local LocalizationService = game:GetService("LocalizationService")
 
@@ -30,29 +28,24 @@ local Table = require("Table")
 local TieRealms = require("TieRealms")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 
-local getEntryMap = TranslatorTestUtils.getEntryMap
-
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local setup = TranslatorTestUtils.setup
-local EXPECTED_TABLE_NAME = TranslatorTestUtils.EXPECTED_TABLE_NAME
-
 describe("TranslatorService:GetLocalizationTable", function()
 	it("creates a role-named LocalizationTable parented to LocalizationService", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local localizationTable = controller.translatorService:GetLocalizationTable()
 
 		expect(localizationTable:IsA("LocalizationTable")).toBe(true)
-		expect(localizationTable.Name).toBe(EXPECTED_TABLE_NAME)
+		expect(localizationTable.Name).toBe(TranslatorTestUtils.EXPECTED_TABLE_NAME)
 		expect(localizationTable.Parent).toBe(LocalizationService)
 		controller:destroy()
 	end)
 
 	it("caches the table so repeated calls return the same instance", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local first = controller.translatorService:GetLocalizationTable()
 		local second = controller.translatorService:GetLocalizationTable()
@@ -61,11 +54,8 @@ describe("TranslatorService:GetLocalizationTable", function()
 		controller:destroy()
 	end)
 
-	-- PIN: the generated table is a single shared instance keyed by name. A second,
-	-- independent service finds the already-created table rather than making a new one.
-	-- This is why writes replicate widely -- every translator shares this one table.
 	it("resolves to the existing named table from a separate service instance", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local first = controller.translatorService:GetLocalizationTable()
 		local second = controller.newTranslatorService():GetLocalizationTable()
@@ -77,13 +67,13 @@ end)
 
 describe("TranslatorService._getLocalizationTableName", function()
 	it("names the table by server/client role", function()
-		local controller = setup()
-		expect(controller.translatorService:_getLocalizationTableName()).toBe(EXPECTED_TABLE_NAME)
+		local controller = TranslatorTestUtils.setup()
+		expect(controller.translatorService:_getLocalizationTableName()).toBe(TranslatorTestUtils.EXPECTED_TABLE_NAME)
 		controller:destroy()
 	end)
 
 	it("uses the client table when the realm is injected as client", function()
-		local controller = setup({ tieRealm = TieRealms.CLIENT })
+		local controller = TranslatorTestUtils.setup({ tieRealm = TieRealms.CLIENT })
 		expect(controller.translatorService:GetLocalizationTable().Name).toBe("GeneratedJSONTable_Client")
 		controller:destroy()
 	end)
@@ -91,14 +81,14 @@ end)
 
 describe("TranslatorService forced locale", function()
 	it("overrides GetLocaleId when a locale is forced", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		controller.translatorService:SetForcedLocaleId("de-de")
 		expect(controller.translatorService:GetLocaleId()).toBe("de-de")
 		controller:destroy()
 	end)
 
 	it("reverts to the inferred locale when the override is cleared", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetForcedLocaleId("de-de")
@@ -109,7 +99,7 @@ describe("TranslatorService forced locale", function()
 	end)
 
 	it("emits the forced locale from ObserveLocaleId", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 		service:SetForcedLocaleId("de-de")
 
@@ -125,7 +115,7 @@ end)
 
 describe("TranslatorService:GetLocaleId", function()
 	it("resolves to RobloxLocaleId on a server with no local player", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		-- With no LocalPlayer, the locale falls through to LocalizationService.RobloxLocaleId.
 		expect(controller.translatorService:GetLocaleId()).toBe(LocalizationService.RobloxLocaleId)
 		controller:destroy()
@@ -134,7 +124,7 @@ end)
 
 describe("TranslatorService:GetTranslator / PromiseTranslator", function()
 	it("acquires a Roblox translator", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local translator = controller.awaitTranslator()
 		expect(typeof(translator)).toBe("Instance")
@@ -143,7 +133,7 @@ describe("TranslatorService:GetTranslator / PromiseTranslator", function()
 	end)
 
 	it("exposes the acquired translator through GetTranslator", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local translator = controller.awaitTranslator()
 		expect(controller.translatorService:GetTranslator()).toBe(translator)
@@ -151,7 +141,7 @@ describe("TranslatorService:GetTranslator / PromiseTranslator", function()
 	end)
 
 	it("resolves PromiseTranslator to the same translator on repeated calls", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		expect(controller.awaitTranslator()).toBe(controller.awaitTranslator())
 		controller:destroy()
@@ -160,13 +150,13 @@ end)
 
 describe("TranslatorService entry writes (deferred)", function()
 	it("resolves PromiseEntriesWritten immediately when nothing is pending", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		expect(controller.translatorService:PromiseEntriesWritten():IsFulfilled()).toBe(true)
 		controller:destroy()
 	end)
 
 	it("defers a SetEntryValue write until the flush", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
@@ -181,7 +171,7 @@ describe("TranslatorService entry writes (deferred)", function()
 	end)
 
 	it("batches multiple writes into a single flush", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "ctx1", "en", "One")
@@ -192,14 +182,14 @@ describe("TranslatorService entry writes (deferred)", function()
 
 		controller.awaitEntriesWritten()
 
-		local entries = getEntryMap(service:GetLocalizationTable())
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"]).never.toBeNil()
 		expect(entries["k.two"]).never.toBeNil()
 		controller:destroy()
 	end)
 
 	it("FlushEntries applies the pending writes synchronously", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
@@ -217,7 +207,7 @@ describe("TranslatorService localization write cost", function()
 	-- engine, so the number of writes per flush is what we minimize: a whole frame's worth
 	-- of queued values/examples is coalesced into a single SetEntries call.
 	it("coalesces a batch of value and example writes into a single table write", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		-- Three entries, each with one locale value plus an example (six queued writes).
@@ -234,7 +224,7 @@ describe("TranslatorService localization write cost", function()
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
 		-- The entries still land correctly.
-		local entries = getEntryMap(service:GetLocalizationTable())
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.one"].Example).toBe("One")
 		expect(entries["k.two"].Values["en"]).toBe("Two")
@@ -243,7 +233,7 @@ describe("TranslatorService localization write cost", function()
 	end)
 
 	it("merges a later write into the existing entries without dropping them", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
@@ -254,14 +244,14 @@ describe("TranslatorService localization write cost", function()
 		controller.awaitEntriesWritten()
 
 		expect(service:GetLocalizationWriteCount()).toBe(2)
-		local entries = getEntryMap(service:GetLocalizationTable())
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.two"].Values["en"]).toBe("Two")
 		controller:destroy()
 	end)
 
 	it("does not write when a queued entry already matches the table", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
@@ -278,7 +268,7 @@ describe("TranslatorService localization write cost", function()
 	end)
 
 	it("writes when a queued entry changes an existing value", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
@@ -289,7 +279,7 @@ describe("TranslatorService localization write cost", function()
 		service:SetEntryValue("k.one", "One", "c1", "en", "Uno")
 		controller.awaitEntriesWritten()
 		expect(service:GetLocalizationWriteCount()).toBe(2)
-		expect(getEntryMap(service:GetLocalizationTable())["k.one"].Values["en"]).toBe("Uno")
+		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.one"].Values["en"]).toBe("Uno")
 		controller:destroy()
 	end)
 end)
@@ -298,7 +288,7 @@ describe("TranslatorService entry merging", function()
 	-- The common package-driven case: several translators register on one ServiceBag and
 	-- initialize together. Their entries must all land, merged, in a single write.
 	it("coalesces three translators initializing together into one write with no drops", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 
 		local service = controller.newPackageServiceBag({
 			{ name = "AlphaTranslator", data = { alpha = { one = "A1", two = "A2" } } },
@@ -311,7 +301,7 @@ describe("TranslatorService entry merging", function()
 		-- All three translators' entries flushed together as a single SetEntries.
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
-		local entries = getEntryMap(service:GetLocalizationTable())
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(Table.count(entries)).toBe(4)
 		expect(entries["alpha.one"].Values["en"]).toBe("A1")
 		expect(entries["alpha.two"].Values["en"]).toBe("A2")
@@ -321,7 +311,7 @@ describe("TranslatorService entry merging", function()
 	end)
 
 	it("preserves entries written directly to the table by an external writer", function()
-		local controller = setup()
+		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 		local localizationTable = service:GetLocalizationTable()
 
@@ -332,7 +322,7 @@ describe("TranslatorService entry merging", function()
 		service:SetEntryValue("internal.key", "Internal", "intctx", "en", "Internal")
 		controller.awaitEntriesWritten()
 
-		local entries = getEntryMap(localizationTable)
+		local entries = TranslatorTestUtils.getEntryMap(localizationTable)
 		-- The external entry survives the SetEntries merge rather than being clobbered.
 		expect(entries["external.key"].Values["en"]).toBe("External")
 		expect(entries["internal.key"].Values["en"]).toBe("Internal")
