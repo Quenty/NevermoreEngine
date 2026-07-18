@@ -2,213 +2,184 @@
 --[[
 	@class InstanceLocaleLoader.spec.lua
 
-	Unit tests for the lazy per-locale loader in isolation, using a recording writer
-	(no ServiceBag / TranslatorService needed).
+	Exercises the lazy per-locale loader through a real ServiceBag and asserts on what
+	actually reached the TranslatorService's localization table. The shared world is built
+	by [LocaleLoaderTestUtils.LocaleLoaderTestUtils.setup].
 ]]
 
 local require = require(script.Parent.loader).load(script)
 
-local HttpService = game:GetService("HttpService")
-
 local InstanceLocaleLoader = require("InstanceLocaleLoader")
 local Jest = require("Jest")
+local LocaleLoaderTestUtils = require("LocaleLoaderTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Records the writes the loader makes so tests can assert on them.
-local function newRecordingWriter()
-	local writer = { values = {}, examples = {} }
-
-	function writer:SetEntryValue(key, source, context, localeId, text)
-		table.insert(self.values, { key = key, source = source, context = context, localeId = localeId, text = text })
-	end
-
-	function writer:SetEntryExample(key, source, context, example)
-		table.insert(self.examples, { key = key, source = source, context = context, example = example })
-	end
-
-	return writer
-end
-
-local function valueFor(writer, key, localeId)
-	for _, op in writer.values do
-		if op.key == key and op.localeId == localeId then
-			return op
-		end
-	end
-	return nil
-end
-
-local function makeFolder(jsonByLocale)
-	local folder = Instance.new("Folder")
-	for localeId, dataTable in jsonByLocale do
-		local stringValue = Instance.new("StringValue")
-		stringValue.Name = localeId .. ".json"
-		stringValue.Value = HttpService:JSONEncode(dataTable)
-		stringValue.Parent = folder
-	end
-	return folder
-end
-
-local function newLoader(jsonByLocale)
-	local folder = makeFolder(jsonByLocale)
-	return InstanceLocaleLoader.new("T", "en", folder), folder
-end
-
 describe("InstanceLocaleLoader.LoadSourceLocale", function()
-	it("writes the source locale's values and examples", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
-		local writer = newRecordingWriter()
+	it("writes the source locale's values and example to the service", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 
-		loader:LoadSourceLocale(writer)
+		loader:LoadSourceLocale()
+		controller.flush()
 
-		local value = valueFor(writer, "greeting", "en")
-		expect(value.text).toBe("Hello")
-		expect(value.source).toBe("Hello")
-		expect(value.context).toBe("Generated from T with key greeting")
+		local entry = controller.getEntryMap()["greeting"]
+		expect(entry.Values["en"]).toBe("Hello")
+		expect(entry.Source).toBe("Hello")
+		expect(entry.Context).toBe("Generated from T with key greeting")
 		-- No other locale was written.
-		expect(valueFor(writer, "greeting", "fr")).toBeNil()
+		expect(entry.Values["fr"]).toBeNil()
 		-- The source locale carries the example.
-		expect(#writer.examples).toBe(1)
-		expect(writer.examples[1].example).toBe("Hello")
+		expect(entry.Example).toBe("Hello")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 end)
 
 describe("InstanceLocaleLoader.LoadLocale", function()
 	it("merges a later locale onto the source entries (keeping source/context)", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
-		local writer = newRecordingWriter()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 
-		loader:LoadSourceLocale(writer)
-		loader:LoadLocale("fr", writer)
+		loader:LoadSourceLocale()
+		loader:LoadLocale("fr")
+		controller.flush()
 
-		local value = valueFor(writer, "greeting", "fr")
-		expect(value.text).toBe("Bonjour")
+		local entry = controller.getEntryMap()["greeting"]
+		expect(entry.Values["fr"]).toBe("Bonjour")
 		-- Source and context come from the source locale so the value merges onto one entry.
-		expect(value.source).toBe("Hello")
-		expect(value.context).toBe("Generated from T with key greeting")
-		-- A non-source locale contributes no example.
-		expect(#writer.examples).toBe(1)
+		expect(entry.Source).toBe("Hello")
+		expect(entry.Context).toBe("Generated from T with key greeting")
+		-- A non-source locale contributes no example, so the source's example stands.
+		expect(entry.Example).toBe("Hello")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("loads the universal and regional files that share the target language", function()
+		local controller = LocaleLoaderTestUtils.setup()
 		-- A universal "es" plus a Mexico-specific "es-mx"; a target of es-mx needs both.
-		local loader, folder = newLoader({
+		local loader = controller.newInstanceLoader({
 			en = { greeting = "Hello" },
 			es = { greeting = "Hola" },
 			["es-mx"] = { greeting = "Que onda" },
 		})
-		local writer = newRecordingWriter()
 
-		loader:LoadSourceLocale(writer)
-		loader:LoadLocale("es-mx", writer)
+		loader:LoadSourceLocale()
+		loader:LoadLocale("es-mx")
+		controller.flush()
 
-		expect(valueFor(writer, "greeting", "es").text).toBe("Hola")
-		expect(valueFor(writer, "greeting", "es-mx").text).toBe("Que onda")
+		expect(controller.valueFor("greeting", "es")).toBe("Hola")
+		expect(controller.valueFor("greeting", "es-mx")).toBe("Que onda")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("loads sibling regional locales so they can serve as fallbacks", function()
+		local controller = LocaleLoaderTestUtils.setup()
 		-- fr-fr and fr-ca each hold a key the other lacks; a fr-fr target loads both.
-		local loader, folder = newLoader({
+		local loader = controller.newInstanceLoader({
 			en = { shared = "Shared" },
 			["fr-fr"] = { onlyFr = "Seulement FR" },
 			["fr-ca"] = { onlyCa = "Seulement CA" },
 		})
-		local writer = newRecordingWriter()
 
-		loader:LoadSourceLocale(writer)
-		loader:LoadLocale("fr-fr", writer)
+		loader:LoadSourceLocale()
+		loader:LoadLocale("fr-fr")
+		controller.flush()
 
-		expect(valueFor(writer, "onlyFr", "fr-fr").text).toBe("Seulement FR")
-		expect(valueFor(writer, "onlyCa", "fr-ca").text).toBe("Seulement CA")
+		expect(controller.valueFor("onlyFr", "fr-fr")).toBe("Seulement FR")
+		expect(controller.valueFor("onlyCa", "fr-ca")).toBe("Seulement CA")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("uses the source Source/Context even if a regional file is decoded first", function()
+		local controller = LocaleLoaderTestUtils.setup()
 		-- Only en-gb shares en's language; the explicit source-first load must still win.
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, ["en-gb"] = { greeting = "Hiya" } })
-		local writer = newRecordingWriter()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" }, ["en-gb"] = { greeting = "Hiya" } })
 
-		loader:LoadLocale("en-gb", writer)
+		loader:LoadLocale("en-gb")
+		controller.flush()
 
-		local value = valueFor(writer, "greeting", "en-gb")
-		expect(value.text).toBe("Hiya")
-		expect(value.source).toBe("Hello")
-		expect(value.context).toBe("Generated from T with key greeting")
+		local entry = controller.getEntryMap()["greeting"]
+		expect(entry.Values["en-gb"]).toBe("Hiya")
+		expect(entry.Source).toBe("Hello")
+		expect(entry.Context).toBe("Generated from T with key greeting")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("does not load a locale twice", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
-		local writer = newRecordingWriter()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 
-		loader:LoadSourceLocale(writer)
-		loader:LoadLocale("fr", writer)
-		local writesAfterFirst = #writer.values
+		loader:LoadSourceLocale()
+		loader:LoadLocale("fr")
+		controller.flush()
+		expect(controller.getWriteCount()).toBe(1)
 
-		-- Second call (and a regional variant of it) touches nothing new.
-		loader:LoadLocale("fr", writer)
-		loader:LoadLocale("fr-fr", writer)
-		expect(#writer.values).toBe(writesAfterFirst)
+		-- The repeat and a regional variant of it decode nothing, so nothing is queued.
+		loader:LoadLocale("fr")
+		loader:LoadLocale("fr-fr")
+		expect(controller.isIdle()).toBe(true)
+		controller.flush()
+		expect(controller.getWriteCount()).toBe(1)
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("writes nothing extra for a language with no files", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" } })
-		local writer = newRecordingWriter()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" } })
 
-		loader:LoadSourceLocale(writer)
-		local writesAfterSource = #writer.values
+		loader:LoadSourceLocale()
+		controller.flush()
+		expect(controller.getWriteCount()).toBe(1)
 
-		loader:LoadLocale("de-de", writer)
-		expect(#writer.values).toBe(writesAfterSource)
+		loader:LoadLocale("de-de")
+		expect(controller.isIdle()).toBe(true)
+		controller.flush()
+		expect(controller.getWriteCount()).toBe(1)
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 
 	it("does not decode the other locales' JSON", function()
-		local folder = Instance.new("Folder")
-		local en = Instance.new("StringValue")
-		en.Name = "en.json"
-		en.Value = HttpService:JSONEncode({ greeting = "Hello" })
-		en.Parent = folder
+		local controller = LocaleLoaderTestUtils.setup()
+		local folder = controller.newInstanceFolder({ en = { greeting = "Hello" } })
 		-- Invalid JSON; loading only the source must not touch it.
 		local frBad = Instance.new("StringValue")
 		frBad.Name = "fr.json"
 		frBad.Value = "{ not valid json"
 		frBad.Parent = folder
 
-		local loader = InstanceLocaleLoader.new("T", "en", folder)
-		local writer = newRecordingWriter()
-		loader:LoadSourceLocale(writer)
-		expect(valueFor(writer, "greeting", "en").text).toBe("Hello")
+		local loader = InstanceLocaleLoader.new(controller.serviceBag, "T", "en", folder)
+		loader:LoadSourceLocale()
+		controller.flush()
 
-		folder:Destroy()
+		expect(controller.valueFor("greeting", "en")).toBe("Hello")
+
+		controller:destroy()
 	end)
 end)
 
 describe("InstanceLocaleLoader.LoadAllLocales", function()
 	it("writes every available locale, with the example only from the source", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
-		local writer = newRecordingWriter()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 
-		loader:LoadAllLocales(writer)
+		loader:LoadAllLocales()
+		controller.flush()
 
-		expect(valueFor(writer, "greeting", "en").text).toBe("Hello")
-		expect(valueFor(writer, "greeting", "fr").text).toBe("Bonjour")
-		expect(#writer.examples).toBe(1)
+		local entry = controller.getEntryMap()["greeting"]
+		expect(entry.Values["en"]).toBe("Hello")
+		expect(entry.Values["fr"]).toBe("Bonjour")
+		-- Only the source contributes an example.
+		expect(entry.Example).toBe("Hello")
 
-		folder:Destroy()
+		controller:destroy()
 	end)
 end)

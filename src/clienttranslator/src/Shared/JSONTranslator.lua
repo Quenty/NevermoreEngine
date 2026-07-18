@@ -42,11 +42,12 @@ JSONTranslator.ServiceName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
 -- The common surface of [TableLocaleLoader] and [InstanceLocaleLoader]. Both queue
--- localization entries through the writer; the instance loader defers per locale.
+-- localization entries onto the [TranslatorService] they were constructed with; the
+-- instance loader defers per locale.
 type LocaleLoader = {
-	LoadSourceLocale: (self: any, writer: any) -> (),
-	LoadLocale: (self: any, localeId: string, writer: any) -> (),
-	LoadAllLocales: (self: any, writer: any) -> (),
+	LoadSourceLocale: (self: any) -> (),
+	LoadLocale: (self: any, localeId: string) -> (),
+	LoadAllLocales: (self: any) -> (),
 }
 
 export type JSONTranslator = typeof(setmetatable(
@@ -56,6 +57,7 @@ export type JSONTranslator = typeof(setmetatable(
 		_translatorService: TranslatorService.TranslatorService,
 		_tieRealmService: TieRealmService.TieRealmService,
 		_translatorName: string,
+		_createLoader: (serviceBag: ServiceBag.ServiceBag) -> LocaleLoader,
 		_loader: LocaleLoader,
 		_localizationTable: any,
 		_localTranslator: ValueObject.ValueObject<any>,
@@ -103,13 +105,19 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	self.ServiceName = translatorName
 
 	if type(localeId) == "string" and type(dataTable) == "table" then
-		-- Table-driven data is already in memory; decode it now and load it eagerly.
+		-- Table-driven data is already in memory; decode it now. The loader needs the service
+		-- bag, so defer its construction to Init via a callback.
 		local entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
-		self._loader = TableLocaleLoader.new(entries) :: any
+		self._createLoader = function(serviceBag)
+			return TableLocaleLoader.new(serviceBag, entries) :: any
+		end
 	elseif typeof(localeId) == "Instance" then
 		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) defer
-		-- decoding to the loader; see Init for how locales are loaded.
-		self._loader = InstanceLocaleLoader.new(self._translatorName, "en", localeId) :: any
+		-- decoding to the loader; it too is built in Init once the bag is available.
+		local folder = localeId
+		self._createLoader = function(serviceBag)
+			return InstanceLocaleLoader.new(serviceBag, self._translatorName, "en", folder) :: any
+		end
 	else
 		error("Must pass a localeId and dataTable")
 	end
@@ -128,17 +136,19 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
-	local writer = self._translatorService :: any
+	-- The loader resolves the TranslatorService from the bag and writes to it directly.
+	self._loader = self._createLoader(self._serviceBag)
+
 	if self._tieRealmService:GetTieRealm() == TieRealms.CLIENT then
 		-- On the client, load the source locale now (the fallback) and each target
 		-- locale's data as the locale is swapped to.
-		self._loader:LoadSourceLocale(writer)
+		self._loader:LoadSourceLocale()
 		self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
-			self._loader:LoadLocale(localeId, writer)
+			self._loader:LoadLocale(localeId)
 		end))
 	else
 		-- Off the client there is no player locale to key off, so load everything.
-		self._loader:LoadAllLocales(writer)
+		self._loader:LoadAllLocales()
 	end
 
 	-- TODO: Maybe don't hold these unless needed
@@ -430,8 +440,9 @@ function JSONTranslator.FormatByKey(self: JSONTranslator, translationKey: string
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	-- Synchronous read: force any deferred writes to land before we read the table.
-	self._translatorService:FlushEntries()
+	-- Synchronous read: land just this key's queued writes before reading, rather than
+	-- forcing the whole deferred batch (and its full table write cost) early.
+	self._translatorService:FlushEntryForKey(translationKey)
 
 	local translator = self._translatorService:GetTranslator()
 	if not translator then

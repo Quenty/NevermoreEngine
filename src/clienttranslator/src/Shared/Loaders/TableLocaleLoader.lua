@@ -4,30 +4,25 @@
 	single locale already in memory, so there is no per-locale laziness -- every entry
 	point queues the full set once.
 
-	Shares the loader surface (LoadSourceLocale / LoadLocale / LoadAllLocales) with
-	[InstanceLocaleLoader] so [JSONTranslator] can drive either the same way.
+	Writes land on the [TranslatorService] resolved from the [ServiceBag] passed to the
+	constructor. Shares the loader surface (LoadSourceLocale / LoadLocale / LoadAllLocales)
+	with [InstanceLocaleLoader] so [JSONTranslator] can drive either the same way.
 
 	@class TableLocaleLoader
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local ServiceBag = require("ServiceBag")
+local TranslatorService = require("TranslatorService")
 
 local TableLocaleLoader = {}
 TableLocaleLoader.ClassName = "TableLocaleLoader"
 TableLocaleLoader.__index = TableLocaleLoader
 
-export type Writer = {
-	SetEntryValue: (
-		self: any,
-		translationKey: string,
-		source: string,
-		context: string,
-		localeId: string,
-		text: string
-	) -> (),
-	SetEntryExample: (self: any, translationKey: string, source: string, context: string, example: string) -> (),
-}
-
 export type TableLocaleLoader = typeof(setmetatable(
 	{} :: {
+		_translatorService: TranslatorService.TranslatorService,
 		_entries: { any },
 		_loaded: boolean,
 	},
@@ -35,14 +30,17 @@ export type TableLocaleLoader = typeof(setmetatable(
 ))
 
 --[=[
+	@param serviceBag ServiceBag -- provides the [TranslatorService] writes land on
 	@param entries { any } -- already-decoded localization entries
 	@return TableLocaleLoader
 ]=]
-function TableLocaleLoader.new(entries: { any }): TableLocaleLoader
+function TableLocaleLoader.new(serviceBag: ServiceBag.ServiceBag, entries: { any }): TableLocaleLoader
+	assert(serviceBag, "Bad serviceBag")
 	assert(type(entries) == "table", "Bad entries")
 
 	local self = setmetatable({}, TableLocaleLoader)
 
+	self._translatorService = serviceBag:GetService(TranslatorService) :: any
 	self._entries = entries
 	self._loaded = false
 
@@ -51,18 +49,16 @@ end
 
 --[=[
 	Queues the entries. See [TableLocaleLoader].
-	@param writer Writer
 ]=]
-function TableLocaleLoader.LoadSourceLocale(self: TableLocaleLoader, writer: Writer)
-	self:_load(writer)
+function TableLocaleLoader.LoadSourceLocale(self: TableLocaleLoader)
+	self:_load()
 end
 
 --[=[
 	Queues the entries. See [TableLocaleLoader].
-	@param writer Writer
 ]=]
-function TableLocaleLoader.LoadAllLocales(self: TableLocaleLoader, writer: Writer)
-	self:_load(writer)
+function TableLocaleLoader.LoadAllLocales(self: TableLocaleLoader)
+	self:_load()
 end
 
 --[=[
@@ -70,13 +66,12 @@ end
 	defer for a specific locale.
 
 	@param _localeId string
-	@param writer Writer
 ]=]
-function TableLocaleLoader.LoadLocale(self: TableLocaleLoader, _localeId: string, writer: Writer)
-	self:_load(writer)
+function TableLocaleLoader.LoadLocale(self: TableLocaleLoader, _localeId: string)
+	self:_load()
 end
 
-function TableLocaleLoader._load(self: TableLocaleLoader, writer: Writer)
+function TableLocaleLoader._load(self: TableLocaleLoader)
 	if self._loaded then
 		return
 	end
@@ -84,9 +79,9 @@ function TableLocaleLoader._load(self: TableLocaleLoader, writer: Writer)
 
 	for _, item in self._entries do
 		for localeId, text in item.Values do
-			writer:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
+			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
 		end
-		writer:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+		self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
 	end
 end
 

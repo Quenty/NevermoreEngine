@@ -4,9 +4,9 @@
 	(a folder of per-locale JSON StringValues / ModuleScripts): which locales are
 	available, which have already been loaded, and the accumulated entry lookup.
 
-	Decodes and writes a locale's entries to the given writer only the first time that
-	locale is needed. The writer is anything with `SetEntryValue` and `SetEntryExample`
-	(i.e. [TranslatorService]), passed per call so this object never has to hold it.
+	Decodes and writes a locale's entries to the [TranslatorService] only the first time
+	that locale is needed. The service is resolved from the [ServiceBag] passed to the
+	constructor, so callers never have to thread a writer through each load call.
 
 	@class InstanceLocaleLoader
 ]=]
@@ -15,25 +15,16 @@ local require = require(script.Parent.loader).load(script)
 
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 local ResolveLocaleUtils = require("ResolveLocaleUtils")
+local ServiceBag = require("ServiceBag")
+local TranslatorService = require("TranslatorService")
 
 local InstanceLocaleLoader = {}
 InstanceLocaleLoader.ClassName = "InstanceLocaleLoader"
 InstanceLocaleLoader.__index = InstanceLocaleLoader
 
-export type Writer = {
-	SetEntryValue: (
-		self: any,
-		translationKey: string,
-		source: string,
-		context: string,
-		localeId: string,
-		text: string
-	) -> (),
-	SetEntryExample: (self: any, translationKey: string, source: string, context: string, example: string) -> (),
-}
-
 export type InstanceLocaleLoader = typeof(setmetatable(
 	{} :: {
+		_translatorService: TranslatorService.TranslatorService,
 		_translatorName: string,
 		_sourceLocaleId: string,
 		_folder: Instance,
@@ -45,22 +36,26 @@ export type InstanceLocaleLoader = typeof(setmetatable(
 ))
 
 --[=[
+	@param serviceBag ServiceBag -- provides the [TranslatorService] writes land on
 	@param translatorName string
 	@param sourceLocaleId string -- always loaded, the fallback for every key
 	@param folder Instance -- holds the per-locale StringValue/ModuleScript children
 	@return InstanceLocaleLoader
 ]=]
 function InstanceLocaleLoader.new(
+	serviceBag: ServiceBag.ServiceBag,
 	translatorName: string,
 	sourceLocaleId: string,
 	folder: Instance
 ): InstanceLocaleLoader
+	assert(serviceBag, "Bad serviceBag")
 	assert(type(translatorName) == "string", "Bad translatorName")
 	assert(type(sourceLocaleId) == "string", "Bad sourceLocaleId")
 	assert(typeof(folder) == "Instance", "Bad folder")
 
 	local self = setmetatable({}, InstanceLocaleLoader)
 
+	self._translatorService = serviceBag:GetService(TranslatorService) :: any
 	self._translatorName = translatorName
 	self._sourceLocaleId = sourceLocaleId
 	self._folder = folder
@@ -74,23 +69,19 @@ end
 --[=[
 	Loads the source locale. Always call this first -- it establishes the Source/Context
 	that other locales' values merge onto, and it is the ultimate fallback for every key.
-
-	@param writer Writer
 ]=]
-function InstanceLocaleLoader.LoadSourceLocale(self: InstanceLocaleLoader, writer: Writer)
-	self:_loadFile(self._sourceLocaleId, writer)
+function InstanceLocaleLoader.LoadSourceLocale(self: InstanceLocaleLoader)
+	self:_loadFile(self._sourceLocaleId)
 end
 
 --[=[
 	Loads every available locale file. Used off the client, where there is no single
 	target locale to narrow to.
-
-	@param writer Writer
 ]=]
-function InstanceLocaleLoader.LoadAllLocales(self: InstanceLocaleLoader, writer: Writer)
-	self:_loadFile(self._sourceLocaleId, writer)
+function InstanceLocaleLoader.LoadAllLocales(self: InstanceLocaleLoader)
+	self:_loadFile(self._sourceLocaleId)
 	for fileLocale in self._availableLocales do
-		self:_loadFile(fileLocale, writer)
+		self:_loadFile(fileLocale)
 	end
 end
 
@@ -103,14 +94,13 @@ end
 	should not) care which files it touched.
 
 	@param localeId string -- the target locale
-	@param writer Writer
 ]=]
-function InstanceLocaleLoader.LoadLocale(self: InstanceLocaleLoader, localeId: string, writer: Writer)
+function InstanceLocaleLoader.LoadLocale(self: InstanceLocaleLoader, localeId: string)
 	assert(type(localeId) == "string", "Bad localeId")
 
 	-- The source is the base fallback and must be decoded before any other file so their
 	-- values merge onto entries with the right Source/Context.
-	self:_loadFile(self._sourceLocaleId, writer)
+	self:_loadFile(self._sourceLocaleId)
 
 	local languageSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
 	if not languageSubtag then
@@ -119,13 +109,13 @@ function InstanceLocaleLoader.LoadLocale(self: InstanceLocaleLoader, localeId: s
 
 	for fileLocale in self._availableLocales do
 		if ResolveLocaleUtils.getLanguageSubtag(fileLocale) == languageSubtag then
-			self:_loadFile(fileLocale, writer)
+			self:_loadFile(fileLocale)
 		end
 	end
 end
 
 -- Decodes and writes a single locale file the first time it is seen. Idempotent.
-function InstanceLocaleLoader._loadFile(self: InstanceLocaleLoader, fileLocale: string, writer: Writer)
+function InstanceLocaleLoader._loadFile(self: InstanceLocaleLoader, fileLocale: string)
 	if self._loadedLocales[fileLocale] or not self._availableLocales[fileLocale] then
 		return
 	end
@@ -142,11 +132,11 @@ function InstanceLocaleLoader._loadFile(self: InstanceLocaleLoader, fileLocale: 
 	for _, item in entries do
 		local text = item.Values[fileLocale]
 		if text ~= nil then
-			writer:SetEntryValue(item.Key, item.Source, item.Context, fileLocale, text)
+			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, fileLocale, text)
 		end
 		-- The example only comes from the source locale.
 		if fileLocale == self._sourceLocaleId then
-			writer:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+			self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
 		end
 	end
 end

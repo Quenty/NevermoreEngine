@@ -14,6 +14,7 @@ local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
@@ -34,6 +35,12 @@ type PendingEntry = {
 	Values: { [string]: string },
 }
 
+-- Pending deltas indexed first by translation key, then by a Source+Context id. The outer
+-- key index lets a single-key flush ([TranslatorService.FlushEntryForKey]) find an entry in
+-- O(1) instead of scanning the whole batch; the inner index still separates entries that
+-- share a key but differ in source/context.
+type PendingEntries = { [string]: { [string]: PendingEntry } }
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
@@ -46,7 +53,7 @@ export type TranslatorService = typeof(setmetatable(
 		_localeIdValue: ValueObject.ValueObject<string>?,
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
-		_pendingEntries: { [string]: PendingEntry },
+		_pendingEntries: PendingEntries,
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
@@ -164,8 +171,14 @@ function TranslatorService._getPendingEntry(
 	source: string,
 	context: string
 ): PendingEntry
-	local id = string.format("%s\0%s\0%s", translationKey, source, context)
-	local entry = self._pendingEntries[id]
+	local byKey = self._pendingEntries[translationKey]
+	if not byKey then
+		byKey = {}
+		self._pendingEntries[translationKey] = byKey
+	end
+
+	local id = string.format("%s\0%s", source, context)
+	local entry = byKey[id]
 	if not entry then
 		entry = {
 			Key = translationKey,
@@ -173,7 +186,7 @@ function TranslatorService._getPendingEntry(
 			Context = context,
 			Values = {},
 		}
-		self._pendingEntries[id] = entry
+		byKey[id] = entry
 	end
 	return entry
 end
@@ -195,13 +208,86 @@ function TranslatorService.PromiseEntriesWritten(self: TranslatorService): Promi
 end
 
 --[=[
-	Flushes any pending localization writes synchronously, for callers that need the
-	table updated immediately rather than at the end of the frame.
+	Flushes every pending localization write synchronously. This defeats the end-of-frame
+	batching and pays the full table write cost, so it exists for tests that need the table
+	settled immediately. Production synchronous reads should use
+	[TranslatorService.FlushEntryForKey] to land just the key they need.
 ]=]
-function TranslatorService.FlushEntries(self: TranslatorService)
+function TranslatorService.FlushEntriesForTesting(self: TranslatorService)
 	if self._flushScheduled then
 		self:_flushWrites()
 	end
+end
+
+--[=[
+	Lands only what a synchronous read of a single key actually needs, leaving the rest of
+	the batch queued for the normal end-of-frame flush. This lets a synchronous read
+	([JSONTranslator.FormatByKey]) guarantee the one key it reads is present without forcing
+	-- and paying for -- the whole pending batch early.
+
+	Only the locales a read can actually consult are landed (the example and every other
+	locale in the entry stay queued), so a read costs a handful of targeted writes rather
+	than one per locale in the entry.
+
+	@param translationKey string
+]=]
+function TranslatorService.FlushEntryForKey(self: TranslatorService, translationKey: string)
+	assert(type(translationKey) == "string", "Bad translationKey")
+
+	if not self._flushScheduled then
+		return
+	end
+
+	local byKey = self._pendingEntries[translationKey]
+	if not byKey then
+		return
+	end
+
+	local localizationTable = self:GetLocalizationTable()
+
+	-- The locales a synchronous read may consult: the current locale and the table's source
+	-- locale, each plus its bare language subtag, since the Roblox translator falls a
+	-- regional locale back to its language (e.g. en-us -> en, and the loaders key the source
+	-- under "en"). Landing just these avoids writing every locale in the entry.
+	local localeId = self:GetLocaleId()
+	local sourceLocaleId = localizationTable.SourceLocaleId
+	local readLocales = { localeId, sourceLocaleId }
+	local localeSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
+	if localeSubtag then
+		table.insert(readLocales, localeSubtag)
+	end
+	local sourceSubtag = ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId)
+	if sourceSubtag then
+		table.insert(readLocales, sourceSubtag)
+	end
+
+	-- A key may have more than one pending entry (different source/context); land each. A
+	-- landed locale is dequeued, so a repeated read locale (e.g. localeId already its own
+	-- subtag) just no-ops the second time.
+	for _, entry in byKey do
+		for _, readLocale in readLocales do
+			self:_landEntryLocale(localizationTable, entry, readLocale)
+		end
+	end
+end
+
+-- Writes one locale's value for a pending entry straight to the table and dequeues just
+-- that locale, so the deferred batch flush does not write it again. No-ops if the entry has
+-- nothing pending for the locale.
+function TranslatorService._landEntryLocale(
+	self: TranslatorService,
+	localizationTable: LocalizationTable,
+	entry: PendingEntry,
+	localeId: string
+)
+	local text = entry.Values[localeId]
+	if text == nil then
+		return
+	end
+
+	localizationTable:SetEntryValue(entry.Key, entry.Source, entry.Context, localeId, text)
+	entry.Values[localeId] = nil
+	self._localizationWriteCount += 1
 end
 
 --[=[
@@ -255,7 +341,7 @@ end
 -- Merges the pending entry deltas into the table's current entries and writes them back
 -- in a single SetEntries call, so a whole frame's worth of translation entries costs one
 -- AutoLocalize invalidation instead of one per value/example.
-function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: { [string]: PendingEntry })
+function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: PendingEntries)
 	local localizationTable = self:GetLocalizationTable()
 
 	local existingById: { [string]: any } = {}
@@ -266,29 +352,32 @@ function TranslatorService._applyPendingEntries(self: TranslatorService, pending
 	end
 
 	local changed = false
-	for id, delta in pendingEntries do
-		local entry = existingById[id]
-		if not entry then
-			entry = {
-				Key = delta.Key,
-				Source = delta.Source,
-				Context = delta.Context,
-				Example = "",
-				Values = {},
-			}
-			existingById[id] = entry
-			table.insert(entries, entry)
-			changed = true
-		end
-
-		if delta.Example ~= nil and entry.Example ~= delta.Example then
-			entry.Example = delta.Example
-			changed = true
-		end
-		for localeId, text in delta.Values do
-			if entry.Values[localeId] ~= text then
-				entry.Values[localeId] = text
+	for _, byKey in pendingEntries do
+		for _, delta in byKey do
+			local id = string.format("%s\0%s\0%s", delta.Key, delta.Source, delta.Context)
+			local entry = existingById[id]
+			if not entry then
+				entry = {
+					Key = delta.Key,
+					Source = delta.Source,
+					Context = delta.Context,
+					Example = "",
+					Values = {},
+				}
+				existingById[id] = entry
+				table.insert(entries, entry)
 				changed = true
+			end
+
+			if delta.Example ~= nil and entry.Example ~= delta.Example then
+				entry.Example = delta.Example
+				changed = true
+			end
+			for localeId, text in delta.Values do
+				if entry.Values[localeId] ~= text then
+					entry.Values[localeId] = text
+					changed = true
+				end
 			end
 		end
 	end

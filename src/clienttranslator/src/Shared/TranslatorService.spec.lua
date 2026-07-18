@@ -188,7 +188,7 @@ describe("TranslatorService entry writes (deferred)", function()
 		controller:destroy()
 	end)
 
-	it("FlushEntries applies the pending writes synchronously", function()
+	it("FlushEntriesForTesting applies the pending writes synchronously", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
@@ -198,6 +198,43 @@ describe("TranslatorService entry writes (deferred)", function()
 		-- No yield needed; the entry is present immediately after the synchronous flush.
 		expect(#service:GetLocalizationTable():GetEntries()).toBe(1)
 		expect(service:PromiseEntriesWritten():IsFulfilled()).toBe(true)
+		controller:destroy()
+	end)
+end)
+
+describe("TranslatorService:FlushEntryForKey", function()
+	it("lands only the requested key, leaving the rest of the batch pending", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx1", "en", "One")
+		service:SetEntryValue("k.two", "Two", "ctx2", "en", "Two")
+
+		service:FlushEntryForKey("k.one")
+
+		-- The requested key landed; the other is still queued for the deferred flush.
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		expect(entries["k.one"].Values["en"]).toBe("One")
+		expect(entries["k.two"]).toBeNil()
+		expect(service:PromiseEntriesWritten():IsPending()).toBe(true)
+
+		-- The still-pending key lands on the normal end-of-frame flush.
+		controller.awaitEntriesWritten()
+		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.two"].Values["en"]).toBe("Two")
+		controller:destroy()
+	end)
+
+	it("is a no-op when nothing is pending", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		controller.awaitEntriesWritten()
+		local writesAfterFlush = service:GetLocalizationWriteCount()
+
+		-- Nothing queued, so there is nothing to land and no extra write happens.
+		service:FlushEntryForKey("k.one")
+		expect(service:GetLocalizationWriteCount()).toBe(writesAfterFlush)
 		controller:destroy()
 	end)
 end)

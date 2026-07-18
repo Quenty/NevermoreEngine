@@ -156,7 +156,7 @@ function TranslatorTestUtils.setup(options)
 
 	-- Flushes the deferred localization writes synchronously.
 	local function flushEntries()
-		translatorService:FlushEntries()
+		translatorService:FlushEntriesForTesting()
 	end
 
 	return {
