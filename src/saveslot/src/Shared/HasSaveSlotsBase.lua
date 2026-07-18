@@ -24,6 +24,7 @@ export type HasSaveSlotsBase =
 			_attributes: any,
 
 			ActiveSlotId: ValueObject.ValueObject<SaveSlotData.SlotId?>,
+			LastActiveSlotId: ValueObject.ValueObject<SaveSlotData.SlotId?>,
 			MaxSlotCount: ValueObject.ValueObject<number>,
 
 			SlotChanged: Signal.Signal<SaveSlotData.SlotId>,
@@ -40,6 +41,7 @@ function HasSaveSlotsBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 	self._attributes = HasSaveSlotsData:Create(self._obj)
 
 	self.ActiveSlotId = self._attributes.ActiveSlotId
+	self.LastActiveSlotId = self._attributes.LastActiveSlotId
 	self.MaxSlotCount = self._attributes.MaxSlotCount
 
 	self.SlotChanged = self.ActiveSlotId.Changed

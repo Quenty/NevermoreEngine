@@ -233,6 +233,34 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 end
 
 --[=[
+	Deletes every slot for the player and clears the active/last-active
+	selection, resetting the player to a fresh state. Resolves once all slots
+	are gone.
+]=]
+function HasSaveSlots.PromiseDeleteAllSlots(self: HasSaveSlots): Promise.Promise<any>
+	return (self._loadPromise :: any):Then(function()
+		-- Clear the selection first so the previously active slot is deletable
+		self.ActiveSlotId.Value = nil
+		self._lastActiveSlotId = nil
+		self.LastActiveSlotId.Value = nil
+
+		local slotIds = {}
+		for slotId in self._slotMap do
+			table.insert(slotIds, slotId)
+		end
+
+		-- Delete sequentially to avoid concurrent datastore saves
+		local promise = (Promise :: any).resolved()
+		for _, slotId in slotIds do
+			promise = promise:Then(function()
+				return self:PromiseDeleteSlot(slotId)
+			end)
+		end
+		return promise
+	end)
+end
+
+--[=[
 	Sets the metadata for the slot with the given ID
 ]=]
 function HasSaveSlots.PromiseSetSlotMetadata(
@@ -296,6 +324,61 @@ function HasSaveSlots.PromiseLastActiveSlotId(self: HasSaveSlots): Promise.Promi
 end
 
 --[=[
+	Selects the player's last active slot if one still exists, resolving to the
+	selected slot id -- or nil when there is no slot to continue on. Backs a
+	"Continue" affordance that every save-slot consumer tends to need.
+]=]
+function HasSaveSlots.PromiseSelectLastSaveSlot(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
+	return self:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
+		if not lastActiveSlotId then
+			return nil
+		end
+
+		return self:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
+			if not hasLastSlot then
+				return nil
+			end
+
+			return self:PromiseSelectSlot(lastActiveSlotId):Then(function()
+				return lastActiveSlotId
+			end)
+		end)
+	end)
+end
+
+--[=[
+	Creates a new slot at the lowest free index and selects it, resolving to the
+	new slot id -- or nil when every slot is already in use. Backs a "New Game"
+	affordance.
+]=]
+function HasSaveSlots.PromiseSelectNewSaveSlot(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
+	return (self._loadPromise :: any):Then(function(): any
+		local usedIndices = {}
+		for _, slot in self._slotMap do
+			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+		end
+
+		local freeIndex
+		for index = 1, self.MaxSlotCount.Value do
+			if not usedIndices[index] then
+				freeIndex = index
+				break
+			end
+		end
+
+		if not freeIndex then
+			return nil
+		end
+
+		return self:PromiseCreateSlot(freeIndex):Then(function(slotId: SaveSlotData.SlotId)
+			return self:PromiseSelectSlot(slotId):Then(function()
+				return slotId
+			end)
+		end)
+	end)
+end
+
+--[=[
 	Sets the summary provider
 ]=]
 function HasSaveSlots.SetSummaryProvider(self: HasSaveSlots, provider: SaveSlotSummaryProvider?): ()
@@ -315,7 +398,17 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 
 			return self._systemStore:Load("activeSlotId"):Then(function(activeId: SaveSlotData.SlotId?)
 				self._lastActiveSlotId = activeId
+				self.LastActiveSlotId.Value = activeId
 				self._maid:GiveTask(self._systemStore:StoreOnValueChange("activeSlotId", self.ActiveSlotId))
+
+				-- Keep the replicated last-active in sync as the player selects slots this session
+				self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
+					local active = self.ActiveSlotId.Value
+					if active ~= nil then
+						self._lastActiveSlotId = active
+						self.LastActiveSlotId.Value = active
+					end
+				end))
 			end)
 		end)
 	end)
