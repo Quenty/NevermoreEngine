@@ -57,7 +57,7 @@ describe("SortFunctionUtils", function()
 	describe("emptyIterator", function()
 		it("should return nothing", function()
 			local count = 0
-			for _ in SortFunctionUtils.emptyIterator do
+			for _ in SortFunctionUtils.emptyIterator :: any do
 				count += 1
 			end
 			expect(count).toEqual(0)

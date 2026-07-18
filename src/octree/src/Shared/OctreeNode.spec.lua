@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class OctreeNode.spec.lua
 ]]

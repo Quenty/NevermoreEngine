@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Unit tests for BrioUtils.lua
 ]]

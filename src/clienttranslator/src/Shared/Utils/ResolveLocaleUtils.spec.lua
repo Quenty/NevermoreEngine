@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
