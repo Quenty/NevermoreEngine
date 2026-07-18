@@ -64,7 +64,7 @@ describe("InstanceLocaleLoader.LoadSourceLocale", function()
 		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 		local writer = newRecordingWriter()
 
-		expect(loader:LoadSourceLocale(writer)).toBe("en")
+		loader:LoadSourceLocale(writer)
 
 		local value = valueFor(writer, "greeting", "en")
 		expect(value.text).toBe("Hello")
@@ -86,7 +86,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		local writer = newRecordingWriter()
 
 		loader:LoadSourceLocale(writer)
-		expect(loader:LoadLocale("fr", writer)).toBe("fr")
+		loader:LoadLocale("fr", writer)
 
 		local value = valueFor(writer, "greeting", "fr")
 		expect(value.text).toBe("Bonjour")
@@ -99,12 +99,53 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		folder:Destroy()
 	end)
 
-	it("resolves a regional locale to the closest available file", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
+	it("loads the universal and regional files that share the target language", function()
+		-- A universal "es" plus a Mexico-specific "es-mx"; a target of es-mx needs both.
+		local loader, folder = newLoader({
+			en = { greeting = "Hello" },
+			es = { greeting = "Hola" },
+			["es-mx"] = { greeting = "Que onda" },
+		})
 		local writer = newRecordingWriter()
 
-		expect(loader:LoadLocale("fr-fr", writer)).toBe("fr")
-		expect(valueFor(writer, "greeting", "fr").text).toBe("Bonjour")
+		loader:LoadSourceLocale(writer)
+		loader:LoadLocale("es-mx", writer)
+
+		expect(valueFor(writer, "greeting", "es").text).toBe("Hola")
+		expect(valueFor(writer, "greeting", "es-mx").text).toBe("Que onda")
+
+		folder:Destroy()
+	end)
+
+	it("loads sibling regional locales so they can serve as fallbacks", function()
+		-- fr-fr and fr-ca each hold a key the other lacks; a fr-fr target loads both.
+		local loader, folder = newLoader({
+			en = { shared = "Shared" },
+			["fr-fr"] = { onlyFr = "Seulement FR" },
+			["fr-ca"] = { onlyCa = "Seulement CA" },
+		})
+		local writer = newRecordingWriter()
+
+		loader:LoadSourceLocale(writer)
+		loader:LoadLocale("fr-fr", writer)
+
+		expect(valueFor(writer, "onlyFr", "fr-fr").text).toBe("Seulement FR")
+		expect(valueFor(writer, "onlyCa", "fr-ca").text).toBe("Seulement CA")
+
+		folder:Destroy()
+	end)
+
+	it("uses the source Source/Context even if a regional file is decoded first", function()
+		-- Only en-gb shares en's language; the explicit source-first load must still win.
+		local loader, folder = newLoader({ en = { greeting = "Hello" }, ["en-gb"] = { greeting = "Hiya" } })
+		local writer = newRecordingWriter()
+
+		loader:LoadLocale("en-gb", writer)
+
+		local value = valueFor(writer, "greeting", "en-gb")
+		expect(value.text).toBe("Hiya")
+		expect(value.source).toBe("Hello")
+		expect(value.context).toBe("Generated from T with key greeting")
 
 		folder:Destroy()
 	end)
@@ -113,23 +154,27 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
 		local writer = newRecordingWriter()
 
-		expect(loader:LoadLocale("fr", writer)).toBe("fr")
+		loader:LoadSourceLocale(writer)
+		loader:LoadLocale("fr", writer)
 		local writesAfterFirst = #writer.values
 
-		-- Second call resolves to the same, already-loaded locale: nothing happens.
-		expect(loader:LoadLocale("fr", writer)).toBeNil()
-		expect(loader:LoadLocale("fr-fr", writer)).toBeNil()
+		-- Second call (and a regional variant of it) touches nothing new.
+		loader:LoadLocale("fr", writer)
+		loader:LoadLocale("fr-fr", writer)
 		expect(#writer.values).toBe(writesAfterFirst)
 
 		folder:Destroy()
 	end)
 
-	it("does nothing for a locale with no file", function()
+	it("writes nothing extra for a language with no files", function()
 		local loader, folder = newLoader({ en = { greeting = "Hello" } })
 		local writer = newRecordingWriter()
 
-		expect(loader:LoadLocale("de", writer)).toBeNil()
-		expect(#writer.values).toBe(0)
+		loader:LoadSourceLocale(writer)
+		local writesAfterSource = #writer.values
+
+		loader:LoadLocale("de-de", writer)
+		expect(#writer.values).toBe(writesAfterSource)
 
 		folder:Destroy()
 	end)
@@ -140,7 +185,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		en.Name = "en.json"
 		en.Value = HttpService:JSONEncode({ greeting = "Hello" })
 		en.Parent = folder
-		-- Invalid JSON; loading only "en" must not touch it.
+		-- Invalid JSON; loading only the source must not touch it.
 		local frBad = Instance.new("StringValue")
 		frBad.Name = "fr.json"
 		frBad.Value = "{ not valid json"
@@ -148,23 +193,8 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 
 		local loader = InstanceLocaleLoader.new("T", "en", folder)
 		local writer = newRecordingWriter()
-		expect(loader:LoadSourceLocale(writer)).toBe("en")
+		loader:LoadSourceLocale(writer)
 		expect(valueFor(writer, "greeting", "en").text).toBe("Hello")
-
-		folder:Destroy()
-	end)
-end)
-
-describe("InstanceLocaleLoader.IsLoaded", function()
-	it("reflects whether a locale has been loaded", function()
-		local loader, folder = newLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
-		local writer = newRecordingWriter()
-
-		expect(loader:IsLoaded("fr")).toBe(false)
-		loader:LoadLocale("fr-fr", writer)
-		expect(loader:IsLoaded("fr")).toBe(true)
-		expect(loader:IsLoaded("fr-fr")).toBe(true)
-		expect(loader:IsLoaded("de")).toBe(false)
 
 		folder:Destroy()
 	end)

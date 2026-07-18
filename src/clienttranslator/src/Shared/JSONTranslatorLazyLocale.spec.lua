@@ -73,6 +73,30 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		controller:destroy()
 	end)
 
+	it("loads the universal and regional files sharing the target language on swap", function()
+		local controller = setup({ tieRealm = TieRealms.CLIENT })
+		controller.setForcedLocaleId("en")
+
+		local folder = controller.newInstanceFolder({
+			en = { greeting = "Hello" },
+			es = { greeting = "Hola" },
+			["es-mx"] = { greeting = "Que onda" },
+		})
+		controller.newTranslatorFromInstance(folder)
+		controller.awaitEntriesWritten()
+
+		controller.setForcedLocaleId("es-mx")
+		controller.awaitEntriesWritten()
+
+		-- Both the universal Spanish and the Mexico-specific file are loaded, with English
+		-- still present as the ultimate fallback.
+		local entry = getEntryMap(controller.getLocalizationTable())["greeting"]
+		expect(entry.Values["es"]).toBe("Hola")
+		expect(entry.Values["es-mx"]).toBe("Que onda")
+		expect(entry.Values["en"]).toBe("Hello")
+		controller:destroy()
+	end)
+
 	it("resolves a regional locale to the closest available file", function()
 		local controller = setupClientTranslator({
 			en = { greeting = "Hello" },

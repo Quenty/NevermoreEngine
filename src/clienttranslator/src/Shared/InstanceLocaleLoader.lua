@@ -72,84 +72,83 @@ function InstanceLocaleLoader.new(
 end
 
 --[=[
-	The source locale this loader always loads.
-	@return string
-]=]
-function InstanceLocaleLoader.GetSourceLocaleId(self: InstanceLocaleLoader): string
-	return self._sourceLocaleId
-end
-
---[=[
-	Returns whether the given locale (after resolution) has already been loaded.
-	@param localeId string
-	@return boolean
-]=]
-function InstanceLocaleLoader.IsLoaded(self: InstanceLocaleLoader, localeId: string): boolean
-	local resolved = ResolveLocaleUtils.resolveClosestKey(localeId, self._availableLocales)
-	return resolved ~= nil and self._loadedLocales[resolved] == true
-end
-
---[=[
-	Loads the source locale. See [InstanceLocaleLoader.LoadLocale].
+	Loads the source locale. Always call this first -- it establishes the Source/Context
+	that other locales' values merge onto, and it is the ultimate fallback for every key.
 
 	@param writer Writer
-	@return string? -- the locale actually loaded, or nil if already loaded
 ]=]
-function InstanceLocaleLoader.LoadSourceLocale(self: InstanceLocaleLoader, writer: Writer): string?
-	return self:LoadLocale(self._sourceLocaleId, writer)
+function InstanceLocaleLoader.LoadSourceLocale(self: InstanceLocaleLoader, writer: Writer)
+	self:_loadFile(self._sourceLocaleId, writer)
 end
 
 --[=[
-	Loads every available locale (source first). Used off the client where there is no
-	single target locale.
+	Loads every available locale file. Used off the client, where there is no single
+	target locale to narrow to.
 
 	@param writer Writer
 ]=]
 function InstanceLocaleLoader.LoadAllLocales(self: InstanceLocaleLoader, writer: Writer)
-	self:LoadLocale(self._sourceLocaleId, writer)
-	for localeId in self._availableLocales do
-		self:LoadLocale(localeId, writer)
+	self:_loadFile(self._sourceLocaleId, writer)
+	for fileLocale in self._availableLocales do
+		self:_loadFile(fileLocale, writer)
 	end
 end
 
 --[=[
-	Resolves localeId to the closest available file and, the first time it is seen,
-	decodes and writes its entries through the writer. Idempotent -- an already-loaded
-	locale is never decoded or written again.
+	Loads every available locale file that shares the target's language (e.g. for "es-mx":
+	both `es` and `es-mx`; for "fr-fr": every `fr-*` file), so a regional player gets the
+	universal-language strings and same-language siblings as fallbacks before dropping to
+	the source. The source locale is ensured first. Idempotent -- a file already loaded is
+	never decoded or written again -- and returns nothing, since the caller does not (and
+	should not) care which files it touched.
 
-	@param localeId string
+	@param localeId string -- the target locale
 	@param writer Writer
-	@return string? -- the resolved locale that was loaded, or nil if none matched or it was already loaded
 ]=]
-function InstanceLocaleLoader.LoadLocale(self: InstanceLocaleLoader, localeId: string, writer: Writer): string?
+function InstanceLocaleLoader.LoadLocale(self: InstanceLocaleLoader, localeId: string, writer: Writer)
 	assert(type(localeId) == "string", "Bad localeId")
 
-	local resolved = ResolveLocaleUtils.resolveClosestKey(localeId, self._availableLocales)
-	if not resolved or self._loadedLocales[resolved] then
-		return nil
+	-- The source is the base fallback and must be decoded before any other file so their
+	-- values merge onto entries with the right Source/Context.
+	self:_loadFile(self._sourceLocaleId, writer)
+
+	local languageSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
+	if not languageSubtag then
+		return
 	end
-	self._loadedLocales[resolved] = true
+
+	for fileLocale in self._availableLocales do
+		if ResolveLocaleUtils.getLanguageSubtag(fileLocale) == languageSubtag then
+			self:_loadFile(fileLocale, writer)
+		end
+	end
+end
+
+-- Decodes and writes a single locale file the first time it is seen. Idempotent.
+function InstanceLocaleLoader._loadFile(self: InstanceLocaleLoader, fileLocale: string, writer: Writer)
+	if self._loadedLocales[fileLocale] or not self._availableLocales[fileLocale] then
+		return
+	end
+	self._loadedLocales[fileLocale] = true
 
 	local entries = LocalizationEntryParserUtils.decodeLocaleFromInstance(
 		self._translatorName,
 		self._sourceLocaleId,
-		resolved,
+		fileLocale,
 		self._folder,
 		self._lookupTable
 	)
 
 	for _, item in entries do
-		local text = item.Values[resolved]
+		local text = item.Values[fileLocale]
 		if text ~= nil then
-			writer:SetEntryValue(item.Key, item.Source, item.Context, resolved, text)
+			writer:SetEntryValue(item.Key, item.Source, item.Context, fileLocale, text)
 		end
 		-- The example only comes from the source locale.
-		if resolved == self._sourceLocaleId then
+		if fileLocale == self._sourceLocaleId then
 			writer:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
 		end
 	end
-
-	return resolved
 end
 
 return InstanceLocaleLoader
