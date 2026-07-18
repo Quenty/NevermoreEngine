@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.30.1...@quenty/brio@14.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/brio
+
 ## [14.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.30.0...@quenty/brio@14.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/brio

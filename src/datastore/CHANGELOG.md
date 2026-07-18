@@ -1,19 +1,11 @@
-# v13.41.0 (Sat Jul 18 2026)
-
-#### 🚀 Enhancement
-
-- datastore: fix session-locked load hang + comprehensive session-lock tests [#736](https://github.com/Quenty/NevermoreEngine/pull/736) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.40.0...@quenty/datastore@13.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/datastore
 
 # [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.39.1...@quenty/datastore@13.40.0) (2026-07-14)
 

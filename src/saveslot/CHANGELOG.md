@@ -1,19 +1,11 @@
-# v1.5.0 (Sat Jul 18 2026)
-
-#### 🚀 Enhancement
-
-- datastore: fix session-locked load hang + comprehensive session-lock tests [#736](https://github.com/Quenty/NevermoreEngine/pull/736) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.4.1...@quenty/saveslot@1.5.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/saveslot
 
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.4.0...@quenty/saveslot@1.4.1) (2026-07-15)
 
