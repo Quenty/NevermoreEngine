@@ -21,15 +21,18 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 local afterEach = Jest.Globals.afterEach
-local jest = Jest.Globals.jest
 
 local FAKE_USER_ID = 424242
 
--- Real implementation, captured at load so the spy can fall through for anything but the fake player.
+-- Real implementation, captured at load so the patch can fall through for anything but the fake player.
 local originalToUserId = PlayerDataStoreManager._toPlayerUserIdOrError
 
+-- We monkeypatch _toPlayerUserIdOrError directly rather than jest.spyOn: after jest.restoreAllMocks(),
+-- re-spying the same method on the next test is a no-op (spyOn hands back the stale, already-restored
+-- spy without re-patching the object), so only the first test's spy took effect and every later Bind
+-- threw "Bad playerOrUserId". A direct swap re-patches deterministically each setup.
 afterEach(function()
-	jest.restoreAllMocks()
+	PlayerDataStoreManager._toPlayerUserIdOrError = originalToUserId
 end)
 
 local function setup(mock)
@@ -47,12 +50,12 @@ local function setup(mock)
 	fakePlayer.Parent = Workspace
 
 	-- Intercept only the UserId read so a Folder can stand in for a Player. Restored after each test.
-	jest.spyOn(PlayerDataStoreManager, "_toPlayerUserIdOrError").mockImplementation(function(self, playerOrUserId)
+	PlayerDataStoreManager._toPlayerUserIdOrError = function(self, playerOrUserId)
 		if playerOrUserId == fakePlayer then
 			return FAKE_USER_ID
 		end
 		return originalToUserId(self, playerOrUserId)
-	end)
+	end
 
 	local hasSaveSlots = binder:Bind(fakePlayer)
 	if hasSaveSlots then
