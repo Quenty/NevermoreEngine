@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RogueAdditive.spec.lua
 ]]
@@ -15,7 +15,7 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local RogueAdditiveClass = RogueAdditive:GetConstructor()
+local RogueAdditiveClass = RogueAdditive:GetConstructor() :: any
 
 -- Only TieRealmService is needed to construct a modifier directly; we do not start the
 -- modifier binders, so this file never binds instances.
@@ -26,14 +26,14 @@ local function setup()
 	serviceBag:Start()
 
 	local function newAdditive(className, value)
-		local valueObject = Instance.new(className)
+		local valueObject: any = Instance.new(className)
 		valueObject.Value = value
 		return RogueAdditiveClass.new(valueObject, serviceBag), valueObject
 	end
 
 	return {
 		newAdditive = newAdditive,
-		destroy = function()
+		destroy = function(_self: any)
 			serviceBag:Destroy()
 		end,
 	}

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RogueMultiplier.spec.lua
 ]]
@@ -15,7 +15,7 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local RogueMultiplierClass = RogueMultiplier:GetConstructor()
+local RogueMultiplierClass = RogueMultiplier:GetConstructor() :: any
 
 -- Only TieRealmService is needed to construct a modifier directly; we do not start the
 -- modifier binders, so this file never binds instances.
@@ -33,7 +33,7 @@ local function setup()
 
 	return {
 		newMultiplier = newMultiplier,
-		destroy = function()
+		destroy = function(_self: any)
 			serviceBag:Destroy()
 		end,
 	}

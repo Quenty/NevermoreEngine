@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RoguePropertyUtils.spec.lua
 ]]

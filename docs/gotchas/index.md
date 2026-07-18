@@ -9,3 +9,4 @@ Things that trip people up. Each page collects small tips organized by topic.
 
 - **[Tooling](tooling.md)** — Lune, symlinks, Rojo, web fetch safety, and other toolchain surprises.
 - **[Troubleshooting](troubleshooting.md)** — Common setup and development issues: pnpm, aftman, Rojo, linting, testing.
+- **[Localization](localization.md)** — `LocalizationTable` entry identity, `SetEntries` duplicate-key crashes.

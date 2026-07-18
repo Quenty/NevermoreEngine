@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class NevermoreCLIManifestUtils.spec.lua
 ]]
@@ -46,19 +46,19 @@ describe("NevermoreCLIManifestUtils injection", function()
 
 		-- A git commit, not a placeholder: a hex string of plausible length.
 		expect(type(metadata.commit)).toEqual("string")
-		expect(#metadata.commit >= 7).toEqual(true)
-		expect(string.match(metadata.commit, "^%x+$")).never.toBeNil()
+		expect(#(metadata.commit :: string) >= 7).toEqual(true)
+		expect(string.match(metadata.commit :: string, "^%x+$")).never.toBeNil()
 
 		-- The full SHA, also hex, and no shorter than the short commit.
 		expect(type(metadata.version)).toEqual("string")
-		expect(#metadata.version >= #metadata.commit).toEqual(true)
-		expect(string.match(metadata.version, "^%x+$")).never.toBeNil()
+		expect(#(metadata.version :: string) >= #(metadata.commit :: string)).toEqual(true)
+		expect(string.match(metadata.version :: string, "^%x+$")).never.toBeNil()
 
 		expect(metadata.target).toEqual("test")
 		expect(metadata.published).toEqual(false)
 
 		expect(type(metadata.timestamp)).toEqual("string")
-		expect(#metadata.timestamp > 0).toEqual(true)
+		expect(#(metadata.timestamp :: string) > 0).toEqual(true)
 
 		-- IDs round-trip through string attributes back to exact numbers.
 		expect(type(metadata.placeId)).toEqual("number")
@@ -121,15 +121,15 @@ describe("NevermoreCLIManifestUtils running place", function()
 
 		-- A real git commit was injected, not a placeholder.
 		expect(type(metadata.commit)).toEqual("string")
-		expect(#metadata.commit >= 7).toEqual(true)
-		expect(string.match(metadata.commit, "^%x+$")).never.toBeNil()
+		expect(#(metadata.commit :: string) >= 7).toEqual(true)
+		expect(string.match(metadata.commit :: string, "^%x+$")).never.toBeNil()
 
 		-- Injected by `runSingleTestAsync` for the test build.
 		expect(metadata.target).toEqual("test")
 		expect(metadata.published).toEqual(false)
 
 		expect(type(metadata.timestamp)).toEqual("string")
-		expect(#metadata.timestamp > 0).toEqual(true)
+		expect(#(metadata.timestamp :: string) > 0).toEqual(true)
 
 		-- The test target's place/universe IDs round-trip back to numbers.
 		expect(type(metadata.placeId)).toEqual("number")

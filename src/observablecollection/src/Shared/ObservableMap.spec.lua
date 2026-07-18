@@ -1,11 +1,9 @@
---!nonstrict
+--!strict
 --[[
 	@class ObservableMap.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local ObservableMap = require("ObservableMap")
@@ -39,9 +37,9 @@ describe("ObservableMap.new()", function()
 	end)
 
 	it("should allow false as a key", function()
-		expect(observableMap:Get(false)).toEqual(nil)
-		observableMap:Set(false, "Hello")
-		expect(observableMap:Get(false)).toEqual("Hello")
+		expect(observableMap:Get(false :: any)).toEqual(nil)
+		observableMap:Set(false :: any, "Hello")
+		expect(observableMap:Get(false :: any)).toEqual("Hello")
 	end)
 
 	it("should fire off events for a specific key", function()

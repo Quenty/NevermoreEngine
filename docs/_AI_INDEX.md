@@ -51,3 +51,4 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
 | [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
+| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas: LocalizationTable key-only entry identity, SetEntries duplicate-key crashes |

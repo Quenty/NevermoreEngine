@@ -3,9 +3,7 @@
 	@class ObservableSortedList.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local Jest = require("Jest")
@@ -59,8 +57,9 @@ describe("ObservableSortedList", function()
 		it("should accept an observable as sort value", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
-			list:Add("b", Rx.of(2))
-			list:Add("a", Rx.of(1))
+			-- Cast: the recursive Observable type does not unify structurally inside Add's union.
+			list:Add("b", Rx.of(2) :: any)
+			list:Add("a", Rx.of(1) :: any)
 
 			expect(list:Get(1)).toEqual("a")
 			expect(list:Get(2)).toEqual("b")
@@ -332,7 +331,7 @@ describe("ObservableSortedList", function()
 			local removeA = list:Add("a", 1)
 			list:_testForceFireEvents()
 
-			local seenBrios: { Brio.Brio<string> } = {}
+			local seenBrios: { Brio.Brio<string, any> } = {}
 			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
 				table.insert(seenBrios, brio)
 			end)
@@ -917,7 +916,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
 			-- Emit nil - B should be removed from tree
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			expect(list:GetList()).toEqual({ "a", "c" })
 			expect(list:Contains("b")).toEqual(false)
 
@@ -943,7 +942,7 @@ describe("ObservableSortedList", function()
 			expect(seenBrios[2]:IsDead()).toEqual(false)
 
 			-- Emit nil - B's brio should die
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			list:_testForceFireEvents()
 
 			expect(seenBrios[2]:IsDead()).toEqual(true)
@@ -958,7 +957,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedList.new())
 
 			list:Add("a", 1)
-			list:Add("b", Rx.EMPTY)
+			list:Add("b", Rx.EMPTY :: any)
 			list:Add("c", 3)
 
 			-- B should never enter the tree
@@ -989,7 +988,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
 			-- Disappear
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			expect(list:GetList()).toEqual({ "a", "c" })
 
 			-- Reappear at different position
@@ -1012,7 +1011,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
 			-- Go nil then come back in the same frame
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			sortValue.Value = 2
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
@@ -1134,7 +1133,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "a", "b" })
 
 			-- Set nil (removes from tree) then also call cleanup
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			remove()
 
 			expect(list:GetList()).toEqual({ "a" })
@@ -1248,7 +1247,7 @@ describe("ObservableSortedList", function()
 			list:Add("b", sortValue:Observe())
 			list:_testForceFireEvents()
 
-			local seenBrios: { Brio.Brio<string> } = {}
+			local seenBrios: { Brio.Brio<string, any> } = {}
 			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
 				table.insert(seenBrios, brio)
 			end)
@@ -1256,7 +1255,7 @@ describe("ObservableSortedList", function()
 			expect(#seenBrios).toEqual(2)
 
 			-- Remove via nil
-			sortValue.Value = nil
+			sortValue.Value = nil :: any
 			list:_testForceFireEvents()
 
 			expect(seenBrios[2]:IsDead()).toEqual(true)

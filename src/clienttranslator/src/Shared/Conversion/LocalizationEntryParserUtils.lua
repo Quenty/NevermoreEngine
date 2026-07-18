@@ -69,6 +69,85 @@ function LocalizationEntryParserUtils.decodeFromInstance(
 	return results
 end
 
+--[=[
+	Returns the set of locales available in a folder, inferred from the names of its
+	StringValue/ModuleScript descendants (e.g. an `en.json` StringValue -> "en").
+
+	@param folder Instance
+	@return { [string]: true }
+]=]
+function LocalizationEntryParserUtils.getAvailableLocales(folder: Instance): { [string]: true }
+	assert(typeof(folder) == "Instance", "Bad folder")
+
+	local locales: { [string]: true } = {}
+	for _, descendant in folder:GetDescendants() do
+		if descendant:IsA("StringValue") or descendant:IsA("ModuleScript") then
+			locales[LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)] = true
+		end
+	end
+	return locales
+end
+
+--[=[
+	Decodes only the descendants matching a single locale into the given lookup table,
+	so a locale's JSON is not decoded until it is actually needed. The lookup table is
+	shared across calls, so decoding a non-source locale after the source locale merges
+	its values onto the existing entries (preserving their Source/Context).
+
+	@param tableName string
+	@param sourceLocaleId string
+	@param localeId string -- the locale to decode
+	@param folder Instance
+	@param lookupTable { [string]: LocalizationEntry } -- accumulated across locales
+	@return { LocalizationEntry } -- entries that now have a value for localeId
+]=]
+function LocalizationEntryParserUtils.decodeLocaleFromInstance(
+	tableName: string,
+	sourceLocaleId: string,
+	localeId: string,
+	folder: Instance,
+	lookupTable: { [string]: LocalizationEntry }
+): { LocalizationEntry }
+	assert(type(tableName) == "string", "Bad tableName")
+	assert(type(sourceLocaleId) == "string", "Bad sourceLocaleId")
+	assert(type(localeId) == "string", "Bad localeId")
+	assert(typeof(folder) == "Instance", "Bad folder")
+	assert(type(lookupTable) == "table", "Bad lookupTable")
+
+	local baseKey = ""
+	for _, descendant in folder:GetDescendants() do
+		if LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name) ~= localeId then
+			continue
+		end
+
+		local decodedTable
+		if descendant:IsA("StringValue") then
+			decodedTable = HttpService:JSONDecode(descendant.Value)
+		elseif descendant:IsA("ModuleScript") then
+			decodedTable = (require :: any)(descendant)
+		end
+
+		if decodedTable then
+			LocalizationEntryParserUtils._parseTableToResultsList(
+				lookupTable,
+				sourceLocaleId,
+				localeId,
+				baseKey,
+				decodedTable,
+				tableName
+			)
+		end
+	end
+
+	local results: { LocalizationEntry } = {}
+	for _, item in lookupTable do
+		if item.Values[localeId] ~= nil then
+			table.insert(results, item)
+		end
+	end
+	return results
+end
+
 function LocalizationEntryParserUtils.decodeFromTable(
 	tableName: string,
 	localeId: string,
