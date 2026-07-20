@@ -1,24 +1,13 @@
-# v7.37.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Datastore keys and error messages [#735](https://github.com/Quenty/NevermoreEngine/pull/735) ([@Quenty](https://github.com/Quenty))
-- feat: Datastore keys and error messages ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/nevermore-datastore ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.36.0...@quenty/adorneedata@7.37.0) (2026-07-20)
+
+### Features
+
+- Datastore keys and error messages ([0fb1380](https://github.com/Quenty/NevermoreEngine/commit/0fb1380735d601b4a8ced180c38d3470aa1b1916))
 
 # [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneedata@7.35.0...@quenty/adorneedata@7.36.0) (2026-07-18)
 
