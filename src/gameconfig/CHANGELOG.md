@@ -1,27 +1,19 @@
-# v12.54.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat(gameconfig): auto-register manifest places via NevermoreManifestConfigProvider ([@Quenty](https://github.com/Quenty))
-- feat(gameconfig): add asset selection priority for key clashes ([@Quenty](https://github.com/Quenty))
-- feat(gameproductservice): add paid-access game ownership tracking ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Strict typing on tests ([@Quenty](https://github.com/Quenty))
-- test(gameconfig): lock gameId gate above priority in the picker ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.53.0...@quenty/gameconfig@12.54.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- **gameconfig:** add asset selection priority for key clashes ([ae7d765](https://github.com/Quenty/NevermoreEngine/commit/ae7d7651f6a3270e8e0ee9fc592b4e6bc2fc5a51))
+- **gameconfig:** auto-register manifest places via NevermoreManifestConfigProvider ([db58cfc](https://github.com/Quenty/NevermoreEngine/commit/db58cfc62b9164f316895c4252942bd292a02f89))
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
 
 # [12.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.52.0...@quenty/gameconfig@12.53.0) (2026-07-18)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermoreclimanifest",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Manifest of nevermore CLI-injected deploy metadata (commit, target, version, timestamp)",
   "keywords": [
     "Roblox",

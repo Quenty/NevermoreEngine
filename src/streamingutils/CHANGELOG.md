@@ -1,21 +1,14 @@
-# v10.21.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat: Integrate teleport data service directly into save slots for cross-game continuation ([@Quenty](https://github.com/Quenty))
-- feat(streamingutils): add StreamingCinematicsService for camera streaming focus ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.20.0...@quenty/streamingutils@10.21.0) (2026-07-20)
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
+- **streamingutils:** add StreamingCinematicsService for camera streaming focus ([4853cd6](https://github.com/Quenty/NevermoreEngine/commit/4853cd6d64c9ca32ea454ca7ebe69697c0baba1e))
 
 # [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.19.0...@quenty/streamingutils@10.20.0) (2026-07-18)
 

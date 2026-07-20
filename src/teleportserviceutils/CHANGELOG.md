@@ -1,24 +1,17 @@
-# v9.34.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat: Integrate teleport data service directly into save slots for cross-game continuation ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Strict typing on tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.33.0...@quenty/teleportserviceutils@9.34.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
 
 # [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.32.0...@quenty/teleportserviceutils@9.33.0) (2026-07-18)
 

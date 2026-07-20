@@ -1,20 +1,13 @@
-# v11.24.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat(gameproductservice): add paid-access game ownership tracking ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.23.0...@quenty/marketplaceutils@11.24.0) (2026-07-20)
+
+### Features
+
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
 
 # [11.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.22.0...@quenty/marketplaceutils@11.23.0) (2026-07-18)
 

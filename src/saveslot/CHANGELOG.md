@@ -1,27 +1,20 @@
-# v1.7.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat: Integrate teleport data service directly into save slots for cross-game continuation ([@Quenty](https://github.com/Quenty))
-- feat: Support unbounded save slots via SetUnlimitedSlots ([@Quenty](https://github.com/Quenty))
-- feat: Support deselecting the active save slot ([@Quenty](https://github.com/Quenty))
-- feat(saveslot): add last-active replication and continue/new-game/wipe APIs ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Strict typing on tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.6.0...@quenty/saveslot@1.7.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
+- **saveslot:** add last-active replication and continue/new-game/wipe APIs ([f5f4045](https://github.com/Quenty/NevermoreEngine/commit/f5f4045b5849482f95a780fce5ba298682afe173))
+- Support deselecting the active save slot ([d7da61d](https://github.com/Quenty/NevermoreEngine/commit/d7da61d80742f56987e2cf69e7fb108e9b18fa2d))
+- Support unbounded save slots via SetUnlimitedSlots ([ec34e9a](https://github.com/Quenty/NevermoreEngine/commit/ec34e9aa6c9fce0cab4dd4f6f88780581e3cd1e5))
 
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.5.0...@quenty/saveslot@1.6.0) (2026-07-18)
 

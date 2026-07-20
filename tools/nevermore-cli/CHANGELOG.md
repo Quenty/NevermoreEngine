@@ -1,20 +1,13 @@
-# v4.40.0 (Mon Jul 20 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
-- feat(manifest): stamp and read the deploy target's place table ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.40.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.39.0...@quenty/nevermore-cli@4.40.0) (2026-07-20)
+
+### Features
+
+- **manifest:** stamp and read the deploy target's place table ([9542015](https://github.com/Quenty/Nevermore/commit/954201515424fa415a0cbfb3eb1101b3d6f3ec85))
 
 # [4.39.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.38.0...@quenty/nevermore-cli@4.39.0) (2026-07-18)
 
