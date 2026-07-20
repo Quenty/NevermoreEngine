@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Integration coverage for the real HasSaveSlots binder, driven against a mocked datastore. Because
 	the load path only reads the player's UserId, a plain Folder stands in for a Player with
@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
+local PlayerDataStoreService = require("PlayerDataStoreService")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -35,22 +36,23 @@ afterEach(function()
 	PlayerDataStoreManager._toPlayerUserIdOrError = originalToUserId
 end)
 
-local function setup(mock)
+local function setup(mock: DataStoreMock.DataStoreMock?)
 	mock = mock or DataStoreMock.new()
 
 	local serviceBag = ServiceBag.new()
-	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
-	-- The binder resolves TeleportDataService lazily at bind time (post-start), so it must already be
-	-- initialized in the bag -- ServiceBag forbids initializing a new service after Start. In the game
-	-- SaveSlotService.Init pre-registers it; here we bootstrap the binder without that owning service,
-	-- so register it directly to mirror the production dependency.
 	serviceBag:GetService(require("TeleportDataService"))
+	-- GetService returns the required module's type; PlayerDataStoreService returns its class table, so
+	-- cast to the instance type before calling instance methods.
+	local playerDataStoreService = (
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	) :: PlayerDataStoreService.PlayerDataStoreService
 	local binder = serviceBag:GetService(require("HasSaveSlots"))
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	local fakePlayer = Instance.new("Folder")
+	-- A Folder stands in for a Player; the load path only reads the UserId, intercepted below.
+	local fakePlayer = (Instance.new("Folder") :: any) :: Player
 	fakePlayer.Name = "FakePlayer"
 	fakePlayer.Parent = Workspace
 
@@ -62,10 +64,8 @@ local function setup(mock)
 		return originalToUserId(self, playerOrUserId)
 	end
 
-	local hasSaveSlots = binder:Bind(fakePlayer)
-	if hasSaveSlots then
-		hasSaveSlots.MaxSlotCount.Value = 5
-	end
+	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
+	hasSaveSlots.MaxSlotCount.Value = 5
 
 	local function destroy()
 		fakePlayer:Destroy()

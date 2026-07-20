@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for NevermoreManifestConfigProvider: it registers named manifest
 	places as high-priority PLACE assets (so they win over a hand-authored place
@@ -15,6 +15,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigService = require("GameConfigService")
 local Jest = require("Jest")
 local NevermoreManifestConfigProvider = require("NevermoreManifestConfigProvider")
 local ServiceBag = require("ServiceBag")
@@ -23,12 +24,14 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local PLACE = GameConfigAssetTypes.PLACE
+local PLACE: GameConfigAssetTypes.GameConfigAssetType = GameConfigAssetTypes.PLACE
 
 local function newProvider()
 	local serviceBag = ServiceBag.new()
-	local gameConfigService = serviceBag:GetService(require("GameConfigService"))
-	local provider = serviceBag:GetService(NevermoreManifestConfigProvider)
+	local gameConfigService = (serviceBag:GetService(GameConfigService) :: any) :: GameConfigService.GameConfigService
+	local provider = (
+		serviceBag:GetService(NevermoreManifestConfigProvider) :: any
+	) :: NevermoreManifestConfigProvider.NevermoreManifestConfigProvider
 	serviceBag:Init()
 	serviceBag:Start()
 	return serviceBag, gameConfigService, provider, gameConfigService:GetConfigPicker()
@@ -44,6 +47,7 @@ describe("NevermoreManifestConfigProvider", function()
 
 		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "provChapterA")
 		expect(asset).never.toBeNil()
+		assert(asset, "no asset")
 		expect(asset:GetAssetId()).toEqual(555)
 
 		serviceBag:Destroy()
@@ -58,6 +62,7 @@ describe("NevermoreManifestConfigProvider", function()
 		})
 
 		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "provChapterB")
+		assert(asset, "no asset")
 		expect(asset:GetAssetId()).toEqual(999)
 		expect(asset:GetPriority() > 0).toEqual(true)
 

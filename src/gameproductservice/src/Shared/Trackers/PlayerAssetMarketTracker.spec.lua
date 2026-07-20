@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Unit coverage for PlayerAssetMarketTracker. The tracker is constructed directly with a fake
 	id-conversion table and a synchronous brio observable, so no ServiceBag, GameConfig, or real
@@ -113,7 +113,7 @@ describe("PlayerAssetMarketTracker basics", function()
 		expect(context.tracker:GetOwnershipTracker()).toBeNil()
 
 		local fakeOwnershipTracker = {}
-		context.tracker:SetOwnershipTracker(fakeOwnershipTracker)
+		context.tracker:SetOwnershipTracker(fakeOwnershipTracker :: any)
 		expect(context.tracker:GetOwnershipTracker()).toEqual(fakeOwnershipTracker)
 
 		context.tracker:SetOwnershipTracker(nil)

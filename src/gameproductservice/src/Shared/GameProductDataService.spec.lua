@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Integration coverage for GameProductDataService driven through a real ServiceBag. Only
 	GameProductDataService (and its dependency TieRealmService) is registered, so the heavy
@@ -11,20 +11,24 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local GameProductDataService = require("GameProductDataService")
 local Jest = require("Jest")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
+local TieRealmService = require("TieRealmService")
 local TieRealms = require("TieRealms")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup(tieRealm)
+local function setup(tieRealm: TieRealms.TieRealm?)
 	local serviceBag = ServiceBag.new()
-	local tieRealmService = serviceBag:GetService(require("TieRealmService"))
-	local gameProductDataService = serviceBag:GetService(require("GameProductDataService"))
+	local tieRealmService = (serviceBag:GetService(TieRealmService) :: any) :: TieRealmService.TieRealmService
+	local gameProductDataService = (
+		serviceBag:GetService(GameProductDataService) :: any
+	) :: GameProductDataService.GameProductDataService
 	serviceBag:Init()
 	tieRealmService:SetTieRealm(tieRealm or TieRealms.SERVER)
 	serviceBag:Start()
@@ -54,7 +58,7 @@ describe("GameProductDataService purchase signals", function()
 				"MembershipPurchased",
 			}
 		do
-			expect(Signal.isSignal(service[signalName])).toEqual(true)
+			expect(Signal.isSignal((service :: any)[signalName])).toEqual(true)
 		end
 
 		context.destroy()
@@ -102,7 +106,7 @@ describe("GameProductDataService server-only prompting", function()
 		local service = context.gameProductDataService
 
 		expect(function()
-			service:SetServerOnlyPrompting("nope")
+			service:SetServerOnlyPrompting("nope" :: any)
 		end).toThrow()
 		context.destroy()
 	end)
@@ -124,7 +128,7 @@ describe("GameProductDataService prompt guard", function()
 		local service = context.gameProductDataService
 
 		local fakePlayer = Instance.new("Folder")
-		local outcome = PromiseTestUtils.awaitOutcome(service:_promiseServerOnlyPromptingGuard(fakePlayer), 5)
+		local outcome = PromiseTestUtils.awaitOutcome(service:_promiseServerOnlyPromptingGuard(fakePlayer :: any), 5)
 		expect(outcome).toEqual("resolved")
 
 		fakePlayer:Destroy()

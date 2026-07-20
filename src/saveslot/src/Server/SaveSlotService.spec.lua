@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for SaveSlotService's ServiceBag-driven configuration surface — the parts reachable
 	without a bound Player (a headless cloud test server has none). The player-driven slot
@@ -11,7 +11,9 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local PlayerDataStoreService = require("PlayerDataStoreService")
 local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotService = require("SaveSlotService")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
 
@@ -23,9 +25,13 @@ local it = Jest.Globals.it
 -- touches a real datastore. Returns the bag + service; the caller decides when to Start.
 local function newServiceBag()
 	local serviceBag = ServiceBag.new()
-	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
-	local saveSlotService = serviceBag:GetService(require("SaveSlotService"))
-	local teleportDataService = serviceBag:GetService(TeleportDataService)
+	local playerDataStoreService = (
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	) :: PlayerDataStoreService.PlayerDataStoreService
+	local saveSlotService = (serviceBag:GetService(SaveSlotService) :: any) :: SaveSlotService.SaveSlotService
+	local teleportDataService = (
+		serviceBag:GetService(TeleportDataService) :: any
+	) :: TeleportDataService.TeleportDataService
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(DataStoreMock.new())
 	return serviceBag, saveSlotService, teleportDataService
@@ -33,8 +39,8 @@ end
 
 -- A Folder is an Instance, so it satisfies the player guards and can carry the ActiveSlotId
 -- attribute the provider reads, standing in for a Player without a real join.
-local function fakePlayer()
-	return Instance.new("Folder")
+local function fakePlayer(): Player
+	return (Instance.new("Folder") :: any) :: Player
 end
 
 describe("SaveSlotService initialization", function()
@@ -138,7 +144,7 @@ describe("SaveSlotService configuration guards", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider("not a function")
+			saveSlotService:SetDefaultSummaryProvider("not a function" :: any)
 		end).toThrow("Bad provider")
 
 		serviceBag:Destroy()
@@ -148,9 +154,9 @@ describe("SaveSlotService configuration guards", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider(function()
+			saveSlotService:SetDefaultSummaryProvider((function()
 				return nil
-			end)
+			end) :: any)
 		end).never.toThrow()
 
 		serviceBag:Destroy()

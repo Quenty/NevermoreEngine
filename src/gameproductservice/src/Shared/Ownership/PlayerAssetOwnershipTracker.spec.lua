@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Unit coverage for PlayerAssetOwnershipTracker. The tracker is constructed directly with a fake
 	config picker (key -> id lookup) and a fake market tracker exposing only a Purchased signal, so
@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigPicker = require("GameConfigPicker")
 local Jest = require("Jest")
 local Observable = require("Observable")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
@@ -67,8 +68,12 @@ local function setup()
 	local player = Instance.new("Folder")
 	player.Name = "FakePlayer"
 
-	local tracker =
-		PlayerAssetOwnershipTracker.new(player, makeConfigPicker(), GameConfigAssetTypes.PASS, marketTracker)
+	local tracker = PlayerAssetOwnershipTracker.new(
+		(player :: any) :: Player,
+		(makeConfigPicker() :: any) :: GameConfigPicker.GameConfigPicker,
+		GameConfigAssetTypes.PASS,
+		marketTracker
+	)
 
 	return {
 		tracker = tracker,

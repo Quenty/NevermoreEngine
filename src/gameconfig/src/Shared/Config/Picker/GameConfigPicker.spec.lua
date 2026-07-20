@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for GameConfigPicker priority selection: when several active assets
 	share a type and key (e.g. a hand-authored place and one registered from the
@@ -18,6 +18,7 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
 local GameConfigBindersServer = require("GameConfigBindersServer")
+local GameConfigService = require("GameConfigService")
 local GameConfigUtils = require("GameConfigUtils")
 local Jest = require("Jest")
 local ServiceBag = require("ServiceBag")
@@ -26,11 +27,11 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local PLACE = GameConfigAssetTypes.PLACE
+local PLACE: GameConfigAssetTypes.GameConfigAssetType = GameConfigAssetTypes.PLACE
 
 local function newPicker()
 	local serviceBag = ServiceBag.new()
-	local gameConfigService = serviceBag:GetService(require("GameConfigService"))
+	local gameConfigService = (serviceBag:GetService(GameConfigService) :: any) :: GameConfigService.GameConfigService
 	serviceBag:Init()
 	serviceBag:Start()
 	return serviceBag, gameConfigService, gameConfigService:GetConfigPicker()
@@ -43,6 +44,7 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		gameConfigService:AddPlace("specResolve", 111)
 		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specResolve")
 		expect(asset).never.toBeNil()
+		assert(asset, "No asset")
 		expect(asset:GetAssetId()).toEqual(111)
 
 		serviceBag:Destroy()
@@ -52,7 +54,9 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		local serviceBag, gameConfigService, picker = newPicker()
 
 		gameConfigService:AddPlace("specDefaultPriority", 111)
-		expect(picker:FindFirstActiveAssetOfKey(PLACE, "specDefaultPriority"):GetPriority()).toEqual(0)
+		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specDefaultPriority")
+		assert(asset, "No asset")
+		expect(asset:GetPriority()).toEqual(0)
 
 		serviceBag:Destroy()
 	end)
@@ -63,7 +67,9 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		gameConfigService:AddPlace("specClashAfter", 111) -- hand-authored (priority 0)
 		gameConfigService:AddPlace("specClashAfter", 222, 100) -- manifest (priority 100)
 
-		expect(picker:FindFirstActiveAssetOfKey(PLACE, "specClashAfter"):GetAssetId()).toEqual(222)
+		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specClashAfter")
+		assert(asset, "No asset")
+		expect(asset:GetAssetId()).toEqual(222)
 
 		serviceBag:Destroy()
 	end)
@@ -74,7 +80,9 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		gameConfigService:AddPlace("specClashFirst", 222, 100) -- manifest first
 		gameConfigService:AddPlace("specClashFirst", 111) -- hand-authored second
 
-		expect(picker:FindFirstActiveAssetOfKey(PLACE, "specClashFirst"):GetAssetId()).toEqual(222)
+		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specClashFirst")
+		assert(asset, "No asset")
+		expect(asset:GetAssetId()).toEqual(222)
 
 		serviceBag:Destroy()
 	end)
@@ -89,8 +97,12 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		-- before priority existed), so the exact winner is implementation-defined.
 		-- The real contract is only that it is stable and matches -- a higher
 		-- priority is the deterministic tie-breaker, covered above.
-		local first = picker:FindFirstActiveAssetOfKey(PLACE, "specTie"):GetAssetId()
-		local second = picker:FindFirstActiveAssetOfKey(PLACE, "specTie"):GetAssetId()
+		local firstAsset = picker:FindFirstActiveAssetOfKey(PLACE, "specTie")
+		local secondAsset = picker:FindFirstActiveAssetOfKey(PLACE, "specTie")
+		assert(firstAsset, "No firstAsset")
+		assert(secondAsset, "No secondAsset")
+		local first = firstAsset:GetAssetId()
+		local second = secondAsset:GetAssetId()
 		expect(first).toEqual(second)
 		expect(first == 111 or first == 222).toEqual(true)
 
@@ -149,6 +161,7 @@ describe("GameConfigPicker gameId gate dominates priority", function()
 
 		local resolved = picker:FindFirstActiveAssetOfKey(PLACE, "specGateBeatsPriority")
 		expect(resolved).never.toBeNil()
+		assert(resolved, "No resolved asset")
 		expect(resolved:GetAssetId()).toEqual(111)
 
 		inactive:Destroy()

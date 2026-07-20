@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for TeleportDataServiceClient's arrived-data accessors. GetLocalPlayerTeleportData is
 	unavailable in the headless test environment (no real teleport), so arrived data is exercised
@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local TeleportDataServiceClient = require("TeleportDataServiceClient")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -19,12 +20,14 @@ local it = Jest.Globals.it
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local service = serviceBag:GetService(require("TeleportDataServiceClient"))
+	local service = (
+		serviceBag:GetService(TeleportDataServiceClient) :: any
+	) :: TeleportDataServiceClient.TeleportDataServiceClient
 	serviceBag:Init()
 
 	return {
 		service = service,
-		destroy = function()
+		destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}

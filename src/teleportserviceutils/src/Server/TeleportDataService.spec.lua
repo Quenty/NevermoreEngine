@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for TeleportDataService's pure data-assembly and arrived-data surface -- the parts
 	reachable on a headless cloud test server (which has no joined players, so arrived data is
@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local TeleportDataService = require("TeleportDataService")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -21,17 +22,17 @@ local it = Jest.Globals.it
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local service = serviceBag:GetService(require("TeleportDataService"))
+	local service = (serviceBag:GetService(TeleportDataService) :: any) :: TeleportDataService.TeleportDataService
 	serviceBag:Init()
 
 	return {
 		service = service,
 		-- A Folder is an Instance, so it satisfies the `typeof(player) == "Instance"` guards and can
 		-- stand in for a Player as long as arrived data is injected (never hitting GetJoinData).
-		fakePlayer = function()
-			return maid:Add(Instance.new("Folder"))
+		fakePlayer = function(): Player
+			return (maid:Add(Instance.new("Folder")) :: any) :: Player
 		end,
-		destroy = function()
+		destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
