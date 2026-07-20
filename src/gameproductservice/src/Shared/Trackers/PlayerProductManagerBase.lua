@@ -78,12 +78,17 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 	local subscription = self:_addAssetTracker(GameConfigAssetTypes.SUBSCRIPTION)
 	local membership = self:_addAssetTracker(GameConfigAssetTypes.MEMBERSHIP)
 
+	-- Paid-access games can be owned but cannot be prompted in-experience, so the market
+	-- tracker is created non-promptable. There's no purchase signal to listen for either.
+	self:_addAssetTracker(GameConfigAssetTypes.GAME, false)
+
 	-- Some assets can be owned and thus, are reflected here
 	local passOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.PASS)
 	local assetOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.ASSET)
 	local bundleOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.BUNDLE)
 	local subscriptionOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.SUBSCRIPTION)
 	local membershipOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.MEMBERSHIP)
+	local gameOwnership = self:_addOwnershipTracker(GameConfigAssetTypes.GAME)
 
 	-- Prompt
 	self._maid:GiveTask(asset.ShowPromptRequested:Connect(function(assetId)
@@ -141,6 +146,11 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 
 	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
 		return Promise.resolved(self._player.MembershipType == membershipType)
+	end)
+
+	-- Paid-access game ownership is queried through PlayerOwnsAssetAsync
+	gameOwnership:SetQueryOwnershipCallback(function(assetId)
+		return MarketplaceUtils.promisePlayerOwnsAssetAsync(self._player, assetId)
 	end)
 
 	return self
@@ -292,7 +302,8 @@ end
 
 function PlayerProductManagerBase._addAssetTracker(
 	self: PlayerProductManagerBase,
-	assetType: GameConfigAssetTypes.GameConfigAssetType
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	promptable: boolean?
 ): PlayerAssetMarketTracker.PlayerAssetMarketTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(not self._assetMarketTrackers[assetType], "Already have tracker")
@@ -305,7 +316,7 @@ function PlayerProductManagerBase._addAssetTracker(
 		assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 		return self._configPicker:ObserveToAssetIdBrio(assetType, idOrKey)
-	end))
+	end, promptable))
 
 	self._assetMarketTrackers[assetType] = assetMarketTracker
 

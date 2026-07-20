@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.33.0...@quenty/teleportserviceutils@9.34.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
+
 # [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.32.0...@quenty/teleportserviceutils@9.33.0) (2026-07-18)
 
 **Note:** Version bump only for package @quenty/teleportserviceutils

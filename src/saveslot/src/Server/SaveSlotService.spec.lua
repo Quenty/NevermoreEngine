@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Coverage for SaveSlotService's ServiceBag-driven configuration surface — the parts reachable
 	without a bound Player (a headless cloud test server has none). The player-driven slot
@@ -11,7 +11,11 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local PlayerDataStoreService = require("PlayerDataStoreService")
+local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotService = require("SaveSlotService")
 local ServiceBag = require("ServiceBag")
+local TeleportDataService = require("TeleportDataService")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -21,11 +25,22 @@ local it = Jest.Globals.it
 -- touches a real datastore. Returns the bag + service; the caller decides when to Start.
 local function newServiceBag()
 	local serviceBag = ServiceBag.new()
-	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
-	local saveSlotService = serviceBag:GetService(require("SaveSlotService"))
+	local playerDataStoreService = (
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	) :: PlayerDataStoreService.PlayerDataStoreService
+	local saveSlotService = (serviceBag:GetService(SaveSlotService) :: any) :: SaveSlotService.SaveSlotService
+	local teleportDataService = (
+		serviceBag:GetService(TeleportDataService) :: any
+	) :: TeleportDataService.TeleportDataService
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(DataStoreMock.new())
-	return serviceBag, saveSlotService
+	return serviceBag, saveSlotService, teleportDataService
+end
+
+-- A Folder is an Instance, so it satisfies the player guards and can carry the ActiveSlotId
+-- attribute the provider reads, standing in for a Player without a real join.
+local function fakePlayer(): Player
+	return (Instance.new("Folder") :: any) :: Player
 end
 
 describe("SaveSlotService initialization", function()
@@ -103,11 +118,33 @@ describe("SaveSlotService configuration guards", function()
 		serviceBag:Destroy()
 	end)
 
+	it("should accept SetUnlimitedSlots before Start", function()
+		local serviceBag, saveSlotService = newServiceBag()
+
+		expect(function()
+			saveSlotService:SetUnlimitedSlots()
+		end).never.toThrow()
+
+		serviceBag:Destroy()
+	end)
+
+	it("should reject SetUnlimitedSlots after Start", function()
+		local serviceBag, saveSlotService = newServiceBag()
+		serviceBag:Start()
+
+		-- Delegates to SetMaxSlotCount, so it surfaces the same before-Start guard
+		expect(function()
+			saveSlotService:SetUnlimitedSlots()
+		end).toThrow("SetMaxSlotCount must be called before Start")
+
+		serviceBag:Destroy()
+	end)
+
 	it("should reject a non-function summary provider", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider("not a function")
+			saveSlotService:SetDefaultSummaryProvider("not a function" :: any)
 		end).toThrow("Bad provider")
 
 		serviceBag:Destroy()
@@ -117,11 +154,76 @@ describe("SaveSlotService configuration guards", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider(function()
+			saveSlotService:SetDefaultSummaryProvider((function()
 				return nil
-			end)
+			end) :: any)
 		end).never.toThrow()
 
+		serviceBag:Destroy()
+	end)
+end)
+
+describe("SaveSlotService internal teleport", function()
+	it("should register a provider that carries a single player's active slot id", function()
+		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local player = fakePlayer()
+		player:SetAttribute("ActiveSlotId", "slot-xyz")
+
+		local data = teleportDataService:BuildTeleportData({ player })
+		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
+
+		player:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("should not carry a slot id when the single player has no active slot", function()
+		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local player = fakePlayer()
+
+		local data = teleportDataService:BuildTeleportData({ player })
+		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
+
+		player:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("should not carry a slot id for a multi-player teleport", function()
+		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local playerA = fakePlayer()
+		local playerB = fakePlayer()
+		playerA:SetAttribute("ActiveSlotId", "slot-a")
+		playerB:SetAttribute("ActiveSlotId", "slot-b")
+
+		local data = teleportDataService:BuildTeleportData({ playerA, playerB })
+		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
+
+		playerA:Destroy()
+		playerB:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("should report IsInternalTeleport from the arrived teleport data", function()
+		local serviceBag, saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local arrived = fakePlayer()
+		teleportDataService:SetArrivedTeleportDataForTesting(arrived, {
+			[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = "slot-1",
+		})
+		expect(saveSlotService:IsInternalTeleport(arrived)).toEqual(true)
+
+		local fresh = fakePlayer()
+		teleportDataService:SetArrivedTeleportDataForTesting(fresh, {})
+		expect(saveSlotService:IsInternalTeleport(fresh)).toEqual(false)
+
+		arrived:Destroy()
+		fresh:Destroy()
 		serviceBag:Destroy()
 	end)
 end)

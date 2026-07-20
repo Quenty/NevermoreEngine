@@ -266,7 +266,13 @@ function GameConfigPicker.PromisePriceInRobux(
 end
 
 --[=[
-	Find the first asset of a given key
+	Find the active asset of a given type and key.
+
+	When several active assets share the type and key, the one with the highest
+	[GameConfigAssetBase.GetPriority] wins; equal priorities keep the first
+	iterated (so a lone hand-authored asset resolves exactly as before, and a
+	higher-priority asset registered in code -- e.g. from the deploy manifest --
+	overrides it). Returns nil when no active asset matches.
 
 	@param assetType
 	@param assetKey
@@ -280,13 +286,20 @@ function GameConfigPicker.FindFirstActiveAssetOfKey(
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 
+	local best: GameConfigAssetBase? = nil
+	local bestPriority: number? = nil
+
 	for _, gameConfig in self:GetActiveConfigs() do
 		for _, gameConfigAsset in gameConfig:GetAssetsOfTypeAndKey(assetType, assetKey) do
-			return gameConfigAsset
+			local priority = gameConfigAsset:GetPriority()
+			if bestPriority == nil or priority > bestPriority then
+				best = gameConfigAsset
+				bestPriority = priority
+			end
 		end
 	end
 
-	return nil
+	return best
 end
 
 --[=[

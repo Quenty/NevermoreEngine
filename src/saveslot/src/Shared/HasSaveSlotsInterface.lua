@@ -9,6 +9,7 @@ local TieDefinition = require("TieDefinition")
 
 return TieDefinition.new("HasSaveSlots", {
 	ActiveSlotId = TieDefinition.Types.PROPERTY,
+	LastActiveSlotId = TieDefinition.Types.PROPERTY,
 	MaxSlotCount = TieDefinition.Types.PROPERTY,
 
 	PromiseHasSlot = TieDefinition.Types.METHOD,
@@ -20,10 +21,20 @@ return TieDefinition.new("HasSaveSlots", {
 	PromiseSlotIdFromIndex = TieDefinition.Types.METHOD,
 	PromiseLastActiveSlotId = TieDefinition.Types.METHOD,
 
+	-- Answered from the teleport data the player arrived with (see HasSaveSlotsBase); both realms
+	-- resolve the incoming slot id from their own [TeleportDataService].
+	PromiseHasSaveSlotFromTeleport = TieDefinition.Types.METHOD,
+	PromiseLoadSaveSlotFromTeleport = TieDefinition.Types.METHOD,
+
 	SlotChanged = TieDefinition.Types.SIGNAL,
 
 	[TieDefinition.Realms.SERVER] = {
 		ObserveActiveSlotStoreBrio = TieDefinition.Types.METHOD,
 		PromiseActiveSlotStore = TieDefinition.Types.METHOD,
+		PromiseSlotsLoaded = TieDefinition.Types.METHOD,
+		PromiseDeselectSlot = TieDefinition.Types.METHOD,
+		PromiseSelectLastSaveSlot = TieDefinition.Types.METHOD,
+		PromiseSelectNewSaveSlot = TieDefinition.Types.METHOD,
+		PromiseDeleteAllSlots = TieDefinition.Types.METHOD,
 	},
 })

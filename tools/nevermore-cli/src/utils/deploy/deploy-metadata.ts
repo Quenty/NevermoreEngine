@@ -7,6 +7,7 @@ import {
 } from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type BuiltPlace } from '../build/build.js';
+import { type ManifestPlaceInfo } from '../build/deploy-config.js';
 
 /** npm name of the package that ships the manifest module. */
 export const MANIFEST_PACKAGE_NAME = '@quenty/nevermoreclimanifest';
@@ -85,10 +86,16 @@ export interface DeployPlaceInfo {
  * round-trip through Lune serialization as float32, which silently corrupts IDs
  * above 2^24 (e.g. 123456789 -> 123456792). Strings are exact; the Luau reader
  * converts them back with `tonumber`.
+ *
+ * When `places` is given (the whole target's place table), it is stamped as a
+ * `Places` JSON-string attribute. The IDs inside stay numeric — a JSON string
+ * is exact text, and the Luau reader decodes it to 64-bit numbers, so the
+ * float32 hazard that forces the top-level IDs to be stringified doesn't apply.
  */
 export function buildDeployMetadataAttributes(
   git: GitDeployInfo,
-  place: DeployPlaceInfo
+  place: DeployPlaceInfo,
+  places?: readonly ManifestPlaceInfo[]
 ): DeployMetadataAttributes {
   const attributes: DeployMetadataAttributes = {
     Deployed: true,
@@ -101,6 +108,15 @@ export function buildDeployMetadataAttributes(
   if (git.commit) attributes.Commit = git.commit;
   if (git.version) attributes.Version = git.version;
   if (git.branch) attributes.Branch = git.branch;
+  if (places && places.length > 0) {
+    attributes.Places = JSON.stringify(
+      places.map((p) => ({
+        name: p.name,
+        placeId: p.placeId,
+        universeId: p.universeId,
+      }))
+    );
+  }
   return attributes;
 }
 

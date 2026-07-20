@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.3.0...@quenty/nevermoreclimanifest@1.4.0) (2026-07-20)
+
+### Features
+
+- **manifest:** stamp and read the deploy target's place table ([9542015](https://github.com/Quenty/NevermoreEngine/commit/954201515424fa415a0cbfb3eb1101b3d6f3ec85))
+
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.2.0...@quenty/nevermoreclimanifest@1.3.0) (2026-07-18)
 
 ### Bug Fixes

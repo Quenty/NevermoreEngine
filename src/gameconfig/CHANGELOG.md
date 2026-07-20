@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.53.0...@quenty/gameconfig@12.54.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- **gameconfig:** add asset selection priority for key clashes ([ae7d765](https://github.com/Quenty/NevermoreEngine/commit/ae7d7651f6a3270e8e0ee9fc592b4e6bc2fc5a51))
+- **gameconfig:** auto-register manifest places via NevermoreManifestConfigProvider ([db58cfc](https://github.com/Quenty/NevermoreEngine/commit/db58cfc62b9164f316895c4252942bd292a02f89))
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
+
 # [12.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.52.0...@quenty/gameconfig@12.53.0) (2026-07-18)
 
 **Note:** Version bump only for package @quenty/gameconfig

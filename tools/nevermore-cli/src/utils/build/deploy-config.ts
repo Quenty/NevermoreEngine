@@ -36,6 +36,28 @@ export interface DeployConfig {
   targets: Record<string, DeployTargetConfig>;
 }
 
+/**
+ * The subset of a resolved place that gets baked into the runtime manifest
+ * (see the nevermore-cli-manifest package). A deployed place carries the whole
+ * target's place table so it can resolve its siblings' IDs at runtime — e.g. a
+ * chapter place teleporting to another chapter without hard-coding place IDs.
+ */
+export interface ManifestPlaceInfo {
+  /** Place name from a multi-place target (e.g. "chapter0"); absent for single-place targets. */
+  name?: string;
+  placeId: number;
+  universeId: number;
+}
+
+/** Project a resolved deploy place down to the fields stamped into the manifest. */
+export function toManifestPlaceInfo(place: DeployTarget): ManifestPlaceInfo {
+  return {
+    name: place.name,
+    placeId: place.placeId,
+    universeId: place.universeId,
+  };
+}
+
 function _isMultiPlace(
   target: DeployTargetConfig
 ): target is MultiPlaceTargetConfig {

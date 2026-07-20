@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Brio = require("Brio")
 local DataStoreStage = require("DataStoreStage")
 local HasSaveSlots = require("HasSaveSlots")
+local HasSaveSlotsData = require("HasSaveSlotsData")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
@@ -18,6 +19,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
+local TeleportDataService = require("TeleportDataService")
 
 local SaveSlotService = {}
 SaveSlotService.ServiceName = "SaveSlotService"
@@ -31,6 +33,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_maxSlotCount: number,
 		_defaultSummaryProvider: HasSaveSlots.SaveSlotSummaryProvider?,
 		_remoting: any,
+		_teleportDataService: any,
 	},
 	{} :: typeof({ __index = SaveSlotService })
 ))
@@ -42,6 +45,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 
 	-- External
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
+	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))
@@ -61,6 +65,23 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 end
 
 function SaveSlotService.Start(self: SaveSlotService)
+	-- Every teleport built through TeleportDataService for a single player carries that player's
+	-- active slot id, so cross-place teleports resume on the same slot without each teleport site
+	-- re-attaching it by hand.
+	self._maid:GiveTask(
+		self._teleportDataService:RegisterTeleportDataProvider(function(players: { Player }): { [string]: any }?
+			if #players ~= 1 then
+				return nil
+			end
+
+			local slotId = HasSaveSlotsData.ActiveSlotId:Get(players[1])
+			if type(slotId) == "string" then
+				return { [SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = slotId }
+			end
+			return nil
+		end)
+	)
+
 	self._maid:GiveTask(self._hasSaveSlotsBinder:ObserveAllBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -74,19 +95,11 @@ function SaveSlotService.Start(self: SaveSlotService)
 			hasSaveSlots:SetSummaryProvider(self._defaultSummaryProvider)
 		end
 
-		-- Select incoming slot from teleport or proceed with default flow
+		-- Select the slot the player teleported in with, or proceed with the default flow
 		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
-			local joinData = hasSaveSlots._obj:GetJoinData()
-			local teleportData = joinData and joinData.TeleportData
-			local incomingSlotId = teleportData and teleportData[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]
-
-			if type(incomingSlotId) ~= "string" then
-				return self:_promiseSelectDefaultSlot(hasSaveSlots)
-			end
-
-			return hasSaveSlots:PromiseHasSlot(incomingSlotId):Then(function(hasSlot: boolean)
-				if hasSlot then
-					return hasSaveSlots:PromiseSelectSlot(incomingSlotId)
+			return hasSaveSlots:PromiseLoadSaveSlotFromTeleport():Then(function(loadedSlotId)
+				if loadedSlotId then
+					return -- Teleported in with a valid slot; it is now selected
 				end
 				return self:_promiseSelectDefaultSlot(hasSaveSlots)
 			end)
@@ -142,12 +155,34 @@ function SaveSlotService.GetExplicitSelectionRequired(self: SaveSlotService): bo
 end
 
 --[=[
+	Returns whether the player teleported in carrying a save-slot id -- i.e. arrived via an internal
+	slot teleport rather than a fresh join. This is the sync, presence-only signal (it does not
+	validate the slot still exists); use [HasSaveSlots.PromiseHasSaveSlotFromTeleport] when existence
+	matters.
+
+	@param player Player
+	@return boolean
+]=]
+function SaveSlotService.IsInternalTeleport(self: SaveSlotService, player: Player): boolean
+	return self._teleportDataService:HasArrivedValue(player, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+end
+
+--[=[
 	Sets the max slot count
 ]=]
 function SaveSlotService.SetMaxSlotCount(self: SaveSlotService, maxSlotCount: number): ()
 	assert(not self._serviceBag:IsStarted(), "SetMaxSlotCount must be called before Start")
 	assert(maxSlotCount >= 1, "Bad maxSlotCount")
 	self._maxSlotCount = maxSlotCount
+end
+
+--[=[
+	Removes the slot ceiling, so [HasSaveSlots.PromiseSelectNewSaveSlot] always
+	allocates the next free index. A thin alias over [SaveSlotService.SetMaxSlotCount]
+	with an unbounded count; same before-Start guard applies.
+]=]
+function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
+	self:SetMaxSlotCount(math.huge)
 end
 
 --[=[

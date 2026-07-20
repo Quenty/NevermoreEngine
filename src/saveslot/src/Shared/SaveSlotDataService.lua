@@ -54,6 +54,21 @@ function SaveSlotDataService.ObserveActiveSlotId(
 end
 
 --[=[
+	Observes the player's last active slot ID (the slot they can continue on)
+]=]
+function SaveSlotDataService.ObserveLastActiveSlotId(
+	self: SaveSlotDataService,
+	player: Player
+): Observable.Observable<SaveSlotData.SlotId?>
+	return (HasSaveSlotsInterface:ObserveBrio(player, self._realm) :: any):Pipe({
+		RxBrioUtils.switchMapBrio(function(hasSaveSlots)
+			return hasSaveSlots.LastActiveSlotId:Observe()
+		end),
+		RxBrioUtils.emitOnDeath(nil),
+	})
+end
+
+--[=[
 	Returns the player's active slot ID
 ]=]
 function SaveSlotDataService.GetActiveSlotId(self: SaveSlotDataService, player: Player): SaveSlotData.SlotId?

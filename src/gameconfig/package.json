@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameconfig",
-  "version": "12.53.0",
+  "version": "12.54.0",
   "description": "Configuration service to specify Roblox badges, products, and other specific assets.",
   "keywords": [
     "Roblox",
@@ -44,6 +44,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/nevermoreclimanifest": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/preferredparentutils": "workspace:*",
@@ -57,6 +58,7 @@
     "@quenty/statestack": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

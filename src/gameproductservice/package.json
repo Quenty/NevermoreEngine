@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "14.56.0",
+  "version": "14.57.0",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -58,6 +58,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

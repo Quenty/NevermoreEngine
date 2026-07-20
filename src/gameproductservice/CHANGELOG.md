@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.56.0...@quenty/gameproductservice@14.57.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
+
 # [14.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.55.0...@quenty/gameproductservice@14.56.0) (2026-07-18)
 
 **Note:** Version bump only for package @quenty/gameproductservice
