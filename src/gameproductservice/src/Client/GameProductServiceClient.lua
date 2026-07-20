@@ -201,6 +201,56 @@ function GameProductServiceClient.PromisePlayerOwnership(
 end
 
 --[=[
+	Sets a local override for the player's ownership of the asset. When set, the override is
+	authoritative: it wins over the cloud query and any session purchase, forcing ownership on
+	(`true`) or off (`false`). Passing `nil` clears the override.
+
+	See [GameProductService.SetPlayerOwnershipOverride] for the server equivalent.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@param ownsAsset boolean?
+	@return Promise
+]=]
+function GameProductServiceClient.SetPlayerOwnershipOverride(
+	self: GameProductServiceClient,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number,
+	ownsAsset: boolean?
+): Promise.Promise<()>
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
+
+	return self._gameProductDataService:SetPlayerOwnershipOverride(player, assetType, idOrKey, ownsAsset)
+end
+
+--[=[
+	Clears any local ownership override for the asset, so ownership falls back to the cloud
+	query. Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise
+]=]
+function GameProductServiceClient.ClearPlayerOwnershipOverride(
+	self: GameProductServiceClient,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<()>
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._gameProductDataService:ClearPlayerOwnershipOverride(player, assetType, idOrKey)
+end
+
+--[=[
 	Observes if the player owns this cloud asset or not
 
 	@param player Player

@@ -240,3 +240,251 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset()", function()
 		context.destroy()
 	end)
 end)
+
+describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", function()
+	it("should resolve true for a true override even when the callback reports no ownership", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(true)
+		context.destroy()
+	end)
+
+	it("should resolve false for a false override even when the callback reports ownership", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(true)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", false)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should resolve true for a true override even with no callback set", function()
+		local context = setup()
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(true)
+		context.destroy()
+	end)
+
+	it("should let a false override revoke an asset already in the owned set", function()
+		local context = setup()
+		context.tracker:SetOwnership(KEY_TO_ID.swordKey, true)
+
+		context.tracker:SetOwnershipOverride("swordKey", false)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should let a false override revoke an asset after a purchase fires", function()
+		local context = setup()
+		context.marketTracker.Purchased:Fire(KEY_TO_ID.swordKey)
+
+		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should not invoke the cloud callback while an override is set", function()
+		local context = setup()
+
+		local callCount = 0
+		context.tracker:SetQueryOwnershipCallback(function()
+			callCount += 1
+			return Promise.resolved(true)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		PromiseTestUtils.awaitSettled(promise, 5)
+
+		expect(callCount).toEqual(0)
+		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", function()
+	it("should fall back to the cloud query once the override is cleared", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+		local owned = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(owned, 5)).toEqual(true)
+		local _, ownsWhileOverridden = owned:Yield()
+		expect(ownsWhileOverridden).toEqual(true)
+
+		context.tracker:ClearOwnershipOverride("swordKey")
+		local afterClear = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(afterClear, 5)).toEqual(true)
+		local _, ownsAfterClear = afterClear:Yield()
+		expect(ownsAfterClear).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should treat SetOwnershipOverride(nil) as clearing the override", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+		context.tracker:SetOwnershipOverride("swordKey", nil)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should flip when the override is re-set", function()
+		local context = setup()
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+		local first = context.tracker:PromiseOwnsAsset("swordKey")
+		PromiseTestUtils.awaitSettled(first, 5)
+		local _, firstOwns = first:Yield()
+		expect(firstOwns).toEqual(true)
+
+		context.tracker:SetOwnershipOverride("swordKey", false)
+		local second = context.tracker:PromiseOwnsAsset("swordKey")
+		PromiseTestUtils.awaitSettled(second, 5)
+		local _, secondOwns = second:Yield()
+		expect(secondOwns).toEqual(false)
+		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", function()
+	it("should honor an override set by key when queried by id", function()
+		local context = setup()
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+
+		local promise = context.tracker:PromiseOwnsAsset(KEY_TO_ID.swordKey)
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(true)
+		context.destroy()
+	end)
+
+	it("should honor an override set by id when queried by key", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(true)
+		end)
+
+		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
+
+		local promise = context.tracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should not affect a different asset", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		context.tracker:SetOwnershipOverride("swordKey", true)
+
+		local promise = context.tracker:PromiseOwnsAsset("shieldKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+		context.destroy()
+	end)
+
+	it("should ignore an override for an unknown key without erroring", function()
+		local context = setup()
+		-- Should warn and no-op rather than throw.
+		context.tracker:SetOwnershipOverride("doesNotExist", true)
+
+		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("doesNotExist"), 5)
+		expect(outcome).toEqual("rejected")
+		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
+	it("should emit the override value and revert to the cloud query when cleared", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		local values = {}
+		local sub = context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
+			table.insert(values, value)
+		end)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return values[#values] == false
+		end, 5)).toEqual(true)
+
+		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, true)
+		expect(PromiseTestUtils.awaitValue(function()
+			return values[#values] == true
+		end, 5)).toEqual(true)
+
+		context.tracker:ClearOwnershipOverride(KEY_TO_ID.swordKey)
+		expect(PromiseTestUtils.awaitValue(function()
+			return values[#values] == false
+		end, 5)).toEqual(true)
+
+		sub:Destroy()
+		context.destroy()
+	end)
+
+	it("should emit false for a false override even when the cloud query reports ownership", function()
+		local context = setup()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(true)
+		end)
+
+		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
+
+		local values = {}
+		local sub = context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
+			table.insert(values, value)
+		end)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return values[#values] == false
+		end, 5)).toEqual(true)
+
+		sub:Destroy()
+		context.destroy()
+	end)
+end)
