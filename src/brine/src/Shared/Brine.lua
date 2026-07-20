@@ -358,6 +358,195 @@ function Brine.observeDeserialize(
 	end) :: any
 end
 
+--[=[
+	A captured baseline -- "the server's version" -- that [Brine.restore] reconciles a live tree
+	back toward. Holds the serialized subtree plus the id -> live-instance identity map (the
+	retained `InstanceRegistry`) restore uses to tell survivor from recreated from added.
+]=]
+export type Checkpoint = {
+	_intermediate: any,
+	_context: BrineContext.BrineContext,
+}
+
+export type RestoreOptions = {
+	-- When false, restore never creates or destroys instances: a baseline node missing from the
+	-- live tree is warned-and-skipped, and an unexpected live instance is warned-and-left. Use for
+	-- server-replicated trees, where "missing" is ambiguous (script-removed vs streamed-out vs
+	-- server-destroyed) and creating/destroying would fight Roblox's own replication. Defaults true.
+	lifecycle: boolean?,
+}
+
+--[=[
+	Captures a baseline of `root` and its subtree. The returned checkpoint is what [Brine.restore]
+	rewinds to, so capture it while the tree is in the state you want to be able to return to.
+]=]
+function Brine.checkpoint(root: Instance, options: BrineTypes.BrineOptions?): Checkpoint
+	local safeOptions = BrineOptionUtils.defaultOptions(options)
+	local context = BrineContext.new(safeOptions)
+
+	local encoded = BrineInstanceEncoder.encodeInstance(context, root)
+	assert(encoded, "[Brine.checkpoint] root is a class Brine cannot construct")
+
+	-- Resolve in-tree instance-valued properties to their serialized tables so restore can remap
+	-- them onto live instances by id. The InstanceRegistry (id -> live instance) stays on the
+	-- context and is the identity map restore reconciles against.
+	local intermediate = context:ReplaceInstancesWithSerializedInstances(encoded :: any)
+
+	return {
+		_intermediate = intermediate,
+		_context = context,
+	}
+end
+
+--[=[
+	Reconciles `root` back to `checkpoint` -- the rewind half of Brine. Survivors are patched in
+	place (same instance, so external references stay valid); missing nodes are recreated and extra
+	nodes removed (unless `lifecycle = false`). Idempotent: restoring an already-restored tree is a
+	no-op.
+]=]
+function Brine.restore(root: Instance, checkpoint: Checkpoint, options: RestoreOptions?): ()
+	local lifecycle = if options and options.lifecycle ~= nil then options.lifecycle else true
+	local context = checkpoint._context
+	local registry = context.InstanceRegistry
+	local safeOptions = context.Options
+	local securityCapabilities = context.SecurityCapabilities
+
+	local idToLive: { [string]: Instance } = {}
+	local pending: { { instance: Instance, node: any } } = {}
+
+	local function isAlive(instance: Instance?): boolean
+		return instance ~= nil and (instance == root or instance:IsDescendantOf(root))
+	end
+
+	-- Structure pass: classify every baseline node, reparent survivors, recreate missing subtrees.
+	local function structure(node: any, parentLive: Instance?)
+		local existing = registry:IdToInstance(node.Id)
+		if isAlive(existing) then
+			local live = existing :: Instance
+			if live ~= root and parentLive and live.Parent ~= parentLive then
+				live.Parent = parentLive
+			end
+			idToLive[node.Id] = live
+			table.insert(pending, { instance = live, node = node })
+			if node.Children then
+				for _, child in node.Children do
+					structure(child, live)
+				end
+			end
+		elseif lifecycle then
+			local created = Instance.new(node.ClassName)
+			registry:SetInstanceId(created, node.Id) -- follow the recreation so reuse stays idempotent
+			idToLive[node.Id] = created
+			table.insert(pending, { instance = created, node = node })
+			if node.Children then
+				for _, child in node.Children do
+					structure(child, created)
+				end
+			end
+			created.Parent = parentLive
+		else
+			warn(
+				string.format(
+					"[Brine.restore] baseline node %s (%s) is missing and lifecycle is disabled; skipping",
+					tostring(node.Id),
+					tostring(node.ClassName)
+				)
+			)
+		end
+	end
+
+	structure(checkpoint._intermediate, nil)
+
+	-- A property value is an in-tree instance reference iff it is a serialized node table; map it to
+	-- whichever live instance now carries that id (survivor or recreation). Externals pass through.
+	local function resolve(value: any): any
+		if type(value) == "table" and value.ClassName ~= nil and value.Id ~= nil then
+			return idToLive[value.Id]
+		end
+		return value
+	end
+
+	-- Value pass: every id now maps to a live instance, so references resolve correctly.
+	for _, entry in pending do
+		local live = entry.instance
+		local node = entry.node
+
+		local metadata = BrineInstanceReflection.getEncodedPropertiesMemoized(node.ClassName, securityCapabilities)
+		if metadata then
+			for _, property in metadata.orderedList do
+				-- Absent from the baseline means it was at its default when captured, so reset it --
+				-- re-applying only what the frame stored would leave script-set-from-default changes.
+				local raw = if node.Properties then node.Properties[property.Name] else nil
+				local target = if raw == nil then property.DefaultValue else resolve(raw)
+				local ok, current = pcall(function()
+					return (live :: any)[property.Name]
+				end)
+				if ok and current ~= target then
+					pcall(function()
+						(live :: any)[property.Name] = target
+					end)
+				end
+			end
+		end
+
+		if safeOptions.includeAttributes then
+			local baselineAttributes = node.Attributes or {}
+			for name in live:GetAttributes() do
+				if baselineAttributes[name] == nil then
+					live:SetAttribute(name, nil)
+				end
+			end
+			for name, value in baselineAttributes do
+				live:SetAttribute(name, value)
+			end
+		end
+
+		if safeOptions.includeTags then
+			local baselineTags: { [string]: boolean } = {}
+			if node.Tags then
+				for _, tag in node.Tags do
+					baselineTags[tag] = true
+				end
+			end
+			for _, tag in live:GetTags() do
+				if not baselineTags[tag] then
+					live:RemoveTag(tag)
+				end
+			end
+			if node.Tags then
+				for _, tag in node.Tags do
+					live:AddTag(tag)
+				end
+			end
+		end
+	end
+
+	-- Reconcile extras: live instances absent from the baseline. Only touch classes Brine could have
+	-- captured -- a non-encodable instance was never in the baseline, so it is not ours to remove.
+	local restored: { [Instance]: boolean } = {}
+	for _, instance in idToLive do
+		restored[instance] = true
+	end
+	for _, descendant in root:GetDescendants() do
+		if restored[descendant] then
+			continue
+		end
+		if not BrineInstanceReflection.canConstructMemoized(descendant.ClassName, securityCapabilities) then
+			continue
+		end
+		if lifecycle then
+			descendant:Destroy()
+		else
+			warn(
+				string.format(
+					"[Brine.restore] extra instance %s is not in the baseline; leaving it (lifecycle disabled)",
+					descendant:GetFullName()
+				)
+			)
+		end
+	end
+end
+
 function Brine._toStream(
 	_context: BrineContext.BrineContext,
 	intermediate: BrineTypes.Intermediate

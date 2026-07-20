@@ -4350,6 +4350,9 @@ importers:
       '@quenty/adorneedata':
         specifier: workspace:*
         version: link:../adorneedata
+      '@quenty/attributeutils':
+        specifier: workspace:*
+        version: link:../attributeutils
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
@@ -4377,6 +4380,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/observablecollection':
+        specifier: workspace:*
+        version: link:../observablecollection
       '@quenty/playerbinder':
         specifier: workspace:*
         version: link:../playerbinder
