@@ -236,13 +236,17 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
         const injected = await injectDeployMetadataAsync(
           builtPlace,
-          buildDeployMetadataAttributes(deployGitInfo, {
-            target: targetName,
-            published: publish,
-            timestamp: deployTimestamp,
-            universeId: buildTarget.target.universeId,
-            placeId: buildTarget.target.placeId,
-          })
+          buildDeployMetadataAttributes(
+            deployGitInfo,
+            {
+              target: targetName,
+              published: publish,
+              timestamp: deployTimestamp,
+              universeId: buildTarget.target.universeId,
+              placeId: buildTarget.target.placeId,
+            },
+            buildTarget.manifestPlaces
+          )
         );
 
         let version: number;

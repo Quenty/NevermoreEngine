@@ -103,9 +103,10 @@ end
 	Adds a new place with the key configured to the `assetKey`
 	@param assetKey string -- Key name to use for the place
 	@param placeId number -- Cloud id
+	@param priority number? -- Selection priority; higher wins on a key clash
 ]=]
-function GameConfigService:AddPlace(assetKey: string, placeId: number)
-	self:AddTypedAsset(GameConfigAssetTypes.PLACE, assetKey, placeId)
+function GameConfigService:AddPlace(assetKey: string, placeId: number, priority: number?)
+	return self:AddTypedAsset(GameConfigAssetTypes.PLACE, assetKey, placeId, priority)
 end
 
 --[=[
@@ -141,19 +142,22 @@ end
 	@param assetType GameConfigAssetType
 	@param assetKey string -- Key name to use for the bundle
 	@param assetId number -- Cloud id
+	@param priority number? -- Selection priority; higher wins on a key clash
 ]=]
 function GameConfigService:AddTypedAsset(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	assetKey: string,
-	assetId: number
+	assetId: number,
+	priority: number?
 )
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(assetKey) == "string", "Bad assetKey")
 	assert(type(assetId) == "number", "Bad assetId")
+	assert(priority == nil or type(priority) == "number", "Bad priority")
 
 	local gameConfig = self:_getOrCreateDefaultGameConfig()
 
-	local asset = GameConfigAssetUtils.create(self._binders.GameConfigAsset, assetType, assetKey, assetId)
+	local asset = GameConfigAssetUtils.create(self._binders.GameConfigAsset, assetType, assetKey, assetId, priority)
 	asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 
 	return asset

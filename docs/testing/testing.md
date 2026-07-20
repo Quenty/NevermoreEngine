@@ -126,6 +126,7 @@ Each testable package needs:
 1. **A `deploy.nevermore.json`** with a `test` target
 2. **A Rojo project file** (typically `test/default.project.json`) that builds the test place
 3. **A script template** (typically `test/scripts/Server/ServerMain.server.lua`) that boots the package and runs tests
+4. **A `@quentystudios/jest-lua` dependency** in the package's `package.json` (plus a `jest.config.lua`, see above) — the first `.spec.lua` in a package that has never had one must add this. Without it every spec fails to *run* with `[Loader] - "Jest" is not available` (a load error, not an assertion failure), because `require("Jest")` resolves through the package's own dependency graph. Run `pnpm install` after adding it so the workspace symlink is created.
 
 ### 1. deploy.nevermore.json
 

@@ -14,6 +14,7 @@ export type GameConfigAssetType =
 	| "asset"
 	| "bundle"
 	| "place"
+	| "game"
 	| "subscription"
 	| "membership"
 
@@ -62,6 +63,16 @@ return SimpleEnum.new({
 	@within GameConfigAssetTypes
 ]=]
 	PLACE = "place" :: "place",
+
+	--[=[
+	Specifies the asset is a game (universe). Ownership is checked against paid-access
+	via [MarketplaceService.PlayerOwnsAssetAsync]. Games cannot be prompted for purchase
+	in-experience, so prompting a game asset type throws.
+
+	@prop GAME string
+	@within GameConfigAssetTypes
+]=]
+	GAME = "game" :: "game",
 
 	--[=[
 	Specifies the asset is of type subscription

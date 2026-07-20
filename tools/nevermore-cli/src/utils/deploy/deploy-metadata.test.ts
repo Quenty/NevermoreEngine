@@ -84,6 +84,34 @@ describe('buildDeployMetadataAttributes', () => {
     );
     expect(attributes.Published).toBe(false);
   });
+
+  it('omits Places when no place table is given', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect('Places' in attributes).toBe(false);
+  });
+
+  it('stamps Places as a JSON string preserving large IDs exactly', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE, [
+      { name: 'chapter0', placeId: 97235312452456, universeId: 10192566764 },
+      { name: 'chapter1', placeId: 87639818897831, universeId: 10192566764 },
+    ]);
+    expect(typeof attributes.Places).toBe('string');
+    const parsed = JSON.parse(attributes.Places as string);
+    // Large place IDs must survive exactly (JSON text, not a float32 attribute).
+    expect(parsed).toEqual([
+      { name: 'chapter0', placeId: 97235312452456, universeId: 10192566764 },
+      { name: 'chapter1', placeId: 87639818897831, universeId: 10192566764 },
+    ]);
+  });
+
+  it('omits the name key for a single-place (nameless) target', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE, [
+      { placeId: 123, universeId: 456 },
+    ]);
+    const parsed = JSON.parse(attributes.Places as string);
+    expect(parsed).toEqual([{ placeId: 123, universeId: 456 }]);
+    expect('name' in parsed[0]).toBe(false);
+  });
 });
 
 describe('packageUsesManifestAsync', () => {

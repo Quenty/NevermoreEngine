@@ -44,6 +44,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/nevermoreclimanifest": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/preferredparentutils": "workspace:*",
@@ -57,6 +58,7 @@
     "@quenty/statestack": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

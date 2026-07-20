@@ -3,9 +3,11 @@ import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployTarget,
+  ManifestPlaceInfo,
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
+  toManifestPlaceInfo,
 } from '../build/deploy-config.js';
 
 export interface TargetPackage {
@@ -33,6 +35,13 @@ export interface BatchTarget {
   path: string;
   /** The single resolved place this BatchTarget represents. */
   target: DeployTarget;
+  /**
+   * Every place of this package's target (including `target` itself), stamped
+   * into the runtime manifest so a deployed place can resolve its siblings' IDs.
+   * Same for every BatchTarget fanned out from one package. Only the deploy
+   * paths populate this; test/script BatchTargets omit it.
+   */
+  manifestPlaces?: ManifestPlaceInfo[];
 }
 
 /**
@@ -119,19 +128,27 @@ export function flattenToBatchTargets(
 ): BatchTarget[] {
   const result: BatchTarget[] = [];
   for (const pkg of packages) {
+    const manifestPlaces = pkg.activeTargets.map(toManifestPlaceInfo);
     if (pkg.activeTargets.length === 1) {
       result.push({
         name: pkg.name,
         packageName: pkg.name,
         path: pkg.path,
         target: pkg.activeTargets[0]!,
+        manifestPlaces,
       });
       continue;
     }
     for (const target of pkg.activeTargets) {
       const suffix = target.name;
       const name = suffix ? `${pkg.name} - ${suffix}` : pkg.name;
-      result.push({ name, packageName: pkg.name, path: pkg.path, target });
+      result.push({
+        name,
+        packageName: pkg.name,
+        path: pkg.path,
+        target,
+        manifestPlaces,
+      });
     }
   }
   return result;

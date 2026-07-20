@@ -31,6 +31,14 @@ local function makeInjectedInstance(): Instance
 	instance:SetAttribute("Published", false)
 	instance:SetAttribute("PlaceId", "136978232832565")
 	instance:SetAttribute("UniverseId", "9716264427")
+	-- The whole target's place table, exactly as the CLI stamps it: a JSON
+	-- string with numeric IDs (see buildDeployMetadataAttributes). The IDs are
+	-- above 2^24 on purpose, to prove the JSON path preserves them.
+	instance:SetAttribute(
+		"Places",
+		'[{"name":"chapter0","placeId":97235312452456,"universeId":9716264427},'
+			.. '{"name":"chapter1","placeId":87639818897831,"universeId":9716264427}]'
+	)
 	return instance
 end
 
@@ -93,6 +101,46 @@ describe("NevermoreCLIManifestUtils without injection", function()
 		expect(metadata.commit).toBeNil()
 		expect(metadata.placeId).toBeNil()
 		expect(metadata.universeId).toBeNil()
+	end)
+end)
+
+describe("NevermoreCLIManifestUtils place table", function()
+	it("reads the whole target's places from the injected table", function()
+		local places = NevermoreCLIManifestUtils.getPlaces(makeInjectedInstance())
+		expect(#places).toEqual(2)
+		expect(places[1].name).toEqual("chapter0")
+		expect(places[2].name).toEqual("chapter1")
+	end)
+
+	it("preserves large place IDs exactly", function()
+		local places = NevermoreCLIManifestUtils.getPlaces(makeInjectedInstance())
+		-- Above 2^24: proves the JSON-string path avoids the float32 corruption a
+		-- numeric attribute would suffer.
+		expect(places[1].placeId).toEqual(97235312452456)
+		expect(places[2].placeId).toEqual(87639818897831)
+		expect(places[1].universeId).toEqual(9716264427)
+	end)
+
+	it("returns an empty list without injection", function()
+		expect(#NevermoreCLIManifestUtils.getPlaces(Instance.new("Folder"))).toEqual(0)
+	end)
+
+	it("degrades malformed place data to an empty list", function()
+		local instance = Instance.new("Folder")
+		instance:SetAttribute("Places", "not json{")
+		expect(#NevermoreCLIManifestUtils.getPlaces(instance)).toEqual(0)
+	end)
+
+	it("observes the injected place table", function()
+		local received
+		local sub = NevermoreCLIManifestUtils.observePlaces(makeInjectedInstance()):Subscribe(function(places)
+			received = places
+		end)
+
+		expect(received).never.toBeNil()
+		expect(#received).toEqual(2)
+
+		sub:Destroy()
 	end)
 end)
 
