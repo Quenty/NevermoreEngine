@@ -17,15 +17,26 @@ local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 
 --[=[
-	Contributes a slice of teleport data for a teleport of the given players. Returns nil to
-	contribute nothing.
+	Contributes teleport data shared by *every* player in a teleport. Returns nil to contribute
+	nothing.
 
 	@type TeleportDataProvider ({ Player }) -> ({ [string]: any }?)
 	@within TeleportDataService
 ]=]
 export type TeleportDataProvider = ({ Player }) -> { [string]: any }?
+
+--[=[
+	Contributes teleport data for a *single* player in a teleport (called once per player, with the
+	full player list for context). Returns nil to contribute nothing. This is how per-player data
+	survives a group teleport, where every player would otherwise share one flat table.
+
+	@type PerPlayerTeleportDataProvider (Player, { Player }) -> ({ [string]: any }?)
+	@within TeleportDataService
+]=]
+export type PerPlayerTeleportDataProvider = (Player, { Player }) -> { [string]: any }?
 
 local TeleportDataService = {}
 TeleportDataService.ServiceName = "TeleportDataService"
@@ -35,6 +46,7 @@ export type TeleportDataService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_providers: { TeleportDataProvider },
+		_perPlayerProviders: { PerPlayerTeleportDataProvider },
 		-- Boxed ({ data } where data may be nil) so an injected nil override is distinguishable from
 		-- "no override" and does not fall through to GetJoinData.
 		_arrivedOverrides: { [Player]: { { [string]: any }? } },
@@ -51,6 +63,7 @@ function TeleportDataService.Init(self: TeleportDataService, serviceBag: Service
 	self._maid = Maid.new()
 
 	self._providers = {}
+	self._perPlayerProviders = {}
 	self._arrivedOverrides = {}
 	self._arrivedRead = {}
 end
@@ -79,13 +92,44 @@ function TeleportDataService.RegisterTeleportDataProvider(
 end
 
 --[=[
-	Builds the merged teleport data for a teleport of the given players: every registered provider's
-	contribution merged together, with `baseData` overlaid last so caller-supplied keys always win.
+	Registers a per-player provider that contributes each player's own slice on every
+	[TeleportDataService.BuildTeleportData] call. Returns a function that unregisters it (also give it
+	to a [Maid]).
 
-	Pure -- performs no teleport -- so it is the seam teleport sites and tests build against.
+	@param provider PerPlayerTeleportDataProvider
+	@return () -> ()
+]=]
+function TeleportDataService.RegisterPerPlayerTeleportDataProvider(
+	self: TeleportDataService,
+	provider: PerPlayerTeleportDataProvider
+): () -> ()
+	assert(type(provider) == "function", "Bad provider")
+
+	table.insert(self._perPlayerProviders, provider)
+
+	return function()
+		local index = table.find(self._perPlayerProviders, provider)
+		if index then
+			table.remove(self._perPlayerProviders, index)
+		end
+	end
+end
+
+--[=[
+	Builds the teleport data for a teleport of the given players as a per-player envelope (see
+	[TeleportDataEnvelopeUtils]): shared-provider contributions plus `baseData` form the shared slice,
+	and each per-player provider's contribution forms that player's slice. On arrival each player reads
+	their own slice merged over the shared one via [TeleportDataService.GetArrivedTeleportData].
+
+	Precedence, least to most specific: shared providers, then `baseData` (the caller's shared
+	override), then per-player providers.
+
+	Pure -- performs no teleport -- so it is the seam teleport sites and tests build against. Errors if
+	the result exceeds the teleport-data size cap, and warns as it approaches it, so an oversized
+	payload fails loudly here instead of being silently dropped by the teleport.
 
 	@param players { Player }
-	@param baseData { [string]: any }? -- caller keys, applied last (win on conflict)
+	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
 	@return { [string]: any }
 ]=]
 function TeleportDataService.BuildTeleportData(
@@ -94,26 +138,66 @@ function TeleportDataService.BuildTeleportData(
 	baseData: { [string]: any }?
 ): { [string]: any }
 	assert(type(players) == "table", "Bad players")
+	if baseData ~= nil then
+		assert(type(baseData) == "table", "Bad baseData")
+	end
 
-	local data: { [string]: any } = {}
-
+	local sharedSlice: { [string]: any } = {}
 	for _, provider in self._providers do
 		local contributed = provider(players)
 		if type(contributed) == "table" then
 			for key, value in contributed do
-				data[key] = value
+				sharedSlice[key] = value
 			end
 		end
 	end
-
 	if baseData ~= nil then
-		assert(type(baseData) == "table", "Bad baseData")
 		for key, value in baseData do
-			data[key] = value
+			sharedSlice[key] = value
 		end
 	end
 
-	return data
+	local perPlayerByUserId: { [string]: { [string]: any } } = {}
+	for _, player in players do
+		local slice: { [string]: any } = {}
+		for _, provider in self._perPlayerProviders do
+			local contributed = provider(player, players)
+			if type(contributed) == "table" then
+				for key, value in contributed do
+					slice[key] = value
+				end
+			end
+		end
+
+		if next(slice) ~= nil then
+			perPlayerByUserId[tostring(self:_getUserId(player))] = slice
+		end
+	end
+
+	local envelope = TeleportDataEnvelopeUtils.build(sharedSlice, perPlayerByUserId)
+
+	local classification = TeleportDataEnvelopeUtils.classifySize(envelope)
+	if classification.level == "over" then
+		error(
+			string.format(
+				"[TeleportDataService] teleport data is %d bytes, over the %d byte cap for %d player(s); reduce provider payloads",
+				classification.bytes,
+				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
+				#players
+			)
+		)
+	elseif classification.level == "warn" then
+		warn(
+			string.format(
+				"[TeleportDataService] teleport data is %d bytes, approaching the %d byte cap for %d player(s)",
+				classification.bytes,
+				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
+				#players
+			)
+		)
+	end
+
+	return envelope
 end
 
 --[=[
@@ -128,18 +212,37 @@ function TeleportDataService.GetArrivedTeleportData(self: TeleportDataService, p
 
 	self._arrivedRead[player] = true
 
+	local raw: any
 	local override = self._arrivedOverrides[player]
 	if override ~= nil then
-		return override[1]
+		raw = override[1]
+	else
+		local joinData = player:GetJoinData()
+		raw = joinData and joinData.TeleportData
 	end
 
-	local joinData = player:GetJoinData()
-	local teleportData = joinData and joinData.TeleportData
-	if type(teleportData) == "table" then
-		return teleportData :: { [string]: any }
+	if type(raw) ~= "table" then
+		return nil
 	end
 
-	return nil
+	-- Legacy/hand-written flat data is read as-is (no UserId needed); only an envelope is unwrapped to
+	-- this player's slice, which is why the UserId read is deferred to here.
+	if not TeleportDataEnvelopeUtils.isEnvelope(raw) then
+		return raw :: { [string]: any }
+	end
+
+	return TeleportDataEnvelopeUtils.readSlice(raw, self:_getUserId(player))
+end
+
+--[=[
+	Resolves the UserId used to key a player's envelope slice. A method so tests can stand in a fake
+	player (which has no UserId) by overriding it.
+
+	@param player Player
+	@return number
+]=]
+function TeleportDataService._getUserId(_self: TeleportDataService, player: Player): number
+	return player.UserId
 end
 
 --[=[
