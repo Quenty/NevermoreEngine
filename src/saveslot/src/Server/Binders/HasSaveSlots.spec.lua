@@ -198,6 +198,127 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		context.destroy()
 	end)
 
+	it("ObserveActiveSlotStoreBrio tears its brio down once the active slot is deselected", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local activeBrio
+		local subscription = context.hasSaveSlots:ObserveActiveSlotStoreBrio():Subscribe(function(brio)
+			if not brio:IsDead() then
+				activeBrio = brio
+			end
+		end)
+
+		local emitted = PromiseTestUtils.awaitValue(function()
+			return activeBrio ~= nil
+		end, 10)
+		expect(emitted).toEqual(true)
+		expect(activeBrio:IsDead()).toEqual(false)
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			subscription:Destroy()
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+
+		-- The store observable kills its brio when the slot is cleared. This is the reactive teardown the
+		-- game relies on: on deselect the server unbinds per-slot data and removes the character purely
+		-- because this brio dies -- no bespoke deselect handling.
+		expect(activeBrio:IsDead()).toEqual(true)
+
+		subscription:Destroy()
+		context.destroy()
+	end)
+
+	it("ObserveActiveSlotStoreBrio swaps its brio when switching to another slot", function()
+		local context = setup()
+
+		local firstCreate = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(firstCreate, 10) then
+			expect("first create hung").toEqual("first create settled")
+			context.destroy()
+			return
+		end
+		local _, firstSlotId = firstCreate:Yield()
+
+		local secondCreate = context.hasSaveSlots:PromiseCreateSlot(2)
+		if not PromiseTestUtils.awaitSettled(secondCreate, 10) then
+			expect("second create hung").toEqual("second create settled")
+			context.destroy()
+			return
+		end
+		local _, secondSlotId = secondCreate:Yield()
+
+		local selectFirst = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
+		if not PromiseTestUtils.awaitSettled(selectFirst, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectFirst:Yield()
+
+		local currentBrio
+		local subscription = context.hasSaveSlots:ObserveActiveSlotStoreBrio():Subscribe(function(brio)
+			if not brio:IsDead() then
+				currentBrio = brio
+			end
+		end)
+
+		if not PromiseTestUtils.awaitValue(function()
+			return currentBrio ~= nil
+		end, 10) then
+			expect("first brio hung").toEqual("first brio emitted")
+			subscription:Destroy()
+			context.destroy()
+			return
+		end
+		local firstBrio = currentBrio
+
+		local selectSecond = context.hasSaveSlots:PromiseSelectSlot(secondSlotId)
+		if not PromiseTestUtils.awaitSettled(selectSecond, 10) then
+			expect("switch hung").toEqual("switch settled")
+			subscription:Destroy()
+			context.destroy()
+			return
+		end
+		selectSecond:Yield()
+
+		if not PromiseTestUtils.awaitValue(function()
+			return currentBrio ~= firstBrio
+		end, 10) then
+			expect("second brio hung").toEqual("second brio emitted")
+			subscription:Destroy()
+			context.destroy()
+			return
+		end
+
+		-- Switching slots kills the old slot's store brio and emits a fresh one, so per-slot server state
+		-- (data bindings, checkpoints, the character) rebuilds against the newly-selected slot.
+		expect(firstBrio:IsDead()).toEqual(true)
+		expect(currentBrio:IsDead()).toEqual(false)
+
+		subscription:Destroy()
+		context.destroy()
+	end)
+
 	it("should reject creating a slot beyond the max slot count", function()
 		local context = setup()
 		context.hasSaveSlots.MaxSlotCount.Value = 1
@@ -773,6 +894,140 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			return
 		end
 		expect((duplicatePromise:Yield())).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("PromiseResetActiveSlot wipes saved data but keeps the slot's index and name", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Adventure" })
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		-- Seed the active slot with saved progress the reset must clear
+		local tracker: any = context.hasSaveSlots
+		tracker:_getSlotStore(slotId):Store("Coins", 500)
+
+		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = resetPromise:Wait()
+		expect(type(newSlotId)).toEqual("string")
+		expect(newSlotId ~= slotId).toEqual(true)
+
+		-- The fresh slot is selected and the old one is gone
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(newSlotId)
+		local hasOldPromise = context.hasSaveSlots:PromiseHasSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(hasOldPromise, 10) then
+			expect("hasSlot hung").toEqual("hasSlot settled")
+			context.destroy()
+			return
+		end
+		expect((hasOldPromise:Wait())).toEqual(false)
+
+		-- Same index and name carried across into the fresh slot
+		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
+		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			context.destroy()
+			return
+		end
+		local metadata = metadataPromise:Wait()
+		expect(metadata.SlotIndex).toEqual(2)
+		expect(metadata.SlotName).toEqual("Adventure")
+
+		-- The saved progress did not survive into the fresh slot's store
+		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
+		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
+			expect("data hung").toEqual("data settled")
+			context.destroy()
+			return
+		end
+		expect((dataPromise:Wait())).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("PromiseResetActiveSlot resets the default slot in place, preserving the system store", function()
+		local context = setup()
+
+		-- Index 1 is the default slot, whose store is the shared root alongside the SaveSlots
+		-- system data; the reset must wipe the game data without clobbering that system store.
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1, { SlotName = "Save" })
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local tracker: any = context.hasSaveSlots
+		tracker:_getSlotStore(slotId):Store("Coins", 750)
+
+		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = resetPromise:Wait()
+
+		-- The system store survived: the fresh default slot still resolves at index 1
+		local lookupPromise = context.hasSaveSlots:PromiseSlotIdFromIndex(1)
+		if not PromiseTestUtils.awaitSettled(lookupPromise, 10) then
+			expect("lookup hung").toEqual("lookup settled")
+			context.destroy()
+			return
+		end
+		expect((lookupPromise:Wait())).toEqual(newSlotId)
+
+		-- The game data in the shared root store was wiped
+		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
+		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
+			expect("data hung").toEqual("data settled")
+			context.destroy()
+			return
+		end
+		expect((dataPromise:Wait())).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("PromiseResetActiveSlot is a no-op resolving nil when no slot is active", function()
+		local context = setup()
+
+		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		expect((resetPromise:Wait())).toBeNil()
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
 		context.destroy()
 	end)

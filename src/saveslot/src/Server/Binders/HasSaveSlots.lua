@@ -28,6 +28,13 @@ local ValueObject = require("ValueObject")
 
 export type SaveSlotSummaryProvider = (Player, any) -> Observable.Observable<string>
 
+-- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
+-- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
+export type SaveSlotCreateMetadata = {
+	SlotName: string?,
+	Summary: string?,
+}
+
 local HasSaveSlots = setmetatable({}, HasSaveSlotsBase)
 HasSaveSlots.ClassName = "HasSaveSlots"
 HasSaveSlots.__index = HasSaveSlots
@@ -189,7 +196,7 @@ end
 function HasSaveSlots.PromiseCreateSlot(
 	self: HasSaveSlots,
 	slotIndex: number,
-	metadata: SaveSlotData.SaveSlotMetadata?
+	metadata: SaveSlotCreateMetadata?
 ): Promise.Promise<SaveSlotData.SlotId>
 	return (self._loadPromise :: any):Then(function()
 		if (slotIndex < 1) or (slotIndex > self.MaxSlotCount.Value) then
@@ -353,6 +360,39 @@ function HasSaveSlots.PromiseDeleteAllSlots(self: HasSaveSlots): Promise.Promise
 			end)
 		end
 		return promise
+	end)
+end
+
+--[=[
+	Resets the active slot to a fresh empty one -- equivalent to deleting the slot and
+	creating a new one at the same index. Everything bound to
+	[HasSaveSlots.ObserveActiveSlotStoreBrio] tears down when the selection clears and
+	rebuilds against the empty store on reselect, so consumers reset reactively without
+	wiping their own state. The slot keeps its index and name; its saved data and metadata
+	(timestamps) start fresh. Resolves to the new slot id, or nil when no slot is active.
+]=]
+function HasSaveSlots.PromiseResetActiveSlot(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
+	return (self._loadPromise :: any):Then(function(): any
+		local slotId = self.ActiveSlotId.Value
+		if not slotId then
+			return nil -- Nothing selected to reset
+		end
+
+		local metadata = SaveSlotData:Get(self._slotMap[slotId])
+
+		-- Clear the selection so the slot is deletable, skipping the deselect flush that would
+		-- persist progress we are about to delete.
+		self.ActiveSlotId.Value = nil
+
+		return self:PromiseDeleteSlot(slotId)
+			:Then(function()
+				return self:PromiseCreateSlot(metadata.SlotIndex, { SlotName = metadata.SlotName })
+			end)
+			:Then(function(newSlotId: SaveSlotData.SlotId)
+				return self:PromiseSelectSlot(newSlotId):Then(function()
+					return newSlotId
+				end)
+			end)
 	end)
 end
 

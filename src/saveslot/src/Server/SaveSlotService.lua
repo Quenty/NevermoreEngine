@@ -276,6 +276,15 @@ function SaveSlotService.PromiseDeleteSlot(
 end
 
 --[=[
+	Resets the player's active slot to a fresh empty one
+]=]
+function SaveSlotService.PromiseResetActiveSlot(self: SaveSlotService, player: Player): Promise.Promise<any>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseResetActiveSlot()
+	end)
+end
+
+--[=[
 	Destroys the service
 ]=]
 function SaveSlotService.Destroy(self: SaveSlotService): ()
