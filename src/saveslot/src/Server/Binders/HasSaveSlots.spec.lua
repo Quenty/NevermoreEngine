@@ -284,6 +284,103 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		context.destroy()
 	end)
 
+	it("PromiseDeselectSlot clears the active slot but remembers the last active", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		expect((deselectPromise:Yield())).toEqual(true)
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+
+		-- The slot is deselected, not deleted: the last-active pointer still resolves it
+		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
+		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
+			expect("lastActive hung").toEqual("lastActive settled")
+			context.destroy()
+			return
+		end
+		expect((lastPromise:Wait())).toEqual(slotId)
+
+		context.destroy()
+	end)
+
+	it("PromiseDeselectSlot is a no-op when no slot is active", function()
+		local context = setup()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		expect((deselectPromise:Yield())).toEqual(true)
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("PromiseDeselectSlot then PromiseSelectLastSaveSlot round-trips back into the slot", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
+
+		local continuePromise = context.hasSaveSlots:PromiseSelectLastSaveSlot()
+		if not PromiseTestUtils.awaitSettled(continuePromise, 10) then
+			expect("continue hung").toEqual("continue settled")
+			context.destroy()
+			return
+		end
+		expect((continuePromise:Wait())).toEqual(slotId)
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
+
+		context.destroy()
+	end)
+
 	it("PromiseSelectLastSaveSlot re-selects the last active slot after the active slot is cleared", function()
 		local context = setup()
 

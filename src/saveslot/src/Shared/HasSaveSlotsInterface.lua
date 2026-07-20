@@ -27,6 +27,7 @@ return TieDefinition.new("HasSaveSlots", {
 		ObserveActiveSlotStoreBrio = TieDefinition.Types.METHOD,
 		PromiseActiveSlotStore = TieDefinition.Types.METHOD,
 		PromiseSlotsLoaded = TieDefinition.Types.METHOD,
+		PromiseDeselectSlot = TieDefinition.Types.METHOD,
 		PromiseSelectLastSaveSlot = TieDefinition.Types.METHOD,
 		PromiseSelectNewSaveSlot = TieDefinition.Types.METHOD,
 		PromiseDeleteAllSlots = TieDefinition.Types.METHOD,

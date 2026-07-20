@@ -157,6 +157,26 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 end
 
 --[=[
+	Clears the active slot selection, returning the player to a no-slot state --
+	the counterpart to [HasSaveSlots.PromiseSelectSlot], backing a "back to menu"
+	affordance. The active slot's progress is flushed first (mirroring the save
+	PromiseSelectSlot runs when switching away), and the last-active slot is
+	remembered, so [HasSaveSlots.PromiseSelectLastSaveSlot] can resume it later.
+	A no-op when no slot is active.
+]=]
+function HasSaveSlots.PromiseDeselectSlot(self: HasSaveSlots): Promise.Promise<()>
+	return (self._loadPromise :: any):Then(function()
+		if self.ActiveSlotId.Value == nil then
+			return -- Already deselected
+		end
+
+		return self._dataStore:Save():Then(function()
+			self.ActiveSlotId.Value = nil
+		end)
+	end)
+end
+
+--[=[
 	Creates a slot at the given index
 ]=]
 function HasSaveSlots.PromiseCreateSlot(

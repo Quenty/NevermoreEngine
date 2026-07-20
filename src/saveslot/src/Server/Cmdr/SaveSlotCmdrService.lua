@@ -113,6 +113,26 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
+		Name = "deselect-save-slot",
+		Description = "Clears the active save slot, returning to a no-slot state.",
+		Group = "SaveSlots",
+		Args = {},
+	}, function(context)
+		if not self._saveSlotDataService:GetActiveSlotId(context.Executor) then
+			return "No active slot."
+		end
+
+		self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseDeselectSlot()
+			end)
+			:Wait()
+
+		return "Deselected active slot."
+	end)
+
+	self._cmdrService:RegisterCommand({
 		Name = "create-save-slot",
 		Description = "Creates a save slot at the given index.",
 		Group = "SaveSlots",
