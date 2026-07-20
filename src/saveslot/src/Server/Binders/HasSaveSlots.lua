@@ -48,6 +48,9 @@ export type HasSaveSlots =
 			_summaryProvider: ValueObject.ValueObject<SaveSlotSummaryProvider?>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
+			_playSessionSlotId: SaveSlotData.SlotId?,
+			_playSessionStart: number?,
+			_playSessionLastFlush: number?,
 		},
 		{} :: typeof({ __index = HasSaveSlots })
 	))
@@ -74,6 +77,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "HasSaveSlots"))
 
 	self:_setupSummary()
+	self:_setupPlaytimeTracking()
 	self:_setupRemotes()
 
 	self._maid:GiveTask(HasSaveSlotsInterface.Server:Implement(self._obj, self))
@@ -489,7 +493,9 @@ function HasSaveSlots._buildSlot(
 	end
 
 	-- Store mutable metadata on change
-	for _, key in { "SlotName", "CreatedTime", "LastPlayedTime", "Summary" } do
+	for _, key in
+		{ "SlotName", "CreatedTime", "LastPlayedTime", "Summary", "TimePlayed", "PlayCount", "LastSessionLength" }
+	do
 		attributes[key].Value = data[key]
 		maid:GiveTask(metadataStore:StoreOnValueChange(key, attributes[key]))
 
@@ -549,6 +555,89 @@ function HasSaveSlots._setupSummary(self: HasSaveSlots): ()
 				end))
 		end)
 	)
+end
+
+--[=[
+	Accrues per-slot playtime automatically. A "session" spans the time a slot is the active slot:
+	selecting a slot begins one (bumping PlayCount), and deselecting, switching, or unbinding ends
+	it. Elapsed wall time is folded into the slot's TimePlayed from a datastore saving callback, so
+	it persists on exactly the cadence the data is written -- always fresh at save time, with no
+	separate timer -- and again at each session boundary.
+]=]
+function HasSaveSlots._setupPlaytimeTracking(self: HasSaveSlots): ()
+	self._playSessionSlotId = nil
+	self._playSessionStart = nil
+	self._playSessionLastFlush = nil
+
+	-- The active slot bounds the session: end the previous one (if any) and begin the new one.
+	self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
+		self:_endPlaySession()
+
+		local activeSlotId = self.ActiveSlotId.Value
+		if activeSlotId ~= nil then
+			self:_beginPlaySession(activeSlotId)
+		end
+	end))
+
+	-- Fold accrued time into TimePlayed just before every save so the written value is current. The
+	-- callback runs before the save serializes staged data (see DataStore._syncData), so the flush is
+	-- captured by that same save -- including the final save-on-leave.
+	self._maid:GivePromise(self._loadPromise):Then(function()
+		self._maid:GiveTask(self._dataStore:AddSavingCallback(function()
+			self:_flushPlaytime()
+		end))
+	end)
+
+	-- Best-effort flush on unbind for the case where the binder tears down before that final save.
+	self._maid:GiveTask(function()
+		self:_endPlaySession()
+	end)
+end
+
+function HasSaveSlots._beginPlaySession(self: HasSaveSlots, slotId: SaveSlotData.SlotId): ()
+	local now = os.time()
+	self._playSessionSlotId = slotId
+	self._playSessionStart = now
+	self._playSessionLastFlush = now
+
+	local slot = self._slotMap[slotId]
+	if slot then
+		SaveSlotData.PlayCount:Set(slot, (SaveSlotData.PlayCount:Get(slot) or 0) + 1)
+	end
+end
+
+function HasSaveSlots._flushPlaytime(self: HasSaveSlots): ()
+	local slotId = self._playSessionSlotId
+	if slotId == nil then
+		return
+	end
+
+	local slot = self._slotMap[slotId]
+	if not slot then
+		return
+	end
+
+	local now = os.time()
+
+	-- Add only the time since the last flush so repeated flushes within a session never double count.
+	local sinceFlush = now - (self._playSessionLastFlush or now)
+	if sinceFlush > 0 then
+		SaveSlotData.TimePlayed:Set(slot, (SaveSlotData.TimePlayed:Get(slot) or 0) + sinceFlush)
+		self._playSessionLastFlush = now
+	end
+
+	SaveSlotData.LastSessionLength:Set(slot, now - (self._playSessionStart or now))
+end
+
+function HasSaveSlots._endPlaySession(self: HasSaveSlots): ()
+	if self._playSessionSlotId == nil then
+		return
+	end
+
+	self:_flushPlaytime()
+	self._playSessionSlotId = nil
+	self._playSessionStart = nil
+	self._playSessionLastFlush = nil
 end
 
 function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()

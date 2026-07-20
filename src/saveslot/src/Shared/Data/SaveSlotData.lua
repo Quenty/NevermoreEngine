@@ -18,6 +18,10 @@ export type SaveSlotMetadata = {
 	CreatedTime: number?,
 	LastPlayedTime: number?,
 	Summary: string?,
+	-- Accrued automatically by HasSaveSlots while the slot is the active slot; see _setupPlaytimeTracking.
+	TimePlayed: number?, -- total seconds the slot has been actively played, across every session
+	PlayCount: number?, -- number of sessions (incremented each time the slot is selected)
+	LastSessionLength: number?, -- seconds of the current/most-recent session
 }
 
 return AdorneeData.new({
@@ -29,4 +33,7 @@ return AdorneeData.new({
 	CreatedTime = AdorneeDataEntry.optionalAttribute("number", "CreatedTime"),
 	LastPlayedTime = AdorneeDataEntry.optionalAttribute("number", "LastPlayedTime"),
 	Summary = AdorneeDataEntry.optionalAttribute("string", "Summary"),
+	TimePlayed = AdorneeDataEntry.optionalAttribute("number", "TimePlayed"),
+	PlayCount = AdorneeDataEntry.optionalAttribute("number", "PlayCount"),
+	LastSessionLength = AdorneeDataEntry.optionalAttribute("number", "LastSessionLength"),
 })

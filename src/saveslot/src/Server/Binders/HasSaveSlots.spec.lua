@@ -699,6 +699,133 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	end)
 end)
 
+describe("HasSaveSlots playtime tracking", function()
+	local function createAndSelect(context, slotIndex: number)
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(slotIndex)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			return nil
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			return nil
+		end
+		selectPromise:Yield()
+
+		return slotId
+	end
+
+	local function getMetadata(context, slotId)
+		local promise = context.hasSaveSlots:PromiseGetSlotMetadata(slotId)
+		if not PromiseTestUtils.awaitSettled(promise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			return nil
+		end
+		return promise:Wait()
+	end
+
+	it("increments PlayCount to 1 the first time a slot is selected", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+		expect(getMetadata(context, slotId).PlayCount).toEqual(1)
+
+		context.destroy()
+	end)
+
+	it("counts a fresh session each time a slot is re-selected", function()
+		local context = setup()
+
+		local firstSlotId = createAndSelect(context, 1)
+		local secondSlotId = createAndSelect(context, 2)
+
+		-- Returning to the first slot is a second session for it, a first for the second slot
+		local reselectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
+		if not PromiseTestUtils.awaitSettled(reselectPromise, 10) then
+			expect("reselect hung").toEqual("reselect settled")
+			context.destroy()
+			return
+		end
+		reselectPromise:Yield()
+
+		expect(getMetadata(context, firstSlotId).PlayCount).toEqual(2)
+		expect(getMetadata(context, secondSlotId).PlayCount).toEqual(1)
+
+		context.destroy()
+	end)
+
+	it("accrues elapsed wall time into TimePlayed and LastSessionLength for the active slot", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+
+		-- Rewind the live session's clock so a flush observes ~120s elapsed without waiting on it. The
+		-- flush adds now - lastFlush, so the total is >= 120 (real time may nudge it a second higher).
+		local tracker: any = context.hasSaveSlots
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+		tracker:_flushPlaytime()
+
+		local metadata = getMetadata(context, slotId)
+		expect(metadata.TimePlayed ~= nil and metadata.TimePlayed >= 120).toEqual(true)
+		expect(metadata.LastSessionLength ~= nil and metadata.LastSessionLength >= 120).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("does not accrue time before any slot is selected", function()
+		local context = setup()
+
+		-- No active slot -> the session is closed, so a flush lands nowhere
+		local tracker: any = context.hasSaveSlots
+		tracker:_flushPlaytime()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		expect(getMetadata(context, slotId).TimePlayed).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("stops accruing into a slot once it is deselected", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+
+		local tracker: any = context.hasSaveSlots
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+		tracker:_flushPlaytime()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+
+		local afterDeselect = getMetadata(context, slotId).TimePlayed
+
+		-- A flush after deselection lands nowhere: the session is closed, so the total must not move
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+		tracker:_flushPlaytime()
+		expect(getMetadata(context, slotId).TimePlayed).toEqual(afterDeselect)
+
+		context.destroy()
+	end)
+end)
+
 describe("HasSaveSlots against a fake player (datastore down)", function()
 	it("PromiseSlotsLoaded rejects fast instead of hanging when datastores are down", function()
 		local mock = DataStoreMock.new()
