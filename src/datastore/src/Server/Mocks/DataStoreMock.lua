@@ -23,6 +23,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local Table = require("Table")
 
 local function deepCopy(value: any): any
@@ -31,6 +33,14 @@ local function deepCopy(value: any): any
 	end
 
 	return Table.deepCopy(value)
+end
+
+-- Mirrors how Roblox reports a value that serializes past the per-key size ceiling.
+local function valueTooLargeMessage(maxValueLength: number): string
+	return string.format(
+		"105: The value provided exceeds the %d byte maximum size limit for a data store value",
+		maxValueLength
+	)
 end
 
 local DataStoreMock = {}
@@ -45,6 +55,17 @@ DataStoreMock.__index = DataStoreMock
 ]=]
 DataStoreMock.OPERATION_NOT_ALLOWED_509 =
 	"509: Data Store operations blocked while running on a Personal RCC to prevent possible data corruption"
+
+--[=[
+	The per-key serialized-value ceiling Roblox enforces (4 MB). Real datastores serialize a key's
+	whole value to JSON and reject the write when that blob is larger than this, which is how a save
+	fails once too much data accumulates under one key. Pass this (or a smaller value, to trigger it
+	without a multi-megabyte payload) to [DataStoreMock.SetMaxValueLength].
+
+	@prop MAX_VALUE_LENGTH number
+	@within DataStoreMock
+]=]
+DataStoreMock.MAX_VALUE_LENGTH = 4194304
 
 export type ErrorInjectorContext = {
 	method: string,
@@ -68,6 +89,7 @@ export type DataStoreMock = typeof(setmetatable(
 		_yieldTime: number,
 		_errorInjector: ErrorInjector?,
 		_blocked: boolean,
+		_maxValueLength: number?,
 	},
 	{} :: typeof({ __index = DataStoreMock })
 ))
@@ -106,6 +128,7 @@ function DataStoreMock.new(name: string?, scope: string?): DataStoreMock
 	self._yieldTime = 0
 	self._errorInjector = nil
 	self._blocked = false
+	self._maxValueLength = nil
 
 	return self
 end
@@ -120,6 +143,24 @@ function DataStoreMock.SetYieldTime(self: DataStoreMock, yieldTime: number): ()
 	assert(type(yieldTime) == "number" and yieldTime >= 0, "Bad yieldTime")
 
 	self._yieldTime = yieldTime
+end
+
+--[=[
+	Enforces a serialized-value ceiling on `SetAsync`/`UpdateAsync`, mirroring the way real
+	datastores reject a write once a key's whole value serializes past their per-key size limit.
+	A write whose value JSON-encodes to more than `maxValueLength` bytes throws (and stores nothing),
+	so tests can exercise the overflow-save failure path without a multi-megabyte payload. A value the
+	mock cannot serialize at all throws the same way a real datastore rejects non-UTF-8 data.
+
+	Pass [DataStoreMock.MAX_VALUE_LENGTH] for the real 4 MB ceiling, a smaller number to trigger it
+	cheaply, or nil to disable the check (the default, so existing tests are unaffected).
+
+	@param maxValueLength number?
+]=]
+function DataStoreMock.SetMaxValueLength(self: DataStoreMock, maxValueLength: number?): ()
+	assert(maxValueLength == nil or (type(maxValueLength) == "number" and maxValueLength >= 0), "Bad maxValueLength")
+
+	self._maxValueLength = maxValueLength
 end
 
 --[=[
@@ -261,6 +302,27 @@ function DataStoreMock._beginRequest(self: DataStoreMock, method: string, key: s
 	end
 end
 
+-- Rejects a write whose value serializes past the configured size ceiling, the way real datastores
+-- reject a key value that grew too large to store safely. A no-op unless SetMaxValueLength was set.
+function DataStoreMock._assertWithinSizeLimit(self: DataStoreMock, value: any): ()
+	local maxValueLength = self._maxValueLength
+	if maxValueLength == nil or value == nil then
+		return
+	end
+
+	local ok, encoded = pcall(function()
+		return HttpService:JSONEncode(value)
+	end)
+	if not ok then
+		-- A real datastore likewise refuses a value it cannot serialize.
+		error("104: Cannot store value in data store. Data stores can only accept valid UTF-8 characters", 0)
+	end
+
+	if #encoded > maxValueLength then
+		error(valueTooLargeMessage(maxValueLength), 0)
+	end
+end
+
 function DataStoreMock._makeKeyInfo(self: DataStoreMock, key: string)
 	local userIds = self._userIds[key]
 	local metadata = self._metadata[key]
@@ -312,6 +374,7 @@ function DataStoreMock.SetAsync(
 	assert(type(key) == "string", "Bad key")
 
 	self:_beginRequest("SetAsync", key)
+	self:_assertWithinSizeLimit(value)
 
 	self._store[key] = deepCopy(value)
 	self._userIds[key] = userIds and Table.deepCopy(userIds) or nil
@@ -350,6 +413,8 @@ function DataStoreMock.UpdateAsync(
 		-- Update cancelled; nothing written
 		return nil, keyInfo
 	end
+
+	self:_assertWithinSizeLimit(newValue)
 
 	self._store[key] = deepCopy(newValue)
 	self._userIds[key] = userIds and Table.deepCopy(userIds) or nil

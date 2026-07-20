@@ -359,6 +359,83 @@ describe("DataStoreMock call counting", function()
 	end)
 end)
 
+describe("DataStoreMock serialized-size overflow", function()
+	it("should not enforce any size limit by default", function()
+		local store = DataStoreMock.new()
+		-- A value far larger than a small limit persists fine when no limit is configured.
+		expect(function()
+			store:SetAsync("key", string.rep("A", 100000))
+		end).never.toThrow()
+	end)
+
+	it("should reject a SetAsync whose value exceeds the configured limit", function()
+		local store = DataStoreMock.new()
+		store:SetMaxValueLength(1024)
+
+		expect(function()
+			store:SetAsync("key", string.rep("A", 4096))
+		end).toThrow("maximum size limit")
+	end)
+
+	it("should allow a SetAsync whose value fits within the configured limit", function()
+		local store = DataStoreMock.new()
+		store:SetMaxValueLength(1024)
+
+		expect(function()
+			store:SetAsync("key", "small")
+		end).never.toThrow()
+		expect((store:GetAsync("key"))).toEqual("small")
+	end)
+
+	it("should not persist an oversized value that was rejected", function()
+		local store = DataStoreMock.new()
+		store:SetAsync("key", "original")
+		store:SetMaxValueLength(1024)
+
+		pcall(function()
+			store:SetAsync("key", string.rep("A", 4096))
+		end)
+
+		store:SetMaxValueLength(nil)
+		expect((store:GetAsync("key"))).toEqual("original")
+	end)
+
+	it("should reject an UpdateAsync whose returned value exceeds the configured limit", function()
+		local store = DataStoreMock.new()
+		store:SetMaxValueLength(1024)
+
+		expect(function()
+			store:UpdateAsync("key", function()
+				return string.rep("A", 4096)
+			end)
+		end).toThrow("maximum size limit")
+	end)
+
+	it("should measure the serialized size of tables, not their length", function()
+		local store = DataStoreMock.new()
+		store:SetMaxValueLength(64)
+
+		local big = {}
+		for i = 1, 100 do
+			big[i] = i
+		end
+
+		expect(function()
+			store:SetAsync("key", big)
+		end).toThrow("maximum size limit")
+	end)
+
+	it("should stop enforcing once the limit is cleared", function()
+		local store = DataStoreMock.new()
+		store:SetMaxValueLength(1024)
+		store:SetMaxValueLength(nil)
+
+		expect(function()
+			store:SetAsync("key", string.rep("A", 4096))
+		end).never.toThrow()
+	end)
+end)
+
 describe("DataStoreMock:SetRaw / GetRaw", function()
 	it("should seed and read without triggering failures", function()
 		local store = DataStoreMock.new()
