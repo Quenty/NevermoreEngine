@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class RogueModifierBase.spec.lua
 ]]
@@ -27,7 +27,7 @@ local function setup()
 
 	return {
 		newModifierBase = newModifierBase,
-		destroy = function()
+		destroy = function(_self: any)
 			serviceBag:Destroy()
 		end,
 	}

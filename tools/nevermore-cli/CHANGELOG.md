@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.39.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.38.0...@quenty/nevermore-cli@4.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/Nevermore/issues/737)) ([1b7a536](https://github.com/Quenty/Nevermore/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [4.38.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.37.0...@quenty/nevermore-cli@4.38.0) (2026-07-17)
+
+### Features
+
+- **nevermore-cli:** pin and promote base place versions in deploy config ([#734](https://github.com/Quenty/Nevermore/issues/734)) ([2f265c4](https://github.com/Quenty/Nevermore/commit/2f265c47dac250b398fe3fc24d70a72b7e01c51c))
+
 # [4.37.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.36.0...@quenty/nevermore-cli@4.37.0) (2026-07-16)
 
 ### Features

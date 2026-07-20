@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.34.0...@quenty/animations@8.35.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [8.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.33.0...@quenty/animations@8.34.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/animations
+
 # [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.32.2...@quenty/animations@8.33.0) (2026-07-14)
 
 ### Features

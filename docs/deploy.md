@@ -155,6 +155,7 @@ Other flags:
 | `targets.<name>.project` | yes | Path to the Rojo project file, relative to the package directory. |
 | `targets.<name>.scriptTemplate` | no | Luau file `nevermore test` executes via Open Cloud after upload. Not used by `nevermore deploy` itself. |
 | `targets.<name>.basePlace` | no | Universe/place to download and merge with the rojo build before uploading. See [Merging with an existing place](testing/integration-testing.md#merging-with-an-existing-place-baseplace). |
+| `targets.<name>.basePlace.version` | no | Pin the base place to a specific published version instead of pulling the latest. See [Pinning base place versions](#pinning-base-place-versions). |
 
 You can declare any number of targets. A common setup is one `test` target for CI and a separate `production` or `staging` target for live deploys:
 
@@ -230,6 +231,66 @@ nevermore deploy run --place-file ./build/my-place.rbxl
 
 The `project` field in `deploy.nevermore.json` is ignored when `--place-file` is set, but `universeId` and `placeId` are still required.
 
+## Pinning base place versions
+
+If a target uses a [`basePlace`](testing/integration-testing.md#merging-with-an-existing-place-baseplace), `nevermore deploy` downloads that place and merges your rojo build into it. By default it pulls **the latest published version** of the base place — so a broken Studio edit to the base place ships on the very next deploy, even when your code hasn't changed.
+
+To make deploys reproducible, pin the base place to a specific version with an optional `version` field:
+
+```json
+{
+  "targets": {
+    "production": {
+      "universeId": 12345,
+      "placeId": 67890,
+      "project": "default.project.json",
+      "basePlace": {
+        "universeId": 12345,
+        "placeId": 11111,
+        "version": 42
+      }
+    }
+  }
+}
+```
+
+With `version` set, the deploy downloads exactly that version of the base place. Omit it to keep pulling the latest (the previous behaviour — nothing changes for configs that don't opt in).
+
+### Bumping the pin
+
+When you actually want to roll base places forward, run:
+
+```bash
+# Re-pin every basePlace in the config to its current latest published version
+nevermore deploy version upgrade
+
+# Only upgrade one target
+nevermore deploy version upgrade production
+
+# Preview the change set without writing
+nevermore deploy version upgrade --dryrun
+```
+
+`upgrade` walks every `basePlace` in `deploy.nevermore.json` (or just the named target), resolves each place's current latest published version, prints an old → new table, and — after a confirmation prompt — writes the new `version` values back into the file. Base places shared by several targets are resolved once. Pass `--yes` to skip the prompt (for scripting), or `--dryrun` to preview only.
+
+Commit the updated `deploy.nevermore.json`, then deploy as usual. This gives you a reviewable, git-tracked record of exactly which base-place content each deploy shipped.
+
+Resolving the latest version uses the same `legacy-asset:manage` scope already required for `basePlace` downloads, so no extra credentials are needed.
+
+### Promoting pins between targets
+
+Once you've validated a target — say a `production-demo` universe — you usually want to ship those exact same base-place versions to `production`, not re-pin to whatever is newest. `promote` copies the pins across:
+
+```bash
+# Copy every base place pin from production-demo onto production
+nevermore deploy version promote production-demo production
+
+# Preview without writing
+nevermore deploy version promote production-demo production --dryrun
+```
+
+Places are matched by **base place id**, not by name, so the same source content lines up even when the two targets name their places differently (e.g. a demo `chapter6` and a prod `chapter8` that share one base place). Places in the destination with no matching pin in the source are left untouched and reported. This is a pure edit of `deploy.nevermore.json` — no network calls — so it's safe to run offline and review as a diff.
+
 ## Batch deploys
 
 If you want to deploy every game affected by a code change (for example, on every PR), use `nevermore batch deploy` instead. It scans the pnpm workspace for packages with a matching deploy target, uses `pnpm ls --filter` to figure out which ones changed since `origin/main`, and runs them in parallel.
@@ -242,7 +303,7 @@ See [Integration Testing → Batch deploy](testing/integration-testing.md#batch-
 
 That package ships a `NevermoreCLIManifestUtils` ModuleScript. Between the rojo build and the upload, the CLI finds that module in the built place and writes the metadata onto it as attributes (via a Lune transform, the same way `basePlace` merges work). Because the data lives on the package's own instance, it replicates to clients automatically. If the module isn't present, the deploy proceeds unchanged.
 
-`nevermore test` and `nevermore batch test` apply the same stamp — but only for packages that ship or directly depend on `nevermore-cli-manifest`, so unrelated packages don't pay for a Lune pass. This is what lets that package's own spec assert the injection actually ran (`getGameMetadata().deployed` is `true`, with a real commit and the `test` target) rather than checking a synthetic fixture. Note the consequence: for those packages, `deployed` is `true` during a test run too, since the test place really was built and uploaded by the CLI.
+`nevermore test` and `nevermore batch test` apply the same stamp — but only for packages that ship or directly depend on `nevermore-cli-manifest`, so unrelated packages don't pay for a Lune pass. A consequence is that when you run tests through the CLI's cloud path, `deployed` is `true` during the run too, since the test place really was built and uploaded by the CLI. The package's own spec does not depend on that, though: the standard Jest CI job runs specs in a Roblox VM without the CLI's injection pass, so the spec stamps a synthetic instance itself and asserts the reader returns reasonable, well-shaped values (a hex commit, the `test` target, IDs that round-trip from strings back to numbers).
 
 Read it from either the client or the server:
 

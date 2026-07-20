@@ -9,30 +9,57 @@ local require = require(script.Parent.loader).load(script)
 
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
 local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
 
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
 
+-- An accumulated localization entry delta that is merged into the table and applied in a
+-- single SetEntries call on flush.
+type PendingEntry = {
+	Key: string,
+	Source: string,
+	Context: string,
+	Example: string?,
+	Values: { [string]: string },
+}
+
+-- Pending deltas indexed by translation key. A LocalizationTable keys its entries by the
+-- translation key alone -- SetEntries rejects two entries that share a key even when their
+-- source/context differ, and SetEntryValue overwrites in place -- so we hold at most one
+-- pending delta per key. A later write for the same key with a different source/context
+-- overwrites the source/context (last write wins) rather than queueing a second entry, which
+-- would make the flush feed SetEntries a duplicate key and throw. Keying by translation key
+-- also lets a single-key flush ([TranslatorService.FlushEntryForKey]) find its entry in O(1).
+type PendingEntries = { [string]: PendingEntry }
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
+		_tieRealmService: TieRealmService.TieRealmService,
 		_translator: ValueObject.ValueObject<Translator>,
 		_localizationTable: LocalizationTable?,
 		_pendingTranslatorPromise: Promise.Promise<Translator>?,
+		_forcedLocaleId: ValueObject.ValueObject<string?>,
 		_localeIdValue: ValueObject.ValueObject<string>?,
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
+		_pendingEntries: PendingEntries,
+		_flushScheduled: boolean,
+		_pendingFlushPromise: Promise.Promise<()>?,
+		_localizationWriteCount: number,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
@@ -41,6 +68,14 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+
+	self._tieRealmService = serviceBag:GetService(TieRealmService) :: any
+
+	self._pendingEntries = {}
+	self._flushScheduled = false
+	self._localizationWriteCount = 0
+
+	self._forcedLocaleId = self._maid:Add(ValueObject.new(nil))
 
 	self._translator = self._maid:Add(ValueObject.new(nil))
 	self._translator:Mount(self:_observeTranslatorImpl())
@@ -64,12 +99,306 @@ function TranslatorService.GetLocalizationTable(self: TranslatorService): Locali
 	return localizationTable
 end
 
-function TranslatorService._getLocalizationTableName(_self: TranslatorService): string
-	if RunService:IsServer() then
+function TranslatorService._getLocalizationTableName(self: TranslatorService): string
+	if self._tieRealmService:GetTieRealm() == TieRealms.SERVER then
 		return "GeneratedJSONTable_Server"
 	else
 		return "GeneratedJSONTable_Client"
 	end
+end
+
+--[=[
+	Forces the locale id used for translation, overriding the inferred player/Roblox
+	locale. Pass nil to clear the override and fall back to the inferred locale. Useful
+	for an in-game language selector.
+
+	@param localeId string?
+]=]
+function TranslatorService.SetForcedLocaleId(self: TranslatorService, localeId: string?)
+	assert(localeId == nil or type(localeId) == "string", "Bad localeId")
+
+	self._forcedLocaleId.Value = localeId
+end
+
+--[=[
+	Queues a localization table entry value write. Writes are batched and flushed
+	together at the end of the frame (via `task.defer`) instead of being applied
+	synchronously, so a burst of translators loading does not each pay the cost of
+	mutating (and re-replicating) the shared localization table in the load path.
+
+	Await [TranslatorService.PromiseEntriesWritten] before reading a translation to
+	guarantee the pending writes have landed.
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param localeId string
+	@param text string
+]=]
+function TranslatorService.SetEntryValue(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	localeId: string,
+	text: string
+)
+	local entry = self:_getPendingEntry(translationKey, source, context)
+	entry.Values[localeId] = text
+	self:_scheduleFlush()
+end
+
+--[=[
+	Queues a localization table entry example write. See [TranslatorService.SetEntryValue].
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param example string
+]=]
+function TranslatorService.SetEntryExample(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	example: string
+)
+	local entry = self:_getPendingEntry(translationKey, source, context)
+	entry.Example = example
+	self:_scheduleFlush()
+end
+
+function TranslatorService._getPendingEntry(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string
+): PendingEntry
+	local entry = self._pendingEntries[translationKey]
+	if not entry then
+		entry = {
+			Key = translationKey,
+			Source = source,
+			Context = context,
+			Values = {},
+		}
+		self._pendingEntries[translationKey] = entry
+	else
+		-- The table keys entries by translation key alone, so a second write for the same key
+		-- with a different source/context overwrites in place (as SetEntryValue would) rather
+		-- than queueing a duplicate that SetEntries would reject. Accumulated values are kept.
+		entry.Source = source
+		entry.Context = context
+	end
+	return entry
+end
+
+--[=[
+	Returns a promise that resolves once all currently-queued localization writes
+	have been flushed to the table. Resolves immediately if nothing is pending.
+
+	Read paths should await this so translation never reads before the writes land.
+
+	@return Promise
+]=]
+function TranslatorService.PromiseEntriesWritten(self: TranslatorService): Promise.Promise<()>
+	if not self._flushScheduled then
+		return Promise.resolved()
+	end
+
+	return assert(self._pendingFlushPromise, "Flush scheduled without a pending promise")
+end
+
+--[=[
+	Flushes every pending localization write synchronously. This defeats the end-of-frame
+	batching and pays the full table write cost, so it exists for tests that need the table
+	settled immediately. Production synchronous reads should use
+	[TranslatorService.FlushEntryForKey] to land just the key they need.
+]=]
+function TranslatorService.FlushEntriesForTesting(self: TranslatorService)
+	if self._flushScheduled then
+		self:_flushWrites()
+	end
+end
+
+--[=[
+	Lands only what a synchronous read of a single key actually needs, leaving the rest of
+	the batch queued for the normal end-of-frame flush. This lets a synchronous read
+	([JSONTranslator.FormatByKey]) guarantee the one key it reads is present without forcing
+	-- and paying for -- the whole pending batch early.
+
+	Only the locales a read can actually consult are landed (the example and every other
+	locale in the entry stay queued), so a read costs a handful of targeted writes rather
+	than one per locale in the entry.
+
+	@param translationKey string
+]=]
+function TranslatorService.FlushEntryForKey(self: TranslatorService, translationKey: string)
+	assert(type(translationKey) == "string", "Bad translationKey")
+
+	if not self._flushScheduled then
+		return
+	end
+
+	local entry = self._pendingEntries[translationKey]
+	if not entry then
+		return
+	end
+
+	local localizationTable = self:GetLocalizationTable()
+
+	-- The locales a synchronous read may consult: the current locale and the table's source
+	-- locale, each plus its bare language subtag, since the Roblox translator falls a
+	-- regional locale back to its language (e.g. en-us -> en, and the loaders key the source
+	-- under "en"). Landing just these avoids writing every locale in the entry.
+	local localeId = self:GetLocaleId()
+	local sourceLocaleId = localizationTable.SourceLocaleId
+	local readLocales = { localeId, sourceLocaleId }
+	local localeSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
+	if localeSubtag then
+		table.insert(readLocales, localeSubtag)
+	end
+	local sourceSubtag = ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId)
+	if sourceSubtag then
+		table.insert(readLocales, sourceSubtag)
+	end
+
+	-- Land each read locale for this key's pending entry. A landed locale is dequeued, so a
+	-- repeated read locale (e.g. localeId already its own subtag) just no-ops the second time.
+	for _, readLocale in readLocales do
+		self:_landEntryLocale(localizationTable, entry, readLocale)
+	end
+end
+
+-- Writes one locale's value for a pending entry straight to the table and dequeues just
+-- that locale, so the deferred batch flush does not write it again. No-ops if the entry has
+-- nothing pending for the locale.
+function TranslatorService._landEntryLocale(
+	self: TranslatorService,
+	localizationTable: LocalizationTable,
+	entry: PendingEntry,
+	localeId: string
+)
+	local text = entry.Values[localeId]
+	if text == nil then
+		return
+	end
+
+	localizationTable:SetEntryValue(entry.Key, entry.Source, entry.Context, localeId, text)
+	entry.Values[localeId] = nil
+	self._localizationWriteCount += 1
+end
+
+--[=[
+	Returns the total number of raw mutating calls made to the localization table. Each
+	such call invalidates every AutoLocalize entry in the engine, so this is the cost we
+	want to keep low. Primarily useful for diagnostics and regression tests.
+
+	@return number
+]=]
+function TranslatorService.GetLocalizationWriteCount(self: TranslatorService): number
+	return self._localizationWriteCount
+end
+
+function TranslatorService._scheduleFlush(self: TranslatorService)
+	if self._flushScheduled then
+		return
+	end
+
+	self._flushScheduled = true
+	self._pendingFlushPromise = Promise.new()
+
+	-- Grouped to the end of the frame. Destroy sets `_flushScheduled = false`, so a
+	-- pending flush no-ops (below) if the service is torn down before this runs, rather
+	-- than recreating the table.
+	task.defer(function()
+		self:_flushWrites()
+	end)
+end
+
+function TranslatorService._flushWrites(self: TranslatorService)
+	if not self._flushScheduled then
+		return
+	end
+
+	self._flushScheduled = false
+
+	local pendingEntries = self._pendingEntries
+	self._pendingEntries = {}
+
+	if next(pendingEntries) then
+		self:_applyPendingEntries(pendingEntries)
+	end
+
+	local promise = self._pendingFlushPromise
+	self._pendingFlushPromise = nil
+	if promise then
+		promise:Resolve()
+	end
+end
+
+-- Merges the pending entry deltas into the table's current entries and writes them back
+-- in a single SetEntries call, so a whole frame's worth of translation entries costs one
+-- AutoLocalize invalidation instead of one per value/example.
+function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: PendingEntries)
+	local localizationTable = self:GetLocalizationTable()
+
+	-- A LocalizationTable keys its entries by translation key alone: SetEntries rejects two
+	-- entries sharing a key even when their source/context differ, so we index existing
+	-- entries by key and merge each delta into the one entry for its key.
+	local existingByKey: { [string]: any } = {}
+	local entries = localizationTable:GetEntries()
+	for _, entry in entries do
+		existingByKey[entry.Key] = entry
+	end
+
+	local changed = false
+	for _, delta in pendingEntries do
+		local entry = existingByKey[delta.Key]
+		if not entry then
+			entry = {
+				Key = delta.Key,
+				Source = delta.Source,
+				Context = delta.Context,
+				Example = "",
+				Values = {},
+			}
+			existingByKey[delta.Key] = entry
+			table.insert(entries, entry)
+			changed = true
+		end
+
+		-- Keep the source/context in step with the latest write for this key, mirroring how
+		-- SetEntryValue overwrites them in place.
+		if entry.Source ~= delta.Source then
+			entry.Source = delta.Source
+			changed = true
+		end
+		if entry.Context ~= delta.Context then
+			entry.Context = delta.Context
+			changed = true
+		end
+		if delta.Example ~= nil and entry.Example ~= delta.Example then
+			entry.Example = delta.Example
+			changed = true
+		end
+		for localeId, text in delta.Values do
+			if entry.Values[localeId] ~= text then
+				entry.Values[localeId] = text
+				changed = true
+			end
+		end
+	end
+
+	-- If every queued write already matched the table there is nothing to do. Skipping the
+	-- SetEntries call avoids invalidating every AutoLocalize entry for no reason (there is
+	-- no partial-update API that invalidates once, so a redundant SetEntries is pure cost).
+	if not changed then
+		return
+	end
+
+	localizationTable:SetEntries(entries)
+	self._localizationWriteCount += 1
 end
 
 --[=[
@@ -142,7 +471,22 @@ function TranslatorService.ObserveLocaleId(self: TranslatorService): Observable.
 
 	local valueObject = self._maid:Add(ValueObject.new("en-us", "string"))
 
-	valueObject:Mount(self._translator:Observe():Pipe({
+	valueObject:Mount(self._forcedLocaleId:Observe():Pipe({
+		Rx.switchMap(function(forcedLocaleId: string?): any
+			if forcedLocaleId ~= nil then
+				return Rx.of(forcedLocaleId)
+			end
+
+			return self:_observeInferredLocaleId()
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any)
+	self._localeIdValue = valueObject
+	return valueObject:Observe()
+end
+
+function TranslatorService._observeInferredLocaleId(self: TranslatorService): Observable.Observable<string>
+	return self._translator:Observe():Pipe({
 		Rx.switchMap(function(translator: Translator): any
 			if translator then
 				return RxInstanceUtils.observeProperty(translator, "LocaleId")
@@ -159,10 +503,7 @@ function TranslatorService.ObserveLocaleId(self: TranslatorService): Observable.
 				})
 			end
 		end) :: any,
-		Rx.distinct() :: any,
-	}) :: any)
-	self._localeIdValue = valueObject
-	return valueObject:Observe()
+	}) :: any
 end
 
 --[=[
@@ -171,6 +512,11 @@ end
 	@return string
 ]=]
 function TranslatorService.GetLocaleId(self: TranslatorService): string
+	local forced = self._forcedLocaleId.Value
+	if forced ~= nil then
+		return forced
+	end
+
 	local found = self._translator.Value
 	if found then
 		return found.LocaleId
@@ -232,6 +578,8 @@ function TranslatorService._observeLoadedPlayer(self: TranslatorService): Observ
 end
 
 function TranslatorService.Destroy(self: TranslatorService)
+	-- Ensures a still-pending deferred flush no-ops instead of recreating the table.
+	self._flushScheduled = false
 	self._maid:DoCleaning()
 end
 

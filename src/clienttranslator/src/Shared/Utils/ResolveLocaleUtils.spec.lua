@@ -1,7 +1,5 @@
---!nonstrict
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+--!strict
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local ResolveLocaleUtils = require("ResolveLocaleUtils")

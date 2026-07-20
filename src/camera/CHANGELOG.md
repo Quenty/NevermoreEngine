@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.44.0...@quenty/camera@14.45.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.43.0...@quenty/camera@14.44.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/camera
+
 # [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.42.0...@quenty/camera@14.43.0) (2026-07-14)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.15.1...@quenty/fzy@5.16.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
 ## [5.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.15.0...@quenty/fzy@5.15.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/fzy

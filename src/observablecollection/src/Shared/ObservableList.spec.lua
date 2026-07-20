@@ -1,11 +1,9 @@
---!nonstrict
+--!strict
 --[[
 	@class ObservableList.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local ObservableList = require("ObservableList")
@@ -37,7 +35,7 @@ describe("ObservableList.new()", function()
 
 	it("should allow false as a value", function()
 		expect(observableList:Get(2)).toEqual(nil)
-		observableList:Add(false)
+		observableList:Add(false :: any)
 		expect(observableList:Get(2)).toEqual(false)
 	end)
 

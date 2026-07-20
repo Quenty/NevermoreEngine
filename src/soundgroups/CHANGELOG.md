@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.43.0...@quenty/soundgroup@1.44.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [1.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.42.2...@quenty/soundgroup@1.43.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/soundgroup
+
+## [1.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.42.1...@quenty/soundgroup@1.42.2) (2026-07-17)
+
+### Bug Fixes
+
+- Fix some types that need to be fixed ([#733](https://github.com/Quenty/NevermoreEngine/issues/733)) ([a4a76c6](https://github.com/Quenty/NevermoreEngine/commit/a4a76c60a6f41050d7f9df2a3b08207917849266))
+
 ## [1.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.42.0...@quenty/soundgroup@1.42.1) (2026-07-15)
 
 **Note:** Version bump only for package @quenty/soundgroup

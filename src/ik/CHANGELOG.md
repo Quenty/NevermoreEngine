@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.56.0...@quenty/ik@15.57.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [15.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.2...@quenty/ik@15.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.55.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.1...@quenty/ik@15.55.2) (2026-07-17)
+
+**Note:** Version bump only for package @quenty/ik
+
 ## [15.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.0...@quenty/ik@15.55.1) (2026-07-15)
 
 **Note:** Version bump only for package @quenty/ik

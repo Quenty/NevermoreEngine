@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.7.0...@quenty/brine@1.8.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.6.0...@quenty/brine@1.7.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/brine
+
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.5.0...@quenty/brine@1.6.0) (2026-07-14)
 
 ### Features

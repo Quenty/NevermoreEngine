@@ -19,6 +19,7 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Blend = require("Blend")
+local InstanceLocaleLoader = require("InstanceLocaleLoader")
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 local Maid = require("Maid")
 local NumberLocalizationUtils = require("NumberLocalizationUtils")
@@ -28,6 +29,9 @@ local PseudoLocalize = require("PseudoLocalize")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
+local TableLocaleLoader = require("TableLocaleLoader")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 local TranslationKeyUtils = require("TranslationKeyUtils")
 local TranslatorService = require("TranslatorService")
 local ValueObject = require("ValueObject")
@@ -37,13 +41,24 @@ JSONTranslator.ClassName = "JSONTranslator"
 JSONTranslator.ServiceName = "JSONTranslator"
 JSONTranslator.__index = JSONTranslator
 
+-- The common surface of [TableLocaleLoader] and [InstanceLocaleLoader]. Both queue
+-- localization entries onto the [TranslatorService] they were constructed with; the
+-- instance loader defers per locale.
+type LocaleLoader = {
+	LoadSourceLocale: (self: any) -> (),
+	LoadLocale: (self: any, localeId: string) -> (),
+	LoadAllLocales: (self: any) -> (),
+}
+
 export type JSONTranslator = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
 		_translatorService: TranslatorService.TranslatorService,
+		_tieRealmService: TieRealmService.TieRealmService,
 		_translatorName: string,
-		_entries: { [string]: any },
+		_createLoader: (serviceBag: ServiceBag.ServiceBag) -> LocaleLoader,
+		_loader: LocaleLoader,
 		_localizationTable: any,
 		_localTranslator: ValueObject.ValueObject<any>,
 		_sourceTranslator: ValueObject.ValueObject<any>,
@@ -90,11 +105,19 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	self.ServiceName = translatorName
 
 	if type(localeId) == "string" and type(dataTable) == "table" then
-		self._entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
+		-- Table-driven data is already in memory; decode it now. The loader needs the service
+		-- bag, so defer its construction to Init via a callback.
+		local entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
+		self._createLoader = function(serviceBag)
+			return TableLocaleLoader.new(serviceBag, entries) :: any
+		end
 	elseif typeof(localeId) == "Instance" then
-		local parent = localeId
-		local sourceLocaleId = "en"
-		self._entries = LocalizationEntryParserUtils.decodeFromInstance(self._translatorName, sourceLocaleId, parent)
+		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) defer
+		-- decoding to the loader; it too is built in Init once the bag is available.
+		local folder = localeId
+		self._createLoader = function(serviceBag)
+			return InstanceLocaleLoader.new(serviceBag, self._translatorName, "en", folder) :: any
+		end
 	else
 		error("Must pass a localeId and dataTable")
 	end
@@ -105,6 +128,7 @@ end
 function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._translatorService = self._serviceBag:GetService(TranslatorService) :: any
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._maid = Maid.new()
 	self._localTranslator = self._maid:Add(ValueObject.new(nil))
@@ -112,11 +136,19 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
-	for _, item in self._entries do
-		for localeId, text in item.Values do
-			self._localizationTable:SetEntryValue(item.Key, item.Source, item.Context, localeId, text)
-		end
-		self._localizationTable:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+	-- The loader resolves the TranslatorService from the bag and writes to it directly.
+	self._loader = self._createLoader(self._serviceBag)
+
+	if self._tieRealmService:GetTieRealm() == TieRealms.CLIENT then
+		-- On the client, load the source locale now (the fallback) and each target
+		-- locale's data as the locale is swapped to.
+		self._loader:LoadSourceLocale()
+		self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
+			self._loader:LoadLocale(localeId)
+		end))
+	else
+		-- Off the client there is no player locale to key off, so load everything.
+		self._loader:LoadAllLocales()
 	end
 
 	-- TODO: Maybe don't hold these unless needed
@@ -178,7 +210,7 @@ function JSONTranslator.ObserveFormatByKey(
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	return Rx.combineLatest({
+	local translationObservable = Rx.combineLatest({
 		cloudTranslator = self:ObserveTranslator(),
 		translationKey = translationKey,
 		translationArgs = self:_observeArgs(translationArgs),
@@ -223,6 +255,14 @@ function JSONTranslator.ObserveFormatByKey(
 				end) :: any,
 			})
 		end) :: any,
+	})
+
+	-- Wait for the deferred entry writes to land before translating, so we never read a
+	-- key before it has been written.
+	return Rx.fromPromise(self._translatorService:PromiseEntriesWritten()):Pipe({
+		Rx.switchMap(function(): any
+			return translationObservable
+		end) :: any,
 	}) :: any
 end
 
@@ -242,10 +282,16 @@ function JSONTranslator.PromiseFormatByKey(self: JSONTranslator, translationKey:
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	-- Always waits for full translator to be loaded since we only get one shot
-	return self:PromiseTranslator():Then(function(translator)
-		return self:_doTranslation(translator, translationKey, args)
-	end)
+	-- Wait for the deferred entry writes to land, then for the translator, so we never
+	-- read a key before it has been written.
+	return self._translatorService
+		:PromiseEntriesWritten()
+		:Then(function()
+			return self:PromiseTranslator()
+		end)
+		:Then(function(translator)
+			return self:_doTranslation(translator, translationKey, args)
+		end)
 end
 
 --[=[
@@ -299,10 +345,10 @@ function JSONTranslator.SetEntryValue(
 	assert(type(localeId) == "string", "Bad localeId")
 	assert(type(text) == "string", "Bad text")
 
-	self._localizationTable:SetEntryValue(translationKey, source, context, localeId, text or source)
+	self._translatorService:SetEntryValue(translationKey, source, context, localeId, text or source)
 
 	if RunService:IsStudio() then
-		self._localizationTable:SetEntryValue(
+		self._translatorService:SetEntryValue(
 			translationKey,
 			source,
 			context,
@@ -393,6 +439,10 @@ end
 function JSONTranslator.FormatByKey(self: JSONTranslator, translationKey: string, args): string
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
+
+	-- Synchronous read: land just this key's queued writes before reading, rather than
+	-- forcing the whole deferred batch (and its full table write cost) early.
+	self._translatorService:FlushEntryForKey(translationKey)
 
 	local translator = self._translatorService:GetTranslator()
 	if not translator then

@@ -116,3 +116,135 @@ describe('OpenCloudClient.uploadPlaceAsync', () => {
     expect(urls[1]).toContain('versionType=Saved');
   });
 });
+
+describe('OpenCloudClient.downloadPlaceAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('downloads the latest version when no version is pinned', async () => {
+    const urls: string[] = [];
+    const fakeLimiter = {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        return new Response(JSON.stringify({ location: 'https://cdn/x' }), {
+          status: 200,
+        });
+      }),
+    } as unknown as RateLimiter;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(Buffer.from([1, 2, 3]), { status: 200 }))
+    );
+
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+    const buffer = await client.downloadPlaceAsync(1, 22);
+
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/asset-delivery-api/v1/assetId/22'
+    );
+    expect(urls[0]).not.toContain('/version/');
+    expect([...buffer]).toEqual([1, 2, 3]);
+  });
+
+  it('downloads a specific version when pinned', async () => {
+    const urls: string[] = [];
+    const fakeLimiter = {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        return new Response(JSON.stringify({ location: 'https://cdn/x' }), {
+          status: 200,
+        });
+      }),
+    } as unknown as RateLimiter;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(Buffer.from([9]), { status: 200 }))
+    );
+
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+    await client.downloadPlaceAsync(1, 22, undefined, 42);
+
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/asset-delivery-api/v1/assetId/22/version/42'
+    );
+  });
+
+  it('throws a clear error when a pinned version does not exist', async () => {
+    // The Asset Delivery API reports a missing version as HTTP 200 with an
+    // errors array and no location.
+    const fakeLimiter = {
+      fetchAsync: vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              errors: [{ code: 404, message: 'Request asset was not found' }],
+            }),
+            { status: 200 }
+          )
+      ),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+
+    await expect(
+      client.downloadPlaceAsync(1, 22, undefined, 999999)
+    ).rejects.toThrowError(/no version 999999/);
+  });
+});
+
+describe('OpenCloudClient.getLatestPlaceVersionAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns the numeric revisionId from the Assets API', async () => {
+    const urls: string[] = [];
+    const fakeLimiter = {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        return new Response(
+          JSON.stringify({ assetId: '22', revisionId: '5781' }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+    const version = await client.getLatestPlaceVersionAsync(1, 22);
+
+    expect(version).toBe(5781);
+    expect(urls[0]).toBe('https://apis.roblox.com/assets/v1/assets/22');
+  });
+
+  it('throws when the Assets API omits a revisionId', async () => {
+    const fakeLimiter = {
+      fetchAsync: vi.fn(
+        async () =>
+          new Response(JSON.stringify({ assetId: '22' }), { status: 200 })
+      ),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+
+    await expect(client.getLatestPlaceVersionAsync(1, 22)).rejects.toThrowError(
+      /no revisionId/
+    );
+  });
+});

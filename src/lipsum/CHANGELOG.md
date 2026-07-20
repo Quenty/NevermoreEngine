@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.38.0...@quenty/lipsum@14.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.37.0...@quenty/lipsum@14.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/lipsum
+
 # [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.36.1...@quenty/lipsum@14.37.0) (2026-07-14)
 
 **Note:** Version bump only for package @quenty/lipsum

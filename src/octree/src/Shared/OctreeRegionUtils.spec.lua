@@ -1,11 +1,9 @@
---!nonstrict
+--!strict
 --[[
 	@class OctreeRegionUtils.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local OctreeRegionUtils = require("OctreeRegionUtils")
@@ -304,7 +302,7 @@ describe("OctreeRegionUtils.removeNode", function()
 		expect(lowest.node_count).toBe(0)
 		expect(top.node_count).toBe(0)
 		-- The now-empty lowest region should be detached from its parent
-		expect(lowest.parent.subRegions[lowest.parentIndex]).toBeNil()
+		expect((lowest.parent :: any).subRegions[lowest.parentIndex]).toBeNil()
 	end)
 
 	it("keeps shared ancestors alive when a sibling still holds a node", function()

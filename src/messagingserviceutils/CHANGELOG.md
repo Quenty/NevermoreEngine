@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/messagingserviceutils@7.23.0...@quenty/messagingserviceutils@7.24.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/messagingserviceutils
+
+# [7.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/messagingserviceutils@7.22.1...@quenty/messagingserviceutils@7.23.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/messagingserviceutils
+
 ## [7.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/messagingserviceutils@7.22.0...@quenty/messagingserviceutils@7.22.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/messagingserviceutils
