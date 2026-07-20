@@ -551,3 +551,95 @@ describe("Brine.restore with lifecycle disabled (server-replicated path)", funct
 		expect(root:FindFirstChild("Added")).never.toEqual(nil)
 	end)
 end)
+
+describe("Brine.restoreFromStream (cross-boundary: server captures, client restores)", function()
+	-- A :Clone() stands in for the client's replicated tree: same structure and encodable-child
+	-- order as the server's, but a distinct set of instances -- so identity must be re-resolved
+	-- positionally from the wire, not by held reference.
+
+	it("reverts a client property to the server baseline from serialized bytes", function()
+		local serverRoot = Instance.new("Folder")
+		local part = Instance.new("Part")
+		part.Parent = serverRoot
+
+		local checkpoint = Brine.checkpoint(serverRoot)
+		local bytes = Brine.serializeCheckpoint(checkpoint)
+
+		local clientRoot = serverRoot:Clone()
+		local clientPart = clientRoot:FindFirstChildOfClass("Part") :: Part
+		clientPart.Transparency = 0.5
+
+		Brine.restoreFromStream(clientRoot, bytes)
+
+		expect(clientPart.Transparency).toEqual(0)
+		expect(snapshot(clientRoot)).toEqual(snapshot(serverRoot))
+	end)
+
+	it("reverts attributes and tags cross-boundary", function()
+		local serverPart = Instance.new("Part")
+		serverPart:SetAttribute("Hp", 100)
+		serverPart:AddTag("Original")
+
+		local checkpoint = Brine.checkpoint(serverPart)
+		local bytes = Brine.serializeCheckpoint(checkpoint)
+
+		local clientPart = serverPart:Clone()
+		clientPart:SetAttribute("Hp", 1)
+		clientPart:RemoveTag("Original")
+		clientPart:AddTag("Added")
+
+		Brine.restoreFromStream(clientPart, bytes)
+
+		expect(clientPart:GetAttribute("Hp")).toEqual(100)
+		expect(clientPart:HasTag("Original")).toEqual(true)
+		expect(clientPart:HasTag("Added")).toEqual(false)
+	end)
+
+	it("resolves an in-tree reference to the client's own instance, not the server's", function()
+		local serverRoot = Instance.new("Folder")
+		local serverTarget = Instance.new("StringValue")
+		serverTarget.Name = "Target"
+		serverTarget.Parent = serverRoot
+		local serverPointer = Instance.new("ObjectValue")
+		serverPointer.Name = "Pointer"
+		serverPointer.Value = serverTarget
+		serverPointer.Parent = serverRoot
+
+		local checkpoint = Brine.checkpoint(serverRoot)
+		local bytes = Brine.serializeCheckpoint(checkpoint)
+
+		-- Clone remaps the internal reference, so the client pointer targets the client's own copy.
+		local clientRoot = serverRoot:Clone()
+		local clientTarget = clientRoot:FindFirstChild("Target")
+		local clientPointer = clientRoot:FindFirstChild("Pointer") :: ObjectValue
+		clientPointer.Value = nil
+
+		Brine.restoreFromStream(clientRoot, bytes)
+
+		expect(clientPointer.Value).toEqual(clientTarget)
+		expect(clientPointer.Value).never.toEqual(serverTarget)
+	end)
+
+	it("restores a nested subtree's properties cross-boundary", function()
+		local serverRoot = Instance.new("Folder")
+		local model = Instance.new("Model")
+		model.Name = "Rig"
+		model.Parent = serverRoot
+		local leaf = Instance.new("StringValue")
+		leaf.Name = "Leaf"
+		leaf.Value = "pristine"
+		leaf.Parent = model
+
+		local checkpoint = Brine.checkpoint(serverRoot)
+		local bytes = Brine.serializeCheckpoint(checkpoint)
+
+		local clientRoot = serverRoot:Clone()
+		local clientLeaf = ((clientRoot:FindFirstChild("Rig") :: Instance):FindFirstChild("Leaf")) :: StringValue
+		clientLeaf.Value = "mutated"
+
+		Brine.restoreFromStream(clientRoot, bytes)
+
+		expect(clientLeaf.Value).toEqual("pristine")
+		expect(snapshot(clientRoot)).toEqual(snapshot(serverRoot))
+	end)
+end)

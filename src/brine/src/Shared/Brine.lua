@@ -376,6 +376,107 @@ export type RestoreOptions = {
 	lifecycle: boolean?,
 }
 
+-- Shared tail of every restore: given a paired baseline-node/live-instance list and the identity
+-- map, reset properties (to baseline-or-default), attributes and tags in place, then reconcile
+-- extras. The structure pass (how `pending`/`idToLive` are built) is what differs between the
+-- same-process (held-ref) and cross-boundary (positional) entry points.
+local function reconcile(
+	root: Instance,
+	pending: { { instance: Instance, node: any } },
+	idToLive: { [string]: Instance },
+	lifecycle: boolean,
+	safeOptions: BrineTypes.SafeBrineOptions,
+	securityCapabilities: SecurityCapabilities
+): ()
+	-- A property value is an in-tree instance reference iff it is a serialized node table; map it to
+	-- whichever live instance now carries that id (survivor or recreation). Externals pass through.
+	local function resolve(value: any): any
+		if type(value) == "table" and value.ClassName ~= nil and value.Id ~= nil then
+			return idToLive[value.Id]
+		end
+		return value
+	end
+
+	for _, entry in pending do
+		local live = entry.instance
+		local node = entry.node
+
+		local metadata = BrineInstanceReflection.getEncodedPropertiesMemoized(node.ClassName, securityCapabilities)
+		if metadata then
+			for _, property in metadata.orderedList do
+				-- Absent from the baseline means it was at its default when captured, so reset it --
+				-- re-applying only what the frame stored would leave script-set-from-default changes.
+				local raw = if node.Properties then node.Properties[property.Name] else nil
+				local target = if raw == nil then property.DefaultValue else resolve(raw)
+				local ok, current = pcall(function()
+					return (live :: any)[property.Name]
+				end)
+				if ok and current ~= target then
+					pcall(function()
+						(live :: any)[property.Name] = target
+					end)
+				end
+			end
+		end
+
+		if safeOptions.includeAttributes then
+			local baselineAttributes = node.Attributes or {}
+			for name in live:GetAttributes() do
+				if baselineAttributes[name] == nil then
+					live:SetAttribute(name, nil)
+				end
+			end
+			for name, value in baselineAttributes do
+				live:SetAttribute(name, value)
+			end
+		end
+
+		if safeOptions.includeTags then
+			local baselineTags: { [string]: boolean } = {}
+			if node.Tags then
+				for _, tag in node.Tags do
+					baselineTags[tag] = true
+				end
+			end
+			for _, tag in live:GetTags() do
+				if not baselineTags[tag] then
+					live:RemoveTag(tag)
+				end
+			end
+			if node.Tags then
+				for _, tag in node.Tags do
+					live:AddTag(tag)
+				end
+			end
+		end
+	end
+
+	-- Reconcile extras: live instances absent from the baseline. Only touch classes Brine could have
+	-- captured -- a non-encodable instance was never in the baseline, so it is not ours to remove.
+	local restored: { [Instance]: boolean } = {}
+	for _, instance in idToLive do
+		restored[instance] = true
+	end
+	for _, descendant in root:GetDescendants() do
+		if restored[descendant] then
+			continue
+		end
+		if not BrineInstanceReflection.canConstructMemoized(descendant.ClassName, securityCapabilities) then
+			continue
+		end
+		if lifecycle then
+			descendant:Destroy()
+		else
+			warn(
+				string.format(
+					"[Brine.restore] extra instance %s is not in the baseline; leaving it (lifecycle disabled)",
+					descendant:GetFullName()
+				)
+			)
+		end
+	end
+end
+
 --[=[
 	Captures a baseline of `root` and its subtree. The returned checkpoint is what [Brine.restore]
 	rewinds to, so capture it while the tree is in the state you want to be able to return to.
@@ -457,94 +558,76 @@ function Brine.restore(root: Instance, checkpoint: Checkpoint, options: RestoreO
 
 	structure(checkpoint._intermediate, nil)
 
-	-- A property value is an in-tree instance reference iff it is a serialized node table; map it to
-	-- whichever live instance now carries that id (survivor or recreation). Externals pass through.
-	local function resolve(value: any): any
-		if type(value) == "table" and value.ClassName ~= nil and value.Id ~= nil then
-			return idToLive[value.Id]
-		end
-		return value
-	end
+	reconcile(root, pending, idToLive, lifecycle, safeOptions, securityCapabilities)
+end
 
-	-- Value pass: every id now maps to a live instance, so references resolve correctly.
-	for _, entry in pending do
-		local live = entry.instance
-		local node = entry.node
+export type RestoreFromStreamOptions = {
+	references: BrineTypes.References?,
+}
 
-		local metadata = BrineInstanceReflection.getEncodedPropertiesMemoized(node.ClassName, securityCapabilities)
-		if metadata then
-			for _, property in metadata.orderedList do
-				-- Absent from the baseline means it was at its default when captured, so reset it --
-				-- re-applying only what the frame stored would leave script-set-from-default changes.
-				local raw = if node.Properties then node.Properties[property.Name] else nil
-				local target = if raw == nil then property.DefaultValue else resolve(raw)
-				local ok, current = pcall(function()
-					return (live :: any)[property.Name]
-				end)
-				if ok and current ~= target then
-					pcall(function()
-						(live :: any)[property.Name] = target
-					end)
-				end
+--[=[
+	Serializes a checkpoint for transport (e.g. a Remoting reply). The returned string, plus the
+	references table, is what a client feeds to [Brine.restoreFromStream].
+]=]
+function Brine.serializeCheckpoint(checkpoint: Checkpoint): (string, BrineTypes.References?)
+	return Brine._toStream(checkpoint._context, checkpoint._intermediate)
+end
+
+--[=[
+	Restores `root` to a checkpoint captured and serialized elsewhere -- the server-authoritative
+	path: the server sends its version, the client reconciles its local tree back to it. There is no
+	shared identity map across the boundary, so nodes are matched positionally against `root`'s live
+	tree; `root` must therefore be structurally identical to the captured tree (the intended use:
+	server-pinned, in-place-only mutations). This path never creates or destroys -- structural
+	divergence warns and skips, matching in place otherwise.
+]=]
+function Brine.restoreFromStream(root: Instance, data: string, options: RestoreFromStreamOptions?): ()
+	local references = if options then options.references else nil
+	local safeOptions = BrineOptionUtils.defaultOptions({ references = references })
+	local context = BrineContext.new(safeOptions)
+	local frame = Brine._fromStream(context, data, references)
+	local securityCapabilities = context.SecurityCapabilities
+
+	local idToLive: { [string]: Instance } = {}
+	local pending: { { instance: Instance, node: any } } = {}
+
+	-- The frame lists encodable children in GetChildren order, so filter the live children the same
+	-- way and pair by index. Any divergence (class mismatch / missing) warns and skips its subtree.
+	local function walk(node: any, live: Instance)
+		idToLive[node.Id] = live
+		table.insert(pending, { instance = live, node = node })
+
+		if not node.Children then
+			return
+		end
+
+		local liveEncodable = {}
+		for _, child in live:GetChildren() do
+			if BrineInstanceReflection.canConstructMemoized(child.ClassName, securityCapabilities) then
+				table.insert(liveEncodable, child)
 			end
 		end
 
-		if safeOptions.includeAttributes then
-			local baselineAttributes = node.Attributes or {}
-			for name in live:GetAttributes() do
-				if baselineAttributes[name] == nil then
-					live:SetAttribute(name, nil)
-				end
-			end
-			for name, value in baselineAttributes do
-				live:SetAttribute(name, value)
-			end
-		end
-
-		if safeOptions.includeTags then
-			local baselineTags: { [string]: boolean } = {}
-			if node.Tags then
-				for _, tag in node.Tags do
-					baselineTags[tag] = true
-				end
-			end
-			for _, tag in live:GetTags() do
-				if not baselineTags[tag] then
-					live:RemoveTag(tag)
-				end
-			end
-			if node.Tags then
-				for _, tag in node.Tags do
-					live:AddTag(tag)
-				end
-			end
-		end
-	end
-
-	-- Reconcile extras: live instances absent from the baseline. Only touch classes Brine could have
-	-- captured -- a non-encodable instance was never in the baseline, so it is not ours to remove.
-	local restored: { [Instance]: boolean } = {}
-	for _, instance in idToLive do
-		restored[instance] = true
-	end
-	for _, descendant in root:GetDescendants() do
-		if restored[descendant] then
-			continue
-		end
-		if not BrineInstanceReflection.canConstructMemoized(descendant.ClassName, securityCapabilities) then
-			continue
-		end
-		if lifecycle then
-			descendant:Destroy()
-		else
-			warn(
-				string.format(
-					"[Brine.restore] extra instance %s is not in the baseline; leaving it (lifecycle disabled)",
-					descendant:GetFullName()
+		for index, childNode in node.Children do
+			local liveChild = liveEncodable[index]
+			if liveChild and liveChild.ClassName == childNode.ClassName then
+				walk(childNode, liveChild)
+			else
+				warn(
+					string.format(
+						"[Brine.restoreFromStream] no positional match for child #%d (%s) under %s; skipping",
+						index,
+						tostring(childNode.ClassName),
+						live:GetFullName()
+					)
 				)
-			)
+			end
 		end
 	end
+
+	walk(frame, root)
+
+	reconcile(root, pending, idToLive, false, safeOptions, securityCapabilities)
 end
 
 function Brine._toStream(
