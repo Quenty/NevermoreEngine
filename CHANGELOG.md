@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/adorneedata@7.37.0`, `@quenty/datastore@13.43.0`
+  - feat: Datastore keys and error messages [#735](https://github.com/Quenty/NevermoreEngine/pull/735) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 20 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/gameconfig@12.54.0`, `@quenty/gameproductservice@14.57.0`, `@quenty/marketplaceutils@11.24.0`, `@quenty/nevermoreclimanifest@1.4.0`, `@quenty/saveslot@1.7.0`, `@quenty/streamingutils@10.21.0`, `@quenty/teleportserviceutils@9.34.0`, `@quenty/nevermore-cli@4.40.0`
   - feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
 

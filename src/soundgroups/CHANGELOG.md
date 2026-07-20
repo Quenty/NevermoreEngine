@@ -1,3 +1,15 @@
+# v1.45.0 (Mon Jul 20 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/nevermore-datastore ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
