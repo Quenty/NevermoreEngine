@@ -1,3 +1,16 @@
+# v11.24.0 (Mon Jul 20 2026)
+
+#### 🚀 Enhancement
+
+- feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
+- feat(gameproductservice): add paid-access game ownership tracking ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
