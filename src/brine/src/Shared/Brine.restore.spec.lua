@@ -232,7 +232,9 @@ describe("Brine.restore round-trip (serialize-equality oracle)", function()
 		local root = Instance.new("Folder")
 		local part = Instance.new("Part")
 		part.Name = "Destructible"
-		part.Color = Color3.new(0.25, 0.5, 0.75)
+		-- fromRGB so the value is an 8-bit quantization fixed-point (Part.Color is Color3uint8);
+		-- an arbitrary Color3.new fraction would differ by rounding across a recreate.
+		part.Color = Color3.fromRGB(64, 128, 192)
 		part:SetAttribute("Hp", 100)
 		part:AddTag("Enemy")
 		part.Parent = root
@@ -245,7 +247,7 @@ describe("Brine.restore round-trip (serialize-equality oracle)", function()
 
 		local restored = root:FindFirstChild("Destructible") :: Part
 		expect(restored).never.toEqual(nil)
-		expect(restored.Color).toEqual(Color3.new(0.25, 0.5, 0.75))
+		expect(restored.Color).toEqual(Color3.fromRGB(64, 128, 192))
 		expect(restored:GetAttribute("Hp")).toEqual(100)
 		expect(restored:HasTag("Enemy")).toEqual(true)
 		expect(snapshot(root)).toEqual(baseline)
