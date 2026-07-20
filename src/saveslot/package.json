@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/adorneedata": "workspace:*",
+    "@quenty/attributeutils": "workspace:*",
     "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
@@ -38,6 +39,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/propertyvalue": "workspace:*",

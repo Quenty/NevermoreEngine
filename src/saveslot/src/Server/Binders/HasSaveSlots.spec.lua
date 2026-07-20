@@ -11,9 +11,11 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Observable = require("Observable")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PromiseTestUtils = require("PromiseTestUtils")
+local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 
 local Workspace = game:GetService("Workspace")
@@ -1032,6 +1034,138 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		context.destroy()
 	end)
 
+	it("PromiseResetSlot wipes a non-active slot without touching the active selection", function()
+		local context = setup()
+
+		-- Slot 1 is active; slot 2 is the one we reset and must stay unselected throughout.
+		local activePromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(activePromise, 10) then
+			expect("active create hung").toEqual("active create settled")
+			context.destroy()
+			return
+		end
+		local _, activeSlotId = activePromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(activeSlotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local targetPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Adventure" })
+		if not PromiseTestUtils.awaitSettled(targetPromise, 10) then
+			expect("target create hung").toEqual("target create settled")
+			context.destroy()
+			return
+		end
+		local _, targetSlotId = targetPromise:Yield()
+
+		local tracker: any = context.hasSaveSlots
+		tracker:_getSlotStore(targetSlotId):Store("Coins", 500)
+
+		local resetPromise = context.hasSaveSlots:PromiseResetSlot(targetSlotId)
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = resetPromise:Wait()
+		expect(type(newSlotId)).toEqual("string")
+		expect(newSlotId ~= targetSlotId).toEqual(true)
+
+		-- The active slot is untouched and the fresh slot is not selected
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(activeSlotId)
+
+		-- Same index and name carried across; saved progress was wiped
+		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
+		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			context.destroy()
+			return
+		end
+		local metadata = metadataPromise:Wait()
+		expect(metadata.SlotIndex).toEqual(2)
+		expect(metadata.SlotName).toEqual("Adventure")
+
+		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
+		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
+			expect("data hung").toEqual("data settled")
+			context.destroy()
+			return
+		end
+		expect((dataPromise:Wait())).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("PromiseResetSlot keeps the continue pointer on the reset slot when it was last-active", function()
+		local context = setup()
+
+		-- Select then deselect so the slot is the resumable last-active but no longer selected.
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+
+		local resetPromise = context.hasSaveSlots:PromiseResetSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = resetPromise:Wait()
+
+		-- The resume pointer follows the reset slot to its fresh id, and "Continue" still resolves it
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(newSlotId)
+
+		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
+		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
+			expect("lastActive hung").toEqual("lastActive settled")
+			context.destroy()
+			return
+		end
+		expect((lastPromise:Wait())).toEqual(newSlotId)
+
+		context.destroy()
+	end)
+
+	it("PromiseResetSlot rejects when the slot is missing", function()
+		local context = setup()
+
+		local resetPromise = context.hasSaveSlots:PromiseResetSlot("does-not-exist")
+		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
+			expect("reset hung").toEqual("reset settled")
+			context.destroy()
+			return
+		end
+		expect((resetPromise:Yield())).toEqual(false)
+
+		context.destroy()
+	end)
+
 	it("allows creating a slot past a finite cap when the count is unbounded", function()
 		local context = setup()
 		context.hasSaveSlots.MaxSlotCount.Value = math.huge
@@ -1191,6 +1325,159 @@ describe("HasSaveSlots playtime tracking", function()
 		tracker._playSessionLastFlush = os.time() - 120
 		tracker:_flushPlaytime()
 		expect(getMetadata(context, slotId).TimePlayed).toEqual(afterDeselect)
+
+		context.destroy()
+	end)
+end)
+
+describe("HasSaveSlots summary providers", function()
+	-- Selecting a slot drives the reactive summary aggregation; poll the slot metadata until the
+	-- Summary settles into the expected shape.
+	local function readSummary(context: any, slotId): any
+		local promise = context.hasSaveSlots:PromiseGetSlotMetadata(slotId)
+		if not PromiseTestUtils.awaitSettled(promise, 10) then
+			return nil
+		end
+		local metadata = promise:Wait()
+		return metadata and metadata.Summary
+	end
+
+	local function awaitSummary(context: any, slotId, predicate: (any) -> boolean): (boolean, any)
+		local last
+		local ok = PromiseTestUtils.awaitValue(function()
+			last = readSummary(context, slotId)
+			return last ~= nil and predicate(last)
+		end, 10)
+		return ok, last
+	end
+
+	local function createAndSelect(context: any): any
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			return nil
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			return nil
+		end
+		selectPromise:Yield()
+
+		return slotId
+	end
+
+	it("aggregates every registered provider into the Summary, keyed by name", function()
+		local context = setup()
+
+		context.hasSaveSlots:RegisterSummaryProvider("coins", function()
+			return Rx.of(100)
+		end)
+		context.hasSaveSlots:RegisterSummaryProvider("world", function()
+			return Rx.of(3)
+		end)
+
+		local slotId = createAndSelect(context)
+		local matched, summary = awaitSummary(context, slotId, function(s)
+			return s.coins == 100 and s.world == 3
+		end)
+
+		expect(matched).toEqual(true)
+		expect(summary.coins).toEqual(100)
+		expect(summary.world).toEqual(3)
+
+		context.destroy()
+	end)
+
+	it("drops a provider's key from the Summary once it is unregistered", function()
+		local context = setup()
+
+		context.hasSaveSlots:RegisterSummaryProvider("coins", function()
+			return Rx.of(100)
+		end)
+		local unregisterWorld = context.hasSaveSlots:RegisterSummaryProvider("world", function()
+			return Rx.of(3)
+		end)
+
+		local slotId = createAndSelect(context)
+		expect((awaitSummary(context, slotId, function(s)
+			return s.coins == 100 and s.world == 3
+		end))).toEqual(true)
+
+		unregisterWorld()
+
+		local matched, summary = awaitSummary(context, slotId, function(s)
+			return s.coins == 100 and s.world == nil
+		end)
+		expect(matched).toEqual(true)
+		expect(summary.world).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("isolates a provider that errors when called so the others still contribute", function()
+		local context = setup()
+
+		context.hasSaveSlots:RegisterSummaryProvider("good", function()
+			return Rx.of(1)
+		end)
+		context.hasSaveSlots:RegisterSummaryProvider("bad", function()
+			error("provider boom")
+		end)
+
+		local slotId = createAndSelect(context)
+		local matched, summary = awaitSummary(context, slotId, function(s)
+			return s.good == 1
+		end)
+
+		expect(matched).toEqual(true)
+		expect(summary.bad).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("isolates a provider whose stream fails so the others still contribute", function()
+		local context = setup()
+
+		context.hasSaveSlots:RegisterSummaryProvider("good", function()
+			return Rx.of(1)
+		end)
+		context.hasSaveSlots:RegisterSummaryProvider("bad", function()
+			return Observable.new(function(sub)
+				sub:Fail("stream boom")
+				return nil
+			end)
+		end)
+
+		local slotId = createAndSelect(context)
+		local matched, summary = awaitSummary(context, slotId, function(s)
+			return s.good == 1
+		end)
+
+		expect(matched).toEqual(true)
+		expect(summary.bad).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("clears the Summary when every provider is unregistered", function()
+		local context = setup()
+
+		local unregister = context.hasSaveSlots:RegisterSummaryProvider("coins", function()
+			return Rx.of(100)
+		end)
+
+		local slotId = createAndSelect(context)
+		expect((awaitSummary(context, slotId, function(s)
+			return s.coins == 100
+		end))).toEqual(true)
+
+		unregister()
+
+		local cleared = PromiseTestUtils.awaitValue(function()
+			return readSummary(context, slotId) == nil
+		end, 10)
+		expect(cleared).toEqual(true)
 
 		context.destroy()
 	end)

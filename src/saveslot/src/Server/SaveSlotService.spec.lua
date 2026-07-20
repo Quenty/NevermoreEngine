@@ -152,23 +152,41 @@ describe("SaveSlotService configuration guards", function()
 		serviceBag:Destroy()
 	end)
 
-	it("should reject a non-function summary provider", function()
+	it("should reject a non-function default summary provider", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider("not a function" :: any)
+			saveSlotService:RegisterDefaultSummaryProvider("progress", "not a function" :: any)
 		end).toThrow("Bad provider")
 
 		serviceBag:Destroy()
 	end)
 
-	it("should accept a function summary provider", function()
+	it("should reject a non-string default summary provider name", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
 		expect(function()
-			saveSlotService:SetDefaultSummaryProvider((function()
-				return nil
-			end) :: any)
+			saveSlotService:RegisterDefaultSummaryProvider(nil :: any, function()
+				return nil :: any
+			end)
+		end).toThrow("Bad name")
+
+		serviceBag:Destroy()
+	end)
+
+	it("registers a default summary provider and returns an unregister function", function()
+		local serviceBag, saveSlotService = newServiceBag()
+
+		local unregister
+		expect(function()
+			unregister = saveSlotService:RegisterDefaultSummaryProvider("progress", function()
+				return nil :: any
+			end)
+		end).never.toThrow()
+
+		expect(type(unregister)).toEqual("function")
+		expect(function()
+			unregister()
 		end).never.toThrow()
 
 		serviceBag:Destroy()
