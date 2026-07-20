@@ -378,15 +378,16 @@ function HasSaveSlots.PromiseSelectNewSaveSlot(self: HasSaveSlots): Promise.Prom
 			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
 		end
 
-		local freeIndex
-		for index = 1, self.MaxSlotCount.Value do
-			if not usedIndices[index] then
-				freeIndex = index
-				break
-			end
+		-- Lowest free positive index. Fills gaps left by deletions (delete slot 2 of
+		-- [1,2,3] and the next new slot reuses index 2). With a finite MaxSlotCount this
+		-- returns nil once [1, MaxSlotCount] is full; with an unbounded count (math.huge)
+		-- there is always a next integer, so it never returns nil.
+		local freeIndex = 1
+		while usedIndices[freeIndex] do
+			freeIndex += 1
 		end
 
-		if not freeIndex then
+		if freeIndex > self.MaxSlotCount.Value then
 			return nil
 		end
 

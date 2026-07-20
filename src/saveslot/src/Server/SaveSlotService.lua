@@ -151,6 +151,15 @@ function SaveSlotService.SetMaxSlotCount(self: SaveSlotService, maxSlotCount: nu
 end
 
 --[=[
+	Removes the slot ceiling, so [HasSaveSlots.PromiseSelectNewSaveSlot] always
+	allocates the next free index. A thin alias over [SaveSlotService.SetMaxSlotCount]
+	with an unbounded count; same before-Start guard applies.
+]=]
+function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
+	self:SetMaxSlotCount(math.huge)
+end
+
+--[=[
 	Sets the default slot summary provider
 ]=]
 function SaveSlotService.SetDefaultSummaryProvider(

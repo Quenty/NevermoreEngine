@@ -505,6 +505,88 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 
 		context.destroy()
 	end)
+
+	it("PromiseSelectNewSaveSlot reuses the lowest free index after a deletion", function()
+		local context = setup()
+
+		-- Fill indices 1, 2, 3 (nothing is selected, so all remain deletable)
+		local slotIdsByIndex = {}
+		for index = 1, 3 do
+			local createPromise = context.hasSaveSlots:PromiseCreateSlot(index)
+			if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+				expect("create hung").toEqual("create settled")
+				context.destroy()
+				return
+			end
+			local _, slotId = createPromise:Yield()
+			slotIdsByIndex[index] = slotId
+		end
+
+		-- Open a gap at index 2
+		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotIdsByIndex[2])
+		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
+			expect("delete hung").toEqual("delete settled")
+			context.destroy()
+			return
+		end
+		deletePromise:Yield()
+
+		-- The next new slot fills the gap at 2 rather than appending at 4
+		local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
+		if not PromiseTestUtils.awaitSettled(newPromise, 10) then
+			expect("new game hung").toEqual("new game settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = newPromise:Wait()
+		expect(type(newSlotId)).toEqual("string")
+
+		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
+		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			context.destroy()
+			return
+		end
+		expect((metadataPromise:Wait()).SlotIndex).toEqual(2)
+
+		context.destroy()
+	end)
+
+	it("allows creating a slot past a finite cap when the count is unbounded", function()
+		local context = setup()
+		context.hasSaveSlots.MaxSlotCount.Value = math.huge
+
+		-- Index 6 is beyond the setup's finite cap of 5; unbounded must accept it
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(6)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local ok, slotId = createPromise:Yield()
+		expect(ok).toEqual(true)
+		expect(type(slotId)).toEqual("string")
+
+		context.destroy()
+	end)
+
+	it("PromiseSelectNewSaveSlot never runs out of slots when unbounded", function()
+		local context = setup()
+		context.hasSaveSlots.MaxSlotCount.Value = math.huge
+
+		-- Allocate past the finite cap of 5; every call still yields a fresh slot
+		for _ = 1, 7 do
+			local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
+			if not PromiseTestUtils.awaitSettled(newPromise, 10) then
+				expect("new game hung").toEqual("new game settled")
+				context.destroy()
+				return
+			end
+			expect(type(newPromise:Wait())).toEqual("string")
+		end
+
+		context.destroy()
+	end)
 end)
 
 describe("HasSaveSlots against a fake player (datastore down)", function()

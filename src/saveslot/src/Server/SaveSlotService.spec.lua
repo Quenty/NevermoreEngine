@@ -103,6 +103,28 @@ describe("SaveSlotService configuration guards", function()
 		serviceBag:Destroy()
 	end)
 
+	it("should accept SetUnlimitedSlots before Start", function()
+		local serviceBag, saveSlotService = newServiceBag()
+
+		expect(function()
+			saveSlotService:SetUnlimitedSlots()
+		end).never.toThrow()
+
+		serviceBag:Destroy()
+	end)
+
+	it("should reject SetUnlimitedSlots after Start", function()
+		local serviceBag, saveSlotService = newServiceBag()
+		serviceBag:Start()
+
+		-- Delegates to SetMaxSlotCount, so it surfaces the same before-Start guard
+		expect(function()
+			saveSlotService:SetUnlimitedSlots()
+		end).toThrow("SetMaxSlotCount must be called before Start")
+
+		serviceBag:Destroy()
+	end)
+
 	it("should reject a non-function summary provider", function()
 		local serviceBag, saveSlotService = newServiceBag()
 
