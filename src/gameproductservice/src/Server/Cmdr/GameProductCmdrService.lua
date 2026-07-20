@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameProductCmdrTypeUtils = require("GameProductCmdrTypeUtils")
 local PlayerUtils = require("PlayerUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -29,6 +30,7 @@ export type GameProductCmdrService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_cmdrService: any,
 		_gameProductService: any,
+		_gameConfigDataService: any,
 	},
 	{} :: typeof({ __index = GameProductCmdrService })
 ))
@@ -39,9 +41,17 @@ function GameProductCmdrService.Init(self: GameProductCmdrService, serviceBag: S
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 	self._gameProductService = self._serviceBag:GetService(require("GameProductService"))
+	self._gameConfigDataService = self._serviceBag:GetService(require("GameConfigDataService"))
 end
 
 function GameProductCmdrService.Start(self: GameProductCmdrService): ()
+	-- Register the shared cmdr types before the commands that reference them. The client
+	-- registers the same types via GameProductCmdrServiceClient so cmdr can autocomplete.
+	local configPicker = self._gameConfigDataService:GetConfigPicker()
+	self._cmdrService:PromiseCmdr():Then(function(cmdr)
+		GameProductCmdrTypeUtils.registerTypes(cmdr, configPicker)
+	end)
+
 	self:_registerCommands()
 end
 
@@ -216,17 +226,17 @@ function GameProductCmdrService._registerCommands(self: GameProductCmdrService):
 			},
 			{
 				Name = "AssetType",
-				Type = "string",
+				Type = GameProductCmdrTypeUtils.OwnableAssetTypeName,
 				Description = "Ownable asset type: game, pass, asset, bundle, subscription, or membership.",
 			},
 			{
 				Name = "AssetIdOrKey",
-				Type = "string",
+				Type = GameProductCmdrTypeUtils.OwnableAssetIdOrKeyName,
 				Description = "The asset id (number) or GameConfig asset key.",
 			},
 			{
 				Name = "State",
-				Type = "string",
+				Type = GameProductCmdrTypeUtils.OwnershipStateName,
 				Description = "own (force owned), disown (force not owned), or clear (remove the override).",
 			},
 		},

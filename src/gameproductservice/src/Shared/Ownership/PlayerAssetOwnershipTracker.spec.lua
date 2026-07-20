@@ -17,6 +17,7 @@ local GameConfigPicker = require("GameConfigPicker")
 local Jest = require("Jest")
 local Observable = require("Observable")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
+local PlayerProductOwnershipOverrideUtils = require("PlayerProductOwnershipOverrideUtils")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Signal = require("Signal")
@@ -486,5 +487,90 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 
 		sub:Destroy()
 		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetOwnershipTracker override replication", function()
+	-- Two trackers over the SAME player share the replicated attribute. Roblox attribute
+	-- replication means a client sees exactly the attribute the server wrote, so a second tracker
+	-- binding to the same player is the replication-receive path.
+	local ATTRIBUTE_NAME = PlayerProductOwnershipOverrideUtils.attributeName(GameConfigAssetTypes.PASS)
+
+	local function makeTracker(player: Instance)
+		local purchased = Signal.new()
+		local tracker = PlayerAssetOwnershipTracker.new(
+			(player :: any) :: Player,
+			(makeConfigPicker() :: any) :: GameConfigPicker.GameConfigPicker,
+			GameConfigAssetTypes.PASS,
+			{ Purchased = purchased }
+		)
+		return tracker, function()
+			tracker:Destroy()
+			purchased:Destroy()
+		end
+	end
+
+	it("should apply an override already present when a new tracker binds to the same player", function()
+		local player = Instance.new("Folder")
+
+		-- The "server" tracker authors the override, writing the replicated attribute.
+		local serverTracker, destroyServer = makeTracker(player)
+		serverTracker:SetOwnershipOverride("swordKey", true)
+
+		-- The "client" tracker binds later over the same (replicated) player attribute.
+		local clientTracker, destroyClient = makeTracker(player)
+		local promise = clientTracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(true)
+
+		destroyClient()
+		destroyServer()
+		player:Destroy()
+	end)
+
+	it("should apply a false override present at bind time even when the cloud query owns", function()
+		local player = Instance.new("Folder")
+
+		local serverTracker, destroyServer = makeTracker(player)
+		serverTracker:SetOwnershipOverride("swordKey", false)
+
+		local clientTracker, destroyClient = makeTracker(player)
+		clientTracker:SetQueryOwnershipCallback(function()
+			return Promise.resolved(true)
+		end)
+		local promise = clientTracker:PromiseOwnsAsset("swordKey")
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local _, owns = promise:Yield()
+		expect(owns).toEqual(false)
+
+		destroyClient()
+		destroyServer()
+		player:Destroy()
+	end)
+
+	it("should not write the attribute for an unknown key", function()
+		local player = Instance.new("Folder")
+		local tracker, destroy = makeTracker(player)
+
+		tracker:SetOwnershipOverride("doesNotExist", true)
+		expect(player:GetAttribute(ATTRIBUTE_NAME)).toEqual(nil)
+
+		destroy()
+		player:Destroy()
+	end)
+
+	it("should remove the attribute once the only override is cleared", function()
+		local player = Instance.new("Folder")
+		local tracker, destroy = makeTracker(player)
+
+		tracker:SetOwnershipOverride("swordKey", true)
+		expect(player:GetAttribute(ATTRIBUTE_NAME) == nil).toEqual(false)
+
+		tracker:ClearOwnershipOverride("swordKey")
+		expect(player:GetAttribute(ATTRIBUTE_NAME)).toEqual(nil)
+
+		destroy()
+		player:Destroy()
 	end)
 end)

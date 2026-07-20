@@ -278,11 +278,16 @@ function GameProductDataService.PromisePlayerOwnership(
 end
 
 --[=[
-	Sets a local override for the player's ownership of the asset. When set, the override is
-	authoritative: it wins over the cloud query and any session purchase, forcing ownership on
-	(`true`) or off (`false`). Passing `nil` clears the override. See
-	[PlayerAssetOwnershipTracker.SetOwnershipOverride].
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
 
+	The override is stored in a replicated attribute and applied to every realm's ownership tracker,
+	so it drives client-side ownership-gated UI. It can only be set from the server: this rejects on
+	the client realm, and [GameProductServiceClient] deliberately exposes no setter, so a player can
+	never grant themselves ownership.
+
+	@server
 	@param player Player
 	@param assetType GameConfigAssetType
 	@param idOrKey string | number
@@ -296,6 +301,12 @@ function GameProductDataService.SetPlayerOwnershipOverride(
 	idOrKey: string | number,
 	ownsAsset: boolean?
 ): Promise.Promise<()>
+	-- Server authority: ownership overrides are never assignable from a client (otherwise a player
+	-- could grant themselves ownership of paid assets).
+	assert(
+		self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT,
+		"[GameProductDataService] - Ownership overrides can only be set from the server"
+	)
 	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -308,9 +319,11 @@ function GameProductDataService.SetPlayerOwnershipOverride(
 end
 
 --[=[
-	Clears any local ownership override for the asset, so ownership falls back to the cloud
-	query. Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`.
+	Clears any ownership override for the asset, so ownership falls back to the cloud query.
+	Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`, and likewise
+	server-only.
 
+	@server
 	@param player Player
 	@param assetType GameConfigAssetType
 	@param idOrKey string | number

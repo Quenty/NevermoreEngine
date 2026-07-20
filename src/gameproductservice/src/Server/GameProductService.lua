@@ -205,13 +205,15 @@ function GameProductService.PromisePlayerOwnership(
 end
 
 --[=[
-	Sets a local override for the player's ownership of the asset. When set, the override is
-	authoritative: it wins over the cloud query and any session purchase, forcing ownership on
-	(`true`) or off (`false`). Passing `nil` clears the override.
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
 
-	This is a local, in-memory override, useful for testing ownership-gated behavior (including
-	paid-access games, which cannot be prompted in-experience) or granting access from a
-	non-Roblox condition. It is never written to a shared attribute.
+	The override is replicated read-only to the client and applied to every realm's ownership
+	tracker, so it drives client-side ownership-gated UI. Useful for testing ownership-gated behavior
+	(including paid-access games, which cannot be prompted in-experience) or granting access from a
+	non-Roblox condition. Only the server may set it; the client has no setter, so a player can never
+	grant themselves ownership.
 
 	@param player Player
 	@param assetType GameConfigAssetType

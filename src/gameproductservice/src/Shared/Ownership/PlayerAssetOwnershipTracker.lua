@@ -4,11 +4,11 @@
 	query (see [PlayerAssetOwnershipTracker:SetQueryOwnershipCallback]) plus session
 	purchases, with an optional local override layered on top.
 
-	The override (see [PlayerAssetOwnershipTracker:SetOwnershipOverride]) is a local,
-	in-memory, authoritative layer: when set it wins over the cloud query and session
-	purchases, forcing ownership on (`true`) or off (`false`). It is never written to a
-	shared attribute, so it cannot be read or mutated from anywhere else -- unlike the old
-	attribute-based approach this deliberately replaces.
+	The override (see [PlayerAssetOwnershipTracker:SetOwnershipOverride]) is an authoritative layer:
+	when set it wins over the cloud query and session purchases, forcing ownership on (`true`) or off
+	(`false`). It is stored in a server-owned [JSONAttributeValue] on the player that Roblox
+	replicates read-only to clients, so every realm applies the same overrides but only the server
+	can assign them -- a player can never grant themselves ownership.
 
 	@class PlayerAssetOwnershipTracker
 ]=]
@@ -19,10 +19,12 @@ local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigPicker = require("GameConfigPicker")
+local JSONAttributeValue = require("JSONAttributeValue")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
+local PlayerProductOwnershipOverrideUtils = require("PlayerProductOwnershipOverrideUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
@@ -43,6 +45,11 @@ export type PlayerAssetOwnershipTracker =
 			-- Typed `any` (not ObservableMap<number, boolean>) to keep this class's intersection
 			-- type small enough for the Luau solver; accessed only through `self: any` methods.
 			_ownershipOverrides: any,
+			-- Server-owned JSONAttributeValue holding the replicated override map, plus the last map
+			-- applied to _ownershipOverrides (for diffing on reconcile). Both `any` for the same
+			-- solver reason as _ownershipOverrides.
+			_overrideAttribute: any,
+			_appliedOverrideState: any,
 			_assetOwnershipPromiseCache: { [number]: Promise.Promise<boolean> | boolean },
 		},
 		{} :: typeof({ __index = PlayerAssetOwnershipTracker })
@@ -68,10 +75,21 @@ function PlayerAssetOwnershipTracker.new(
 	self._ownedAssetIdSet = self._maid:Add(ObservableSet.new())
 	self._ownershipOverrides = self._maid:Add(ObservableMap.new())
 
+	self._appliedOverrideState = {}
+	self._overrideAttribute =
+		JSONAttributeValue.new(self._player, PlayerProductOwnershipOverrideUtils.attributeName(assetType), nil)
+
 	self._assetOwnershipPromiseCache = {}
 
 	self._maid:GiveTask(self._marketTracker.Purchased:Connect(function(idOrKey)
 		self:SetOwnership(idOrKey, true)
+	end))
+
+	-- Apply the replicated override map to _ownershipOverrides. Observe() emits synchronously on
+	-- subscribe (current value) and again on every change -- including a client receiving the
+	-- server's replicated write -- so this covers both the initial reconcile and later updates.
+	self._maid:GiveTask(self._overrideAttribute:Observe():Subscribe(function()
+		self:_reconcileOverrides()
 	end))
 
 	return self
@@ -156,13 +174,15 @@ function PlayerAssetOwnershipTracker:SetOwnership(idOrKey, ownsAsset: boolean): 
 end
 
 --[=[
-	Sets a local override for the player's ownership of the asset. When set, the override is
-	authoritative: it wins over the cloud query and any session purchase, forcing ownership on
-	(`true`) or off (`false`). Passing `nil` clears the override so ownership falls back to the
-	cloud query again (equivalent to [PlayerAssetOwnershipTracker.ClearOwnershipOverride]).
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override so ownership falls back to the cloud query again
+	(equivalent to [PlayerAssetOwnershipTracker.ClearOwnershipOverride]).
 
-	The override is local, in-memory, and authoritative -- it is never written to a shared
-	attribute and cannot be read or mutated from elsewhere.
+	The override is published into a replicated attribute and applied on every realm, so it drives
+	client-side ownership-gated UI. Only the server can assign it: the client-facing service exposes
+	no setter and [GameProductService.SetPlayerOwnershipOverride] guards the server realm, so a player
+	can never grant themselves ownership. Callers should go through that service, never here directly.
 
 	@param idOrKey number | string
 	@param ownsAsset boolean?
@@ -182,11 +202,39 @@ function PlayerAssetOwnershipTracker.SetOwnershipOverride(self: any, idOrKey, ow
 		return
 	end
 
-	if ownsAsset == nil then
-		self._ownershipOverrides:Remove(assetId)
+	-- Resolve to a stable asset id so the override applies to the same key every realm observes.
+	local state = PlayerProductOwnershipOverrideUtils.sanitizeState(self._overrideAttribute.Value)
+	state[tostring(assetId)] = ownsAsset
+	if next(state) == nil then
+		-- Drop the attribute entirely so "no overrides" is the absence of the attribute.
+		self._overrideAttribute.Value = nil
 	else
-		self._ownershipOverrides:Set(assetId, ownsAsset)
+		self._overrideAttribute.Value = state
 	end
+
+	-- Apply immediately rather than waiting on the (possibly deferred) attribute-changed signal.
+	-- _reconcileOverrides diffs against the applied state, so the later Observe callback is a no-op.
+	self:_reconcileOverrides()
+end
+
+-- Applies the replicated override map onto _ownershipOverrides, adding/updating present entries and
+-- removing ones that are gone. Runs on every realm from the attribute observer.
+function PlayerAssetOwnershipTracker._reconcileOverrides(self: any): ()
+	local desiredState = PlayerProductOwnershipOverrideUtils.sanitizeState(self._overrideAttribute.Value)
+
+	for key, ownsAsset in desiredState do
+		if self._appliedOverrideState[key] ~= ownsAsset then
+			self._ownershipOverrides:Set(tonumber(key) or key, ownsAsset)
+		end
+	end
+
+	for key in self._appliedOverrideState do
+		if desiredState[key] == nil then
+			self._ownershipOverrides:Remove(tonumber(key) or key)
+		end
+	end
+
+	self._appliedOverrideState = desiredState
 end
 
 --[=[
