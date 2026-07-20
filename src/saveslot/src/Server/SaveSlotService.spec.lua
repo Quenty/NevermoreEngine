@@ -15,6 +15,7 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotService = require("SaveSlotService")
 local ServiceBag = require("ServiceBag")
+local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 local TeleportDataService = require("TeleportDataService")
 
 local describe = Jest.Globals.describe
@@ -34,13 +35,24 @@ local function newServiceBag()
 	) :: TeleportDataService.TeleportDataService
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(DataStoreMock.new())
+
+	-- Fake players (Folders) have no real UserId; key envelope slices off a "UserId" attribute.
+	local anyTeleportDataService = teleportDataService :: any
+	anyTeleportDataService._getUserId = function(_self, player: Instance): any
+		return player:GetAttribute("UserId")
+	end
+
 	return serviceBag, saveSlotService, teleportDataService
 end
 
--- A Folder is an Instance, so it satisfies the player guards and can carry the ActiveSlotId
--- attribute the provider reads, standing in for a Player without a real join.
-local function fakePlayer(): Player
-	return (Instance.new("Folder") :: any) :: Player
+-- A Folder is an Instance, so it satisfies the player guards and can carry the ActiveSlotId and
+-- UserId attributes the provider/envelope read, standing in for a Player without a real join.
+local function fakePlayer(userId: number?): Player
+	local player = Instance.new("Folder")
+	if userId ~= nil then
+		player:SetAttribute("UserId", userId)
+	end
+	return (player :: any) :: Player
 end
 
 describe("SaveSlotService initialization", function()
@@ -168,11 +180,12 @@ describe("SaveSlotService internal teleport", function()
 		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
 		serviceBag:Start()
 
-		local player = fakePlayer()
+		local player = fakePlayer(111)
 		player:SetAttribute("ActiveSlotId", "slot-xyz")
 
 		local data = teleportDataService:BuildTeleportData({ player })
-		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
+		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
+		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
 
 		player:Destroy()
 		serviceBag:Destroy()
@@ -182,26 +195,30 @@ describe("SaveSlotService internal teleport", function()
 		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
 		serviceBag:Start()
 
-		local player = fakePlayer()
+		local player = fakePlayer(111)
 
 		local data = teleportDataService:BuildTeleportData({ player })
-		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
+		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
+		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
 
 		player:Destroy()
 		serviceBag:Destroy()
 	end)
 
-	it("should not carry a slot id for a multi-player teleport", function()
+	it("should carry each player's own active slot id for a multi-player teleport", function()
 		local serviceBag, _saveSlotService, teleportDataService = newServiceBag()
 		serviceBag:Start()
 
-		local playerA = fakePlayer()
-		local playerB = fakePlayer()
+		local playerA = fakePlayer(111)
+		local playerB = fakePlayer(222)
 		playerA:SetAttribute("ActiveSlotId", "slot-a")
 		playerB:SetAttribute("ActiveSlotId", "slot-b")
 
 		local data = teleportDataService:BuildTeleportData({ playerA, playerB })
-		expect(data[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
+		local sliceA = TeleportDataEnvelopeUtils.readSlice(data, 111)
+		local sliceB = TeleportDataEnvelopeUtils.readSlice(data, 222)
+		expect(sliceA and sliceA[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-a")
+		expect(sliceB and sliceB[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-b")
 
 		playerA:Destroy()
 		playerB:Destroy()

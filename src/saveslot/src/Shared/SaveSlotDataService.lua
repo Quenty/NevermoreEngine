@@ -77,6 +77,20 @@ function SaveSlotDataService.GetActiveSlotId(self: SaveSlotDataService, player: 
 end
 
 --[=[
+	Returns the player's last active slot ID -- the active slot when one is selected, otherwise the
+	slot they last played and can continue on. This is the slot the "." shorthand resolves to in the
+	save-slot Cmdr commands. The synchronous counterpart to
+	[SaveSlotDataService.ObserveLastActiveSlotId].
+]=]
+function SaveSlotDataService.GetLastActiveSlotId(self: SaveSlotDataService, player: Player): SaveSlotData.SlotId?
+	local hasSaveSlots = HasSaveSlotsInterface:Find(player, self._realm)
+	if not hasSaveSlots then
+		return nil
+	end
+	return hasSaveSlots.ActiveSlotId.Value or hasSaveSlots.LastActiveSlotId.Value
+end
+
+--[=[
 	Observes the player's active slot list
 ]=]
 function SaveSlotDataService.ObserveSlotList(

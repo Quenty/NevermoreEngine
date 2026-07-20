@@ -217,7 +217,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		local activeBrio
+		local activeBrio: any = nil
 		local subscription = context.hasSaveSlots:ObserveActiveSlotStoreBrio():Subscribe(function(brio)
 			if not brio:IsDead() then
 				activeBrio = brio
@@ -275,7 +275,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectFirst:Yield()
 
-		local currentBrio
+		local currentBrio: any = nil
 		local subscription = context.hasSaveSlots:ObserveActiveSlotStoreBrio():Subscribe(function(brio)
 			if not brio:IsDead() then
 				currentBrio = brio
@@ -1070,7 +1070,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 end)
 
 describe("HasSaveSlots playtime tracking", function()
-	local function createAndSelect(context, slotIndex: number)
+	local function createAndSelect(context: any, slotIndex: number): any
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(slotIndex)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
@@ -1088,7 +1088,7 @@ describe("HasSaveSlots playtime tracking", function()
 		return slotId
 	end
 
-	local function getMetadata(context, slotId)
+	local function getMetadata(context: any, slotId): any
 		local promise = context.hasSaveSlots:PromiseGetSlotMetadata(slotId)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("metadata hung").toEqual("metadata settled")

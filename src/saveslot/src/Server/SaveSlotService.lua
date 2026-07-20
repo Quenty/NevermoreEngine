@@ -65,16 +65,12 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 end
 
 function SaveSlotService.Start(self: SaveSlotService)
-	-- Every teleport built through TeleportDataService for a single player carries that player's
-	-- active slot id, so cross-place teleports resume on the same slot without each teleport site
-	-- re-attaching it by hand.
+	-- Every teleport built through TeleportDataService carries each player's own active slot id, so
+	-- cross-place teleports resume on the same slot without each teleport site re-attaching it by hand
+	-- (and a group teleport carries every member's slot, not just a single player's).
 	self._maid:GiveTask(
-		self._teleportDataService:RegisterTeleportDataProvider(function(players: { Player }): { [string]: any }?
-			if #players ~= 1 then
-				return nil
-			end
-
-			local slotId = HasSaveSlotsData.ActiveSlotId:Get(players[1])
+		self._teleportDataService:RegisterPerPlayerTeleportDataProvider(function(player: Player): { [string]: any }?
+			local slotId = HasSaveSlotsData.ActiveSlotId:Get(player)
 			if type(slotId) == "string" then
 				return { [SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = slotId }
 			end

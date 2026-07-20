@@ -90,7 +90,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slot",
 				Type = "slotIndex",
-				Description = "Slot index to switch to.",
+				Description = "Slot index to switch to, or . for your current slot.",
 			},
 		},
 	}, function(context, slotIndex: number)
@@ -192,7 +192,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to delete (e.g. 1,2 or * for all).",
+				Description = "Slot indices to delete (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
 	}, function(context, slotIndices: { number })
@@ -250,7 +250,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slot",
 				Type = "slotIndex",
-				Description = "Slot index to duplicate.",
+				Description = "Slot index to duplicate, or . for your current slot.",
 			},
 		},
 	}, function(context, slotIndex: number)
