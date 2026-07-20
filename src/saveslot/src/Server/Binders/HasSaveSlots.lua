@@ -217,6 +217,67 @@ function HasSaveSlots.PromiseCreateSlot(
 end
 
 --[=[
+	Duplicates the slot with the given ID into a new slot at the lowest free index,
+	copying its saved data. Resolves to the new slot's id. The copy is not selected,
+	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
+	" (Copy)". Rejects when the source slot is missing or every index is in use.
+]=]
+function HasSaveSlots.PromiseDuplicateSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		local sourceSlot = self._slotMap[slotId]
+		if not sourceSlot then
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
+		end
+
+		-- Lowest free positive index, filling gaps left by deletions (mirrors PromiseSelectNewSaveSlot).
+		local usedIndices = {}
+		for _, slot in self._slotMap do
+			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+		end
+		local freeIndex = 1
+		while usedIndices[freeIndex] do
+			freeIndex += 1
+		end
+		if freeIndex > self.MaxSlotCount.Value then
+			return (Promise :: any).rejected("All slots are already in use")
+		end
+
+		local sourceMetadata = SaveSlotData:Get(sourceSlot)
+
+		-- Read the source's saved data before creating the copy so a read failure leaves no orphan slot.
+		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
+			-- The default slot shares the player's root store with the SaveSlots system data. Never carry
+			-- that system key across into the copy's saved data.
+			local slotData = if type(sourceData) == "table" then table.clone(sourceData) else {}
+			slotData[SaveSlotConstants.SYSTEM_STORE_KEY] = nil
+
+			return self:PromiseCreateSlot(freeIndex, {
+				SlotName = `{sourceMetadata.SlotName} (Copy)`,
+				Summary = sourceMetadata.Summary,
+			}):Then(function(newSlotId: SaveSlotData.SlotId)
+				local destStore = self:_getSlotStore(newSlotId)
+
+				if destStore == self._dataStore then
+					-- The copy is the default slot, whose store is the shared root. Merge so the SaveSlots
+					-- system store living alongside it survives (a plain Overwrite would wipe it).
+					destStore:OverwriteMerge(slotData)
+				else
+					destStore:Overwrite(slotData)
+				end
+
+				-- Flush so the duplicated data survives a crash before the next autosave.
+				return self._dataStore:Save():Then(function()
+					return newSlotId
+				end)
+			end)
+		end)
+	end)
+end
+
+--[=[
 	Deletes the slot with the given ID
 ]=]
 function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<any>

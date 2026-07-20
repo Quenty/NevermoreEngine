@@ -241,6 +241,49 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 		return `Deleted slot(s) {table.concat(deletedIndices, ", ")}.`
 	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "duplicate-save-slot",
+		Description = "Duplicates a save slot into a new slot at the lowest free index.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Slot",
+				Type = "slotIndex",
+				Description = "Slot index to duplicate.",
+			},
+		},
+	}, function(context, slotIndex: number)
+		local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+		if not slotId then
+			return `No slot with index {slotIndex}.`
+		end
+
+		-- Mirror the binder's lowest-free-index pick so a full roster reports cleanly instead of throwing.
+		local maxSlotCount = context.Executor:GetAttribute("MaxSlotCount")
+		local used = {}
+		for _, metadata in self._saveSlotDataService:GetSlotList(context.Executor) do
+			used[metadata.SlotIndex] = true
+		end
+		local freeIndex = 1
+		while used[freeIndex] do
+			freeIndex += 1
+		end
+		if freeIndex > maxSlotCount then
+			return "All slots are already in use."
+		end
+
+		local newSlotId = self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseDuplicateSlot(slotId)
+			end)
+			:Wait()
+
+		local newMetadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, newSlotId)
+
+		return `Duplicated slot {slotIndex} into slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}").`
+	end)
 end
 
 function SaveSlotCmdrService.Destroy(self: SaveSlotCmdrService): ()

@@ -662,6 +662,121 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		context.destroy()
 	end)
 
+	it("PromiseDuplicateSlot copies saved data into a fresh slot and marks the name", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1, { SlotName = "Adventure" })
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		-- Seed the source slot with some saved data to copy across
+		local tracker: any = context.hasSaveSlots
+		tracker:_getSlotStore(slotId):Store("Coins", 500)
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = duplicatePromise:Wait()
+		expect(type(newSlotId)).toEqual("string")
+		expect(newSlotId ~= slotId).toEqual(true)
+
+		-- The copy lands at the next free index with a marked name
+		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
+		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			context.destroy()
+			return
+		end
+		local metadata = metadataPromise:Wait()
+		expect(metadata.SlotIndex).toEqual(2)
+		expect(metadata.SlotName).toEqual("Adventure (Copy)")
+
+		-- The saved data carried across into the new slot's own store
+		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
+		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
+			expect("data hung").toEqual("data settled")
+			context.destroy()
+			return
+		end
+		expect((dataPromise:Wait())).toEqual(500)
+
+		context.destroy()
+	end)
+
+	it("PromiseDuplicateSlot into the default slot preserves the system store", function()
+		local context = setup()
+
+		-- Only a non-default slot exists, so the duplicate lands at the free default index (1), whose
+		-- store is the shared root alongside the SaveSlots system data.
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Save" })
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local tracker: any = context.hasSaveSlots
+		tracker:_getSlotStore(slotId):Store("Coins", 750)
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = duplicatePromise:Wait()
+
+		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
+		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
+			expect("metadata hung").toEqual("metadata settled")
+			context.destroy()
+			return
+		end
+		expect((metadataPromise:Wait()).SlotIndex).toEqual(1)
+
+		-- The original slot still resolves -- merging into root did not clobber the system store
+		local sourceStillThere = context.hasSaveSlots:PromiseSlotIdFromIndex(2)
+		if not PromiseTestUtils.awaitSettled(sourceStillThere, 10) then
+			expect("lookup hung").toEqual("lookup settled")
+			context.destroy()
+			return
+		end
+		expect((sourceStillThere:Wait())).toEqual(slotId)
+
+		-- The copied game data landed in the default (root) store
+		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
+		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
+			expect("data hung").toEqual("data settled")
+			context.destroy()
+			return
+		end
+		expect((dataPromise:Wait())).toEqual(750)
+
+		context.destroy()
+	end)
+
+	it("PromiseDuplicateSlot rejects when the source slot is missing", function()
+		local context = setup()
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot("does-not-exist")
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+		expect((duplicatePromise:Yield())).toEqual(false)
+
+		context.destroy()
+	end)
+
 	it("allows creating a slot past a finite cap when the count is unbounded", function()
 		local context = setup()
 		context.hasSaveSlots.MaxSlotCount.Value = math.huge
