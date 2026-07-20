@@ -12,8 +12,10 @@ local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
+local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
+local TeleportDataServiceClient = require("TeleportDataServiceClient")
 
 local HasSaveSlotsClient = setmetatable({}, HasSaveSlotsBase)
 HasSaveSlotsClient.ClassName = "HasSaveSlotsClient"
@@ -25,6 +27,7 @@ export type HasSaveSlotsClient =
 			_obj: Player,
 			_serviceBag: ServiceBag.ServiceBag,
 			_remoting: any,
+			_teleportDataServiceClient: any,
 		},
 		{} :: typeof({ __index = HasSaveSlotsClient })
 	))
@@ -38,6 +41,7 @@ function HasSaveSlotsClient.new(player: Player, serviceBag: ServiceBag.ServiceBa
 	local self: HasSaveSlotsClient = setmetatable(HasSaveSlotsBase.new(player, serviceBag) :: any, HasSaveSlotsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._teleportDataServiceClient = self._serviceBag:GetService(TeleportDataServiceClient)
 
 	self._remoting = self._maid:Add(Remoting.Client.new(self._obj, "HasSaveSlots"))
 
@@ -123,6 +127,16 @@ function HasSaveSlotsClient.PromiseSlotIdFromIndex(
 	slotIndex: number
 ): Promise.Promise<SaveSlotData.SlotId?>
 	return self._remoting.PromiseSlotIdFromIndex:PromiseInvokeServer(slotIndex)
+end
+
+-- Client realm hook for HasSaveSlotsBase: the incoming slot id is whatever the local player
+-- teleported in with, read from their local teleport data via TeleportDataServiceClient.
+function HasSaveSlotsClient._getIncomingSlotId(self: HasSaveSlotsClient): SaveSlotData.SlotId?
+	local slotId = self._teleportDataServiceClient:GetArrivedValue(SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+	if type(slotId) == "string" then
+		return slotId
+	end
+	return nil
 end
 
 return Binder.new("HasSaveSlots", HasSaveSlotsClient :: any) :: Binder.Binder<HasSaveSlotsClient>

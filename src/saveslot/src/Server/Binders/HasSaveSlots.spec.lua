@@ -40,6 +40,11 @@ local function setup(mock)
 
 	local serviceBag = ServiceBag.new()
 	local playerDataStoreService = serviceBag:GetService(require("PlayerDataStoreService"))
+	-- The binder resolves TeleportDataService lazily at bind time (post-start), so it must already be
+	-- initialized in the bag -- ServiceBag forbids initializing a new service after Start. In the game
+	-- SaveSlotService.Init pre-registers it; here we bootstrap the binder without that owning service,
+	-- so register it directly to mirror the production dependency.
+	serviceBag:GetService(require("TeleportDataService"))
 	local binder = serviceBag:GetService(require("HasSaveSlots"))
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(mock)
@@ -322,6 +327,111 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			return
 		end
 		expect((lastPromise:Wait())).toEqual(slotId)
+
+		context.destroy()
+	end)
+
+	it("deleting the last-active slot clears the continue pointer", function()
+		-- Repro for the `delete-save-slot *` bug: deleting the (deselected) active slot left
+		-- LastActiveSlotId dangling, so the menu kept offering "Continue" for a slot that was gone.
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		-- Deselect first, matching how the cmdr command frees the active slot before deleting it.
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+
+		-- Deselection deliberately keeps remembering the slot for "Continue"...
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+
+		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
+			expect("delete hung").toEqual("delete settled")
+			context.destroy()
+			return
+		end
+		deletePromise:Yield()
+
+		-- ...but once that slot is deleted, there is nothing to continue on.
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
+
+		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
+		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
+			expect("lastActive hung").toEqual("lastActive settled")
+			context.destroy()
+			return
+		end
+		expect((lastPromise:Wait())).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("deleting a non-last-active slot leaves the continue pointer intact", function()
+		-- The clear must be scoped to the resumable slot: deleting some other slot must not wipe it.
+		local context = setup()
+
+		local firstPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(firstPromise, 10) then
+			expect("first create hung").toEqual("first create settled")
+			context.destroy()
+			return
+		end
+		local _, firstSlotId = firstPromise:Yield()
+
+		local secondPromise = context.hasSaveSlots:PromiseCreateSlot(2)
+		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
+			expect("second create hung").toEqual("second create settled")
+			context.destroy()
+			return
+		end
+		local _, secondSlotId = secondPromise:Yield()
+
+		-- Slot 1 is the last-active; slot 2 is just another slot, and stays deletable while 1 is deselected.
+		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
+		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
+			expect("select hung").toEqual("select settled")
+			context.destroy()
+			return
+		end
+		selectPromise:Yield()
+
+		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
+		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
+			expect("deselect hung").toEqual("deselect settled")
+			context.destroy()
+			return
+		end
+		deselectPromise:Yield()
+
+		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(secondSlotId)
+		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
+			expect("delete hung").toEqual("delete settled")
+			context.destroy()
+			return
+		end
+		deletePromise:Yield()
+
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(firstSlotId)
 
 		context.destroy()
 	end)

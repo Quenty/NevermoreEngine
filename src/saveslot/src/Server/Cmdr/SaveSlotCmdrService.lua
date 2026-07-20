@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local CmdrService = require("CmdrService")
 local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local SaveSlotCmdrUtils = require("SaveSlotCmdrUtils")
 local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
@@ -134,18 +135,37 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "create-save-slot",
-		Description = "Creates a save slot at the given index.",
+		Description = "Creates a save slot. Defaults to the lowest free index when none is given.",
 		Group = "SaveSlots",
 		Args = {
 			{
 				Name = "Slot",
 				Type = "number",
-				Description = "Slot index to create.",
+				Description = "Slot index to create. Omit to use the lowest free index.",
+				Optional = true,
 			},
 		},
-	}, function(context, slotIndex: number)
+	}, function(context, slotIndex: number?)
 		local maxSlotCount = context.Executor:GetAttribute("MaxSlotCount")
-		if (slotIndex < 1) or (slotIndex > maxSlotCount) then
+
+		if slotIndex == nil then
+			-- Default to the lowest free index, filling gaps left by deletions.
+			local used = {}
+			for _, metadata in self._saveSlotDataService:GetSlotList(context.Executor) do
+				used[metadata.SlotIndex] = true
+			end
+
+			local freeIndex = 1
+			while used[freeIndex] do
+				freeIndex += 1
+			end
+
+			if freeIndex > maxSlotCount then
+				return "All slots are already in use."
+			end
+
+			slotIndex = freeIndex
+		elseif (slotIndex < 1) or (slotIndex > maxSlotCount) then
 			return `Index must be in range [1, {maxSlotCount}].`
 		end
 
@@ -166,33 +186,60 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "delete-save-slot",
-		Description = "Deletes the given save slot.",
+		Description = "Deletes the given save slots.",
 		Group = "SaveSlots",
 		Args = {
 			{
-				Name = "Slot",
-				Type = "slotIndex",
-				Description = "Slot index to delete.",
+				Name = "Slots",
+				Type = "slotIndices",
+				Description = "Slot indices to delete (e.g. 1,2 or * for all).",
 			},
 		},
-	}, function(context, slotIndex: number)
-		local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
-		if not slotId then
-			return `No slot with index {slotIndex}.`
+	}, function(context, slotIndices: { number })
+		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(context.Executor)
+
+		-- Resolve indices to ids up front; `*` can include the active slot and duplicates.
+		local seen = {}
+		local toDelete = {}
+		for _, slotIndex in slotIndices do
+			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+			if slotId and not seen[slotId] then
+				seen[slotId] = true
+				table.insert(toDelete, { slotIndex = slotIndex, slotId = slotId })
+			end
 		end
 
-		if slotId == self._saveSlotDataService:GetActiveSlotId(context.Executor) then
-			return "Cannot delete active slot."
+		if #toDelete == 0 then
+			return "No matching slots to delete."
 		end
 
 		self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
 			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseDeleteSlot(slotId)
+				-- Delete sequentially to avoid concurrent datastore saves. The active slot can't be
+				-- deleted while selected, so deselect it first (flushing its progress) when reached.
+				local promise = Promise.resolved()
+				for _, entry in toDelete do
+					promise = promise:Then(function()
+						if entry.slotId == activeSlotId then
+							return hasSaveSlots:PromiseDeselectSlot():Then(function()
+								return hasSaveSlots:PromiseDeleteSlot(entry.slotId)
+							end)
+						end
+
+						return hasSaveSlots:PromiseDeleteSlot(entry.slotId)
+					end)
+				end
+				return promise
 			end)
 			:Wait()
 
-		return `Deleted slot {slotIndex}.`
+		local deletedIndices = {}
+		for _, entry in toDelete do
+			table.insert(deletedIndices, entry.slotIndex)
+		end
+
+		return `Deleted slot(s) {table.concat(deletedIndices, ", ")}.`
 	end)
 end
 

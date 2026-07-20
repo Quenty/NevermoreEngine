@@ -48,11 +48,7 @@ function StreamingCinematicsService.Init(self: StreamingCinematicsService): ()
 	end))
 end
 
-function StreamingCinematicsService._setFocus(
-	self: StreamingCinematicsService,
-	player: Player,
-	position: Vector3?
-): ()
+function StreamingCinematicsService._setFocus(self: StreamingCinematicsService, player: Player, position: Vector3?): ()
 	if position == nil then
 		self:_clearFocus(player)
 		return

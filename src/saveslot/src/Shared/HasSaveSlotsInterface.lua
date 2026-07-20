@@ -21,6 +21,11 @@ return TieDefinition.new("HasSaveSlots", {
 	PromiseSlotIdFromIndex = TieDefinition.Types.METHOD,
 	PromiseLastActiveSlotId = TieDefinition.Types.METHOD,
 
+	-- Answered from the teleport data the player arrived with (see HasSaveSlotsBase); both realms
+	-- resolve the incoming slot id from their own [TeleportDataService].
+	PromiseHasSaveSlotFromTeleport = TieDefinition.Types.METHOD,
+	PromiseLoadSaveSlotFromTeleport = TieDefinition.Types.METHOD,
+
 	SlotChanged = TieDefinition.Types.SIGNAL,
 
 	[TieDefinition.Realms.SERVER] = {

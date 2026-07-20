@@ -23,6 +23,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
+local TeleportDataService = require("TeleportDataService")
 local ValueObject = require("ValueObject")
 
 export type SaveSlotSummaryProvider = (Player, any) -> Observable.Observable<string>
@@ -46,6 +47,7 @@ export type HasSaveSlots =
 			_metadataStore: any,
 			_summaryProvider: ValueObject.ValueObject<SaveSlotSummaryProvider?>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
+			_teleportDataService: any,
 		},
 		{} :: typeof({ __index = HasSaveSlots })
 	))
@@ -56,6 +58,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
+	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
 
 	self._slotContainer = self._maid:Add(Instance.new("Folder"))
 	self._slotContainer.Name = SaveSlotConstants.METADATA_CONTAINER_NAME
@@ -224,6 +227,14 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 		end
 
 		self._maid[slotId] = nil
+
+		-- The continue pointer must not outlive its slot. When the deleted slot is the one the player
+		-- would resume on (e.g. the just-deselected active slot, or a never-reselected last-active),
+		-- clear the last-active memory so "Continue" stops offering a slot that no longer exists.
+		if slotId == self._lastActiveSlotId then
+			self._lastActiveSlotId = nil
+			self.LastActiveSlotId.Value = nil
+		end
 
 		-- Wipe default slot
 		local slotIndex = SaveSlotData.SlotIndex:Get(slot)
@@ -404,6 +415,16 @@ end
 ]=]
 function HasSaveSlots.SetSummaryProvider(self: HasSaveSlots, provider: SaveSlotSummaryProvider?): ()
 	self._summaryProvider.Value = provider
+end
+
+-- Server realm hook for HasSaveSlotsBase: the incoming slot id is whatever the player teleported in
+-- with, read from their join data via TeleportDataService.
+function HasSaveSlots._getIncomingSlotId(self: HasSaveSlots): SaveSlotData.SlotId?
+	local slotId = self._teleportDataService:GetArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+	if type(slotId) == "string" then
+		return slotId
+	end
+	return nil
 end
 
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
