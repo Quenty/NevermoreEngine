@@ -129,7 +129,7 @@ function AdorneeDataValue:__newindex(index, newValue)
 			if attributeValues[key] then
 				attributeValues[key].Value = value
 			else
-				error("%s is not a valid member of AttributeValue")
+				error(string.format("%s is not a valid member of AttributeValue", key))
 			end
 		end
 	else
