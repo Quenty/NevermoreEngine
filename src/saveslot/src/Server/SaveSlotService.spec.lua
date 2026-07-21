@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
 local PlayerDataStoreService = require("PlayerDataStoreService")
+local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotService = require("SaveSlotService")
 local ServiceBag = require("ServiceBag")
@@ -243,21 +244,56 @@ describe("SaveSlotService internal teleport", function()
 		serviceBag:Destroy()
 	end)
 
-	it("should report IsInternalTeleport from the arrived teleport data", function()
+	-- Awaits a boolean read promise and returns its fulfilled value.
+	local function awaitBool(promise: any): boolean
+		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		local ok, value = promise:Yield()
+		expect(ok).toEqual(true)
+		return value
+	end
+
+	it("should report a client-initiated teleport (non-trusted band) as internal", function()
+		-- This is the fix: a slot the *client* attached only reaches the server via replication, and the
+		-- server must still see it.
 		local serviceBag, saveSlotService, teleportDataService = newServiceBag()
 		serviceBag:Start()
 
-		local arrived = fakePlayer()
-		teleportDataService:SetArrivedTeleportDataForTesting(arrived, {
+		local arrived = fakePlayer(111)
+		teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(arrived, {
 			[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = "slot-1",
 		})
-		expect(saveSlotService:IsInternalTeleport(arrived)).toEqual(true)
 
-		local fresh = fakePlayer()
-		teleportDataService:SetArrivedTeleportDataForTesting(fresh, {})
-		expect(saveSlotService:IsInternalTeleport(fresh)).toEqual(false)
+		expect(awaitBool(saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
 
 		arrived:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("should report a server-initiated teleport (trusted band) as internal", function()
+		local serviceBag, saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local arrived = fakePlayer(111)
+		teleportDataService:SetTrustedArrivedTeleportDataForTesting(arrived, {
+			[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = "slot-1",
+		})
+		teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(arrived, nil) -- no client band; seals
+
+		expect(awaitBool(saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
+
+		arrived:Destroy()
+		serviceBag:Destroy()
+	end)
+
+	it("should report a fresh join (no arrived data) as not internal", function()
+		local serviceBag, saveSlotService, teleportDataService = newServiceBag()
+		serviceBag:Start()
+
+		local fresh = fakePlayer(111)
+		teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(fresh, nil) -- fresh-join sentinel; seals
+
+		expect(awaitBool(saveSlotService:PromiseIsInternalTeleport(fresh))).toEqual(false)
+
 		fresh:Destroy()
 		serviceBag:Destroy()
 	end)

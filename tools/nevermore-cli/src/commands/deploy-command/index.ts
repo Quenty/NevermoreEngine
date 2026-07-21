@@ -29,7 +29,11 @@ import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { type BatchTarget } from '../../utils/batch/changed-packages-utils.js';
-import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import {
+  isCI,
+  readPackageNameAsync,
+  readPackageVersionAsync,
+} from '../../utils/nevermore-cli-utils.js';
 import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
@@ -248,6 +252,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
+    const packageVersion = await readPackageVersionAsync(cwd);
 
     const { targetName, autoDetected: targetAutoDetected } =
       await selectTargetAsync(cwd, {
@@ -414,6 +419,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
                 timestamp: deployTimestamp,
                 universeId: args.universeId ?? buildTarget.target.universeId,
                 placeId: args.placeId ?? buildTarget.target.placeId,
+                packageVersion,
               },
               buildTarget.manifestPlaces
             )

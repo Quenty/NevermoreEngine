@@ -51,15 +51,16 @@ function HasSaveSlotsBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 end
 
 --[=[
-	Returns the save-slot id the player teleported in with, or nil. Realm hook: the server reads it
-	from the join data, the client from the local player's teleport data (both via
-	[TeleportDataService]). The base default returns nil so a realm that never sets one degrades to
-	"no incoming slot".
+	Resolves the save-slot id the player teleported in with, or nil. Realm hook: the server reads it from
+	the client-replicated teleport data, the client from the local player's teleport data (both via the
+	[TeleportDataService] unified read, which is a promise because the server must wait for the client to
+	replicate). The base default resolves nil so a realm that never sets one degrades to "no incoming
+	slot".
 
-	@return SaveSlotData.SlotId?
+	@return Promise<SaveSlotData.SlotId?>
 ]=]
-function HasSaveSlotsBase._getIncomingSlotId(_self: HasSaveSlotsBase): SaveSlotData.SlotId?
-	return nil
+function HasSaveSlotsBase.PromiseIncomingSlotId(_self: HasSaveSlotsBase): Promise.Promise<SaveSlotData.SlotId?>
+	return (Promise :: any).resolved(nil)
 end
 
 --[=[
@@ -69,12 +70,13 @@ end
 	@return Promise<boolean>
 ]=]
 function HasSaveSlotsBase.PromiseHasSaveSlotFromTeleport(self: HasSaveSlotsBase): Promise.Promise<boolean>
-	local slotId = self:_getIncomingSlotId()
-	if type(slotId) ~= "string" then
-		return (Promise :: any).resolved(false)
-	end
+	return self:PromiseIncomingSlotId():Then(function(slotId: SaveSlotData.SlotId?)
+		if type(slotId) ~= "string" then
+			return false
+		end
 
-	return (self :: any):PromiseHasSlot(slotId)
+		return (self :: any):PromiseHasSlot(slotId)
+	end)
 end
 
 --[=[
@@ -85,18 +87,19 @@ end
 	@return Promise<SaveSlotData.SlotId?>
 ]=]
 function HasSaveSlotsBase.PromiseLoadSaveSlotFromTeleport(self: HasSaveSlotsBase): Promise.Promise<SaveSlotData.SlotId?>
-	local slotId = self:_getIncomingSlotId()
-	if type(slotId) ~= "string" then
-		return (Promise :: any).resolved(nil)
-	end
-
-	return (self :: any):PromiseHasSlot(slotId):Then(function(hasSlot: boolean)
-		if not hasSlot then
+	return self:PromiseIncomingSlotId():Then(function(slotId: SaveSlotData.SlotId?)
+		if type(slotId) ~= "string" then
 			return nil
 		end
 
-		return (self :: any):PromiseSelectSlot(slotId):Then(function()
-			return slotId
+		return (self :: any):PromiseHasSlot(slotId):Then(function(hasSlot: boolean)
+			if not hasSlot then
+				return nil
+			end
+
+			return (self :: any):PromiseSelectSlot(slotId):Then(function()
+				return slotId
+			end)
 		end)
 	end)
 end

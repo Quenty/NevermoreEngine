@@ -59,6 +59,61 @@ describe("TeleportDataEnvelopeUtils.build / readSlice round-trip", function()
 	end)
 end)
 
+describe("TeleportDataEnvelopeUtils.readMergedSlice", function()
+	it("returns nil when neither band carried anything", function()
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(nil, nil, 111)).toBeNil()
+		expect(TeleportDataEnvelopeUtils.readMergedSlice({}, {}, 111)).toBeNil()
+	end)
+
+	it("returns the trusted band alone when there is no non-trusted band", function()
+		local trusted = TeleportDataEnvelopeUtils.build({ mode = "hard" }, nil)
+
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(trusted, nil, 111)).toEqual({ mode = "hard" })
+	end)
+
+	it("returns the non-trusted band alone when there is no trusted band", function()
+		local nonTrusted = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "a" } })
+
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(nil, nonTrusted, 111)).toEqual({ slot = "a" })
+	end)
+
+	it("unions disjoint keys from both bands", function()
+		local trusted = TeleportDataEnvelopeUtils.build({ region = "us" }, nil)
+		local nonTrusted = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "a" } })
+
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(trusted, nonTrusted, 111)).toEqual({
+			region = "us",
+			slot = "a",
+		})
+	end)
+
+	it("lets the trusted band win on a key conflict (client can never override the server)", function()
+		local trusted = TeleportDataEnvelopeUtils.build({ slot = "server-slot" }, nil)
+		local nonTrusted = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client-slot" } })
+
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(trusted, nonTrusted, 111)).toEqual({
+			slot = "server-slot",
+		})
+	end)
+
+	it("merges only each player's own non-trusted slice by UserId", function()
+		local nonTrusted = TeleportDataEnvelopeUtils.build(nil, {
+			["111"] = { slot = "mine" },
+			["222"] = { slot = "theirs" },
+		})
+
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(nil, nonTrusted, 111)).toEqual({ slot = "mine" })
+		expect(TeleportDataEnvelopeUtils.readMergedSlice(nil, nonTrusted, 222)).toEqual({ slot = "theirs" })
+	end)
+
+	it("merges legacy flat bands as-is", function()
+		expect(TeleportDataEnvelopeUtils.readMergedSlice({ a = 1 }, { a = 2, b = 3 }, 111)).toEqual({
+			a = 1,
+			b = 3,
+		})
+	end)
+end)
+
 describe("TeleportDataEnvelopeUtils.isEnvelope", function()
 	it("recognizes an envelope by its reserved sections", function()
 		expect(TeleportDataEnvelopeUtils.isEnvelope(TeleportDataEnvelopeUtils.build({ a = 1 }, nil))).toBe(true)

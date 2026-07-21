@@ -77,6 +77,19 @@ describe('buildDeployMetadataAttributes', () => {
     expect('Branch' in attributes).toBe(false);
   });
 
+  it('includes the package version when present', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      { ...PLACE, packageVersion: '1.0.0' }
+    );
+    expect(attributes.PackageVersion).toBe('1.0.0');
+  });
+
+  it('omits the package version when unavailable', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect('PackageVersion' in attributes).toBe(false);
+  });
+
   it('reflects a Saved (unpublished) deploy', () => {
     const attributes = buildDeployMetadataAttributes(
       {},

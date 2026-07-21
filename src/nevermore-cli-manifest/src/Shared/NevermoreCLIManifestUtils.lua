@@ -45,6 +45,7 @@ local NevermoreCLIManifestUtils = {}
 	.commit string? -- short git commit SHA the build was made from
 	.version string? -- full git commit SHA the build was made from
 	.branch string? -- git branch the build was made from
+	.packageVersion string? -- `version` from the deploying package's package.json (e.g. "1.0.0")
 	.target string? -- deploy target name (e.g. "test", "integration")
 	.timestamp string? -- ISO 8601 UTC timestamp of when the deploy ran
 	.published boolean? -- true if published live (`--publish`), false if only Saved
@@ -57,6 +58,7 @@ export type GameMetadata = {
 	commit: string?,
 	version: string?,
 	branch: string?,
+	packageVersion: string?,
 	target: string?,
 	timestamp: string?,
 	published: boolean?,
@@ -92,6 +94,7 @@ local ATTRIBUTE = {
 	commit = "Commit",
 	version = "Version",
 	branch = "Branch",
+	packageVersion = "PackageVersion",
 	target = "Target",
 	timestamp = "Timestamp",
 	published = "Published",
@@ -120,6 +123,7 @@ local function readMetadata(instance: Instance): GameMetadata
 		commit = instance:GetAttribute(ATTRIBUTE.commit) :: string?,
 		version = instance:GetAttribute(ATTRIBUTE.version) :: string?,
 		branch = instance:GetAttribute(ATTRIBUTE.branch) :: string?,
+		packageVersion = instance:GetAttribute(ATTRIBUTE.packageVersion) :: string?,
 		target = instance:GetAttribute(ATTRIBUTE.target) :: string?,
 		timestamp = instance:GetAttribute(ATTRIBUTE.timestamp) :: string?,
 		published = instance:GetAttribute(ATTRIBUTE.published) :: boolean?,

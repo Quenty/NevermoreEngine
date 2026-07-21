@@ -34,7 +34,10 @@ import {
   discoverChangedTargetPackagesAsync,
   flattenToBatchTargets,
 } from '../../utils/batch/changed-packages-utils.js';
-import { isCI } from '../../utils/nevermore-cli-utils.js';
+import {
+  isCI,
+  readPackageVersionAsync,
+} from '../../utils/nevermore-cli-utils.js';
 import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
 
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
@@ -244,6 +247,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               timestamp: deployTimestamp,
               universeId: buildTarget.target.universeId,
               placeId: buildTarget.target.placeId,
+              packageVersion: await readPackageVersionAsync(buildTarget.path),
             },
             buildTarget.manifestPlaces
           )

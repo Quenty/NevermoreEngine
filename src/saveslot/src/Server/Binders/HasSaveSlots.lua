@@ -582,13 +582,19 @@ function HasSaveSlots.RegisterSummaryProvider(self: HasSaveSlots, name: string, 
 end
 
 -- Server realm hook for HasSaveSlotsBase: the incoming slot id is whatever the player teleported in
--- with, read from their join data via TeleportDataService.
-function HasSaveSlots._getIncomingSlotId(self: HasSaveSlots): SaveSlotData.SlotId?
-	local slotId = self._teleportDataService:GetArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
-	if type(slotId) == "string" then
-		return slotId
-	end
-	return nil
+-- with, read from the unified TeleportDataService view. It is a promise because a client-initiated
+-- teleport only reaches the server once the client replicates its arrived data. The slot id is a
+-- client *request* -- fine here, because PromiseLoadSaveSlotFromTeleport re-validates ownership via
+-- PromiseHasSlot before selecting it.
+function HasSaveSlots.PromiseIncomingSlotId(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
+	return self._teleportDataService
+		:PromiseArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+		:Then(function(slotId): SaveSlotData.SlotId?
+			if type(slotId) == "string" then
+				return slotId
+			end
+			return nil
+		end)
 end
 
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>

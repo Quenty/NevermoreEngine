@@ -9,9 +9,10 @@
 	slice with their own on arrival. A non-envelope table (an in-flight teleport from a build predating
 	this, or a hand-written `TeleportData`) is read as-is, so the change is backward compatible.
 
-	All logic here is pure and keyed by plain numbers, so it is unit tested without any [Player].
+	All logic here is pure and keyed by plain numbers, so it is unit tested without any [Player]. It is
+	shared (not server-only) because both realms unwrap arrived data: the server keys each player's
+	slice by their UserId, the client by the local player's.
 
-	@server
 	@class TeleportDataEnvelopeUtils
 ]=]
 
@@ -112,6 +113,49 @@ function TeleportDataEnvelopeUtils.readSlice(raw: any, userId: number | string):
 			for key, value in slice do
 				merged[key] = value
 			end
+		end
+	end
+
+	if next(merged) == nil then
+		return nil
+	end
+
+	return merged
+end
+
+--[=[
+	Reads a player's slice from two raw arrived tables of different trust and merges them, with the
+	trusted band winning on conflict. This is the single place the "trusted over non-trusted" precedence
+	lives, so both realms compute the identical unified view.
+
+	A teleport carries the trusted band (server-authored, from the server's join data) in one raw table
+	and the non-trusted band (client-authored, from the client's local teleport data) in the other;
+	either may be nil. Returns nil when neither band carried anything for the player.
+
+	@param trustedRaw any -- raw arrived data trusted for this player (server-authored), or nil
+	@param nonTrustedRaw any -- raw arrived data asserted by the client, or nil
+	@param userId number | string -- the arriving player's UserId
+	@return TeleportDataSlice?
+]=]
+function TeleportDataEnvelopeUtils.readMergedSlice(
+	trustedRaw: any,
+	nonTrustedRaw: any,
+	userId: number | string
+): TeleportDataSlice?
+	local merged: TeleportDataSlice = {}
+
+	-- Non-trusted first, then trusted overwrites -- so a client can never override a key the server set.
+	local nonTrusted = TeleportDataEnvelopeUtils.readSlice(nonTrustedRaw, userId)
+	if nonTrusted ~= nil then
+		for key, value in nonTrusted do
+			merged[key] = value
+		end
+	end
+
+	local trusted = TeleportDataEnvelopeUtils.readSlice(trustedRaw, userId)
+	if trusted ~= nil then
+		for key, value in trusted do
+			merged[key] = value
 		end
 	end
 
