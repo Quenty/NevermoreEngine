@@ -204,7 +204,11 @@ function PlayerAssetOwnershipTracker.SetOwnershipOverride(self: any, idOrKey, ow
 
 	-- Resolve to a stable asset id so the override applies to the same key every realm observes.
 	local state = PlayerProductOwnershipOverrideUtils.sanitizeState(self._overrideAttribute.Value)
-	state[tostring(assetId)] = ownsAsset
+	if ownsAsset == nil then
+		state[tostring(assetId)] = nil
+	else
+		state[tostring(assetId)] = ownsAsset
+	end
 	if next(state) == nil then
 		-- Drop the attribute entirely so "no overrides" is the absence of the attribute.
 		self._overrideAttribute.Value = nil

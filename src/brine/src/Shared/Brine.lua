@@ -358,11 +358,9 @@ function Brine.observeDeserialize(
 	end) :: any
 end
 
---[=[
-	A captured baseline -- "the server's version" -- that [Brine.restore] reconciles a live tree
-	back toward. Holds the serialized subtree plus the id -> live-instance identity map (the
-	retained `InstanceRegistry`) restore uses to tell survivor from recreated from added.
-]=]
+-- A captured baseline -- "the server's version" -- that [Brine.restore] reconciles a live tree
+-- back toward. Holds the serialized subtree plus the id -> live-instance identity map (the
+-- retained `InstanceRegistry`) restore uses to tell survivor from recreated from added.
 export type Checkpoint = {
 	_intermediate: any,
 	_context: BrineContext.BrineContext,

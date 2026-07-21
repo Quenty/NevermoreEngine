@@ -79,7 +79,7 @@ end
 -- Registers the types against a fake data service backed by `state` and returns the registered types.
 local function registerSlotIndex(state)
 	local cmdr, registered = newFakeCmdr()
-	SaveSlotCmdrUtils.registerSlotIndexType(cmdr, newFakeDataService(state))
+	SaveSlotCmdrUtils.registerSlotIndexType(cmdr :: any, newFakeDataService(state))
 	return registered.slotIndex, registered.slotIndices
 end
 
