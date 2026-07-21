@@ -48,8 +48,8 @@ else
 	print(&quot;Running an undeployed build (Studio)&quot;)
 end
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/NevermoreCLIManifestUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/NevermoreCLIManifestUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/NevermoreCLIManifestUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.847b3181.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.ae1dd7b9.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.54e1baa2.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.dd2b614f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -81,7 +81,7 @@ end
 	<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Running an undeployed build (Studio)"</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span>
 </code></pre>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GameMetadata"><code style="text-decoration:none">GameMetadata</code><a href="#GameMetadata" class="hash-link" aria-label="Direct link to GameMetadata" title="Direct link to GameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L55"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>GameMetadata<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>deployed<!-- -->: </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="types">Types<a href="#types" class="hash-link" aria-label="Direct link to Types" title="Direct link to Types" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GameMetadata"><code style="text-decoration:none">GameMetadata</code><a href="#GameMetadata" class="hash-link" aria-label="Direct link to GameMetadata" title="Direct link to GameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L56"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>GameMetadata<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>deployed<!-- -->: </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
 <p>true only when injected by a <code>nevermore deploy</code></p>
 </span></span></div><div><code>commit<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>short git commit SHA the build was made from</p>
@@ -89,6 +89,8 @@ end
 <p>full git commit SHA the build was made from</p>
 </span></span></div><div><code>branch<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>git branch the build was made from</p>
+</span></span></div><div><code>packageVersion<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
+<p><code>version</code> from the deploying package's package.json (e.g. "1.0.0")</p>
 </span></span></div><div><code>target<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>deploy target name (e.g. "test", "integration")</p>
 </span></span></div><div><code>timestamp<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
@@ -105,7 +107,7 @@ end
   other than <code>deployed</code> is optional -- older CLI versions may not populate all
   of them, and none are present in an undeployed build.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ManifestPlace"><code style="text-decoration:none">ManifestPlace</code><a href="#ManifestPlace" class="hash-link" aria-label="Direct link to ManifestPlace" title="Direct link to ManifestPlace" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L82"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>ManifestPlace<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string?</code></div><div><code>placeId<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>universeId<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ManifestPlace"><code style="text-decoration:none">ManifestPlace</code><a href="#ManifestPlace" class="hash-link" aria-label="Direct link to ManifestPlace" title="Direct link to ManifestPlace" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L84"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code class="purple_ieR2">interface</code> <code>ManifestPlace<!-- --> <!-- -->{</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string?</code></div><div><code>placeId<!-- -->: </code><code class="blue_P4bS">number</code></div><div><code>universeId<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>}</code></div><div>
 <p>
   One place in the deployed target's place table. Deploying a multi-place
   target (e.g. a game with <code>chapter0</code>..<code>chapterN</code> places) bakes every place's
@@ -116,7 +118,7 @@ end
   <code>name</code> is the place name from the deploy target (e.g. "chapter0"); it is
   absent for single-place targets.
 </p>
-</div><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getGameMetadata"><code style="text-decoration:none">getGameMetadata</code><a href="#getGameMetadata" class="hash-link" aria-label="Direct link to getGameMetadata" title="Direct link to getGameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L176"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">getGameMetadata</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#GameMetadata">GameMetadata</a></code></div><div>
+</div><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getGameMetadata"><code style="text-decoration:none">getGameMetadata</code><a href="#getGameMetadata" class="hash-link" aria-label="Direct link to getGameMetadata" title="Direct link to getGameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L180"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">getGameMetadata</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#GameMetadata">GameMetadata</a></code></div><div>
 <p>Returns a snapshot of the deploy metadata for the running place.</p>
 <p>
   Safe to call on both the client and the server. On the client the metadata
@@ -128,18 +130,18 @@ end
   <code>instance</code> defaults to the manifest module itself (where the CLI injects the
   data); pass an instance to parse metadata attributes off somewhere else.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isDeployed"><code style="text-decoration:none">isDeployed</code><a href="#isDeployed" class="hash-link" aria-label="Direct link to isDeployed" title="Direct link to isDeployed" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L187"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">isDeployed</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isDeployed"><code style="text-decoration:none">isDeployed</code><a href="#isDeployed" class="hash-link" aria-label="Direct link to isDeployed" title="Direct link to isDeployed" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L191"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">isDeployed</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>
   Returns true if the running place was deployed through <code>nevermore deploy</code>.
   Returns false in Studio and in any place that was never deployed via the CLI.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="observeGameMetadata"><code style="text-decoration:none">observeGameMetadata</code><a href="#observeGameMetadata" class="hash-link" aria-label="Direct link to observeGameMetadata" title="Direct link to observeGameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L199"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">observeGameMetadata</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#GameMetadata">GameMetadata</a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="observeGameMetadata"><code style="text-decoration:none">observeGameMetadata</code><a href="#observeGameMetadata" class="hash-link" aria-label="Direct link to observeGameMetadata" title="Direct link to observeGameMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L203"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">observeGameMetadata</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#GameMetadata">GameMetadata</a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Observes the deploy metadata, firing immediately with the current snapshot
   and again whenever any field changes (for example when the metadata first
   replicates to a client).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getPlaces"><code style="text-decoration:none">getPlaces</code><a href="#getPlaces" class="hash-link" aria-label="Direct link to getPlaces" title="Direct link to getPlaces" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L227"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">getPlaces</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#ManifestPlace">ManifestPlace</a></code><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getPlaces"><code style="text-decoration:none">getPlaces</code><a href="#getPlaces" class="hash-link" aria-label="Direct link to getPlaces" title="Direct link to getPlaces" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L231"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">getPlaces</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#ManifestPlace">ManifestPlace</a></code><code class="purple_ieR2">}</code></div><div>
 <p>
   Returns every place in the deployed target, so a running place can look up a
   sibling place's <code>placeId</code> (for example to teleport between chapters) without
@@ -153,7 +155,7 @@ end
   <code>instance</code> defaults to the manifest module itself; pass an instance to parse
   the place table off somewhere else.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="observePlaces"><code style="text-decoration:none">observePlaces</code><a href="#observePlaces" class="hash-link" aria-label="Direct link to observePlaces" title="Direct link to observePlaces" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L239"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">observePlaces</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#ManifestPlace">ManifestPlace</a></code><code class="purple_ieR2">}</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="observePlaces"><code style="text-decoration:none">observePlaces</code><a href="#observePlaces" class="hash-link" aria-label="Direct link to observePlaces" title="Direct link to observePlaces" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua#L243"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>NevermoreCLIManifestUtils<!-- -->.</code><code class="green_DgR4">observePlaces</code><code>(</code><code>instance<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Instance" target="_blank" rel="noopener noreferrer">Instance?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/NevermoreCLIManifestUtils#ManifestPlace">ManifestPlace</a></code><code class="purple_ieR2">}</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Observes the deployed target's place table, firing immediately with the
   current list and again whenever attributes change (for example when the
@@ -179,7 +181,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 176,
+                &quot;line&quot;: 180,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         },
@@ -201,7 +203,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 187,
+                &quot;line&quot;: 191,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         },
@@ -223,7 +225,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 199,
+                &quot;line&quot;: 203,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         },
@@ -245,7 +247,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 227,
+                &quot;line&quot;: 231,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         },
@@ -267,7 +269,7 @@ end
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 239,
+                &quot;line&quot;: 243,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         }
@@ -299,6 +301,11 @@ end
                     &quot;desc&quot;: &quot;git branch the build was made from&quot;
                 },
                 {
+                    &quot;name&quot;: &quot;packageVersion&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;,
+                    &quot;desc&quot;: &quot;`version` from the deploying package&#x27;s package.json (e.g. \&quot;1.0.0\&quot;)&quot;
+                },
+                {
                     &quot;name&quot;: &quot;target&quot;,
                     &quot;lua_type&quot;: &quot;string?&quot;,
                     &quot;desc&quot;: &quot;deploy target name (e.g. \&quot;test\&quot;, \&quot;integration\&quot;)&quot;
@@ -325,7 +332,7 @@ end
                 }
             ],
             &quot;source&quot;: {
-                &quot;line&quot;: 55,
+                &quot;line&quot;: 56,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         },
@@ -350,7 +357,7 @@ end
                 }
             ],
             &quot;source&quot;: {
-                &quot;line&quot;: 82,
+                &quot;line&quot;: 84,
                 &quot;path&quot;: &quot;src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua&quot;
             }
         }
