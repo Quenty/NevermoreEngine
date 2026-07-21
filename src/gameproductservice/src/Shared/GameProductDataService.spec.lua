@@ -11,6 +11,7 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
 local Jest = require("Jest")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -118,6 +119,36 @@ describe("GameProductDataService server-only prompting", function()
 		expect(function()
 			service:SetServerOnlyPrompting(true)
 		end).toThrow()
+		context.destroy()
+	end)
+end)
+
+describe("GameProductDataService ownership overrides", function()
+	it("should refuse to set an ownership override from the client realm", function()
+		local context = setup(TieRealms.CLIENT)
+		local service = context.gameProductDataService
+		local fakePlayer = Instance.new("Folder")
+
+		-- The realm guard is checked before anything else, so a player can never grant themselves
+		-- ownership from the client.
+		expect(function()
+			service:SetPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123, true)
+		end).toThrow()
+
+		fakePlayer:Destroy()
+		context.destroy()
+	end)
+
+	it("should refuse to clear an ownership override from the client realm", function()
+		local context = setup(TieRealms.CLIENT)
+		local service = context.gameProductDataService
+		local fakePlayer = Instance.new("Folder")
+
+		expect(function()
+			service:ClearPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123)
+		end).toThrow()
+
+		fakePlayer:Destroy()
 		context.destroy()
 	end)
 end)

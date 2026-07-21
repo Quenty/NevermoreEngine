@@ -60,6 +60,7 @@ function GameProductServiceClient.Init(self: GameProductServiceClient, serviceBa
 	-- Internal
 	self._gameProductDataService = self._serviceBag:GetService(require("GameProductDataService"))
 	self._serviceBag:GetService(require("PlayerProductManagerClient"))
+	self._serviceBag:GetService((require :: any)("GameProductCmdrServiceClient"))
 
 	-- Additional API for ergonomics
 	self.GamePassPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(gamePassId)
@@ -199,6 +200,12 @@ function GameProductServiceClient.PromisePlayerOwnership(
 
 	return self._gameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
 end
+
+--[=[
+	Ownership overrides are intentionally not settable from the client. They are server-authoritative
+	and replicated read-only (see [GameProductService.SetPlayerOwnershipOverride]), so a player can
+	never grant themselves ownership. Read ownership with [GameProductServiceClient.ObservePlayerOwnership].
+]=]
 
 --[=[
 	Observes if the player owns this cloud asset or not

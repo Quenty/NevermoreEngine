@@ -14,6 +14,7 @@ local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableMap = require("ObservableMap")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -24,9 +25,23 @@ local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
-local ValueObject = require("ValueObject")
 
-export type SaveSlotSummaryProvider = (Player, any) -> Observable.Observable<string>
+-- A summary provider contributes one named piece of a slot's Summary. It is called with the player and
+-- the slot's DataStoreStage and returns an Observable of a JSON-serializable value. Providers are
+-- aggregated into a table keyed by their registered name; see RegisterSummaryProvider and _setupSummary.
+export type SummaryProvider = (Player, DataStoreStage.DataStoreStage) -> Observable.Observable<any>
+
+-- A provider that errors (when called, or mid-stream) contributes this sentinel rather than stalling or
+-- failing the whole aggregate; _setupSummary strips it back out before writing the Summary. Compared by
+-- identity, so it never collides with a real value (even an empty table) a provider might emit.
+local NONE = {}
+
+-- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
+-- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
+export type SaveSlotCreateMetadata = {
+	SlotName: string?,
+	Summary: SaveSlotData.SaveSlotSummary?,
+}
 
 local HasSaveSlots = setmetatable({}, HasSaveSlotsBase)
 HasSaveSlots.ClassName = "HasSaveSlots"
@@ -45,9 +60,12 @@ export type HasSaveSlots =
 			_dataStore: any,
 			_systemStore: any,
 			_metadataStore: any,
-			_summaryProvider: ValueObject.ValueObject<SaveSlotSummaryProvider?>,
+			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
+			_playSessionSlotId: SaveSlotData.SlotId?,
+			_playSessionStart: number?,
+			_playSessionLastFlush: number?,
 		},
 		{} :: typeof({ __index = HasSaveSlots })
 	))
@@ -67,13 +85,14 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 
 	self._slotMap = {}
 
-	self._summaryProvider = self._maid:Add(ValueObject.new(nil))
+	self._summaryProviders = self._maid:Add(ObservableMap.new())
 
 	self._loadPromise = self._maid:GivePromise(self:_promiseLoadSlots())
 
 	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "HasSaveSlots"))
 
 	self:_setupSummary()
+	self:_setupPlaytimeTracking()
 	self:_setupRemotes()
 
 	self._maid:GiveTask(HasSaveSlotsInterface.Server:Implement(self._obj, self))
@@ -185,7 +204,7 @@ end
 function HasSaveSlots.PromiseCreateSlot(
 	self: HasSaveSlots,
 	slotIndex: number,
-	metadata: SaveSlotData.SaveSlotMetadata?
+	metadata: SaveSlotCreateMetadata?
 ): Promise.Promise<SaveSlotData.SlotId>
 	return (self._loadPromise :: any):Then(function()
 		if (slotIndex < 1) or (slotIndex > self.MaxSlotCount.Value) then
@@ -209,6 +228,67 @@ function HasSaveSlots.PromiseCreateSlot(
 
 		self:_buildSlot(slotId, data, true)
 		return slotId
+	end)
+end
+
+--[=[
+	Duplicates the slot with the given ID into a new slot at the lowest free index,
+	copying its saved data. Resolves to the new slot's id. The copy is not selected,
+	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
+	" (Copy)". Rejects when the source slot is missing or every index is in use.
+]=]
+function HasSaveSlots.PromiseDuplicateSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		local sourceSlot = self._slotMap[slotId]
+		if not sourceSlot then
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
+		end
+
+		-- Lowest free positive index, filling gaps left by deletions (mirrors PromiseSelectNewSaveSlot).
+		local usedIndices = {}
+		for _, slot in self._slotMap do
+			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+		end
+		local freeIndex = 1
+		while usedIndices[freeIndex] do
+			freeIndex += 1
+		end
+		if freeIndex > self.MaxSlotCount.Value then
+			return (Promise :: any).rejected("All slots are already in use")
+		end
+
+		local sourceMetadata = SaveSlotData:Get(sourceSlot)
+
+		-- Read the source's saved data before creating the copy so a read failure leaves no orphan slot.
+		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
+			-- The default slot shares the player's root store with the SaveSlots system data. Never carry
+			-- that system key across into the copy's saved data.
+			local slotData = if type(sourceData) == "table" then table.clone(sourceData) else {}
+			slotData[SaveSlotConstants.SYSTEM_STORE_KEY] = nil
+
+			return self:PromiseCreateSlot(freeIndex, {
+				SlotName = `{sourceMetadata.SlotName} (Copy)`,
+				Summary = sourceMetadata.Summary,
+			}):Then(function(newSlotId: SaveSlotData.SlotId)
+				local destStore = self:_getSlotStore(newSlotId)
+
+				if destStore == self._dataStore then
+					-- The copy is the default slot, whose store is the shared root. Merge so the SaveSlots
+					-- system store living alongside it survives (a plain Overwrite would wipe it).
+					destStore:OverwriteMerge(slotData)
+				else
+					destStore:Overwrite(slotData)
+				end
+
+				-- Flush so the duplicated data survives a crash before the next autosave.
+				return self._dataStore:Save():Then(function()
+					return newSlotId
+				end)
+			end)
+		end)
 	end)
 end
 
@@ -288,6 +368,80 @@ function HasSaveSlots.PromiseDeleteAllSlots(self: HasSaveSlots): Promise.Promise
 			end)
 		end
 		return promise
+	end)
+end
+
+--[=[
+	Resets the slot with the given id to a fresh empty one -- equivalent to deleting the slot
+	and creating a new one at the same index. The slot keeps its index and name; its saved data
+	and metadata (timestamps) start fresh. Resolves to the new slot id.
+
+	When the reset slot is the active slot, the selection clears and then reselects the fresh
+	slot: everything bound to [HasSaveSlots.ObserveActiveSlotStoreBrio] tears down as the
+	selection clears and rebuilds against the empty store on reselect, so consumers reset
+	reactively without wiping their own state. A non-active slot is left unselected, and its
+	"Continue" pointer (when it was the last-active slot) is carried across to the fresh id so
+	the reset slot stays resumable. Rejects when the slot is missing.
+]=]
+function HasSaveSlots.PromiseResetSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function(): any
+		local slot = self._slotMap[slotId]
+		if not slot then
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
+		end
+
+		local metadata = SaveSlotData:Get(slot)
+		local wasActive = (slotId == self.ActiveSlotId.Value)
+		-- PromiseDeleteSlot clears the continue pointer when it targets the last-active slot; capture it
+		-- now so the non-active path can move it onto the fresh slot id below.
+		local wasLastActive = (slotId == self._lastActiveSlotId)
+
+		if wasActive then
+			-- Clear the selection so the slot is deletable, skipping the deselect flush that would
+			-- persist progress we are about to delete.
+			self.ActiveSlotId.Value = nil
+		end
+
+		return self:PromiseDeleteSlot(slotId)
+			:Then(function()
+				return self:PromiseCreateSlot(metadata.SlotIndex, { SlotName = metadata.SlotName })
+			end)
+			:Then(function(newSlotId: SaveSlotData.SlotId)
+				if wasActive then
+					-- Reselecting restores the continue pointer via the ActiveSlotId hook.
+					return self:PromiseSelectSlot(newSlotId):Then(function()
+						return newSlotId
+					end)
+				end
+
+				-- Non-active reset never reselects, so carry the resume pointer onto the fresh id
+				-- ourselves when this slot was the one "Continue" would resume.
+				if wasLastActive then
+					self._lastActiveSlotId = newSlotId
+					self.LastActiveSlotId.Value = newSlotId
+				end
+
+				return newSlotId
+			end)
+	end)
+end
+
+--[=[
+	Resets the active slot to a fresh empty one -- see [HasSaveSlots.PromiseResetSlot]. The slot
+	keeps its index and name; its saved data and metadata (timestamps) start fresh, and the fresh
+	slot stays selected. Resolves to the new slot id, or nil when no slot is active.
+]=]
+function HasSaveSlots.PromiseResetActiveSlot(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
+	return (self._loadPromise :: any):Then(function(): any
+		local slotId = self.ActiveSlotId.Value
+		if not slotId then
+			return nil -- Nothing selected to reset
+		end
+
+		return self:PromiseResetSlot(slotId)
 	end)
 end
 
@@ -411,10 +565,20 @@ function HasSaveSlots.PromiseSelectNewSaveSlot(self: HasSaveSlots): Promise.Prom
 end
 
 --[=[
-	Sets the summary provider
+	Registers a named summary provider. Every registered provider's current value is aggregated into
+	the active slot's Summary, keyed by `name` (see [HasSaveSlots.PromiseGetSlotMetadata]). Registering
+	the same name again replaces the previous provider. Returns a function that unregisters the provider
+	(also give it to a [Maid]).
+
+	@param name string
+	@param provider SummaryProvider
+	@return () -> ()
 ]=]
-function HasSaveSlots.SetSummaryProvider(self: HasSaveSlots, provider: SaveSlotSummaryProvider?): ()
-	self._summaryProvider.Value = provider
+function HasSaveSlots.RegisterSummaryProvider(self: HasSaveSlots, name: string, provider: SummaryProvider): () -> ()
+	assert(type(name) == "string", "Bad name")
+	assert(type(provider) == "function", "Bad provider")
+
+	return self._summaryProviders:Set(name, provider :: any)
 end
 
 -- Server realm hook for HasSaveSlotsBase: the incoming slot id is whatever the player teleported in
@@ -489,7 +653,9 @@ function HasSaveSlots._buildSlot(
 	end
 
 	-- Store mutable metadata on change
-	for _, key in { "SlotName", "CreatedTime", "LastPlayedTime", "Summary" } do
+	for _, key in
+		{ "SlotName", "CreatedTime", "LastPlayedTime", "Summary", "TimePlayed", "PlayCount", "LastSessionLength" }
+	do
 		attributes[key].Value = data[key]
 		maid:GiveTask(metadataStore:StoreOnValueChange(key, attributes[key]))
 
@@ -522,33 +688,164 @@ function HasSaveSlots._setupSummary(self: HasSaveSlots): ()
 
 			local maid, slotStore = brio:ToMaidAndValue()
 
-			maid:GiveTask(self._summaryProvider
-				:Observe()
-				:Pipe({
-					Rx.switchMap(function(provider: SaveSlotSummaryProvider?)
-						if not provider then
-							return Rx.of("") :: any
-						end
-
-						local success, observable = pcall(provider, self._obj, slotStore)
-						if not success then
-							warn(`[HasSaveSlots] Summary provider errored: {observable}`)
-							return Rx.of("") :: any
-						end
-
-						return observable
-					end) :: any,
-				})
-				:Subscribe(function(summary: string)
-					if type(summary) ~= "string" then
-						warn(`[HasSaveSlots] Summary provider emitted non-string ({typeof(summary)})`)
-						return
-					end
-
-					SaveSlotData.Summary:Set(activeSlot, summary)
-				end))
+			maid:GiveTask(self:_observeSummary(slotStore):Subscribe(function(summary: SaveSlotData.SaveSlotSummary)
+				-- An empty aggregate (no providers, or every one errored/contributed nothing) clears the
+				-- Summary rather than persisting an empty table.
+				SaveSlotData.Summary:Set(activeSlot, if next(summary) ~= nil then summary else nil)
+			end))
 		end)
 	)
+end
+
+-- Aggregates every registered summary provider's current value into one table keyed by provider name,
+-- re-aggregating whenever a provider is registered or unregistered. Always emits a table (possibly
+-- empty); providers that contribute nothing are simply absent from it.
+function HasSaveSlots._observeSummary(
+	self: HasSaveSlots,
+	slotStore: DataStoreStage.DataStoreStage
+): Observable.Observable<SaveSlotData.SaveSlotSummary>
+	return self._summaryProviders:ObserveKeyList():Pipe({
+		Rx.switchMap(function(names: { string })
+			if #names == 0 then
+				return Rx.of({}) :: any
+			end
+
+			local observablesByName = {}
+			for _, name in names do
+				observablesByName[name] = self:_observeProviderValue(name, slotStore)
+			end
+
+			return Rx.combineLatest(observablesByName):Pipe({
+				Rx.map(function(valuesByName: { [string]: any }): SaveSlotData.SaveSlotSummary
+					local summary = {}
+					for name, value in valuesByName do
+						if value ~= NONE then
+							summary[name] = value
+						end
+					end
+					return summary
+				end) :: any,
+			}) :: any
+		end) :: any,
+	}) :: any
+end
+
+-- Observes the value contributed by the provider registered under `name`, isolating it: an error when
+-- calling the provider, a non-Observable return, or a mid-stream error all resolve to the NONE sentinel
+-- so one bad provider neither stalls nor fails the aggregate. Tracks provider replacement at `name`.
+function HasSaveSlots._observeProviderValue(
+	self: HasSaveSlots,
+	name: string,
+	slotStore: DataStoreStage.DataStoreStage
+): Observable.Observable<any>
+	return self._summaryProviders:ObserveAtKey(name):Pipe({
+		Rx.switchMap(function(provider: SummaryProvider?)
+			if not provider then
+				return Rx.of(NONE) :: any
+			end
+
+			local success, observable = pcall(provider, self._obj, slotStore)
+			if not success then
+				warn(`[HasSaveSlots] Summary provider {name} errored: {observable}`)
+				return Rx.of(NONE) :: any
+			end
+
+			if not Observable.isObservable(observable) then
+				warn(`[HasSaveSlots] Summary provider {name} did not return an Observable`)
+				return Rx.of(NONE) :: any
+			end
+
+			return (observable :: any):Pipe({
+				Rx.catchError(function(err)
+					warn(`[HasSaveSlots] Summary provider {name} stream errored: {err}`)
+					return Rx.of(NONE)
+				end) :: any,
+			})
+		end) :: any,
+	}) :: any
+end
+
+--[=[
+	Accrues per-slot playtime automatically. A "session" spans the time a slot is the active slot:
+	selecting a slot begins one (bumping PlayCount), and deselecting, switching, or unbinding ends
+	it. Elapsed wall time is folded into the slot's TimePlayed from a datastore saving callback, so
+	it persists on exactly the cadence the data is written -- always fresh at save time, with no
+	separate timer -- and again at each session boundary.
+]=]
+function HasSaveSlots._setupPlaytimeTracking(self: HasSaveSlots): ()
+	self._playSessionSlotId = nil
+	self._playSessionStart = nil
+	self._playSessionLastFlush = nil
+
+	-- The active slot bounds the session: end the previous one (if any) and begin the new one.
+	self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
+		self:_endPlaySession()
+
+		local activeSlotId = self.ActiveSlotId.Value
+		if activeSlotId ~= nil then
+			self:_beginPlaySession(activeSlotId)
+		end
+	end))
+
+	-- Fold accrued time into TimePlayed just before every save so the written value is current. The
+	-- callback runs before the save serializes staged data (see DataStore._syncData), so the flush is
+	-- captured by that same save -- including the final save-on-leave.
+	self._maid:GivePromise(self._loadPromise):Then(function()
+		self._maid:GiveTask(self._dataStore:AddSavingCallback(function()
+			self:_flushPlaytime()
+		end))
+	end)
+
+	-- Best-effort flush on unbind for the case where the binder tears down before that final save.
+	self._maid:GiveTask(function()
+		self:_endPlaySession()
+	end)
+end
+
+function HasSaveSlots._beginPlaySession(self: HasSaveSlots, slotId: SaveSlotData.SlotId): ()
+	local now = os.time()
+	self._playSessionSlotId = slotId
+	self._playSessionStart = now
+	self._playSessionLastFlush = now
+
+	local slot = self._slotMap[slotId]
+	if slot then
+		SaveSlotData.PlayCount:Set(slot, (SaveSlotData.PlayCount:Get(slot) or 0) + 1)
+	end
+end
+
+function HasSaveSlots._flushPlaytime(self: HasSaveSlots): ()
+	local slotId = self._playSessionSlotId
+	if slotId == nil then
+		return
+	end
+
+	local slot = self._slotMap[slotId]
+	if not slot then
+		return
+	end
+
+	local now = os.time()
+
+	-- Add only the time since the last flush so repeated flushes within a session never double count.
+	local sinceFlush = now - (self._playSessionLastFlush or now)
+	if sinceFlush > 0 then
+		SaveSlotData.TimePlayed:Set(slot, (SaveSlotData.TimePlayed:Get(slot) or 0) + sinceFlush)
+		self._playSessionLastFlush = now
+	end
+
+	SaveSlotData.LastSessionLength:Set(slot, now - (self._playSessionStart or now))
+end
+
+function HasSaveSlots._endPlaySession(self: HasSaveSlots): ()
+	if self._playSessionSlotId == nil then
+		return
+	end
+
+	self:_flushPlaytime()
+	self._playSessionSlotId = nil
+	self._playSessionStart = nil
+	self._playSessionLastFlush = nil
 end
 
 function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()

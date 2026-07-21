@@ -278,6 +278,67 @@ function GameProductDataService.PromisePlayerOwnership(
 end
 
 --[=[
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
+
+	The override is stored in a replicated attribute and applied to every realm's ownership tracker,
+	so it drives client-side ownership-gated UI. It can only be set from the server: this rejects on
+	the client realm, and [GameProductServiceClient] deliberately exposes no setter, so a player can
+	never grant themselves ownership.
+
+	@server
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@param ownsAsset boolean?
+	@return Promise
+]=]
+function GameProductDataService.SetPlayerOwnershipOverride(
+	self: GameProductDataService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number,
+	ownsAsset: boolean?
+): Promise.Promise<()>
+	-- Server authority: ownership overrides are never assignable from a client (otherwise a player
+	-- could grant themselves ownership of paid assets).
+	assert(
+		self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT,
+		"[GameProductDataService] - Ownership overrides can only be set from the server"
+	)
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
+
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+		ownershipTracker:SetOwnershipOverride(idOrKey, ownsAsset)
+	end)
+end
+
+--[=[
+	Clears any ownership override for the asset, so ownership falls back to the cloud query.
+	Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`, and likewise
+	server-only.
+
+	@server
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise
+]=]
+function GameProductDataService.ClearPlayerOwnershipOverride(
+	self: GameProductDataService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<()>
+	return self:SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)
+end
+
+--[=[
 	Returns true if item has been purchased this session
 
 	@param player Player

@@ -205,6 +205,60 @@ function GameProductService.PromisePlayerOwnership(
 end
 
 --[=[
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
+
+	The override is replicated read-only to the client and applied to every realm's ownership
+	tracker, so it drives client-side ownership-gated UI. Useful for testing ownership-gated behavior
+	(including paid-access games, which cannot be prompted in-experience) or granting access from a
+	non-Roblox condition. Only the server may set it; the client has no setter, so a player can never
+	grant themselves ownership.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@param ownsAsset boolean?
+	@return Promise
+]=]
+function GameProductService.SetPlayerOwnershipOverride(
+	self: GameProductService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number,
+	ownsAsset: boolean?
+): Promise.Promise<()>
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
+
+	return self._gameProductDataService:SetPlayerOwnershipOverride(player, assetType, idOrKey, ownsAsset)
+end
+
+--[=[
+	Clears any local ownership override for the asset, so ownership falls back to the cloud
+	query. Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise
+]=]
+function GameProductService.ClearPlayerOwnershipOverride(
+	self: GameProductService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<()>
+	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._gameProductDataService:ClearPlayerOwnershipOverride(player, assetType, idOrKey)
+end
+
+--[=[
 	Checks if the asset is ownable and if it is, checks player ownership. Otherwise, it checks if the asset
 	has been purchased this session. If the asset has not been purchased this session it prompts the user to
 	purchase the item.

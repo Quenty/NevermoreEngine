@@ -13,6 +13,7 @@ local HasSaveSlots = require("HasSaveSlots")
 local HasSaveSlotsData = require("HasSaveSlotsData")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableMap = require("ObservableMap")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
@@ -31,7 +32,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_hasSaveSlotsBinder: any,
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
-		_defaultSummaryProvider: HasSaveSlots.SaveSlotSummaryProvider?,
+		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
 		_remoting: any,
 		_teleportDataService: any,
 	},
@@ -56,6 +57,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 
 	self._selectionRequired = false
 	self._maxSlotCount = 1
+	self._defaultSummaryProviders = self._maid:Add(ObservableMap.new())
 
 	self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, "SaveSlotService"))
 
@@ -65,16 +67,12 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 end
 
 function SaveSlotService.Start(self: SaveSlotService)
-	-- Every teleport built through TeleportDataService for a single player carries that player's
-	-- active slot id, so cross-place teleports resume on the same slot without each teleport site
-	-- re-attaching it by hand.
+	-- Every teleport built through TeleportDataService carries each player's own active slot id, so
+	-- cross-place teleports resume on the same slot without each teleport site re-attaching it by hand
+	-- (and a group teleport carries every member's slot, not just a single player's).
 	self._maid:GiveTask(
-		self._teleportDataService:RegisterTeleportDataProvider(function(players: { Player }): { [string]: any }?
-			if #players ~= 1 then
-				return nil
-			end
-
-			local slotId = HasSaveSlotsData.ActiveSlotId:Get(players[1])
+		self._teleportDataService:RegisterPerPlayerTeleportDataProvider(function(player: Player): { [string]: any }?
+			local slotId = HasSaveSlotsData.ActiveSlotId:Get(player)
 			if type(slotId) == "string" then
 				return { [SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = slotId }
 			end
@@ -91,9 +89,17 @@ function SaveSlotService.Start(self: SaveSlotService)
 
 		-- Pass consumer-specified configs
 		hasSaveSlots.MaxSlotCount.Value = self._maxSlotCount
-		if self._defaultSummaryProvider then
-			hasSaveSlots:SetSummaryProvider(self._defaultSummaryProvider)
-		end
+
+		-- Mirror every default summary provider onto this player, and keep it in sync: a provider
+		-- registered or unregistered later is added to or removed from every bound player reactively.
+		maid:GiveTask(self._defaultSummaryProviders:ObservePairsBrio():Subscribe(function(pairBrio)
+			if pairBrio:IsDead() then
+				return
+			end
+			local pairMaid = pairBrio:ToMaid()
+			local name, provider = pairBrio:GetValue()
+			pairMaid:GiveTask(hasSaveSlots:RegisterSummaryProvider(name, provider))
+		end))
 
 		-- Select the slot the player teleported in with, or proceed with the default flow
 		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
@@ -186,14 +192,24 @@ function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
 end
 
 --[=[
-	Sets the default slot summary provider
+	Registers a named default summary provider, applied to every player's save slots. Each provider's
+	current value is aggregated into the active slot's Summary, keyed by `name`. Registering or
+	unregistering reflects on all bound players. Returns a function that unregisters the provider (also
+	give it to a [Maid]).
+
+	@param name string
+	@param provider HasSaveSlots.SummaryProvider
+	@return () -> ()
 ]=]
-function SaveSlotService.SetDefaultSummaryProvider(
+function SaveSlotService.RegisterDefaultSummaryProvider(
 	self: SaveSlotService,
-	provider: HasSaveSlots.SaveSlotSummaryProvider
-): ()
+	name: string,
+	provider: HasSaveSlots.SummaryProvider
+): () -> ()
+	assert(type(name) == "string", "Bad name")
 	assert(type(provider) == "function", "Bad provider")
-	self._defaultSummaryProvider = provider
+
+	return self._defaultSummaryProviders:Set(name, provider :: any)
 end
 
 --[=[
@@ -272,6 +288,15 @@ function SaveSlotService.PromiseDeleteSlot(
 ): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseDeleteSlot(slotId)
+	end)
+end
+
+--[=[
+	Resets the player's active slot to a fresh empty one
+]=]
+function SaveSlotService.PromiseResetActiveSlot(self: SaveSlotService, player: Player): Promise.Promise<any>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseResetActiveSlot()
 	end)
 end
 

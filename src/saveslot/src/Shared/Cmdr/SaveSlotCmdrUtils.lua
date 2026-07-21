@@ -24,6 +24,21 @@ function SaveSlotCmdrUtils.registerSlotIndexType(cmdr, saveSlotDataService)
 		Parse = function(keys)
 			return tonumber(keys[1])
 		end,
+
+		-- "." resolves to the player's current slot: the active slot when one is selected, otherwise the
+		-- slot they last played. Cmdr feeds this string back through Transform, so it fuzzy matches the
+		-- real slot. MakeListableType inherits Default, so "." works for delete-save-slot's list too.
+		Default = function(player: Player): string?
+			local slotId = saveSlotDataService:GetLastActiveSlotId(player)
+			if not slotId then
+				return nil
+			end
+			local metadata = saveSlotDataService:GetSlotMetadata(player, slotId)
+			if type(metadata) ~= "table" then
+				return nil
+			end
+			return tostring(metadata.SlotIndex)
+		end,
 	}
 
 	cmdr.Registry:RegisterType("slotIndex", slotIndex)
