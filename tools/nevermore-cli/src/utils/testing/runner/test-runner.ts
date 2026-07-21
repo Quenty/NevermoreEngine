@@ -14,6 +14,7 @@ import {
   injectDeployMetadataInPlaceAsync,
   packageUsesManifestAsync,
 } from '../../deploy/deploy-metadata.js';
+import { readPackageVersionAsync } from '../../nevermore-cli-utils.js';
 
 export interface SingleTestResult {
   success: boolean;
@@ -78,6 +79,7 @@ export async function runSingleTestAsync(
         timestamp: new Date().toISOString(),
         placeId: builtPlace.target.placeId,
         universeId: builtPlace.target.universeId,
+        packageVersion: await readPackageVersionAsync(packagePath),
       })
     );
   }

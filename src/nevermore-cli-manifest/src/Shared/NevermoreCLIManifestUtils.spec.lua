@@ -26,6 +26,7 @@ local function makeInjectedInstance(): Instance
 	instance:SetAttribute("Commit", "a1b2c3d")
 	instance:SetAttribute("Version", "a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4")
 	instance:SetAttribute("Branch", "main")
+	instance:SetAttribute("PackageVersion", "1.0.0")
 	instance:SetAttribute("Target", "test")
 	instance:SetAttribute("Timestamp", "2026-07-15T00:00:00.000Z")
 	instance:SetAttribute("Published", false)
@@ -61,6 +62,8 @@ describe("NevermoreCLIManifestUtils injection", function()
 		expect(type(metadata.version)).toEqual("string")
 		expect(#(metadata.version :: string) >= #(metadata.commit :: string)).toEqual(true)
 		expect(string.match(metadata.version :: string, "^%x+$")).never.toBeNil()
+
+		expect(metadata.packageVersion).toEqual("1.0.0")
 
 		expect(metadata.target).toEqual("test")
 		expect(metadata.published).toEqual(false)

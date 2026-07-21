@@ -75,6 +75,8 @@ export interface DeployPlaceInfo {
   timestamp: string;
   placeId: number;
   universeId: number;
+  /** `version` from the deploying package's package.json (e.g. "1.0.0"), if any. */
+  packageVersion?: string;
 }
 
 /**
@@ -108,6 +110,7 @@ export function buildDeployMetadataAttributes(
   if (git.commit) attributes.Commit = git.commit;
   if (git.version) attributes.Version = git.version;
   if (git.branch) attributes.Branch = git.branch;
+  if (place.packageVersion) attributes.PackageVersion = place.packageVersion;
   if (places && places.length > 0) {
     attributes.Places = JSON.stringify(
       places.map((p) => ({
