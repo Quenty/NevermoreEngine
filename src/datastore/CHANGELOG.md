@@ -1,24 +1,13 @@
-# v13.44.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
-- feat: Add data store overflow handling ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.43.0...@quenty/datastore@13.44.0) (2026-07-21)
+
+### Features
+
+- Add data store overflow handling ([96df5f5](https://github.com/Quenty/NevermoreEngine/commit/96df5f57bff20c41a8293dfaadb951e1831297b3))
 
 # [13.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.42.0...@quenty/datastore@13.43.0) (2026-07-20)
 

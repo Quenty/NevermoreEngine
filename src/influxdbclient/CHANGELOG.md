@@ -1,24 +1,11 @@
-# v7.38.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-- @ ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.37.0...@quenty/influxdbclient@7.38.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/influxdbclient
 
 # [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.36.0...@quenty/influxdbclient@7.37.0) (2026-07-18)
 

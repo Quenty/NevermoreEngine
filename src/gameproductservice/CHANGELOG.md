@@ -1,26 +1,18 @@
-# v14.58.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
-- feat: Game ownership works ([@Quenty](https://github.com/Quenty))
-- feat: Add kinda risky ownership override method + cmdr commands ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-- fix: Resolve luau-lsp and moonwave lint failures ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.57.0...@quenty/gameproductservice@14.58.0) (2026-07-21)
+
+### Bug Fixes
+
+- Resolve luau-lsp and moonwave lint failures ([286e352](https://github.com/Quenty/NevermoreEngine/commit/286e3527b52a86639fc0485359141d7805b3fefa))
+
+### Features
+
+- Add kinda risky ownership override method + cmdr commands ([b0aaa68](https://github.com/Quenty/NevermoreEngine/commit/b0aaa68ebfab7f34da05b57bca77b35bf7890c3b))
+- Game ownership works ([c09bdc3](https://github.com/Quenty/NevermoreEngine/commit/c09bdc32174fc17cfac7aeb6c7849b556be9cec4))
 
 # [14.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.56.0...@quenty/gameproductservice@14.57.0) (2026-07-20)
 

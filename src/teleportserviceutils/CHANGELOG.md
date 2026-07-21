@@ -1,24 +1,13 @@
-# v9.35.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
-- feat: Teleport data service allows teleport data per a player and per a packet ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.34.0...@quenty/teleportserviceutils@9.35.0) (2026-07-21)
+
+### Features
+
+- Teleport data service allows teleport data per a player and per a packet ([3c2a88f](https://github.com/Quenty/NevermoreEngine/commit/3c2a88f882b7f490395b5f291b5094d8743a3a04))
 
 # [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.33.0...@quenty/teleportserviceutils@9.34.0) (2026-07-20)
 

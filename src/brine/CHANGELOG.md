@@ -1,28 +1,20 @@
-# v1.9.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
-- feat: Revert brine restoreFromStream ([@Quenty](https://github.com/Quenty))
-- feat: Brine restore/snapshot ([@Quenty](https://github.com/Quenty))
-- feat: Add new brine.restore fnction ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-- fix: Resolve luau-lsp and moonwave lint failures ([@Quenty](https://github.com/Quenty))
-- fix: Fix brine ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.8.0...@quenty/brine@1.9.0) (2026-07-21)
+
+### Bug Fixes
+
+- Fix brine ([277663b](https://github.com/Quenty/NevermoreEngine/commit/277663bc9c83838083d07288ac9c96e56316d3eb))
+- Resolve luau-lsp and moonwave lint failures ([286e352](https://github.com/Quenty/NevermoreEngine/commit/286e3527b52a86639fc0485359141d7805b3fefa))
+
+### Features
+
+- Add new brine.restore fnction ([4a0df0d](https://github.com/Quenty/NevermoreEngine/commit/4a0df0d4ae1593a656b1e2440926d79ee5480f73))
+- Brine restore/snapshot ([ab3ae72](https://github.com/Quenty/NevermoreEngine/commit/ab3ae7246e7b6d1823dd1b29adcd17225279c589))
+- Revert brine restoreFromStream ([070c36f](https://github.com/Quenty/NevermoreEngine/commit/070c36f0b39c985128f6019ac76530fab5a9b975))
 
 # [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.7.0...@quenty/brine@1.8.0) (2026-07-18)
 

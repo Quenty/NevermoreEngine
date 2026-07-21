@@ -1,19 +1,11 @@
-# v7.56.0 (Tue Jul 21 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.55.0...@quenty/secrets@7.56.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/secrets
 
 # [7.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.54.0...@quenty/secrets@7.55.0) (2026-07-20)
 
