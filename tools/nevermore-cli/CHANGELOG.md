@@ -1,20 +1,13 @@
-# v4.41.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add additional metadata to versions [#740](https://github.com/Quenty/NevermoreEngine/pull/740) ([@Quenty](https://github.com/Quenty))
-- feat: Add additional metadata to versions ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.41.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.40.0...@quenty/nevermore-cli@4.41.0) (2026-07-21)
+
+### Features
+
+- Add additional metadata to versions ([c499aef](https://github.com/Quenty/Nevermore/commit/c499aef65462f5814c618920a0533b211a79f516))
 
 # [4.40.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.39.0...@quenty/nevermore-cli@4.40.0) (2026-07-20)
 
