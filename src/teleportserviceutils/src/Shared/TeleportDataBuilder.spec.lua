@@ -1,0 +1,211 @@
+--!strict
+--[[
+	Coverage for the realm-agnostic teleport-data assembly. Fully pure: a fake UserId resolver keys the
+	envelope, so no real Player is needed (a headless cloud test server has none).
+
+	@class TeleportDataBuilder.spec.lua
+]]
+local require = require(script.Parent.loader).load(script)
+
+local Jest = require("Jest")
+local TeleportDataBuilder = require("TeleportDataBuilder")
+local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+-- A fake player is any table carrying a UserId; the builder only ever reads it through the injected
+-- resolver, never as a real Instance.
+local function fakePlayer(userId: number): Player
+	return ({ UserId = userId } :: any) :: Player
+end
+
+local function newBuilder(): TeleportDataBuilder.TeleportDataBuilder
+	return TeleportDataBuilder.new(function(player: Player): number
+		return (player :: any).UserId
+	end)
+end
+
+-- Reads the slice a player would arrive with from freshly built teleport data.
+local function sliceFor(built: { [string]: any }, userId: number): TeleportDataEnvelopeUtils.TeleportDataSlice?
+	return TeleportDataEnvelopeUtils.readSlice(built, userId)
+end
+
+describe("TeleportDataBuilder.new", function()
+	it("defaults the UserId resolver to player.UserId", function()
+		local builder = TeleportDataBuilder.new()
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { slot = "a" }
+		end)
+
+		local built = builder:BuildTeleportData({ fakePlayer(111) })
+		expect(sliceFor(built, 111)).toEqual({ slot = "a" })
+	end)
+end)
+
+describe("TeleportDataBuilder shared data", function()
+	it("carries nothing with no providers and no base data", function()
+		expect(newBuilder():BuildTeleportData({})).toEqual({})
+	end)
+
+	it("delivers base data to any player", function()
+		local built = newBuilder():BuildTeleportData({}, { a = 1, b = "two" })
+		expect(sliceFor(built, 111)).toEqual({ a = 1, b = "two" })
+	end)
+
+	it("merges shared providers together", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { a = 1 }
+		end)
+		builder:RegisterTeleportDataProvider(function()
+			return { b = 2 }
+		end)
+
+		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1, b = 2 })
+	end)
+
+	it("lets base data win over a shared provider key", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { shared = "provider" }
+		end)
+
+		expect(sliceFor(builder:BuildTeleportData({}, { shared = "caller" }), 111)).toEqual({ shared = "caller" })
+	end)
+
+	it("ignores a shared provider that returns nil", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return nil
+		end)
+		builder:RegisterTeleportDataProvider(function()
+			return { a = 1 }
+		end)
+
+		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1 })
+	end)
+
+	it("stops merging a shared provider after it is unregistered", function()
+		local builder = newBuilder()
+		local unregister = builder:RegisterTeleportDataProvider(function()
+			return { a = 1 }
+		end)
+		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1 })
+
+		unregister()
+		expect(builder:BuildTeleportData({})).toEqual({})
+	end)
+end)
+
+describe("TeleportDataBuilder per-player data", function()
+	it("carries a single player's own slice", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function(player)
+			return { slot = "slot-" .. tostring((player :: any).UserId) }
+		end)
+
+		local built = builder:BuildTeleportData({ fakePlayer(111) })
+		expect(sliceFor(built, 111)).toEqual({ slot = "slot-111" })
+		expect(sliceFor(built, 222)).toBeNil()
+	end)
+
+	it("gives each player of a group teleport only their own slice", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function(player)
+			return { userId = (player :: any).UserId }
+		end)
+
+		local built = builder:BuildTeleportData({ fakePlayer(111), fakePlayer(222) })
+		expect(sliceFor(built, 111)).toEqual({ userId = 111 })
+		expect(sliceFor(built, 222)).toEqual({ userId = 222 })
+	end)
+
+	it("merges the shared slice under each player's slice", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { mode = "hard" }
+		end)
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { slot = "a" }
+		end)
+
+		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }), 111)).toEqual({ mode = "hard", slot = "a" })
+	end)
+
+	it("lets a per-player key win over shared and base data (most specific)", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { v = "shared" }
+		end)
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { v = "player" }
+		end)
+
+		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }, { v = "base" }), 111)).toEqual({ v = "player" })
+	end)
+
+	it("does not create a slice for a player whose providers contribute nothing", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return nil
+		end)
+
+		expect(builder:BuildTeleportData({ fakePlayer(111) })).toEqual({})
+	end)
+
+	it("calls the provider once per player with the full player list", function()
+		local builder = newBuilder()
+		local players = { fakePlayer(111), fakePlayer(222) }
+		local seen = {}
+		local receivedList
+		builder:RegisterPerPlayerTeleportDataProvider(function(player, givenPlayers)
+			table.insert(seen, player)
+			receivedList = givenPlayers
+			return nil
+		end)
+
+		builder:BuildTeleportData(players)
+		expect(seen[1]).toBe(players[1])
+		expect(seen[2]).toBe(players[2])
+		expect(receivedList).toBe(players)
+	end)
+
+	it("stops calling a per-player provider after it is unregistered", function()
+		local builder = newBuilder()
+		local unregister = builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { slot = "a" }
+		end)
+		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }), 111)).toEqual({ slot = "a" })
+
+		unregister()
+		expect(builder:BuildTeleportData({ fakePlayer(111) })).toEqual({})
+	end)
+end)
+
+describe("TeleportDataBuilder size guard", function()
+	it("throws when the built data exceeds the size cap", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { blob = string.rep("x", TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES + 1024) }
+		end)
+
+		expect(function()
+			builder:BuildTeleportData({})
+		end).toThrow()
+	end)
+
+	it("throws when a provider returns un-encodable teleport data", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			local cyclic = {}
+			cyclic.self = cyclic
+			return cyclic
+		end)
+
+		expect(function()
+			builder:BuildTeleportData({})
+		end).toThrow()
+	end)
+end)

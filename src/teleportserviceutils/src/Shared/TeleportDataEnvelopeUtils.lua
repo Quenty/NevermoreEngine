@@ -124,6 +124,49 @@ function TeleportDataEnvelopeUtils.readSlice(raw: any, userId: number | string):
 end
 
 --[=[
+	Reads a player's slice from two raw arrived tables of different trust and merges them, with the
+	trusted band winning on conflict. This is the single place the "trusted over non-trusted" precedence
+	lives, so both realms compute the identical unified view.
+
+	A teleport carries the trusted band (server-authored, from the server's join data) in one raw table
+	and the non-trusted band (client-authored, from the client's local teleport data) in the other;
+	either may be nil. Returns nil when neither band carried anything for the player.
+
+	@param trustedRaw any -- raw arrived data trusted for this player (server-authored), or nil
+	@param nonTrustedRaw any -- raw arrived data asserted by the client, or nil
+	@param userId number | string -- the arriving player's UserId
+	@return TeleportDataSlice?
+]=]
+function TeleportDataEnvelopeUtils.readMergedSlice(
+	trustedRaw: any,
+	nonTrustedRaw: any,
+	userId: number | string
+): TeleportDataSlice?
+	local merged: TeleportDataSlice = {}
+
+	-- Non-trusted first, then trusted overwrites -- so a client can never override a key the server set.
+	local nonTrusted = TeleportDataEnvelopeUtils.readSlice(nonTrustedRaw, userId)
+	if nonTrusted ~= nil then
+		for key, value in nonTrusted do
+			merged[key] = value
+		end
+	end
+
+	local trusted = TeleportDataEnvelopeUtils.readSlice(trustedRaw, userId)
+	if trusted ~= nil then
+		for key, value in trusted do
+			merged[key] = value
+		end
+	end
+
+	if next(merged) == nil then
+		return nil
+	end
+
+	return merged
+end
+
+--[=[
 	Approximate serialized byte size of teleport data, via its JSON encoding. Encoding also fails
 	loudly on genuinely un-encodable data (a cyclic table, a function value), so that surfaces here at
 	build time rather than as a broken teleport.

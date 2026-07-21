@@ -161,16 +161,16 @@ function SaveSlotService.GetExplicitSelectionRequired(self: SaveSlotService): bo
 end
 
 --[=[
-	Returns whether the player teleported in carrying a save-slot id -- i.e. arrived via an internal
-	slot teleport rather than a fresh join. This is the sync, presence-only signal (it does not
-	validate the slot still exists); use [HasSaveSlots.PromiseHasSaveSlotFromTeleport] when existence
-	matters.
+	Resolves whether the player teleported in carrying a save-slot id -- i.e. arrived via an internal
+	slot teleport rather than a fresh join. Presence-only (it does not validate the slot still exists);
+	use [HasSaveSlots.PromiseHasSaveSlotFromTeleport] when existence matters. It is a promise because a
+	client-initiated teleport only reaches the server once the client replicates its arrived data.
 
 	@param player Player
-	@return boolean
+	@return Promise<boolean>
 ]=]
-function SaveSlotService.IsInternalTeleport(self: SaveSlotService, player: Player): boolean
-	return self._teleportDataService:HasArrivedValue(player, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+function SaveSlotService.PromiseIsInternalTeleport(self: SaveSlotService, player: Player): Promise.Promise<boolean>
+	return self._teleportDataService:PromiseHasArrivedValue(player, SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
 end
 
 --[=[

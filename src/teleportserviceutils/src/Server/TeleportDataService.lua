@@ -1,13 +1,27 @@
 --!strict
 --[=[
-	Central place to assemble the [TeleportData] a teleport should carry. Systems register a
-	provider once (analytics, save-slot id, ...) and every teleport site builds its data through
-	[TeleportDataService.BuildTeleportData] instead of hand-writing the same table -- so a site can
-	never forget to attach the shared data, and the assembly is unit testable.
+	Server half of the symmetric teleport-data surface. Two responsibilities:
 
-	This service only *builds* data and *reads* the data a player arrived with; it deliberately does
-	not wrap the teleport call itself (that stays on [TeleportServiceUtils]), so we are never forced
-	to route every teleport through here.
+	* **Building** teleport data through a shared [TeleportDataBuilder], so every teleport site assembles
+	  the same envelope from the same providers (see [TeleportDataService.BuildTeleportData]).
+	* **Reading** the data a player arrived with, as a *unified* view across two trust bands.
+
+	The trust split is the load-bearing idea. A player's arrived data reaches the server two ways:
+
+	* the **trusted** band -- `player:GetJoinData().TeleportData` -- which Roblox only populates for a
+	  *server*-initiated teleport, so it is genuinely server-authored and safe to authorize on; and
+	* the **non-trusted** band -- what the *client* read from its own local teleport data
+	  (`GetLocalPlayerTeleportData`) and replicated back to us. A client-initiated teleport (e.g. a menu
+	  teleporting the local player) only ever reaches the server this way, so without it the server is
+	  blind to data the client can see.
+
+	The unified read ([TeleportDataService.PromiseArrivedData]) merges both with the **trusted band
+	winning**, so a client can never override a key the server set. Because the non-trusted band arrives
+	over the network, every read is a [Promise]: it resolves once the client has replicated (or a bounded
+	timeout falls back to the trusted band alone, so a stale client can never hang a read forever). Code
+	that must *not* trust the client reads the trusted band explicitly via
+	[TeleportDataService.PromiseTrustedArrivedData]; the unified accessor is deliberately un-named for
+	trust so trusting client data is always a visible choice.
 
 	@server
 	@class TeleportDataService
@@ -15,28 +29,41 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Maid = require("Maid")
+local Promise = require("Promise")
+local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
+local TeleportDataBuilder = require("TeleportDataBuilder")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 
---[=[
-	Contributes teleport data shared by *every* player in a teleport. Returns nil to contribute
-	nothing.
+export type TeleportDataProvider = TeleportDataBuilder.TeleportDataProvider
+export type PerPlayerTeleportDataProvider = TeleportDataBuilder.PerPlayerTeleportDataProvider
 
-	@type TeleportDataProvider ({ Player }) -> ({ [string]: any }?)
-	@within TeleportDataService
-]=]
-export type TeleportDataProvider = ({ Player }) -> { [string]: any }?
+-- Bounded wait for the client's replication before a read falls back to the trusted band alone. Long
+-- enough to cover a normal join round-trip, short enough that a client that never replicates (crashed,
+-- outdated) cannot stall a slot-load indefinitely.
+local DEFAULT_REPLICATION_TIMEOUT = 8
 
---[=[
-	Contributes teleport data for a *single* player in a teleport (called once per player, with the
-	full player list for context). Returns nil to contribute nothing. This is how per-player data
-	survives a group teleport, where every player would otherwise share one flat table.
-
-	@type PerPlayerTeleportDataProvider (Player, { Player }) -> ({ [string]: any }?)
-	@within TeleportDataService
-]=]
-export type PerPlayerTeleportDataProvider = (Player, { Player }) -> { [string]: any }?
+-- Per-player arrival state. The first of {replication arrives, timeout fires, player leaves} *seals* the
+-- entry: it snapshots both raw bands and resolves `promise`, so every reader -- now or later -- computes
+-- the identical unified view. Later replications are ignored (first-wins), preserving one agreed answer.
+type ArrivalEntry = {
+	maid: Maid.Maid,
+	promise: any,
+	sealed: boolean,
+	-- Boxed test override for the trusted band ({ raw }); nil means read from real join data.
+	trustedOverride: { any }?,
+	-- Snapshotted at seal time so reads never re-read a changing source.
+	trustedRaw: any,
+	nonTrustedRaw: any,
+	-- Set once a read has been requested; injecting a trusted override afterwards would disagree with
+	-- what that reader will see, so the seam asserts against it.
+	read: boolean,
+	resolve: (nonTrustedRaw: any) -> (),
+}
 
 local TeleportDataService = {}
 TeleportDataService.ServiceName = "TeleportDataService"
@@ -45,14 +72,10 @@ export type TeleportDataService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_providers: { TeleportDataProvider },
-		_perPlayerProviders: { PerPlayerTeleportDataProvider },
-		-- Boxed ({ data } where data may be nil) so an injected nil override is distinguishable from
-		-- "no override" and does not fall through to GetJoinData.
-		_arrivedOverrides: { [Player]: { { [string]: any }? } },
-		-- Players whose arrived data has already been read. Injecting a test override after a read
-		-- would silently disagree with what the earlier reader saw, so the seam asserts against it.
-		_arrivedRead: { [Player]: true },
+		_builder: TeleportDataBuilder.TeleportDataBuilder,
+		_remoting: any,
+		_entries: { [Player]: ArrivalEntry },
+		_replicationTimeout: number,
 	},
 	{} :: typeof({ __index = TeleportDataService })
 ))
@@ -62,15 +85,35 @@ function TeleportDataService.Init(self: TeleportDataService, serviceBag: Service
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._providers = {}
-	self._perPlayerProviders = {}
-	self._arrivedOverrides = {}
-	self._arrivedRead = {}
+	self._entries = {}
+	self._replicationTimeout = DEFAULT_REPLICATION_TIMEOUT
+	-- The builder shares the service's UserId resolver so a test override of `_getUserId` keys both the
+	-- built envelope and the arrived-data reads the same way.
+	self._builder = TeleportDataBuilder.new(function(player: Player): number
+		return self:_getUserId(player)
+	end)
+
+	self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, "TeleportDataService"))
+
+	-- Client pushes the raw teleport data it arrived with; we store it as that player's non-trusted band,
+	-- keyed by the *authenticated* sender (never any UserId embedded in the payload).
+	self._maid:GiveTask(self._remoting:Connect("ReplicateArrivedData", function(player: Player, raw: any)
+		self:_onReplicated(player, raw)
+	end))
+
+	-- Client pulls its trusted band -- the part it cannot distinguish inside its own local teleport data.
+	self._maid:GiveTask(self._remoting:Bind("RequestTrustedArrivedData", function(player: Player): any
+		return TeleportDataEnvelopeUtils.readSlice(self:_getTrustedRaw(player), self:_getUserId(player))
+	end))
+
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
+		self:_cleanupPlayer(player)
+	end))
 end
 
 --[=[
-	Registers a provider that contributes teleport data on every [TeleportDataService.BuildTeleportData]
-	call. Returns a function that unregisters the provider (also give it to a [Maid]).
+	Registers a shared provider (contributes to every player's teleport data). See
+	[TeleportDataBuilder.RegisterTeleportDataProvider]. Returns an unregister function.
 
 	@param provider TeleportDataProvider
 	@return () -> ()
@@ -79,22 +122,12 @@ function TeleportDataService.RegisterTeleportDataProvider(
 	self: TeleportDataService,
 	provider: TeleportDataProvider
 ): () -> ()
-	assert(type(provider) == "function", "Bad provider")
-
-	table.insert(self._providers, provider)
-
-	return function()
-		local index = table.find(self._providers, provider)
-		if index then
-			table.remove(self._providers, index)
-		end
-	end
+	return self._builder:RegisterTeleportDataProvider(provider)
 end
 
 --[=[
-	Registers a per-player provider that contributes each player's own slice on every
-	[TeleportDataService.BuildTeleportData] call. Returns a function that unregisters it (also give it
-	to a [Maid]).
+	Registers a per-player provider. See [TeleportDataBuilder.RegisterPerPlayerTeleportDataProvider].
+	Returns an unregister function.
 
 	@param provider PerPlayerTeleportDataProvider
 	@return () -> ()
@@ -103,33 +136,15 @@ function TeleportDataService.RegisterPerPlayerTeleportDataProvider(
 	self: TeleportDataService,
 	provider: PerPlayerTeleportDataProvider
 ): () -> ()
-	assert(type(provider) == "function", "Bad provider")
-
-	table.insert(self._perPlayerProviders, provider)
-
-	return function()
-		local index = table.find(self._perPlayerProviders, provider)
-		if index then
-			table.remove(self._perPlayerProviders, index)
-		end
-	end
+	return self._builder:RegisterPerPlayerTeleportDataProvider(provider)
 end
 
 --[=[
-	Builds the teleport data for a teleport of the given players as a per-player envelope (see
-	[TeleportDataEnvelopeUtils]): shared-provider contributions plus `baseData` form the shared slice,
-	and each per-player provider's contribution forms that player's slice. On arrival each player reads
-	their own slice merged over the shared one via [TeleportDataService.GetArrivedTeleportData].
-
-	Precedence, least to most specific: shared providers, then `baseData` (the caller's shared
-	override), then per-player providers.
-
-	Pure -- performs no teleport -- so it is the seam teleport sites and tests build against. Errors if
-	the result exceeds the teleport-data size cap, and warns as it approaches it, so an oversized
-	payload fails loudly here instead of being silently dropped by the teleport.
+	Builds the teleport data envelope for a teleport of the given players. See
+	[TeleportDataBuilder.BuildTeleportData].
 
 	@param players { Player }
-	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
+	@param baseData { [string]: any }?
 	@return { [string]: any }
 ]=]
 function TeleportDataService.BuildTeleportData(
@@ -137,101 +152,7 @@ function TeleportDataService.BuildTeleportData(
 	players: { Player },
 	baseData: { [string]: any }?
 ): { [string]: any }
-	assert(type(players) == "table", "Bad players")
-	if baseData ~= nil then
-		assert(type(baseData) == "table", "Bad baseData")
-	end
-
-	local sharedSlice: { [string]: any } = {}
-	for _, provider in self._providers do
-		local contributed = provider(players)
-		if type(contributed) == "table" then
-			for key, value in contributed do
-				sharedSlice[key] = value
-			end
-		end
-	end
-	if baseData ~= nil then
-		for key, value in baseData do
-			sharedSlice[key] = value
-		end
-	end
-
-	local perPlayerByUserId: { [string]: { [string]: any } } = {}
-	for _, player in players do
-		local slice: { [string]: any } = {}
-		for _, provider in self._perPlayerProviders do
-			local contributed = provider(player, players)
-			if type(contributed) == "table" then
-				for key, value in contributed do
-					slice[key] = value
-				end
-			end
-		end
-
-		if next(slice) ~= nil then
-			perPlayerByUserId[tostring(self:_getUserId(player))] = slice
-		end
-	end
-
-	local envelope = TeleportDataEnvelopeUtils.build(sharedSlice, perPlayerByUserId)
-
-	local classification = TeleportDataEnvelopeUtils.classifySize(envelope)
-	if classification.level == "over" then
-		error(
-			string.format(
-				"[TeleportDataService] teleport data is %d bytes, over the %d byte cap for %d player(s); reduce provider payloads",
-				classification.bytes,
-				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
-				#players
-			)
-		)
-	elseif classification.level == "warn" then
-		warn(
-			string.format(
-				"[TeleportDataService] teleport data is %d bytes, approaching the %d byte cap for %d player(s)",
-				classification.bytes,
-				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
-				#players
-			)
-		)
-	end
-
-	return envelope
-end
-
---[=[
-	Returns the teleport data the player arrived with (from `player:GetJoinData().TeleportData`), or
-	the value injected by [TeleportDataService.SetArrivedTeleportDataForTesting].
-
-	@param player Player
-	@return { [string]: any }?
-]=]
-function TeleportDataService.GetArrivedTeleportData(self: TeleportDataService, player: Player): { [string]: any }?
-	assert(typeof(player) == "Instance", "Bad player")
-
-	self._arrivedRead[player] = true
-
-	local raw: any
-	local override = self._arrivedOverrides[player]
-	if override ~= nil then
-		raw = override[1]
-	else
-		local joinData = player:GetJoinData()
-		raw = joinData and joinData.TeleportData
-	end
-
-	if type(raw) ~= "table" then
-		return nil
-	end
-
-	-- Legacy/hand-written flat data is read as-is (no UserId needed); only an envelope is unwrapped to
-	-- this player's slice, which is why the UserId read is deferred to here.
-	if not TeleportDataEnvelopeUtils.isEnvelope(raw) then
-		return raw :: { [string]: any }
-	end
-
-	return TeleportDataEnvelopeUtils.readSlice(raw, self:_getUserId(player))
+	return self._builder:BuildTeleportData(players, baseData)
 end
 
 --[=[
@@ -246,53 +167,270 @@ function TeleportDataService._getUserId(_self: TeleportDataService, player: Play
 end
 
 --[=[
-	Returns the value the player arrived with under `key`, or nil.
+	Returns the *unified* teleport data the player arrived with -- the trusted band (server join data)
+	merged over the non-trusted band (client-replicated), trusted winning -- or nil. Resolves once the
+	client has replicated its band, or when the bounded timeout falls back to the trusted band alone.
+
+	This is the everyday accessor. It may contain client-authored keys, so treat it as a *request*, not
+	an authority; for authoritative reads use [TeleportDataService.PromiseTrustedArrivedData].
+
+	@param player Player
+	@return Promise<{ [string]: any }?>
+]=]
+function TeleportDataService.PromiseArrivedData(self: TeleportDataService, player: Player): any
+	assert(typeof(player) == "Instance", "Bad player")
+
+	local entry = self:_getEntry(player)
+	entry.read = true
+	return entry.promise:Then(function()
+		return TeleportDataEnvelopeUtils.readMergedSlice(entry.trustedRaw, entry.nonTrustedRaw, self:_getUserId(player))
+	end)
+end
+
+--[=[
+	Returns the trusted-band teleport data the player arrived with (server-authored, from join data), or
+	nil. Safe to authorize on -- a client can never place data here. Resolves once the arrival is sealed.
+
+	@param player Player
+	@return Promise<{ [string]: any }?>
+]=]
+function TeleportDataService.PromiseTrustedArrivedData(self: TeleportDataService, player: Player): any
+	assert(typeof(player) == "Instance", "Bad player")
+
+	local entry = self:_getEntry(player)
+	entry.read = true
+	return entry.promise:Then(function()
+		return TeleportDataEnvelopeUtils.readSlice(entry.trustedRaw, self:_getUserId(player))
+	end)
+end
+
+--[=[
+	Returns the non-trusted-band teleport data the player arrived with (client-replicated), or nil.
+	Rarely needed directly; prefer the unified [TeleportDataService.PromiseArrivedData].
+
+	@param player Player
+	@return Promise<{ [string]: any }?>
+]=]
+function TeleportDataService.PromiseNonTrustedArrivedData(self: TeleportDataService, player: Player): any
+	assert(typeof(player) == "Instance", "Bad player")
+
+	local entry = self:_getEntry(player)
+	entry.read = true
+	return entry.promise:Then(function()
+		return TeleportDataEnvelopeUtils.readSlice(entry.nonTrustedRaw, self:_getUserId(player))
+	end)
+end
+
+--[=[
+	Returns the unified value the player arrived with under `key`, or nil.
 
 	@param player Player
 	@param key string
-	@return any
+	@return Promise<any>
 ]=]
-function TeleportDataService.GetArrivedValue(self: TeleportDataService, player: Player, key: string): any
+function TeleportDataService.PromiseArrivedValue(self: TeleportDataService, player: Player, key: string): any
 	assert(type(key) == "string", "Bad key")
 
-	local data = self:GetArrivedTeleportData(player)
-	if type(data) == "table" then
-		return data[key]
-	end
-
-	return nil
+	return self:PromiseArrivedData(player):Then(function(data)
+		if type(data) == "table" then
+			return data[key]
+		end
+		return nil
+	end)
 end
 
 --[=[
-	Returns whether the player arrived with a value under `key`.
+	Returns whether the player arrived with a unified value under `key`.
 
 	@param player Player
 	@param key string
-	@return boolean
+	@return Promise<boolean>
 ]=]
-function TeleportDataService.HasArrivedValue(self: TeleportDataService, player: Player, key: string): boolean
-	return self:GetArrivedValue(player, key) ~= nil
+function TeleportDataService.PromiseHasArrivedValue(self: TeleportDataService, player: Player, key: string): any
+	return self:PromiseArrivedValue(player, key):Then(function(value)
+		return value ~= nil
+	end)
 end
 
 --[=[
-	Overrides the arrived teleport data for a player. Test seam -- headless servers have no joined
-	players, so specs inject the data a player would have arrived with.
+	Returns the trusted-band value the player arrived with under `key`, or nil. Safe to authorize on.
+
+	@param player Player
+	@param key string
+	@return Promise<any>
+]=]
+function TeleportDataService.PromiseTrustedArrivedValue(self: TeleportDataService, player: Player, key: string): any
+	assert(type(key) == "string", "Bad key")
+
+	return self:PromiseTrustedArrivedData(player):Then(function(data)
+		if type(data) == "table" then
+			return data[key]
+		end
+		return nil
+	end)
+end
+
+--[=[
+	Returns whether the player arrived with a trusted-band value under `key`.
+
+	@param player Player
+	@param key string
+	@return Promise<boolean>
+]=]
+function TeleportDataService.PromiseHasTrustedArrivedValue(self: TeleportDataService, player: Player, key: string): any
+	return self:PromiseTrustedArrivedValue(player, key):Then(function(value)
+		return value ~= nil
+	end)
+end
+
+--[=[
+	Returns whether the unified value for `key` came from the trusted band -- i.e. whether it is safe to
+	authorize on. Defense-in-depth for code that reads the unified view but must occasionally assert
+	provenance without a second read.
+
+	@param player Player
+	@param key string
+	@return Promise<boolean>
+]=]
+function TeleportDataService.PromiseArrivedValueIsTrusted(self: TeleportDataService, player: Player, key: string): any
+	assert(type(key) == "string", "Bad key")
+
+	local entry = self:_getEntry(player)
+	entry.read = true
+	return entry.promise:Then(function()
+		local trusted = TeleportDataEnvelopeUtils.readSlice(entry.trustedRaw, self:_getUserId(player))
+		return type(trusted) == "table" and trusted[key] ~= nil
+	end)
+end
+
+--[=[
+	Overrides the *trusted* arrived band for a player. Test seam -- headless servers have no join data, so
+	specs inject what a player would have arrived with from a server teleport. Must be set before any read
+	seals the arrival.
 
 	@param player Player
 	@param data { [string]: any }?
 ]=]
-function TeleportDataService.SetArrivedTeleportDataForTesting(
+function TeleportDataService.SetTrustedArrivedTeleportDataForTesting(
 	self: TeleportDataService,
 	player: Player,
 	data: { [string]: any }?
 )
 	assert(typeof(player) == "Instance", "Bad player")
-	assert(
-		not self._arrivedRead[player],
-		"Cannot set arrived teleport data after it has been read -- inject it before anything reads it"
-	)
 
-	self._arrivedOverrides[player] = { data }
+	local entry = self:_getEntry(player)
+	assert(not entry.sealed, "Cannot set trusted arrived data after the arrival has sealed")
+	assert(not entry.read, "Cannot set trusted arrived data after it has been read -- inject it first")
+	entry.trustedOverride = { data }
+end
+
+--[=[
+	Simulates the client's non-trusted band arriving (the replication the real client pushes). Test seam.
+	First arrival wins and seals; later calls are ignored, mirroring production first-wins semantics.
+
+	@param player Player
+	@param data { [string]: any }?
+]=]
+function TeleportDataService.SetNonTrustedArrivedTeleportDataForTesting(
+	self: TeleportDataService,
+	player: Player,
+	data: { [string]: any }?
+)
+	assert(typeof(player) == "Instance", "Bad player")
+
+	self:_onReplicated(player, data)
+end
+
+--[=[
+	Sets the bounded wait before a read falls back to the trusted band alone. Test seam, so a spec can
+	drive the timeout path deterministically without waiting the production window.
+
+	@param seconds number
+]=]
+function TeleportDataService.SetReplicationTimeoutForTesting(self: TeleportDataService, seconds: number)
+	assert(type(seconds) == "number", "Bad seconds")
+	self._replicationTimeout = seconds
+end
+
+function TeleportDataService._getTrustedRaw(self: TeleportDataService, player: Player): any
+	local entry = self._entries[player]
+	if entry and entry.trustedOverride ~= nil then
+		return entry.trustedOverride[1]
+	end
+
+	-- GetJoinData can throw (and does for a non-Player stand-in in tests); treat any failure as "no
+	-- trusted band" rather than letting it break the seal.
+	local ok, joinData = pcall(function()
+		return player:GetJoinData()
+	end)
+	if ok and type(joinData) == "table" then
+		return joinData.TeleportData
+	end
+	return nil
+end
+
+function TeleportDataService._onReplicated(self: TeleportDataService, player: Player, raw: any)
+	if raw ~= nil and type(raw) ~= "table" then
+		return -- Malformed payload; ignore rather than seal with garbage.
+	end
+
+	local entry = self:_getEntry(player)
+	entry.resolve(raw)
+end
+
+function TeleportDataService._getEntry(self: TeleportDataService, player: Player): ArrivalEntry
+	local existing = self._entries[player]
+	if existing then
+		return existing
+	end
+
+	local maid = Maid.new()
+	local promise = Promise.new()
+
+	local entry: ArrivalEntry = {
+		maid = maid,
+		promise = promise,
+		sealed = false,
+		trustedOverride = nil,
+		trustedRaw = nil,
+		nonTrustedRaw = nil,
+		read = false,
+		resolve = function() end,
+	}
+
+	entry.resolve = function(nonTrustedRaw: any)
+		if entry.sealed then
+			return
+		end
+		entry.sealed = true
+		entry.nonTrustedRaw = nonTrustedRaw
+		-- Snapshot the trusted band at the same instant, so every reader sees one frozen pair of bands.
+		entry.trustedRaw = self:_getTrustedRaw(player)
+		promise:Resolve()
+	end
+
+	-- Arm the fallback: if the client never replicates, resolve to the trusted band alone.
+	maid:GiveTask(task.delay(self._replicationTimeout, function()
+		entry.resolve(nil)
+	end))
+
+	-- If the player leaves before replicating, seal on what we have so no read hangs forever.
+	maid:GiveTask(function()
+		entry.resolve(nil)
+	end)
+
+	self._entries[player] = entry
+	return entry
+end
+
+function TeleportDataService._cleanupPlayer(self: TeleportDataService, player: Player)
+	local entry = self._entries[player]
+	if not entry then
+		return
+	end
+
+	self._entries[player] = nil
+	entry.maid:DoCleaning()
 end
 
 function TeleportDataService.Destroy(self: TeleportDataService)

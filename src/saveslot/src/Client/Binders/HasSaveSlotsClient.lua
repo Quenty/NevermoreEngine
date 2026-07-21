@@ -129,14 +129,18 @@ function HasSaveSlotsClient.PromiseSlotIdFromIndex(
 	return self._remoting.PromiseSlotIdFromIndex:PromiseInvokeServer(slotIndex)
 end
 
--- Client realm hook for HasSaveSlotsBase: the incoming slot id is whatever the local player
--- teleported in with, read from their local teleport data via TeleportDataServiceClient.
-function HasSaveSlotsClient._getIncomingSlotId(self: HasSaveSlotsClient): SaveSlotData.SlotId?
-	local slotId = self._teleportDataServiceClient:GetArrivedValue(SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
-	if type(slotId) == "string" then
-		return slotId
-	end
-	return nil
+-- Client realm hook for HasSaveSlotsBase: the incoming slot id is whatever the local player teleported
+-- in with, read from the unified TeleportDataServiceClient view (a promise for symmetry with the
+-- server; on the client it resolves immediately from local teleport data).
+function HasSaveSlotsClient.PromiseIncomingSlotId(self: HasSaveSlotsClient): Promise.Promise<SaveSlotData.SlotId?>
+	return self._teleportDataServiceClient
+		:PromiseArrivedValue(SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+		:Then(function(slotId): SaveSlotData.SlotId?
+			if type(slotId) == "string" then
+				return slotId
+			end
+			return nil
+		end)
 end
 
 return Binder.new("HasSaveSlots", HasSaveSlotsClient :: any) :: Binder.Binder<HasSaveSlotsClient>

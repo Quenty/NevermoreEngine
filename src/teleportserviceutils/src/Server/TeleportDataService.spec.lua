@@ -1,8 +1,10 @@
 --!strict
 --[[
-	Coverage for TeleportDataService's per-player data assembly and arrived-data surface -- the parts
-	reachable on a headless cloud test server (which has no joined players, so both the UserId keying
-	and arrived data are exercised through test seams rather than a real teleport).
+	Coverage for the server's arrived-data surface: the two trust bands, the unified merge, the
+	pend-until-replicated / timeout-fallback lifecycle, and first-wins sealing. A headless cloud test
+	server has no joined players and no join data, so both the UserId keying and each band are driven
+	through the inject seams rather than a real teleport. The replication *transport* (Remoting) is not
+	exercised here -- only the logic behind it.
 
 	@class TeleportDataService.spec.lua
 ]]
@@ -10,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local Maid = require("Maid")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 local TeleportDataService = require("TeleportDataService")
@@ -18,8 +21,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Controller pattern (see docs/testing/testing.md): the maid owns the ServiceBag and every fake
--- player folder, so a batch run leaves nothing running in a later package's window.
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
@@ -34,8 +35,6 @@ local function setup()
 
 	return {
 		service = service,
-		-- A Folder is an Instance, so it satisfies the `typeof(player) == "Instance"` guards and can
-		-- stand in for a Player as long as arrived data is injected (never hitting GetJoinData).
 		fakePlayer = function(userId: number?): Player
 			local player = maid:Add(Instance.new("Folder"))
 			if userId ~= nil then
@@ -43,96 +42,21 @@ local function setup()
 			end
 			return (player :: any) :: Player
 		end,
+		-- Awaits a read promise and returns its fulfilled value (fails the test if it rejects or hangs).
+		await = function(promise: any): any
+			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+			local ok, value = promise:Yield()
+			expect(ok).toEqual(true)
+			return value
+		end,
 		destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 end
 
--- Reads the slice a player would arrive with from freshly built teleport data, exercising the same
--- envelope shape a real teleport round-trips.
-local function sliceFor(built: { [string]: any }, userId: number): TeleportDataEnvelopeUtils.TeleportDataSlice?
-	return TeleportDataEnvelopeUtils.readSlice(built, userId)
-end
-
-describe("TeleportDataService.BuildTeleportData shared data", function()
-	it("should carry nothing with no providers and no base data", function()
-		local controller = setup()
-
-		expect(controller.service:BuildTeleportData({})).toEqual({})
-
-		controller:destroy()
-	end)
-
-	it("should deliver base data to any player", function()
-		local controller = setup()
-
-		local built = controller.service:BuildTeleportData({}, { a = 1, b = "two" })
-		expect(sliceFor(built, 111)).toEqual({ a = 1, b = "two" })
-
-		controller:destroy()
-	end)
-
-	it("should merge shared providers together", function()
-		local controller = setup()
-
-		controller.service:RegisterTeleportDataProvider(function()
-			return { a = 1 }
-		end)
-		controller.service:RegisterTeleportDataProvider(function()
-			return { b = 2 }
-		end)
-
-		expect(sliceFor(controller.service:BuildTeleportData({}), 111)).toEqual({ a = 1, b = 2 })
-
-		controller:destroy()
-	end)
-
-	it("should let base data win over a shared provider key", function()
-		local controller = setup()
-
-		controller.service:RegisterTeleportDataProvider(function()
-			return { shared = "provider" }
-		end)
-
-		local built = controller.service:BuildTeleportData({}, { shared = "caller" })
-		expect(sliceFor(built, 111)).toEqual({ shared = "caller" })
-
-		controller:destroy()
-	end)
-
-	it("should ignore a shared provider that returns nil", function()
-		local controller = setup()
-
-		controller.service:RegisterTeleportDataProvider(function()
-			return nil
-		end)
-		controller.service:RegisterTeleportDataProvider(function()
-			return { a = 1 }
-		end)
-
-		expect(sliceFor(controller.service:BuildTeleportData({}), 111)).toEqual({ a = 1 })
-
-		controller:destroy()
-	end)
-
-	it("should stop merging a shared provider after it is unregistered", function()
-		local controller = setup()
-
-		local unregister = controller.service:RegisterTeleportDataProvider(function()
-			return { a = 1 }
-		end)
-		expect(sliceFor(controller.service:BuildTeleportData({}), 111)).toEqual({ a = 1 })
-
-		unregister()
-		expect(controller.service:BuildTeleportData({})).toEqual({})
-
-		controller:destroy()
-	end)
-end)
-
-describe("TeleportDataService.BuildTeleportData per-player data", function()
-	it("should carry a single player's own slice", function()
+describe("TeleportDataService.BuildTeleportData (delegates to the shared builder)", function()
+	it("assembles a per-player envelope readable by UserId", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
 
@@ -141,198 +65,273 @@ describe("TeleportDataService.BuildTeleportData per-player data", function()
 		end)
 
 		local built = controller.service:BuildTeleportData({ player })
-		expect(sliceFor(built, 111)).toEqual({ slot = "slot-111" })
-		-- Another player is not carried, and reads nothing from this player's teleport.
-		expect(sliceFor(built, 222)).toBeNil()
+		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "slot-111" })
 
 		controller:destroy()
 	end)
 
-	it("should give each player of a group teleport only their own slice", function()
+	it("carries base data under a shared provider key", function()
 		local controller = setup()
-		local playerA = controller.fakePlayer(111)
-		local playerB = controller.fakePlayer(222)
 
-		controller.service:RegisterPerPlayerTeleportDataProvider(function(givenPlayer)
-			return { userId = givenPlayer:GetAttribute("UserId") }
+		controller.service:RegisterTeleportDataProvider(function()
+			return { shared = "provider" }
 		end)
 
-		local built = controller.service:BuildTeleportData({ playerA, playerB })
-		expect(sliceFor(built, 111)).toEqual({ userId = 111 })
-		expect(sliceFor(built, 222)).toEqual({ userId = 222 })
+		local built = controller.service:BuildTeleportData({}, { shared = "caller" })
+		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ shared = "caller" })
 
 		controller:destroy()
 	end)
+end)
 
-	it("should merge the shared slice under each player's slice", function()
+describe("TeleportDataService unified arrived data", function()
+	it("reads the trusted band alone when nothing was replicated", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
 
-		controller.service:RegisterTeleportDataProvider(function()
-			return { mode = "hard" }
-		end)
-		controller.service:RegisterPerPlayerTeleportDataProvider(function()
-			return { slot = "a" }
-		end)
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, nil)
 
-		expect(sliceFor(controller.service:BuildTeleportData({ player }), 111)).toEqual({
-			mode = "hard",
-			slot = "a",
+		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ region = "us" })
+
+		controller:destroy()
+	end)
+
+	it("reads the non-trusted band alone when there is no trusted band", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
+
+		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ slot = "client" })
+
+		controller:destroy()
+	end)
+
+	it("unions disjoint keys across both bands", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
+
+		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({
+			region = "us",
+			slot = "client",
 		})
 
 		controller:destroy()
 	end)
 
-	it("should let a per-player key win over shared and base data (most specific)", function()
+	it("lets the trusted band win on a key conflict (client cannot override the server)", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
 
-		controller.service:RegisterTeleportDataProvider(function()
-			return { v = "shared" }
-		end)
-		controller.service:RegisterPerPlayerTeleportDataProvider(function()
-			return { v = "player" }
-		end)
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { slot = "server-slot" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client-slot" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		local built = controller.service:BuildTeleportData({ player }, { v = "base" })
-		expect(sliceFor(built, 111)).toEqual({ v = "player" })
-
-		controller:destroy()
-	end)
-
-	it("should not create a slice for a player whose providers contribute nothing", function()
-		local controller = setup()
-		local player = controller.fakePlayer(111)
-
-		controller.service:RegisterPerPlayerTeleportDataProvider(function()
-			return nil
-		end)
-
-		expect(controller.service:BuildTeleportData({ player })).toEqual({})
-
-		controller:destroy()
-	end)
-
-	it("should call the provider once per player with the full player list", function()
-		local controller = setup()
-		local players = { controller.fakePlayer(111), controller.fakePlayer(222) }
-		local seen = {}
-		local receivedList
-		controller.service:RegisterPerPlayerTeleportDataProvider(function(player, givenPlayers)
-			table.insert(seen, player)
-			receivedList = givenPlayers
-			return nil
-		end)
-
-		controller.service:BuildTeleportData(players)
-		expect(seen[1]).toBe(players[1])
-		expect(seen[2]).toBe(players[2])
-		expect(receivedList).toBe(players)
+		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("server-slot")
 
 		controller:destroy()
 	end)
 end)
 
-describe("TeleportDataService.BuildTeleportData size guard", function()
-	it("should throw when the built data exceeds the size cap", function()
+describe("TeleportDataService band separation", function()
+	it("exposes only the trusted band through the trusted accessors", function()
 		local controller = setup()
+		local player = controller.fakePlayer(111)
 
-		controller.service:RegisterTeleportDataProvider(function()
-			return { blob = string.rep("x", TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES + 1024) }
-		end)
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(function()
-			controller.service:BuildTeleportData({})
-		end).toThrow()
+		expect(controller.await(controller.service:PromiseTrustedArrivedData(player))).toEqual({ region = "us" })
+		expect(controller.await(controller.service:PromiseTrustedArrivedValue(player, "slot"))).toBeNil()
+		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "region"))).toEqual(true)
+		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "slot"))).toEqual(false)
 
 		controller:destroy()
 	end)
 
-	it("should throw when a provider returns un-encodable teleport data", function()
+	it("exposes only the non-trusted band through the non-trusted accessor", function()
 		local controller = setup()
+		local player = controller.fakePlayer(111)
 
-		controller.service:RegisterTeleportDataProvider(function()
-			local cyclic = {}
-			cyclic.self = cyclic
-			return cyclic
-		end)
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(function()
-			controller.service:BuildTeleportData({})
-		end).toThrow()
+		expect(controller.await(controller.service:PromiseNonTrustedArrivedData(player))).toEqual({ slot = "client" })
+
+		controller:destroy()
+	end)
+
+	it("reports provenance: a trusted key is trusted, a client-only key is not", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
+
+		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "region"))).toEqual(true)
+		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("reports a conflicting key as trusted (the trusted value is the one that wins)", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { slot = "server" })
+		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
+
+		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(true)
 
 		controller:destroy()
 	end)
 end)
 
-describe("TeleportDataService arrived data", function()
-	it("should read an injected legacy (flat) arrived value", function()
+describe("TeleportDataService value accessors", function()
+	it("reports presence and absence of a unified value", function()
 		local controller = setup()
-		local player = controller.fakePlayer()
+		local player = controller.fakePlayer(111)
 
-		controller.service:SetArrivedTeleportDataForTesting(player, { key = "value" })
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(
+			player,
+			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "a" } })
+		)
 
-		expect(controller.service:GetArrivedTeleportData(player)).toEqual({ key = "value" })
-		expect(controller.service:GetArrivedValue(player, "key")).toEqual("value")
-		expect(controller.service:HasArrivedValue(player, "key")).toEqual(true)
+		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("a")
+		expect(controller.await(controller.service:PromiseArrivedValue(player, "missing"))).toBeNil()
+		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "slot"))).toEqual(true)
+		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "missing"))).toEqual(false)
 
 		controller:destroy()
 	end)
+end)
 
-	it("should unwrap each arriving player's own slice from a shared envelope", function()
+describe("TeleportDataService per-player replication", function()
+	it("gives each player only their own slice from the same replicated envelope", function()
 		local controller = setup()
 		local playerA = controller.fakePlayer(111)
 		local playerB = controller.fakePlayer(222)
 
-		controller.service:RegisterPerPlayerTeleportDataProvider(function(player)
-			return { userId = player:GetAttribute("UserId") }
-		end)
+		-- Both players replicate the same group envelope (as they would from one group teleport).
+		local envelope = TeleportDataEnvelopeUtils.build(nil, {
+			["111"] = { slot = "a" },
+			["222"] = { slot = "b" },
+		})
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(playerA, envelope)
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(playerB, envelope)
 
-		-- Both players arrive carrying the same envelope (as they would from one group teleport).
-		local envelope = controller.service:BuildTeleportData({ playerA, playerB })
-		controller.service:SetArrivedTeleportDataForTesting(playerA, envelope)
-		controller.service:SetArrivedTeleportDataForTesting(playerB, envelope)
+		expect(controller.await(controller.service:PromiseArrivedValue(playerA, "slot"))).toEqual("a")
+		expect(controller.await(controller.service:PromiseArrivedValue(playerB, "slot"))).toEqual("b")
 
-		expect(controller.service:GetArrivedValue(playerA, "userId")).toEqual(111)
-		expect(controller.service:GetArrivedValue(playerB, "userId")).toEqual(222)
+		controller:destroy()
+	end)
+end)
+
+describe("TeleportDataService arrival lifecycle", function()
+	it("pends the unified read until the client replicates, then resolves", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+
+		local promise = controller.service:PromiseArrivedData(player)
+		expect(promise:IsPending()).toEqual(true)
+
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(
+			player,
+			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
+		)
+
+		expect(controller.await(promise)).toEqual({ region = "us", slot = "client" })
 
 		controller:destroy()
 	end)
 
-	it("should report a missing key as absent", function()
+	it("falls back to the trusted band alone when replication never arrives (timeout)", function()
 		local controller = setup()
-		local player = controller.fakePlayer()
+		local player = controller.fakePlayer(111)
 
-		controller.service:SetArrivedTeleportDataForTesting(player, { key = "value" })
+		-- Arm a tiny timeout *before* the entry is created (the timer is armed on first touch).
+		controller.service:SetReplicationTimeoutForTesting(0.1)
+		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
 
-		expect(controller.service:GetArrivedValue(player, "other")).toBeNil()
-		expect(controller.service:HasArrivedValue(player, "other")).toEqual(false)
+		local promise = controller.service:PromiseArrivedData(player)
+		expect(promise:IsPending()).toEqual(true)
+
+		expect(controller.await(promise)).toEqual({ region = "us" })
 
 		controller:destroy()
 	end)
 
-	it("should clear an injected override back to nil", function()
+	it("seals on the first replication -- a later one is ignored (first wins)", function()
 		local controller = setup()
-		local player = controller.fakePlayer()
+		local player = controller.fakePlayer(111)
 
-		controller.service:SetArrivedTeleportDataForTesting(player, { key = "value" })
-		controller.service:SetArrivedTeleportDataForTesting(player, nil)
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(
+			player,
+			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "first" } })
+		)
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(
+			player,
+			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "second" } })
+		)
 
-		expect(controller.service:HasArrivedValue(player, "key")).toEqual(false)
+		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("first")
 
 		controller:destroy()
 	end)
 
-	it("should reject injecting an override after the data has been read", function()
+	it("gives every reader the same sealed answer", function()
 		local controller = setup()
-		local player = controller.fakePlayer()
+		local player = controller.fakePlayer(111)
 
-		controller.service:SetArrivedTeleportDataForTesting(player, { key = "value" })
-		controller.service:GetArrivedTeleportData(player) -- consumes it
+		local pendingRead = controller.service:PromiseArrivedValue(player, "slot")
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(
+			player,
+			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "a" } })
+		)
+		local laterRead = controller.service:PromiseArrivedValue(player, "slot")
+
+		expect(controller.await(pendingRead)).toEqual("a")
+		expect(controller.await(laterRead)).toEqual("a")
+
+		controller:destroy()
+	end)
+end)
+
+describe("TeleportDataService inject-before-read invariant", function()
+	it("rejects injecting a trusted override after a read has been requested", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:PromiseArrivedData(player) -- requests a read
 
 		expect(function()
-			controller.service:SetArrivedTeleportDataForTesting(player, { key = "other" })
-		end).toThrow("after it has been read")
+			controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		end).toThrow()
+
+		controller:destroy()
+	end)
+
+	it("rejects injecting a trusted override after the arrival has sealed", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, nil) -- seals
+
+		expect(function()
+			controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
+		end).toThrow()
 
 		controller:destroy()
 	end)
