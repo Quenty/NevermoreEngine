@@ -1,3 +1,15 @@
+# v9.55.0 (Tue Jul 21 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

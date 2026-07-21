@@ -1,3 +1,25 @@
+# v1.9.0 (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
+- test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
+- feat: Add a method to reset active slots ([@Quenty](https://github.com/Quenty))
+- feat: Add duplication to save slots package ([@Quenty](https://github.com/Quenty))
+- feat: Add save slot tracking data ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/influxdb-tests ([@Quenty](https://github.com/Quenty))
+- fix: Resolve luau-lsp and moonwave lint failures ([@Quenty](https://github.com/Quenty))
+- refactor: Save slot summary infrastructure ([@Quenty](https://github.com/Quenty))
+- refactor: Save slots updates ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
