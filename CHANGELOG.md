@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/datastore@13.45.0`, `@quenty/saveslot@1.11.0`
+  - feat: Add ephemeral save slots [#741](https://github.com/Quenty/NevermoreEngine/pull/741) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/nevermoreclimanifest@1.5.0`, `@quenty/saveslot@1.10.0`, `@quenty/teleportserviceutils@9.36.0`, `@quenty/nevermore-cli@4.41.0`
   - feat: Add additional metadata to versions [#740](https://github.com/Quenty/NevermoreEngine/pull/740) ([@Quenty](https://github.com/Quenty))
 
