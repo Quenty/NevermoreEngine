@@ -1514,18 +1514,18 @@ describe("HasSaveSlots ephemeral slots", function()
 		return value
 	end
 
-	local function selectEphemeral(context, metadata)
+	local function selectEphemeral(context: any, metadata: any?)
 		return resolve(context.hasSaveSlots:PromiseSelectEphemeralSlot(metadata))
 	end
 
-	local function createAndSelectReal(context, slotIndex)
+	local function createAndSelectReal(context: any, slotIndex: number)
 		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(slotIndex))
 		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
 		return slotId
 	end
 
 	-- The container SaveSlotDataService lists over; a real slot's folder lives here, an ephemeral one never does.
-	local function slotContainerHasChild(context, slotId): boolean
+	local function slotContainerHasChild(context: any, slotId): boolean
 		local container = context.fakePlayer:FindFirstChild("SaveSlots")
 		return container ~= nil and container:FindFirstChild(slotId) ~= nil
 	end
@@ -1563,7 +1563,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		local ephemeralId = selectEphemeral(context)
 
 		local listedIds = {}
-		for _, metadata in SaveSlotDataService.GetSlotList(SaveSlotDataService, context.fakePlayer) do
+		for _, metadata in (SaveSlotDataService :: any):GetSlotList(context.fakePlayer) do
 			listedIds[metadata.SlotId] = true
 		end
 
@@ -1587,7 +1587,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		local ephemeralId = selectEphemeral(context)
 		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("coins", 98789)
 
-		local raw = context.mock:GetRaw(tostring(FAKE_USER_ID))
+		local raw = (context.mock :: any):GetRaw(tostring(FAKE_USER_ID))
 		local encoded = if raw ~= nil then HttpService:JSONEncode(raw) else ""
 
 		-- string.find returns multiple values, so bind the first before asserting (expect takes one arg).

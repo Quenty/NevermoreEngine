@@ -818,7 +818,7 @@ function HasSaveSlots._isEphemeral(self: HasSaveSlots, slotId: SaveSlotData.Slot
 	if slotId == nil then
 		return false
 	end
-	local slot = self._slotMap[slotId]
+	local slot = self._slotMap[slotId] :: Folder?
 	return slot ~= nil and SaveSlotData.IsEphemeral:Get(slot) == true
 end
 
