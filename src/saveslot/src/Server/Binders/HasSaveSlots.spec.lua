@@ -16,8 +16,10 @@ local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Rx = require("Rx")
+local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
 
+local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
 
 local describe = Jest.Globals.describe
@@ -1498,6 +1500,219 @@ describe("HasSaveSlots against a fake player (datastore down)", function()
 			local ok = promise:Yield()
 			expect(ok).toEqual(false)
 		end
+
+		context.destroy()
+	end)
+end)
+
+describe("HasSaveSlots ephemeral slots", function()
+	-- Settles a promise (failing the test on a hang) and returns its value.
+	local function resolve(promise, timeout: number?)
+		expect(PromiseTestUtils.awaitSettled(promise, timeout or 10)).toEqual(true)
+		local ok, value = promise:Yield()
+		expect(ok).toEqual(true)
+		return value
+	end
+
+	local function selectEphemeral(context, metadata)
+		return resolve(context.hasSaveSlots:PromiseSelectEphemeralSlot(metadata))
+	end
+
+	local function createAndSelectReal(context, slotIndex)
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(slotIndex))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+		return slotId
+	end
+
+	-- The container SaveSlotDataService lists over; a real slot's folder lives here, an ephemeral one never does.
+	local function slotContainerHasChild(context, slotId): boolean
+		local container = context.fakePlayer:FindFirstChild("SaveSlots")
+		return container ~= nil and container:FindFirstChild(slotId) ~= nil
+	end
+
+	it("selects an ephemeral slot and reports it active", function()
+		local context = setup()
+
+		local slotId = selectEphemeral(context)
+		expect(type(slotId)).toEqual("string")
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotId))).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("marks the slot with the IsEphemeral property, and real slots without it", function()
+		local context = setup()
+
+		local realId = createAndSelectReal(context, 1)
+		local ephemeralId = selectEphemeral(context)
+
+		local realMetadata = resolve(context.hasSaveSlots:PromiseGetSlotMetadata(realId))
+		local ephemeralMetadata = resolve(context.hasSaveSlots:PromiseGetSlotMetadata(ephemeralId))
+
+		expect(ephemeralMetadata.IsEphemeral).toEqual(true)
+		expect(realMetadata.IsEphemeral).never.toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("keeps the ephemeral slot out of the replicated slot list", function()
+		local context = setup()
+
+		local realId = createAndSelectReal(context, 2)
+		local ephemeralId = selectEphemeral(context)
+
+		local listedIds = {}
+		for _, metadata in SaveSlotDataService.GetSlotList(SaveSlotDataService, context.fakePlayer) do
+			listedIds[metadata.SlotId] = true
+		end
+
+		expect(listedIds[realId]).toEqual(true)
+		expect(listedIds[ephemeralId]).toBeNil()
+		expect(slotContainerHasChild(context, realId)).toEqual(true)
+		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("persists a real slot's data but never an ephemeral slot's", function()
+		local context = setup()
+
+		-- A real slot whose data is flushed to the datastore -- selecting the ephemeral slot below saves the
+		-- outgoing real slot -- giving a positive control alongside the ephemeral negative. Distinctive values
+		-- so a substring search can't match them coincidentally elsewhere in the serialized blob.
+		local realId = createAndSelectReal(context, 2)
+		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("coins", 12321)
+
+		local ephemeralId = selectEphemeral(context)
+		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("coins", 98789)
+
+		local raw = context.mock:GetRaw(tostring(FAKE_USER_ID))
+		local encoded = if raw ~= nil then HttpService:JSONEncode(raw) else ""
+
+		-- string.find returns multiple values, so bind the first before asserting (expect takes one arg).
+		local realIdFound = string.find(encoded, realId, 1, true) ~= nil
+		local realValueFound = string.find(encoded, "12321", 1, true) ~= nil
+		local ephemeralIdFound = string.find(encoded, ephemeralId, 1, true) ~= nil
+		local ephemeralValueFound = string.find(encoded, "98789", 1, true) ~= nil
+
+		-- The real slot and its value reached the datastore...
+		expect(realIdFound).toEqual(true)
+		expect(realValueFound).toEqual(true)
+		-- ...but nothing of the ephemeral slot did: not its id, not the value written through its store.
+		expect(ephemeralIdFound).toEqual(false)
+		expect(ephemeralValueFound).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("destroys the ephemeral slot's in-memory store when it is retired", function()
+		local context = setup()
+
+		selectEphemeral(context)
+		local store = resolve(context.hasSaveSlots:PromiseActiveSlotStore())
+		expect(getmetatable(store)).never.toBeNil()
+
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		-- BaseObject.Destroy clears the metatable, so a nil metatable means the store was torn down (and is
+		-- now GC-eligible) when the slot was retired, rather than lingering.
+		expect(getmetatable(store)).toBeNil()
+
+		context.destroy()
+	end)
+
+	it("does not disturb the Continue pointer when an ephemeral slot is selected", function()
+		local context = setup()
+
+		local realId = createAndSelectReal(context, 1)
+		-- Selecting the ephemeral slot must leave the replicated last-active pinned to the real slot.
+		selectEphemeral(context)
+
+		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(realId)
+
+		context.destroy()
+	end)
+
+	it("tears the ephemeral slot down once it stops being active", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(true)
+
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(nil)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
+		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("retires the ephemeral slot when switching to a real slot, keeping the real slots", function()
+		local context = setup()
+
+		local slotA = createAndSelectReal(context, 1)
+		local slotB = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		local ephemeralId = selectEphemeral(context)
+
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotB))
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotB)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotA))).toEqual(true)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotB))).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("drives summaries through the ephemeral slot's in-memory store", function()
+		local context = setup()
+
+		context.hasSaveSlots:RegisterSummaryProvider("coins", function()
+			return Rx.of(42)
+		end)
+
+		local ephemeralId = selectEphemeral(context)
+
+		local matched = PromiseTestUtils.awaitValue(function()
+			local metadata = context.hasSaveSlots:PromiseGetSlotMetadata(ephemeralId):Wait()
+			return metadata ~= nil and metadata.Summary ~= nil and metadata.Summary.coins == 42
+		end, 10)
+		expect(matched).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("refuses to reset or duplicate an ephemeral slot", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context)
+
+		local resetPromise = context.hasSaveSlots:PromiseResetSlot(ephemeralId)
+		expect(PromiseTestUtils.awaitSettled(resetPromise, 10)).toEqual(true)
+		expect((resetPromise:Yield())).toEqual(false)
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(ephemeralId)
+		expect(PromiseTestUtils.awaitSettled(duplicatePromise, 10)).toEqual(true)
+		expect((duplicatePromise:Yield())).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("still resumes the real slot with Continue after an ephemeral session", function()
+		local context = setup()
+
+		local realId = createAndSelectReal(context, 2)
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		-- An ephemeral round trip in the middle must not steal the Continue slot.
+		selectEphemeral(context)
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		local continuedId = resolve(context.hasSaveSlots:PromiseSelectLastSaveSlot())
+		expect(continuedId).toEqual(realId)
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(realId)
 
 		context.destroy()
 	end)

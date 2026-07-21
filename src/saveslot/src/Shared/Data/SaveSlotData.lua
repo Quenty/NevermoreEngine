@@ -28,6 +28,9 @@ export type SaveSlotMetadata = {
 	TimePlayed: number?, -- total seconds the slot has been actively played, across every session
 	PlayCount: number?, -- number of sessions (incremented each time the slot is selected)
 	LastSessionLength: number?, -- seconds of the current/most-recent session
+	-- A session-only slot that is never persisted and is filtered out of the save-slot list. Set at
+	-- creation and never mutated; see HasSaveSlots.PromiseSelectEphemeralSlot.
+	IsEphemeral: boolean?,
 }
 
 -- The Summary is a structured table JSON-encoded into one attribute. A string is also accepted so a
@@ -54,4 +57,5 @@ return AdorneeData.new({
 	TimePlayed = AdorneeDataEntry.optionalAttribute("number", "TimePlayed"),
 	PlayCount = AdorneeDataEntry.optionalAttribute("number", "PlayCount"),
 	LastSessionLength = AdorneeDataEntry.optionalAttribute("number", "LastSessionLength"),
+	IsEphemeral = AdorneeDataEntry.optionalAttribute("boolean", "IsEphemeral"),
 })

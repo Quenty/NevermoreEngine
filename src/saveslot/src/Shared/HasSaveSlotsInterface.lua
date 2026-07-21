@@ -35,6 +35,7 @@ return TieDefinition.new("HasSaveSlots", {
 		PromiseDeselectSlot = TieDefinition.Types.METHOD,
 		PromiseSelectLastSaveSlot = TieDefinition.Types.METHOD,
 		PromiseSelectNewSaveSlot = TieDefinition.Types.METHOD,
+		PromiseSelectEphemeralSlot = TieDefinition.Types.METHOD,
 		PromiseDeleteAllSlots = TieDefinition.Types.METHOD,
 	},
 })

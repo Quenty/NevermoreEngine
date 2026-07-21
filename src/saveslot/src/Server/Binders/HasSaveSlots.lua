@@ -12,6 +12,7 @@ local Brio = require("Brio")
 local DataStoreStage = require("DataStoreStage")
 local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
+local InMemoryDataStore = require("InMemoryDataStore")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
@@ -36,6 +37,13 @@ export type SummaryProvider = (Player, DataStoreStage.DataStoreStage) -> Observa
 -- identity, so it never collides with a real value (even an empty table) a provider might emit.
 local NONE = {}
 
+-- An ephemeral slot carries no meaningful index -- a real slot's index positions it in the save list and
+-- routes its store, neither of which applies to a throwaway slot. The authoritative "is ephemeral"
+-- discriminator is the slot's own IsEphemeral property (see _isEphemeral), and every index-accounting path
+-- skips ephemeral slots, so this value never routes anything and any number of ephemeral slots can coexist.
+-- 0 is used because a real index is always >= 1 (DEFAULT_SLOT_INDEX is 1, PromiseCreateSlot rejects < 1).
+local EPHEMERAL_SLOT_INDEX = 0
+
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
 -- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
 export type SaveSlotCreateMetadata = {
@@ -55,6 +63,10 @@ export type HasSaveSlots =
 			_playerDataStoreService: any,
 			_slotContainer: Folder,
 			_slotMap: { [SaveSlotData.SlotId]: Folder },
+			-- The in-memory stores backing ephemeral (session-only) slots, keyed by slot id. A slot's
+			-- IsEphemeral property is the discriminator (see _isEphemeral); this holds the store objects a
+			-- property can't. See PromiseSelectEphemeralSlot.
+			_ephemeralStores: { [SaveSlotData.SlotId]: InMemoryDataStore.InMemoryDataStore },
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
@@ -84,6 +96,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._slotContainer.Parent = self._obj
 
 	self._slotMap = {}
+	self._ephemeralStores = {}
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
 
@@ -174,6 +187,13 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 			return
 		end
 
+		-- Leaving an ephemeral slot has nothing to persist, so switch without a datastore flush (the flush
+		-- exists to save the outgoing slot's progress, and an ephemeral slot has none).
+		if self:_isEphemeral(self.ActiveSlotId.Value) then
+			setSlot()
+			return
+		end
+
 		return self._dataStore:Save():Then(setSlot)
 	end)
 end
@@ -190,6 +210,12 @@ function HasSaveSlots.PromiseDeselectSlot(self: HasSaveSlots): Promise.Promise<(
 	return (self._loadPromise :: any):Then(function()
 		if self.ActiveSlotId.Value == nil then
 			return -- Already deselected
+		end
+
+		-- An ephemeral slot has nothing to flush, so clear it without a datastore save.
+		if self:_isEphemeral(self.ActiveSlotId.Value) then
+			self.ActiveSlotId.Value = nil
+			return
 		end
 
 		return self._dataStore:Save():Then(function()
@@ -211,7 +237,10 @@ function HasSaveSlots.PromiseCreateSlot(
 			return (Promise :: any).rejected(`Index must be in range [1, {self.MaxSlotCount.Value}]`)
 		end
 
-		for _, slot in self._slotMap do
+		for existingSlotId, slot in self._slotMap do
+			if self:_isEphemeral(existingSlotId) then
+				continue -- ephemeral slots carry no meaningful index; never let one block a real index
+			end
 			if slotIndex == SaveSlotData.SlotIndex:Get(slot) then
 				return (Promise :: any).rejected(`Slot {slotIndex} already exists`)
 			end
@@ -247,10 +276,16 @@ function HasSaveSlots.PromiseDuplicateSlot(
 			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
+		if self:_isEphemeral(slotId) then
+			return (Promise :: any).rejected("Cannot duplicate an ephemeral slot")
+		end
+
 		-- Lowest free positive index, filling gaps left by deletions (mirrors PromiseSelectNewSaveSlot).
 		local usedIndices = {}
-		for _, slot in self._slotMap do
-			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+		for existingSlotId, slot in self._slotMap do
+			if not self:_isEphemeral(existingSlotId) then
+				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+			end
 		end
 		local freeIndex = 1
 		while usedIndices[freeIndex] do
@@ -393,6 +428,10 @@ function HasSaveSlots.PromiseResetSlot(
 			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
+		if self:_isEphemeral(slotId) then
+			return (Promise :: any).rejected("Cannot reset an ephemeral slot")
+		end
+
 		local metadata = SaveSlotData:Get(slot)
 		local wasActive = (slotId == self.ActiveSlotId.Value)
 		-- PromiseDeleteSlot clears the continue pointer when it targets the last-active slot; capture it
@@ -491,6 +530,9 @@ function HasSaveSlots.PromiseSlotIdFromIndex(
 ): Promise.Promise<SaveSlotData.SlotId?>
 	return (self._loadPromise :: any):Then(function()
 		for slotId, slot in self._slotMap do
+			if self:_isEphemeral(slotId) then
+				continue -- ephemeral slots are never addressable by index
+			end
 			if slotIndex == SaveSlotData.SlotIndex:Get(slot) then
 				return (Promise :: any).resolved(slotId)
 			end
@@ -539,8 +581,10 @@ end
 function HasSaveSlots.PromiseSelectNewSaveSlot(self: HasSaveSlots): Promise.Promise<SaveSlotData.SlotId?>
 	return (self._loadPromise :: any):Then(function(): any
 		local usedIndices = {}
-		for _, slot in self._slotMap do
-			usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+		for existingSlotId, slot in self._slotMap do
+			if not self:_isEphemeral(existingSlotId) then
+				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+			end
 		end
 
 		-- Lowest free positive index. Fills gaps left by deletions (delete slot 2 of
@@ -560,6 +604,40 @@ function HasSaveSlots.PromiseSelectNewSaveSlot(self: HasSaveSlots): Promise.Prom
 			return self:PromiseSelectSlot(slotId):Then(function()
 				return slotId
 			end)
+		end)
+	end)
+end
+
+--[=[
+	Creates a fresh ephemeral slot and selects it, resolving to its id. An ephemeral slot is selectable and
+	active exactly like a real one -- it drives [HasSaveSlots.ObserveActiveSlotStoreBrio], summaries, and
+	playtime the same way -- but it is never persisted: no metadata is written, its data store is in-memory,
+	it is kept out of the replicated slot list, and it is torn down the moment it stops being the active slot.
+	Selecting it also never disturbs the persisted active-slot pointer or the "Continue" target, so the real
+	slot the player came from resumes untouched afterward. Backs a throwaway session (e.g. exploring a lobby)
+	that must leave no trace on save data.
+
+	@param metadata SaveSlotCreateMetadata? -- optional SlotName/Summary for the in-memory slot
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseSelectEphemeralSlot(
+	self: HasSaveSlots,
+	metadata: SaveSlotCreateMetadata?
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		local slotId = HttpService:GenerateGUID(false)
+		local data = {
+			SlotId = slotId,
+			SlotIndex = EPHEMERAL_SLOT_INDEX,
+			SlotName = (metadata and metadata.SlotName) or "Ephemeral",
+			CreatedTime = os.time(),
+			Summary = metadata and metadata.Summary,
+		}
+
+		self:_buildSlot(slotId, data, true, true)
+
+		return self:PromiseSelectSlot(slotId):Then(function()
+			return slotId
 		end)
 	end)
 end
@@ -611,14 +689,37 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 			return self._systemStore:Load("activeSlotId"):Then(function(activeId: SaveSlotData.SlotId?)
 				self._lastActiveSlotId = activeId
 				self.LastActiveSlotId.Value = activeId
-				self._maid:GiveTask(self._systemStore:StoreOnValueChange("activeSlotId", self.ActiveSlotId))
 
-				-- Keep the replicated last-active in sync as the player selects slots this session
+				-- The persisted active-slot pointer and the replicated "Continue" target only ever track real
+				-- slots. This replaces StoreOnValueChange so an ephemeral selection is invisible to both:
+				-- entering one leaves them pinned to the real slot, and the ephemeral slot is torn down the
+				-- moment it stops being active. We track the id we are leaving to know which of those to do.
+				local previousActiveSlotId: SaveSlotData.SlotId? = activeId
+
 				self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
 					local active = self.ActiveSlotId.Value
-					if active ~= nil then
-						self._lastActiveSlotId = active
-						self.LastActiveSlotId.Value = active
+					local leftSlotId = previousActiveSlotId
+					-- Read before the retire below, while the outgoing slot is still in the map.
+					local leavingEphemeral = self:_isEphemeral(leftSlotId)
+					previousActiveSlotId = active
+
+					-- Persist the pointer + remember the Continue target only for real-slot transitions
+					-- (real -> real, real -> nil deselect, nil -> real). Skip both ephemeral cases: entering an
+					-- ephemeral slot must stay invisible to persistence, and leaving one back to no slot must
+					-- leave the real pointer pinned where it was.
+					local enteringEphemeral = self:_isEphemeral(active)
+					local leavingEphemeralToMenu = leavingEphemeral and active == nil
+					if not (enteringEphemeral or leavingEphemeralToMenu) then
+						self._systemStore:Store("activeSlotId", active)
+						if active ~= nil then
+							self._lastActiveSlotId = active
+							self.LastActiveSlotId.Value = active
+						end
+					end
+
+					-- An ephemeral slot exists only while it is the active slot; retire the one we just left.
+					if leavingEphemeral and leftSlotId ~= active then
+						self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
 					end
 				end))
 			end)
@@ -627,6 +728,11 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 end
 
 function HasSaveSlots._getSlotStore(self: HasSaveSlots, slotId: SaveSlotData.SlotId): DataStoreStage.DataStoreStage
+	local ephemeralStore = self._ephemeralStores[slotId]
+	if ephemeralStore then
+		return ephemeralStore
+	end
+
 	local slot = self._slotMap[slotId]
 	if slot and (SaveSlotData.SlotIndex:Get(slot) == SaveSlotConstants.DEFAULT_SLOT_INDEX) then
 		return self._dataStore
@@ -634,11 +740,15 @@ function HasSaveSlots._getSlotStore(self: HasSaveSlots, slotId: SaveSlotData.Slo
 	return self._systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):GetSubStore(slotId)
 end
 
+local MUTABLE_METADATA_KEYS =
+	{ "SlotName", "CreatedTime", "LastPlayedTime", "Summary", "TimePlayed", "PlayCount", "LastSessionLength" }
+
 function HasSaveSlots._buildSlot(
 	self: HasSaveSlots,
 	slotId: SaveSlotData.SlotId,
 	data: SaveSlotData.SaveSlotMetadata,
-	isNew: boolean?
+	isNew: boolean?,
+	isEphemeral: boolean?
 ): ()
 	local maid = Maid.new()
 	self._maid[slotId] = maid
@@ -647,11 +757,35 @@ function HasSaveSlots._buildSlot(
 	slot.Name = slotId
 	slot.Archivable = false
 
-	local metadataStore = self._metadataStore:GetSubStore(slotId)
-
 	local attributes = SaveSlotData:Create(slot)
 	attributes.SlotId.Value = slotId
 	attributes.SlotIndex.Value = data.SlotIndex
+
+	if isEphemeral then
+		-- Ephemeral: seed the metadata in memory with no write-back wiring, back the slot with an in-memory
+		-- store, and deliberately leave the folder unparented so it never joins the replicated slot container
+		-- (SaveSlotDataService lists that container's children -- an ephemeral slot must not surface as a save).
+		--
+		-- The in-memory store's lifetime is owned by this slot's maid (which is in turn owned by self._maid),
+		-- so it is Destroyed -- and becomes GC-eligible -- the instant the slot is retired (_destroyEphemeralSlot)
+		-- or the player unbinds. Nothing outside this object holds a lasting reference: while the slot is active
+		-- ObserveActiveSlotStoreBrio hands it out inside a Brio that dies when the slot deselects, releasing it.
+		attributes.IsEphemeral.Value = true
+		self._ephemeralStores[slotId] = maid:Add(InMemoryDataStore.new(slotId))
+
+		for _, key in MUTABLE_METADATA_KEYS do
+			attributes[key].Value = data[key]
+		end
+
+		self._slotMap[slotId] = slot
+		maid:GiveTask(function()
+			self._slotMap[slotId] = nil
+			self._ephemeralStores[slotId] = nil
+		end)
+		return
+	end
+
+	local metadataStore = self._metadataStore:GetSubStore(slotId)
 
 	-- Store immutable SlotIndex once on creation
 	if isNew then
@@ -659,9 +793,7 @@ function HasSaveSlots._buildSlot(
 	end
 
 	-- Store mutable metadata on change
-	for _, key in
-		{ "SlotName", "CreatedTime", "LastPlayedTime", "Summary", "TimePlayed", "PlayCount", "LastSessionLength" }
-	do
+	for _, key in MUTABLE_METADATA_KEYS do
 		attributes[key].Value = data[key]
 		maid:GiveTask(metadataStore:StoreOnValueChange(key, attributes[key]))
 
@@ -677,6 +809,23 @@ function HasSaveSlots._buildSlot(
 	maid:GiveTask(function()
 		self._slotMap[slotId] = nil
 	end)
+end
+
+-- Whether the slot is an ephemeral (session-only, never-persisted) slot. The slot's own IsEphemeral property
+-- is the single source of truth (set once at creation in _buildSlot); nil-safe so callers can pass a possibly
+-- nil active-slot id directly.
+function HasSaveSlots._isEphemeral(self: HasSaveSlots, slotId: SaveSlotData.SlotId?): boolean
+	if slotId == nil then
+		return false
+	end
+	local slot = self._slotMap[slotId]
+	return slot ~= nil and SaveSlotData.IsEphemeral:Get(slot) == true
+end
+
+-- Tears down the ephemeral slot's maid (folder, in-memory store, and every map entry via the teardown task
+-- registered in _buildSlot). Idempotent -- clearing an already-cleared maid key is a no-op.
+function HasSaveSlots._destroyEphemeralSlot(self: HasSaveSlots, slotId: SaveSlotData.SlotId): ()
+	self._maid[slotId] = nil
 end
 
 function HasSaveSlots._setupSummary(self: HasSaveSlots): ()
