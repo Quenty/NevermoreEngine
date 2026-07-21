@@ -34,8 +34,8 @@ store:SetRaw(&quot;key&quot;, { coins = 5 })
 -- Simulate Roblox datastores being down
 store:FailAllRequests(DataStoreMock.OPERATION_NOT_ALLOWED_509)
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/DataStoreMock"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreMock" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreMock" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.2c148d2a.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.984d1c2f.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.847b3181.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.ae1dd7b9.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -59,79 +59,98 @@ store<span class="token punctuation">:</span><span class="token function">SetRaw
 <span class="token comment">-- Simulate Roblox datastores being down</span>
 store<span class="token punctuation">:</span><span class="token function">FailAllRequests</span><span class="token punctuation">(</span>DataStoreMock<span class="token punctuation">.</span>OPERATION_NOT_ALLOWED_509<span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="OPERATION_NOT_ALLOWED_509"><code style="text-decoration:none">OPERATION_NOT_ALLOWED_509</code><a href="#OPERATION_NOT_ALLOWED_509" class="hash-link" aria-label="Direct link to OPERATION_NOT_ALLOWED_509" title="Direct link to OPERATION_NOT_ALLOWED_509" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L46"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.<!-- -->OPERATION_NOT_ALLOWED_509<!-- -->:<!-- --> </code> <code class="blue_P4bS">string</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="OPERATION_NOT_ALLOWED_509"><code style="text-decoration:none">OPERATION_NOT_ALLOWED_509</code><a href="#OPERATION_NOT_ALLOWED_509" class="hash-link" aria-label="Direct link to OPERATION_NOT_ALLOWED_509" title="Direct link to OPERATION_NOT_ALLOWED_509" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L56"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.<!-- -->OPERATION_NOT_ALLOWED_509<!-- -->:<!-- --> </code> <code class="blue_P4bS">string</code></div><div>
 <p>
   The error Roblox raises when datastore operations run on a Personal RCC. This is the
   real-world failure that motivated the mock.
 </p>
-</div><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isDataStoreMock"><code style="text-decoration:none">isDataStoreMock</code><a href="#isDataStoreMock" class="hash-link" aria-label="Direct link to isDataStoreMock" title="Direct link to isDataStoreMock" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L82"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">isDataStoreMock</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="MAX_VALUE_LENGTH"><code style="text-decoration:none">MAX_VALUE_LENGTH</code><a href="#MAX_VALUE_LENGTH" class="hash-link" aria-label="Direct link to MAX_VALUE_LENGTH" title="Direct link to MAX_VALUE_LENGTH" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L68"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.<!-- -->MAX_VALUE_LENGTH<!-- -->:<!-- --> </code> <code class="blue_P4bS">number</code></div><div>
+<p>
+  The per-key serialized-value ceiling Roblox enforces (4 MB). Real datastores serialize a key's
+  whole value to JSON and reject the write when that blob is larger than this, which is how a save
+  fails once too much data accumulates under one key. Pass this (or a smaller value, to trigger it
+  without a multi-megabyte payload) to <a href="/NevermoreEngine/api/DataStoreMock#SetMaxValueLength">DataStoreMock.SetMaxValueLength</a>.
+</p>
+</div><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isDataStoreMock"><code style="text-decoration:none">isDataStoreMock</code><a href="#isDataStoreMock" class="hash-link" aria-label="Direct link to isDataStoreMock" title="Direct link to isDataStoreMock" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L104"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">isDataStoreMock</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>
   Returns whether the given value is a <a href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a>. Used by <a href="/NevermoreEngine/api/DataStorePromises">DataStorePromises</a> so the
   mock can stand in for a real datastore <code>Instance</code>.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L93"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>scope<!-- -->: </code><code class="blue_P4bS">string?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L115"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>name<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>scope<!-- -->: </code><code class="blue_P4bS">string?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code></div><div>
 <p>Constructs a new DataStoreMock.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetYieldTime"><code style="text-decoration:none">SetYieldTime</code><a href="#SetYieldTime" class="hash-link" aria-label="Direct link to SetYieldTime" title="Direct link to SetYieldTime" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L119"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetYieldTime</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>yieldTime<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetYieldTime"><code style="text-decoration:none">SetYieldTime</code><a href="#SetYieldTime" class="hash-link" aria-label="Direct link to SetYieldTime" title="Direct link to SetYieldTime" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L142"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetYieldTime</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>yieldTime<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Sets how long (in seconds) each request yields before completing, to mimic real
   datastore latency. Defaults to 0 (no yield) so tests stay fast.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetErrorInjector"><code style="text-decoration:none">SetErrorInjector</code><a href="#SetErrorInjector" class="hash-link" aria-label="Direct link to SetErrorInjector" title="Direct link to SetErrorInjector" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L131"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetErrorInjector</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>errorInjector<!-- -->: </code><code class="purple_ieR2">(</code><code class="green_DgR4">(</code><code class="blue_P4bS">ErrorInjectorContext</code><code class="green_DgR4">)</code><code class="green_DgR4"> → </code><code class="blue_P4bS">string?</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetMaxValueLength"><code style="text-decoration:none">SetMaxValueLength</code><a href="#SetMaxValueLength" class="hash-link" aria-label="Direct link to SetMaxValueLength" title="Direct link to SetMaxValueLength" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L160"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetMaxValueLength</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>maxValueLength<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>
+  Enforces a serialized-value ceiling on <code>SetAsync</code>/<code>UpdateAsync</code>, mirroring the way real
+  datastores reject a write once a key's whole value serializes past their per-key size limit.
+  A write whose value JSON-encodes to more than <code>maxValueLength</code> bytes throws (and stores nothing),
+  so tests can exercise the overflow-save failure path without a multi-megabyte payload. A value the
+  mock cannot serialize at all throws the same way a real datastore rejects non-UTF-8 data.
+</p>
+<p>
+  Pass <a href="/NevermoreEngine/api/DataStoreMock#MAX_VALUE_LENGTH">DataStoreMock.MAX_VALUE_LENGTH</a> for the real 4 MB ceiling, a smaller number to trigger it
+  cheaply, or nil to disable the check (the default, so existing tests are unaffected).
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetErrorInjector"><code style="text-decoration:none">SetErrorInjector</code><a href="#SetErrorInjector" class="hash-link" aria-label="Direct link to SetErrorInjector" title="Direct link to SetErrorInjector" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L172"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetErrorInjector</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>errorInjector<!-- -->: </code><code class="purple_ieR2">(</code><code class="green_DgR4">(</code><code class="blue_P4bS">ErrorInjectorContext</code><code class="green_DgR4">)</code><code class="green_DgR4"> → </code><code class="blue_P4bS">string?</code><code class="purple_ieR2">)</code><code class="blue_P4bS">?</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Injects a callback consulted before every request. Returning a string from the callback
   makes that request throw the string as its error; returning nil lets the request proceed.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FailAllRequests"><code style="text-decoration:none">FailAllRequests</code><a href="#FailAllRequests" class="hash-link" aria-label="Direct link to FailAllRequests" title="Direct link to FailAllRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L143"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">FailAllRequests</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>errorMessage<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FailAllRequests"><code style="text-decoration:none">FailAllRequests</code><a href="#FailAllRequests" class="hash-link" aria-label="Direct link to FailAllRequests" title="Direct link to FailAllRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L184"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">FailAllRequests</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>errorMessage<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>Defaults to the 509 Personal-RCC error</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Makes every subsequent request throw the given error until <a href="/NevermoreEngine/api/DataStoreMock#StopFailing">DataStoreMock.StopFailing</a>
   is called. Simulates a total datastore outage.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FailNextRequests"><code style="text-decoration:none">FailNextRequests</code><a href="#FailNextRequests" class="hash-link" aria-label="Direct link to FailNextRequests" title="Direct link to FailNextRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L159"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">FailNextRequests</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>count<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>errorMessage<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FailNextRequests"><code style="text-decoration:none">FailNextRequests</code><a href="#FailNextRequests" class="hash-link" aria-label="Direct link to FailNextRequests" title="Direct link to FailNextRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L200"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">FailNextRequests</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>count<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>errorMessage<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>Defaults to the 509 Personal-RCC error</p>
 </span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Makes the next <code>count</code> requests throw the given error, then recover. Simulates a
   transient outage that the retry logic is expected to survive.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="StopFailing"><code style="text-decoration:none">StopFailing</code><a href="#StopFailing" class="hash-link" aria-label="Direct link to StopFailing" title="Direct link to StopFailing" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L177"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">StopFailing</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="StopFailing"><code style="text-decoration:none">StopFailing</code><a href="#StopFailing" class="hash-link" aria-label="Direct link to StopFailing" title="Direct link to StopFailing" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L218"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">StopFailing</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Clears any injected failures.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="BlockRequests"><code style="text-decoration:none">BlockRequests</code><a href="#BlockRequests" class="hash-link" aria-label="Direct link to BlockRequests" title="Direct link to BlockRequests" translate="no">  ​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L187"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">BlockRequests</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="BlockRequests"><code style="text-decoration:none">BlockRequests</code><a href="#BlockRequests" class="hash-link" aria-label="Direct link to BlockRequests" title="Direct link to BlockRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L228"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">BlockRequests</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Makes every subsequent request hang (yield) inside the datastore call until
   <a href="/NevermoreEngine/api/DataStoreMock#UnblockRequests">DataStoreMock.UnblockRequests</a> is called. Simulates a request that does not settle -- e.g. a
   lock command that can take up to ~30s to propagate across servers -- so tests can exercise a
   request in flight (and its maid cancelling the yielding thread).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="UnblockRequests"><code style="text-decoration:none">UnblockRequests</code><a href="#UnblockRequests" class="hash-link" aria-label="Direct link to UnblockRequests" title="Direct link to UnblockRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L195"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">UnblockRequests</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="UnblockRequests"><code style="text-decoration:none">UnblockRequests</code><a href="#UnblockRequests" class="hash-link" aria-label="Direct link to UnblockRequests" title="Direct link to UnblockRequests" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L236"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">UnblockRequests</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Releases requests blocked by <a href="/NevermoreEngine/api/DataStoreMock#BlockRequests">DataStoreMock.BlockRequests</a>. A request whose thread was cancelled
   while blocked never resumes.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetCallCount"><code style="text-decoration:none">GetCallCount</code><a href="#GetCallCount" class="hash-link" aria-label="Direct link to GetCallCount" title="Direct link to GetCallCount" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L206"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetCallCount</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>method<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetCallCount"><code style="text-decoration:none">GetCallCount</code><a href="#GetCallCount" class="hash-link" aria-label="Direct link to GetCallCount" title="Direct link to GetCallCount" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L247"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetCallCount</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>method<!-- -->: </code><code class="blue_P4bS">string?</code><span class="inlineDescription_G7Er">-- <span>
 <p>e.g. "GetAsync", "UpdateAsync"</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>
   Returns the number of times a given API was called (or total across all APIs when no
   method is given). Failed calls count too.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetRaw"><code style="text-decoration:none">SetRaw</code><a href="#SetRaw" class="hash-link" aria-label="Direct link to SetRaw" title="Direct link to SetRaw" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L220"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetRaw</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>value<!-- -->: </code><code class="blue_P4bS">any</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetRaw"><code style="text-decoration:none">SetRaw</code><a href="#SetRaw" class="hash-link" aria-label="Direct link to SetRaw" title="Direct link to SetRaw" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L261"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetRaw</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>value<!-- -->: </code><code class="blue_P4bS">any</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Directly seeds a stored value without datastore semantics (no version bump, no failure
   injection). For test setup.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetRaw"><code style="text-decoration:none">GetRaw</code><a href="#GetRaw" class="hash-link" aria-label="Direct link to GetRaw" title="Direct link to GetRaw" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L232"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetRaw</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS">any</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetRaw"><code style="text-decoration:none">GetRaw</code><a href="#GetRaw" class="hash-link" aria-label="Direct link to GetRaw" title="Direct link to GetRaw" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L273"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetRaw</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS">any</code></div><div>
 <p>Directly reads a stored value without datastore semantics. For test assertions.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetAsync"><code style="text-decoration:none">GetAsync</code><a href="#GetAsync" class="hash-link" aria-label="Direct link to GetAsync" title="Direct link to GetAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L288"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetAsync"><code style="text-decoration:none">GetAsync</code><a href="#GetAsync" class="hash-link" aria-label="Direct link to GetAsync" title="Direct link to GetAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L350"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">GetAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
 <p>value, keyInfo</p>
 </span></span></div><div>
 <p>Mimics <code>GlobalDataStore:GetAsync</code>.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetAsync"><code style="text-decoration:none">SetAsync</code><a href="#SetAsync" class="hash-link" aria-label="Direct link to SetAsync" title="Direct link to SetAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L305"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>userIds<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><code>,</code></div><div><code>options<!-- -->: </code><code class="blue_P4bS">any?</code></div></div><code>) → </code><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetAsync"><code style="text-decoration:none">SetAsync</code><a href="#SetAsync" class="hash-link" aria-label="Direct link to SetAsync" title="Direct link to SetAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L367"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">SetAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>userIds<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><code>,</code></div><div><code>options<!-- -->: </code><code class="blue_P4bS">any?</code></div></div><code>) → </code><code class="blue_P4bS">string</code><span class="inlineDescription_G7Er">-- <span>
 <p>version</p>
 </span></span></div><div>
 <p>Mimics <code>GlobalDataStore:SetAsync</code>.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="UpdateAsync"><code style="text-decoration:none">UpdateAsync</code><a href="#UpdateAsync" class="hash-link" aria-label="Direct link to UpdateAsync" title="Direct link to UpdateAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L335"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">UpdateAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>transformFunction<!-- -->: </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">...any</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="UpdateAsync"><code style="text-decoration:none">UpdateAsync</code><a href="#UpdateAsync" class="hash-link" aria-label="Direct link to UpdateAsync" title="Direct link to UpdateAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L398"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">UpdateAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>transformFunction<!-- -->: </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">...any</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
 <p>value, keyInfo</p>
 </span></span></div><div>
 <p>
@@ -139,11 +158,11 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
   key-info stand-in, and returns <code>newValue [, userIds [, metadata]]</code>. Returning nil cancels
   the update (matching Roblox semantics).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RemoveAsync"><code style="text-decoration:none">RemoveAsync</code><a href="#RemoveAsync" class="hash-link" aria-label="Direct link to RemoveAsync" title="Direct link to RemoveAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L368"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">RemoveAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RemoveAsync"><code style="text-decoration:none">RemoveAsync</code><a href="#RemoveAsync" class="hash-link" aria-label="Direct link to RemoveAsync" title="Direct link to RemoveAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L433"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">RemoveAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="purple_ieR2">(</code><div class="inset_uKQm"><code class="blue_P4bS">any</code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">any</code></div><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
 <p>removed value, keyInfo</p>
 </span></span></div><div>
 <p>Mimics <code>GlobalDataStore:RemoveAsync</code>.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="IncrementAsync"><code style="text-decoration:none">IncrementAsync</code><a href="#IncrementAsync" class="hash-link" aria-label="Direct link to IncrementAsync" title="Direct link to IncrementAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L390"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">IncrementAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>delta<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="IncrementAsync"><code style="text-decoration:none">IncrementAsync</code><a href="#IncrementAsync" class="hash-link" aria-label="Direct link to IncrementAsync" title="Direct link to IncrementAsync" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/Mocks/DataStoreMock.lua#L455"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreMock<!-- -->.</code><code class="green_DgR4">IncrementAsync</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>delta<!-- -->: </code><code class="blue_P4bS">number?</code></div></div><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Mimics <code>GlobalDataStore:IncrementAsync</code>.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -165,7 +184,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 82,
+                &quot;line&quot;: 104,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -192,7 +211,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 93,
+                &quot;line&quot;: 115,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -214,7 +233,29 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 119,
+                &quot;line&quot;: 142,
+                &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;SetMaxValueLength&quot;,
+            &quot;desc&quot;: &quot;Enforces a serialized-value ceiling on `SetAsync`/`UpdateAsync`, mirroring the way real\ndatastores reject a write once a key&#x27;s whole value serializes past their per-key size limit.\nA write whose value JSON-encodes to more than `maxValueLength` bytes throws (and stores nothing),\nso tests can exercise the overflow-save failure path without a multi-megabyte payload. A value the\nmock cannot serialize at all throws the same way a real datastore rejects non-UTF-8 data.\n\nPass [DataStoreMock.MAX_VALUE_LENGTH] for the real 4 MB ceiling, a smaller number to trigger it\ncheaply, or nil to disable the check (the default, so existing tests are unaffected).&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;DataStoreMock&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;maxValueLength&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;number?&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 160,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -236,7 +277,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 131,
+                &quot;line&quot;: 172,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -258,7 +299,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 143,
+                &quot;line&quot;: 184,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -285,7 +326,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 159,
+                &quot;line&quot;: 200,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -302,7 +343,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 177,
+                &quot;line&quot;: 218,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -319,7 +360,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 187,
+                &quot;line&quot;: 228,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -336,7 +377,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 195,
+                &quot;line&quot;: 236,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -363,7 +404,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 206,
+                &quot;line&quot;: 247,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -390,7 +431,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 220,
+                &quot;line&quot;: 261,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -417,7 +458,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 232,
+                &quot;line&quot;: 273,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -444,7 +485,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 288,
+                &quot;line&quot;: 350,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -486,7 +527,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 305,
+                &quot;line&quot;: 367,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -518,7 +559,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 335,
+                &quot;line&quot;: 398,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -545,7 +586,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 368,
+                &quot;line&quot;: 433,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         },
@@ -577,7 +618,7 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 390,
+                &quot;line&quot;: 455,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         }
@@ -588,7 +629,16 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
             &quot;desc&quot;: &quot;The error Roblox raises when datastore operations run on a Personal RCC. This is the\nreal-world failure that motivated the mock.&quot;,
             &quot;lua_type&quot;: &quot;string&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 46,
+                &quot;line&quot;: 56,
+                &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;MAX_VALUE_LENGTH&quot;,
+            &quot;desc&quot;: &quot;The per-key serialized-value ceiling Roblox enforces (4 MB). Real datastores serialize a key&#x27;s\nwhole value to JSON and reject the write when that blob is larger than this, which is how a save\nfails once too much data accumulates under one key. Pass this (or a smaller value, to trigger it\nwithout a multi-megabyte payload) to [DataStoreMock.SetMaxValueLength].&quot;,
+            &quot;lua_type&quot;: &quot;number&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 68,
                 &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
             }
         }
@@ -603,6 +653,6 @@ store<span class="token punctuation">:</span><span class="token function">FailAl
         &quot;line&quot;: 23,
         &quot;path&quot;: &quot;src/datastore/src/Server/Mocks/DataStoreMock.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#OPERATION_NOT_ALLOWED_509" class="table-of-contents__link toc-highlight">OPERATION_NOT_ALLOWED_509</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#BlockRequests" class="table-of-contents__link toc-highlight">.BlockRequests</a></li><li><a href="#FailAllRequests" class="table-of-contents__link toc-highlight">.FailAllRequests</a></li><li><a href="#FailNextRequests" class="table-of-contents__link toc-highlight">.FailNextRequests</a></li><li><a href="#GetAsync" class="table-of-contents__link toc-highlight">.GetAsync</a></li><li><a href="#GetCallCount" class="table-of-contents__link toc-highlight">.GetCallCount</a></li><li><a href="#GetRaw" class="table-of-contents__link toc-highlight">.GetRaw</a></li><li><a href="#IncrementAsync" class="table-of-contents__link toc-highlight">.IncrementAsync</a></li><li><a href="#isDataStoreMock" class="table-of-contents__link toc-highlight">.isDataStoreMock</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li><li><a href="#RemoveAsync" class="table-of-contents__link toc-highlight">.RemoveAsync</a></li><li><a href="#SetAsync" class="table-of-contents__link toc-highlight">.SetAsync</a></li><li><a href="#SetErrorInjector" class="table-of-contents__link toc-highlight">.SetErrorInjector</a></li><li><a href="#SetRaw" class="table-of-contents__link toc-highlight">.SetRaw</a></li><li><a href="#SetYieldTime" class="table-of-contents__link toc-highlight">.SetYieldTime</a></li><li><a href="#StopFailing" class="table-of-contents__link toc-highlight">.StopFailing</a></li><li><a href="#UnblockRequests" class="table-of-contents__link toc-highlight">.UnblockRequests</a></li><li><a href="#UpdateAsync" class="table-of-contents__link toc-highlight">.UpdateAsync</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#MAX_VALUE_LENGTH" class="table-of-contents__link toc-highlight">MAX_VALUE_LENGTH</a></li><li><a href="#OPERATION_NOT_ALLOWED_509" class="table-of-contents__link toc-highlight">OPERATION_NOT_ALLOWED_509</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#BlockRequests" class="table-of-contents__link toc-highlight">.BlockRequests</a></li><li><a href="#FailAllRequests" class="table-of-contents__link toc-highlight">.FailAllRequests</a></li><li><a href="#FailNextRequests" class="table-of-contents__link toc-highlight">.FailNextRequests</a></li><li><a href="#GetAsync" class="table-of-contents__link toc-highlight">.GetAsync</a></li><li><a href="#GetCallCount" class="table-of-contents__link toc-highlight">.GetCallCount</a></li><li><a href="#GetRaw" class="table-of-contents__link toc-highlight">.GetRaw</a></li><li><a href="#IncrementAsync" class="table-of-contents__link toc-highlight">.IncrementAsync</a></li><li><a href="#isDataStoreMock" class="table-of-contents__link toc-highlight">.isDataStoreMock</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li><li><a href="#RemoveAsync" class="table-of-contents__link toc-highlight">.RemoveAsync</a></li><li><a href="#SetAsync" class="table-of-contents__link toc-highlight">.SetAsync</a></li><li><a href="#SetErrorInjector" class="table-of-contents__link toc-highlight">.SetErrorInjector</a></li><li><a href="#SetMaxValueLength" class="table-of-contents__link toc-highlight">.SetMaxValueLength</a></li><li><a href="#SetRaw" class="table-of-contents__link toc-highlight">.SetRaw</a></li><li><a href="#SetYieldTime" class="table-of-contents__link toc-highlight">.SetYieldTime</a></li><li><a href="#StopFailing" class="table-of-contents__link toc-highlight">.StopFailing</a></li><li><a href="#UnblockRequests" class="table-of-contents__link toc-highlight">.UnblockRequests</a></li><li><a href="#UpdateAsync" class="table-of-contents__link toc-highlight">.UpdateAsync</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
