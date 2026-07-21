@@ -9,9 +9,10 @@
 	slice with their own on arrival. A non-envelope table (an in-flight teleport from a build predating
 	this, or a hand-written `TeleportData`) is read as-is, so the change is backward compatible.
 
-	All logic here is pure and keyed by plain numbers, so it is unit tested without any [Player].
+	All logic here is pure and keyed by plain numbers, so it is unit tested without any [Player]. It is
+	shared (not server-only) because both realms unwrap arrived data: the server keys each player's
+	slice by their UserId, the client by the local player's.
 
-	@server
 	@class TeleportDataEnvelopeUtils
 ]=]
 

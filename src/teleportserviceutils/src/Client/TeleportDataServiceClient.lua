@@ -10,10 +10,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
+local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 
 local TeleportDataServiceClient = {}
 TeleportDataServiceClient.ServiceName = "TeleportDataServiceClient"
@@ -22,7 +24,9 @@ export type TeleportDataServiceClient = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_arrivedData: { [string]: any }?,
+		-- The raw arrived table (envelope or legacy flat), captured before unwrapping. Kept raw rather
+		-- than pre-sliced so the slice can be re-derived and the test seam injects what actually arrived.
+		_arrivedRaw: { [string]: any }?,
 		-- Arrived data is captured lazily on first read (not at Init) so a test can inject an override
 		-- before anything consumes it; `_arrivedRead` lets the test seam assert it did so in time.
 		_arrivedResolved: boolean,
@@ -46,25 +50,50 @@ function TeleportDataServiceClient.Init(self: TeleportDataServiceClient, service
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._arrivedData = nil
+	self._arrivedRaw = nil
 	self._arrivedResolved = false
 	self._arrivedRead = false
 end
 
 --[=[
-	Returns the teleport data the local player arrived with, or nil. Resolved once (from the real
-	teleport data, or a test override) and cached for the life of the session.
+	Returns the teleport data the local player arrived with, or nil. The raw table is resolved once
+	(from the real teleport data, or a test override) and cached for the life of the session; an
+	envelope is unwrapped to the local player's slice on read, mirroring the server's
+	[TeleportDataService.GetArrivedTeleportData].
 
 	@return { [string]: any }?
 ]=]
 function TeleportDataServiceClient.GetArrivedTeleportData(self: TeleportDataServiceClient): { [string]: any }?
 	if not self._arrivedResolved then
-		self._arrivedData = readLocalPlayerTeleportData()
+		self._arrivedRaw = readLocalPlayerTeleportData()
 		self._arrivedResolved = true
 	end
 
 	self._arrivedRead = true
-	return self._arrivedData
+
+	local raw = self._arrivedRaw
+	if type(raw) ~= "table" then
+		return nil
+	end
+
+	-- Legacy/hand-written flat data is read as-is; only an envelope is unwrapped to this player's
+	-- slice, which is why the UserId read is deferred to here (a headless client has no LocalPlayer).
+	if not TeleportDataEnvelopeUtils.isEnvelope(raw) then
+		return raw :: { [string]: any }
+	end
+
+	return TeleportDataEnvelopeUtils.readSlice(raw, self:_getLocalUserId())
+end
+
+--[=[
+	Resolves the UserId used to select the local player's envelope slice. A method so tests can stand
+	in a fixed id (a headless client has no `Players.LocalPlayer`), mirroring the server's
+	`_getUserId` seam.
+
+	@return number
+]=]
+function TeleportDataServiceClient._getLocalUserId(_self: TeleportDataServiceClient): number
+	return Players.LocalPlayer.UserId
 end
 
 --[=[
@@ -110,7 +139,7 @@ function TeleportDataServiceClient.SetArrivedTeleportDataForTesting(
 		"Cannot set arrived teleport data after it has been read -- inject it before anything reads it"
 	)
 
-	self._arrivedData = data
+	self._arrivedRaw = data
 	self._arrivedResolved = true
 end
 
