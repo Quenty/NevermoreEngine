@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/nevermoreclimanifest@1.5.0`, `@quenty/saveslot@1.10.0`, `@quenty/teleportserviceutils@9.36.0`, `@quenty/nevermore-cli@4.41.0`
+  - feat: Add additional metadata to versions [#740](https://github.com/Quenty/NevermoreEngine/pull/740) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/brine@1.9.0`, `@quenty/datastore@13.44.0`, `@quenty/gameproductservice@14.58.0`, `@quenty/influxdbclient@7.38.0`, `@quenty/saveslot@1.9.0`, `@quenty/teleportserviceutils@9.35.0`
   - test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
 
