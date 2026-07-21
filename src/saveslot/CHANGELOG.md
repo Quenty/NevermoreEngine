@@ -1,24 +1,17 @@
-# v1.11.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add ephemeral save slots [#741](https://github.com/Quenty/NevermoreEngine/pull/741) ([@Quenty](https://github.com/Quenty))
-- feat: Add ephemeral save slots ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix(saveslot): satisfy luau-lsp on ephemeral slot code ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.10.0...@quenty/saveslot@1.11.0) (2026-07-21)
+
+### Bug Fixes
+
+- **saveslot:** satisfy luau-lsp on ephemeral slot code ([12ac92b](https://github.com/Quenty/NevermoreEngine/commit/12ac92b5ecabc391b1cb716c16a3ee7113d7175f))
+
+### Features
+
+- Add ephemeral save slots ([16bd91b](https://github.com/Quenty/NevermoreEngine/commit/16bd91b87943a65165245cba90d44274585903d6))
 
 # [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.9.0...@quenty/saveslot@1.10.0) (2026-07-21)
 

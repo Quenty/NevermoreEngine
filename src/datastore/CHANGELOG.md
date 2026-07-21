@@ -1,20 +1,13 @@
-# v13.45.0 (Tue Jul 21 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add ephemeral save slots [#741](https://github.com/Quenty/NevermoreEngine/pull/741) ([@Quenty](https://github.com/Quenty))
-- feat: Add ephemeral save slots ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.44.0...@quenty/datastore@13.45.0) (2026-07-21)
+
+### Features
+
+- Add ephemeral save slots ([16bd91b](https://github.com/Quenty/NevermoreEngine/commit/16bd91b87943a65165245cba90d44274585903d6))
 
 # [13.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.43.0...@quenty/datastore@13.44.0) (2026-07-21)
 
