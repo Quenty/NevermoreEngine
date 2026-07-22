@@ -84,11 +84,11 @@ instrumentation that still times out tells you nothing. Two distinct causes to r
 
 ### Test fails with `loader is not a valid member of ModuleScript "..."`
 
-The standard file header `require(script.Parent.loader).load(script)` only resolves when the file
-is a direct child of a realm folder (`Shared/`, `Client/`, `Server/`), where the loader link is
-injected as a sibling. A spec (or any file) placed *inside* an `init.lua`-style ModuleScript folder
-has the ModuleScript itself as `script.Parent`, so the require throws at runtime — Jest reports the
-whole suite as failed with 0 tests run.
+The standard file header `require(script.Parent.loader).load(script)` deliberately does not
+resolve under a ModuleScript: loader links are never injected inside ModuleScripts, so libraries
+that use sub-modules don't accidentally intercept a loader. A spec (or any file) placed *inside*
+an `init.lua`-style ModuleScript folder therefore has no `loader` to find — the require throws at
+runtime and Jest reports the whole suite as failed with 0 tests run.
 
 Fix: move the file up so it sits directly under the realm folder, and require the module under test
 by name (`require("MyModule")`) instead of `require(script.Parent)`.
