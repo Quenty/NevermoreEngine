@@ -82,6 +82,17 @@ instrumentation that still times out tells you nothing. Two distinct causes to r
   step detached (`task.spawn`) so the test body returns, and have a later test in the same suite
   sample and print the detached thread's `coroutine.status`/`debug.traceback`.
 
+### Test fails with `loader is not a valid member of ModuleScript "..."`
+
+The standard file header `require(script.Parent.loader).load(script)` only resolves when the file
+is a direct child of a realm folder (`Shared/`, `Client/`, `Server/`), where the loader link is
+injected as a sibling. A spec (or any file) placed *inside* an `init.lua`-style ModuleScript folder
+has the ModuleScript itself as `script.Parent`, so the require throws at runtime — Jest reports the
+whole suite as failed with 0 tests run.
+
+Fix: move the file up so it sits directly under the realm folder, and require the module under test
+by name (`require("MyModule")`) instead of `require(script.Parent)`.
+
 ## Rojo
 
 ### Rojo build errors or missing modules
