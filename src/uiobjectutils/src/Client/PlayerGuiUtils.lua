@@ -6,11 +6,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 
 local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
+local PlayerMockUtils = require("PlayerMockUtils")
 local Rx = require("Rx")
 
 local PlayerGuiUtils = {}
@@ -74,21 +74,15 @@ function PlayerGuiUtils.observePlayerGui(): Observable.Observable<PlayerGui?>
 		return Rx.of(PlayerGuiUtils.findPlayerGui()) :: any
 	end
 
-	return Observable.new(function(sub)
-		local function update()
-			sub:Fire(PlayerGuiUtils.findPlayerGui())
-		end
+	return PlayerMockUtils.observeMockedLocalPlayer():Pipe({
+		Rx.map(function(localPlayer: Player?): PlayerGui?
+			if localPlayer ~= nil then
+				return PlayerMock.getPlayerGui(localPlayer)
+			end
 
-		local addedConnection = CollectionService:GetInstanceAddedSignal(PlayerMock.LOCAL_PLAYER_TAG):Connect(update)
-		local removedConnection = CollectionService:GetInstanceRemovedSignal(PlayerMock.LOCAL_PLAYER_TAG)
-			:Connect(update)
-		update()
-
-		return function()
-			addedConnection:Disconnect()
-			removedConnection:Disconnect()
-		end
-	end) :: any
+			return nil
+		end) :: any,
+	}) :: any
 end
 
 return PlayerGuiUtils

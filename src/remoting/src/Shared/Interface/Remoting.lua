@@ -529,9 +529,6 @@ function Remoting.FireServer(self: Remoting, memberName: string, ...)
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "FireServer must be called on client")
 
-	-- Fire-and-forget: no caller can consume the internal promise through this API. A nil rejection
-	-- is cancellation (e.g. the remoting torn down mid-fire) and stays silent; a valued rejection is
-	-- a genuine failure (e.g. the remote never appeared) and must stay visible.
 	self:PromiseFireServer(memberName, ...):Catch(function(err)
 		if err ~= nil then
 			warn(

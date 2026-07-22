@@ -99,18 +99,10 @@ PlayerMock.TAG = MOCK_TAG
 -- still letting DI-less code like dummy-mode Remoting resolve it.
 local LOCAL_PLAYER_TAG = "PlayerMockLocalPlayer"
 
---[=[
-	The CollectionService tag carried by the mock currently designated as the local player (see
-	[PlayerMock.setMockedLocalPlayer]). Exposed so consumers can *observe* the designation changing --
-	via `CollectionService:GetInstanceAddedSignal`/`GetInstanceRemovedSignal` -- instead of one-shot
-	reading [PlayerMock.getMockedLocalPlayer], which goes stale when a test designates after the
-	consumer initializes (designation is only required before bags Start, not before Init).
-
-	@prop LOCAL_PLAYER_TAG string
-	@readonly
-	@within PlayerMock
-]=]
-PlayerMock.LOCAL_PLAYER_TAG = LOCAL_PLAYER_TAG
+-- Shared with PlayerMockUtils (same package) so [PlayerMockUtils.observeMockedLocalPlayer] can watch
+-- the designation change via the tag signals. Not public API -- consumers observe the designation
+-- through that observable rather than the raw tag.
+PlayerMock._LOCAL_PLAYER_TAG = LOCAL_PLAYER_TAG
 
 type PropertySpec = {
 	default: any,
