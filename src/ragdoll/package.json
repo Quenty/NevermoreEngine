@@ -43,6 +43,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/motor6d": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/physicsutils": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
@@ -50,6 +51,7 @@
     "@quenty/qframe": "workspace:*",
     "@quenty/r15utils": "workspace:*",
     "@quenty/remoting": "workspace:*",
+    "@quenty/rigbuilderutils": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxbinderutils": "workspace:*",
     "@quenty/rxsignal": "workspace:*",
@@ -59,7 +61,8 @@
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

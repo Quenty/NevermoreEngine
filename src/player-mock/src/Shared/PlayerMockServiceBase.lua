@@ -24,7 +24,6 @@ local require = require(script.Parent.loader).load(script)
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
-local TestService = game:GetService("TestService")
 
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
@@ -101,22 +100,19 @@ end
 function PlayerMockServiceBase:_startConsumingMocks()
 	self._consumerId = HttpService:GenerateGUID(false)
 
-	-- Sweep before allocating anything into the maid: a leak detected here throws out of Init, and
-	-- nothing may be left behind for the next test.
-	for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
-		if PlayerMock.isMock(tagged) then
-			self:_consumeMock(tagged)
+	-- A leak detected in this sweep throws out of Init; unwind any tokens already parented into
+	-- earlier mocks so nothing is left behind for the next test.
+	local ok, err = pcall(function()
+		for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
+			if PlayerMock.isMock(tagged) then
+				self:_consumeMock(tagged)
+			end
 		end
+	end)
+	if not ok then
+		self._maid:DoCleaning()
+		error(err, 0)
 	end
-
-	-- The liveness token outlives module copies (batch places load PlayerMock more than once per
-	-- realm), so consumer identity rides the DataModel like the mocks themselves do.
-	local token = Instance.new("Configuration")
-	token.Name = "PlayerMockConsumer"
-	token:SetAttribute("ConsumerId", self._consumerId)
-	CollectionService:AddTag(token, CONSUMER_TOKEN_TAG)
-	token.Parent = TestService
-	self._maid:GiveTask(token)
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(PlayerMock.TAG):Connect(function(instance)
 		if PlayerMock.isMock(instance) then
@@ -129,6 +125,16 @@ function PlayerMockServiceBase:_consumeMock(mock: Instance)
 	local existing = mock:GetAttribute(self._consumedAttributeName)
 	if existing == nil then
 		mock:SetAttribute(self._consumedAttributeName, self._consumerId)
+
+		-- The liveness token outlives module copies (batch places load PlayerMock more than once per
+		-- realm), so consumer identity rides the DataModel with the mock it consumed. It dies with
+		-- the service (maid) or with the mock (parent), whichever goes first.
+		local token = Instance.new("Configuration")
+		token.Name = "PlayerMockConsumer"
+		token:SetAttribute("ConsumerId", self._consumerId)
+		CollectionService:AddTag(token, CONSUMER_TOKEN_TAG)
+		token.Parent = mock
+		self._maid:GiveTask(token)
 		return
 	end
 

@@ -71,13 +71,10 @@ local Workspace = game:GetService("Workspace")
 
 local PlayerMock = {}
 
--- Boolean attribute stamped on every mock so [PlayerMock.isMock] can recognize it without a
--- registry. Real Players never carry it, so the recognition can never false-positive on a real join.
-local MARKER_ATTRIBUTE = "PlayerMock"
-
--- CollectionService tag stamped on every mock alongside the marker attribute. The attribute answers
--- "is this value a mock?"; the tag answers the reverse question "which mocks exist?" -- needed by
+-- CollectionService tag stamped on every mock: the single marker answering both "is this value
+-- a mock?" ([PlayerMock.isMock]) and the reverse question "which mocks exist?" -- needed by
 -- enumerating consumers like [PlayerMock.getMockByUserId] and [PlayerMockService.GetPlayerMocks].
+-- Real Players never carry it, so the recognition can never false-positive on a real join.
 -- `GetTagged` only resolves instances in the DataModel, which matches the engine calls being
 -- mirrored (`Players:GetPlayerByUserId`, `Players:GetPlayers`): they only resolve players that
 -- are in the game.
@@ -176,7 +173,6 @@ function PlayerMock.new(overrides: { [string]: any }?): Player
 
 	local player = Instance.new("Folder")
 	player.Name = if userId ~= nil then string.format("PlayerMock_%d", userId) else "PlayerMock"
-	player:SetAttribute(MARKER_ATTRIBUTE, true)
 	CollectionService:AddTag(player, MOCK_TAG)
 
 	local castPlayer = (player :: any) :: Player
@@ -221,7 +217,9 @@ end
 	@return boolean
 ]=]
 function PlayerMock.isMock(value: any): boolean
-	return typeof(value) == "Instance" and value:GetAttribute(MARKER_ATTRIBUTE) == true
+	-- A mock's backing instance is always a Folder (see [PlayerMock.new]); requiring it rejects
+	-- foreign instances that merely carry the tag.
+	return typeof(value) == "Instance" and value:IsA("Folder") and CollectionService:HasTag(value, MOCK_TAG)
 end
 
 --[=[

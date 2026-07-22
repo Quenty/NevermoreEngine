@@ -5,6 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
@@ -66,6 +67,20 @@ describe("PlayerMock.isMock", function()
 		local folder = Instance.new("Folder")
 		expect(PlayerMock.isMock(folder)).toBe(false)
 		folder:Destroy()
+	end)
+
+	it("returns false for a Folder carrying only a PlayerMock attribute", function()
+		local folder = Instance.new("Folder")
+		folder:SetAttribute("PlayerMock", true)
+		expect(PlayerMock.isMock(folder)).toBe(false)
+		folder:Destroy()
+	end)
+
+	it("returns false for a tagged non-Folder", function()
+		local part = Instance.new("Part")
+		CollectionService:AddTag(part, PlayerMock.TAG)
+		expect(PlayerMock.isMock(part)).toBe(false)
+		part:Destroy()
 	end)
 
 	it("returns false for non-instance values", function()

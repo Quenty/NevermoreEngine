@@ -3978,6 +3978,9 @@ importers:
       '@quenty/motor6d':
         specifier: workspace:*
         version: link:../motor6d
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/physicsutils':
         specifier: workspace:*
         version: link:../physicsutils
@@ -3999,6 +4002,9 @@ importers:
       '@quenty/remoting':
         specifier: workspace:*
         version: link:../remoting
+      '@quenty/rigbuilderutils':
+        specifier: workspace:*
+        version: link:../rigbuilderutils
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -4029,6 +4035,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/randomutils:
     dependencies:
