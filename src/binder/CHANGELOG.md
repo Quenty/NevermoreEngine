@@ -1,23 +1,11 @@
-# v14.40.0 (Wed Jul 22 2026)
-
-#### 🚀 Enhancement
-
-- Add more testing to Nevermore [#742](https://github.com/Quenty/NevermoreEngine/pull/742) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test(binder): add comprehensive unit tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.39.0...@quenty/binder@14.40.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/binder
 
 # [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.38.0...@quenty/binder@14.39.0) (2026-07-18)
 

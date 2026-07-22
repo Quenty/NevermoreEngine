@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.59.0...@quenty/gameproductservice@14.60.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
 # [14.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.58.0...@quenty/gameproductservice@14.59.0) (2026-07-21)
 
 **Note:** Version bump only for package @quenty/gameproductservice

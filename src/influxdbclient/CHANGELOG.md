@@ -1,20 +1,13 @@
-# v7.39.0 (Wed Jul 22 2026)
-
-#### 🚀 Enhancement
-
-- Add more testing to Nevermore [#742](https://github.com/Quenty/NevermoreEngine/pull/742) ([@Quenty](https://github.com/Quenty))
-- feat: Add tests to InfluxDBClient package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.38.0...@quenty/influxdbclient@7.39.0) (2026-07-22)
+
+### Features
+
+- Add tests to InfluxDBClient package ([c2b138f](https://github.com/Quenty/NevermoreEngine/commit/c2b138f0c0ed050dd6cb3541f644b766b5db6b10))
 
 # [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.37.0...@quenty/influxdbclient@7.38.0) (2026-07-21)
 
