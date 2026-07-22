@@ -696,22 +696,23 @@ describe("PlayerMock.removeCharacter", function()
 end)
 
 describe("PlayerMock.kick", function()
-	it("records the message and destroys the mock, like the engine removing a kicked player", function()
+	it("records the message and removes the mock from the game, like the engine removing a kicked player", function()
 		local player = PlayerMock.new({ UserId = 2001 })
 		player.Parent = workspace
 
-		local destroyingFired = false
-		local conn = PlayerMock.getSignal(player, "Destroying"):Connect(function()
-			destroyingFired = true
+		local ancestryChangedFired = false
+		local conn = PlayerMock.getSignal(player, "AncestryChanged"):Connect(function()
+			ancestryChangedFired = true
 		end)
 
 		PlayerMock.kick(player, "You are banned")
 
 		expect(PlayerMock.getKickMessage(player)).toBe("You are banned")
-		expect(destroyingFired).toBe(true)
+		expect(ancestryChangedFired).toBe(true)
 		expect(player.Parent).toBeNil()
 
 		conn:Disconnect()
+		player:Destroy()
 	end)
 
 	it("removes the character while the mock is still in the game, before the mock is destroyed", function()

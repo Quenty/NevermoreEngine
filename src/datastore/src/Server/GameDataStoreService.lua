@@ -83,8 +83,11 @@ function GameDataStoreService.PromiseDataStore(self: GameDataStoreService): Prom
 			if not dataStore.Destroy then
 				return
 			end
-			-- Best-effort: swallow a rejection (e.g. the load failed) so it is not uncaught.
-			dataStore:Save():Catch(function() end)
+			-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+			-- manufacture a guaranteed rejection.
+			if not dataStore:DidLoadFail() then
+				dataStore:Save()
+			end
 			dataStore:Destroy()
 		end)
 

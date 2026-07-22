@@ -25,7 +25,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 
 local PlayerMock = require("PlayerMock")
 local PlayerMockServiceBase = require("PlayerMockServiceBase")
@@ -36,15 +36,17 @@ PlayerMockService._consumedAttributeName = "PlayerMockConsumedServer"
 PlayerMockService._allowConcurrentConsumers = false
 
 --[=[
-	Creates a [PlayerMock], parents it into the world -- which replicates it, so PlayerBinders and
-	[PlayerMockServiceClient]s in every bag discover it like a real join -- and tracks it for cleanup.
+	Creates a [PlayerMock], parents it into [Players] -- where real players live, so the mock's
+	subtree (PlayerGui, property backings) never hydrates instances inside Workspace -- and tracks it
+	for cleanup. Parenting anywhere in the DataModel replicates it, so PlayerBinders and
+	[PlayerMockServiceClient]s in every bag discover it like a real join.
 
 	@param overrides { [string]: any }? -- Per-property seed values, e.g. `{ UserId = 12345 }` (see [PlayerMock.new]).
 	@return Player
 ]=]
 function PlayerMockService:CreatePlayer(overrides: { [string]: any }?): Player
 	local player = PlayerMock.new(overrides)
-	player.Parent = Workspace
+	player.Parent = Players
 
 	self._maid:GiveTask(player)
 

@@ -22,7 +22,7 @@
 
 	```lua
 	local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
-	player.Parent = workspace
+	player.Parent = game:GetService("Players") -- where real players live; see PlayerMockService.CreatePlayer
 
 	assert(PlayerMock.isMock(player))
 	assert(PlayerMock.read(player, "UserId") == 12345)
