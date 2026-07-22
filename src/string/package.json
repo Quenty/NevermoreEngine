@@ -25,6 +25,11 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm"
   },
+  "dependencies": {
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
   "contributors": [
     "Quenty"
   ],
