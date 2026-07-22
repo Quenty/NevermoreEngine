@@ -1,3 +1,16 @@
+# v7.39.0 (Wed Jul 22 2026)
+
+#### 🚀 Enhancement
+
+- Add more testing to Nevermore [#742](https://github.com/Quenty/NevermoreEngine/pull/742) ([@Quenty](https://github.com/Quenty))
+- feat: Add tests to InfluxDBClient package ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

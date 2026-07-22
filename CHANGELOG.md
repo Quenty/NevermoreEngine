@@ -1,3 +1,16 @@
+# (Wed Jul 22 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.40.0`, `@quenty/influxdbclient@7.39.0`, `@quenty/remoting@12.35.0`
+  - Add more testing to Nevermore [#742](https://github.com/Quenty/NevermoreEngine/pull/742) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jul 21 2026)
 
 #### 🚀 Enhancement
