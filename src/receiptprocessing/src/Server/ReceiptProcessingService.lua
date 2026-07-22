@@ -14,6 +14,7 @@ local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -82,9 +83,10 @@ end
 	@return Observable<ReceiptInfo>
 ]=]
 function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player): Observable.Observable<ReceiptInfo>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
-	return self:ObserveReceiptProcessedForUserId(player.UserId)
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+	return self:ObserveReceiptProcessedForUserId(userId)
 end
 --[=[
 	Observes receipt by userId

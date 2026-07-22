@@ -1,12 +1,5 @@
 --!strict
 --[[
-	Coverage for BoundParentTracker, which exposes the bound class on a child's direct parent.
-
-	The binder is booted through a ServiceBag; the tracker is a plain BaseObject constructed
-	directly. Instances live under a workspace container so parent-change and CollectionService
-	signals fire. Parent changes and unbinds are awaited event-driven via the tracker's
-	Class.Changed signal rather than a fixed sleep.
-
 	@class BoundParentTracker.spec.lua
 ]]
 
@@ -74,7 +67,6 @@ local function setup()
 		serviceBag:Start()
 	end
 
-	-- Blocks until the tracker's value moves off `previous`.
 	local function awaitChange(tracker, previous)
 		if tracker.Class.Value == previous then
 			tracker.Class.Changed:Wait()
@@ -116,52 +108,52 @@ end)
 
 describe("BoundParentTracker tracking", function()
 	it("exposes the bound class of the direct parent", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.binder:Tag(parent)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(parent)
+		controller.boot()
 
-		local tracker = env.track(BoundParentTracker.new(env.binder, child))
-		expect(tracker.Class.Value).toEqual(env.binder:Get(parent))
+		local tracker = controller.track(BoundParentTracker.new(controller.binder, child))
+		expect(tracker.Class.Value).toEqual(controller.binder:Get(parent))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("clears the value when the child is reparented off the bound parent", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.binder:Tag(parent)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(parent)
+		controller.boot()
 
-		local tracker = env.track(BoundParentTracker.new(env.binder, child))
-		local class = env.binder:Get(parent)
+		local tracker = controller.track(BoundParentTracker.new(controller.binder, child))
+		local class = controller.binder:Get(parent)
 		expect(tracker.Class.Value).toEqual(class)
 
-		child.Parent = env.container
-		expect(env.awaitChange(tracker, class)).toBeNil()
+		child.Parent = controller.container
+		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("clears the value when the parent's class is unbound", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.binder:Tag(parent)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(parent)
+		controller.boot()
 
-		local tracker = env.track(BoundParentTracker.new(env.binder, child))
-		local class = env.binder:Get(parent)
+		local tracker = controller.track(BoundParentTracker.new(controller.binder, child))
+		local class = controller.binder:Get(parent)
 		expect(tracker.Class.Value).toEqual(class)
 
-		env.binder:Untag(parent)
-		expect(env.awaitChange(tracker, class)).toBeNil()
+		controller.binder:Untag(parent)
+		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)

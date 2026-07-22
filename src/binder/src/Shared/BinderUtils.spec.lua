@@ -1,12 +1,5 @@
 --!strict
 --[[
-	Coverage for BinderUtils lookup helpers.
-
-	Binders are booted through a ServiceBag (as production code does) and instances are tagged
-	BEFORE the service bag starts, so they bind synchronously and :Get() resolves without waiting.
-	Instances live in a workspace container so the binders' added signals fire. Each test tears
-	down its service bag and instances because the test place is shared across a batch run.
-
 	@class BinderUtils.spec.lua
 ]]
 
@@ -64,8 +57,6 @@ local function setup()
 		return inst
 	end
 
-	-- Tags each instance with the binder, then boots everything through the service bag so the
-	-- instances bind synchronously.
 	local function boot()
 		assert(not booted, "Already booted")
 		booted = true
@@ -100,248 +91,248 @@ end
 
 describe("BinderUtils.findFirstAncestor()", function()
 	it("returns the nearest bound ancestor, skipping the child itself", function()
-		local env = setup()
+		local controller = setup()
 
-		local grandparent = env.newInstance()
-		local parent = env.newInstance(grandparent)
-		local child = env.newInstance(parent)
+		local grandparent = controller.newInstance()
+		local parent = controller.newInstance(grandparent)
+		local child = controller.newInstance(parent)
 
-		local binder = env.newBinder()
+		local binder = controller.newBinder()
 		binder:Tag(grandparent)
 		binder:Tag(child) -- child is bound too, but must be skipped
-		env.boot()
+		controller.boot()
 
 		expect(BinderUtils.findFirstAncestor(binder, child)).toEqual(binder:Get(grandparent))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("returns nil when no ancestor is bound", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		local binder = env.newBinder()
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		local binder = controller.newBinder()
+		controller.boot()
 
 		expect(BinderUtils.findFirstAncestor(binder, child)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("throws for a non-instance child", function()
-		local env = setup()
+		local controller = setup()
 
-		local binder = env.newBinder()
-		env.boot()
+		local binder = controller.newBinder()
+		controller.boot()
 		expect(function()
 			BinderUtils.findFirstAncestor(binder, 5 :: any)
 		end).toThrow()
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.findFirstChild()", function()
 	it("returns the first bound child", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local unboundChild = env.newInstance(parent)
-		local boundChild = env.newInstance(parent)
+		local parent = controller.newInstance()
+		local unboundChild = controller.newInstance(parent)
+		local boundChild = controller.newInstance(parent)
 
-		local binder = env.newBinder()
+		local binder = controller.newBinder()
 		binder:Tag(boundChild)
-		env.boot()
+		controller.boot()
 
 		expect(BinderUtils.findFirstChild(binder, parent)).toEqual(binder:Get(boundChild))
 		expect(binder:Get(unboundChild)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("returns nil when no child is bound", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		env.newInstance(parent)
-		local binder = env.newBinder()
-		env.boot()
+		local parent = controller.newInstance()
+		controller.newInstance(parent)
+		local binder = controller.newBinder()
+		controller.boot()
 
 		expect(BinderUtils.findFirstChild(binder, parent)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.getChildren()", function()
 	it("returns every bound child", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local childA = env.newInstance(parent)
-		local childB = env.newInstance(parent)
-		env.newInstance(parent) -- unbound
+		local parent = controller.newInstance()
+		local childA = controller.newInstance(parent)
+		local childB = controller.newInstance(parent)
+		controller.newInstance(parent) -- unbound
 
-		local binder = env.newBinder()
+		local binder = controller.newBinder()
 		binder:Tag(childA)
 		binder:Tag(childB)
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getChildren(binder, parent)).toEqual(2)
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("does not include bound descendants deeper than one level", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		local grandchild = env.newInstance(child)
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		local grandchild = controller.newInstance(child)
 
-		local binder = env.newBinder()
+		local binder = controller.newBinder()
 		binder:Tag(grandchild)
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getChildren(binder, parent)).toEqual(0)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.getDescendants()", function()
 	it("returns bound instances at any depth", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		local grandchild = env.newInstance(child)
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		local grandchild = controller.newInstance(child)
 
-		local binder = env.newBinder()
+		local binder = controller.newBinder()
 		binder:Tag(child)
 		binder:Tag(grandchild)
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getDescendants(binder, parent)).toEqual(2)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.mapBinderListToTable()", function()
 	it("keys binders by their tag", function()
-		local env = setup()
+		local controller = setup()
 
-		local binderA = env.newBinder()
-		local binderB = env.newBinder()
-		env.boot()
+		local binderA = controller.newBinder()
+		local binderB = controller.newBinder()
+		controller.boot()
 
 		local map = BinderUtils.mapBinderListToTable({ binderA, binderB })
 		expect(map[binderA:GetTag()]).toEqual(binderA)
 		expect(map[binderB:GetTag()]).toEqual(binderB)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.getMappedFromList()", function()
 	it("resolves bound values across an instance list by tag", function()
-		local env = setup()
+		local controller = setup()
 
-		local instA = env.newInstance()
-		local instB = env.newInstance()
-		local binderA = env.newBinder()
-		local binderB = env.newBinder()
+		local instA = controller.newInstance()
+		local instB = controller.newInstance()
+		local binderA = controller.newBinder()
+		local binderB = controller.newBinder()
 		binderA:Tag(instA)
 		binderB:Tag(instB)
-		env.boot()
+		controller.boot()
 
 		local tagsMap = BinderUtils.mapBinderListToTable({ binderA, binderB })
-		local objects = BinderUtils.getMappedFromList(tagsMap, { instA, instB, env.newInstance() })
+		local objects = BinderUtils.getMappedFromList(tagsMap, { instA, instB, controller.newInstance() })
 
 		expect(#objects).toEqual(2)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.getChildrenOfBinders()", function()
 	it("returns children bound by any binder in the list", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local childA = env.newInstance(parent)
-		local childB = env.newInstance(parent)
+		local parent = controller.newInstance()
+		local childA = controller.newInstance(parent)
+		local childB = controller.newInstance(parent)
 
-		local binderA = env.newBinder()
-		local binderB = env.newBinder()
+		local binderA = controller.newBinder()
+		local binderB = controller.newBinder()
 		binderA:Tag(childA)
 		binderB:Tag(childB)
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getChildrenOfBinders({ binderA, binderB }, parent)).toEqual(2)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BinderUtils.getLinkedChildren()", function()
 	it("resolves bound targets of matching ObjectValue links", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local target = env.newInstance()
-		local binder = env.newBinder()
+		local parent = controller.newInstance()
+		local target = controller.newInstance()
+		local binder = controller.newBinder()
 		binder:Tag(target)
 
-		local link = env.newInstance(parent, "ObjectValue") :: ObjectValue
+		local link = controller.newInstance(parent, "ObjectValue") :: ObjectValue
 		link.Name = "Link"
 		link.Value = target
-		env.boot()
+		controller.boot()
 
 		local objects = BinderUtils.getLinkedChildren(binder, "Link", parent)
 		expect(#objects).toEqual(1)
 		expect(objects[1]).toEqual(binder:Get(target))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("ignores links whose name does not match", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local target = env.newInstance()
-		local binder = env.newBinder()
+		local parent = controller.newInstance()
+		local target = controller.newInstance()
+		local binder = controller.newBinder()
 		binder:Tag(target)
 
-		local link = env.newInstance(parent, "ObjectValue") :: ObjectValue
+		local link = controller.newInstance(parent, "ObjectValue") :: ObjectValue
 		link.Name = "OtherLink"
 		link.Value = target
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getLinkedChildren(binder, "Link", parent)).toEqual(0)
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("deduplicates when two links point to the same bound target", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local target = env.newInstance()
-		local binder = env.newBinder()
+		local parent = controller.newInstance()
+		local target = controller.newInstance()
+		local binder = controller.newBinder()
 		binder:Tag(target)
 
 		for _ = 1, 2 do
-			local link = env.newInstance(parent, "ObjectValue") :: ObjectValue
+			local link = controller.newInstance(parent, "ObjectValue") :: ObjectValue
 			link.Name = "Link"
 			link.Value = target
 		end
-		env.boot()
+		controller.boot()
 
 		expect(#BinderUtils.getLinkedChildren(binder, "Link", parent)).toEqual(1)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)

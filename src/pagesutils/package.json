@@ -31,7 +31,9 @@
   "dependencies": {
     "@quenty/ducktype": "workspace:*",
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

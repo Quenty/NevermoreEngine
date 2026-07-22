@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local PlayersServicePromises = {}
@@ -21,6 +22,11 @@ function PlayersServicePromises.promiseUserIdFromName(name: string): Promise.Pro
 	assert(type(name) == "string", "Bad name")
 
 	return Promise.spawn(function(resolve, reject)
+		local mockPlayer = PlayerMock.getMockByUsername(name)
+		if mockPlayer ~= nil then
+			return resolve(PlayerMock.read(mockPlayer, "UserId"))
+		end
+
 		local userId
 		local ok, err = pcall(function()
 			userId = Players:GetUserIdFromNameAsync(name)

@@ -1,8 +1,5 @@
 --!strict
 --[[
-	Coverage for the realm-agnostic teleport-data assembly. Fully pure: a fake UserId resolver keys the
-	envelope, so no real Player is needed (a headless cloud test server has none).
-
 	@class TeleportDataBuilder.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -15,8 +12,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- A fake player is any table carrying a UserId; the builder only ever reads it through the injected
--- resolver, never as a real Instance.
 local function fakePlayer(userId: number): Player
 	return ({ UserId = userId } :: any) :: Player
 end
@@ -27,7 +22,6 @@ local function newBuilder(): TeleportDataBuilder.TeleportDataBuilder
 	end)
 end
 
--- Reads the slice a player would arrive with from freshly built teleport data.
 local function sliceFor(built: { [string]: any }, userId: number): TeleportDataEnvelopeUtils.TeleportDataSlice?
 	return TeleportDataEnvelopeUtils.readSlice(built, userId)
 end

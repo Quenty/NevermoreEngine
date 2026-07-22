@@ -59,6 +59,7 @@ local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local ServiceBag = require("ServiceBag")
@@ -164,7 +165,11 @@ function PlayerDataStoreManager._flushAndDestroyAll(self: PlayerDataStoreManager
 		-- Cast past the DataStore intersection type: the solver otherwise blows up ("code too complex")
 		-- resolving :Save()/:Destroy() through it.
 		local store = datastore :: any
-		store:Save():Catch(function() end)
+		-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+		-- manufacture a guaranteed rejection.
+		if not store:DidLoadFail() then
+			store:Save()
+		end
 		store:Destroy()
 		self._datastores[userId] = nil
 	end
@@ -290,13 +295,17 @@ function PlayerDataStoreManager._promiseWaitForRemoving(
 end
 
 function PlayerDataStoreManager:_toPlayerUserIdOrError(playerOrUserId: Player | PlayerUserId): PlayerUserId
-	if typeof(playerOrUserId) == "Instance" and playerOrUserId:IsA("Player") then
-		return playerOrUserId.UserId
-	elseif type(playerOrUserId) == "number" then
+	if type(playerOrUserId) == "number" then
 		return playerOrUserId :: PlayerUserId
-	else
-		error("Bad playerOrUserId")
 	end
+
+	assert(
+		typeof(playerOrUserId) == "Instance" and (playerOrUserId:IsA("Player") or PlayerMock.isMock(playerOrUserId)),
+		"Bad playerOrUserId"
+	)
+	return (
+		if PlayerMock.isMock(playerOrUserId) then PlayerMock.read(playerOrUserId, "UserId") else playerOrUserId.UserId
+	) :: PlayerUserId
 end
 
 --[=[

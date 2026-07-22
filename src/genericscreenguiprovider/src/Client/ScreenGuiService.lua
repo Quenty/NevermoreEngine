@@ -1,6 +1,9 @@
 --!strict
 --[=[
-	Centralized provider so Hoarcekat stories can bootstrap in a fake PlayerGui
+	Centralized provider for the parent that ScreenGuis mount into. Defaults to the local player's
+	PlayerGui -- including a [PlayerMock] designated as the local player, even when the designation
+	happens after this service initializes -- so tests "just work". Hoarcekat stories and tests can
+	still override the parent explicitly with [ScreenGuiService.SetGuiParent].
 
 	@client
 	@class ScreenGuiService
@@ -13,6 +16,7 @@ local RunService = game:GetService("RunService")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerGuiUtils = require("PlayerGuiUtils")
+local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
@@ -42,18 +46,21 @@ function ScreenGuiService.Init(self: ScreenGuiService, serviceBag: ServiceBag.Se
 end
 
 --[=[
-	Gets the current player gui to use
+	Gets the current gui parent to use. When no explicit parent is set (see
+	[ScreenGuiService.SetGuiParent]), falls back to the local player's PlayerGui -- resolved at call
+	time, so a [PlayerMock] designated after this service initialized is still honored.
 
-	return ScreenGui?
+	return Instance?
 ]=]
 function ScreenGuiService.GetGuiParent(self: ScreenGuiService): Instance?
 	self:_ensureInit()
 
-	return self._guiParent.Value
+	return self._guiParent.Value or PlayerGuiUtils.findPlayerGui()
 end
 
 --[=[
-	Sets the current playerGui to use
+	Sets the current playerGui to use, overriding the PlayerGui default. The returned task clears
+	the override (restoring the default) if it is still ours.
 
 	@param playerGui PlayerGui | Instance
 	return MaidTask
@@ -71,14 +78,24 @@ function ScreenGuiService.SetGuiParent(self: ScreenGuiService, playerGui: Instan
 end
 
 --[=[
-	Observes the player gui to parent stuff into
+	Observes the gui parent to parent stuff into. Emits the explicitly set parent when there is one
+	(see [ScreenGuiService.SetGuiParent]), otherwise follows the local player's PlayerGui --
+	including a [PlayerMock] designated as the local player after subscription.
 
-	return Observable<ScreenGui?>
+	return Observable<Instance?>
 ]=]
 function ScreenGuiService.ObservePlayerGui(self: ScreenGuiService): Observable.Observable<ScreenGui?>
 	self:_ensureInit()
 
-	return (self._guiParent :: any):Observe()
+	return (self._guiParent :: any):Observe():Pipe({
+		Rx.switchMap(function(guiParent: Instance?)
+			if guiParent ~= nil then
+				return Rx.of(guiParent) :: any
+			end
+
+			return PlayerGuiUtils.observePlayerGui()
+		end) :: any,
+	}) :: any
 end
 
 function ScreenGuiService._ensureInit(self: ScreenGuiService): ()
@@ -87,12 +104,17 @@ function ScreenGuiService._ensureInit(self: ScreenGuiService): ()
 	if not self._maid then
 		local maid = Maid.new()
 		self._maid = maid
-		self._guiParent = maid:Add(ValueObject.new(PlayerGuiUtils.findPlayerGui() :: Instance?))
+		-- Holds only the explicit override; the PlayerGui default is resolved lazily in
+		-- GetGuiParent/ObservePlayerGui so a PlayerMock designated after init is picked up.
+		self._guiParent = maid:Add(ValueObject.new(nil :: Instance?))
 
 		-- TODO: Don't do this? But what's the alternative..
 		if not RunService:IsRunning() then
-			if ScreenGuiService._hackPlayerGui then
-				self._guiParent:Mount(ScreenGuiService._hackPlayerGui:Observe())
+			-- The shared value object outlives any one service bag; a destroyed one (its bag tore
+			-- down) has lost its methods, so adopt ours as the new shared parent instead.
+			local hackPlayerGui = ScreenGuiService._hackPlayerGui
+			if hackPlayerGui and type((hackPlayerGui :: any).Observe) == "function" then
+				self._guiParent:Mount(hackPlayerGui:Observe())
 			else
 				ScreenGuiService._hackPlayerGui = self._guiParent
 			end
@@ -104,6 +126,10 @@ end
 	Cleans up the ScreenGuiService
 ]=]
 function ScreenGuiService.Destroy(self: ScreenGuiService): ()
+	if ScreenGuiService._hackPlayerGui == self._guiParent then
+		ScreenGuiService._hackPlayerGui = nil
+	end
+
 	self._maid:DoCleaning()
 end
 

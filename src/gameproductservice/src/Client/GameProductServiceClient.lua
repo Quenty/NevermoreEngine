@@ -20,6 +20,7 @@ local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -77,7 +78,7 @@ end
 function GameProductServiceClient.Start(self: GameProductServiceClient): ()
 	local function forwardSignal(origSignal: any, signal: any)
 		self._maid:GiveTask(origSignal:Connect(function(player, ...)
-			if player == Players.LocalPlayer then
+			if player == Players.LocalPlayer or player == PlayerMock.getMockedLocalPlayer() then
 				signal:Fire(...)
 			end
 		end))
@@ -141,7 +142,7 @@ function GameProductServiceClient.HasPlayerPurchasedThisSession(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -162,7 +163,7 @@ function GameProductServiceClient.PromisePromptPurchase(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -177,7 +178,9 @@ end
 	@return Observable<boolean>
 ]=]
 function GameProductServiceClient:ObserveServerOnlyPromptingEnabled(): Observable.Observable<boolean>
-	return self._gameProductDataService:ObserveServerOnlyPrompting(Players.LocalPlayer)
+	return self._gameProductDataService:ObserveServerOnlyPrompting(
+		Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	)
 end
 
 --[=[
@@ -194,7 +197,7 @@ function GameProductServiceClient.PromisePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -221,7 +224,7 @@ function GameProductServiceClient.ObservePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -238,7 +241,7 @@ function GameProductServiceClient.PromisePlayerIsPromptOpen(
 	self: GameProductServiceClient,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
@@ -255,7 +258,7 @@ function GameProductServiceClient.PromisePlayerPromptClosed(
 	self: GameProductServiceClient,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
@@ -278,7 +281,7 @@ function GameProductServiceClient.PromisePlayerOwnershipOrPrompt(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -300,18 +303,19 @@ function GameProductServiceClient.PromiseGamePassOrProductUnlockOrPrompt(
 	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
 	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "Bad productIdOrKey")
 
-	if self:HasPlayerPurchasedThisSession(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+
+	if self:HasPlayerPurchasedThisSession(localPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
 		return Promise.resolved(true)
 	end
 
-	return self:PromisePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, gamePassIdOrKey)
-		:Then(function(owns)
-			if owns then
-				return true
-			else
-				return self:PromisePromptPurchase(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
-			end
-		end)
+	return self:PromisePlayerOwnership(localPlayer, GameConfigAssetTypes.PASS, gamePassIdOrKey):Then(function(owns)
+		if owns then
+			return true
+		else
+			return self:PromisePromptPurchase(localPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
+		end
+	end)
 end
 
 function GameProductServiceClient.Destroy(self: GameProductServiceClient): ()

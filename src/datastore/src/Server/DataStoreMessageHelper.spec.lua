@@ -1,11 +1,5 @@
 --!nonstrict
 --[[
-	Coverage for DataStoreMessageHelper, the coordinator that drives graceful cross-server
-	session-close over MessagingService. The full request/complete handshake needs a second server
-	to answer, so cross-server behaviour is characterized rather than asserted; what a single server
-	can verify (construction, the "cannot message self" guard, messaging wiring, and the
-	MessagingServiceUtils.toHumanReadable formatter) is exercised here.
-
 	@class DataStoreMessageHelper.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -53,7 +47,6 @@ describe("DataStoreMessageHelper.new", function()
 		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newMessageHelper()
 
-		-- The test destroys the helper itself; the maid then skips it, so there is no double-Destroy.
 		expect(function()
 			helper:Destroy()
 		end).never.toThrow()
@@ -81,8 +74,6 @@ end)
 
 describe("DataStoreMessageHelper.PromiseCloseSessionGraceful", function()
 	it("should return a promise (cross-server outcome is not unit-testable single-server)", function()
-		-- The graceful handshake needs a second server to answer, so we only assert it returns a
-		-- promise; its settlement is environment dependent and covered by real multi-server usage.
 		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newMessageHelper()
 
@@ -97,7 +88,6 @@ describe("DataStore.SetSessionMessagingEnabled wiring", function()
 	it("should enable then disable session messaging without erroring", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
-		-- Messaging is documented to work alongside session locking; enable both like real usage.
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 

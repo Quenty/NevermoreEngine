@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	Re-entrance and cancellation: when a datastore request is in flight (yielding) and its owning
-	maid is torn down (the DataStore is destroyed / the player leaves), the request thread must be
-	cancelled and never resume to write. A session-locked load can legitimately stay pending for a
-	long time while a lock command is outstanding.
-
 	@class DataStoreReentrance.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -20,18 +15,15 @@ local it = Jest.Globals.it
 describe("in-flight request cancellation (maid teardown)", function()
 	it("cancels a yielding load thread when the DataStore is destroyed (no leaked thread)", function()
 		local controller = DataStoreTestUtils.setup()
-		controller.mock:BlockRequests() -- the lock-acquire request hangs, so the load is stuck in flight
+		controller.mock:BlockRequests()
 
 		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
 		expect(PromiseTestUtils.awaitSettled(promise, 1)).toEqual(false)
 
-		-- Destroy while the request thread is yielding -- its maid must cancel it.
 		dataStore:Destroy()
 
-		-- A properly cancelled thread never resumes, so the lock is never written. A leaked thread
-		-- would resume on unblock and write the lock envelope.
 		controller.mock:UnblockRequests()
 		local everWrote = PromiseTestUtils.awaitValue(function()
 			return controller.mock:GetRaw("player_1") ~= nil
@@ -44,7 +36,6 @@ describe("in-flight request cancellation (maid teardown)", function()
 	it("cancels a yielding save thread when the DataStore is destroyed", function()
 		local controller = DataStoreTestUtils.setup()
 
-		-- Load cleanly first (acquires the lock), then block so the SAVE request hangs in flight.
 		local dataStore = controller.newSessionLockedStore()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
@@ -62,7 +53,6 @@ describe("in-flight request cancellation (maid teardown)", function()
 		dataStore:Destroy()
 		controller.mock:UnblockRequests()
 
-		-- The cancelled save thread must not resume and perform another UpdateAsync write.
 		local extraWrites = PromiseTestUtils.awaitValue(function()
 			return controller.mock:GetCallCount("UpdateAsync") > versionsBefore + 1
 		end, 2)
@@ -75,12 +65,11 @@ end)
 describe("lock command that does not settle", function()
 	it("keeps the load pending while the lock command is outstanding, then completes when it settles", function()
 		local controller = DataStoreTestUtils.setup()
-		controller.mock:BlockRequests() -- simulate a lock command that hasn't propagated yet (up to ~30s)
+		controller.mock:BlockRequests()
 
 		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
-		-- Must NOT spuriously resolve or error while the lock command is outstanding.
 		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
 
 		controller.mock:UnblockRequests()
@@ -101,10 +90,9 @@ describe("lock command that does not settle", function()
 		local first = controller.newSessionLockedStore()
 		local firstPromise = first:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(firstPromise, 1)).toEqual(false)
-		first:Destroy() -- cancel the in-flight lock command
+		first:Destroy()
 		controller.mock:UnblockRequests()
 
-		-- The cancelled attempt left no lock, so a fresh session acquires cleanly.
 		local second = controller.newSessionLockedStore()
 		local secondPromise = second:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then

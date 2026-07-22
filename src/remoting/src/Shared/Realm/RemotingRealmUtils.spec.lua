@@ -40,8 +40,6 @@ end)
 
 describe("RemotingRealmUtils.inferRemotingRealm", function()
 	it("infers the SERVER realm when specs run on the server", function()
-		-- The test runner executes specs from a server script, so RunService:IsServer()
-		-- is true and inference resolves to SERVER.
 		expect(RemotingRealmUtils.inferRemotingRealm()).toEqual(RemotingRealms.SERVER)
 	end)
 end)

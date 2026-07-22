@@ -14,6 +14,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerInputModeServiceConstants = require("PlayerInputModeServiceConstants")
 local PlayerInputModeUtils = require("PlayerInputModeUtils")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
@@ -54,7 +55,7 @@ function PlayerInputModeService.GetPlayerInputModeType(
 	_self: PlayerInputModeService,
 	player: Player
 ): PlayerInputModeUtils.PlayerInputModeType?
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerInputModeUtils.getPlayerInputModeType(player)
 end
@@ -71,7 +72,7 @@ function PlayerInputModeService.PromisePlayerInputMode(
 	player: Player,
 	cancelToken: any?
 ): Promise.Promise<PlayerInputModeUtils.PlayerInputModeType?>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerInputModeUtils.promisePlayerInputMode(player, cancelToken)
 end
@@ -86,7 +87,7 @@ function PlayerInputModeService.ObservePlayerInputType(
 	_self: PlayerInputModeService,
 	player: Player
 ): Observable.Observable<PlayerInputModeUtils.PlayerInputModeType?>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerInputModeUtils.observePlayerInputModeType(player)
 end

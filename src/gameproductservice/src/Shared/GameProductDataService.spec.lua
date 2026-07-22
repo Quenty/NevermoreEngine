@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
 local Jest = require("Jest")
+local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -26,10 +27,9 @@ local it = Jest.Globals.it
 
 local function setup(tieRealm: TieRealms.TieRealm?)
 	local serviceBag = ServiceBag.new()
-	local tieRealmService = (serviceBag:GetService(TieRealmService) :: any) :: TieRealmService.TieRealmService
-	local gameProductDataService = (
+	local tieRealmService: TieRealmService.TieRealmService = serviceBag:GetService(TieRealmService) :: any
+	local gameProductDataService: GameProductDataService.GameProductDataService =
 		serviceBag:GetService(GameProductDataService) :: any
-	) :: GameProductDataService.GameProductDataService
 	serviceBag:Init()
 	tieRealmService:SetTieRealm(tieRealm or TieRealms.SERVER)
 	serviceBag:Start()
@@ -127,10 +127,8 @@ describe("GameProductDataService ownership overrides", function()
 	it("should refuse to set an ownership override from the client realm", function()
 		local context = setup(TieRealms.CLIENT)
 		local service = context.gameProductDataService
-		local fakePlayer = Instance.new("Folder")
+		local fakePlayer = PlayerMock.new()
 
-		-- The realm guard is checked before anything else, so a player can never grant themselves
-		-- ownership from the client.
 		expect(function()
 			service:SetPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123, true)
 		end).toThrow()
@@ -142,7 +140,7 @@ describe("GameProductDataService ownership overrides", function()
 	it("should refuse to clear an ownership override from the client realm", function()
 		local context = setup(TieRealms.CLIENT)
 		local service = context.gameProductDataService
-		local fakePlayer = Instance.new("Folder")
+		local fakePlayer = PlayerMock.new()
 
 		expect(function()
 			service:ClearPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123)
@@ -158,7 +156,7 @@ describe("GameProductDataService prompt guard", function()
 		local context = setup(TieRealms.SERVER)
 		local service = context.gameProductDataService
 
-		local fakePlayer = Instance.new("Folder")
+		local fakePlayer = PlayerMock.new()
 		local outcome = PromiseTestUtils.awaitOutcome(service:_promiseServerOnlyPromptingGuard(fakePlayer :: any), 5)
 		expect(outcome).toEqual("resolved")
 

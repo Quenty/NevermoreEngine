@@ -30,11 +30,9 @@ local function newPoint(): InfluxDBPoint.InfluxDBPoint
 	return point
 end
 
--- Boots a service through a ServiceBag with a request mock injected between Init and Start, mirroring
--- how a consuming package would swap in the mock at the ServiceBag layer.
 local function setup()
 	local serviceBag = ServiceBag.new()
-	local influxDBService = (serviceBag:GetService(InfluxDBService) :: any) :: InfluxDBService.InfluxDBService
+	local influxDBService: InfluxDBService.InfluxDBService = serviceBag:GetService(InfluxDBService) :: any
 	serviceBag:Init()
 
 	local requestMock = InfluxDBRequestHandlerMock.new()
@@ -62,7 +60,7 @@ describe("InfluxDBService.SetRequestHandler", function()
 
 	it("should throw on a non-function handler", function()
 		local serviceBag = ServiceBag.new()
-		local influxDBService = (serviceBag:GetService(InfluxDBService) :: any) :: InfluxDBService.InfluxDBService
+		local influxDBService: InfluxDBService.InfluxDBService = serviceBag:GetService(InfluxDBService) :: any
 		serviceBag:Init()
 
 		expect(function()
@@ -74,11 +72,10 @@ describe("InfluxDBService.SetRequestHandler", function()
 
 	it("should throw once the client has been built", function()
 		local serviceBag = ServiceBag.new()
-		local influxDBService = (serviceBag:GetService(InfluxDBService) :: any) :: InfluxDBService.InfluxDBService
+		local influxDBService: InfluxDBService.InfluxDBService = serviceBag:GetService(InfluxDBService) :: any
 		serviceBag:Init()
 		serviceBag:Start()
 
-		-- Building the client locks the seam.
 		influxDBService:GetClient()
 
 		expect(function()
@@ -103,7 +100,6 @@ describe("InfluxDBService.SetClientConfig", function()
 	it("should apply a config set after the client is built", function()
 		local serviceBag, influxDBService, requestMock = setup()
 
-		-- Build the client and its write API before any config is set.
 		local writeAPI = influxDBService:GetWriteAPI("my-org", "my-bucket")
 
 		influxDBService:SetClientConfig(CONFIG)

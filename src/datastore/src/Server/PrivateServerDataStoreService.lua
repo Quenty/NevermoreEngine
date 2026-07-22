@@ -64,8 +64,11 @@ function PrivateServerDataStoreService.PromiseDataStore(
 		-- On service teardown (hot reload / tests) flush and destroy the store. Save() is a best-effort
 		-- synchronous write before Destroy() cancels it.
 		self._maid:GiveTask(function()
-			-- Best-effort: swallow a rejection (e.g. the load failed) so it is not uncaught.
-			dataStore:Save():Catch(function() end)
+			-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+			-- manufacture a guaranteed rejection.
+			if not dataStore:DidLoadFail() then
+				dataStore:Save()
+			end
 			dataStore:Destroy()
 		end)
 

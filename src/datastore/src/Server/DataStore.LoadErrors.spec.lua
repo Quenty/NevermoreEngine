@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	Characterizes the shared load promise and the auto-save loop. The load view is cached
-	(PromiseViewUpToDate returns one shared promise), so every Load/LoadAll/Store/Observe attaches
-	its own continuation to the same promise; these tests pin that a settled load fans out its
-	resolution or rejection to every consumer, including ones attached mid-yield.
-
 	@class DataStoreLoadErrors.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -94,7 +89,6 @@ describe("auto-save loop", function()
 		local dataStore = controller.newDataStore("key")
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 
-		-- Store triggers the initial load; once loaded, the auto-save loop starts and flushes.
 		dataStore:Store("coins", 5)
 
 		local saved = PromiseTestUtils.awaitValue(function()
@@ -119,8 +113,6 @@ describe("auto-save loop", function()
 
 		dataStore:Destroy()
 
-		-- After destroy the loop is gone: record the call count, wait past several auto-save
-		-- intervals, and confirm no new saves land.
 		local before = controller.mock:GetCallCount("UpdateAsync")
 		local settled = PromiseTestUtils.awaitValue(function()
 			return false

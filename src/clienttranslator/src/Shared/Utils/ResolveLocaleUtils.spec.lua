@@ -66,8 +66,6 @@ describe("ResolveLocaleUtils.resolveClosestKey", function()
 	end)
 
 	it("falls back a regional variant to its closest same-language key", function()
-		-- en-gb has no exact entry, so it should resolve to en-us (same language),
-		-- NOT to some unrelated default.
 		expect(ResolveLocaleUtils.resolveClosestKey("en-gb", available)).toBe("en-us")
 		expect(ResolveLocaleUtils.resolveClosestKey("es-mx", available)).toBe("es-es")
 	end)
@@ -86,8 +84,6 @@ describe("ResolveLocaleUtils.resolveClosestKey", function()
 	end)
 
 	it("prefers whichever Chinese variant key the caller actually defines", function()
-		-- Only a Simplified key exists here; a Traditional request still resolves to
-		-- it rather than returning nil, because it shares the language.
 		local simplifiedOnly = { ["zh-cn"] = true }
 		expect(ResolveLocaleUtils.resolveClosestKey("zh-tw", simplifiedOnly)).toBe("zh-cn")
 	end)

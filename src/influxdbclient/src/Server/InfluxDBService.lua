@@ -28,6 +28,7 @@ local require = require(script.Parent.loader).load(script)
 
 local InfluxDBClient = require("InfluxDBClient")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
+local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBWriteAPI = require("InfluxDBWriteAPI")
 local Maid = require("Maid")
 local Promise = require("Promise")
@@ -43,6 +44,7 @@ export type InfluxDBService = typeof(setmetatable(
 		_client: InfluxDBClient.InfluxDBClient?,
 		_requestHandler: InfluxDBWriteAPI.InfluxDBRequestHandler?,
 		_pendingClientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig?,
+		_destroyed: boolean?,
 	},
 	{} :: typeof({ __index = InfluxDBService })
 ))
@@ -72,6 +74,16 @@ function InfluxDBService.SetRequestHandler(
 	assert(not self._client, "Already built client, cannot override requestHandler")
 
 	self._requestHandler = requestHandler
+end
+
+--[=[
+	Returns whether a request handler override was injected (see [InfluxDBService.SetRequestHandler]).
+	Consumers can use this to skip resolving real credentials when HTTP is intercepted.
+
+	@return boolean
+]=]
+function InfluxDBService.HasRequestHandler(self: InfluxDBService): boolean
+	return self._requestHandler ~= nil
 end
 
 --[=[
@@ -128,6 +140,34 @@ function InfluxDBService.GetWriteAPI(
 end
 
 --[=[
+	Queues a point to the shared client's write API for the given org and bucket. Consumers should
+	route queueing through this rather than holding the [InfluxDBWriteAPI] object: the service owns
+	client teardown, so it can answer liveness -- a point queued after the service is destroyed
+	errors, because it means the caller outlived teardown (the closing flush has already run; the
+	caller should have been destroyed first).
+
+	@param org string
+	@param bucket string
+	@param point InfluxDBPoint
+]=]
+function InfluxDBService.QueuePoint(self: InfluxDBService, org: string, bucket: string, point): ()
+	assert(type(org) == "string", "Bad org")
+	assert(type(bucket) == "string", "Bad bucket")
+	assert(InfluxDBPoint.isInfluxDBPoint(point), "Bad point")
+
+	if self._destroyed then
+		error(
+			string.format(
+				"[InfluxDBService.QueuePoint] - Queued %q after InfluxDBService was destroyed; the caller outlived teardown",
+				tostring(point:GetMeasurementName())
+			)
+		)
+	end
+
+	self:GetWriteAPI(org, bucket):QueuePoint(point)
+end
+
+--[=[
 	Flushes every write API on the shared client. Resolves immediately if the client was never built.
 
 	@return Promise<()>
@@ -141,6 +181,7 @@ function InfluxDBService.PromiseFlushAll(self: InfluxDBService): Promise.Promise
 end
 
 function InfluxDBService.Destroy(self: InfluxDBService): ()
+	self._destroyed = true
 	self._maid:DoCleaning()
 end
 

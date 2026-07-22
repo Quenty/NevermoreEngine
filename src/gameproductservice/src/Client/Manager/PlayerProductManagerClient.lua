@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local AvatarEditorInventoryServiceClient = require("AvatarEditorInventoryServiceClient")
 local Binder = require("Binder")
@@ -15,6 +16,7 @@ local CatalogSearchServiceCache = require("CatalogSearchServiceCache")
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceUtils = require("MarketplaceUtils")
+local PlayerMock = require("PlayerMock")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
@@ -77,7 +79,7 @@ function PlayerProductManagerClient.new(player: Player, serviceBag: ServiceBag.S
 	self._avatarEditorInventoryServiceClient = self._serviceBag:GetService(AvatarEditorInventoryServiceClient :: any)
 	self._catalogSearchServiceCache = self._serviceBag:GetService(CatalogSearchServiceCache :: any)
 
-	if self._obj == Players.LocalPlayer then
+	if self._obj == Players.LocalPlayer or self._obj == PlayerMock.getMockedLocalPlayer() then
 		self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerProductManager", Remoting.Realms.CLIENT))
 
 		self:_setupAssetTracker()
@@ -87,7 +89,11 @@ function PlayerProductManagerClient.new(player: Player, serviceBag: ServiceBag.S
 		self:_setupBundleTracker()
 		self:_connectGamePassTracker()
 
-		self:_connectBulkPurchaseMarketplace()
+		if RunService:IsClient() then
+			-- PromptBulkPurchaseFinished may only be subscribed from a local script; headless
+			-- (a server-run spec driving a mock local player) it can never fire anyway.
+			self:_connectBulkPurchaseMarketplace()
+		end
 	end
 
 	local impl = self._maid:Add((PlayerProductManagerInterface :: any).Client:Implement(self._obj, self))
@@ -241,20 +247,25 @@ function PlayerProductManagerClient._setupProductTracker(self: any): ()
 end
 
 function PlayerProductManagerClient._connectGamePassTracker(self: any): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
-
 	self._maid:GiveTask(
 		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
 			assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
 			if player == self._obj then
-				tracker:HandlePromptClosedEvent(gamePassId)
-				tracker:HandlePurchaseEvent(gamePassId, isPurchased)
-
-				self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
+				self:_handleGamePassPromptFinished(gamePassId, isPurchased)
 			end
 		end)
 	)
+end
+
+function PlayerProductManagerClient._handleGamePassPromptFinished(
+	self: any,
+	gamePassId: number,
+	isPurchased: boolean
+): ()
+	PlayerProductManagerBase._handleGamePassPromptFinished(self, gamePassId, isPurchased)
+
+	self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
 end
 
 function PlayerProductManagerClient._setupBundleTracker(self: any): ()

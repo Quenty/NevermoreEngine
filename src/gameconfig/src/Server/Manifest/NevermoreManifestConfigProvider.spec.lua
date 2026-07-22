@@ -28,10 +28,9 @@ local PLACE: GameConfigAssetTypes.GameConfigAssetType = GameConfigAssetTypes.PLA
 
 local function newProvider()
 	local serviceBag = ServiceBag.new()
-	local gameConfigService = (serviceBag:GetService(GameConfigService) :: any) :: GameConfigService.GameConfigService
-	local provider = (
+	local gameConfigService: GameConfigService.GameConfigService = serviceBag:GetService(GameConfigService) :: any
+	local provider: NevermoreManifestConfigProvider.NevermoreManifestConfigProvider =
 		serviceBag:GetService(NevermoreManifestConfigProvider) :: any
-	) :: NevermoreManifestConfigProvider.NevermoreManifestConfigProvider
 	serviceBag:Init()
 	serviceBag:Start()
 	return serviceBag, gameConfigService, provider, gameConfigService:GetConfigPicker()

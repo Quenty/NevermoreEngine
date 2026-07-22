@@ -93,11 +93,7 @@ end
 function TeleportDataServiceClient.Start(self: TeleportDataServiceClient)
 	-- Replicate unconditionally -- even a fresh join (no arrived data) sends the empty sentinel, so the
 	-- server resolves promptly instead of waiting out its fallback timeout on every normal join.
-	self._maid:GiveTask(
-		self._remoting:PromiseFireServer("ReplicateArrivedData", self:_getNonTrustedRaw()):Catch(function()
-			-- The server always binds this; swallow transient replication errors rather than surfacing them.
-		end)
-	)
+	self._maid:GiveTask(self._remoting:PromiseFireServer("ReplicateArrivedData", self:_getNonTrustedRaw()))
 end
 
 --[=[

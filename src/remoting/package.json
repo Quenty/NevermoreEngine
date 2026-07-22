@@ -36,10 +36,12 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/remotefunctionutils": "workspace:*",
     "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },

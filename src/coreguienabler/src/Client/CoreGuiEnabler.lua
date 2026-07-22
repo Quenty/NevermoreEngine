@@ -26,10 +26,23 @@ local UserInputService = game:GetService("UserInputService")
 local CharacterUtils = require("CharacterUtils")
 local Maid = require("Maid")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local PlayerMock = require("PlayerMock")
 local Rx = require("Rx")
 local Symbol = require("Symbol")
 
 local ALL_TOKEN = Symbol.named("allToken")
+
+-- SetCoreGuiEnabled is a client-only engine call. With a mock local player designated (headless
+-- test runs), the effect is recorded on the mock instead -- see the "StarterGui.SetCoreGuiEnabled"
+-- lookup domain in [PlayerMock] -- so tests read the state production wrote.
+local function setCoreGuiEnabled(coreGuiType: Enum.CoreGuiType, isEnabled: boolean)
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		PlayerMock.writeLookup(localPlayer, "StarterGui.SetCoreGuiEnabled", coreGuiType, isEnabled)
+	else
+		StarterGui:SetCoreGuiEnabled(coreGuiType, isEnabled)
+	end
+end
 
 local CoreGuiEnabler = {}
 CoreGuiEnabler.__index = CoreGuiEnabler
@@ -53,10 +66,11 @@ function CoreGuiEnabler.new(): CoreGuiEnabler
 	self._stateSubs = self._maid:Add(ObservableSubscriptionTable.new() :: any)
 
 	self:AddState(Enum.CoreGuiType.Backpack, function(isEnabled)
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
+		setCoreGuiEnabled(Enum.CoreGuiType.Backpack, isEnabled)
 
-		if Players.LocalPlayer then
-			CharacterUtils.unequipTools(Players.LocalPlayer)
+		local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+		if localPlayer then
+			CharacterUtils.unequipTools(localPlayer)
 		end
 	end)
 
@@ -84,7 +98,7 @@ function CoreGuiEnabler.new(): CoreGuiEnabler
 	for _, coreGuiType in Enum.CoreGuiType:GetEnumItems() do
 		if not self._states[coreGuiType] then
 			self:AddState(coreGuiType, function(isEnabled)
-				StarterGui:SetCoreGuiEnabled(coreGuiType, isEnabled)
+				setCoreGuiEnabled(coreGuiType, isEnabled)
 			end)
 		end
 	end

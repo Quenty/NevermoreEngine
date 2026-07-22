@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	Integration coverage for PlayerDataStoreService, the ServiceBag-driven wrapper around one
-	PlayerDataStoreManager, with the underlying datastore injected via the SetRobloxDataStore test
-	seam. The manager auto-enables session locking, so even a load does an UpdateAsync round-trip
-	through the mock. Tests use numeric userIds, never real Players.
-
 	@class PlayerDataStoreService.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -91,7 +86,6 @@ describe("PlayerDataStoreService configuration guards", function()
 	it("should throw when SetRobloxDataStore is called after the manager is built", function()
 		local controller = setup(DataStoreMock.new())
 
-		-- Building the manager (via PromiseDataStore) locks out further overrides.
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
@@ -144,8 +138,6 @@ describe("PlayerDataStoreService failure handling", function()
 
 		local controller = setup(mock)
 
-		-- PromiseDataStore resolves synchronously; the session-locked load underneath is what must
-		-- settle rather than hang against a failing datastore.
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
@@ -207,10 +199,8 @@ describe("PlayerDataStoreService teardown", function()
 
 		dataStore:Store("coins", 7)
 
-		-- Destroy must fire a synchronous Save before tearing the store down.
 		controller:destroy()
 
-		-- keyGenerator maps userId 1 -> "1"
 		local raw = controller.mock:GetRaw("1")
 		expect(raw).never.toBeNil()
 		expect(raw.coins).toEqual(7)

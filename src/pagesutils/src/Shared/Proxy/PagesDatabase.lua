@@ -13,7 +13,8 @@ PagesDatabase.__index = PagesDatabase
 
 export type PagesDatabase = typeof(setmetatable(
 	{} :: {
-		_pages: Pages,
+		-- nil for a static database (see [PagesDatabase.fromPageData]), which has every page pre-stored
+		_pages: Pages?,
 		_lastIncrementedIndex: number,
 		_pageData: { [number]: { currentPage: any, isFinished: boolean } },
 	},
@@ -32,14 +33,56 @@ function PagesDatabase.new(pages: Pages): PagesDatabase
 	return self
 end
 
+--[=[
+	Constructs a database from static page data instead of a live [Pages] instance, for consumers
+	that already hold the full result set -- e.g. a test fabricating an engine pages result through
+	[PagesProxy]. Each entry in `pageData` is one page's item array; the last page reads back
+	`IsFinished = true`. Empty `pageData` mirrors an empty engine result: a single empty page that
+	is already finished.
+
+	```lua
+	local pages = PagesProxy.new(PagesDatabase.fromPageData({
+		{ "a", "b" },
+		{ "c" },
+	}))
+	```
+
+	@param pageData { { any } }
+	@return PagesDatabase
+]=]
+function PagesDatabase.fromPageData(pageData: { { any } }): PagesDatabase
+	assert(type(pageData) == "table", "Bad pageData")
+
+	local self: PagesDatabase = setmetatable({} :: any, PagesDatabase)
+
+	local pageCount = math.max(#pageData, 1)
+
+	self._lastIncrementedIndex = pageCount
+	self._pageData = {}
+
+	for pageId = 1, pageCount do
+		local page = pageData[pageId] or {}
+		assert(type(page) == "table", "Bad page")
+
+		self._pageData[pageId] = {
+			currentPage = page,
+			isFinished = pageId == pageCount,
+		}
+	end
+
+	return self
+end
+
 function PagesDatabase.isPagesDatabase(value): boolean
 	return DuckTypeUtils.isImplementation(PagesDatabase, value)
 end
 
 function PagesDatabase.IncrementToPageIdAsync(self: PagesDatabase, pageId: number)
 	while self._lastIncrementedIndex < pageId do
+		local pages = assert(self._pages, "Cannot advance a static PagesDatabase past its stored pages")
+
 		self._lastIncrementedIndex += 1
-		self._pages:AdvanceToNextPageAsync()
+		pages:AdvanceToNextPageAsync()
 		self:_storeState()
 	end
 end
@@ -63,9 +106,11 @@ function PagesDatabase._getPageState(self: PagesDatabase, pageId: number)
 end
 
 function PagesDatabase._storeState(self: PagesDatabase)
+	local pages = assert(self._pages, "No pages")
+
 	self._pageData[self._lastIncrementedIndex] = {
-		currentPage = self._pages:GetCurrentPage(),
-		isFinished = self._pages.IsFinished,
+		currentPage = pages:GetCurrentPage(),
+		isFinished = pages.IsFinished,
 	}
 end
 

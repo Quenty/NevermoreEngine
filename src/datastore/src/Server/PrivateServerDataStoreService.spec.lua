@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	Integration coverage for PrivateServerDataStoreService wired through a real ServiceBag, with the
-	underlying datastore injected via the SetRobloxDataStore test seam. It is not session-locking, so a
-	failing load rejects promptly rather than hanging. The datastore key defaults to "main" (or the
-	private-server id) unless a custom key is set via SetCustomKey before the datastore is resolved.
-
 	@class PrivateServerDataStoreService.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -123,7 +118,6 @@ describe("PrivateServerDataStoreService persistence", function()
 		end
 		expect((savePromise:Yield())).toEqual(true)
 
-		-- Non-session-locking, so the raw persisted value is the plain data table.
 		local raw = controller.mock:GetRaw(key)
 		expect(raw).never.toBeNil()
 		expect(raw.motd).toEqual("hello")
@@ -146,7 +140,6 @@ describe("PrivateServerDataStoreService.SetRobloxDataStore", function()
 	it("should throw on a non-datastore argument", function()
 		local controller = setup()
 
-		-- isDataStore is validated before the already-resolved check, so a bad arg throws regardless.
 		expect(function()
 			controller.service:SetRobloxDataStore({})
 		end).toThrow("Bad robloxDataStore")
@@ -176,7 +169,6 @@ describe("PrivateServerDataStoreService failure handling", function()
 		local ok, dataStore = promise:Yield()
 		expect(ok).toEqual(true)
 
-		-- Non-session-locking: a failing load rejects promptly, so this settles false rather than hanging.
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 5) then
 			expect("hung").toEqual("settled")
@@ -232,7 +224,6 @@ describe("PrivateServerDataStoreService teardown", function()
 		local key = dataStore:GetKey()
 		dataStore:Store("region", "us")
 
-		-- Destroy must fire a synchronous Save before tearing the store down.
 		controller:destroy()
 
 		local raw = controller.mock:GetRaw(key)

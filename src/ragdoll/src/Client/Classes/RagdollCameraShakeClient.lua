@@ -115,11 +115,16 @@ function RagdollCameraShakeClient._setupCameraShake(self: RagdollCameraShakeClie
 			maid:GiveTask(RunService.Heartbeat:Connect(function()
 				debug.profilebegin("ragdollcamerashake")
 
-				local cameraCFrame = Workspace.CurrentCamera.CFrame
-
 				local velocity = getEstimatedVelocityFromUpperTorso()
 				local dVelocity = velocity - lastVelocity
-				if dVelocity.magnitude >= 0 then
+
+				-- CurrentCamera can be transiently nil on live clients (respawn, camera swap)
+				-- and is always nil in headless test runs -- skip the impulse for the frame
+				-- but keep tracking velocity so the camera's return doesn't spike.
+				local camera = Workspace.CurrentCamera
+				if camera ~= nil and dVelocity.magnitude >= 0 then
+					local cameraCFrame = camera.CFrame
+
 					if self._ragdollServiceClient:GetScreenShakeEnabled() then
 						-- Defaults, but we should tune these
 						local speed = 20

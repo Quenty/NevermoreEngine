@@ -7,8 +7,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local Blend = require("Blend")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
@@ -130,7 +128,7 @@ end
 	@return Observable<T>
 ]=]
 function SpringObject:ObserveRenderStepped()
-	return self:ObserveOnSignal(RunService.RenderStepped)
+	return self:ObserveOnSignal(StepUtils.getAnimationStepSignal())
 end
 
 --[=[
@@ -139,11 +137,7 @@ end
 	@return Observable<T>
 ]=]
 function SpringObject:Observe()
-	if RunService:IsClient() then
-		return self:ObserveOnSignal(RunService.RenderStepped)
-	else
-		return self:ObserveOnSignal(RunService.Stepped)
-	end
+	return self:ObserveOnSignal(StepUtils.getAnimationStepSignal())
 end
 
 --[=[
@@ -172,7 +166,7 @@ function SpringObject:ObserveTarget()
 end
 
 function SpringObject:ObserveVelocityOnRenderStepped()
-	return self:ObserveVelocityOnSignal(RunService.RenderStepped)
+	return self:ObserveVelocityOnSignal(StepUtils.getAnimationStepSignal())
 end
 
 --[=[
@@ -183,7 +177,7 @@ end
 	@return Observable<T>
 ]=]
 function SpringObject:PromiseFinished(signal)
-	signal = signal or RunService.RenderStepped
+	signal = signal or StepUtils.getAnimationStepSignal()
 
 	local maid = Maid.new()
 	local promise = maid:Add(Promise.new())

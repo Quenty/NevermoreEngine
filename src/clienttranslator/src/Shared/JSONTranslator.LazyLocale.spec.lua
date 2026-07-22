@@ -1,16 +1,6 @@
 --!strict
 --[[
 	@class JSONTranslatorLazyLocale.spec.lua
-
-	Covers lazy per-locale loading for instance-decoded translators (per-locale JSON
-	StringValues under a folder). On the client the target locale is knowable, so a
-	locale's JSON is only decoded and written when that locale is actually needed; the
-	source locale is always loaded as the fallback. Off the client every locale is
-	loaded eagerly, since there is no player locale to key off.
-
-	The realm is injected with TieRealmService and the locale is driven with
-	TranslatorService:SetForcedLocaleId, so this client behavior runs on the server
-	test runner. See [TranslatorTestUtils.setup].
 ]]
 
 local require = require(script.Parent.loader).load(script)
@@ -25,8 +15,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a client world with a two-locale (en/fr) instance translator already loaded
--- at the source locale.
 local function setupClientTranslator(jsonByLocale)
 	local controller = TranslatorTestUtils.setup({ tieRealm = TieRealms.CLIENT })
 	controller.setForcedLocaleId("en")
@@ -47,7 +35,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
-		-- French was never decoded or written -- it is not the target locale.
 		expect(entry.Values["fr"]).toBeNil()
 		controller:destroy()
 	end)
@@ -63,7 +50,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["fr"]).toBe("Bonjour")
-		-- The source locale stays loaded as the fallback.
 		expect(entry.Values["en"]).toBe("Hello")
 		controller:destroy()
 	end)
@@ -83,8 +69,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		controller.setForcedLocaleId("es-mx")
 		controller.awaitEntriesWritten()
 
-		-- Both the universal Spanish and the Mexico-specific file are loaded, with English
-		-- still present as the ultimate fallback.
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["es"]).toBe("Hola")
 		expect(entry.Values["es-mx"]).toBe("Que onda")
@@ -98,7 +82,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 			fr = { greeting = "Bonjour" },
 		})
 
-		-- fr-fr has no file, so it resolves to the fr file.
 		controller.setForcedLocaleId("fr-fr")
 		controller.awaitEntriesWritten()
 
@@ -112,7 +95,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		local controller = TranslatorTestUtils.setup({ tieRealm = TieRealms.CLIENT })
 		controller.setForcedLocaleId("en")
 
-		-- French holds invalid JSON: decoding it at init would throw. Init must not decode it.
 		local folder = controller.track(Instance.new("Folder"))
 		local en = Instance.new("StringValue")
 		en.Name = "en.json"
@@ -126,7 +108,6 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		controller.newTranslatorFromInstance(folder)
 		controller.awaitEntriesWritten()
 
-		-- Init succeeded (only the source locale was decoded).
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["en"]).toBe(
 			"Hello"
 		)
@@ -143,15 +124,12 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		controller.awaitEntriesWritten()
 		local writesAfterFirstLoad = controller.translatorService:GetLocalizationWriteCount()
 
-		-- Change the French source after it has been loaded; a reload would pick this up.
 		folder:FindFirstChild("fr.json").Value = HttpService:JSONEncode({ greeting = "CHANGED" })
 
-		-- Swap away and back to French.
 		controller.setForcedLocaleId("en")
 		controller.setForcedLocaleId("fr")
 		controller.awaitEntriesWritten()
 
-		-- Still the originally-decoded value, and no additional writes happened.
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["fr"]).toBe(
 			"Bonjour"
 		)
@@ -173,7 +151,6 @@ describe("JSONTranslator instance loading off the client", function()
 
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
-		-- No target locale off the client, so every locale is written up front.
 		expect(entry.Values["fr"]).toBe("Bonjour")
 		controller:destroy()
 	end)

@@ -1,13 +1,5 @@
 --!strict
 --[[
-	Coverage for BoundChildCollection, which tracks the bound children of a parent instance.
-
-	The binder is booted through a ServiceBag (as production code does); the collection itself is a
-	plain BaseObject and is constructed directly. Everything lives under a workspace container so
-	CollectionService and ChildAdded/ChildRemoved signals fire. Children tagged before the service
-	bag starts bind synchronously; changes made after construction are awaited event-driven via the
-	collection's own ClassAdded/ClassRemoved signals rather than a fixed sleep.
-
 	@class BoundChildCollection.spec.lua
 ]]
 
@@ -100,19 +92,19 @@ end
 
 describe("BoundChildCollection construction", function()
 	it("counts children bound before construction without firing ClassAdded", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local childA = env.newInstance(parent)
-		local childB = env.newInstance(parent)
-		env.newInstance(parent) -- unbound child
+		local parent = controller.newInstance()
+		local childA = controller.newInstance(parent)
+		local childB = controller.newInstance(parent)
+		controller.newInstance(parent) -- unbound child
 
-		env.binder:Tag(childA)
-		env.binder:Tag(childB)
-		env.boot()
+		controller.binder:Tag(childA)
+		controller.binder:Tag(childB)
+		controller.boot()
 
 		local fired = 0
-		local collection = env.track(BoundChildCollection.new(env.binder, parent))
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		collection.ClassAdded:Connect(function()
 			fired += 1
 		end)
@@ -120,25 +112,24 @@ describe("BoundChildCollection construction", function()
 		expect(collection:GetSize()).toEqual(2)
 		expect(fired).toEqual(0)
 		expect(#collection:GetClasses()).toEqual(2)
-		expect(collection:HasClass(env.binder:Get(childA))).toEqual(true)
+		expect(collection:HasClass(controller.binder:Get(childA))).toEqual(true)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)
 
 describe("BoundChildCollection dynamic updates", function()
 	it("fires ClassAdded when a bound child is reparented in", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		env.boot()
+		local parent = controller.newInstance()
+		controller.boot()
 
-		local collection = env.track(BoundChildCollection.new(env.binder, parent))
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 
-		-- Bind an instance living elsewhere, then move it under the tracked parent.
-		local child = env.newInstance()
-		env.binder:Tag(child)
-		local ok, class = env.binder:Promise(child):Yield()
+		local child = controller.newInstance()
+		controller.binder:Tag(child)
+		local ok, class = controller.binder:Promise(child):Yield()
 		assert(ok, "child never bound")
 
 		local addedClass
@@ -155,18 +146,18 @@ describe("BoundChildCollection dynamic updates", function()
 		expect(addedClass).toEqual(class)
 		expect(collection:GetSize()).toEqual(1)
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("fires ClassRemoved when a tracked child is reparented out", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.binder:Tag(child)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(child)
+		controller.boot()
 
-		local collection = env.track(BoundChildCollection.new(env.binder, parent))
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		expect(collection:GetSize()).toEqual(1)
 
 		local removedClass
@@ -174,8 +165,8 @@ describe("BoundChildCollection dynamic updates", function()
 			removedClass = c
 		end)
 
-		local class = env.binder:Get(child)
-		child.Parent = env.container
+		local class = controller.binder:Get(child)
+		child.Parent = controller.container
 		if collection:GetSize() == 1 then
 			collection.ClassRemoved:Wait()
 		end
@@ -184,22 +175,22 @@ describe("BoundChildCollection dynamic updates", function()
 		expect(removedClass).toEqual(class)
 		expect(collection:GetSize()).toEqual(0)
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("fires ClassRemoved when a tracked child is unbound", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.binder:Tag(child)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(child)
+		controller.boot()
 
-		local collection = env.track(BoundChildCollection.new(env.binder, parent))
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		expect(collection:GetSize()).toEqual(1)
 
 		local conn = collection.ClassRemoved:Connect(function() end)
-		env.binder:Untag(child)
+		controller.binder:Untag(child)
 		if collection:GetSize() == 1 then
 			collection.ClassRemoved:Wait()
 		end
@@ -207,6 +198,6 @@ describe("BoundChildCollection dynamic updates", function()
 
 		expect(collection:GetSize()).toEqual(0)
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)

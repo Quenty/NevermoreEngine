@@ -101,6 +101,12 @@ function CmdrServiceClient.Start(self: CmdrServiceClient): ()
 		else
 			cmdr:SetActivationKeys({})
 		end
+	end, function(err)
+		-- A nil rejection is teardown before cmdr resolved (e.g. the ServiceBag was destroyed) and
+		-- stays silent; a valued rejection is a genuine failure and must stay visible.
+		if err ~= nil then
+			warn(string.format("[CmdrServiceClient.Start] - Failed to set up cmdr: %s", tostring(err)))
+		end
 	end)
 end
 

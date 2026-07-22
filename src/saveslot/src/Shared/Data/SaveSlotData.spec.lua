@@ -1,8 +1,5 @@
 --!nonstrict
 --[[
-	Covers the Summary metadata field, which is JSON-encoded into a single attribute so a structured,
-	provider-keyed summary survives the attribute round-trip (attributes cannot hold tables directly).
-
 	@class SaveSlotData.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -39,8 +36,6 @@ describe("SaveSlotData.Summary", function()
 	end)
 
 	it("tolerates a legacy plain-string Summary without erroring", function()
-		-- Before the summary was structured it was a single string. A slot saved then still loads: the
-		-- value survives (as a string) until the active slot's providers regenerate it as a table.
 		local folder = Instance.new("Folder")
 
 		expect(function()

@@ -39,10 +39,12 @@
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/qframe": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/spring": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
     "@quenty/vector3utils": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"

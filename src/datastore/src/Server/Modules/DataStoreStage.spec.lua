@@ -1,9 +1,5 @@
 --!nonstrict
 --[[
-	Characterization coverage for the DataStoreStage staging layer, exercised through a real root
-	(`DataStore.new(DataStoreMock.new(), key)`) since a bare stage has no load parent. Stores here are
-	non-session-locking, so staging is deterministic.
-
 	@class DataStoreStage.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -154,12 +150,10 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 	describe("View priority", function()
 		it("should prioritize staged save data over loaded base data", function()
 			local mock = DataStoreMock.new()
-			-- Seed base data BEFORE constructing the reader so it loads through getAsync.
 			mock:SetRaw("player_1", { coins = 1, gems = 2 })
 
 			local dataStore = DataStore.new(mock, "player_1")
 
-			-- Base data loads first
 			local basePromise = dataStore:Load("coins")
 			if not PromiseTestUtils.awaitSettled(basePromise) then
 				expect("hung").toEqual("settled")
@@ -167,7 +161,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			end
 			expect((basePromise:Wait())).toEqual(1)
 
-			-- Staged value overrides base; untouched base key stays visible
 			dataStore:Store("coins", 999)
 
 			local promise = dataStore:LoadAll()
@@ -228,7 +221,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			local dataStore = DataStore.new(mock, "player_1")
 
-			-- Force base to load first
 			local basePromise = dataStore:Load("coins")
 			if not PromiseTestUtils.awaitSettled(basePromise) then
 				expect("hung").toEqual("settled")
@@ -347,8 +339,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should fire the whole-view observer with the new snapshot after a Store", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			-- The initial emission of an empty store is nil, so count emissions (not value) to
-			-- confirm the Changed connection is established before we Store.
 			local emissions = 0
 			local captured
 			local sub = dataStore:Observe():Subscribe(function(snapshot)
@@ -404,7 +394,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local ok, list = promise:Yield()
 			expect(ok).toEqual(true)
 
-			-- Order is not guaranteed; compare as a set
 			local asSet = {}
 			for _, key in list do
 				asSet[key] = true
@@ -419,7 +408,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should stage the value whenever the ValueObject changes", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			-- Ensure the stage is loaded before wiring up the value object
 			if not PromiseTestUtils.awaitSettled(dataStore:Load("level")) then
 				expect("hung").toEqual("settled")
 				return
@@ -428,7 +416,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local valueObject = ValueObject.new(0)
 			dataStore:StoreOnValueChange("level", valueObject)
 
-			-- Construction does not stage; a change does
 			valueObject.Value = 7
 
 			local promise = dataStore:LoadAll()
@@ -482,7 +469,6 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local input = { count = 1 }
 			dataStore:Store("data", input)
 
-			-- Mutating the caller's table must not change the frozen staged copy
 			input.count = 999
 
 			local promise = dataStore:Load("data")

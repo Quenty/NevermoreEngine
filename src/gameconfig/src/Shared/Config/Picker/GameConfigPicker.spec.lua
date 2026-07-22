@@ -1,16 +1,5 @@
 --!strict
 --[[
-	Coverage for GameConfigPicker priority selection: when several active assets
-	share a type and key (e.g. a hand-authored place and one registered from the
-	deploy manifest), the highest-priority one wins, and equal priorities keep
-	the first iterated -- so a lone hand-authored asset resolves exactly as it did
-	before priority existed.
-
-	Each test uses a distinct asset key. Configs are bound through global
-	CollectionService tags under a shared parent, so assets registered by one
-	ServiceBag remain visible to the next within a run; distinct keys keep lookups
-	isolated regardless.
-
 	@class GameConfigPicker.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -31,7 +20,7 @@ local PLACE: GameConfigAssetTypes.GameConfigAssetType = GameConfigAssetTypes.PLA
 
 local function newPicker()
 	local serviceBag = ServiceBag.new()
-	local gameConfigService = (serviceBag:GetService(GameConfigService) :: any) :: GameConfigService.GameConfigService
+	local gameConfigService: GameConfigService.GameConfigService = serviceBag:GetService(GameConfigService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 	return serviceBag, gameConfigService, gameConfigService:GetConfigPicker()
@@ -64,8 +53,8 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 	it("prefers the higher-priority asset added after a default one", function()
 		local serviceBag, gameConfigService, picker = newPicker()
 
-		gameConfigService:AddPlace("specClashAfter", 111) -- hand-authored (priority 0)
-		gameConfigService:AddPlace("specClashAfter", 222, 100) -- manifest (priority 100)
+		gameConfigService:AddPlace("specClashAfter", 111)
+		gameConfigService:AddPlace("specClashAfter", 222, 100)
 
 		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specClashAfter")
 		assert(asset, "No asset")
@@ -77,8 +66,8 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 	it("prefers the higher-priority asset even when added first", function()
 		local serviceBag, gameConfigService, picker = newPicker()
 
-		gameConfigService:AddPlace("specClashFirst", 222, 100) -- manifest first
-		gameConfigService:AddPlace("specClashFirst", 111) -- hand-authored second
+		gameConfigService:AddPlace("specClashFirst", 222, 100)
+		gameConfigService:AddPlace("specClashFirst", 111)
 
 		local asset = picker:FindFirstActiveAssetOfKey(PLACE, "specClashFirst")
 		assert(asset, "No asset")
@@ -93,10 +82,6 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 		gameConfigService:AddPlace("specTie", 111)
 		gameConfigService:AddPlace("specTie", 222)
 
-		-- Equal priority keeps the config's own iteration order (unchanged from
-		-- before priority existed), so the exact winner is implementation-defined.
-		-- The real contract is only that it is stable and matches -- a higher
-		-- priority is the deterministic tie-breaker, covered above.
 		local firstAsset = picker:FindFirstActiveAssetOfKey(PLACE, "specTie")
 		local secondAsset = picker:FindFirstActiveAssetOfKey(PLACE, "specTie")
 		assert(firstAsset, "No firstAsset")
@@ -119,10 +104,6 @@ describe("GameConfigPicker.FindFirstActiveAssetOfKey priority", function()
 end)
 
 describe("GameConfigPicker gameId gate dominates priority", function()
-	-- Builds a config whose GameId is NOT the running place's, containing one
-	-- PLACE asset. Such a config is never active, so its assets must never be
-	-- returned -- no matter how high their priority. Returns the config folder so
-	-- the caller can destroy it.
 	local function addInactiveConfigPlace(
 		serviceBag: any,
 		gameConfigService: any,
@@ -154,9 +135,7 @@ describe("GameConfigPicker gameId gate dominates priority", function()
 	it("keeps a lower-priority active asset over a higher-priority wrong-gameId one", function()
 		local serviceBag, gameConfigService, picker = newPicker()
 
-		-- Wrong-gameId asset with a far higher priority than the active one.
 		local inactive = addInactiveConfigPlace(serviceBag, gameConfigService, "specGateBeatsPriority", 888, 5000)
-		-- Correct-gameId asset at the default priority.
 		gameConfigService:AddPlace("specGateBeatsPriority", 111)
 
 		local resolved = picker:FindFirstActiveAssetOfKey(PLACE, "specGateBeatsPriority")

@@ -8,6 +8,9 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local PagesDatabase = require("PagesDatabase")
+local PagesProxy = require("PagesProxy")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local FriendUtils = {}
@@ -113,6 +116,12 @@ function FriendUtils.promiseFriendPages(userId: number): Promise.Promise<FriendP
 	assert(type(userId) == "number", "Bad userId")
 
 	return Promise.spawn(function(resolve, reject)
+		local mockPlayer = PlayerMock.getMockByUserId(userId)
+		if mockPlayer ~= nil then
+			local friends = PlayerMock.readLookup(mockPlayer, "Players.GetFriendsAsync", 0)
+			return resolve(PagesProxy.new(PagesDatabase.fromPageData({ friends })) :: any)
+		end
+
 		local pages
 		local ok, err = pcall(function()
 			pages = Players:GetFriendsAsync(userId)

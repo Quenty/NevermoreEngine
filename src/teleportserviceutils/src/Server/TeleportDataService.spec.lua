@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
@@ -24,25 +25,14 @@ local it = Jest.Globals.it
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local service = (serviceBag:GetService(TeleportDataService) :: any) :: TeleportDataService.TeleportDataService
+	local service: TeleportDataService.TeleportDataService = serviceBag:GetService(TeleportDataService) :: any
 	serviceBag:Init()
-
-	-- Fake players (Folders) have no real UserId, so key envelope slices off an attribute instead.
-	local anyService = service :: any
-	anyService._getUserId = function(_self, player: Instance): any
-		return player:GetAttribute("UserId")
-	end
 
 	return {
 		service = service,
 		fakePlayer = function(userId: number?): Player
-			local player = maid:Add(Instance.new("Folder"))
-			if userId ~= nil then
-				player:SetAttribute("UserId", userId)
-			end
-			return (player :: any) :: Player
+			return maid:Add(PlayerMock.new(if userId ~= nil then { UserId = userId } else nil))
 		end,
-		-- Awaits a read promise and returns its fulfilled value (fails the test if it rejects or hangs).
 		await = function(promise: any): any
 			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 			local ok, value = promise:Yield()
@@ -222,7 +212,6 @@ describe("TeleportDataService per-player replication", function()
 		local playerA = controller.fakePlayer(111)
 		local playerB = controller.fakePlayer(222)
 
-		-- Both players replicate the same group envelope (as they would from one group teleport).
 		local envelope = TeleportDataEnvelopeUtils.build(nil, {
 			["111"] = { slot = "a" },
 			["222"] = { slot = "b" },
@@ -273,6 +262,15 @@ describe("TeleportDataService arrival lifecycle", function()
 		controller:destroy()
 	end)
 
+	it("resolves promptly for a mock with nothing injected -- there is no client to wait for", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		expect(controller.await(controller.service:PromiseArrivedData(player))).toBeNil()
+
+		controller:destroy()
+	end)
+
 	it("seals on the first replication -- a later one is ignored (first wins)", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
@@ -314,7 +312,7 @@ describe("TeleportDataService inject-before-read invariant", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
 
-		controller.service:PromiseArrivedData(player) -- requests a read
+		controller.service:PromiseArrivedData(player)
 
 		expect(function()
 			controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })

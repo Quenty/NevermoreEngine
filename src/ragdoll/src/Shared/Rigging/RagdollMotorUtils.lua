@@ -491,6 +491,12 @@ function RagdollMotorUtils.promiseVelocityRecordings(
 end
 
 function RagdollMotorUtils.yieldUntilStepped(): number
+	if not RunService:IsRunning() then
+		-- Physics never steps in a non-running DataModel (headless test runs), so there is no
+		-- settling to wait on. Report a nominal frame time so velocity math stays finite.
+		return 1 / 60
+	end
+
 	local start = time()
 	local dt: number
 	repeat

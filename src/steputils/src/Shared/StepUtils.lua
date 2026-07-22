@@ -10,7 +10,34 @@ local RunService = game:GetService("RunService")
 local StepUtils = {}
 
 --[=[
-	Binds the given update function to [RunService.RenderStepped].
+	Returns the signal animation should step on: [RunService.RenderStepped] on the client,
+	[RunService.Stepped] (the physics pre-step) on a running server so that writes land before
+	the physics step -- springs that drive CFrames stay in lockstep with constraints, characters,
+	and replication. Heartbeat is only the fallback for a non-running DataModel (headless test
+	runs, edit mode), where Stepped never fires.
+
+	Use this instead of hand-rolling the realm branch at call sites.
+
+	:::caution
+	The argument shape is realm-dependent: RenderStepped fires `(deltaTime)` but Stepped fires
+	`(time, deltaTime)`. Shared code connecting directly to this signal must not assume the
+	first argument is deltaTime.
+	:::
+
+	@return RBXScriptSignal
+]=]
+function StepUtils.getAnimationStepSignal(): RBXScriptSignal
+	if RunService:IsClient() then
+		return RunService.RenderStepped
+	elseif RunService:IsRunning() then
+		return RunService.Stepped
+	else
+		return RunService.Heartbeat
+	end
+end
+
+--[=[
+	Binds the given update function to [StepUtils.getAnimationStepSignal].
 
 	```lua
 	local spring = Spring.new(0)
@@ -37,7 +64,7 @@ local StepUtils = {}
 	@return () -> () -- Disconnect function
 ]=]
 function StepUtils.bindToRenderStep(update: () -> boolean): (() -> (), () -> ())
-	return StepUtils.bindToSignal(RunService.RenderStepped, update)
+	return StepUtils.bindToSignal(StepUtils.getAnimationStepSignal(), update)
 end
 
 --[=[
@@ -183,7 +210,7 @@ end
 	@return function -- Call this function to cancel call
 ]=]
 function StepUtils.onceAtRenderStepped(func: () -> ()): () -> ()
-	local conn = RunService.RenderStepped:Once(func)
+	local conn = StepUtils.getAnimationStepSignal():Once(func)
 	return function()
 		conn:Disconnect()
 	end

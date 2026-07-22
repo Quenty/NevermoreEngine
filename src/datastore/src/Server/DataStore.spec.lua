@@ -1,8 +1,5 @@
 --!nonstrict
 --[[
-	Integration coverage for DataStore against a mocked Roblox datastore: the load/save round-trip
-	and how it behaves when datastore operations fail (e.g. the 509 Personal-RCC block).
-
 	@class DataStore.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -16,8 +13,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Asserts the promise settled within the timeout, so a hung promise fails the test (here) instead of
--- freezing the runner on the following :Yield().
 local function expectSettled(promise, timeout: number?)
 	expect(PromiseTestUtils.awaitSettled(promise, timeout)).toEqual(true)
 end
@@ -225,8 +220,6 @@ describe("DataStore with session locking", function()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
-		-- PromiseLoadSuccessful maps the error to a boolean, so read the rejection from
-		-- PromiseViewUpToDate to assert the underlying datastore error propagates.
 		local outcome, err = PromiseTestUtils.awaitOutcome(dataStore:PromiseViewUpToDate())
 
 		expect(outcome).toEqual("rejected")

@@ -5,6 +5,19 @@ sidebar_position: 1
 
 # Testing
 
+So you want to unit test your project. Roblox testing has a reputation for being painful — Nevermore removes
+most of the reasons why:
+
+- **Tests run in a real place, from your terminal.** `nevermore test` builds the package's test place and
+  executes it in Studio locally or headlessly via Open Cloud. No manual Studio sessions, no hand-wired runners.
+- **You write ordinary Jest.** Familiar `describe`/`it`/`expect`, strictly typed, with specs living next to
+  the code they test.
+- **Player I/O is already intercepted.** [PlayerMock](/api/PlayerMock) stands in for real players at the
+  lowest level of the stack, so server logic, remoting round-trips, and client UI all run headless through
+  production code paths — no connected client, no stubbing in your tests.
+- **CI is included.** `nevermore batch test` detects changed packages, runs them in the cloud, and posts
+  results to your PR.
+
 ## Writing tests
 
 We use [Jest3](https://github.com/jsdotlua/jest-lua) via the Nevermore-compatible wrapper `@quentystudios/jest-lua`. The only difference from upstream Jest is how you access globals — require `Jest` and access them via `Jest.Globals`.
@@ -34,6 +47,15 @@ describe("MyUtils", function()
 	end)
 end)
 ```
+
+### Self-documenting code
+
+Spec files should be comment-free apart from lint directives (`--!strict`, `-- selene:`) and the
+`@class` docstring — the code and test names carry the intent. Do **not** write prose headers above
+`setup()` or other helpers describing what they build, comments narrating test flow, or comments
+restating what an assertion checks — `setup()`/`destroy()` is an established pattern and needs no
+explanation. The only comment worth keeping is one documenting something impossible to infer from
+the code (e.g. an engine-bug workaround, with a link). When in doubt, omit it.
 
 ### Clean up everything a test creates
 
@@ -90,6 +112,136 @@ Guidelines:
   metatable nil'd), so there is no double-destroy.
 - A plain object with no `ServiceBag` can skip the controller: create it in the test and
   `object:Destroy()` at the end (and in any early-return guard).
+
+### Consume every rejection (or Jest passes but the run still fails)
+
+Jest only tracks assertions that run inside an `it`. Any **uncaught Luau error** raised outside that —
+printed as a `Stack Begin` / `Stack End` block — fails the whole run, so you can see
+`Tests: N passed` from Jest and `Tests failed!` from the CLI in the same output. It is a real leak to
+fix, not a false positive.
+
+The most common cause is an **unconsumed promise rejection**. A rejected `Promise` warns
+`[Promise] - Uncaught exception in promise: ...` at the end of the frame unless something consumes the
+rejection. Attaching a rejection handler (`Catch`, or `Then` with a reject callback) consumes it — and so
+does reading the settled outcome: `GetResults`, `Yield`, and `Wait` all mark the rejection consumed, since
+the caller has inspected it. What still leaks is the **fire-and-forget** promise nobody ever reads:
+
+```luau
+-- Leaks: nothing ever consumes the rejection
+store:Save()
+
+-- Fixed: a best-effort call consumes its own failure
+store:Save():Catch(function() end)
+```
+
+When you need to wait for a settled result, `PromiseTestUtils.awaitOutcome` / `awaitSettled` attach handlers
+synchronously — prefer them over hand-rolled awaits.
+
+One case is untestable rather than fixable: an error raised inside a `BindableFunction`/`BindableEvent`
+handler is **always printed by the engine** (as a `Stack Begin` block), even when the invoker wraps the
+call in `pcall` and correctly converts it to a rejection. So a round-trip spec asserting "a bound
+callback that errors rejects the caller's promise" cannot pass in a cloud run — assert the two halves
+separately instead: the callback-side error with `expect(...).toThrow()` in the test's own thread, and
+the `pcall`→reject conversion at the utility layer (e.g. `RemoteFunctionUtils`). See the note at the
+end of `Remoting.spec.lua`'s fidelity describe for a worked example.
+
+### Standing in for a `Player`
+
+A real `Player` cannot be `Instance.new`'d, and no client joins a headless test place — `Players.LocalPlayer`
+is nil and `Players:GetPlayers()` is empty. Tests use **[PlayerMock](/api/PlayerMock)** (package
+`@quenty/playermock`): a real `Instance` typed as `Player` that stands in anywhere production code touches a
+player.
+
+**The design contract is that it just works.** PlayerMock is the interception layer for everything that hits
+I/O for a player — properties, character and backpack, remoting, ID-keyed engine calls (group rank, asset
+ownership, ...). Core packages already branch on the mock internally, at the lowest level of the stack, so a
+test creates a mock and drives production APIs unchanged. You should not need to know how the mock is
+implemented to test against it; the API reference lives in the [moonwave docs](/api/PlayerMock).
+
+If production code does **not** work against a mock, that is the package failing its contract — the fix is a
+seam in the package (an `isMock` branch at the engine call, or a new domain in the `LOOKUPS` or
+`INPUT_DOMAINS` tables in `PlayerMock.lua`), never a stub in your test or at a call site. If the package isn't yours to change, file
+the gap upstream instead of working around it.
+
+Add `@quenty/playermock` to the package's `package.json` (then `pnpm install`) before requiring it.
+
+**Quick unit tests** construct mocks directly:
+
+```luau
+local PlayerMock = require("PlayerMock")
+
+local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
+player.Parent = game:GetService("Players") -- where real players live; CreatePlayer does this for you
+
+PlayerMock.write(player, "AccountAge", 31) -- mock a property
+PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", gamePassId, true)
+```
+
+`PlayerMock.writeLookup` injects the result of an ID-keyed engine call. Domains are named after the
+canonical engine `Service.Method` the production code path bottoms out in, and injected values are the raw
+engine result shape — the consuming util's real parsing, fallback ordering, and reject paths all execute;
+only the engine call is stubbed. (For coherent group rank/role pairs, see `GroupTestUtils.assignGroupInfo`
+in `@quenty/grouputils`.)
+
+**Full-flow tests** use the services:
+
+- Create mocks before or after booting bags — both work. `playerMockService:CreatePlayer({ UserId = 12345 })`
+  ties the mock's lifetime to the bag (teardown cleans it up); a hand-built `PlayerMock.new` is yours to
+  destroy.
+- For client-realm code, designate the local player — before boot via
+  `PlayerMock.setMockedLocalPlayer(player)` (the booting `PlayerMockServiceClient` adopts it, matching
+  production where `Players.LocalPlayer` exists before any service runs), or after boot via
+  `playerMockServiceClient:SetLocalPlayer(player)`. Client code resolves it as
+  `Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()`, and dummy-mode `Remoting` routes fires the
+  same way — client↔server round-trips run headless against production remoting, with no loopback stubs.
+- One server-realm mock service may be alive at a time; multiple client services (simulated clients) may
+  coexist, each knowing its own local player (`playerMockServiceClient:GetLocalPlayer()`).
+- Destroy every mock the test creates. Leak detection is built in: a mock may not outlive the mock service
+  that observed it — the next boot that sees one fails loudly.
+- **Tear down client bags before the server bag** — explicitly, not via a shared maid (maid order is not a
+  contract). Destroying the server side first destroys its mocks under a still-live client, and a mock's
+  PlayerGui may hold mounted UI: client code reacting to the engine's destroy cascade through a
+  ViewportFrame's `WorldModel` hard-crashes the engine, which cloud runs report only as a silent timeout.
+  Production parity: a client is gone before its player is removed — no client ever watches its own
+  PlayerGui die.
+
+Behavior beyond seeded properties is emulated with real engine semantics rather than recorded:
+`PlayerMock.loadCharacterAsync` is the spawn path (full avatar-loading event order, fresh `Backpack` per
+spawn) and `PlayerMock.kick` really performs the removal sequence. See each function's docs.
+
+:::warning
+Never fork production behavior at a call site to survive a headless test — no `pcall` around
+context-restricted engine calls, no gating on `RunService:IsRunning()`/`IsStudio()` environment queries.
+Both silently change what production executes. The one acceptable `RunService` branch is **signal
+selection**, and it lives centrally in `StepUtils.getAnimationStepSignal()`, never at call sites:
+`RenderStepped` on the client, `Stepped` (the physics pre-step) on a live server so server-side
+writes stay in sync with constraints and replication (`SpringObject`, `TimedTween`), falling back
+to `Heartbeat` headless, where `Stepped` never fires.
+:::
+
+For package authors adding a seam, the branch is explicit and greppable — `PlayerMock.read`/`write` error on
+anything that is not a mock, so the real-player branch stays a typed native access:
+
+```luau
+local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+
+assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+```
+
+`PlayerMock.findFirstAncestorMock` covers ancestor walks (`FindFirstAncestorWhichIsA("Player")` cannot see
+the mock) and `PlayerMock.getMockByUserId` covers utils that only hold a `userId`.
+
+Known limits — these are gaps in `player-mock`'s contract to fix there, not patterns to work around in tests:
+
+- Headless UI mounts into the designated mock's PlayerGui automatically (`ScreenGuiService` falls back to
+  it, resolved reactively — designation may happen after services boot). `SetGuiParent` remains for the
+  cases that need an explicitly *sized* surface (e.g. a 1280×720 `Frame`), since nothing computes a
+  viewport headless.
+- Concurrent simulated clients are distinct only through their services — the ambient
+  `PlayerMock.getMockedLocalPlayer()` global holds a single designation, so bag-less call sites (dummy-mode
+  `Remoting`) see the most recent one.
+- Per-player data with no lookup domain yet: add a domain to `LOOKUPS` rather than stubbing per call
+  site.
 
 ### jest.config.lua
 

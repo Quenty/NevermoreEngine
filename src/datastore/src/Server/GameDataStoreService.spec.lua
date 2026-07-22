@@ -1,9 +1,5 @@
 --!nonstrict
 --[[
-	Integration coverage for GameDataStoreService wired through a real ServiceBag, with the underlying
-	datastore injected via the SetRobloxDataStore test seam. It is not session-locking, so a failing
-	load rejects promptly rather than hanging.
-
 	@class GameDataStoreService.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -98,7 +94,6 @@ describe("GameDataStoreService persistence", function()
 		end
 		expect((savePromise:Yield())).toEqual(true)
 
-		-- Non-session-locking, so the raw persisted value is the plain data table.
 		local raw = controller.mock:GetRaw("version1")
 		expect(raw).never.toBeNil()
 		expect(raw.motd).toEqual("hello")
@@ -121,7 +116,6 @@ describe("GameDataStoreService.SetRobloxDataStore", function()
 	it("should throw on a non-datastore argument", function()
 		local controller = setup()
 
-		-- isDataStore is validated before the already-resolved check, so a bad arg throws regardless.
 		expect(function()
 			controller.service:SetRobloxDataStore({})
 		end).toThrow("Bad robloxDataStore")
@@ -151,7 +145,6 @@ describe("GameDataStoreService failure handling", function()
 		local ok, dataStore = promise:Yield()
 		expect(ok).toEqual(true)
 
-		-- Non-session-locking: a failing load rejects promptly, so this settles false rather than hanging.
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 5) then
 			expect("hung").toEqual("settled")
@@ -204,8 +197,6 @@ describe("GameDataStoreService teardown", function()
 
 		dataStore:Store("motd", "goodbye")
 
-		-- Destroy must fire a synchronous Save before tearing the store down, so the value is
-		-- already in the store the instant destroy() returns -- asserted with no awaiting.
 		controller:destroy()
 
 		local raw = controller.mock:GetRaw("version1")

@@ -29,7 +29,11 @@
   ],
   "dependencies": {
     "@quenty/binder": "workspace:*",
-    "@quenty/loader": "workspace:*"
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

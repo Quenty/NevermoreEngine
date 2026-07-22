@@ -7,7 +7,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local GamepadRotateModel = require("GamepadRotateModel")
@@ -16,6 +15,7 @@ local Maid = require("Maid")
 local PushCamera = require("PushCamera")
 local SmoothRotatedCamera = require("SmoothRotatedCamera")
 local SmoothZoomedCamera = require("SmoothZoomedCamera")
+local StepUtils = require("StepUtils")
 
 -- Stolen directly from ROBLOX's core scripts.
 -- Looks like a simple integrator.
@@ -380,8 +380,10 @@ function CameraControls._handleGamepadRotateStart(self: CameraControls): ()
 		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.zero)
 	end
 
-	maid:GiveTask(RunService.Stepped:Connect(function()
-		local deltaAngle: Vector2 = 0.1 * self._gamepadRotateModel:GetThumbstickDeltaAngle()
+	maid:GiveTask(StepUtils.getAnimationStepSignal():Connect(function(deltaTime: number)
+		-- Sensitivity is tuned per-60Hz-frame; scale by deltaTime * 60 so rotation speed is
+		-- framerate independent.
+		local deltaAngle: Vector2 = 0.1 * (deltaTime * 60) * self._gamepadRotateModel:GetThumbstickDeltaAngle()
 
 		if self._rotatedCamera then
 			self._rotatedCamera:RotateXY(deltaAngle)

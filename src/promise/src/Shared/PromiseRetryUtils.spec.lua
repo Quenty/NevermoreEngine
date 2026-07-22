@@ -20,8 +20,6 @@ local FAST_OPTIONS = {
 	printWarning = false,
 }
 
--- Returns a callback that rejects with `errorMessage` for its first `failureCount` attempts, then
--- resolves with `value`, and a counter table exposing how many attempts were made.
 local function newFlakyCallback(failureCount: number, errorMessage: string, value: any)
 	local attempts = { count = 0 }
 	local function callback()
@@ -103,7 +101,6 @@ describe("PromiseRetryUtils.retry", function()
 
 		expect(outcome).toEqual("rejected")
 		expect(attempts.count).toEqual(3)
-		-- Consulted after every failure, including the final attempt.
 		expect(consulted.count).toEqual(3)
 	end)
 end)

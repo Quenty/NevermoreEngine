@@ -1,20 +1,5 @@
 --!strict
 --[[
-	Rewind (checkpoint / restore) contract for Brine.
-
-	Replay Brine (observeSerialize/observeDeserialize) reconstructs a *mirror* of a source
-	instance on a receiver. Rewind is the other direction: capture a baseline of ONE instance,
-	let arbitrary mutation happen, then return that same instance to the baseline.
-
-	The oracle for "is it back to pristine?" is serialize-equality: Brine.serialize is
-	deterministic (see Brine.spec.lua), so a tree restored to baseline must serialize to the
-	exact same bytes as the baseline did. That is the deep-equal check, for free. Identity and
-	reference behavior -- which serialize-equality alone cannot see -- get explicit assertions.
-
-	The contract, in one line: surviving instances are patched in place (same instance, so
-	external references to them stay valid); destroyed instances are recreated (their identity
-	was already gone, so a fresh instance is acceptable); script-added instances are removed.
-
 	@class Brine.restore.spec.lua
 ]]
 
@@ -27,7 +12,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Serialized baseline used as the pristine oracle.
 local function snapshot(root: Instance): string
 	return (Brine.serialize(root))
 end
@@ -83,9 +67,6 @@ describe("Brine.restore round-trip (serialize-equality oracle)", function()
 	end)
 
 	it("resets a property the script set away from its default back to the default", function()
-		-- The baseline frame only stores NON-default properties (encodeProperties skips
-		-- defaults), so restore must force class properties absent from the frame back to
-		-- their default -- it cannot merely re-apply what the frame recorded.
 		local part = Instance.new("Part")
 		local defaultTransparency = part.Transparency
 
@@ -290,7 +271,6 @@ describe("Brine.restore instance identity", function()
 		part.Color = Color3.new(1, 0, 0)
 		Brine.restore(root, checkpoint)
 
-		-- Patched in place, not replaced -- external references to `part` stay valid.
 		expect(root:FindFirstChild("Survivor")).toEqual(part)
 	end)
 
@@ -305,7 +285,6 @@ describe("Brine.restore instance identity", function()
 		part:Destroy()
 		Brine.restore(root, checkpoint)
 
-		-- Identity was already gone when the script destroyed it; a fresh instance is correct.
 		expect(root:FindFirstChild("Phoenix")).never.toEqual(part)
 	end)
 end)
@@ -485,9 +464,6 @@ describe("Brine.restore idempotency and robustness", function()
 end)
 
 describe("Brine.restore with lifecycle disabled (server-replicated path)", function()
-	-- On a server-replicated tree, "missing" is ambiguous (script-removed vs streamed-out vs
-	-- server-destroyed), so restore must never create or destroy -- only reconcile in place.
-
 	it("reconciles a survivor's property in place", function()
 		local root = Instance.new("Folder")
 		local part = Instance.new("Part")
@@ -530,7 +506,6 @@ describe("Brine.restore with lifecycle disabled (server-replicated path)", funct
 		part:Destroy()
 		Brine.restore(root, checkpoint, { lifecycle = false })
 
-		-- No client-local resurrection -- a later stream-in of the real instance can't duplicate.
 		expect(root:FindFirstChild("Gone")).toEqual(nil)
 	end)
 
@@ -547,7 +522,6 @@ describe("Brine.restore with lifecycle disabled (server-replicated path)", funct
 		added.Parent = root
 		Brine.restore(root, checkpoint, { lifecycle = false })
 
-		-- Might be a legitimately server-replicated instance -- never our call to remove.
 		expect(root:FindFirstChild("Added")).never.toEqual(nil)
 	end)
 end)

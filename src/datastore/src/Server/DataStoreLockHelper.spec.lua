@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	Characterization coverage for DataStore session locking, exercised through a real DataStore
-	against a mocked Roblox datastore. It pins the observable behaviour of the lock lifecycle: a
-	healthy acquire wraps the stored profile in a lock envelope, SaveAndCloseSession releases it,
-	user data survives a lock/unlock round-trip, and a stale lock left by a dead session is stolen.
-
 	@class DataStoreLockHelper.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -68,7 +63,6 @@ describe("DataStore session locking", function()
 		end
 		expect((closePromise:Yield())).toEqual(true)
 
-		-- Closing strips the lock envelope back off the stored value.
 		local raw = controller.mock:GetRaw("player_1")
 		expect(type(raw)).toEqual("table")
 		expect(raw.lock).toEqual(nil)
@@ -125,10 +119,6 @@ describe("DataStore session locking", function()
 	it("steals a stale lock left by a dead session", function()
 		local controller = DataStoreTestUtils.setup()
 
-		-- Seed a lock owned by a long-dead session. LastUpdateTime is far enough in the past that
-		-- os.time() - LastUpdateTime exceeds GetAutoSaveTimeSeconds() * 2.1 (default 300 * 2.1 = 630s),
-		-- so the lock is stolen on the first acquire attempt (no retry backoff). Seed user data too,
-		-- to prove it survives the steal.
 		controller.mock:SetRaw("player_1", {
 			coins = 7,
 			lock = {
@@ -156,7 +146,6 @@ describe("DataStore session locking", function()
 		local raw = controller.mock:GetRaw("player_1")
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
 
-		-- The dead session's user data survived the steal.
 		local loadPromise = dataStore:Load("coins")
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
@@ -183,7 +172,6 @@ describe("DataStore session locking", function()
 		end
 		expect((loadPromise:Yield())).toEqual(true)
 
-		-- Another session steals the lock out from under us directly in the datastore.
 		controller.mock:SetRaw("player_1", {
 			coins = 1,
 			lock = {

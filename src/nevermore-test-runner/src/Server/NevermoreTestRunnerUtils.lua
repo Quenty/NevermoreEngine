@@ -52,7 +52,9 @@ function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance): boolean
 	local canReadSource = NevermoreTestRunnerUtils.canReadScriptSource()
 	if not canReadSource then
 		return false
-	elseif isOpenCloud then
+	end
+
+	if isOpenCloud then
 		print("[NevermoreTestRunner] Running in Open Cloud execution context")
 		NevermoreTestRunnerUtils._runTestsAsync(root)
 

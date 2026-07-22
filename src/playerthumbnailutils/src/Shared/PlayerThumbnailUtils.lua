@@ -10,9 +10,18 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local MAX_TRIES = 5
+
+-- What each ThumbnailType is called in an rbxthumb:// content URL, which is the shape
+-- GetUserThumbnailAsync itself resolves -- so a mock's thumbnail can derive from its UserId alone.
+local THUMBNAIL_TYPE_TO_RBXTHUMB_TYPE = {
+	[Enum.ThumbnailType.HeadShot] = "AvatarHeadShot",
+	[Enum.ThumbnailType.AvatarBust] = "AvatarBust",
+	[Enum.ThumbnailType.AvatarThumbnail] = "Avatar",
+}
 
 local PlayerThumbnailUtils = {}
 
@@ -35,17 +44,36 @@ function PlayerThumbnailUtils.promiseUserThumbnail(
 	thumbnailSize: Enum.ThumbnailSize?
 ): Promise.Promise<string>
 	assert(type(userId) == "number", "Bad userId")
-	thumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
-	thumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
+	local resolvedThumbnailType: Enum.ThumbnailType = thumbnailType or Enum.ThumbnailType.HeadShot
+	local resolvedThumbnailSize: Enum.ThumbnailSize = thumbnailSize or Enum.ThumbnailSize.Size100x100
 
 	local promise
 	promise = Promise.spawn(function(resolve, reject)
+		if PlayerMock.getMockByUserId(userId) ~= nil then
+			-- The engine call would reject a fake UserId; derive the rbxthumb content URL it
+			-- would resolve for a real one.
+			local width, height = string.match(resolvedThumbnailSize.Name, "^Size(%d+)x(%d+)$")
+			if width == nil or height == nil then
+				return reject(string.format("Failed to parse thumbnail size %q", resolvedThumbnailSize.Name))
+			end
+
+			return resolve(
+				string.format(
+					"rbxthumb://type=%s&id=%d&w=%s&h=%s",
+					THUMBNAIL_TYPE_TO_RBXTHUMB_TYPE[resolvedThumbnailType],
+					userId,
+					width,
+					height
+				)
+			)
+		end
+
 		local tries = 0
 		repeat
 			tries = tries + 1
 			local content, isReady
 			local ok, err = pcall(function()
-				content, isReady = Players:GetUserThumbnailAsync(userId, thumbnailType, thumbnailSize)
+				content, isReady = Players:GetUserThumbnailAsync(userId, resolvedThumbnailType, resolvedThumbnailSize)
 			end)
 
 			-- Don't retry if we immediately error (timeout exceptions!)
@@ -79,6 +107,13 @@ function PlayerThumbnailUtils.promiseUserName(userId: number): Promise.Promise<s
 
 	local promise
 	promise = Promise.spawn(function(resolve, reject)
+		local mockPlayer = PlayerMock.getMockByUserId(userId)
+		if mockPlayer ~= nil then
+			-- Resolved from the same user-info domain UserServiceUtils reads, so the two
+			-- packages' usernames can never disagree for a mock.
+			return resolve(PlayerMock.readLookup(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0).Username)
+		end
+
 		local tries = 0
 		repeat
 			tries = tries + 1

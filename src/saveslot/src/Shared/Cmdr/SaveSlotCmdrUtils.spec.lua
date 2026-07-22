@@ -1,9 +1,5 @@
 --!strict
 --[[
-	Coverage for the "slotIndex"/"slotIndices" Cmdr types, focused on the "." shorthand (Cmdr's
-	Default callback) that resolves to the player's current slot -- the active slot, or the last one
-	they played. Cmdr itself is stubbed so the type's Default/Transform can be exercised directly.
-
 	@class SaveSlotCmdrUtils.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -15,10 +11,8 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- A stand-in player. The fake data service keys off nothing, so any sentinel works.
 local FAKE_PLAYER = newproxy(false)
 
--- Minimal SaveSlotDataService driven by a mutable `state`. Mirrors the real methods the type uses.
 local function newFakeDataService(state)
 	return {
 		GetSlotList = function(_self, _player)
@@ -38,9 +32,6 @@ local function newFakeDataService(state)
 	}
 end
 
--- Enough of Cmdr for registerSlotIndexType: a substring fuzzy finder, a listable wrapper that copies
--- fields the way the real Util.MakeListableType does (so Default propagation is exercised), and a
--- registry that captures the registered definitions.
 local function newFakeCmdr()
 	local registered: { [string]: any } = {}
 	local cmdr = {
@@ -76,7 +67,6 @@ local function newFakeCmdr()
 	return cmdr, registered
 end
 
--- Registers the types against a fake data service backed by `state` and returns the registered types.
 local function registerSlotIndex(state)
 	local cmdr, registered = newFakeCmdr()
 	SaveSlotCmdrUtils.registerSlotIndexType(cmdr :: any, newFakeDataService(state))
@@ -106,7 +96,6 @@ describe("SaveSlotCmdrUtils.registerSlotIndexType", function()
 	end)
 
 	it("returns nil from Default when the remembered slot no longer exists", function()
-		-- Last-active points at a deleted slot: GetSlotMetadata finds nothing, so "." resolves to nothing.
 		local slotIndex = registerSlotIndex({
 			lastActiveSlotId = "id-gone",
 			slots = {
