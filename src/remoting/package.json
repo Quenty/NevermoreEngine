@@ -35,11 +35,13 @@
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/remotefunctionutils": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quenty/table": "workspace:*"
+    "@quenty/table": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

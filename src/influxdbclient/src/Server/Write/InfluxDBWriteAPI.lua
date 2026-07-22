@@ -24,6 +24,15 @@ local InfluxDBWriteAPI = setmetatable({}, BaseObject)
 InfluxDBWriteAPI.ClassName = "InfluxDBWriteAPI"
 InfluxDBWriteAPI.__index = InfluxDBWriteAPI
 
+--[=[
+	Function used to actually send a request. Defaults to [HttpPromise.request], but can be injected so
+	tests can stand in a mock (see [InfluxDBRequestHandlerMock]) instead of making real HTTP calls.
+
+	@type InfluxDBRequestHandler (request: HttpPromise.HTTPRequest) -> Promise<HttpPromise.HTTPResponse>
+	@within InfluxDBWriteAPI
+]=]
+export type InfluxDBRequestHandler = (request: HttpPromise.HTTPRequest) -> Promise.Promise<HttpPromise.HTTPResponse>
+
 export type InfluxDBWriteAPI =
 	typeof(setmetatable(
 		{} :: {
@@ -38,6 +47,7 @@ export type InfluxDBWriteAPI =
 			_pointSettings: InfluxDBPointSettings.InfluxDBPointSettings,
 			_writeOptions: InfluxDBWriteOptionUtils.InfluxDBWriteOptions,
 			_writeBuffer: InfluxDBWriteBuffer.InfluxDBWriteBuffer,
+			_requestHandler: InfluxDBRequestHandler,
 		},
 		{} :: typeof({ __index = InfluxDBWriteAPI })
 	))
@@ -49,14 +59,23 @@ export type InfluxDBWriteAPI =
 	@param org string
 	@param bucket string
 	@param precision string?
+	@param requestHandler InfluxDBRequestHandler? -- Defaults to [HttpPromise.request]. Inject a mock to avoid real HTTP.
 	@return InfluxDBWriteAPI
 ]=]
-function InfluxDBWriteAPI.new(org: string, bucket: string, precision: string?): InfluxDBWriteAPI
+function InfluxDBWriteAPI.new(
+	org: string,
+	bucket: string,
+	precision: string?,
+	requestHandler: InfluxDBRequestHandler?
+): InfluxDBWriteAPI
 	local self: InfluxDBWriteAPI = setmetatable(BaseObject.new() :: any, InfluxDBWriteAPI)
 
 	assert(type(org) == "string", "Bad org")
 	assert(type(bucket) == "string", "Bad bucket")
 	assert(type(precision) == "string" or precision == nil, "Bad precision")
+	assert(type(requestHandler) == "function" or requestHandler == nil, "Bad requestHandler")
+
+	self._requestHandler = requestHandler or (HttpPromise.request :: any)
 
 	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
@@ -193,7 +212,7 @@ function InfluxDBWriteAPI._promiseSendBatch(self: InfluxDBWriteAPI, toSend: { st
 	end
 
 	return self._maid
-		:GivePromise(HttpPromise.request(request))
+		:GivePromise(self._requestHandler(request))
 		:Then(function(result)
 			if result.Success then
 				if self.Destroy then
