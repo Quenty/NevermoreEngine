@@ -171,7 +171,7 @@ Add `@quenty/playermock` to the package's `package.json` (then `pnpm install`) b
 local PlayerMock = require("PlayerMock")
 
 local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
-player.Parent = workspace
+player.Parent = game:GetService("Players") -- where real players live; CreatePlayer does this for you
 
 PlayerMock.write(player, "AccountAge", 31) -- mock a property
 PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", gamePassId, true)
@@ -198,6 +198,12 @@ in `@quenty/grouputils`.)
   coexist, each knowing its own local player (`playerMockServiceClient:GetLocalPlayer()`).
 - Destroy every mock the test creates. Leak detection is built in: a mock may not outlive the mock service
   that observed it — the next boot that sees one fails loudly.
+- **Tear down client bags before the server bag** — explicitly, not via a shared maid (maid order is not a
+  contract). Destroying the server side first destroys its mocks under a still-live client, and a mock's
+  PlayerGui may hold mounted UI: client code reacting to the engine's destroy cascade through a
+  ViewportFrame's `WorldModel` hard-crashes the engine, which cloud runs report only as a silent timeout.
+  Production parity: a client is gone before its player is removed — no client ever watches its own
+  PlayerGui die.
 
 Behavior beyond seeded properties is emulated with real engine semantics rather than recorded:
 `PlayerMock.loadCharacterAsync` is the spawn path (full avatar-loading event order, fresh `Backpack` per
@@ -227,8 +233,10 @@ the mock) and `PlayerMock.getMockByUserId` covers utils that only hold a `userId
 
 Known limits — these are gaps in `player-mock`'s contract to fix there, not patterns to work around in tests:
 
-- Headless UI needs a hand-sized surface: `ScreenGuiService:SetGuiParent(frame)` with an explicitly sized
-  `Frame` (e.g. 1280×720), since nothing computes a viewport headless. This surface belongs in the mock.
+- Headless UI mounts into the designated mock's PlayerGui automatically (`ScreenGuiService` falls back to
+  it, resolved reactively — designation may happen after services boot). `SetGuiParent` remains for the
+  cases that need an explicitly *sized* surface (e.g. a 1280×720 `Frame`), since nothing computes a
+  viewport headless.
 - Concurrent simulated clients are distinct only through their services — the ambient
   `PlayerMock.getMockedLocalPlayer()` global holds a single designation, so bag-less call sites (dummy-mode
   `Remoting`) see the most recent one.

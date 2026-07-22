@@ -40,7 +40,7 @@ local remoteNameCounter = 0
 local function setup()
 	local maid = Maid.new()
 
-	local serverBag = maid:Add(ServiceBag.new())
+	local serverBag = ServiceBag.new()
 	serverBag:GetService(require("TieRealmService") :: any):SetTieRealm(require("TieRealms").SERVER)
 
 	local gameProductService: any = serverBag:GetService(GameProductService)
@@ -56,7 +56,7 @@ local function setup()
 	}))
 	serverBag:Start()
 
-	local clientBag = maid:Add(ServiceBag.new())
+	local clientBag = ServiceBag.new()
 	clientBag:GetService(require("TieRealmService") :: any):SetTieRealm(require("TieRealms").CLIENT)
 	local gameProductServiceClient: any = clientBag:GetService((require :: any)("GameProductServiceClient"))
 	local playerMockServiceClient = clientBag:GetService((require :: any)("PlayerMockServiceClient"))
@@ -80,6 +80,8 @@ local function setup()
 			return value
 		end,
 		destroy = function(_self)
+			clientBag:Destroy()
+			serverBag:Destroy()
 			maid:DoCleaning()
 		end,
 	}

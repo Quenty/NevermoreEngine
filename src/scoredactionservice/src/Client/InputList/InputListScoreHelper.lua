@@ -76,6 +76,12 @@ function InputListScoreHelper.new(
 end
 
 function InputListScoreHelper._updateInputTypeSet(self: InputListScoreHelper, inputTypeList: { any }): ()
+	-- Teardown emissions can reach us after the provider (service-owned; may die before this
+	-- caller-owned helper) or this helper is destroyed -- destroyed objects lose their metatable.
+	if not ((self :: any).Destroy and (self._provider :: any).GetOrCreatePicker) then
+		return
+	end
+
 	local remaining = Set.copy(self._currentTypes)
 
 	-- Register inputTypes

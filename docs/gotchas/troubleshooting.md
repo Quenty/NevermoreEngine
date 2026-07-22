@@ -64,6 +64,24 @@ See `docs/testing/testing.md` for full credential documentation.
 - Look at the CI job summary for sourcemap-resolved failure annotations.
 - The `--script-text` flag can help debug: `nevermore test --cloud --script-text 'print(workspace:GetChildren())'`
 
+### Cloud test times out with zero output
+
+`Test timed out after 120s` with no jest output at all means the place run never completed — and
+**output is only relayed when the run completes**, so any prints the run made are lost. Debug
+instrumentation that still times out tells you nothing. Two distinct causes to rule out:
+
+- **The engine itself crashed.** The cloud runner reports a crash only as a timeout. Run the same
+  test locally in Studio (`nevermore test` without `--cloud`) — if Studio hard-crashes, check
+  `%LOCALAPPDATA%\Roblox\logs\*.log` for an
+  `RBXCRASH` line naming the assertion (e.g. `RBXCRASH: WorldModel removed from wrong workspace`
+  from Lua mutating a ViewportFrame's WorldModel contents while an ancestor `Destroy()` cascade is
+  tearing it down — destroy client-realm bags before destroying the mock/server bag that owns the
+  mounted UI).
+- **An unyielding loop or infinite yield.** If Studio doesn't crash but hangs, it's Lua. To get
+  data out of the cloud despite the output limitation, make the run *complete*: run the suspect
+  step detached (`task.spawn`) so the test body returns, and have a later test in the same suite
+  sample and print the detached thread's `coroutine.status`/`debug.traceback`.
+
 ## Rojo
 
 ### Rojo build errors or missing modules
