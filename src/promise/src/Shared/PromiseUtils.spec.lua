@@ -139,6 +139,58 @@ describe("PromiseUtils.combine", function()
 		local outcome = PromiseTestUtils.awaitOutcome(PromiseUtils.combine({ a = Promise.rejected("bad"), b = "B" }))
 		expect(outcome).toEqual("rejected")
 	end)
+
+	it("rejects with the results table carrying the error under its key", function()
+		local combined = PromiseUtils.combine({
+			a = Promise.rejected("bad"),
+			b = Promise.resolved("B"),
+		})
+		combined:Catch(function() end)
+
+		expect(PromiseTestUtils.awaitSettled(combined)).toEqual(true)
+		local ok, results = combined:GetResults()
+		expect(ok).toEqual(false)
+		expect(results.a).toEqual("bad")
+		expect(results.b).toEqual("B")
+	end)
+
+	it("rejects with no values when the only failure is a cancellation", function()
+		local pending = Promise.new()
+		local combined = PromiseUtils.combine({
+			a = pending,
+			b = Promise.resolved("B"),
+		})
+
+		local rejectionCount = nil
+		combined:Then(nil, function(...)
+			rejectionCount = select("#", ...)
+		end)
+
+		pending:Reject() -- cancellation: rejection with no values
+
+		expect(PromiseTestUtils.awaitSettled(combined)).toEqual(true)
+		expect(combined:IsRejected()).toEqual(true)
+		expect(rejectionCount).toEqual(0)
+	end)
+
+	it("still rejects with the results table when a cancellation and a real error mix", function()
+		local cancelled = Promise.new()
+		local combined = PromiseUtils.combine({
+			a = cancelled,
+			b = Promise.rejected("bad"),
+			c = Promise.resolved("C"),
+		})
+		combined:Catch(function() end)
+
+		cancelled:Reject()
+
+		expect(PromiseTestUtils.awaitSettled(combined)).toEqual(true)
+		local ok, results = combined:GetResults()
+		expect(ok).toEqual(false)
+		expect(results.a).toEqual(nil)
+		expect(results.b).toEqual("bad")
+		expect(results.c).toEqual("C")
+	end)
 end)
 
 describe("PromiseUtils.invert", function()
@@ -150,8 +202,6 @@ describe("PromiseUtils.invert", function()
 
 	it("turns a rejected promise into a resolution", function()
 		local source = Promise.rejected("was bad")
-		-- invert reads the settled source via GetResults, which does not consume the rejection.
-		source:Catch(function() end)
 
 		local outcome, value = PromiseTestUtils.awaitOutcome(PromiseUtils.invert(source))
 		expect(outcome).toEqual("resolved")

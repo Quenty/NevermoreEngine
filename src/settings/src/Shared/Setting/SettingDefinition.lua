@@ -26,6 +26,7 @@ local Players = game:GetService("Players")
 local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local SettingProperty = require("SettingProperty")
@@ -175,9 +176,13 @@ function SettingDefinition.GetSettingProperty<T>(
 	player: Player
 ): SettingProperty.SettingProperty<T>
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
-	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(
+		typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	-- May still be nil in a non-running DataModel; SettingProperty resolves the local player lazily.
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	return SettingProperty.new(serviceBag, player, self)
 end
@@ -194,7 +199,7 @@ function SettingDefinition.GetLocalPlayerSettingProperty<T>(
 ): SettingProperty.SettingProperty<T>
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 
-	return self:GetSettingProperty(serviceBag, Players.LocalPlayer)
+	return self:GetSettingProperty(serviceBag, Players.LocalPlayer or PlayerMock.getMockedLocalPlayer())
 end
 
 --[=[

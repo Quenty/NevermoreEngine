@@ -1,9 +1,5 @@
 --!nonstrict
 --[[
-	Unit coverage for RemotingMember: the natural-syntax wrapper delegates each call
-	straight through to its parent Remoting (prefixing the member name) and enforces
-	the same realm guards as the underlying Remoting API.
-
 	@class RemotingMember.spec.lua
 ]]
 
@@ -17,8 +13,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- A stand-in Remoting that records every method call so we can assert on delegation
--- without constructing real remotes.
 local function newRecordingRemoting()
 	local calls = {}
 	local fake = setmetatable({}, {

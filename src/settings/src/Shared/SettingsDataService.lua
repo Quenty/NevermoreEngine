@@ -14,6 +14,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
+local PlayerMock = require("PlayerMock")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
@@ -154,7 +155,7 @@ function SettingsDataService.ObservePlayerSettings(
 	self: SettingsDataService,
 	player: Player
 ): Observable.Observable<any>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return (self:_getPlayerSettingsMapForPlayer(player) :: any):ObserveAtKey(
 		player,
@@ -190,7 +191,7 @@ function SettingsDataService.PromisePlayerSettings(
 	player: Player,
 	cancelToken: any
 ): Promise.Promise<any>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return Rx.toPromise(
 		(self:ObservePlayerSettings(player) :: any):Pipe({
@@ -209,7 +210,7 @@ end
 	@return Promise<PlayerSettingsBase>
 ]=]
 function SettingsDataService.GetPlayerSettings(self: SettingsDataService, player: Player): any
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self:_getPlayerSettingsMapForPlayer(player):Get(player)
 end

@@ -12,14 +12,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Stamp an instance the same way the nevermore CLI stamps a deployed place, so
--- these specs run anywhere (Studio, plain unit-test VM, cloud) without depending
--- on the CLI's deploy-metadata pass having actually run against the test build.
---
--- We deliberately do NOT assert exact strings. The values a real deploy injects
--- (commit, timestamp, place/universe IDs) change every build, so the point is
--- only that whatever the CLI assigns round-trips through getGameMetadata with a
--- reasonable shape -- IDs are written as strings and must read back as numbers.
 local function makeInjectedInstance(): Instance
 	local instance = Instance.new("Folder")
 	instance:SetAttribute("Deployed", true)
@@ -32,9 +24,6 @@ local function makeInjectedInstance(): Instance
 	instance:SetAttribute("Published", false)
 	instance:SetAttribute("PlaceId", "136978232832565")
 	instance:SetAttribute("UniverseId", "9716264427")
-	-- The whole target's place table, exactly as the CLI stamps it: a JSON
-	-- string with numeric IDs (see buildDeployMetadataAttributes). The IDs are
-	-- above 2^24 on purpose, to prove the JSON path preserves them.
 	instance:SetAttribute(
 		"Places",
 		'[{"name":"chapter0","placeId":97235312452456,"universeId":9716264427},'
@@ -53,12 +42,10 @@ describe("NevermoreCLIManifestUtils injection", function()
 
 		expect(metadata.deployed).toEqual(true)
 
-		-- A git commit, not a placeholder: a hex string of plausible length.
 		expect(type(metadata.commit)).toEqual("string")
 		expect(#(metadata.commit :: string) >= 7).toEqual(true)
 		expect(string.match(metadata.commit :: string, "^%x+$")).never.toBeNil()
 
-		-- The full SHA, also hex, and no shorter than the short commit.
 		expect(type(metadata.version)).toEqual("string")
 		expect(#(metadata.version :: string) >= #(metadata.commit :: string)).toEqual(true)
 		expect(string.match(metadata.version :: string, "^%x+$")).never.toBeNil()
@@ -71,7 +58,6 @@ describe("NevermoreCLIManifestUtils injection", function()
 		expect(type(metadata.timestamp)).toEqual("string")
 		expect(#(metadata.timestamp :: string) > 0).toEqual(true)
 
-		-- IDs round-trip through string attributes back to exact numbers.
 		expect(type(metadata.placeId)).toEqual("number")
 		expect(metadata.placeId > 0).toEqual(true)
 		expect(type(metadata.universeId)).toEqual("number")
@@ -147,13 +133,6 @@ describe("NevermoreCLIManifestUtils place table", function()
 	end)
 end)
 
--- Read the metadata off the *actual* running place (no instance argument). When
--- these specs run through the nevermore CLI's cloud test path the place really
--- was built and stamped by the CLI, so we get to assert the real deploy stamp --
--- the same values a `nevermore deploy` would inject. The standard Jest CI job
--- runs the specs in a plain Roblox VM with no injection, so guard on `deployed`
--- and only assert the un-stamped invariants there rather than forcing a stamp
--- that path never applies.
 describe("NevermoreCLIManifestUtils running place", function()
 	it("agrees with isDeployed", function()
 		local metadata = NevermoreCLIManifestUtils.getGameMetadata()
@@ -164,25 +143,20 @@ describe("NevermoreCLIManifestUtils running place", function()
 	it("carries a real deploy stamp when deployed by the CLI", function()
 		local metadata = NevermoreCLIManifestUtils.getGameMetadata()
 		if not metadata.deployed then
-			-- Plain Jest VM (or Studio): nothing was injected, so there is no
-			-- stamp to assert. The un-stamped shape is covered above.
 			expect(metadata.commit).toBeNil()
 			return
 		end
 
-		-- A real git commit was injected, not a placeholder.
 		expect(type(metadata.commit)).toEqual("string")
 		expect(#(metadata.commit :: string) >= 7).toEqual(true)
 		expect(string.match(metadata.commit :: string, "^%x+$")).never.toBeNil()
 
-		-- Injected by `runSingleTestAsync` for the test build.
 		expect(metadata.target).toEqual("test")
 		expect(metadata.published).toEqual(false)
 
 		expect(type(metadata.timestamp)).toEqual("string")
 		expect(#(metadata.timestamp :: string) > 0).toEqual(true)
 
-		-- The test target's place/universe IDs round-trip back to numbers.
 		expect(type(metadata.placeId)).toEqual("number")
 		expect(metadata.placeId > 0).toEqual(true)
 		expect(type(metadata.universeId)).toEqual("number")

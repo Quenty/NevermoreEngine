@@ -58,6 +58,7 @@ export type ServiceBag =
 			_parentProvider: ServiceBag?,
 			_serviceTypesToInitializeSet: { [any]: true }?,
 			_initializedServiceTypeSet: { [any]: true },
+			_initializedServiceTypeList: { any },
 			_serviceTypesToStartSet: { [any]: true }?,
 
 			_initRunAllowed: boolean,
@@ -85,6 +86,7 @@ function ServiceBag.new(parentProvider: ServiceBag?): ServiceBag
 
 	self._serviceTypesToInitializeSet = {}
 	self._initializedServiceTypeSet = {}
+	self._initializedServiceTypeList = {}
 	self._serviceTypesToStartSet = {}
 
 	self._initRunAllowed = false
@@ -345,6 +347,9 @@ function ServiceBag._initService(self: ServiceBag, serviceType)
 		end
 	end
 
+	-- Init-completion order is a valid dependency order (a service's dependencies finish
+	-- initializing before it does, via the GetService recursion), so record it for teardown.
+	table.insert(self._initializedServiceTypeList, serviceType)
 	table.insert(self._serviceTypesToStartSet, serviceType)
 end
 
@@ -371,30 +376,48 @@ end
 
 function ServiceBag._destructServices(self: ServiceBag)
 	local services = self._services
+
+	-- Destroy in reverse initialization order, so dependents tear down before the dependencies
+	-- they may still be writing to (see _initService: init-completion order is a dependency order).
+	local initializedList = self._initializedServiceTypeList
+	for index = #initializedList, 1, -1 do
+		local serviceType = initializedList[index]
+		local service = services[serviceType]
+		if service ~= nil then
+			services[serviceType] = nil
+			self:_destructService(serviceType, service)
+		end
+	end
+
+	-- Anything left never finished initializing; destroy it in arbitrary order, as before.
 	local serviceType, service = next(services)
 	while service ~= nil do
 		services[serviceType] = nil
 
 		if not (self._serviceTypesToInitializeSet and self._serviceTypesToInitializeSet[serviceType]) then
-			local serviceName = self:_getServiceName(serviceType)
-
-			local current
-			task.spawn(function()
-				debug.setmemorycategory(serviceName)
-				current = coroutine.running()
-
-				if service.Destroy then
-					service:Destroy()
-				end
-			end)
-
-			local isDead = coroutine.status(current) == "dead"
-			if not isDead then
-				warn(debug.traceback(current, string.format("Destroying service %q yielded", serviceName)))
-			end
+			self:_destructService(serviceType, service)
 		end
 
 		serviceType, service = next(services)
+	end
+end
+
+function ServiceBag._destructService(self: ServiceBag, serviceType, service)
+	local serviceName = self:_getServiceName(serviceType)
+
+	local current
+	task.spawn(function()
+		debug.setmemorycategory(serviceName)
+		current = coroutine.running()
+
+		if service.Destroy then
+			service:Destroy()
+		end
+	end)
+
+	local isDead = coroutine.status(current) == "dead"
+	if not isDead then
+		warn(debug.traceback(current, string.format("Destroying service %q yielded", serviceName)))
 	end
 end
 

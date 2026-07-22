@@ -1,11 +1,5 @@
 --!strict
 --[[
-	Coverage for promiseBoundClass, a thin wrapper that delegates to Binder:Promise after
-	validating its arguments.
-
-	The binder is booted through a ServiceBag; the instance is tagged before start so it binds
-	synchronously and the promise resolves immediately.
-
 	@class promiseBoundClass.spec.lua
 ]]
 
@@ -85,51 +79,51 @@ end
 
 describe("promiseBoundClass()", function()
 	it("resolves with the bound class", function()
-		local env = setup()
+		local controller = setup()
 
-		local inst = env.newInstance()
-		env.binder:Tag(inst)
-		env.boot()
+		local inst = controller.newInstance()
+		controller.binder:Tag(inst)
+		controller.boot()
 
-		local ok, class = promiseBoundClass(env.binder, inst):Yield()
+		local ok, class = promiseBoundClass(controller.binder, inst):Yield()
 		assert(ok, "Never bound")
-		expect(class).toEqual(env.binder:Get(inst))
+		expect(class).toEqual(controller.binder:Get(inst))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("resolves once an instance is bound after start", function()
-		local env = setup()
+		local controller = setup()
 
-		env.boot()
-		local inst = env.newInstance()
-		env.binder:Tag(inst)
+		controller.boot()
+		local inst = controller.newInstance()
+		controller.binder:Tag(inst)
 
-		local ok = promiseBoundClass(env.binder, inst):Yield()
+		local ok = promiseBoundClass(controller.binder, inst):Yield()
 		expect(ok).toEqual(true)
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("throws when the binder is not a binder", function()
-		local env = setup()
-		env.boot()
+		local controller = setup()
+		controller.boot()
 
 		expect(function()
-			promiseBoundClass({} :: any, env.newInstance())
+			promiseBoundClass({} :: any, controller.newInstance())
 		end).toThrow()
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("throws when the instance is not an Instance", function()
-		local env = setup()
-		env.boot()
+		local controller = setup()
+		controller.boot()
 
 		expect(function()
-			promiseBoundClass(env.binder, 5 :: any)
+			promiseBoundClass(controller.binder, 5 :: any)
 		end).toThrow()
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)

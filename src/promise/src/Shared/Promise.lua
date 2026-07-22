@@ -188,7 +188,8 @@ end
 
 --[=[
 	Yields until the promise is complete, and errors if an error
-	exists, otherwise returns the fulfilled results.
+	exists, otherwise returns the fulfilled results. Raising the rejection to the caller consumes it —
+	no uncaught-exception warning fires for a rejection surfaced here.
 
 	@yields
 	@return T
@@ -197,6 +198,7 @@ function Promise.Wait<T...>(self: Promise<T...>): T...
 	if self._fulfilled then
 		return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
+		self._unconsumedException = false
 		error(tostring(self._rejected[1]), 2)
 	else
 		local waitingCoroutine = coroutine.running()
@@ -227,7 +229,8 @@ end
 
 --[=[
 	Yields until the promise is complete, then returns a boolean indicating
-	the result, followed by the values from the promise.
+	the result, followed by the values from the promise. Reading the outcome consumes a rejection — the
+	caller has inspected it, so no uncaught-exception warning fires for it.
 
 	@yields
 	@return boolean, T
@@ -236,6 +239,7 @@ function Promise.Yield<T...>(self: Promise<T...>): (boolean, T...)
 	if self._fulfilled then
 		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
+		self._unconsumedException = false
 		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	else
 		local waitingCoroutine = coroutine.running()
@@ -346,7 +350,7 @@ function Promise.Reject<T...>(self: Promise<T...>, ...: any): ()
 	self:_reject(table.pack(...))
 end
 
-function Promise._reject<T...>(self: Promise<T...>, values: { any }): ()
+function Promise._reject<T...>(self: Promise<T...>, values: { n: number, [number]: any }): ()
 	if not self._pendingExecuteList then
 		return
 	end
@@ -359,8 +363,11 @@ function Promise._reject<T...>(self: Promise<T...>, values: { any }): ()
 		self:_executeThen(unpack(data))
 	end
 
-	-- Check for uncaught exceptions
-	if self._unconsumedException and self._rejected.n > 0 then
+	-- Check for uncaught exceptions. A single empty table carries no more information than an
+	-- empty rejection (aggregators may reject with an empty results table), so it is not
+	-- reported either.
+	local isEmptyTableRejection = values.n == 1 and type(values[1]) == "table" and next(values[1]) == nil
+	if self._unconsumedException and values.n > 0 and not isEmptyTableRejection then
 		task.defer(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
@@ -381,8 +388,10 @@ end
 
 function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
 	if type(data) == "table" then
+		-- A custom __tostring is the best human-readable form; only address-form tables
+		-- ("table: 0x...") fall through to JSON encoding.
 		local converted = tostring(data)
-		if string.sub(converted, 1, 8) ~= "table: 0x" then
+		if string.sub(converted, 1, 9) ~= "table: 0x" then
 			return converted
 		end
 
@@ -501,7 +510,8 @@ function Promise.Destroy<T...>(self: Promise<T...>): ()
 end
 
 --[=[
-	Returns the results from the promise.
+	Returns the results from the promise. Reading the outcome consumes a rejection — the caller has
+	inspected it, so no uncaught-exception warning fires for it.
 
 	:::warning
 	This API surface will error if the promise is still pending.
@@ -512,6 +522,7 @@ end
 ]=]
 function Promise.GetResults<T...>(self: Promise<T...>): (boolean, T...)
 	if self._rejected then
+		self._unconsumedException = false
 		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	elseif self._fulfilled then
 		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)

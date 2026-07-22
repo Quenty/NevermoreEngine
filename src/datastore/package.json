@@ -37,6 +37,7 @@
     "@quenty/messagingserviceutils": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/pagesutils": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/rx": "workspace:*",

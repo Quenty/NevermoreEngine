@@ -11,6 +11,8 @@ local Players = game:GetService("Players")
 local Binder = require("Binder")
 local HumanoidTrackerService = require("HumanoidTrackerService")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
+local PlayerMockService = require("PlayerMockService")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
@@ -55,6 +57,11 @@ function PlayerHumanoidBinder.Init<T>(self: PlayerHumanoidBinder<T>, serviceBag:
 	getmetatable(PlayerHumanoidBinder).Init(self, serviceBag, ...)
 
 	self._humanoidTrackerService = self._serviceBag:GetService(HumanoidTrackerService)
+
+	-- Declare the PlayerMockService dependency during the init phase (a ServiceBag refuses to add new
+	-- services once started). Production bags just carry an empty registry -- mocks are only ever
+	-- created by tests -- so this adds no production behavior.
+	self._serviceBag:GetService(PlayerMockService)
 
 	if not self._shouldTag then
 		self._shouldTag = self._maid:Add(ValueObject.new(true, "boolean"))
@@ -122,6 +129,17 @@ function PlayerHumanoidBinder._bindTagging<T>(self: PlayerHumanoidBinder<T>, doU
 			self:_handlePlayerAdded(playerMaid, player)
 		end
 
+		-- Discover replicated PlayerMocks the same way as real joins. Production places just carry an
+		-- empty replicated set, so this adds no production behavior.
+		if self._serviceBag then
+			-- Cast: the service's instance fields are assigned in Init, so its methods do not
+			-- type-check against the exported module type.
+			local playerMockService: any = self._serviceBag:GetService(PlayerMockService)
+			maid:GiveTask(playerMockService:ObservePlayerMocks(function(playerMock)
+				self:_handlePlayerAdded(playerMaid, playerMock)
+			end))
+		end
+
 		self._maid._tagging = maid
 	else
 		self._maid._tagging = nil
@@ -132,6 +150,17 @@ function PlayerHumanoidBinder._bindTagging<T>(self: PlayerHumanoidBinder<T>, doU
 				local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
 				if humanoid then
 					self:Unbind(humanoid)
+				end
+			end
+
+			if self._serviceBag then
+				local playerMockService: any = self._serviceBag:GetService(PlayerMockService)
+				for _, playerMock in playerMockService:GetPlayerMocks() do
+					local character = PlayerMock.read(playerMock, "Character")
+					local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
+					if humanoid then
+						self:Unbind(humanoid)
+					end
 				end
 			end
 		end
@@ -145,12 +174,18 @@ function PlayerHumanoidBinder._handlePlayerAdded<T>(
 ): ()
 	local maid = Maid.new()
 
-	-- TODO: Use HumanoidTrackerService
 	maid:GiveTask(self._humanoidTrackerService:ObserveHumanoid(player):Subscribe(function(humanoid)
 		if humanoid then
 			self:Bind(humanoid)
 		end
 	end))
+
+	-- Destroying stands in for PlayerRemoving on a PlayerMock.
+	if PlayerMock.isMock(player) then
+		maid:GiveTask(player.Destroying:Connect(function()
+			playerMaid[player] = nil
+		end))
+	end
 
 	playerMaid[player] = maid
 end

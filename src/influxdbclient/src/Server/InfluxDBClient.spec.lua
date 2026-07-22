@@ -117,9 +117,6 @@ describe("InfluxDBClient.GetWriteAPI", function()
 		client:Destroy()
 	end)
 
-	-- Regression: GetWriteAPI must work before a config is set. Its ValueObject:Observe() subscription
-	-- fires the current value (nil) immediately; without a nil guard in GetWriteAPI this would call
-	-- writeAPI:SetClientConfig(nil) and throw "Bad clientConfig".
 	it("should return a write API", function()
 		local client = InfluxDBClient.new()
 		local writeAPI = client:GetWriteAPI("my-org", "my-bucket")
@@ -155,7 +152,6 @@ describe("InfluxDBClient.GetWriteAPI", function()
 		local client, requestMock = InfluxDBClient.newMock(CONFIG)
 		local writeAPI = client:GetWriteAPI("my-org", "my-bucket")
 
-		-- If the config had not reached the write API, the flush would reject with "No client configuration".
 		writeAPI:QueuePoint(newPoint())
 		expect(PromiseTestUtils.awaitSettled(writeAPI:PromiseFlush())).toEqual(true)
 
@@ -205,7 +201,6 @@ describe("InfluxDBClient.PromiseFlushAll", function()
 	it("should reuse the pending flush promise while one is in flight", function()
 		local client, requestMock = InfluxDBClient.newMock(CONFIG)
 
-		-- A request that never settles keeps the flush pending, so both calls observe the same promise.
 		requestMock:SetResponder(function()
 			return Promise.new(function() end)
 		end)

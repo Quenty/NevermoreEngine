@@ -1,25 +1,6 @@
 --!strict
 --[[
 	@class JSONTranslator.spec.lua
-
-	Pins the *current* behavior of [JSONTranslator]. These tests are intentionally
-	behavior-pinning (characterization) tests: they document how the translator
-	writes into a Roblox LocalizationTable today, so that an upcoming refactor
-	(deferring/centralizing those writes to avoid replicating megabytes of
-	localization data) can be validated against a known baseline.
-
-	Writes into the localization table are deferred: JSONTranslator queues them with
-	the centralized TranslatorService, which batches and flushes them at the end of
-	the frame (via task.defer). So:
-	  * :Init() does NOT write synchronously; entries appear after the deferred flush.
-	  * :SetEntryValue() and :ToTranslationKey() queue writes the same way.
-	  * Read paths (ObserveFormatByKey / PromiseFormatByKey / FormatByKey) wait for
-	    the flush so a key is never read before it has been written.
-
-	Tests drive the flush explicitly via controller.awaitEntriesWritten().
-
-	The shared world (real ServiceBag + real TranslatorService, isolated per test) is
-	built by [TranslatorTestUtils.TranslatorTestUtils.setup]; see there for details.
 ]]
 
 local require = require(script.Parent.loader).load(script)
@@ -82,8 +63,6 @@ describe("JSONTranslator.new", function()
 end)
 
 describe("JSONTranslator:Init deferred writes", function()
-	-- PIN: entries are queued, not written synchronously. new() writes nothing, Init
-	-- writes nothing synchronously, and the entries only land after the deferred flush.
 	it("does not write during new() or synchronously during Init, then flushes on defer", function()
 		local controller = TranslatorTestUtils.setup()
 
@@ -95,7 +74,6 @@ describe("JSONTranslator:Init deferred writes", function()
 			translator:Destroy()
 		end)
 
-		-- Still nothing: the write is deferred to the end of the frame.
 		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
 
 		controller.awaitEntriesWritten()
@@ -136,7 +114,6 @@ describe("JSONTranslator:Init deferred writes", function()
 		expect(entry.Source).toBe("Hello there")
 		expect(entry.Values["en"]).toBe("Hello there")
 		expect(entry.Example).toBe("Hello there")
-		-- Context is generated deterministically from the translator name and key.
 		expect(entry.Context).toBe("Generated from TestTranslator with key greeting")
 		controller:destroy()
 	end)
@@ -149,7 +126,6 @@ describe("JSONTranslator:SetEntryValue", function()
 
 		translator:SetEntryValue("some.key", "Source", "context", "en", "Translated")
 
-		-- Deferred: nothing in the table yet.
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["some.key"]).toBeNil()
 
 		controller.awaitEntriesWritten()
@@ -175,7 +151,6 @@ describe("JSONTranslator:SetEntryValue", function()
 		controller:destroy()
 	end)
 
-	-- PIN: outside of Studio, only the requested locale is written (no pseudo-localization).
 	it("writes only the requested locale outside of Studio", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({})
@@ -191,21 +166,18 @@ end)
 
 describe("JSONTranslator:ToTranslationKey", function()
 	it("derives a stable translation key from a prefix and text", function()
-		-- Text is lower-camel-cased (spaces are word boundaries) and capped at 20 chars.
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({})
 		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playNow")
 		controller:destroy()
 	end)
 
-	-- ToTranslationKey queues an "en" entry as a side effect; like other writes it is deferred.
 	it("queues an 'en' entry as a side effect, written after the flush", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({})
 
 		local key = translator:ToTranslationKey("button", "Play Now")
 
-		-- Deferred: nothing written yet.
 		expect(#controller.getLocalizationTable():GetEntries()).toBe(0)
 
 		controller.awaitEntriesWritten()
@@ -257,8 +229,6 @@ describe("JSONTranslator:FormatByKey", function()
 end)
 
 describe("JSONTranslator:ObserveFormatByKey", function()
-	-- The key read-before-write guarantee: with entry writes still pending, the
-	-- observable does not emit until the deferred flush has landed the entries.
 	it("does not emit until the deferred entry writes have flushed", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({
@@ -274,7 +244,6 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 			end)
 		)
 
-		-- Writes are still pending, so nothing has been emitted yet.
 		expect(received).toBeNil()
 
 		controller.awaitEntriesWritten()
@@ -346,7 +315,6 @@ describe("JSONTranslator:Destroy", function()
 
 		translator:Destroy()
 
-		-- After Destroy the metatable is stripped, so method access is gone.
 		expect(getmetatable(translator)).toBeNil()
 		controller:destroy()
 	end)

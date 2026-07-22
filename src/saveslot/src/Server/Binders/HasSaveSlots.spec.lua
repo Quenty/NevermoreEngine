@@ -1,9 +1,9 @@
 --!strict
 --[[
-	Integration coverage for the real HasSaveSlots binder, driven against a mocked datastore. Because
-	the load path only reads the player's UserId, a plain Folder stands in for a Player with
-	PlayerDataStoreManager._toPlayerUserIdOrError intercepted to map it to a fixed userId; everything
-	else exercises the real code.
+	Integration coverage for the real HasSaveSlots binder, driven against a mocked datastore. A
+	PlayerMock with a seeded UserId stands in for a Player -- the load path only reads the UserId,
+	which PlayerDataStoreManager resolves natively from the mock; everything else exercises the
+	real code.
 
 	@class HasSaveSlots.spec.lua
 ]]
@@ -12,8 +12,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
 local Observable = require("Observable")
-local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PlayerDataStoreService = require("PlayerDataStoreService")
+local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Rx = require("Rx")
 local SaveSlotDataService = require("SaveSlotDataService")
@@ -25,48 +25,23 @@ local Workspace = game:GetService("Workspace")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
 local FAKE_USER_ID = 424242
-
--- Real implementation, captured at load so the patch can fall through for anything but the fake player.
-local originalToUserId = PlayerDataStoreManager._toPlayerUserIdOrError
-
--- We monkeypatch _toPlayerUserIdOrError directly rather than jest.spyOn: after jest.restoreAllMocks(),
--- re-spying the same method on the next test is a no-op (spyOn hands back the stale, already-restored
--- spy without re-patching the object), so only the first test's spy took effect and every later Bind
--- threw "Bad playerOrUserId". A direct swap re-patches deterministically each setup.
-afterEach(function()
-	PlayerDataStoreManager._toPlayerUserIdOrError = originalToUserId
-end)
 
 local function setup(mock: DataStoreMock.DataStoreMock?)
 	mock = mock or DataStoreMock.new()
 
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
-	-- GetService returns the required module's type; PlayerDataStoreService returns its class table, so
-	-- cast to the instance type before calling instance methods.
-	local playerDataStoreService = (
+	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
-	) :: PlayerDataStoreService.PlayerDataStoreService
 	local binder = serviceBag:GetService(require("HasSaveSlots"))
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	-- A Folder stands in for a Player; the load path only reads the UserId, intercepted below.
-	local fakePlayer = (Instance.new("Folder") :: any) :: Player
-	fakePlayer.Name = "FakePlayer"
+	local fakePlayer = PlayerMock.new({ UserId = FAKE_USER_ID })
 	fakePlayer.Parent = Workspace
-
-	-- Intercept only the UserId read so a Folder can stand in for a Player. Restored after each test.
-	PlayerDataStoreManager._toPlayerUserIdOrError = function(self, playerOrUserId)
-		if playerOrUserId == fakePlayer then
-			return FAKE_USER_ID
-		end
-		return originalToUserId(self, playerOrUserId)
-	end
 
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
@@ -243,9 +218,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		deselectPromise:Yield()
 
-		-- The store observable kills its brio when the slot is cleared. This is the reactive teardown the
-		-- game relies on: on deselect the server unbinds per-slot data and removes the character purely
-		-- because this brio dies -- no bespoke deselect handling.
 		expect(activeBrio:IsDead()).toEqual(true)
 
 		subscription:Destroy()
@@ -314,8 +286,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			return
 		end
 
-		-- Switching slots kills the old slot's store brio and emits a fresh one, so per-slot server state
-		-- (data bindings, checkpoints, the character) rebuilds against the newly-selected slot.
 		expect(firstBrio:IsDead()).toEqual(true)
 		expect(currentBrio:IsDead()).toEqual(false)
 
@@ -444,7 +414,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
 
-		-- The slot is deselected, not deleted: the last-active pointer still resolves it
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
 		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
 			expect("lastActive hung").toEqual("lastActive settled")
@@ -477,7 +446,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		-- Deselect first, matching how the cmdr command frees the active slot before deleting it.
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
@@ -486,7 +454,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		deselectPromise:Yield()
 
-		-- Deselection deliberately keeps remembering the slot for "Continue"...
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
 
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotId)
@@ -497,7 +464,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		deletePromise:Yield()
 
-		-- ...but once that slot is deleted, there is nothing to continue on.
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
 
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
@@ -512,7 +478,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	end)
 
 	it("deleting a non-last-active slot leaves the continue pointer intact", function()
-		-- The clear must be scoped to the resumable slot: deleting some other slot must not wipe it.
 		local context = setup()
 
 		local firstPromise = context.hasSaveSlots:PromiseCreateSlot(1)
@@ -531,7 +496,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local _, secondSlotId = secondPromise:Yield()
 
-		-- Slot 1 is the last-active; slot 2 is just another slot, and stays deletable while 1 is deselected.
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
@@ -635,7 +599,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		-- Simulate returning to the menu: no active slot, but the last active is remembered
 		context.hasSaveSlots.ActiveSlotId.Value = nil
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
 
@@ -744,7 +707,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	it("PromiseSelectNewSaveSlot reuses the lowest free index after a deletion", function()
 		local context = setup()
 
-		-- Fill indices 1, 2, 3 (nothing is selected, so all remain deletable)
 		local slotIdsByIndex = {}
 		for index = 1, 3 do
 			local createPromise = context.hasSaveSlots:PromiseCreateSlot(index)
@@ -757,7 +719,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			slotIdsByIndex[index] = slotId
 		end
 
-		-- Open a gap at index 2
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotIdsByIndex[2])
 		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
 			expect("delete hung").toEqual("delete settled")
@@ -766,7 +727,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		deletePromise:Yield()
 
-		-- The next new slot fills the gap at 2 rather than appending at 4
 		local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 		if not PromiseTestUtils.awaitSettled(newPromise, 10) then
 			expect("new game hung").toEqual("new game settled")
@@ -798,7 +758,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local _, slotId = createPromise:Yield()
 
-		-- Seed the source slot with some saved data to copy across
 		local tracker: any = context.hasSaveSlots
 		tracker:_getSlotStore(slotId):Store("Coins", 500)
 
@@ -812,7 +771,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(type(newSlotId)).toEqual("string")
 		expect(newSlotId ~= slotId).toEqual(true)
 
-		-- The copy lands at the next free index with a marked name
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
@@ -823,7 +781,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(metadata.SlotIndex).toEqual(2)
 		expect(metadata.SlotName).toEqual("Adventure (Copy)")
 
-		-- The saved data carried across into the new slot's own store
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
@@ -838,8 +795,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	it("PromiseDuplicateSlot into the default slot preserves the system store", function()
 		local context = setup()
 
-		-- Only a non-default slot exists, so the duplicate lands at the free default index (1), whose
-		-- store is the shared root alongside the SaveSlots system data.
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Save" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
@@ -867,7 +822,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		expect((metadataPromise:Wait()).SlotIndex).toEqual(1)
 
-		-- The original slot still resolves -- merging into root did not clobber the system store
 		local sourceStillThere = context.hasSaveSlots:PromiseSlotIdFromIndex(2)
 		if not PromiseTestUtils.awaitSettled(sourceStillThere, 10) then
 			expect("lookup hung").toEqual("lookup settled")
@@ -876,7 +830,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		expect((sourceStillThere:Wait())).toEqual(slotId)
 
-		-- The copied game data landed in the default (root) store
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
@@ -921,7 +874,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		-- Seed the active slot with saved progress the reset must clear
 		local tracker: any = context.hasSaveSlots
 		tracker:_getSlotStore(slotId):Store("Coins", 500)
 
@@ -935,7 +887,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(type(newSlotId)).toEqual("string")
 		expect(newSlotId ~= slotId).toEqual(true)
 
-		-- The fresh slot is selected and the old one is gone
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(newSlotId)
 		local hasOldPromise = context.hasSaveSlots:PromiseHasSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(hasOldPromise, 10) then
@@ -945,7 +896,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		expect((hasOldPromise:Wait())).toEqual(false)
 
-		-- Same index and name carried across into the fresh slot
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
@@ -956,7 +906,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(metadata.SlotIndex).toEqual(2)
 		expect(metadata.SlotName).toEqual("Adventure")
 
-		-- The saved progress did not survive into the fresh slot's store
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
@@ -971,8 +920,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	it("PromiseResetActiveSlot resets the default slot in place, preserving the system store", function()
 		local context = setup()
 
-		-- Index 1 is the default slot, whose store is the shared root alongside the SaveSlots
-		-- system data; the reset must wipe the game data without clobbering that system store.
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1, { SlotName = "Save" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
@@ -1000,7 +947,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local newSlotId = resetPromise:Wait()
 
-		-- The system store survived: the fresh default slot still resolves at index 1
 		local lookupPromise = context.hasSaveSlots:PromiseSlotIdFromIndex(1)
 		if not PromiseTestUtils.awaitSettled(lookupPromise, 10) then
 			expect("lookup hung").toEqual("lookup settled")
@@ -1009,7 +955,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		expect((lookupPromise:Wait())).toEqual(newSlotId)
 
-		-- The game data in the shared root store was wiped
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
@@ -1039,7 +984,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	it("PromiseResetSlot wipes a non-active slot without touching the active selection", function()
 		local context = setup()
 
-		-- Slot 1 is active; slot 2 is the one we reset and must stay unselected throughout.
 		local activePromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(activePromise, 10) then
 			expect("active create hung").toEqual("active create settled")
@@ -1077,10 +1021,8 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(type(newSlotId)).toEqual("string")
 		expect(newSlotId ~= targetSlotId).toEqual(true)
 
-		-- The active slot is untouched and the fresh slot is not selected
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(activeSlotId)
 
-		-- Same index and name carried across; saved progress was wiped
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
@@ -1105,7 +1047,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	it("PromiseResetSlot keeps the continue pointer on the reset slot when it was last-active", function()
 		local context = setup()
 
-		-- Select then deselect so the slot is the resumable last-active but no longer selected.
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
@@ -1139,7 +1080,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local newSlotId = resetPromise:Wait()
 
-		-- The resume pointer follows the reset slot to its fresh id, and "Continue" still resolves it
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(newSlotId)
 
@@ -1172,7 +1112,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local context = setup()
 		context.hasSaveSlots.MaxSlotCount.Value = math.huge
 
-		-- Index 6 is beyond the setup's finite cap of 5; unbounded must accept it
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(6)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
@@ -1190,7 +1129,6 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local context = setup()
 		context.hasSaveSlots.MaxSlotCount.Value = math.huge
 
-		-- Allocate past the finite cap of 5; every call still yields a fresh slot
 		for _ = 1, 7 do
 			local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 			if not PromiseTestUtils.awaitSettled(newPromise, 10) then
@@ -1248,7 +1186,6 @@ describe("HasSaveSlots playtime tracking", function()
 		local firstSlotId = createAndSelect(context, 1)
 		local secondSlotId = createAndSelect(context, 2)
 
-		-- Returning to the first slot is a second session for it, a first for the second slot
 		local reselectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(reselectPromise, 10) then
 			expect("reselect hung").toEqual("reselect settled")
@@ -1285,7 +1222,6 @@ describe("HasSaveSlots playtime tracking", function()
 	it("does not accrue time before any slot is selected", function()
 		local context = setup()
 
-		-- No active slot -> the session is closed, so a flush lands nowhere
 		local tracker: any = context.hasSaveSlots
 		tracker:_flushPlaytime()
 
@@ -1322,7 +1258,6 @@ describe("HasSaveSlots playtime tracking", function()
 
 		local afterDeselect = getMetadata(context, slotId).TimePlayed
 
-		-- A flush after deselection lands nowhere: the session is closed, so the total must not move
 		tracker._playSessionStart = os.time() - 120
 		tracker._playSessionLastFlush = os.time() - 120
 		tracker:_flushPlaytime()
@@ -1333,8 +1268,6 @@ describe("HasSaveSlots playtime tracking", function()
 end)
 
 describe("HasSaveSlots summary providers", function()
-	-- Selecting a slot drives the reactive summary aggregation; poll the slot metadata until the
-	-- Summary settles into the expected shape.
 	local function readSummary(context: any, slotId): any
 		local promise = context.hasSaveSlots:PromiseGetSlotMetadata(slotId)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
@@ -1506,7 +1439,6 @@ describe("HasSaveSlots against a fake player (datastore down)", function()
 end)
 
 describe("HasSaveSlots ephemeral slots", function()
-	-- Settles a promise (failing the test on a hang) and returns its value.
 	local function resolve(promise, timeout: number?)
 		expect(PromiseTestUtils.awaitSettled(promise, timeout or 10)).toEqual(true)
 		local ok, value = promise:Yield()
@@ -1524,7 +1456,6 @@ describe("HasSaveSlots ephemeral slots", function()
 		return slotId
 	end
 
-	-- The container SaveSlotDataService lists over; a real slot's folder lives here, an ephemeral one never does.
 	local function slotContainerHasChild(context: any, slotId): boolean
 		local container = context.fakePlayer:FindFirstChild("SaveSlots")
 		return container ~= nil and container:FindFirstChild(slotId) ~= nil
@@ -1578,9 +1509,6 @@ describe("HasSaveSlots ephemeral slots", function()
 	it("persists a real slot's data but never an ephemeral slot's", function()
 		local context = setup()
 
-		-- A real slot whose data is flushed to the datastore -- selecting the ephemeral slot below saves the
-		-- outgoing real slot -- giving a positive control alongside the ephemeral negative. Distinctive values
-		-- so a substring search can't match them coincidentally elsewhere in the serialized blob.
 		local realId = createAndSelectReal(context, 2)
 		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("coins", 12321)
 
@@ -1596,10 +1524,8 @@ describe("HasSaveSlots ephemeral slots", function()
 		local ephemeralIdFound = string.find(encoded, ephemeralId, 1, true) ~= nil
 		local ephemeralValueFound = string.find(encoded, "98789", 1, true) ~= nil
 
-		-- The real slot and its value reached the datastore...
 		expect(realIdFound).toEqual(true)
 		expect(realValueFound).toEqual(true)
-		-- ...but nothing of the ephemeral slot did: not its id, not the value written through its store.
 		expect(ephemeralIdFound).toEqual(false)
 		expect(ephemeralValueFound).toEqual(false)
 
@@ -1626,7 +1552,6 @@ describe("HasSaveSlots ephemeral slots", function()
 		local context = setup()
 
 		local realId = createAndSelectReal(context, 1)
-		-- Selecting the ephemeral slot must leave the replicated last-active pinned to the real slot.
 		selectEphemeral(context)
 
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(realId)
@@ -1706,7 +1631,6 @@ describe("HasSaveSlots ephemeral slots", function()
 		local realId = createAndSelectReal(context, 2)
 		resolve(context.hasSaveSlots:PromiseDeselectSlot())
 
-		-- An ephemeral round trip in the middle must not steal the Continue slot.
 		selectEphemeral(context)
 		resolve(context.hasSaveSlots:PromiseDeselectSlot())
 

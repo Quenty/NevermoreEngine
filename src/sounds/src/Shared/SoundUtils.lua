@@ -173,7 +173,11 @@ function SoundUtils.playTemplate(templates, templateName: string): Sound
 	local sound = templates:Clone(templateName)
 	sound.Archivable = false
 
-	SoundService:PlayLocalSound(sound)
+	if RunService:IsClient() then
+		SoundService:PlayLocalSound(sound)
+	else
+		sound:Play()
+	end
 
 	SoundUtils.removeAfterTimeLength(sound)
 

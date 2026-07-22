@@ -1,22 +1,6 @@
 --!strict
 --[[
 	@class TranslatorService.spec.lua
-
-	Pins the *current* behavior of [TranslatorService] as exercised through a real
-	ServiceBag.
-
-	The behaviors pinned here matter for the upcoming replication refactor:
-	  * GetLocalizationTable() lazily creates a *single* named table under
-	    LocalizationService and caches it. The name is role-based
-	    ("GeneratedJSONTable_Server" vs "GeneratedJSONTable_Client"), and a second,
-	    independent service resolves to the same instance. That shared, replicated
-	    table is the thing we are trying to stop over-replicating.
-	  * GetLocaleId() resolves the current locale (RobloxLocaleId on a server with no
-	    local player).
-	  * PromiseTranslator() / GetTranslator() acquire the Roblox translator.
-
-	The shared world (real ServiceBag + real TranslatorService, isolated per test) is
-	built by [TranslatorTestUtils.TranslatorTestUtils.setup]; see there for details.
 ]]
 
 local require = require(script.Parent.loader).load(script)
@@ -116,7 +100,6 @@ end)
 describe("TranslatorService:GetLocaleId", function()
 	it("resolves to RobloxLocaleId on a server with no local player", function()
 		local controller = TranslatorTestUtils.setup()
-		-- With no LocalPlayer, the locale falls through to LocalizationService.RobloxLocaleId.
 		expect(controller.translatorService:GetLocaleId()).toBe(LocalizationService.RobloxLocaleId)
 		controller:destroy()
 	end)
@@ -161,7 +144,6 @@ describe("TranslatorService entry writes (deferred)", function()
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
 
-		-- Pending: not yet applied to the table.
 		expect(#service:GetLocalizationTable():GetEntries()).toBe(0)
 		expect(service:PromiseEntriesWritten():IsPending()).toBe(true)
 
@@ -195,7 +177,6 @@ describe("TranslatorService entry writes (deferred)", function()
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
 		controller.flushEntries()
 
-		-- No yield needed; the entry is present immediately after the synchronous flush.
 		expect(#service:GetLocalizationTable():GetEntries()).toBe(1)
 		expect(service:PromiseEntriesWritten():IsFulfilled()).toBe(true)
 		controller:destroy()
@@ -212,13 +193,11 @@ describe("TranslatorService:FlushEntryForKey", function()
 
 		service:FlushEntryForKey("k.one")
 
-		-- The requested key landed; the other is still queued for the deferred flush.
 		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.two"]).toBeNil()
 		expect(service:PromiseEntriesWritten():IsPending()).toBe(true)
 
-		-- The still-pending key lands on the normal end-of-frame flush.
 		controller.awaitEntriesWritten()
 		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.two"].Values["en"]).toBe("Two")
 		controller:destroy()
@@ -232,7 +211,6 @@ describe("TranslatorService:FlushEntryForKey", function()
 		controller.awaitEntriesWritten()
 		local writesAfterFlush = service:GetLocalizationWriteCount()
 
-		-- Nothing queued, so there is nothing to land and no extra write happens.
 		service:FlushEntryForKey("k.one")
 		expect(service:GetLocalizationWriteCount()).toBe(writesAfterFlush)
 		controller:destroy()
@@ -247,7 +225,6 @@ describe("TranslatorService localization write cost", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
-		-- Three entries, each with one locale value plus an example (six queued writes).
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
 		service:SetEntryExample("k.one", "One", "c1", "One")
 		service:SetEntryValue("k.two", "Two", "c2", "en", "Two")
@@ -257,10 +234,8 @@ describe("TranslatorService localization write cost", function()
 
 		controller.awaitEntriesWritten()
 
-		-- One write for the whole batch, so one AutoLocalize invalidation instead of six.
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
-		-- The entries still land correctly.
 		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
 		expect(entries["k.one"].Values["en"]).toBe("One")
 		expect(entries["k.one"].Example).toBe("One")
@@ -276,7 +251,6 @@ describe("TranslatorService localization write cost", function()
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
 		controller.awaitEntriesWritten()
 
-		-- A second, separate flush should preserve the first entry and add the new one.
 		service:SetEntryValue("k.two", "Two", "c2", "en", "Two")
 		controller.awaitEntriesWritten()
 
@@ -296,7 +270,6 @@ describe("TranslatorService localization write cost", function()
 		controller.awaitEntriesWritten()
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
-		-- Re-queue the identical entry: no net change, so no write and no invalidation.
 		service:SetEntryValue("k.one", "One", "c1", "en", "One")
 		service:SetEntryExample("k.one", "One", "c1", "One")
 		controller.awaitEntriesWritten()
@@ -312,7 +285,6 @@ describe("TranslatorService localization write cost", function()
 		controller.awaitEntriesWritten()
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
-		-- A genuinely different value must still write.
 		service:SetEntryValue("k.one", "One", "c1", "en", "Uno")
 		controller.awaitEntriesWritten()
 		expect(service:GetLocalizationWriteCount()).toBe(2)
@@ -322,8 +294,6 @@ describe("TranslatorService localization write cost", function()
 end)
 
 describe("TranslatorService entry merging", function()
-	-- The common package-driven case: several translators register on one ServiceBag and
-	-- initialize together. Their entries must all land, merged, in a single write.
 	it("coalesces three translators initializing together into one write with no drops", function()
 		local controller = TranslatorTestUtils.setup()
 
@@ -335,7 +305,6 @@ describe("TranslatorService entry merging", function()
 
 		controller.awaitEntriesWritten(service)
 
-		-- All three translators' entries flushed together as a single SetEntries.
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 
 		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
@@ -347,13 +316,9 @@ describe("TranslatorService entry merging", function()
 		controller:destroy()
 	end)
 
-	-- Regression: a LocalizationTable keys its entries by translation key alone. SetEntries
-	-- rejects two entries that share a key even when their source/context differ, throwing
+	-- A LocalizationTable keys its entries by translation key alone. SetEntries rejects two
+	-- entries that share a key even when their source/context differ, throwing
 	-- "Entry at index N has the same (key) or (key,source,context) tuple as another entry".
-	-- The deferred writer used to queue one entry per (key, source, context), so two writes
-	-- for the same key with different source/context fed SetEntries a duplicate key and blew
-	-- up the flush. Seen in the wild: "collectable.toolUnlocked" written both as a collectable
-	-- name and again "Generated from DialogLineLocalization with key collectable.toolUnlocked".
 	it("collapses two writes for one key with differing source/context into a single entry", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
@@ -368,11 +333,9 @@ describe("TranslatorService entry merging", function()
 			"Tool unlocked!"
 		)
 
-		-- Before the fix this flush threw inside SetEntries (duplicate key) and never resolved.
 		controller.awaitEntriesWritten()
 
 		local entries = service:GetLocalizationTable():GetEntries()
-		-- Exactly one entry lands for the key -- the second write overwrote the first in place.
 		local matching = 0
 		for _, entry in entries do
 			if entry.Key == key then
@@ -391,8 +354,6 @@ describe("TranslatorService entry merging", function()
 		service:SetEntryValue("k.one", "One", "ctx-a", "en", "One")
 		controller.awaitEntriesWritten()
 
-		-- A later flush re-registers the same key under a different source/context. The table
-		-- still holds a single entry for the key rather than crashing on a duplicate.
 		service:SetEntryValue("k.one", "One", "ctx-b", "en", "Uno")
 		controller.awaitEntriesWritten()
 
@@ -412,15 +373,12 @@ describe("TranslatorService entry merging", function()
 		local service = controller.translatorService
 		local localizationTable = service:GetLocalizationTable()
 
-		-- External writer mutates the table directly, not through the service.
 		localizationTable:SetEntryValue("external.key", "External", "extctx", "en", "External")
 
-		-- Internal writer goes through the service and triggers a merged flush.
 		service:SetEntryValue("internal.key", "Internal", "intctx", "en", "Internal")
 		controller.awaitEntriesWritten()
 
 		local entries = TranslatorTestUtils.getEntryMap(localizationTable)
-		-- The external entry survives the SetEntries merge rather than being clobbered.
 		expect(entries["external.key"].Values["en"]).toBe("External")
 		expect(entries["internal.key"].Values["en"]).toBe("Internal")
 		expect(service:GetLocalizationWriteCount()).toBe(1)

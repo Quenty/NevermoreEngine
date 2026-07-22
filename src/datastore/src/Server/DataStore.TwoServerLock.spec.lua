@@ -1,11 +1,5 @@
 --!nonstrict
 --[[
-	Two servers fighting over one player's session-locked key: two DataStore objects (server A and
-	server B) share one DataStoreMock with distinct SessionIds, exactly like two live game servers.
-	This exercises the full cross-server lock lifecycle -- clean handoff via close, crash recovery via
-	stale-lock steal, a concurrent-load race, the MessagingService graceful-close handshake, and
-	session-stolen data integrity.
-
 	@class DataStoreTwoServerLock.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -49,7 +43,6 @@ describe("two servers: clean handoff and crash recovery", function()
 	it("recovers a crashed server's saved data by stealing its stale lock", function()
 		local controller = DataStoreTestUtils.setup()
 
-		-- A acquires, saves coins under its lock, then "crashes" (no clean close).
 		local serverA = controller.newServer()
 		expect(controller.awaitOwn(serverA)).toEqual(true)
 		serverA:Store("coins", 7)
@@ -59,12 +52,10 @@ describe("two servers: clean handoff and crash recovery", function()
 			return
 		end
 
-		-- Age A's lock so it looks like a long-dead (crashed) server, then abandon A.
 		local raw = controller.mock:GetRaw(KEY)
 		raw.lock.LastUpdateTime = os.time() - 1000000
 		controller.mock:SetRaw(KEY, raw)
 
-		-- B loads: steals the stale lock and recovers A's saved coins.
 		local serverB = controller.newServer()
 		local coins = serverB:Load("coins")
 		if not PromiseTestUtils.awaitSettled(coins, 10) then
@@ -87,14 +78,13 @@ describe("two servers: clean handoff and crash recovery", function()
 		local loadA = serverA:PromiseLoadSuccessful()
 		local loadB = serverB:PromiseLoadSuccessful()
 
-		-- One acquires quickly; the other is blocked (retrying against the winner's fresh lock).
 		expect(PromiseTestUtils.awaitValue(function()
 			return not loadA:IsPending() or not loadB:IsPending()
 		end, 5)).toEqual(true)
 
 		local aSettled = not loadA:IsPending()
 		local bSettled = not loadB:IsPending()
-		expect(aSettled ~= bSettled).toEqual(true) -- exactly one
+		expect(aSettled ~= bSettled).toEqual(true)
 
 		local owner = controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId
 		expect(owner == serverA:GetSessionId() or owner == serverB:GetSessionId()).toEqual(true)
@@ -108,7 +98,6 @@ describe("two servers: clean handoff and crash recovery", function()
 		local serverA = controller.newServer()
 		expect(controller.awaitOwn(serverA)).toEqual(true)
 
-		-- B takes over by writing its own lock + data directly (as if it stole the session).
 		controller.mock:SetRaw(KEY, {
 			coins = 100,
 			lock = {
@@ -117,7 +106,6 @@ describe("two servers: clean handoff and crash recovery", function()
 			},
 		})
 
-		-- A tries to save its own value; the write is cancelled (SessionStolen), B's data survives.
 		local stolen = nil
 		serverA.SessionStolen:Connect(function(session)
 			stolen = session
@@ -145,7 +133,6 @@ describe("two servers: MessagingService graceful close", function()
 
 		local _serverB, helperB = controller.newServer({ messaging = true })
 
-		-- B gracefully asks A (the lock holder) to close.
 		local graceful = helperB:PromiseCloseSessionGraceful(game.PlaceId, game.JobId, serverA:GetSessionId())
 		if not PromiseTestUtils.awaitSettled(graceful, 15) then
 			expect("graceful close hung").toEqual("resolved")
@@ -154,7 +141,6 @@ describe("two servers: MessagingService graceful close", function()
 		end
 		expect((graceful:Yield())).toEqual(true)
 
-		-- A honored the request and released its lock.
 		expect(PromiseTestUtils.awaitValue(function()
 			local raw = controller.mock:GetRaw(KEY)
 			return raw ~= nil and raw.lock == nil
@@ -166,13 +152,9 @@ describe("two servers: MessagingService graceful close", function()
 	it("evicts the holder during a messaging-enabled load and then acquires (production flow)", function()
 		local controller = DataStoreTestUtils.setup()
 
-		-- A holds the lock and will honor a graceful close request.
 		local serverA = controller.newServer({ messaging = true, autoCloseOnRequest = true })
 		expect(controller.awaitOwn(serverA)).toEqual(true)
 
-		-- B loads with messaging enabled: blocked by A's fresh lock, its load asks A to close, then
-		-- (after the propagation delay) retries and acquires. This is the real cross-server handoff.
-		-- Use a tiny propagation delay so the test does not wait the production 5s.
 		local serverB = controller.newServer({ messaging = true })
 		serverB:SetSessionMessagingCloseDelaySeconds(0.1)
 		local loadB = serverB:PromiseLoadSuccessful()

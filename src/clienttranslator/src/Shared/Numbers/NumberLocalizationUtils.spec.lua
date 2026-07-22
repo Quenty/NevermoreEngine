@@ -87,8 +87,6 @@ describe("NumberLocalizationUtils.localize", function()
 		})
 	end)
 
-	-- resolveLocaleInfo: a regional variant with no exact entry falls back to its closest same-language
-	-- entry (NOT the en-us default), so e.g. a Mexican-Spanish player still gets Spanish "." grouping.
 	it("should fall back a regional variant to its closest same-language entry", function()
 		checkLocale("es-mx", { [7857000] = "7.857.000" }) -- -> es-es (group ".")
 		checkLocale("es-419", { [7857000] = "7.857.000" }) -- -> es-es
@@ -164,8 +162,6 @@ describe("NumberLocalizationUtils.abbreviate", function()
 		})
 	end)
 
-	-- The resolver picks Chinese Simplified vs Traditional by script/region subtag; the compact words
-	-- differ (万/亿 vs 萬/億), so this proves the routing reaches abbreviate — not just an exact key.
 	it("should choose Chinese Simplified vs Traditional by script/region subtag", function()
 		checkAbbrev("zh-hans", { [50000] = "5万", [1e9] = "10亿" })
 		checkAbbrev("zh-cn", { [50000] = "5万", [1e9] = "10亿" })

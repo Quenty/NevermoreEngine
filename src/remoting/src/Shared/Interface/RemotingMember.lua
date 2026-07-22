@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local RemotingRealms = require("RemotingRealms")
 
@@ -152,7 +153,7 @@ end
 	@return Promise<any>
 ]=]
 function RemotingMember.PromiseInvokeClient(self: RemotingMember, player: Player, ...): Promise.Promise<...any>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "PromiseInvokeClient must be called on server")
 
 	return self._remoting:PromiseInvokeClient(self._memberName, player, ...)
@@ -169,7 +170,7 @@ end
 	@return ... any
 ]=]
 function RemotingMember.InvokeClient(self: RemotingMember, player: Player, ...): ...any
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "InvokeClient must be called on server")
 
 	return self._remoting:InvokeClient(self._memberName, player, ...)
@@ -199,7 +200,8 @@ end
 ]=]
 function RemotingMember.FireAllClientsExcept(self: RemotingMember, excludePlayer: Player, ...)
 	assert(
-		typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil,
+		typeof(excludePlayer) == "Instance" and (excludePlayer:IsA("Player") or PlayerMock.isMock(excludePlayer))
+			or excludePlayer == nil,
 		"Bad excludePlayer"
 	)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClientsExcept must be called on server")
@@ -218,7 +220,7 @@ end
 ]=]
 function RemotingMember.FireClient(self: RemotingMember, player: Player, ...)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireClient must be called on server")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	self._remoting:FireClient(self._memberName, player, ...)
 end

@@ -17,8 +17,6 @@ local it = Jest.Globals.it
 
 local RogueSetterClass = RogueSetter:GetConstructor() :: any
 
--- Only TieRealmService is needed to construct a modifier directly; we do not start the
--- modifier binders, so this file never binds instances.
 local function setup()
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TieRealmService"))

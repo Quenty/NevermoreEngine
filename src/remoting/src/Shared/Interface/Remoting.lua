@@ -14,6 +14,7 @@ local RunService = game:GetService("RunService")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local RemoteFunctionUtils = require("RemoteFunctionUtils")
@@ -76,7 +77,11 @@ export type Remoting = typeof(setmetatable(
 		FireServer: (self: Remoting, memberName: string, ...any) -> (),
 		PromiseFireServer: (self: Remoting, memberName: string, ...any) -> Promise.Promise<()>,
 		PromiseInvokeServer: (self: Remoting, memberName: string, ...any) -> Promise.Promise<...any>,
+		InvokeServer: (self: Remoting, memberName: string, ...any) -> ...any,
+		InvokeClient: (self: Remoting, memberName: string, player: Player, ...any) -> ...any,
+		PromiseInvokeClient: (self: Remoting, memberName: string, player: Player, ...any) -> Promise.Promise<...any>,
 		GetContainerClass: (self: Remoting) -> string,
+		Destroy: (self: Remoting) -> (),
 
 		-- Private methods
 		_getDummyMemberName: (self: Remoting, memberName: string, suffix: string) -> string,
@@ -406,11 +411,18 @@ end
 ]=]
 function Remoting.FireClient(self: Remoting, memberName: string, player: Player, ...)
 	assert(type(memberName) == "string", "Bad memberName")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireClient must be called on server")
 
 	if self._useDummyObject then
-		local bindableEvent: BindableEvent = self:_getOrCreateRemoteEvent(memberName) :: any
+		-- The one simulated client is the (mocked) local player; a fire targeted at anyone else
+		-- has no simulated receiver, so it is dropped -- mirroring the engine's player targeting.
+		if player ~= (Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()) then
+			return
+		end
+
+		local bindableEvent: BindableEvent =
+			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnClientEvent")) :: any
 		bindableEvent:Fire(...)
 		return
 	end
@@ -431,18 +443,17 @@ end
 ]=]
 function Remoting.InvokeClient(self: Remoting, memberName: string, player: Player, ...)
 	assert(type(memberName) == "string", "Bad memberName")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 	assert(self._remotingRealm == RemotingRealms.SERVER, "InvokeClient must be called on server")
 
 	if self._useDummyObject then
 		local bindableFunction: BindableFunction =
 			self:_getOrCreateRemoteFunction(self:_getDummyMemberName(memberName, "OnClientInvoke")) :: any
-		bindableFunction:Invoke(...)
-		return
+		return bindableFunction:Invoke(...)
 	end
 
 	local remoteFunction: RemoteFunction = self:_getOrCreateRemoteFunction(memberName) :: any
-	remoteFunction:InvokeClient(player, ...)
+	return remoteFunction:InvokeClient(player, ...)
 end
 
 --[=[
@@ -481,12 +492,18 @@ end
 function Remoting.FireAllClientsExcept(self: Remoting, memberName: string, excludePlayer: Player, ...)
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(
-		typeof(excludePlayer) == "Instance" and excludePlayer:IsA("Player") or excludePlayer == nil,
+		typeof(excludePlayer) == "Instance" and (excludePlayer:IsA("Player") or PlayerMock.isMock(excludePlayer))
+			or excludePlayer == nil,
 		"Bad excludePlayer"
 	)
 	assert(self._remotingRealm == RemotingRealms.SERVER, "FireAllClientsExcept must be called on server")
 
 	if self._useDummyObject then
+		-- The one simulated client is the (mocked) local player -- honor the exclusion for it.
+		if excludePlayer ~= nil and excludePlayer == (Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()) then
+			return
+		end
+
 		local bindableEvent: BindableEvent =
 			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnClientEvent")) :: any
 		bindableEvent:Fire(...)
@@ -512,7 +529,20 @@ function Remoting.FireServer(self: Remoting, memberName: string, ...)
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(self._remotingRealm == RemotingRealms.CLIENT, "FireServer must be called on client")
 
-	self:PromiseFireServer(memberName, ...)
+	-- Fire-and-forget: no caller can consume the internal promise through this API. A nil rejection
+	-- is cancellation (e.g. the remoting torn down mid-fire) and stays silent; a valued rejection is
+	-- a genuine failure (e.g. the remote never appeared) and must stay visible.
+	self:PromiseFireServer(memberName, ...):Catch(function(err)
+		if err ~= nil then
+			warn(
+				string.format(
+					"[Remoting.FireServer] - Failed to fire %q: %s",
+					self:_getDebugMemberName(memberName),
+					tostring(err)
+				)
+			)
+		end
+	end)
 end
 
 --[=[
@@ -534,7 +564,10 @@ function Remoting.PromiseFireServer(self: Remoting, memberName: string, ...)
 	if self._useDummyObject then
 		promise = self:_promiseRemoteEvent(fireMaid, self:_getDummyMemberName(memberName, "OnServerEvent"))
 			:Then(function(bindableEvent)
-				bindableEvent:Fire(Players.LocalPlayer, table.unpack(args, 1, args.n))
+				bindableEvent:Fire(
+					Players.LocalPlayer or PlayerMock.getMockedLocalPlayer(),
+					table.unpack(args, 1, args.n)
+				)
 			end)
 	else
 		promise = self:_promiseRemoteEvent(fireMaid, memberName):Then(function(remoteEvent)
@@ -590,7 +623,7 @@ function Remoting.PromiseInvokeServer(self: Remoting, memberName: string, ...): 
 				return invokeMaid:GivePromise(
 					RemoteFunctionUtils.promiseInvokeBindableFunction(
 						remoteFunction,
-						Players.LocalPlayer,
+						Players.LocalPlayer or PlayerMock.getMockedLocalPlayer(),
 						table.unpack(args, 1, args.n)
 					)
 				)
@@ -627,7 +660,7 @@ end
 ]=]
 function Remoting.PromiseInvokeClient(self: Remoting, memberName: string, player: Player, ...)
 	assert(type(memberName) == "string", "Bad memberName")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	local invokeMaid: Maid.Maid = Maid.new()
 

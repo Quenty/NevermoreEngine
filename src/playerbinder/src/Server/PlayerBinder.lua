@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local Binder = require("Binder")
+local PlayerMockService = require("PlayerMockService")
 
 local PlayerBinder = setmetatable({}, Binder)
 PlayerBinder.ClassName = "PlayerBinder"
@@ -30,6 +31,24 @@ function PlayerBinder.new<T>(tag: string, class: Binder.BinderConstructor<T>, ..
 end
 
 --[=[
+	Initializes the binder. Captures the owning [ServiceBag] so [PlayerBinder.Start] can discover mock
+	players from it. Done via a ServiceBag.
+]=]
+function PlayerBinder.Init<T>(self: PlayerBinder<T>, serviceBag: any, ...: any): ...any
+	-- The ServiceBag passes itself as the first Init arg (and on to bound-class constructors).
+	(self :: any)._serviceBag = serviceBag
+
+	if serviceBag then
+		-- Declare the PlayerMockService dependency during the init phase. A test can then
+		-- serviceBag:GetService(PlayerMockService) after the bag has started (a bag refuses to add
+		-- new services once started), and every service upstream of a PlayerBinder inherits this.
+		serviceBag:GetService(PlayerMockService)
+	end
+
+	return (getmetatable(PlayerBinder) :: any).Init(self, serviceBag, ...)
+end
+
+--[=[
 	Starts the binder. See [Binder.Start].
 	Should be done via a [ServiceBag].
 ]=]
@@ -41,6 +60,16 @@ function PlayerBinder.Start<T>(self: PlayerBinder<T>): ...any
 	end))
 	for _, item in Players:GetPlayers() do
 		self:Tag(item)
+	end
+
+	-- Discover mock players the same way as real joins. Replication is the default and place-wide,
+	-- like Players:GetPlayers() -- any parented mock binds here, whichever bag (either realm) made
+	-- it; production places just carry no mocks (they are only ever created by tests).
+	local serviceBag = (self :: any)._serviceBag
+	if serviceBag then
+		self._maid:GiveTask(serviceBag:GetService(PlayerMockService):ObservePlayerMocks(function(playerMock)
+			self:Tag(playerMock)
+		end))
 	end
 
 	return unpack(results)

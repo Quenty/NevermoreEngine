@@ -327,8 +327,12 @@ function ObservableCountingMap.Add<T>(self: ObservableCountingMap<T>, key: T, am
 			-- Remove item
 			self._map[key] = nil
 
-			-- Fire events
-			self._totalKeyCountValue.Value = self._totalKeyCountValue.Value - 1
+			-- Fire events. The backing ValueObject may already be destroyed when a stored removal
+			-- callback fires during this map's own teardown, in which case its Value reads nil.
+			local totalKeyCount = self._totalKeyCountValue.Value
+			if totalKeyCount ~= nil then
+				self._totalKeyCountValue.Value = totalKeyCount - 1
+			end
 
 			if self.Destroy then
 				self.KeyRemoved:Fire(key)
@@ -348,8 +352,11 @@ function ObservableCountingMap.Add<T>(self: ObservableCountingMap<T>, key: T, am
 		-- Add item
 		self._map[key] = change
 
-		-- Fire events
-		self._totalKeyCountValue.Value = self._totalKeyCountValue.Value + 1
+		-- Fire events (see the removal branch for why Value may read nil here)
+		local totalKeyCount = self._totalKeyCountValue.Value
+		if totalKeyCount ~= nil then
+			self._totalKeyCountValue.Value = totalKeyCount + 1
+		end
 
 		if self.Destroy then
 			self.KeyAdded:Fire(key)

@@ -20,8 +20,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Maps asset keys to numeric ids. Any key not present converts to nil, which exercises the
--- "no asset with key" reject paths.
 local KEY_TO_ID = {
 	swordKey = 111,
 	shieldKey = 222,
@@ -65,8 +63,6 @@ local function setup()
 	}
 end
 
--- Builds a non-promptable tracker (as used for the game asset type), which should reject
--- prompts instead of surfacing them.
 local function setupNonPromptable()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.GAME, convertIds, observeIdsBrio, false)
 
@@ -78,8 +74,6 @@ local function setupNonPromptable()
 	}
 end
 
--- Drives a full prompt: fires PromisePromptPurchase, waits for ShowPromptRequested to surface the
--- resolved id, then feeds the purchase result back in. Returns the tracking promise and the id.
 local function promptAndCapture(tracker, idOrKey)
 	local capturedId
 	local conn = tracker.ShowPromptRequested:Connect(function(id)
@@ -278,7 +272,6 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 		local secondOutcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("shieldKey"), 5)
 		expect(secondOutcome).toEqual("rejected")
 
-		-- Close out the first prompt so nothing leaks.
 		context.tracker:HandlePurchaseEvent(firstId, true)
 		context.tracker:HandlePromptClosedEvent(firstId)
 		PromiseTestUtils.awaitSettled(firstPromise, 5)
@@ -317,7 +310,6 @@ describe("PlayerAssetMarketTracker prompt open counting", function()
 		PromiseTestUtils.awaitSettled(promise, 5)
 		sub:Destroy()
 
-		-- Should have observed the initial 0 and at least one increment to 1.
 		expect(counts[1]).toEqual(0)
 		local sawOpen = false
 		for _, value in counts do

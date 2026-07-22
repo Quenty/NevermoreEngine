@@ -18,6 +18,7 @@ local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -85,7 +86,7 @@ function GameProductService.ObservePlayerAssetPurchased(
 	idOrKey: string | number
 ): Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._gameProductDataService:ObservePlayerAssetPurchased(player, assetType, idOrKey)
@@ -123,7 +124,7 @@ function GameProductService.HasPlayerPurchasedThisSession(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -140,7 +141,7 @@ function GameProductService.PromisePlayerIsPromptOpen(
 	self: GameProductService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerIsPromptOpen(player)
@@ -156,7 +157,7 @@ function GameProductService.PromisePlayerPromptClosed(
 	self: GameProductService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerPromptClosed(player)
@@ -176,7 +177,7 @@ function GameProductService.PromisePlayerPromptPurchase(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -197,7 +198,7 @@ function GameProductService.PromisePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -228,7 +229,7 @@ function GameProductService.SetPlayerOwnershipOverride(
 	idOrKey: string | number,
 	ownsAsset: boolean?
 ): Promise.Promise<()>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
@@ -251,7 +252,7 @@ function GameProductService.ClearPlayerOwnershipOverride(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<()>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -274,7 +275,7 @@ function GameProductService.PromisePlayerOwnershipOrPrompt(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -295,7 +296,7 @@ function GameProductService.ObservePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 

@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 local BaseObject = require("BaseObject")
 local DataStoreStringUtils = require("DataStoreStringUtils")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
@@ -51,7 +52,9 @@ end
 	@return Player
 ]=]
 function PlayerSettingsBase.GetPlayer(self: PlayerSettingsBase): Player?
-	return self._obj:FindFirstAncestorWhichIsA("Player")
+	-- The real Player ancestor, or the PlayerMock a test parented the settings folder under
+	-- (a mock's backing Folder is invisible to the IsA walk).
+	return self._obj:FindFirstAncestorWhichIsA("Player") or PlayerMock.findFirstAncestorMock(self._obj)
 end
 
 --[=[

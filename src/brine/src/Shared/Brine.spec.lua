@@ -364,9 +364,6 @@ describe("Brine.observeDeserialize", function()
 	end)
 end)
 
--- Edge-case probes for the observe pipeline. These are documentation tests:
--- some are expected to fail today and the failures are the signal — they
--- highlight scenarios the change-packet pipeline does not propagate yet.
 describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", function()
 	it("propagates a descendant added after subscribe", function()
 		local original = Instance.new("Folder")
@@ -584,9 +581,6 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 	end)
 end)
 
--- Asserts directly on the wire packets emitted by observeSerialize. Each
--- emission is decoded with a fresh BrineContext so the test sees the raw
--- {type = ..., ...} packet table rather than the side effect on the receiver.
 describe("Brine.observeSerialize packet shape", function()
 	local function decodePacket(stream, encodedReferences)
 		local context = BrineContext.new(BrineOptionUtils.defaultOptions(nil))
@@ -745,9 +739,6 @@ describe("Brine.observeSerialize packet shape", function()
 	end)
 end)
 
--- Direct (non-Rx) repro: build the same packet shape that observeSerialize
--- emits internally and roundtrip it via _toStream / _fromStream. Used to
--- isolate whether the hang is in the encode/decode layer or in the observer.
 describe("Brine direct packet roundtrip (non-Rx)", function()
 	it("can roundtrip a manually-constructed 'full' packet", function()
 		local original = Instance.new("StringValue")
@@ -909,13 +900,11 @@ describe("Brine direct packet roundtrip (non-Rx)", function()
 
 		local writeContext = BrineContext.new(BrineOptionUtils.defaultOptions(nil))
 
-		-- Encode root as a full frame
 		local rootData = Brine._toIntermediate(writeContext, root)
 		local fullPacket = { type = "full", data = rootData }
 		local fullStream = Brine._toStream(writeContext, fullPacket)
 		expect(#fullStream > 0).toEqual(true)
 
-		-- Encode first child as a descendantAdded
 		local firstData = Brine._toIntermediate(writeContext, first)
 		local firstPacket = {
 			type = "descendantAdded",

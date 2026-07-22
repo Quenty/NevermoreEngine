@@ -41,6 +41,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/propertyvalue": "workspace:*",
     "@quenty/remoting": "workspace:*",

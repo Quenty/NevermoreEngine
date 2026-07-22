@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local GroupService = game:GetService("GroupService")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local GroupUtils = {}
@@ -48,17 +49,34 @@ type GetGroupDictionary = {
 }
 type GetGroupsAsyncResult = { GetGroupDictionary }
 
-local function _getRankAndRoleFallback(userId: number, groupId: number): (number, string?)
+-- The mock interception point is the engine call itself (see [PlayerMock.writeLookup]), not the
+-- promise wrappers below -- so the highest-role scan, fallback ordering, and reject paths all
+-- run for mocks too. A PlayerMock is in no real Roblox group, so answering from the injected
+-- result avoids the (flaky, fake-UserId) group lookup.
+local function _getRolesInGroupAsync(player: Player, groupId: number): GetRolesInGroupAsyncResult
+	if PlayerMock.isMock(player) then
+		return PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", groupId)
+	end
+
+	return GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
+end
+
+local function _getRankAndRoleFallbackAsync(player: Player, groupId: number): (number, string?)
 	-- euvin: i yoinked this from
 	-- https://devforum.roblox.com/t/groupservicegetrolesingroupasync-is-not-enabled-yet-wiki-tells-me-to-use-it/4660969
 
 	--? The GetRankInGroup method is deprecated and unstable now.
 	--? https://devforum.roblox.com/t/excessive-rate-limits-when-checking-gamepasses-group-ranks/3549665
-	local groups = GroupService:GetGroupsAsync(userId) :: GetGroupsAsyncResult
+	local groups: GetGroupsAsyncResult
+	if PlayerMock.isMock(player) then
+		groups = PlayerMock.readLookup(player, "GroupService.GetGroupsAsync", 0)
+	else
+		groups = GroupService:GetGroupsAsync(player.UserId) :: GetGroupsAsyncResult
+	end
 
-	for _, GroupInfo: GetGroupDictionary in groups do
-		if GroupInfo.Id == groupId then
-			return GroupInfo.Rank, GroupInfo.Role
+	for _, groupInfo: GetGroupDictionary in groups do
+		if groupInfo.Id == groupId then
+			return groupInfo.Rank, groupInfo.Role
 		end
 	end
 
@@ -73,7 +91,7 @@ end
 	@return Promise<number> -- Generally from 0 to 255
 ]=]
 function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise.Promise<number>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
 
 	return Promise.spawn(function(resolve, reject)
@@ -82,7 +100,7 @@ function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise
 			-- GetRankInGroupAsync is deprecated, changed from GetRankInGroupAsync to GetRolesInGroupAsync
 			-- ... but GetRolesInGroupAsync fails for some reason and hasn't been fixed (June 2, 2026)
 			-- so we will fall back to a deprecated method anyway
-			local result = GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
+			local result = _getRolesInGroupAsync(player, groupId)
 			if result.IsMember then
 				local highestRoleTable = _getHighestRoleTable(result.Roles)
 				if highestRoleTable then
@@ -92,7 +110,7 @@ function GroupUtils.promiseRankInGroup(player: Player, groupId: number): Promise
 		end)
 		if not rank then
 			ok, err = pcall(function()
-				local gotRank, _ = _getRankAndRoleFallback(player.UserId, groupId)
+				local gotRank, _ = _getRankAndRoleFallbackAsync(player, groupId)
 				rank = gotRank
 			end)
 		end
@@ -117,13 +135,13 @@ end
 	@return Promise<string>
 ]=]
 function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise.Promise<string>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(type(groupId) == "number", "Bad groupId")
 
 	return Promise.spawn(function(resolve, reject)
 		local role: string? = nil
 		local ok, err = pcall(function()
-			local result = GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
+			local result = _getRolesInGroupAsync(player, groupId)
 			if result.IsMember then
 				local highestRoleTable = _getHighestRoleTable(result.Roles)
 				if highestRoleTable then
@@ -134,7 +152,7 @@ function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise
 
 		if not role then
 			ok, err = pcall(function()
-				local _, gotRole = _getRankAndRoleFallback(player.UserId, groupId)
+				local _, gotRole = _getRankAndRoleFallbackAsync(player, groupId)
 				role = gotRole
 			end)
 		end

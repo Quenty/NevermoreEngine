@@ -225,8 +225,6 @@ describe("Promise:Wait", function()
 
 	it("errors when the promise is rejected", function()
 		local promise = Promise.rejected("boom")
-		-- Wait does not consume the rejection, so handle it to avoid an uncaught-exception warning.
-		promise:Catch(function() end)
 		local ok, err = pcall(function()
 			promise:Wait()
 		end)
@@ -252,8 +250,6 @@ describe("Promise:Yield", function()
 
 	it("returns false and the error when rejected", function()
 		local promise = Promise.rejected("bad")
-		-- Yield does not consume the rejection, so handle it to avoid an uncaught-exception warning.
-		promise:Catch(function() end)
 		local ok, err = promise:Yield()
 		expect(ok).toEqual(false)
 		expect(err).toEqual("bad")
@@ -406,10 +402,46 @@ describe("Promise:GetResults", function()
 
 	it("returns false and the error when rejected", function()
 		local promise = Promise.rejected("failure")
-		-- GetResults does not consume the rejection, so handle it to avoid an uncaught-exception warning.
-		promise:Catch(function() end)
 		local ok, err = promise:GetResults()
 		expect(ok).toEqual(false)
 		expect(err).toEqual("failure")
+	end)
+
+	it("consumes the rejection", function()
+		local promise = Promise.rejected("failure")
+		promise:GetResults()
+		expect((promise :: any)._unconsumedException).toEqual(false)
+	end)
+end)
+
+describe("Promise._toHumanReadable", function()
+	local promise = Promise.new()
+
+	it("stringifies non-table values", function()
+		expect(promise:_toHumanReadable("failure")).toEqual("failure")
+		expect(promise:_toHumanReadable(5)).toEqual("5")
+		expect(promise:_toHumanReadable(nil)).toEqual("nil")
+		expect(promise:_toHumanReadable(false)).toEqual("false")
+	end)
+
+	it("uses a table's custom __tostring when present", function()
+		local data = setmetatable({}, {
+			__tostring = function()
+				return "CustomError<oops>"
+			end,
+		})
+		expect(promise:_toHumanReadable(data)).toEqual("CustomError<oops>")
+	end)
+
+	it("JSON-encodes a plain table instead of returning its address", function()
+		expect(promise:_toHumanReadable({ code = 500 })).toEqual('{"code":500}')
+		expect(promise:_toHumanReadable({})).toEqual("[]")
+	end)
+
+	it("falls back to tostring when the table cannot be JSON-encoded", function()
+		local data = {}
+		data.cycle = data
+		local result = promise:_toHumanReadable(data)
+		expect(string.sub(result, 1, 9)).toEqual("table: 0x")
 	end)
 end)

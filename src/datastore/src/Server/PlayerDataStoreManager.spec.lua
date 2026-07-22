@@ -1,23 +1,18 @@
 --!nonstrict
 --[[
-	Integration coverage for PlayerDataStoreManager against a mocked Roblox datastore. The manager
-	auto-enables session locking and session messaging on every DataStore it creates, so even a load
-	does an UpdateAsync round-trip through the mock. Tests use numeric userIds, never real Players.
-
 	@class PlayerDataStoreManager.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Asserts the promise settled within the timeout and returns whether it is now safe to :Yield(), so
--- a hung promise fails the test instead of freezing the runner.
 local function expectSettled(promise, timeout: number?): boolean
 	local settled = PromiseTestUtils.awaitSettled(promise, timeout)
 	expect(settled).toEqual(true)
@@ -57,6 +52,44 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 	end)
 end)
 
+describe("PlayerDataStoreManager PlayerMock support", function()
+	it("resolves a datastore for a PlayerMock keyed by its seeded UserId", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local player = PlayerMock.new({ UserId = 42 })
+		local dataStore = controller.manager:GetDataStore(player)
+		expect(dataStore).never.toBeNil()
+		expect((dataStore:GetKey())).toEqual("user_42")
+
+		player:Destroy()
+		controller:destroy()
+	end)
+
+	it("shares the same datastore between the mock and its numeric userId (unified state)", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local player = PlayerMock.new({ UserId = 42 })
+		local viaMock = controller.manager:GetDataStore(player)
+		local viaUserId = controller.manager:GetDataStore(42)
+		expect(viaMock).toEqual(viaUserId)
+
+		player:Destroy()
+		controller:destroy()
+	end)
+
+	it("rejects a plain Folder that is not a PlayerMock", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local folder = Instance.new("Folder")
+		expect(function()
+			controller.manager:GetDataStore(folder)
+		end).toThrow()
+
+		folder:Destroy()
+		controller:destroy()
+	end)
+end)
+
 describe("PlayerDataStoreManager.PromiseDataStore", function()
 	it("should resolve the datastore and load successfully against a healthy mock", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
@@ -89,11 +122,8 @@ describe("PlayerDataStoreManager persistence", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		dataStore:Store("coins", 5)
 
-		-- Removal saves (SaveAndCloseSession) then closes the session, asynchronously.
 		controller.manager:RemovePlayerDataStore(1)
 
-		-- PromiseDataStore waits for the in-progress removal to finish before handing back a
-		-- fresh datastore for the same user.
 		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
 			controller:destroy()
@@ -128,7 +158,6 @@ describe("PlayerDataStoreManager.AddRemovingCallback", function()
 
 		controller.manager:GetDataStore(1)
 
-		-- Drain the removal to be sure the callback fired.
 		local promise = controller.manager:PromiseAllSaves()
 		if not expectSettled(promise, 10) then
 			controller:destroy()
@@ -172,7 +201,6 @@ describe("PlayerDataStoreManager teardown", function()
 
 		controller.manager:Destroy()
 
-		-- BaseObject.Destroy clears the metatable, so a torn-down store reads a nil metatable.
 		expect(getmetatable(dataStore)).toBeNil()
 
 		controller:destroy()
@@ -189,8 +217,6 @@ describe("PlayerDataStoreManager teardown", function()
 
 		dataStore:Store("coins", 5)
 
-		-- Destroy must fire a synchronous Save before tearing each store down, so the staged value is
-		-- already persisted the instant Destroy() returns -- asserted with no awaiting.
 		controller.manager:Destroy()
 
 		local raw = controller.mock:GetRaw("user_1")

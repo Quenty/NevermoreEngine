@@ -7,8 +7,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local BasicPane = require("BasicPane")
 local Maid = require("Maid")
 local Math = require("Math")
@@ -118,7 +116,7 @@ end
 	@return Observable<number>
 ]=]
 function TimedTween.ObserveRenderStepped(self: TimedTween): Observable.Observable<number>
-	return self:ObserveOnSignal(RunService.RenderStepped)
+	return self:ObserveOnSignal(StepUtils.getRenderStepSignal())
 end
 
 --[=[
@@ -151,7 +149,7 @@ end
 	@return Observable<number>
 ]=]
 function TimedTween.Observe(self: TimedTween): Observable.Observable<number>
-	return self:ObserveOnSignal(RunService.RenderStepped)
+	return self:ObserveRenderStepped()
 end
 
 --[=[

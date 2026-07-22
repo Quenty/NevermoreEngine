@@ -22,9 +22,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a ServiceBag with a mock-injected PlayerDataStoreService, owned by a Maid so destroy() tears
--- down the service (and the session-locked stores its manager owns). Read controller.mock to seed,
--- fail, or size-limit the datastore.
 local function setup(mock)
 	local maid = Maid.new()
 	mock = mock or DataStoreMock.new()
@@ -44,7 +41,6 @@ local function setup(mock)
 	}
 end
 
--- Resolves the session-locked datastore for a userId (bounded); returns nil on failure to settle.
 local function resolveDataStore(playerDataStoreService, userId)
 	local promise = playerDataStoreService:PromiseDataStore(userId)
 	if not PromiseTestUtils.awaitSettled(promise, 10) then
@@ -57,7 +53,6 @@ local function resolveDataStore(playerDataStoreService, userId)
 	return dataStore
 end
 
--- Slot stores live at SaveSlots.slots.<slotId>, matching HasSaveSlots._getSlotStore.
 local function getSlotStore(dataStore, slotId)
 	return dataStore
 		:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
@@ -74,13 +69,11 @@ describe("save slot overflow save", function()
 
 		local slotStore = getSlotStore(dataStore, "slot-abc")
 
-		-- A first, well-sized save acquires the session lock and writes the slot.
 		slotStore:Store("coins", 25)
 		local firstSave = dataStore:Save()
 		expect(PromiseTestUtils.awaitSettled(firstSave, 10)).toEqual(true)
 		expect((firstSave:Yield())).toEqual(true)
 
-		-- Now overflow the slot with more data than the key can serialize.
 		controller.mock:SetMaxValueLength(8192)
 		slotStore:Store("blob", string.rep("A", 32768))
 
@@ -115,7 +108,6 @@ describe("save slot overflow save", function()
 		expect(PromiseTestUtils.awaitSettled(savePromise, 10)).toEqual(true)
 		expect((savePromise:Yield())).toEqual(false)
 
-		-- The rejected write must not have corrupted the coins we already stored.
 		controller.mock:SetMaxValueLength(nil)
 		local loadPromise = slotStore:Load("coins")
 		expect(PromiseTestUtils.awaitSettled(loadPromise, 10)).toEqual(true)

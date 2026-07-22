@@ -5,7 +5,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxSignal = require("RxSignal")
@@ -24,7 +27,7 @@ export type SettingProperty<T> = typeof(setmetatable(
 
 		_serviceBag: ServiceBag.ServiceBag,
 		_bridge: SettingsDataService.SettingsDataService,
-		_player: Player,
+		_player: Player?,
 		_definition: any,
 	},
 	{} :: typeof({ __index = SettingProperty })
@@ -33,23 +36,33 @@ export type SettingProperty<T> = typeof(setmetatable(
 --[=[
 	Constructs a new SettingProperty.
 
+	A nil player means the local player: the real `Players.LocalPlayer`, or the mock a test has
+	already designated through [PlayerMock.setMockedLocalPlayer]. Designation may happen before
+	bags boot -- matching production, where `Players.LocalPlayer` exists before any service runs --
+	so construction requires a resolvable local player up front.
+
 	@param serviceBag ServiceBag
-	@param player Player
+	@param player Player?
 	@param definition SettingDefinition
 	@return SettingProperty<T>
 ]=]
-function SettingProperty.new<T>(serviceBag: ServiceBag.ServiceBag, player: Player, definition): SettingProperty<T>
+function SettingProperty.new<T>(serviceBag: ServiceBag.ServiceBag, player: Player?, definition): SettingProperty<T>
 	local self: SettingProperty<T> = setmetatable({} :: any, SettingProperty)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._bridge = self._serviceBag:GetService(SettingsDataService) :: any
 
-	self._player = assert(player, "No player")
+	assert(player ~= nil or Players.LocalPlayer ~= nil or PlayerMock.getMockedLocalPlayer() ~= nil, "No player")
+	if player ~= nil then
+		self._player = player
+	end
 	self._definition = assert(definition, "No definition")
 
-	self:_promisePlayerSettings():Then(function(playerSettings)
-		playerSettings:EnsureInitialized(self._definition:GetSettingName(), self._definition:GetDefaultValue())
-	end)
+	if self:_findPlayer() ~= nil then
+		self:_promisePlayerSettings():Then(function(playerSettings)
+			playerSettings:EnsureInitialized(self._definition:GetSettingName(), self._definition:GetDefaultValue())
+		end)
+	end
 
 	return self
 end
@@ -191,16 +204,24 @@ function SettingProperty.PromiseRestoreDefault<T>(self: SettingProperty<T>): Pro
 	end)
 end
 
+function SettingProperty._findPlayer<T>(self: SettingProperty<T>): Player?
+	return rawget(self :: any, "_player") or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+end
+
+function SettingProperty._resolvePlayer<T>(self: SettingProperty<T>): Player
+	return assert(self:_findPlayer(), "No player") :: Player
+end
+
 function SettingProperty._observePlayerSettings<T>(self: SettingProperty<T>)
-	return self._bridge:ObservePlayerSettings(self._player)
+	return self._bridge:ObservePlayerSettings(self:_resolvePlayer())
 end
 
 function SettingProperty._getPlayerSettings<T>(self: SettingProperty<T>)
-	return self._bridge:GetPlayerSettings(self._player)
+	return self._bridge:GetPlayerSettings(self:_resolvePlayer())
 end
 
 function SettingProperty._promisePlayerSettings<T>(self: SettingProperty<T>)
-	return self._bridge:PromisePlayerSettings(self._player)
+	return self._bridge:PromisePlayerSettings(self:_resolvePlayer())
 end
 
 return SettingProperty

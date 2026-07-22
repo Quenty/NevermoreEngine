@@ -18,7 +18,9 @@
 	The unified read ([TeleportDataService.PromiseArrivedData]) merges both with the **trusted band
 	winning**, so a client can never override a key the server set. Because the non-trusted band arrives
 	over the network, every read is a [Promise]: it resolves once the client has replicated (or a bounded
-	timeout falls back to the trusted band alone, so a stale client can never hang a read forever). Code
+	timeout falls back to the trusted band alone, so a stale client can never hang a read forever). A
+	[PlayerMock] has no client to wait for, so its reads fall back at the next resumption step instead of
+	the production window -- a spec injects arrived data (via the testing seams) before yielding. Code
 	that must *not* trust the client reads the trusted band explicitly via
 	[TeleportDataService.PromiseTrustedArrivedData]; the unified accessor is deliberately un-named for
 	trust so trusting client data is always a visible choice.
@@ -33,6 +35,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
@@ -163,7 +166,7 @@ end
 	@return number
 ]=]
 function TeleportDataService._getUserId(_self: TeleportDataService, player: Player): number
-	return player.UserId
+	return if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 end
 
 --[=[
@@ -409,10 +412,21 @@ function TeleportDataService._getEntry(self: TeleportDataService, player: Player
 		promise:Resolve()
 	end
 
-	-- Arm the fallback: if the client never replicates, resolve to the trusted band alone.
-	maid:GiveTask(task.delay(self._replicationTimeout, function()
-		entry.resolve(nil)
-	end))
+	-- Arm the fallback: if the client never replicates, resolve to the trusted band alone. A
+	-- [PlayerMock] has no client, so nothing can replicate asynchronously -- its only "replication"
+	-- is a test injection from the running thread. Its fallback therefore fires at the next
+	-- resumption step (inject before yielding) instead of stalling every read on the production
+	-- window. An explicit SetReplicationTimeoutForTesting keeps the timed fallback, so the timeout
+	-- path itself stays drivable from a spec.
+	if PlayerMock.isMock(player) and self._replicationTimeout == DEFAULT_REPLICATION_TIMEOUT then
+		maid:GiveTask(task.defer(function()
+			entry.resolve(nil)
+		end))
+	else
+		maid:GiveTask(task.delay(self._replicationTimeout, function()
+			entry.resolve(nil)
+		end))
+	end
 
 	-- If the player leaves before replicating, seal on what we have so no read hangs forever.
 	maid:GiveTask(function()

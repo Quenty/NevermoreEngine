@@ -11,6 +11,7 @@ local BaseObject = require("BaseObject")
 local GetRemoteFunction = require("GetRemoteFunction")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderUtils = require("PermissionProviderUtils")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Table = require("Table")
 
@@ -68,7 +69,7 @@ function BasePermissionProvider.PromiseIsPermissionLevel(
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(PermissionLevel:IsValue(permissionLevel))
 
 	error("Not implemented")
@@ -85,7 +86,7 @@ function BasePermissionProvider.IsPermissionLevel(
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(PermissionLevel:IsValue(permissionLevel))
 
 	local promise = self:PromiseIsPermissionLevel(player, permissionLevel)
@@ -108,7 +109,7 @@ end
 	@return Promise<boolean>
 ]=]
 function BasePermissionProvider.PromiseIsCreator(self: BasePermissionProvider, player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
 end
@@ -119,7 +120,7 @@ end
 	@return Promise<boolean>
 ]=]
 function BasePermissionProvider.PromiseIsAdmin(self: BasePermissionProvider, player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
 end
@@ -135,7 +136,7 @@ end
 	@return boolean
 ]=]
 function BasePermissionProvider.IsCreator(self: BasePermissionProvider, player: Player): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:IsPermissionLevel(player, PermissionLevel.CREATOR)
 end
@@ -151,7 +152,7 @@ end
 	@return boolean
 ]=]
 function BasePermissionProvider.IsAdmin(self: BasePermissionProvider, player: Player): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:IsPermissionLevel(player, PermissionLevel.ADMIN)
 end

@@ -12,7 +12,10 @@ local Binder = require("Binder")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
+local PlayerMockService = require("PlayerMockService")
 local Rx = require("Rx")
+local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
 local PlayerCharacterBinder = setmetatable({}, Binder)
@@ -22,6 +25,7 @@ PlayerCharacterBinder.__index = PlayerCharacterBinder
 export type PlayerCharacterBinder<T> =
 	typeof(setmetatable(
 		{} :: {
+			_serviceBag: ServiceBag.ServiceBag?,
 			_shouldTag: ValueObject.ValueObject<boolean>,
 		},
 		{} :: typeof({ __index = PlayerCharacterBinder })
@@ -45,10 +49,20 @@ end
 	Inits the binder. See [Binder.Init].
 	Should be done via a [ServiceBag].
 
+	@param serviceBag ServiceBag
 	@param ... any
 ]=]
-function PlayerCharacterBinder.Init<T>(self: PlayerCharacterBinder<T>, ...): ()
-	getmetatable(PlayerCharacterBinder).Init(self, ...)
+function PlayerCharacterBinder.Init<T>(self: PlayerCharacterBinder<T>, serviceBag: ServiceBag.ServiceBag?, ...): ()
+	self._serviceBag = serviceBag
+
+	if serviceBag then
+		-- Declare the PlayerMockService dependency during the init phase (a ServiceBag refuses to add
+		-- new services once started). Production bags just carry an empty registry -- mocks are only
+		-- ever created by tests -- so this adds no production behavior.
+		serviceBag:GetService(PlayerMockService)
+	end
+
+	getmetatable(PlayerCharacterBinder).Init(self, serviceBag, ...)
 
 	if not self._shouldTag then
 		self._shouldTag = self._maid:Add(ValueObject.new(true, "boolean"))
@@ -117,6 +131,17 @@ function PlayerCharacterBinder._bindTagging<T>(self: PlayerCharacterBinder<T>, d
 			self:_handlePlayerAdded(playerMaid, player)
 		end
 
+		-- Discover replicated PlayerMocks the same way as real joins. Production places just carry an
+		-- empty replicated set, so this adds no production behavior.
+		if self._serviceBag then
+			-- Cast: the service's instance fields are assigned in Init, so its methods do not
+			-- type-check against the exported module type.
+			local playerMockService: any = self._serviceBag:GetService(PlayerMockService)
+			maid:GiveTask(playerMockService:ObservePlayerMocks(function(playerMock)
+				self:_handlePlayerAdded(playerMaid, playerMock)
+			end))
+		end
+
 		self._maid._tagging = maid
 	else
 		self._maid._tagging = nil
@@ -126,6 +151,16 @@ function PlayerCharacterBinder._bindTagging<T>(self: PlayerCharacterBinder<T>, d
 				local character = player.Character
 				if character then
 					self:Unbind(character)
+				end
+			end
+
+			if self._serviceBag then
+				local playerMockService: any = self._serviceBag:GetService(PlayerMockService)
+				for _, playerMock in playerMockService:GetPlayerMocks() do
+					local character = PlayerMock.read(playerMock, "Character")
+					if character then
+						self:Unbind(character)
+					end
 				end
 			end
 		end
@@ -139,12 +174,29 @@ function PlayerCharacterBinder._handlePlayerAdded<T>(
 ): ()
 	local maid = Maid.new()
 
-	maid:GiveTask(player.CharacterAdded:Connect(function(character)
-		self:Tag(character)
-	end))
+	if PlayerMock.isMock(player) then
+		-- Mirror the real branch below through the mock's stand-ins: CharacterAdded fires via
+		-- PlayerMock.loadCharacterAsync (a bare Character write deliberately does not fire it, like
+		-- the engine), and Destroying stands in for PlayerRemoving.
+		maid:GiveTask(PlayerMock.getSignal(player, "CharacterAdded"):Connect(function(character)
+			self:Tag(character)
+		end))
+		maid:GiveTask(player.Destroying:Connect(function()
+			playerMaid[player] = nil
+		end))
 
-	if player.Character then
-		self:Tag(player.Character)
+		local character = PlayerMock.read(player, "Character")
+		if character then
+			self:Tag(character)
+		end
+	else
+		maid:GiveTask(player.CharacterAdded:Connect(function(character)
+			self:Tag(character)
+		end))
+
+		if player.Character then
+			self:Tag(player.Character)
+		end
 	end
 
 	playerMaid[player] = maid

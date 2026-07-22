@@ -91,8 +91,11 @@ function ScreenGuiService._ensureInit(self: ScreenGuiService): ()
 
 		-- TODO: Don't do this? But what's the alternative..
 		if not RunService:IsRunning() then
-			if ScreenGuiService._hackPlayerGui then
-				self._guiParent:Mount(ScreenGuiService._hackPlayerGui:Observe())
+			-- The shared value object outlives any one service bag; a destroyed one (its bag tore
+			-- down) has lost its methods, so adopt ours as the new shared parent instead.
+			local hackPlayerGui = ScreenGuiService._hackPlayerGui
+			if hackPlayerGui and type((hackPlayerGui :: any).Observe) == "function" then
+				self._guiParent:Mount(hackPlayerGui:Observe())
 			else
 				ScreenGuiService._hackPlayerGui = self._guiParent
 			end
@@ -104,6 +107,10 @@ end
 	Cleans up the ScreenGuiService
 ]=]
 function ScreenGuiService.Destroy(self: ScreenGuiService): ()
+	if ScreenGuiService._hackPlayerGui == self._guiParent then
+		ScreenGuiService._hackPlayerGui = nil
+	end
+
 	self._maid:DoCleaning()
 end
 

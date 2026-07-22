@@ -1,13 +1,5 @@
 --!nonstrict
 --[[
-	Coverage for InMemoryDataStore.
-
-	The bulk is a *matrix* suite: one shared battery of DataStoreStage-surface behaviors run against both
-	store roots -- the real DataStore (over a DataStoreMock) and InMemoryDataStore -- so the in-memory store
-	is proven to behave identically to the persisted one on every read/write/substore/observe path they share.
-	The store-specific describe blocks then cover what only the in-memory store guarantees: isolation between
-	instances, a no-op save, and never reaching a datastore at all.
-
 	@class InMemoryDataStore.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -22,8 +14,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Asserts the promise settled within the timeout and returns its resolved value, so a hung promise fails
--- the test here instead of freezing the runner on a later :Yield().
 local function resolve(promise, timeout: number?)
 	expect(PromiseTestUtils.awaitSettled(promise, timeout or 10)).toEqual(true)
 	local ok, value = promise:Yield()
@@ -31,8 +21,6 @@ local function resolve(promise, timeout: number?)
 	return value
 end
 
--- A controller exposes makeStore() (a fresh store root) and destroy() (tears down everything it created).
--- The matrix runs the same suite against one of these per store implementation.
 local function newInMemoryController()
 	local maid = Maid.new()
 	return {
@@ -55,7 +43,6 @@ local function newDataStoreController()
 	}
 end
 
--- The shared behavior battery. `newController` returns a fresh controller so each test is isolated.
 local function describeSharedBehavior(caseName: string, newController)
 	describe(caseName, function()
 		it("loads the default value when the key is empty", function()
@@ -150,7 +137,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local store = c.makeStore()
 			local source = { count = 1 }
 			store:Store("data", source)
-			source.count = 999 -- Mutating after the store must not change what was stored.
+			source.count = 999
 
 			expect(resolve(store:Load("data")).count).toEqual(1)
 			c.destroy()
@@ -169,7 +156,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			expect(PromiseTestUtils.awaitValue(function()
 				return #seen >= 1
 			end, 5)).toEqual(true)
-			expect(seen[1]).toEqual(0) -- default before anything is stored
+			expect(seen[1]).toEqual(0)
 
 			store:Store("coins", 7)
 			expect(PromiseTestUtils.awaitValue(function()
@@ -185,8 +172,6 @@ end
 describeSharedBehavior("matrix: DataStore over DataStoreMock", newDataStoreController)
 describeSharedBehavior("matrix: InMemoryDataStore", newInMemoryController)
 
--- A single test that runs an identical op sequence against both roots at once and asserts they land on the
--- exact same view -- the matrix's consistency guarantee stated directly, not just implied by parallel suites.
 describe("matrix: cross-implementation consistency", function()
 	it("yields the same view for the same op sequence on both roots", function()
 		local dataStoreController = newDataStoreController()
@@ -228,7 +213,6 @@ describe("InMemoryDataStore isolation and non-persistence", function()
 		store:Store("coins", 5)
 
 		expect(resolve(store:Save())).toEqual(nil)
-		-- Data is still readable in memory after the (no-op) save.
 		expect(resolve(store:Load("coins"))).toEqual(5)
 
 		maid:DoCleaning()
@@ -238,7 +222,6 @@ describe("InMemoryDataStore isolation and non-persistence", function()
 		local maid = Maid.new()
 		local store = maid:Add(InMemoryDataStore.new())
 
-		-- The base class errors on Load for a parentless stage; this proves the override took.
 		expect(resolve(store:LoadAll({}))).toEqual({})
 
 		maid:DoCleaning()

@@ -10,6 +10,44 @@ local RunService = game:GetService("RunService")
 local StepUtils = {}
 
 --[=[
+	Returns the signal render-bound animation should step on: [RunService.RenderStepped] on the
+	client, [RunService.Heartbeat] otherwise. RenderStepped can only be connected from the client,
+	and the server fallback must be Heartbeat -- Stepped is the physics pre-step and never fires in
+	a non-running DataModel (headless test runs), which silently freezes anything bound to it.
+
+	Use this instead of hand-rolling the realm branch at call sites.
+
+	@return RBXScriptSignal
+]=]
+function StepUtils.getRenderStepSignal(): RBXScriptSignal
+	if RunService:IsClient() then
+		return RunService.RenderStepped
+	end
+
+	return RunService.Heartbeat
+end
+
+--[=[
+	Returns the signal physics-synchronized animation should step on. Like
+	[StepUtils.getRenderStepSignal], but on a running server it returns [RunService.Stepped]
+	(the physics pre-step) so that writes land before the physics step -- springs that drive
+	CFrames stay in lockstep with constraints, characters, and replication. Heartbeat is only
+	the fallback for a non-running DataModel (headless test runs, edit mode), where Stepped
+	never fires.
+
+	@return RBXScriptSignal
+]=]
+function StepUtils.getAnimationStepSignal(): RBXScriptSignal
+	if RunService:IsClient() then
+		return RunService.RenderStepped
+	elseif RunService:IsRunning() then
+		return RunService.Stepped
+	else
+		return RunService.Heartbeat
+	end
+end
+
+--[=[
 	Binds the given update function to [RunService.RenderStepped].
 
 	```lua
@@ -37,7 +75,7 @@ local StepUtils = {}
 	@return () -> () -- Disconnect function
 ]=]
 function StepUtils.bindToRenderStep(update: () -> boolean): (() -> (), () -> ())
-	return StepUtils.bindToSignal(RunService.RenderStepped, update)
+	return StepUtils.bindToSignal(StepUtils.getRenderStepSignal(), update)
 end
 
 --[=[
@@ -183,7 +221,7 @@ end
 	@return function -- Call this function to cancel call
 ]=]
 function StepUtils.onceAtRenderStepped(func: () -> ()): () -> ()
-	local conn = RunService.RenderStepped:Once(func)
+	local conn = StepUtils.getRenderStepSignal():Once(func)
 	return function()
 		conn:Disconnect()
 	end

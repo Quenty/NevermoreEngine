@@ -4,7 +4,11 @@
 	@class PlayerGuiUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local Players = game:GetService("Players")
+
+local PlayerMock = require("PlayerMock")
 
 local PlayerGuiUtils = {}
 
@@ -19,9 +23,13 @@ local PlayerGuiUtils = {}
 	@return PlayerGui
 ]=]
 function PlayerGuiUtils.getPlayerGui(): PlayerGui
-	local localPlayer = Players.LocalPlayer
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 	if not localPlayer then
 		error("[PlayerGuiUtils.getPlayerGui] - No localPlayer")
+	end
+
+	if PlayerMock.isMock(localPlayer) then
+		return PlayerMock.getPlayerGui(localPlayer)
 	end
 
 	local playerGui = localPlayer:FindFirstChildOfClass("PlayerGui")
@@ -38,9 +46,13 @@ end
 	@return PlayerGui | nil
 ]=]
 function PlayerGuiUtils.findPlayerGui(): PlayerGui?
-	local localPlayer = Players.LocalPlayer
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 	if not localPlayer then
 		return nil
+	end
+
+	if PlayerMock.isMock(localPlayer) then
+		return PlayerMock.getPlayerGui(localPlayer)
 	end
 
 	return localPlayer:FindFirstChildOfClass("PlayerGui")

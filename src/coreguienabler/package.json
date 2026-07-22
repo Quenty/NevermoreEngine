@@ -30,8 +30,11 @@
     "@quenty/characterutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quenty/symbol": "workspace:*"
+    "@quenty/symbol": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

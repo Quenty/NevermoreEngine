@@ -1,14 +1,12 @@
 --!strict
---[[
-	Unit tests for RxCharacterUtils.lua
-]]
-
 local require = require(script.Parent.loader).load(script)
+
+local Players = game:GetService("Players")
 
 local Brio = require("Brio")
 local Jest = require("Jest")
 local Maid = require("Maid")
-local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local RxCharacterUtils = require("RxCharacterUtils")
 
 local afterAll = Jest.Globals.afterAll
@@ -16,89 +14,51 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Test instances (shared across all tests)
-local character = Instance.new("Model")
-character.Name = "MockCharacter"
+-- Builds a rig with one tracked descendant part. Rigs are per-spawn: despawning destroys the
+-- character model (engine semantics), so a rig never comes back once removed.
+local function makeRig(): (Model, Part)
+	local rig = Instance.new("Model")
+	local part = Instance.new("Part")
+	part.Parent = rig
+	return rig, part
+end
 
-local childPart = Instance.new("Part")
-childPart.Name = "ChildPart"
-childPart.Parent = character
-
-local unrelatedPart = Instance.new("Part")
-unrelatedPart.Name = "UnrelatedPart"
-
--- Save original before any overrides
-local originalObserveLocalPlayerCharacter = RxCharacterUtils.observeLocalPlayerCharacter
-
---[[
-	Creates a mock environment that:
-	1. Injects a proxy for Players so Players.LocalPlayer is truthy
-	2. Overrides observeLocalPlayerCharacter to return a controllable observable
-	Returns setCharacter(char) to change the character and cleanup() to restore.
-]]
-local function createMockEnvironment()
-	local currentCharacter: Model? = nil
-	local subscribers: { any } = {}
-
-	-- Mock Players: only needs .LocalPlayer to be truthy to pass the nil-check
-	-- in observeIsOfLocalCharacter. We never pass this to RxInstanceUtils.
-	local mockPlayers = newproxy(true)
-	local mt = getmetatable(mockPlayers)
-	mt.__index = function(_, key)
-		if key == "LocalPlayer" then
-			return true
-		end
-
-		error("Bad index " .. tostring(key) .. " on mock Players")
-	end
-
-	RxCharacterUtils._test_injectPlayerService(mockPlayers :: any)
-
-	-- Override observeLocalPlayerCharacter so it doesn't call
-	-- RxInstanceUtils.observeProperty(Players, "LocalPlayer") which requires a real Instance.
-	RxCharacterUtils.observeLocalPlayerCharacter = function()
-		return Observable.new(function(sub)
-			table.insert(subscribers, sub)
-			sub:Fire(currentCharacter)
-			return function()
-				local idx = table.find(subscribers, sub)
-				if idx then
-					table.remove(subscribers, idx)
-				end
-			end
-		end) :: any
-	end
-
-	local function setCharacter(char: Model?)
-		currentCharacter = char
-		for _, sub in subscribers do
-			sub:Fire(char)
-		end
-	end
+local function setup()
+	local player = PlayerMock.new()
+	player.Parent = workspace -- setMockedLocalPlayer requires a parented mock
+	PlayerMock.setMockedLocalPlayer(player)
 
 	local function cleanup()
-		RxCharacterUtils.observeLocalPlayerCharacter = originalObserveLocalPlayerCharacter
-		RxCharacterUtils._test_injectPlayerService(nil :: any)
+		if PlayerMock.getMockedLocalPlayer() == player then
+			PlayerMock.setMockedLocalPlayer(nil)
+		end
+		player:Destroy() -- also removes any loaded character, like a player leaving
 	end
 
-	return setCharacter, cleanup
+	return player, cleanup
 end
 
 describe("RxCharacterUtils.observeIsOfLocalCharacter", function()
 	local maid = Maid.new()
-	local setCharacter, cleanupMock = createMockEnvironment()
+	local player, cleanupMock = setup()
 
-	-- Subscribe to all three instances at once
-	local childPartValue = nil
-	local childPartFireCount = 0
-	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacter(childPart):Subscribe(function(value)
-		childPartValue = value
-		childPartFireCount += 1
+	local firstRig, firstChildPart = makeRig()
+	local secondRig, secondChildPart = makeRig()
+	local unrelatedPart = Instance.new("Part")
+
+	local firstChildValue = nil
+	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacter(firstChildPart):Subscribe(function(value)
+		firstChildValue = value
 	end))
 
-	local characterValue = nil
-	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacter(character):Subscribe(function(value)
-		characterValue = value
+	local firstRigValue = nil
+	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacter(firstRig):Subscribe(function(value)
+		firstRigValue = value
+	end))
+
+	local secondChildValue = nil
+	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacter(secondChildPart):Subscribe(function(value)
+		secondChildValue = value
 	end))
 
 	local unrelatedValue = nil
@@ -109,59 +69,66 @@ describe("RxCharacterUtils.observeIsOfLocalCharacter", function()
 	afterAll(function()
 		maid:Destroy()
 		cleanupMock()
+		unrelatedPart:Destroy()
 	end)
 
-	it("should initially emit false for all instances when no character is set", function()
-		expect(childPartValue).toEqual(false)
-		expect(characterValue).toEqual(false)
+	it("should initially emit false for all instances when no character is spawned", function()
+		expect(firstChildValue).toEqual(false)
+		expect(firstRigValue).toEqual(false)
 		expect(unrelatedValue).toEqual(false)
 	end)
 
-	it("should emit true for descendant and character itself when character is set", function()
-		setCharacter(character)
-		expect(childPartValue).toEqual(true)
-		expect(characterValue).toEqual(true)
+	it("should emit true for the character and its descendant on spawn", function()
+		PlayerMock.loadCharacterAsync(player, firstRig)
+		expect(firstChildValue).toEqual(true)
+		expect(firstRigValue).toEqual(true)
 	end)
 
-	it("should still emit false for unrelated instance when character is set", function()
+	it("should still emit false for instances outside the character", function()
 		expect(unrelatedValue).toEqual(false)
+		expect(secondChildValue).toEqual(false)
 	end)
 
-	it("should emit false when character is cleared", function()
-		setCharacter(nil)
-		expect(childPartValue).toEqual(false)
-		expect(characterValue).toEqual(false)
+	it("should flip membership to the new character's parts on respawn", function()
+		PlayerMock.loadCharacterAsync(player, secondRig)
+		-- The old rig was destroyed with the respawn; its parts are never of the character again
+		expect(firstChildValue).toEqual(false)
+		expect(firstRigValue).toEqual(false)
+		expect(secondChildValue).toEqual(true)
 	end)
 
-	it("should emit true again when character is restored", function()
-		setCharacter(character)
-		expect(childPartValue).toEqual(true)
-		expect(characterValue).toEqual(true)
+	it("should emit false for everything on despawn", function()
+		PlayerMock.removeCharacter(player)
+		expect(secondChildValue).toEqual(false)
 		expect(unrelatedValue).toEqual(false)
 	end)
 end)
 
 describe("RxCharacterUtils.observeIsOfLocalCharacterBrio", function()
 	local maid = Maid.new()
-	local setCharacter, cleanupMock = createMockEnvironment()
+	local player, cleanupMock = setup()
 
-	-- childPart subscription (descendant of character)
-	local childPartBrios = {}
-	local childPartBrioCount = 0
-	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacterBrio(childPart):Subscribe(function(brio)
-		table.insert(childPartBrios, brio)
-		childPartBrioCount += 1
+	local firstRig, firstChildPart = makeRig()
+	local secondRig, secondChildPart = makeRig()
+	local unrelatedPart = Instance.new("Part")
+
+	local firstChildBrios = {}
+	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacterBrio(firstChildPart):Subscribe(function(brio)
+		table.insert(firstChildBrios, brio)
 	end))
 
-	-- unrelatedPart subscription
+	local secondChildBrios = {}
+	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacterBrio(secondChildPart):Subscribe(function(brio)
+		table.insert(secondChildBrios, brio)
+	end))
+
 	local unrelatedBrioCount = 0
 	maid:GiveTask(RxCharacterUtils.observeIsOfLocalCharacterBrio(unrelatedPart):Subscribe(function(_brio)
 		unrelatedBrioCount += 1
 	end))
 
-	-- Separate subscription to test that destroying a sub kills its brio
 	local cleanupTestBrio = nil
-	local cleanupSub = RxCharacterUtils.observeIsOfLocalCharacterBrio(childPart):Subscribe(function(brio)
+	local cleanupSub = RxCharacterUtils.observeIsOfLocalCharacterBrio(firstChildPart):Subscribe(function(brio)
 		cleanupTestBrio = brio
 	end)
 
@@ -169,48 +136,186 @@ describe("RxCharacterUtils.observeIsOfLocalCharacterBrio", function()
 		maid:Destroy()
 		cleanupSub:Destroy()
 		cleanupMock()
+		unrelatedPart:Destroy()
 	end)
 
-	it("should not emit any brio initially when character is nil", function()
-		expect(childPartBrioCount).toEqual(0)
+	it("should not emit any brio before a spawn", function()
+		expect(#firstChildBrios).toEqual(0)
 		expect(unrelatedBrioCount).toEqual(0)
 	end)
 
-	it("should emit a living brio for descendant when character is set", function()
-		setCharacter(character)
-		expect(childPartBrioCount).toEqual(1)
-		expect(Brio.isBrio(childPartBrios[1])).toEqual(true)
-		expect(childPartBrios[1]:IsDead()).toEqual(false)
-		expect(childPartBrios[1]:GetValue()).toEqual(true)
+	it("should emit a living brio for a descendant of the spawned character", function()
+		PlayerMock.loadCharacterAsync(player, firstRig)
+		expect(#firstChildBrios).toEqual(1)
+		expect(Brio.isBrio(firstChildBrios[1])).toEqual(true)
+		expect(firstChildBrios[1]:IsDead()).toEqual(false)
+		expect(firstChildBrios[1]:GetValue()).toEqual(true)
 	end)
 
-	it("should not emit a brio for unrelated instance when character is set", function()
+	it("should not emit a brio for instances outside the character", function()
 		expect(unrelatedBrioCount).toEqual(0)
+		expect(#secondChildBrios).toEqual(0)
 	end)
 
-	it("should kill the brio when character is cleared", function()
-		local firstBrio = childPartBrios[1]
-		setCharacter(nil)
-		expect(firstBrio:IsDead()).toEqual(true)
-	end)
-
-	it("should emit a new living brio when character is restored", function()
-		setCharacter(character)
-		expect(childPartBrioCount).toEqual(2)
-
-		local secondBrio = childPartBrios[2]
-		expect(Brio.isBrio(secondBrio)).toEqual(true)
-		expect(secondBrio:IsDead()).toEqual(false)
-		expect(secondBrio:GetValue()).toEqual(true)
-		-- Should be a different brio than the first one
-		expect(secondBrio).never.toBe(childPartBrios[1])
-	end)
-
-	it("should kill the brio when subscription is destroyed", function()
+	it("should kill the brio when its subscription is destroyed", function()
 		expect(cleanupTestBrio).never.toBeNil()
 		expect(cleanupTestBrio:IsDead()).toEqual(false)
 		local brioRef = cleanupTestBrio
 		cleanupSub:Destroy()
 		expect(brioRef:IsDead()).toEqual(true)
+	end)
+
+	it("should kill the old part's brio and emit for the new part on respawn", function()
+		PlayerMock.loadCharacterAsync(player, secondRig)
+		expect(firstChildBrios[1]:IsDead()).toEqual(true)
+		expect(#firstChildBrios).toEqual(1) -- the destroyed rig's part never revives
+		expect(#secondChildBrios).toEqual(1)
+		expect(secondChildBrios[1]:IsDead()).toEqual(false)
+		expect(secondChildBrios[1]:GetValue()).toEqual(true)
+	end)
+
+	it("should kill the brio on despawn", function()
+		PlayerMock.removeCharacter(player)
+		expect(secondChildBrios[1]:IsDead()).toEqual(true)
+		expect(#secondChildBrios).toEqual(1)
+	end)
+end)
+
+describe("RxCharacterUtils.observeCharacterBrio through the spawn lifecycle", function()
+	local maid = Maid.new()
+	local player = PlayerMock.new()
+
+	local brios = {}
+	maid:GiveTask(RxCharacterUtils.observeCharacterBrio(player):Subscribe(function(brio)
+		table.insert(brios, brio)
+	end))
+
+	afterAll(function()
+		maid:Destroy()
+		PlayerMock.removeCharacter(player)
+		player:Destroy()
+	end)
+
+	it("emits nothing before the first spawn", function()
+		expect(#brios).toBe(0)
+	end)
+
+	it("emits a living brio holding the character on spawn", function()
+		local rig = PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
+		expect(#brios).toBe(1)
+		expect(brios[1]:IsDead()).toBe(false)
+		expect(brios[1]:GetValue()).toBe(rig)
+	end)
+
+	it("kills the old brio and emits a new one on respawn", function()
+		local rig = PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
+		expect(brios[1]:IsDead()).toBe(true)
+		expect(#brios).toBe(2)
+		expect(brios[2]:IsDead()).toBe(false)
+		expect(brios[2]:GetValue()).toBe(rig)
+	end)
+
+	it("kills the brio with no replacement when the character despawns", function()
+		PlayerMock.removeCharacter(player)
+		expect(brios[2]:IsDead()).toBe(true)
+		expect(#brios).toBe(2)
+	end)
+end)
+
+describe("RxCharacterUtils.observeLastHumanoidBrio across respawns with real rigs", function()
+	local maid = Maid.new()
+	local player = PlayerMock.new()
+
+	local humanoidBrios = {}
+	maid:GiveTask(RxCharacterUtils.observeLastHumanoidBrio(player):Subscribe(function(brio)
+		table.insert(humanoidBrios, brio)
+	end))
+
+	afterAll(function()
+		maid:Destroy()
+		PlayerMock.removeCharacter(player)
+		player:Destroy()
+	end)
+
+	it("emits the humanoid of an engine-built default R15 rig", function()
+		local rig = PlayerMock.loadCharacterAsync(player)
+		expect(#humanoidBrios).toBe(1)
+		expect(humanoidBrios[1]:IsDead()).toBe(false)
+		expect(humanoidBrios[1]:GetValue()).toBe(rig:FindFirstChildOfClass("Humanoid"))
+	end)
+
+	it("swaps to the humanoid of a real avatar appearance on respawn", function()
+		-- Real appearance fetch by userId; verified to work in Open Cloud test runs
+		local rig = Players:CreateHumanoidModelFromUserId(261)
+		PlayerMock.loadCharacterAsync(player, rig)
+
+		expect(humanoidBrios[1]:IsDead()).toBe(true)
+		expect(#humanoidBrios).toBe(2)
+		expect(humanoidBrios[2]:GetValue()).toBe(rig:FindFirstChildOfClass("Humanoid"))
+	end)
+
+	it("kills the humanoid brio when the character despawns", function()
+		PlayerMock.removeCharacter(player)
+		expect(humanoidBrios[2]:IsDead()).toBe(true)
+	end)
+end)
+
+describe("RxCharacterUtils.observeLastAliveHumanoidBrio", function()
+	-- Cloud runs never step the humanoid state machine (Humanoid.Died does not fire even at
+	-- Health=0), so the engine-fired Died->brio-death transition is only observable in a live
+	-- server. These cover the alive path, the dead-at-subscribe path, and death-by-respawn.
+
+	it("emits a living brio for a spawned humanoid with health", function()
+		local player = PlayerMock.new()
+		PlayerMock.loadCharacterAsync(player)
+
+		local brios = {}
+		local sub = RxCharacterUtils.observeLastAliveHumanoidBrio(player):Subscribe(function(brio)
+			table.insert(brios, brio)
+		end)
+
+		expect(#brios).toBe(1)
+		expect(brios[1]:IsDead()).toBe(false)
+
+		sub:Destroy()
+		PlayerMock.removeCharacter(player)
+		player:Destroy()
+	end)
+
+	it("emits nothing when the humanoid is already dead at subscribe", function()
+		local player = PlayerMock.new()
+		local rig = PlayerMock.loadCharacterAsync(player)
+		local humanoid = rig:FindFirstChildOfClass("Humanoid") :: Humanoid
+		humanoid.Health = 0
+
+		local count = 0
+		local sub = RxCharacterUtils.observeLastAliveHumanoidBrio(player):Subscribe(function()
+			count += 1
+		end)
+
+		expect(count).toBe(0)
+
+		sub:Destroy()
+		PlayerMock.removeCharacter(player)
+		player:Destroy()
+	end)
+
+	it("kills the alive brio when the player respawns", function()
+		local player = PlayerMock.new()
+		PlayerMock.loadCharacterAsync(player)
+
+		local brios = {}
+		local sub = RxCharacterUtils.observeLastAliveHumanoidBrio(player):Subscribe(function(brio)
+			table.insert(brios, brio)
+		end)
+		expect(#brios).toBe(1)
+
+		PlayerMock.loadCharacterAsync(player)
+		expect(brios[1]:IsDead()).toBe(true)
+		expect(#brios).toBe(2)
+
+		sub:Destroy()
+		PlayerMock.removeCharacter(player)
+		player:Destroy()
 	end)
 end)

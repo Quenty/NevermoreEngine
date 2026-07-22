@@ -36,6 +36,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
     "@quenty/remotefunctionutils": "workspace:*",

@@ -9,13 +9,15 @@
 local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
-local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local ConstrainedLookCamera = require("ConstrainedLookCamera")
 local GamepadRotateModel = require("GamepadRotateModel")
 local InputObjectUtils = require("InputObjectUtils")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
+local StepUtils = require("StepUtils")
 
 local ConstrainedLookControls = {}
 ConstrainedLookControls.__index = ConstrainedLookControls
@@ -97,22 +99,53 @@ function ConstrainedLookControls.Enable(self: ConstrainedLookControls)
 		end
 	end))
 
-	ContextActionService:BindAction(self._key .. "Drag", function(_, userInputState, inputObject)
+	local function onDragAction(_, userInputState: Enum.UserInputState, inputObject: InputObject)
 		if userInputState == Enum.UserInputState.Begin then
 			self:_beginDrag(inputObject)
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, unpack(self._dragBeginTypes))
+	end
 
-	ContextActionService:BindAction(self._key .. "Rotate", function(_, _, inputObject)
+	local function onRotateAction(_, _, inputObject: InputObject)
 		self._gamepadRotateModel:HandleThumbstickInput(inputObject)
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Thumbstick2)
+	end
 
-	maid:GiveTask(function()
-		ContextActionService:UnbindAction(self._key .. "Drag")
-		ContextActionService:UnbindAction(self._key .. "Rotate")
-	end)
+	-- BindAction is a client-only engine call. With a mock local player designated (headless test
+	-- runs, where there is no input to receive), the actions bind on the mock instead and a test
+	-- dispatches them through [PlayerMock.fireInput].
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		PlayerMock.bindInput(
+			localPlayer,
+			"ContextActionService.BindAction",
+			self._key .. "Drag",
+			onDragAction,
+			false,
+			unpack(self._dragBeginTypes)
+		)
+		PlayerMock.bindInput(
+			localPlayer,
+			"ContextActionService.BindAction",
+			self._key .. "Rotate",
+			onRotateAction,
+			false,
+			Enum.KeyCode.Thumbstick2
+		)
+
+		maid:GiveTask(function()
+			PlayerMock.bindInput(localPlayer, "ContextActionService.UnbindAction", self._key .. "Drag")
+			PlayerMock.bindInput(localPlayer, "ContextActionService.UnbindAction", self._key .. "Rotate")
+		end)
+	else
+		ContextActionService:BindAction(self._key .. "Drag", onDragAction, false, unpack(self._dragBeginTypes))
+		ContextActionService:BindAction(self._key .. "Rotate", onRotateAction, false, Enum.KeyCode.Thumbstick2)
+
+		maid:GiveTask(function()
+			ContextActionService:UnbindAction(self._key .. "Drag")
+			ContextActionService:UnbindAction(self._key .. "Rotate")
+		end)
+	end
 
 	maid:GiveTask(function()
 		self._camera:Release()
@@ -196,8 +229,12 @@ function ConstrainedLookControls._handleGamepadRotateStart(self: ConstrainedLook
 
 	local maid = Maid.new()
 
-	maid:GiveTask(RunService.Stepped:Connect(function()
-		local deltaAngle = self._gamepadSensitivity * self._gamepadRotateModel:GetThumbstickDeltaAngle()
+	maid:GiveTask(StepUtils.getRenderStepSignal():Connect(function(deltaTime: number)
+		-- Sensitivity is tuned per-60Hz-frame; scale by deltaTime * 60 so rotation speed is
+		-- framerate independent without changing the units of GAMEPAD_SENSITIVITY.
+		local deltaAngle = self._gamepadSensitivity
+			* (deltaTime * 60)
+			* self._gamepadRotateModel:GetThumbstickDeltaAngle()
 		self._camera:RotateXY(deltaAngle)
 	end))
 

@@ -1,12 +1,5 @@
 --!nonstrict
 --[[
-	Deep characterization of the session-lock state machine (DataStoreLockHelper) and the
-	cross-server scenarios it governs: validate/invalidate a lock, steal a crashed session's lock,
-	block a live session, and prevent data duplication when a session is stolen. Two servers are
-	modeled as two DataStore objects sharing one DataStoreMock, with distinct SessionIds. The
-	blocking cases assume RunService:IsStudio() == false (true in the cloud test runner); in Studio,
-	ALWAYS_STEAL_LOCKS_IN_STUDIO makes every foreign lock stealable.
-
 	@class DataStoreSessionLock.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -27,7 +20,6 @@ local function foreignSession(sessionId: string?)
 	}
 end
 
--- Builds a stored profile locked by an arbitrary session.
 local function lockedBy(session, lastUpdateTime: number?, data: { [string]: any }?)
 	local profile = {}
 	if data then
@@ -98,7 +90,6 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time() - 700, { coins = 9 }), false)
 		expect(result.isValid).toEqual(true)
 		expect(result.stolenLockFromSession.SessionId).toEqual("foreign-session-id")
-		-- The crashed session's data survives the steal.
 		expect(result.unlockedProfile.coins).toEqual(9)
 		controller:destroy()
 	end)
@@ -274,14 +265,12 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 	it("blocks a new session's load while another session holds a fresh lock", function()
 		local controller = DataStoreTestUtils.setup()
 
-		-- A fresh, live foreign lock is present in the datastore.
 		controller.mock:SetRaw("player_1", lockedBy(foreignSession(), os.time(), { coins = 1 }))
 
 		local dataStore = controller.newDataStore()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
-		-- The load is legitimately blocked (retrying to acquire), so it must NOT settle quickly.
 		local promise = dataStore:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(promise, 3)).toEqual(false)
 
@@ -289,12 +278,8 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 	end)
 
 	it("acquires the lock once the holding session releases it (retry resolves genuine contention)", function()
-		-- GUARD for the load-hang fix: a blocked load must still RESOLVE via retry when the holder
-		-- releases -- only genuine op FAILURES should fail fast, not lock contention (a successful op
-		-- that returns a locked profile).
 		local controller = DataStoreTestUtils.setup()
 
-		-- Session A acquires and holds the lock.
 		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
@@ -306,8 +291,6 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		end
 		expect((loadA:Yield())).toEqual(true)
 
-		-- Session B starts loading; A's fresh lock blocks it, so B is retrying (not yet settled). Use a
-		-- tiny retry backoff so the test exercises the retry quickly instead of the ~6.5s production one.
 		local sessionB = controller.newDataStore()
 		sessionB:SetSessionLockingEnabled(true)
 		sessionB:SetUserIdList({ 1 })
@@ -315,7 +298,6 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local loadB = sessionB:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(loadB, 0.5)).toEqual(false)
 
-		-- A releases the lock; B's next retry attempt should acquire it and the load resolves.
 		local closeA = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closeA, 10) then
 			expect("A close hung").toEqual("A close settled")
@@ -348,10 +330,8 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		end
 		expect((loadA:Yield())).toEqual(true)
 
-		-- Another live session steals the lock and writes its own value directly into the datastore.
 		controller.mock:SetRaw("player_1", lockedBy(foreignSession("winner-session"), os.time(), { coins = 20 }))
 
-		-- Session A tries to save its own (now-orphaned) change.
 		sessionA:Store("coins", 10)
 		local saveA = sessionA:Save()
 		if not PromiseTestUtils.awaitSettled(saveA, 10) then
@@ -360,8 +340,6 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 			return
 		end
 
-		-- A's write was cancelled, so the datastore still holds the winner's data -- not A's, and not
-		-- a merged/duplicated mix.
 		local raw = controller.mock:GetRaw("player_1")
 		expect(raw.coins).toEqual(20)
 		expect(raw.lock.ActiveSession.SessionId).toEqual("winner-session")
@@ -387,8 +365,6 @@ describe("session lock edge cases and failure modes", function()
 		end
 		expect((first:Yield())).toEqual(true)
 
-		-- The load is cached (_firstLoadPromise), so exactly one UpdateAsync acquires the lock -- a
-		-- second acquire would risk two "owners" of the session.
 		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(1)
 
 		controller:destroy()
@@ -419,8 +395,6 @@ describe("session lock edge cases and failure modes", function()
 			return
 		end
 
-		-- No corruption/duplication: the stored value is a valid number still owned by us, and the
-		-- last staged value won.
 		local raw = controller.mock:GetRaw("player_1")
 		expect(type(raw.coins)).toEqual("number")
 		expect(raw.coins).toEqual(2)
@@ -432,14 +406,9 @@ end)
 
 describe("why session locking exists (unlocked stores can duplicate)", function()
 	it("allows item duplication under a read-before-store race, without session locking", function()
-		-- The classic dupe that session locking prevents: two servers load the same profile, one
-		-- trades an item away and saves, but the other loaded BEFORE that save (or is a crashed
-		-- server's stale session) and writes its stale view back -- restoring the traded-away item.
-		-- This is EXPECTED behavior for unlocked stores; it is the whole motivation for locking.
 		local controller = DataStoreTestUtils.setup()
 		controller.mock:SetRaw("player_1", { items = { "rare_sword" } })
 
-		-- Two servers, NO session locking, both load the same starting state (B reads before A stores).
 		local serverA = controller.newDataStore()
 		local serverB = controller.newDataStore()
 
@@ -453,7 +422,6 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		expect((aLoad:Wait())).toEqual({ "rare_sword" })
 		expect((bLoad:Wait())).toEqual({ "rare_sword" })
 
-		-- Server A: the player trades the sword away, and A saves it gone.
 		serverA:Store("items", {})
 		if not PromiseTestUtils.awaitSettled(serverA:Save(), 5) then
 			expect("A save hung").toEqual("A save settled")
@@ -462,7 +430,6 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		end
 		expect(controller.mock:GetRaw("player_1").items).toEqual({})
 
-		-- Server B still holds the stale sword and writes it back on its own save.
 		serverB:Store("items", { "rare_sword" })
 		if not PromiseTestUtils.awaitSettled(serverB:Save(), 5) then
 			expect("B save hung").toEqual("B save settled")
@@ -470,7 +437,6 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 			return
 		end
 
-		-- The traded-away sword is back: duplicated. An unlocked store cannot prevent this.
 		expect(controller.mock:GetRaw("player_1").items).toEqual({ "rare_sword" })
 
 		controller:destroy()

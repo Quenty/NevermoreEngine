@@ -1,13 +1,5 @@
 --!strict
 --[[
-	Coverage for BoundAncestorTracker, which exposes the bound class of a child's nearest bound
-	ancestor.
-
-	The binder is booted through a ServiceBag; the tracker is a plain BaseObject constructed
-	directly. Instances live under a workspace container so ancestry and CollectionService signals
-	fire. Ancestry changes and late binds are awaited event-driven via the tracker's Class.Changed
-	signal rather than a fixed sleep.
-
 	@class BoundAncestorTracker.spec.lua
 ]]
 
@@ -108,68 +100,68 @@ end
 
 describe("BoundAncestorTracker tracking", function()
 	it("exposes the nearest bound ancestor's class", function()
-		local env = setup()
+		local controller = setup()
 
-		local grandparent = env.newInstance()
-		local parent = env.newInstance(grandparent)
-		local child = env.newInstance(parent)
-		env.binder:Tag(grandparent)
-		env.boot()
+		local grandparent = controller.newInstance()
+		local parent = controller.newInstance(grandparent)
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(grandparent)
+		controller.boot()
 
-		local tracker = env.track(BoundAncestorTracker.new(env.binder, child))
-		expect(tracker.Class.Value).toEqual(env.binder:Get(grandparent))
+		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
+		expect(tracker.Class.Value).toEqual(controller.binder:Get(grandparent))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("has no value when no ancestor is bound", function()
-		local env = setup()
+		local controller = setup()
 
-		local parent = env.newInstance()
-		local child = env.newInstance(parent)
-		env.boot()
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.boot()
 
-		local tracker = env.track(BoundAncestorTracker.new(env.binder, child))
+		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("updates when an ancestor becomes bound", function()
-		local env = setup()
+		local controller = setup()
 
 		-- The tracker resolves ancestors above the child's direct parent, so bind the grandparent.
-		local ancestor = env.newInstance()
-		local parent = env.newInstance(ancestor)
-		local child = env.newInstance(parent)
-		env.boot()
+		local ancestor = controller.newInstance()
+		local parent = controller.newInstance(ancestor)
+		local child = controller.newInstance(parent)
+		controller.boot()
 
-		local tracker = env.track(BoundAncestorTracker.new(env.binder, child))
+		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toBeNil()
 
-		env.binder:Tag(ancestor)
-		local value = env.awaitChange(tracker, nil)
-		expect(value).toEqual(env.binder:Get(ancestor))
+		controller.binder:Tag(ancestor)
+		local value = controller.awaitChange(tracker, nil)
+		expect(value).toEqual(controller.binder:Get(ancestor))
 
-		env.destroy()
+		controller.destroy()
 	end)
 
 	it("clears the value when the child leaves the bound ancestry", function()
-		local env = setup()
+		local controller = setup()
 
-		local ancestor = env.newInstance()
-		local parent = env.newInstance(ancestor)
-		local child = env.newInstance(parent)
-		env.binder:Tag(ancestor)
-		env.boot()
+		local ancestor = controller.newInstance()
+		local parent = controller.newInstance(ancestor)
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(ancestor)
+		controller.boot()
 
-		local tracker = env.track(BoundAncestorTracker.new(env.binder, child))
-		local class = env.binder:Get(ancestor)
+		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
+		local class = controller.binder:Get(ancestor)
 		expect(tracker.Class.Value).toEqual(class)
 
-		child.Parent = env.container
-		expect(env.awaitChange(tracker, class)).toBeNil()
+		child.Parent = controller.container
+		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		env.destroy()
+		controller.destroy()
 	end)
 end)

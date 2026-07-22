@@ -18,6 +18,7 @@ local Observable = require("Observable")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local PlayerAssetMarketTrackerInterface = require("PlayerAssetMarketTrackerInterface")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
@@ -98,6 +99,18 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 		MarketplaceService:PromptBundlePurchase(self._player, bundleId)
 	end))
 	self._maid:GiveTask(pass.ShowPromptRequested:Connect(function(gamePassId)
+		if PlayerMock.isMock(self._player) then
+			-- The engine cannot prompt a mock; answer a frame later with the decision injected
+			-- through [PlayerMock.writeLookup] (default: declined), routed through the same
+			-- handler the engine's PromptGamePassPurchaseFinished would reach.
+			local isPurchased =
+				PlayerMock.readLookup(self._player, "MarketplaceService.PromptGamePassPurchase", gamePassId)
+			self._maid:GiveTask(task.defer(function()
+				(self :: any):_handleGamePassPromptFinished(gamePassId, isPurchased)
+			end))
+			return
+		end
+
 		MarketplaceService:PromptGamePassPurchase(self._player, gamePassId)
 	end))
 	self._maid:GiveTask(product.ShowPromptRequested:Connect(function(productId)
@@ -124,7 +137,11 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 
 	-- Configure gamepass to be a bit special
 	passOwnership:SetQueryOwnershipCallback(function(gamePassId)
-		return MarketplaceUtils.promiseUserOwnsGamePass(self._player.UserId, gamePassId)
+		local userId = if PlayerMock.isMock(self._player)
+			then PlayerMock.read(self._player, "UserId")
+			else self._player.UserId
+
+		return MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)
 	end)
 
 	-- Configure assets too
@@ -145,7 +162,10 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 	end)
 
 	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
-		return Promise.resolved(self._player.MembershipType == membershipType)
+		local playerMembershipType = if PlayerMock.isMock(self._player)
+			then PlayerMock.read(self._player, "MembershipType")
+			else self._player.MembershipType
+		return Promise.resolved(playerMembershipType == membershipType)
 	end)
 
 	-- Paid-access game ownership is queried through PlayerOwnsAssetAsync
@@ -154,6 +174,25 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 	end)
 
 	return self
+end
+
+--[=[
+	Applies a gamepass prompt result to this realm's tracker, exactly as the engine's
+	PromptGamePassPurchaseFinished handler would. Only invoked for a [PlayerMock] (see the
+	ShowPromptRequested mock branch); [PlayerProductManagerClient] overrides this to also
+	forward the result to the server over remoting, matching its engine handler.
+
+	@param gamePassId number
+	@param isPurchased boolean
+]=]
+function PlayerProductManagerBase._handleGamePassPromptFinished(
+	self: PlayerProductManagerBase,
+	gamePassId: number,
+	isPurchased: boolean
+)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS) :: any
+	tracker:HandlePromptClosedEvent(gamePassId)
+	tracker:HandlePurchaseEvent(gamePassId, isPurchased)
 end
 
 function PlayerProductManagerBase.ExportMarketTrackers(self: PlayerProductManagerBase, parent)

@@ -20,9 +20,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- Builds a ServiceBag with a mock-injected PlayerDataStoreService, owned by a Maid so destroy() tears
--- down the service (and the session-locked stores its manager owns), mirroring how the save-slot
--- system resolves a player's datastore. Read controller.mock to seed or fail the datastore.
 local function setup(mock)
 	local maid = Maid.new()
 	mock = mock or DataStoreMock.new()
@@ -42,7 +39,6 @@ local function setup(mock)
 	}
 end
 
--- Resolves the session-locked datastore for a userId (bounded); returns nil on failure to settle.
 local function resolveDataStore(playerDataStoreService, userId)
 	local promise = playerDataStoreService:PromiseDataStore(userId)
 	if not PromiseTestUtils.awaitSettled(promise, 10) then
@@ -94,7 +90,6 @@ describe("save slot load flow (healthy datastore)", function()
 		local dataStore = resolveDataStore(controller.playerDataStoreService, 1)
 		expect(dataStore).never.toBeNil()
 
-		-- Slot stores live at SaveSlots.slots.<slotId>, matching HasSaveSlots._getSlotStore.
 		local slotStore = dataStore
 			:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
 			:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY)
@@ -135,7 +130,6 @@ describe("save slot load flow (datastore down)", function()
 		local dataStore = resolveDataStore(controller.playerDataStoreService, 1)
 		expect(dataStore).never.toBeNil()
 
-		-- The first actual read (loading slot metadata) triggers the session-locked load.
 		local metadataStore =
 			dataStore:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY):GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
 

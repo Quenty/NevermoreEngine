@@ -1,10 +1,5 @@
 --!nonstrict
 --[[
-	How a misbehaving removing callback affects (a) whether the player's data is saved on leave, and
-	(b) whether the session lock is released. SaveAndCloseSession is what releases the lock, so when
-	it is skipped the departing session's lock lingers until it goes stale. Several of these are
-	genuine data-integrity failure modes, so pinning them documents the contract callers must honor.
-
 	@class PlayerDataStoreManager.RemovalCallbacks.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -32,7 +27,6 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			local raw = controller.mock:GetRaw("user_1")
 			return raw ~= nil and raw.coins == 5
 		end, 10)).toEqual(true)
-		-- SaveAndCloseSession stripped the lock as it wrote.
 		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
 
 		controller:destroy()
@@ -48,8 +42,6 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 			controller.manager:RemovePlayerDataStore(1)
 
-			-- The rejected callback short-circuits PromiseUtils.all before SaveAndCloseSession: coins are
-			-- never persisted, and the lock is never released.
 			expect(PromiseTestUtils.awaitValue(function()
 				local raw = controller.mock:GetRaw("user_1")
 				return raw ~= nil and raw.coins == 5
@@ -67,7 +59,6 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 
-			-- There is no pcall around removing callbacks, so a synchronous throw escapes removal entirely.
 			expect(function()
 				controller.manager:RemovePlayerDataStore(1)
 			end).toThrow("removing callback boom")
@@ -85,8 +76,6 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 			controller.manager:RemovePlayerDataStore(1)
 
-			-- SaveAndCloseSession is gated behind the yielding callback, so neither the save nor the lock
-			-- release ever happen.
 			expect(PromiseTestUtils.awaitValue(function()
 				local raw = controller.mock:GetRaw("user_1")
 				return raw ~= nil and raw.coins == 5

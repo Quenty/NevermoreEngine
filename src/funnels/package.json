@@ -32,6 +32,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
     "@quenty/loader": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/propertyvalue": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*"

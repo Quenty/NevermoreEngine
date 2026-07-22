@@ -8,9 +8,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AttributeValue = require("AttributeValue")
-
 local Players = game:GetService("Players")
+
+local AttributeValue = require("AttributeValue")
+local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
 local RagdollServiceClient = {}
@@ -44,7 +45,8 @@ function RagdollServiceClient.Init(self: RagdollServiceClient, serviceBag: Servi
 	self._serviceBag:GetService((require :: any)("RagdollCameraShakeClient"))
 	self._serviceBag:GetService((require :: any)("RagdollBindersClient"))
 
-	self._screenShakeEnabled = AttributeValue.new(Players.LocalPlayer, "RagdollScreenShakeEnabled", true)
+	local localPlayer = assert(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer(), "No local player")
+	self._screenShakeEnabled = AttributeValue.new(localPlayer, "RagdollScreenShakeEnabled", true)
 end
 
 --[=[

@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local UserService = game:GetService("UserService")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local UserServiceUtils = {}
@@ -42,16 +43,33 @@ function UserServiceUtils.promiseUserInfosByUserIds(userIds: { number }): Promis
 	assert(type(userIds) == "table", "Bad userIds")
 
 	return Promise.spawn(function(resolve, reject)
-		local userInfos
-		local ok, err = pcall(function()
-			userInfos = UserService:GetUserInfosByUserIdsAsync(userIds)
-		end)
-		if not ok then
-			return reject(err)
+		local userInfos = {}
+		local remainingUserIds = {}
+		for _, userId in userIds do
+			local mockPlayer = PlayerMock.getMockByUserId(userId)
+			if mockPlayer ~= nil then
+				table.insert(userInfos, PlayerMock.readLookup(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0))
+			else
+				table.insert(remainingUserIds, userId)
+			end
 		end
 
-		if type(userInfos) ~= "table" then
-			return reject("Failed to get an array of user infos back")
+		if #remainingUserIds > 0 then
+			local engineUserInfos
+			local ok, err = pcall(function()
+				engineUserInfos = UserService:GetUserInfosByUserIdsAsync(remainingUserIds)
+			end)
+			if not ok then
+				return reject(err)
+			end
+
+			if type(engineUserInfos) ~= "table" then
+				return reject("Failed to get an array of user infos back")
+			end
+
+			for _, userInfo in engineUserInfos do
+				table.insert(userInfos, userInfo)
+			end
 		end
 
 		return resolve(userInfos)

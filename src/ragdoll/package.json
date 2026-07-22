@@ -45,6 +45,7 @@
     "@quenty/motor6d": "workspace:*",
     "@quenty/physicsutils": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/qframe": "workspace:*",
     "@quenty/r15utils": "workspace:*",

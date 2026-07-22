@@ -929,6 +929,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/qframe':
         specifier: workspace:*
         version: link:../qframe
@@ -941,6 +944,9 @@ importers:
       '@quenty/spring':
         specifier: workspace:*
         version: link:../spring
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
@@ -1025,6 +1031,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -1516,12 +1525,21 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
       '@quenty/symbol':
         specifier: workspace:*
         version: link:../symbol
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/coreguiutils:
     dependencies:
@@ -1597,6 +1615,9 @@ importers:
       '@quenty/pagesutils':
         specifier: workspace:*
         version: link:../pagesutils
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -1972,12 +1993,24 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/pagesutils':
+        specifier: workspace:*
+        version: link:../pagesutils
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/functionutils: {}
 
@@ -1995,6 +2028,9 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/propertyvalue':
         specifier: workspace:*
         version: link:../propertyvalue
@@ -2154,9 +2190,15 @@ importers:
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
+      '@quenty/permissionprovider':
+        specifier: workspace:*
+        version: link:../permissionprovider
       '@quenty/playerbinder':
         specifier: workspace:*
         version: link:../playerbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -2187,6 +2229,9 @@ importers:
       '@quenty/statestack':
         specifier: workspace:*
         version: link:../statestack
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/string':
         specifier: workspace:*
         version: link:../string
@@ -2293,9 +2338,18 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/guitriangle: {}
 
@@ -2535,18 +2589,30 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/humanoidutils:
     dependencies:
@@ -2987,12 +3053,21 @@ importers:
       '@quenty/memoize':
         specifier: workspace:*
         version: link:../memoize
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/math: {}
 
@@ -3342,9 +3417,15 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/particleengine:
     dependencies:
@@ -3438,6 +3519,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -3481,6 +3565,24 @@ importers:
         specifier: workspace:*
         version: link:../table
 
+  src/player-mock:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/playerbinder:
     dependencies:
       '@quenty/binder':
@@ -3489,12 +3591,27 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/playerhumanoidbinder:
     dependencies:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
       '@quenty/humanoidtracker':
         specifier: workspace:*
         version: link:../humanoidtracker
@@ -3504,12 +3621,24 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/playerinputmode:
     dependencies:
@@ -3531,6 +3660,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -3555,18 +3687,36 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/playerthumbnailutils:
     dependencies:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/playerutils:
     dependencies:
@@ -3639,9 +3789,15 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/promptqueue:
     dependencies:
@@ -3828,6 +3984,9 @@ importers:
       '@quenty/playerhumanoidbinder':
         specifier: workspace:*
         version: link:../playerhumanoidbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -3917,6 +4076,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -3989,6 +4151,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -4392,6 +4557,9 @@ importers:
       '@quenty/playerbinder':
         specifier: workspace:*
         version: link:../playerbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -4629,9 +4797,15 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/setmechanismcframe:
     dependencies:
@@ -4692,6 +4866,9 @@ importers:
       '@quenty/playerbinder':
         specifier: workspace:*
         version: link:../playerbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils
@@ -5212,7 +5389,17 @@ importers:
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
 
-  src/string: {}
+  src/string:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/sunpositionutils:
     dependencies:
@@ -5283,6 +5470,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -5711,6 +5901,9 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -5764,6 +5957,12 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -5773,6 +5972,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/utf8: {}
 

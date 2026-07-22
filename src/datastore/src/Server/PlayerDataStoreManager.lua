@@ -59,6 +59,7 @@ local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local ServiceBag = require("ServiceBag")
@@ -290,13 +291,17 @@ function PlayerDataStoreManager._promiseWaitForRemoving(
 end
 
 function PlayerDataStoreManager:_toPlayerUserIdOrError(playerOrUserId: Player | PlayerUserId): PlayerUserId
-	if typeof(playerOrUserId) == "Instance" and playerOrUserId:IsA("Player") then
-		return playerOrUserId.UserId
-	elseif type(playerOrUserId) == "number" then
+	if type(playerOrUserId) == "number" then
 		return playerOrUserId :: PlayerUserId
-	else
-		error("Bad playerOrUserId")
 	end
+
+	assert(
+		typeof(playerOrUserId) == "Instance" and (playerOrUserId:IsA("Player") or PlayerMock.isMock(playerOrUserId)),
+		"Bad playerOrUserId"
+	)
+	return (
+		if PlayerMock.isMock(playerOrUserId) then PlayerMock.read(playerOrUserId, "UserId") else playerOrUserId.UserId
+	) :: PlayerUserId
 end
 
 --[=[

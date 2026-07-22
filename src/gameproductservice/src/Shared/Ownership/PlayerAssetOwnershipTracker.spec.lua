@@ -2,7 +2,7 @@
 --[[
 	Unit coverage for PlayerAssetOwnershipTracker. The tracker is constructed directly with a fake
 	config picker (key -> id lookup) and a fake market tracker exposing only a Purchased signal, so
-	no ServiceBag, GameConfig, or real MarketplaceService is involved. A plain Folder stands in for
+	no ServiceBag, GameConfig, or real MarketplaceService is involved. A PlayerMock stands in for
 	the player because the tracker only stores the player, never reads properties off it in the code
 	paths under test. Each test destroys everything it creates so nothing leaks into the shared test
 	place.
@@ -17,6 +17,7 @@ local GameConfigPicker = require("GameConfigPicker")
 local Jest = require("Jest")
 local Observable = require("Observable")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
+local PlayerMock = require("PlayerMock")
 local PlayerProductOwnershipOverrideUtils = require("PlayerProductOwnershipOverrideUtils")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -38,7 +39,6 @@ local function toId(idOrKey)
 	return KEY_TO_ID[idOrKey]
 end
 
--- Minimal GameConfigPicker stand-in covering the two methods the tracker calls.
 local function makeConfigPicker()
 	return {
 		ToAssetId = function(_self, _assetType, idOrKey)
@@ -66,7 +66,7 @@ end
 local function setup()
 	local purchased = Signal.new()
 	local marketTracker = { Purchased = purchased }
-	local player = Instance.new("Folder")
+	local player = PlayerMock.new()
 	player.Name = "FakePlayer"
 
 	local tracker = PlayerAssetOwnershipTracker.new(
@@ -168,7 +168,6 @@ describe("PlayerAssetOwnershipTracker:SetOwnership()", function()
 
 	it("should ignore an unknown key without erroring", function()
 		local context = setup()
-		-- Should warn and no-op rather than throw.
 		context.tracker:SetOwnership("doesNotExist", true)
 		context.destroy()
 	end)
@@ -429,7 +428,6 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 
 	it("should ignore an override for an unknown key without erroring", function()
 		local context = setup()
-		-- Should warn and no-op rather than throw.
 		context.tracker:SetOwnershipOverride("doesNotExist", true)
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("doesNotExist"), 5)
@@ -511,13 +509,11 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 	end
 
 	it("should apply an override already present when a new tracker binds to the same player", function()
-		local player = Instance.new("Folder")
+		local player = PlayerMock.new()
 
-		-- The "server" tracker authors the override, writing the replicated attribute.
 		local serverTracker, destroyServer = makeTracker(player)
 		serverTracker:SetOwnershipOverride("swordKey", true)
 
-		-- The "client" tracker binds later over the same (replicated) player attribute.
 		local clientTracker, destroyClient = makeTracker(player)
 		local promise = clientTracker:PromiseOwnsAsset("swordKey")
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
@@ -530,7 +526,7 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 	end)
 
 	it("should apply a false override present at bind time even when the cloud query owns", function()
-		local player = Instance.new("Folder")
+		local player = PlayerMock.new()
 
 		local serverTracker, destroyServer = makeTracker(player)
 		serverTracker:SetOwnershipOverride("swordKey", false)
@@ -550,7 +546,7 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 	end)
 
 	it("should not write the attribute for an unknown key", function()
-		local player = Instance.new("Folder")
+		local player = PlayerMock.new()
 		local tracker, destroy = makeTracker(player)
 
 		tracker:SetOwnershipOverride("doesNotExist", true)
@@ -561,7 +557,7 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 	end)
 
 	it("should remove the attribute once the only override is cleared", function()
-		local player = Instance.new("Folder")
+		local player = PlayerMock.new()
 		local tracker, destroy = makeTracker(player)
 
 		tracker:SetOwnershipOverride("swordKey", true)

@@ -1,12 +1,6 @@
 --!strict
 --[[
 	@class RogueProperty.spec.lua
-
-	Integration coverage for real RogueProperty / RoguePropertyTable usage.
-
-	Waiting is event-driven, never a fixed sleep: binding is awaited through the binder's
-	`:Promise(inst):Yield()`, and reactive recomputation through an observable-to-promise
-	that resolves on the first emission matching a predicate.
 ]]
 
 local require = require(script.Parent.loader).load(script)
@@ -82,13 +76,10 @@ local function setup()
 		return definition:GetPropertyTable(serviceBag, adornee), adornee
 	end
 
-	-- Reads/writes a modifier's Order/Enabled/Source data off the created modifier instance.
 	local function modifierData(modifier)
 		return RoguePropertyModifierData:Create(modifier)
 	end
 
-	-- Returns once the modifier instance has been bound (its Tie implemented), so it is
-	-- visible to GetRogueModifiers and the reactive pipeline.
 	local function awaitBound(binder, modifier)
 		local ok = binder:Promise(modifier):Yield()
 		assert(ok, "Modifier instance was never bound")
@@ -110,7 +101,6 @@ local function setup()
 		return awaitBound(setterBinder, modifier)
 	end
 
-	-- Resolves with the first value the observable emits that satisfies the predicate.
 	local function awaitValue(observable, predicate)
 		local ok, value = Rx.toPromise((observable :: any):Pipe({
 			Rx.where(predicate),
@@ -472,7 +462,6 @@ describe("RoguePropertyTable array reactiveness", function()
 	it("should re-emit array values after a replacement", function()
 		local controller = setup()
 		local properties = controller.newArrayStats()
-		-- Prime the subscription at the default length.
 		controller.awaitValue(properties.Numbers:Observe(), function(v)
 			return type(v) == "table" and #v == 3
 		end)
@@ -495,7 +484,6 @@ describe("RoguePropertyTable scalar array serialization forms", function()
 		local controller = setup()
 		local properties = controller.newArrayStats()
 		local container = properties.Numbers:GetContainer()
-		-- Fresh init already serializes the defaults as attributes; overwrite a couple.
 		container:SetAttribute(RoguePropertyArrayUtils.getNameFromIndex(1), 11)
 		container:SetAttribute(RoguePropertyArrayUtils.getNameFromIndex(2), 22)
 
@@ -511,7 +499,6 @@ describe("RoguePropertyTable scalar array serialization forms", function()
 		local controller = setup()
 		local properties = controller.newArrayStats()
 		local container = properties.Numbers:GetContainer()
-		-- Simulate a game that serialized the elements as ValueBase instances.
 		for i, v in { 77, 88, 99 } do
 			local name = RoguePropertyArrayUtils.getNameFromIndex(i)
 			container:SetAttribute(name, RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE)
@@ -611,7 +598,6 @@ describe("RogueProperty modifier ordering", function()
 		controller.addAdditive(health, 10, adornee) -- Order 1
 		controller.addMultiplier(health, 2, adornee) -- Order 2
 
-		-- (100 + 10) * 2
 		expect(health.Value).toEqual(220)
 		controller:destroy()
 	end)
@@ -624,10 +610,8 @@ describe("RogueProperty modifier ordering", function()
 		local additive = controller.addAdditive(health, 10, adornee)
 		controller.addMultiplier(health, 2, adornee) -- Order 2
 
-		-- Push the additive after the multiplier.
 		controller.modifierData(additive).Order.Value = 5
 
-		-- 100 * 2 + 10
 		expect(health.Value).toEqual(210)
 		controller:destroy()
 	end)
@@ -641,7 +625,6 @@ describe("RogueProperty modifier ordering", function()
 		controller.addAdditive(health, 10, adornee) -- Order 1
 		controller.addMultiplier(health, 2, adornee) -- Order 2
 
-		-- setter -> 50, +10 -> 60, *2 -> 120
 		expect(health.Value).toEqual(120)
 		controller:destroy()
 	end)
@@ -757,8 +740,3 @@ describe("RogueProperty reactiveness", function()
 		controller:destroy()
 	end)
 end)
-
--- Per-implementation modifier unit tests (surface + math in isolation) live next to each
--- implementation: RogueMultiplier.spec, RogueAdditive.spec, RogueSetter.spec,
--- RogueModifierBase.spec. The modifier tests here exercise the integration path (binder ->
--- construct -> read through a RogueProperty).

@@ -27,9 +27,8 @@ local OTHER_USER_ID = 222
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local service = (
+	local service: TeleportDataServiceClient.TeleportDataServiceClient =
 		serviceBag:GetService(TeleportDataServiceClient) :: any
-	) :: TeleportDataServiceClient.TeleportDataServiceClient
 	serviceBag:Init()
 
 	-- Stand in a fixed local UserId: a headless client has no Players.LocalPlayer to key the slice by.
@@ -123,7 +122,6 @@ describe("TeleportDataServiceClient band separation", function()
 	it("reads the trusted band pulled from the server", function()
 		local controller = setup()
 
-		-- Local band is a superset; the trusted band (server-authored subset) is pulled separately.
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ region = "us", slot = "client" })
 		controller.service:SetTrustedArrivedTeleportDataForTesting({ region = "us" })
 
@@ -169,7 +167,6 @@ describe("TeleportDataServiceClient band separation", function()
 
 		expect(controller.await(controller.service:PromiseTrustedArrivedData())).toBeNil()
 		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted("slot"))).toEqual(false)
-		-- ...but the unified read still surfaces it as a request.
 		expect(controller.await(controller.service:PromiseArrivedValue("slot"))).toEqual("client")
 
 		controller:destroy()
@@ -184,7 +181,6 @@ describe("TeleportDataServiceClient build API (symmetric with the server)", func
 			return { slot = "built" }
 		end)
 
-		-- A fake local player carrying the fixed UserId; the builder keys off the injected resolver.
 		local fakeLocalPlayer = ({ UserId = LOCAL_USER_ID } :: any) :: Player
 		local built = controller.service:BuildTeleportData({ fakeLocalPlayer })
 
@@ -198,7 +194,7 @@ describe("TeleportDataServiceClient inject-before-read invariant", function()
 	it("rejects injecting the local band after a read", function()
 		local controller = setup()
 
-		controller.service:PromiseArrivedData() -- reads (resolves to nil headless)
+		controller.service:PromiseArrivedData()
 
 		expect(function()
 			controller.service:SetNonTrustedArrivedTeleportDataForTesting({ slot = "a" })
@@ -210,7 +206,7 @@ describe("TeleportDataServiceClient inject-before-read invariant", function()
 	it("rejects injecting the trusted band after a read", function()
 		local controller = setup()
 
-		controller.service:PromiseArrivedData() -- reads
+		controller.service:PromiseArrivedData()
 
 		expect(function()
 			controller.service:SetTrustedArrivedTeleportDataForTesting({ region = "us" })

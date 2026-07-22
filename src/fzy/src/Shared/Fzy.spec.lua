@@ -235,7 +235,6 @@ end)
 
 describe("filtering", function()
 	it("repeats application of hasMatch and positions", function()
-		-- compare the result of `filter` with repeated calls to `positions`
 		local function check_filter(needle: string, haystacks: { string }, case: boolean?)
 			local result = (Fzy.filter :: any)(config, needle, haystacks, case)
 			local r = 0

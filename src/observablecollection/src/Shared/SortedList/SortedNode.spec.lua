@@ -112,7 +112,6 @@ describe("SortedNode", function()
 			second.value = 1
 			root = root:InsertNode(second)
 
-			-- Both should be present
 			expect(root.descendantCount).toEqual(2)
 
 			local result = {}
@@ -276,7 +275,6 @@ describe("SortedNode", function()
 	describe("NeedsToMove", function()
 		it("should return false when value stays valid relative to neighbors", function()
 			local root, nodes = buildTree({ 1, 3, 5 })
-			-- nodes[2] = "c" (value=3), between 1 and 5
 
 			expect(nodes[2]:NeedsToMove(root, 2)).toEqual(false)
 			expect(nodes[2]:NeedsToMove(root, 4)).toEqual(false)
@@ -285,7 +283,6 @@ describe("SortedNode", function()
 		it("should return true when value violates parent constraint", function()
 			local root, nodes = buildTree({ 1, 3, 5 })
 
-			-- Try to move "a" (value=1, leftmost) past its parent
 			expect(nodes[1]:NeedsToMove(root, 100)).toEqual(true)
 		end)
 
@@ -371,7 +368,6 @@ describe("SortedNode", function()
 				table.insert(result, node.data)
 			end
 
-			-- -2 means up to second-to-last (index 4)
 			expect(result).toEqual({ "a", "b", "c", "d" })
 		end)
 
@@ -410,7 +406,6 @@ describe("SortedNode", function()
 		it("should maintain sorted order through a sequence of inserts and removes", function()
 			local root, nodes = buildTree({ 5, 2, 8, 1, 3, 7, 9 })
 
-			-- Remove some internal nodes
 			root = root:RemoveNode(nodes[3]) -- value=8
 			root = root:RemoveNode(nodes[4]) -- value=1
 
@@ -423,25 +418,18 @@ describe("SortedNode", function()
 		end)
 
 		it("should maintain sorted order when swapping two nodes' values via remove-reinsert", function()
-			-- Simulates what ObservableSortedList does when two sort values swap:
-			-- Tree: a(1), b(2), c(3), d(4), e(5)
-			-- Swap B(2→4) and D(4→2)
-			-- Expected result: a(1), d(2), c(3), b(4), e(5)
 			local root, nodes = buildTree({ 1, 2, 3, 4, 5 })
 			local nodeB = nodes[2] -- data="b", value=2
 			local nodeD = nodes[4] -- data="d", value=4
 
-			-- Step 1: Move B from 2 to 4 (remove, change value, reinsert)
 			root = root:RemoveNode(nodeB)
 			nodeB.value = 4
 			root = root:InsertNode(nodeB)
 
-			-- Step 2: Move D from 4 to 2 (remove, change value, reinsert)
 			root = root:RemoveNode(nodeD)
 			nodeD.value = 2
 			root = root:InsertNode(nodeD)
 
-			-- Should be sorted: a(1), d(2), c(3), b(4), e(5)
 			local result = {}
 			for _, data in root:IterateData() do
 				table.insert(result, data)
@@ -451,13 +439,10 @@ describe("SortedNode", function()
 		end)
 
 		it("should maintain sorted order when swapping via NeedsToMove gated remove-reinsert", function()
-			-- Same as above but uses NeedsToMove to gate whether to remove-reinsert,
-			-- matching the exact logic of ObservableSortedList._assignSortValue
 			local root, nodes = buildTree({ 1, 2, 3, 4, 5 })
 			local nodeB = nodes[2] -- data="b", value=2
 			local nodeD = nodes[4] -- data="d", value=4
 
-			-- Step 1: Move B from 2 to 4
 			if nodeB:NeedsToMove(root, 4) then
 				root = root:RemoveNode(nodeB)
 				nodeB.value = 4
@@ -466,7 +451,6 @@ describe("SortedNode", function()
 				nodeB.value = 4
 			end
 
-			-- Step 2: Move D from 4 to 2
 			if nodeD:NeedsToMove(root, 2) then
 				root = root:RemoveNode(nodeD)
 				nodeD.value = 2
@@ -475,7 +459,6 @@ describe("SortedNode", function()
 				nodeD.value = 2
 			end
 
-			-- Should be sorted: a(1), d(2), c(3), b(4), e(5)
 			local result = {}
 			for _, data in root:IterateData() do
 				table.insert(result, data)
