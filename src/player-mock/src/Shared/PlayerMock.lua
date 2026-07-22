@@ -99,6 +99,19 @@ PlayerMock.TAG = MOCK_TAG
 -- still letting DI-less code like dummy-mode Remoting resolve it.
 local LOCAL_PLAYER_TAG = "PlayerMockLocalPlayer"
 
+--[=[
+	The CollectionService tag carried by the mock currently designated as the local player (see
+	[PlayerMock.setMockedLocalPlayer]). Exposed so consumers can *observe* the designation changing --
+	via `CollectionService:GetInstanceAddedSignal`/`GetInstanceRemovedSignal` -- instead of one-shot
+	reading [PlayerMock.getMockedLocalPlayer], which goes stale when a test designates after the
+	consumer initializes (designation is only required before bags Start, not before Init).
+
+	@prop LOCAL_PLAYER_TAG string
+	@readonly
+	@within PlayerMock
+]=]
+PlayerMock.LOCAL_PLAYER_TAG = LOCAL_PLAYER_TAG
+
 type PropertySpec = {
 	default: any,
 	-- Instance-valued member: backed by a prefixed ObjectValue child instead of an attribute
@@ -923,11 +936,12 @@ local KICK_MESSAGE_ATTRIBUTE = "PlayerMockKickMessage"
 	2. the character is removed (`CharacterRemoving` fires while `Character` still points at it,
 	   `Character` nils, the model is destroyed), mirroring the engine cleaning up a kicked player's
 	   character
-	3. the mock leaves the DataModel and is destroyed, so the native `Destroying`/`AncestryChanged`
-	   signals genuinely fire -- the same way a kicked player's instance leaves `Players`
+	3. the mock leaves the DataModel (`Parent = nil`, not a destroy -- a held reference stays
+	   readable), so the native `AncestryChanged` signal genuinely fires -- the same way a kicked
+	   player's instance leaves `Players`
 
 	`Players.PlayerRemoving` is a `Players`-service event only the engine fires, so consumers of that
-	event cannot observe a mock kick; observe `Destroying` (via [PlayerMock.getSignal]) instead.
+	event cannot observe a mock kick; observe `AncestryChanged` instead.
 
 	Production code branches explicitly, like every other mock seam:
 
@@ -952,7 +966,7 @@ function PlayerMock.kick(player: Player, message: string?)
 	-- Explicitly, rather than via the Destroying hook, so CharacterRemoving observers still see a
 	-- live (parented) mock -- the engine removes the character before the player instance goes away.
 	PlayerMock.removeCharacter(player)
-	instance:Destroy()
+	instance.Parent = nil
 end
 
 --[=[

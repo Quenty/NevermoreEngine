@@ -15,6 +15,7 @@ local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
 local ServiceBag = require("ServiceBag")
+local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -61,25 +62,27 @@ describe("PlayerMockServiceClient", function()
 		local before = newMock(1)
 
 		local seen = {}
-		maid:GiveTask(service:ObservePlayerMocks(function(observed)
+		maid:GiveTask(service:ObservePlayerMocks():Subscribe(function(observed)
 			table.insert(seen, observed)
 		end))
 
 		local after = newMock(2)
+		StepUtils.deferWait()
 
 		expect(seen).toEqual({ before, after })
 	end)
 
-	it("stops observing after disconnect", function()
+	it("stops observing after unsubscribe", function()
 		local service = makeService()
 
 		local seen = {}
-		local disconnect = service:ObservePlayerMocks(function(observed)
+		local subscription = service:ObservePlayerMocks():Subscribe(function(observed)
 			table.insert(seen, observed)
 		end)
-		disconnect()
+		subscription:Destroy()
 
 		newMock(1)
+		StepUtils.deferWait()
 
 		expect(seen).toEqual({})
 	end)

@@ -67,7 +67,7 @@ function PlayerBinder.Start<T>(self: PlayerBinder<T>): ...any
 	-- it; production places just carry no mocks (they are only ever created by tests).
 	local serviceBag = (self :: any)._serviceBag
 	if serviceBag then
-		self._maid:GiveTask(serviceBag:GetService(PlayerMockService):ObservePlayerMocks(function(playerMock)
+		self._maid:GiveTask(serviceBag:GetService(PlayerMockService):ObservePlayerMocks():Subscribe(function(playerMock)
 			self:Tag(playerMock)
 		end))
 	end

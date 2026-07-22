@@ -137,6 +137,14 @@ store:Save():Catch(function() end)
 When you need to wait for a settled result, `PromiseTestUtils.awaitOutcome` / `awaitSettled` attach handlers
 synchronously — prefer them over hand-rolled awaits.
 
+One case is untestable rather than fixable: an error raised inside a `BindableFunction`/`BindableEvent`
+handler is **always printed by the engine** (as a `Stack Begin` block), even when the invoker wraps the
+call in `pcall` and correctly converts it to a rejection. So a round-trip spec asserting "a bound
+callback that errors rejects the caller's promise" cannot pass in a cloud run — assert the two halves
+separately instead: the callback-side error with `expect(...).toThrow()` in the test's own thread, and
+the `pcall`→reject conversion at the utility layer (e.g. `RemoteFunctionUtils`). See the note at the
+end of `Remoting.spec.lua`'s fidelity describe for a worked example.
+
 ### Standing in for a `Player`
 
 A real `Player` cannot be `Instance.new`'d, and no client joins a headless test place — `Players.LocalPlayer`
@@ -199,11 +207,10 @@ spawn) and `PlayerMock.kick` really performs the removal sequence. See each func
 Never fork production behavior at a call site to survive a headless test — no `pcall` around
 context-restricted engine calls, no gating on `RunService:IsRunning()`/`IsStudio()` environment queries.
 Both silently change what production executes. The one acceptable `RunService` branch is **signal
-selection**, and it lives centrally in `StepUtils`, never at call sites: `StepUtils.getRenderStepSignal()`
-for render-bound work that doesn't feed physics (`StepUtils.bindToRenderStep`, `TimedTween`), and
-`StepUtils.getAnimationStepSignal()` when server-side writes may be physics-locked (`SpringObject` —
-on a live server it keeps `Stepped`, the physics pre-step, so spring-driven CFrames stay in sync with
-constraints and replication). Both fall back to `Heartbeat` headless, where `Stepped` never fires.
+selection**, and it lives centrally in `StepUtils.getAnimationStepSignal()`, never at call sites:
+`RenderStepped` on the client, `Stepped` (the physics pre-step) on a live server so server-side
+writes stay in sync with constraints and replication (`SpringObject`, `TimedTween`), falling back
+to `Heartbeat` headless, where `Stepped` never fires.
 :::
 
 For package authors adding a seam, the branch is explicit and greppable — `PlayerMock.read`/`write` error on

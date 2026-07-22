@@ -1969,6 +1969,9 @@ importers:
       '@quenty/sprites':
         specifier: workspace:*
         version: link:../sprites
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/uiobjectutils':
         specifier: workspace:*
         version: link:../uiobjectutils
@@ -3576,9 +3579,15 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -4175,6 +4184,9 @@ importers:
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
       '@quenty/table':
         specifier: workspace:*
         version: link:../table

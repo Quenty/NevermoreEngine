@@ -6,9 +6,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 
+local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
+local Rx = require("Rx")
 
 local PlayerGuiUtils = {}
 
@@ -56,6 +59,36 @@ function PlayerGuiUtils.findPlayerGui(): PlayerGui?
 	end
 
 	return localPlayer:FindFirstChildOfClass("PlayerGui")
+end
+
+--[=[
+	Observes the current player gui. On a real client this is static -- the engine inserts the
+	PlayerGui before any client script runs and never replaces it. Headless (no `Players.LocalPlayer`)
+	it follows the [PlayerMock] local-player designation, which a test may make or change after
+	subscription (see [PlayerMock.setMockedLocalPlayer]).
+
+	@return Observable<PlayerGui | nil>
+]=]
+function PlayerGuiUtils.observePlayerGui(): Observable.Observable<PlayerGui?>
+	if Players.LocalPlayer then
+		return Rx.of(PlayerGuiUtils.findPlayerGui()) :: any
+	end
+
+	return Observable.new(function(sub)
+		local function update()
+			sub:Fire(PlayerGuiUtils.findPlayerGui())
+		end
+
+		local addedConnection = CollectionService:GetInstanceAddedSignal(PlayerMock.LOCAL_PLAYER_TAG):Connect(update)
+		local removedConnection = CollectionService:GetInstanceRemovedSignal(PlayerMock.LOCAL_PLAYER_TAG)
+			:Connect(update)
+		update()
+
+		return function()
+			addedConnection:Disconnect()
+			removedConnection:Disconnect()
+		end
+	end) :: any
 end
 
 return PlayerGuiUtils

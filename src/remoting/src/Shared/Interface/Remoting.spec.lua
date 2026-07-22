@@ -10,10 +10,12 @@ local Workspace = game:GetService("Workspace")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local PlayerMockServiceClient = require("PlayerMockServiceClient")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Remoting = require("Remoting")
 local RemotingRealms = require("RemotingRealms")
+local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -398,6 +400,49 @@ describe("Remoting dummy-mode round trip", function()
 		instance:Destroy()
 	end)
 
+	it("attributes a client InvokeServer to the designated mocked local player", function()
+		local server, client, instance = newDummyRealmPair("RoundTrip")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		local receivedPlayer
+		server:Bind("WhoAmI", function(player)
+			receivedPlayer = player
+			return true
+		end)
+
+		local promise = client:PromiseInvokeServer("WhoAmI")
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect(receivedPlayer).toBe(playerMock)
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
+	it("resolves PromiseFireServer once the fire is delivered", function()
+		local server, client, instance = newDummyRealmPair("RoundTrip")
+
+		local received
+		server:Connect("Ping", function(_player, value)
+			received = value
+		end)
+
+		local promise = client:PromiseFireServer("Ping", 42)
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect((promise:Yield())).toEqual(true)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return received ~= nil
+		end)).toEqual(true)
+		expect(received).toEqual(42)
+
+		server:Destroy()
+		client:Destroy()
+		instance:Destroy()
+	end)
+
 	it("delivers a server FireClient targeted at the mocked local player to the client Connect handler", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
 		local playerMock = designateLocalPlayerMock(12345)
@@ -512,6 +557,35 @@ describe("Remoting dummy-mode round trip", function()
 		instance:Destroy()
 	end)
 
+	it("drops a server FireClient when no local player is designated", function()
+		local server, client, instance = newDummyRealmPair("RoundTrip")
+		local playerMock = PlayerMock.new({ UserId = 12345 })
+		playerMock.Parent = Workspace
+
+		server:DeclareEvent("Pong")
+
+		local receivedTags = {}
+		client:Connect("Pong", function(tag)
+			table.insert(receivedTags, tag)
+		end)
+
+		-- Ordered probe: with no designated local player there is no simulated client to receive.
+		server:FireClient("Pong", playerMock, "dropped")
+		PlayerMock.setMockedLocalPlayer(playerMock)
+		server:FireClient("Pong", playerMock, "delivered")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedTags >= 1
+		end)).toEqual(true)
+		expect(receivedTags).toEqual({ "delivered" })
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
 	it("returns a client Bind result to a server PromiseInvokeClient against a mock player", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
 		local playerMock = designateLocalPlayerMock(12345)
@@ -587,6 +661,41 @@ describe("Remoting dummy-mode round trip", function()
 		instance:Destroy()
 	end)
 
+	it("supports client-side fires and invokes through the RemotingMember API", function()
+		local server, client, instance = newDummyRealmPair("RoundTrip")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		local receivedPlayer, receivedValue
+		server.Ping:Connect(function(player, value)
+			receivedPlayer = player
+			receivedValue = value
+		end)
+		server.Double:Bind(function(_player, n)
+			return n * 2
+		end)
+
+		client.Ping:FireServer(42)
+
+		local promise = client.Double:PromiseInvokeServer(5)
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+
+		local isFulfilled, result = promise:Yield()
+		expect(isFulfilled).toEqual(true)
+		expect(result).toEqual(10)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return receivedValue ~= nil
+		end)).toEqual(true)
+		expect(receivedPlayer).toBe(playerMock)
+		expect(receivedValue).toEqual(42)
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
 	it("rejects a plain Instance that is neither a Player nor a PlayerMock", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
 		local folder = Instance.new("Folder")
@@ -630,6 +739,394 @@ describe("Remoting dummy-mode round trip", function()
 
 		server:Destroy()
 		client:Destroy()
+		instance:Destroy()
+	end)
+end)
+
+describe("Remoting dummy-mode connection lifecycle", function()
+	it("delivers to a client Connect made before the server declares the event", function()
+		local server, client, instance = newDummyRealmPair("Lifecycle")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		local received
+		client:Connect("Pong", function(value)
+			received = value
+		end)
+
+		server:DeclareEvent("Pong")
+
+		-- The client attaches when the declared channel replicates into its observable, which may
+		-- resolve on a deferred signal -- refire until the attachment lands rather than racing it.
+		expect(PromiseTestUtils.awaitValue(function()
+			server:FireClient("Pong", playerMock, 42)
+			return received ~= nil
+		end)).toEqual(true)
+		expect(received).toEqual(42)
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
+	it("attaches a client Bind made before the server declares the method", function()
+		local server, client, instance = newDummyRealmPair("Lifecycle")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		client:Bind("Compute", function(n)
+			return n * 2
+		end)
+
+		server:DeclareMethod("Compute")
+
+		local promise = server:PromiseInvokeClient("Compute", playerMock, 5)
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+
+		local isFulfilled, result = promise:Yield()
+		expect(isFulfilled).toEqual(true)
+		expect(result).toEqual(10)
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
+	it("does not replay a fire to a Connect made after it", function()
+		local server, client, instance = newDummyRealmPair("Lifecycle")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		server:DeclareEvent("Pong")
+		server:FireClient("Pong", playerMock, "early")
+
+		local receivedTags = {}
+		client:Connect("Pong", function(tag)
+			table.insert(receivedTags, tag)
+		end)
+
+		server:FireClient("Pong", playerMock, "late")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedTags >= 1
+		end)).toEqual(true)
+		expect(receivedTags).toEqual({ "late" })
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
+	it("stops delivering to a server Connect after its maid is cleaned", function()
+		local server, client, instance = newDummyRealmPair("Lifecycle")
+
+		local receivedA, receivedB = {}, {}
+		local connectionMaid = server:Connect("Ping", function(_player, value)
+			table.insert(receivedA, value)
+		end)
+		server:Connect("Ping", function(_player, value)
+			table.insert(receivedB, value)
+		end)
+
+		client:FireServer("Ping", "first")
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedA >= 1 and #receivedB >= 1
+		end)).toEqual(true)
+
+		connectionMaid:DoCleaning()
+		client:FireServer("Ping", "second")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedB >= 2
+		end)).toEqual(true)
+		expect(receivedA).toEqual({ "first" })
+		expect(receivedB).toEqual({ "first", "second" })
+
+		server:Destroy()
+		client:Destroy()
+		instance:Destroy()
+	end)
+
+	it("stops delivering to a client Connect after its maid is cleaned", function()
+		local server, client, instance = newDummyRealmPair("Lifecycle")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		server:DeclareEvent("Pong")
+
+		local receivedA, receivedB = {}, {}
+		local connectionMaid = client:Connect("Pong", function(value)
+			table.insert(receivedA, value)
+		end)
+		client:Connect("Pong", function(value)
+			table.insert(receivedB, value)
+		end)
+
+		server:FireClient("Pong", playerMock, "first")
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedA >= 1 and #receivedB >= 1
+		end)).toEqual(true)
+
+		connectionMaid:DoCleaning()
+		server:FireClient("Pong", playerMock, "second")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedB >= 2
+		end)).toEqual(true)
+		expect(receivedA).toEqual({ "first" })
+		expect(receivedB).toEqual({ "first", "second" })
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+end)
+
+describe("Remoting dummy-mode fidelity", function()
+	it("preserves argument count and nil holes through FireServer", function()
+		local server, client, instance = newDummyRealmPair("Fidelity")
+		local playerMock = designateLocalPlayerMock(12345)
+
+		local receivedArgs
+		server:Connect("Ping", function(_player, ...)
+			receivedArgs = table.pack(...)
+		end)
+
+		client:FireServer("Ping", 1, nil, 3)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return receivedArgs ~= nil
+		end)).toEqual(true)
+		expect(receivedArgs.n).toEqual(3)
+		expect(receivedArgs[1]).toEqual(1)
+		expect(receivedArgs[2]).toEqual(nil)
+		expect(receivedArgs[3]).toEqual(3)
+
+		PlayerMock.setMockedLocalPlayer(nil)
+		server:Destroy()
+		client:Destroy()
+		playerMock:Destroy()
+		instance:Destroy()
+	end)
+
+	it("preserves multiple return values with nil holes through InvokeServer", function()
+		local server, client, instance = newDummyRealmPair("Fidelity")
+
+		server:Bind("Multi", function(_player)
+			return 1, nil, 3
+		end)
+
+		local promise = client:PromiseInvokeServer("Multi")
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+
+		local isFulfilled, a, b, c = promise:Yield()
+		expect(isFulfilled).toEqual(true)
+		expect(a).toEqual(1)
+		expect(b).toEqual(nil)
+		expect(c).toEqual(3)
+
+		server:Destroy()
+		client:Destroy()
+		instance:Destroy()
+	end)
+
+	it("unwraps a promise returned by a server Bind through the client invoke", function()
+		local server, client, instance = newDummyRealmPair("Fidelity")
+
+		server:Bind("Fetch", function(_player, n)
+			return Promise.resolved(n + 1)
+		end)
+
+		local promise = client:PromiseInvokeServer("Fetch", 41)
+		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+
+		local isFulfilled, result = promise:Yield()
+		expect(isFulfilled).toEqual(true)
+		expect(result).toEqual(42)
+
+		server:Destroy()
+		client:Destroy()
+		instance:Destroy()
+	end)
+
+	-- Rejection propagation (a bound callback erroring or rejecting -> the invoking promise
+	-- rejects) is deliberately not round-trip tested here: an error raised inside a
+	-- BindableFunction handler is always printed by the engine (Stack Begin) even though it
+	-- propagates to the invoker's pcall, and the test runner fails a run on any error output.
+	-- The halves are covered without engine logs: the disconnected guard in the
+	-- Remoting._translateCallback describe, and pcall->reject in RemoteFunctionUtils.
+end)
+
+describe("Remoting dummy-mode multiple simulated clients", function()
+	local function newSimulatedClient(instance: Instance, name: string, userId: number)
+		local clientMaid = Maid.new()
+
+		local serviceBag = clientMaid:Add(ServiceBag.new())
+		local service = serviceBag:GetService(PlayerMockServiceClient)
+		serviceBag:Init()
+		serviceBag:Start()
+
+		local player = clientMaid:Add(PlayerMock.new({ UserId = userId }))
+		player.Parent = Workspace
+		service:SetLocalPlayer(player)
+
+		local remoting = clientMaid:Add(Remoting.Client.new(instance, name))
+		remoting._useDummyObject = true
+
+		return {
+			player = player,
+			remoting = remoting,
+			service = service,
+			activate = function()
+				service:SetLocalPlayer(player)
+			end,
+			destroy = function()
+				clientMaid:DoCleaning()
+			end,
+		}
+	end
+
+	local function newDummyServer(name: string)
+		local instance = Instance.new("Folder")
+		local server = Remoting.Server.new(instance, name)
+		server._useDummyObject = true
+		return server, instance
+	end
+
+	it("attributes fires from each simulated client to its own local player", function()
+		local server, instance = newDummyServer("MultiClient")
+		local clientA = newSimulatedClient(instance, "MultiClient", 1001)
+		local clientB = newSimulatedClient(instance, "MultiClient", 1002)
+
+		local received = {}
+		server:Connect("Ping", function(player)
+			table.insert(received, player)
+		end)
+
+		-- FireServer reads the ambient local player at (possibly deferred) fire time, so each
+		-- client's fire is awaited before the next client activates.
+		clientA.activate()
+		clientA.remoting:FireServer("Ping")
+		expect(PromiseTestUtils.awaitValue(function()
+			return #received >= 1
+		end)).toEqual(true)
+
+		clientB.activate()
+		clientB.remoting:FireServer("Ping")
+		expect(PromiseTestUtils.awaitValue(function()
+			return #received >= 2
+		end)).toEqual(true)
+
+		expect(received[1]).toBe(clientA.player)
+		expect(received[2]).toBe(clientB.player)
+
+		clientA.destroy()
+		clientB.destroy()
+		server:Destroy()
+		instance:Destroy()
+	end)
+
+	it("delivers a server FireClient only while its target is the active simulated client", function()
+		local server, instance = newDummyServer("MultiClient")
+		local clientA = newSimulatedClient(instance, "MultiClient", 1001)
+		local clientB = newSimulatedClient(instance, "MultiClient", 1002)
+
+		server:DeclareEvent("Pong")
+
+		local receivedA, receivedB = {}, {}
+		clientA.remoting:Connect("Pong", function(tag)
+			table.insert(receivedA, tag)
+		end)
+		clientB.remoting:Connect("Pong", function(tag)
+			table.insert(receivedB, tag)
+		end)
+
+		clientA.activate()
+		server:FireClient("Pong", clientA.player, "toA")
+		server:FireClient("Pong", clientB.player, "droppedB")
+		clientB.activate()
+		server:FireClient("Pong", clientB.player, "toB")
+		server:FireClient("Pong", clientA.player, "droppedA")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #receivedA >= 2 and #receivedB >= 2
+		end)).toEqual(true)
+
+		-- Dummy mode has one simulated client wire: a delivered fire reaches every client-realm
+		-- Connect handler, so only the active-target filter distinguishes the simulated clients.
+		expect(receivedA).toEqual({ "toA", "toB" })
+		expect(receivedB).toEqual({ "toA", "toB" })
+
+		clientA.destroy()
+		clientB.destroy()
+		server:Destroy()
+		instance:Destroy()
+	end)
+
+	it("accumulates per-player server state across invokes from distinct simulated clients", function()
+		local server, instance = newDummyServer("MultiClient")
+		local clientA = newSimulatedClient(instance, "MultiClient", 1001)
+		local clientB = newSimulatedClient(instance, "MultiClient", 1002)
+
+		local counts = {}
+		server:Bind("Increment", function(player)
+			counts[player] = (counts[player] or 0) + 1
+			return counts[player]
+		end)
+
+		local function invokeAs(client)
+			client.activate()
+			local promise = client.remoting:PromiseInvokeServer("Increment")
+			expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+
+			local isFulfilled, count = promise:Yield()
+			expect(isFulfilled).toEqual(true)
+			return count
+		end
+
+		expect(invokeAs(clientA)).toEqual(1)
+		expect(invokeAs(clientA)).toEqual(2)
+		expect(invokeAs(clientB)).toEqual(1)
+		expect(invokeAs(clientA)).toEqual(3)
+
+		expect(counts[clientA.player]).toEqual(3)
+		expect(counts[clientB.player]).toEqual(1)
+
+		clientA.destroy()
+		clientB.destroy()
+		server:Destroy()
+		instance:Destroy()
+	end)
+
+	it("keeps a surviving simulated client working after another disconnects", function()
+		local server, instance = newDummyServer("MultiClient")
+		local clientA = newSimulatedClient(instance, "MultiClient", 1001)
+		local clientB = newSimulatedClient(instance, "MultiClient", 1002)
+
+		local received = {}
+		server:Connect("Ping", function(player)
+			table.insert(received, player)
+		end)
+
+		clientB.destroy()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
+		expect(clientA.service:GetLocalPlayer()).toBe(clientA.player)
+
+		clientA.activate()
+		clientA.remoting:FireServer("Ping")
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #received >= 1
+		end)).toEqual(true)
+		expect(received[1]).toBe(clientA.player)
+
+		clientA.destroy()
+		server:Destroy()
 		instance:Destroy()
 	end)
 end)

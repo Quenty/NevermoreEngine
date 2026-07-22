@@ -229,7 +229,7 @@ function ConstrainedLookControls._handleGamepadRotateStart(self: ConstrainedLook
 
 	local maid = Maid.new()
 
-	maid:GiveTask(StepUtils.getRenderStepSignal():Connect(function(deltaTime: number)
+	maid:GiveTask(StepUtils.getAnimationStepSignal():Connect(function(deltaTime: number)
 		-- Sensitivity is tuned per-60Hz-frame; scale by deltaTime * 60 so rotation speed is
 		-- framerate independent without changing the units of GAMEPAD_SENSITIVITY.
 		local deltaAngle = self._gamepadSensitivity

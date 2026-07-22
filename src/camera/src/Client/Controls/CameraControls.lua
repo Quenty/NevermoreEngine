@@ -380,7 +380,7 @@ function CameraControls._handleGamepadRotateStart(self: CameraControls): ()
 		self._rotVelocityTracker = self:_getVelocityTracker(0.05, Vector2.zero)
 	end
 
-	maid:GiveTask(StepUtils.getRenderStepSignal():Connect(function(deltaTime: number)
+	maid:GiveTask(StepUtils.getAnimationStepSignal():Connect(function(deltaTime: number)
 		-- Sensitivity is tuned per-60Hz-frame; scale by deltaTime * 60 so rotation speed is
 		-- framerate independent.
 		local deltaAngle: Vector2 = 0.1 * (deltaTime * 60) * self._gamepadRotateModel:GetThumbstickDeltaAngle()

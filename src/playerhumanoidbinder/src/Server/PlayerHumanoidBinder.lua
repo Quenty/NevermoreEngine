@@ -135,7 +135,7 @@ function PlayerHumanoidBinder._bindTagging<T>(self: PlayerHumanoidBinder<T>, doU
 			-- Cast: the service's instance fields are assigned in Init, so its methods do not
 			-- type-check against the exported module type.
 			local playerMockService: any = self._serviceBag:GetService(PlayerMockService)
-			maid:GiveTask(playerMockService:ObservePlayerMocks(function(playerMock)
+			maid:GiveTask(playerMockService:ObservePlayerMocks():Subscribe(function(playerMock)
 				self:_handlePlayerAdded(playerMaid, playerMock)
 			end))
 		end

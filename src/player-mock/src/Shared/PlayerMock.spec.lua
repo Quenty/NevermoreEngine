@@ -1468,6 +1468,29 @@ describe("PlayerMock local player", function()
 		player:Destroy()
 	end)
 
+	it("carries the designation as the public LOCAL_PLAYER_TAG", function()
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+
+		local seen = {}
+		local maid = Maid.new()
+		maid:GiveTask(CollectionService:GetInstanceAddedSignal(PlayerMock.LOCAL_PLAYER_TAG):Connect(function(instance)
+			table.insert(seen, instance)
+		end))
+
+		PlayerMock.setMockedLocalPlayer(player)
+
+		expect(CollectionService:HasTag(player, PlayerMock.LOCAL_PLAYER_TAG)).toBe(true)
+		expect(seen).toEqual({ player })
+
+		PlayerMock.setMockedLocalPlayer(nil)
+
+		expect(CollectionService:HasTag(player, PlayerMock.LOCAL_PLAYER_TAG)).toBe(false)
+
+		maid:DoCleaning()
+		player:Destroy()
+	end)
+
 	it("asserts on a non-mock designation", function()
 		local folder = Instance.new("Folder")
 		expect(function()

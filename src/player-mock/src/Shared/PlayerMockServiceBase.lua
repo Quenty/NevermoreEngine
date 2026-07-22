@@ -26,6 +26,7 @@ local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
 
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
@@ -68,33 +69,33 @@ end
 
 --[=[
 	Observes every mock in the place -- those already alive and those parented later, from any bag in
-	either realm -- invoking `onAdded` once per mock in its own thread. Mirrors how
-	`Players.PlayerAdded` + `Players:GetPlayers()` are consumed, so a PlayerBinder can treat mocks
-	like real joins. Returns a disconnect function.
+	either realm -- emitting each mock once. Mirrors how `Players.PlayerAdded` +
+	`Players:GetPlayers()` are consumed, so a PlayerBinder can treat mocks like real joins.
 
-	@param onAdded (player: Player) -> ()
-	@return () -> ()
+	@return Observable<Player>
 ]=]
-function PlayerMockServiceBase:ObservePlayerMocks(onAdded: (player: Player) -> ()): () -> ()
-	assert(type(onAdded) == "function", "Bad onAdded")
+function PlayerMockServiceBase:ObservePlayerMocks(): Observable.Observable<Player>
+	return Observable.new(function(sub)
+		local maid = Maid.new()
 
-	-- In a new thread, not directly: tag signals fire synchronously inside the parenting that
-	-- replicates a mock, and PlayerAdded consumers are entitled to yield without blocking it.
-	local connection = CollectionService:GetInstanceAddedSignal(PlayerMock.TAG):Connect(function(instance)
-		if PlayerMock.isMock(instance) then
-			task.spawn(onAdded, (instance :: any) :: Player)
+		maid:GiveTask(CollectionService:GetInstanceAddedSignal(PlayerMock.TAG):Connect(function(instance)
+			if PlayerMock.isMock(instance) then
+				if sub:IsPending() then
+					sub:Fire((instance :: any) :: Player)
+				end
+			end
+		end))
+
+		for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
+			if PlayerMock.isMock(tagged) then
+				task.spawn(function()
+					sub:Fire((tagged :: any) :: Player)
+				end)
+			end
 		end
-	end)
 
-	for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
-		if PlayerMock.isMock(tagged) then
-			task.spawn(onAdded, (tagged :: any) :: Player)
-		end
-	end
-
-	return function()
-		connection:Disconnect()
-	end
+		return maid
+	end) :: any
 end
 
 function PlayerMockServiceBase:_startConsumingMocks()

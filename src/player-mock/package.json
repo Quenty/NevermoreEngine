@@ -31,7 +31,9 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {

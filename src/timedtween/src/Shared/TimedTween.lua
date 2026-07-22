@@ -116,7 +116,7 @@ end
 	@return Observable<number>
 ]=]
 function TimedTween.ObserveRenderStepped(self: TimedTween): Observable.Observable<number>
-	return self:ObserveOnSignal(StepUtils.getRenderStepSignal())
+	return self:ObserveOnSignal(StepUtils.getAnimationStepSignal())
 end
 
 --[=[

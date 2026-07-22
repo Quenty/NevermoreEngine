@@ -37,6 +37,7 @@
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/sprites": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quenty/uiobjectutils": "workspace:*",
     "@quenty/valueobject": "workspace:*"
   },
