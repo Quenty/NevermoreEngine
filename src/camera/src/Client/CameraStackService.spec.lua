@@ -34,7 +34,7 @@ local function setup(options: { start: boolean? }?): CameraStackService.CameraSt
 	local serviceBag = ServiceBag.new()
 	currentServiceBag = serviceBag
 
-	local service = serviceBag:GetService(CameraStackService)
+	local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
 	serviceBag:Init()
 
 	if not (options and options.start == false) then
@@ -86,7 +86,7 @@ describe("CameraStackService.Init", function()
 	it("errors when used before the service bag runs Init", function()
 		local serviceBag = ServiceBag.new()
 		currentServiceBag = serviceBag
-		local service = serviceBag:GetService(CameraStackService)
+		local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
 
 		expect(function()
 			service:GetTopState()

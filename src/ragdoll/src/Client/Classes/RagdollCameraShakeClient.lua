@@ -47,6 +47,12 @@ function RagdollCameraShakeClient.new(humanoid: Humanoid, serviceBag: ServiceBag
 	self._cameraStackService = self._serviceBag:GetService(CameraStackService)
 	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
 
+	-- Shake reads Workspace.CurrentCamera every frame; with no camera (headless test runs,
+	-- where nothing renders), there is nothing to shake -- stay passive.
+	if Workspace.CurrentCamera == nil then
+		return self
+	end
+
 	-- While we've got a charater and we're ragdolled
 	self._maid:GiveTask((RxCharacterUtils.observeIsOfLocalCharacterBrio(self._obj :: any) :: any)
 		:Pipe({

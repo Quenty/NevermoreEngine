@@ -53,6 +53,10 @@ function PlayerThumbnailUtils.promiseUserThumbnail(
 			-- The engine call would reject a fake UserId; derive the rbxthumb content URL it
 			-- would resolve for a real one.
 			local width, height = string.match(resolvedThumbnailSize.Name, "^Size(%d+)x(%d+)$")
+			if width == nil or height == nil then
+				return reject(string.format("Failed to parse thumbnail size %q", resolvedThumbnailSize.Name))
+			end
+
 			return resolve(
 				string.format(
 					"rbxthumb://type=%s&id=%d&w=%s&h=%s",
