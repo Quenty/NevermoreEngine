@@ -31,6 +31,7 @@
     "@quenty/enabledmixin": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/rx": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/valueobject": "workspace:*"
   },
