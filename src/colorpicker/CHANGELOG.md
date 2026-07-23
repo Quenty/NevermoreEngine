@@ -1,19 +1,13 @@
-# v10.41.2 (Thu Jul 23 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Update versions + README.md [#745](https://github.com/Quenty/NevermoreEngine/pull/745) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.41.1...@quenty/colorpicker@10.41.2) (2026-07-23)
+
+### Bug Fixes
+
+- Update versions + README.md ([#745](https://github.com/Quenty/NevermoreEngine/issues/745)) ([22b9a04](https://github.com/Quenty/NevermoreEngine/commit/22b9a0480da777feee4b8becb7cc4bb8098bba37))
 
 ## [10.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.41.0...@quenty/colorpicker@10.41.1) (2026-07-23)
 

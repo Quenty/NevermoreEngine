@@ -1,19 +1,13 @@
-# v13.37.1 (Thu Jul 23 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Update versions + README.md [#745](https://github.com/Quenty/NevermoreEngine/pull/745) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [13.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.37.0...@quenty/actionmanager@13.37.1) (2026-07-23)
+
+### Bug Fixes
+
+- Update versions + README.md ([#745](https://github.com/Quenty/NevermoreEngine/issues/745)) ([22b9a04](https://github.com/Quenty/NevermoreEngine/commit/22b9a0480da777feee4b8becb7cc4bb8098bba37))
 
 # [13.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/actionmanager@13.36.0...@quenty/actionmanager@13.37.0) (2026-07-23)
 
