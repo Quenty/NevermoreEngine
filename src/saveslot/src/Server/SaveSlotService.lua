@@ -107,13 +107,13 @@ function SaveSlotService.Start(self: SaveSlotService)
 		-- continuation re-checks the binder is alive: a continuation queued before the maid
 		-- died still runs, and calling any method on the destroyed (metatable-stripped)
 		-- binder throws.
-		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
+		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function(): any
 			if not hasSaveSlots.Destroy then
 				return nil -- The binder died while the load settled
 			end
-			return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport()):Then(function(loadedSlotId)
+			return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport()):Then(function(loadedSlotId): any
 				if loadedSlotId then
-					return -- Teleported in with a valid slot; it is now selected
+					return nil -- Teleported in with a valid slot; it is now selected
 				end
 				if not hasSaveSlots.Destroy then
 					return nil -- The binder died while the teleport read settled
@@ -133,7 +133,7 @@ end
 ]=]
 function SaveSlotService._promiseSelectDefaultSlot(
 	self: SaveSlotService,
-	maid: Maid.Maid,
+	maid: any,
 	hasSaveSlots: any
 ): Promise.Promise<any>?
 	if self._selectionRequired then
@@ -141,37 +141,38 @@ function SaveSlotService._promiseSelectDefaultSlot(
 	end
 
 	return maid:GivePromise(hasSaveSlots:PromiseLastActiveSlotId())
-		:Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
+		:Then(function(lastActiveSlotId: SaveSlotData.SlotId?): any
 			if not hasSaveSlots.Destroy then
 				return nil
 			end
-			return maid:GivePromise(hasSaveSlots:PromiseHasSlot(lastActiveSlotId)):Then(function(hasLastSlot: boolean)
-				if not hasSaveSlots.Destroy then
-					return nil
-				end
-				if hasLastSlot then
-					return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
-				end
+			return maid:GivePromise(hasSaveSlots:PromiseHasSlot(lastActiveSlotId))
+				:Then(function(hasLastSlot: boolean): any
+					if not hasSaveSlots.Destroy then
+						return nil
+					end
+					if hasLastSlot then
+						return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
+					end
 
-				-- Or create and select default slot
-				return maid:GivePromise(hasSaveSlots:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX))
-					:Then(function(defaultSlotId: SaveSlotData.SlotId?)
-						if not hasSaveSlots.Destroy then
-							return nil
-						end
-						if defaultSlotId then
-							return defaultSlotId
-						else
-							return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-						end
-					end)
-					:Then(function(slotId: SaveSlotData.SlotId?)
-						if not slotId or not hasSaveSlots.Destroy then
-							return nil
-						end
-						return hasSaveSlots:PromiseSelectSlot(slotId)
-					end)
-			end)
+					-- Or create and select default slot
+					return maid:GivePromise(hasSaveSlots:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+						:Then(function(defaultSlotId: SaveSlotData.SlotId?): any
+							if not hasSaveSlots.Destroy then
+								return nil
+							end
+							if defaultSlotId then
+								return defaultSlotId
+							else
+								return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+							end
+						end)
+						:Then(function(slotId: SaveSlotData.SlotId?): any
+							if not slotId or not hasSaveSlots.Destroy then
+								return nil
+							end
+							return hasSaveSlots:PromiseSelectSlot(slotId)
+						end)
+				end)
 		end)
 end
 
