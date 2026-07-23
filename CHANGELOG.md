@@ -1,5 +1,18 @@
 # (Thu Jul 23 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@1.14.1`
+  - fix(saveslot): selection chain consumes loads that settle after the player leaves [#747](https://github.com/Quenty/NevermoreEngine/pull/747) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/datastore@13.47.0`, `@quenty/playermock@1.2.0`, `@quenty/promise@10.22.0`, `@quenty/tie@10.45.0`
