@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
@@ -69,6 +70,38 @@ describe("TeleportDataService.BuildTeleportData (delegates to the shared builder
 
 		local built = controller.service:BuildTeleportData({}, { shared = "caller" })
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ shared = "caller" })
+
+		controller:destroy()
+	end)
+end)
+
+describe("TeleportDataService.PromiseBuildTeleportData (async build)", function()
+	it("awaits an async per-player provider", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:RegisterPerPlayerTeleportDataProvider(function()
+			return Promise.resolved():Then(function()
+				return { slot = "async" }
+			end)
+		end)
+
+		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
+		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "async" })
+
+		controller:destroy()
+	end)
+
+	it("still carries a synchronous provider slice", function()
+		local controller = setup()
+		local player = controller.fakePlayer(111)
+
+		controller.service:RegisterPerPlayerTeleportDataProvider(function()
+			return { slot = "sync" }
+		end)
+
+		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
+		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "sync" })
 
 		controller:destroy()
 	end)
