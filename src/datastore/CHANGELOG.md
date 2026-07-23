@@ -1,25 +1,17 @@
-# v13.47.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve standard patches [#746](https://github.com/Quenty/NevermoreEngine/pull/746) ([@Quenty](https://github.com/Quenty))
-- feat: Even more stuff ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Add more tests and fixes ([@Quenty](https://github.com/Quenty))
-- fix: Data store tear down fixes that are graceful ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.46.1...@quenty/datastore@13.47.0) (2026-07-23)
+
+### Bug Fixes
+
+- Data store tear down fixes that are graceful ([79152d0](https://github.com/Quenty/NevermoreEngine/commit/79152d03156f2328ab2a4a07bc68e27b5b666775))
+
+### Features
+
+- Even more stuff ([fea7e95](https://github.com/Quenty/NevermoreEngine/commit/fea7e9587e7195bbfa7f4753c130a3d597f9a34b))
 
 ## [13.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.46.0...@quenty/datastore@13.46.1) (2026-07-23)
 

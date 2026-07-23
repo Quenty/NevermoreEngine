@@ -1,24 +1,13 @@
-# v10.45.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- feat: Improve standard patches [#746](https://github.com/Quenty/NevermoreEngine/pull/746) ([@Quenty](https://github.com/Quenty))
-- feat: Even more stuff ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: Add more tests and fixes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.44.0...@quenty/tie@10.45.0) (2026-07-23)
+
+### Features
+
+- Even more stuff ([fea7e95](https://github.com/Quenty/NevermoreEngine/commit/fea7e9587e7195bbfa7f4753c130a3d597f9a34b))
 
 # [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.43.0...@quenty/tie@10.44.0) (2026-07-23)
 
