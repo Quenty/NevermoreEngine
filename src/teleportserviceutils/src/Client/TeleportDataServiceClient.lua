@@ -26,6 +26,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
@@ -145,7 +146,14 @@ end
 	@return number
 ]=]
 function TeleportDataServiceClient._getLocalUserId(_self: TeleportDataServiceClient): number
-	return Players.LocalPlayer.UserId
+	-- Headless (test) sessions have no Players.LocalPlayer; the designated PlayerMock stands in.
+	-- Mirrors TeleportDataService._getUserId on the server.
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer == nil then
+		return 0 -- No local identity at all; no envelope slice will match.
+	end
+
+	return if PlayerMock.isMock(localPlayer) then PlayerMock.read(localPlayer, "UserId") else localPlayer.UserId
 end
 
 --[=[

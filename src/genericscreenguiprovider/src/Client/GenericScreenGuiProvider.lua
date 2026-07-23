@@ -146,15 +146,33 @@ function GenericScreenGuiProvider.Get(self: GenericScreenGuiProvider, orderName:
 	self:_assertOrderExists(orderName)
 
 	if not RunService:IsRunning() then
-		local frame = Instance.new("Frame")
-		frame.Name = String.toCamelCase(orderName)
-		frame.Archivable = false
-		frame.Size = UDim2.fromScale(1, 1)
-		frame.BorderSizePixel = 0
-		frame.BackgroundTransparency = 1
-		frame.BackgroundColor3 = Color3.new(1, 1, 1)
-		frame.Parent = self:_getScreenGuiService():GetGuiParent()
-		return (frame :: any) :: ScreenGui
+		local guiParent = self:_getScreenGuiService():GetGuiParent()
+
+		-- Story previews mount inside another GuiObject and Studio plugins inside a LayerCollector
+		-- (DockWidgetPluginGui) -- a nested ScreenGui can't render in either, so a Frame stands in.
+		-- Headless (test) runs -- where the parent is a mock PlayerGui -- get a real ScreenGui, so
+		-- consumers can set ScreenGui-only properties (ClipToDeviceSafeArea, ScreenInsets, ...)
+		-- without caring which environment they booted in.
+		if guiParent and (guiParent:IsA("GuiObject") or guiParent:IsA("LayerCollector")) then
+			local frame = Instance.new("Frame")
+			frame.Name = String.toCamelCase(orderName)
+			frame.Archivable = false
+			frame.Size = UDim2.fromScale(1, 1)
+			frame.BorderSizePixel = 0
+			frame.BackgroundTransparency = 1
+			frame.BackgroundColor3 = Color3.new(1, 1, 1)
+			frame.Parent = guiParent
+			return (frame :: any) :: ScreenGui
+		end
+
+		local screenGui = Instance.new("ScreenGui")
+		screenGui.Name = String.toCamelCase(orderName)
+		screenGui.ResetOnSpawn = false
+		screenGui.AutoLocalize = false
+		screenGui.Archivable = false
+		screenGui.DisplayOrder = self:GetDisplayOrder(orderName)
+		screenGui.Parent = guiParent
+		return screenGui
 	end
 
 	local screenGui = Instance.new("ScreenGui")

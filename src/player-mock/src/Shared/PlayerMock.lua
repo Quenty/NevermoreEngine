@@ -135,6 +135,7 @@ local PLAYER_PROPERTIES: { [string]: PropertySpec } = {
 	HasVerifiedBadge = { default = false },
 	FollowUserId = { default = 0 },
 	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
+	ReplicationFocus = { instanceValued = true }, -- default nil; streaming focus stand-in
 }
 
 -- Prefix for the ObjectValue children backing Instance-valued stand-in properties. Like the

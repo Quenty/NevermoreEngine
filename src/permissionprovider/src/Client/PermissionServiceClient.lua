@@ -15,6 +15,7 @@ local require = require(script.Parent.loader).load(script)
 local Maid = require("Maid")
 local PermissionProviderClient = require("PermissionProviderClient")
 local PermissionProviderConstants = require("PermissionProviderConstants")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
@@ -53,7 +54,10 @@ function PermissionServiceClient.PromiseIsAdmin(
 	self: PermissionServiceClient,
 	player: Player?
 ): Promise.Promise<boolean>
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player))) or player == nil,
+		"Bad player"
+	)
 
 	return self:PromisePermissionProvider():Then(function(permissionProvider)
 		return permissionProvider:PromiseIsAdmin(player)
