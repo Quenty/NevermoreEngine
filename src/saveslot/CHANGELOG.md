@@ -1,22 +1,13 @@
-# v1.14.1 (Thu Jul 23 2026)
-
-#### 🐛 Bug Fix
-
-- fix(saveslot): selection chain consumes loads that settle after the player leaves [#747](https://github.com/Quenty/NevermoreEngine/pull/747) ([@Quenty](https://github.com/Quenty))
-- style: Type annotations for strict luau-lsp ([@Quenty](https://github.com/Quenty))
-- style: Apply repo stylua config ([@Quenty](https://github.com/Quenty))
-- fix(saveslot): selection chain consumes loads that settle after the player leaves ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.14.0...@quenty/saveslot@1.14.1) (2026-07-23)
+
+### Bug Fixes
+
+- **saveslot:** selection chain consumes loads that settle after the player leaves ([f8716a3](https://github.com/Quenty/NevermoreEngine/commit/f8716a37028db5474578ccad1b0d9aa811edd64c))
 
 # [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.13.1...@quenty/saveslot@1.14.0) (2026-07-23)
 
