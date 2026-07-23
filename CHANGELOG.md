@@ -1,3 +1,16 @@
+# (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.41.0`, `@quenty/blend@12.40.0`, `@quenty/brine@1.10.0`, `@quenty/camera@14.46.0`, `@quenty/characterutils@12.36.0`, `@quenty/clienttranslator@14.42.0`, `@quenty/cmdrservice@13.51.0`, `@quenty/coreguienabler@12.37.0`, `@quenty/datastore@13.46.0`, `@quenty/ellipticcurvecryptography@1.14.0`, `@quenty/flipbook@9.36.0`, `@quenty/friendutils@12.33.0`, `@quenty/funnels@1.30.0`, `@quenty/fzy@5.17.0`, `@quenty/gameconfig@12.57.0`, `@quenty/gameproductservice@14.61.0`, `@quenty/genericscreenguiprovider@13.43.0`, `@quenty/grouputils@10.23.0`, `@quenty/humanoidtracker@13.34.0`, `@quenty/influxdbclient@7.40.0`, `@quenty/marketplaceutils@11.25.0`, `@quenty/nevermoreclimanifest@1.6.0`, `@quenty/nevermore-test-runner@1.5.0`, `@quenty/observablecollection@12.42.0`, `@quenty/pagesutils@5.22.0`, `@quenty/permissionprovider@14.44.0`, `@quenty/playermock@1.1.0`, `@quenty/playerbinder@14.41.0`, `@quenty/playerhumanoidbinder@14.42.0`, `@quenty/playerinputmode@9.44.0`, `@quenty/playersservicepromises@10.21.0`, `@quenty/playerthumbnailutils@10.21.0`, `@quenty/promise@10.21.0`, `@quenty/promisemaid@5.21.0`, `@quenty/ragdoll@15.59.0`, `@quenty/receiptprocessing@7.37.0`, `@quenty/remoting@12.36.0`, `@quenty/rogue-properties@11.52.0`, `@quenty/saveslot@1.13.0`, `@quenty/scoredactionservice@16.49.0`, `@quenty/servicebag@11.20.0`, `@quenty/settings@11.62.0`, `@quenty/sounds@10.25.0`, `@quenty/steputils@3.7.0`, `@quenty/string@3.4.0`, `@quenty/teleportserviceutils@9.38.0`, `@quenty/timedtween@7.40.0`, `@quenty/uiobjectutils@6.32.0`, `@quenty/userserviceutils@9.35.0`
+  - Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jul 22 2026)
 
 #### 🚀 Enhancement

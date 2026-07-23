@@ -1,3 +1,19 @@
+# v16.49.0 (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Safey tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
