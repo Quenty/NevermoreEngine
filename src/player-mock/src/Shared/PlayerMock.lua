@@ -786,7 +786,8 @@ end
 
 	Each call also replaces the mock's `Backpack` stand-in with a fresh empty one before any spawn
 	signal fires, like the engine does on respawn (minus the StarterPack copy) -- see
-	[PlayerMock.getBackpack].
+	[PlayerMock.getBackpack]. The first call additionally inserts the `StarterGear` stand-in,
+	which later spawns keep -- see [PlayerMock.getStarterGear].
 
 	@param player Player -- must be a PlayerMock
 	@param character Model? -- the new character; nil builds a default R15 rig
@@ -815,6 +816,13 @@ function PlayerMock.loadCharacterAsync(player: Player, character: Model?): Model
 
 	local backpack = Instance.new("Backpack")
 	backpack.Parent = player :: Instance
+
+	-- The StarterGear appears alongside the first spawn and then persists -- the engine never
+	-- replaces it on respawn (unlike the Backpack), so granted gear survives here too.
+	if PlayerMock.getStarterGear(player) == nil then
+		local starterGear = Instance.new("StarterGear")
+		starterGear.Parent = player :: Instance
+	end
 
 	PlayerMock.write(player, "Character", newCharacter)
 	newCharacter.Parent = Workspace
@@ -895,6 +903,30 @@ function PlayerMock.getBackpack(player: Player): Backpack?
 	assert(PlayerMock.isMock(player), "Not a PlayerMock")
 
 	return (player :: Instance):FindFirstChildOfClass("Backpack")
+end
+
+--[=[
+	Returns the mock's current `StarterGear` stand-in, or nil before the first spawn -- the engine
+	only inserts a player's StarterGear alongside their first character spawn. Like the Backpack
+	stand-in it is a genuine `StarterGear` instance parented to the mock, so class-based lookups
+	(`player:FindFirstChildOfClass("StarterGear")`) work unchanged; unlike the Backpack,
+	[PlayerMock.loadCharacterAsync] never replaces it -- the engine keeps a player's StarterGear
+	across respawns. Consumers that dot-index `player.StarterGear` resolve it through the usual
+	explicit branch:
+
+	```lua
+	local starterGear = if PlayerMock.isMock(player)
+		then PlayerMock.getStarterGear(player)
+		else player.StarterGear
+	```
+
+	@param player Player -- must be a PlayerMock
+	@return StarterGear?
+]=]
+function PlayerMock.getStarterGear(player: Player): StarterGear?
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+
+	return (player :: Instance):FindFirstChildOfClass("StarterGear")
 end
 
 --[=[

@@ -639,6 +639,55 @@ describe("PlayerMock.getBackpack", function()
 	end)
 end)
 
+describe("PlayerMock.getStarterGear", function()
+	it("is nil before the first spawn, like a real Player", function()
+		local player = PlayerMock.new({ UserId = 1014 })
+		expect(PlayerMock.getStarterGear(player)).toBeNil()
+		player:Destroy()
+	end)
+
+	it("resolves a genuine StarterGear instance named 'StarterGear' after a spawn", function()
+		local player = PlayerMock.new({ UserId = 1015 })
+		local character = PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
+
+		local starterGear = PlayerMock.getStarterGear(player)
+		expect(starterGear).never.toBeNil()
+		expect((starterGear :: StarterGear):IsA("StarterGear")).toBe(true)
+		expect((starterGear :: StarterGear).Name).toBe("StarterGear")
+		expect((starterGear :: StarterGear).Parent).toBe(player)
+
+		character:Destroy()
+		player:Destroy()
+	end)
+
+	it("persists the same StarterGear (and its contents) across a respawn, unlike the Backpack", function()
+		local player = PlayerMock.new({ UserId = 1016 })
+		PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
+
+		local first = assert(PlayerMock.getStarterGear(player))
+		local tool = Instance.new("Tool")
+		tool.RequiresHandle = false
+		tool.Parent = first
+
+		local character = PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
+
+		local second = assert(PlayerMock.getStarterGear(player))
+		expect(second).toBe(first)
+		expect(second:FindFirstChildOfClass("Tool")).toBe(tool)
+
+		character:Destroy()
+		player:Destroy()
+	end)
+
+	it("throws when passed something that is not a PlayerMock", function()
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getStarterGear(folder :: any)
+		end).toThrow()
+		folder:Destroy()
+	end)
+end)
+
 describe("PlayerMock.removeCharacter", function()
 	it(
 		"despawns: CharacterRemoving sees the character still current, then Character nils, then it is destroyed",
