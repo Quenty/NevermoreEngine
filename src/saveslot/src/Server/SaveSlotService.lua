@@ -19,6 +19,7 @@ local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
 
@@ -328,6 +329,33 @@ end
 function SaveSlotService.PromiseResetActiveSlot(self: SaveSlotService, player: Player): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseResetActiveSlot()
+	end)
+end
+
+--[=[
+	Exports the player's non-main slot into a serializable table. See [HasSaveSlots.PromiseExportSlot].
+]=]
+function SaveSlotService.PromiseExportSlot(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotExportUtils.SaveSlotExport>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSlot(slotId)
+	end)
+end
+
+--[=[
+	Imports an exported slot into a fresh non-main slot for the player, resolving to the new slot id.
+	See [HasSaveSlots.PromiseImportSlot].
+]=]
+function SaveSlotService.PromiseImportSlot(
+	self: SaveSlotService,
+	player: Player,
+	export: SaveSlotExportUtils.SaveSlotExport
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseImportSlot(export)
 	end)
 end
 

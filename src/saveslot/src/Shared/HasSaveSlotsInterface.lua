@@ -37,5 +37,10 @@ return TieDefinition.new("HasSaveSlots", {
 		PromiseSelectNewSaveSlot = TieDefinition.Types.METHOD,
 		PromiseSelectEphemeralSlot = TieDefinition.Types.METHOD,
 		PromiseDeleteAllSlots = TieDefinition.Types.METHOD,
+
+		-- Export/import operate on the server's datastore-backed slots and are refused on the main
+		-- slot (see SaveSlotExportUtils); server realm only.
+		PromiseExportSlot = TieDefinition.Types.METHOD,
+		PromiseImportSlot = TieDefinition.Types.METHOD,
 	},
 })

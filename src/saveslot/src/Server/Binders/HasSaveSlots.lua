@@ -24,6 +24,7 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
 
@@ -257,6 +258,87 @@ function HasSaveSlots.PromiseCreateSlot(
 
 		self:_buildSlot(slotId, data, true)
 		return slotId
+	end)
+end
+
+--[=[
+	Exports a slot's saved data into a plain, serializable [SaveSlotExportUtils.SaveSlotExport].
+	Rejects the main/default slot: its store is the player's shared root datastore, so exporting it
+	would leak the SaveSlots system data and universe-scoped global data living alongside it. Only
+	isolated non-main slot substores are exportable.
+
+	@param slotId SlotId
+	@return Promise<SaveSlotExportUtils.SaveSlotExport>
+]=]
+function HasSaveSlots.PromiseExportSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotExportUtils.SaveSlotExport>
+	return (self._loadPromise :: any):Then(function()
+		local slot = self._slotMap[slotId]
+		if not slot then
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
+		end
+
+		if SaveSlotExportUtils.isMainSlotIndex(SaveSlotData.SlotIndex:Get(slot)) then
+			return (Promise :: any).rejected("Cannot export the main slot")
+		end
+
+		local metadata = SaveSlotData:Get(slot)
+		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
+			local data = if type(sourceData) == "table" then table.clone(sourceData) else {}
+			return SaveSlotExportUtils.create(data, metadata.SlotName, metadata.Summary)
+		end)
+	end)
+end
+
+--[=[
+	Imports an exported slot into a fresh slot at the lowest free non-main index, seeding the new
+	slot's store with the exported data. Never uses the main/default index -- importing onto the
+	shared root store would wipe the player's global data. Resolves to the new slot's id. Rejects a
+	malformed export, or when no non-main index is free.
+
+	@param export SaveSlotExportUtils.SaveSlotExport
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseImportSlot(
+	self: HasSaveSlots,
+	export: SaveSlotExportUtils.SaveSlotExport
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		if not SaveSlotExportUtils.isSaveSlotExport(export) then
+			return (Promise :: any).rejected("Bad save slot export")
+		end
+
+		-- Lowest free index strictly above the main slot: an imported slot must never occupy the
+		-- default index, whose store is the shared root datastore.
+		local usedIndices = {}
+		for existingSlotId, slot in self._slotMap do
+			if not self:_isEphemeral(existingSlotId) then
+				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+			end
+		end
+		local freeIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX + 1
+		while usedIndices[freeIndex] do
+			freeIndex += 1
+		end
+		if freeIndex > self.MaxSlotCount.Value then
+			return (Promise :: any).rejected("No free non-main slot index available")
+		end
+
+		return self:PromiseCreateSlot(freeIndex, {
+			SlotName = export.slotName,
+			Summary = export.summary,
+		}):Then(function(newSlotId: SaveSlotData.SlotId)
+			-- freeIndex is always > DEFAULT_SLOT_INDEX, so this store is an isolated substore
+			-- (never the shared root); a plain Overwrite cannot touch system or global data.
+			self:_getSlotStore(newSlotId):Overwrite(export.data)
+
+			-- Flush so the imported slot survives a crash before the next autosave.
+			return self._dataStore:Save():Then(function()
+				return newSlotId
+			end)
+		end)
 	end)
 end
 
