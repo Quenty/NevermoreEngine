@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/actionmanager@13.37.1`, `@quenty/colorpicker@10.41.2`
+  - fix: Update versions + README.md [#745](https://github.com/Quenty/NevermoreEngine/pull/745) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/genericscreenguiprovider@13.43.1`, `@quenty/permissionprovider@14.44.1`, `@quenty/playermock@1.1.1`, `@quenty/ragdoll@15.59.1`, `@quenty/streamingutils@10.23.1`, `@quenty/teleportserviceutils@9.38.1`
   - test: Add more tests and fixes [#744](https://github.com/Quenty/NevermoreEngine/pull/744) ([@Quenty](https://github.com/Quenty))
 

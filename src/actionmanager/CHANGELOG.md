@@ -1,3 +1,15 @@
+# v13.37.1 (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Update versions + README.md [#745](https://github.com/Quenty/NevermoreEngine/pull/745) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
