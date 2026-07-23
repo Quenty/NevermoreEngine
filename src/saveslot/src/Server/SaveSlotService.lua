@@ -101,13 +101,24 @@ function SaveSlotService.Start(self: SaveSlotService)
 			pairMaid:GiveTask(hasSaveSlots:RegisterSummaryProvider(name, provider))
 		end))
 
-		-- Select the slot the player teleported in with, or proceed with the default flow
+		-- Select the slot the player teleported in with, or proceed with the default flow.
+		-- The loads can settle long after this player is gone (session-lock or datastore
+		-- retries outlive a leave), so the maid must own the INNER promise too, and each
+		-- continuation re-checks the binder is alive: a continuation queued before the maid
+		-- died still runs, and calling any method on the destroyed (metatable-stripped)
+		-- binder throws.
 		maid:GivePromise(hasSaveSlots:PromiseSlotsLoaded()):Then(function()
-			return hasSaveSlots:PromiseLoadSaveSlotFromTeleport():Then(function(loadedSlotId)
+			if not hasSaveSlots.Destroy then
+				return nil -- The binder died while the load settled
+			end
+			return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport()):Then(function(loadedSlotId)
 				if loadedSlotId then
 					return -- Teleported in with a valid slot; it is now selected
 				end
-				return self:_promiseSelectDefaultSlot(hasSaveSlots)
+				if not hasSaveSlots.Destroy then
+					return nil -- The binder died while the teleport read settled
+				end
+				return self:_promiseSelectDefaultSlot(maid, hasSaveSlots)
 			end)
 		end)
 	end))
@@ -116,29 +127,47 @@ end
 --[=[
 	Selects the player's last active slot, or creates and selects the default slot.
 	Does nothing when explicit selection is required.
+
+	Every hop is maid-owned and re-checks the binder for the same reason as the caller: any of
+	these reads can settle after the player left, and continuing into the destroyed binder throws.
 ]=]
-function SaveSlotService._promiseSelectDefaultSlot(self: SaveSlotService, hasSaveSlots: any): Promise.Promise<any>?
+function SaveSlotService._promiseSelectDefaultSlot(
+	self: SaveSlotService,
+	maid: Maid.Maid,
+	hasSaveSlots: any
+): Promise.Promise<any>?
 	if self._selectionRequired then
 		return nil -- Consumer handles selection
 	end
 
-	return hasSaveSlots:PromiseLastActiveSlotId():Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
-		return hasSaveSlots:PromiseHasSlot(lastActiveSlotId):Then(function(hasLastSlot: boolean)
+	return maid:GivePromise(hasSaveSlots:PromiseLastActiveSlotId()):Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
+		if not hasSaveSlots.Destroy then
+			return nil
+		end
+		return maid:GivePromise(hasSaveSlots:PromiseHasSlot(lastActiveSlotId)):Then(function(hasLastSlot: boolean)
+			if not hasSaveSlots.Destroy then
+				return nil
+			end
 			if hasLastSlot then
 				return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
 			end
 
 			-- Or create and select default slot
-			return hasSaveSlots
-				:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+			return maid:GivePromise(hasSaveSlots:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX))
 				:Then(function(defaultSlotId: SaveSlotData.SlotId?)
+					if not hasSaveSlots.Destroy then
+						return nil
+					end
 					if defaultSlotId then
 						return defaultSlotId
 					else
 						return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
 					end
 				end)
-				:Then(function(slotId: SaveSlotData.SlotId)
+				:Then(function(slotId: SaveSlotData.SlotId?)
+					if not slotId or not hasSaveSlots.Destroy then
+						return nil
+					end
 					return hasSaveSlots:PromiseSelectSlot(slotId)
 				end)
 		end)
