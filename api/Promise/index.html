@@ -8,8 +8,8 @@
 See: https://promisesaplus.com/"><meta data-rh="true" property="og:description" content="Promises, but without error handling as this screws with stack traces, using Roblox signals
 
 See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Promise"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Promise" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Promise" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.a57f737c.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.582c8ad7.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.beb36e3b.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.3a092d90.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -118,7 +118,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
   If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their
   originating calls to then.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Tap"><code style="text-decoration:none">Tap</code><a href="#Tap" class="hash-link" aria-label="Direct link to Tap" title="Direct link to Tap" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L459"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Tap</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>onFulfilled<!-- -->: </code><code class="blue_P4bS">function</code><code>,</code></div><div><code>onRejected<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Tap"><code style="text-decoration:none">Tap</code><a href="#Tap" class="hash-link" aria-label="Direct link to Tap" title="Direct link to Tap" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L468"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Tap</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>onFulfilled<!-- -->: </code><code class="blue_P4bS">function</code><code>,</code></div><div><code>onRejected<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><span class="inlineDescription_G7Er">-- <span>
 <p>Returns self</p>
 </span></span></div><div>
 <p>
@@ -126,13 +126,13 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
   the value returned from onFulfilled or onRejected
 </p>
 <p>Will still yield for the result if a promise is returned, but will discard the result.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Finally"><code style="text-decoration:none">Finally</code><a href="#Finally" class="hash-link" aria-label="Direct link to Finally" title="Direct link to Finally" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L491"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Finally</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Finally"><code style="text-decoration:none">Finally</code><a href="#Finally" class="hash-link" aria-label="Direct link to Finally" title="Direct link to Finally" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L500"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Finally</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Executes upon pending stop</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Catch"><code style="text-decoration:none">Catch</code><a href="#Catch" class="hash-link" aria-label="Direct link to Catch" title="Direct link to Catch" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L501"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Catch</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>onRejected<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Catch"><code style="text-decoration:none">Catch</code><a href="#Catch" class="hash-link" aria-label="Direct link to Catch" title="Direct link to Catch" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L510"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Catch</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>,</code></div><div><code>onRejected<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Catch errors from the promise</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L508"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L517"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Rejects the current promise. Utility left for Maid task</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetResults"><code style="text-decoration:none">GetResults</code><a href="#GetResults" class="hash-link" aria-label="Direct link to GetResults" title="Direct link to GetResults" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L523"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">GetResults</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetResults"><code style="text-decoration:none">GetResults</code><a href="#GetResults" class="hash-link" aria-label="Direct link to GetResults" title="Direct link to GetResults" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/promise/src/Shared/Promise.lua#L532"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Promise<!-- -->.</code><code class="green_DgR4">GetResults</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">T...</code><code class="op_lSLc">&gt;</code><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="blue_P4bS">boolean</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>true if resolved, false otherwise.</p>
 </span></span></div><div><code class="blue_P4bS">any</code></div></div><code>)</code></div><div>
 <p>
@@ -530,7 +530,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 459,
+                &quot;line&quot;: 468,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         },
@@ -557,7 +557,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 491,
+                &quot;line&quot;: 500,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         },
@@ -584,7 +584,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 501,
+                &quot;line&quot;: 510,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         },
@@ -601,7 +601,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 508,
+                &quot;line&quot;: 517,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         },
@@ -627,7 +627,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 523,
+                &quot;line&quot;: 532,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         },
@@ -665,7 +665,7 @@ See: https://promisesaplus.com/"><link data-rh="true" rel="canonical" href="http
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;private&quot;: true,
             &quot;source&quot;: {
-                &quot;line&quot;: 550,
+                &quot;line&quot;: 559,
                 &quot;path&quot;: &quot;src/promise/src/Shared/Promise.lua&quot;
             }
         }
