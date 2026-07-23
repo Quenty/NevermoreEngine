@@ -159,6 +159,23 @@ function TeleportDataService.BuildTeleportData(
 end
 
 --[=[
+	Builds the teleport data envelope, awaiting any provider that returns a Promise. See
+	[TeleportDataBuilder.PromiseBuildTeleportData]. Use this when a provider assembles its slice
+	asynchronously (e.g. persisting live state before a teleport).
+
+	@param players { Player }
+	@param baseData { [string]: any }?
+	@return Promise<{ [string]: any }>
+]=]
+function TeleportDataService.PromiseBuildTeleportData(
+	self: TeleportDataService,
+	players: { Player },
+	baseData: { [string]: any }?
+): Promise.Promise<{ [string]: any }>
+	return self._builder:PromiseBuildTeleportData(players, baseData)
+end
+
+--[=[
 	Resolves the UserId used to key a player's envelope slice. A method so tests can stand in a fake
 	player (which has no UserId) by overriding it.
 

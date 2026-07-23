@@ -15,6 +15,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 
 --[=[
@@ -23,7 +25,7 @@ local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 	@type TeleportDataProvider ({ Player }) -> ({ [string]: any }?)
 	@within TeleportDataBuilder
 ]=]
-export type TeleportDataProvider = ({ Player }) -> { [string]: any }?
+export type TeleportDataProvider = ({ Player }) -> { [string]: any }? | Promise.Promise<{ [string]: any }?>
 
 --[=[
 	Contributes teleport data for a *single* player in a teleport (called once per player, with the full
@@ -33,7 +35,10 @@ export type TeleportDataProvider = ({ Player }) -> { [string]: any }?
 	@type PerPlayerTeleportDataProvider (Player, { Player }) -> ({ [string]: any }?)
 	@within TeleportDataBuilder
 ]=]
-export type PerPlayerTeleportDataProvider = (Player, { Player }) -> { [string]: any }?
+export type PerPlayerTeleportDataProvider = (
+	Player,
+	{ Player }
+) -> { [string]: any }? | Promise.Promise<{ [string]: any }?>
 
 local TeleportDataBuilder = {}
 TeleportDataBuilder.ClassName = "TeleportDataBuilder"
@@ -129,24 +134,27 @@ end
 	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
 	@return { [string]: any }
 ]=]
-function TeleportDataBuilder.BuildTeleportData(
+-- Merges already-resolved provider contributions (plain tables; nil/non-table/Promise entries are
+-- skipped) into the per-player envelope, applying precedence and the size guard. Shared by the sync
+-- and async build paths so both produce an identical envelope.
+function TeleportDataBuilder._assembleEnvelope(
 	self: TeleportDataBuilder,
-	players: { Player },
+	sharedContributions: { any },
+	perPlayerContributions: { { player: Player, contributions: { any } } },
 	baseData: { [string]: any }?
 ): { [string]: any }
-	assert(type(players) == "table", "Bad players")
-	if baseData ~= nil then
-		assert(type(baseData) == "table", "Bad baseData")
+	local function mergeInto(target: { [string]: any }, contributed: any)
+		-- A Promise is itself a table, so guard against merging an un-awaited one into the envelope.
+		if type(contributed) == "table" and not Promise.isPromise(contributed) then
+			for key, value in contributed do
+				target[key] = value
+			end
+		end
 	end
 
 	local sharedSlice: { [string]: any } = {}
-	for _, provider in self._providers do
-		local contributed = provider(players)
-		if type(contributed) == "table" then
-			for key, value in contributed do
-				sharedSlice[key] = value
-			end
-		end
+	for _, contributed in sharedContributions do
+		mergeInto(sharedSlice, contributed)
 	end
 	if baseData ~= nil then
 		for key, value in baseData do
@@ -155,19 +163,14 @@ function TeleportDataBuilder.BuildTeleportData(
 	end
 
 	local perPlayerByUserId: { [string]: { [string]: any } } = {}
-	for _, player in players do
+	for _, entry in perPlayerContributions do
 		local slice: { [string]: any } = {}
-		for _, provider in self._perPlayerProviders do
-			local contributed = provider(player, players)
-			if type(contributed) == "table" then
-				for key, value in contributed do
-					slice[key] = value
-				end
-			end
+		for _, contributed in entry.contributions do
+			mergeInto(slice, contributed)
 		end
 
 		if next(slice) ~= nil then
-			perPlayerByUserId[tostring(self._getUserId(player))] = slice
+			perPlayerByUserId[tostring(self._getUserId(entry.player))] = slice
 		end
 	end
 
@@ -180,7 +183,7 @@ function TeleportDataBuilder.BuildTeleportData(
 				"[TeleportDataBuilder] teleport data is %d bytes, over the %d byte cap for %d player(s); reduce provider payloads",
 				classification.bytes,
 				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
-				#players
+				#perPlayerContributions
 			)
 		)
 	elseif classification.level == "warn" then
@@ -189,12 +192,128 @@ function TeleportDataBuilder.BuildTeleportData(
 				"[TeleportDataBuilder] teleport data is %d bytes, approaching the %d byte cap for %d player(s)",
 				classification.bytes,
 				TeleportDataEnvelopeUtils.MAX_TELEPORT_DATA_BYTES,
-				#players
+				#perPlayerContributions
 			)
 		)
 	end
 
 	return envelope
+end
+
+--[=[
+	Builds the teleport-data envelope synchronously (see [TeleportDataBuilder._assembleEnvelope] for the
+	precedence and size guard). A provider that returns a Promise cannot be awaited here and contributes
+	nothing; use [TeleportDataBuilder.PromiseBuildTeleportData] when any provider is asynchronous.
+
+	@param players { Player }
+	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
+	@return { [string]: any }
+]=]
+function TeleportDataBuilder.BuildTeleportData(
+	self: TeleportDataBuilder,
+	players: { Player },
+	baseData: { [string]: any }?
+): { [string]: any }
+	assert(type(players) == "table", "Bad players")
+	if baseData ~= nil then
+		assert(type(baseData) == "table", "Bad baseData")
+	end
+
+	local sharedContributions = {}
+	for _, provider in self._providers do
+		local contributed = provider(players)
+		if contributed ~= nil then
+			table.insert(sharedContributions, contributed)
+		end
+	end
+
+	local perPlayerContributions = {}
+	for _, player in players do
+		local contributions = {}
+		for _, provider in self._perPlayerProviders do
+			local contributed = provider(player, players)
+			if contributed ~= nil then
+				table.insert(contributions, contributed)
+			end
+		end
+		table.insert(perPlayerContributions, { player = player, contributions = contributions })
+	end
+
+	return self:_assembleEnvelope(sharedContributions, perPlayerContributions, baseData)
+end
+
+--[=[
+	Builds the teleport-data envelope, awaiting any provider that returns a Promise. Providers may return
+	a table, nil, or a Promise of either; sync providers behave exactly as in
+	[TeleportDataBuilder.BuildTeleportData]. Resolves to the same envelope shape.
+
+	A provider whose Promise rejects rejects the whole build, so an asynchronous provider should handle
+	its own errors (e.g. resolve nil) when it would rather degrade than block the teleport.
+
+	@param players { Player }
+	@param baseData { [string]: any }?
+	@return Promise<{ [string]: any }>
+]=]
+function TeleportDataBuilder.PromiseBuildTeleportData(
+	self: TeleportDataBuilder,
+	players: { Player },
+	baseData: { [string]: any }?
+): Promise.Promise<{ [string]: any }>
+	assert(type(players) == "table", "Bad players")
+	if baseData ~= nil then
+		assert(type(baseData) == "table", "Bad baseData")
+	end
+
+	-- Normalize a provider's return (table, nil, or a Promise of either) to a Promise of a non-nil
+	-- value: the first Then flattens a returned Promise; the second collapses nil to `false` so
+	-- PromiseUtils.all yields a hole-free array (a nil array slot truncates iteration in _assembleEnvelope).
+	local function promiseContribution(contributed: any): Promise.Promise<any>
+		return Promise.resolved()
+			:Then(function()
+				return contributed
+			end)
+			:Then(function(resolved: any)
+				if resolved == nil then
+					return false
+				end
+				return resolved
+			end)
+	end
+
+	-- PromiseUtils.all resolves a *tuple* (and special-cases 0- and 1-element lists), so pack the
+	-- varargs into one array value: every downstream Then then receives a single, uniformly-shaped array.
+	local function promiseContributionArray(contributionPromises: { any }): Promise.Promise<{ any }>
+		return PromiseUtils.all(contributionPromises):Then(function(...)
+			return { ... }
+		end)
+	end
+
+	local sharedContributionPromises = {}
+	for _, provider in self._providers do
+		table.insert(sharedContributionPromises, promiseContribution(provider(players)))
+	end
+
+	local perPlayerListPromises = {}
+	for _, player in players do
+		local contributionPromises = {}
+		for _, provider in self._perPlayerProviders do
+			table.insert(contributionPromises, promiseContribution(provider(player, players)))
+		end
+		table.insert(perPlayerListPromises, promiseContributionArray(contributionPromises))
+	end
+
+	return promiseContributionArray(sharedContributionPromises):Then(function(sharedContributions)
+		return promiseContributionArray(perPlayerListPromises):Then(function(perPlayerLists)
+			local perPlayerContributions = {}
+			for index, player in players do
+				table.insert(perPlayerContributions, {
+					player = player,
+					contributions = perPlayerLists[index],
+				})
+			end
+			return self:_assembleEnvelope(sharedContributions, perPlayerContributions, baseData)
+		end)
+	end)
 end
 
 return TeleportDataBuilder

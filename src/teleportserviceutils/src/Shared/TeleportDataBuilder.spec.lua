@@ -5,6 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local Promise = require("Promise")
+local PromiseTestUtils = require("PromiseTestUtils")
 local TeleportDataBuilder = require("TeleportDataBuilder")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 
@@ -201,5 +203,91 @@ describe("TeleportDataBuilder size guard", function()
 		expect(function()
 			builder:BuildTeleportData({})
 		end).toThrow()
+	end)
+end)
+
+describe("TeleportDataBuilder.PromiseBuildTeleportData", function()
+	local function asyncProvider(value: any)
+		return function()
+			return Promise.resolved():Then(function()
+				return value
+			end)
+		end
+	end
+
+	local function buildAsync(builder, players, baseData)
+		local promise = builder:PromiseBuildTeleportData(players, baseData)
+		assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
+		return promise:Wait()
+	end
+
+	it("matches the sync build for sync providers", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(function()
+			return { mode = "hard" }
+		end)
+		builder:RegisterPerPlayerTeleportDataProvider(function(player)
+			return { slot = "slot-" .. tostring((player :: any).UserId) }
+		end)
+
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ mode = "hard", slot = "slot-111" })
+	end)
+
+	it("awaits an async per-player provider", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(asyncProvider({ slot = "async" }))
+
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ slot = "async" })
+	end)
+
+	it("awaits an async shared provider", function()
+		local builder = newBuilder()
+		builder:RegisterTeleportDataProvider(asyncProvider({ a = 1 }))
+
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ a = 1 })
+	end)
+
+	it("mixes sync and async providers under one player", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { sync = 1 }
+		end)
+		builder:RegisterPerPlayerTeleportDataProvider(asyncProvider({ async = 2 }))
+
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ sync = 1, async = 2 })
+	end)
+
+	it("ignores an async provider that resolves nil", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(asyncProvider(nil))
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return { a = 1 }
+		end)
+
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ a = 1 })
+	end)
+
+	it("gives each player of a group teleport their own async slice", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function(player)
+			return Promise.resolved():Then(function()
+				return { userId = (player :: any).UserId }
+			end)
+		end)
+
+		local built = buildAsync(builder, { fakePlayer(111), fakePlayer(222) })
+		expect(sliceFor(built, 111)).toEqual({ userId = 111 })
+		expect(sliceFor(built, 222)).toEqual({ userId = 222 })
+	end)
+
+	it("rejects the build when an async provider rejects", function()
+		local builder = newBuilder()
+		builder:RegisterPerPlayerTeleportDataProvider(function()
+			return Promise.rejected("boom")
+		end)
+
+		local promise = builder:PromiseBuildTeleportData({ fakePlayer(111) })
+		assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
+		expect((promise:Yield())).toEqual(false)
 	end)
 end)

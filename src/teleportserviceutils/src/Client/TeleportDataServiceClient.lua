@@ -140,6 +140,22 @@ function TeleportDataServiceClient.BuildTeleportData(
 end
 
 --[=[
+	Builds the teleport data envelope, awaiting any provider that returns a Promise. See
+	[TeleportDataBuilder.PromiseBuildTeleportData].
+
+	@param players { Player }
+	@param baseData { [string]: any }?
+	@return Promise<{ [string]: any }>
+]=]
+function TeleportDataServiceClient.PromiseBuildTeleportData(
+	self: TeleportDataServiceClient,
+	players: { Player },
+	baseData: { [string]: any }?
+): Promise.Promise<{ [string]: any }>
+	return self._builder:PromiseBuildTeleportData(players, baseData)
+end
+
+--[=[
 	Resolves the UserId used to select the local player's envelope slice. A method so tests can stand in a
 	fixed id (a headless client has no `Players.LocalPlayer`), mirroring the server's `_getUserId`.
 
