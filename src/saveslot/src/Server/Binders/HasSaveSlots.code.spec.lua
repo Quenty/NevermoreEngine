@@ -16,6 +16,7 @@ local SaveSlotConstants = require("SaveSlotConstants")
 local ServiceBag = require("ServiceBag")
 local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 
+local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
 
 local describe = Jest.Globals.describe
@@ -140,6 +141,30 @@ describe("HasSaveSlots export-to-code / load-from-code", function()
 	it("rejects loading an unknown code", function()
 		runWithContext(function(context)
 			expect(awaitResolved(context.hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode("nope"))).toEqual(false)
+		end)
+	end)
+
+	it("exports a slot as JSON that decodes back to its data", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			createSelectAndWrite(hasSaveSlots, 2)
+
+			local json = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToJson())
+			expect(type(json)).toEqual("string")
+
+			local decoded = HttpService:JSONDecode(json)
+			expect(decoded.data.Coins).toEqual(7)
+			expect(decoded.data.World_2.Eggs).toEqual(3)
+		end)
+	end)
+
+	it("refuses to export the main slot as JSON", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+			awaitValueOf(hasSaveSlots:PromiseSelectSlot(mainSlotId))
+
+			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToJson())).toEqual(false)
 		end)
 	end)
 end)

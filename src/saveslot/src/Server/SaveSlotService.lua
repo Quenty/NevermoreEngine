@@ -445,6 +445,19 @@ function SaveSlotService.PromiseLoadEphemeralSaveSlotFromCode(
 end
 
 --[=[
+	Exports the player's slot as a raw JSON string. See [HasSaveSlots.PromiseExportSaveSlotToJson].
+]=]
+function SaveSlotService.PromiseExportSaveSlotToJson(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSaveSlotToJson(slotId)
+	end)
+end
+
+--[=[
 	Destroys the service
 ]=]
 function SaveSlotService.Destroy(self: SaveSlotService): ()

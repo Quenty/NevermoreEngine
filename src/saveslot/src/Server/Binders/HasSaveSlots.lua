@@ -522,6 +522,29 @@ function HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode(
 end
 
 --[=[
+	Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug
+	report. Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).
+
+	@param slotId SlotId? -- defaults to the active slot
+	@return Promise<string>
+]=]
+function HasSaveSlots.PromiseExportSaveSlotToJson(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return (self._loadPromise :: any):Then(function()
+		local targetSlotId = slotId or self.ActiveSlotId.Value
+		if not targetSlotId then
+			return (Promise :: any).rejected("No slot to export")
+		end
+
+		return self:PromiseExportSlot(targetSlotId):Then(function(export)
+			return HttpService:JSONEncode(export)
+		end)
+	end)
+end
+
+--[=[
 	Duplicates the slot with the given ID into a new slot at the lowest free index,
 	copying its saved data. Resolves to the new slot's id. The copy is not selected,
 	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
