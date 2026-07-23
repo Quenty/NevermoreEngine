@@ -86,6 +86,17 @@ function SaveSlotService.Start(self: SaveSlotService)
 		end)
 	)
 
+	-- A transferable ephemeral slot re-saves its live state and carries its shared-store key across a
+	-- teleport. This provider is asynchronous (it persists before returning the key), so it only
+	-- contributes through TeleportDataService.PromiseBuildTeleportData; a plain BuildTeleportData drops it.
+	self._maid:GiveTask(self._teleportDataService:RegisterPerPlayerTeleportDataProvider(function(player: Player): any
+		local hasSaveSlots = self._hasSaveSlotsBinder:Get(player)
+		if not hasSaveSlots then
+			return nil
+		end
+		return hasSaveSlots:PromiseBuildEphemeralTransferSlice()
+	end))
+
 	self._maid:GiveTask(self._hasSaveSlotsBinder:ObserveAllBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -117,15 +128,27 @@ function SaveSlotService.Start(self: SaveSlotService)
 			if not hasSaveSlots.Destroy then
 				return nil -- The binder died while the load settled
 			end
-			return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport()):Then(function(loadedSlotId): any
-				if loadedSlotId then
-					return nil -- Teleported in with a valid slot; it is now selected
-				end
-				if not hasSaveSlots.Destroy then
-					return nil -- The binder died while the teleport read settled
-				end
-				return self:_promiseSelectDefaultSlot(maid, hasSaveSlots)
-			end)
+			-- A transferable ephemeral slot carried across a teleport takes precedence over the normal
+			-- slot-id resume and the default flow: re-select it from its shared-store key.
+			return maid:GivePromise(hasSaveSlots:PromiseLoadTransferableEphemeralSlotFromTeleport())
+				:Then(function(ephemeralSlotId): any
+					if ephemeralSlotId then
+						return nil -- Arrived carrying a transferable ephemeral slot; it is now selected
+					end
+					if not hasSaveSlots.Destroy then
+						return nil
+					end
+					return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport())
+						:Then(function(loadedSlotId): any
+							if loadedSlotId then
+								return nil -- Teleported in with a valid slot; it is now selected
+							end
+							if not hasSaveSlots.Destroy then
+								return nil -- The binder died while the teleport read settled
+							end
+							return self:_promiseSelectDefaultSlot(maid, hasSaveSlots)
+						end)
+				end)
 		end)
 	end))
 end

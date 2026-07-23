@@ -13,5 +13,7 @@ return Table.readonly({
 	METADATA_STORE_KEY = "slotMetadata",
 	METADATA_CONTAINER_NAME = "SaveSlots",
 	TELEPORT_DATA_SLOT_KEY = "IncomingSaveSlotId",
+	-- Carries the shared-store key of a transferable ephemeral slot across a teleport (trusted band).
+	TELEPORT_DATA_EPHEMERAL_KEY = "IncomingEphemeralSaveSlotKey",
 	DEFAULT_SLOT_INDEX = 1,
 })

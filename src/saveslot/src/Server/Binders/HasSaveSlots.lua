@@ -69,6 +69,9 @@ export type HasSaveSlots =
 			-- IsEphemeral property is the discriminator (see _isEphemeral); this holds the store objects a
 			-- property can't. See PromiseSelectEphemeralSlot.
 			_ephemeralStores: { [SaveSlotData.SlotId]: InMemoryDataStore.InMemoryDataStore },
+			-- The shared-store key each transferable ephemeral slot was loaded from, so a teleport can
+			-- re-save its live state under that key and carry it forward. See PromiseSelectTransferableEphemeralSlot.
+			_transferableEphemeralKeys: { [SaveSlotData.SlotId]: string },
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
@@ -101,6 +104,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 
 	self._slotMap = {}
 	self._ephemeralStores = {}
+	self._transferableEphemeralKeys = {}
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
 
@@ -380,6 +384,102 @@ function HasSaveSlots.PromiseImportSlotFromSharedDataStore(
 		end
 		return self:PromiseImportSlot(export)
 	end)
+end
+
+--[=[
+	Loads the export stored under the given shared-store key into a fresh ephemeral slot and selects it,
+	remembering the key so a teleport can carry the slot forward (see the transferable-ephemeral teleport
+	provider in [SaveSlotService]). Like every ephemeral slot it is never persisted, stays out of the slot
+	list, and is torn down on deselect. Rejects when no valid export is stored under the key.
+
+	@param key string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseSelectTransferableEphemeralSlot(
+	self: HasSaveSlots,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+			if export == nil then
+				return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
+			end
+			if not SaveSlotExportUtils.isSaveSlotExport(export) then
+				return (Promise :: any).rejected("Bad save slot export in shared store")
+			end
+
+			local slotId = HttpService:GenerateGUID(false)
+			self:_buildSlot(slotId, {
+				SlotId = slotId,
+				SlotIndex = EPHEMERAL_SLOT_INDEX,
+				SlotName = export.slotName or "Transfer",
+				CreatedTime = os.time(),
+				Summary = export.summary,
+			}, true, true)
+
+			-- Seed the in-memory store before selecting so a consumer of ObserveActiveSlotStoreBrio never
+			-- observes an empty active slot; then remember the key this slot transfers under.
+			self:_getSlotStore(slotId):Overwrite(export.data)
+			self._transferableEphemeralKeys[slotId] = key
+
+			return self:PromiseSelectSlot(slotId):Then(function()
+				return slotId
+			end)
+		end)
+	end)
+end
+
+--[=[
+	Builds this player's teleport slice for a transferable ephemeral slot: re-saves the active slot's
+	*current live* data to the shared store under its key and returns a slice carrying that key. Resolves
+	nil when the active slot is not a transferable ephemeral slot. A failed re-save degrades to nil so a
+	teleport is never blocked (the destination then re-loads the last saved state). Asynchronous -- it is
+	consumed through [TeleportDataService.PromiseBuildTeleportData].
+
+	@return Promise<{ [string]: any }?>
+]=]
+function HasSaveSlots.PromiseBuildEphemeralTransferSlice(self: HasSaveSlots): Promise.Promise<{ [string]: any }?>
+	return (self._loadPromise :: any):Then(function(): any
+		local slotId = self.ActiveSlotId.Value
+		if not slotId then
+			return nil
+		end
+		local storeKey = self._transferableEphemeralKeys[slotId]
+		if not storeKey then
+			return nil
+		end
+
+		return self:PromiseExportSlot(slotId)
+			:Then(function(export)
+				return self._sharedSaveSlotDataStoreService:PromiseWrite(storeKey, export)
+			end)
+			:Then(function()
+				return { [SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY] = storeKey }
+			end)
+			:Catch(function()
+				return nil
+			end)
+	end)
+end
+
+--[=[
+	Selects the transferable ephemeral slot the player teleported in with, when they carry one in the
+	*trusted* band (server-authored, so a client cannot forge it). Resolves to the slot id, or nil when
+	none arrived.
+
+	@return Promise<SlotId?>
+]=]
+function HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport(
+	self: HasSaveSlots
+): Promise.Promise<SaveSlotData.SlotId?>
+	return self._teleportDataService
+		:PromiseTrustedArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY)
+		:Then(function(key): any
+			if type(key) ~= "string" then
+				return nil
+			end
+			return self:PromiseSelectTransferableEphemeralSlot(key)
+		end)
 end
 
 --[=[
@@ -903,6 +1003,7 @@ function HasSaveSlots._buildSlot(
 		maid:GiveTask(function()
 			self._slotMap[slotId] = nil
 			self._ephemeralStores[slotId] = nil
+			self._transferableEphemeralKeys[slotId] = nil
 		end)
 		return
 	end
