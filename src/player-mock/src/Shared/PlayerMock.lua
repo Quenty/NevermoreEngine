@@ -136,6 +136,7 @@ local PLAYER_PROPERTIES: { [string]: PropertySpec } = {
 	FollowUserId = { default = 0 },
 	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
 	ReplicationFocus = { instanceValued = true }, -- default nil; streaming focus stand-in
+	RespawnLocation = { instanceValued = true }, -- default nil; checkpoint spawn stand-in
 }
 
 -- Prefix for the ObjectValue children backing Instance-valued stand-in properties. Like the
@@ -205,6 +206,13 @@ function PlayerMock.new(overrides: { [string]: any }?): Player
 	local playerGui = Instance.new("Folder")
 	playerGui.Name = "PlayerGui"
 	playerGui.Parent = player
+
+	-- The engine likewise inserts a player's PlayerScripts at join; mirror that with a stand-in.
+	-- PlayerScripts is not Instance.new-able either, so this too is a Folder resolved through the
+	-- explicit isMock branch (see PlayerMock.getPlayerScripts).
+	local playerScripts = Instance.new("Folder")
+	playerScripts.Name = "PlayerScripts"
+	playerScripts.Parent = player
 
 	-- The engine removes a player's character when the player leaves or is kicked; mirror that so
 	-- a destroyed mock cannot leak its character into the Workspace.
@@ -913,6 +921,30 @@ function PlayerMock.getPlayerGui(player: Player): PlayerGui
 
 	local playerGui: any = assert((player :: Instance):FindFirstChild("PlayerGui"), "No PlayerGui")
 	return playerGui :: PlayerGui
+end
+
+--[=[
+	Returns the mock's `PlayerScripts` stand-in, parented at construction -- mirroring the engine
+	inserting a player's PlayerScripts at join, like the PlayerGui stand-in. `PlayerScripts` cannot
+	be `Instance.new`'d, so the stand-in is really a `Folder` (named "PlayerScripts") typed as the
+	native class. A Folder can never satisfy an `IsA("PlayerScripts")` class filter, so consumers
+	observing the child by class resolve it through the usual explicit branch:
+
+	```lua
+	local playerScriptsClassName = if PlayerMock.isMock(localPlayer) then "Folder" else "PlayerScripts"
+	RxInstanceUtils.observeLastNamedChildBrio(localPlayer, playerScriptsClassName, "PlayerScripts")
+	```
+
+	Tests parent script stand-ins (e.g. an `RbxCharacterSounds` `LocalScript`) into it directly.
+
+	@param player Player -- must be a PlayerMock
+	@return PlayerScripts
+]=]
+function PlayerMock.getPlayerScripts(player: Player): PlayerScripts
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+
+	local playerScripts: any = assert((player :: Instance):FindFirstChild("PlayerScripts"), "No PlayerScripts")
+	return playerScripts :: PlayerScripts
 end
 
 -- Attribute recording the message a mock was kicked with (see [PlayerMock.kick]). Stored on the
