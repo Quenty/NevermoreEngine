@@ -217,6 +217,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
@@ -1369,6 +1372,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
