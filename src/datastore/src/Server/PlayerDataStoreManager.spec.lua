@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	@class PlayerDataStoreManager.spec.lua
 ]]
@@ -222,6 +222,77 @@ describe("PlayerDataStoreManager teardown", function()
 		local raw = controller.mock:GetRaw("user_1")
 		expect(raw).never.toBeNil()
 		expect(raw.coins).toEqual(5)
+
+		controller:destroy()
+	end)
+
+	it("releases the session lock when destroyed, not just the staged data", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		if not controller.storeAndAwaitLock() then
+			expect("lock was never acquired").toEqual("lock was acquired")
+			controller:destroy()
+			return
+		end
+
+		controller.manager:Destroy()
+
+		expect(PromiseTestUtils.awaitValue(function()
+			local raw = controller.mock:GetRaw("user_1")
+			return raw ~= nil and raw.lock == nil
+		end, 5)).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
+
+		controller:destroy()
+	end)
+
+	it("releases the lock for every store it still owns", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:GetDataStore(1):Store("coins", 1)
+		controller.manager:GetDataStore(2):Store("coins", 2)
+
+		local locked = PromiseTestUtils.awaitValue(function()
+			local rawOne = controller.mock:GetRaw("user_1")
+			local rawTwo = controller.mock:GetRaw("user_2")
+			return rawOne ~= nil and rawOne.lock ~= nil and rawTwo ~= nil and rawTwo.lock ~= nil
+		end, 10)
+		if not locked then
+			expect("both locks were never acquired").toEqual("both locks were acquired")
+			controller:destroy()
+			return
+		end
+
+		controller.manager:Destroy()
+
+		expect(PromiseTestUtils.awaitValue(function()
+			local rawOne = controller.mock:GetRaw("user_1")
+			local rawTwo = controller.mock:GetRaw("user_2")
+			return rawOne ~= nil and rawOne.lock == nil and rawTwo ~= nil and rawTwo.lock == nil
+		end, 5)).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").coins).toEqual(1)
+		expect(controller.mock:GetRaw("user_2").coins).toEqual(2)
+
+		controller:destroy()
+	end)
+
+	it("tears down cleanly when a store's load failed, leaking no rejection and writing no lock", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.mock:FailAllRequests()
+
+		local dataStore = controller.manager:GetDataStore(1)
+
+		local loaded = dataStore:PromiseLoadSuccessful()
+		if not expectSettled(loaded, 10) then
+			controller:destroy()
+			return
+		end
+		expect((loaded:Wait())).toEqual(false)
+
+		controller.manager:Destroy()
+
+		expect(controller.mock:GetRaw("user_1")).toBeNil()
 
 		controller:destroy()
 	end)

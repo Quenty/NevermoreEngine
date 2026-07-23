@@ -154,21 +154,25 @@ end
 
 --[=[
 	Flushes and tears down every datastore we still own. Runs on manager teardown (a hot-reloaded
-	ServiceBag, or a unit test). Save() is a best-effort synchronous write: the underlying UpdateAsync
-	request is dispatched before Destroy() cancels the promise, so a live server usually honors it, but
-	it is not guaranteed. A store whose load failed rejects, so the rejection is swallowed. Stores handed
-	off gracefully via _removePlayerDataStore have already been pulled out of _datastores, so this only
-	covers the ones nothing else cleaned up.
+	ServiceBag, or a unit test). SaveAndCloseSession() is a best-effort synchronous write: the
+	underlying UpdateAsync request is dispatched before Destroy() cancels the promise, so a live
+	server usually honors it, but it is not guaranteed. A store whose load failed rejects, so the
+	rejection is swallowed. Stores handed off gracefully via _removePlayerDataStore have already been
+	pulled out of _datastores, so this only covers the ones nothing else cleaned up.
 ]=]
 function PlayerDataStoreManager._flushAndDestroyAll(self: PlayerDataStoreManager): ()
 	for userId, datastore in self._datastores do
 		-- Cast past the DataStore intersection type: the solver otherwise blows up ("code too complex")
-		-- resolving :Save()/:Destroy() through it.
+		-- resolving :SaveAndCloseSession()/:Destroy() through it.
 		local store = datastore :: any
-		-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+		-- A failed load makes the save reject unconditionally; skip it so teardown does not
 		-- manufacture a guaranteed rejection.
 		if not store:DidLoadFail() then
-			store:Save()
+			-- Close the session, don't just save: this teardown ends the session, so it must also
+			-- release the session lock. A lock left held here reads as a live foreign session to the
+			-- next server that loads the key, which then grinds through the whole graceful-close/steal
+			-- retry ladder against a holder that no longer exists before it can load.
+			store:SaveAndCloseSession()
 		end
 		store:Destroy()
 		self._datastores[userId] = nil

@@ -433,15 +433,24 @@ function Promise.Then<T...>(
 	onFulfilled: ((T...) -> ...any)?,
 	onRejected: ((...any) -> ...any)?
 ): Promise<...any>
-	if type(onRejected) == "function" then
-		self._unconsumedException = false
-	end
-
 	if self._pendingExecuteList then
+		-- Attaching any continuation delegates this promise's rejection to the returned
+		-- child promise, which becomes the new carrier of the unconsumed exception. So the
+		-- parent is consumed even without an onRejected here: a rejection flowing through a
+		-- handler-less Then is forwarded, not dropped, and the warning surfaces only at the
+		-- tail of the chain if nobody ever handles it.
+		self._unconsumedException = false
+
 		local promise: Promise<T...> = Promise.new()
 		self._pendingExecuteList[#self._pendingExecuteList + 1] = { onFulfilled, onRejected, promise } :: { any }
 		return promise
 	else
+		-- Already settled: _executeThen returns self when there is no matching handler, so
+		-- self stays the carrier. Only an actual onRejected consumes the rejection here.
+		if type(onRejected) == "function" then
+			self._unconsumedException = false
+		end
+
 		return self:_executeThen(onFulfilled, onRejected, nil)
 	end
 end
