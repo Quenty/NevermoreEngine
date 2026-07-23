@@ -324,6 +324,123 @@ describe("Promise:Then", function()
 	end)
 end)
 
+describe("Promise:Then unconsumed-exception propagation", function()
+	it("consumes a pending promise once any continuation is attached", function()
+		local root = Promise.new()
+		expect((root :: any)._unconsumedException).toEqual(true)
+
+		root:Then(function() end)
+
+		expect((root :: any)._unconsumedException).toEqual(false)
+	end)
+
+	it("transfers the unconsumed exception to the returned child", function()
+		local root = Promise.new()
+		local child = root:Then(function() end)
+
+		expect((root :: any)._unconsumedException).toEqual(false)
+		expect((child :: any)._unconsumedException).toEqual(true)
+
+		root:Reject("boom")
+
+		-- Consume the child before the deferred uncaught-exception warning fires.
+		child:Catch(function() end)
+	end)
+
+	it("propagates a rejection through handler-less Thens to a downstream handler", function()
+		local root = Promise.new()
+		local tail = root:Then(function() end):Then(function() end):Then(nil, function(err)
+			return "recovered from " .. err
+		end)
+
+		root:Reject("boom")
+
+		local outcome, value = PromiseTestUtils.awaitOutcome(tail)
+		expect(outcome).toEqual("resolved")
+		expect(value).toEqual("recovered from boom")
+	end)
+
+	it("consumes every intermediate hop so none of them warn", function()
+		local root = Promise.new()
+		local hop1 = root:Then(function() end)
+		local hop2 = hop1:Then(function() end)
+		hop2:Then(nil, function(err)
+			return err
+		end)
+
+		root:Reject("boom")
+
+		expect((root :: any)._unconsumedException).toEqual(false)
+		expect((hop1 :: any)._unconsumedException).toEqual(false)
+		expect((hop2 :: any)._unconsumedException).toEqual(false)
+	end)
+
+	it("leaves an unhandled tail flagged so the error is not silently dropped", function()
+		local root = Promise.new()
+		local tail = root:Then(function() end):Then(function() end)
+
+		root:Reject("boom")
+
+		expect(tail:IsRejected()).toEqual(true)
+		expect((tail :: any)._unconsumedException).toEqual(true)
+
+		-- Consume it before the deferred uncaught-exception warning fires.
+		tail:Catch(function() end)
+		expect((tail :: any)._unconsumedException).toEqual(false)
+	end)
+
+	it("gives each fan-out branch its own unconsumed carrier", function()
+		local root = Promise.new()
+		local branchA = root:Then(function() end)
+		local branchB = root:Then(function() end)
+
+		root:Reject("boom")
+
+		expect((branchA :: any)._unconsumedException).toEqual(true)
+		expect((branchB :: any)._unconsumedException).toEqual(true)
+
+		branchA:Catch(function() end)
+		branchB:Catch(function() end)
+	end)
+
+	it("does not consume an already-rejected source when onRejected is omitted", function()
+		local source = Promise.rejected("nope")
+		-- Settled + no onRejected returns self, so self stays the carrier and must remain flagged.
+		local same = source:Then(function() end)
+
+		expect(same == source).toEqual(true)
+		expect((source :: any)._unconsumedException).toEqual(true)
+
+		source:Catch(function() end)
+		expect((source :: any)._unconsumedException).toEqual(false)
+	end)
+
+	it("runs the tail error handler for the datastore graceful-close shape", function()
+		local outer = Promise.new()
+		local root = Promise.new()
+
+		root:Then(function()
+			return "unused"
+		end)
+			:Then(function()
+				return "unused"
+			end)
+			:Then(function(value)
+				outer:Resolve(value)
+			end, function(err)
+				outer:Reject(string.format("locked: %s", err))
+			end)
+
+		root:Reject("still locked")
+
+		local outcome, err = PromiseTestUtils.awaitOutcome(outer)
+		expect(outcome).toEqual("rejected")
+		expect(err).toEqual("locked: still locked")
+
+		expect((root :: any)._unconsumedException).toEqual(false)
+	end)
+end)
+
 describe("Promise:Catch", function()
 	it("handles a rejection", function()
 		local outcome, value = PromiseTestUtils.awaitOutcome(Promise.rejected("caught"):Catch(function(err)

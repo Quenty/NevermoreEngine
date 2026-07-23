@@ -45,7 +45,7 @@ local function getScore(definition, adornee)
 	return definition:Get(adornee, TieRealms.SERVER).Score
 end
 
-local function getContainer(definition, adornee)
+local function getContainer(definition, adornee): Instance
 	return definition:GetImplementationParents(adornee, TieRealms.SERVER)[1]
 end
 
@@ -154,8 +154,7 @@ describe("TiePropertyInterface.Value set", function()
 		getScore(definition, adornee).Value = part
 
 		local container = getContainer(definition, adornee)
-		local member = container:FindFirstChild("Score")
-		expect(member).never.toBeNil()
+		local member = assert(container:FindFirstChild("Score"), "No Score member")
 		expect(member:IsA("ObjectValue")).toBe(true)
 		expect(container:GetAttribute("Score")).toBeNil()
 		expect(getScore(definition, adornee).Value).toBe(part)
@@ -201,8 +200,7 @@ describe("TiePropertyInterface.Value set", function()
 		getScore(definition, adornee).Value = nil
 
 		local container = getContainer(definition, adornee)
-		local member = container:FindFirstChild("Score")
-		expect(member).never.toBeNil()
+		local member = assert(container:FindFirstChild("Score"), "No Score member")
 		expect(member:IsA("ObjectValue")).toBe(true)
 		expect(container:GetAttribute("Score")).toBeNil()
 		expect(getScore(definition, adornee).Value).toBeNil()

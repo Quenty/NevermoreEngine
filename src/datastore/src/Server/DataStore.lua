@@ -696,13 +696,6 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 							local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
 							if not lockResult.isValid then
 								if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
-									-- Consume the rejection at every hop: a rejection that flows through a Then
-									-- with no rejection handler leaves that intermediate promise's exception
-									-- unconsumed, which surfaces as an uncaught rejection per hop.
-									local function repropagate(err)
-										return Promise.rejected(err)
-									end
-
 									-- Gracefully kick to avoid losing memory
 									self._sessionMessagingEnabledHelper
 										:PromiseCloseSessionGraceful(
@@ -716,10 +709,10 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 											return maid:GivePromise(
 												PromiseUtils.delayed(self._sessionMessagingCloseDelaySeconds)
 											)
-										end, repropagate)
+										end)
 										:Then(function()
 											return maid:GivePromise(promiseLoadUnlockedProfile(canStealLock, false))
-										end, repropagate)
+										end)
 										:Then(function(unlockedProfile)
 											loadPromise:Resolve(unlockedProfile)
 										end, function(err)
