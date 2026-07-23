@@ -119,24 +119,10 @@ function TeleportDataBuilder.RegisterPerPlayerTeleportDataProvider(
 	end
 end
 
---[=[
-	Builds the teleport data for a teleport of the given players as a per-player envelope (see
-	[TeleportDataEnvelopeUtils]): shared-provider contributions plus `baseData` form the shared slice, and
-	each per-player provider's contribution forms that player's slice.
-
-	Precedence, least to most specific: shared providers, then `baseData` (the caller's shared override),
-	then per-player providers.
-
-	Errors if the result exceeds the teleport-data size cap, and warns as it approaches it, so an
-	oversized payload fails loudly here instead of being silently dropped by the teleport.
-
-	@param players { Player }
-	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
-	@return { [string]: any }
-]=]
 -- Merges already-resolved provider contributions (plain tables; nil/non-table/Promise entries are
--- skipped) into the per-player envelope, applying precedence and the size guard. Shared by the sync
--- and async build paths so both produce an identical envelope.
+-- skipped) into the per-player envelope, applying precedence (shared providers, then baseData, then
+-- per-player) and the size guard. Shared by the sync and async build paths so both produce an
+-- identical envelope.
 function TeleportDataBuilder._assembleEnvelope(
 	self: TeleportDataBuilder,
 	sharedContributions: { any },

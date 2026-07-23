@@ -215,7 +215,7 @@ describe("TeleportDataBuilder.PromiseBuildTeleportData", function()
 		end
 	end
 
-	local function buildAsync(builder, players, baseData)
+	local function buildAsync(builder, players, baseData: { [string]: any }?)
 		local promise = builder:PromiseBuildTeleportData(players, baseData)
 		assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
 		return promise:Wait()

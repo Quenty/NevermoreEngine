@@ -31,7 +31,7 @@ local function setup()
 	local sharedMock = DataStoreMock.new()
 
 	local serviceBag = ServiceBag.new()
-	local teleportDataService = serviceBag:GetService(require("TeleportDataService"))
+	local teleportDataService: any = serviceBag:GetService(require("TeleportDataService"))
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local sharedService: SharedSaveSlotDataStoreService.SharedSaveSlotDataStoreService =
