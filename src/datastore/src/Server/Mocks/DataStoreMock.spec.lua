@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Sanity coverage for the DataStoreMock itself, so tests that rely on it can trust its
 	datastore-faithful behavior (deep-copy round-tripping, UpdateAsync transform semantics,

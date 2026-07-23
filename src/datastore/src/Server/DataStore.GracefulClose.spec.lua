@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Covers the graceful session close handoff between two sequential "server sessions" over one
 	DataStoreMock: a session that ends cleanly must release its session lock, so the next server's
@@ -30,11 +30,11 @@ describe("clean session end releases the lock (server-shutdown teardown path)", 
 		-- first), which is exactly what a ServiceBag destroy after a clean session looks like.
 		local maidA = Maid.new()
 		local serviceBagA = DataStoreTestUtils.newServiceBag(maidA, MessagingServiceMock.new())
-		local managerA = maidA:Add(PlayerDataStoreManager.new(serviceBagA, mock, function(userId)
+		local managerA = maidA:Add(PlayerDataStoreManager.new(serviceBagA, mock :: any, function(userId)
 			return "user_" .. tostring(userId)
 		end, true))
 
-		local storeA = managerA:GetDataStore(1)
+		local storeA = assert(managerA:GetDataStore(1), "No storeA")
 		storeA:Store("coins", 42)
 		if
 			not PromiseTestUtils.awaitValue(function()

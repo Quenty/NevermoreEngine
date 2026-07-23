@@ -52,7 +52,11 @@ function TiePropertyInterface.ObserveBrio(
 ): Observable.Observable<Brio.Brio<any>>
 	return (self:_observeValueBaseBrio() :: any):Pipe({
 		RxBrioUtils.switchMapBrio(function(valueBase): any
-			if typeof(valueBase) == "Instance" then
+			if valueBase == nil then
+				-- No implementation right now (see _observeFromImplParent firing nil).
+				-- Emit nothing; the previous value's brio already died.
+				return Rx.EMPTY
+			elseif typeof(valueBase) == "Instance" then
 				return RxInstanceUtils.observePropertyBrio(valueBase, "Value", predicate)
 			else
 				-- TODO: Maybe don't assumet his exists and use a helper method instead.
@@ -126,7 +130,7 @@ function TiePropertyInterface._getValueBaseOrError(self: TiePropertyInterface): 
 	if not valueBase then
 		error(
 			string.format(
-				"%s.%s is not implemented for %s" :: string,
+				"%s is not implemented for %s" :: string,
 				self._memberDefinition:GetFriendlyName(),
 				self:_getFullName()
 			)
@@ -312,6 +316,13 @@ rawTiePropertyInterface.__newindex = function(self: any, index: any, value: any)
 					current:Destroy()
 				end
 				return
+			else
+				error(
+					string.format(
+						"[TiePropertyImplementation] - No implParent for %q",
+						self._memberDefinition:GetMemberName()
+					)
+				)
 			end
 		else
 			local implParent = self:GetImplParent()
