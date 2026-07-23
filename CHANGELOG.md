@@ -1,5 +1,18 @@
 # (Thu Jul 23 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.47.0`, `@quenty/playermock@1.2.0`, `@quenty/promise@10.22.0`, `@quenty/tie@10.45.0`
+  - feat: Improve standard patches [#746](https://github.com/Quenty/NevermoreEngine/pull/746) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/actionmanager@13.37.1`, `@quenty/colorpicker@10.41.2`

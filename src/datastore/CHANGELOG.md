@@ -1,3 +1,21 @@
+# v13.47.0 (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- feat: Improve standard patches [#746](https://github.com/Quenty/NevermoreEngine/pull/746) ([@Quenty](https://github.com/Quenty))
+- feat: Even more stuff ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test: Add more tests and fixes ([@Quenty](https://github.com/Quenty))
+- fix: Data store tear down fixes that are graceful ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
