@@ -140,38 +140,39 @@ function SaveSlotService._promiseSelectDefaultSlot(
 		return nil -- Consumer handles selection
 	end
 
-	return maid:GivePromise(hasSaveSlots:PromiseLastActiveSlotId()):Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
-		if not hasSaveSlots.Destroy then
-			return nil
-		end
-		return maid:GivePromise(hasSaveSlots:PromiseHasSlot(lastActiveSlotId)):Then(function(hasLastSlot: boolean)
+	return maid:GivePromise(hasSaveSlots:PromiseLastActiveSlotId())
+		:Then(function(lastActiveSlotId: SaveSlotData.SlotId?)
 			if not hasSaveSlots.Destroy then
 				return nil
 			end
-			if hasLastSlot then
-				return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
-			end
+			return maid:GivePromise(hasSaveSlots:PromiseHasSlot(lastActiveSlotId)):Then(function(hasLastSlot: boolean)
+				if not hasSaveSlots.Destroy then
+					return nil
+				end
+				if hasLastSlot then
+					return hasSaveSlots:PromiseSelectSlot(lastActiveSlotId)
+				end
 
-			-- Or create and select default slot
-			return maid:GivePromise(hasSaveSlots:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX))
-				:Then(function(defaultSlotId: SaveSlotData.SlotId?)
-					if not hasSaveSlots.Destroy then
-						return nil
-					end
-					if defaultSlotId then
-						return defaultSlotId
-					else
-						return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
-					end
-				end)
-				:Then(function(slotId: SaveSlotData.SlotId?)
-					if not slotId or not hasSaveSlots.Destroy then
-						return nil
-					end
-					return hasSaveSlots:PromiseSelectSlot(slotId)
-				end)
+				-- Or create and select default slot
+				return maid:GivePromise(hasSaveSlots:PromiseSlotIdFromIndex(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+					:Then(function(defaultSlotId: SaveSlotData.SlotId?)
+						if not hasSaveSlots.Destroy then
+							return nil
+						end
+						if defaultSlotId then
+							return defaultSlotId
+						else
+							return hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX)
+						end
+					end)
+					:Then(function(slotId: SaveSlotData.SlotId?)
+						if not slotId or not hasSaveSlots.Destroy then
+							return nil
+						end
+						return hasSaveSlots:PromiseSelectSlot(slotId)
+					end)
+			end)
 		end)
-	end)
 end
 
 --[=[
