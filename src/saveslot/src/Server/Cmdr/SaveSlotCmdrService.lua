@@ -380,6 +380,93 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		table.sort(resetIndices)
 		return `Reset slot(s) {table.concat(resetIndices, ", ")}.`
 	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "export-save-slot",
+		Description = "Exports a save slot to the shared store and prints its code.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Player",
+				Type = "player",
+				Description = "Player whose slot to export (defaults to you).",
+				Optional = true,
+			},
+			{
+				Name = "Slot",
+				Type = "number",
+				Description = "Slot index to export (defaults to the active slot).",
+				Optional = true,
+			},
+			{
+				Name = "Code",
+				Type = "string",
+				Description = "Code to store under (defaults to a generated one).",
+				Optional = true,
+			},
+		},
+	}, function(context, player: Player?, slotIndex: number?, code: string?)
+		local targetPlayer = player or context.Executor
+
+		local exportSlotId: string
+		if slotIndex then
+			local resolved = self._saveSlotDataService:GetSlotIdFromIndex(targetPlayer, slotIndex)
+			if not resolved then
+				return `No slot with index {slotIndex}.`
+			end
+			exportSlotId = resolved
+		else
+			local active = self._saveSlotDataService:GetActiveSlotId(targetPlayer)
+			if not active then
+				return "No active slot to export."
+			end
+			exportSlotId = active
+		end
+
+		return self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(targetPlayer))
+			:Then(function(hasSaveSlots)
+				if code then
+					return hasSaveSlots:PromiseSaveSlotToSharedDataStore(exportSlotId, code):Then(function()
+						return code
+					end)
+				end
+				return hasSaveSlots:PromiseExportSaveSlotToCode(exportSlotId)
+			end)
+			:Then(function(resultCode)
+				return `Exported save slot to code: {resultCode}`
+			end)
+			:Catch(function(err)
+				return `Export failed: {tostring(err)}`
+			end)
+			:Wait()
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "load-ephemeral-save-slot",
+		Description = "Loads a save slot code into a throwaway ephemeral slot and selects it.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Code",
+				Type = "string",
+				Description = "The code to load.",
+			},
+		},
+	}, function(context, code: string)
+		return self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code)
+			end)
+			:Then(function()
+				return `Loaded ephemeral save slot from code: {code}`
+			end)
+			:Catch(function(err)
+				return `Load failed: {tostring(err)}`
+			end)
+			:Wait()
+	end)
 end
 
 function SaveSlotCmdrService.Destroy(self: SaveSlotCmdrService): ()
