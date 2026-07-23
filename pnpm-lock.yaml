@@ -5394,6 +5394,9 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise

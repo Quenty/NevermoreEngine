@@ -194,6 +194,14 @@ in `@quenty/grouputils`.)
   `playerMockServiceClient:SetLocalPlayer(player)`. Client code resolves it as
   `Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()`, and dummy-mode `Remoting` routes fires the
   same way — client↔server round-trips run headless against production remoting, with no loopback stubs.
+- A mock carries Folder stand-ins for the engine-inserted containers `PlayerGui` and `PlayerScripts`
+  (`PlayerMock.getPlayerGui` / `PlayerMock.getPlayerScripts`) — both classes are NotCreatable, so a Folder
+  is the best a mock can do. That means an `IsA`-class-filtered observe (e.g.
+  `RxInstanceUtils.observeLastNamedChildBrio(player, "PlayerScripts", "PlayerScripts")`) silently never
+  fires against a mock; the seam is the explicit class branch
+  `if PlayerMock.isMock(localPlayer) then "Folder" else "PlayerScripts"`. `LocalScript` **is**
+  `Instance.new`-able server-side, so a test can parent e.g. an `RbxCharacterSounds` stand-in into the
+  PlayerScripts Folder and assert production toggles its `Enabled`.
 - One server-realm mock service may be alive at a time; multiple client services (simulated clients) may
   coexist, each knowing its own local player (`playerMockServiceClient:GetLocalPlayer()`).
 - Destroy every mock the test creates. Leak detection is built in: a mock may not outlive the mock service

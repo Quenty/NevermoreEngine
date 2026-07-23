@@ -15,6 +15,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 
 local FOCUS_PART_NAME = "StreamingCinematicFocus"
 
@@ -67,7 +68,7 @@ function ReplicationFocusTracker.SetPosition(self: ReplicationFocusTracker, posi
 
 	self._part = part
 	self._maid:GiveTask(part)
-	self._subject.ReplicationFocus = part
+	self:_writeReplicationFocus(part)
 end
 
 --[=[
@@ -79,9 +80,18 @@ function ReplicationFocusTracker.IsActive(self: ReplicationFocusTracker): boolea
 end
 
 function ReplicationFocusTracker.Destroy(self: ReplicationFocusTracker): ()
-	self._subject.ReplicationFocus = nil
+	self:_writeReplicationFocus(nil)
 	self._maid:DoCleaning()
 	self._part = nil
+end
+
+-- Mock-safe: a PlayerMock's backing Folder has no ReplicationFocus property; write its stand-in.
+function ReplicationFocusTracker._writeReplicationFocus(self: ReplicationFocusTracker, part: BasePart?): ()
+	if PlayerMock.isMock(self._subject) then
+		PlayerMock.write(self._subject, "ReplicationFocus", part)
+	else
+		self._subject.ReplicationFocus = part
+	end
 end
 
 return ReplicationFocusTracker

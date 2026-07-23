@@ -1517,3 +1517,44 @@ describe("PlayerMock.getPlayerGui", function()
 		folder:Destroy()
 	end)
 end)
+
+describe("PlayerMock.getPlayerScripts", function()
+	it("carries a PlayerScripts stand-in from construction", function()
+		local player = PlayerMock.new()
+
+		local playerScripts = PlayerMock.getPlayerScripts(player)
+		expect(typeof(playerScripts)).toBe("Instance")
+		expect((playerScripts :: Instance).Name).toBe("PlayerScripts")
+		expect((playerScripts :: Instance).Parent).toBe(player)
+
+		player:Destroy()
+	end)
+
+	it("accepts parented script stand-ins", function()
+		local player = PlayerMock.new()
+
+		local localScript = Instance.new("LocalScript")
+		localScript.Name = "RbxCharacterSounds"
+		localScript.Parent = PlayerMock.getPlayerScripts(player)
+		expect(localScript.Parent).toBe(PlayerMock.getPlayerScripts(player))
+
+		player:Destroy()
+	end)
+
+	it("is destroyed with the mock", function()
+		local player = PlayerMock.new()
+		local playerScripts = PlayerMock.getPlayerScripts(player)
+
+		player:Destroy()
+
+		expect(playerScripts.Parent).toBeNil()
+	end)
+
+	it("asserts on a non-mock", function()
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getPlayerScripts(folder :: any)
+		end).toThrow()
+		folder:Destroy()
+	end)
+end)
