@@ -276,6 +276,61 @@ function DataStoreMock.GetRaw(self: DataStoreMock, key: string): any
 	return deepCopy(self._store[key])
 end
 
+--[=[
+	Serializes the full raw key -> value store to a JSON string, so a mock's contents can
+	survive between two in-process "server sessions" (e.g. an integration test simulating a
+	cross-place teleport) or be written out as an inspectable, diffable checkpoint artifact.
+	Datastore values are JSON-safe by contract, so the export is lossless; hydrate a fresh
+	mock from it with [DataStoreMock.ImportRaw].
+
+	Errors when the store holds a value that cannot be JSON-encoded (which a real datastore
+	would have refused to store in the first place).
+
+	@return string
+]=]
+function DataStoreMock.ExportRaw(self: DataStoreMock): string
+	local ok, encoded = pcall(function()
+		return HttpService:JSONEncode(self._store)
+	end)
+	if not ok then
+		error(string.format("[DataStoreMock.ExportRaw] - Store contents are not JSON-encodable: %s", tostring(encoded)))
+	end
+
+	return encoded
+end
+
+--[=[
+	Decodes a JSON string produced by [DataStoreMock.ExportRaw] and replaces the store
+	contents with it. This replaces rather than merges: every existing key is discarded,
+	along with its version/userId/metadata bookkeeping. Each imported key is then seeded
+	exactly like [DataStoreMock.SetRaw] (no version bump, no failure injection), so a
+	hydrated mock is indistinguishable from a fresh one seeded key-by-key.
+
+	@param json string
+]=]
+function DataStoreMock.ImportRaw(self: DataStoreMock, json: string): ()
+	assert(type(json) == "string", "Bad json")
+
+	local ok, decoded = pcall(function()
+		return HttpService:JSONDecode(json)
+	end)
+	if not ok then
+		error(string.format("[DataStoreMock.ImportRaw] - Could not decode json: %s", tostring(decoded)))
+	end
+	assert(type(decoded) == "table", "Bad json - expected an encoded key -> value object")
+
+	local store: { [string]: any } = {}
+	for key, value in decoded do
+		assert(type(key) == "string", "Bad json - datastore keys must be strings")
+		store[key] = value
+	end
+
+	self._store = store
+	self._userIds = {}
+	self._metadata = {}
+	self._versions = {}
+end
+
 function DataStoreMock._beginRequest(self: DataStoreMock, method: string, key: string): ()
 	self._callCounts[method] = (self._callCounts[method] or 0) + 1
 	self._totalCalls += 1

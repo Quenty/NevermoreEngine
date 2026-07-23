@@ -94,6 +94,13 @@ function DataStoreMessageHelper.PromiseCloseSessionGraceful(
 	self._maid[promise] = promise
 	promise:Finally(function()
 		self._maid[promise] = nil
+
+		-- Never cache a settled notification: a timed-out (rejected) promise left in the map would
+		-- make every later request for this session fail instantly instead of sending a fresh
+		-- close request with its own timeout window.
+		if self._sessionClosedNotifications[sessionId] == promise then
+			self._sessionClosedNotifications[sessionId] = nil
+		end
 	end)
 
 	PromiseMaidUtils.whilePromise(promise, function(maid)

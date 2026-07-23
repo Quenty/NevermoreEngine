@@ -673,73 +673,85 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 			self._maid[loadPromise] = loadPromise
 
 			PromiseMaidUtils.whilePromise(loadPromise, function(maid)
-				maid:GivePromise(
-					DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data, datastoreKeyInfo)
-						local userIdList = self._userIdList
-						if datastoreKeyInfo then
-							userIdList = datastoreKeyInfo:GetUserIds()
-						end
+				maid
+					:GivePromise(
+						DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(data, datastoreKeyInfo)
+							local userIdList = self._userIdList
+							if datastoreKeyInfo then
+								userIdList = datastoreKeyInfo:GetUserIds()
+							end
 
-						local metadata = nil
-						if datastoreKeyInfo then
-							metadata = datastoreKeyInfo:GetMetadata()
-						end
+							local metadata = nil
+							if datastoreKeyInfo then
+								metadata = datastoreKeyInfo:GetMetadata()
+							end
 
-						if self._debugWriting then
-							print(string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)), data)
-						end
-
-						local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
-						if not lockResult.isValid then
-							if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
-								-- Gracefully kick to avoid losing memory
-								self._sessionMessagingEnabledHelper
-									:PromiseCloseSessionGraceful(
-										lockResult.blockingSession.PlaceId,
-										lockResult.blockingSession.JobId,
-										lockResult.blockingSession.SessionId
-									)
-									:Then(function()
-										-- Give enough time for Roblox to replicate changes
-										-- We probably could bump back to the loop but this has slightly better error messages
-										return maid:GivePromise(
-											PromiseUtils.delayed(self._sessionMessagingCloseDelaySeconds)
-										)
-									end)
-									:Then(function()
-										return maid:GivePromise(promiseLoadUnlockedProfile(canStealLock, false))
-									end)
-									:Then(function(unlockedProfile)
-										loadPromise:Resolve(unlockedProfile)
-									end, function(err)
-										loadPromise:Reject(
-											`Profile is locked, but gracefully closed. Failed to load with {err}`
-										)
-									end)
-							else
-								loadPromise:Reject(
-									string.format(
-										"Profile is locked (%s)",
-										MessagingServiceUtils.toHumanReadable(data.lock)
-									)
+							if self._debugWriting then
+								print(
+									string.format("DataStorePromises.updateAsync(%q) -> Got ", tostring(self._key)),
+									data
 								)
 							end
 
-							-- Cancel write to avoid maintaining lock
-							return nil
+							local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
+							if not lockResult.isValid then
+								if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
+									-- Consume the rejection at every hop: a rejection that flows through a Then
+									-- with no rejection handler leaves that intermediate promise's exception
+									-- unconsumed, which surfaces as an uncaught rejection per hop.
+									local function repropagate(err)
+										return Promise.rejected(err)
+									end
+
+									-- Gracefully kick to avoid losing memory
+									self._sessionMessagingEnabledHelper
+										:PromiseCloseSessionGraceful(
+											lockResult.blockingSession.PlaceId,
+											lockResult.blockingSession.JobId,
+											lockResult.blockingSession.SessionId
+										)
+										:Then(function()
+											-- Give enough time for Roblox to replicate changes
+											-- We probably could bump back to the loop but this has slightly better error messages
+											return maid:GivePromise(
+												PromiseUtils.delayed(self._sessionMessagingCloseDelaySeconds)
+											)
+										end, repropagate)
+										:Then(function()
+											return maid:GivePromise(promiseLoadUnlockedProfile(canStealLock, false))
+										end, repropagate)
+										:Then(function(unlockedProfile)
+											loadPromise:Resolve(unlockedProfile)
+										end, function(err)
+											loadPromise:Reject(
+												`Profile is locked and the graceful session-close request did not release it. Failed to load with {err}`
+											)
+										end)
+								else
+									loadPromise:Reject(
+										string.format(
+											"Profile is locked (%s)",
+											MessagingServiceUtils.toHumanReadable(data.lock)
+										)
+									)
+								end
+
+								-- Cancel write to avoid maintaining lock
+								return nil
+							end
+
+							loadPromise:Resolve(lockResult.unlockedProfile)
+
+							return lockResult.lockedProfile, userIdList, metadata
+						end)
+					)
+					:Catch(function(opError)
+						-- The datastore operation itself failed (e.g. 509), which is NOT lock contention and
+						-- will not resolve by retrying. Fail the load fast, preserving the original error.
+						if loadPromise:IsPending() then
+							loadPromise:Reject(DataStoreNonRetryableLoadError.new(opError))
 						end
-
-						loadPromise:Resolve(lockResult.unlockedProfile)
-
-						return lockResult.lockedProfile, userIdList, metadata
 					end)
-				):Catch(function(opError)
-					-- The datastore operation itself failed (e.g. 509), which is NOT lock contention and
-					-- will not resolve by retrying. Fail the load fast, preserving the original error.
-					if loadPromise:IsPending() then
-						loadPromise:Reject(DataStoreNonRetryableLoadError.new(opError))
-					end
-				end)
 			end)
 
 			loadPromise:Finally(function()

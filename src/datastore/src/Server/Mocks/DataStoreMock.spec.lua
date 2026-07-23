@@ -436,6 +436,125 @@ describe("DataStoreMock serialized-size overflow", function()
 	end)
 end)
 
+describe("DataStoreMock:ExportRaw / ImportRaw", function()
+	it("should round-trip values written through the real datastore APIs", function()
+		local sessionA = DataStoreMock.new()
+		sessionA:SetAsync("player_1", { coins = 5, inventory = { "sword", "shield" } })
+		sessionA:UpdateAsync("player_2", function()
+			return { coins = 12, quests = { active = { "eggHunt" }, completed = {} } }
+		end)
+		sessionA:SetAsync("motd", "Welcome!")
+
+		local json = sessionA:ExportRaw()
+		expect(type(json)).toEqual("string")
+
+		local sessionB = DataStoreMock.new()
+		sessionB:ImportRaw(json)
+
+		expect((sessionB:GetAsync("player_1"))).toEqual({ coins = 5, inventory = { "sword", "shield" } })
+		expect((sessionB:GetAsync("player_2"))).toEqual({
+			coins = 12,
+			quests = { active = { "eggHunt" }, completed = {} },
+		})
+		expect((sessionB:GetAsync("motd"))).toEqual("Welcome!")
+	end)
+
+	it("should hand out a sane keyInfo for imported keys, like a mock seeded via SetRaw", function()
+		local sessionA = DataStoreMock.new()
+		sessionA:SetAsync("key", { coins = 5 })
+		sessionA:SetAsync("key", { coins = 6 }) -- version bumps stay behind, like SetRaw
+
+		local sessionB = DataStoreMock.new()
+		sessionB:ImportRaw(sessionA:ExportRaw())
+
+		local _, keyInfo = sessionB:GetAsync("key")
+		expect(keyInfo).never.toBeNil()
+		expect(keyInfo.Version).toEqual("0")
+		expect(keyInfo:GetUserIds()).toEqual({})
+		expect(keyInfo:GetMetadata()).toEqual({})
+	end)
+
+	it("should replace, not merge, the existing contents on import", function()
+		local source = DataStoreMock.new()
+		source:SetAsync("imported", 1)
+
+		local target = DataStoreMock.new()
+		target:SetAsync("preexisting", "should be discarded")
+		target:SetAsync("imported", "stale value")
+
+		target:ImportRaw(source:ExportRaw())
+
+		expect((target:GetAsync("preexisting"))).toEqual(nil)
+		expect((target:GetAsync("imported"))).toEqual(1)
+	end)
+
+	it("should discard bookkeeping for keys that survive a replace", function()
+		local source = DataStoreMock.new()
+		source:SetAsync("key", 1)
+
+		local target = DataStoreMock.new()
+		target:SetAsync("key", "old", { 111 })
+		target:ImportRaw(source:ExportRaw())
+
+		local _, keyInfo = target:GetAsync("key")
+		expect(keyInfo.Version).toEqual("0")
+		expect(keyInfo:GetUserIds()).toEqual({})
+	end)
+
+	it("should round-trip an empty store", function()
+		local empty = DataStoreMock.new()
+
+		local target = DataStoreMock.new()
+		target:SetAsync("key", "should be discarded")
+		target:ImportRaw(empty:ExportRaw())
+
+		expect((target:GetAsync("key"))).toEqual(nil)
+	end)
+
+	it("should export stably across an import cycle", function()
+		local sessionA = DataStoreMock.new()
+		sessionA:SetAsync("player_1", { coins = 5, nested = { list = { 1, 2, 3 } } })
+		sessionA:SetAsync("player_2", true)
+
+		local firstExport = sessionA:ExportRaw()
+
+		local sessionB = DataStoreMock.new()
+		sessionB:ImportRaw(firstExport)
+		local secondExport = sessionB:ExportRaw()
+
+		-- Key order inside the JSON is not guaranteed, so compare decoded contents.
+		local HttpService = game:GetService("HttpService")
+		expect(HttpService:JSONDecode(secondExport)).toEqual(HttpService:JSONDecode(firstExport))
+	end)
+
+	it("should not alias imported values to later reads", function()
+		local source = DataStoreMock.new()
+		source:SetAsync("key", { coins = 5 })
+
+		local target = DataStoreMock.new()
+		target:ImportRaw(source:ExportRaw())
+
+		local first = target:GetAsync("key")
+		first.coins = 999
+
+		expect((target:GetAsync("key")).coins).toEqual(5)
+	end)
+
+	it("should throw a clear error for malformed json", function()
+		local store = DataStoreMock.new()
+		expect(function()
+			store:ImportRaw("not json {")
+		end).toThrow("Could not decode json")
+	end)
+
+	it("should throw when the json is not an object", function()
+		local store = DataStoreMock.new()
+		expect(function()
+			store:ImportRaw('"just a string"')
+		end).toThrow()
+	end)
+end)
+
 describe("DataStoreMock:SetRaw / GetRaw", function()
 	it("should seed and read without triggering failures", function()
 		local store = DataStoreMock.new()
