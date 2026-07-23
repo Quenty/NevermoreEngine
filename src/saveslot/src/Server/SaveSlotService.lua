@@ -21,6 +21,7 @@ local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local ServiceBag = require("ServiceBag")
+local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 local TeleportDataService = require("TeleportDataService")
 
 local SaveSlotService = {}
@@ -48,6 +49,10 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	-- External
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
+
+	-- Registered here (pre-start) so the HasSaveSlots binder can acquire it when a player binds,
+	-- which happens after Start. Mirrors how PlayerDataStoreService/TeleportDataService are pulled in.
+	self._serviceBag:GetService(SharedSaveSlotDataStoreService)
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))
@@ -356,6 +361,35 @@ function SaveSlotService.PromiseImportSlot(
 ): Promise.Promise<SaveSlotData.SlotId>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseImportSlot(export)
+	end)
+end
+
+--[=[
+	Saves the player's non-main slot to the shared store under the given key. See
+	[HasSaveSlots.PromiseSaveSlotToSharedDataStore].
+]=]
+function SaveSlotService.PromiseSaveSlotToSharedDataStore(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId,
+	key: string
+): Promise.Promise<boolean>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseSaveSlotToSharedDataStore(slotId, key)
+	end)
+end
+
+--[=[
+	Imports a shared-store export into a fresh non-main slot for the player. See
+	[HasSaveSlots.PromiseImportSlotFromSharedDataStore].
+]=]
+function SaveSlotService.PromiseImportSlotFromSharedDataStore(
+	self: SaveSlotService,
+	player: Player,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseImportSlotFromSharedDataStore(key)
 	end)
 end
 

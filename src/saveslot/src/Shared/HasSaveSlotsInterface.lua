@@ -42,5 +42,7 @@ return TieDefinition.new("HasSaveSlots", {
 		-- slot (see SaveSlotExportUtils); server realm only.
 		PromiseExportSlot = TieDefinition.Types.METHOD,
 		PromiseImportSlot = TieDefinition.Types.METHOD,
+		PromiseSaveSlotToSharedDataStore = TieDefinition.Types.METHOD,
+		PromiseImportSlotFromSharedDataStore = TieDefinition.Types.METHOD,
 	},
 })

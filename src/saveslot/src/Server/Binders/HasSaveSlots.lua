@@ -26,6 +26,7 @@ local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local ServiceBag = require("ServiceBag")
+local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 local TeleportDataService = require("TeleportDataService")
 
 -- A summary provider contributes one named piece of a slot's Summary. It is called with the player and
@@ -76,6 +77,7 @@ export type HasSaveSlots =
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
+			_sharedSaveSlotDataStoreService: any,
 			_playSessionSlotId: SaveSlotData.SlotId?,
 			_playSessionStart: number?,
 			_playSessionLastFlush: number?,
@@ -90,6 +92,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
+	self._sharedSaveSlotDataStoreService = self._serviceBag:GetService(SharedSaveSlotDataStoreService)
 
 	self._slotContainer = self._maid:Add(Instance.new("Folder"))
 	self._slotContainer.Name = SaveSlotConstants.METADATA_CONTAINER_NAME
@@ -339,6 +342,43 @@ function HasSaveSlots.PromiseImportSlot(
 				return newSlotId
 			end)
 		end)
+	end)
+end
+
+--[=[
+	Exports a non-main slot (see [HasSaveSlots.PromiseExportSlot]) and writes it to the shared save
+	slot store under the given key.
+
+	@param slotId SlotId
+	@param key string
+	@return Promise<boolean>
+]=]
+function HasSaveSlots.PromiseSaveSlotToSharedDataStore(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId,
+	key: string
+): Promise.Promise<boolean>
+	return self:PromiseExportSlot(slotId):Then(function(export)
+		return self._sharedSaveSlotDataStoreService:PromiseWrite(key, export)
+	end)
+end
+
+--[=[
+	Reads an export from the shared save slot store and imports it into a fresh non-main slot (see
+	[HasSaveSlots.PromiseImportSlot]). Rejects when no export is stored under the key.
+
+	@param key string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseImportSlotFromSharedDataStore(
+	self: HasSaveSlots,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+		if export == nil then
+			return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
+		end
+		return self:PromiseImportSlot(export)
 	end)
 end
 
