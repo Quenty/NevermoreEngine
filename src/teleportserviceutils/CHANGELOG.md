@@ -1,21 +1,14 @@
-# v9.38.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-- feat: Improve stuff ([@Quenty](https://github.com/Quenty))
-- feat: Add baseline player-mock and support across Nevermore for mocked players. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.37.0...@quenty/teleportserviceutils@9.38.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Improve stuff ([ae11166](https://github.com/Quenty/NevermoreEngine/commit/ae1116636cea882a51754b0a74cb5a641bad9ae4))
 
 # [9.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.36.0...@quenty/teleportserviceutils@9.37.0) (2026-07-22)
 

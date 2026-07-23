@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.39.0...@quenty/lipsum@14.40.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/lipsum
+
 # [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.38.0...@quenty/lipsum@14.39.0) (2026-07-18)
 
 ### Bug Fixes

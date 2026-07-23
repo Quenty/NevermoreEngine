@@ -1,20 +1,13 @@
-# v10.23.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-- feat: Add baseline player-mock and support across Nevermore for mocked players. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.22.0...@quenty/grouputils@10.23.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
 
 # [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.21.0...@quenty/grouputils@10.22.0) (2026-07-18)
 

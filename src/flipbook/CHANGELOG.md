@@ -1,23 +1,13 @@
-# v9.36.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Cleanup code a bit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.35.0...@quenty/flipbook@9.36.0) (2026-07-23)
+
+### Bug Fixes
+
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
 
 # [9.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/flipbook@9.34.0...@quenty/flipbook@9.35.0) (2026-07-18)
 

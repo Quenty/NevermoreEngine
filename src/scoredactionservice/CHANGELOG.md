@@ -1,23 +1,13 @@
-# v16.49.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Safey tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [16.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.48.0...@quenty/scoredactionservice@16.49.0) (2026-07-23)
+
+### Bug Fixes
+
+- Safey tests ([881e7a9](https://github.com/Quenty/NevermoreEngine/commit/881e7a9c9ca8c51d30b4791b84668425955f318d))
 
 # [16.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/scoredactionservice@16.47.0...@quenty/scoredactionservice@16.48.0) (2026-07-18)
 

@@ -1,20 +1,13 @@
-# v3.4.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-- feat: Add unit tests to string package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.3.7...@quenty/string@3.4.0) (2026-07-23)
+
+### Features
+
+- Add unit tests to string package ([f15f2f2](https://github.com/Quenty/NevermoreEngine/commit/f15f2f2892d782bed552a882e31f3b5d07975184))
 
 ## [3.3.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.3.6...@quenty/string@3.3.7) (2026-05-30)
 

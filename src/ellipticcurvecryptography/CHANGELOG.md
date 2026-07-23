@@ -1,24 +1,13 @@
-# v1.14.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix(ellipticcurvecryptography): move specs out of ModuleScript folder ([@Quenty](https://github.com/Quenty))
-- refactor: Spec uses proper header ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.13.0...@quenty/ellipticcurvecryptography@1.14.0) (2026-07-23)
+
+### Bug Fixes
+
+- **ellipticcurvecryptography:** move specs out of ModuleScript folder ([eb31399](https://github.com/Quenty/NevermoreEngine/commit/eb31399c5e25a790ede55b395ed7972d038b5e6a))
 
 # [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ellipticcurvecryptography@1.12.0...@quenty/ellipticcurvecryptography@1.13.0) (2026-07-14)
 

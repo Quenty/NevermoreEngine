@@ -1,20 +1,13 @@
-# v9.44.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-- feat: Add baseline player-mock and support across Nevermore for mocked players. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.43.0...@quenty/playerinputmode@9.44.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
 
 # [9.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.42.0...@quenty/playerinputmode@9.43.0) (2026-07-22)
 

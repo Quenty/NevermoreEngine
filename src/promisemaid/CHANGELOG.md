@@ -1,20 +1,13 @@
-# v5.21.0 (Thu Jul 23 2026)
-
-#### 🚀 Enhancement
-
-- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
-- feat: Add promise tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promisemaid@5.20.0...@quenty/promisemaid@5.21.0) (2026-07-23)
+
+### Features
+
+- Add promise tests ([ff0a2a6](https://github.com/Quenty/NevermoreEngine/commit/ff0a2a6f72bcd63dbecf1af0a57870bac62c77ca))
 
 # [5.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promisemaid@5.19.0...@quenty/promisemaid@5.20.0) (2026-07-18)
 
