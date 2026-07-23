@@ -1,3 +1,16 @@
+# v9.38.1 (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
+- test: Add more tests and fixes [#744](https://github.com/Quenty/NevermoreEngine/pull/744) ([@Quenty](https://github.com/Quenty))
+- test: Add more tests and fixes ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
