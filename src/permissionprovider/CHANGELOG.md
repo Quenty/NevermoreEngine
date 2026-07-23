@@ -1,20 +1,11 @@
-# v14.44.1 (Thu Jul 23 2026)
-
-#### 🐛 Bug Fix
-
-- test: Add more tests and fixes [#744](https://github.com/Quenty/NevermoreEngine/pull/744) ([@Quenty](https://github.com/Quenty))
-- test: Add more tests and fixes ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.44.0...@quenty/permissionprovider@14.44.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/permissionprovider
 
 # [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.43.0...@quenty/permissionprovider@14.44.0) (2026-07-23)
 

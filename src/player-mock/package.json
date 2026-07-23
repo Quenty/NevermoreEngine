@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playermock",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Mock Player instance standing in for a Player in tests",
   "keywords": [
     "Roblox",
