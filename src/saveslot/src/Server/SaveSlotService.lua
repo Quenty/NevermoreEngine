@@ -417,6 +417,34 @@ function SaveSlotService.PromiseImportSlotFromSharedDataStore(
 end
 
 --[=[
+	Exports the player's slot to the shared store under a fresh code and resolves to it. See
+	[HasSaveSlots.PromiseExportSaveSlotToCode].
+]=]
+function SaveSlotService.PromiseExportSaveSlotToCode(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSaveSlotToCode(slotId)
+	end)
+end
+
+--[=[
+	Loads the code into a fresh transferable ephemeral slot for the player. See
+	[HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode].
+]=]
+function SaveSlotService.PromiseLoadEphemeralSaveSlotFromCode(
+	self: SaveSlotService,
+	player: Player,
+	code: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code)
+	end)
+end
+
+--[=[
 	Destroys the service
 ]=]
 function SaveSlotService.Destroy(self: SaveSlotService): ()

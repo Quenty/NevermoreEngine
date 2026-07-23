@@ -45,5 +45,7 @@ return TieDefinition.new("HasSaveSlots", {
 		PromiseSaveSlotToSharedDataStore = TieDefinition.Types.METHOD,
 		PromiseImportSlotFromSharedDataStore = TieDefinition.Types.METHOD,
 		PromiseSelectTransferableEphemeralSlot = TieDefinition.Types.METHOD,
+		PromiseExportSaveSlotToCode = TieDefinition.Types.METHOD,
+		PromiseLoadEphemeralSaveSlotFromCode = TieDefinition.Types.METHOD,
 	},
 })

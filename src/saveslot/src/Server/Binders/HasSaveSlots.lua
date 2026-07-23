@@ -483,6 +483,45 @@ function HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport(
 end
 
 --[=[
+	Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
+	is a shareable handle other sessions load with [HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode].
+	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).
+
+	@param slotId SlotId? -- defaults to the active slot
+	@return Promise<string>
+]=]
+function HasSaveSlots.PromiseExportSaveSlotToCode(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return (self._loadPromise :: any):Then(function()
+		local targetSlotId = slotId or self.ActiveSlotId.Value
+		if not targetSlotId then
+			return (Promise :: any).rejected("No slot to export")
+		end
+
+		local code = HttpService:GenerateGUID(false)
+		return self:PromiseSaveSlotToSharedDataStore(targetSlotId, code):Then(function()
+			return code
+		end)
+	end)
+end
+
+--[=[
+	Loads the slot stored under the given code into a fresh transferable ephemeral slot and selects it
+	(see [HasSaveSlots.PromiseSelectTransferableEphemeralSlot]). Resolves to the new slot id.
+
+	@param code string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode(
+	self: HasSaveSlots,
+	code: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self:PromiseSelectTransferableEphemeralSlot(code)
+end
+
+--[=[
 	Duplicates the slot with the given ID into a new slot at the lowest free index,
 	copying its saved data. Resolves to the new slot's id. The copy is not selected,
 	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
