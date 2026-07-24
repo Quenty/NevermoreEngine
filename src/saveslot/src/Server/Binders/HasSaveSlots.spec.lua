@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
@@ -18,6 +19,7 @@ local PromiseTestUtils = require("PromiseTestUtils")
 local Rx = require("Rx")
 local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
+local ValueObject = require("ValueObject")
 
 local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
@@ -1488,7 +1490,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		context.destroy()
 	end)
 
-	it("keeps the ephemeral slot out of the replicated slot list", function()
+	it("keeps the ephemeral slot out of the slot list while still replicating it", function()
 		local context = setup()
 
 		local realId = createAndSelectReal(context, 2)
@@ -1502,8 +1504,113 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(listedIds[realId]).toEqual(true)
 		expect(listedIds[ephemeralId]).toBeNil()
 		expect(slotContainerHasChild(context, realId)).toEqual(true)
-		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
+		expect(slotContainerHasChild(context, ephemeralId)).toEqual(true)
 
+		context.destroy()
+	end)
+
+	it("replicates the ephemeral slot's metadata so it is readable off the instance tree", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context, { SlotName = "Lobby run" })
+
+		local metadata = (SaveSlotDataService :: any):GetSlotMetadata(context.fakePlayer, ephemeralId)
+		expect(metadata).never.toBeNil()
+		expect(metadata.SlotId).toEqual(ephemeralId)
+		expect(metadata.SlotName).toEqual("Lobby run")
+		expect(metadata.IsEphemeral).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("replicates the ephemeral slot's summary as its providers update it", function()
+		local context = setup()
+
+		local coins = ValueObject.new(7)
+		context.hasSaveSlots:RegisterSummaryProvider("coins", function()
+			return coins:Observe()
+		end)
+
+		local ephemeralId = selectEphemeral(context)
+
+		local function summaryCoins(): number?
+			local metadata = (SaveSlotDataService :: any):GetSlotMetadata(context.fakePlayer, ephemeralId)
+			return metadata and metadata.Summary and metadata.Summary.coins
+		end
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return summaryCoins() == 7
+		end, 10)).toEqual(true)
+
+		coins.Value = 9
+		expect(PromiseTestUtils.awaitValue(function()
+			return summaryCoins() == 9
+		end, 10)).toEqual(true)
+
+		coins:Destroy()
+		context.destroy()
+	end)
+
+	it("emits the ephemeral slot through ObserveSlotMetadata, and nil once it is retired", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context, { SlotName = "Lobby run" })
+
+		local maid = Maid.new()
+		local observed: any = nil
+		maid:GiveTask(
+			(SaveSlotDataService :: any)
+				:ObserveSlotMetadata(context.fakePlayer, ephemeralId)
+				:Subscribe(function(metadata)
+					observed = metadata
+				end)
+		)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return observed ~= nil and observed.SlotName == "Lobby run"
+		end, 10)).toEqual(true)
+
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return observed == nil
+		end, 10)).toEqual(true)
+
+		maid:DoCleaning()
+		context.destroy()
+	end)
+
+	it("excludes the ephemeral slot from ObserveSlotList without dropping the real slots", function()
+		local context = setup()
+
+		local realId = createAndSelectReal(context, 2)
+
+		local maid = Maid.new()
+		local observedIds: { [string]: boolean } = {}
+		maid:GiveTask((SaveSlotDataService :: any):ObserveSlotList(context.fakePlayer):Subscribe(function(slotList: any)
+			observedIds = {}
+			for _, metadata in (slotList or {}) :: { any } do
+				observedIds[metadata.SlotId] = true
+			end
+		end))
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return observedIds[realId] == true
+		end, 10)).toEqual(true)
+
+		local ephemeralId = selectEphemeral(context)
+
+		-- Adding a real slot after the ephemeral one forces a re-emission that must have seen both, so the
+		-- ephemeral slot's absence below is a filtered list rather than a list that never updated.
+		local laterRealId = resolve(context.hasSaveSlots:PromiseCreateSlot(3))
+		expect(PromiseTestUtils.awaitValue(function()
+			return observedIds[laterRealId] == true
+		end, 10)).toEqual(true)
+
+		expect(observedIds[ephemeralId]).toBeNil()
+		expect(observedIds[realId]).toEqual(true)
+
+		maid:DoCleaning()
 		context.destroy()
 	end)
 
