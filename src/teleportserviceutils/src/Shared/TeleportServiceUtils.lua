@@ -157,6 +157,8 @@ end
 --[=[
 	Promise wrapper of [TeleportServiceUtils.teleportAsync] -- so it is mock-aware too, recording mock
 	players and resolving without an engine call when the batch is all mocks.
+
+	@server
 	@param placeId number
 	@param players { Player }
 	@param teleportOptions TeleportOptions?
