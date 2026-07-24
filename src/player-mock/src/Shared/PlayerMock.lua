@@ -549,6 +549,25 @@ local LOOKUPS: { [string]: LookupSpec } = {
 	-- performs the set on the mock local player, there being no CoreGui to affect) and read by tests
 	-- to assert the effect. Default true: CoreGui starts enabled on a real client.
 	["StarterGui.SetCoreGuiEnabled"] = { default = true, valueType = "boolean", keyKind = "EnumItem" },
+	-- TeleportService teleports (Teleport / TeleportAsync / TeleportToPlaceInstance) -- client engine
+	-- effects recorded like SetCoreGuiEnabled: production (TeleportServiceUtils) writes a record keyed by
+	-- destination placeId on the mock, there being no real place to send it to, and a test reads it back
+	-- to assert the hop and its data. Value is a { via, teleportData?, instanceId?, spawnName? } record
+	-- (`via` names the API used). Default nil: no teleport requested until one is.
+	["TeleportService.Teleport"] = {
+		default = nil :: any,
+		valueType = "table",
+		validate = function(value: any)
+			assert(type(value.via) == "string", "Bad teleport.via")
+			assert(value.teleportData == nil or type(value.teleportData) == "table", "Bad teleport.teleportData")
+		end,
+		encode = function(value: any): string
+			return HttpService:JSONEncode(value)
+		end,
+		decode = function(value: any): any
+			return HttpService:JSONDecode(value)
+		end,
+	},
 	-- Players:GetFriendsAsync(userId) -> FriendPages, stored as the flat FriendData array the pages
 	-- iterate ({ Id, Username, DisplayName, IsOnline }). The engine call is keyed by userId alone
 	-- and the injected result already lives on the mock, so the lookup key is fixed at 0. Consumers
