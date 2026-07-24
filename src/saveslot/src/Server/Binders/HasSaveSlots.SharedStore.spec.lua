@@ -3,7 +3,7 @@
 	Coverage for saving/importing slots through the shared store: the real HasSaveSlots binder
 	composed with SharedSaveSlotDataStoreService, each backed by its own mocked datastore.
 
-	@class HasSaveSlots.sharedStore.spec.lua
+	@class HasSaveSlots.SharedStore.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -55,6 +55,7 @@ local function setup()
 		serviceBag = serviceBag,
 		hasSaveSlots = hasSaveSlots,
 		sharedService = sharedService,
+		sharedMock = sharedMock,
 		destroy = destroy,
 	}
 end
@@ -124,6 +125,29 @@ describe("HasSaveSlots shared-store save/import", function()
 
 			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
 			expect(awaitResolved(hasSaveSlots:PromiseSaveSlotToSharedDataStore(mainSlotId, "k"))).toEqual(false)
+		end)
+	end)
+
+	it("rejects a save when the shared store write fails", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+
+			context.sharedMock:FailNextRequests(1)
+			expect(awaitResolved(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-fail"))).toEqual(
+				false
+			)
+		end)
+	end)
+
+	it("rejects an import when the shared store read fails", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-read"))
+
+			context.sharedMock:FailNextRequests(1)
+			expect(awaitResolved(hasSaveSlots:PromiseImportSlotFromSharedDataStore("code-read"))).toEqual(false)
 		end)
 	end)
 end)

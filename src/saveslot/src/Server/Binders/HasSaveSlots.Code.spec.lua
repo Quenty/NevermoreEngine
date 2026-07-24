@@ -3,7 +3,7 @@
 	Coverage for the code convenience: exporting a slot to a generated code and loading that code into
 	a fresh transferable ephemeral slot. Driven against separate player/shared mocked datastores.
 
-	@class HasSaveSlots.code.spec.lua
+	@class HasSaveSlots.Code.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -52,7 +52,7 @@ local function setup()
 		serviceBag:Destroy()
 	end
 
-	return { hasSaveSlots = hasSaveSlots, destroy = destroy }
+	return { hasSaveSlots = hasSaveSlots, sharedMock = sharedMock, destroy = destroy }
 end
 
 local function runWithContext(body)
@@ -165,6 +165,57 @@ describe("HasSaveSlots export-to-code / load-from-code", function()
 			awaitValueOf(hasSaveSlots:PromiseSelectSlot(mainSlotId))
 
 			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToJson())).toEqual(false)
+		end)
+	end)
+
+	it("generates a sanity-checkable default code (date-state-user-token)", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			createSelectAndWrite(hasSaveSlots, 2)
+
+			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode())
+			-- Date-prefixed, lowercase alphanumeric + hyphens, safe as a datastore key.
+			expect(string.match(code, "^%d%d%d%d%d%d%d%d%-") ~= nil).toEqual(true)
+			expect(string.match(code, "^[a-z0-9%-]+$") ~= nil).toEqual(true)
+			expect(#code <= 50).toEqual(true)
+		end)
+	end)
+
+	it("honors an injected code generator", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			hasSaveSlots:SetCodeGenerator(function(generatorContext)
+				return `custom-{generatorContext.slotIndex}`
+			end)
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+
+			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode(sourceSlotId))
+			expect(code).toEqual("custom-2")
+
+			-- The custom code still round-trips through the shared store.
+			awaitValueOf(hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code))
+			expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
+		end)
+	end)
+
+	it("rejects export-to-code when the shared store write fails", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			createSelectAndWrite(hasSaveSlots, 2)
+
+			context.sharedMock:FailNextRequests(1)
+			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToCode())).toEqual(false)
+		end)
+	end)
+
+	it("rejects load-from-code when the shared store read fails", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			createSelectAndWrite(hasSaveSlots, 2)
+			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode())
+
+			context.sharedMock:FailNextRequests(1)
+			expect(awaitResolved(hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code))).toEqual(false)
 		end)
 	end)
 end)

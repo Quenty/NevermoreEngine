@@ -4,7 +4,7 @@
 	safety property: export/import never touch the main/default slot (whose store is the shared root
 	datastore holding global player data), and imported slots always land at a non-main index.
 
-	@class HasSaveSlots.exportImport.spec.lua
+	@class HasSaveSlots.ExportImport.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 

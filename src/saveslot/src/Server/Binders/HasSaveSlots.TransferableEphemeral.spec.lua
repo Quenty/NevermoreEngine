@@ -4,7 +4,7 @@
 	teleport slice that re-saves its live state, and re-selecting it on arrival from the trusted band
 	only. Driven against separate player/shared mocked datastores plus the teleport-data test seams.
 
-	@class HasSaveSlots.transferableEphemeral.spec.lua
+	@class HasSaveSlots.TransferableEphemeral.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -56,6 +56,7 @@ local function setup()
 	return {
 		hasSaveSlots = hasSaveSlots,
 		sharedService = sharedService,
+		sharedMock = sharedMock,
 		teleportDataService = teleportDataService,
 		fakePlayer = fakePlayer,
 		destroy = destroy,
@@ -122,6 +123,21 @@ describe("HasSaveSlots.PromiseSelectTransferableEphemeralSlot", function()
 			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("missing"))).toEqual(false)
 		end)
 	end)
+
+	it("rejects when the shared store holds a value that is not a valid export", function()
+		runWithContext(function(context)
+			awaitValueOf(context.sharedService:PromiseWrite("corrupt", { notAnExport = true }))
+			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("corrupt"))).toEqual(false)
+		end)
+	end)
+
+	it("rejects when the shared store read fails", function()
+		runWithContext(function(context)
+			awaitValueOf(context.sharedService:PromiseWrite("code-x", { data = { Coins = 1 } }))
+			context.sharedMock:FailNextRequests(1)
+			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-x"))).toEqual(false)
+		end)
+	end)
 end)
 
 describe("HasSaveSlots.PromiseBuildEphemeralTransferSlice", function()
@@ -150,6 +166,18 @@ describe("HasSaveSlots.PromiseBuildEphemeralTransferSlice", function()
 			local slotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(2))
 			awaitValueOf(hasSaveSlots:PromiseSelectSlot(slotId))
 
+			expect(awaitValueOf(hasSaveSlots:PromiseBuildEphemeralTransferSlice())).toBeNil()
+		end)
+	end)
+
+	it("degrades to nil (does not block the teleport) when the re-save fails", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			awaitValueOf(context.sharedService:PromiseWrite("code-5", { data = { Coins = 5 } }))
+			awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-5"))
+
+			-- The re-save write fails; the slice must resolve nil rather than reject.
+			context.sharedMock:FailNextRequests(1)
 			expect(awaitValueOf(hasSaveSlots:PromiseBuildEphemeralTransferSlice())).toBeNil()
 		end)
 	end)
