@@ -1,3 +1,15 @@
+# v10.1.0 (Fri Jul 24 2026)
+
+#### 🚀 Enhancement
+
+- feat: mock-safe teleport and screen-gui-provider teardown [#751](https://github.com/Quenty/NevermoreEngine/pull/751) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

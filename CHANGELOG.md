@@ -1,5 +1,18 @@
 # (Fri Jul 24 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/genericscreenguiprovider@13.46.0`, `@quenty/playermock@1.4.0`, `@quenty/teleportserviceutils@10.1.0`
+  - feat: mock-safe teleport and screen-gui-provider teardown [#751](https://github.com/Quenty/NevermoreEngine/pull/751) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
 #### 💥 Breaking Change
 
 - `@quenty/saveslot@2.0.0`, `@quenty/teleportserviceutils@10.0.0`
