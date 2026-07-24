@@ -33,7 +33,7 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
-	serviceBag:GetService(require("SharedSaveSlotDataStoreService"))
+	serviceBag:GetService(require("SaveSlotSharedDataStoreService"))
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local binder = serviceBag:GetService(require("HasSaveSlots"))

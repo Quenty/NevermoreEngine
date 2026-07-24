@@ -21,8 +21,8 @@ local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
-local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 local TeleportDataService = require("TeleportDataService")
 
 local SaveSlotService = {}
@@ -54,7 +54,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 
 	-- Registered here (pre-start) so the HasSaveSlots binder can acquire it when a player binds,
 	-- which happens after Start. Mirrors how PlayerDataStoreService/TeleportDataService are pulled in.
-	self._serviceBag:GetService(SharedSaveSlotDataStoreService)
+	self._serviceBag:GetService(SaveSlotSharedDataStoreService)
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))

@@ -26,8 +26,8 @@ local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
-local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 local TeleportDataService = require("TeleportDataService")
 
 -- A summary provider contributes one named piece of a slot's Summary. It is called with the player and
@@ -97,7 +97,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
-	self._sharedSaveSlotDataStoreService = self._serviceBag:GetService(SharedSaveSlotDataStoreService)
+	self._sharedSaveSlotDataStoreService = self._serviceBag:GetService(SaveSlotSharedDataStoreService)
 
 	self._slotContainer = self._maid:Add(Instance.new("Folder"))
 	self._slotContainer.Name = SaveSlotConstants.METADATA_CONTAINER_NAME

@@ -2,15 +2,15 @@
 --[[
 	Coverage for the flat, session-lock-free shared snapshot store, driven against a mocked datastore.
 
-	@class SharedSaveSlotDataStoreService.spec.lua
+	@class SaveSlotSharedDataStoreService.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
-local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -20,8 +20,8 @@ local function setup()
 	local mock = DataStoreMock.new()
 
 	local serviceBag = ServiceBag.new()
-	local service: SharedSaveSlotDataStoreService.SharedSaveSlotDataStoreService =
-		serviceBag:GetService(SharedSaveSlotDataStoreService) :: any
+	local service: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
+		serviceBag:GetService(SaveSlotSharedDataStoreService) :: any
 	serviceBag:Init()
 	service:SetRobloxDataStore(mock)
 	serviceBag:Start()
@@ -65,7 +65,7 @@ local function awaitResolved(promise): boolean
 	return (promise:Yield())
 end
 
-describe("SharedSaveSlotDataStoreService", function()
+describe("SaveSlotSharedDataStoreService", function()
 	it("round-trips a value by key", function()
 		runWithContext(function(context)
 			awaitValueOf(context.service:PromiseWrite("code-1", { Coins = 9, World = { Eggs = 2 } }))

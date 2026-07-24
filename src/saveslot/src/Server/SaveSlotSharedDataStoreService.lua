@@ -6,7 +6,7 @@
 	with [HasSaveSlots.PromiseSaveSlotToSharedDataStore] / [HasSaveSlots.PromiseImportSlotFromSharedDataStore].
 
 	@server
-	@class SharedSaveSlotDataStoreService
+	@class SaveSlotSharedDataStoreService
 ]=]
 
 local require = require(script.Parent.loader).load(script)
@@ -16,10 +16,10 @@ local Maid = require("Maid")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
-local SharedSaveSlotDataStoreService = {}
-SharedSaveSlotDataStoreService.ServiceName = "SharedSaveSlotDataStoreService"
+local SaveSlotSharedDataStoreService = {}
+SaveSlotSharedDataStoreService.ServiceName = "SaveSlotSharedDataStoreService"
 
-export type SharedSaveSlotDataStoreService = typeof(setmetatable(
+export type SaveSlotSharedDataStoreService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
@@ -27,11 +27,11 @@ export type SharedSaveSlotDataStoreService = typeof(setmetatable(
 		_dataStoreName: string,
 		_dataStoreScope: string,
 	},
-	{} :: typeof({ __index = SharedSaveSlotDataStoreService })
+	{} :: typeof({ __index = SaveSlotSharedDataStoreService })
 ))
 
-function SharedSaveSlotDataStoreService.Init(
-	self: SharedSaveSlotDataStoreService,
+function SaveSlotSharedDataStoreService.Init(
+	self: SaveSlotSharedDataStoreService,
 	serviceBag: ServiceBag.ServiceBag
 ): ()
 	assert(not (self :: any)._serviceBag, "Already initialized")
@@ -48,8 +48,8 @@ end
 
 	@param robloxDataStore DataStore | DataStoreMock
 ]=]
-function SharedSaveSlotDataStoreService.SetRobloxDataStore(
-	self: SharedSaveSlotDataStoreService,
+function SaveSlotSharedDataStoreService.SetRobloxDataStore(
+	self: SaveSlotSharedDataStoreService,
 	robloxDataStore: any
 ): ()
 	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
@@ -61,7 +61,7 @@ end
 --[=[
 	Sets the datastore name. Must be called before the datastore is first resolved.
 ]=]
-function SharedSaveSlotDataStoreService.SetDataStoreName(self: SharedSaveSlotDataStoreService, name: string): ()
+function SaveSlotSharedDataStoreService.SetDataStoreName(self: SaveSlotSharedDataStoreService, name: string): ()
 	assert(type(name) == "string", "Bad name")
 	assert(not self._robloxDataStorePromise, "Cannot set name after datastore has been resolved")
 
@@ -71,7 +71,7 @@ end
 --[=[
 	Sets the datastore scope. Must be called before the datastore is first resolved.
 ]=]
-function SharedSaveSlotDataStoreService.SetDataStoreScope(self: SharedSaveSlotDataStoreService, scope: string): ()
+function SaveSlotSharedDataStoreService.SetDataStoreScope(self: SaveSlotSharedDataStoreService, scope: string): ()
 	assert(type(scope) == "string", "Bad scope")
 	assert(not self._robloxDataStorePromise, "Cannot set scope after datastore has been resolved")
 
@@ -87,8 +87,8 @@ end
 	@param userIds { number }?
 	@return Promise<boolean>
 ]=]
-function SharedSaveSlotDataStoreService.PromiseWrite(
-	self: SharedSaveSlotDataStoreService,
+function SaveSlotSharedDataStoreService.PromiseWrite(
+	self: SaveSlotSharedDataStoreService,
 	key: string,
 	value: any,
 	userIds: { number }?
@@ -106,8 +106,8 @@ end
 	@param key string
 	@return Promise<any>
 ]=]
-function SharedSaveSlotDataStoreService.PromiseRead(
-	self: SharedSaveSlotDataStoreService,
+function SaveSlotSharedDataStoreService.PromiseRead(
+	self: SaveSlotSharedDataStoreService,
 	key: string
 ): Promise.Promise<any>
 	assert(type(key) == "string", "Bad key")
@@ -123,8 +123,8 @@ end
 	@param key string
 	@return Promise<boolean>
 ]=]
-function SharedSaveSlotDataStoreService.PromiseRemove(
-	self: SharedSaveSlotDataStoreService,
+function SaveSlotSharedDataStoreService.PromiseRemove(
+	self: SaveSlotSharedDataStoreService,
 	key: string
 ): Promise.Promise<boolean>
 	assert(type(key) == "string", "Bad key")
@@ -134,8 +134,8 @@ function SharedSaveSlotDataStoreService.PromiseRemove(
 	end)
 end
 
-function SharedSaveSlotDataStoreService._promiseRobloxDataStore(
-	self: SharedSaveSlotDataStoreService
+function SaveSlotSharedDataStoreService._promiseRobloxDataStore(
+	self: SaveSlotSharedDataStoreService
 ): Promise.Promise<any>
 	if self._robloxDataStorePromise then
 		return self._robloxDataStorePromise
@@ -149,8 +149,8 @@ function SharedSaveSlotDataStoreService._promiseRobloxDataStore(
 	return self._robloxDataStorePromise
 end
 
-function SharedSaveSlotDataStoreService.Destroy(self: SharedSaveSlotDataStoreService): ()
+function SaveSlotSharedDataStoreService.Destroy(self: SaveSlotSharedDataStoreService): ()
 	self._maid:DoCleaning()
 end
 
-return SharedSaveSlotDataStoreService
+return SaveSlotSharedDataStoreService

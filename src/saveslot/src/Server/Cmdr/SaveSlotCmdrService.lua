@@ -472,6 +472,33 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
+		Name = "import-save-slot",
+		Description = "Imports a save slot code into a new persisted (non-main) slot.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Code",
+				Type = "string",
+				Description = "The code to import.",
+			},
+		},
+	}, function(context, code: string)
+		return self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseImportSlotFromSharedDataStore(code)
+			end)
+			:Then(function(newSlotId)
+				local metadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, newSlotId)
+				return `Imported save slot from code into slot {metadata.SlotIndex} ("{metadata.SlotName}").`
+			end)
+			:Catch(function(err)
+				return `Import failed: {tostring(err)}`
+			end)
+			:Wait()
+	end)
+
+	self._cmdrService:RegisterCommand({
 		Name = "import-ephemeral-save-slot",
 		Description = "Imports a save slot code into a throwaway ephemeral slot and selects it.",
 		Group = "SaveSlots",

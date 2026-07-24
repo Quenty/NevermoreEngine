@@ -14,8 +14,8 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
-local SharedSaveSlotDataStoreService = require("SharedSaveSlotDataStoreService")
 
 local Workspace = game:GetService("Workspace")
 
@@ -34,8 +34,8 @@ local function setup()
 	local teleportDataService: any = serviceBag:GetService(require("TeleportDataService"))
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
-	local sharedService: SharedSaveSlotDataStoreService.SharedSaveSlotDataStoreService =
-		serviceBag:GetService(SharedSaveSlotDataStoreService) :: any
+	local sharedService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
+		serviceBag:GetService(SaveSlotSharedDataStoreService) :: any
 	local binder = serviceBag:GetService(require("HasSaveSlots"))
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(playerMock)
