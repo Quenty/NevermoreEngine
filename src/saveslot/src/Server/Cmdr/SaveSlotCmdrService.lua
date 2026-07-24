@@ -380,6 +380,177 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		table.sort(resetIndices)
 		return `Reset slot(s) {table.concat(resetIndices, ", ")}.`
 	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "export-save-slot",
+		Description = "Exports save slots to the shared store and prints their codes.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Slots",
+				Type = "slotIndices",
+				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for the active slot.",
+				Optional = true,
+			},
+		},
+	}, function(context, slotIndices: { number }?)
+		local entries = self:_resolveSlotEntries(context, slotIndices)
+		if #entries == 0 then
+			return "No matching slots to export."
+		end
+
+		local lines = self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				-- Export sequentially to avoid concurrent datastore writes; report per-slot so a
+				-- mid-batch failure (e.g. the main slot, which export refuses) still surfaces the successes.
+				local promise = Promise.resolved()
+				local results = {}
+				for _, entry in entries do
+					promise = promise:Then(function()
+						return hasSaveSlots
+							:PromiseExportSaveSlotToCode(entry.slotId)
+							:Then(function(code)
+								table.insert(results, `slot {entry.slotIndex} → {code}`)
+							end)
+							:Catch(function(err)
+								table.insert(results, `slot {entry.slotIndex}: {tostring(err)}`)
+							end)
+					end)
+				end
+				return promise:Then(function()
+					return results
+				end)
+			end)
+			:Wait()
+
+		return `Exported:\n{table.concat(lines, "\n")}`
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "export-save-slot-json",
+		Description = "Exports save slots as raw JSON (no shared store) and prints them.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Slots",
+				Type = "slotIndices",
+				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for the active slot.",
+				Optional = true,
+			},
+		},
+	}, function(context, slotIndices: { number }?)
+		local entries = self:_resolveSlotEntries(context, slotIndices)
+		if #entries == 0 then
+			return "No matching slots to export."
+		end
+
+		local blocks = self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				local promise = Promise.resolved()
+				local results = {}
+				for _, entry in entries do
+					promise = promise:Then(function()
+						return hasSaveSlots
+							:PromiseExportSaveSlotToJson(entry.slotId)
+							:Then(function(json)
+								table.insert(results, `-- slot {entry.slotIndex}\n{json}`)
+							end)
+							:Catch(function(err)
+								table.insert(results, `slot {entry.slotIndex}: {tostring(err)}`)
+							end)
+					end)
+				end
+				return promise:Then(function()
+					return results
+				end)
+			end)
+			:Wait()
+
+		return table.concat(blocks, "\n\n")
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "import-save-slot",
+		Description = "Imports a save slot code into a new persisted (non-main) slot.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Code",
+				Type = "string",
+				Description = "The code to import.",
+			},
+		},
+	}, function(context, code: string)
+		return self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseImportSlotFromSharedDataStore(code)
+			end)
+			:Then(function(newSlotId)
+				local metadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, newSlotId)
+				return `Imported save slot from code into slot {metadata.SlotIndex} ("{metadata.SlotName}").`
+			end)
+			:Catch(function(err)
+				return `Import failed: {tostring(err)}`
+			end)
+			:Wait()
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "import-ephemeral-save-slot",
+		Description = "Imports a save slot code into a throwaway ephemeral slot and selects it.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Code",
+				Type = "string",
+				Description = "The code to load.",
+			},
+		},
+	}, function(context, code: string)
+		return self._maid
+			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:Then(function(hasSaveSlots)
+				return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
+			end)
+			:Then(function()
+				return `Imported ephemeral save slot from code: {code}`
+			end)
+			:Catch(function(err)
+				return `Load failed: {tostring(err)}`
+			end)
+			:Wait()
+	end)
+end
+
+-- Resolves a slotIndices argument (or nil = the active slot) into de-duplicated { slotIndex, slotId }
+-- entries for the executor. An empty result means nothing matched, and the caller reports it.
+function SaveSlotCmdrService._resolveSlotEntries(
+	self: SaveSlotCmdrService,
+	context: any,
+	slotIndices: { number }?
+): { { slotIndex: number, slotId: string } }
+	local entries = {}
+	if slotIndices == nil then
+		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(context.Executor)
+		if not activeSlotId then
+			return entries
+		end
+		local metadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, activeSlotId)
+		table.insert(entries, { slotIndex = metadata.SlotIndex, slotId = activeSlotId })
+	else
+		local seen = {}
+		for _, slotIndex in slotIndices do
+			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+			if slotId and not seen[slotId] then
+				seen[slotId] = true
+				table.insert(entries, { slotIndex = slotIndex, slotId = slotId })
+			end
+		end
+	end
+	return entries
 end
 
 function SaveSlotCmdrService.Destroy(self: SaveSlotCmdrService): ()

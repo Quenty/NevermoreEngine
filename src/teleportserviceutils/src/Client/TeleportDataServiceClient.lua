@@ -125,18 +125,19 @@ end
 
 --[=[
 	Builds the teleport data envelope for a teleport (typically `{ Players.LocalPlayer }`, since a client
-	can only teleport itself). See [TeleportDataBuilder.BuildTeleportData].
+	can only teleport itself), awaiting any provider that returns a Promise. See
+	[TeleportDataBuilder.PromiseBuildTeleportData].
 
 	@param players { Player }
 	@param baseData { [string]: any }?
-	@return { [string]: any }
+	@return Promise<{ [string]: any }>
 ]=]
-function TeleportDataServiceClient.BuildTeleportData(
+function TeleportDataServiceClient.PromiseBuildTeleportData(
 	self: TeleportDataServiceClient,
 	players: { Player },
 	baseData: { [string]: any }?
-): { [string]: any }
-	return self._builder:BuildTeleportData(players, baseData)
+): Promise.Promise<{ [string]: any }>
+	return self._builder:PromiseBuildTeleportData(players, baseData)
 end
 
 --[=[

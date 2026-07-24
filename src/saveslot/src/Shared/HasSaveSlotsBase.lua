@@ -26,6 +26,7 @@ export type HasSaveSlotsBase =
 
 			ActiveSlotId: ValueObject.ValueObject<SaveSlotData.SlotId?>,
 			LastActiveSlotId: ValueObject.ValueObject<SaveSlotData.SlotId?>,
+			ActiveTransferableEphemeralKey: ValueObject.ValueObject<string?>,
 			MaxSlotCount: ValueObject.ValueObject<number>,
 
 			SlotChanged: Signal.Signal<SaveSlotData.SlotId>,
@@ -43,6 +44,7 @@ function HasSaveSlotsBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 
 	self.ActiveSlotId = self._attributes.ActiveSlotId
 	self.LastActiveSlotId = self._attributes.LastActiveSlotId
+	self.ActiveTransferableEphemeralKey = self._attributes.ActiveTransferableEphemeralKey
 	self.MaxSlotCount = self._attributes.MaxSlotCount
 
 	self.SlotChanged = self.ActiveSlotId.Changed

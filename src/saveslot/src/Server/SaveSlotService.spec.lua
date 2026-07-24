@@ -200,7 +200,7 @@ describe("SaveSlotService internal teleport", function()
 		local player = controller.fakePlayer(111)
 		player:SetAttribute("ActiveSlotId", "slot-xyz")
 
-		local data = controller.teleportDataService:BuildTeleportData({ player })
+		local data = controller.teleportDataService:PromiseBuildTeleportData({ player }):Wait()
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
 
@@ -213,7 +213,7 @@ describe("SaveSlotService internal teleport", function()
 
 		local player = controller.fakePlayer(111)
 
-		local data = controller.teleportDataService:BuildTeleportData({ player })
+		local data = controller.teleportDataService:PromiseBuildTeleportData({ player }):Wait()
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
 
@@ -229,7 +229,7 @@ describe("SaveSlotService internal teleport", function()
 		playerA:SetAttribute("ActiveSlotId", "slot-a")
 		playerB:SetAttribute("ActiveSlotId", "slot-b")
 
-		local data = controller.teleportDataService:BuildTeleportData({ playerA, playerB })
+		local data = controller.teleportDataService:PromiseBuildTeleportData({ playerA, playerB }):Wait()
 		local sliceA = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		local sliceB = TeleportDataEnvelopeUtils.readSlice(data, 222)
 		expect(sliceA and sliceA[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-a")

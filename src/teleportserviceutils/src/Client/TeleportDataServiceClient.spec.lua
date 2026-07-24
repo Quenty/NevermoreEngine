@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
@@ -57,6 +58,23 @@ describe("TeleportDataServiceClient initialization", function()
 
 		expect(controller.await(controller.service:PromiseArrivedData())).toBeNil()
 		expect(controller.await(controller.service:PromiseHasArrivedValue("anything"))).toEqual(false)
+
+		controller:destroy()
+	end)
+end)
+
+describe("TeleportDataServiceClient.PromiseBuildTeleportData (async build)", function()
+	it("awaits an async shared provider", function()
+		local controller = setup()
+
+		controller.service:RegisterTeleportDataProvider(function()
+			return Promise.resolved():Then(function()
+				return { region = "async" }
+			end)
+		end)
+
+		local built = controller.await(controller.service:PromiseBuildTeleportData({}))
+		expect(TeleportDataEnvelopeUtils.readSlice(built, LOCAL_USER_ID)).toEqual({ region = "async" })
 
 		controller:destroy()
 	end)
@@ -182,7 +200,7 @@ describe("TeleportDataServiceClient build API (symmetric with the server)", func
 		end)
 
 		local fakeLocalPlayer = ({ UserId = LOCAL_USER_ID } :: any) :: Player
-		local built = controller.service:BuildTeleportData({ fakeLocalPlayer })
+		local built = controller.await(controller.service:PromiseBuildTeleportData({ fakeLocalPlayer }))
 
 		expect(TeleportDataEnvelopeUtils.readSlice(built, LOCAL_USER_ID)).toEqual({ slot = "built" })
 

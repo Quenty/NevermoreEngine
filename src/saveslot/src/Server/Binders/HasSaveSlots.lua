@@ -22,8 +22,11 @@ local Promise = require("Promise")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
 
@@ -67,6 +70,10 @@ export type HasSaveSlots =
 			-- IsEphemeral property is the discriminator (see _isEphemeral); this holds the store objects a
 			-- property can't. See PromiseSelectEphemeralSlot.
 			_ephemeralStores: { [SaveSlotData.SlotId]: InMemoryDataStore.InMemoryDataStore },
+			-- The shared-store key each transferable ephemeral slot was loaded from, so a teleport can
+			-- re-save its live state under that key and carry it forward. See PromiseSelectTransferableEphemeralSlot.
+			_transferableEphemeralKeys: { [SaveSlotData.SlotId]: string },
+			_codeGenerator: SaveSlotCodeUtils.CodeGenerator,
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
@@ -75,6 +82,7 @@ export type HasSaveSlots =
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
+			_sharedSaveSlotDataStoreService: any,
 			_playSessionSlotId: SaveSlotData.SlotId?,
 			_playSessionStart: number?,
 			_playSessionLastFlush: number?,
@@ -89,6 +97,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
+	self._sharedSaveSlotDataStoreService = self._serviceBag:GetService(SaveSlotSharedDataStoreService)
 
 	self._slotContainer = self._maid:Add(Instance.new("Folder"))
 	self._slotContainer.Name = SaveSlotConstants.METADATA_CONTAINER_NAME
@@ -97,6 +106,8 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 
 	self._slotMap = {}
 	self._ephemeralStores = {}
+	self._transferableEphemeralKeys = {}
+	self._codeGenerator = SaveSlotCodeUtils.generateDefaultCode
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
 
@@ -257,6 +268,318 @@ function HasSaveSlots.PromiseCreateSlot(
 
 		self:_buildSlot(slotId, data, true)
 		return slotId
+	end)
+end
+
+--[=[
+	Exports a slot's saved data into a plain, serializable [SaveSlotExportUtils.SaveSlotExport].
+	Rejects the main/default slot: its store is the player's shared root datastore, so exporting it
+	would leak the SaveSlots system data and universe-scoped global data living alongside it. Only
+	isolated non-main slot substores are exportable.
+
+	@param slotId SlotId
+	@return Promise<SaveSlotExportUtils.SaveSlotExport>
+]=]
+function HasSaveSlots.PromiseExportSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotExportUtils.SaveSlotExport>
+	return (self._loadPromise :: any):Then(function()
+		local slot = self._slotMap[slotId]
+		if not slot then
+			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
+		end
+
+		if SaveSlotExportUtils.isMainSlotIndex(SaveSlotData.SlotIndex:Get(slot)) then
+			return (Promise :: any).rejected("Cannot export the main slot")
+		end
+
+		local metadata = SaveSlotData:Get(slot)
+		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
+			local data = if type(sourceData) == "table" then table.clone(sourceData) else {}
+			return SaveSlotExportUtils.create(data, metadata.SlotName, metadata.Summary)
+		end)
+	end)
+end
+
+--[=[
+	Imports an exported slot into a fresh slot at the lowest free non-main index, seeding the new
+	slot's store with the exported data. Never uses the main/default index -- importing onto the
+	shared root store would wipe the player's global data. Resolves to the new slot's id. Rejects a
+	malformed export, or when no non-main index is free.
+
+	@param export SaveSlotExportUtils.SaveSlotExport
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseImportSlot(
+	self: HasSaveSlots,
+	export: SaveSlotExportUtils.SaveSlotExport
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		if not SaveSlotExportUtils.isSaveSlotExport(export) then
+			return (Promise :: any).rejected("Bad save slot export")
+		end
+
+		-- Lowest free index strictly above the main slot: an imported slot must never occupy the
+		-- default index, whose store is the shared root datastore.
+		local usedIndices = {}
+		for existingSlotId, slot in self._slotMap do
+			if not self:_isEphemeral(existingSlotId) then
+				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
+			end
+		end
+		local freeIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX + 1
+		while usedIndices[freeIndex] do
+			freeIndex += 1
+		end
+		if freeIndex > self.MaxSlotCount.Value then
+			return (Promise :: any).rejected("No free non-main slot index available")
+		end
+
+		return self:PromiseCreateSlot(freeIndex, {
+			SlotName = export.slotName,
+			Summary = export.summary,
+		}):Then(function(newSlotId: SaveSlotData.SlotId)
+			-- freeIndex is always > DEFAULT_SLOT_INDEX, so this store is an isolated substore
+			-- (never the shared root); a plain Overwrite cannot touch system or global data.
+			self:_getSlotStore(newSlotId):Overwrite(export.data)
+
+			-- Flush so the imported slot survives a crash before the next autosave.
+			return self._dataStore:Save():Then(function()
+				return newSlotId
+			end)
+		end)
+	end)
+end
+
+--[=[
+	Exports a non-main slot (see [HasSaveSlots.PromiseExportSlot]) and writes it to the shared save
+	slot store under the given key.
+
+	@param slotId SlotId
+	@param key string
+	@return Promise<boolean>
+]=]
+function HasSaveSlots.PromiseSaveSlotToSharedDataStore(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId,
+	key: string
+): Promise.Promise<boolean>
+	return self:PromiseExportSlot(slotId):Then(function(export)
+		return self._sharedSaveSlotDataStoreService:PromiseWrite(key, export)
+	end)
+end
+
+--[=[
+	Reads an export from the shared save slot store and imports it into a fresh non-main slot (see
+	[HasSaveSlots.PromiseImportSlot]). Rejects when no export is stored under the key.
+
+	@param key string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseImportSlotFromSharedDataStore(
+	self: HasSaveSlots,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+		if export == nil then
+			return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
+		end
+		return self:PromiseImportSlot(export)
+	end)
+end
+
+--[=[
+	Loads the export stored under the given shared-store key into a fresh ephemeral slot and selects it,
+	remembering the key so a teleport can carry the slot forward (see the transferable-ephemeral teleport
+	provider in [SaveSlotService]). Like every ephemeral slot it is never persisted, stays out of the slot
+	list, and is torn down on deselect. Rejects when no valid export is stored under the key.
+
+	@param key string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseSelectTransferableEphemeralSlot(
+	self: HasSaveSlots,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+			if export == nil then
+				return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
+			end
+			if not SaveSlotExportUtils.isSaveSlotExport(export) then
+				return (Promise :: any).rejected("Bad save slot export in shared store")
+			end
+
+			local slotId = HttpService:GenerateGUID(false)
+			self:_buildSlot(slotId, {
+				SlotId = slotId,
+				SlotIndex = EPHEMERAL_SLOT_INDEX,
+				SlotName = export.slotName or "Transfer",
+				CreatedTime = os.time(),
+				Summary = export.summary,
+			}, true, true)
+
+			-- Seed the in-memory store before selecting so a consumer of ObserveActiveSlotStoreBrio never
+			-- observes an empty active slot; then remember the key this slot transfers under.
+			self:_getSlotStore(slotId):Overwrite(export.data)
+			self._transferableEphemeralKeys[slotId] = key
+
+			return self:PromiseSelectSlot(slotId):Then(function()
+				return slotId
+			end)
+		end)
+	end)
+end
+
+--[=[
+	Builds this player's teleport slice for a transferable ephemeral slot: re-saves the active slot's
+	*current live* data to the shared store under its key and returns a slice carrying that key. Resolves
+	nil when the active slot is not a transferable ephemeral slot. A failed re-save degrades to nil so a
+	teleport is never blocked (the destination then re-loads the last saved state). Asynchronous -- it is
+	consumed through [TeleportDataService.PromiseBuildTeleportData].
+
+	@return Promise<{ [string]: any }?>
+]=]
+function HasSaveSlots.PromiseBuildEphemeralTransferSlice(self: HasSaveSlots): Promise.Promise<{ [string]: any }?>
+	return (self._loadPromise :: any):Then(function(): any
+		local slotId = self.ActiveSlotId.Value
+		if not slotId then
+			return nil
+		end
+		local storeKey = self._transferableEphemeralKeys[slotId]
+		if not storeKey then
+			return nil
+		end
+
+		return self:PromiseExportSlot(slotId)
+			:Then(function(export)
+				return self._sharedSaveSlotDataStoreService:PromiseWrite(storeKey, export)
+			end)
+			:Then(function()
+				return { [SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY] = storeKey }
+			end)
+			:Catch(function()
+				return nil
+			end)
+	end)
+end
+
+--[=[
+	Selects the transferable ephemeral slot the player teleported in with, from the shared-store key in
+	their arrived data. Reads the *unified* band (not trusted-only) so a **client-initiated** teleport --
+	the common case, e.g. a menu resume hop -- carries it too; a server-initiated teleport still works via
+	the trusted band. Resolves to the slot id, or nil when none arrived.
+
+	Because the client band is honored, a client can present any key it knows. The key resolves to a
+	server-side shared-store entry and only ever seeds a throwaway (never-persisted) slot, so the exposure
+	is read-only visibility of a snapshot whose code you already have -- acceptable for the dev/Cmdr tooling
+	this backs. Harden (longer code entropy / ownership) before exposing it to a player-facing surface.
+
+	@return Promise<SlotId?>
+]=]
+function HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport(
+	self: HasSaveSlots
+): Promise.Promise<SaveSlotData.SlotId?>
+	return self._teleportDataService
+		:PromiseArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY)
+		:Then(function(key): any
+			if type(key) ~= "string" then
+				return nil
+			end
+			return self:PromiseSelectTransferableEphemeralSlot(key)
+		end)
+end
+
+--[=[
+	Overrides the share-code generator for this player's exports (see [SaveSlotCodeUtils.CodeGenerator]).
+	Games inject a custom format; the default is [SaveSlotCodeUtils.generateDefaultCode]. Usually set
+	game-wide via [SaveSlotService.SetCodeGenerator] rather than per player.
+
+	@param generator CodeGenerator
+]=]
+function HasSaveSlots.SetCodeGenerator(self: HasSaveSlots, generator: SaveSlotCodeUtils.CodeGenerator): ()
+	assert(type(generator) == "function", "Bad generator")
+	self._codeGenerator = generator
+end
+
+-- Builds a code for a slot from the configured generator, resolving the owner's identity defensively
+-- (player.UserId is not indexable on every stand-in) and the slot's name/index from its metadata.
+function HasSaveSlots._generateCode(self: HasSaveSlots, slotId: SaveSlotData.SlotId): string
+	local slot = self._slotMap[slotId]
+	local metadata = if slot then SaveSlotData:Get(slot) else nil
+	local okUserId, userId = pcall(function()
+		return self._obj.UserId
+	end)
+
+	return self._codeGenerator({
+		userId = if okUserId and type(userId) == "number" then userId else nil,
+		userName = self._obj.Name,
+		slotName = metadata and metadata.SlotName,
+		slotIndex = metadata and metadata.SlotIndex,
+	})
+end
+
+--[=[
+	Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
+	is a shareable handle other sessions load with [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].
+	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]). The code
+	format comes from the configured generator (see [HasSaveSlots.SetCodeGenerator]).
+
+	@param slotId SlotId? -- defaults to the active slot
+	@return Promise<string>
+]=]
+function HasSaveSlots.PromiseExportSaveSlotToCode(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return (self._loadPromise :: any):Then(function()
+		local targetSlotId = slotId or self.ActiveSlotId.Value
+		if not targetSlotId then
+			return (Promise :: any).rejected("No slot to export")
+		end
+
+		local code = self:_generateCode(targetSlotId)
+		return self:PromiseSaveSlotToSharedDataStore(targetSlotId, code):Then(function()
+			return code
+		end)
+	end)
+end
+
+--[=[
+	Loads the slot stored under the given code into a fresh transferable ephemeral slot and selects it
+	(see [HasSaveSlots.PromiseSelectTransferableEphemeralSlot]). Resolves to the new slot id.
+
+	@param code string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode(
+	self: HasSaveSlots,
+	code: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self:PromiseSelectTransferableEphemeralSlot(code)
+end
+
+--[=[
+	Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug
+	report. Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).
+
+	@param slotId SlotId? -- defaults to the active slot
+	@return Promise<string>
+]=]
+function HasSaveSlots.PromiseExportSaveSlotToJson(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return (self._loadPromise :: any):Then(function()
+		local targetSlotId = slotId or self.ActiveSlotId.Value
+		if not targetSlotId then
+			return (Promise :: any).rejected("No slot to export")
+		end
+
+		return self:PromiseExportSlot(targetSlotId):Then(function(export)
+			return HttpService:JSONEncode(export)
+		end)
 	end)
 end
 
@@ -698,6 +1021,13 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 
 				self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
 					local active = self.ActiveSlotId.Value
+
+					-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
+					-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
+					self.ActiveTransferableEphemeralKey.Value = if active
+						then self._transferableEphemeralKeys[active]
+						else nil
+
 					local leftSlotId = previousActiveSlotId
 					-- Read before the retire below, while the outgoing slot is still in the map.
 					local leavingEphemeral = self:_isEphemeral(leftSlotId)
@@ -781,6 +1111,7 @@ function HasSaveSlots._buildSlot(
 		maid:GiveTask(function()
 			self._slotMap[slotId] = nil
 			self._ephemeralStores[slotId] = nil
+			self._transferableEphemeralKeys[slotId] = nil
 		end)
 		return
 	end

@@ -17,8 +17,11 @@ local ObservableMap = require("ObservableMap")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
+local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
+local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
 
@@ -35,6 +38,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
 		_remoting: any,
 		_teleportDataService: any,
+		_codeGenerator: SaveSlotCodeUtils.CodeGenerator?,
 	},
 	{} :: typeof({ __index = SaveSlotService })
 ))
@@ -47,6 +51,10 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	-- External
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
+
+	-- Registered here (pre-start) so the HasSaveSlots binder can acquire it when a player binds,
+	-- which happens after Start. Mirrors how PlayerDataStoreService/TeleportDataService are pulled in.
+	self._serviceBag:GetService(SaveSlotSharedDataStoreService)
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))
@@ -80,6 +88,17 @@ function SaveSlotService.Start(self: SaveSlotService)
 		end)
 	)
 
+	-- A transferable ephemeral slot re-saves its live state and carries its shared-store key across a
+	-- teleport. This provider is asynchronous (it persists before returning the key), so it only
+	-- contributes through TeleportDataService.PromiseBuildTeleportData; a plain BuildTeleportData drops it.
+	self._maid:GiveTask(self._teleportDataService:RegisterPerPlayerTeleportDataProvider(function(player: Player): any
+		local hasSaveSlots = self._hasSaveSlotsBinder:Get(player)
+		if not hasSaveSlots then
+			return nil
+		end
+		return hasSaveSlots:PromiseBuildEphemeralTransferSlice()
+	end))
+
 	self._maid:GiveTask(self._hasSaveSlotsBinder:ObserveAllBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -89,6 +108,9 @@ function SaveSlotService.Start(self: SaveSlotService)
 
 		-- Pass consumer-specified configs
 		hasSaveSlots.MaxSlotCount.Value = self._maxSlotCount
+		if self._codeGenerator then
+			hasSaveSlots:SetCodeGenerator(self._codeGenerator)
+		end
 
 		-- Mirror every default summary provider onto this player, and keep it in sync: a provider
 		-- registered or unregistered later is added to or removed from every bound player reactively.
@@ -111,15 +133,27 @@ function SaveSlotService.Start(self: SaveSlotService)
 			if not hasSaveSlots.Destroy then
 				return nil -- The binder died while the load settled
 			end
-			return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport()):Then(function(loadedSlotId): any
-				if loadedSlotId then
-					return nil -- Teleported in with a valid slot; it is now selected
-				end
-				if not hasSaveSlots.Destroy then
-					return nil -- The binder died while the teleport read settled
-				end
-				return self:_promiseSelectDefaultSlot(maid, hasSaveSlots)
-			end)
+			-- A transferable ephemeral slot carried across a teleport takes precedence over the normal
+			-- slot-id resume and the default flow: re-select it from its shared-store key.
+			return maid:GivePromise(hasSaveSlots:PromiseLoadTransferableEphemeralSlotFromTeleport())
+				:Then(function(ephemeralSlotId): any
+					if ephemeralSlotId then
+						return nil -- Arrived carrying a transferable ephemeral slot; it is now selected
+					end
+					if not hasSaveSlots.Destroy then
+						return nil
+					end
+					return maid:GivePromise(hasSaveSlots:PromiseLoadSaveSlotFromTeleport())
+						:Then(function(loadedSlotId): any
+							if loadedSlotId then
+								return nil -- Teleported in with a valid slot; it is now selected
+							end
+							if not hasSaveSlots.Destroy then
+								return nil -- The binder died while the teleport read settled
+							end
+							return self:_promiseSelectDefaultSlot(maid, hasSaveSlots)
+						end)
+				end)
 		end)
 	end))
 end
@@ -220,6 +254,19 @@ end
 ]=]
 function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
 	self:SetMaxSlotCount(math.huge)
+end
+
+--[=[
+	Sets the share-code generator applied to every player's exports (see [SaveSlotCodeUtils.CodeGenerator]),
+	so a game can choose a code format that suits its players. Defaults to
+	[SaveSlotCodeUtils.generateDefaultCode]. Must be called before Start.
+
+	@param generator SaveSlotCodeUtils.CodeGenerator
+]=]
+function SaveSlotService.SetCodeGenerator(self: SaveSlotService, generator: SaveSlotCodeUtils.CodeGenerator): ()
+	assert(not self._serviceBag:IsStarted(), "SetCodeGenerator must be called before Start")
+	assert(type(generator) == "function", "Bad generator")
+	self._codeGenerator = generator
 end
 
 --[=[
@@ -328,6 +375,103 @@ end
 function SaveSlotService.PromiseResetActiveSlot(self: SaveSlotService, player: Player): Promise.Promise<any>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
 		return hasSaveSlots:PromiseResetActiveSlot()
+	end)
+end
+
+--[=[
+	Exports the player's non-main slot into a serializable table. See [HasSaveSlots.PromiseExportSlot].
+]=]
+function SaveSlotService.PromiseExportSlot(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<SaveSlotExportUtils.SaveSlotExport>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSlot(slotId)
+	end)
+end
+
+--[=[
+	Imports an exported slot into a fresh non-main slot for the player, resolving to the new slot id.
+	See [HasSaveSlots.PromiseImportSlot].
+]=]
+function SaveSlotService.PromiseImportSlot(
+	self: SaveSlotService,
+	player: Player,
+	export: SaveSlotExportUtils.SaveSlotExport
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseImportSlot(export)
+	end)
+end
+
+--[=[
+	Saves the player's non-main slot to the shared store under the given key. See
+	[HasSaveSlots.PromiseSaveSlotToSharedDataStore].
+]=]
+function SaveSlotService.PromiseSaveSlotToSharedDataStore(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId,
+	key: string
+): Promise.Promise<boolean>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseSaveSlotToSharedDataStore(slotId, key)
+	end)
+end
+
+--[=[
+	Imports a shared-store export into a fresh non-main slot for the player. See
+	[HasSaveSlots.PromiseImportSlotFromSharedDataStore].
+]=]
+function SaveSlotService.PromiseImportSlotFromSharedDataStore(
+	self: SaveSlotService,
+	player: Player,
+	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseImportSlotFromSharedDataStore(key)
+	end)
+end
+
+--[=[
+	Exports the player's slot to the shared store under a fresh code and resolves to it. See
+	[HasSaveSlots.PromiseExportSaveSlotToCode].
+]=]
+function SaveSlotService.PromiseExportSaveSlotToCode(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSaveSlotToCode(slotId)
+	end)
+end
+
+--[=[
+	Loads the code into a fresh transferable ephemeral slot for the player. See
+	[HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].
+]=]
+function SaveSlotService.PromiseImportEphemeralSaveSlotFromCode(
+	self: SaveSlotService,
+	player: Player,
+	code: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
+	end)
+end
+
+--[=[
+	Exports the player's slot as a raw JSON string. See [HasSaveSlots.PromiseExportSaveSlotToJson].
+]=]
+function SaveSlotService.PromiseExportSaveSlotToJson(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<string>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromiseExportSaveSlotToJson(slotId)
 	end)
 end
 
