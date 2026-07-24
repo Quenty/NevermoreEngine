@@ -22,6 +22,7 @@ local Promise = require("Promise")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
+local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
@@ -72,6 +73,7 @@ export type HasSaveSlots =
 			-- The shared-store key each transferable ephemeral slot was loaded from, so a teleport can
 			-- re-save its live state under that key and carry it forward. See PromiseSelectTransferableEphemeralSlot.
 			_transferableEphemeralKeys: { [SaveSlotData.SlotId]: string },
+			_codeGenerator: SaveSlotCodeUtils.CodeGenerator,
 			_loadPromise: Promise.Promise<{}>,
 			_remoting: any,
 			_dataStore: any,
@@ -105,6 +107,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._slotMap = {}
 	self._ephemeralStores = {}
 	self._transferableEphemeralKeys = {}
+	self._codeGenerator = SaveSlotCodeUtils.generateDefaultCode
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
 
@@ -483,9 +486,39 @@ function HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport(
 end
 
 --[=[
+	Overrides the share-code generator for this player's exports (see [SaveSlotCodeUtils.CodeGenerator]).
+	Games inject a custom format; the default is [SaveSlotCodeUtils.generateDefaultCode]. Usually set
+	game-wide via [SaveSlotService.SetCodeGenerator] rather than per player.
+
+	@param generator CodeGenerator
+]=]
+function HasSaveSlots.SetCodeGenerator(self: HasSaveSlots, generator: SaveSlotCodeUtils.CodeGenerator): ()
+	assert(type(generator) == "function", "Bad generator")
+	self._codeGenerator = generator
+end
+
+-- Builds a code for a slot from the configured generator, resolving the owner's identity defensively
+-- (player.UserId is not indexable on every stand-in) and the slot's name/index from its metadata.
+function HasSaveSlots._generateCode(self: HasSaveSlots, slotId: SaveSlotData.SlotId): string
+	local slot = self._slotMap[slotId]
+	local metadata = if slot then SaveSlotData:Get(slot) else nil
+	local okUserId, userId = pcall(function()
+		return self._obj.UserId
+	end)
+
+	return self._codeGenerator({
+		userId = if okUserId and type(userId) == "number" then userId else nil,
+		userName = self._obj.Name,
+		slotName = metadata and metadata.SlotName,
+		slotIndex = metadata and metadata.SlotIndex,
+	})
+end
+
+--[=[
 	Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
 	is a shareable handle other sessions load with [HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode].
-	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).
+	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]). The code
+	format comes from the configured generator (see [HasSaveSlots.SetCodeGenerator]).
 
 	@param slotId SlotId? -- defaults to the active slot
 	@return Promise<string>
@@ -500,7 +533,7 @@ function HasSaveSlots.PromiseExportSaveSlotToCode(
 			return (Promise :: any).rejected("No slot to export")
 		end
 
-		local code = HttpService:GenerateGUID(false)
+		local code = self:_generateCode(targetSlotId)
 		return self:PromiseSaveSlotToSharedDataStore(targetSlotId, code):Then(function()
 			return code
 		end)

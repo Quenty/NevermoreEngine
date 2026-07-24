@@ -17,6 +17,7 @@ local ObservableMap = require("ObservableMap")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
+local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
@@ -37,6 +38,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
 		_remoting: any,
 		_teleportDataService: any,
+		_codeGenerator: SaveSlotCodeUtils.CodeGenerator?,
 	},
 	{} :: typeof({ __index = SaveSlotService })
 ))
@@ -106,6 +108,9 @@ function SaveSlotService.Start(self: SaveSlotService)
 
 		-- Pass consumer-specified configs
 		hasSaveSlots.MaxSlotCount.Value = self._maxSlotCount
+		if self._codeGenerator then
+			hasSaveSlots:SetCodeGenerator(self._codeGenerator)
+		end
 
 		-- Mirror every default summary provider onto this player, and keep it in sync: a provider
 		-- registered or unregistered later is added to or removed from every bound player reactively.
@@ -249,6 +254,19 @@ end
 ]=]
 function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
 	self:SetMaxSlotCount(math.huge)
+end
+
+--[=[
+	Sets the share-code generator applied to every player's exports (see [SaveSlotCodeUtils.CodeGenerator]),
+	so a game can choose a code format that suits its players. Defaults to
+	[SaveSlotCodeUtils.generateDefaultCode]. Must be called before Start.
+
+	@param generator SaveSlotCodeUtils.CodeGenerator
+]=]
+function SaveSlotService.SetCodeGenerator(self: SaveSlotService, generator: SaveSlotCodeUtils.CodeGenerator): ()
+	assert(not self._serviceBag:IsStarted(), "SetCodeGenerator must be called before Start")
+	assert(type(generator) == "function", "Bad generator")
+	self._codeGenerator = generator
 end
 
 --[=[
