@@ -1,19 +1,13 @@
-# v2.0.0 (Fri Jul 24 2026)
-
-#### 💥 Breaking Change
-
-- feat(saveslot): save slot export/import + cross-session transfer [#748](https://github.com/Quenty/NevermoreEngine/pull/748) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.15.0...@quenty/saveslot@2.0.0) (2026-07-24)
+
+### Features
+
+- **saveslot:** save slot export/import + cross-session transfer ([#748](https://github.com/Quenty/NevermoreEngine/issues/748)) ([3ef4fe0](https://github.com/Quenty/NevermoreEngine/commit/3ef4fe0024a6036f396babfc292099041bdf56d6))
 
 # [1.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.14.2...@quenty/saveslot@1.15.0) (2026-07-24)
 
