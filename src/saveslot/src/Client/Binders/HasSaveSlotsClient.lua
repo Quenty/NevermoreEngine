@@ -10,6 +10,7 @@ local Players = game:GetService("Players")
 local Binder = require("Binder")
 local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local SaveSlotConstants = require("SaveSlotConstants")
@@ -34,7 +35,7 @@ export type HasSaveSlotsClient =
 	& HasSaveSlotsBase.HasSaveSlotsBase
 
 function HasSaveSlotsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag): HasSaveSlotsClient
-	if player ~= Players.LocalPlayer then
+	if player ~= (Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()) then
 		return nil :: any
 	end
 
