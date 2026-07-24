@@ -1,3 +1,16 @@
+# v1.14.2 (Fri Jul 24 2026)
+
+#### 🐛 Bug Fix
+
+- fix(saveslot): bind the client HasSaveSlots for a mocked local player [#749](https://github.com/Quenty/NevermoreEngine/pull/749) ([@Quenty](https://github.com/Quenty))
+- fix(saveslot): bind the client HasSaveSlots for a mocked local player ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
