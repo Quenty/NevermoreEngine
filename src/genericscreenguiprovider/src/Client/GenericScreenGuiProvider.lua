@@ -196,7 +196,13 @@ function GenericScreenGuiProvider.GetDisplayOrder(self: GenericScreenGuiProvider
 	assert(type(orderName) == "string", "Bad orderName")
 	self:_assertOrderExists(orderName)
 
-	return self._orderValues[orderName].Value
+	local orderValue: any = self._orderValues[orderName]
+	local value = if orderValue then orderValue.Value else nil
+	if value == nil then
+		return self._defaultOrders[orderName]
+	end
+
+	return value
 end
 
 --[=[

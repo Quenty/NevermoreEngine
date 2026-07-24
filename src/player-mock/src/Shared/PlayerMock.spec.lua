@@ -927,6 +927,93 @@ describe("PlayerMock.readLookup", function()
 	end)
 end)
 
+describe("PlayerMock TeleportService.Teleport lookup", function()
+	it("defaults to nil until a teleport is recorded", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)).toEqual(nil)
+		player:Destroy()
+	end)
+
+	it("records and reads back a teleport record with its data", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, {
+			via = "Teleport",
+			teleportData = { SlotId = "abc", Flag = true },
+		})
+
+		local recorded = PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)
+		expect(recorded.via).toEqual("Teleport")
+		expect(recorded.teleportData.SlotId).toEqual("abc")
+		expect(recorded.teleportData.Flag).toEqual(true)
+		player:Destroy()
+	end)
+
+	it("keys recorded teleports independently per placeId", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, {
+			via = "Teleport",
+			teleportData = { SlotId = "abc" },
+		})
+
+		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 4567).teleportData.SlotId).toEqual("abc")
+		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 9999)).toEqual(nil)
+		player:Destroy()
+	end)
+
+	it("round-trips a nested instance-teleport record through encode/decode", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", 1, {
+			via = "TeleportToPlaceInstance",
+			instanceId = "job-1",
+			teleportData = { nested = { a = 1, list = { "x", "y" } } },
+		})
+
+		local recorded = PlayerMock.readLookup(player, "TeleportService.Teleport", 1)
+		expect(recorded.instanceId).toEqual("job-1")
+		expect(recorded.teleportData.nested.a).toEqual(1)
+		expect(recorded.teleportData.nested.list[2]).toEqual("y")
+		player:Destroy()
+	end)
+
+	it("clears back to the default when written nil", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+		PlayerMock.writeLookup(
+			player,
+			"TeleportService.Teleport",
+			4567,
+			{ via = "Teleport", teleportData = { SlotId = "abc" } }
+		)
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, nil)
+
+		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)).toEqual(nil)
+		player:Destroy()
+	end)
+
+	it("validates the record shape: a missing `via` is rejected", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, { teleportData = {} } :: any)
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors when written a non-table value", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, "nope" :: any)
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on a non-number key (the domain is placeId-keyed)", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.readLookup(player, "TeleportService.Teleport", Enum.CoreGuiType.Backpack :: any)
+		end).toThrow()
+		player:Destroy()
+	end)
+end)
+
 describe("PlayerMock.writeLookup", function()
 	it("injects a value every subsequent read resolves", function()
 		local player = PlayerMock.new({ UserId = 12345 })
