@@ -28,6 +28,14 @@ local function sliceFor(built: { [string]: any }, userId: number): TeleportDataE
 	return TeleportDataEnvelopeUtils.readSlice(built, userId)
 end
 
+-- Builds and awaits the (async-only) envelope. `:Wait()` returns the built table and rethrows a
+-- rejection, so the size-guard `toThrow` assertions keep working through it.
+local function buildAsync(builder: any, players: { Player }, baseData: { [string]: any }?): any
+	local promise = builder:PromiseBuildTeleportData(players, baseData)
+	assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
+	return promise:Wait()
+end
+
 describe("TeleportDataBuilder.new", function()
 	it("defaults the UserId resolver to player.UserId", function()
 		local builder = TeleportDataBuilder.new()
@@ -35,18 +43,18 @@ describe("TeleportDataBuilder.new", function()
 			return { slot = "a" }
 		end)
 
-		local built = builder:BuildTeleportData({ fakePlayer(111) })
+		local built = buildAsync(builder, { fakePlayer(111) })
 		expect(sliceFor(built, 111)).toEqual({ slot = "a" })
 	end)
 end)
 
 describe("TeleportDataBuilder shared data", function()
 	it("carries nothing with no providers and no base data", function()
-		expect(newBuilder():BuildTeleportData({})).toEqual({})
+		expect(buildAsync(newBuilder(), {})).toEqual({})
 	end)
 
 	it("delivers base data to any player", function()
-		local built = newBuilder():BuildTeleportData({}, { a = 1, b = "two" })
+		local built = buildAsync(newBuilder(), {}, { a = 1, b = "two" })
 		expect(sliceFor(built, 111)).toEqual({ a = 1, b = "two" })
 	end)
 
@@ -59,7 +67,7 @@ describe("TeleportDataBuilder shared data", function()
 			return { b = 2 }
 		end)
 
-		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1, b = 2 })
+		expect(sliceFor(buildAsync(builder, {}), 111)).toEqual({ a = 1, b = 2 })
 	end)
 
 	it("lets base data win over a shared provider key", function()
@@ -68,7 +76,7 @@ describe("TeleportDataBuilder shared data", function()
 			return { shared = "provider" }
 		end)
 
-		expect(sliceFor(builder:BuildTeleportData({}, { shared = "caller" }), 111)).toEqual({ shared = "caller" })
+		expect(sliceFor(buildAsync(builder, {}, { shared = "caller" }), 111)).toEqual({ shared = "caller" })
 	end)
 
 	it("ignores a shared provider that returns nil", function()
@@ -80,7 +88,7 @@ describe("TeleportDataBuilder shared data", function()
 			return { a = 1 }
 		end)
 
-		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1 })
+		expect(sliceFor(buildAsync(builder, {}), 111)).toEqual({ a = 1 })
 	end)
 
 	it("stops merging a shared provider after it is unregistered", function()
@@ -88,10 +96,10 @@ describe("TeleportDataBuilder shared data", function()
 		local unregister = builder:RegisterTeleportDataProvider(function()
 			return { a = 1 }
 		end)
-		expect(sliceFor(builder:BuildTeleportData({}), 111)).toEqual({ a = 1 })
+		expect(sliceFor(buildAsync(builder, {}), 111)).toEqual({ a = 1 })
 
 		unregister()
-		expect(builder:BuildTeleportData({})).toEqual({})
+		expect(buildAsync(builder, {})).toEqual({})
 	end)
 end)
 
@@ -102,7 +110,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return { slot = "slot-" .. tostring((player :: any).UserId) }
 		end)
 
-		local built = builder:BuildTeleportData({ fakePlayer(111) })
+		local built = buildAsync(builder, { fakePlayer(111) })
 		expect(sliceFor(built, 111)).toEqual({ slot = "slot-111" })
 		expect(sliceFor(built, 222)).toBeNil()
 	end)
@@ -113,7 +121,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return { userId = (player :: any).UserId }
 		end)
 
-		local built = builder:BuildTeleportData({ fakePlayer(111), fakePlayer(222) })
+		local built = buildAsync(builder, { fakePlayer(111), fakePlayer(222) })
 		expect(sliceFor(built, 111)).toEqual({ userId = 111 })
 		expect(sliceFor(built, 222)).toEqual({ userId = 222 })
 	end)
@@ -127,7 +135,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return { slot = "a" }
 		end)
 
-		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }), 111)).toEqual({ mode = "hard", slot = "a" })
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ mode = "hard", slot = "a" })
 	end)
 
 	it("lets a per-player key win over shared and base data (most specific)", function()
@@ -139,7 +147,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return { v = "player" }
 		end)
 
-		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }, { v = "base" }), 111)).toEqual({ v = "player" })
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }, { v = "base" }), 111)).toEqual({ v = "player" })
 	end)
 
 	it("does not create a slice for a player whose providers contribute nothing", function()
@@ -148,7 +156,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return nil
 		end)
 
-		expect(builder:BuildTeleportData({ fakePlayer(111) })).toEqual({})
+		expect(buildAsync(builder, { fakePlayer(111) })).toEqual({})
 	end)
 
 	it("calls the provider once per player with the full player list", function()
@@ -162,7 +170,7 @@ describe("TeleportDataBuilder per-player data", function()
 			return nil
 		end)
 
-		builder:BuildTeleportData(players)
+		buildAsync(builder, players)
 		expect(seen[1]).toBe(players[1])
 		expect(seen[2]).toBe(players[2])
 		expect(receivedList).toBe(players)
@@ -173,10 +181,10 @@ describe("TeleportDataBuilder per-player data", function()
 		local unregister = builder:RegisterPerPlayerTeleportDataProvider(function()
 			return { slot = "a" }
 		end)
-		expect(sliceFor(builder:BuildTeleportData({ fakePlayer(111) }), 111)).toEqual({ slot = "a" })
+		expect(sliceFor(buildAsync(builder, { fakePlayer(111) }), 111)).toEqual({ slot = "a" })
 
 		unregister()
-		expect(builder:BuildTeleportData({ fakePlayer(111) })).toEqual({})
+		expect(buildAsync(builder, { fakePlayer(111) })).toEqual({})
 	end)
 end)
 
@@ -188,7 +196,7 @@ describe("TeleportDataBuilder size guard", function()
 		end)
 
 		expect(function()
-			builder:BuildTeleportData({})
+			buildAsync(builder, {})
 		end).toThrow()
 	end)
 
@@ -201,7 +209,7 @@ describe("TeleportDataBuilder size guard", function()
 		end)
 
 		expect(function()
-			builder:BuildTeleportData({})
+			buildAsync(builder, {})
 		end).toThrow()
 	end)
 end)
@@ -215,13 +223,7 @@ describe("TeleportDataBuilder.PromiseBuildTeleportData", function()
 		end
 	end
 
-	local function buildAsync(builder, players, baseData: { [string]: any }?)
-		local promise = builder:PromiseBuildTeleportData(players, baseData)
-		assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
-		return promise:Wait()
-	end
-
-	it("matches the sync build for sync providers", function()
+	it("carries a synchronous provider slice", function()
 		local builder = newBuilder()
 		builder:RegisterTeleportDataProvider(function()
 			return { mode = "hard" }

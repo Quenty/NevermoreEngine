@@ -3,7 +3,7 @@
 	Server half of the symmetric teleport-data surface. Two responsibilities:
 
 	* **Building** teleport data through a shared [TeleportDataBuilder], so every teleport site assembles
-	  the same envelope from the same providers (see [TeleportDataService.BuildTeleportData]).
+	  the same envelope from the same providers (see [TeleportDataService.PromiseBuildTeleportData]).
 	* **Reading** the data a player arrived with, as a *unified* view across two trust bands.
 
 	The trust split is the load-bearing idea. A player's arrived data reaches the server two ways:
@@ -140,22 +140,6 @@ function TeleportDataService.RegisterPerPlayerTeleportDataProvider(
 	provider: PerPlayerTeleportDataProvider
 ): () -> ()
 	return self._builder:RegisterPerPlayerTeleportDataProvider(provider)
-end
-
---[=[
-	Builds the teleport data envelope for a teleport of the given players. See
-	[TeleportDataBuilder.BuildTeleportData].
-
-	@param players { Player }
-	@param baseData { [string]: any }?
-	@return { [string]: any }
-]=]
-function TeleportDataService.BuildTeleportData(
-	self: TeleportDataService,
-	players: { Player },
-	baseData: { [string]: any }?
-): { [string]: any }
-	return self._builder:BuildTeleportData(players, baseData)
 end
 
 --[=[

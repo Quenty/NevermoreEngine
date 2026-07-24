@@ -200,7 +200,7 @@ describe("TeleportDataServiceClient build API (symmetric with the server)", func
 		end)
 
 		local fakeLocalPlayer = ({ UserId = LOCAL_USER_ID } :: any) :: Player
-		local built = controller.service:BuildTeleportData({ fakeLocalPlayer })
+		local built = controller.await(controller.service:PromiseBuildTeleportData({ fakeLocalPlayer }))
 
 		expect(TeleportDataEnvelopeUtils.readSlice(built, LOCAL_USER_ID)).toEqual({ slot = "built" })
 

@@ -46,7 +46,7 @@ local function setup()
 	}
 end
 
-describe("TeleportDataService.BuildTeleportData (delegates to the shared builder)", function()
+describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared builder)", function()
 	it("assembles a per-player envelope readable by UserId", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
@@ -55,7 +55,7 @@ describe("TeleportDataService.BuildTeleportData (delegates to the shared builder
 			return { slot = "slot-" .. tostring(givenPlayer:GetAttribute("UserId")) }
 		end)
 
-		local built = controller.service:BuildTeleportData({ player })
+		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "slot-111" })
 
 		controller:destroy()
@@ -68,7 +68,7 @@ describe("TeleportDataService.BuildTeleportData (delegates to the shared builder
 			return { shared = "provider" }
 		end)
 
-		local built = controller.service:BuildTeleportData({}, { shared = "caller" })
+		local built = controller.await(controller.service:PromiseBuildTeleportData({}, { shared = "caller" }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ shared = "caller" })
 
 		controller:destroy()

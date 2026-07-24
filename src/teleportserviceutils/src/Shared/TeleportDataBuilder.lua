@@ -1,7 +1,7 @@
 --!strict
 --[=[
 	Realm-agnostic assembly of the teleport-data envelope: the provider registry plus
-	[TeleportDataBuilder.BuildTeleportData]. Both [TeleportDataService] (server) and
+	[TeleportDataBuilder.PromiseBuildTeleportData]. Both [TeleportDataService] (server) and
 	[TeleportDataServiceClient] (client) own one of these and delegate their build surface to it, so a
 	teleport authored on either realm goes through the *same* providers and produces the *same* envelope
 	shape. That symmetry is the point: a client-initiated teleport can no longer forget shared data or
@@ -73,7 +73,7 @@ function TeleportDataBuilder.new(getUserId: ((Player) -> number)?): TeleportData
 end
 
 --[=[
-	Registers a provider that contributes teleport data on every [TeleportDataBuilder.BuildTeleportData]
+	Registers a provider that contributes teleport data on every [TeleportDataBuilder.PromiseBuildTeleportData]
 	call. Returns a function that unregisters the provider (also give it to a [Maid]).
 
 	@param provider TeleportDataProvider
@@ -97,7 +97,7 @@ end
 
 --[=[
 	Registers a per-player provider that contributes each player's own slice on every
-	[TeleportDataBuilder.BuildTeleportData] call. Returns a function that unregisters it (also give it to
+	[TeleportDataBuilder.PromiseBuildTeleportData] call. Returns a function that unregisters it (also give it to
 	a [Maid]).
 
 	@param provider PerPlayerTeleportDataProvider
@@ -121,8 +121,8 @@ end
 
 -- Merges already-resolved provider contributions (plain tables; nil/non-table/Promise entries are
 -- skipped) into the per-player envelope, applying precedence (shared providers, then baseData, then
--- per-player) and the size guard. Shared by the sync and async build paths so both produce an
--- identical envelope.
+-- per-player) and the size guard. Used by [TeleportDataBuilder.PromiseBuildTeleportData] to produce the
+-- envelope.
 function TeleportDataBuilder._assembleEnvelope(
 	self: TeleportDataBuilder,
 	sharedContributions: { any },
@@ -187,51 +187,9 @@ function TeleportDataBuilder._assembleEnvelope(
 end
 
 --[=[
-	Builds the teleport-data envelope synchronously (see [TeleportDataBuilder._assembleEnvelope] for the
-	precedence and size guard). A provider that returns a Promise cannot be awaited here and contributes
-	nothing; use [TeleportDataBuilder.PromiseBuildTeleportData] when any provider is asynchronous.
-
-	@param players { Player }
-	@param baseData { [string]: any }? -- shared caller keys, overriding shared providers
-	@return { [string]: any }
-]=]
-function TeleportDataBuilder.BuildTeleportData(
-	self: TeleportDataBuilder,
-	players: { Player },
-	baseData: { [string]: any }?
-): { [string]: any }
-	assert(type(players) == "table", "Bad players")
-	if baseData ~= nil then
-		assert(type(baseData) == "table", "Bad baseData")
-	end
-
-	local sharedContributions = {}
-	for _, provider in self._providers do
-		local contributed = provider(players)
-		if contributed ~= nil then
-			table.insert(sharedContributions, contributed)
-		end
-	end
-
-	local perPlayerContributions = {}
-	for _, player in players do
-		local contributions = {}
-		for _, provider in self._perPlayerProviders do
-			local contributed = provider(player, players)
-			if contributed ~= nil then
-				table.insert(contributions, contributed)
-			end
-		end
-		table.insert(perPlayerContributions, { player = player, contributions = contributions })
-	end
-
-	return self:_assembleEnvelope(sharedContributions, perPlayerContributions, baseData)
-end
-
---[=[
 	Builds the teleport-data envelope, awaiting any provider that returns a Promise. Providers may return
-	a table, nil, or a Promise of either; sync providers behave exactly as in
-	[TeleportDataBuilder.BuildTeleportData]. Resolves to the same envelope shape.
+	a table, nil, or a Promise of either. Resolves to the assembled per-player envelope (see
+	[TeleportDataBuilder._assembleEnvelope] for precedence and the size guard).
 
 	A provider whose Promise rejects rejects the whole build, so an asynchronous provider should handle
 	its own errors (e.g. resolve nil) when it would rather degrade than block the teleport.
