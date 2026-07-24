@@ -1,19 +1,13 @@
-# v1.3.0 (Fri Jul 24 2026)
-
-#### 🚀 Enhancement
-
-- feat: PlayerMock seams for GuiService.SelectedObject and rich input firing [#750](https://github.com/Quenty/NevermoreEngine/pull/750) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.2.0...@quenty/playermock@1.3.0) (2026-07-24)
+
+### Features
+
+- PlayerMock seams for GuiService.SelectedObject and rich input firing ([#750](https://github.com/Quenty/NevermoreEngine/issues/750)) ([f424dda](https://github.com/Quenty/NevermoreEngine/commit/f424dda9304bc1616d8f13de42d5527fd126e151))
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.1.1...@quenty/playermock@1.2.0) (2026-07-23)
 
