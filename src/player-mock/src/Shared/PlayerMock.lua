@@ -1326,6 +1326,14 @@ function PlayerMock.fireInput(
 	return callback(actionName, userInputState, inputObject)
 end
 
+export type InputObjectProps = {
+	UserInputType: Enum.UserInputType?,
+	KeyCode: Enum.KeyCode?,
+	UserInputState: Enum.UserInputState?,
+	Position: Vector3?,
+	Delta: Vector3?,
+}
+
 --[=[
 	Builds a stand-in `InputObject` for [PlayerMock.fireInput] to hand a bound action -- for handlers
 	that read more than the raw fields, in particular `:GetPropertyChangedSignal("UserInputState")`
@@ -1339,17 +1347,11 @@ end
 	input:SetUserInputState(Enum.UserInputState.End) -- releases the press
 	```
 
-	@param props { UserInputType: Enum.UserInputType?, KeyCode: Enum.KeyCode?, UserInputState: Enum.UserInputState?, Position: Vector3?, Delta: Vector3? }?
+	@param props InputObjectProps?
 	@return table -- an InputObject stand-in
 ]=]
-function PlayerMock.makeInputObject(props: {
-	UserInputType: Enum.UserInputType?,
-	KeyCode: Enum.KeyCode?,
-	UserInputState: Enum.UserInputState?,
-	Position: Vector3?,
-	Delta: Vector3?,
-}?): any
-	local resolved = props or {}
+function PlayerMock.makeInputObject(props: InputObjectProps?): any
+	local resolved: InputObjectProps = props or {}
 	assert(
 		resolved.UserInputType == nil
 			or (typeof(resolved.UserInputType) == "EnumItem" and resolved.UserInputType.EnumType == Enum.UserInputType),
