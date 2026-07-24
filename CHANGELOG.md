@@ -1,5 +1,18 @@
 # (Fri Jul 24 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/playermock@1.3.0`
+  - feat: PlayerMock seams for GuiService.SelectedObject and rich input firing [#750](https://github.com/Quenty/NevermoreEngine/pull/750) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/saveslot@1.14.2`
