@@ -450,15 +450,15 @@ end
 
 --[=[
 	Loads the code into a fresh transferable ephemeral slot for the player. See
-	[HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode].
+	[HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].
 ]=]
-function SaveSlotService.PromiseLoadEphemeralSaveSlotFromCode(
+function SaveSlotService.PromiseImportEphemeralSaveSlotFromCode(
 	self: SaveSlotService,
 	player: Player,
 	code: string
 ): Promise.Promise<SaveSlotData.SlotId>
 	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
-		return hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code)
+		return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
 	end)
 end
 

@@ -466,9 +466,15 @@ function HasSaveSlots.PromiseBuildEphemeralTransferSlice(self: HasSaveSlots): Pr
 end
 
 --[=[
-	Selects the transferable ephemeral slot the player teleported in with, when they carry one in the
-	*trusted* band (server-authored, so a client cannot forge it). Resolves to the slot id, or nil when
-	none arrived.
+	Selects the transferable ephemeral slot the player teleported in with, from the shared-store key in
+	their arrived data. Reads the *unified* band (not trusted-only) so a **client-initiated** teleport --
+	the common case, e.g. a menu resume hop -- carries it too; a server-initiated teleport still works via
+	the trusted band. Resolves to the slot id, or nil when none arrived.
+
+	Because the client band is honored, a client can present any key it knows. The key resolves to a
+	server-side shared-store entry and only ever seeds a throwaway (never-persisted) slot, so the exposure
+	is read-only visibility of a snapshot whose code you already have -- acceptable for the dev/Cmdr tooling
+	this backs. Harden (longer code entropy / ownership) before exposing it to a player-facing surface.
 
 	@return Promise<SlotId?>
 ]=]
@@ -476,7 +482,7 @@ function HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport(
 	self: HasSaveSlots
 ): Promise.Promise<SaveSlotData.SlotId?>
 	return self._teleportDataService
-		:PromiseTrustedArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY)
+		:PromiseArrivedValue(self._obj, SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY)
 		:Then(function(key): any
 			if type(key) ~= "string" then
 				return nil
@@ -516,7 +522,7 @@ end
 
 --[=[
 	Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
-	is a shareable handle other sessions load with [HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode].
+	is a shareable handle other sessions load with [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].
 	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]). The code
 	format comes from the configured generator (see [HasSaveSlots.SetCodeGenerator]).
 
@@ -547,7 +553,7 @@ end
 	@param code string
 	@return Promise<SlotId>
 ]=]
-function HasSaveSlots.PromiseLoadEphemeralSaveSlotFromCode(
+function HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode(
 	self: HasSaveSlots,
 	code: string
 ): Promise.Promise<SaveSlotData.SlotId>
@@ -1015,6 +1021,13 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 
 				self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
 					local active = self.ActiveSlotId.Value
+
+					-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
+					-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
+					self.ActiveTransferableEphemeralKey.Value = if active
+						then self._transferableEphemeralKeys[active]
+						else nil
+
 					local leftSlotId = previousActiveSlotId
 					-- Read before the retire below, while the outgoing slot is still in the map.
 					local leavingEphemeral = self:_isEphemeral(leftSlotId)

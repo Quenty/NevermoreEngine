@@ -472,8 +472,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "load-ephemeral-save-slot",
-		Description = "Loads a save slot code into a throwaway ephemeral slot and selects it.",
+		Name = "import-ephemeral-save-slot",
+		Description = "Imports a save slot code into a throwaway ephemeral slot and selects it.",
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -486,10 +486,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		return self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
 			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseLoadEphemeralSaveSlotFromCode(code)
+				return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
 			end)
 			:Then(function()
-				return `Loaded ephemeral save slot from code: {code}`
+				return `Imported ephemeral save slot from code: {code}`
 			end)
 			:Catch(function(err)
 				return `Load failed: {tostring(err)}`

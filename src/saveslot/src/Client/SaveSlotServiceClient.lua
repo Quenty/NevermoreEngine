@@ -52,6 +52,13 @@ function SaveSlotServiceClient.Start(self: SaveSlotServiceClient)
 	self._maid:GiveTask(
 		self._teleportDataServiceClient:RegisterPerPlayerTeleportDataProvider(
 			function(player: Player): { [string]: any }?
+				-- A transferable ephemeral slot resumes at the destination from its shared-store key -- its
+				-- own (ephemeral) slot id is not a resumable persisted slot there -- so carry the key when one
+				-- is active. Otherwise carry the active real slot id, as before.
+				local ephemeralKey = HasSaveSlotsData.ActiveTransferableEphemeralKey:Get(player)
+				if type(ephemeralKey) == "string" then
+					return { [SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY] = ephemeralKey }
+				end
 				local slotId = HasSaveSlotsData.ActiveSlotId:Get(player)
 				if type(slotId) == "string" then
 					return { [SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = slotId }

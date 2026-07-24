@@ -201,18 +201,46 @@ describe("HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport", functi
 		end)
 	end)
 
-	it("ignores a key that arrived only in the untrusted client band", function()
+	it("re-selects the slot from a key in the client band (client-initiated teleport)", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
 			awaitValueOf(context.sharedService:PromiseWrite("code-4", { data = { Coins = 7 } }))
 
-			-- Only the client (untrusted) band carries the key; a client must not be able to forge a transfer.
+			-- Egg-hunt's menu resume is a client-initiated teleport, so the key rides the client band; the
+			-- unified arrival read honors it (see PromiseLoadTransferableEphemeralSlotFromTeleport).
 			context.teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(
 				context.fakePlayer,
 				{ [EPHEMERAL_KEY] = "code-4" }
 			)
 
-			expect(awaitValueOf(hasSaveSlots:PromiseLoadTransferableEphemeralSlotFromTeleport())).toBeNil()
+			local slotId = awaitValueOf(hasSaveSlots:PromiseLoadTransferableEphemeralSlotFromTeleport())
+			expect(type(slotId)).toEqual("string")
+			expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
+		end)
+	end)
+end)
+
+describe("HasSaveSlots.ActiveTransferableEphemeralKey (replicated for the client teleport provider)", function()
+	it("reflects the active transferable-ephemeral key and clears it on deselect", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			awaitValueOf(context.sharedService:PromiseWrite("code-6", { data = { Coins = 1 } }))
+
+			awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-6"))
+			expect(hasSaveSlots.ActiveTransferableEphemeralKey.Value).toEqual("code-6")
+
+			awaitValueOf(hasSaveSlots:PromiseDeselectSlot())
+			expect(hasSaveSlots.ActiveTransferableEphemeralKey.Value).toBeNil()
+		end)
+	end)
+
+	it("is nil while a normal (non-transferable) slot is active", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local slotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(2))
+			awaitValueOf(hasSaveSlots:PromiseSelectSlot(slotId))
+
+			expect(hasSaveSlots.ActiveTransferableEphemeralKey.Value).toBeNil()
 		end)
 	end)
 end)
