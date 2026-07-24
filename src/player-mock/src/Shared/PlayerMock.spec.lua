@@ -1490,6 +1490,119 @@ describe("PlayerMock.fireInput", function()
 
 		player:Destroy()
 	end)
+
+	it("passes the inputObject by reference, so a stand-in's methods survive", function()
+		local player = PlayerMock.new()
+		local seenInput
+		PlayerMock.bindInput(player, "ContextActionService.BindAction", "Fire", function(_name, _state, inputObject)
+			seenInput = inputObject
+			return nil
+		end, false)
+
+		local input = PlayerMock.makeInputObject({
+			UserInputType = Enum.UserInputType.Gamepad1,
+			KeyCode = Enum.KeyCode.ButtonA,
+		})
+		PlayerMock.fireInput(player, "Fire", Enum.UserInputState.Begin, input)
+
+		-- Same object (not a bindable copy): the method a handler needs is still callable.
+		expect(seenInput).toBe(input)
+		expect(typeof(seenInput:GetPropertyChangedSignal("UserInputState"))).toBe("table")
+
+		player:Destroy()
+	end)
+end)
+
+describe("PlayerMock.makeInputObject", function()
+	it("exposes the read fields with sensible defaults", function()
+		local input = PlayerMock.makeInputObject({
+			UserInputType = Enum.UserInputType.Gamepad1,
+			KeyCode = Enum.KeyCode.ButtonA,
+		})
+
+		expect(input.UserInputType).toBe(Enum.UserInputType.Gamepad1)
+		expect(input.KeyCode).toBe(Enum.KeyCode.ButtonA)
+		expect(input.UserInputState).toBe(Enum.UserInputState.Begin)
+		expect(input.Position).toBe(Vector3.zero)
+	end)
+
+	it("fires GetPropertyChangedSignal('UserInputState') on SetUserInputState", function()
+		local input = PlayerMock.makeInputObject({ UserInputType = Enum.UserInputType.Gamepad1 })
+
+		local fired = 0
+		local connection = input:GetPropertyChangedSignal("UserInputState"):Connect(function()
+			fired += 1
+		end)
+
+		input:SetUserInputState(Enum.UserInputState.End)
+
+		expect(fired).toBe(1)
+		expect(input.UserInputState).toBe(Enum.UserInputState.End)
+
+		connection:Disconnect()
+	end)
+
+	it("returns the same signal per property and rejects a bad UserInputType", function()
+		local input = PlayerMock.makeInputObject()
+		expect(input:GetPropertyChangedSignal("UserInputState")).toBe(input:GetPropertyChangedSignal("UserInputState"))
+		expect(function()
+			PlayerMock.makeInputObject({ UserInputType = Enum.KeyCode.ButtonA :: any })
+		end).toThrow()
+	end)
+end)
+
+describe("PlayerMock selected GUI object", function()
+	it("defaults to nil and round-trips a set value", function()
+		local player = PlayerMock.new()
+		local screenGui = Instance.new("ScreenGui")
+		local frame = Instance.new("Frame")
+		frame.Parent = screenGui
+
+		expect(PlayerMock.getSelectedGuiObject(player)).toBeNil()
+
+		PlayerMock.setSelectedGuiObject(player, frame)
+		expect(PlayerMock.getSelectedGuiObject(player)).toBe(frame)
+
+		PlayerMock.setSelectedGuiObject(player, nil)
+		expect(PlayerMock.getSelectedGuiObject(player)).toBeNil()
+
+		screenGui:Destroy()
+		player:Destroy()
+	end)
+
+	it("fires the changed signal when the selection moves", function()
+		local player = PlayerMock.new()
+		local screenGui = Instance.new("ScreenGui")
+		local frame = Instance.new("Frame")
+		frame.Parent = screenGui
+
+		local fired = 0
+		local connection = PlayerMock.getSelectedGuiObjectChangedSignal(player):Connect(function()
+			fired += 1
+		end)
+
+		PlayerMock.setSelectedGuiObject(player, frame)
+		expect(fired).toBe(1)
+
+		connection:Disconnect()
+		screenGui:Destroy()
+		player:Destroy()
+	end)
+
+	it("rejects a non-GuiObject and a non-mock", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.setSelectedGuiObject(player, Instance.new("Folder") :: any)
+		end).toThrow()
+
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getSelectedGuiObject(folder :: any)
+		end).toThrow()
+		folder:Destroy()
+
+		player:Destroy()
+	end)
 end)
 
 describe("PlayerMock local player", function()

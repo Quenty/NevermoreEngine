@@ -1164,6 +1164,13 @@ end
 -- handler, so like the other backings it is inspectable and self-cleaning.
 local ACTION_NAME_PREFIX = "PlayerMockAction_"
 
+-- The raw Lua callback for each bind, keyed by its marker BindableFunction so [PlayerMock.fireInput]
+-- can invoke it *directly*. Firing through the BindableFunction itself (as this once did) crosses the
+-- bindable boundary, which strips a stand-in InputObject's methods/signals -- and real handlers read
+-- `inputObject:GetPropertyChangedSignal(...)` (e.g. KeymapControls tracking the input's end). Weak keys
+-- so an entry drops with its child; also cleared explicitly on unbind/rebind.
+local boundActionCallbacks: { [BindableFunction]: (...any) -> ...any } = setmetatable({}, { __mode = "k" }) :: any
+
 local function findActionBindable(player: Player, actionName: string): BindableFunction?
 	return (player :: Instance):FindFirstChild(ACTION_NAME_PREFIX .. actionName) :: BindableFunction?
 end
@@ -1179,7 +1186,7 @@ local function bindActionCallback(player: Player, actionName: string, functionTo
 		bindableFunction = created
 	end
 
-	(bindableFunction :: BindableFunction).OnInvoke = functionToBind
+	boundActionCallbacks[bindableFunction :: BindableFunction] = functionToBind
 end
 
 -- Context-restricted input-binding engine calls a mock stands in for, keyed by the canonical
@@ -1212,6 +1219,7 @@ local INPUT_DOMAINS: { [string]: (player: Player, actionName: string, ...any) ->
 	["ContextActionService.UnbindAction"] = function(player, actionName)
 		local bindableFunction = findActionBindable(player, actionName)
 		if bindableFunction ~= nil then
+			boundActionCallbacks[bindableFunction] = nil
 			bindableFunction:Destroy()
 		end
 	end,
@@ -1282,14 +1290,15 @@ end
 	Errors when the action is not bound: with no engine sink logic modeled, firing an unbound
 	action can only be a test mistake (typo'd name, or firing after the production unbind).
 
-	The invocation goes through the backing `BindableFunction`, so a stand-in `inputObject` must be
-	bindable-safe -- a real `InputObject` reference, or a plain metatable-free table of the fields
-	the callback reads (e.g. `UserInputType`, `Position`, `Delta`).
+	The bound callback is invoked directly (not through the marker BindableFunction), so `inputObject`
+	is passed by reference: hand it a real `InputObject`, a plain table of the fields the callback reads
+	(`UserInputType`, `Position`, `Delta`, ...), or a [PlayerMock.makeInputObject] stand-in when the
+	callback also needs `:GetPropertyChangedSignal(...)` (e.g. a KeymapControls handler).
 
 	@param player Player -- must be a PlayerMock
 	@param actionName string
 	@param userInputState Enum.UserInputState
-	@param inputObject any? -- a real InputObject or a bindable-safe stand-in table
+	@param inputObject any? -- a real InputObject, a plain stand-in table, or a makeInputObject stand-in
 	@return Enum.ContextActionResult?
 ]=]
 function PlayerMock.fireInput(
@@ -1308,7 +1317,173 @@ function PlayerMock.fireInput(
 	local bindableFunction =
 		assert(findActionBindable(player, actionName), string.format("%q is not a bound action", actionName))
 
-	return bindableFunction:Invoke(actionName, userInputState, inputObject)
+	local callback = boundActionCallbacks[bindableFunction]
+	if callback == nil then
+		-- Bound before this mock carried a raw callback (or by foreign code): fall back to the bindable.
+		return bindableFunction:Invoke(actionName, userInputState, inputObject)
+	end
+
+	return callback(actionName, userInputState, inputObject)
+end
+
+export type InputObjectProps = {
+	UserInputType: Enum.UserInputType?,
+	KeyCode: Enum.KeyCode?,
+	UserInputState: Enum.UserInputState?,
+	Position: Vector3?,
+	Delta: Vector3?,
+}
+
+--[=[
+	Builds a stand-in `InputObject` for [PlayerMock.fireInput] to hand a bound action -- for handlers
+	that read more than the raw fields, in particular `:GetPropertyChangedSignal("UserInputState")`
+	(KeymapControls connects it to learn when the press ends). A real `InputObject` cannot be
+	`Instance.new`'d, so this is a plain table exposing the fields and that one method; drive the press
+	lifecycle with `:SetUserInputState(...)`, which updates the field and fires the signal.
+
+	```lua
+	local input = PlayerMock.makeInputObject({ UserInputType = Enum.UserInputType.Gamepad1, KeyCode = Enum.KeyCode.ButtonA })
+	PlayerMock.fireInput(mock, actionName, Enum.UserInputState.Begin, input)
+	input:SetUserInputState(Enum.UserInputState.End) -- releases the press
+	```
+
+	@param props InputObjectProps?
+	@return table -- an InputObject stand-in
+]=]
+function PlayerMock.makeInputObject(props: InputObjectProps?): any
+	local resolved: InputObjectProps = props or {}
+	assert(
+		resolved.UserInputType == nil
+			or (typeof(resolved.UserInputType) == "EnumItem" and resolved.UserInputType.EnumType == Enum.UserInputType),
+		"Bad UserInputType"
+	)
+
+	-- One lightweight signal per observed property (only UserInputState is driven today). A local
+	-- implementation keeps player-mock free of a Signal dependency; it exposes the Connect/Disconnect
+	-- shape a Maid accepts.
+	local signals: { [string]: any } = {}
+	local function signalFor(propertyName: string)
+		local signal = signals[propertyName]
+		if signal then
+			return signal
+		end
+
+		local connections: { [(...any) -> ()]: boolean } = {}
+		signal = {
+			Connect = function(_self, callback)
+				connections[callback] = true
+				return {
+					Connected = true,
+					Disconnect = function(self)
+						self.Connected = false
+						connections[callback] = nil
+					end,
+				}
+			end,
+			Fire = function(_self, ...)
+				for callback in connections do
+					callback(...)
+				end
+			end,
+		}
+		signals[propertyName] = signal
+		return signal
+	end
+
+	local inputObject: any = {
+		UserInputType = resolved.UserInputType or Enum.UserInputType.Keyboard,
+		KeyCode = resolved.KeyCode or Enum.KeyCode.None,
+		UserInputState = resolved.UserInputState or Enum.UserInputState.Begin,
+		Position = resolved.Position or Vector3.zero,
+		Delta = resolved.Delta or Vector3.zero,
+	}
+
+	function inputObject.GetPropertyChangedSignal(_self, propertyName: string)
+		assert(type(propertyName) == "string", "Bad propertyName")
+		return signalFor(propertyName)
+	end
+
+	function inputObject.SetUserInputState(self, userInputState: Enum.UserInputState)
+		assert(
+			typeof(userInputState) == "EnumItem" and userInputState.EnumType == Enum.UserInputState,
+			"Bad userInputState"
+		)
+		self.UserInputState = userInputState
+		signalFor("UserInputState"):Fire()
+	end
+
+	return inputObject
+end
+
+-- ObjectValue child standing in for the client-global `GuiService.SelectedObject` (gamepad/keyboard
+-- focus). A headless server has no PlayerGui, so the engine refuses `GuiService.SelectedObject = obj`
+-- ("not a descendant of a PlayerGui"); selection code branches to store/read it on the mock local
+-- player instead, which is inspectable and self-cleaning like the other backings. Global focus maps to
+-- the single mocked local player.
+local SELECTED_GUI_OBJECT_NAME = "PlayerMockSelectedGuiObject"
+
+local function getOrCreateSelectedGuiObjectValue(player: Player): ObjectValue
+	local existing = (player :: Instance):FindFirstChild(SELECTED_GUI_OBJECT_NAME)
+	if existing ~= nil then
+		return existing :: ObjectValue
+	end
+
+	local objectValue = Instance.new("ObjectValue")
+	objectValue.Name = SELECTED_GUI_OBJECT_NAME
+	objectValue.Parent = player :: Instance
+	return objectValue
+end
+
+--[=[
+	Sets the mock's stand-in for `GuiService.SelectedObject` (or clears it with nil). Selection code
+	branches to this when the local player is a mock, since the engine's `GuiService.SelectedObject`
+	rejects any object not under a real PlayerGui (which a headless run has none of):
+
+	```lua
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		PlayerMock.setSelectedGuiObject(localPlayer, button)
+	else
+		GuiService.SelectedObject = button
+	end
+	```
+
+	@param player Player -- must be a PlayerMock
+	@param guiObject GuiObject? -- the focused object, or nil to clear
+]=]
+function PlayerMock.setSelectedGuiObject(player: Player, guiObject: GuiObject?)
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+	assert(guiObject == nil or (typeof(guiObject) == "Instance" and guiObject:IsA("GuiObject")), "Bad guiObject")
+
+	getOrCreateSelectedGuiObjectValue(player).Value = guiObject
+end
+
+--[=[
+	Reads the mock's stand-in for `GuiService.SelectedObject`, or nil when nothing is selected. The
+	read side of the same branch as [PlayerMock.setSelectedGuiObject].
+
+	@param player Player -- must be a PlayerMock
+	@return GuiObject?
+]=]
+function PlayerMock.getSelectedGuiObject(player: Player): GuiObject?
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+
+	local objectValue = (player :: Instance):FindFirstChild(SELECTED_GUI_OBJECT_NAME)
+	return if objectValue ~= nil then (objectValue :: ObjectValue).Value :: GuiObject? else nil
+end
+
+--[=[
+	Returns the signal that fires when the mock's stand-in for `GuiService.SelectedObject` changes --
+	the backing ObjectValue's Value-changed signal. Lets a test (or a production observer that mirrors
+	`GuiService:GetPropertyChangedSignal("SelectedObject")`) react to selection moving.
+
+	@param player Player -- must be a PlayerMock
+	@return RBXScriptSignal
+]=]
+function PlayerMock.getSelectedGuiObjectChangedSignal(player: Player): RBXScriptSignal
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+
+	return getOrCreateSelectedGuiObjectValue(player):GetPropertyChangedSignal("Value")
 end
 
 --[=[
