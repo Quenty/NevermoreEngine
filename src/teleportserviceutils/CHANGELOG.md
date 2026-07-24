@@ -1,19 +1,13 @@
-# v10.1.0 (Fri Jul 24 2026)
-
-#### 🚀 Enhancement
-
-- feat: mock-safe teleport and screen-gui-provider teardown [#751](https://github.com/Quenty/NevermoreEngine/pull/751) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.0.0...@quenty/teleportserviceutils@10.1.0) (2026-07-24)
+
+### Features
+
+- mock-safe teleport and screen-gui-provider teardown ([#751](https://github.com/Quenty/NevermoreEngine/issues/751)) ([743da25](https://github.com/Quenty/NevermoreEngine/commit/743da25a3eba46e0e498999ce4eec964f9774b18))
 
 # [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.40.0...@quenty/teleportserviceutils@10.0.0) (2026-07-24)
 

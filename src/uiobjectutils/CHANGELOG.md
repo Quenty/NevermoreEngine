@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.34.0...@quenty/uiobjectutils@6.35.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
 # [6.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.33.0...@quenty/uiobjectutils@6.34.0) (2026-07-24)
 
 **Note:** Version bump only for package @quenty/uiobjectutils

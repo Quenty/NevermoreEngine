@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.35.0...@quenty/friendutils@12.36.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/friendutils
+
 # [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.34.0...@quenty/friendutils@12.35.0) (2026-07-24)
 
 **Note:** Version bump only for package @quenty/friendutils

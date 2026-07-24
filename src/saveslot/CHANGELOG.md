@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.0.0...@quenty/saveslot@2.1.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/saveslot
+
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@1.15.0...@quenty/saveslot@2.0.0) (2026-07-24)
 
 ### Features
