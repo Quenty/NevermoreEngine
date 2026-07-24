@@ -1,5 +1,18 @@
 # (Fri Jul 24 2026)
 
+#### 💥 Breaking Change
+
+- `@quenty/saveslot@2.0.0`, `@quenty/teleportserviceutils@10.0.0`
+  - feat(saveslot): save slot export/import + cross-session transfer [#748](https://github.com/Quenty/NevermoreEngine/pull/748) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/playermock@1.3.0`
