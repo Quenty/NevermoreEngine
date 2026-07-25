@@ -137,6 +137,12 @@ store:Save():Catch(function() end)
 When you need to wait for a settled result, `PromiseTestUtils.awaitOutcome` / `awaitSettled` attach handlers
 synchronously — prefer them over hand-rolled awaits.
 
+A rejection is only reported if it carries information. Rejecting with no values at all (what `Destroy()`
+and cancellation produce), with values that are all nil (`Promise.rejected(nil)`), or with a single empty
+table (aggregators rejecting with an empty results table) is silent, because there is nothing a warning
+could relay. So an unconsumed cancellation is not noise you need to `Catch` away — only a *valued*
+rejection warns.
+
 One case is untestable rather than fixable: an error raised inside a `BindableFunction`/`BindableEvent`
 handler is **always printed by the engine** (as a `Stack Begin` block), even when the invoker wraps the
 call in `pcall` and correctly converts it to a rejection. So a round-trip spec asserting "a bound

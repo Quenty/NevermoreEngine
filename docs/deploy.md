@@ -320,6 +320,24 @@ end
 
 `metadata.deployed` is the source of truth for "is this a real deploy?" — it's only ever `true` when the CLI injected it, so it stays `false` in Studio and in any place that wasn't deployed through the CLI. The full field list (`commit`, `version`, `branch`, `target`, `timestamp`, `published`, `placeId`, `universeId`) is documented in the [package README](https://github.com/Quenty/NevermoreEngine/tree/main/src/nevermore-cli-manifest). Consumers like `GameConfig`, `GameVersionUtils`, and PlayerMetrics read from this module rather than reaching for the raw attributes.
 
+### Showing the running version to humans
+
+Anything you put in front of a person — a settings footer, a Cmdr prompt, a bug report — should go through `GameVersionUtils` rather than formatting the metadata itself, so every surface reports a build the same way.
+
+```lua
+local GameVersionUtils = require("GameVersionUtils")
+
+print(GameVersionUtils.getVersionString())
+--> 1.0.0 · integration · a4a79e8 · v312                        (deployed from main)
+--> 1.0.0 · integration · users/quenty/thing · a4a79e8 · v312   (deployed from a branch)
+--> studio                                                      (never deployed)
+--> undeployed · v312                                           (published outside the CLI)
+```
+
+Fields run from most to least stable — package version, environment, branch, commit, place version — and anything the CLI didn't stamp is dropped instead of printed as `?`. The branch only appears when a build came from something other than `main`/`master`, which is exactly when the target alone doesn't tell you what's running.
+
+`GameVersionUtils.observeVersionString()` is the reactive form, and the one to use for anything shown at boot: on the client the metadata arrives with replication, so a synchronous read during startup can miss it. `GameVersionUtils.getEnvironmentName()` / `observeEnvironmentName()` return just the target (`"integration"`, `"production-demo"`), or nil when the place wasn't CLI-deployed — callers should degrade to whatever they showed before rather than inventing an environment name. `GameConfig` uses it to suffix the Cmdr prompt, so `Quenty@CanyonHeights$` becomes `Quenty@CanyonHeights:production$` on a deployed place.
+
 The attribute names the CLI writes (`Commit`, `Version`, `Target`, …) live in two places that must agree: `buildDeployMetadataAttributes` in `tools/nevermore-cli/src/utils/deploy/deploy-metadata.ts` (the write side) and the `ATTRIBUTE` table in `NevermoreCLIManifestUtils.lua` (the read side). The Lune transform itself is generic — it writes whatever keys it's handed — so adding a field is just those two edits. Note place/universe IDs are written as strings on purpose (Lune serializes number attributes as float32, which corrupts large IDs); the reader converts them back with `tonumber`.
 
 ## Common workflows

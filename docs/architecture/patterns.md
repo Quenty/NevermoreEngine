@@ -33,6 +33,8 @@ maid:DoCleaning() -- Disconnects, destroys, and runs everything
 
 **Key API:** `Maid.new()`, `:GiveTask(task)`, `:Add(task)`, `maid[key] = task` (named), `:DoCleaning()` / `:Destroy()`
 
+The three adders return different things, which matters when you want to keep using the value: `:GiveTask(task)` returns a numeric task id, `:Add(task)` returns the task itself, and `:GivePromise(promise)` returns a *wrapper* promise — cleaning the maid settles the wrapper, not the promise you passed in. To hold a reference and have cleanup cancel the original, use `:Add`.
+
 **When to use:** Any time you create connections, spawn threads, or instantiate objects that need cleanup. Almost every class uses one.
 
 ## BaseObject
@@ -150,6 +152,30 @@ brio:Kill() --> "Resource is no longer valid"
 **Key API:** `Brio.new(...)`, `:GetValue()`, `:IsDead()`, `:Kill()` / `:Destroy()`, `:GetDiedSignal()`, `:ToMaid()`
 
 **When to use:** When emitting objects from Observables that have a limited lifetime. Binder's `:ObserveBrio()` returns `Observable<Brio<T>>` — this is the canonical use case. Essential for safely passing resources through reactive pipelines.
+
+### Three ways a Brio pipeline silently gives the wrong answer
+
+These bite when a stream models "the current state of some replicated instances", where the consumer needs an answer at every moment — not just when things exist.
+
+**Never emitting is not the same as emitting nil.** `RxInstanceUtils.observeLastNamedChildBrio` (and anything built on it) fires only once a matching child exists. Subscribe before the instance replicates and you get *nothing* — the subscriber can't tell "not there" from "not loaded yet" and renders whatever it had. End such a pipeline with `Rx.defaultsToNil`, which fires nil only when the source didn't already fire synchronously, so a present value never flickers through nil first.
+
+**`Rx.EMPTY` as a switchMap fallback swallows the disappearance.** `Rx.switchMap(function(inst) return inst and Data:Observe(inst) or Rx.EMPTY end)` looks right, but `Rx.EMPTY` emits nothing at all — so when the instance goes away, the nil that `RxBrioUtils.emitOnDeath(nil)` worked to produce is dropped and the subscriber keeps stale data forever. Return `Rx.of(nil)`.
+
+**`flatMapBrio` into `reduceToAliveList` appends instead of replaces.** Each emission of the inner observable becomes its own brio, bounded only by the *source* brio's lifetime, so a per-instance stream that re-emits (any attribute change) leaves the old value alive in the list alongside the new one. To build a live list of per-instance values, reduce to the alive *instances* first and `Rx.combineLatest` their value observables:
+
+```lua
+RxInstanceUtils.observeChildrenBrio(container):Pipe({
+	RxBrioUtils.reduceToAliveList(), -- Brio<{ Instance }> -- one entry per live child
+}),
+RxBrioUtils.emitOnDeath(nil),
+Rx.switchMap(function(instances)
+	local observables = {}
+	for index, instance in instances do
+		observables[index] = SomeData:Observe(instance)
+	end
+	return Rx.combineLatest(observables) -- latest value per child, replaced not appended
+end),
+```
 
 ## Blend
 
