@@ -1,21 +1,14 @@
-# v12.40.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Add RootPartUtils.getPlayerRootPart(player) ([@Quenty](https://github.com/Quenty))
-- feat: Add RootPartUtils.promisePlayerHumanoidRootPart(player) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.39.0...@quenty/characterutils@12.40.0) (2026-07-25)
+
+### Features
+
+- Add RootPartUtils.getPlayerRootPart(player) ([dc1c687](https://github.com/Quenty/NevermoreEngine/commit/dc1c68760c3e4b699b0a4e59eec464b73a61867b))
+- Add RootPartUtils.promisePlayerHumanoidRootPart(player) ([50a789b](https://github.com/Quenty/NevermoreEngine/commit/50a789b4ae0f126d893fd86405b1f5b2ccdfc5b7))
 
 # [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.38.0...@quenty/characterutils@12.39.0) (2026-07-24)
 

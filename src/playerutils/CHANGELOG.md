@@ -1,20 +1,13 @@
-# v8.40.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Add PlayerUtils.promiseLoadCharacter(player) mock aware ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.39.0...@quenty/playerutils@8.40.0) (2026-07-25)
+
+### Features
+
+- Add PlayerUtils.promiseLoadCharacter(player) mock aware ([973ae62](https://github.com/Quenty/NevermoreEngine/commit/973ae62f5459f24368c64fe0c086cdf255b8eeb1))
 
 # [8.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerutils@8.38.0...@quenty/playerutils@8.39.0) (2026-07-24)
 

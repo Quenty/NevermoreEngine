@@ -1,24 +1,17 @@
-# v2.2.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Export other people's save slots for debugging ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Ephemeral save slots replicate to the client ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.1.0...@quenty/saveslot@2.2.0) (2026-07-25)
+
+### Bug Fixes
+
+- Ephemeral save slots replicate to the client ([457f3e9](https://github.com/Quenty/NevermoreEngine/commit/457f3e95e1c9f6714e027c0e96754f646ee7f6a5))
+
+### Features
+
+- Export other people's save slots for debugging ([d5600ae](https://github.com/Quenty/NevermoreEngine/commit/d5600ae650d0af21dbd0c26d24f7cf7e292489b9))
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.0.0...@quenty/saveslot@2.1.0) (2026-07-24)
 

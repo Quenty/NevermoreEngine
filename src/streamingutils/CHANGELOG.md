@@ -1,24 +1,17 @@
-# v10.27.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Use ReplicationFocus instead of overwriting the focus ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Streaming cinematic allows latest focus to work (for now) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.26.0...@quenty/streamingutils@10.27.0) (2026-07-25)
+
+### Bug Fixes
+
+- Streaming cinematic allows latest focus to work (for now) ([528cb41](https://github.com/Quenty/NevermoreEngine/commit/528cb41a8c4f233d0903faf66c67dd6e71450cea))
+
+### Features
+
+- Use ReplicationFocus instead of overwriting the focus ([daaf82f](https://github.com/Quenty/NevermoreEngine/commit/daaf82f22862570e1eaafd48188c8ed067005ef9))
 
 # [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.25.0...@quenty/streamingutils@10.26.0) (2026-07-24)
 

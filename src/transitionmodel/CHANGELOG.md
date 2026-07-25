@@ -1,20 +1,13 @@
-# v7.46.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Add unit tests to TransitionModel ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.45.0...@quenty/transitionmodel@7.46.0) (2026-07-25)
+
+### Features
+
+- Add unit tests to TransitionModel ([e67675e](https://github.com/Quenty/NevermoreEngine/commit/e67675eccb48bbba42ae4a22551878db5b50265f))
 
 # [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.44.0...@quenty/transitionmodel@7.45.0) (2026-07-24)
 

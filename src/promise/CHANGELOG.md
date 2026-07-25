@@ -1,20 +1,13 @@
-# v10.23.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Promises don't reject on Promise.rejected(nil) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.22.0...@quenty/promise@10.23.0) (2026-07-25)
+
+### Features
+
+- Promises don't reject on Promise.rejected(nil) ([be63400](https://github.com/Quenty/NevermoreEngine/commit/be63400f89c863624b75b1903f7e8357ddca7bf9))
 
 # [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.21.0...@quenty/promise@10.22.0) (2026-07-23)
 

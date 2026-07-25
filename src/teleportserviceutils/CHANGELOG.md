@@ -1,25 +1,17 @@
-# v10.2.0 (Sat Jul 25 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
-- feat: Add teleport utils that retries ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Improve docs ([@Quenty](https://github.com/Quenty))
-- docs: Update docs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.1.0...@quenty/teleportserviceutils@10.2.0) (2026-07-25)
+
+### Bug Fixes
+
+- Improve docs ([a6fd136](https://github.com/Quenty/NevermoreEngine/commit/a6fd13630628db6b9139ca4c36fa707c288eb92f))
+
+### Features
+
+- Add teleport utils that retries ([89cd3c5](https://github.com/Quenty/NevermoreEngine/commit/89cd3c5a20968a361334c722cec58b833071b5ec))
 
 # [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.0.0...@quenty/teleportserviceutils@10.1.0) (2026-07-24)
 
