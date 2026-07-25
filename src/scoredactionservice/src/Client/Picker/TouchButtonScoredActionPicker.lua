@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local ScoredAction = require("ScoredAction")
 
 local TouchButtonScoredActionPicker = setmetatable({}, BaseObject)
 TouchButtonScoredActionPicker.ClassName = "TouchButtonScoredActionPicker"
@@ -58,12 +59,17 @@ function TouchButtonScoredActionPicker.AddAction(self: TouchButtonScoredActionPi
 end
 
 --[=[
-	Touch actions do not compete for a slot the way [ScoredActionPicker] makes keys compete, so this is
-	the whole of the test: being disabled is the one thing that keeps a touch button off the screen.
+	Touch actions do not compete for a slot the way [ScoredActionPicker] makes keys compete, so being
+	disabled is the only thing that keeps a touch button off the screen.
 
+	@param action ScoredAction
+	@return boolean
 	@private
 ]=]
-function TouchButtonScoredActionPicker._isPreferable(_self: TouchButtonScoredActionPicker, action): boolean
+function TouchButtonScoredActionPicker._isPreferable(
+	_self: TouchButtonScoredActionPicker,
+	action: ScoredAction.ScoredAction
+): boolean
 	return action:IsEnabled() and action:GetScore() ~= -math.huge
 end
 
