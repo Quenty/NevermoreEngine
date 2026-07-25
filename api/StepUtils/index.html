@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">StepUtils | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/StepUtils"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="StepUtils | Nevermore"><meta data-rh="true" name="description" content="Utility functions primarily used to bind animations into update loops of the Roblox engine."><meta data-rh="true" property="og:description" content="Utility functions primarily used to bind animations into update loops of the Roblox engine."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/StepUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StepUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StepUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.2a7cff09.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.45d0694b.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.2abbf402.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.c9920aeb.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -43,7 +43,39 @@
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToRenderStep"><code style="text-decoration:none">bindToRenderStep</code><a href="#bindToRenderStep" class="hash-link" aria-label="Direct link to bindToRenderStep" title="Direct link to bindToRenderStep" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L66"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToRenderStep</code><code>(</code><div class="inset_uKQm"><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getSteppedSignal"><code style="text-decoration:none">getSteppedSignal</code><a href="#getSteppedSignal" class="hash-link" aria-label="Direct link to getSteppedSignal" title="Direct link to getSteppedSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L56"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">getSteppedSignal</code><code>(</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+<p>
+  Returns the signal per-frame bookkeeping should run on: <a href="https://developer.roblox.com/en-us/api-reference/class/RunService#Stepped">RunService.Stepped</a> (the physics
+  pre-step) on a running DataModel, falling back to <a href="https://developer.roblox.com/en-us/api-reference/class/RunService#Heartbeat">RunService.Heartbeat</a> on a non-running one
+  (headless test runs, edit mode) where Stepped never fires.
+</p>
+<p>
+  Unlike <a href="/NevermoreEngine/api/StepUtils#getAnimationStepSignal">StepUtils.getAnimationStepSignal</a> this does not branch to RenderStepped on the client,
+  so both realms step at the same point in the frame. Prefer it for work that is not driving
+  visuals -- rescoring, polling, cache invalidation -- and that would otherwise silently stop
+  running outside a live game.
+</p>
+
+  
+    
+    
+      <div class="admonition admonition-caution alert alert--warning">
+        <div class="admonition-heading">
+          <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path>
+              </svg></span><span class="admonition-title">CAUTION</span></h5>
+        </div>
+        <div class="admonition-content">
+          <p>
+            Stepped fires <code>(time, deltaTime)</code> but Heartbeat fires <code>(deltaTime)</code>. Do not assume the first
+            argument is deltaTime when connecting directly to this signal.
+          </p>
+        </div>
+      </div>
+    
+  
+
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToRenderStep"><code style="text-decoration:none">bindToRenderStep</code><a href="#bindToRenderStep" class="hash-link" aria-label="Direct link to bindToRenderStep" title="Direct link to bindToRenderStep" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L91"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToRenderStep</code><code>(</code><div class="inset_uKQm"><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
 <p>should return true while it needs to update</p>
 </span></span></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="purple_ieR2">(</code><code class="blue_P4bS">...</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Connect function</p>
@@ -82,9 +114,9 @@ spring<span class="token punctuation">.</span>t <span class="token operator">=</
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="deferWait"><code style="text-decoration:none">deferWait</code><a href="#deferWait" class="hash-link" aria-label="Direct link to deferWait" title="Direct link to deferWait" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L73"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">deferWait</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="deferWait"><code style="text-decoration:none">deferWait</code><a href="#deferWait" class="hash-link" aria-label="Direct link to deferWait" title="Direct link to deferWait" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L98"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">deferWait</code><code>(</code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>Yields until the frame deferral is done</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToStepped"><code style="text-decoration:none">bindToStepped</code><a href="#bindToStepped" class="hash-link" aria-label="Direct link to bindToStepped" title="Direct link to bindToStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L91"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToStepped</code><code>(</code><div class="inset_uKQm"><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToStepped"><code style="text-decoration:none">bindToStepped</code><a href="#bindToStepped" class="hash-link" aria-label="Direct link to bindToStepped" title="Direct link to bindToStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L116"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToStepped</code><code>(</code><div class="inset_uKQm"><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
 <p>should return true while it needs to update</p>
 </span></span></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="purple_ieR2">(</code><code class="blue_P4bS">...</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Connect function</p>
@@ -109,7 +141,7 @@ spring<span class="token punctuation">.</span>t <span class="token operator">=</
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToSignal"><code style="text-decoration:none">bindToSignal</code><a href="#bindToSignal" class="hash-link" aria-label="Direct link to bindToSignal" title="Direct link to bindToSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L104"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToSignal</code><code>(</code><div class="inset_uKQm"><div><code>signal<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bindToSignal"><code style="text-decoration:none">bindToSignal</code><a href="#bindToSignal" class="hash-link" aria-label="Direct link to bindToSignal" title="Direct link to bindToSignal" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L129"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">bindToSignal</code><code>(</code><div class="inset_uKQm"><div><code>signal<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>update<!-- -->: </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
 <p>should return true while it needs to update</p>
 </span></span></div></div><code>) → </code><code>(</code><div class="inset_uKQm"><div><code class="purple_ieR2">(</code><code class="blue_P4bS">...</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Connect function</p>
@@ -120,7 +152,7 @@ spring<span class="token punctuation">.</span>t <span class="token operator">=</
   Binds an update event to a signal until the update function stops returning a truthy
   value.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtRenderPriority"><code style="text-decoration:none">onceAtRenderPriority</code><a href="#onceAtRenderPriority" class="hash-link" aria-label="Direct link to onceAtRenderPriority" title="Direct link to onceAtRenderPriority" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L158"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtRenderPriority</code><code>(</code><div class="inset_uKQm"><div><code>priority<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtRenderPriority"><code style="text-decoration:none">onceAtRenderPriority</code><a href="#onceAtRenderPriority" class="hash-link" aria-label="Direct link to onceAtRenderPriority" title="Direct link to onceAtRenderPriority" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L183"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtRenderPriority</code><code>(</code><div class="inset_uKQm"><div><code>priority<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to call</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call this function to cancel call</p>
@@ -129,7 +161,7 @@ spring<span class="token punctuation">.</span>t <span class="token operator">=</
   Calls the function once at the given priority level, unless the cancel callback is
   invoked.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtStepped"><code style="text-decoration:line-through">onceAtStepped</code><a href="#onceAtStepped" class="hash-link" aria-label="Direct link to onceAtStepped" title="Direct link to onceAtStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L194"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtStepped</code><code>(</code><div class="inset_uKQm"><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtStepped"><code style="text-decoration:line-through">onceAtStepped</code><a href="#onceAtStepped" class="hash-link" aria-label="Direct link to onceAtStepped" title="Direct link to onceAtStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L219"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtStepped</code><code>(</code><div class="inset_uKQm"><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to call</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call this function to cancel call</p>
@@ -157,7 +189,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtRenderStepped"><code style="text-decoration:line-through">onceAtRenderStepped</code><a href="#onceAtRenderStepped" class="hash-link" aria-label="Direct link to onceAtRenderStepped" title="Direct link to onceAtRenderStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L212"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtRenderStepped</code><code>(</code><div class="inset_uKQm"><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtRenderStepped"><code style="text-decoration:line-through">onceAtRenderStepped</code><a href="#onceAtRenderStepped" class="hash-link" aria-label="Direct link to onceAtRenderStepped" title="Direct link to onceAtRenderStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L237"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtRenderStepped</code><code>(</code><div class="inset_uKQm"><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to call</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call this function to cancel call</p>
@@ -180,7 +212,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtEvent"><code style="text-decoration:line-through">onceAtEvent</code><a href="#onceAtEvent" class="hash-link" aria-label="Direct link to onceAtEvent" title="Direct link to onceAtEvent" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L227"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtEvent</code><code>(</code><div class="inset_uKQm"><div><code>event<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="onceAtEvent"><code style="text-decoration:line-through">onceAtEvent</code><a href="#onceAtEvent" class="hash-link" aria-label="Direct link to onceAtEvent" title="Direct link to onceAtEvent" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><span class="releaseVersion_EonW">deprecated in <!-- -->3.5.2</span><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/steputils/src/Shared/StepUtils.lua#L252"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="admonition admonition-caution alert alert--warning"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span><span class="admonition-title">This was deprecated in 3.5.2</span></h5></div><div class="admonition-content">This item is deprecated. Do not use it for new work. </div></div><div class="memberString_GwaU"><code>StepUtils<!-- -->.</code><code class="green_DgR4">onceAtEvent</code><code>(</code><div class="inset_uKQm"><div><code>event<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/RBXScriptSignal" target="_blank" rel="noopener noreferrer">RBXScriptSignal<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>func<!-- -->: </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Function to call</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call this function to cancel call</p>
@@ -201,6 +233,22 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
                 &quot;line&quot;: 29,
+                &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getSteppedSignal&quot;,
+            &quot;desc&quot;: &quot;Returns the signal per-frame bookkeeping should run on: [RunService.Stepped] (the physics\npre-step) on a running DataModel, falling back to [RunService.Heartbeat] on a non-running one\n(headless test runs, edit mode) where Stepped never fires.\n\nUnlike [StepUtils.getAnimationStepSignal] this does not branch to RenderStepped on the client,\nso both realms step at the same point in the frame. Prefer it for work that is not driving\nvisuals -- rescoring, polling, cache invalidation -- and that would otherwise silently stop\nrunning outside a live game.\n\n:::caution\nStepped fires `(time, deltaTime)` but Heartbeat fires `(deltaTime)`. Do not assume the first\nargument is deltaTime when connecting directly to this signal.\n:::&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;RBXScriptSignal&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 56,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -226,7 +274,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 66,
+                &quot;line&quot;: 91,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -237,7 +285,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 73,
+                &quot;line&quot;: 98,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -263,7 +311,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 91,
+                &quot;line&quot;: 116,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -294,7 +342,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 104,
+                &quot;line&quot;: 129,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -321,7 +369,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 158,
+                &quot;line&quot;: 183,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -347,7 +395,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
                 &quot;desc&quot;: null
             },
             &quot;source&quot;: {
-                &quot;line&quot;: 194,
+                &quot;line&quot;: 219,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -373,7 +421,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
                 &quot;desc&quot;: null
             },
             &quot;source&quot;: {
-                &quot;line&quot;: 212,
+                &quot;line&quot;: 237,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         },
@@ -404,7 +452,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
                 &quot;desc&quot;: null
             },
             &quot;source&quot;: {
-                &quot;line&quot;: 227,
+                &quot;line&quot;: 252,
                 &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
             }
         }
@@ -417,6 +465,6 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
         &quot;line&quot;: 6,
         &quot;path&quot;: &quot;src/steputils/src/Shared/StepUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#bindToRenderStep" class="table-of-contents__link toc-highlight">.bindToRenderStep</a></li><li><a href="#bindToSignal" class="table-of-contents__link toc-highlight">.bindToSignal</a></li><li><a href="#bindToStepped" class="table-of-contents__link toc-highlight">.bindToStepped</a></li><li><a href="#deferWait" class="table-of-contents__link toc-highlight">.deferWait</a></li><li><a href="#getAnimationStepSignal" class="table-of-contents__link toc-highlight">.getAnimationStepSignal</a></li><li><a href="#onceAtEvent" class="table-of-contents__link toc-highlight">.onceAtEvent</a></li><li><a href="#onceAtRenderPriority" class="table-of-contents__link toc-highlight">.onceAtRenderPriority</a></li><li><a href="#onceAtRenderStepped" class="table-of-contents__link toc-highlight">.onceAtRenderStepped</a></li><li><a href="#onceAtStepped" class="table-of-contents__link toc-highlight">.onceAtStepped</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#bindToRenderStep" class="table-of-contents__link toc-highlight">.bindToRenderStep</a></li><li><a href="#bindToSignal" class="table-of-contents__link toc-highlight">.bindToSignal</a></li><li><a href="#bindToStepped" class="table-of-contents__link toc-highlight">.bindToStepped</a></li><li><a href="#deferWait" class="table-of-contents__link toc-highlight">.deferWait</a></li><li><a href="#getAnimationStepSignal" class="table-of-contents__link toc-highlight">.getAnimationStepSignal</a></li><li><a href="#getSteppedSignal" class="table-of-contents__link toc-highlight">.getSteppedSignal</a></li><li><a href="#onceAtEvent" class="table-of-contents__link toc-highlight">.onceAtEvent</a></li><li><a href="#onceAtRenderPriority" class="table-of-contents__link toc-highlight">.onceAtRenderPriority</a></li><li><a href="#onceAtRenderStepped" class="table-of-contents__link toc-highlight">.onceAtRenderStepped</a></li><li><a href="#onceAtStepped" class="table-of-contents__link toc-highlight">.onceAtStepped</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
