@@ -934,11 +934,13 @@ end
 --[=[
 	Creates a fresh ephemeral slot and selects it, resolving to its id. An ephemeral slot is selectable and
 	active exactly like a real one -- it drives [HasSaveSlots.ObserveActiveSlotStoreBrio], summaries, and
-	playtime the same way -- but it is never persisted: no metadata is written, its data store is in-memory,
-	it is kept out of the replicated slot list, and it is torn down the moment it stops being the active slot.
-	Selecting it also never disturbs the persisted active-slot pointer or the "Continue" target, so the real
-	slot the player came from resumes untouched afterward. Backs a throwaway session (e.g. exploring a lobby)
-	that must leave no trace on save data.
+	playtime the same way, and its metadata replicates to the client like any other slot's, so UI can render
+	the active session's name and summary -- but it is never persisted: no metadata is written, its data store
+	is in-memory, and it is torn down the moment it stops being the active slot. It is also excluded from the
+	save list ([SaveSlotDataService.GetSlotList] / [SaveSlotDataService.ObserveSlotList]), so it never shows up
+	as something the player can return to. Selecting it never disturbs the persisted active-slot pointer or the
+	"Continue" target, so the real slot the player came from resumes untouched afterward. Backs a throwaway
+	session (e.g. exploring a lobby) that must leave no trace on save data.
 
 	@param metadata SaveSlotCreateMetadata? -- optional SlotName/Summary for the in-memory slot
 	@return Promise<SlotId>
@@ -1092,9 +1094,11 @@ function HasSaveSlots._buildSlot(
 	attributes.SlotIndex.Value = data.SlotIndex
 
 	if isEphemeral then
-		-- Ephemeral: seed the metadata in memory with no write-back wiring, back the slot with an in-memory
-		-- store, and deliberately leave the folder unparented so it never joins the replicated slot container
-		-- (SaveSlotDataService lists that container's children -- an ephemeral slot must not surface as a save).
+		-- Ephemeral: seed the metadata in memory with no write-back wiring, and back the slot with an in-memory
+		-- store. The folder still joins the replicated container so the client can read the active slot's
+		-- metadata (name, summary, playtime) the same way it reads a real slot's -- what makes the slot
+		-- ephemeral is that nothing is persisted, not that it is invisible. The IsEphemeral attribute is what
+		-- keeps it out of the save list; SaveSlotDataService's list reads filter on it.
 		--
 		-- The in-memory store's lifetime is owned by this slot's maid (which is in turn owned by self._maid),
 		-- so it is Destroyed -- and becomes GC-eligible -- the instant the slot is retired (_destroyEphemeralSlot)
@@ -1106,6 +1110,10 @@ function HasSaveSlots._buildSlot(
 		for _, key in MUTABLE_METADATA_KEYS do
 			attributes[key].Value = data[key]
 		end
+
+		-- Parent last, so the folder replicates carrying IsEphemeral -- a client that saw it land without the
+		-- flag would briefly list a throwaway slot as a save.
+		slot.Parent = self._slotContainer
 
 		self._slotMap[slotId] = slot
 		maid:GiveTask(function()

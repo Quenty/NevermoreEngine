@@ -133,6 +133,25 @@ describe("Promise.rejected", function()
 	it("reuses a single shared promise when rejecting with no values", function()
 		expect(Promise.rejected()).toBe(Promise.rejected())
 	end)
+
+	it("rejects with nil without reporting an uncaught exception", function()
+		local promise = Promise.rejected(nil)
+
+		expect(promise:IsRejected()).toEqual(true)
+		expect(promise:_isReportableRejection(promise._rejected)).toEqual(false)
+
+		local ok, err = promise:GetResults()
+		expect(ok).toEqual(false)
+		expect(err).toEqual(nil)
+	end)
+
+	it("rejects with several nils without reporting an uncaught exception", function()
+		local promise = Promise.rejected(nil, nil, nil)
+
+		expect(promise:IsRejected()).toEqual(true)
+		expect(promise._rejected.n).toEqual(3)
+		expect(promise:_isReportableRejection(promise._rejected)).toEqual(false)
+	end)
 end)
 
 describe("Promise:Resolve", function()
@@ -528,6 +547,34 @@ describe("Promise:GetResults", function()
 		local promise = Promise.rejected("failure")
 		promise:GetResults()
 		expect((promise :: any)._unconsumedException).toEqual(false)
+	end)
+end)
+
+describe("Promise._isReportableRejection", function()
+	local promise = Promise.new()
+
+	it("reports a rejection that carries a value", function()
+		expect(promise:_isReportableRejection(table.pack("boom"))).toEqual(true)
+		expect(promise:_isReportableRejection(table.pack(false))).toEqual(true)
+		expect(promise:_isReportableRejection(table.pack(0))).toEqual(true)
+		expect(promise:_isReportableRejection(table.pack({ code = 500 }))).toEqual(true)
+	end)
+
+	it("reports a rejection whose value is not the first one", function()
+		expect(promise:_isReportableRejection(table.pack(nil, "boom"))).toEqual(true)
+	end)
+
+	it("does not report a rejection with no values", function()
+		expect(promise:_isReportableRejection({ n = 0 })).toEqual(false)
+	end)
+
+	it("does not report a rejection whose values are all nil", function()
+		expect(promise:_isReportableRejection(table.pack(nil))).toEqual(false)
+		expect(promise:_isReportableRejection(table.pack(nil, nil, nil))).toEqual(false)
+	end)
+
+	it("does not report a rejection carrying a single empty table", function()
+		expect(promise:_isReportableRejection(table.pack({}))).toEqual(false)
 	end)
 end)
 

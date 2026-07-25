@@ -137,6 +137,7 @@ These are the types you'll use most often:
 - **Requires sorted**: stylua sorts requires alphabetically (`[sort_requires] enabled = true`)
 - **Assert serviceBag**: `self._serviceBag = assert(serviceBag, "No serviceBag")` in constructors
 - **Moonwave docstrings**: `--[=[ @class ClassName ]=]` at the top of each file
+- **Self-documenting code**: For private members, prefer self documenting code over lots of of comments. If you must document private things, use `--[[ ]]`, not `--[=[ ]=]`, as moonwave only parses `--[=[ ]=]` blocks.
 - **Conventional commits**: `feat(scope):`, `fix(scope):`, `chore(scope):`, etc.
 - **Commit messages describe impact, not reasoning**: Keep them short. e.g. `fix(localizedtextutils): make translationArgs optional`
 - **Squash before pushing**: Rebase and squash into a single cohesive commit before pushing

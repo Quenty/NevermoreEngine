@@ -1,9 +1,9 @@
 --!strict
 --[=[
 	Server half of the streaming-cinematics system. Receives a focus position from a client
-	(who has no character, or whose character is far from a cinematic camera) and points that
-	player's `ReplicationFocus` at it via a [ReplicationFocusTracker], so world content streams
-	in around the cinematic camera. Sending nil clears it.
+	(who has no character, or whose character is far from a cinematic camera) and adds a
+	replication focus there via a [ReplicationFocusTracker], so world content streams in around
+	the cinematic camera. Sending nil clears it.
 
 	@server
 	@class StreamingCinematicsService

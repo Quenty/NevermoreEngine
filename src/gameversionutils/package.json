@@ -26,6 +26,14 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/nevermoreclimanifest": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
   "publishConfig": {
     "access": "public"
   }
