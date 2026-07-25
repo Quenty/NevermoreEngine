@@ -126,3 +126,54 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		folder:Destroy()
 	end)
 end)
+
+describe("RootPartUtils.getPlayerRootPart", function()
+	it("returns the root part of a spawned character", function()
+		local character = PlayerMock.loadMinimalCharacterAsync(player)
+
+		expect(RootPartUtils.getPlayerRootPart(player)).toBe(getRootPart(character))
+	end)
+
+	it("returns nil when the player has no character", function()
+		expect(RootPartUtils.getPlayerRootPart(player)).toBe(nil)
+	end)
+
+	it("returns nil once the character is removed", function()
+		PlayerMock.loadMinimalCharacterAsync(player)
+		PlayerMock.removeCharacter(player)
+
+		expect(RootPartUtils.getPlayerRootPart(player)).toBe(nil)
+	end)
+
+	it("returns nil for a character without a humanoid", function()
+		local character = Instance.new("Model")
+
+		local rootPart = Instance.new("Part")
+		rootPart.Name = "HumanoidRootPart"
+		rootPart.Anchored = true
+		rootPart.Parent = character
+		character.PrimaryPart = rootPart
+
+		PlayerMock.loadCharacterAsync(player, character)
+
+		expect(RootPartUtils.getPlayerRootPart(player)).toBe(nil)
+	end)
+
+	it("returns the root part for a dead humanoid", function()
+		local character = PlayerMock.loadMinimalCharacterAsync(player)
+		local humanoid = character:FindFirstChildOfClass("Humanoid") :: Humanoid
+		humanoid.Health = 0
+
+		expect(RootPartUtils.getPlayerRootPart(player)).toBe(getRootPart(character))
+	end)
+
+	it("rejects a value that is neither a Player nor a PlayerMock", function()
+		local folder = Instance.new("Folder")
+
+		expect(function()
+			RootPartUtils.getPlayerRootPart(folder :: any)
+		end).toThrow()
+
+		folder:Destroy()
+	end)
+end)

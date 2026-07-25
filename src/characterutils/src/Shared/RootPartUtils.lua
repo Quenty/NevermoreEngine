@@ -141,6 +141,30 @@ function RootPartUtils.promisePlayerHumanoidRootPart(player: Player): Promise.Pr
 end
 
 --[=[
+	Gets the root part of the player's current character, if it exists.
+
+	Synchronous counterpart to [RootPartUtils.promisePlayerHumanoidRootPart]. Health is not
+	considered -- a dead humanoid still has a root part.
+
+	```lua
+	local rootPart = RootPartUtils.getPlayerRootPart(player)
+	if rootPart then
+		print(rootPart:GetPivot())
+	end
+	```
+
+	Accepts a [PlayerMock] as well as a real `Player`.
+
+	@param player Player
+	@return BasePart? -- Nil if not found
+]=]
+function RootPartUtils.getPlayerRootPart(player: Player): BasePart?
+	assert(player:IsA("Player") or PlayerMock.isMock(player), "Bad player")
+
+	return CharacterUtils.getPlayerRootPart(player)
+end
+
+--[=[
 	Gets the root part of a character, if it exists
 	@param character Model
 	@return BasePart? -- Nil if not found
