@@ -5,6 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local PlayerUtils = {}
@@ -130,11 +131,15 @@ end
 	@return Promise<Model>
 ]=]
 function PlayerUtils.promiseLoadCharacter(player: Player): Promise.Promise<Model>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
 		local ok, err = pcall(function()
-			player:LoadCharacterAsync()
+			if PlayerMock.isMock(player) then
+				PlayerMock.loadCharacterAsync(player)
+			else
+				player:LoadCharacterAsync()
+			end
 		end)
 		if not ok then
 			return reject(err or "Failed to load character")
