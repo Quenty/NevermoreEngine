@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local PlayerMock = require("PlayerMock")
+local PromiseTestUtils = require("PromiseTestUtils")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 local TeleportServiceUtils = require("TeleportServiceUtils")
 
@@ -29,6 +30,31 @@ afterEach(function()
 	end
 	table.clear(mocks)
 end)
+
+-- The hop the mock recorded for this destination, or nil if none has been made since the last clear.
+local function readHop(player: Player, placeId: number): any
+	return PlayerMock.readLookup(player, "TeleportService.Teleport", placeId)
+end
+
+-- Forgets the recorded hop, so the next one is observable as a fresh record rather than an
+-- indistinguishable overwrite -- how a test sees that a retry actually teleported again.
+local function clearHop(player: Player, placeId: number): ()
+	PlayerMock.writeLookup(player, "TeleportService.Teleport", placeId, nil)
+end
+
+-- Stands in for TeleportService refusing the hop. The message must differ from the previous refusal
+-- of the same teleport: the backing attribute only reports a change (see the domain's note in
+-- PlayerMock), and a repeat would go unnoticed rather than counting as a second refusal.
+local function refuse(player: Player, placeId: number, message: string): ()
+	PlayerMock.writeLookup(player, "TeleportService.TeleportInitFailed", placeId, { message = message })
+end
+
+local function awaitHop(player: Player, placeId: number): any
+	PromiseTestUtils.awaitValue(function()
+		return readHop(player, placeId) ~= nil
+	end)
+	return readHop(player, placeId)
+end
 
 describe("TeleportServiceUtils.teleport", function()
 	it("records the teleport with via=Teleport and its data on a mock", function()
@@ -147,6 +173,202 @@ describe("TeleportServiceUtils.promiseTeleport", function()
 		local hop = PlayerMock.readLookup(player, "TeleportService.Teleport", 700)
 		expect(hop.via).toEqual("TeleportAsync")
 		expect(hop.teleportData.SlotId).toEqual("z")
+	end)
+end)
+
+describe("TeleportServiceUtils.promiseTeleportClient", function()
+	it("teleports on the spot, carrying the config's teleport data", function()
+		local player = newMock(885001)
+
+		TeleportServiceUtils.promiseTeleportClient(800, player, { teleportData = { SlotId = "abc" } })
+
+		local hop = readHop(player, 800)
+		expect(hop.via).toEqual("Teleport")
+		expect(hop.teleportData.SlotId).toEqual("abc")
+	end)
+
+	it("teleports with no data at all when no config is given", function()
+		local player = newMock(885002)
+
+		TeleportServiceUtils.promiseTeleportClient(801, player)
+
+		expect(readHop(player, 801).via).toEqual("Teleport")
+	end)
+
+	it("stays pending, because a teleport that works ends with the player gone", function()
+		local player = newMock(885003)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(802, player)
+
+		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
+		expect(promise:IsPending()).toEqual(true)
+
+		promise:Destroy()
+	end)
+
+	it("teleports again after the engine refuses, carrying the same data", function()
+		local player = newMock(885004)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(803, player, {
+			teleportData = { SlotId = "retry-me" },
+			retryWait = 0,
+		})
+
+		clearHop(player, 803)
+		refuse(player, 803, "server full")
+
+		expect(awaitHop(player, 803).teleportData.SlotId).toEqual("retry-me")
+		expect(promise:IsPending()).toEqual(true)
+
+		promise:Destroy()
+	end)
+
+	it("keeps retrying until the attempts are spent, then rejects naming the last refusal", function()
+		local player = newMock(885005)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(804, player, { maxAttempts = 3, retryWait = 0 })
+
+		-- Two refusals are absorbed by retries; the third finds no attempts left.
+		refuse(player, 804, "refusal 1")
+		clearHop(player, 804)
+		awaitHop(player, 804)
+		refuse(player, 804, "refusal 2")
+		clearHop(player, 804)
+		awaitHop(player, 804)
+		refuse(player, 804, "refusal 3")
+
+		local outcome, err = PromiseTestUtils.awaitOutcome(promise)
+		expect(outcome).toEqual("rejected")
+		expect(err).toContain("refusal 3")
+		expect(err).toContain("3 attempt(s)")
+		expect(err).toContain("804")
+	end)
+
+	it("gives up on the first refusal when the config allows a single attempt", function()
+		local player = newMock(885006)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(805, player, { maxAttempts = 1, retryWait = 0 })
+
+		clearHop(player, 805)
+		refuse(player, 805, "nope")
+
+		local outcome = PromiseTestUtils.awaitOutcome(promise)
+		expect(outcome).toEqual("rejected")
+		expect(readHop(player, 805)).toEqual(nil) -- no retry was ever attempted
+	end)
+
+	it("waits the configured backoff before trying again", function()
+		local player = newMock(885007)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(806, player, { retryWait = 0.5 })
+
+		clearHop(player, 806)
+		refuse(player, 806, "not yet")
+
+		task.wait(0.1)
+		expect(readHop(player, 806)).toEqual(nil) -- still inside the backoff
+
+		expect(awaitHop(player, 806).via).toEqual("Teleport")
+
+		promise:Destroy()
+	end)
+
+	it("ignores a refusal aimed at another player's teleport", function()
+		local player = newMock(885008)
+		local other = newMock(885009)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(807, player, { maxAttempts = 1, retryWait = 0 })
+
+		clearHop(player, 807)
+		refuse(other, 807, "someone else's problem")
+
+		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
+		expect(readHop(player, 807)).toEqual(nil)
+
+		promise:Destroy()
+	end)
+
+	it("ignores a refusal of a hop to a different place", function()
+		local player = newMock(885010)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(808, player, { maxAttempts = 1, retryWait = 0 })
+
+		refuse(player, 999, "a different destination")
+
+		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
+
+		promise:Destroy()
+	end)
+
+	it("rejects with nothing when cancelled, so a caller can tell teardown from a failure", function()
+		local player = newMock(885011)
+
+		local outcome, err = "pending", nil :: any
+		local promise = TeleportServiceUtils.promiseTeleportClient(809, player)
+		promise:Then(function()
+			outcome = "resolved"
+		end, function(...)
+			outcome, err = "rejected", ...
+		end)
+
+		promise:Destroy()
+
+		expect(outcome).toEqual("rejected")
+		expect(err).toEqual(nil)
+	end)
+
+	it("stops retrying once cancelled, including a backoff already counting down", function()
+		local player = newMock(885012)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(810, player, { retryWait = 0.1 })
+
+		refuse(player, 810, "will retry")
+		promise:Destroy()
+		clearHop(player, 810)
+
+		-- Well past the backoff: the retry the refusal scheduled must not teleport a player whose
+		-- teleport was cancelled out from under it.
+		task.wait(0.3)
+		expect(readHop(player, 810)).toEqual(nil)
+	end)
+
+	it("ignores a refusal that lands after it has already given up", function()
+		local player = newMock(885013)
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(811, player, { maxAttempts = 1, retryWait = 0 })
+
+		refuse(player, 811, "first")
+		local outcome = PromiseTestUtils.awaitOutcome(promise)
+		expect(outcome).toEqual("rejected")
+
+		clearHop(player, 811)
+		refuse(player, 811, "second")
+
+		task.wait(0.1)
+		expect(readHop(player, 811)).toEqual(nil)
+	end)
+
+	it("errors on a bad placeId, player, or config", function()
+		local player = newMock(885014)
+
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient("nope" :: any, player)
+		end).toThrow()
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient(812, nil :: any)
+		end).toThrow()
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient(812, player, "nope" :: any)
+		end).toThrow()
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient(812, player, { maxAttempts = 0 })
+		end).toThrow()
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient(812, player, { retryWait = -1 })
+		end).toThrow()
+		expect(function()
+			TeleportServiceUtils.promiseTeleportClient(812, player, { teleportData = "nope" :: any })
+		end).toThrow()
 	end)
 end)
 

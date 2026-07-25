@@ -568,6 +568,26 @@ local LOOKUPS: { [string]: LookupSpec } = {
 			return HttpService:JSONDecode(value)
 		end,
 	},
+	-- TeleportService.TeleportInitFailed(player, teleportResult, message) -- the engine's refusal of a
+	-- teleport, which it can never fire for a mock, whose teleport never reaches the engine (see the
+	-- domain above). A test injects a refusal keyed by the destination placeId and the backing
+	-- attribute's changed signal stands in for the event, the way "Player.IsFriendsWithAsync" stands in
+	-- for the friendship events. Attributes only fire on change, so consecutive refusals of the same
+	-- teleport must differ (an attempt number in the message, say) for a retrying consumer to see each
+	-- one. Default nil: the engine has refused nothing.
+	["TeleportService.TeleportInitFailed"] = {
+		default = nil :: any,
+		valueType = "table",
+		validate = function(value: any)
+			assert(type(value.message) == "string", "Bad teleportInitFailed.message")
+		end,
+		encode = function(value: any): string
+			return HttpService:JSONEncode(value)
+		end,
+		decode = function(value: any): any
+			return HttpService:JSONDecode(value)
+		end,
+	},
 	-- Players:GetFriendsAsync(userId) -> FriendPages, stored as the flat FriendData array the pages
 	-- iterate ({ Id, Username, DisplayName, IsOnline }). The engine call is keyed by userId alone
 	-- and the injected result already lives on the mock, so the lookup key is fixed at 0. Consumers
