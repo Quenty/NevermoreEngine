@@ -67,17 +67,6 @@ local function recordMockTeleport(player: Player, placeId: number, record: MockT
 	PlayerMock.writeLookup(player, "TeleportService.Teleport", placeId, record)
 end
 
---[=[
-	Connects to the engine refusing this player's teleport. Mock-aware, like the teleport itself: the
-	engine never sees a mock's teleport and so can never refuse it, and a test injects the refusal into
-	the `"TeleportService.TeleportInitFailed"` lookup instead.
-
-	@param placeId number
-	@param player Player
-	@param onFailed (message: string) -> ()
-	@return RBXScriptConnection
-	@private
-]=]
 local function connectTeleportInitFailed(
 	placeId: number,
 	player: Player,
