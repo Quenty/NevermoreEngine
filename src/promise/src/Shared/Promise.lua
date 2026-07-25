@@ -363,11 +363,8 @@ function Promise._reject<T...>(self: Promise<T...>, values: { n: number, [number
 		self:_executeThen(unpack(data))
 	end
 
-	-- Check for uncaught exceptions. A single empty table carries no more information than an
-	-- empty rejection (aggregators may reject with an empty results table), so it is not
-	-- reported either.
-	local isEmptyTableRejection = values.n == 1 and type(values[1]) == "table" and next(values[1]) == nil
-	if self._unconsumedException and values.n > 0 and not isEmptyTableRejection then
+	-- Check for uncaught exceptions
+	if self._unconsumedException and self:_isReportableRejection(values) then
 		task.defer(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
@@ -384,6 +381,23 @@ function Promise._reject<T...>(self: Promise<T...>, values: { n: number, [number
 			end
 		end)
 	end
+end
+
+-- A rejection is only worth reporting if it carries information. Rejecting with no values at all
+-- (what Destroy() and cancellation produce), with values that are all nil, or with a single empty
+-- table (aggregators may reject with an empty results table) says nothing a warning could relay.
+function Promise._isReportableRejection<T...>(_self: Promise<T...>, values: { n: number, [number]: any }): boolean
+	if values.n == 1 and type(values[1]) == "table" and next(values[1]) == nil then
+		return false
+	end
+
+	for index = 1, values.n do
+		if values[index] ~= nil then
+			return true
+		end
+	end
+
+	return false
 end
 
 function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
