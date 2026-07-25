@@ -1,3 +1,16 @@
+# v3.7.1 (Sat Jul 25 2026)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/scored action fix [#753](https://github.com/Quenty/NevermoreEngine/pull/753) ([@Quenty](https://github.com/Quenty))
+- fix: Fix things ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
