@@ -114,9 +114,9 @@ end
 ]=]
 function TransitionModel.PromiseToggle(self: TransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
 	if self:IsVisible() then
-		return self:PromiseShow(doNotAnimate)
-	else
 		return self:PromiseHide(doNotAnimate)
+	else
+		return self:PromiseShow(doNotAnimate)
 	end
 end
 
