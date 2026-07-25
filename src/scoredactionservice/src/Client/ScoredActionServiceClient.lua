@@ -8,8 +8,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local InputKeyMapList = require("InputKeyMapList")
 local InputListScoreHelper = require("InputListScoreHelper")
 local Maid = require("Maid")
@@ -17,6 +15,7 @@ local Observable = require("Observable")
 local ScoredAction = require("ScoredAction")
 local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
 local ServiceBag = require("ServiceBag")
+local StepUtils = require("StepUtils")
 local ValueObject = require("ValueObject")
 
 local ScoredActionServiceClient = {}
@@ -51,7 +50,7 @@ end
 	Starts the scored action service. Should be done via [ServiceBag].
 ]=]
 function ScoredActionServiceClient.Start(self: ScoredActionServiceClient)
-	self._maid:GiveTask(RunService.Stepped:Connect(function()
+	self._maid:GiveTask(StepUtils.getSteppedSignal():Connect(function()
 		-- TODO: Push to end of frame so we don't delay input by a frame?
 		self._provider:Update()
 	end))
@@ -105,6 +104,13 @@ end
 
 	:::warning
 	This MUTATES state of the scored action service whenever an object is emitted.
+	:::
+
+	:::warning
+	Each emitted [ScoredAction] is owned by the subscription, and is destroyed when the next one is
+	emitted or when the subscription ends. A source that completes as soon as it emits (such as
+	[Rx.of]) therefore hands back an already-destroyed action. Keep the source open for as long as
+	the action should live.
 	:::
 
 	@param scoreValue ValueObject<number>

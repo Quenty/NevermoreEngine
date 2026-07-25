@@ -227,11 +227,38 @@ spawn) and `PlayerMock.kick` really performs the removal sequence. See each func
 Never fork production behavior at a call site to survive a headless test — no `pcall` around
 context-restricted engine calls, no gating on `RunService:IsRunning()`/`IsStudio()` environment queries.
 Both silently change what production executes. The one acceptable `RunService` branch is **signal
-selection**, and it lives centrally in `StepUtils.getAnimationStepSignal()`, never at call sites:
-`RenderStepped` on the client, `Stepped` (the physics pre-step) on a live server so server-side
-writes stay in sync with constraints and replication (`SpringObject`, `TimedTween`), falling back
-to `Heartbeat` headless, where `Stepped` never fires.
+selection**, and it lives centrally in `StepUtils`, never at call sites. `getAnimationStepSignal()`
+returns `RenderStepped` on the client and `Stepped` (the physics pre-step) on a live server so
+server-side writes stay in sync with constraints and replication (`SpringObject`, `TimedTween`);
+`getSteppedSignal()` drops the client branch for per-frame bookkeeping that is not driving visuals
+(`ScoredActionServiceClient` rescoring its pickers). Both fall back to `Heartbeat` on a non-running
+DataModel, where `Stepped` never fires.
+
+A loop reached through either getter therefore still ticks in a test place, so assert its effect by
+waiting on the getter's signal rather than poking a different input to force an update. Wait
+**twice**: the first fire may be the same one the code under test is already resuming from.
 :::
+
+### What a test place can drive
+
+A test place runs a non-running DataModel on the server, so only some of the frame machinery is
+alive. Knowing which decides what a spec can assert:
+
+| API | Headless behavior |
+| --- | --- |
+| `RunService.Heartbeat` | Fires (~60/s). The only usable frame signal. |
+| `RunService.Stepped` | Never fires, so `:Wait()` on it hangs and `:Once()` never resolves. |
+| `RunService.RenderStepped` | Can be read, but connecting throws `RenderStepped event can only be used from local scripts`. |
+| `RunService:BindToRenderStep` | Binds without erroring and then never invokes the callback — the silent one. |
+| `BindableEvent.Event` | A real `RBXScriptSignal` you can `:Fire()` on demand. |
+
+That last row is the useful lever: anything taking a signal or an event — `StepUtils.bindToSignal`,
+`StepUtils.onceAtEvent` — is best tested by firing a `BindableEvent` rather than waiting on frames,
+which keeps the test synchronous and exact instead of timing-dependent. Reserve frame waiting for
+code that reaches a step signal internally. Where a helper is hard-wired to `Stepped` or
+`BindToRenderStep` its invocation simply cannot be asserted here; cover the parts that are real
+(argument validation, the connect/cancel contract) and leave the rest to integration testing rather
+than adding an environment branch to make it observable.
 
 For package authors adding a seam, the branch is explicit and greppable — `PlayerMock.read`/`write` error on
 anything that is not a mock, so the real-player branch stays a typed native access:

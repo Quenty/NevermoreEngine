@@ -4693,6 +4693,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
@@ -4705,12 +4708,18 @@ importers:
       '@quenty/statestack':
         specifier: workspace:*
         version: link:../statestack
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/screenshothudservice:
     dependencies:
@@ -5436,7 +5445,17 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
 
-  src/steputils: {}
+  src/steputils:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/streamingutils:
     dependencies:

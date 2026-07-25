@@ -1511,8 +1511,9 @@ function PlayerMock.makeInputObject(props: InputObjectProps?): any
 	)
 
 	-- One lightweight signal per observed property (only UserInputState is driven today). A local
-	-- implementation keeps player-mock free of a Signal dependency; it exposes the Connect/Disconnect
-	-- shape a Maid accepts.
+	-- implementation keeps player-mock free of a Signal dependency. The connection carries Destroy
+	-- alongside Disconnect: a Maid only cleans a table task through Destroy, so without it a handler
+	-- that maids the connection (e.g. KeymapControls) leaks it and warns about a task with no Destroy.
 	local signals: { [string]: any } = {}
 	local function signalFor(propertyName: string)
 		local signal = signals[propertyName]
@@ -1524,13 +1525,17 @@ function PlayerMock.makeInputObject(props: InputObjectProps?): any
 		signal = {
 			Connect = function(_self, callback)
 				connections[callback] = true
-				return {
+
+				local connection = {
 					Connected = true,
 					Disconnect = function(self)
 						self.Connected = false
 						connections[callback] = nil
 					end,
 				}
+				connection.Destroy = connection.Disconnect
+
+				return connection
 			end,
 			Fire = function(_self, ...)
 				for callback in connections do
