@@ -1,20 +1,13 @@
-# v3.6.1 (Sat Jul 25 2026)
-
-#### 🐛 Bug Fix
-
-- Users/quenty/scored action fix [#753](https://github.com/Quenty/NevermoreEngine/pull/753) ([@Quenty](https://github.com/Quenty))
-- fix: Include packages in nevermore ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.6.0...@quenty/gameversionutils@3.6.1) (2026-07-25)
+
+### Bug Fixes
+
+- Include packages in nevermore ([fe786ab](https://github.com/Quenty/NevermoreEngine/commit/fe786ab1563e8481d44bb7498cc997efae9c73d4))
 
 # [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.5.2...@quenty/gameversionutils@3.6.0) (2026-07-25)
 

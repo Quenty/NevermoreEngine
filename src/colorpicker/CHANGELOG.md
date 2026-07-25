@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.45.0...@quenty/colorpicker@10.45.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/colorpicker
+
 # [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpicker@10.44.0...@quenty/colorpicker@10.45.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/colorpicker
