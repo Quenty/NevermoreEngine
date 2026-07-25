@@ -16,6 +16,9 @@ local ServiceBag = require("ServiceBag")
 local SaveSlotCmdrService = {}
 SaveSlotCmdrService.ServiceName = "SaveSlotCmdrService"
 
+type SlotEntry = { slotIndex: number, slotId: string }
+type SlotEntries = { SlotEntry }
+
 export type SaveSlotCmdrService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
@@ -387,42 +390,28 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {
 			{
+				Name = "Players",
+				Type = "players",
+				Description = "Players to export from (e.g. . for yourself, or * for everyone).",
+			},
+			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for the active slot.",
+				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
 				Optional = true,
 			},
 		},
-	}, function(context, slotIndices: { number }?)
-		local entries = self:_resolveSlotEntries(context, slotIndices)
-		if #entries == 0 then
+	}, function(_context, players: { Player }, slotIndices: { number }?)
+		local targets = self:_resolveExportTargets(players, slotIndices)
+		if #targets == 0 then
 			return "No matching slots to export."
 		end
 
-		local lines = self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
-			:Then(function(hasSaveSlots)
-				-- Export sequentially to avoid concurrent datastore writes; report per-slot so a
-				-- mid-batch failure (e.g. the main slot, which export refuses) still surfaces the successes.
-				local promise = Promise.resolved()
-				local results = {}
-				for _, entry in entries do
-					promise = promise:Then(function()
-						return hasSaveSlots
-							:PromiseExportSaveSlotToCode(entry.slotId)
-							:Then(function(code)
-								table.insert(results, `slot {entry.slotIndex} → {code}`)
-							end)
-							:Catch(function(err)
-								table.insert(results, `slot {entry.slotIndex}: {tostring(err)}`)
-							end)
-					end)
-				end
-				return promise:Then(function()
-					return results
-				end)
+		local lines = self:_promiseExportLines(targets, function(hasSaveSlots, entry, player)
+			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId):Then(function(code)
+				return `{player.Name} slot {entry.slotIndex} → {code}`
 			end)
-			:Wait()
+		end):Wait()
 
 		return `Exported:\n{table.concat(lines, "\n")}`
 	end)
@@ -433,40 +422,28 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {
 			{
+				Name = "Players",
+				Type = "players",
+				Description = "Players to export from (e.g. . for yourself, or * for everyone).",
+			},
+			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for the active slot.",
+				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
 				Optional = true,
 			},
 		},
-	}, function(context, slotIndices: { number }?)
-		local entries = self:_resolveSlotEntries(context, slotIndices)
-		if #entries == 0 then
+	}, function(_context, players: { Player }, slotIndices: { number }?)
+		local targets = self:_resolveExportTargets(players, slotIndices)
+		if #targets == 0 then
 			return "No matching slots to export."
 		end
 
-		local blocks = self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
-			:Then(function(hasSaveSlots)
-				local promise = Promise.resolved()
-				local results = {}
-				for _, entry in entries do
-					promise = promise:Then(function()
-						return hasSaveSlots
-							:PromiseExportSaveSlotToJson(entry.slotId)
-							:Then(function(json)
-								table.insert(results, `-- slot {entry.slotIndex}\n{json}`)
-							end)
-							:Catch(function(err)
-								table.insert(results, `slot {entry.slotIndex}: {tostring(err)}`)
-							end)
-					end)
-				end
-				return promise:Then(function()
-					return results
-				end)
+		local blocks = self:_promiseExportLines(targets, function(hasSaveSlots, entry, player)
+			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId):Then(function(json)
+				return `-- {player.Name} slot {entry.slotIndex}\n{json}`
 			end)
-			:Wait()
+		end):Wait()
 
 		return table.concat(blocks, "\n\n")
 	end)
@@ -526,24 +503,24 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 end
 
 -- Resolves a slotIndices argument (or nil = the active slot) into de-duplicated { slotIndex, slotId }
--- entries for the executor. An empty result means nothing matched, and the caller reports it.
+-- entries for the player. An empty result means nothing matched, and the caller reports it.
 function SaveSlotCmdrService._resolveSlotEntries(
 	self: SaveSlotCmdrService,
-	context: any,
+	player: Player,
 	slotIndices: { number }?
-): { { slotIndex: number, slotId: string } }
+): SlotEntries
 	local entries = {}
 	if slotIndices == nil then
-		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(context.Executor)
+		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
 		if not activeSlotId then
 			return entries
 		end
-		local metadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, activeSlotId)
+		local metadata = self._saveSlotDataService:GetSlotMetadata(player, activeSlotId)
 		table.insert(entries, { slotIndex = metadata.SlotIndex, slotId = activeSlotId })
 	else
 		local seen = {}
 		for _, slotIndex in slotIndices do
-			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
+			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(player, slotIndex)
 			if slotId and not seen[slotId] then
 				seen[slotId] = true
 				table.insert(entries, { slotIndex = slotIndex, slotId = slotId })
@@ -551,6 +528,60 @@ function SaveSlotCmdrService._resolveSlotEntries(
 		end
 	end
 	return entries
+end
+
+-- Pairs each player with their resolved slots, dropping players with nothing to export. Note that
+-- Cmdr resolves the "." and "*" slot operators against the executor's slot list, since types only
+-- see the executor, so indices given that way come from the executor's slots.
+function SaveSlotCmdrService._resolveExportTargets(
+	self: SaveSlotCmdrService,
+	players: { Player },
+	slotIndices: { number }?
+): { { player: Player, entries: SlotEntries } }
+	local targets = {}
+	for _, player in players do
+		local entries = self:_resolveSlotEntries(player, slotIndices)
+		if #entries > 0 then
+			table.insert(targets, { player = player, entries = entries })
+		end
+	end
+	return targets
+end
+
+-- Exports every resolved slot of every target, sequentially, to avoid concurrent datastore writes.
+-- Reports per-slot so a mid-batch failure (e.g. the main slot, which export refuses) still surfaces
+-- the successes.
+function SaveSlotCmdrService._promiseExportLines(
+	self: SaveSlotCmdrService,
+	targets: { { player: Player, entries: SlotEntries } },
+	exportSlot: (any, SlotEntry, Player) -> any
+): any
+	local promise = Promise.resolved()
+	local results: { string } = {}
+
+	for _, target in targets do
+		promise = promise:Then(function()
+			return self._maid:GivePromise(self._hasSaveSlotsBinder:Promise(target.player)):Then(function(hasSaveSlots)
+				local slotPromise = Promise.resolved()
+				for _, entry in target.entries do
+					slotPromise = slotPromise:Then(function()
+						return exportSlot(hasSaveSlots, entry, target.player)
+							:Then(function(line)
+								table.insert(results, line)
+							end)
+							:Catch(function(err)
+								table.insert(results, `{target.player.Name} slot {entry.slotIndex}: {tostring(err)}`)
+							end)
+					end)
+				end
+				return slotPromise
+			end)
+		end)
+	end
+
+	return promise:Then(function()
+		return results
+	end)
 end
 
 function SaveSlotCmdrService.Destroy(self: SaveSlotCmdrService): ()
