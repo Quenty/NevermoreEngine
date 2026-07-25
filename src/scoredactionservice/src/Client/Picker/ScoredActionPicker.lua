@@ -46,11 +46,6 @@ function ScoredActionPicker.new()
 end
 
 function ScoredActionPicker.Update(self: ScoredActionPicker): ()
-	if not next(self._actionSet) then
-		self._currentPreferred.Value = nil
-		return
-	end
-
 	local actionList: { ScoredAction.ScoredAction } = {}
 	for action: any, _ in self._actionSet do
 		if not action.Destroy then
@@ -82,13 +77,15 @@ function ScoredActionPicker.Update(self: ScoredActionPicker): ()
 		)
 	end
 
+	local preferred: ScoredAction.ScoredAction? = nil
 	for _, action: any in actionList do
-		local preferredAction = self:_tryGetValidPreferredAction(action)
-		if preferredAction then
-			self._currentPreferred.Value = preferredAction
+		preferred = self:_tryGetValidPreferredAction(action)
+		if preferred then
 			break
 		end
 	end
+
+	self._currentPreferred.Value = preferred
 end
 
 function ScoredActionPicker._tryGetValidPreferredAction(

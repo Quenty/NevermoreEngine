@@ -7,6 +7,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local ScoredAction = require("ScoredAction")
 
 local TouchButtonScoredActionPicker = setmetatable({}, BaseObject)
 TouchButtonScoredActionPicker.ClassName = "TouchButtonScoredActionPicker"
@@ -34,14 +35,12 @@ function TouchButtonScoredActionPicker.Update(self: TouchButtonScoredActionPicke
 		if not action.Destroy then
 			warn("[ScoredActionPicker] - Action is destroyed. Should have been removed.")
 			self._maid[action] = nil
-		else
-			if action:GetScore() ~= -math.huge then
-				if not self._maid[action] then
-					self._maid[action] = action:PushPreferred()
-				end
-			else
-				self._maid[action] = nil
+		elseif self:_isPreferable(action) then
+			if not self._maid[action] then
+				self._maid[action] = action:PushPreferred()
 			end
+		else
+			self._maid[action] = nil
 		end
 	end
 end
@@ -54,9 +53,24 @@ function TouchButtonScoredActionPicker.AddAction(self: TouchButtonScoredActionPi
 	-- Always prefer touch buttons
 	self._actionSet[action] = true
 
-	if action:GetScore() ~= -math.huge then
+	if self:_isPreferable(action) then
 		self._maid[action] = action:PushPreferred()
 	end
+end
+
+--[=[
+	Touch actions do not compete for a slot the way [ScoredActionPicker] makes keys compete, so being
+	disabled is the only thing that keeps a touch button off the screen.
+
+	@param action ScoredAction
+	@return boolean
+	@private
+]=]
+function TouchButtonScoredActionPicker._isPreferable(
+	_self: TouchButtonScoredActionPicker,
+	action: ScoredAction.ScoredAction
+): boolean
+	return action:IsEnabled() and action:GetScore() ~= -math.huge
 end
 
 function TouchButtonScoredActionPicker.RemoveAction(self: TouchButtonScoredActionPicker, action)

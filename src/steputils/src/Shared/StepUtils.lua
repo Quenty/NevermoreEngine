@@ -37,6 +37,31 @@ function StepUtils.getAnimationStepSignal(): RBXScriptSignal
 end
 
 --[=[
+	Returns the signal per-frame bookkeeping should run on: [RunService.Stepped] (the physics
+	pre-step) on a running DataModel, falling back to [RunService.Heartbeat] on a non-running one
+	(headless test runs, edit mode) where Stepped never fires.
+
+	Unlike [StepUtils.getAnimationStepSignal] this does not branch to RenderStepped on the client,
+	so both realms step at the same point in the frame. Prefer it for work that is not driving
+	visuals -- rescoring, polling, cache invalidation -- and that would otherwise silently stop
+	running outside a live game.
+
+	:::caution
+	Stepped fires `(time, deltaTime)` but Heartbeat fires `(deltaTime)`. Do not assume the first
+	argument is deltaTime when connecting directly to this signal.
+	:::
+
+	@return RBXScriptSignal
+]=]
+function StepUtils.getSteppedSignal(): RBXScriptSignal
+	if RunService:IsRunning() then
+		return RunService.Stepped
+	else
+		return RunService.Heartbeat
+	end
+end
+
+--[=[
 	Binds the given update function to [StepUtils.getAnimationStepSignal].
 
 	```lua
