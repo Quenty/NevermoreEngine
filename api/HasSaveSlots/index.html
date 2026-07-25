@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">HasSaveSlots | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="HasSaveSlots | Nevermore"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.1971f84e.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.b6f00dde.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.2a7cff09.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.45d0694b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -166,26 +166,28 @@
   new slot id -- or nil when every slot is already in use. Backs a "New Game"
   affordance.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectEphemeralSlot"><code style="text-decoration:none">PromiseSelectEphemeralSlot</code><a href="#PromiseSelectEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectEphemeralSlot" title="Direct link to PromiseSelectEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L946"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>metadata<!-- -->: </code><code class="blue_P4bS">SaveSlotCreateMetadata?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectEphemeralSlot"><code style="text-decoration:none">PromiseSelectEphemeralSlot</code><a href="#PromiseSelectEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectEphemeralSlot" title="Direct link to PromiseSelectEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L948"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>metadata<!-- -->: </code><code class="blue_P4bS">SaveSlotCreateMetadata?</code><span class="inlineDescription_G7Er">-- <span>
 <p>optional SlotName/Summary for the in-memory slot</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Creates a fresh ephemeral slot and selects it, resolving to its id. An ephemeral slot is selectable and
   active exactly like a real one -- it drives <a href="/NevermoreEngine/api/HasSaveSlots#ObserveActiveSlotStoreBrio">HasSaveSlots.ObserveActiveSlotStoreBrio</a>, summaries, and
-  playtime the same way -- but it is never persisted: no metadata is written, its data store is in-memory,
-  it is kept out of the replicated slot list, and it is torn down the moment it stops being the active slot.
-  Selecting it also never disturbs the persisted active-slot pointer or the "Continue" target, so the real
-  slot the player came from resumes untouched afterward. Backs a throwaway session (e.g. exploring a lobby)
-  that must leave no trace on save data.
+  playtime the same way, and its metadata replicates to the client like any other slot's, so UI can render
+  the active session's name and summary -- but it is never persisted: no metadata is written, its data store
+  is in-memory, and it is torn down the moment it stops being the active slot. It is also excluded from the
+  save list (<a href="/NevermoreEngine/api/SaveSlotDataService#GetSlotList">SaveSlotDataService.GetSlotList</a> / <a href="/NevermoreEngine/api/SaveSlotDataService#ObserveSlotList">SaveSlotDataService.ObserveSlotList</a>), so it never shows up
+  as something the player can return to. Selecting it never disturbs the persisted active-slot pointer or the
+  "Continue" target, so the real slot the player came from resumes untouched afterward. Backs a throwaway
+  session (e.g. exploring a lobby) that must leave no trace on save data.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterSummaryProvider"><code style="text-decoration:none">RegisterSummaryProvider</code><a href="#RegisterSummaryProvider" class="hash-link" aria-label="Direct link to RegisterSummaryProvider" title="Direct link to RegisterSummaryProvider" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L978"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">RegisterSummaryProvider</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>provider<!-- -->: </code><code class="blue_P4bS">SummaryProvider</code></div></div><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterSummaryProvider"><code style="text-decoration:none">RegisterSummaryProvider</code><a href="#RegisterSummaryProvider" class="hash-link" aria-label="Direct link to RegisterSummaryProvider" title="Direct link to RegisterSummaryProvider" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L980"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">RegisterSummaryProvider</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>provider<!-- -->: </code><code class="blue_P4bS">SummaryProvider</code></div></div><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code></div><div>
 <p>
   Registers a named summary provider. Every registered provider's current value is aggregated into
   the active slot's Summary, keyed by <code>name</code> (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseGetSlotMetadata">HasSaveSlots.PromiseGetSlotMetadata</a>). Registering
   the same name again replaces the previous provider. Returns a function that unregisters the provider
   (also give it to a [Maid]).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="_setupPlaytimeTracking"><code style="text-decoration:none">_setupPlaytimeTracking</code><a href="#_setupPlaytimeTracking" class="hash-link" aria-label="Direct link to _setupPlaytimeTracking" title="Direct link to _setupPlaytimeTracking" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L1261"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">_setupPlaytimeTracking</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="_setupPlaytimeTracking"><code style="text-decoration:none">_setupPlaytimeTracking</code><a href="#_setupPlaytimeTracking" class="hash-link" aria-label="Direct link to _setupPlaytimeTracking" title="Direct link to _setupPlaytimeTracking" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L1269"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">_setupPlaytimeTracking</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Accrues per-slot playtime automatically. A "session" spans the time a slot is the active slot:
   selecting a slot begins one (bumping PlayCount), and deselecting, switching, or unbinding ends
@@ -935,7 +937,7 @@
         },
         {
             &quot;name&quot;: &quot;PromiseSelectEphemeralSlot&quot;,
-            &quot;desc&quot;: &quot;Creates a fresh ephemeral slot and selects it, resolving to its id. An ephemeral slot is selectable and\nactive exactly like a real one -- it drives [HasSaveSlots.ObserveActiveSlotStoreBrio], summaries, and\nplaytime the same way -- but it is never persisted: no metadata is written, its data store is in-memory,\nit is kept out of the replicated slot list, and it is torn down the moment it stops being the active slot.\nSelecting it also never disturbs the persisted active-slot pointer or the \&quot;Continue\&quot; target, so the real\nslot the player came from resumes untouched afterward. Backs a throwaway session (e.g. exploring a lobby)\nthat must leave no trace on save data.&quot;,
+            &quot;desc&quot;: &quot;Creates a fresh ephemeral slot and selects it, resolving to its id. An ephemeral slot is selectable and\nactive exactly like a real one -- it drives [HasSaveSlots.ObserveActiveSlotStoreBrio], summaries, and\nplaytime the same way, and its metadata replicates to the client like any other slot&#x27;s, so UI can render\nthe active session&#x27;s name and summary -- but it is never persisted: no metadata is written, its data store\nis in-memory, and it is torn down the moment it stops being the active slot. It is also excluded from the\nsave list ([SaveSlotDataService.GetSlotList] / [SaveSlotDataService.ObserveSlotList]), so it never shows up\nas something the player can return to. Selecting it never disturbs the persisted active-slot pointer or the\n\&quot;Continue\&quot; target, so the real slot the player came from resumes untouched afterward. Backs a throwaway\nsession (e.g. exploring a lobby) that must leave no trace on save data.&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -956,7 +958,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 946,
+                &quot;line&quot;: 948,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -988,7 +990,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 978,
+                &quot;line&quot;: 980,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -1005,7 +1007,7 @@
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 1261,
+                &quot;line&quot;: 1269,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         }

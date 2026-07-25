@@ -10,8 +10,8 @@ far from the camera."><meta data-rh="true" property="og:description" content="Cl
 camera position up to the [StreamingCinematicsService] (throttled) so the server can stream world
 content in around it -- covering the cases where the player has no character, or the character is
 far from the camera."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/StreamingCinematicsServiceClient"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StreamingCinematicsServiceClient" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StreamingCinematicsServiceClient" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.1971f84e.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.b6f00dde.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.2a7cff09.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.45d0694b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -24,47 +24,20 @@ far from the camera."><link data-rh="true" rel="canonical" href="https://quenty.
   content in around it -- covering the cases where the player has no character, or the character is
   far from the camera.
 </p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetFocus"><code style="text-decoration:none">SetFocus</code><a href="#SetFocus" class="hash-link" aria-label="Direct link to SetFocus" title="Direct link to SetFocus" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua#L56"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StreamingCinematicsServiceClient<!-- -->.</code><code class="green_DgR4">SetFocus</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StreamingCinematicsServiceClient">StreamingCinematicsServiceClient</a></code><code>,</code></div><div><code>position<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
-<p>
-  Sends a single focus position to the server (or nil to clear). Low-level; prefer
-  <a href="/NevermoreEngine/api/StreamingCinematicsServiceClient#PushCameraFocus">StreamingCinematicsServiceClient:PushCameraFocus</a>.
-</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveCurrentCameraPosition"><code style="text-decoration:none">ObserveCurrentCameraPosition</code><a href="#ObserveCurrentCameraPosition" class="hash-link" aria-label="Direct link to ObserveCurrentCameraPosition" title="Direct link to ObserveCurrentCameraPosition" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua#L64"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StreamingCinematicsServiceClient<!-- -->.</code><code class="green_DgR4">ObserveCurrentCameraPosition</code><code>(</code><code>_self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StreamingCinematicsServiceClient">StreamingCinematicsServiceClient</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveCurrentCameraPosition"><code style="text-decoration:none">ObserveCurrentCameraPosition</code><a href="#ObserveCurrentCameraPosition" class="hash-link" aria-label="Direct link to ObserveCurrentCameraPosition" title="Direct link to ObserveCurrentCameraPosition" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StreamingCinematicsServiceClient<!-- -->.</code><code class="green_DgR4">ObserveCurrentCameraPosition</code><code>(</code><code>_self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StreamingCinematicsServiceClient">StreamingCinematicsServiceClient</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes the current camera's position, following <a href="https://developer.roblox.com/en-us/api-reference/class/Workspace#CurrentCamera">Workspace.CurrentCamera</a> as it changes.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PushCameraFocus"><code style="text-decoration:none">PushCameraFocus</code><a href="#PushCameraFocus" class="hash-link" aria-label="Direct link to PushCameraFocus" title="Direct link to PushCameraFocus" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua#L90"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StreamingCinematicsServiceClient<!-- -->.</code><code class="green_DgR4">PushCameraFocus</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StreamingCinematicsServiceClient">StreamingCinematicsServiceClient</a></code><code>,</code></div><div><code>observePosition<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PushCameraFocus"><code style="text-decoration:none">PushCameraFocus</code><a href="#PushCameraFocus" class="hash-link" aria-label="Direct link to PushCameraFocus" title="Direct link to PushCameraFocus" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua#L105"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StreamingCinematicsServiceClient<!-- -->.</code><code class="green_DgR4">PushCameraFocus</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StreamingCinematicsServiceClient">StreamingCinematicsServiceClient</a></code><code>,</code></div><div><code>observePosition<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3?<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
 <p>Optional override</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
-<p>Cleanup; clears the focus when called</p>
+<p>Cleanup; hands the focus back to the push underneath, or clears it</p>
 </span></span></div><div>
 <p>
   Streams world content around a cinematic camera until the returned cleanup runs. Defaults to
   following the current camera; pass an observable of <code>Vector3?</code> to drive the focus explicitly.
-  Sends are throttled to [SEND_RATE_SECONDS].
+  Sends are throttled to [SEND_RATE_SECONDS] across every push.
 </p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
-        {
-            &quot;name&quot;: &quot;SetFocus&quot;,
-            &quot;desc&quot;: &quot;Sends a single focus position to the server (or nil to clear). Low-level; prefer\n[StreamingCinematicsServiceClient:PushCameraFocus].&quot;,
-            &quot;params&quot;: [
-                {
-                    &quot;name&quot;: &quot;self&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;StreamingCinematicsServiceClient&quot;
-                },
-                {
-                    &quot;name&quot;: &quot;position&quot;,
-                    &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Vector3?&quot;
-                }
-            ],
-            &quot;returns&quot;: [],
-            &quot;function_type&quot;: &quot;static&quot;,
-            &quot;source&quot;: {
-                &quot;line&quot;: 56,
-                &quot;path&quot;: &quot;src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua&quot;
-            }
-        },
         {
             &quot;name&quot;: &quot;ObserveCurrentCameraPosition&quot;,
             &quot;desc&quot;: &quot;Observes the current camera&#x27;s position, following [Workspace.CurrentCamera] as it changes.&quot;,
@@ -83,13 +56,13 @@ far from the camera."><link data-rh="true" rel="canonical" href="https://quenty.
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 64,
+                &quot;line&quot;: 79,
                 &quot;path&quot;: &quot;src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua&quot;
             }
         },
         {
             &quot;name&quot;: &quot;PushCameraFocus&quot;,
-            &quot;desc&quot;: &quot;Streams world content around a cinematic camera until the returned cleanup runs. Defaults to\nfollowing the current camera; pass an observable of `Vector3?` to drive the focus explicitly.\nSends are throttled to [SEND_RATE_SECONDS].&quot;,
+            &quot;desc&quot;: &quot;Streams world content around a cinematic camera until the returned cleanup runs. Defaults to\nfollowing the current camera; pass an observable of `Vector3?` to drive the focus explicitly.\nSends are throttled to [SEND_RATE_SECONDS] across every push.&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -104,13 +77,13 @@ far from the camera."><link data-rh="true" rel="canonical" href="https://quenty.
             ],
             &quot;returns&quot;: [
                 {
-                    &quot;desc&quot;: &quot;Cleanup; clears the focus when called&quot;,
+                    &quot;desc&quot;: &quot;Cleanup; hands the focus back to the push underneath, or clears it&quot;,
                     &quot;lua_type&quot;: &quot;function&quot;
                 }
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 90,
+                &quot;line&quot;: 105,
                 &quot;path&quot;: &quot;src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua&quot;
             }
         }
@@ -126,6 +99,6 @@ far from the camera."><link data-rh="true" rel="canonical" href="https://quenty.
         &quot;line&quot;: 11,
         &quot;path&quot;: &quot;src/streamingutils/src/Client/StreamingCinematicsServiceClient.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#ObserveCurrentCameraPosition" class="table-of-contents__link toc-highlight">.ObserveCurrentCameraPosition</a></li><li><a href="#PushCameraFocus" class="table-of-contents__link toc-highlight">.PushCameraFocus</a></li><li><a href="#SetFocus" class="table-of-contents__link toc-highlight">.SetFocus</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#ObserveCurrentCameraPosition" class="table-of-contents__link toc-highlight">.ObserveCurrentCameraPosition</a></li><li><a href="#PushCameraFocus" class="table-of-contents__link toc-highlight">.PushCameraFocus</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
