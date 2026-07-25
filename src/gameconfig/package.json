@@ -39,6 +39,7 @@
     "@quenty/clienttranslator": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
     "@quenty/enums": "workspace:*",
+    "@quenty/gameversionutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
