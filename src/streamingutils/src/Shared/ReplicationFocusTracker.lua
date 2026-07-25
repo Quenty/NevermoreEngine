@@ -1,11 +1,12 @@
 --!strict
 --[=[
-	Keeps a single hidden part positioned at a point and assigned as a [Player]'s
-	`ReplicationFocus`, so Roblox streams world content around that point. Reuses one part
-	across position updates and clears the focus (and destroys the part) on cleanup.
+	Keeps a single hidden part positioned at a point and added as a [Player] replication focus, so
+	Roblox streams world content around that point. Reuses one part across position updates and
+	removes the focus (and destroys the part) on cleanup.
 
-	The subject is duck-typed at runtime -- anything with a settable `ReplicationFocus` -- so tests
-	pass a plain table; the production caller always passes a [Player].
+	The subject is duck-typed at runtime -- anything with `AddReplicationFocus` /
+	`RemoveReplicationFocus` methods -- so tests pass a plain table; the production caller always
+	passes a [Player].
 
 	@class ReplicationFocusTracker
 ]=]
@@ -68,7 +69,7 @@ function ReplicationFocusTracker.SetPosition(self: ReplicationFocusTracker, posi
 
 	self._part = part
 	self._maid:GiveTask(part)
-	self:_writeReplicationFocus(part)
+	self:_addReplicationFocus(part)
 end
 
 --[=[
@@ -80,17 +81,29 @@ function ReplicationFocusTracker.IsActive(self: ReplicationFocusTracker): boolea
 end
 
 function ReplicationFocusTracker.Destroy(self: ReplicationFocusTracker): ()
-	self:_writeReplicationFocus(nil)
+	local part = self._part
+	if part then
+		self:_removeReplicationFocus(part)
+	end
+
 	self._maid:DoCleaning()
 	self._part = nil
 end
 
--- Mock-safe: a PlayerMock's backing Folder has no ReplicationFocus property; write its stand-in.
-function ReplicationFocusTracker._writeReplicationFocus(self: ReplicationFocusTracker, part: BasePart?): ()
+-- Mock-safe: a PlayerMock's backing Folder has no AddReplicationFocus method; call its stand-in.
+function ReplicationFocusTracker._addReplicationFocus(self: ReplicationFocusTracker, part: BasePart): ()
 	if PlayerMock.isMock(self._subject) then
-		PlayerMock.write(self._subject, "ReplicationFocus", part)
+		PlayerMock.addReplicationFocus(self._subject, part)
 	else
-		self._subject.ReplicationFocus = part
+		self._subject:AddReplicationFocus(part)
+	end
+end
+
+function ReplicationFocusTracker._removeReplicationFocus(self: ReplicationFocusTracker, part: BasePart): ()
+	if PlayerMock.isMock(self._subject) then
+		PlayerMock.removeReplicationFocus(self._subject, part)
+	else
+		self._subject:RemoveReplicationFocus(part)
 	end
 end
 

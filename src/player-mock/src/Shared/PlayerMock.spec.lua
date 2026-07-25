@@ -829,6 +829,85 @@ describe("PlayerMock.getKickMessage", function()
 	end)
 end)
 
+describe("PlayerMock replication focuses", function()
+	it("starts empty and tracks added parts in order", function()
+		local player = PlayerMock.new()
+		local first = Instance.new("Part")
+		local second = Instance.new("Part")
+
+		expect(PlayerMock.getReplicationFocuses(player)).toEqual({})
+
+		PlayerMock.addReplicationFocus(player, first)
+		PlayerMock.addReplicationFocus(player, second)
+
+		local focuses = PlayerMock.getReplicationFocuses(player)
+		expect(#focuses).toBe(2)
+		expect(focuses[1]).toBe(first)
+		expect(focuses[2]).toBe(second)
+
+		first:Destroy()
+		second:Destroy()
+		player:Destroy()
+	end)
+
+	it("does not add a part twice", function()
+		local player = PlayerMock.new()
+		local part = Instance.new("Part")
+
+		PlayerMock.addReplicationFocus(player, part)
+		PlayerMock.addReplicationFocus(player, part)
+
+		expect(#PlayerMock.getReplicationFocuses(player)).toBe(1)
+
+		part:Destroy()
+		player:Destroy()
+	end)
+
+	it("removes a focused part and leaves the rest", function()
+		local player = PlayerMock.new()
+		local first = Instance.new("Part")
+		local second = Instance.new("Part")
+
+		PlayerMock.addReplicationFocus(player, first)
+		PlayerMock.addReplicationFocus(player, second)
+		PlayerMock.removeReplicationFocus(player, first)
+
+		local focuses = PlayerMock.getReplicationFocuses(player)
+		expect(#focuses).toBe(1)
+		expect(focuses[1]).toBe(second)
+
+		first:Destroy()
+		second:Destroy()
+		player:Destroy()
+	end)
+
+	it("ignores removing a part that is not focused", function()
+		local player = PlayerMock.new()
+		local part = Instance.new("Part")
+
+		PlayerMock.removeReplicationFocus(player, part)
+		expect(PlayerMock.getReplicationFocuses(player)).toEqual({})
+
+		part:Destroy()
+		player:Destroy()
+	end)
+
+	it("rejects a non-BasePart and a non-mock", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.addReplicationFocus(player, Instance.new("Folder") :: any)
+		end).toThrow()
+
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getReplicationFocuses(folder :: any)
+		end).toThrow()
+		folder:Destroy()
+
+		player:Destroy()
+	end)
+end)
+
 describe("PlayerMock.readLookup", function()
 	it("returns the pre-authored default for an uninjected lookup", function()
 		local player = PlayerMock.new({ UserId = 12345 })

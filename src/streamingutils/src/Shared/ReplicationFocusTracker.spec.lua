@@ -6,22 +6,44 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local PlayerMock = require("PlayerMock")
 local ReplicationFocusTracker = require("ReplicationFocusTracker")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-type FakeSubject = { ReplicationFocus: BasePart? }
+type FakeSubject = {
+	focuses: { BasePart },
+	AddReplicationFocus: (FakeSubject, BasePart) -> (),
+	RemoveReplicationFocus: (FakeSubject, BasePart) -> (),
+}
+
+local function newFakeSubject(): FakeSubject
+	local focuses: { BasePart } = {}
+
+	return {
+		focuses = focuses,
+		AddReplicationFocus = function(_self, part)
+			table.insert(focuses, part)
+		end,
+		RemoveReplicationFocus = function(_self, part)
+			local index = table.find(focuses, part)
+			if index then
+				table.remove(focuses, index)
+			end
+		end,
+	}
+end
 
 describe("ReplicationFocusTracker", function()
-	it("creates a hidden part and assigns it as the subject's ReplicationFocus", function()
-		local subject: FakeSubject = {}
+	it("creates a hidden part and adds it as a replication focus", function()
+		local subject = newFakeSubject()
 		local tracker = ReplicationFocusTracker.new(subject :: any)
 
 		tracker:SetPosition(Vector3.new(1, 2, 3))
 
-		local part = subject.ReplicationFocus
+		local part = subject.focuses[1]
 		assert(part, "expected a focus part")
 		expect(part:IsA("BasePart")).toEqual(true)
 		expect(part.Position).toEqual(Vector3.new(1, 2, 3))
@@ -32,23 +54,24 @@ describe("ReplicationFocusTracker", function()
 	end)
 
 	it("reuses the same part across position updates", function()
-		local subject: FakeSubject = {}
+		local subject = newFakeSubject()
 		local tracker = ReplicationFocusTracker.new(subject :: any)
 
 		tracker:SetPosition(Vector3.new(1, 0, 0))
-		local first = subject.ReplicationFocus
+		local first = subject.focuses[1]
 		assert(first, "expected a focus part")
 
 		tracker:SetPosition(Vector3.new(5, 0, 0))
 
-		expect(subject.ReplicationFocus).toBe(first)
+		expect(#subject.focuses).toEqual(1)
+		expect(subject.focuses[1]).toBe(first)
 		expect(first.Position).toEqual(Vector3.new(5, 0, 0))
 
 		tracker:Destroy()
 	end)
 
 	it("reports active state", function()
-		local subject: FakeSubject = {}
+		local subject = newFakeSubject()
 		local tracker = ReplicationFocusTracker.new(subject :: any)
 
 		expect(tracker:IsActive()).toEqual(false)
@@ -58,27 +81,44 @@ describe("ReplicationFocusTracker", function()
 		tracker:Destroy()
 	end)
 
-	it("clears the ReplicationFocus and destroys the part on Destroy", function()
-		local subject: FakeSubject = {}
+	it("removes the replication focus and destroys the part on Destroy", function()
+		local subject = newFakeSubject()
 		local tracker = ReplicationFocusTracker.new(subject :: any)
 
 		tracker:SetPosition(Vector3.new(1, 2, 3))
-		local part = subject.ReplicationFocus
+		local part = subject.focuses[1]
 		assert(part, "expected a focus part")
 
 		tracker:Destroy()
 
-		expect(subject.ReplicationFocus).toEqual(nil)
+		expect(#subject.focuses).toEqual(0)
 		-- Destroyed parts are reparented to nil.
 		expect(part.Parent).toEqual(nil)
 	end)
 
 	it("does nothing to a subject that was never positioned", function()
-		local subject: FakeSubject = {}
+		local subject = newFakeSubject()
 		local tracker = ReplicationFocusTracker.new(subject :: any)
 
 		tracker:Destroy()
 
-		expect(subject.ReplicationFocus).toEqual(nil)
+		expect(#subject.focuses).toEqual(0)
+	end)
+
+	it("adds and removes the focus through the PlayerMock seam", function()
+		local player = PlayerMock.new()
+		local tracker = ReplicationFocusTracker.new(player)
+
+		tracker:SetPosition(Vector3.new(1, 2, 3))
+
+		local focuses = PlayerMock.getReplicationFocuses(player)
+		expect(#focuses).toEqual(1)
+		expect(focuses[1].Position).toEqual(Vector3.new(1, 2, 3))
+
+		tracker:Destroy()
+
+		expect(#PlayerMock.getReplicationFocuses(player)).toEqual(0)
+
+		player:Destroy()
 	end)
 end)

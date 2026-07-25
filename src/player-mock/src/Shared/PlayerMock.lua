@@ -135,7 +135,6 @@ local PLAYER_PROPERTIES: { [string]: PropertySpec } = {
 	HasVerifiedBadge = { default = false },
 	FollowUserId = { default = 0 },
 	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
-	ReplicationFocus = { instanceValued = true }, -- default nil; streaming focus stand-in
 	RespawnLocation = { instanceValued = true }, -- default nil; checkpoint spawn stand-in
 }
 
@@ -1078,6 +1077,120 @@ function PlayerMock.getKickMessage(player: Player): string?
 
 	local message = (player :: Instance):GetAttribute(KICK_MESSAGE_ATTRIBUTE)
 	return if type(message) == "string" then message else nil
+end
+
+-- Folder holding one ObjectValue per part added through [PlayerMock.addReplicationFocus]. Streaming
+-- focuses are a *set* the engine only lets you add to and remove from -- it exposes no getter -- so the
+-- set lives on the mock, inspectable and self-cleaning like the other backings, and a test reads it
+-- back through [PlayerMock.getReplicationFocuses].
+local REPLICATION_FOCUS_FOLDER_NAME = "PlayerMockReplicationFocuses"
+
+local function findReplicationFocusFolder(player: Player): Folder?
+	return (player :: Instance):FindFirstChild(REPLICATION_FOCUS_FOLDER_NAME) :: Folder?
+end
+
+local function getOrCreateReplicationFocusFolder(player: Player): Folder
+	local existing = findReplicationFocusFolder(player)
+	if existing ~= nil then
+		return existing
+	end
+
+	local folder = Instance.new("Folder")
+	folder.Name = REPLICATION_FOCUS_FOLDER_NAME
+	folder.Parent = player :: Instance
+	return folder
+end
+
+local function findReplicationFocusValue(player: Player, part: BasePart): ObjectValue?
+	local folder = findReplicationFocusFolder(player)
+	if folder == nil then
+		return nil
+	end
+
+	for _, child in folder:GetChildren() do
+		if (child :: ObjectValue).Value == part then
+			return child :: ObjectValue
+		end
+	end
+
+	return nil
+end
+
+--[=[
+	Emulates `Player:AddReplicationFocus(part)` on a mock, adding the part to the mock's set of
+	streaming focuses. A mock's backing Folder has no such method, so production code branches
+	explicitly, like every other mock seam:
+
+	```lua
+	if PlayerMock.isMock(player) then
+		PlayerMock.addReplicationFocus(player, part)
+	else
+		player:AddReplicationFocus(part)
+	end
+	```
+
+	The backing is a set, so adding a part already focused does nothing.
+
+	@param player Player -- must be a PlayerMock
+	@param part BasePart
+]=]
+function PlayerMock.addReplicationFocus(player: Player, part: BasePart)
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
+
+	if findReplicationFocusValue(player, part) ~= nil then
+		return
+	end
+
+	local objectValue = Instance.new("ObjectValue")
+	objectValue.Name = part.Name
+	objectValue.Value = part
+	objectValue.Parent = getOrCreateReplicationFocusFolder(player)
+end
+
+--[=[
+	Emulates `Player:RemoveReplicationFocus(part)` on a mock, dropping the part from its set of
+	streaming focuses. The removal half of the branch in [PlayerMock.addReplicationFocus]; removing a
+	part that is not focused is a no-op.
+
+	@param player Player -- must be a PlayerMock
+	@param part BasePart
+]=]
+function PlayerMock.removeReplicationFocus(player: Player, part: BasePart)
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
+
+	local objectValue = findReplicationFocusValue(player, part)
+	if objectValue ~= nil then
+		objectValue:Destroy()
+	end
+end
+
+--[=[
+	Returns the parts currently focused on a mock, in the order they were added. The engine has no
+	counterpart -- a real `Player`'s focuses can only be added and removed -- so this is the test-side
+	reader for the effect of [PlayerMock.addReplicationFocus] / [PlayerMock.removeReplicationFocus],
+	the way [PlayerMock.getKickMessage] reads the effect of [PlayerMock.kick].
+
+	@param player Player -- must be a PlayerMock
+	@return { BasePart }
+]=]
+function PlayerMock.getReplicationFocuses(player: Player): { BasePart }
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+
+	local folder = findReplicationFocusFolder(player)
+	if folder == nil then
+		return {}
+	end
+
+	local focuses: { BasePart } = {}
+	for _, child in folder:GetChildren() do
+		local value = (child :: ObjectValue).Value
+		if value ~= nil then
+			table.insert(focuses, value :: BasePart)
+		end
+	end
+	return focuses
 end
 
 -- Prefix for the BindableEvent children backing `Player`-class events on a mock (see
