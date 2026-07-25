@@ -1,3 +1,16 @@
+# (Sat Jul 25 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.40.0`, `@quenty/gameconfig@12.61.0`, `@quenty/gameversionutils@3.6.0`, `@quenty/playermock@1.5.0`, `@quenty/playerutils@8.40.0`, `@quenty/promise@10.23.0`, `@quenty/resetservice@11.45.0`, `@quenty/saveslot@2.2.0`, `@quenty/streamingutils@10.27.0`, `@quenty/teleportserviceutils@10.2.0`, `@quenty/transitionmodel@7.46.0`
+  - users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Jul 24 2026)
 
 #### 🚀 Enhancement

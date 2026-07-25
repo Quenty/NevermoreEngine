@@ -1,3 +1,16 @@
+# v11.45.0 (Sat Jul 25 2026)
+
+#### 🚀 Enhancement
+
+- users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
+- feat: Add ability for reset service to be disabled on the client ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
