@@ -24,6 +24,14 @@ local function newMock(userId: number): Player
 	return player
 end
 
+-- A player the mock layer will not claim, so the call reaches the engine, which refuses it.
+local function newUnmockedPlayer(): Player
+	local player = Instance.new("Folder")
+	player.Name = "NotAPlayerMock"
+	table.insert(mocks, (player :: any) :: Player)
+	return (player :: any) :: Player
+end
+
 afterEach(function()
 	for _, player in mocks do
 		player:Destroy()
@@ -31,20 +39,16 @@ afterEach(function()
 	table.clear(mocks)
 end)
 
--- The hop the mock recorded for this destination, or nil if none has been made since the last clear.
 local function readHop(player: Player, placeId: number): any
 	return PlayerMock.readLookup(player, "TeleportService.Teleport", placeId)
 end
 
--- Forgets the recorded hop, so the next one is observable as a fresh record rather than an
--- indistinguishable overwrite -- how a test sees that a retry actually teleported again.
 local function clearHop(player: Player, placeId: number): ()
 	PlayerMock.writeLookup(player, "TeleportService.Teleport", placeId, nil)
 end
 
--- Stands in for TeleportService refusing the hop. The message must differ from the previous refusal
--- of the same teleport: the backing attribute only reports a change (see the domain's note in
--- PlayerMock), and a repeat would go unnoticed rather than counting as a second refusal.
+-- The message must differ from the previous refusal of the same teleport: the backing attribute only
+-- reports a change, so a repeat goes unnoticed.
 local function refuse(player: Player, placeId: number, message: string): ()
 	PlayerMock.writeLookup(player, "TeleportService.TeleportInitFailed", placeId, { message = message })
 end
@@ -91,6 +95,27 @@ describe("TeleportServiceUtils.teleport", function()
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 333).teleportData.SlotId).toEqual("second")
 	end)
 
+	it("returns true when the hop is recorded on a mock", function()
+		local player = newMock(880006)
+
+		local ok, err = TeleportServiceUtils.teleport(444, player, {})
+
+		expect(ok).toEqual(true)
+		expect(err).toEqual(nil)
+	end)
+
+	it("reports an engine refusal as false and a reason, instead of throwing", function()
+		local player = newUnmockedPlayer()
+
+		local ok, err
+		expect(function()
+			ok, err = TeleportServiceUtils.teleport(555, player, {})
+		end).never.toThrow()
+
+		expect(ok).toEqual(false)
+		expect(type(err)).toEqual("string")
+	end)
+
 	it("errors on a non-number placeId", function()
 		local player = newMock(880005)
 		expect(function()
@@ -134,7 +159,7 @@ describe("TeleportServiceUtils.teleportAsync", function()
 
 		local result = TeleportServiceUtils.teleportAsync(600, { a, b }, options)
 
-		expect(result).toEqual(nil) -- an all-mock batch skips the engine
+		expect(result).toEqual(nil)
 		expect(PlayerMock.readLookup(a, "TeleportService.Teleport", 600).via).toEqual("TeleportAsync")
 		expect(PlayerMock.readLookup(a, "TeleportService.Teleport", 600).teleportData.SlotId).toEqual("shared")
 		expect(PlayerMock.readLookup(b, "TeleportService.Teleport", 600).teleportData.SlotId).toEqual("shared")
@@ -228,7 +253,6 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(804, player, { maxAttempts = 3, retryWait = 0 })
 
-		-- Two refusals are absorbed by retries; the third finds no attempts left.
 		refuse(player, 804, "refusal 1")
 		clearHop(player, 804)
 		awaitHop(player, 804)
@@ -254,7 +278,7 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 		local outcome = PromiseTestUtils.awaitOutcome(promise)
 		expect(outcome).toEqual("rejected")
-		expect(readHop(player, 805)).toEqual(nil) -- no retry was ever attempted
+		expect(readHop(player, 805)).toEqual(nil)
 	end)
 
 	it("waits the configured backoff before trying again", function()
@@ -266,7 +290,7 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		refuse(player, 806, "not yet")
 
 		task.wait(0.1)
-		expect(readHop(player, 806)).toEqual(nil) -- still inside the backoff
+		expect(readHop(player, 806)).toEqual(nil)
 
 		expect(awaitHop(player, 806).via).toEqual("Teleport")
 
@@ -326,8 +350,7 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		promise:Destroy()
 		clearHop(player, 810)
 
-		-- Well past the backoff: the retry the refusal scheduled must not teleport a player whose
-		-- teleport was cancelled out from under it.
+		-- Well past the backoff.
 		task.wait(0.3)
 		expect(readHop(player, 810)).toEqual(nil)
 	end)
@@ -346,6 +369,30 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 		task.wait(0.1)
 		expect(readHop(player, 811)).toEqual(nil)
+	end)
+
+	it("rejects when the engine raises instead of refusing through the event", function()
+		local player = newUnmockedPlayer()
+
+		local promise
+		expect(function()
+			promise = TeleportServiceUtils.promiseTeleportClient(813, player, { maxAttempts = 1, retryWait = 0 })
+		end).never.toThrow()
+
+		local outcome, err = PromiseTestUtils.awaitOutcome(promise)
+		expect(outcome).toEqual("rejected")
+		expect(err).toContain("813")
+		expect(err).toContain("1 attempt(s)")
+	end)
+
+	it("retries a raised refusal like any other, then rejects once the attempts are spent", function()
+		local player = newUnmockedPlayer()
+
+		local promise = TeleportServiceUtils.promiseTeleportClient(814, player, { maxAttempts = 3, retryWait = 0 })
+
+		local outcome, err = PromiseTestUtils.awaitOutcome(promise)
+		expect(outcome).toEqual("rejected")
+		expect(err).toContain("3 attempt(s)")
 	end)
 
 	it("errors on a bad placeId, player, or config", function()
@@ -372,11 +419,8 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 	end)
 end)
 
--- A real server consumer never passes a flat table -- it passes a TeleportDataEnvelopeUtils envelope
--- (shared slice + per-player slices keyed by stringified UserId). The mock records whatever
--- GetTeleportData returns, which the record then JSON round-trips -- exactly as a real teleport
--- serializes its data -- so these assert the envelope survives that trip and the standard reader still
--- recovers each arriving player's slice. The fragile part is the per-player map's numeric-string keys.
+-- The record JSON round-trips its teleport data, exactly as a real teleport serializes it. The
+-- fragile part is the per-player map's numeric-string keys.
 describe("TeleportServiceUtils teleport data (consumer envelope round-trip)", function()
 	it("recovers the arriving player's merged slice from a recorded envelope", function()
 		local userId = 884001
