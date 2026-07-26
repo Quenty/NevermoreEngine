@@ -1,20 +1,15 @@
 --!strict
 --[=[
-	Utilities for teleporting players, including mock-aware wrappers of the user-facing TeleportService
-	teleport APIs. With a [PlayerMock] (a headless test), each teleport is recorded on the mock -- the
-	`"TeleportService.Teleport"` lookup domain, keyed by destination placeId -- instead of calling the
-	engine, which rejects a mock and would surface as a `TeleportInitFailed`. A test reads the recorded
-	teleport back to assert the hop and the data carried with it:
+	Utilities for teleporting players, including mock-aware wrappers of the TeleportService teleport
+	APIs. A [PlayerMock] records its teleports in the `"TeleportService.Teleport"` lookup domain, keyed
+	by destination placeId, instead of reaching the engine:
 
 	```lua
 	TeleportServiceUtils.teleport(placeId, mock, { SlotId = "abc" })
 	local hop = PlayerMock.readLookup(mock, "TeleportService.Teleport", placeId)
-	-- hop.via == "Teleport", hop.teleportData.SlotId == "abc"
 	```
 
-	The refusal side is mocked the same way: since the engine never sees a mock's teleport it can never
-	refuse one, so [TeleportServiceUtils.promiseTeleportClient] takes its `TeleportInitFailed` from the
-	`"TeleportService.TeleportInitFailed"` lookup a test writes.
+	A refusal comes from the `"TeleportService.TeleportInitFailed"` lookup the same way.
 
 	@class TeleportServiceUtils
 ]=]
@@ -27,17 +22,15 @@ local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
--- What a client teleport does when the engine refuses it, unless the caller says otherwise. Roblox
--- refuses a teleport for transient reasons (a full destination server, a place still deploying), so
--- the default is patient: five attempts a wide ten seconds apart.
+-- Roblox refuses teleports for transient reasons, so the default is patient.
 local DEFAULT_MAX_ATTEMPTS = 5
 local DEFAULT_RETRY_WAIT = 10
 
 local TeleportServiceUtils = {}
 
 --[=[
-	A teleport recorded against a [PlayerMock] (stored in the `"TeleportService.Teleport"` lookup domain
-	keyed by destination placeId). `via` names the TeleportService API the caller reached for.
+	A teleport recorded against a [PlayerMock]. `via` names the TeleportService API the caller reached
+	for.
 
 	@type MockTeleport { via: string, teleportData: { [string]: any }?, instanceId: string?, spawnName: string? }
 	@within TeleportServiceUtils
@@ -51,8 +44,7 @@ export type MockTeleport = {
 
 --[=[
 	How a client teleport retries when the engine refuses it (see
-	[TeleportServiceUtils.promiseTeleportClient]). Every field is optional; an omitted one takes the
-	default, and `maxAttempts = 1` means a single try with no retry at all.
+	[TeleportServiceUtils.promiseTeleportClient]). `maxAttempts = 1` means no retry at all.
 
 	@type TeleportClientConfig { teleportData: { [string]: any }?, maxAttempts: number?, retryWait: number? }
 	@within TeleportServiceUtils
@@ -77,7 +69,7 @@ local function connectTeleportInitFailed(
 			:Connect(function()
 				local failure = PlayerMock.readLookup(player, "TeleportService.TeleportInitFailed", placeId)
 				if failure == nil then
-					return -- Cleared back to "nothing refused", which is not itself a refusal.
+					return
 				end
 
 				onFailed(failure.message)
@@ -94,21 +86,37 @@ local function connectTeleportInitFailed(
 end
 
 --[=[
-	Mock-aware `TeleportService:Teleport(placeId, player, teleportData)`.
+	Mock-aware `TeleportService:Teleport(placeId, player, teleportData)`. On a server prefer
+	[TeleportServiceUtils.teleportAsync]; on a client this is the teleport, since TeleportAsync is
+	server-only.
+
 	@param placeId number
 	@param player Player -- a real Player or a PlayerMock
 	@param teleportData { [string]: any }?
+	@return boolean -- Whether the teleport was started.
+	@return string? -- Why the engine refused it, when it did.
 ]=]
-function TeleportServiceUtils.teleport(placeId: number, player: Player, teleportData: { [string]: any }?): ()
+function TeleportServiceUtils.teleport(
+	placeId: number,
+	player: Player,
+	teleportData: { [string]: any }?
+): (boolean, string?)
 	assert(type(placeId) == "number", "Bad placeId")
 	assert(player, "No player")
 
 	if PlayerMock.isMock(player) then
 		recordMockTeleport(player, placeId, { via = "Teleport", teleportData = teleportData or {} })
-		return
+		return true
 	end
 
-	TeleportService:Teleport(placeId, player, teleportData)
+	local ok, err = pcall(function()
+		TeleportService:Teleport(placeId, player, teleportData)
+	end)
+	if not ok then
+		return false, tostring(err)
+	end
+
+	return true
 end
 
 --[=[
@@ -241,13 +249,12 @@ function TeleportServiceUtils.promiseTeleport(
 end
 
 --[=[
-	A client teleporting itself, retried while the engine refuses the hop.
+	A client teleporting itself through [TeleportServiceUtils.teleport], retried while the engine
+	refuses the hop.
 
-	The promise reports only failure. A teleport that works ends with the player leaving this place, so
-	the success case never settles -- it stays pending until the client is gone. It rejects with the
-	reason once the attempts are spent, which is the caller's cue to take the terminal path: the player
-	is stranded here otherwise. Destroying it (a maid slot cleaning up) stops the retries and rejects
-	with nothing, so a caller can tell its own teardown from a hop that genuinely failed.
+	The promise reports only failure: a teleport that works ends with the player leaving this place, so
+	it stays pending until the client is gone. Destroying it stops the retries and rejects with nothing,
+	so a caller can tell its own teardown from a hop that genuinely failed.
 
 	```lua
 	maid._teleport = TeleportServiceUtils.promiseTeleportClient(placeId, Players.LocalPlayer, {
@@ -256,10 +263,6 @@ end
 		-- retries spent; the player is going nowhere
 	end)
 	```
-
-	Mock-aware throughout (see [TeleportServiceUtils.teleport]): the hop is recorded on a
-	[PlayerMock] rather than run by the engine, and a refusal is whatever the test injects into the
-	`"TeleportService.TeleportInitFailed"` lookup.
 
 	@client
 	@param placeId number
@@ -286,33 +289,33 @@ function TeleportServiceUtils.promiseTeleportClient(
 
 	local promise = Promise.new()
 
-	-- Everything the attempt sets up hangs off the promise's own lifetime, so the retry connection and
-	-- any pending backoff go away the moment it settles or is cancelled.
 	local maid = Maid.new()
 	promise:Finally(function()
 		maid:DoCleaning()
 	end)
 
-	local attempts = 0
-	local function attempt()
-		attempts += 1
-		TeleportServiceUtils.teleport(placeId, player, teleportData)
-	end
+	local attempt: () -> ()
 
-	maid:GiveTask(connectTeleportInitFailed(placeId, player, function(message: string)
+	local attempts = 0
+	local reportedAttempts = 0
+
+	local function onFailed(message: string)
 		if not promise:IsPending() then
 			return
 		end
+
+		-- A refused hop reports itself twice: the call raises and TeleportInitFailed fires.
+		if reportedAttempts >= attempts then
+			return
+		end
+		reportedAttempts = attempts
 
 		if attempts >= maxAttempts then
 			promise:Reject(`Teleport to place {placeId} failed after {attempts} attempt(s): {message}`)
 			return
 		end
 
-		-- Backoff as a promise rather than a yield in the signal handler, so the wait between attempts
-		-- is a maid task that cancellation can reach. Reaching it destroys the promise but cannot
-		-- unschedule the delay itself, so the attempt is what checks: a backoff that was cancelled --
-		-- by teardown, or by a later refusal replacing it -- must not teleport anyone.
+		-- Cancelling the backoff destroys the promise but cannot unschedule the delay itself.
 		local retry
 		retry = Promise.delay(retryWait, function(resolve)
 			if retry:IsPending() then
@@ -323,7 +326,18 @@ function TeleportServiceUtils.promiseTeleportClient(
 		end)
 
 		maid._retry = retry
-	end))
+	end
+
+	function attempt()
+		attempts += 1
+
+		local ok, err = TeleportServiceUtils.teleport(placeId, player, teleportData)
+		if not ok then
+			onFailed(err or "Teleport failed")
+		end
+	end
+
+	maid:GiveTask(connectTeleportInitFailed(placeId, player, onFailed))
 
 	attempt()
 
