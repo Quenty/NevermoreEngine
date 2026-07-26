@@ -1,3 +1,15 @@
+# v10.2.2 (Sun Jul 26 2026)
+
+#### 🐛 Bug Fix
+
+- fix(teleportserviceutils): report a refused teleport instead of raising [#754](https://github.com/Quenty/NevermoreEngine/pull/754) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
