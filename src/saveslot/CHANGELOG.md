@@ -1,3 +1,15 @@
+# v2.3.0 (Mon Jul 27 2026)
+
+#### 🚀 Enhancement
+
+- feat(saveslot): save slot commands take a players argument [#756](https://github.com/Quenty/NevermoreEngine/pull/756) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
