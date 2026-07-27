@@ -380,8 +380,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return "No matching slots to export."
 		end
 
+		-- Admin tooling exports the main slot too, which the normal path refuses. See
+		-- HasSaveSlots.PromiseExportSlot for what that carries.
 		local lines = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
-			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId):Then(function(code)
+			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId, true):Then(function(code)
 				return `{player.Name} slot {entry.slotIndex} → {code}`
 			end)
 		end):Wait()
@@ -412,8 +414,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return "No matching slots to export."
 		end
 
+		-- Admin tooling exports the main slot too, which the normal path refuses. See
+		-- HasSaveSlots.PromiseExportSlot for what that carries.
 		local blocks = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
-			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId):Then(function(json)
+			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId, true):Then(function(json)
 				return `-- {player.Name} slot {entry.slotIndex}\n{json}`
 			end)
 		end):Wait()
@@ -564,8 +568,8 @@ function SaveSlotCmdrService._promisePlayerLines(
 end
 
 -- Runs handleSlot over every resolved slot of every target, sequentially, to avoid concurrent
--- datastore writes. Reports per-slot so a mid-batch failure (e.g. the main slot, which export
--- refuses) still surfaces the successes.
+-- datastore writes. Reports per-slot so a mid-batch failure (e.g. one player's slot failing to
+-- load) still surfaces the successes.
 function SaveSlotCmdrService._promiseSlotLines(
 	self: SaveSlotCmdrService,
 	targets: { { player: Player, entries: SlotEntries } },
