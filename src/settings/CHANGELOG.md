@@ -1,3 +1,15 @@
+# v11.66.3 (Mon Jul 27 2026)
+
+#### 🐛 Bug Fix
+
+- fix(settings): stop settings hydration recursing until the C stack dies [#757](https://github.com/Quenty/NevermoreEngine/pull/757) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
