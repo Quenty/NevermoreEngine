@@ -31,6 +31,11 @@ local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local SettingProperty = require("SettingProperty")
 local SettingsDataService = require("SettingsDataService")
+local Symbol = require("Symbol")
+
+-- Cache key for the local player before the DataModel can name them, when there is no Player to
+-- key on (see [SettingDefinition.GetSettingProperty]).
+local UNRESOLVED_LOCAL_PLAYER = Symbol.named("unresolvedLocalPlayer")
 
 local SettingDefinition = {}
 SettingDefinition.ClassName = "SettingDefinition"
@@ -43,6 +48,7 @@ export type SettingDefinition<T> = typeof(setmetatable(
 		_defaultValue: T,
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
+		_settingPropertyCache: { [any]: { [any]: any } },
 		ServiceName: string,
 	},
 	{} :: typeof({ __index = SettingDefinition })
@@ -63,6 +69,7 @@ function SettingDefinition.new<T>(settingName: string, defaultValue: T): Setting
 
 	self._settingName = settingName
 	self._defaultValue = defaultValue
+	self._settingPropertyCache = setmetatable({}, { __mode = "k" }) :: any
 
 	self.ServiceName = self._settingName .. "SettingDefinition"
 
@@ -164,7 +171,9 @@ function SettingDefinition.isSettingDefinition(value: any): boolean
 end
 
 --[=[
-	Gets a new setting property for the given definition
+	Gets the setting property for this definition, reused per (serviceBag, player) -- callers commonly
+	ask per use, and constructing one costs an EnsureInitialized round-trip and its own observable
+	chain.
 
 	@param serviceBag ServiceBag
 	@param player Player
@@ -184,7 +193,22 @@ function SettingDefinition.GetSettingProperty<T>(
 	-- May still be nil in a non-running DataModel; SettingProperty resolves the local player lazily.
 	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
-	return SettingProperty.new(serviceBag, player, self)
+	-- Weak throughout: a cached property must not keep its bag or player alive. The lazily-resolved
+	-- local player has no key of its own, hence the sentinel.
+	local byPlayer = self._settingPropertyCache[serviceBag]
+	if not byPlayer then
+		byPlayer = setmetatable({}, { __mode = "kv" }) :: any
+		self._settingPropertyCache[serviceBag] = byPlayer
+	end
+
+	local playerKey: any = player or UNRESOLVED_LOCAL_PLAYER
+	local property = byPlayer[playerKey]
+	if not property then
+		property = SettingProperty.new(serviceBag, player, self)
+		byPlayer[playerKey] = property
+	end
+
+	return property
 end
 
 --[=[

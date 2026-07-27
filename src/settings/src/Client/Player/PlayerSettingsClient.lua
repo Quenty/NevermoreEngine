@@ -224,6 +224,13 @@ function PlayerSettingsClient.SetValue<T>(self: PlayerSettingsClient, settingNam
 		end
 	end
 
+	-- A reader already sees this value -- queued, in transit, or replicated. Observers dedupe on value
+	-- themselves; returning rather than just skipping the notification is what also skips the
+	-- redundant round-trip to the server.
+	if self:_getCurrentValue(settingName) == value then
+		return
+	end
+
 	local queueReplication = false
 	local toReplicate
 	if self._toReplicate then
@@ -254,6 +261,21 @@ function PlayerSettingsClient.SetValue<T>(self: PlayerSettingsClient, settingNam
 			self._queueSendSettingsFunc:Call()
 		end
 	end
+end
+
+-- No default to fall back on, so "unset" stays distinguishable from "set to the default".
+function PlayerSettingsClient._getCurrentValue(self: PlayerSettingsClient, settingName: string): any
+	if self._toReplicate and self._toReplicate[settingName] ~= nil then
+		return PlayerSettingsUtils.decodeForNetwork(self._toReplicate[settingName])
+	end
+
+	local pending = self._pendingReplicationDataInTransit.Value
+	if pending and pending[settingName] ~= nil then
+		return PlayerSettingsUtils.decodeForNetwork(pending[settingName])
+	end
+
+	local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
+	return PlayerSettingsUtils.decodeForAttribute(self._obj:GetAttribute(attributeName))
 end
 
 function PlayerSettingsClient._sendSettings(self: PlayerSettingsClient)

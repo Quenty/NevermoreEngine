@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.66.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.2...@quenty/settings@11.66.3) (2026-07-27)
+
+### Bug Fixes
+
+- **settings:** stop settings hydration recursing until the C stack dies ([#757](https://github.com/Quenty/NevermoreEngine/issues/757)) ([d6ff0e3](https://github.com/Quenty/NevermoreEngine/commit/d6ff0e313c05ff618ca794dd4bdc70fb3e645f0a))
+
 ## [11.66.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.1...@quenty/settings@11.66.2) (2026-07-27)
 
 **Note:** Version bump only for package @quenty/settings
