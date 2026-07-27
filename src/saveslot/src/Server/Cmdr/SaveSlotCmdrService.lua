@@ -268,53 +268,28 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {
 			{
+				Name = "Players",
+				Type = "players",
+				Description = "Players to duplicate slots for (e.g. . for yourself, or * for everyone).",
+			},
+			{
 				Name = "Slots",
 				Type = "slotIndices",
 				Description = "Slot indices to duplicate (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(context, slotIndices: { number })
-		-- Resolve indices to ids up front; `*`/`.` can include duplicates.
-		local seen = {}
-		local toDuplicate = {}
-		for _, slotIndex in slotIndices do
-			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(context.Executor, slotIndex)
-			if slotId and not seen[slotId] then
-				seen[slotId] = true
-				table.insert(toDuplicate, { slotIndex = slotIndex, slotId = slotId })
-			end
-		end
-
-		if #toDuplicate == 0 then
+	}, function(_context, players: { Player }, slotIndices: { number })
+		local targets = self:_resolveTargets(players, slotIndices)
+		if #targets == 0 then
 			return "No matching slots to duplicate."
 		end
 
-		local lines = self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
-			:Then(function(hasSaveSlots)
-				-- Duplicate sequentially: each copy consumes a free index the next one must see. Report
-				-- per-slot so a mid-batch failure (e.g. the roster filling up) still surfaces the successes.
-				local promise = Promise.resolved()
-				local results = {}
-				for _, entry in toDuplicate do
-					promise = promise:Then(function()
-						return hasSaveSlots
-							:PromiseDuplicateSlot(entry.slotId)
-							:Then(function(newSlotId)
-								local newMetadata =
-									self._saveSlotDataService:GetSlotMetadata(context.Executor, newSlotId)
-								table.insert(
-									results,
-									`slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
-								)
-							end)
-							:Catch(function(err)
-								table.insert(results, `slot {entry.slotIndex}: {tostring(err)}`)
-							end)
-					end)
-				end
-				return promise:Then(function()
-					return results
+		-- Each copy consumes a free index the next one must see, which the sequential walk guarantees.
+		local lines = self
+			:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+				return hasSaveSlots:PromiseDuplicateSlot(entry.slotId):Then(function(newSlotId)
+					local newMetadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
+					return `{player.Name} slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
 				end)
 			end)
 			:Wait()
@@ -402,12 +377,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, players: { Player }, slotIndices: { number }?)
-		local targets = self:_resolveExportTargets(players, slotIndices)
+		local targets = self:_resolveTargets(players, slotIndices)
 		if #targets == 0 then
 			return "No matching slots to export."
 		end
 
-		local lines = self:_promiseExportLines(targets, function(hasSaveSlots, entry, player)
+		local lines = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
 			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId):Then(function(code)
 				return `{player.Name} slot {entry.slotIndex} → {code}`
 			end)
@@ -434,12 +409,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, players: { Player }, slotIndices: { number }?)
-		local targets = self:_resolveExportTargets(players, slotIndices)
+		local targets = self:_resolveTargets(players, slotIndices)
 		if #targets == 0 then
 			return "No matching slots to export."
 		end
 
-		local blocks = self:_promiseExportLines(targets, function(hasSaveSlots, entry, player)
+		local blocks = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
 			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId):Then(function(json)
 				return `-- {player.Name} slot {entry.slotIndex}\n{json}`
 			end)
@@ -530,10 +505,10 @@ function SaveSlotCmdrService._resolveSlotEntries(
 	return entries
 end
 
--- Pairs each player with their resolved slots, dropping players with nothing to export. Note that
+-- Pairs each player with their resolved slots, dropping players with nothing to act on. Note that
 -- Cmdr resolves the "." and "*" slot operators against the executor's slot list, since types only
 -- see the executor, so indices given that way come from the executor's slots.
-function SaveSlotCmdrService._resolveExportTargets(
+function SaveSlotCmdrService._resolveTargets(
 	self: SaveSlotCmdrService,
 	players: { Player },
 	slotIndices: { number }?
@@ -548,13 +523,13 @@ function SaveSlotCmdrService._resolveExportTargets(
 	return targets
 end
 
--- Exports every resolved slot of every target, sequentially, to avoid concurrent datastore writes.
--- Reports per-slot so a mid-batch failure (e.g. the main slot, which export refuses) still surfaces
--- the successes.
-function SaveSlotCmdrService._promiseExportLines(
+-- Runs handleSlot over every resolved slot of every target, sequentially, to avoid concurrent
+-- datastore writes. Reports per-slot so a mid-batch failure (e.g. the main slot, which export
+-- refuses) still surfaces the successes.
+function SaveSlotCmdrService._promiseSlotLines(
 	self: SaveSlotCmdrService,
 	targets: { { player: Player, entries: SlotEntries } },
-	exportSlot: (any, SlotEntry, Player) -> any
+	handleSlot: (any, SlotEntry, Player) -> any
 ): any
 	local promise = Promise.resolved()
 	local results: { string } = {}
@@ -565,7 +540,7 @@ function SaveSlotCmdrService._promiseExportLines(
 				local slotPromise = Promise.resolved()
 				for _, entry in target.entries do
 					slotPromise = slotPromise:Then(function()
-						return exportSlot(hasSaveSlots, entry, target.player)
+						return handleSlot(hasSaveSlots, entry, target.player)
 							:Then(function(line)
 								table.insert(results, line)
 							end)
