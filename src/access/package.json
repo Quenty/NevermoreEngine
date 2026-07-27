@@ -1,0 +1,52 @@
+{
+  "name": "@quenty/access",
+  "version": "1.0.0",
+  "description": "Feature access gating: facts about a player, features that decide",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "access"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/access/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/baseobject": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
+    "@quenty/gameconfig": "workspace:*",
+    "@quenty/gameproductservice": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
+    "@quenty/permissionprovider": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valuebaseutils": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

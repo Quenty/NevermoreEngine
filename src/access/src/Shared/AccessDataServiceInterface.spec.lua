@@ -1,0 +1,161 @@
+--!strict
+--[[
+	@class AccessDataServiceInterface.spec.lua
+]]
+local require = require(script.Parent.loader).load(script)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local AccessDataService = require("AccessDataService")
+local AccessDataServiceInterface = require("AccessDataServiceInterface")
+local AccessFact = require("AccessFact")
+local AccessFeature = require("AccessFeature")
+local Jest = require("Jest")
+local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
+local ServiceBag = require("ServiceBag")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+local function setup()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
+	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
+	serviceBag:Init()
+	serviceBag:Start()
+
+	return {
+		maid = maid,
+		accessDataService = accessDataService,
+		fakePlayer = function(): Player
+			return maid:Add(PlayerMock.new()) :: any
+		end,
+		registerAllowed = function(featureName: string, allowed: boolean)
+			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(`{featureName}Fact`, {
+				resolve = function()
+					return allowed
+				end,
+			})))
+			maid:GiveTask(accessDataService:RegisterFeature(AccessFeature.anyOf(featureName, { `{featureName}Fact` })))
+		end,
+		destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+end
+
+describe("AccessDataServiceInterface", function()
+	it("is findable without requiring the service", function()
+		-- The point of the tie: a package that gates on access should not have to depend on this one.
+		local controller = setup()
+
+		expect(AccessDataServiceInterface:HasImplementation(ReplicatedStorage)).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("reports no implementation once the service is gone", function()
+		-- A game without the access package installed should read as "no access system", not as a crash.
+		-- HasImplementation rather than Find: Find hands back an interface either way, so it is the wrong
+		-- question to ask about presence.
+		local controller = setup()
+		controller:destroy()
+
+		expect(AccessDataServiceInterface:HasImplementation(ReplicatedStorage)).toEqual(false)
+	end)
+
+	it("answers by name through the tie", function()
+		local controller = setup()
+		controller.registerAllowed("chapters", true)
+
+		local tie = assert(AccessDataServiceInterface:Find(ReplicatedStorage), "No implementation")
+		expect(tie:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("lists what is registered through the tie", function()
+		local controller = setup()
+		controller.registerAllowed("chapters", true)
+
+		local tie = assert(AccessDataServiceInterface:Find(ReplicatedStorage), "No implementation")
+		expect(table.find(tie:GetFeatureNames(), "chapters") ~= nil).toEqual(true)
+		expect(tie:HasFeature("chapters")).toEqual(true)
+		expect(tie:HasFeature("nosuch")).toEqual(false)
+
+		controller:destroy()
+	end)
+end)
+
+describe("AccessDataService.IsFeatureAllowedByName", function()
+	it("reads a granted feature as allowed", function()
+		-- Guards the trap that every access observable opens on unresolved: a reader that keeps the first
+		-- emission instead of the last reports "denied" for everything, and every false-expecting test
+		-- still passes.
+		local controller = setup()
+		controller.registerAllowed("chapters", true)
+
+		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("reads a denial as not allowed", function()
+		local controller = setup()
+		controller.registerAllowed("chapters", false)
+
+		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("fails closed on unresolved, since a boolean cannot carry a third answer", function()
+		local controller = setup()
+		controller.maid:GiveTask(controller.accessDataService:RegisterFact(AccessFact.new("pending", {
+			resolve = function()
+				return nil
+			end,
+		})))
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFeature(AccessFeature.anyOf("chapters", { "pending" }))
+		)
+
+		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("refuses a feature nobody registered, so a typo is loud", function()
+		local controller = setup()
+
+		expect(function()
+			controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chpaters")
+		end).toThrow("No feature registered")
+
+		controller:destroy()
+	end)
+end)
+
+describe("AccessDataService.ObserveIsFeatureAllowedByName", function()
+	it("tracks the verdict as it changes", function()
+		local controller = setup()
+		controller.registerAllowed("chapters", false)
+
+		local player = controller.fakePlayer()
+		local last = nil
+		controller.maid:GiveTask(
+			controller.accessDataService:ObserveIsFeatureAllowedByName(player, "chapters"):Subscribe(function(value)
+				last = value
+			end)
+		)
+
+		expect(last).toEqual(false)
+
+		controller.accessDataService:SetFactOverride(player, "chaptersFact", true)
+		expect(last).toEqual(true)
+
+		controller:destroy()
+	end)
+end)
