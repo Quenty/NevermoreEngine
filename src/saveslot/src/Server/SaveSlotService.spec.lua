@@ -87,6 +87,42 @@ describe("SaveSlotService.GetExplicitSelectionRequired", function()
 	end)
 end)
 
+describe("SaveSlotService:RegisterPreSelectCallback", function()
+	-- The per-player binder half is covered in HasSaveSlots.PreSelect.spec; what is service-level is the
+	-- registration guard and that removal is handed back to the caller.
+	it("rejects a non-function callback", function()
+		local controller = setup()
+
+		expect(function()
+			controller.saveSlotService:RegisterPreSelectCallback(nil :: any)
+		end).toThrow("Bad callback")
+
+		controller:destroy()
+	end)
+
+	it("hands back a remover, before and after Start alike", function()
+		local controller = setup()
+
+		local remove = controller.saveSlotService:RegisterPreSelectCallback(function()
+			return nil
+		end)
+		expect(type(remove)).toEqual("function")
+		expect(function()
+			remove()
+		end).never.toThrow()
+
+		controller.serviceBag:Start()
+
+		expect(function()
+			controller.saveSlotService:RegisterPreSelectCallback(function()
+			return nil
+		end)()
+		end).never.toThrow()
+
+		controller:destroy()
+	end)
+end)
+
 describe("SaveSlotService configuration guards", function()
 	it("should reject RequireExplicitSelection after Start", function()
 		local controller = setup()

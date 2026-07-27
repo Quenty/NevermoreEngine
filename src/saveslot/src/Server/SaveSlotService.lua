@@ -14,6 +14,7 @@ local HasSaveSlotsData = require("HasSaveSlotsData")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local ObservableSet = require("ObservableSet")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
@@ -36,6 +37,9 @@ export type SaveSlotService = typeof(setmetatable(
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
 		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
+		-- ObservableSet<HasSaveSlots.PreSelectCallback>, erased for the same reason the binder erases its
+		-- own: the generic parameterized by a function type blows up inference.
+		_preSelectCallbacks: any,
 		_remoting: any,
 		_teleportDataService: any,
 		_codeGenerator: SaveSlotCodeUtils.CodeGenerator?,
@@ -66,6 +70,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	self._selectionRequired = false
 	self._maxSlotCount = 1
 	self._defaultSummaryProviders = self._maid:Add(ObservableMap.new())
+	self._preSelectCallbacks = self._maid:Add(ObservableSet.new())
 
 	self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, "SaveSlotService"))
 
@@ -121,6 +126,16 @@ function SaveSlotService.Start(self: SaveSlotService)
 			local pairMaid = pairBrio:ToMaid()
 			local name, provider = pairBrio:GetValue()
 			pairMaid:GiveTask(hasSaveSlots:RegisterSummaryProvider(name, provider))
+		end))
+
+		-- Same mirroring for the pre-select callbacks, so a game-wide one registered before or after this
+		-- player bound applies to their selections either way.
+		maid:GiveTask(self._preSelectCallbacks:ObserveItemsBrio():Subscribe(function(itemBrio)
+			if itemBrio:IsDead() then
+				return
+			end
+			local itemMaid = itemBrio:ToMaid()
+			itemMaid:GiveTask(hasSaveSlots:RegisterPreSelectCallback(itemBrio:GetValue()))
 		end))
 
 		-- Select the slot the player teleported in with, or proceed with the default flow.
@@ -288,6 +303,23 @@ function SaveSlotService.RegisterDefaultSummaryProvider(
 	assert(type(provider) == "function", "Bad provider")
 
 	return self._defaultSummaryProviders:Set(name, provider :: any)
+end
+
+--[=[
+	Registers a callback to run immediately before any slot becomes active, for every player. The
+	game-wide counterpart to [HasSaveSlots.RegisterPreSelectCallback] -- registering or unregistering
+	reflects on all bound players -- for per-selection state a game settles once rather than per player.
+
+	@param callback HasSaveSlots.PreSelectCallback
+	@return () -> () -- Removes the callback
+]=]
+function SaveSlotService.RegisterPreSelectCallback(
+	self: SaveSlotService,
+	callback: HasSaveSlots.PreSelectCallback
+): () -> ()
+	assert(type(callback) == "function", "Bad callback")
+
+	return self._preSelectCallbacks:Add(callback)
 end
 
 --[=[

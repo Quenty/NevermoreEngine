@@ -16,9 +16,11 @@ local InMemoryDataStore = require("InMemoryDataStore")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local ObservableSet = require("ObservableSet")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
@@ -46,6 +48,16 @@ local NONE = {}
 -- skips ephemeral slots, so this value never routes anything and any number of ephemeral slots can coexist.
 -- 0 is used because a real index is always >= 1 (DEFAULT_SLOT_INDEX is 1, PromiseCreateSlot rejects < 1).
 local EPHEMERAL_SLOT_INDEX = 0
+
+-- Called with (player, slotId, previousSlotId) before slotId becomes the active slot, while the previous
+-- selection is still in place. Return `false` to refuse the selection, a promise to hold it open until
+-- that promise settles (resolving `false` refuses), or nothing at all to allow it. See
+-- RegisterPreSelectCallback.
+export type PreSelectCallback = (
+	Player,
+	SaveSlotData.SlotId,
+	SaveSlotData.SlotId?
+) -> (Promise.Promise<boolean?> | boolean)?
 
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
 -- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
@@ -80,6 +92,9 @@ export type HasSaveSlots =
 			_systemStore: any,
 			_metadataStore: any,
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
+			-- ObservableSet<PreSelectCallback>, erased: parameterizing the generic by a function type walks
+			-- this file into Luau's "code is too complex to typecheck" ceiling.
+			_preSelectCallbacks: any,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
 			_sharedSaveSlotDataStoreService: any,
@@ -110,6 +125,7 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._codeGenerator = SaveSlotCodeUtils.generateDefaultCode
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
+	self._preSelectCallbacks = self._maid:Add(ObservableSet.new())
 
 	self._loadPromise = self._maid:GivePromise(self:_promiseLoadSlots())
 
@@ -174,6 +190,81 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 end
 
 --[=[
+	Registers a callback to run immediately before a slot becomes this player's active one, whatever
+	selected it -- an explicit [HasSaveSlots.PromiseSelectSlot], a new or ephemeral slot, the default
+	slot on join, an arrival resuming the slot it teleported in with, or Cmdr. Every one of those
+	funnels through the same commit, so a consumer with per-selection state to settle registers here
+	once instead of chasing each entry point.
+
+	Runs with the previous selection still in place, so a callback that writes state the selection is
+	about to be read against has written it before anything observes the change. What it returns decides
+	what happens next:
+
+	* nothing (or `true`) -- allow the selection
+	* `false` -- refuse it; [HasSaveSlots.PromiseSelectSlot] rejects and the active slot is left alone
+	* a promise -- hold the selection open until it settles, refusing if it resolves `false`
+
+	A callback that errors, or whose promise rejects, is isolated and warned about, and the selection
+	proceeds: a refusal is a decision a callback states, never one inferred from it crashing, and one
+	consumer's bug must not be able to stop every player in the game from loading a save slot. By the same
+	reasoning there is no timeout -- a callback that never settles holds the selection open, so keep the
+	work bounded.
+
+	@param callback PreSelectCallback
+	@return () -> () -- Removes the callback
+]=]
+function HasSaveSlots.RegisterPreSelectCallback(self: HasSaveSlots, callback: PreSelectCallback): () -> ()
+	assert(type(callback) == "function", "Bad callback")
+
+	return self._preSelectCallbacks:Add(callback)
+end
+
+--[=[
+	Runs every registered pre-select callback for a selection about to commit, resolving with whether the
+	selection may proceed once the ones that returned a promise have settled.
+
+	Every callback runs, even once one has refused: they are independent, and a callback that only wanted
+	to settle state must not be skipped because an unrelated one said no.
+
+	@param slotId SlotId
+	@return Promise<boolean> -- False when any callback refused
+	@private
+]=]
+function HasSaveSlots._promisePreSelect(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<boolean>
+	local previousSlotId = self.ActiveSlotId.Value
+	local promises = {}
+	local refused = false
+
+	-- A copy, so a callback that registers or removes one mid-fire can't mutate the list being walked.
+	for _, callback in self._preSelectCallbacks:GetList() do
+		local ok, result = pcall(callback, self._obj, slotId, previousSlotId)
+		if not ok then
+			-- Isolated rather than treated as a refusal: a refusal is a decision a callback states, never
+			-- one inferred from it crashing, and one consumer's bug must not stop every player in the game
+			-- from loading a save slot. Same call the summary providers make with their NONE sentinel.
+			warn(`[HasSaveSlots] - Pre-select callback errored: {tostring(result)}`)
+		elseif Promise.isPromise(result) then
+			table.insert(
+				promises,
+				(result :: any):Then(function(allowed: boolean?)
+					if allowed == false then
+						refused = true
+					end
+				end, function(err: any)
+					warn(`[HasSaveSlots] - Pre-select callback rejected: {tostring(err)}`)
+				end)
+			)
+		elseif result == false then
+			refused = true
+		end
+	end
+
+	return (PromiseUtils.all(promises) :: any):Then(function()
+		return not refused
+	end)
+end
+
+--[=[
 	Selects the slot with the given ID
 ]=]
 function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<any>
@@ -192,20 +283,32 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 			SaveSlotData.LastPlayedTime:Set(slot, os.time())
 		end
 
+		-- The pre-select fan-out runs last, immediately before the value changes, so a callback reads the
+		-- selection it is replacing rather than one an outgoing flush has already moved past.
+		local function promiseSetSlot()
+			return self:_promisePreSelect(slotId):Then(function(allowed: boolean)
+				if not allowed then
+					-- Rejected rather than resolved quietly: the caller asked for a selection that did not
+					-- happen, and every caller here is one that has already committed to it on screen.
+					return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
+				end
+
+				return setSlot()
+			end)
+		end
+
 		-- Initialize or save and switch
 		if self.ActiveSlotId.Value == nil then
-			setSlot()
-			return
+			return promiseSetSlot()
 		end
 
 		-- Leaving an ephemeral slot has nothing to persist, so switch without a datastore flush (the flush
 		-- exists to save the outgoing slot's progress, and an ephemeral slot has none).
 		if self:_isEphemeral(self.ActiveSlotId.Value) then
-			setSlot()
-			return
+			return promiseSetSlot()
 		end
 
-		return self._dataStore:Save():Then(setSlot)
+		return self._dataStore:Save():Then(promiseSetSlot)
 	end)
 end
 
