@@ -1,7 +1,7 @@
 --!strict
 --[[
-	Coverage for the pre-select callback: the seam a consumer uses to settle per-selection state before a
-	slot becomes active, whatever selected it.
+	Where a selection asks SaveSlotService whether it may proceed, and what it does with the answer. The
+	fan-out behind that answer is covered in SaveSlotService.spec.
 
 	@class HasSaveSlots.PreSelect.spec.lua
 ]]
@@ -34,6 +34,8 @@ afterEach(function()
 	end
 end)
 
+type Ask = { slotId: string, previousSlotId: string? }
+
 local function setup()
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
@@ -51,21 +53,14 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	-- The seam SaveSlotService fills on bind. Booting the service here would drag a second
-	-- PlayerMockService into a DataModel another suite is already using one in.
-	local callbacks: { any } = {}
-	hasSaveSlots:_setPreSelectCallbackProvider(function(): { any }
-		return table.clone(callbacks)
-	end)
+	-- Booting SaveSlotService here would drag a second PlayerMockService into a DataModel another suite is
+	-- already using one in, so the question put to it is answered by the test.
+	local asks: { Ask } = {}
+	local verdict: any = nil
+	hasSaveSlots._promisePreSelectFromSaveSlotService = function(_self: any, slotId: string): any
+		table.insert(asks, { slotId = slotId, previousSlotId = hasSaveSlots.ActiveSlotId.Value })
 
-	local function register(callback: any): () -> ()
-		table.insert(callbacks, callback)
-		return function()
-			local index = table.find(callbacks, callback)
-			if index then
-				table.remove(callbacks, index)
-			end
-		end
+		return verdict or Promise.resolved(true)
 	end
 
 	local destroyed = false
@@ -86,7 +81,10 @@ local function setup()
 		serviceBag = serviceBag,
 		fakePlayer = fakePlayer,
 		hasSaveSlots = hasSaveSlots,
-		register = register,
+		asks = asks,
+		answerWith = function(promise: any)
+			verdict = promise
+		end,
 		destroy = destroy,
 	}
 	activeContext = context
@@ -101,36 +99,16 @@ local function await(promise: any): any
 	return value
 end
 
-type Call = { player: Player, slotId: string, previousSlotId: string?, activeAtCall: string? }
-
-local function recordCalls(context: any): { Call }
-	local calls: { Call } = {}
-
-	context.register(function(player: Player, slotId: string, previousSlotId: string?)
-		table.insert(calls, {
-			player = player,
-			slotId = slotId,
-			previousSlotId = previousSlotId,
-			activeAtCall = context.hasSaveSlots.ActiveSlotId.Value,
-		})
-	end)
-
-	return calls
-end
-
-describe("HasSaveSlots pre-select fan-out", function()
-	it("runs before the slot becomes active", function()
+describe("HasSaveSlots pre-select", function()
+	it("asks before the slot becomes active", function()
 		local context = setup()
-		local calls = recordCalls(context)
 
 		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
 
-		expect(#calls).toEqual(1)
-		expect(calls[1].slotId).toEqual(slotId)
-		expect(calls[1].player).toEqual(context.fakePlayer)
-		expect(calls[1].activeAtCall).toBeNil()
-		expect(calls[1].previousSlotId).toBeNil()
+		expect(#context.asks).toEqual(1)
+		expect(context.asks[1].slotId).toEqual(slotId)
+		expect(context.asks[1].previousSlotId).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
 		context.destroy()
@@ -142,75 +120,45 @@ describe("HasSaveSlots pre-select fan-out", function()
 		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
 		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
-
-		local calls = recordCalls(context)
 		await(context.hasSaveSlots:PromiseSelectSlot(secondId))
 
-		expect(#calls).toEqual(1)
-		expect(calls[1].slotId).toEqual(secondId)
-		expect(calls[1].previousSlotId).toEqual(firstId)
-		expect(calls[1].activeAtCall).toEqual(firstId)
+		expect(#context.asks).toEqual(2)
+		expect(context.asks[2].slotId).toEqual(secondId)
+		expect(context.asks[2].previousSlotId).toEqual(firstId)
 
 		context.destroy()
 	end)
 
-	it("runs for a new slot and for an ephemeral slot alike", function()
+	it("asks for a new slot and for an ephemeral slot alike", function()
 		local context = setup()
-		local calls = recordCalls(context)
 
 		local newId = await(context.hasSaveSlots:PromiseSelectNewSaveSlot())
 		local ephemeralId = await(context.hasSaveSlots:PromiseSelectEphemeralSlot({ SlotName = "Throwaway" }))
 
-		expect(#calls).toEqual(2)
-		expect(calls[1].slotId).toEqual(newId)
-		expect(calls[2].slotId).toEqual(ephemeralId)
+		expect(#context.asks).toEqual(2)
+		expect(context.asks[1].slotId).toEqual(newId)
+		expect(context.asks[2].slotId).toEqual(ephemeralId)
 
 		context.destroy()
 	end)
 
-	it("does not run when the slot is already active", function()
+	it("does not ask when the slot is already active", function()
 		local context = setup()
 
 		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-
-		local calls = recordCalls(context)
 		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
 
-		expect(calls).toEqual({})
+		expect(#context.asks).toEqual(1)
 
 		context.destroy()
 	end)
 
-	it("stops running once removed", function()
-		local context = setup()
-
-		local ran = 0
-		local remove = context.register(function()
-			ran += 1
-			return nil
-		end)
-
-		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
-		expect(ran).toEqual(1)
-
-		remove()
-
-		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
-		await(context.hasSaveSlots:PromiseSelectSlot(secondId))
-		expect(ran).toEqual(1)
-
-		context.destroy()
-	end)
-
-	it("holds the selection until a returned promise resolves", function()
+	it("holds the selection until the answer settles", function()
 		local context = setup()
 
 		local gate = Promise.new()
-		context.register(function()
-			return gate
-		end)
+		context.answerWith(gate)
 
 		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
@@ -218,7 +166,7 @@ describe("HasSaveSlots pre-select fan-out", function()
 		expect(PromiseTestUtils.awaitSettled(selection, 0.5)).toEqual(false)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		gate:Resolve()
+		gate:Resolve(true)
 
 		await(selection)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
@@ -226,130 +174,10 @@ describe("HasSaveSlots pre-select fan-out", function()
 		context.destroy()
 	end)
 
-	it("waits on every returned promise before committing", function()
+	it("rejects the selection and leaves the active slot alone when refused", function()
 		local context = setup()
 
-		local first = Promise.new()
-		local second = Promise.new()
-		context.register(function()
-			return first
-		end)
-		context.register(function()
-			return second
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
-
-		first:Resolve()
-		expect(PromiseTestUtils.awaitSettled(selection, 0.5)).toEqual(false)
-
-		second:Resolve()
-		await(selection)
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
-
-		context.destroy()
-	end)
-
-	it("proceeds when a returned promise rejects", function()
-		local context = setup()
-
-		context.register(function()
-			return Promise.rejected("work blew up")
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
-
-		context.destroy()
-	end)
-
-	it("isolates a callback that errors", function()
-		local context = setup()
-
-		context.register(function()
-			error("callback blew up")
-		end)
-		local ranAfter = 0
-		context.register(function()
-			ranAfter += 1
-			return nil
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
-		expect(ranAfter).toEqual(1)
-
-		context.destroy()
-	end)
-end)
-
-describe("HasSaveSlots pre-select callback provider", function()
-	it("runs none until a provider is set", function()
-		local context = setup()
-
-		context.hasSaveSlots:_setPreSelectCallbackProvider(nil)
-		context.register(function()
-			return false
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
-
-		context.destroy()
-	end)
-
-	it("reads the provider afresh on every selection", function()
-		local context = setup()
-
-		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
-		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
-
-		local ran = 0
-		context.register(function()
-			ran += 1
-			return nil
-		end)
-
-		await(context.hasSaveSlots:PromiseSelectSlot(secondId))
-
-		expect(ran).toEqual(1)
-
-		context.destroy()
-	end)
-end)
-
-describe("HasSaveSlots pre-select refusal", function()
-	it("refuses the selection when a callback returns false", function()
-		local context = setup()
-
-		context.register(function()
-			return false
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
-
-		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
-		expect(selection:IsRejected()).toEqual(true)
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
-
-		context.destroy()
-	end)
-
-	it("refuses when a returned promise resolves false", function()
-		local context = setup()
-
-		context.register(function()
-			return Promise.resolved(false)
-		end)
+		context.answerWith(Promise.resolved(false))
 
 		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
@@ -368,50 +196,12 @@ describe("HasSaveSlots pre-select refusal", function()
 		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
 		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
 
-		context.register(function()
-			return false
-		end)
-
+		context.answerWith(Promise.resolved(false))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(secondId)
-		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
 
+		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
 		expect(selection:IsRejected()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(firstId)
-
-		context.destroy()
-	end)
-
-	it("still runs every callback once one has refused", function()
-		local context = setup()
-
-		context.register(function()
-			return false
-		end)
-		local ranAfter = 0
-		context.register(function()
-			ranAfter += 1
-			return nil
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		PromiseTestUtils.awaitSettled(context.hasSaveSlots:PromiseSelectSlot(slotId), 10)
-
-		expect(ranAfter).toEqual(1)
-
-		context.destroy()
-	end)
-
-	it("allows the selection when a callback errors rather than treating it as a refusal", function()
-		local context = setup()
-
-		context.register(function()
-			error("callback blew up")
-		end)
-
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-
-		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
 		context.destroy()
 	end)

@@ -14,6 +14,7 @@ local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotService = require("SaveSlotService")
@@ -98,56 +99,176 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller:destroy()
 	end)
 
-	it("hands every registered callback to the readers", function()
-		local controller = setup()
-
-		local function first(): any
-			return nil
-		end
-		local function second(): any
-			return nil
-		end
-
-		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({})
-
-		controller.saveSlotService:RegisterPreSelectCallback(first)
-		local removeSecond = controller.saveSlotService:RegisterPreSelectCallback(second)
-
-		local registered = controller.saveSlotService:GetPreSelectCallbacks()
-		expect(#registered).toEqual(2)
-		expect(table.find(registered, first)).never.toBeNil()
-		expect(table.find(registered, second)).never.toBeNil()
-
-		removeSecond()
-		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({ first })
-
-		controller:destroy()
-	end)
-
 	it("accepts registrations after Start", function()
 		local controller = setup()
 		controller.serviceBag:Start()
+		local player = controller.fakePlayer()
 
-		local function callback(): any
+		local ran = 0
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			ran += 1
 			return nil
-		end
-		controller.saveSlotService:RegisterPreSelectCallback(callback)
+		end)
 
-		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({ callback })
+		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		expect(ran).toEqual(1)
 
 		controller:destroy()
 	end)
 
-	it("hands back a snapshot rather than the live registry", function()
+	it("stops running a callback once removed", function()
 		local controller = setup()
+		local player = controller.fakePlayer()
 
-		controller.saveSlotService:RegisterPreSelectCallback(function()
+		local ran = 0
+		local remove = controller.saveSlotService:RegisterPreSelectCallback(function()
+			ran += 1
 			return nil
 		end)
 
-		table.clear(controller.saveSlotService:GetPreSelectCallbacks())
+		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		expect(ran).toEqual(1)
 
-		expect(#controller.saveSlotService:GetPreSelectCallbacks()).toEqual(1)
+		remove()
+
+		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		expect(ran).toEqual(1)
+
+		controller:destroy()
+	end)
+end)
+
+describe("SaveSlotService:PromisePreSelect", function()
+	it("allows the selection when nothing is registered", function()
+		local controller = setup()
+
+		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
+			true
+		)
+
+		controller:destroy()
+	end)
+
+	it("hands each callback the player and the selection it is replacing", function()
+		local controller = setup()
+		local player = controller.fakePlayer()
+
+		local calls: { any } = {}
+		controller.saveSlotService:RegisterPreSelectCallback(function(forPlayer, slotId, previousSlotId)
+			table.insert(calls, { player = forPlayer, slotId = slotId, previousSlotId = previousSlotId })
+			return nil
+		end)
+
+		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-2", "slot-1"))
+
+		expect(#calls).toEqual(1)
+		expect(calls[1].player).toEqual(player)
+		expect(calls[1].slotId).toEqual("slot-2")
+		expect(calls[1].previousSlotId).toEqual("slot-1")
+
+		controller:destroy()
+	end)
+
+	it("refuses when a callback returns false", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return false
+		end)
+
+		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
+			false
+		)
+
+		controller:destroy()
+	end)
+
+	it("refuses when a returned promise resolves false", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return Promise.resolved(false)
+		end)
+
+		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
+			false
+		)
+
+		controller:destroy()
+	end)
+
+	it("waits on every returned promise before answering", function()
+		local controller = setup()
+
+		local first = Promise.new()
+		local second = Promise.new()
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return first
+		end)
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return second
+		end)
+
+		local verdict = controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+
+		first:Resolve()
+		expect(PromiseTestUtils.awaitSettled(verdict, 0.5)).toEqual(false)
+
+		second:Resolve()
+		expect(controller.awaitBool(verdict)).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("runs every callback even once one has refused", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return false
+		end)
+		local ranAfter = 0
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			ranAfter += 1
+			return nil
+		end)
+
+		controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))
+
+		expect(ranAfter).toEqual(1)
+
+		controller:destroy()
+	end)
+
+	it("allows the selection when a callback errors rather than treating it as a refusal", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			error("callback blew up")
+		end)
+		local ranAfter = 0
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			ranAfter += 1
+			return nil
+		end)
+
+		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
+			true
+		)
+		expect(ranAfter).toEqual(1)
+
+		controller:destroy()
+	end)
+
+	it("allows the selection when a returned promise rejects", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return Promise.rejected("work blew up")
+		end)
+
+		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
+			true
+		)
 
 		controller:destroy()
 	end)

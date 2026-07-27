@@ -16,6 +16,7 @@ local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local Remoting = require("Remoting")
 local RxBrioUtils = require("RxBrioUtils")
 local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
@@ -25,6 +26,14 @@ local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 local TeleportDataService = require("TeleportDataService")
+
+-- Called with (player, slotId, previousSlotId) before slotId becomes the active slot, while the previous
+-- selection is still in place. See RegisterPreSelectCallback.
+export type PreSelectCallback = (
+	Player,
+	SaveSlotData.SlotId,
+	SaveSlotData.SlotId?
+) -> (Promise.Promise<boolean?> | boolean)?
 
 local SaveSlotService = {}
 SaveSlotService.ServiceName = "SaveSlotService"
@@ -37,7 +46,7 @@ export type SaveSlotService = typeof(setmetatable(
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
 		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
-		-- ObservableSet<HasSaveSlots.PreSelectCallback>; erased because the generic parameterized by a
+		-- ObservableSet<PreSelectCallback>; erased because the generic parameterized by a
 		-- function type blows up inference.
 		_preSelectCallbacks: any,
 		_remoting: any,
@@ -116,10 +125,6 @@ function SaveSlotService.Start(self: SaveSlotService)
 		if self._codeGenerator then
 			hasSaveSlots:SetCodeGenerator(self._codeGenerator)
 		end
-
-		hasSaveSlots:_setPreSelectCallbackProvider(function()
-			return self:GetPreSelectCallbacks()
-		end)
 
 		-- Mirror every default summary provider onto this player, and keep it in sync: a provider
 		-- registered or unregistered later is added to or removed from every bound player reactively.
@@ -311,25 +316,60 @@ end
 	An error or a rejection is warned about and allows the selection: only a stated `false` refuses. There
 	is no timeout, so keep the work bounded.
 
-	@param callback HasSaveSlots.PreSelectCallback
+	@param callback PreSelectCallback
 	@return () -> () -- Removes the callback
 ]=]
-function SaveSlotService.RegisterPreSelectCallback(
-	self: SaveSlotService,
-	callback: HasSaveSlots.PreSelectCallback
-): () -> ()
+function SaveSlotService.RegisterPreSelectCallback(self: SaveSlotService, callback: PreSelectCallback): () -> ()
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._preSelectCallbacks:Add(callback)
 end
 
 --[=[
-	Every registered pre-select callback, as a snapshot list.
+	Runs every registered pre-select callback for a slot about to become active, resolving with whether the
+	selection may proceed once the ones that returned a promise have settled. Called by [HasSaveSlots] as
+	each selection commits.
 
-	@return { HasSaveSlots.PreSelectCallback }
+	Every callback runs, even once one has refused: they are independent, and one that only wanted to
+	settle state must not be skipped because an unrelated one said no.
+
+	@param player Player
+	@param slotId SlotId
+	@param previousSlotId SlotId?
+	@return Promise<boolean> -- False when any callback refused
 ]=]
-function SaveSlotService.GetPreSelectCallbacks(self: SaveSlotService): { HasSaveSlots.PreSelectCallback }
-	return self._preSelectCallbacks:GetList()
+function SaveSlotService.PromisePreSelect(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId,
+	previousSlotId: SaveSlotData.SlotId?
+): Promise.Promise<boolean>
+	local promises = {}
+	local refused = false
+
+	for _, callback in self._preSelectCallbacks:GetList() do
+		local ok, result = pcall(callback, player, slotId, previousSlotId)
+		if not ok then
+			warn(`[SaveSlotService] - Pre-select callback errored: {tostring(result)}`)
+		elseif Promise.isPromise(result) then
+			table.insert(
+				promises,
+				(result :: any):Then(function(allowed: boolean?)
+					if allowed == false then
+						refused = true
+					end
+				end, function(err: any)
+					warn(`[SaveSlotService] - Pre-select callback rejected: {tostring(err)}`)
+				end)
+			)
+		elseif result == false then
+			refused = true
+		end
+	end
+
+	return (PromiseUtils.all(promises) :: any):Then(function()
+		return not refused
+	end)
 end
 
 --[=[

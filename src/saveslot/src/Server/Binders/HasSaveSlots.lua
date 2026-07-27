@@ -19,7 +19,6 @@ local ObservableMap = require("ObservableMap")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
@@ -47,12 +46,6 @@ local NONE = {}
 -- skips ephemeral slots, so this value never routes anything and any number of ephemeral slots can coexist.
 -- 0 is used because a real index is always >= 1 (DEFAULT_SLOT_INDEX is 1, PromiseCreateSlot rejects < 1).
 local EPHEMERAL_SLOT_INDEX = 0
-
-export type PreSelectCallback = (
-	Player,
-	SaveSlotData.SlotId,
-	SaveSlotData.SlotId?
-) -> (Promise.Promise<boolean?> | boolean)?
 
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
 -- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
@@ -87,7 +80,6 @@ export type HasSaveSlots =
 			_systemStore: any,
 			_metadataStore: any,
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
-			_preSelectCallbackProvider: (() -> { PreSelectCallback })?,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
 			_sharedSaveSlotDataStoreService: any,
@@ -181,45 +173,20 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 	end)
 end
 
--- Set by SaveSlotService on bind, which owns the registry. Handed over rather than fetched: requiring
--- SaveSlotService from here is a cyclic module dependency however deep the require sits.
-function HasSaveSlots._setPreSelectCallbackProvider(self: HasSaveSlots, provider: (() -> { PreSelectCallback })?): ()
-	self._preSelectCallbackProvider = provider
-end
-
-function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCallback }
-	local provider = self._preSelectCallbackProvider
-	return if provider then provider() else {}
-end
-
-function HasSaveSlots._promisePreSelect(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<boolean>
-	local previousSlotId = self.ActiveSlotId.Value
-	local promises = {}
-	local refused = false
-
-	for _, callback in self:_getPreSelectCallbacks() do
-		local ok, result = pcall(callback, self._obj, slotId, previousSlotId)
-		if not ok then
-			warn(`[HasSaveSlots] - Pre-select callback errored: {tostring(result)}`)
-		elseif Promise.isPromise(result) then
-			table.insert(
-				promises,
-				(result :: any):Then(function(allowed: boolean?)
-					if allowed == false then
-						refused = true
-					end
-				end, function(err: any)
-					warn(`[HasSaveSlots] - Pre-select callback rejected: {tostring(err)}`)
-				end)
-			)
-		elseif result == false then
-			refused = true
-		end
+-- SaveSlotService owns the callbacks and runs them. Reached through the module instance rather than by
+-- name, because `require("SaveSlotService")` from here -- at any depth, even inside this function -- is a
+-- cyclic module dependency: SaveSlotService requires this module. A binder bound without the service in
+-- its bag has nothing to ask, and allows the selection.
+function HasSaveSlots._promisePreSelectFromSaveSlotService(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<boolean>
+	local serviceModule = script.Parent.Parent:FindFirstChild("SaveSlotService")
+	if not serviceModule or not self._serviceBag:HasService(serviceModule) then
+		return (Promise :: any).resolved(true)
 	end
 
-	return (PromiseUtils.all(promises) :: any):Then(function()
-		return not refused
-	end)
+	return self._serviceBag:GetService(serviceModule):PromisePreSelect(self._obj, slotId, self.ActiveSlotId.Value)
 end
 
 --[=[
@@ -242,7 +209,7 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 		end
 
 		local function promiseSetSlot()
-			return self:_promisePreSelect(slotId):Then(function(allowed: boolean)
+			return self:_promisePreSelectFromSaveSlotService(slotId):Then(function(allowed: boolean)
 				if not allowed then
 					return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
 				end
