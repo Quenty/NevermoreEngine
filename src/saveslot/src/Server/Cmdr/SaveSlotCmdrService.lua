@@ -429,20 +429,25 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {
 			{
+				Name = "Player",
+				Type = "player",
+				Description = "Player to import into (e.g. . for yourself).",
+			},
+			{
 				Name = "Code",
 				Type = "string",
 				Description = "The code to import.",
 			},
 		},
-	}, function(context, code: string)
+	}, function(_context, player: Player, code: string)
 		return self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
 			:Then(function(hasSaveSlots)
 				return hasSaveSlots:PromiseImportSlotFromSharedDataStore(code)
 			end)
 			:Then(function(newSlotId)
-				local metadata = self._saveSlotDataService:GetSlotMetadata(context.Executor, newSlotId)
-				return `Imported save slot from code into slot {metadata.SlotIndex} ("{metadata.SlotName}").`
+				local metadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
+				return `Imported save slot from code into {player.Name} slot {metadata.SlotIndex} ("{metadata.SlotName}").`
 			end)
 			:Catch(function(err)
 				return `Import failed: {tostring(err)}`
@@ -456,19 +461,24 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Group = "SaveSlots",
 		Args = {
 			{
+				Name = "Player",
+				Type = "player",
+				Description = "Player to import into (e.g. . for yourself).",
+			},
+			{
 				Name = "Code",
 				Type = "string",
 				Description = "The code to load.",
 			},
 		},
-	}, function(context, code: string)
+	}, function(_context, player: Player, code: string)
 		return self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(context.Executor))
+			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
 			:Then(function(hasSaveSlots)
 				return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
 			end)
 			:Then(function()
-				return `Imported ephemeral save slot from code: {code}`
+				return `Imported ephemeral save slot into {player.Name} from code: {code}`
 			end)
 			:Catch(function(err)
 				return `Load failed: {tostring(err)}`
