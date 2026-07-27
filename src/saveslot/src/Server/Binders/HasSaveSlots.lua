@@ -87,6 +87,7 @@ export type HasSaveSlots =
 			_systemStore: any,
 			_metadataStore: any,
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
+			_preSelectCallbackProvider: (() -> { PreSelectCallback })?,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
 			_sharedSaveSlotDataStoreService: any,
@@ -180,15 +181,22 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 	end)
 end
 
--- Required lazily, and typed `any`: SaveSlotService requires this module, and resolved at call time it
--- reads as a distinct type from the one GetService's generic binds.
-function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCallback }
-	local saveSlotService: any = require("SaveSlotService")
-	if not self._serviceBag:HasService(saveSlotService) then
-		return {}
-	end
+--[=[
+	Points this binder at the pre-select callbacks to run, read afresh as each selection commits.
+	[SaveSlotService] hands its own registry over on bind; a binder bound without one runs none.
 
-	return self._serviceBag:GetService(saveSlotService):GetPreSelectCallbacks()
+	Handed over rather than fetched, because requiring [SaveSlotService] from here -- at any depth, even
+	inside a function -- is a cyclic module dependency.
+
+	@param provider (() -> { PreSelectCallback })?
+]=]
+function HasSaveSlots.SetPreSelectCallbackProvider(self: HasSaveSlots, provider: (() -> { PreSelectCallback })?): ()
+	self._preSelectCallbackProvider = provider
+end
+
+function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCallback }
+	local provider = self._preSelectCallbackProvider
+	return if provider then provider() else {}
 end
 
 function HasSaveSlots._promisePreSelect(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<boolean>

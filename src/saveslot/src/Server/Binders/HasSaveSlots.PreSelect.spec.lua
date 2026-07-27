@@ -51,10 +51,12 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
+	-- The seam SaveSlotService fills on bind. Booting the service here would drag a second
+	-- PlayerMockService into a DataModel another suite is already using one in.
 	local callbacks: { any } = {}
-	hasSaveSlots._getPreSelectCallbacks = function(): { any }
+	hasSaveSlots:SetPreSelectCallbackProvider(function(): { any }
 		return table.clone(callbacks)
-	end
+	end)
 
 	local function register(callback: any): () -> ()
 		table.insert(callbacks, callback)
@@ -281,6 +283,44 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 		expect(ranAfter).toEqual(1)
+
+		context.destroy()
+	end)
+end)
+
+describe("HasSaveSlots:SetPreSelectCallbackProvider", function()
+	it("runs none until a provider is set", function()
+		local context = setup()
+
+		context.hasSaveSlots:SetPreSelectCallbackProvider(nil)
+		context.register(function()
+			return false
+		end)
+
+		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
+		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
+
+		context.destroy()
+	end)
+
+	it("reads the provider afresh on every selection", function()
+		local context = setup()
+
+		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
+		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
+		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
+
+		local ran = 0
+		context.register(function()
+			ran += 1
+			return nil
+		end)
+
+		await(context.hasSaveSlots:PromiseSelectSlot(secondId))
+
+		expect(ran).toEqual(1)
 
 		context.destroy()
 	end)

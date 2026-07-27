@@ -117,6 +117,10 @@ function SaveSlotService.Start(self: SaveSlotService)
 			hasSaveSlots:SetCodeGenerator(self._codeGenerator)
 		end
 
+		hasSaveSlots:SetPreSelectCallbackProvider(function()
+			return self:GetPreSelectCallbacks()
+		end)
+
 		-- Mirror every default summary provider onto this player, and keep it in sync: a provider
 		-- registered or unregistered later is added to or removed from every bound player reactively.
 		maid:GiveTask(self._defaultSummaryProviders:ObservePairsBrio():Subscribe(function(pairBrio)
