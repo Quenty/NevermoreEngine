@@ -5580,6 +5580,9 @@ importers:
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quenty/promisemaid':
+        specifier: workspace:*
+        version: link:../promisemaid
       '@quenty/remoting':
         specifier: workspace:*
         version: link:../remoting
