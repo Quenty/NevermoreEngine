@@ -54,7 +54,7 @@ local function setup()
 	-- The seam SaveSlotService fills on bind. Booting the service here would drag a second
 	-- PlayerMockService into a DataModel another suite is already using one in.
 	local callbacks: { any } = {}
-	hasSaveSlots:SetPreSelectCallbackProvider(function(): { any }
+	hasSaveSlots:_setPreSelectCallbackProvider(function(): { any }
 		return table.clone(callbacks)
 	end)
 
@@ -118,7 +118,7 @@ local function recordCalls(context: any): { Call }
 	return calls
 end
 
-describe("HasSaveSlots:RegisterPreSelectCallback", function()
+describe("HasSaveSlots pre-select fan-out", function()
 	it("runs before the slot becomes active", function()
 		local context = setup()
 		local calls = recordCalls(context)
@@ -288,11 +288,11 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 	end)
 end)
 
-describe("HasSaveSlots:SetPreSelectCallbackProvider", function()
+describe("HasSaveSlots pre-select callback provider", function()
 	it("runs none until a provider is set", function()
 		local context = setup()
 
-		context.hasSaveSlots:SetPreSelectCallbackProvider(nil)
+		context.hasSaveSlots:_setPreSelectCallbackProvider(nil)
 		context.register(function()
 			return false
 		end)

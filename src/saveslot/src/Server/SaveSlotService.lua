@@ -117,7 +117,7 @@ function SaveSlotService.Start(self: SaveSlotService)
 			hasSaveSlots:SetCodeGenerator(self._codeGenerator)
 		end
 
-		hasSaveSlots:SetPreSelectCallbackProvider(function()
+		hasSaveSlots:_setPreSelectCallbackProvider(function()
 			return self:GetPreSelectCallbacks()
 		end)
 

@@ -181,16 +181,9 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 	end)
 end
 
---[=[
-	Points this binder at the pre-select callbacks to run, read afresh as each selection commits.
-	[SaveSlotService] hands its own registry over on bind; a binder bound without one runs none.
-
-	Handed over rather than fetched, because requiring [SaveSlotService] from here -- at any depth, even
-	inside a function -- is a cyclic module dependency.
-
-	@param provider (() -> { PreSelectCallback })?
-]=]
-function HasSaveSlots.SetPreSelectCallbackProvider(self: HasSaveSlots, provider: (() -> { PreSelectCallback })?): ()
+-- Set by SaveSlotService on bind, which owns the registry. Handed over rather than fetched: requiring
+-- SaveSlotService from here is a cyclic module dependency however deep the require sits.
+function HasSaveSlots._setPreSelectCallbackProvider(self: HasSaveSlots, provider: (() -> { PreSelectCallback })?): ()
 	self._preSelectCallbackProvider = provider
 end
 
