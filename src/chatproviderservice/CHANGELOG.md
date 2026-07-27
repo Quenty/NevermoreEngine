@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.66.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.66.1...@quenty/chatproviderservice@9.66.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
 ## [9.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.66.0...@quenty/chatproviderservice@9.66.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/chatproviderservice

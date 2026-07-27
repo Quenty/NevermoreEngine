@@ -567,24 +567,36 @@ local LOOKUPS: { [string]: LookupSpec } = {
 			return HttpService:JSONDecode(value)
 		end,
 	},
-	-- TeleportService.TeleportInitFailed(player, teleportResult, message) -- the engine's refusal of a
-	-- teleport, which it can never fire for a mock, whose teleport never reaches the engine (see the
-	-- domain above). A test injects a refusal keyed by the destination placeId and the backing
+	-- TeleportService.TeleportInitFailed(player, teleportResult, message) -- what the engine says about
+	-- a teleport, which it can never say to a mock, whose teleport never reaches the engine (see the
+	-- domain above). A test injects a report keyed by the destination placeId and the backing
 	-- attribute's changed signal stands in for the event, the way "Player.IsFriendsWithAsync" stands in
-	-- for the friendship events. Attributes only fire on change, so consecutive refusals of the same
-	-- teleport must differ (an attempt number in the message, say) for a retrying consumer to see each
-	-- one. Default nil: the engine has refused nothing.
+	-- for the friendship events. Despite the name the event reports outcomes, not only failures: it
+	-- also carries Success and IsTeleporting, so `result` is required, and injecting one of those is
+	-- how a test says the hop is underway. Attributes only fire on change, so consecutive reports about
+	-- the same teleport must differ (an attempt number in the message, say) for a retrying consumer to
+	-- see each one. Default nil: the engine has said nothing.
 	["TeleportService.TeleportInitFailed"] = {
 		default = nil :: any,
 		valueType = "table",
 		validate = function(value: any)
+			assert(
+				typeof(value.result) == "EnumItem" and value.result.EnumType == Enum.TeleportResult,
+				"Bad teleportInitFailed.result"
+			)
 			assert(type(value.message) == "string", "Bad teleportInitFailed.message")
 		end,
+		-- Stored by name, an EnumItem being the one part of this record JSON cannot carry. Production
+		-- reads back the EnumItem the engine would have handed it.
 		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
+			return HttpService:JSONEncode({ result = value.result.Name, message = value.message })
 		end,
 		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
+			local decoded = HttpService:JSONDecode(value)
+			return {
+				result = (Enum.TeleportResult :: any)[decoded.result],
+				message = decoded.message,
+			}
 		end,
 	},
 	-- Players:GetFriendsAsync(userId) -> FriendPages, stored as the flat FriendData array the pages

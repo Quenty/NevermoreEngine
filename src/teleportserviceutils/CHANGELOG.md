@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.2...@quenty/teleportserviceutils@10.2.3) (2026-07-27)
+
+### Bug Fixes
+
+- **teleportserviceutils:** hold one outstanding teleport request at a time ([#755](https://github.com/Quenty/NevermoreEngine/issues/755)) ([7e8761e](https://github.com/Quenty/NevermoreEngine/commit/7e8761e5d6becc7391975a5cd465cb8f0ff23b72))
+
 ## [10.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.1...@quenty/teleportserviceutils@10.2.2) (2026-07-26)
 
 ### Bug Fixes

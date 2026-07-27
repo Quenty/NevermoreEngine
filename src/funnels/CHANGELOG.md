@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.34.1...@quenty/funnels@1.34.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/funnels
+
 ## [1.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/funnels@1.34.0...@quenty/funnels@1.34.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/funnels
