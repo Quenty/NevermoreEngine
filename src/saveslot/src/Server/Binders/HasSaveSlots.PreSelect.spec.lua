@@ -54,6 +54,25 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
+	-- The binder pulls its callbacks from SaveSlotService as each selection commits. Booting that service
+	-- here would drag a second PlayerMockService into a DataModel another suite is already using one in, so
+	-- the pull itself is stubbed and the list injected. The real pull is exercised where both are booted
+	-- together (egg-hunt's EggHuntMainMenuService specs).
+	local callbacks: { any } = {}
+	hasSaveSlots._getPreSelectCallbacks = function(): { any }
+		return table.clone(callbacks)
+	end
+
+	local function register(callback: any): () -> ()
+		table.insert(callbacks, callback)
+		return function()
+			local index = table.find(callbacks, callback)
+			if index then
+				table.remove(callbacks, index)
+			end
+		end
+	end
+
 	local destroyed = false
 	local function destroy()
 		if destroyed then
@@ -72,6 +91,7 @@ local function setup()
 		serviceBag = serviceBag,
 		fakePlayer = fakePlayer,
 		hasSaveSlots = hasSaveSlots,
+		register = register,
 		destroy = destroy,
 	}
 	activeContext = context
@@ -96,7 +116,7 @@ type Call = { player: Player, slotId: string, previousSlotId: string?, activeAtC
 local function recordCalls(context: any): { Call }
 	local calls: { Call } = {}
 
-	context.hasSaveSlots:RegisterPreSelectCallback(function(player: Player, slotId: string, previousSlotId: string?)
+	context.register(function(player: Player, slotId: string, previousSlotId: string?)
 		table.insert(calls, {
 			player = player,
 			slotId = slotId,
@@ -180,7 +200,7 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		local context = setup()
 
 		local ran = 0
-		local remove = context.hasSaveSlots:RegisterPreSelectCallback(function()
+		local remove = context.register(function()
 			ran += 1
 			return nil
 		end)
@@ -204,7 +224,7 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		local context = setup()
 
 		local gate = Promise.new()
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return gate
 		end)
 
@@ -228,10 +248,10 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 
 		local first = Promise.new()
 		local second = Promise.new()
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return first
 		end)
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return second
 		end)
 
@@ -251,7 +271,7 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 	it("proceeds when a returned promise rejects", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return Promise.rejected("work blew up")
 		end)
 
@@ -268,11 +288,11 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 	it("isolates a callback that errors", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			error("callback blew up")
 		end)
 		local ranAfter = 0
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			ranAfter += 1
 			return nil
 		end)
@@ -291,7 +311,7 @@ describe("HasSaveSlots pre-select refusal", function()
 	it("refuses the selection when a callback returns false", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return false
 		end)
 
@@ -308,7 +328,7 @@ describe("HasSaveSlots pre-select refusal", function()
 	it("refuses when a returned promise resolves false", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return Promise.resolved(false)
 		end)
 
@@ -329,7 +349,7 @@ describe("HasSaveSlots pre-select refusal", function()
 		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
 		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return false
 		end)
 
@@ -346,11 +366,11 @@ describe("HasSaveSlots pre-select refusal", function()
 	it("still runs every callback once one has refused", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			return false
 		end)
 		local ranAfter = 0
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			ranAfter += 1
 			return nil
 		end)
@@ -368,7 +388,7 @@ describe("HasSaveSlots pre-select refusal", function()
 	it("allows the selection when a callback errors rather than treating it as a refusal", function()
 		local context = setup()
 
-		context.hasSaveSlots:RegisterPreSelectCallback(function()
+		context.register(function()
 			error("callback blew up")
 		end)
 

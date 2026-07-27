@@ -128,16 +128,6 @@ function SaveSlotService.Start(self: SaveSlotService)
 			pairMaid:GiveTask(hasSaveSlots:RegisterSummaryProvider(name, provider))
 		end))
 
-		-- Same mirroring for the pre-select callbacks, so a game-wide one registered before or after this
-		-- player bound applies to their selections either way.
-		maid:GiveTask(self._preSelectCallbacks:ObserveItemsBrio():Subscribe(function(itemBrio)
-			if itemBrio:IsDead() then
-				return
-			end
-			local itemMaid = itemBrio:ToMaid()
-			itemMaid:GiveTask(hasSaveSlots:RegisterPreSelectCallback(itemBrio:GetValue()))
-		end))
-
 		-- Select the slot the player teleported in with, or proceed with the default flow.
 		-- The loads can settle long after this player is gone (session-lock or datastore
 		-- retries outlive a leave), so the maid must own the INNER promise too, and each
@@ -306,9 +296,25 @@ function SaveSlotService.RegisterDefaultSummaryProvider(
 end
 
 --[=[
-	Registers a callback to run immediately before any slot becomes active, for every player. The
-	game-wide counterpart to [HasSaveSlots.RegisterPreSelectCallback] -- registering or unregistering
-	reflects on all bound players -- for per-selection state a game settles once rather than per player.
+	Registers a callback to run immediately before a slot becomes active, for every player, whatever
+	selected it -- an explicit [SaveSlotService.PromiseSelectSlot], a new or ephemeral slot, the default
+	slot on join, an arrival resuming the slot it teleported in with, or Cmdr. Every one of those funnels
+	through the same commit, so a consumer with per-selection state to settle registers here once instead
+	of chasing each entry point. Registering or unregistering applies to all players, bound or not yet.
+
+	The callback runs with the previous selection still in place, so one that writes state the selection is
+	about to be read against has written it before anything observes the change. What it returns decides
+	what happens next:
+
+	* nothing (or `true`) -- allow the selection
+	* `false` -- refuse it; the selection rejects and the active slot is left alone
+	* a promise -- hold the selection open until it settles, refusing if it resolves `false`
+
+	A callback that errors, or whose promise rejects, is isolated and warned about, and the selection
+	proceeds: a refusal is a decision a callback states, never one inferred from it crashing, and one
+	consumer's bug must not be able to stop every player in the game from loading a save slot. By the same
+	reasoning there is no timeout -- a callback that never settles holds the selection open, so keep the
+	work bounded.
 
 	@param callback HasSaveSlots.PreSelectCallback
 	@return () -> () -- Removes the callback
@@ -320,6 +326,16 @@ function SaveSlotService.RegisterPreSelectCallback(
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._preSelectCallbacks:Add(callback)
+end
+
+--[=[
+	Every registered pre-select callback, as a snapshot list. Read by [HasSaveSlots] as each selection
+	commits, so a callback registered mid-session applies to the very next selection.
+
+	@return { HasSaveSlots.PreSelectCallback }
+]=]
+function SaveSlotService.GetPreSelectCallbacks(self: SaveSlotService): { HasSaveSlots.PreSelectCallback }
+	return self._preSelectCallbacks:GetList()
 end
 
 --[=[

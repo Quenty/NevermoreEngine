@@ -88,8 +88,8 @@ describe("SaveSlotService.GetExplicitSelectionRequired", function()
 end)
 
 describe("SaveSlotService:RegisterPreSelectCallback", function()
-	-- The per-player binder half is covered in HasSaveSlots.PreSelect.spec; what is service-level is the
-	-- registration guard and that removal is handed back to the caller.
+	-- The service owns the registry; HasSaveSlots reads it as each selection commits. What the fan-out then
+	-- does with the callbacks is covered in HasSaveSlots.PreSelect.spec.
 	it("rejects a non-function callback", function()
 		local controller = setup()
 
@@ -100,24 +100,59 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller:destroy()
 	end)
 
-	it("hands back a remover, before and after Start alike", function()
+	it("hands every registered callback to the readers", function()
 		local controller = setup()
 
-		local remove = controller.saveSlotService:RegisterPreSelectCallback(function()
+		local function first(): any
 			return nil
-		end)
-		expect(type(remove)).toEqual("function")
-		expect(function()
-			remove()
-		end).never.toThrow()
+		end
+		local function second(): any
+			return nil
+		end
 
+		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({})
+
+		controller.saveSlotService:RegisterPreSelectCallback(first)
+		local removeSecond = controller.saveSlotService:RegisterPreSelectCallback(second)
+
+		local registered = controller.saveSlotService:GetPreSelectCallbacks()
+		expect(#registered).toEqual(2)
+		expect(table.find(registered, first)).never.toBeNil()
+		expect(table.find(registered, second)).never.toBeNil()
+
+		removeSecond()
+		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({ first })
+
+		controller:destroy()
+	end)
+
+	-- Registration is not tied to this service's lifecycle: a game registers in its own Start, which runs
+	-- after this one's, and a player who binds later still has to get it.
+	it("accepts registrations after Start", function()
+		local controller = setup()
 		controller.serviceBag:Start()
 
-		expect(function()
-			controller.saveSlotService:RegisterPreSelectCallback(function()
+		local function callback(): any
 			return nil
-		end)()
-		end).never.toThrow()
+		end
+		controller.saveSlotService:RegisterPreSelectCallback(callback)
+
+		expect(controller.saveSlotService:GetPreSelectCallbacks()).toEqual({ callback })
+
+		controller:destroy()
+	end)
+
+	-- A snapshot, so a callback registering or removing one mid-fan-out cannot mutate the list being walked.
+	it("hands back a snapshot rather than the live registry", function()
+		local controller = setup()
+
+		controller.saveSlotService:RegisterPreSelectCallback(function()
+			return nil
+		end)
+
+		table.clear(controller.saveSlotService:GetPreSelectCallbacks())
+
+		expect(#controller.saveSlotService:GetPreSelectCallbacks()).toEqual(1)
 
 		controller:destroy()
 	end)

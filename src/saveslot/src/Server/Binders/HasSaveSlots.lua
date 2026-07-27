@@ -16,7 +16,6 @@ local InMemoryDataStore = require("InMemoryDataStore")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
-local ObservableSet = require("ObservableSet")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -92,9 +91,6 @@ export type HasSaveSlots =
 			_systemStore: any,
 			_metadataStore: any,
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
-			-- ObservableSet<PreSelectCallback>, erased: parameterizing the generic by a function type walks
-			-- this file into Luau's "code is too complex to typecheck" ceiling.
-			_preSelectCallbacks: any,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
 			_sharedSaveSlotDataStoreService: any,
@@ -125,7 +121,6 @@ function HasSaveSlots.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ha
 	self._codeGenerator = SaveSlotCodeUtils.generateDefaultCode
 
 	self._summaryProviders = self._maid:Add(ObservableMap.new())
-	self._preSelectCallbacks = self._maid:Add(ObservableSet.new())
 
 	self._loadPromise = self._maid:GivePromise(self:_promiseLoadSlots())
 
@@ -190,33 +185,26 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 end
 
 --[=[
-	Registers a callback to run immediately before a slot becomes this player's active one, whatever
-	selected it -- an explicit [HasSaveSlots.PromiseSelectSlot], a new or ephemeral slot, the default
-	slot on join, an arrival resuming the slot it teleported in with, or Cmdr. Every one of those
-	funnels through the same commit, so a consumer with per-selection state to settle registers here
-	once instead of chasing each entry point.
+	The pre-select callbacks to run for this player, read from [SaveSlotService] at the moment a selection
+	commits rather than mirrored onto every binder: the service owns the registry, and registration is
+	game-wide, so there is nothing here worth a second copy of.
 
-	Runs with the previous selection still in place, so a callback that writes state the selection is
-	about to be read against has written it before anything observes the change. What it returns decides
-	what happens next:
+	Empty when no [SaveSlotService] is in the bag -- a binder can be bound on its own (specs do), and
+	nobody can have registered a callback through a service that isn't there. Required lazily because
+	[SaveSlotService] requires this module, and a require at the top of both would be a cycle.
 
-	* nothing (or `true`) -- allow the selection
-	* `false` -- refuse it; [HasSaveSlots.PromiseSelectSlot] rejects and the active slot is left alone
-	* a promise -- hold the selection open until it settles, refusing if it resolves `false`
-
-	A callback that errors, or whose promise rejects, is isolated and warned about, and the selection
-	proceeds: a refusal is a decision a callback states, never one inferred from it crashing, and one
-	consumer's bug must not be able to stop every player in the game from loading a save slot. By the same
-	reasoning there is no timeout -- a callback that never settles holds the selection open, so keep the
-	work bounded.
-
-	@param callback PreSelectCallback
-	@return () -> () -- Removes the callback
+	@return { PreSelectCallback }
+	@private
 ]=]
-function HasSaveSlots.RegisterPreSelectCallback(self: HasSaveSlots, callback: PreSelectCallback): () -> ()
-	assert(type(callback) == "function", "Bad callback")
+function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCallback }
+	-- Typed `any`: resolved at call time, the service reads as a distinct type from the one GetService's
+	-- generic binds ("Expected SaveSlotService, got SaveSlotService"), which no annotation here reconciles.
+	local saveSlotService: any = require("SaveSlotService")
+	if not self._serviceBag:HasService(saveSlotService) then
+		return {}
+	end
 
-	return self._preSelectCallbacks:Add(callback)
+	return self._serviceBag:GetService(saveSlotService):GetPreSelectCallbacks()
 end
 
 --[=[
@@ -235,8 +223,8 @@ function HasSaveSlots._promisePreSelect(self: HasSaveSlots, slotId: SaveSlotData
 	local promises = {}
 	local refused = false
 
-	-- A copy, so a callback that registers or removes one mid-fire can't mutate the list being walked.
-	for _, callback in self._preSelectCallbacks:GetList() do
+	-- A snapshot, so a callback that registers or removes one mid-fire can't mutate the list being walked.
+	for _, callback in self:_getPreSelectCallbacks() do
 		local ok, result = pcall(callback, self._obj, slotId, previousSlotId)
 		if not ok then
 			-- Isolated rather than treated as a refusal: a refusal is a decision a callback states, never
