@@ -273,16 +273,24 @@ end
 
 --[=[
 	Exports a slot's saved data into a plain, serializable [SaveSlotExportUtils.SaveSlotExport].
-	Rejects the main/default slot: its store is the player's shared root datastore, so exporting it
-	would leak the SaveSlots system data and universe-scoped global data living alongside it. Only
-	isolated non-main slot substores are exportable.
+	Rejects the main/default slot by default: its store is the player's shared root datastore, so
+	exporting it would leak the SaveSlots system data and universe-scoped global data living
+	alongside it. Only isolated non-main slot substores are exportable.
+
+	`allowMainSlot` opts out of that refusal for trusted admin tooling (see [SaveSlotCmdrService]).
+	The SaveSlots system data is always stripped from the result, so the export never carries the
+	slot roster or the other slots' saved data. Universe-scoped global data sharing the root store
+	is indistinguishable from the main slot's own data and is still carried, which is why this is
+	not exposed through [SaveSlotService].
 
 	@param slotId SlotId
+	@param allowMainSlot boolean? -- defaults to false
 	@return Promise<SaveSlotExportUtils.SaveSlotExport>
 ]=]
 function HasSaveSlots.PromiseExportSlot(
 	self: HasSaveSlots,
-	slotId: SaveSlotData.SlotId
+	slotId: SaveSlotData.SlotId,
+	allowMainSlot: boolean?
 ): Promise.Promise<SaveSlotExportUtils.SaveSlotExport>
 	return (self._loadPromise :: any):Then(function()
 		local slot = self._slotMap[slotId]
@@ -290,13 +298,23 @@ function HasSaveSlots.PromiseExportSlot(
 			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
-		if SaveSlotExportUtils.isMainSlotIndex(SaveSlotData.SlotIndex:Get(slot)) then
+		local isMainSlot = SaveSlotExportUtils.isMainSlotIndex(SaveSlotData.SlotIndex:Get(slot))
+		if isMainSlot and not allowMainSlot then
 			return (Promise :: any).rejected("Cannot export the main slot")
 		end
 
 		local metadata = SaveSlotData:Get(slot)
 		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
 			local data = if type(sourceData) == "table" then table.clone(sourceData) else {}
+
+			if isMainSlot then
+				-- The main slot's store is the player's shared root, so LoadAll pulls the SaveSlots system
+				-- data with it -- the slot roster and every non-main slot's saved data. Drop it so the
+				-- export is only this slot, and so importing it can't nest a whole roster inside a slot
+				-- (mirrors PromiseDuplicateSlot, which strips the same key for the same reason).
+				data[SaveSlotConstants.SYSTEM_STORE_KEY] = nil
+			end
+
 			return SaveSlotExportUtils.create(data, metadata.SlotName, metadata.Summary)
 		end)
 	end)
@@ -358,14 +376,16 @@ end
 
 	@param slotId SlotId
 	@param key string
+	@param allowMainSlot boolean? -- defaults to false, see [HasSaveSlots.PromiseExportSlot]
 	@return Promise<boolean>
 ]=]
 function HasSaveSlots.PromiseSaveSlotToSharedDataStore(
 	self: HasSaveSlots,
 	slotId: SaveSlotData.SlotId,
-	key: string
+	key: string,
+	allowMainSlot: boolean?
 ): Promise.Promise<boolean>
-	return self:PromiseExportSlot(slotId):Then(function(export)
+	return self:PromiseExportSlot(slotId, allowMainSlot):Then(function(export)
 		return self._sharedSaveSlotDataStoreService:PromiseWrite(key, export)
 	end)
 end
@@ -523,15 +543,18 @@ end
 --[=[
 	Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
 	is a shareable handle other sessions load with [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].
-	Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]). The code
-	format comes from the configured generator (see [HasSaveSlots.SetCodeGenerator]).
+	Defaults to the active slot. Refuses the main slot unless `allowMainSlot` is set (see
+	[HasSaveSlots.PromiseExportSlot]). The code format comes from the configured generator (see
+	[HasSaveSlots.SetCodeGenerator]).
 
 	@param slotId SlotId? -- defaults to the active slot
+	@param allowMainSlot boolean? -- defaults to false, see [HasSaveSlots.PromiseExportSlot]
 	@return Promise<string>
 ]=]
 function HasSaveSlots.PromiseExportSaveSlotToCode(
 	self: HasSaveSlots,
-	slotId: SaveSlotData.SlotId?
+	slotId: SaveSlotData.SlotId?,
+	allowMainSlot: boolean?
 ): Promise.Promise<string>
 	return (self._loadPromise :: any):Then(function()
 		local targetSlotId = slotId or self.ActiveSlotId.Value
@@ -540,7 +563,7 @@ function HasSaveSlots.PromiseExportSaveSlotToCode(
 		end
 
 		local code = self:_generateCode(targetSlotId)
-		return self:PromiseSaveSlotToSharedDataStore(targetSlotId, code):Then(function()
+		return self:PromiseSaveSlotToSharedDataStore(targetSlotId, code, allowMainSlot):Then(function()
 			return code
 		end)
 	end)
@@ -562,14 +585,17 @@ end
 
 --[=[
 	Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug
-	report. Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).
+	report. Defaults to the active slot. Refuses the main slot unless `allowMainSlot` is set (see
+	[HasSaveSlots.PromiseExportSlot]).
 
 	@param slotId SlotId? -- defaults to the active slot
+	@param allowMainSlot boolean? -- defaults to false, see [HasSaveSlots.PromiseExportSlot]
 	@return Promise<string>
 ]=]
 function HasSaveSlots.PromiseExportSaveSlotToJson(
 	self: HasSaveSlots,
-	slotId: SaveSlotData.SlotId?
+	slotId: SaveSlotData.SlotId?,
+	allowMainSlot: boolean?
 ): Promise.Promise<string>
 	return (self._loadPromise :: any):Then(function()
 		local targetSlotId = slotId or self.ActiveSlotId.Value
@@ -577,7 +603,7 @@ function HasSaveSlots.PromiseExportSaveSlotToJson(
 			return (Promise :: any).rejected("No slot to export")
 		end
 
-		return self:PromiseExportSlot(targetSlotId):Then(function(export)
+		return self:PromiseExportSlot(targetSlotId, allowMainSlot):Then(function(export)
 			return HttpService:JSONEncode(export)
 		end)
 	end)

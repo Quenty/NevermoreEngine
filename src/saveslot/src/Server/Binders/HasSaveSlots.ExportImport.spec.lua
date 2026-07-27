@@ -158,6 +158,39 @@ describe("HasSaveSlots.PromiseExportSlot / PromiseImportSlot", function()
 		end)
 	end)
 
+	it("exports the main slot when allowMainSlot is set", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local mainSlotId = createSelectAndWrite(hasSaveSlots, SaveSlotConstants.DEFAULT_SLOT_INDEX)
+
+			local export = awaitValueOf(hasSaveSlots:PromiseExportSlot(mainSlotId, true))
+			expect(export.data.Coins).toEqual(7)
+			expect(export.data.World_2.Eggs).toEqual(3)
+		end)
+	end)
+
+	it("strips the SaveSlots system data from a main slot export", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local mainSlotId = createSelectAndWrite(hasSaveSlots, SaveSlotConstants.DEFAULT_SLOT_INDEX)
+			createSelectAndWrite(hasSaveSlots, 2)
+
+			local export = awaitValueOf(hasSaveSlots:PromiseExportSlot(mainSlotId, true))
+			expect(export.data[SaveSlotConstants.SYSTEM_STORE_KEY]).toBeNil()
+		end)
+	end)
+
+	it("still refuses the main slot when allowMainSlot is false", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+			expect(awaitResolved(hasSaveSlots:PromiseExportSlot(mainSlotId, false))).toEqual(false)
+		end)
+	end)
+
 	it("refuses to export a missing slot", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
