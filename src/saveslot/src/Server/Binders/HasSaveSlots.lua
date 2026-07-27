@@ -48,10 +48,6 @@ local NONE = {}
 -- 0 is used because a real index is always >= 1 (DEFAULT_SLOT_INDEX is 1, PromiseCreateSlot rejects < 1).
 local EPHEMERAL_SLOT_INDEX = 0
 
--- Called with (player, slotId, previousSlotId) before slotId becomes the active slot, while the previous
--- selection is still in place. Return `false` to refuse the selection, a promise to hold it open until
--- that promise settles (resolving `false` refuses), or nothing at all to allow it. See
--- RegisterPreSelectCallback.
 export type PreSelectCallback = (
 	Player,
 	SaveSlotData.SlotId,
@@ -184,21 +180,9 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 	end)
 end
 
---[=[
-	The pre-select callbacks to run for this player, read from [SaveSlotService] at the moment a selection
-	commits rather than mirrored onto every binder: the service owns the registry, and registration is
-	game-wide, so there is nothing here worth a second copy of.
-
-	Empty when no [SaveSlotService] is in the bag -- a binder can be bound on its own (specs do), and
-	nobody can have registered a callback through a service that isn't there. Required lazily because
-	[SaveSlotService] requires this module, and a require at the top of both would be a cycle.
-
-	@return { PreSelectCallback }
-	@private
-]=]
+-- Required lazily, and typed `any`: SaveSlotService requires this module, and resolved at call time it
+-- reads as a distinct type from the one GetService's generic binds.
 function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCallback }
-	-- Typed `any`: resolved at call time, the service reads as a distinct type from the one GetService's
-	-- generic binds ("Expected SaveSlotService, got SaveSlotService"), which no annotation here reconciles.
 	local saveSlotService: any = require("SaveSlotService")
 	if not self._serviceBag:HasService(saveSlotService) then
 		return {}
@@ -207,29 +191,14 @@ function HasSaveSlots._getPreSelectCallbacks(self: HasSaveSlots): { PreSelectCal
 	return self._serviceBag:GetService(saveSlotService):GetPreSelectCallbacks()
 end
 
---[=[
-	Runs every registered pre-select callback for a selection about to commit, resolving with whether the
-	selection may proceed once the ones that returned a promise have settled.
-
-	Every callback runs, even once one has refused: they are independent, and a callback that only wanted
-	to settle state must not be skipped because an unrelated one said no.
-
-	@param slotId SlotId
-	@return Promise<boolean> -- False when any callback refused
-	@private
-]=]
 function HasSaveSlots._promisePreSelect(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<boolean>
 	local previousSlotId = self.ActiveSlotId.Value
 	local promises = {}
 	local refused = false
 
-	-- A snapshot, so a callback that registers or removes one mid-fire can't mutate the list being walked.
 	for _, callback in self:_getPreSelectCallbacks() do
 		local ok, result = pcall(callback, self._obj, slotId, previousSlotId)
 		if not ok then
-			-- Isolated rather than treated as a refusal: a refusal is a decision a callback states, never
-			-- one inferred from it crashing, and one consumer's bug must not stop every player in the game
-			-- from loading a save slot. Same call the summary providers make with their NONE sentinel.
 			warn(`[HasSaveSlots] - Pre-select callback errored: {tostring(result)}`)
 		elseif Promise.isPromise(result) then
 			table.insert(
@@ -271,13 +240,9 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 			SaveSlotData.LastPlayedTime:Set(slot, os.time())
 		end
 
-		-- The pre-select fan-out runs last, immediately before the value changes, so a callback reads the
-		-- selection it is replacing rather than one an outgoing flush has already moved past.
 		local function promiseSetSlot()
 			return self:_promisePreSelect(slotId):Then(function(allowed: boolean)
 				if not allowed then
-					-- Rejected rather than resolved quietly: the caller asked for a selection that did not
-					-- happen, and every caller here is one that has already committed to it on screen.
 					return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
 				end
 

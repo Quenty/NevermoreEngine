@@ -37,8 +37,8 @@ export type SaveSlotService = typeof(setmetatable(
 		_selectionRequired: boolean,
 		_maxSlotCount: number,
 		_defaultSummaryProviders: ObservableMap.ObservableMap<string, HasSaveSlots.SummaryProvider>,
-		-- ObservableSet<HasSaveSlots.PreSelectCallback>, erased for the same reason the binder erases its
-		-- own: the generic parameterized by a function type blows up inference.
+		-- ObservableSet<HasSaveSlots.PreSelectCallback>; erased because the generic parameterized by a
+		-- function type blows up inference.
 		_preSelectCallbacks: any,
 		_remoting: any,
 		_teleportDataService: any,
@@ -296,25 +296,16 @@ function SaveSlotService.RegisterDefaultSummaryProvider(
 end
 
 --[=[
-	Registers a callback to run immediately before a slot becomes active, for every player, whatever
-	selected it -- an explicit [SaveSlotService.PromiseSelectSlot], a new or ephemeral slot, the default
-	slot on join, an arrival resuming the slot it teleported in with, or Cmdr. Every one of those funnels
-	through the same commit, so a consumer with per-selection state to settle registers here once instead
-	of chasing each entry point. Registering or unregistering applies to all players, bound or not yet.
-
-	The callback runs with the previous selection still in place, so one that writes state the selection is
-	about to be read against has written it before anything observes the change. What it returns decides
-	what happens next:
+	Registers a callback to run for every player immediately before a slot becomes active, whatever
+	selected it. It runs with the previous selection still in place, and what it returns decides what
+	happens next:
 
 	* nothing (or `true`) -- allow the selection
 	* `false` -- refuse it; the selection rejects and the active slot is left alone
 	* a promise -- hold the selection open until it settles, refusing if it resolves `false`
 
-	A callback that errors, or whose promise rejects, is isolated and warned about, and the selection
-	proceeds: a refusal is a decision a callback states, never one inferred from it crashing, and one
-	consumer's bug must not be able to stop every player in the game from loading a save slot. By the same
-	reasoning there is no timeout -- a callback that never settles holds the selection open, so keep the
-	work bounded.
+	An error or a rejection is warned about and allows the selection: only a stated `false` refuses. There
+	is no timeout, so keep the work bounded.
 
 	@param callback HasSaveSlots.PreSelectCallback
 	@return () -> () -- Removes the callback
@@ -329,8 +320,7 @@ function SaveSlotService.RegisterPreSelectCallback(
 end
 
 --[=[
-	Every registered pre-select callback, as a snapshot list. Read by [HasSaveSlots] as each selection
-	commits, so a callback registered mid-session applies to the very next selection.
+	Every registered pre-select callback, as a snapshot list.
 
 	@return { HasSaveSlots.PreSelectCallback }
 ]=]

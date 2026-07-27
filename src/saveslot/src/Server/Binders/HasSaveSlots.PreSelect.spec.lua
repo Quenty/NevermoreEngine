@@ -26,9 +26,6 @@ local FAKE_USER_ID = 424243
 
 local activeContext: any = nil
 
--- A test that fails mid-body never reaches its own destroy, and the PlayerMock it leaves parented to
--- Workspace is consumed by the next suite that boots a PlayerMockService -- which fails *that* suite
--- instead of this one. destroy is idempotent, so this is a no-op after a test that tore itself down.
 afterEach(function()
 	if activeContext then
 		local context = activeContext
@@ -54,10 +51,6 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	-- The binder pulls its callbacks from SaveSlotService as each selection commits. Booting that service
-	-- here would drag a second PlayerMockService into a DataModel another suite is already using one in, so
-	-- the pull itself is stubbed and the list injected. The real pull is exercised where both are booted
-	-- together (egg-hunt's EggHuntMainMenuService specs).
 	local callbacks: { any } = {}
 	hasSaveSlots._getPreSelectCallbacks = function(): { any }
 		return table.clone(callbacks)
@@ -99,9 +92,6 @@ local function setup()
 	return context
 end
 
--- Every call below settles quickly against the mocked datastore; a hang is a failure worth naming rather
--- than a test that waits out the runner. Yield reports (ok, value), and every await here is on a call
--- whose value the test goes on to use, so a rejection is an assertion failure rather than a nil later on.
 local function await(promise: any): any
 	assert(PromiseTestUtils.awaitSettled(promise, 10), "promise never settled")
 	local ok, value = promise:Yield()
@@ -111,8 +101,6 @@ end
 
 type Call = { player: Player, slotId: string, previousSlotId: string?, activeAtCall: string? }
 
--- Records what each fire saw, including the active slot *at the moment it ran* -- which is what pins the
--- callback to before the change rather than after it.
 local function recordCalls(context: any): { Call }
 	local calls: { Call } = {}
 
@@ -139,7 +127,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		expect(#calls).toEqual(1)
 		expect(calls[1].slotId).toEqual(slotId)
 		expect(calls[1].player).toEqual(context.fakePlayer)
-		-- The selection it is about to make has not landed yet.
 		expect(calls[1].activeAtCall).toBeNil()
 		expect(calls[1].previousSlotId).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
@@ -165,8 +152,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		context.destroy()
 	end)
 
-	-- The reason this is one hook rather than a hook per entry point: every way a slot can be selected
-	-- funnels through the same commit.
 	it("runs for a new slot and for an ephemeral slot alike", function()
 		local context = setup()
 		local calls = recordCalls(context)
@@ -181,7 +166,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		context.destroy()
 	end)
 
-	-- Re-selecting the active slot changes nothing and emits nothing, so there is no selection to settle for.
 	it("does not run when the slot is already active", function()
 		local context = setup()
 
@@ -218,8 +202,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		context.destroy()
 	end)
 
-	-- Work that has to finish before the slot changes rarely finishes synchronously, so a callback can
-	-- hand back a promise and the selection waits on it.
 	it("holds the selection until a returned promise resolves", function()
 		local context = setup()
 
@@ -231,7 +213,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
 
-		-- Still pending, and -- the point of the hook -- the slot has not changed underneath the work.
 		expect(PromiseTestUtils.awaitSettled(selection, 0.5)).toEqual(false)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
@@ -283,8 +264,6 @@ describe("HasSaveSlots:RegisterPreSelectCallback", function()
 		context.destroy()
 	end)
 
-	-- One consumer's bug must not stop every player in the game from loading a save slot, so the error is
-	-- isolated to its own callback: the selection lands and the callbacks beside it still run.
 	it("isolates a callback that errors", function()
 		local context = setup()
 
@@ -362,7 +341,6 @@ describe("HasSaveSlots pre-select refusal", function()
 		context.destroy()
 	end)
 
-	-- Callbacks are independent: one refusing must not skip the state another only wanted to settle.
 	it("still runs every callback once one has refused", function()
 		local context = setup()
 
@@ -383,8 +361,6 @@ describe("HasSaveSlots pre-select refusal", function()
 		context.destroy()
 	end)
 
-	-- An error is not a refusal: the decision has to be stated, or a consumer bug silently locks players
-	-- out of their save slots.
 	it("allows the selection when a callback errors rather than treating it as a refusal", function()
 		local context = setup()
 

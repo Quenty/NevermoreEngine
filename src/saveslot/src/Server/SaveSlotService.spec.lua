@@ -88,8 +88,6 @@ describe("SaveSlotService.GetExplicitSelectionRequired", function()
 end)
 
 describe("SaveSlotService:RegisterPreSelectCallback", function()
-	-- The service owns the registry; HasSaveSlots reads it as each selection commits. What the fan-out then
-	-- does with the callbacks is covered in HasSaveSlots.PreSelect.spec.
 	it("rejects a non-function callback", function()
 		local controller = setup()
 
@@ -126,8 +124,6 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller:destroy()
 	end)
 
-	-- Registration is not tied to this service's lifecycle: a game registers in its own Start, which runs
-	-- after this one's, and a player who binds later still has to get it.
 	it("accepts registrations after Start", function()
 		local controller = setup()
 		controller.serviceBag:Start()
@@ -142,7 +138,6 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller:destroy()
 	end)
 
-	-- A snapshot, so a callback registering or removing one mid-fan-out cannot mutate the list being walked.
 	it("hands back a snapshot rather than the live registry", function()
 		local controller = setup()
 
