@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">HasSaveSlots | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="HasSaveSlots | Nevermore"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/HasSaveSlots" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.4acc86fd.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.c79c6670.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.0e3e1c9f.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.f1f46e7e.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -32,38 +32,49 @@
 </p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseCreateSlot"><code style="text-decoration:none">PromiseCreateSlot</code><a href="#PromiseCreateSlot" class="hash-link" aria-label="Direct link to PromiseCreateSlot" title="Direct link to PromiseCreateSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L241"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseCreateSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotIndex<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code></div><div><code>metadata<!-- -->: </code><code class="blue_P4bS">SaveSlotCreateMetadata?</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Creates a slot at the given index</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSlot"><code style="text-decoration:none">PromiseExportSlot</code><a href="#PromiseExportSlot" class="hash-link" aria-label="Direct link to PromiseExportSlot" title="Direct link to PromiseExportSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L283"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotExportUtils.SaveSlotExport</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSlot"><code style="text-decoration:none">PromiseExportSlot</code><a href="#PromiseExportSlot" class="hash-link" aria-label="Direct link to PromiseExportSlot" title="Direct link to PromiseExportSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L290"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId</code><code>,</code></div><div><code>allowMainSlot<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>defaults to false</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotExportUtils.SaveSlotExport</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Exports a slot's saved data into a plain, serializable <a href="/NevermoreEngine/api/SaveSlotExportUtils#SaveSlotExport">SaveSlotExportUtils.SaveSlotExport</a>.
-  Rejects the main/default slot: its store is the player's shared root datastore, so exporting it
-  would leak the SaveSlots system data and universe-scoped global data living alongside it. Only
-  isolated non-main slot substores are exportable.
+  Rejects the main/default slot by default: its store is the player's shared root datastore, so
+  exporting it would leak the SaveSlots system data and universe-scoped global data living
+  alongside it. Only isolated non-main slot substores are exportable.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportSlot"><code style="text-decoration:none">PromiseImportSlot</code><a href="#PromiseImportSlot" class="hash-link" aria-label="Direct link to PromiseImportSlot" title="Direct link to PromiseImportSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L314"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>export<!-- -->: </code><code class="blue_P4bS">SaveSlotExportUtils.SaveSlotExport</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+<p>
+  <code>allowMainSlot</code> opts out of that refusal for trusted admin tooling (see <a href="/NevermoreEngine/api/SaveSlotCmdrService">SaveSlotCmdrService</a>).
+  The SaveSlots system data is always stripped from the result, so the export never carries the
+  slot roster or the other slots' saved data. Universe-scoped global data sharing the root store
+  is indistinguishable from the main slot's own data and is still carried, which is why this is
+  not exposed through <a href="/NevermoreEngine/api/SaveSlotService">SaveSlotService</a>.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportSlot"><code style="text-decoration:none">PromiseImportSlot</code><a href="#PromiseImportSlot" class="hash-link" aria-label="Direct link to PromiseImportSlot" title="Direct link to PromiseImportSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L332"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>export<!-- -->: </code><code class="blue_P4bS">SaveSlotExportUtils.SaveSlotExport</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Imports an exported slot into a fresh slot at the lowest free non-main index, seeding the new
   slot's store with the exported data. Never uses the main/default index -- importing onto the
   shared root store would wipe the player's global data. Resolves to the new slot's id. Rejects a
   malformed export, or when no non-main index is free.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSaveSlotToSharedDataStore"><code style="text-decoration:none">PromiseSaveSlotToSharedDataStore</code><a href="#PromiseSaveSlotToSharedDataStore" class="hash-link" aria-label="Direct link to PromiseSaveSlotToSharedDataStore" title="Direct link to PromiseSaveSlotToSharedDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L363"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSaveSlotToSharedDataStore</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId</code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">boolean</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSaveSlotToSharedDataStore"><code style="text-decoration:none">PromiseSaveSlotToSharedDataStore</code><a href="#PromiseSaveSlotToSharedDataStore" class="hash-link" aria-label="Direct link to PromiseSaveSlotToSharedDataStore" title="Direct link to PromiseSaveSlotToSharedDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L382"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSaveSlotToSharedDataStore</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId</code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>allowMainSlot<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>defaults to false, see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a></p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">boolean</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Exports a non-main slot (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a>) and writes it to the shared save
   slot store under the given key.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportSlotFromSharedDataStore"><code style="text-decoration:none">PromiseImportSlotFromSharedDataStore</code><a href="#PromiseImportSlotFromSharedDataStore" class="hash-link" aria-label="Direct link to PromiseImportSlotFromSharedDataStore" title="Direct link to PromiseImportSlotFromSharedDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L380"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportSlotFromSharedDataStore</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportSlotFromSharedDataStore"><code style="text-decoration:none">PromiseImportSlotFromSharedDataStore</code><a href="#PromiseImportSlotFromSharedDataStore" class="hash-link" aria-label="Direct link to PromiseImportSlotFromSharedDataStore" title="Direct link to PromiseImportSlotFromSharedDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L400"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportSlotFromSharedDataStore</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Reads an export from the shared save slot store and imports it into a fresh non-main slot (see
   <a href="/NevermoreEngine/api/HasSaveSlots#PromiseImportSlot">HasSaveSlots.PromiseImportSlot</a>). Rejects when no export is stored under the key.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectTransferableEphemeralSlot"><code style="text-decoration:none">PromiseSelectTransferableEphemeralSlot</code><a href="#PromiseSelectTransferableEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectTransferableEphemeralSlot" title="Direct link to PromiseSelectTransferableEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L401"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectTransferableEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectTransferableEphemeralSlot"><code style="text-decoration:none">PromiseSelectTransferableEphemeralSlot</code><a href="#PromiseSelectTransferableEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectTransferableEphemeralSlot" title="Direct link to PromiseSelectTransferableEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L421"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectTransferableEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Loads the export stored under the given shared-store key into a fresh ephemeral slot and selects it,
   remembering the key so a teleport can carry the slot forward (see the transferable-ephemeral teleport
   provider in <a href="/NevermoreEngine/api/SaveSlotService">SaveSlotService</a>). Like every ephemeral slot it is never persisted, stays out of the slot
   list, and is torn down on deselect. Rejects when no valid export is stored under the key.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseBuildEphemeralTransferSlice"><code style="text-decoration:none">PromiseBuildEphemeralTransferSlice</code><a href="#PromiseBuildEphemeralTransferSlice" class="hash-link" aria-label="Direct link to PromiseBuildEphemeralTransferSlice" title="Direct link to PromiseBuildEphemeralTransferSlice" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L444"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseBuildEphemeralTransferSlice</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseBuildEphemeralTransferSlice"><code style="text-decoration:none">PromiseBuildEphemeralTransferSlice</code><a href="#PromiseBuildEphemeralTransferSlice" class="hash-link" aria-label="Direct link to PromiseBuildEphemeralTransferSlice" title="Direct link to PromiseBuildEphemeralTransferSlice" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L464"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseBuildEphemeralTransferSlice</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Builds this player's teleport slice for a transferable ephemeral slot: re-saves the active slot's
   <em>current live</em> data to the shared store under its key and returns a slice carrying that key. Resolves
@@ -71,7 +82,7 @@
   teleport is never blocked (the destination then re-loads the last saved state). Asynchronous -- it is
   consumed through <a href="/NevermoreEngine/api/TeleportDataService#PromiseBuildTeleportData">TeleportDataService.PromiseBuildTeleportData</a>.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLoadTransferableEphemeralSlotFromTeleport"><code style="text-decoration:none">PromiseLoadTransferableEphemeralSlotFromTeleport</code><a href="#PromiseLoadTransferableEphemeralSlotFromTeleport" class="hash-link" aria-label="Direct link to PromiseLoadTransferableEphemeralSlotFromTeleport" title="Direct link to PromiseLoadTransferableEphemeralSlotFromTeleport" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L481"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseLoadTransferableEphemeralSlotFromTeleport</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLoadTransferableEphemeralSlotFromTeleport"><code style="text-decoration:none">PromiseLoadTransferableEphemeralSlotFromTeleport</code><a href="#PromiseLoadTransferableEphemeralSlotFromTeleport" class="hash-link" aria-label="Direct link to PromiseLoadTransferableEphemeralSlotFromTeleport" title="Direct link to PromiseLoadTransferableEphemeralSlotFromTeleport" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L501"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseLoadTransferableEphemeralSlotFromTeleport</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Selects the transferable ephemeral slot the player teleported in with, from the shared-store key in
   their arrived data. Reads the <em>unified</em> band (not trusted-only) so a <strong>client-initiated</strong> teleport --
@@ -84,49 +95,55 @@
   is read-only visibility of a snapshot whose code you already have -- acceptable for the dev/Cmdr tooling
   this backs. Harden (longer code entropy / ownership) before exposing it to a player-facing surface.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetCodeGenerator"><code style="text-decoration:none">SetCodeGenerator</code><a href="#SetCodeGenerator" class="hash-link" aria-label="Direct link to SetCodeGenerator" title="Direct link to SetCodeGenerator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L501"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">SetCodeGenerator</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>generator<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/SaveSlotCodeUtils#CodeGenerator">CodeGenerator</a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetCodeGenerator"><code style="text-decoration:none">SetCodeGenerator</code><a href="#SetCodeGenerator" class="hash-link" aria-label="Direct link to SetCodeGenerator" title="Direct link to SetCodeGenerator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L521"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">SetCodeGenerator</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>generator<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/SaveSlotCodeUtils#CodeGenerator">CodeGenerator</a></code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Overrides the share-code generator for this player's exports (see <a href="/NevermoreEngine/api/SaveSlotCodeUtils#CodeGenerator">SaveSlotCodeUtils.CodeGenerator</a>).
   Games inject a custom format; the default is <a href="/NevermoreEngine/api/SaveSlotCodeUtils#generateDefaultCode">SaveSlotCodeUtils.generateDefaultCode</a>. Usually set
   game-wide via <a href="/NevermoreEngine/api/SaveSlotService#SetCodeGenerator">SaveSlotService.SetCodeGenerator</a> rather than per player.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSaveSlotToCode"><code style="text-decoration:none">PromiseExportSaveSlotToCode</code><a href="#PromiseExportSaveSlotToCode" class="hash-link" aria-label="Direct link to PromiseExportSaveSlotToCode" title="Direct link to PromiseExportSaveSlotToCode" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L532"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSaveSlotToCode</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSaveSlotToCode"><code style="text-decoration:none">PromiseExportSaveSlotToCode</code><a href="#PromiseExportSaveSlotToCode" class="hash-link" aria-label="Direct link to PromiseExportSaveSlotToCode" title="Direct link to PromiseExportSaveSlotToCode" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L554"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSaveSlotToCode</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId?</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>defaults to the active slot</p>
+</span></span></div><div><code>allowMainSlot<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>defaults to false, see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a></p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Exports a slot to the shared store under a fresh generated code and resolves to that code. The code
   is a shareable handle other sessions load with <a href="/NevermoreEngine/api/HasSaveSlots#PromiseImportEphemeralSaveSlotFromCode">HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode</a>.
-  Defaults to the active slot. Refuses the main slot (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a>). The code
-  format comes from the configured generator (see <a href="/NevermoreEngine/api/HasSaveSlots#SetCodeGenerator">HasSaveSlots.SetCodeGenerator</a>).
+  Defaults to the active slot. Refuses the main slot unless <code>allowMainSlot</code> is set (see
+  <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a>). The code format comes from the configured generator (see
+  <a href="/NevermoreEngine/api/HasSaveSlots#SetCodeGenerator">HasSaveSlots.SetCodeGenerator</a>).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportEphemeralSaveSlotFromCode"><code style="text-decoration:none">PromiseImportEphemeralSaveSlotFromCode</code><a href="#PromiseImportEphemeralSaveSlotFromCode" class="hash-link" aria-label="Direct link to PromiseImportEphemeralSaveSlotFromCode" title="Direct link to PromiseImportEphemeralSaveSlotFromCode" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L556"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportEphemeralSaveSlotFromCode</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>code<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseImportEphemeralSaveSlotFromCode"><code style="text-decoration:none">PromiseImportEphemeralSaveSlotFromCode</code><a href="#PromiseImportEphemeralSaveSlotFromCode" class="hash-link" aria-label="Direct link to PromiseImportEphemeralSaveSlotFromCode" title="Direct link to PromiseImportEphemeralSaveSlotFromCode" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L579"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseImportEphemeralSaveSlotFromCode</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>code<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Loads the slot stored under the given code into a fresh transferable ephemeral slot and selects it
   (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseSelectTransferableEphemeralSlot">HasSaveSlots.PromiseSelectTransferableEphemeralSlot</a>). Resolves to the new slot id.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSaveSlotToJson"><code style="text-decoration:none">PromiseExportSaveSlotToJson</code><a href="#PromiseExportSaveSlotToJson" class="hash-link" aria-label="Direct link to PromiseExportSaveSlotToJson" title="Direct link to PromiseExportSaveSlotToJson" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L570"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSaveSlotToJson</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseExportSaveSlotToJson"><code style="text-decoration:none">PromiseExportSaveSlotToJson</code><a href="#PromiseExportSaveSlotToJson" class="hash-link" aria-label="Direct link to PromiseExportSaveSlotToJson" title="Direct link to PromiseExportSaveSlotToJson" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L595"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseExportSaveSlotToJson</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SlotId?</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>defaults to the active slot</p>
+</span></span></div><div><code>allowMainSlot<!-- -->: </code><code class="blue_P4bS">boolean?</code><span class="inlineDescription_G7Er">-- <span>
+<p>defaults to false, see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a></p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug
-  report. Defaults to the active slot. Refuses the main slot (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a>).
+  report. Defaults to the active slot. Refuses the main slot unless <code>allowMainSlot</code> is set (see
+  <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a>).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDuplicateSlot"><code style="text-decoration:none">PromiseDuplicateSlot</code><a href="#PromiseDuplicateSlot" class="hash-link" aria-label="Direct link to PromiseDuplicateSlot" title="Direct link to PromiseDuplicateSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L592"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDuplicateSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDuplicateSlot"><code style="text-decoration:none">PromiseDuplicateSlot</code><a href="#PromiseDuplicateSlot" class="hash-link" aria-label="Direct link to PromiseDuplicateSlot" title="Direct link to PromiseDuplicateSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L618"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDuplicateSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Duplicates the slot with the given ID into a new slot at the lowest free index,
   copying its saved data. Resolves to the new slot's id. The copy is not selected,
   its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
   " (Copy)". Rejects when the source slot is missing or every index is in use.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDeleteSlot"><code style="text-decoration:none">PromiseDeleteSlot</code><a href="#PromiseDeleteSlot" class="hash-link" aria-label="Direct link to PromiseDeleteSlot" title="Direct link to PromiseDeleteSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L656"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDeleteSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDeleteSlot"><code style="text-decoration:none">PromiseDeleteSlot</code><a href="#PromiseDeleteSlot" class="hash-link" aria-label="Direct link to PromiseDeleteSlot" title="Direct link to PromiseDeleteSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L682"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDeleteSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Deletes the slot with the given ID</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDeleteAllSlots"><code style="text-decoration:none">PromiseDeleteAllSlots</code><a href="#PromiseDeleteAllSlots" class="hash-link" aria-label="Direct link to PromiseDeleteAllSlots" title="Direct link to PromiseDeleteAllSlots" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L709"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDeleteAllSlots</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseDeleteAllSlots"><code style="text-decoration:none">PromiseDeleteAllSlots</code><a href="#PromiseDeleteAllSlots" class="hash-link" aria-label="Direct link to PromiseDeleteAllSlots" title="Direct link to PromiseDeleteAllSlots" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L735"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseDeleteAllSlots</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Deletes every slot for the player and clears the active/last-active
   selection, resetting the player to a fresh state. Resolves once all slots
   are gone.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseResetSlot"><code style="text-decoration:none">PromiseResetSlot</code><a href="#PromiseResetSlot" class="hash-link" aria-label="Direct link to PromiseResetSlot" title="Direct link to PromiseResetSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L744"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseResetSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseResetSlot"><code style="text-decoration:none">PromiseResetSlot</code><a href="#PromiseResetSlot" class="hash-link" aria-label="Direct link to PromiseResetSlot" title="Direct link to PromiseResetSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L770"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseResetSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Resets the slot with the given id to a fresh empty one -- equivalent to deleting the slot
   and creating a new one at the same index. The slot keeps its index and name; its saved data
@@ -140,33 +157,33 @@
   "Continue" pointer (when it was the last-active slot) is carried across to the fresh id so
   the reset slot stays resumable. Rejects when the slot is missing.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseResetActiveSlot"><code style="text-decoration:none">PromiseResetActiveSlot</code><a href="#PromiseResetActiveSlot" class="hash-link" aria-label="Direct link to PromiseResetActiveSlot" title="Direct link to PromiseResetActiveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L799"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseResetActiveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseResetActiveSlot"><code style="text-decoration:none">PromiseResetActiveSlot</code><a href="#PromiseResetActiveSlot" class="hash-link" aria-label="Direct link to PromiseResetActiveSlot" title="Direct link to PromiseResetActiveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L825"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseResetActiveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Resets the active slot to a fresh empty one -- see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseResetSlot">HasSaveSlots.PromiseResetSlot</a>. The slot
   keeps its index and name; its saved data and metadata (timestamps) start fresh, and the fresh
   slot stays selected. Resolves to the new slot id, or nil when no slot is active.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSetSlotMetadata"><code style="text-decoration:none">PromiseSetSlotMetadata</code><a href="#PromiseSetSlotMetadata" class="hash-link" aria-label="Direct link to PromiseSetSlotMetadata" title="Direct link to PromiseSetSlotMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L813"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSetSlotMetadata</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SaveSlotMetadata</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSetSlotMetadata"><code style="text-decoration:none">PromiseSetSlotMetadata</code><a href="#PromiseSetSlotMetadata" class="hash-link" aria-label="Direct link to PromiseSetSlotMetadata" title="Direct link to PromiseSetSlotMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L839"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSetSlotMetadata</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code><code>,</code></div><div><code>data<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SaveSlotMetadata</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">any</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Sets the metadata for the slot with the given ID</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseGetSlotMetadata"><code style="text-decoration:none">PromiseGetSlotMetadata</code><a href="#PromiseGetSlotMetadata" class="hash-link" aria-label="Direct link to PromiseGetSlotMetadata" title="Direct link to PromiseGetSlotMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L837"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseGetSlotMetadata</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SaveSlotMetadata?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseGetSlotMetadata"><code style="text-decoration:none">PromiseGetSlotMetadata</code><a href="#PromiseGetSlotMetadata" class="hash-link" aria-label="Direct link to PromiseGetSlotMetadata" title="Direct link to PromiseGetSlotMetadata" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L863"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseGetSlotMetadata</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotId<!-- -->: </code><code class="blue_P4bS">SaveSlotData.SlotId</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SaveSlotMetadata?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Gets the metadata for the slot with the given ID</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSlotIdFromIndex"><code style="text-decoration:none">PromiseSlotIdFromIndex</code><a href="#PromiseSlotIdFromIndex" class="hash-link" aria-label="Direct link to PromiseSlotIdFromIndex" title="Direct link to PromiseSlotIdFromIndex" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L850"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSlotIdFromIndex</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotIndex<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSlotIdFromIndex"><code style="text-decoration:none">PromiseSlotIdFromIndex</code><a href="#PromiseSlotIdFromIndex" class="hash-link" aria-label="Direct link to PromiseSlotIdFromIndex" title="Direct link to PromiseSlotIdFromIndex" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L876"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSlotIdFromIndex</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>slotIndex<!-- -->: </code><code class="blue_P4bS">number</code></div></div><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Returns the slot ID from the given index</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLastActiveSlotId"><code style="text-decoration:none">PromiseLastActiveSlotId</code><a href="#PromiseLastActiveSlotId" class="hash-link" aria-label="Direct link to PromiseLastActiveSlotId" title="Direct link to PromiseLastActiveSlotId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L870"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseLastActiveSlotId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLastActiveSlotId"><code style="text-decoration:none">PromiseLastActiveSlotId</code><a href="#PromiseLastActiveSlotId" class="hash-link" aria-label="Direct link to PromiseLastActiveSlotId" title="Direct link to PromiseLastActiveSlotId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L896"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseLastActiveSlotId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Gets the last active slot ID</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectLastSaveSlot"><code style="text-decoration:none">PromiseSelectLastSaveSlot</code><a href="#PromiseSelectLastSaveSlot" class="hash-link" aria-label="Direct link to PromiseSelectLastSaveSlot" title="Direct link to PromiseSelectLastSaveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L881"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectLastSaveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectLastSaveSlot"><code style="text-decoration:none">PromiseSelectLastSaveSlot</code><a href="#PromiseSelectLastSaveSlot" class="hash-link" aria-label="Direct link to PromiseSelectLastSaveSlot" title="Direct link to PromiseSelectLastSaveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L907"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectLastSaveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Selects the player's last active slot if one still exists, resolving to the
   selected slot id -- or nil when there is no slot to continue on. Backs a
   "Continue" affordance that every save-slot consumer tends to need.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectNewSaveSlot"><code style="text-decoration:none">PromiseSelectNewSaveSlot</code><a href="#PromiseSelectNewSaveSlot" class="hash-link" aria-label="Direct link to PromiseSelectNewSaveSlot" title="Direct link to PromiseSelectNewSaveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L904"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectNewSaveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectNewSaveSlot"><code style="text-decoration:none">PromiseSelectNewSaveSlot</code><a href="#PromiseSelectNewSaveSlot" class="hash-link" aria-label="Direct link to PromiseSelectNewSaveSlot" title="Direct link to PromiseSelectNewSaveSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L930"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectNewSaveSlot</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code class="blue_P4bS">Promise.Promise</code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SaveSlotData.SlotId?</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
   Creates a new slot at the lowest free index and selects it, resolving to the
   new slot id -- or nil when every slot is already in use. Backs a "New Game"
   affordance.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectEphemeralSlot"><code style="text-decoration:none">PromiseSelectEphemeralSlot</code><a href="#PromiseSelectEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectEphemeralSlot" title="Direct link to PromiseSelectEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L948"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>metadata<!-- -->: </code><code class="blue_P4bS">SaveSlotCreateMetadata?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseSelectEphemeralSlot"><code style="text-decoration:none">PromiseSelectEphemeralSlot</code><a href="#PromiseSelectEphemeralSlot" class="hash-link" aria-label="Direct link to PromiseSelectEphemeralSlot" title="Direct link to PromiseSelectEphemeralSlot" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L974"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">PromiseSelectEphemeralSlot</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>metadata<!-- -->: </code><code class="blue_P4bS">SaveSlotCreateMetadata?</code><span class="inlineDescription_G7Er">-- <span>
 <p>optional SlotName/Summary for the in-memory slot</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">SlotId</code><code class="op_lSLc">&gt;</code></div><div>
 <p>
@@ -180,14 +197,14 @@
   "Continue" target, so the real slot the player came from resumes untouched afterward. Backs a throwaway
   session (e.g. exploring a lobby) that must leave no trace on save data.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterSummaryProvider"><code style="text-decoration:none">RegisterSummaryProvider</code><a href="#RegisterSummaryProvider" class="hash-link" aria-label="Direct link to RegisterSummaryProvider" title="Direct link to RegisterSummaryProvider" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L980"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">RegisterSummaryProvider</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>provider<!-- -->: </code><code class="blue_P4bS">SummaryProvider</code></div></div><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterSummaryProvider"><code style="text-decoration:none">RegisterSummaryProvider</code><a href="#RegisterSummaryProvider" class="hash-link" aria-label="Direct link to RegisterSummaryProvider" title="Direct link to RegisterSummaryProvider" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L1006"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">RegisterSummaryProvider</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>,</code></div><div><code>name<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>provider<!-- -->: </code><code class="blue_P4bS">SummaryProvider</code></div></div><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code></div><div>
 <p>
   Registers a named summary provider. Every registered provider's current value is aggregated into
   the active slot's Summary, keyed by <code>name</code> (see <a href="/NevermoreEngine/api/HasSaveSlots#PromiseGetSlotMetadata">HasSaveSlots.PromiseGetSlotMetadata</a>). Registering
   the same name again replaces the previous provider. Returns a function that unregisters the provider
   (also give it to a [Maid]).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="_setupPlaytimeTracking"><code style="text-decoration:none">_setupPlaytimeTracking</code><a href="#_setupPlaytimeTracking" class="hash-link" aria-label="Direct link to _setupPlaytimeTracking" title="Direct link to _setupPlaytimeTracking" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L1269"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">_setupPlaytimeTracking</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="_setupPlaytimeTracking"><code style="text-decoration:none">_setupPlaytimeTracking</code><a href="#_setupPlaytimeTracking" class="hash-link" aria-label="Direct link to _setupPlaytimeTracking" title="Direct link to _setupPlaytimeTracking" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Server/Binders/HasSaveSlots.lua#L1295"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>HasSaveSlots<!-- -->.</code><code class="green_DgR4">_setupPlaytimeTracking</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/HasSaveSlots">HasSaveSlots</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Accrues per-slot playtime automatically. A "session" spans the time a slot is the active slot:
   selecting a slot begins one (bumping PlayCount), and deselecting, switching, or unbinding ends
@@ -373,7 +390,7 @@
         },
         {
             &quot;name&quot;: &quot;PromiseExportSlot&quot;,
-            &quot;desc&quot;: &quot;Exports a slot&#x27;s saved data into a plain, serializable [SaveSlotExportUtils.SaveSlotExport].\nRejects the main/default slot: its store is the player&#x27;s shared root datastore, so exporting it\nwould leak the SaveSlots system data and universe-scoped global data living alongside it. Only\nisolated non-main slot substores are exportable.&quot;,
+            &quot;desc&quot;: &quot;Exports a slot&#x27;s saved data into a plain, serializable [SaveSlotExportUtils.SaveSlotExport].\nRejects the main/default slot by default: its store is the player&#x27;s shared root datastore, so\nexporting it would leak the SaveSlots system data and universe-scoped global data living\nalongside it. Only isolated non-main slot substores are exportable.\n\n`allowMainSlot` opts out of that refusal for trusted admin tooling (see [SaveSlotCmdrService]).\nThe SaveSlots system data is always stripped from the result, so the export never carries the\nslot roster or the other slots&#x27; saved data. Universe-scoped global data sharing the root store\nis indistinguishable from the main slot&#x27;s own data and is still carried, which is why this is\nnot exposed through [SaveSlotService].&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -384,6 +401,11 @@
                     &quot;name&quot;: &quot;slotId&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;SlotId&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;allowMainSlot&quot;,
+                    &quot;desc&quot;: &quot;defaults to false&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -394,7 +416,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 283,
+                &quot;line&quot;: 290,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -421,7 +443,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 314,
+                &quot;line&quot;: 332,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -443,6 +465,11 @@
                     &quot;name&quot;: &quot;key&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;string&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;allowMainSlot&quot;,
+                    &quot;desc&quot;: &quot;defaults to false, see [HasSaveSlots.PromiseExportSlot]&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -453,7 +480,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 363,
+                &quot;line&quot;: 382,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -480,7 +507,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 380,
+                &quot;line&quot;: 400,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -507,7 +534,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 401,
+                &quot;line&quot;: 421,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -529,7 +556,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 444,
+                &quot;line&quot;: 464,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -551,7 +578,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 481,
+                &quot;line&quot;: 501,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -573,13 +600,13 @@
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 501,
+                &quot;line&quot;: 521,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
         {
             &quot;name&quot;: &quot;PromiseExportSaveSlotToCode&quot;,
-            &quot;desc&quot;: &quot;Exports a slot to the shared store under a fresh generated code and resolves to that code. The code\nis a shareable handle other sessions load with [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].\nDefaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]). The code\nformat comes from the configured generator (see [HasSaveSlots.SetCodeGenerator]).&quot;,
+            &quot;desc&quot;: &quot;Exports a slot to the shared store under a fresh generated code and resolves to that code. The code\nis a shareable handle other sessions load with [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode].\nDefaults to the active slot. Refuses the main slot unless `allowMainSlot` is set (see\n[HasSaveSlots.PromiseExportSlot]). The code format comes from the configured generator (see\n[HasSaveSlots.SetCodeGenerator]).&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -590,6 +617,11 @@
                     &quot;name&quot;: &quot;slotId&quot;,
                     &quot;desc&quot;: &quot;defaults to the active slot&quot;,
                     &quot;lua_type&quot;: &quot;SlotId?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;allowMainSlot&quot;,
+                    &quot;desc&quot;: &quot;defaults to false, see [HasSaveSlots.PromiseExportSlot]&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -600,7 +632,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 532,
+                &quot;line&quot;: 554,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -627,13 +659,13 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 556,
+                &quot;line&quot;: 579,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
         {
             &quot;name&quot;: &quot;PromiseExportSaveSlotToJson&quot;,
-            &quot;desc&quot;: &quot;Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug\nreport. Defaults to the active slot. Refuses the main slot (see [HasSaveSlots.PromiseExportSlot]).&quot;,
+            &quot;desc&quot;: &quot;Exports a slot as a raw JSON string (no shared store), for direct inspection or attaching to a bug\nreport. Defaults to the active slot. Refuses the main slot unless `allowMainSlot` is set (see\n[HasSaveSlots.PromiseExportSlot]).&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -644,6 +676,11 @@
                     &quot;name&quot;: &quot;slotId&quot;,
                     &quot;desc&quot;: &quot;defaults to the active slot&quot;,
                     &quot;lua_type&quot;: &quot;SlotId?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;allowMainSlot&quot;,
+                    &quot;desc&quot;: &quot;defaults to false, see [HasSaveSlots.PromiseExportSlot]&quot;,
+                    &quot;lua_type&quot;: &quot;boolean?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -654,7 +691,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 570,
+                &quot;line&quot;: 595,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -681,7 +718,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 592,
+                &quot;line&quot;: 618,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -708,7 +745,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 656,
+                &quot;line&quot;: 682,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -730,7 +767,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 709,
+                &quot;line&quot;: 735,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -757,7 +794,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 744,
+                &quot;line&quot;: 770,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -779,7 +816,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 799,
+                &quot;line&quot;: 825,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -811,7 +848,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 813,
+                &quot;line&quot;: 839,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -838,7 +875,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 837,
+                &quot;line&quot;: 863,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -865,7 +902,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 850,
+                &quot;line&quot;: 876,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -887,7 +924,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 870,
+                &quot;line&quot;: 896,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -909,7 +946,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 881,
+                &quot;line&quot;: 907,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -931,7 +968,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 904,
+                &quot;line&quot;: 930,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -958,7 +995,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 948,
+                &quot;line&quot;: 974,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -990,7 +1027,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 980,
+                &quot;line&quot;: 1006,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         },
@@ -1007,7 +1044,7 @@
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 1269,
+                &quot;line&quot;: 1295,
                 &quot;path&quot;: &quot;src/saveslot/src/Server/Binders/HasSaveSlots.lua&quot;
             }
         }
