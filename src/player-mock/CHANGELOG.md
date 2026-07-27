@@ -1,19 +1,13 @@
-# v1.5.2 (Mon Jul 27 2026)
-
-#### 🐛 Bug Fix
-
-- fix(teleportserviceutils): hold one outstanding teleport request at a time [#755](https://github.com/Quenty/NevermoreEngine/pull/755) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.1...@quenty/playermock@1.5.2) (2026-07-27)
+
+### Bug Fixes
+
+- **teleportserviceutils:** hold one outstanding teleport request at a time ([#755](https://github.com/Quenty/NevermoreEngine/issues/755)) ([7e8761e](https://github.com/Quenty/NevermoreEngine/commit/7e8761e5d6becc7391975a5cd465cb8f0ff23b72))
 
 ## [1.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.0...@quenty/playermock@1.5.1) (2026-07-25)
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.40.1...@quenty/remoting@12.40.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/remoting
+
 ## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.40.0...@quenty/remoting@12.40.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/remoting
