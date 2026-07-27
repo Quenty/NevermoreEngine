@@ -134,6 +134,11 @@ local PLAYER_PROPERTIES: { [string]: PropertySpec } = {
 	AccountAge = { default = 0 },
 	HasVerifiedBadge = { default = false },
 	FollowUserId = { default = 0 },
+	-- Method-shaped rather than a property on a real Player (`Player:HasAppearanceLoaded()`), but a
+	-- zero-arg boolean getter reads the same way, so it stands in through the same backing.
+	-- [PlayerMock.loadCharacterAsync] sets it, the way the engine sets it when a spawn finishes
+	-- loading an appearance.
+	HasAppearanceLoaded = { default = false },
 	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
 	RespawnLocation = { instanceValued = true }, -- default nil; checkpoint spawn stand-in
 }
@@ -295,6 +300,98 @@ function PlayerMock.getMockByUserId(userId: number): Player?
 	end
 
 	return nil
+end
+
+--[=[
+	Returns the mocks currently in the DataModel. The mock counterpart of `Players:GetPlayers()`,
+	for code that enumerates the players present rather than resolving one:
+
+	```lua
+	for _, player in Players:GetPlayers() do
+		handlePlayer(player)
+	end
+	for _, player in PlayerMock.getMocks() do
+		handlePlayer(player)
+	end
+	```
+
+	Like the engine call, only mocks in the game resolve -- discovery runs over [PlayerMock.TAG],
+	and tag resolution is DataModel-scoped, so an unparented (or destroyed) mock is not returned.
+
+	@return { Player }
+]=]
+function PlayerMock.getMocks(): { Player }
+	local mocks: { Player } = {}
+	for _, tagged in CollectionService:GetTagged(MOCK_TAG) do
+		if PlayerMock.isMock(tagged) then
+			table.insert(mocks, (tagged :: any) :: Player)
+		end
+	end
+
+	return mocks
+end
+
+-- BindableEvents mirroring the mock tag's CollectionService signals with the [PlayerMock.isMock]
+-- guard already applied, so the exposed signals only ever hand back a genuine mock -- the way
+-- `Players.PlayerAdded` only ever hands back a real `Player`, and a foreign instance merely carrying
+-- the tag can never reach a consumer. Module-level and never torn down, because they mirror the
+-- place-wide tag channel rather than any one consumer's subscription.
+local mockAddedBindable: BindableEvent? = nil
+local mockRemovingBindable: BindableEvent? = nil
+
+--[=[
+	Returns the signal that fires when a mock enters the DataModel. The mock counterpart of
+	`Players.PlayerAdded` -- mocks are invisible to the `Players` service, so code observing joins
+	connects both:
+
+	```lua
+	maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
+	maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(handlePlayer))
+	```
+
+	Membership is carried by [PlayerMock.TAG], whose resolution is DataModel-scoped, so this fires
+	when a mock is parented in -- which is when [PlayerMock.getMocks] starts returning it -- not when
+	it is constructed.
+
+	@return RBXScriptSignal
+]=]
+function PlayerMock.getMockAddedSignal(): RBXScriptSignal
+	local bindable = mockAddedBindable
+	if bindable == nil then
+		bindable = Instance.new("BindableEvent")
+		mockAddedBindable = bindable
+
+		CollectionService:GetInstanceAddedSignal(MOCK_TAG):Connect(function(instance)
+			if PlayerMock.isMock(instance) then
+				(bindable :: BindableEvent):Fire((instance :: any) :: Player)
+			end
+		end)
+	end
+
+	return (bindable :: BindableEvent).Event
+end
+
+--[=[
+	Returns the signal that fires when a mock leaves the DataModel, whether it was destroyed or
+	merely unparented (which is how [PlayerMock.kick] ends a mock). The mock counterpart of
+	`Players.PlayerRemoving`, connected alongside it like [PlayerMock.getMockAddedSignal].
+
+	@return RBXScriptSignal
+]=]
+function PlayerMock.getMockRemovingSignal(): RBXScriptSignal
+	local bindable = mockRemovingBindable
+	if bindable == nil then
+		bindable = Instance.new("BindableEvent")
+		mockRemovingBindable = bindable
+
+		CollectionService:GetInstanceRemovedSignal(MOCK_TAG):Connect(function(instance)
+			if PlayerMock.isMock(instance) then
+				(bindable :: BindableEvent):Fire((instance :: any) :: Player)
+			end
+		end)
+	end
+
+	return (bindable :: BindableEvent).Event
 end
 
 --[=[
@@ -828,7 +925,8 @@ end
 	5. the new character is parented to the Workspace
 	6. `CharacterAdded(new)` fires -- after both the assignment and the Workspace parenting, per
 	   the announcement above (the pre-2019 "not in Workspace yet" gotcha is gone)
-	7. `CharacterAppearanceLoaded(new)` fires -- after `CharacterAdded`, with the rig finalized
+	7. the `HasAppearanceLoaded` stand-in flips true and `CharacterAppearanceLoaded(new)` fires --
+	   after `CharacterAdded`, with the rig finalized
 	8. only then does the call return, mirroring "LoadCharacter returns" ending the announced order
 
 	Per the same announcement, `CharacterAdded` fires only during avatar loading -- which is why a
@@ -877,6 +975,9 @@ function PlayerMock.loadCharacterAsync(player: Player, character: Model?): Model
 	PlayerMock.write(player, "Character", newCharacter)
 	newCharacter.Parent = Workspace
 	PlayerMock.fireSignal(player, "CharacterAdded", newCharacter)
+
+	-- Written before the event fires so a handler that reads the stand-in agrees with the event
+	PlayerMock.write(player, "HasAppearanceLoaded", true)
 	PlayerMock.fireSignal(player, "CharacterAppearanceLoaded", newCharacter)
 
 	return newCharacter

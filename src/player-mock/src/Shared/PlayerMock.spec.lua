@@ -1886,3 +1886,152 @@ describe("PlayerMock.getPlayerScripts", function()
 		folder:Destroy()
 	end)
 end)
+
+describe("PlayerMock.getMocks", function()
+	it("returns a mock parented into the DataModel", function()
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+
+		expect(table.find(PlayerMock.getMocks(), player)).never.toBeNil()
+
+		player:Destroy()
+	end)
+
+	it("does not return an unparented mock", function()
+		local player = PlayerMock.new({ UserId = 1 })
+
+		expect(table.find(PlayerMock.getMocks(), player)).toBeNil()
+
+		player:Destroy()
+	end)
+
+	it("stops returning a mock once it is destroyed", function()
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+		player:Destroy()
+
+		expect(table.find(PlayerMock.getMocks(), player)).toBeNil()
+	end)
+end)
+
+describe("PlayerMock.getMockAddedSignal", function()
+	it("fires when a mock is parented into the DataModel", function()
+		local maid = Maid.new()
+		local added = {}
+		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(function(player)
+			table.insert(added, player)
+		end))
+
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+		task.wait()
+
+		expect(table.find(added, player)).never.toBeNil()
+
+		maid:DoCleaning()
+		player:Destroy()
+	end)
+
+	it("does not fire for a foreign instance carrying the tag", function()
+		local maid = Maid.new()
+		local added = {}
+		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(function(player)
+			table.insert(added, player)
+		end))
+
+		local imposter = Instance.new("Configuration")
+		CollectionService:AddTag(imposter, PlayerMock.TAG)
+		imposter.Parent = workspace
+		task.wait()
+
+		expect(table.find(added, imposter :: any)).toBeNil()
+
+		maid:DoCleaning()
+		imposter:Destroy()
+	end)
+end)
+
+describe("PlayerMock.getMockRemovingSignal", function()
+	it("fires when a mock is destroyed", function()
+		local maid = Maid.new()
+		local removed = {}
+		maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(function(player)
+			table.insert(removed, player)
+		end))
+
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+		task.wait()
+		player:Destroy()
+		task.wait()
+
+		expect(table.find(removed, player)).never.toBeNil()
+
+		maid:DoCleaning()
+	end)
+
+	it("fires when a mock is kicked, which unparents rather than destroys it", function()
+		local maid = Maid.new()
+		local removed = {}
+		maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(function(player)
+			table.insert(removed, player)
+		end))
+
+		local player = PlayerMock.new({ UserId = 1 })
+		player.Parent = workspace
+		task.wait()
+		PlayerMock.kick(player, "Kicked by a test")
+		task.wait()
+
+		expect(table.find(removed, player)).never.toBeNil()
+
+		maid:DoCleaning()
+		player:Destroy()
+	end)
+end)
+
+describe("PlayerMock HasAppearanceLoaded stand-in", function()
+	it("is false before the first spawn", function()
+		local player = PlayerMock.new()
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(false)
+
+		player:Destroy()
+	end)
+
+	it("is true after a spawn", function()
+		local player = PlayerMock.new()
+		PlayerMock.loadMinimalCharacterAsync(player)
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(true)
+
+		player:Destroy()
+	end)
+
+	it("stays false on a plain Character write, which loads no appearance", function()
+		local player = PlayerMock.new()
+		PlayerMock.write(player, "Character", Instance.new("Model"))
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(false)
+
+		player:Destroy()
+	end)
+
+	it("stays true across a despawn", function()
+		local player = PlayerMock.new()
+		PlayerMock.loadMinimalCharacterAsync(player)
+		PlayerMock.removeCharacter(player)
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(true)
+
+		player:Destroy()
+	end)
+
+	it("can be seeded from the overrides", function()
+		local player = PlayerMock.new({ HasAppearanceLoaded = true })
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(true)
+
+		player:Destroy()
+	end)
+end)

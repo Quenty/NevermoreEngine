@@ -5,6 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
@@ -23,10 +25,10 @@ local PlayerUtils = {}
 	@return string -- Formatted name
 ]=]
 function PlayerUtils.formatName(player: Player): string
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	local name = player.Name
-	local displayName = player.DisplayName
+	local displayName = if PlayerMock.isMock(player) then PlayerMock.read(player, "DisplayName") else player.DisplayName
 
 	return PlayerUtils.formatDisplayName(name, displayName)
 end
@@ -134,18 +136,20 @@ function PlayerUtils.promiseLoadCharacter(player: Player): Promise.Promise<Model
 	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return Promise.spawn(function(resolve, reject)
+		local character: Model?
 		local ok, err = pcall(function()
 			if PlayerMock.isMock(player) then
-				PlayerMock.loadCharacterAsync(player)
+				character = PlayerMock.loadCharacterAsync(player)
 			else
 				player:LoadCharacterAsync()
+				character = player.Character
 			end
 		end)
 		if not ok then
 			return reject(err or "Failed to load character")
 		end
 
-		return resolve()
+		return resolve(character)
 	end)
 end
 
@@ -160,21 +164,32 @@ function PlayerUtils.promiseLoadCharacterWithHumanoidDescription(
 	player: Player,
 	humanoidDescription: HumanoidDescription
 ): Promise.Promise<Model>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(
 		typeof(humanoidDescription) == "Instance" and humanoidDescription:IsA("HumanoidDescription"),
 		"Bad humanoidDescription"
 	)
 
 	return Promise.spawn(function(resolve, reject)
+		local character: Model?
 		local ok, err = pcall(function()
-			player:LoadCharacterWithHumanoidDescriptionAsync(humanoidDescription)
+			if PlayerMock.isMock(player) then
+				-- The engine builds the rig from the description before spawning it; the mock's spawn
+				-- path takes the built rig, which is the same split the engine call does internally.
+				character = PlayerMock.loadCharacterAsync(
+					player,
+					Players:CreateHumanoidModelFromDescription(humanoidDescription, Enum.HumanoidRigType.R15)
+				)
+			else
+				player:LoadCharacterWithHumanoidDescriptionAsync(humanoidDescription)
+				character = player.Character
+			end
 		end)
 		if not ok then
 			return reject(err or "Failed to load character")
 		end
 
-		return resolve()
+		return resolve(character)
 	end)
 end
 
