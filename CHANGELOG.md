@@ -1,3 +1,16 @@
+# (Mon Jul 27 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/playermock@1.5.2`, `@quenty/teleportserviceutils@10.2.3`
+  - fix(teleportserviceutils): hold one outstanding teleport request at a time [#755](https://github.com/Quenty/NevermoreEngine/pull/755) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Jul 26 2026)
 
 #### 🐛 Bug Fix

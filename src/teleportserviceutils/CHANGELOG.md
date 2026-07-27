@@ -1,3 +1,15 @@
+# v10.2.3 (Mon Jul 27 2026)
+
+#### 🐛 Bug Fix
+
+- fix(teleportserviceutils): hold one outstanding teleport request at a time [#755](https://github.com/Quenty/NevermoreEngine/pull/755) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
