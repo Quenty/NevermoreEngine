@@ -34,6 +34,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessFactPriority = require("AccessFactPriority")
+local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
 local BaseObject = require("BaseObject")
 local Observable = require("Observable")
 local Rx = require("Rx")
@@ -46,6 +47,37 @@ local ValueObject = require("ValueObject")
 local AccessFact = setmetatable({}, BaseObject)
 AccessFact.ClassName = "AccessFact"
 AccessFact.__index = AccessFact
+
+--[=[
+	An answer with attribution attached. Use where "yes" alone is not enough for the UI you will build:
+	"you own this" is less useful than "you own this because of gamepass 12345", and a friend-granted
+	fact is nearly useless without knowing *which* friend.
+
+	```lua
+	resolve = function(_serviceBag, player)
+		return observeFriendGrant(player):Pipe({
+			Rx.map(function(friend)
+				return AccessFact.contribution(friend ~= nil, { grantedByUserId = friend })
+			end),
+		})
+	end
+	```
+
+	@param value boolean?
+	@param metadata any?
+	@return AccessFactContribution
+]=]
+function AccessFact.contribution(value: boolean?, metadata: any?): AccessFactContribution
+	return { value = value, metadata = metadata }
+end
+
+--[=[
+	@param value any
+	@return boolean
+]=]
+function AccessFact.isContribution(value: any): boolean
+	return type(value) == "table" and (rawget(value, "value") ~= nil or rawget(value, "metadata") ~= nil)
+end
 
 --[=[
 	Returned by a resolver that has nothing to say, so a lower-priority layer answers instead.
@@ -63,10 +95,14 @@ AccessFact.ABSTAIN = newproxy(false)
 	What a layer said. `nil` for the whole contribution means the layer abstained; a contribution whose
 	`value` is nil means the layer answered "unresolved".
 
+	`metadata` is why it said so, in whatever shape the mechanism has: which friend granted access, which
+	gamepass was owned, which allowlist matched. Opaque to this package -- it is carried, printed and
+	handed back, never interpreted -- because only the mechanism knows what is worth attributing.
+
 	@type AccessFactContribution { value: boolean? }?
 	@within AccessFact
 ]=]
-export type AccessFactContribution = { value: boolean? }?
+export type AccessFactContribution = { value: boolean?, metadata: any? }?
 
 --[=[
 	Resolves the fact for one player. Returns anything [ValueObject.Mountable] accepts, so a test can hand
@@ -89,6 +125,7 @@ export type AccessFactResolver = (serviceBag: ServiceBag.ServiceBag, player: Pla
 	.value ValueObject.Mountable<boolean?>? -- game-wide
 	.priority number? -- defaults to AccessFactPriority.DEFAULT
 	.source string? -- label for readouts, defaults to "default"
+	.serverOverrideBehavior string? -- see AccessFactServerOverrideBehavior, defaults to allow-only
 	@within AccessFact
 ]=]
 export type AccessFactOptions = {
@@ -96,6 +133,7 @@ export type AccessFactOptions = {
 	value: ValueObject.Mountable<boolean?>?,
 	priority: number?,
 	source: string?,
+	serverOverrideBehavior: string?,
 }
 
 local DEFAULT_SOURCE = "default"
@@ -106,6 +144,7 @@ export type AccessFact =
 			_factName: string,
 			_priority: number,
 			_source: string,
+			_serverOverrideBehavior: string,
 			_resolve: AccessFactResolver,
 			_serviceBag: ServiceBag.ServiceBag?,
 			-- Weak keys: a player who left is collected along with their cached observable, so nothing has to
@@ -128,12 +167,18 @@ function AccessFact.new(factName: string, options: AccessFactOptions): AccessFac
 	assert(options.resolve == nil or options.value == nil, "Bad options, resolve and value are exclusive")
 	assert(type(options.priority) == "number" or options.priority == nil, "Bad options.priority")
 	assert(type(options.source) == "string" or options.source == nil, "Bad options.source")
+	assert(
+		options.serverOverrideBehavior == nil
+			or AccessFactServerOverrideBehavior.isBehavior(options.serverOverrideBehavior),
+		"Bad options.serverOverrideBehavior"
+	)
 
 	local self: AccessFact = setmetatable(BaseObject.new() :: any, AccessFact)
 
 	self._factName = factName
 	self._priority = options.priority or AccessFactPriority.DEFAULT
 	self._source = options.source or DEFAULT_SOURCE
+	self._serverOverrideBehavior = options.serverOverrideBehavior or AccessFactServerOverrideBehavior.DEFAULT
 	self._observableByPlayer = setmetatable({}, { __mode = "k" }) :: any
 
 	if options.resolve ~= nil then
@@ -194,6 +239,16 @@ function AccessFact.GetSource(self: AccessFact): string
 end
 
 --[=[
+	How this fact's server answer combines with a locally-resolved one. See
+	[AccessFactServerOverrideBehavior].
+
+	@return string
+]=]
+function AccessFact.GetServerOverrideBehavior(self: AccessFact): string
+	return self._serverOverrideBehavior
+end
+
+--[=[
 	What this layer says about the player, live.
 
 	Emits immediately -- unresolved until the resolver answers -- so a consumer always has something to
@@ -225,6 +280,8 @@ function AccessFact.ObserveForPlayer(self: AccessFact, player: Player): Observab
 		Rx.map(function(value: any): AccessFactContribution
 			if value == AccessFact.ABSTAIN then
 				return nil
+			elseif AccessFact.isContribution(value) then
+				return value
 			end
 
 			return { value = value }
@@ -253,11 +310,12 @@ end
 
 	@return { factName: string, priority: number, source: string }
 ]=]
-function AccessFact.GetDebugState(self: AccessFact): { factName: string, priority: number, source: string }
+function AccessFact.GetDebugState(self: AccessFact): { [string]: any }
 	return {
 		factName = self._factName,
 		priority = self._priority,
 		source = self._source,
+		serverOverrideBehavior = self._serverOverrideBehavior,
 	}
 end
 
@@ -276,6 +334,8 @@ function AccessFact._toObservable(value: any): Observable.Observable<any>
 		error(`[AccessFact] - Cannot resolve a fact from a {value.ClassName}`)
 	elseif type(value) == "table" and ValueObject.isValueObject(value) then
 		return (value :: any):Observe()
+	elseif AccessFact.isContribution(value) then
+		return RxAccessStateUtils.ofStatic(value :: any)
 	elseif type(value) == "boolean" or value == nil then
 		return RxAccessStateUtils.ofStatic(value :: boolean?)
 	end

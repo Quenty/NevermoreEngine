@@ -44,7 +44,10 @@ local AccessDataServiceInterface = require("AccessDataServiceInterface")
 local AccessFact = require("AccessFact")
 local AccessFactNames = require("AccessFactNames")
 local AccessFactPriority = require("AccessFactPriority")
+local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
 local AccessFeature = require("AccessFeature")
+local AccessReplicationState = require("AccessReplicationState")
+local AccessReplicationStateUtils = require("AccessReplicationStateUtils")
 local AccessStateUtils = require("AccessStateUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -55,6 +58,7 @@ local Promise = require("Promise")
 local Rx = require("Rx")
 local RxAccessStateUtils = require("RxAccessStateUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
 local ValueObject = require("ValueObject")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
 
@@ -77,6 +81,7 @@ export type AccessFactLayerReport = {
 	priority: number,
 	contributes: boolean,
 	value: boolean?,
+	metadata: any?,
 	decided: boolean,
 }
 
@@ -94,8 +99,16 @@ export type AccessFactLayerReport = {
 export type AccessFactReport = {
 	factName: string,
 	value: boolean?,
+	metadata: any?,
 	decidedBy: string?,
 	layers: { AccessFactLayerReport },
+	-- What this realm worked out on its own, before the server's answer was applied. Kept separate so a
+	-- readout can show both and say which won.
+	localValue: boolean?,
+	serverValue: boolean?,
+	serverState: string,
+	serverOverrideBehavior: string?,
+	serverOverrode: boolean,
 }
 
 --[=[
@@ -121,6 +134,7 @@ type OverrideState = { [string]: OverrideBox }
 
 local EMPTY_OVERRIDE_STATE: OverrideState = {}
 local OVERRIDE_SOURCE = "override"
+local SERVER_SOURCE = "server"
 
 local AccessDataService = {}
 AccessDataService.ServiceName = "AccessDataService"
@@ -129,6 +143,7 @@ export type AccessDataService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
+		_tieRealmService: any,
 		-- Highest priority first, so the merge reads the array in order.
 		-- Loosely typed for the same reason AccessFeature's fact list is: an array of a BaseObject-derived
 		-- class does not unify with itself under the old solver, and the cascade reaches every caller.
@@ -141,6 +156,9 @@ export type AccessDataService = typeof(setmetatable(
 		-- rather than removed, so anything asking about them afterwards completes at once instead of
 		-- subscribing to a live stream that will never fire again.
 		_presenceByPlayer: { [any]: any },
+		_warnedMissingFacts: { [string]: boolean },
+		-- What the server said, per player, per fact. Empty on the server itself.
+		_serverValuesByPlayer: { [any]: any },
 	},
 	{} :: typeof({ __index = AccessDataService })
 ))
@@ -150,11 +168,14 @@ function AccessDataService.Init(self: AccessDataService, serviceBag: ServiceBag.
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._layersByFactName = {}
 	self._features = self._maid:Add(ObservableMap.new()) :: any
 	self._overridesByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._presenceByPlayer = setmetatable({}, { __mode = "k" }) :: any
+	self._warnedMissingFacts = {}
+	self._serverValuesByPlayer = setmetatable({}, { __mode = "k" }) :: any
 
 	self:_registerBuiltInFacts()
 end
@@ -175,7 +196,9 @@ end
 function AccessDataService.Start(self: AccessDataService): ()
 	-- Implemented on ReplicatedStorage because this is a singleton and ReplicatedStorage is the one
 	-- adornee both realms already agree on -- no folder to create, no replication to wait for.
-	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self :: any))
+	self._maid:GiveTask(
+		AccessDataServiceInterface:Implement(ReplicatedStorage, self :: any, self._tieRealmService:GetTieRealm())
+	)
 end
 
 --[=[
@@ -517,6 +540,15 @@ function AccessDataService.GetFeatureNames(self: AccessDataService): { string }
 end
 
 --[=[
+	Every registered feature name, live. Changes as a game registers more.
+
+	@return Observable<{ string }>
+]=]
+function AccessDataService.ObserveFeatureNames(self: AccessDataService): Observable.Observable<{ string }>
+	return self._features:ObserveKeyList() :: any
+end
+
+--[=[
 	Whether the player may use this feature, live.
 
 	Opens on unresolved rather than on nothing, so a consumer always has a state to render. Repeats of the
@@ -706,14 +738,17 @@ function AccessDataService.ObserveFactReport(
 ): Observable.Observable<AccessFactReport>
 	assert(player, "Bad player")
 	assert(
-		self:HasFact(factName),
-		`[AccessDataService] - No fact registered named {factName}. A feature declaring a fact registered in `
-			.. `only one realm will fail here in the other one.`
+		self:HasFact(factName) or self:_hasServerFactValue(player, factName),
+		`[AccessDataService] - No fact named {factName} is registered here and none has been replicated. `
+			.. `Register it in shared code, or let the server replicate it.`
 	)
 
-	local layers = assert(self._layersByFactName[factName], "No layers")
+	-- May legitimately be empty: a fact the client cannot compute is registered only on the server, and
+	-- reaches this realm purely as a replicated value.
+	local layers: { any } = self._layersByFactName[factName] or {}
 	local sources: { [string]: any } = {
 		overrides = self:_observeOverrides(player),
+		serverValue = self:_observeServerFactValue(player, factName),
 	}
 
 	for index, layer in layers do
@@ -740,9 +775,49 @@ function AccessDataService.ObserveFactReport(
 				})
 			end
 
-			return AccessDataService._mergeContributions(factName, contributions)
+			local report = AccessDataService._mergeContributions(factName, contributions)
+			-- No layers means nothing local declared a behavior; the default applies, and rule 2 in
+			-- AccessFactServerOverrideBehavior.combine makes the server's value decide anyway.
+			local behavior = if layers[1] then layers[1]:GetServerOverrideBehavior() else nil
+
+			return AccessDataService._applyServerValue(report, latest.serverValue, behavior)
 		end) :: any,
 	}) :: any
+end
+
+--[=[
+	Folds the server's replicated answer into a locally-merged report, per the fact's
+	[AccessFactServerOverrideBehavior]. The local answer is kept alongside rather than replaced, so a
+	readout can show what this realm thought and what the server said.
+
+	@param report AccessFactReport
+	@param serverValue boolean?
+	@param behavior string?
+	@return AccessFactReport
+	@private
+]=]
+function AccessDataService._applyServerValue(
+	report: AccessFactReport,
+	serverEntry: { value: boolean?, abstained: boolean? }?,
+	behavior: string?
+): AccessFactReport
+	local localValue = report.value
+	local serverValue = if serverEntry then serverEntry.value else nil
+	local serverState = AccessReplicationStateUtils.fromEntry(serverEntry)
+	local combined = AccessFactServerOverrideBehavior.combine(localValue, serverValue, serverState, behavior)
+
+	report.localValue = localValue
+	report.serverValue = serverValue
+	report.serverState = serverState
+	report.serverOverrideBehavior = behavior or AccessFactServerOverrideBehavior.DEFAULT
+	report.serverOverrode = combined ~= localValue
+	report.value = combined
+
+	if report.serverOverrode then
+		report.decidedBy = SERVER_SOURCE
+	end
+
+	return report
 end
 
 --[=[
@@ -844,8 +919,16 @@ function AccessDataService._mergeContributions(
 	local report: AccessFactReport = {
 		factName = factName,
 		value = nil,
+		metadata = nil,
 		decidedBy = nil,
 		layers = {},
+		-- Filled in by _applyServerValue; declared here so the shape is complete from the start rather
+		-- than growing fields partway through the pipeline.
+		localValue = nil,
+		serverValue = nil,
+		serverState = AccessReplicationState.NOT_YET_ARRIVED,
+		serverOverrideBehavior = nil,
+		serverOverrode = false,
 	}
 
 	local alreadyDecided = false
@@ -856,6 +939,9 @@ function AccessDataService._mergeContributions(
 		if decided then
 			alreadyDecided = true
 			report.value = entry.contribution.value
+			-- Attribution follows the answer: the report carries the deciding layer's metadata, because
+			-- the layers it outranked did not decide anything and their reasons would mislead.
+			report.metadata = entry.contribution.metadata
 			report.decidedBy = entry.source
 		end
 
@@ -864,6 +950,7 @@ function AccessDataService._mergeContributions(
 			priority = entry.priority,
 			contributes = contributes,
 			value = if contributes then entry.contribution.value else nil,
+			metadata = if contributes then entry.contribution.metadata else nil,
 			decided = decided,
 		})
 	end
@@ -884,15 +971,112 @@ function AccessDataService._observeFactState(
 
 	local sources: { [string]: any } = {}
 	for _, factName in factNames do
-		sources[factName] = self:ObserveFactReport(player, factName):Pipe({
-			Rx.map(function(report: AccessFactReport)
-				return report.value
-			end) :: any,
-			Rx.distinct() :: any,
-		})
+		if not self:HasFact(factName) then
+			-- No local layer can answer it, so this realm follows the replicated value alone. Observed
+			-- rather than sampled: replication may well arrive after whatever is watching subscribed, and
+			-- a value pinned at subscribe time would leave the feature unresolved forever.
+			--
+			-- Warned about only when nothing has been replicated either, because then genuinely nothing
+			-- can answer it -- usually a fact registered in one realm and not the other.
+			if not self:_hasServerFactValue(player, factName) then
+				self:_warnMissingFactOnce(factName)
+			end
+
+			sources[factName] = self:_observeServerFactValue(player, factName):Pipe({
+				Rx.map(function(entry: any)
+					return if entry then entry.value else nil
+				end) :: any,
+			})
+		else
+			sources[factName] = self:ObserveFactReport(player, factName):Pipe({
+				Rx.map(function(report: AccessFactReport)
+					return report.value
+				end) :: any,
+				Rx.distinct() :: any,
+			})
+		end
 	end
 
 	return Rx.combineLatest(sources) :: any
+end
+
+-- Once per name, because a feature re-derives its fact list on every change and would otherwise warn on
+-- a loop. The registry itself is the real readout -- see GetDebugState and access-facts.
+function AccessDataService._warnMissingFactOnce(self: AccessDataService, factName: string): ()
+	if self._warnedMissingFacts[factName] then
+		return
+	end
+	self._warnedMissingFacts[factName] = true
+
+	warn(
+		`[AccessDataService] - Feature reads fact "{factName}", which is not registered in this realm. `
+			.. `It will read as unresolved. Register the fact in shared code so both realms can answer it.`
+	)
+end
+
+--[=[
+	Records what the server says a fact reads as for this player. Called by the client's replication
+	receiver; the server itself never calls it.
+
+	Replication is unconditional -- every fact's server answer is sent -- and what a client *does* with
+	it is the fact's [AccessFactServerOverrideBehavior]. Splitting it that way means a fact can never
+	accidentally not replicate, only decline to be overridden by what arrived.
+
+	@param player Player
+	@param factName string
+	@param value boolean?
+]=]
+function AccessDataService.SetServerFactValue(
+	self: AccessDataService,
+	player: Player,
+	factName: string,
+	value: boolean?,
+	abstained: boolean?
+): ()
+	assert(player, "Bad player")
+	assert(type(factName) == "string", "Bad factName")
+	assert(type(value) == "boolean" or value == nil, "Bad value")
+
+	local store = self._serverValuesByPlayer[player]
+	if not store then
+		store = ValueObject.new({})
+		self._serverValuesByPlayer[player] = store
+	end
+
+	local next = table.clone(store.Value)
+	-- Boxed, so "the server says unresolved" is distinguishable from "the server has not said anything",
+	-- which is the difference between overriding and not.
+	next[factName] = { value = value, abstained = abstained }
+	store.Value = next
+end
+
+-- Whether the server has ever said anything about this fact for this player. Distinct from the value
+-- being nil, which is the server actively saying "unresolved".
+function AccessDataService._hasServerFactValue(self: AccessDataService, player: Player, factName: string): boolean
+	local store = self._serverValuesByPlayer[player]
+
+	return store ~= nil and (store.Value :: any)[factName] ~= nil
+end
+
+function AccessDataService._observeServerFactValue(
+	self: AccessDataService,
+	player: Player,
+	factName: string
+): Observable.Observable<boolean?>
+	local store = self._serverValuesByPlayer[player]
+	if not store then
+		store = ValueObject.new({})
+		self._serverValuesByPlayer[player] = store
+	end
+
+	return store:Observe():Pipe({
+		Rx.map(function(values: { [string]: any })
+			-- The whole entry, not its value: "no entry" and "an entry whose value is nil" are different
+			-- states and the combine needs to tell them apart.
+			return values[factName]
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
 end
 
 function AccessDataService._observeOverrides(

@@ -233,13 +233,33 @@ describe("AccessDataService.ObserveFeature", function()
 		controller:destroy()
 	end)
 
-	it("errors clearly when a feature declares a fact this realm never registered", function()
+	it("reads a fact this realm never registered as unresolved, without taking the subscriber down", function()
+		-- A feature re-derives its fact list live, so an unregistered fact also happens when one is
+		-- removed underneath a live subscription. Throwing there kills whatever was watching.
 		local controller = setup()
 		local feature = controller.feature("chapters", { "registeredOnlyOnTheServer" })
 
+		local last = nil
 		expect(function()
-			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function() end)
-		end).toThrow("No fact registered")
+			controller.maid:GiveTask(
+				controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function(state)
+					last = state
+				end)
+			)
+		end).never.toThrow()
+
+		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("still errors when a missing fact is asked for directly", function()
+		-- Direct calls are a human asking about a specific fact, where silence is the unhelpful answer.
+		local controller = setup()
+
+		expect(function()
+			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "nosuch")
+		end).toThrow("is registered here and none has been replicated")
 
 		controller:destroy()
 	end)

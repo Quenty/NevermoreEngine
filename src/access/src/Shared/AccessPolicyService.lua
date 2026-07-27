@@ -16,18 +16,25 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
 local AccessDataService = require("AccessDataService")
 local AccessFactNames = require("AccessFactNames")
 local AccessFeature = require("AccessFeature")
 local AccessKickPolicy = require("AccessKickPolicy")
 local AccessPolicy = require("AccessPolicy")
+local AccessPolicyContextUtils = require("AccessPolicyContextUtils")
 local AccessPolicyNames = require("AccessPolicyNames")
+local AccessPolicyServiceInterface = require("AccessPolicyServiceInterface")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
+local Promise = require("Promise")
 local Rx = require("Rx")
-local RunService = game:GetService("RunService")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
 
 local AccessPolicyService = {}
 AccessPolicyService.ServiceName = "AccessPolicyService"
@@ -36,9 +43,10 @@ export type AccessPolicyService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
+		_tieRealmService: any,
 		_accessDataService: AccessDataService.AccessDataService,
 		_policies: any,
-		_enabled: { [string]: boolean? },
+		_enabled: any,
 		-- One maid per player, holding one task per enabled policy, keyed by policy name so a policy can be
 		-- switched off for everyone without disturbing the others.
 		_playerMaids: { [any]: any },
@@ -52,12 +60,15 @@ function AccessPolicyService.Init(self: AccessPolicyService, serviceBag: Service
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._accessDataService = self._serviceBag:GetService(AccessDataService) :: any
 	local policies = ObservableMap.new()
 	self._policies = policies :: any
 	self._maid:GiveTask(policies)
-	self._enabled = {}
+	local enabled = ObservableMap.new()
+	self._enabled = enabled :: any
+	self._maid:GiveTask(enabled)
 	self._playerMaids = {}
 	self._alive = true
 
@@ -70,6 +81,7 @@ function AccessPolicyService._registerBuiltInPolicies(self: AccessPolicyService)
 	self._maid:GiveTask(
 		self:RegisterPolicy(
 			AccessKickPolicy.whenFactIs(
+				self._serviceBag,
 				AccessPolicyNames.KICK_ON_NON_ADMIN,
 				AccessFactNames.PLAYER_IS_ADMIN,
 				false,
@@ -79,7 +91,20 @@ function AccessPolicyService._registerBuiltInPolicies(self: AccessPolicyService)
 	)
 end
 
-function AccessPolicyService.Start(_self: AccessPolicyService): () end
+function AccessPolicyService.Start(self: AccessPolicyService): ()
+	-- Owned here rather than left to an entry point. A policy application is running code -- a
+	-- subscription, a connection, a kick timer -- and leaking one past the session it belonged to is the
+	-- kind of bug that only shows up as a server slowly filling with work for people who left.
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
+		self:RemovePlayer(player)
+	end))
+
+	-- Same adornee as AccessDataServiceInterface: this is a singleton, and ReplicatedStorage is the one
+	-- instance both realms already agree on.
+	self._maid:GiveTask(
+		AccessPolicyServiceInterface:Implement(ReplicatedStorage, self :: any, self._tieRealmService:GetTieRealm())
+	)
+end
 
 --[=[
 	Registers a policy, disabled.
@@ -127,10 +152,10 @@ function AccessPolicyService.SetPolicyEnabled(self: AccessPolicyService, policyN
 	assert(type(enabled) == "boolean", "Bad enabled")
 	assert(self._policies:ContainsKey(policyName), `[AccessPolicyService] - No policy registered named {policyName}`)
 
-	if self._enabled[policyName] == enabled then
+	if self:IsPolicyEnabled(policyName) == enabled then
 		return
 	end
-	self._enabled[policyName] = enabled or nil
+	self._enabled:Set(policyName, enabled or nil)
 
 	for player, playerMaid in self._playerMaids do
 		if enabled then
@@ -148,7 +173,7 @@ end
 function AccessPolicyService.IsPolicyEnabled(self: AccessPolicyService, policyName: string): boolean
 	assert(type(policyName) == "string", "Bad policyName")
 
-	return self._enabled[policyName] == true
+	return self._enabled:Get(policyName) == true
 end
 
 --[=[
@@ -172,6 +197,158 @@ function AccessPolicyService.GetPolicyNames(self: AccessPolicyService): { string
 end
 
 --[=[
+	Whether a policy is running, live. The registry changes at runtime -- a console command flips one,
+	a game registers another -- so anything rendering policy state wants this rather than a snapshot it
+	has to remember to refresh.
+
+	@param policyName string
+	@return Observable<boolean>
+]=]
+function AccessPolicyService.ObserveIsPolicyEnabled(
+	self: AccessPolicyService,
+	policyName: string
+): Observable.Observable<boolean>
+	assert(type(policyName) == "string", "Bad policyName")
+
+	return self._enabled:ObserveAtKey(policyName):Pipe({
+		Rx.map(function(value: boolean?)
+			return value == true
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
+end
+
+--[=[
+	Every registered policy name, live.
+
+	@return Observable<{ string }>
+]=]
+function AccessPolicyService.ObservePolicyNames(self: AccessPolicyService): Observable.Observable<{ string }>
+	return self._policies:ObserveKeyList() :: any
+end
+
+--[=[
+	Which policies read this fact.
+
+	The reverse of [AccessPolicy.GetFactNames], and the question you actually have in a bug report:
+	somebody's fact just flipped, so what acts on it? Declared inputs are what make this answerable at
+	all -- a policy that read facts without declaring them would be invisible here.
+
+	@param factName string
+	@return { string }
+]=]
+function AccessPolicyService.GetPolicyNamesReadingFact(self: AccessPolicyService, factName: string): { string }
+	assert(type(factName) == "string", "Bad factName")
+
+	local names = {}
+	for _, policyName in self._policies:GetKeyList() do
+		if self._policies:Get(policyName):DeclaresFact(factName) then
+			table.insert(names, policyName)
+		end
+	end
+	table.sort(names)
+
+	return names
+end
+
+--[=[
+	Which policies read this feature.
+
+	@param feature AccessFeature
+	@return { string }
+]=]
+function AccessPolicyService.GetPolicyNamesReadingFeature(
+	self: AccessPolicyService,
+	feature: AccessFeature.AccessFeature
+): { string }
+	assert(AccessFeature.isAccessFeature(feature), "Bad feature")
+
+	local names = {}
+	for _, policyName in self._policies:GetKeyList() do
+		if self._policies:Get(policyName):DeclaresFeature(feature) then
+			table.insert(names, policyName)
+		end
+	end
+	table.sort(names)
+
+	return names
+end
+
+--[=[
+	Whether a policy is actually running against this player right now.
+
+	Three things have to be true and each fails differently, which is why asking
+	[AccessPolicyService.IsPolicyEnabled] alone misleads: the policy is enabled, this realm is the one it
+	runs in, and the player is being tracked at all.
+
+	@param player Player
+	@param policyName string
+	@return boolean
+]=]
+function AccessPolicyService.IsPolicyActiveForPlayer(
+	self: AccessPolicyService,
+	player: Player,
+	policyName: string
+): boolean
+	assert(player, "Bad player")
+	assert(type(policyName) == "string", "Bad policyName")
+
+	local policy = self._policies:Get(policyName)
+
+	return policy ~= nil
+		and self:IsPolicyEnabled(policyName)
+		and policy:RunsInRealm(RunService:IsServer())
+		and self._playerMaids[player] ~= nil
+end
+
+--[=[
+	Whether a policy is *active* for this player, live.
+
+	The naming across this service is deliberate and worth knowing: **enabled** is the global switch, and
+	**active** is enabled *and* the right realm *and* this player being tracked. Everything scoped to one
+	player says `ForPlayer`, so which of the two a method means is readable at the call site rather than
+	something you have to remember.
+
+	@param player Player
+	@param policyName string
+	@return Observable<boolean>
+]=]
+function AccessPolicyService.ObserveIsPolicyActiveForPlayer(
+	self: AccessPolicyService,
+	player: Player,
+	policyName: string
+): Observable.Observable<boolean>
+	assert(player, "Bad player")
+
+	return self:ObserveIsPolicyEnabled(policyName):Pipe({
+		Rx.map(function()
+			return self:IsPolicyActiveForPlayer(player, policyName)
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
+end
+
+--[=[
+	Settles once the policy is active for this player. Never resolves false -- a caller waiting on a policy
+	wants to know when it starts, and "not yet" is not an outcome worth settling on.
+
+	@param player Player
+	@param policyName string
+	@return Promise<boolean>
+]=]
+function AccessPolicyService.PromiseIsPolicyActiveForPlayer(
+	self: AccessPolicyService,
+	player: Player,
+	policyName: string
+): Promise.Promise<boolean>
+	return Rx.toPromise(self:ObserveIsPolicyActiveForPlayer(player, policyName):Pipe({
+		Rx.where(function(isActive: boolean)
+			return isActive
+		end) :: any,
+	}) :: any) :: any
+end
+
+--[=[
 	Starts running the enabled policies for a player.
 
 	Called by [AccessService] as players join, and callable directly by a test holding a mock. Idempotent.
@@ -186,7 +363,7 @@ function AccessPolicyService.AddPlayer(self: AccessPolicyService, player: Player
 		local playerMaid = Maid.new()
 		self._playerMaids[player] = playerMaid
 
-		for policyName in self._enabled do
+		for _, policyName in self._enabled:GetKeyList() do
 			playerMaid[policyName] = self:_applyPolicy(policyName, player)
 		end
 	end
@@ -238,7 +415,7 @@ function AccessPolicyService._applyPolicy(self: AccessPolicyService, policyName:
 		return nil
 	end
 
-	local context: AccessPolicy.AccessPolicyContext = {
+	local context = AccessPolicyContextUtils.create({
 		player = player,
 
 		observeFact = function(factName: string): Observable.Observable<boolean?>
@@ -265,7 +442,7 @@ function AccessPolicyService._applyPolicy(self: AccessPolicyService, policyName:
 
 			return self._accessDataService:ObserveFeature(player, feature, subject)
 		end,
-	}
+	})
 
 	return policy:Apply(context)
 end

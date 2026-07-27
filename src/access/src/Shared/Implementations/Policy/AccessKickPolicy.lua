@@ -7,13 +7,13 @@
 
 	```lua
 	accessPolicyService:RegisterPolicy(
-		AccessKickPolicy.whenFactIs("kick-on-non-admin", AccessFactNames.PLAYER_IS_ADMIN, false, {
+		AccessKickPolicy.whenFactIs(serviceBag, "kick-on-non-admin", AccessFactNames.PLAYER_IS_ADMIN, false, {
 			message = "This place is currently limited to the development team.",
 		})
 	)
 
 	accessPolicyService:RegisterPolicy(
-		AccessKickPolicy.whenFeatureDisallowed("kick-without-chapter-access", MyFeatures.Chapters)
+		AccessKickPolicy.whenFeatureDisallowed(serviceBag, "kick-without-chapter-access", MyFeatures.Chapters)
 	)
 	```
 
@@ -50,6 +50,7 @@ local DEFAULT_MESSAGE = "You do not have access to this place."
 export type AccessKickTrigger = (context: AccessPolicy.AccessPolicyContext) -> Observable.Observable<boolean>
 
 export type AccessKickPolicyOptions = {
+	policyName: string,
 	facts: { string }?,
 	features: { AccessFeature.AccessFeature }?,
 	message: string?,
@@ -61,18 +62,19 @@ export type AccessKickPolicyOptions = {
 	[AccessKickPolicy.whenFeatureDisallowed] -- they read better and they get the unresolved rule right
 	without you having to remember it.
 
-	@param policyName string
+	@param serviceBag ServiceBag
 	@param options AccessKickPolicyOptions
 	@return AccessPolicy
 ]=]
-function AccessKickPolicy.new(policyName: string, options: AccessKickPolicyOptions): AccessPolicy.AccessPolicy
+function AccessKickPolicy.new(serviceBag: any, options: AccessKickPolicyOptions): AccessPolicy.AccessPolicy
 	assert(type(options) == "table", "Bad options")
 	assert(type(options.observeShouldKick) == "function", "Bad options.observeShouldKick")
 	assert(type(options.message) == "string" or options.message == nil, "Bad options.message")
 
 	local message = options.message or DEFAULT_MESSAGE
 
-	return AccessPolicy.new(policyName, {
+	return AccessPolicy.new(serviceBag, {
+		policyName = options.policyName,
 		facts = options.facts,
 		features = options.features,
 		-- Kicking is enforcement. The client registers this policy too, so its name autocompletes, but
@@ -94,6 +96,7 @@ end
 	`AccessKickPolicy.whenFactIs("kick-on-non-admin", "playerIsAdmin", false)` reads as what it does:
 	kick when playerIsAdmin is false. Unresolved is not false, so an unanswered lookup kicks nobody.
 
+	@param serviceBag ServiceBag
 	@param policyName string
 	@param factName string
 	@param value boolean
@@ -101,6 +104,7 @@ end
 	@return AccessPolicy
 ]=]
 function AccessKickPolicy.whenFactIs(
+	serviceBag: any,
 	policyName: string,
 	factName: string,
 	value: boolean,
@@ -109,7 +113,8 @@ function AccessKickPolicy.whenFactIs(
 	assert(type(factName) == "string", "Bad factName")
 	assert(type(value) == "boolean", "Bad value")
 
-	return AccessKickPolicy.new(policyName, {
+	return AccessKickPolicy.new(serviceBag, {
+		policyName = policyName,
 		facts = { factName },
 		message = if options then options.message else nil,
 		observeShouldKick = function(context)
@@ -128,19 +133,22 @@ end
 	Skips unresolved, which is the whole trap: an unresolved state *is* a disallowed state, so the obvious
 	`not isAllowed(state)` would kick everyone whose lookup had not landed yet.
 
+	@param serviceBag ServiceBag
 	@param policyName string
 	@param feature AccessFeature
 	@param options { message: string? }?
 	@return AccessPolicy
 ]=]
 function AccessKickPolicy.whenFeatureDisallowed(
+	serviceBag: any,
 	policyName: string,
 	feature: AccessFeature.AccessFeature,
 	options: { message: string? }?
 ): AccessPolicy.AccessPolicy
 	assert(AccessFeature.isAccessFeature(feature), "Bad feature")
 
-	return AccessKickPolicy.new(policyName, {
+	return AccessKickPolicy.new(serviceBag, {
+		policyName = policyName,
 		features = { feature },
 		message = if options then options.message else nil,
 		observeShouldKick = function(context)

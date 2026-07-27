@@ -1,8 +1,11 @@
 --!strict
 --[=[
 	One capability a game gates: entering a chapter, buying an egg, opening a demo area. A feature is
-	policy -- it reads facts and decides. Flags, inversions, and anything else game-shaped live here rather
-	than in [AccessFact], so the same fact can grant one feature and deny another.
+	policy -- it reads facts and **decides**.
+
+	Every judgement lives here: which combination of facts opens a thing, what a release flag means for it,
+	inversions, per-thing context. Facts state what is true; features decide what that is worth. That is
+	why the same fact can grant one feature and deny another.
 
 	```lua
 	-- The common case needs no function.

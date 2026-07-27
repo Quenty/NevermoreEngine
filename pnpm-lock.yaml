@@ -202,9 +202,15 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/binder':
+        specifier: workspace:*
+        version: link:../binder
       '@quenty/cmdrservice':
         specifier: workspace:*
         version: link:../cmdrservice
+      '@quenty/enums':
+        specifier: workspace:*
+        version: link:../enums
       '@quenty/gameconfig':
         specifier: workspace:*
         version: link:../gameconfig
@@ -226,18 +232,27 @@ importers:
       '@quenty/permissionprovider':
         specifier: workspace:*
         version: link:../permissionprovider
+      '@quenty/playerbinder':
+        specifier: workspace:*
+        version: link:../playerbinder
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
+      '@quenty/remoting':
+        specifier: workspace:*
+        version: link:../remoting
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie
@@ -250,6 +265,9 @@ importers:
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
+      '@quentystudios/t':
+        specifier: ^3.0.0
+        version: 3.0.0
 
   src/accessorytypeutils:
     dependencies:

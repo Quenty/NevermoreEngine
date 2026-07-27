@@ -11,6 +11,7 @@ local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
 local AccessFactNames = require("AccessFactNames")
 local AccessFactPriority = require("AccessFactPriority")
+local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
 local AccessFeature = require("AccessFeature")
 local AccessPolicy = require("AccessPolicy")
 local AccessPolicyNames = require("AccessPolicyNames")
@@ -36,6 +37,7 @@ local function setup()
 
 	return {
 		maid = maid,
+		serviceBag = serviceBag,
 		accessDataService = accessDataService,
 		accessPolicyService = accessPolicyService,
 		destroy = function(_self)
@@ -58,6 +60,7 @@ describe("AccessFact.GetDebugState", function()
 			factName = "isStaff",
 			priority = AccessFactPriority.ELEVATED,
 			source = "allowlist",
+			serverOverrideBehavior = AccessFactServerOverrideBehavior.DEFAULT,
 		})
 	end)
 end)
@@ -80,8 +83,10 @@ end)
 
 describe("AccessPolicy.GetDebugState", function()
 	it("says where a policy runs and what it reads", function()
+		local controller = setup()
 		local feature = AccessFeature.anyOf("shop", {})
-		local policy = AccessPolicy.new("closeShop", {
+		local policy = AccessPolicy.new(controller.serviceBag, {
+			policyName = "closeShop",
 			facts = { "isStaff" },
 			features = { feature },
 			realm = AccessPolicyRealm.CLIENT,
@@ -96,6 +101,8 @@ describe("AccessPolicy.GetDebugState", function()
 			facts = { "isStaff" },
 			features = { "shop" },
 		})
+
+		controller:destroy()
 	end)
 end)
 

@@ -24,32 +24,53 @@ npm install @quenty/access --save
 
 ## Why this exists
 
-Access questions get answered in more than one place. The menu decides whether to show a button, the
-storefront decides whether to offer a purchase, and the server decides whether to let someone in — and
-each one grows its own copy of the rule. They drift, and the drift is invisible until a player is stuck
-in a menu that says they can play a game the server has already refused them.
+You can build all of this out of Rx chains, and most games already have. Ownership feeds a
+`combineLatest`, a flag guards it, a subscription somewhere kicks people. It works right up until
+somebody says *"I can't get in"* — and then you are reading four files trying to reconstruct which
+input was false at the time.
 
-This package holds one answer that every surface reads, and — just as importantly — can explain it.
-When somebody says "I can't get in", one console command tells you why.
+This package is not more powerful than the chains it replaces. It is the same logic with two things
+the chains do not give you:
+
+**Instrumentation.** Every input is named, addressable, inspectable and overridable. One console
+command prints the whole decision — every layer, what each said, which one won — and the same
+computation produces both the answer and the explanation, so a readout can never describe a decision
+that was not the one made.
+
+**Legibility.** A named vocabulary means the shape of an access rule is readable without tracing it.
+`kick-on-non-admin reads playerIsAdmin` says more than any chain of operators can.
+
+The cost is a little ceremony. The return is that access stops being the part of the codebase nobody
+wants to touch.
 
 ## Vocabulary
 
-Three things, and keeping them apart is the whole design.
+Three kinds of thing, split so each can be reasoned about on its own terms. That separation is the
+whole design, and it is worth being explicit about *why* each one is separate.
 
-**Facts** are true or false about a player. *Does this player own the game.* A fact never knows what
-it's for, never reads a release flag, and never consults another fact.
+**Facts** state what is true. *Does this player own the game. Is the event running. Is this player
+staff.* Facts include things that sound like switches — whether an event is running is a fact about the
+world — but a fact never **decides** anything: it does not combine other facts into a verdict and never
+reasons about what its answer is for. That restraint is what makes them **easy to test**: one lookup,
+one answer, so the test is "given this stream, assert true, false or unresolved" — no policy, no realms,
+no game state.
 
-**Features** are capabilities a game gates. *May this player enter a chapter.* A feature reads facts and
-applies policy — flags, inversions, per-thing context. The same fact can grant one feature and deny
-another, which is what makes them separate: `ownsGame` grants `chapters` only after launch, but always
-denies `gamePurchase`, because "we haven't opened yet" is no reason to sell someone a game they own.
+**Features** are capabilities a game gates. *May this player enter a chapter.* Features **decide** —
+every judgement lives here, and this is where the **release schedule** sits: which combination of facts
+opens a thing, and when. `ownsGame` grants
+`chapters` only once the game has launched, but always denies `gamePurchase`, because "we have not
+opened yet" is no reason to sell someone a game they already own. Keeping that here means flipping a
+launch is a change to one feature rather than a hunt through every surface that asks.
 
-**Policies** are consequences. *Kick anyone who isn't staff.* A policy reads declared facts and features
-and does something about them. Policies ship **disabled** — turning one on is a deliberate act you can
-see in a readout.
+**Policies** are consequences — the parts with **side effects on the real game**. *Kick anyone who is
+not staff.* Policies are the only kind that *do* anything, which is why they are the only kind that
+ships **disabled**, that declares its inputs, and that has a lifetime you can end.
 
-The boundaries are a guide, not a cage. A fact may aggregate other facts; a feature may be trivial. What
-matters is that the answer stays in one place and stays explainable.
+The three-way split is a convenience, not a law. A fact may aggregate other facts; a feature may be
+trivial; where a rule belongs is sometimes a judgement call. What the split buys is that when
+something is wrong you know which of three questions you are asking: *is the input wrong* (fact), *is
+the rule wrong* (feature), or *is the reaction wrong* (policy). Those are debugged very differently,
+and a single Rx chain makes you answer all three at once.
 
 ### Three answers, not two
 

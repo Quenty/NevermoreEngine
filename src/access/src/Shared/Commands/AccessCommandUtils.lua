@@ -67,6 +67,39 @@ function AccessCommandUtils.parseOverrideValue(text: string): boolean?
 end
 
 --[=[
+	Attribution, rendered inline. Empty when a layer attached none, so the common case stays uncluttered.
+
+	Answers the question a bare "true" cannot: *which* friend granted this, *which* gamepass was owned.
+
+	@param metadata any?
+	@return string
+]=]
+function AccessCommandUtils.describeMetadata(metadata: any?): string
+	if metadata == nil then
+		return ""
+	elseif type(metadata) ~= "table" then
+		return ` [{tostring(metadata)}]`
+	end
+
+	local parts = {}
+	local keys = {}
+	for key in metadata do
+		table.insert(keys, tostring(key))
+	end
+	table.sort(keys)
+
+	for _, key in keys do
+		table.insert(parts, `{key}={tostring(metadata[key])}`)
+	end
+
+	if #parts == 0 then
+		return ""
+	end
+
+	return ` [{table.concat(parts, " ")}]`
+end
+
+--[=[
 	One fact and every layer under it, highest priority first, with the winner marked.
 
 	Losing layers are printed rather than hidden. "Denied and the allowlist said false" and "denied and
@@ -92,11 +125,12 @@ function AccessCommandUtils.formatFactReport(report: any, indent: string?): stri
 		table.insert(
 			lines,
 			string.format(
-				"%s  %-" .. SOURCE_WIDTH .. "s p%-7d %-11s%s",
+				"%s  %-" .. SOURCE_WIDTH .. "s p%-7d %-11s%s%s",
 				pad,
 				layer.source,
 				layer.priority,
 				if layer.contributes then AccessCommandUtils.describeValue(layer.value) else ABSTAINED,
+				AccessCommandUtils.describeMetadata(layer.metadata),
 				if layer.decided then DECIDED_MARKER else ""
 			)
 		)

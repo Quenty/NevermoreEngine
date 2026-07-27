@@ -29,7 +29,9 @@
   ],
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
+    "@quenty/binder": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
+    "@quenty/enums": "workspace:*",
     "@quenty/gameconfig": "workspace:*",
     "@quenty/gameproductservice": "workspace:*",
     "@quenty/loader": "workspace:*",
@@ -37,14 +39,18 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
     "@quenty/permissionprovider": "workspace:*",
+    "@quenty/playerbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"

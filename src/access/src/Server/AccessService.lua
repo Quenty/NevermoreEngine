@@ -22,7 +22,9 @@ local Players = game:GetService("Players")
 
 local AccessCommandService = require("AccessCommandService")
 local AccessDataService = require("AccessDataService")
+local AccessPlayer = require("AccessPlayer")
 local AccessPolicyService = require("AccessPolicyService")
+local AccessReplicationService = require("AccessReplicationService")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
@@ -48,6 +50,8 @@ function AccessService.Init(self: AccessService, serviceBag: ServiceBag.ServiceB
 	self._accessDataService = self._serviceBag:GetService(AccessDataService) :: any
 	self._accessPolicyService = self._serviceBag:GetService(AccessPolicyService) :: any
 	self._serviceBag:GetService(AccessCommandService)
+	self._serviceBag:GetService(AccessReplicationService)
+	self._serviceBag:GetService(AccessPlayer)
 end
 
 function AccessService.Start(self: AccessService): ()

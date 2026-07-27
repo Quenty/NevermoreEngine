@@ -19,7 +19,9 @@ local require = require(script.Parent.loader).load(script)
 
 local AccessCommandServiceClient = require("AccessCommandServiceClient")
 local AccessDataService = require("AccessDataService")
+local AccessPlayerClient = require("AccessPlayerClient")
 local AccessPolicyService = require("AccessPolicyService")
+local AccessReplicationServiceClient = require("AccessReplicationServiceClient")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
@@ -47,6 +49,8 @@ function AccessServiceClient.Init(self: AccessServiceClient, serviceBag: Service
 	-- client-side; the service skips them.
 	self._accessPolicyService = self._serviceBag:GetService(AccessPolicyService) :: any
 	self._serviceBag:GetService(AccessCommandServiceClient)
+	self._serviceBag:GetService(AccessReplicationServiceClient)
+	self._serviceBag:GetService(AccessPlayerClient)
 end
 
 function AccessServiceClient.Start(_self: AccessServiceClient): () end

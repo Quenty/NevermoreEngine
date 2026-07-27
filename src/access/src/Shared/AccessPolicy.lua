@@ -4,7 +4,8 @@
 	and a policy is the consequence -- kicking, teleporting, closing a door.
 
 	```lua
-	AccessPolicy.new("kickOnNonAdmin", {
+	AccessPolicy.new(serviceBag, {
+		policyName = "kickOnNonAdmin",
 		facts = { AccessFactNames.PLAYER_IS_ADMIN },
 		apply = function(context)
 			return context.observeFact(AccessFactNames.PLAYER_IS_ADMIN):Subscribe(function(isAdmin)
@@ -33,77 +34,87 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local AccessFeature = require("AccessFeature")
-local AccessPolicyRealm = require("AccessPolicyRealm")
-local AccessStateUtils = require("AccessStateUtils")
-local Observable = require("Observable")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local AccessPolicy = {}
+local AccessFeature = require("AccessFeature")
+local AccessPolicyContextUtils = require("AccessPolicyContextUtils")
+local AccessPolicyRealm = require("AccessPolicyRealm")
+local AccessPolicyServiceInterface = require("AccessPolicyServiceInterface")
+local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local MaidTaskUtils = require("MaidTaskUtils")
+local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
+
+local AccessPolicy = setmetatable({}, BaseObject)
 AccessPolicy.ClassName = "AccessPolicy"
 AccessPolicy.__index = AccessPolicy
 
 --[=[
-	What a policy is handed when it is applied to a player. `observeFact` and `observeFeature` refuse
-	anything the policy did not declare, so the declaration cannot drift from what it actually reads.
-
-	@interface AccessPolicyContext
-	.player Player
-	.observeFact (factName: string) -> Observable<boolean?>
-	.observeFeature (feature: AccessFeature, subject: any?) -> Observable<AccessState>
+	@type AccessPolicyContext AccessPolicyContextUtils.AccessPolicyContext
 	@within AccessPolicy
 ]=]
-export type AccessPolicyContext = {
-	player: Player,
-	observeFact: (factName: string) -> Observable.Observable<boolean?>,
-	observeFeature: (
-		feature: AccessFeature.AccessFeature,
-		subject: any?
-	) -> Observable.Observable<AccessStateUtils.AccessState>,
-}
+export type AccessPolicyContext = AccessPolicyContextUtils.AccessPolicyContext
 
 --[=[
-	Runs the policy for one player. Return anything a [Maid] can clean up; it is torn down when the policy
-	is disabled or the player leaves.
+	Runs the policy for one player. Return a [MaidTaskUtils.MaidTask] -- a subscription, a connection, a
+	function -- and it is cleaned up when the policy is disabled, the player leaves, or the policy itself
+	is destroyed.
 
-	@type AccessPolicyApply (AccessPolicyContext) -> any
+	@type AccessPolicyApply (AccessPolicyContext) -> MaidTask?
 	@within AccessPolicy
 ]=]
-export type AccessPolicyApply = (context: AccessPolicyContext) -> any
+export type AccessPolicyApply = (context: AccessPolicyContext) -> MaidTaskUtils.MaidTask?
 
 export type AccessPolicyOptions = {
+	policyName: string,
 	facts: { string }?,
 	features: { AccessFeature.AccessFeature }?,
 	realm: string?,
 	apply: AccessPolicyApply,
 }
 
-export type AccessPolicy = typeof(setmetatable(
-	{} :: {
-		_policyName: string,
-		_factNames: { string },
-		_features: { AccessFeature.AccessFeature },
-		_apply: AccessPolicyApply,
-		_realm: string,
-	},
-	{} :: typeof({ __index = AccessPolicy })
-))
+export type AccessPolicy =
+	typeof(setmetatable(
+		{} :: {
+			_policyName: string,
+			_factNames: { string },
+			_features: { AccessFeature.AccessFeature },
+			_apply: AccessPolicyApply,
+			_realm: string,
+			_serviceBag: ServiceBag.ServiceBag,
+			_tieRealmService: any,
+		},
+		{} :: typeof({ __index = AccessPolicy })
+	))
+	& BaseObject.BaseObject
 
 --[=[
-	@param policyName string
+	A [ServiceBag] rather than none, because a policy has to look itself up through
+	[AccessPolicyServiceInterface] and that lookup needs a tie realm. Taking the bag means the realm comes
+	from [TieRealmService] -- the same source production uses -- rather than being guessed from
+	`RunService`, which is what a test running both realms in one DataModel would get wrong.
+
+	Policies are built by application code, which already has a bag, so this costs the caller nothing.
+
+	@param serviceBag ServiceBag
 	@param options AccessPolicyOptions
 	@return AccessPolicy
 ]=]
-function AccessPolicy.new(policyName: string, options: AccessPolicyOptions): AccessPolicy
-	assert(type(policyName) == "string" and policyName ~= "", "Bad policyName")
+function AccessPolicy.new(serviceBag: ServiceBag.ServiceBag, options: AccessPolicyOptions): AccessPolicy
+	assert(serviceBag, "No serviceBag")
 	assert(type(options) == "table", "Bad options")
+	assert(type(options.policyName) == "string" and options.policyName ~= "", "Bad options.policyName")
 	assert(type(options.apply) == "function", "Bad options.apply")
 	assert(type(options.facts) == "table" or options.facts == nil, "Bad options.facts")
 	assert(type(options.features) == "table" or options.features == nil, "Bad options.features")
 	assert(type(options.realm) == "string" or options.realm == nil, "Bad options.realm")
 
-	local self: AccessPolicy = setmetatable({} :: any, AccessPolicy)
+	local self: AccessPolicy = setmetatable(BaseObject.new() :: any, AccessPolicy)
 
-	self._policyName = policyName
+	self._serviceBag = serviceBag
+	self._tieRealmService = self._serviceBag:GetService(TieRealmService)
+	self._policyName = options.policyName
 	self._factNames = if options.facts then table.clone(options.facts) else {}
 	self._features = if options.features then table.clone(options.features) else {}
 	self._apply = options.apply
@@ -200,13 +211,81 @@ function AccessPolicy.GetDebugState(self: AccessPolicy): {
 end
 
 --[=[
+	Whether this policy is *active* for the player right now: enabled, in this realm, and this player
+	being tracked. See [AccessPolicyService] for the enabled-versus-active distinction.
+
+	Shallow: it asks the service through [AccessPolicyServiceInterface] rather than holding one, so a
+	policy stays a description that happens to be able to look itself up, and answers false in a game
+	with no access service rather than erroring.
+
+	@param player Player
+	@return boolean
+]=]
+function AccessPolicy._findService(self: AccessPolicy): any
+	return AccessPolicyServiceInterface:Find(ReplicatedStorage, self._tieRealmService:GetTieRealm())
+end
+
+function AccessPolicy.IsPolicyActiveForPlayer(self: AccessPolicy, player: Player): boolean
+	local service = self:_findService()
+	if not service then
+		return false
+	end
+
+	return (service :: any):IsPolicyActiveForPlayer(player, self._policyName)
+end
+
+--[=[
+	The same question, live.
+
+	@param player Player
+	@return Observable<boolean>
+]=]
+function AccessPolicy.ObserveIsPolicyActiveForPlayer(self: AccessPolicy, player: Player): any
+	local service = assert(self:_findService(), "[AccessPolicy] - No AccessPolicyService is running")
+
+	return (service :: any):ObserveIsPolicyActiveForPlayer(player, self._policyName)
+end
+
+--[=[
+	Settles once this policy is running for the player.
+
+	@param player Player
+	@return Promise<boolean>
+]=]
+function AccessPolicy.PromiseIsPolicyActiveForPlayer(self: AccessPolicy, player: Player): any
+	local service = assert(self:_findService(), "[AccessPolicy] - No AccessPolicyService is running")
+
+	return (service :: any):PromiseIsPolicyActiveForPlayer(player, self._policyName)
+end
+
+--[=[
 	Runs the policy. Called by [AccessPolicyService] when the policy is enabled for a player.
 
+	The returned task is owned twice over: by the caller, which drops it when the policy is disabled or
+	the player leaves, and by this policy, which drops it when the policy itself is destroyed. Unlike
+	[AccessFact] and [AccessFeature] -- which are inert descriptions -- a policy is *running*, so it needs
+	a lifetime of its own and everything it started has to end with it.
+
 	@param context AccessPolicyContext
-	@return any -- A maid task
+	@return MaidTask?
 ]=]
-function AccessPolicy.Apply(self: AccessPolicy, context: AccessPolicyContext): any
-	return self._apply(context)
+function AccessPolicy.Apply(self: AccessPolicy, context: AccessPolicyContext): MaidTaskUtils.MaidTask?
+	local task = self._apply(context)
+	if task == nil then
+		return nil
+	end
+
+	assert(MaidTaskUtils.isValidTask(task), "Bad task returned from an AccessPolicy apply")
+
+	-- Held by the policy as well as the caller, so destroying a policy stops everything it started even
+	-- if whoever applied it forgets.
+	local applicationMaid = self._maid:Add(Maid.new())
+	applicationMaid:GiveTask(task)
+
+	return function()
+		applicationMaid:DoCleaning()
+		self._maid[applicationMaid] = nil
+	end
 end
 
 return AccessPolicy
