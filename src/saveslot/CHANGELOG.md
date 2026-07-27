@@ -1,3 +1,15 @@
+# v2.4.0 (Mon Jul 27 2026)
+
+#### 🚀 Enhancement
+
+- feat(saveslot): run consumer callbacks before a slot is selected [#758](https://github.com/Quenty/NevermoreEngine/pull/758) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

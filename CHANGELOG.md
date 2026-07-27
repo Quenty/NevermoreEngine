@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/saveslot@2.4.0`
+  - feat(saveslot): run consumer callbacks before a slot is selected [#758](https://github.com/Quenty/NevermoreEngine/pull/758) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 27 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/saveslot@2.3.0`
   - feat(saveslot): save slot commands take a players argument [#756](https://github.com/Quenty/NevermoreEngine/pull/756) ([@Quenty](https://github.com/Quenty))
 
