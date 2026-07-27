@@ -350,8 +350,10 @@ function AccessFact.GetDebugState(self: AccessFact): { [string]: any }
 	}
 end
 
--- ValueObject.Mountable, unrolled. ValueObject itself only exposes this through Mount, which would mean
--- owning a ValueObject per player just to read one value out of it.
+--[[
+	ValueObject.Mountable, unrolled. ValueObject only exposes this through Mount, which would mean owning
+	a ValueObject per player just to read one value out of it.
+]]
 function AccessFact._toObservable(value: any): Observable.Observable<any>
 	if value == AccessFact.ABSTAIN then
 		return RxAccessStateUtils.ofStatic(AccessFact.ABSTAIN :: any)

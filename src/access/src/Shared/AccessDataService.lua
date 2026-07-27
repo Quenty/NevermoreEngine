@@ -185,8 +185,10 @@ function AccessDataService.Init(self: AccessDataService, serviceBag: ServiceBag.
 	self:_registerBuiltInFacts()
 end
 
--- Registered here rather than left to each game, so a console command and a feature can rely on these
--- names existing. All at AccessFactPriority.BUILT_IN, so a game that disagrees layers over them.
+--[[
+	Registered here rather than left to each game, so a command or a feature can rely on these names
+	existing. All at AccessFactPriority.BUILT_IN, so a game that disagrees layers over them.
+]]
 function AccessDataService._registerBuiltInFacts(self: AccessDataService): ()
 	self._maid:GiveTask(self:RegisterFact(PlayerIsAdminAccessFact.new(self._serviceBag)))
 	self._maid:GiveTask(self:RegisterFact(OwnsGameAccessFact.new(self._serviceBag)))
@@ -206,10 +208,11 @@ function AccessDataService.Start(self: AccessDataService): ()
 	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
 end
 
--- This class is shared, but the tie declares the override setters SERVER-only, and a tie refuses a
--- client implementation that exposes a server-only member. So the implementer is built for the realm
--- rather than being `self`: the setters are simply not there on a client, which is the same rule the
--- interface already states, enforced rather than described.
+--[[
+	This class is shared, but the tie declares the override setters SERVER-only and refuses a client
+	implementation that exposes one. So the implementer is built for the realm rather than being `self`:
+	on a client the setters are simply not there.
+]]
 function AccessDataService._buildTieImplementer(self: AccessDataService): any
 	local implementer = {}
 
@@ -233,8 +236,10 @@ function AccessDataService._buildTieImplementer(self: AccessDataService): any
 		"TeardownPlayer",
 	}
 
-	-- Declared with a receiver: the tie invokes members method-style, so the first argument is the
-	-- implementer and the real arguments follow it.
+	--[[
+		Declared with a receiver: the tie invokes members method-style, so the first argument is the
+		implementer and the real arguments follow it.
+	]]
 	local function delegate(methodName: string)
 		implementer[methodName] = function(_implementer, ...)
 			return (self :: any)[methodName](self, ...)
@@ -403,8 +408,10 @@ function AccessDataService.ObserveIsPlayerPresent(
 	return self:_getPresence(player):Observe() :: any
 end
 
--- Fires once, when the player goes. Already-departed players fire immediately, which is what makes a
--- subscription taken out after they left complete rather than hang.
+--[[
+	Fires once, when the player goes. Already-departed players fire immediately, which is what makes a
+	subscription taken out after they left complete rather than hang.
+]]
 function AccessDataService._observePlayerRemoving(self: AccessDataService, player: Player): any
 	return self:_getPresence(player):Observe():Pipe({
 		Rx.where(function(present: boolean)
@@ -869,7 +876,7 @@ end
 	readout can show what this realm thought and what the server said.
 
 	@param report AccessFactReport
-	@param serverValue boolean?
+	@param serverEntry { value: boolean?, abstained: boolean? }?
 	@param behavior string?
 	@return AccessFactReport
 	@private
@@ -978,9 +985,11 @@ function AccessDataService.GetDebugState(
 	return { facts = facts, features = features }
 end
 
--- The replicated answer as a layer, plus where it belongs relative to the local ones. This is the whole
--- of what a behavior means, expressed as position rather than as a post-hoc override: a layer above the
--- locals wins when it speaks, and one below only answers what they left open.
+--[[
+	The replicated answer as a layer, plus where it sits relative to the local ones. That position is the
+	whole of what a behavior means: a layer above the locals wins when it speaks, one below only answers
+	what they left open.
+]]
 function AccessDataService._replicatedContribution(
 	serverEntry: { value: boolean?, abstained: boolean?, metadata: any? }?,
 	behavior: string?
@@ -1101,8 +1110,10 @@ function AccessDataService._mergeContributions(
 	return report
 end
 
--- The facts a feature declared, folded into one table. Facts it did not declare are absent, so a
--- mechanism that is broken or slow only stalls the features that actually asked about it.
+--[[
+	The facts a feature declared, folded into one table. Facts it did not declare are absent, so a
+	mechanism that is broken or slow only stalls the features that asked about it.
+]]
 function AccessDataService._observeFactState(
 	self: AccessDataService,
 	player: Player,
@@ -1145,8 +1156,10 @@ function AccessDataService._observeFactState(
 	return Rx.combineLatest(sources) :: any
 end
 
--- Once per name, because a feature re-derives its fact list on every change and would otherwise warn on
--- a loop. The registry itself is the real readout -- see GetDebugState and access-facts.
+--[[
+	Once per name, because a feature re-derives its fact list on every change and would otherwise warn in
+	a loop.
+]]
 function AccessDataService._warnMissingFactOnce(self: AccessDataService, factName: string): ()
 	if self._warnedMissingFacts[factName] then
 		return
@@ -1196,8 +1209,10 @@ function AccessDataService.SetServerFactValue(
 	store.Value = next
 end
 
--- Whether the server has ever said anything about this fact for this player. Distinct from the value
--- being nil, which is the server actively saying "unresolved".
+--[[
+	Whether the server has ever said anything about this fact for this player. Distinct from the value
+	being nil, which is the server actively saying "unresolved".
+]]
 function AccessDataService._hasServerFactValue(self: AccessDataService, player: Player, factName: string): boolean
 	local store = self._serverValuesByPlayer[player]
 
@@ -1232,9 +1247,10 @@ function AccessDataService._observeOverrides(
 	return self:_getOverrides(player):Observe() :: any
 end
 
--- Created on first use rather than on join: a game with no overrides in play allocates nothing, and there
--- is no player lifecycle to hook. Not held by the maid on purpose -- a strong reference here would defeat
--- the weak keys and keep every player who ever joined alive for the session.
+--[[
+	Created on first use, and deliberately not held by the maid: a strong reference here would defeat the
+	weak keys and keep every player who ever joined alive for the session.
+]]
 function AccessDataService._getOverrides(
 	self: AccessDataService,
 	player: Player

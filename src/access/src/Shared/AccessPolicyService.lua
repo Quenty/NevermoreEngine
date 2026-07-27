@@ -75,8 +75,10 @@ function AccessPolicyService.Init(self: AccessPolicyService, serviceBag: Service
 	self:_registerBuiltInPolicies()
 end
 
--- Registered in both realms so the name exists everywhere, and disabled so shipping one does not switch
--- it on. A game that wants different wording registers its own and leaves this one off.
+--[[
+	Registered in both realms so the name exists everywhere, and disabled so shipping one does not switch
+	it on. A game that wants different wording registers its own and leaves this one off.
+]]
 function AccessPolicyService._registerBuiltInPolicies(self: AccessPolicyService): ()
 	self._maid:GiveTask(
 		self:RegisterPolicy(
@@ -404,8 +406,10 @@ function AccessPolicyService.GetDebugState(self: AccessPolicyService): { [string
 	return described
 end
 
--- Builds the context a policy is applied with. Fact and feature access is scoped to what the policy
--- declared, so the declaration in the readout is the whole truth about its inputs.
+--[[
+	Fact and feature access is scoped to what the policy declared, so the declaration in the readout is
+	the whole truth about its inputs.
+]]
 function AccessPolicyService._applyPolicy(self: AccessPolicyService, policyName: string, player: Player): any
 	local policy = assert(self._policies:Get(policyName), "No policy")
 

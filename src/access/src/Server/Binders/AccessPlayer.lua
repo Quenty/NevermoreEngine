@@ -17,6 +17,7 @@ local AccessPlayerInterface = require("AccessPlayerInterface")
 local AccessPolicyService = require("AccessPolicyService")
 local Binder = require("Binder")
 local PlayerBinder = require("PlayerBinder")
+local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
 
 local AccessPlayer = setmetatable({}, AccessPlayerBase)
@@ -27,6 +28,7 @@ export type AccessPlayer =
 	typeof(setmetatable(
 		{} :: {
 			_accessPolicyService: any,
+			_remoting: any,
 		},
 		{} :: typeof({ __index = AccessPlayer })
 	))
@@ -39,17 +41,18 @@ function AccessPlayer.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ac
 
 	self._maid:GiveTask(AccessPlayerInterface.Server:Implement(self._obj :: Instance, self :: any))
 
+	self._remoting = self._maid:Add(Remoting.Server.new(self._obj :: Instance, "AccessPlayerDebug"))
+	self._remoting.GetClientAccessState:DeclareMethod()
+
 	self:_replicateFacts()
 
 	return self
 end
 
--- Writes what this server resolved onto the player, for every client to read. Owned by the player
--- object rather than by a service, so a player's access state arrives and leaves with them and any
--- client can read any player's.
---
--- The whole set is written at once: a UI reading a half-updated map would show a player as lacking
--- something they hold, which is exactly the flicker this package exists to avoid.
+--[[
+	Writes what this server resolved onto the player, for any client to read. The whole set goes at
+	once: a UI reading a half-updated map would show a player as lacking something they hold.
+]]
 function AccessPlayer._replicateFacts(self: AccessPlayer): ()
 	self._maid:GiveTask(self._accessDataService:ObserveFactReports(self._obj):Subscribe(function(reports: any)
 		local entries = {}
@@ -68,6 +71,22 @@ function AccessPlayer._replicateFacts(self: AccessPlayer): ()
 
 		self._replicatedFacts.Value = entries
 	end))
+end
+
+--[=[
+	Asks this player's client what *it* thinks their access is.
+
+	For a console readout only. The answer is never used to decide anything -- a client that could report
+	its own access authoritatively could grant itself whatever it liked. Its worth is that a person can
+	see both realms at once, and a disagreement is exactly the bug this package exists to make visible.
+
+	Rejects if the client does not answer, which is itself informative: it means their realm never got
+	far enough to have a view.
+
+	@return Promise<{ [string]: any }>
+]=]
+function AccessPlayer.PromiseClientAccessState(self: AccessPlayer): any
+	return self._remoting.GetClientAccessState:PromiseInvokeClient(self._obj)
 end
 
 --[=[

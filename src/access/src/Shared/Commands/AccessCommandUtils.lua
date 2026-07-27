@@ -23,6 +23,20 @@ AccessCommandUtils.ToggleValues = {
 	OFF = "off",
 }
 
+--[=[
+	Which realm a readout should come from. `both` is the one worth reaching for: the server and the
+	client disagreeing about a fact is the failure this package exists to make visible, and it is
+	invisible from either side alone.
+
+	@prop RealmValues { SERVER: string, CLIENT: string, BOTH: string }
+	@within AccessCommandUtils
+]=]
+AccessCommandUtils.RealmValues = {
+	SERVER = "server",
+	CLIENT = "client",
+	BOTH = "both",
+}
+
 AccessCommandUtils.OverrideValues = {
 	TRUE = "true",
 	FALSE = "false",
@@ -31,6 +45,20 @@ AccessCommandUtils.OverrideValues = {
 
 local DECIDED_MARKER = " <-- decided"
 local SOURCE_WIDTH = 16
+
+--[[
+	GOTCHA: keeps the LAST emission, not the first. A fact opens on unresolved before anything is looked
+	up, so taking the first would print "unresolved" for everything however well resolved it is.
+]]
+local function readOnce(observable: any): any
+	local captured = nil
+	local subscription = observable:Subscribe(function(value)
+		captured = value
+	end)
+	subscription:Destroy()
+
+	return captured
+end
 
 --[=[
 	How a tri-state reads to a human. Never blank -- an empty column in a readout looks like a bug in the
@@ -245,6 +273,67 @@ function AccessCommandUtils.formatPlayerState(
 end
 
 --[=[
+	Everything a readout needs about one player, gathered from whichever realm this runs on.
+
+	Shared rather than written twice, because the whole value of showing the client's view next to the
+	server's is that a difference between them is a real difference and not two formatters disagreeing.
+
+	The result is plain tables so it can be sent over remoting for exactly that comparison.
+
+	@param accessDataService AccessDataService
+	@param accessPolicyService AccessPolicyService
+	@param player Player
+	@return { featureReports: { AccessFeatureReport }, factReports: { [string]: AccessFactReport }, policies: { any } }
+]=]
+function AccessCommandUtils.collectPlayerState(accessDataService: any, accessPolicyService: any, player: Player): any
+	assert(accessDataService, "No accessDataService")
+	assert(player, "No player")
+
+	local featureReports = {}
+	for _, featureName in accessDataService:GetFeatureNames() do
+		local feature = accessDataService:GetFeature(featureName)
+		if feature then
+			-- Subject-parameterized features are evaluated with no subject, which is the honest answer to
+			-- "what does this feature say about the player alone".
+			local report = readOnce(accessDataService:ObserveFeatureReport(player, feature))
+			if report then
+				table.insert(featureReports, report)
+			end
+		end
+	end
+
+	local policies = {}
+	if accessPolicyService then
+		for _, policyName in accessPolicyService:GetPolicyNames() do
+			local policy = accessPolicyService:GetPolicy(policyName)
+			if policy then
+				table.insert(policies, {
+					policyName = policyName,
+					enabled = accessPolicyService:IsPolicyEnabled(policyName),
+					facts = policy:GetFactNames(),
+				})
+			end
+		end
+	end
+
+	return {
+		featureReports = featureReports,
+		factReports = readOnce(accessDataService:ObserveFactReports(player)) or {},
+		policies = policies,
+	}
+end
+
+--[=[
+	Renders what [AccessCommandUtils.collectPlayerState] gathered.
+
+	@param collected any
+	@return string
+]=]
+function AccessCommandUtils.formatCollectedPlayerState(collected: any): string
+	return AccessCommandUtils.formatPlayerState(collected.featureReports, collected.factReports, collected.policies)
+end
+
+--[=[
 	Registers the fact-name and override-value argument types. Called on both realms -- the client needs
 	them for autocomplete, the server to validate.
 
@@ -311,6 +400,14 @@ function AccessCommandUtils.registerTypes(cmdr: any, accessDataService: any, get
 		cmdr.Util.MakeEnumType("accessToggle", {
 			AccessCommandUtils.ToggleValues.ON,
 			AccessCommandUtils.ToggleValues.OFF,
+		})
+	)
+	cmdr.Registry:RegisterType(
+		"accessRealm",
+		cmdr.Util.MakeEnumType("accessRealm", {
+			AccessCommandUtils.RealmValues.SERVER,
+			AccessCommandUtils.RealmValues.CLIENT,
+			AccessCommandUtils.RealmValues.BOTH,
 		})
 	)
 	-- Cmdr has no RegisterEnumType; an enum is a type object built by Util.MakeEnumType and registered

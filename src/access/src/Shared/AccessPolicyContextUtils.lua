@@ -40,8 +40,10 @@ export type AccessPolicyContext = {
 	observeFeature: (feature: any, subject: any?) -> any,
 }
 
--- A mock is a Player as far as every policy is concerned, and refusing one here would make policies
--- untestable without a real session.
+--[[
+	A mock is a Player as far as every policy is concerned, and refusing one here would make policies
+	untestable without a real session.
+]]
 local function isPlayerLike(value: any): (boolean, string?)
 	if typeof(value) == "Instance" and value:IsA("Player") then
 		return true

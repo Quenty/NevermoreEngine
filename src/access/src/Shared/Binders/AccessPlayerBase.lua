@@ -81,9 +81,7 @@ export type AccessPlayerBase =
 --[=[
 	@param player Player
 	@param serviceBag ServiceBag
-	@AccessPlayerBase.REPLICATED_FACTS_ATTRIBUTE = REPLICATED_FACTS_ATTRIBUTE
-
-return AccessPlayerBase
+	@return AccessPlayerBase
 ]=]
 function AccessPlayerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag): AccessPlayerBase
 	local self: AccessPlayerBase = setmetatable(BaseObject.new(player) :: any, AccessPlayerBase)
@@ -91,14 +89,7 @@ function AccessPlayerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._accessDataService = self._serviceBag:GetService(AccessDataService)
 	self._stateByFeatureName = {}
-	-- Given to the maid as a closure rather than added directly: Maid:Add probes for Destroy through the
-	-- value's __index, and EncodedAttributeValue has a strict one that errors on anything it does not
-	-- recognise.
-	local replicatedFacts = JSONAttributeValue.new(player, REPLICATED_FACTS_ATTRIBUTE, {})
-	self._replicatedFacts = replicatedFacts
-	self._maid:GiveTask(function()
-		replicatedFacts:Destroy()
-	end)
+	self._replicatedFacts = JSONAttributeValue.new(player, REPLICATED_FACTS_ATTRIBUTE, {})
 
 	--[=[
 		Fires when a feature's verdict changes for this player, with the feature name, whether it is now
@@ -364,10 +355,11 @@ function AccessPlayerBase.GetDebugState(self: AccessPlayerBase): { featureStates
 	}
 end
 
--- Subscribes to every registered subject-less feature, so IsFeatureAllowed is a real synchronous read
--- and FeatureAllowedChanged fires for everything rather than only for whatever somebody asked about
--- first. Rebuilt wholesale when the registry changes -- there are few features and the fan-in behind
--- them is already shared, so the simple thing is cheap.
+--[[
+	Subscribes to every registered subject-less feature, so IsFeatureAllowed is a real synchronous read
+	and FeatureAllowedChanged fires for all of them rather than only for whatever was asked about first.
+	Rebuilt wholesale on registry changes -- the fan-in behind them is already shared, so it is cheap.
+]]
 function AccessPlayerBase._trackRegisteredFeatures(self: AccessPlayerBase): ()
 	self._maid:GiveTask(self._accessDataService:ObserveFeatureNames():Subscribe(function(featureNames: { string })
 		local featureMaid = Maid.new()
@@ -386,8 +378,10 @@ function AccessPlayerBase._trackRegisteredFeatures(self: AccessPlayerBase): ()
 	end))
 end
 
--- Every access observable emits synchronously on subscribe, so the current value can be read without
--- yielding. Keeps the LAST emission: they open on unresolved before anything is looked up.
+--[[
+	GOTCHA: keeps the LAST emission. Access observables open on unresolved before anything is looked up,
+	so the first would read unresolved however well resolved the fact is.
+]]
 function AccessPlayerBase._readOnce(observable: any): any
 	local captured = nil
 	local subscription = observable:Subscribe(function(value)

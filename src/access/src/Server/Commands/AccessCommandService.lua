@@ -25,6 +25,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AccessCommandUtils = require("AccessCommandUtils")
 local AccessDataService = require("AccessDataService")
+local AccessPlayer = require("AccessPlayer")
 local AccessPolicyService = require("AccessPolicyService")
 local CmdrService = require("CmdrService")
 local Maid = require("Maid")
@@ -40,15 +41,15 @@ export type AccessCommandService = typeof(setmetatable(
 		_cmdrService: any,
 		_accessDataService: AccessDataService.AccessDataService,
 		_accessPolicyService: AccessPolicyService.AccessPolicyService,
+		_accessPlayerBinder: any,
 	},
 	{} :: typeof({ __index = AccessCommandService })
 ))
 
--- Every observable in this package emits synchronously on subscribe, so a command can read the current
--- value without yielding.
---
--- GOTCHA: keeps the LAST emission, not the first. A fact opens on unresolved before anything is looked
--- up, so taking the first would print "unresolved" for everything however well resolved it actually is.
+--[[
+	GOTCHA: keeps the LAST emission, not the first. A fact opens on unresolved before anything is looked
+	up, so taking the first would print "unresolved" for everything however well resolved it is.
+]]
 local function readOnce(observable: any): any
 	local captured = nil
 	local subscription = observable:Subscribe(function(value)
@@ -71,6 +72,7 @@ function AccessCommandService.Init(self: AccessCommandService, serviceBag: Servi
 	-- Internal
 	self._accessDataService = self._serviceBag:GetService(AccessDataService) :: any
 	self._accessPolicyService = self._serviceBag:GetService(AccessPolicyService) :: any
+	self._accessPlayerBinder = self._serviceBag:GetService(AccessPlayer)
 end
 
 function AccessCommandService.Start(self: AccessCommandService): ()
@@ -130,25 +132,26 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 				Type = "players",
 				Description = "Players to dump (e.g. . for yourself).",
 			},
+			{
+				Name = "Realm",
+				Type = "accessRealm",
+				Description = "server (default), client, or both to compare them.",
+				Default = AccessCommandUtils.RealmValues.SERVER,
+			},
 		},
-	}, function(_context, players: { Player })
+	}, function(_context, players: { Player }, realm: string)
 		return self:_render(players, function(player)
-			local featureReports = {}
-			for _, featureName in self._accessDataService:GetFeatureNames() do
-				local feature = self._accessDataService:GetFeature(featureName)
-				if feature then
-					-- Subject-parameterized features are evaluated with no subject, which is the honest
-					-- answer to "what does this feature say about the player alone".
-					local report = readOnce(self._accessDataService:ObserveFeatureReport(player, feature))
-					if report then
-						table.insert(featureReports, report)
-					end
-				end
+			local blocks = {}
+
+			if realm ~= AccessCommandUtils.RealmValues.CLIENT then
+				table.insert(blocks, self:_labelRealm(realm, "SERVER", self:_collectState(player)))
 			end
 
-			local factReports = readOnce(self._accessDataService:ObserveFactReports(player)) or {}
+			if realm ~= AccessCommandUtils.RealmValues.SERVER then
+				table.insert(blocks, self:_labelRealm(realm, "CLIENT", self:_collectClientState(player)))
+			end
 
-			return AccessCommandUtils.formatPlayerState(featureReports, factReports, self:_describePolicies())
+			return table.concat(blocks, "\n\n")
 		end)
 	end)
 
@@ -270,6 +273,44 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 
 		return `Cleared overrides for {#players} player(s).`
 	end)
+end
+
+function AccessCommandService._collectState(self: AccessCommandService, player: Player): string
+	return AccessCommandUtils.formatCollectedPlayerState(
+		AccessCommandUtils.collectPlayerState(self._accessDataService, self._accessPolicyService, player)
+	)
+end
+
+--[[
+	Runs the same collector the server just ran, on the client, so a difference between the two blocks is
+	a real difference. A client that cannot answer is reported rather than hidden -- "their realm never
+	got that far" is usually the answer to the complaint that prompted the command.
+]]
+function AccessCommandService._collectClientState(self: AccessCommandService, player: Player): string
+	local accessPlayer = self._accessPlayerBinder:Get(player)
+	if not accessPlayer then
+		return "  (no AccessPlayer bound for this player yet)"
+	end
+
+	local ok, result = accessPlayer:PromiseClientAccessState():Yield()
+	if not ok then
+		return `  (client did not answer: {tostring(result)})`
+	end
+
+	return AccessCommandUtils.formatCollectedPlayerState(result)
+end
+
+function AccessCommandService._labelRealm(
+	_self: AccessCommandService,
+	realm: string,
+	label: string,
+	block: string
+): string
+	if realm ~= AccessCommandUtils.RealmValues.BOTH then
+		return block
+	end
+
+	return `=== {label} ===\n{block}`
 end
 
 function AccessCommandService._describePolicies(self: AccessCommandService): { any }

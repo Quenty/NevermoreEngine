@@ -9,10 +9,14 @@ local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local Rx = require("Rx")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+
+-- These are pure functions over reports; the player is only ever passed through to the observables.
+local PLAYER = Instance.new("Folder") :: any
 
 local function layer(source: string, priority: number, contributes: boolean, value: boolean?, decided: boolean)
 	return {
@@ -300,6 +304,7 @@ describe("AccessCommandUtils.registerTypes", function()
 				"accessFeatureName",
 				"accessPolicyName",
 				"accessOverrideValue",
+				"accessRealm",
 				"accessToggle",
 			}
 		do
@@ -322,5 +327,79 @@ describe("AccessCommandUtils.registerTypes", function()
 		expect(function()
 			AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), "not a function" :: any)
 		end).toThrow("Bad getPolicyNames")
+	end)
+end)
+
+describe("AccessCommandUtils.collectPlayerState", function()
+	local function collectingDataService()
+		return {
+			GetFeatureNames = function()
+				return { "chapters" }
+			end,
+			GetFeature = function(_self, featureName: string)
+				return { featureName = featureName }
+			end,
+			ObserveFeatureReport = function()
+				return Rx.of({
+					featureName = "chapters",
+					state = AccessStateUtils.allowed({ "isStaff" }),
+					facts = { isStaff = staffReport() },
+				})
+			end,
+			ObserveFactReports = function()
+				return Rx.of({ isStaff = staffReport() })
+			end,
+		}
+	end
+
+	local function collectingPolicyService()
+		return {
+			GetPolicyNames = function()
+				return { "kick-on-non-admin" }
+			end,
+			GetPolicy = function()
+				return {
+					GetFactNames = function()
+						return { "isStaff" }
+					end,
+				}
+			end,
+			IsPolicyEnabled = function()
+				return true
+			end,
+		}
+	end
+
+	it("gathers what a readout needs from whichever realm it runs on", function()
+		local collected =
+			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), PLAYER)
+
+		expect(#collected.featureReports).toEqual(1)
+		expect(collected.featureReports[1].featureName).toEqual("chapters")
+		expect(collected.factReports.isStaff).never.toEqual(nil)
+		expect(collected.policies[1].policyName).toEqual("kick-on-non-admin")
+	end)
+
+	it("survives a realm with no policies, which is how a bare client comes up", function()
+		local collected = AccessCommandUtils.collectPlayerState(collectingDataService(), nil, PLAYER)
+
+		expect(collected.policies).toEqual({})
+	end)
+
+	it("renders identically to the readout the server builds by hand", function()
+		-- The point of sharing the collector: two realms shown side by side differ only where they
+		-- actually disagree, never because two formatters phrased the same state differently.
+		local collected =
+			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), PLAYER)
+
+		expect(AccessCommandUtils.formatCollectedPlayerState(collected)).toEqual(
+			AccessCommandUtils.formatPlayerState(collected.featureReports, collected.factReports, collected.policies)
+		)
+	end)
+
+	it("refuses to collect without a player rather than reading a blank state", function()
+		expect(function()
+			AccessCommandUtils.collectPlayerState(collectingDataService(), nil, nil :: any)
+		end).toThrow("No player")
 	end)
 end)

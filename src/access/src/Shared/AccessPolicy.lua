@@ -210,6 +210,10 @@ function AccessPolicy.GetDebugState(self: AccessPolicy): {
 	}
 end
 
+function AccessPolicy._findService(self: AccessPolicy): any
+	return AccessPolicyServiceInterface:Find(ReplicatedStorage, self._tieRealmService:GetTieRealm())
+end
+
 --[=[
 	Whether this policy is *active* for the player right now: enabled, in this realm, and this player
 	being tracked. See [AccessPolicyService] for the enabled-versus-active distinction.
@@ -221,10 +225,6 @@ end
 	@param player Player
 	@return boolean
 ]=]
-function AccessPolicy._findService(self: AccessPolicy): any
-	return AccessPolicyServiceInterface:Find(ReplicatedStorage, self._tieRealmService:GetTieRealm())
-end
-
 function AccessPolicy.IsPolicyActiveForPlayer(self: AccessPolicy, player: Player): boolean
 	local service = self:_findService()
 	if not service then

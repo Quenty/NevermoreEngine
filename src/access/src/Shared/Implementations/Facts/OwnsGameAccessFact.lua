@@ -16,6 +16,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessFact = require("AccessFact")
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactNames = require("AccessFactNames")
 local AccessFactPriority = require("AccessFactPriority")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
@@ -27,6 +28,7 @@ local ServiceBag = require("ServiceBag")
 local OwnsGameAccessFact = {}
 
 local SOURCE = "purchase"
+local QUERY_FAILED_REASON = "ownershipQueryFailed"
 
 --[=[
 	@param serviceBag ServiceBag
@@ -56,12 +58,39 @@ function OwnsGameAccessFact.new(serviceBag: ServiceBag.ServiceBag): AccessFact.A
 				return AccessFact.ABSTAIN
 			end
 
-			return observable:Pipe({
-				Rx.catchError(function()
-					return RxAccessStateUtils.ofStatic(AccessFact.ABSTAIN :: any)
-				end) :: any,
+			-- The observable alone cannot tell "still asking" from "the ask failed": a rejected marketplace
+			-- query leaves it silent forever, which reads here as unresolved and shows up as a gate that
+			-- never decides. The promise for the same query does surface the rejection, so it rides along
+			-- purely to turn that silence into an abstention that says why.
+			return Rx.merge({
+				observable:Pipe({
+					Rx.catchError(function()
+						return RxAccessStateUtils.ofStatic(AccessFact.ABSTAIN :: any)
+					end) :: any,
+				}),
+				OwnsGameAccessFact._observeQueryFailure(gameProductDataService, player),
 			})
 		end,
+	})
+end
+
+--[[
+	Emits nothing when the query succeeds -- that answer is the observable's job -- and an attributed
+	abstention when it fails.
+]]
+function OwnsGameAccessFact._observeQueryFailure(gameProductDataService: any, player: Player): any
+	local promise = gameProductDataService:PromisePlayerOwnership(player, GameConfigAssetTypes.GAME, game.GameId)
+
+	return Rx.fromPromise(promise):Pipe({
+		Rx.switchMap(function()
+			return Rx.EMPTY :: any
+		end) :: any,
+		Rx.catchError(function(err)
+			return RxAccessStateUtils.ofStatic(AccessFact.contributionOfState(AccessFactContributionState.ABSTAIN, {
+				reason = QUERY_FAILED_REASON,
+				error = tostring(err),
+			}) :: any)
+		end) :: any,
 	})
 end
 

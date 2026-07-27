@@ -130,7 +130,7 @@ what a policy reads shows up in a readout like everything else.
 
 | Command | |
 | --- | --- |
-| `access-state <players>` | everything: every feature verdict, every policy, every fact |
+| `access-state <players> [server\|client\|both]` | everything: every feature verdict, every policy, every fact |
 | `access-facts <players>` | every fact with its layers and which one decided |
 | `access-feature <players> <feature>` | one verdict and the facts it was reached from |
 | `access-override <players> <fact> <true\|false\|unresolved>` | force a fact, including forcing *unresolved* |
@@ -139,6 +139,12 @@ what a policy reads shows up in a readout like everything else.
 
 Every command is admin-gated by `CmdrService`. Overrides appear as their own layer with the real answer
 still visible underneath, so nobody mistakes one left on after a QA session for a genuine entitlement.
+
+`access-state ... both` asks the player's own client what *it* resolved and prints it beside the server's
+view. Both blocks come from one collector, so a difference between them is a real difference and not two
+readouts phrased differently — which is the failure this package exists to make visible. The client's
+answer is a readout only and never feeds a decision; a client that could report its own access
+authoritatively could grant itself whatever it liked.
 
 ## Consuming from another package
 
