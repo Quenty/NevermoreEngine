@@ -1,19 +1,13 @@
-# v2.3.0 (Mon Jul 27 2026)
-
-#### 🚀 Enhancement
-
-- feat(saveslot): save slot commands take a players argument [#756](https://github.com/Quenty/NevermoreEngine/pull/756) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.2.3...@quenty/saveslot@2.3.0) (2026-07-27)
+
+### Features
+
+- **saveslot:** save slot commands take a players argument ([#756](https://github.com/Quenty/NevermoreEngine/issues/756)) ([724b9b4](https://github.com/Quenty/NevermoreEngine/commit/724b9b40e4acdb4700d841e514e578332c60e155))
 
 ## [2.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.2.2...@quenty/saveslot@2.2.3) (2026-07-27)
 
