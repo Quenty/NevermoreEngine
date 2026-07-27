@@ -477,9 +477,9 @@ describe("AccessDataService.ObserveFactReport", function()
 		controller:destroy()
 	end)
 
-	it("stops at a layer that answers unresolved, rather than falling through", function()
-		-- The distinction abstaining exists for: this layer said "nobody knows", and a lower layer that
-		-- does know must not quietly answer over the top of it.
+	it("falls through a layer that answers unresolved to one that knows", function()
+		-- An observation of "I do not know" must not outrank a lower layer that does. This is what keeps a
+		-- fact the client cannot compute from hanging when something underneath could have settled it.
 		local controller = setup()
 		controller.fact("isStaff", true, { source = "groupRank" })
 		controller.fact("isStaff", nil, { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
@@ -488,8 +488,8 @@ describe("AccessDataService.ObserveFactReport", function()
 			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
 		) :: any
 
-		expect(report.value).toEqual(nil)
-		expect(report.decidedBy).toEqual("allowlist")
+		expect(report.value).toEqual(true)
+		expect(report.decidedBy).toEqual("groupRank")
 
 		controller:destroy()
 	end)
@@ -503,8 +503,9 @@ describe("AccessDataService.ObserveFactReport", function()
 			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
 		) :: any
 
-		-- override sits above every registered layer, and abstains while nothing is set
-		expect(#report.layers).toEqual(3)
+		-- override on top, then the registered layers, then the replicated one -- which abstains here
+		-- because nothing has been replicated.
+		expect(#report.layers).toEqual(4)
 		expect(report.layers[1].source).toEqual("override")
 		expect(report.layers[1].contributes).toEqual(false)
 		expect(report.layers[2].source).toEqual("allowlist")
@@ -513,6 +514,8 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.layers[3].contributes).toEqual(true)
 		expect(report.layers[3].decided).toEqual(false)
 		expect(report.layers[3].value).toEqual(false)
+		expect(report.layers[4].source).toEqual("replicated")
+		expect(report.layers[4].contributes).toEqual(false)
 
 		controller:destroy()
 	end)

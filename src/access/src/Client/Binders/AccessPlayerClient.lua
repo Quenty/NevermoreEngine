@@ -1,10 +1,11 @@
 --!strict
 --[=[
-	The client half of [AccessPlayerBase]. Adds nothing of its own: the client resolves its own facts
-	rather than being told a verdict, so everything a client needs is already in the base.
+	The client half of [AccessPlayerBase]. It reads what the server replicated onto the player instance
+	and feeds it into this realm's [AccessDataService], so a fact this realm can resolve and one only the
+	server can are answered through the same path.
 
-	It exists so the tie has a client implementation -- without one, `AccessPlayerInterface:Find(player)`
-	on the client would come back with nothing and every UI would have to reach for the service instead.
+	Bound to every player, so this realm can answer questions about anybody -- a party UI can show which
+	teammate is missing a chapter without asking them.
 
 	@client
 	@class AccessPlayerClient
@@ -30,7 +31,28 @@ function AccessPlayerClient.new(player: Player, serviceBag: ServiceBag.ServiceBa
 
 	self._maid:GiveTask((AccessPlayerInterface :: any).Client:Implement(self._obj :: Instance, self))
 
+	self:_consumeReplicatedFacts()
+
 	return self
+end
+
+-- Feeds what the server replicated into this realm's AccessDataService, so a locally-registered fact and
+-- a server-only one are answered through exactly the same path.
+--
+-- Runs for every player, not only the local one: the attribute is on the player instance, so this realm
+-- can answer questions about anybody.
+function AccessPlayerClient._consumeReplicatedFacts(self: AccessPlayerClient): ()
+	self._maid:GiveTask(self._replicatedFacts:Observe():Subscribe(function(entries: any)
+		for factName, entry in entries or {} do
+			self._accessDataService:SetServerFactValue(
+				self._obj,
+				factName,
+				entry.value,
+				entry.abstained,
+				entry.metadata
+			)
+		end
+	end))
 end
 
 return Binder.new("AccessPlayer", AccessPlayerClient :: any) :: Binder.Binder<AccessPlayerClient>

@@ -107,12 +107,9 @@ function AccessFeature.anyOf(featureName: string, factNames: { string }): Access
 
 	feature = AccessFeature.new(featureName, {
 		facts = table.clone(factNames),
-		-- Reads the feature's names at fold time rather than the list captured here, so a fact pushed on
-		-- later grants it too.
-		--
-		-- GOTCHA: it has to be the name list, not the keys of `factState`. Rx.combineLatest drops keys
-		-- whose value is nil, and nil is precisely how a fact says "unresolved" -- so folding over what
-		-- arrived would make every unanswered fact disappear and report a confident denial.
+		-- Folds over the feature's own name list, read live so facts pushed on later are included. It has
+		-- to be the declared list rather than whatever arrived: only the list knows a fact was *expected*,
+		-- and a fact that has not arrived must read as unresolved rather than vanish into a denial.
 		observeCompute = function(observeFacts)
 			return observeFacts:Pipe({
 				Rx.map(function(factState: AccessStateUtils.AccessFactState)

@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessFact = require("AccessFact")
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local Jest = require("Jest")
 local Maid = require("Maid")
@@ -69,8 +70,8 @@ local function setup()
 			local emitted: { { value: boolean?, abstained: boolean } } = {}
 			maid:GiveTask(observable:Subscribe(function(contribution: any)
 				table.insert(emitted, {
-					value = if contribution then contribution.value else nil,
-					abstained = contribution == nil,
+					value = contribution.value,
+					abstained = contribution.state == AccessFactContributionState.ABSTAIN,
 				})
 			end))
 			return emitted

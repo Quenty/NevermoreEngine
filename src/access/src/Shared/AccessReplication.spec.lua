@@ -155,12 +155,20 @@ describe("AccessDataService.SetServerFactValue", function()
 		local player = controller.fakePlayer()
 		controller.accessDataService:SetServerFactValue(player, "ownsGame", true)
 
+		-- The local answer is not a separate field any more: it is a layer, visible in the readout under
+		-- the replicated one that outranked it.
 		local report = controller.report(player, "ownsGame")
-		expect(report.localValue).toEqual(false)
 		expect(report.serverValue).toEqual(true)
 		expect(report.value).toEqual(true)
-		expect(report.serverOverrode).toEqual(true)
-		expect(report.decidedBy).toEqual("server")
+		expect(report.decidedBy).toEqual("replicated")
+
+		local localLayer = nil
+		for _, layer in report.layers do
+			if layer.source == "default" then
+				localLayer = layer
+			end
+		end
+		expect((localLayer :: any).value).toEqual(false)
 
 		controller:destroy()
 	end)

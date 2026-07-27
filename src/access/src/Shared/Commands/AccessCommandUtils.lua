@@ -29,7 +29,6 @@ AccessCommandUtils.OverrideValues = {
 	UNRESOLVED = "unresolved",
 }
 
-local ABSTAINED = "abstained"
 local DECIDED_MARKER = " <-- decided"
 local SOURCE_WIDTH = 16
 
@@ -112,13 +111,7 @@ end
 function AccessCommandUtils.formatFactReport(report: any, indent: string?): string
 	local pad = indent or ""
 	local lines = {
-		string.format(
-			"%s%s = %s (%s)",
-			pad,
-			report.factName,
-			AccessCommandUtils.describeValue(report.value),
-			report.decidedBy or "nothing contributed"
-		),
+		string.format("%s%s = %s (%s)", pad, report.factName, report.state, report.decidedBy or "nothing contributed"),
 	}
 
 	for _, layer in report.layers do
@@ -129,7 +122,7 @@ function AccessCommandUtils.formatFactReport(report: any, indent: string?): stri
 				pad,
 				layer.source,
 				layer.priority,
-				if layer.contributes then AccessCommandUtils.describeValue(layer.value) else ABSTAINED,
+				layer.state,
 				AccessCommandUtils.describeMetadata(layer.metadata),
 				if layer.decided then DECIDED_MARKER else ""
 			)

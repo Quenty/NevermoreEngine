@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local AccessCommandUtils = require("AccessCommandUtils")
 local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
@@ -164,6 +165,7 @@ describe("AccessCommandUtils.describeMetadata", function()
 	it("shows attribution in the fact readout", function()
 		local text = AccessCommandUtils.formatFactReport({
 			factName = "ownsGamePass",
+			state = AccessFactContributionState.ALLOW,
 			value = true,
 			metadata = { gamePassId = 12345 },
 			decidedBy = "purchase",
@@ -171,6 +173,7 @@ describe("AccessCommandUtils.describeMetadata", function()
 				{
 					source = "purchase",
 					priority = 0,
+					state = AccessFactContributionState.ALLOW,
 					contributes = true,
 					value = true,
 					metadata = { gamePassId = 12345 },
@@ -180,5 +183,44 @@ describe("AccessCommandUtils.describeMetadata", function()
 		})
 
 		expect(string.find(text, "gamePassId=12345") ~= nil).toEqual(true)
+	end)
+end)
+
+describe("attribution across replication", function()
+	it("rides with a replicated answer, which is where it matters most", function()
+		-- "Which friend granted this" is resolved on the server and rendered on the client. Losing it in
+		-- transit would strand the most useful metadata the package carries on the wrong realm.
+		local controller = setup()
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetServerFactValue(player, "friendAccess", true, false, { grantedByUserId = 42 })
+
+		local report = controller.report(player, "friendAccess")
+
+		expect(report.value).toEqual(true)
+		expect(report.decidedBy).toEqual("replicated")
+		expect(report.metadata.grantedByUserId).toEqual(42)
+
+		controller:destroy()
+	end)
+
+	it("shows the replicated attribution on its own layer", function()
+		local controller = setup()
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetServerFactValue(player, "friendAccess", true, false, { grantedByUserId = 42 })
+
+		local report = controller.report(player, "friendAccess")
+
+		local replicated = nil
+		for _, layer in report.layers do
+			if layer.source == "replicated" then
+				replicated = layer
+			end
+		end
+
+		expect((replicated :: any).metadata.grantedByUserId).toEqual(42)
+
+		controller:destroy()
 	end)
 end)

@@ -33,6 +33,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local AccessFactContributionState = require("AccessFactContributionState")
+local AccessFactContributionStateUtils = require("AccessFactContributionStateUtils")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
 local BaseObject = require("BaseObject")
@@ -68,7 +70,28 @@ AccessFact.__index = AccessFact
 	@return AccessFactContribution
 ]=]
 function AccessFact.contribution(value: boolean?, metadata: any?): AccessFactContribution
-	return { value = value, metadata = metadata }
+	return {
+		state = AccessFactContributionStateUtils.fromValue(value),
+		value = value,
+		metadata = metadata,
+	}
+end
+
+--[=[
+	A contribution in a state directly, for the states no boolean can express.
+
+	@param state string
+	@param metadata any?
+	@return AccessFactContribution
+]=]
+function AccessFact.contributionOfState(state: string, metadata: any?): AccessFactContribution
+	assert(AccessFactContributionStateUtils.isContributionState(state), "Bad state")
+
+	return {
+		state = state,
+		value = AccessFactContributionStateUtils.toValue(state),
+		metadata = metadata,
+	}
 end
 
 --[=[
@@ -76,15 +99,16 @@ end
 	@return boolean
 ]=]
 function AccessFact.isContribution(value: any): boolean
-	return type(value) == "table" and (rawget(value, "value") ~= nil or rawget(value, "metadata") ~= nil)
+	return type(value) == "table" and AccessFactContributionStateUtils.isContributionState(rawget(value, "state"))
 end
 
 --[=[
-	Returned by a resolver that has nothing to say, so a lower-priority layer answers instead.
+	Returned by a resolver that has nothing to say, so a lower-priority layer answers instead. Sugar for
+	[AccessFactContributionState].ABSTAIN.
 
-	Distinct from `nil` on purpose. `nil` means "I am the one answering, and my answer is that nobody
-	knows yet" -- which stops the fall-through, and is what lets a console override force a fact to
-	unresolved without a real lookup quietly filling it back in.
+	Distinct from returning `nil`, which means "I am answering, and my answer is that nobody knows yet".
+	One is silence and the other is an answer; they behave differently in the merge, and naming both is
+	what stopped that difference from living in a nil.
 
 	@prop ABSTAIN userdata
 	@within AccessFact
@@ -92,8 +116,9 @@ end
 AccessFact.ABSTAIN = newproxy(false)
 
 --[=[
-	What a layer said. `nil` for the whole contribution means the layer abstained; a contribution whose
-	`value` is nil means the layer answered "unresolved".
+	What a layer said: an [AccessFactContributionState] plus, for the states that carry one, the boolean
+	it means. Always a table -- there is no nil contribution any more, because a nil could not be told
+	apart from a layer that said nothing and could not survive being put in a map.
 
 	`metadata` is why it said so, in whatever shape the mechanism has: which friend granted access, which
 	gamepass was owned, which allowlist matched. Opaque to this package -- it is carried, printed and
@@ -102,7 +127,11 @@ AccessFact.ABSTAIN = newproxy(false)
 	@type AccessFactContribution { value: boolean? }?
 	@within AccessFact
 ]=]
-export type AccessFactContribution = { value: boolean?, metadata: any? }?
+export type AccessFactContribution = {
+	state: string,
+	value: boolean?,
+	metadata: any?,
+}
 
 --[=[
 	Resolves the fact for one player. Returns anything [ValueObject.Mountable] accepts, so a test can hand
@@ -277,14 +306,16 @@ function AccessFact.ObserveForPlayer(self: AccessFact, player: Player): Observab
 	end):Pipe({
 		RxAccessStateUtils.unresolvedOnError() :: any,
 		RxAccessStateUtils.startUnresolved() :: any,
+		-- Everything an author may hand back, named. A bare boolean or nil is normalised here so the merge
+		-- only ever sees states, and an unlabelled nil can no longer reach it.
 		Rx.map(function(value: any): AccessFactContribution
 			if value == AccessFact.ABSTAIN then
-				return nil
+				return AccessFact.contributionOfState(AccessFactContributionState.ABSTAIN)
 			elseif AccessFact.isContribution(value) then
 				return value
 			end
 
-			return { value = value }
+			return AccessFact.contribution(value)
 		end) :: any,
 		Rx.shareReplay(1) :: any,
 	}) :: any

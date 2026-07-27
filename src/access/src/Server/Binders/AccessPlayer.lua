@@ -39,7 +39,35 @@ function AccessPlayer.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ac
 
 	self._maid:GiveTask(AccessPlayerInterface.Server:Implement(self._obj :: Instance, self :: any))
 
+	self:_replicateFacts()
+
 	return self
+end
+
+-- Writes what this server resolved onto the player, for every client to read. Owned by the player
+-- object rather than by a service, so a player's access state arrives and leaves with them and any
+-- client can read any player's.
+--
+-- The whole set is written at once: a UI reading a half-updated map would show a player as lacking
+-- something they hold, which is exactly the flicker this package exists to avoid.
+function AccessPlayer._replicateFacts(self: AccessPlayer): ()
+	self._maid:GiveTask(self._accessDataService:ObserveFactReports(self._obj):Subscribe(function(reports: any)
+		local entries = {}
+
+		for factName, report in reports do
+			-- decidedBy nil means every layer abstained: nobody here can answer it either, which a client
+			-- must be able to tell apart from a value still in flight.
+			entries[factName] = {
+				value = report.value,
+				abstained = report.decidedBy == nil,
+				-- Attribution travels with the answer: which gamepass, which friend. It is what a client UI
+				-- renders, and it is only knowable here.
+				metadata = report.metadata,
+			}
+		end
+
+		self._replicatedFacts.Value = entries
+	end))
 end
 
 --[=[

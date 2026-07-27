@@ -24,6 +24,15 @@
 	*why* somebody is refused -- use `GetFeatureAllowedState` and friends, which hand back the whole
 	[AccessStateUtils.AccessState].
 
+	## Where replicated facts live
+
+	The server half writes what it resolved onto a JSON attribute of the player instance, and the client
+	half reads it. Player instances replicate to *every* client, so one player's access state is legible
+	to all of them -- a party UI can say who is missing a chapter without asking anyone.
+
+	That also means facts are **public**. Anything that must not be visible to other players does not
+	belong in one.
+
 	@class AccessPlayerBase
 ]=]
 
@@ -31,14 +40,26 @@ local require = require(script.Parent.loader).load(script)
 
 local AccessDataService = require("AccessDataService")
 local AccessFeature = require("AccessFeature")
+local AccessReplicationStateUtils = require("AccessReplicationStateUtils")
 local AccessStateUtils = require("AccessStateUtils")
 local BaseObject = require("BaseObject")
+local JSONAttributeValue = require("JSONAttributeValue")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
+
+--[=[
+	The attribute carrying this player's server-resolved facts, as
+	`{ [factName]: { value: boolean?, abstained: boolean? } }`. One attribute rather than one per fact so
+	a whole snapshot lands atomically instead of a UI seeing a half-updated set.
+
+	@prop REPLICATED_FACTS_ATTRIBUTE string
+	@within AccessPlayerBase
+]=]
+local REPLICATED_FACTS_ATTRIBUTE = "AccessFacts"
 
 local AccessPlayerBase = setmetatable({}, BaseObject)
 AccessPlayerBase.ClassName = "AccessPlayerBase"
@@ -50,6 +71,7 @@ export type AccessPlayerBase =
 			_serviceBag: ServiceBag.ServiceBag,
 			_accessDataService: any,
 			_stateByFeatureName: { [string]: any },
+			_replicatedFacts: any,
 			FeatureAllowedChanged: any,
 		},
 		{} :: typeof({ __index = AccessPlayerBase })
@@ -59,7 +81,9 @@ export type AccessPlayerBase =
 --[=[
 	@param player Player
 	@param serviceBag ServiceBag
-	@return AccessPlayerBase
+	@AccessPlayerBase.REPLICATED_FACTS_ATTRIBUTE = REPLICATED_FACTS_ATTRIBUTE
+
+return AccessPlayerBase
 ]=]
 function AccessPlayerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag): AccessPlayerBase
 	local self: AccessPlayerBase = setmetatable(BaseObject.new(player) :: any, AccessPlayerBase)
@@ -67,6 +91,14 @@ function AccessPlayerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._accessDataService = self._serviceBag:GetService(AccessDataService)
 	self._stateByFeatureName = {}
+	-- Given to the maid as a closure rather than added directly: Maid:Add probes for Destroy through the
+	-- value's __index, and EncodedAttributeValue has a strict one that errors on anything it does not
+	-- recognise.
+	local replicatedFacts = JSONAttributeValue.new(player, REPLICATED_FACTS_ATTRIBUTE, {})
+	self._replicatedFacts = replicatedFacts
+	self._maid:GiveTask(function()
+		replicatedFacts:Destroy()
+	end)
 
 	--[=[
 		Fires when a feature's verdict changes for this player, with the feature name, whether it is now
@@ -280,6 +312,38 @@ function AccessPlayerBase.ObserveFactMetadata(self: AccessPlayerBase, factName: 
 end
 
 --[=[
+	What the server resolved for this player, keyed by fact name, each with its
+	[AccessReplicationState]. Readable for **any** player, not just the local one.
+
+	@return { [string]: { value: boolean?, state: string } }
+]=]
+function AccessPlayerBase.GetReplicatedFacts(self: AccessPlayerBase): { [string]: any }
+	local described = {}
+
+	for factName, entry in self._replicatedFacts.Value or {} do
+		described[factName] = {
+			value = entry.value,
+			state = AccessReplicationStateUtils.fromEntry(entry),
+		}
+	end
+
+	return described
+end
+
+--[=[
+	The same, live.
+
+	@return Observable<{ [string]: { value: boolean?, state: string } }>
+]=]
+function AccessPlayerBase.ObserveReplicatedFacts(self: AccessPlayerBase): Observable.Observable<{ [string]: any }>
+	return self._replicatedFacts:Observe():Pipe({
+		Rx.map(function()
+			return self:GetReplicatedFacts()
+		end) :: any,
+	}) :: any
+end
+
+--[=[
 	Every feature's current verdict for this player, plus every fact underneath. What to print when
 	somebody says they cannot get in.
 
@@ -333,5 +397,7 @@ function AccessPlayerBase._readOnce(observable: any): any
 
 	return captured
 end
+
+AccessPlayerBase.REPLICATED_FACTS_ATTRIBUTE = REPLICATED_FACTS_ATTRIBUTE
 
 return AccessPlayerBase

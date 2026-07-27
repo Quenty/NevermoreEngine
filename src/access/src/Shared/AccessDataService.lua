@@ -39,9 +39,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local AccessDataServiceInterface = require("AccessDataServiceInterface")
 local AccessFact = require("AccessFact")
+local AccessFactContributionState = require("AccessFactContributionState")
+local AccessFactContributionStateUtils = require("AccessFactContributionStateUtils")
 local AccessFactNames = require("AccessFactNames")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
@@ -79,6 +82,7 @@ local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
 export type AccessFactLayerReport = {
 	source: string,
 	priority: number,
+	state: string,
 	contributes: boolean,
 	value: boolean?,
 	metadata: any?,
@@ -98,6 +102,7 @@ export type AccessFactLayerReport = {
 ]=]
 export type AccessFactReport = {
 	factName: string,
+	state: string,
 	value: boolean?,
 	metadata: any?,
 	decidedBy: string?,
@@ -134,7 +139,7 @@ type OverrideState = { [string]: OverrideBox }
 
 local EMPTY_OVERRIDE_STATE: OverrideState = {}
 local OVERRIDE_SOURCE = "override"
-local SERVER_SOURCE = "server"
+local REPLICATED_SOURCE = "replicated"
 
 local AccessDataService = {}
 AccessDataService.ServiceName = "AccessDataService"
@@ -196,9 +201,57 @@ end
 function AccessDataService.Start(self: AccessDataService): ()
 	-- Implemented on ReplicatedStorage because this is a singleton and ReplicatedStorage is the one
 	-- adornee both realms already agree on -- no folder to create, no replication to wait for.
-	self._maid:GiveTask(
-		AccessDataServiceInterface:Implement(ReplicatedStorage, self :: any, self._tieRealmService:GetTieRealm())
-	)
+	local tieRealm = self._tieRealmService:GetTieRealm()
+
+	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
+end
+
+-- This class is shared, but the tie declares the override setters SERVER-only, and a tie refuses a
+-- client implementation that exposes a server-only member. So the implementer is built for the realm
+-- rather than being `self`: the setters are simply not there on a client, which is the same rule the
+-- interface already states, enforced rather than described.
+function AccessDataService._buildTieImplementer(self: AccessDataService): any
+	local implementer = {}
+
+	local shared = {
+		"GetFactNames",
+		"GetFeatureNames",
+		"HasFact",
+		"HasFeature",
+		"IsFeatureAllowedByName",
+		"ObserveIsFeatureAllowedByName",
+		"PromiseIsFeatureAllowedByName",
+		"ObserveFeatureAllowedStateByName",
+		"ObserveFactReport",
+		"ObserveFactReports",
+		"ObserveIsPlayerPresent",
+	}
+	local serverOnly = {
+		"SetFactOverride",
+		"ClearFactOverride",
+		"ClearFactOverrides",
+		"TeardownPlayer",
+	}
+
+	-- Declared with a receiver: the tie invokes members method-style, so the first argument is the
+	-- implementer and the real arguments follow it.
+	local function delegate(methodName: string)
+		implementer[methodName] = function(_implementer, ...)
+			return (self :: any)[methodName](self, ...)
+		end
+	end
+
+	for _, methodName in shared do
+		delegate(methodName)
+	end
+
+	if RunService:IsServer() then
+		for _, methodName in serverOnly do
+			delegate(methodName)
+		end
+	end
+
+	return implementer
 end
 
 --[=[
@@ -759,28 +812,53 @@ function AccessDataService.ObserveFactReport(
 		RxAccessStateUtils.completeOn(self:_observePlayerRemoving(player)) :: any,
 		Rx.map(function(latest: { [string]: any }): AccessFactReport
 			local overrides = (latest.overrides or EMPTY_OVERRIDE_STATE) :: OverrideState
+			local behavior = if layers[1] then layers[1]:GetServerOverrideBehavior() else nil
 
-			local contributions = {
+			-- Override sits above everything, and abstains when nothing is set rather than being absent:
+			-- every row in a report is a layer, so a readout shows what it would have done.
+			local overrideBox = overrides[factName]
+			local contributions: { any } = {
 				{
 					source = OVERRIDE_SOURCE,
 					priority = AccessFactPriority.OVERRIDE,
-					contribution = overrides[factName],
+					terminating = true,
+					contribution = if overrideBox
+						then AccessFact.contribution(overrideBox.value)
+						else AccessFact.contributionOfState(AccessFactContributionState.ABSTAIN),
 				},
 			}
+
+			-- What the server replicated, as a layer like any other. Its position is what the fact's
+			-- AccessFactServerOverrideBehavior actually means: "override on allow only" is a layer that
+			-- sits above the local ones when it says yes and below them when it does not.
+			local replicated = AccessDataService._replicatedContribution(latest.serverValue, behavior)
+			if replicated.aboveLocal then
+				table.insert(contributions, replicated.entry)
+			end
+
 			for index, layer in layers do
-				table.insert(contributions, {
-					source = layer:GetSource(),
-					priority = layer:GetPriority(),
-					contribution = latest[tostring(index)],
-				})
+				table.insert(
+					contributions,
+					{
+						source = layer:GetSource(),
+						priority = layer:GetPriority(),
+						terminating = false,
+						contribution = latest[tostring(index)],
+					} :: any
+				)
+			end
+
+			if not replicated.aboveLocal then
+				table.insert(contributions, replicated.entry)
 			end
 
 			local report = AccessDataService._mergeContributions(factName, contributions)
-			-- No layers means nothing local declared a behavior; the default applies, and rule 2 in
-			-- AccessFactServerOverrideBehavior.combine makes the server's value decide anyway.
-			local behavior = if layers[1] then layers[1]:GetServerOverrideBehavior() else nil
+			report.serverState = AccessReplicationStateUtils.fromEntry(latest.serverValue)
+			report.serverValue = if latest.serverValue then latest.serverValue.value else nil
+			report.serverOverrideBehavior = behavior or AccessFactServerOverrideBehavior.DEFAULT
+			report.serverOverrode = report.decidedBy == REPLICATED_SOURCE
 
-			return AccessDataService._applyServerValue(report, latest.serverValue, behavior)
+			return report
 		end) :: any,
 	}) :: any
 end
@@ -812,10 +890,6 @@ function AccessDataService._applyServerValue(
 	report.serverOverrideBehavior = behavior or AccessFactServerOverrideBehavior.DEFAULT
 	report.serverOverrode = combined ~= localValue
 	report.value = combined
-
-	if report.serverOverrode then
-		report.decidedBy = SERVER_SOURCE
-	end
 
 	return report
 end
@@ -904,6 +978,42 @@ function AccessDataService.GetDebugState(
 	return { facts = facts, features = features }
 end
 
+-- The replicated answer as a layer, plus where it belongs relative to the local ones. This is the whole
+-- of what a behavior means, expressed as position rather than as a post-hoc override: a layer above the
+-- locals wins when it speaks, and one below only answers what they left open.
+function AccessDataService._replicatedContribution(
+	serverEntry: { value: boolean?, abstained: boolean?, metadata: any? }?,
+	behavior: string?
+): { entry: any, aboveLocal: boolean }
+	local replicationState = AccessReplicationStateUtils.fromEntry(serverEntry)
+	local resolved = behavior or AccessFactServerOverrideBehavior.DEFAULT
+
+	local state = if AccessReplicationStateUtils.hasAnswer(replicationState)
+		then AccessFactContributionStateUtils.fromValue(if serverEntry then serverEntry.value else nil)
+		else AccessFactContributionState.ABSTAIN
+
+	local aboveLocal = false
+	if resolved == AccessFactServerOverrideBehavior.SERVER_OVERRIDE_ALL then
+		aboveLocal = true
+	elseif resolved == AccessFactServerOverrideBehavior.SERVER_OVERRIDE_ON_ALLOW_ONLY then
+		aboveLocal = state == AccessFactContributionState.ALLOW
+	elseif resolved == AccessFactServerOverrideBehavior.SERVER_OVERRIDE_ON_DISALLOW_ONLY then
+		aboveLocal = state == AccessFactContributionState.DENY
+	end
+
+	return {
+		aboveLocal = aboveLocal,
+		entry = {
+			source = REPLICATED_SOURCE,
+			priority = if aboveLocal then AccessFactPriority.OVERRIDE - 1 else AccessFactPriority.BUILT_IN - 1,
+			-- Attribution rides across replication too. Which friend granted access is resolved on the
+			-- server and is precisely what a client UI needs to render, so losing it here would leave the
+			-- most useful metadata the package carries stranded on the wrong realm.
+			contribution = AccessFact.contributionOfState(state, if serverEntry then serverEntry.metadata else nil),
+		},
+	}
+end
+
 --[=[
 	The merge, as a pure function: layers highest priority first, the first that contributes decides.
 
@@ -914,10 +1024,18 @@ end
 ]=]
 function AccessDataService._mergeContributions(
 	factName: string,
-	contributions: { { source: string, priority: number, contribution: any } }
+	contributions: {
+		{
+			source: string,
+			priority: number,
+			contribution: any,
+			terminating: boolean?,
+		}
+	}
 ): AccessFactReport
 	local report: AccessFactReport = {
 		factName = factName,
+		state = AccessFactContributionState.UNRESOLVED,
 		value = nil,
 		metadata = nil,
 		decidedBy = nil,
@@ -932,27 +1050,52 @@ function AccessDataService._mergeContributions(
 	}
 
 	local alreadyDecided = false
+	local fallback = nil
+
 	for _, entry in contributions do
-		local contributes = entry.contribution ~= nil
-		local decided = contributes and not alreadyDecided
+		local state = entry.contribution.state
+		local contributes = AccessFactContributionStateUtils.contributes(state)
+
+		-- A definite yes or no ends the search. UNRESOLVED does not: it is an *observation* that this
+		-- layer does not know, and one layer not knowing should not stop a lower one that does -- which is
+		-- what lets a fact the client cannot compute be settled by a replicated layer underneath it.
+		--
+		-- An override is the exception, because it is an *instruction* rather than an observation. Forcing
+		-- a fact to unresolved is a thing you ask for on purpose, and a lower layer answering over the top
+		-- of it would make the override silently do nothing.
+		local terminates = AccessFactContributionStateUtils.isDefinite(state)
+			or (entry.terminating == true and contributes)
+		local decided = not alreadyDecided and terminates
 
 		if decided then
 			alreadyDecided = true
+			report.state = state
 			report.value = entry.contribution.value
 			-- Attribution follows the answer: the report carries the deciding layer's metadata, because
 			-- the layers it outranked did not decide anything and their reasons would mislead.
 			report.metadata = entry.contribution.metadata
 			report.decidedBy = entry.source
+		elseif not alreadyDecided and contributes and fallback == nil then
+			-- The highest layer that said *something* without saying which way. Used only if nothing
+			-- definite turns up, so the readout can still name who left it unresolved.
+			fallback = entry
 		end
 
 		table.insert(report.layers, {
 			source = entry.source,
 			priority = entry.priority,
+			state = state,
 			contributes = contributes,
-			value = if contributes then entry.contribution.value else nil,
-			metadata = if contributes then entry.contribution.metadata else nil,
+			value = entry.contribution.value,
+			metadata = entry.contribution.metadata,
 			decided = decided,
 		})
+	end
+
+	if not alreadyDecided and fallback then
+		report.state = fallback.contribution.state
+		report.metadata = fallback.contribution.metadata
+		report.decidedBy = fallback.source
 	end
 
 	return report
@@ -984,13 +1127,15 @@ function AccessDataService._observeFactState(
 
 			sources[factName] = self:_observeServerFactValue(player, factName):Pipe({
 				Rx.map(function(entry: any)
-					return if entry then entry.value else nil
+					return if entry
+						then AccessFactContributionStateUtils.fromValue(entry.value)
+						else AccessFactContributionState.UNRESOLVED
 				end) :: any,
 			})
 		else
 			sources[factName] = self:ObserveFactReport(player, factName):Pipe({
 				Rx.map(function(report: AccessFactReport)
-					return report.value
+					return report.state
 				end) :: any,
 				Rx.distinct() :: any,
 			})
@@ -1031,7 +1176,8 @@ function AccessDataService.SetServerFactValue(
 	player: Player,
 	factName: string,
 	value: boolean?,
-	abstained: boolean?
+	abstained: boolean?,
+	metadata: any?
 ): ()
 	assert(player, "Bad player")
 	assert(type(factName) == "string", "Bad factName")
@@ -1046,7 +1192,7 @@ function AccessDataService.SetServerFactValue(
 	local next = table.clone(store.Value)
 	-- Boxed, so "the server says unresolved" is distinguishable from "the server has not said anything",
 	-- which is the difference between overriding and not.
-	next[factName] = { value = value, abstained = abstained }
+	next[factName] = { value = value, abstained = abstained, metadata = metadata }
 	store.Value = next
 end
 

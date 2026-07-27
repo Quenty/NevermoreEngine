@@ -4,8 +4,12 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+
+local ALLOW = AccessFactContributionState.ALLOW
+local DENY = AccessFactContributionState.DENY
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -13,7 +17,7 @@ local it = Jest.Globals.it
 
 describe("AccessStateUtils.fromFacts", function()
 	it("lists every fact that granted, not just the first", function()
-		local state = AccessStateUtils.fromFacts({ a = true, b = true, c = false }, { "a", "b", "c" })
+		local state = AccessStateUtils.fromFacts({ a = ALLOW, b = ALLOW, c = DENY }, { "a", "b", "c" })
 
 		expect(state.type).toEqual("allowed")
 		expect((state :: any).grantedBy).toEqual({ "a", "b" })
@@ -22,19 +26,19 @@ describe("AccessStateUtils.fromFacts", function()
 	it("grants on a true fact even while another is unanswered", function()
 		-- An answer that already grants cannot be taken back by one that hasn't arrived, and waiting for it
 		-- would keep an entitled player out for no reason.
-		local state = AccessStateUtils.fromFacts({ a = true }, { "a", "neverAnswers" })
+		local state = AccessStateUtils.fromFacts({ a = ALLOW }, { "a", "neverAnswers" })
 
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
 	end)
 
 	it("is unresolved, not denied, while a fact is unanswered", function()
-		local state = AccessStateUtils.fromFacts({ a = false }, { "a", "neverAnswers" })
+		local state = AccessStateUtils.fromFacts({ a = DENY }, { "a", "neverAnswers" })
 
 		expect(AccessStateUtils.isUnresolved(state)).toEqual(true)
 	end)
 
 	it("denies only once every answer is in", function()
-		local state = AccessStateUtils.fromFacts({ a = false, b = false }, { "a", "b" })
+		local state = AccessStateUtils.fromFacts({ a = DENY, b = DENY }, { "a", "b" })
 
 		expect(state.type).toEqual("disallowed")
 		expect((state :: any).reason).toEqual(AccessStateUtils.Reasons.NOT_GRANTED)
@@ -42,7 +46,7 @@ describe("AccessStateUtils.fromFacts", function()
 
 	it("ignores facts the feature did not declare", function()
 		-- A feature only stalls on mechanisms it actually reads.
-		local state = AccessStateUtils.fromFacts({ a = false, undeclared = true }, { "a" })
+		local state = AccessStateUtils.fromFacts({ a = DENY, undeclared = ALLOW }, { "a" })
 
 		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
 		expect(AccessStateUtils.isUnresolved(state)).toEqual(false)

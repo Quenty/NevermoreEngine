@@ -4,11 +4,15 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local Rx = require("Rx")
+
+local ALLOW = AccessFactContributionState.ALLOW
+local DENY = AccessFactContributionState.DENY
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -52,7 +56,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a", "b" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, b = true }) :: any), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, b = ALLOW }) :: any), maid)
 
 		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
 		maid:DoCleaning()
@@ -62,7 +66,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a", "b" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false }) :: any), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY }) :: any), maid)
 
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 		maid:DoCleaning()
@@ -72,7 +76,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, unrelated = true }) :: any), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, unrelated = ALLOW }) :: any), maid)
 
 		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
 		maid:DoCleaning()
@@ -135,7 +139,7 @@ describe("AccessFeature.ObserveCompute", function()
 			end,
 		})
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = true }) :: any), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = ALLOW }) :: any), maid)
 
 		expect((state :: any).reason).toEqual("eggNotCollected")
 		maid:DoCleaning()

@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessCommandUtils = require("AccessCommandUtils")
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
@@ -17,6 +18,11 @@ local function layer(source: string, priority: number, contributes: boolean, val
 	return {
 		source = source,
 		priority = priority,
+		state = if not contributes
+			then AccessFactContributionState.ABSTAIN
+			elseif value == true then AccessFactContributionState.ALLOW
+			elseif value == false then AccessFactContributionState.DENY
+			else AccessFactContributionState.UNRESOLVED,
 		contributes = contributes,
 		value = value,
 		decided = decided,
@@ -26,6 +32,7 @@ end
 local function staffReport()
 	return {
 		factName = "isStaff",
+		state = AccessFactContributionState.ALLOW,
 		value = true,
 		decidedBy = "allowlist",
 		layers = {
@@ -57,7 +64,7 @@ describe("AccessCommandUtils.formatFactReport", function()
 	it("leads with the answer and who decided it", function()
 		local lines = string.split(AccessCommandUtils.formatFactReport(staffReport()), "\n")
 
-		expect(lines[1]).toEqual("isStaff = true (allowlist)")
+		expect(lines[1]).toEqual("isStaff = allow (allowlist)")
 	end)
 
 	it("marks exactly one layer as the decider", function()
@@ -73,18 +80,19 @@ describe("AccessCommandUtils.formatFactReport", function()
 		local text = AccessCommandUtils.formatFactReport(staffReport())
 
 		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
-		expect(string.find(text, "false") ~= nil).toEqual(true)
+		expect(string.find(text, AccessFactContributionState.DENY) ~= nil).toEqual(true)
 	end)
 
 	it("says a layer abstained rather than showing it as an answer", function()
 		local text = AccessCommandUtils.formatFactReport(staffReport())
 
-		expect(string.find(text, "abstained") ~= nil).toEqual(true)
+		expect(string.find(text, AccessFactContributionState.ABSTAIN) ~= nil).toEqual(true)
 	end)
 
 	it("says so plainly when nothing contributed", function()
 		local text = AccessCommandUtils.formatFactReport({
 			factName = "isStaff",
+			state = AccessFactContributionState.UNRESOLVED,
 			value = nil,
 			decidedBy = nil,
 			layers = {},
@@ -130,7 +138,7 @@ describe("AccessCommandUtils.formatFeatureReport", function()
 			facts = { isStaff = staffReport() },
 		})
 
-		expect(string.find(text, "isStaff = true") ~= nil).toEqual(true)
+		expect(string.find(text, "isStaff = " .. AccessFactContributionState.ALLOW) ~= nil).toEqual(true)
 		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
 	end)
 

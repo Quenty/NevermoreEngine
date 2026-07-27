@@ -10,6 +10,10 @@
 	@class AccessStateUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local AccessFactContributionState = require("AccessFactContributionState")
+
 local AccessStateUtils = {}
 
 --[=[
@@ -41,13 +45,15 @@ export type AccessDisallowedState = {
 export type AccessState = AccessAllowedState | AccessDisallowedState
 
 --[=[
-	A fact's current value. `nil` is unresolved, which is why this is read out of a plain map -- an absent
-	key and an unresolved fact are the same thing to a policy, and Lua spells both `nil`.
+	Every declared fact and what it said, as an [AccessFactContributionState].
 
-	@type AccessFactState { [string]: boolean? }
+	Always present, never nil: a Lua table cannot hold a nil, so the old `boolean?` map silently lost
+	exactly the facts that had not answered -- the ones a gate most needs to know about.
+
+	@type AccessFactState { [string]: string }
 	@within AccessStateUtils
 ]=]
-export type AccessFactState = { [string]: boolean? }
+export type AccessFactState = { [string]: string }
 
 --[=[
 	Allowed, listing every fact that granted rather than the first one found. Callers surface `grantedBy`
@@ -126,10 +132,12 @@ function AccessStateUtils.fromFacts(factState: AccessFactState, factNames: { str
 	local anyUnresolved = false
 
 	for _, factName in factNames do
-		local value = factState[factName]
-		if value == true then
+		local state = factState[factName]
+		if state == AccessFactContributionState.ALLOW then
 			table.insert(grantedBy, factName)
-		elseif value == nil then
+		elseif state ~= AccessFactContributionState.DENY then
+			-- Unresolved, abstained, or a fact nothing answered: all of them mean "not a no", and a gate
+			-- must not read any of them as one.
 			anyUnresolved = true
 		end
 	end
@@ -141,6 +149,23 @@ function AccessStateUtils.fromFacts(factState: AccessFactState, factNames: { str
 	end
 
 	return AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED)
+end
+
+--[=[
+	The same fold over every fact present, for a feature whose fact list is not fixed when it is written.
+	Safe now that states are always present -- it was not, when an unanswered fact vanished from the map.
+
+	@param factState AccessFactState
+	@return AccessState
+]=]
+function AccessStateUtils.fromAnyFact(factState: AccessFactState): AccessState
+	local factNames = {}
+	for factName in factState do
+		table.insert(factNames, factName)
+	end
+	table.sort(factNames)
+
+	return AccessStateUtils.fromFacts(factState, factNames)
 end
 
 return AccessStateUtils

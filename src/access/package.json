@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/attributeutils": "workspace:*",
     "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
@@ -42,7 +43,6 @@
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
-    "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
