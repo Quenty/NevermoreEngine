@@ -61,7 +61,9 @@ export type AccessFeatureOptions = {
 export type AccessFeature = typeof(setmetatable(
 	{} :: {
 		_featureName: string,
-		_factNames: ValueObject.ValueObject<{ string }>,
+		-- Typed loosely on purpose: naming the generic here makes every type that holds an AccessFeature
+		-- fail to unify with itself under the old solver, and the cascade reaches half the package.
+		_factNames: any,
 		_compute: AccessFeatureCompute,
 	},
 	{} :: typeof({ __index = AccessFeature })

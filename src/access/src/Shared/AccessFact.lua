@@ -110,7 +110,7 @@ export type AccessFact =
 			_serviceBag: ServiceBag.ServiceBag?,
 			-- Weak keys: a player who left is collected along with their cached observable, so nothing has to
 			-- watch PlayerRemoving to evict -- which also keeps this working for a PlayerMock in tests.
-			_observableByPlayer: { [any]: Observable.Observable<AccessFactContribution> },
+			_observableByPlayer: { [any]: any },
 		},
 		{} :: typeof({ __index = AccessFact })
 	))
@@ -270,7 +270,7 @@ function AccessFact._toObservable(value: any): Observable.Observable<any>
 		return value :: any
 	elseif typeof(value) == "Instance" then
 		if ValueBaseUtils.isValueBase(value) then
-			return RxValueBaseUtils.observeValue(value) :: any
+			return RxValueBaseUtils.observeValue(value :: any) :: any
 		end
 
 		error(`[AccessFact] - Cannot resolve a fact from a {value.ClassName}`)

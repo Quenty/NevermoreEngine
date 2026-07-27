@@ -37,11 +37,11 @@ export type AccessPolicyService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		_accessDataService: AccessDataService.AccessDataService,
-		_policies: ObservableMap.ObservableMap<string, AccessPolicy.AccessPolicy>,
-		_enabled: { [string]: boolean },
+		_policies: any,
+		_enabled: { [string]: boolean? },
 		-- One maid per player, holding one task per enabled policy, keyed by policy name so a policy can be
 		-- switched off for everyone without disturbing the others.
-		_playerMaids: { [any]: Maid.Maid },
+		_playerMaids: { [any]: any },
 		_alive: boolean,
 	},
 	{} :: typeof({ __index = AccessPolicyService })
@@ -218,8 +218,8 @@ end
 function AccessPolicyService.GetDebugState(self: AccessPolicyService): { [string]: any }
 	local described = {}
 
-	for policyName, policy in self._policies do
-		local state = policy:GetDebugState()
+	for _, policyName in self._policies:GetKeyList() do
+		local state = self._policies:Get(policyName):GetDebugState()
 		state.enabled = self:IsPolicyEnabled(policyName)
 		described[policyName] = state
 	end

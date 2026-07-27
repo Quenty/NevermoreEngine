@@ -14,7 +14,7 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function lastState(observable: any, maid: Maid.Maid): AccessStateUtils.AccessState?
+local function lastState(observable: any, maid: any): AccessStateUtils.AccessState?
 	local last: AccessStateUtils.AccessState? = nil
 	maid:GiveTask(observable:Subscribe(function(state)
 		last = state
@@ -52,7 +52,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a", "b" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, b = true })), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, b = true }) :: any), maid)
 
 		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
 		maid:DoCleaning()
@@ -62,7 +62,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a", "b" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false })), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = false }) :: any), maid)
 
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 		maid:DoCleaning()
@@ -72,7 +72,7 @@ describe("AccessFeature.anyOf", function()
 		local maid = Maid.new()
 		local feature = AccessFeature.anyOf("thing", { "a" })
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, unrelated = true })), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ a = false, unrelated = true }) :: any), maid)
 
 		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
 		maid:DoCleaning()
@@ -85,7 +85,9 @@ describe("AccessFeature.alwaysAllowed", function()
 		local feature = AccessFeature.alwaysAllowed("hub")
 
 		expect(feature:GetFactNames()).toEqual({})
-		expect(AccessStateUtils.isAllowed(lastState(feature:ObserveCompute(Rx.of({})), maid) :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(lastState(feature:ObserveCompute(Rx.of({}) :: any), maid) :: any)).toEqual(
+			true
+		)
 
 		maid:DoCleaning()
 	end)
@@ -104,7 +106,7 @@ describe("AccessFeature.ObserveCompute", function()
 			end,
 		})
 
-		lastState(feature:ObserveCompute(Rx.of({}), "blueEgg"), maid)
+		lastState(feature:ObserveCompute(Rx.of({}) :: any, "blueEgg"), maid)
 
 		expect(seen).toEqual("blueEgg")
 		maid:DoCleaning()
@@ -117,22 +119,23 @@ describe("AccessFeature.ObserveCompute", function()
 
 		local feature = AccessFeature.new("eggPurchase", {
 			facts = { "ownsGame" },
-			observeCompute = function(observeFacts)
+			observeCompute = function(observeFacts: any): any
 				return Rx.combineLatest({
 					facts = observeFacts,
 					hasCollected = Rx.of(false),
 				}):Pipe({
-					Rx.map(function(latest)
+					Rx.map(function(latest: any): AccessStateUtils.AccessState
 						if not latest.hasCollected then
 							return AccessStateUtils.disallowed("eggNotCollected")
 						end
+
 						return AccessStateUtils.fromFacts(latest.facts, { "ownsGame" })
 					end) :: any,
 				}) :: any
 			end,
 		})
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = true })), maid)
+		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = true }) :: any), maid)
 
 		expect((state :: any).reason).toEqual("eggNotCollected")
 		maid:DoCleaning()
@@ -147,7 +150,7 @@ describe("AccessFeature.ObserveCompute", function()
 		})
 
 		expect(function()
-			feature:ObserveCompute(Rx.of({}))
+			feature:ObserveCompute(Rx.of({}) :: any)
 		end).toThrow("must return an Observable")
 	end)
 end)

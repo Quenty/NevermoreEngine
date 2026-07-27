@@ -207,7 +207,7 @@ end)
 describe("AccessKickPolicy.whenFactIs", function()
 	local POLICY_NAME = "kick-on-non-admin-test"
 
-	local function armed(controller)
+	local function armed(controller: any)
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(
 				AccessKickPolicy.whenFactIs(POLICY_NAME, AccessFactNames.PLAYER_IS_ADMIN, false)
@@ -346,14 +346,14 @@ end)
 describe("AccessKickPolicy.whenFeatureDisallowed", function()
 	local POLICY_NAME = "kick-without-access"
 
-	local function armed(controller, feature)
+	local function armed(controller: any, feature: any)
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(AccessKickPolicy.whenFeatureDisallowed(POLICY_NAME, feature))
 		)
 		controller.accessPolicyService:SetPolicyEnabled(POLICY_NAME, true)
 	end
 
-	local function feature(controller, factName)
+	local function feature(controller: any, factName: string)
 		local built = AccessFeature.anyOf("chapters", { factName })
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(built))
 		return built

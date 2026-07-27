@@ -47,7 +47,9 @@ end
 describe("AccessFact.GetDebugState", function()
 	it("reports the things that decide a merge", function()
 		local fact = AccessFact.new("isStaff", {
-			resolve = function() end,
+			resolve = function()
+				return nil
+			end,
 			priority = AccessFactPriority.ELEVATED,
 			source = "allowlist",
 		})
@@ -64,7 +66,11 @@ describe("AccessFeature.GetDebugState", function()
 	it("includes facts pushed on after the feature was written", function()
 		-- Reading the source of a feature is no longer enough to know what it reads.
 		local feature = AccessFeature.anyOf("shop", { "ownsGame" })
-		feature:PushFactAllowsFeature(AccessFact.new("isStaff", { resolve = function() end }))
+		feature:PushFactAllowsFeature(AccessFact.new("isStaff", {
+			resolve = function()
+				return nil
+			end,
+		}))
 
 		local state = feature:GetDebugState()
 		expect(state.featureName).toEqual("shop")
@@ -79,7 +85,9 @@ describe("AccessPolicy.GetDebugState", function()
 			facts = { "isStaff" },
 			features = { feature },
 			realm = AccessPolicyRealm.CLIENT,
-			apply = function() end,
+			apply = function()
+				return nil
+			end,
 		})
 
 		expect(policy:GetDebugState()).toEqual({
@@ -106,7 +114,9 @@ describe("AccessDataService.GetDebugState", function()
 		local controller = setup()
 		controller.maid:GiveTask(
 			controller.accessDataService:RegisterFact(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
-				resolve = function() end,
+				resolve = function()
+					return nil
+				end,
 				priority = AccessFactPriority.ELEVATED,
 				source = "gameAllowlist",
 			}))

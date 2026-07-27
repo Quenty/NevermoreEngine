@@ -84,7 +84,11 @@ end
 describe("AccessFact.new", function()
 	it("rejects an empty fact name", function()
 		expect(function()
-			AccessFact.new("", { resolve = function() end })
+			AccessFact.new("", {
+				resolve = function()
+					return nil
+				end,
+			})
 		end).toThrow("Bad factName")
 	end)
 
@@ -260,7 +264,11 @@ end)
 
 describe("AccessFact layering", function()
 	it("defaults to the default priority and source", function()
-		local fact = AccessFact.new("owns", { resolve = function() end })
+		local fact = AccessFact.new("owns", {
+			resolve = function()
+				return nil
+			end,
+		})
 
 		expect(fact:GetPriority()).toEqual(AccessFactPriority.DEFAULT)
 		expect(fact:GetSource()).toEqual("default")
@@ -268,7 +276,9 @@ describe("AccessFact layering", function()
 
 	it("carries the priority and source it was given", function()
 		local fact = AccessFact.new("owns", {
-			resolve = function() end,
+			resolve = function()
+				return nil
+			end,
 			priority = AccessFactPriority.ELEVATED,
 			source = "allowlist",
 		})

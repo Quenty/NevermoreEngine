@@ -130,15 +130,17 @@ export type AccessDataService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		-- Highest priority first, so the merge reads the array in order.
-		_layersByFactName: { [string]: { AccessFact.AccessFact } },
-		_features: ObservableMap.ObservableMap<string, AccessFeature.AccessFeature>,
+		-- Loosely typed for the same reason AccessFeature's fact list is: an array of a BaseObject-derived
+		-- class does not unify with itself under the old solver, and the cascade reaches every caller.
+		_layersByFactName: { [string]: { any } },
+		_features: any,
 		-- Weak keys, same as AccessFact's cache: a player who left takes their overrides with them without
 		-- anything having to watch for it, which also keeps a PlayerMock working in tests.
-		_overridesByPlayer: { [any]: ValueObject.ValueObject<OverrideState> },
+		_overridesByPlayer: { [any]: any },
 		-- True while the player is here. Weak-keyed like the rest: a departed player's entry is left false
 		-- rather than removed, so anything asking about them afterwards completes at once instead of
 		-- subscribing to a live stream that will never fire again.
-		_presenceByPlayer: { [any]: ValueObject.ValueObject<boolean> },
+		_presenceByPlayer: { [any]: any },
 	},
 	{} :: typeof({ __index = AccessDataService })
 ))
@@ -820,8 +822,8 @@ function AccessDataService.GetDebugState(
 	end
 
 	local features = {}
-	for featureName, feature in self._features do
-		features[featureName] = feature:GetDebugState()
+	for _, featureName in self._features:GetKeyList() do
+		features[featureName] = self._features:Get(featureName):GetDebugState()
 	end
 
 	return { facts = facts, features = features }
