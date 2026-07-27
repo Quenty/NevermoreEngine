@@ -33,6 +33,7 @@ export type SettingsDataService = typeof(setmetatable(
 		_settingDefinitions: ObservableSet.ObservableSet<any>,
 		_playerSettingsCacheMap: ObservableMap.ObservableMap<Player, any>,
 		_hydratedPlayersMaid: Maid.Maid,
+		_hydratingPlayers: { [Player]: boolean },
 	},
 	{} :: typeof({ __index = SettingsDataService })
 ))
@@ -64,12 +65,29 @@ function SettingsDataService._getPlayerSettingsCacheMap(
 
 	self._playerSettingsCacheMap = self._maid:Add(ObservableMap.new() :: ObservableMap.ObservableMap<Player, any>)
 	self._hydratedPlayersMaid = self._maid:Add(Maid.new())
+	self._hydratingPlayers = {}
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
-		self._hydratedPlayersMaid[player] = nil
+		self:_onPlayerRemoving(player)
 	end))
 
 	return (self._playerSettingsCacheMap :: any) :: ObservableMap.ObservableMap<Player, any>
+end
+
+-- Split out from the Players.PlayerRemoving connection above, which no test can make the engine fire.
+function SettingsDataService._onPlayerRemoving(self: SettingsDataService, player: Player): ()
+	-- Dropping the hydration emits into live observers, and a settings read from one of those handlers
+	-- lands back in [_getPlayerSettingsMapForPlayer], rebuilding the tie for a player on their way out.
+	-- So a tombstone claims the slot across the teardown instead of clearing it, and drops itself once
+	-- the player is really out of the DataModel and nothing can reach these settings again.
+	local tombstone = Maid.new()
+	tombstone:GiveTask(player.AncestryChanged:Connect(function()
+		if not player:IsDescendantOf(game) then
+			self._hydratedPlayersMaid[player] = nil
+		end
+	end))
+
+	self._hydratedPlayersMaid[player] = tombstone
 end
 
 function SettingsDataService._getPlayerSettingsMapForPlayer(
@@ -78,19 +96,40 @@ function SettingsDataService._getPlayerSettingsMapForPlayer(
 ): ObservableMap.ObservableMap<Player, any>
 	local playerSettingsCacheMap = self:_getPlayerSettingsCacheMap()
 
+	-- Claimed already: either hydrated, or tombstoned by a departure (see [_onPlayerRemoving]).
 	if self._hydratedPlayersMaid[player] then
+		return playerSettingsCacheMap
+	end
+
+	-- Gone for good, and the tombstone has already dropped itself: their settings folder went with
+	-- them, so claiming a slot would only hold onto a departed player.
+	if not player:IsDescendantOf(game) then
 		return playerSettingsCacheMap
 	end
 
 	-- Note we only do this as requested to save memory. On the client, we're unlikely
 	-- to even query other player's settings.
-	self._hydratedPlayersMaid[player] = self:_hydrateCacheForPlayer(player)
+	--
+	-- Claim the slot before hydrating, not after: hydration emits synchronously, and a settings read
+	-- from that emission lands back here. Memoizing afterwards left the slot empty for the whole
+	-- emission, so each such read hydrated again -- minting a fresh tie interface the cache map cannot
+	-- dedupe by identity, so it re-emitted and recursed until the C stack died.
+	local playerMaid = Maid.new()
+	self._hydratedPlayersMaid[player] = playerMaid
+	self:_hydrateCacheForPlayer(player, playerMaid)
 
 	return playerSettingsCacheMap
 end
 
-function SettingsDataService._hydrateCacheForPlayer(self: SettingsDataService, player: Player): Maid.Maid
-	local playerMaid = Maid.new()
+function SettingsDataService._hydrateCacheForPlayer(
+	self: SettingsDataService,
+	player: Player,
+	playerMaid: Maid.Maid
+): ()
+	-- Tripwire for the crash: hydrating while a hydration is still on the stack is what used to
+	-- recurse. Unreachable now that the slot is claimed first, so firing means the claim was cleared.
+	assert(not self._hydratingPlayers[player], "[SettingsDataService] - Re-entrant hydration for player")
+	self._hydratingPlayers[player] = true
 
 	playerMaid:GiveTask((RxInstanceUtils.observeChildrenBrio(player, function(value): any
 		-- We really only care about this, and we can assume we have the tag immediately
@@ -107,10 +146,14 @@ function SettingsDataService._hydrateCacheForPlayer(self: SettingsDataService, p
 			end
 
 			local maid, playerSettings = brio:ToMaidAndValue()
-			maid:GiveTask(self._playerSettingsCacheMap:Set(playerSettings:GetPlayer(), playerSettings))
+
+			-- Keyed off the player we hydrated for, not `playerSettings:GetPlayer()`: we only observe
+			-- this player's children, so the tie call can only return `player` again -- at the cost of
+			-- a bindable round-trip per emission, and a nil key if the folder reparents.
+			maid:GiveTask(self._playerSettingsCacheMap:Set(player, playerSettings))
 		end))
 
-	return playerMaid
+	self._hydratingPlayers[player] = nil
 end
 
 --[=[

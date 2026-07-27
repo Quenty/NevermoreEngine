@@ -72,7 +72,12 @@ end
 	@return Observable<T>
 ]=]
 function SettingProperty.Observe<T>(self: SettingProperty<T>): Observable.Observable<T>
-	return self:_observePlayerSettings():Pipe({
+	local found = rawget(self :: any, "_observeCache")
+	if found then
+		return found
+	end
+
+	local observe = self:_observePlayerSettings():Pipe({
 		Rx.where(function(settings)
 			return settings ~= nil
 		end),
@@ -92,7 +97,14 @@ function SettingProperty.Observe<T>(self: SettingProperty<T>): Observable.Observ
 				)
 			end
 		end) :: any,
+		-- The tie mints a new interface per subscription, so the switchMap above re-emits on churn that
+		-- never changed the value -- and observers that read other settings while handling one turn
+		-- each re-emit into a loop.
+		Rx.distinct() :: any,
+		Rx.cache() :: any,
 	}) :: any
+	rawset(self :: any, "_observeCache", observe)
+	return observe
 end
 
 (SettingProperty :: any).__index = function(self, index): any
