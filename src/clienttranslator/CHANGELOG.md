@@ -1,19 +1,13 @@
-# v14.47.1 (Tue Jul 28 2026)
-
-#### 🐛 Bug Fix
-
-- feat(clienttranslator): gate reactive translation on per-key readiness [#766](https://github.com/Quenty/NevermoreEngine/pull/766) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.0...@quenty/clienttranslator@14.47.1) (2026-07-28)
+
+### Features
+
+- **clienttranslator:** gate reactive translation on per-key readiness ([#766](https://github.com/Quenty/NevermoreEngine/issues/766)) ([216fbcb](https://github.com/Quenty/NevermoreEngine/commit/216fbcb1500d362476ad9861b55b47813cee6cf7))
 
 # [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.46.2...@quenty/clienttranslator@14.47.0) (2026-07-28)
 
