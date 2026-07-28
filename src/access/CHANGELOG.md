@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.1.2...@quenty/access@1.2.0) (2026-07-28)
+
+### Bug Fixes
+
+- **access:** run policies against the bag's tie realm, not RunService ([298bbe3](https://github.com/Quenty/NevermoreEngine/commit/298bbe3e84afdd31992da4bacb93727c57c8d811))
+
+### Features
+
+- **access:** replicate policy enablement from server to client ([de527c8](https://github.com/Quenty/NevermoreEngine/commit/de527c8b6d6ed5592e6908911a27193346899bca))
+
 ## [1.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.1.1...@quenty/access@1.1.2) (2026-07-28)
 
 ### Bug Fixes
