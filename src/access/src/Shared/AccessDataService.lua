@@ -63,6 +63,7 @@ local Rx = require("Rx")
 local RxAccessStateUtils = require("RxAccessStateUtils")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
 
@@ -164,6 +165,9 @@ export type AccessDataService = typeof(setmetatable(
 		-- subscribing to a live stream that will never fire again.
 		_presenceByPlayer: { [any]: any },
 		_warnedMissingFacts: { [string]: boolean },
+		-- The registered fact names, live. Kept beside _layersByFactName rather than derived from it,
+		-- because anything reading "every fact" has to notice one registered after it subscribed.
+		_factNames: any,
 		-- What the server said, per player, per fact. Empty on the server itself.
 		_serverValuesByPlayer: { [any]: any },
 		-- The fact names the server says each feature reads. Empty on the server itself.
@@ -187,6 +191,7 @@ function AccessDataService.Init(self: AccessDataService, serviceBag: ServiceBag.
 	self._overridesByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._presenceByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._warnedMissingFacts = {}
+	self._factNames = self._maid:Add(ValueObject.new({})) :: any
 	self._serverValuesByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._replicatedFeatureFactNames = {}
 	self._pushedFeatureFactRemovers = {}
@@ -212,11 +217,7 @@ function AccessDataService._registerBuiltInFacts(self: AccessDataService): ()
 end
 
 function AccessDataService.Start(self: AccessDataService): ()
-	-- Implemented on ReplicatedStorage because this is a singleton and ReplicatedStorage is the one
-	-- adornee both realms already agree on -- no folder to create, no replication to wait for.
 	local tieRealm = self._tieRealmService:GetTieRealm()
-
-	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
 
 	-- Reconciles in either realm on a registry change: the payload is empty on the server, so this costs
 	-- nothing there, and on the client a feature registered after the payload landed still picks up its
@@ -225,11 +226,22 @@ function AccessDataService.Start(self: AccessDataService): ()
 		self:_reconcileReplicatedFeatureFacts()
 	end))
 
-	if RunService:IsServer() then
-		self:_replicateFeatureFactNames()
-	else
+	-- Branching on the tie realm rather than on RunService, for the same reason the tie itself does: it is
+	-- the one realm answer a service bag can be told, which is what lets both halves be booted together
+	-- and actually exercised against each other.
+	if tieRealm == TieRealms.CLIENT then
 		self:_consumeReplicatedFeatureFactNames()
+	else
+		self:_replicateFeatureFactNames()
 	end
+
+	-- Last, and deliberately: implementing a client-side tie waits for the server's implementation, and
+	-- replication must not be sitting behind that. A realm that never got its tie up should still be
+	-- reading the facts and features the other realm published.
+	--
+	-- On ReplicatedStorage because this is a singleton and ReplicatedStorage is the one adornee both
+	-- realms already agree on -- no folder to create, nothing to find.
+	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
 end
 
 --[[
@@ -606,6 +618,7 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 	table.sort(layers, function(a, b)
 		return a:GetPriority() > b:GetPriority()
 	end)
+	self:_refreshFactNames()
 
 	return function()
 		local current = self._layersByFactName[factName]
@@ -621,7 +634,17 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 		if #current == 0 then
 			self._layersByFactName[factName] = nil
 		end
+
+		self:_refreshFactNames()
 	end
+end
+
+function AccessDataService._refreshFactNames(self: AccessDataService): ()
+	if not self._factNames then
+		return
+	end
+
+	self._factNames.Value = self:GetFactNames()
 end
 
 --[=[
@@ -1048,12 +1071,28 @@ function AccessDataService.ObserveFactReports(
 ): Observable.Observable<{ [string]: AccessFactReport }>
 	assert(player, "Bad player")
 
-	local sources: { [string]: any } = {}
-	for factName in self._layersByFactName do
-		sources[factName] = self:ObserveFactReport(player, factName)
-	end
+	-- Rebuilt when the registry changes, not snapshotted at subscribe: a fact registered after a player
+	-- joined would otherwise never reach anything reading "every fact" -- including the binder that
+	-- replicates them, which is how a late-registered fact silently never arrives on the client.
+	return self:ObserveFactNames():Pipe({
+		Rx.switchMap(function(factNames: { string })
+			local sources: { [string]: any } = {}
+			for _, factName in factNames do
+				sources[factName] = self:ObserveFactReport(player, factName)
+			end
 
-	return Rx.combineLatest(sources) :: any
+			return Rx.combineLatest(sources)
+		end) :: any,
+	}) :: any
+end
+
+--[=[
+	The registered fact names, live. Emits again whenever a layer is registered or removed.
+
+	@return Observable<{ string }>
+]=]
+function AccessDataService.ObserveFactNames(self: AccessDataService): Observable.Observable<{ string }>
+	return self._factNames:Observe() :: any
 end
 
 --[=[

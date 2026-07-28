@@ -20,7 +20,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local shared = nil
 local featureCounter = 0
 
 local function makeController()
@@ -85,15 +84,11 @@ local function makeController()
 	}
 end
 
--- The AccessPlayer tag is global and the test place is shared, so a second ServiceBag registering a
--- second binder on the same tag fights the first. One bag for the file, a fresh mock per test, which is
--- also how a real game runs it.
+-- A bag per test, torn down with it. The AccessPlayer tag is global, so a binder that outlives its test
+-- goes on binding every player mock a later test creates and overwriting the facts attribute with its own
+-- registry -- which is invisible here and breaks whoever is actually reading that attribute.
 local function setup()
-	if not shared then
-		shared = makeController()
-	end
-
-	return shared
+	return makeController()
 end
 
 describe("AccessPlayer", function()
@@ -104,6 +99,8 @@ describe("AccessPlayer", function()
 		local player = controller.fakePlayer()
 
 		expect(controller.accessPlayerFor(player)).never.toEqual(nil)
+
+		controller:destroy()
 	end)
 
 	it("binds an implementation onto the player, findable through the tie", function()
@@ -113,6 +110,8 @@ describe("AccessPlayer", function()
 		controller.accessPlayerFor(player)
 
 		expect(AccessPlayerInterface:HasImplementation(player)).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("answers the same question three ways, consistently", function()
@@ -129,6 +128,8 @@ describe("AccessPlayer", function()
 			observed = value
 		end))
 		expect(observed).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("fails closed on unresolved for the boolean, but says unresolved for the state", function()
@@ -141,6 +142,8 @@ describe("AccessPlayer", function()
 		expect(accessPlayer:IsFeatureAllowed(chapters)).toEqual(false)
 		expect(accessPlayer:GetFeatureAllowedState(chapters).type).toEqual("disallowed")
 		expect((accessPlayer:GetFeatureAllowedState(chapters) :: any).reason).toEqual("unresolved")
+
+		controller:destroy()
 	end)
 
 	it("fires FeatureAllowedChanged as a verdict changes", function()
@@ -163,6 +166,8 @@ describe("AccessPlayer", function()
 			end
 		end
 		expect(sawChapters).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("overrides a fact from the player object, server-side", function()
@@ -177,6 +182,8 @@ describe("AccessPlayer", function()
 		accessPlayer:SetFactOverride(`{chapters:GetFeatureName()}Fact`, true)
 
 		expect(accessPlayer:IsFeatureAllowed(chapters)).toEqual(true)
+
+		controller:destroy()
 	end)
 
 	it("reports every feature verdict in its debug state", function()
@@ -187,5 +194,7 @@ describe("AccessPlayer", function()
 		local state = accessPlayer:GetDebugState()
 
 		expect(state.featureStates[chapters:GetFeatureName()].allowed).toEqual(true)
+
+		controller:destroy()
 	end)
 end)
