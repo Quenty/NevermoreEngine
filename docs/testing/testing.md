@@ -270,7 +270,11 @@ assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isM
 ```
 
 `PlayerMock.findFirstAncestorMock` covers ancestor walks (`FindFirstAncestorWhichIsA("Player")` cannot see
-the mock) and `PlayerMock.getMockByUserId` covers utils that only hold a `userId`.
+the mock) and `PlayerMock.getMockByUserId` covers utils that only hold a `userId`. Code that enumerates or
+watches the players present adds the mock counterparts alongside the engine calls, in the same body, so both
+kinds of player flow through one code path — `PlayerMock.getMocks` beside `Players:GetPlayers()`, and
+`PlayerMock.getMockAddedSignal` / `getMockRemovingSignal` beside `Players.PlayerAdded` / `PlayerRemoving`
+(mocks are invisible to the `Players` service, so its events never fire for them).
 
 Known limits — these are gaps in `player-mock`'s contract to fix there, not patterns to work around in tests:
 

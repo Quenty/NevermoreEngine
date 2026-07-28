@@ -11,6 +11,8 @@ local Players = game:GetService("Players")
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
+local PlayerMockUtils = require("PlayerMockUtils")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxCharacterUtils = require("RxCharacterUtils")
@@ -38,13 +40,25 @@ function RxPlayerUtils.observePlayersBrio(predicate: Rx.Predicate<Player>?): Obs
 			end
 		end
 
-		maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
-
-		maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+		local function handleRemoving(player: Player)
 			maid[player] = nil
-		end))
+		end
+
+		maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
+		maid:GiveTask(Players.PlayerRemoving:Connect(handleRemoving))
+
+		-- Mocks are invisible to the Players service, so their tag lifecycle is the counterpart of
+		-- the join events, feeding the same handlers.
+		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(handlePlayer))
+		maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(handleRemoving))
 
 		for _, player in Players:GetPlayers() do
+			task.spawn(function()
+				handlePlayer(player)
+			end)
+		end
+
+		for _, player in PlayerMock.getMocks() do
 			task.spawn(function()
 				handlePlayer(player)
 			end)
@@ -82,9 +96,20 @@ end
 	@return Observable<Brio<Player>>
 ]=]
 function RxPlayerUtils.observeLocalPlayerBrio(): Observable.Observable<Brio.Brio<Player>>
-	return RxInstanceUtils.observePropertyBrio(Players, "LocalPlayer", function(value)
-		return value ~= nil
-	end)
+	-- Headless tests have no Players.LocalPlayer; a test designates a PlayerMock instead. Observed
+	-- rather than read once, so a designation made after subscribing still resolves.
+	return Rx.combineLatest({
+		real = RxInstanceUtils.observeProperty(Players, "LocalPlayer"),
+		mocked = PlayerMockUtils.observeMockedLocalPlayer(),
+	}):Pipe({
+		Rx.map(function(state: any): Player?
+			return state.real or state.mocked
+		end) :: any,
+		Rx.distinct() :: any,
+		RxBrioUtils.switchToBrio(function(player)
+			return player ~= nil
+		end) :: any,
+	}) :: any
 end
 
 --[=[
@@ -116,8 +141,15 @@ function RxPlayerUtils.observePlayers(predicate: Rx.Predicate<Player>?): Observa
 		end
 
 		maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
+		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(handlePlayer))
 
 		for _, player in Players:GetPlayers() do
+			task.spawn(function()
+				handlePlayer(player)
+			end)
+		end
+
+		for _, player in PlayerMock.getMocks() do
 			task.spawn(function()
 				handlePlayer(player)
 			end)
@@ -136,8 +168,13 @@ end
 function RxPlayerUtils.observeFirstAppearanceLoaded(player: Player): Observable.Observable<()>
 	assert(typeof(player) == "Instance", "Bad player")
 
+	local isMock = PlayerMock.isMock(player)
+
 	return Observable.new(function(sub)
-		if player:HasAppearanceLoaded() then
+		local alreadyLoaded = if isMock
+			then PlayerMock.read(player, "HasAppearanceLoaded")
+			else player:HasAppearanceLoaded()
+		if alreadyLoaded then
 			sub:Fire()
 			sub:Complete()
 			return
@@ -145,18 +182,24 @@ function RxPlayerUtils.observeFirstAppearanceLoaded(player: Player): Observable.
 
 		local maid = Maid.new()
 
+		local characterAppearanceLoaded: RBXScriptSignal<...any> = if isMock
+			then PlayerMock.getSignal(player, "CharacterAppearanceLoaded")
+			else player.CharacterAppearanceLoaded
+
 		-- In case this works
-		maid:GiveTask(player.CharacterAppearanceLoaded:Connect(function()
+		maid:GiveTask(characterAppearanceLoaded:Connect(function()
 			sub:Fire()
 			sub:Complete()
 		end))
 
 		maid:GiveTask(task.spawn(function()
-			while not player:HasAppearanceLoaded() and player:IsDescendantOf(game) do
+			local loaded = false
+			while not loaded and player:IsDescendantOf(game) do
 				task.wait(0.05)
+				loaded = if isMock then PlayerMock.read(player, "HasAppearanceLoaded") else player:HasAppearanceLoaded()
 			end
 
-			if player:HasAppearanceLoaded() then
+			if loaded then
 				sub:Fire()
 				sub:Complete()
 			else

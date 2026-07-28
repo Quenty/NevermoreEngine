@@ -37,6 +37,9 @@ function EncodedAttributeValue.new(object: Instance, attributeName: string, enco
 		_attributeName = attributeName,
 		_decode = decode,
 		_encode = encode,
+		-- Kept, not merely written below: Value and Observe both fall back to it whenever the attribute is
+		-- absent, which is any time it is cleared after construction.
+		_defaultValue = defaultValue,
 	}
 
 	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
