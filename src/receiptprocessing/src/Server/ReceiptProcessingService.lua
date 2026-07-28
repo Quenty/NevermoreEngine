@@ -110,6 +110,7 @@ export type ReceiptProcessor = (
 
 	@param processor (receiptInfo) -> ProductPurchaseDecision | Promise<ProductPurchaseDecision> | nil
 	@param priority number?
+	@return function -- Unregisters the processor. Safe to call after [ReceiptProcessingService.Destroy].
 ]=]
 function ReceiptProcessingService:RegisterReceiptProcessor(processor: ReceiptProcessor, priority: number?): () -> ()
 	assert(self._processors, "Not initialized")
@@ -135,9 +136,14 @@ function ReceiptProcessingService:RegisterReceiptProcessor(processor: ReceiptPro
 	end)
 
 	return function()
-		local index = table.find(self._handles, data)
+		-- Destroy clears the list, and a maid holding this task will run it after that.
+		if not self._processors then
+			return
+		end
+
+		local index = table.find(self._processors, data)
 		if index then
-			table.remove(self._handles, index)
+			table.remove(self._processors, index)
 		end
 	end
 end
