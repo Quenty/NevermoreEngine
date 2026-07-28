@@ -5,100 +5,50 @@ sidebar_position: 3
 
 # Localization gotchas
 
-Surprises specific to `LocalizationTable` and the translation stack.
+What surprises people using the translation stack in a game.
 
-## A LocalizationTable keys its entries by translation key alone
+:::note
+This page is about using the stack. The internals — batched localization writes, per-key readiness,
+the translator fallback chain, and the verified engine behavior all of it is built on — are
+documented in the package itself, in
+[`src/clienttranslator/docs/`](https://github.com/Quenty/NevermoreEngine/tree/main/src/clienttranslator/docs).
+Go there if you are changing the stack, or if you want to know *why* something below behaves the
+way it does.
+:::
 
-At runtime a `LocalizationTable` treats the **translation key as the unique identifier** for an
-entry. Source and context are stored as metadata but do **not** widen the identity:
+## Which locale file a player actually gets
 
-- `SetEntryValue(key, sourceA, contextA, ...)` followed by
-  `SetEntryValue(key, sourceB, contextB, ...)` leaves a **single** entry — the second call
-  overwrites the source/context in place (last write wins).
-- `SetEntries` **rejects** any array containing two entries that share a key, even when their
-  source and context differ. It throws:
+A player's locale is matched to your locale files by **language and script**, not by exact name:
 
-  ```
-  Entry at index N has the same (key) or (key,source,context) tuple as another entry.
-  ```
+- **Regional variants substitute.** Ship `es-es.json` and an `es-mx` player reads it. Same for
+  `en-gb` reading `en-us`, or `pt-br` reading `pt-pt`.
+- **Scripts never substitute.** A `zh-tw` player will **not** read `zh-cn.json`. Traditional and
+  Simplified are separate: ship both. Chinese carries its script in the region (`zh-tw`, `zh-hk`,
+  `zh-mo` are Traditional) as often as in the name (`zh-hant`), and both spellings work.
+- The same applies to any language with distinct scripts, such as `sr-latn` and `sr-cyrl`.
 
-  Despite the "(key,source,context)" wording, two entries with the same key and *distinct*
-  non-empty contexts still collide. When the context is empty the check narrows further to the
-  key only (ignoring source). The duplicate check also trims surrounding whitespace on source and
-  context, so `"ctx"` and `"ctx "` are treated as the same.
+When nothing matches, the player gets the source locale — usually your `en.json`.
 
-`GetEntries` returns whatever was stored verbatim (no trimming, no normalization), so a
-round-trip through `GetEntries` → mutate → `SetEntries` will blow up if the array ever holds two
-entries the engine considers the same key.
+## A key with no translation renders as the key
 
-### Why this matters for batched writes
+If no locale file and no uploaded cloud translation resolves a key, the text you get back is the
+translation key itself (`quests.groups.theBeginning`), and one warning is logged. That is the
+signal that a key is missing everywhere, not just in the current language — a key missing only in
+the current language quietly falls back to the source locale instead.
 
-`TranslatorService` batches localization writes and applies them with one `SetEntries` call per
-flush. It therefore holds **at most one pending delta per translation key**; a later write for the
-same key with a different source/context overwrites the pending entry rather than queueing a second
-one. Queuing per `(key, source, context)` instead — the original design — fed `SetEntries` a
-duplicate key whenever a game registered the same key twice (e.g. `collectable.toolUnlocked`
-written both as a collectable name and again as a generated dialog line), crashing the flush.
+## Text may correct itself a frame after it appears
 
-The behaviors above were established empirically against Open Cloud; see
-`TranslatorService.spec.lua` ("TranslatorService entry merging") for the regression tests.
+`ObserveFormatByKey` emits immediately so a label is never blank, then re-emits the real
+translation once the key's data is in place. A label can therefore show the raw key for a frame on
+first load. It will not flicker backwards: once you have a good translation, a locale swap replaces
+it with the new language's text and never with a fallback.
 
-## A translator answers in its own locale, and will happily answer in the wrong language
+You do not need to wait for anything to make this work. Every read path — `ObserveFormatByKey`,
+`PromiseFormatByKey`, `FormatByKey`, `ObserveTranslation` — already handles it.
 
-`Translator:FormatByKey` is bound to the locale the translator was built for. Two consequences:
+## One entry per translation key
 
-- A key with no value for that locale **raises** (`Key <key> not found for locale <locale>`)
-  rather than returning nil or falling back to the source locale. Every read has to be wrapped.
-- The cloud translator from `LocalizationService:GetTranslatorForPlayerAsync` is bound to the
-  **player's Roblox locale**, which an in-game language selector does not move. Asked for a key it
-  knows, it returns the player-locale text and **succeeds** — so a fallback chain that tries it
-  first silently serves the wrong language after a locale swap.
-
-`JSONTranslator._doTranslation` therefore only consults a translator that
-`ResolveLocaleUtils.isCompatibleLocale` accepts for the locale being translated for, before falling
-back to the source translator (whose job is to answer in another language).
-
-Compatible means same language **and same script**, which is not the same as sharing a language
-subtag:
-
-- Regional variants substitute: `es-mx` reads `es-es`, `en-gb` reads `en-us`, `pt-br` reads
-  `pt-pt`. Losing this would break the regional fallback games rely on.
-- Scripts do not: `zh-tw` never reads `zh-cn`. Chinese carries its script in the region
-  (`zh-tw`/`zh-hk`/`zh-mo` are Traditional) as often as in a script subtag (`zh-Hant`), so both
-  spellings have to be understood. The same holds for any language with differing script subtags,
-  such as `sr-Latn` and `sr-Cyrl`.
-- A locale that names no script reads as either, so `sr` and `sr-Cyrl` substitute.
-
-Note this is a different question from `ResolveLocaleUtils.resolveClosestKey`, which picks the
-best available key from a table the caller owns and may deliberately route `zh-tw` to a
-Simplified key when that is all that exists (fine for number formatting, wrong for text).
-
-## Localization writes are batched, so a key is not readable the instant it is registered
-
-`TranslatorService` defers writes to the end of the frame, because a game streaming in registers
-thousands of entries in a single frame and every raw table write invalidates every `AutoLocalize`
-entry in the engine. A read taken the moment a key is registered therefore misses.
-
-**You do not have to do anything about this.** Every way of reading a translation —
-`ObserveFormatByKey`, `PromiseFormatByKey`, `FormatByKey`, `ObserveTranslation` — already waits for
-the key it is reading and re-reads when a locale swap brings new data in. The rest of this section
-is about how, and matters only if you are working on the translation stack itself.
-
-Readiness is tracked **per key**, by `TranslatorService:ObserveTranslationReady` /
-`IsTranslationReady`, and consumed by `JSONTranslator`. Do **not** reach for
-`PromiseEntriesWritten` instead: it resolves for the batch pending *when it was called*, which is
-not the batch containing the data you are about to read — writes queued during that flush's own
-resolution land in the next batch, and a caller who asks while nothing is pending gets an
-already-resolved promise.
-
-A key nothing ever registered reads as ready, so an unknown key falls through to the fallback
-instead of hanging. Synchronous reads (`JSONTranslator:FormatByKey`) use `FlushEntryForKey` to land
-only the locales that read can consult, leaving the rest of the batch queued.
-
-`ObserveFormatByKey` emits a best-effort value immediately rather than withholding its first
-emission, so a UI bound to it is never blank for a frame; it re-emits the correct text once the key
-lands. It will not flicker a good translation back to a fallback during a locale swap.
-
-See `JSONTranslator.TranslationReady.spec.lua` for the readiness contract and
-`TranslatorService.spec.lua` ("TranslatorService write cost while streaming in") for the batching
-cost this is protecting.
+A `LocalizationTable` treats the translation key as the whole identity of an entry. Registering the
+same key twice with a different source or context does not create a second entry — the later write
+overwrites the source and context of the first. Plan keys to be unique on their own; do not rely on
+context to disambiguate two uses of one key.

@@ -22,11 +22,17 @@ src/<package>/
     Shared/                 # or Client/, Server/
       MyModule.lua
       MyModule.spec.lua     # test files live alongside source
+  docs/                     # optional, internal design notes (see below)
   test/                     # optional, for packages with test targets
     default.project.json    # Rojo project for test place
     scripts/Server/         # script template for test runner
   deploy.nevermore.json      # optional, for deployable/testable packages
 ```
+
+A package's `docs/` holds what only a maintainer of that package needs: internal design, why an
+implementation is shaped the way it is, engine behavior it depends on. Link it from the package
+`README.md` under "Working on this package". Consumer-facing docs stay in the repo-root `docs/`.
+`src/clienttranslator/docs/` is the reference example.
 
 ## Setup
 

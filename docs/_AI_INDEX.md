@@ -29,7 +29,23 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | Entirely new topic area | Create a new doc + add to Index below |
 | Universal rule for every session | Update CLAUDE.md (rare) |
 | A gotchas section has 10+ items | Graduate it to its own doc |
+| How one package works inside, and why | `src/<package>/docs/` — see below |
 | Ambiguous case not covered above | Resolve it, then add a row to this table |
+
+### Package-local docs
+
+`docs/` here is for **consumers** of Nevermore. Knowledge that only matters to someone changing one
+package — internal design, why an implementation is shaped the way it is, engine behavior it
+depends on — goes in `src/<package>/docs/` instead, linked from that package's `README.md` under a
+"Working on this package" heading.
+
+Split them by audience, not by topic: if a game developer using the package would act on it, it
+belongs in `docs/`; if only a maintainer of that package would, it belongs in the package. When a
+consumer-facing page has a matching package doc, link to it so readers can find the "why".
+
+`src/clienttranslator/docs/` is the reference example
+([design.md](../src/clienttranslator/docs/design.md),
+[engine-behavior.md](../src/clienttranslator/docs/engine-behavior.md)).
 
 ## Index
 
@@ -51,4 +67,4 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
 | [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
-| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas: LocalizationTable key-only entry identity, SetEntries duplicate-key crashes, translators answering in the wrong language, batched writes and per-key readiness |
+| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, self-correcting text, one entry per key. Internals live in `src/clienttranslator/docs/` |

@@ -20,6 +20,19 @@ Gets local translator for player
 npm install @quenty/clienttranslator --save
 ```
 
+## Working on this package
+
+Read these before changing the translation stack. They exist because most of this package's
+behavior is driven by engine quirks that are not obvious from the code:
+
+- [`docs/design.md`](docs/design.md) — how the stack fits together and why: batched localization
+  writes, per-key readiness, the translator fallback chain, re-entrancy rules.
+- [`docs/engine-behavior.md`](docs/engine-behavior.md) — verified `LocalizationTable` and
+  `Translator` behavior the design rests on, and how to verify more of it.
+
+Consumer-facing behavior is documented in
+[`docs/gotchas/localization.md`](../../docs/gotchas/localization.md) at the repo root.
+
 ## Usage
 Usage is designed to be simple.
 
