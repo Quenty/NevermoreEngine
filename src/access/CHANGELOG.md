@@ -1,3 +1,15 @@
+# v1.3.3 (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- fix(access): run client-realm policies for the local player [#768](https://github.com/Quenty/NevermoreEngine/pull/768) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
