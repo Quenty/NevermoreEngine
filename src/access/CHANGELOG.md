@@ -1,3 +1,21 @@
+# v1.2.0 (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- fix(access): make client-realm policies actually run, and give them an off switch [#763](https://github.com/Quenty/NevermoreEngine/pull/763) ([@Quenty](https://github.com/Quenty))
+- feat(access): replicate policy enablement from server to client ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- docs(access): trim comments to what the code cannot say ([@Quenty](https://github.com/Quenty))
+- fix(access): run policies against the bag's tie realm, not RunService ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

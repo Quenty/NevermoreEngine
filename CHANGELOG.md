@@ -1,5 +1,18 @@
 # (Tue Jul 28 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/access@1.2.0`
+  - fix(access): make client-realm policies actually run, and give them an off switch [#763](https://github.com/Quenty/NevermoreEngine/pull/763) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/access@1.1.2`
