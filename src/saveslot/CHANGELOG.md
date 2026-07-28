@@ -1,24 +1,13 @@
-# v2.6.0 (Tue Jul 28 2026)
-
-#### 🚀 Enhancement
-
-- feat(saveslot): let save-slot commands address ephemeral slots and persist them [#764](https://github.com/Quenty/NevermoreEngine/pull/764) ([@Quenty](https://github.com/Quenty))
-- feat(saveslot): let save-slot commands address ephemeral slots and persist them ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/james/saveslot-persist-ephemeral ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.5.0...@quenty/saveslot@2.6.0) (2026-07-28)
+
+### Features
+
+- **saveslot:** let save-slot commands address ephemeral slots and persist them ([17fd930](https://github.com/Quenty/NevermoreEngine/commit/17fd930afdfa259eca552072e9a15bfa29f0afe7))
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.4.0...@quenty/saveslot@2.5.0) (2026-07-28)
 
