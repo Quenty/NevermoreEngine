@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.0...@quenty/access@1.3.1) (2026-07-28)
+
+### Bug Fixes
+
+- **access:** make the access-policy list readout deterministic and tested ([#767](https://github.com/Quenty/NevermoreEngine/issues/767)) ([301c785](https://github.com/Quenty/NevermoreEngine/commit/301c785e99b7069dbf89a029962a1e5b769ee0cb)), closes [#765](https://github.com/Quenty/NevermoreEngine/issues/765)
+
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.2.0...@quenty/access@1.3.0) (2026-07-28)
 
 ### Features

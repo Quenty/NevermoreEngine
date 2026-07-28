@@ -226,7 +226,9 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 	}, function(_context, policyNames: { string }, state: string)
 		local enabled = state == AccessCommandUtils.ToggleValues.ON
 
-		-- Checked before anything is toggled, so a typo in a list does not leave half of it switched.
+		-- SetPolicyEnabled asserts on a name nobody registered, so a stale one partway through a list would
+		-- throw with the policies before it already switched. Cmdr validates each name as it is typed; this
+		-- catches the one it cannot, a policy unregistered between then and now.
 		local missing = {}
 		for _, policyName in policyNames do
 			if not self._accessPolicyService:GetPolicy(policyName) then
@@ -235,7 +237,9 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 		end
 
 		if #missing > 0 then
-			return `No policy registered named {table.concat(missing, ", ")}`
+			table.sort(missing)
+
+			return `No policy registered named: {table.concat(missing, ", ")}`
 		end
 
 		for _, policyName in policyNames do
@@ -244,7 +248,7 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 
 		local toggled = AccessCommandUtils.describeNameList(policyNames, "policies")
 
-		return `{if enabled then "ENABLED" else "disabled"} {toggled}.`
+		return `{if enabled then "Enabled" else "Disabled"} {toggled}.`
 	end)
 
 	self._cmdrService:RegisterCommand({
