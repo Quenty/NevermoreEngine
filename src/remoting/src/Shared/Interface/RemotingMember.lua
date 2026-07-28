@@ -9,8 +9,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
+local RemotingObservableServerRelay = require("RemotingObservableServerRelay")
 local RemotingRealms = require("RemotingRealms")
 
 local RemotingMember = {}
@@ -61,6 +63,44 @@ function RemotingMember.Bind(self: RemotingMember, callback: (...any) -> ...any)
 	assert(type(callback) == "function", "Bad callback")
 
 	return self._remoting:Bind(self._memberName, callback)
+end
+
+--[=[
+	Binds an observable factory to the member.
+
+	See [Remoting.BindObservable].
+
+	@server
+	@param factory (player: Player, ...any) -> Observable
+	@return MaidTask
+]=]
+function RemotingMember.BindObservable(
+	self: RemotingMember,
+	factory: RemotingObservableServerRelay.ObservableFactory
+): Maid.Maid
+	assert(type(factory) == "function", "Bad factory")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "BindObservable must be called on server")
+
+	return self._remoting:BindObservable(self._memberName, factory)
+end
+
+--[=[
+	Observes the member bound on the server with [RemotingMember.BindObservable].
+
+	```lua
+	maid:GiveTask(remoting.Health:Observe(entityId):Subscribe(print))
+	```
+
+	See [Remoting.Observe].
+
+	@client
+	@param ... any
+	@return Observable<...any>
+]=]
+function RemotingMember.Observe(self: RemotingMember, ...): Observable.Observable<...any>
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "Observe must be called on client")
+
+	return self._remoting:Observe(self._memberName, ...)
 end
 
 --[=[

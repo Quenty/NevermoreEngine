@@ -40,7 +40,7 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [cli.md](cli.md) | `nevermore` CLI command reference: every command and flag (`init`, `install`, `login`, `test`, `deploy`, `batch`, `tools`), global options, command tree |
 | [deploy.md](deploy.md) | `nevermore deploy`: login, `deploy init`, `deploy run`, config schema, flag reference, common workflows |
 | [architecture/](architecture/index.md) | Architecture: workspace layout, design philosophy, ServiceBag, dependency injection |
-| [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition; Brio pipeline pitfalls |
+| [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition, Remoting observables; Brio pipeline pitfalls |
 | [build.md](build.md) | Contributing: local setup, tools, versioning, custom Rojo |
 | [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
 | [testing/integration-testing.md](testing/integration-testing.md) | Integration testing: full-game tests, base place merging, deploy pipeline |

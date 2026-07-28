@@ -37,6 +37,27 @@ The three adders return different things, which matters when you want to keep us
 
 **When to use:** Any time you create connections, spawn threads, or instantiate objects that need cleanup. Almost every class uses one.
 
+### Register with the parent maid before attaching `Finally`
+
+A common shape is a short-lived maid, scoped to one async operation, parked on a long-lived one:
+
+```lua
+self._maid[opMaid] = opMaid
+opMaid:GiveTask(function()
+	self._maid[opMaid] = nil
+end)
+
+promise:Finally(function()
+	self._maid[opMaid] = nil   -- must come after the registration above
+end)
+```
+
+Written the other way round it leaks, silently and only sometimes. Our promises settle *synchronously* when the work is already done — an `:Then` on a resolved promise runs inline — so a `Finally` attached first fires immediately, removes an entry that isn't there yet, and then the registration lands with nothing left to clear it. The entry survives for the lifetime of the owner. It looks correct in review and behaves correctly whenever the operation happens to be genuinely async, which is what makes it easy to miss.
+
+`Maid:GivePromise` already does this correctly and is worth reading as the reference — it registers before attaching `Finally`, and early-outs entirely when the promise is already settled. Reach for it when the thing you're tracking *is* the promise. Hand-roll only when it isn't (tracking a sub-maid that owns the intermediate work, say), and then copy the ordering exactly.
+
+The invariant is worth asserting directly: bind, release, and check the owner's task count is back where it started. Repeating the cycle ten times turns a slow leak into an obvious one.
+
 ## BaseObject
 
 A lightweight base class that gives you a `_maid` and optional `_obj` reference for free. Nearly all Nevermore classes inherit from it.
@@ -275,6 +296,36 @@ end
 
 **When to use:** When you need optional or pluggable interfaces — particularly across client/server boundaries or for plugin systems where the implementer shouldn't need to know about the consumer.
 
+## Remoting observables
+
+[Remoting](/api/Remoting) wraps RemoteEvents and RemoteFunctions so a service can declare its network surface as members rather than hand-managed Instances. Alongside the event and method members it can carry observable streams: the server binds a factory, the client subscribes, and values flow for as long as the client stays subscribed.
+
+```lua
+-- Server
+remoting:BindObservable("Health", function(player, entityId)
+	return observeHealth(player, entityId)
+end)
+
+-- Client
+maid:GiveTask(remoting:Observe("Health", entityId):Subscribe(print))
+
+-- Or through member syntax, which reads better at the call site
+remoting.Health:BindObservable(function(player, entityId) ... end)
+maid:GiveTask(remoting.Health:Observe(entityId):Subscribe(print))
+```
+
+The factory runs once per subscription, so it can vary the stream by player and by the arguments the client passed. The server tears the stream down when the client unsubscribes, when the source completes or fails, when the player leaves, or when the remoting is destroyed — the client's subscription completes in that last case rather than hanging.
+
+Under the hood each observable member reserves one extra remote event named `<Member>__Observe`. A RemoteEvent is full duplex, so that single instance carries subscribe and unsubscribe up and emissions down.
+
+**Two ways this differs from a local observable:**
+
+**It cannot emit synchronously on subscribe.** Most Nevermore observables fire an initial value during `:Subscribe()`; this one can't, because the first value is at least a round trip away. Anything that assumes a synchronous first emission — a Blend binding, a `Rx.combineLatest` that mixes local and remote sources — will sit empty until the value lands. Give it a starting value with `Rx.defaultsTo` when the consumer can't tolerate that gap.
+
+**It is cold, and each subscription costs a stream.** Two `:Subscribe()` calls on the same observable open two server-side subscriptions and produce two streams of packets. That is correct Rx semantics but a real network bill, so pipe through `Rx.share()` when several consumers want the same values.
+
+**When to use:** When the client needs a live view of server state rather than a one-shot answer. For a single value, `PromiseInvokeServer` is cheaper and simpler.
+
 ## How the patterns fit together
 
 These patterns compose naturally:
@@ -286,3 +337,4 @@ These patterns compose naturally:
 5. **Blend + Rx** — Blend properties accept observables directly, making UI reactive.
 6. **ServiceBag + Binder** — Services create and manage binders; binders receive ServiceBag for dependency injection.
 7. **AdorneeData + Binder** — Binder creates a class per tagged Instance; AdorneeData reads/observes configuration attributes on that Instance.
+8. **Remoting + Rx** — Remoting carries observables across the client/server boundary, so a server-side Rx pipeline can drive client UI directly.

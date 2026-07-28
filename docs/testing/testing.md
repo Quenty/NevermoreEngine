@@ -284,6 +284,28 @@ Known limits — these are gaps in `player-mock`'s contract to fix there, not pa
 - Per-player data with no lookup domain yet: add a domain to `LOOKUPS` rather than stubbing per call
   site.
 
+### Both realms share a thread, so replication no longer hides creation races
+
+In a live game a server-created remote reaches the client a network step after the server finished
+wiring it up. Dummy mode collapses that: the server's `Instance.new` and the client's reaction to it
+run on one thread, so a client watching for a remote to appear can act on it *while the server is
+still mid-setup* — after the instance was parented, before the handler was attached. A message sent
+in that window goes nowhere and is never retried, which reads as a stream that silently never starts.
+
+The fix is to make the instance discoverable only once it is fully wired: create it detached, attach
+the handler, then parent it. `Remoting._getOrCreateRemoteEvent` and `_getOrCreateRemoteFunction` take
+an `attachHandler` callback for exactly this, so `Connect` and `Bind` are live the instant anything
+can see them. Parenting last is worth doing on reflex whenever another realm — or another observer —
+keys off an instance appearing.
+
+Resist the urge to paper over it with `task.defer` on the reacting side. It passes the test for the
+same reason production passes without it, which is precisely why it hides the defect rather than
+fixing it: the window is still there, just harder to hit.
+
+The general shape: when a spec covers one realm reacting to another realm creating an Instance, ask
+whether the reaction can observe a half-built state. If it can, the bug is real — production just has
+a network hop papering over it — and the ordering fix belongs in the package, not the spec.
+
 ### jest.config.lua
 
 Every testable package needs a `jest.config.lua` in its `src/` directory. This tells the test runner to discover `.spec` files:
