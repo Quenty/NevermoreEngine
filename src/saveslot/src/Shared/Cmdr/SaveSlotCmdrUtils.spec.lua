@@ -13,7 +13,9 @@ local it = Jest.Globals.it
 
 local FAKE_PLAYER = newproxy(false)
 
-local function newFakeDataService(state)
+local function newFakeDataService(state: any)
+	-- Mirrors the real service: an ephemeral slot is excluded from the slot list but still resolvable as
+	-- metadata, which is exactly the split the type has to bridge.
 	return {
 		GetSlotList = function(_self, _player)
 			return state.slots
@@ -21,7 +23,13 @@ local function newFakeDataService(state)
 		GetLastActiveSlotId = function(_self, _player)
 			return state.lastActiveSlotId
 		end,
+		IsActiveSlotEphemeral = function(_self, _player)
+			return state.ephemeralSlot ~= nil
+		end,
 		GetSlotMetadata = function(_self, _player, slotId)
+			if state.ephemeralSlot and state.ephemeralSlot.SlotId == slotId then
+				return state.ephemeralSlot
+			end
 			for _, slot in state.slots do
 				if slot.SlotId == slotId then
 					return slot
@@ -67,7 +75,7 @@ local function newFakeCmdr()
 	return cmdr, registered
 end
 
-local function registerSlotIndex(state)
+local function registerSlotIndex(state: any)
 	local cmdr, registered = newFakeCmdr()
 	SaveSlotCmdrUtils.registerSlotIndexType(cmdr :: any, newFakeDataService(state))
 	return registered.slotIndex, registered.slotIndices
@@ -116,6 +124,56 @@ describe("SaveSlotCmdrUtils.registerSlotIndexType", function()
 		})
 
 		expect(slotIndex.Parse(slotIndex.Transform("2", FAKE_PLAYER))).toBe(2)
+	end)
+
+	it("suggests the reserved ephemeral index while an ephemeral session is active", function()
+		local slotIndex = registerSlotIndex({
+			lastActiveSlotId = "id-ephemeral",
+			ephemeralSlot = { SlotId = "id-ephemeral", SlotIndex = 0, IsEphemeral = true },
+			slots = {
+				{ SlotId = "id-1", SlotIndex = 1 },
+			},
+		})
+
+		-- Transform("") is what "*" and autocomplete expand against.
+		expect(slotIndex.Transform("", FAKE_PLAYER)).toEqual({ "1", "0" })
+		expect(slotIndex.Default(FAKE_PLAYER)).toBe("0")
+		expect(slotIndex.Parse(slotIndex.Transform("0", FAKE_PLAYER))).toBe(0)
+	end)
+
+	it("leaves the ephemeral index out of the suggestions when no session is active", function()
+		local slotIndex = registerSlotIndex({
+			lastActiveSlotId = "id-1",
+			slots = {
+				{ SlotId = "id-1", SlotIndex = 1 },
+			},
+		})
+
+		expect(slotIndex.Transform("", FAKE_PLAYER)).toEqual({ "1" })
+	end)
+
+	it("accepts a literal index the executor has no slot for, so other players can be targeted", function()
+		local slotIndex = registerSlotIndex({
+			lastActiveSlotId = "id-1",
+			slots = {
+				{ SlotId = "id-1", SlotIndex = 1 },
+			},
+		})
+
+		expect((slotIndex.Validate(slotIndex.Transform("3", FAKE_PLAYER)))).toBe(true)
+		expect(slotIndex.Parse(slotIndex.Transform("3", FAKE_PLAYER))).toBe(3)
+	end)
+
+	it("rejects text that is not a slot index at all", function()
+		local slotIndex = registerSlotIndex({
+			lastActiveSlotId = "id-1",
+			slots = {
+				{ SlotId = "id-1", SlotIndex = 1 },
+			},
+		})
+
+		expect((slotIndex.Validate(slotIndex.Transform("nope", FAKE_PLAYER)))).toBe(false)
+		expect((slotIndex.Validate(slotIndex.Transform("-2", FAKE_PLAYER)))).toBe(false)
 	end)
 
 	it('exposes Default on the listable type too, so "." works for delete-save-slot', function()

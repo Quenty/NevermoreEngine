@@ -461,6 +461,20 @@ function SaveSlotService.PromiseResetActiveSlot(self: SaveSlotService, player: P
 end
 
 --[=[
+	Turns the player's ephemeral session into a real save slot and continues play on it, resolving to the
+	new slot id. See [HasSaveSlots.PromisePersistEphemeralSlot].
+]=]
+function SaveSlotService.PromisePersistEphemeralSlot(
+	self: SaveSlotService,
+	player: Player,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<SaveSlotData.SlotId>
+	return self._hasSaveSlotsBinder:Promise(player):Then(function(hasSaveSlots)
+		return hasSaveSlots:PromisePersistEphemeralSlot(slotId)
+	end)
+end
+
+--[=[
 	Exports the player's non-main slot into a serializable table. See [HasSaveSlots.PromiseExportSlot].
 ]=]
 function SaveSlotService.PromiseExportSlot(
