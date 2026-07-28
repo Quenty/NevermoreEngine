@@ -351,6 +351,9 @@ end
 	How a list of names reads back in a confirmation. Names them while there are few enough to check at a
 	glance, and counts them once naming them would be a wall -- which is exactly what `*` produces.
 
+	Sorted, because Cmdr builds a list argument by iterating its dedupe table: the order it hands back is
+	hash order, not the order anybody typed.
+
 	@param names { string }
 	@param noun string -- plural, for the count and empty forms: "facts", "policies"
 	@return string
@@ -358,11 +361,14 @@ end
 function AccessCommandUtils.describeNameList(names: { string }, noun: string): string
 	if #names == 0 then
 		return `no {noun}`
-	elseif #names <= NAMED_LIMIT then
-		return table.concat(names, ", ")
+	elseif #names > NAMED_LIMIT then
+		return `{#names} {noun}`
 	end
 
-	return `{#names} {noun}`
+	local sorted = table.clone(names)
+	table.sort(sorted)
+
+	return table.concat(sorted, ", ")
 end
 
 --[=[
