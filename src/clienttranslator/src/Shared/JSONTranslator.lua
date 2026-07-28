@@ -61,7 +61,7 @@ export type JSONTranslator = typeof(setmetatable(
 		_createLoader: (serviceBag: ServiceBag.ServiceBag) -> LocaleLoader,
 		_loader: LocaleLoader,
 		_localizationTable: any,
-		_localTranslator: ValueObject.ValueObject<any>,
+		_localTranslators: { [string]: any },
 		_sourceTranslator: ValueObject.ValueObject<any>,
 	},
 	{} :: typeof({ __index = JSONTranslator })
@@ -132,7 +132,7 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 	self._tieRealmService = self._serviceBag:GetService(TieRealmService) :: any
 
 	self._maid = Maid.new()
-	self._localTranslator = self._maid:Add(ValueObject.new(nil))
+	self._localTranslators = {}
 	self._sourceTranslator = self._maid:Add(ValueObject.new(nil))
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
@@ -152,10 +152,6 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 		self._loader:LoadAllLocales()
 	end
 
-	-- TODO: Maybe don't hold these unless needed
-	self._maid:GiveTask(self._translatorService:ObserveLocaleId():Subscribe(function(localeId)
-		self._localTranslator.Value = self._localizationTable:GetTranslator(localeId)
-	end))
 	self._maid:GiveTask(
 		RxInstanceUtils.observeProperty(self._localizationTable, "SourceLocaleId"):Subscribe(function(localeId)
 			self._sourceTranslator.Value = self._localizationTable:GetTranslator(localeId)
@@ -334,6 +330,13 @@ function JSONTranslator._observeTranslationTrigger(
 		local hasFired = false
 
 		maid:GiveTask(self:ObserveTranslationReady(translationKey):Subscribe(function(readyLocaleId: string?)
+			-- Readiness belongs to the TranslatorService, which outlives this translator (the
+			-- service bag tears services down in reverse init order), so a consumer's
+			-- subscription can still be fed after Destroy has stripped the metatable.
+			if not self.Destroy then
+				return
+			end
+
 			if readyLocaleId ~= nil or not hasFired then
 				hasFired = true
 				sub:Fire(readyLocaleId)
@@ -535,7 +538,7 @@ function JSONTranslator._doTranslation(
 	-- selector) does not move, so it is only consulted when the languages agree.
 	-- The source translator is exempt: answering in another language is its whole job.
 	local translation = self:_tryTranslate(translator, translationKey, args, targetLocaleId)
-		or self:_tryTranslate(self._localTranslator.Value, translationKey, args, targetLocaleId)
+		or self:_tryTranslate(self:_getLocalTranslator(targetLocaleId), translationKey, args, targetLocaleId)
 		or self:_tryTranslate(self._sourceTranslator.Value, translationKey, args, nil)
 
 	if translation then
@@ -553,6 +556,22 @@ function JSONTranslator._doTranslation(
 	return translationKey
 end
 
+-- The local table's translator for a locale, cached per locale. Resolved from the locale
+-- being translated for rather than held in a ValueObject updated by a locale subscription:
+-- signal handlers fire newest-connected first, so such a subscription can still hold the
+-- previous locale's translator while a reader is translating for the new one. A translator
+-- reflects entries written after it was obtained, so caching one per locale is safe.
+function JSONTranslator._getLocalTranslator(self: JSONTranslator, localeId: string): Translator?
+	local found = self._localTranslators[localeId]
+	if found then
+		return found
+	end
+
+	local translator = self._localizationTable:GetTranslator(localeId)
+	self._localTranslators[localeId] = translator
+	return translator
+end
+
 -- Translates through one translator, returning nil when it cannot answer: it is absent, it
 -- is built for another language than requiredLocaleId (nil to accept any), or it does not
 -- have the key. Roblox raises rather than returning nil for a missing key, hence the pcall.
@@ -567,11 +586,8 @@ function JSONTranslator._tryTranslate(
 		return nil
 	end
 
-	if requiredLocaleId then
-		local languageSubtag = ResolveLocaleUtils.getLanguageSubtag(requiredLocaleId)
-		if languageSubtag and ResolveLocaleUtils.getLanguageSubtag(translator.LocaleId) ~= languageSubtag then
-			return nil
-		end
+	if requiredLocaleId and not ResolveLocaleUtils.isCompatibleLocale(requiredLocaleId, translator.LocaleId) then
+		return nil
 	end
 
 	local translation: string?

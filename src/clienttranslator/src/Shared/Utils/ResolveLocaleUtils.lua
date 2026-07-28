@@ -51,9 +51,62 @@ function ResolveLocaleUtils.getLanguageSubtag(locale: string?): string?
 	return string.lower(languageSubtag)
 end
 
+-- Regions written in Traditional Chinese. A `zh` locale that names one of these is
+-- Traditional even without an explicit `hant` script subtag (`zh-tw`, `zh-hk`, `zh-mo`).
+-- Frozen rather than Table.readonly: this is looked up with subtags that are usually not in
+-- it, and Table.readonly raises on a missing index.
+local TRADITIONAL_CHINESE_REGIONS: { [string]: boolean } = table.freeze({ tw = true, hk = true, mo = true })
+
+-- Splits a locale into its lowercased subtags, accepting either separator. Returns nil when
+-- there is nothing to split.
+local function getSubtags(locale: string?): { string }?
+	if type(locale) ~= "string" or locale == "" then
+		return nil
+	end
+
+	local subtags = {}
+	for subtag in string.gmatch(string.lower(locale), "[^-_]+") do
+		table.insert(subtags, subtag)
+	end
+
+	if #subtags == 0 then
+		return nil
+	end
+
+	return subtags
+end
+
 --[=[
-	Whether a Chinese locale is Traditional. `hant`, and the `tw` / `hk` / `mo`
-	regions are Traditional; everything else (`hans`, `cn`, `sg`, bare `zh`) is
+	Returns the script subtag, or nil when the locale does not carry one. A script subtag is
+	the four-letter subtag directly after the language (`zh-Hant`, `zh-Hant-TW`, `sr-Latn`);
+	a two-letter or three-digit subtag in that position is a region, not a script.
+
+	```lua
+	ResolveLocaleUtils.getScriptSubtag("zh-Hant-TW") --> "hant"
+	ResolveLocaleUtils.getScriptSubtag("zh-TW") --> nil
+	```
+
+	@param locale string?
+	@return string?
+	@within ResolveLocaleUtils
+]=]
+function ResolveLocaleUtils.getScriptSubtag(locale: string?): string?
+	local subtags = getSubtags(locale)
+	if not subtags then
+		return nil
+	end
+
+	local candidate = subtags[2]
+	if candidate and #candidate == 4 and string.match(candidate, "^%a+$") then
+		return candidate
+	end
+
+	return nil
+end
+
+--[=[
+	Whether a Chinese locale is Traditional. The `hant` script subtag, and the `tw` / `hk` /
+	`mo` regions, are Traditional; everything else (`hans`, `cn`, `sg`, bare `zh`) is
 	Simplified. Only meaningful for `zh` locales.
 
 	@param locale string?
@@ -61,15 +114,71 @@ end
 	@within ResolveLocaleUtils
 ]=]
 function ResolveLocaleUtils.isTraditionalChinese(locale: string?): boolean
-	if type(locale) ~= "string" then
+	local subtags = getSubtags(locale)
+	if not subtags then
 		return false
 	end
 
-	local lowered = string.lower(locale)
-	return string.find(lowered, "hant", 1, true) ~= nil
-		or string.find(lowered, "-tw", 1, true) ~= nil
-		or string.find(lowered, "-hk", 1, true) ~= nil
-		or string.find(lowered, "-mo", 1, true) ~= nil
+	-- Matched per subtag rather than as a substring, so a region only counts in the region
+	-- position -- and so `_` separators are read the same as `-`.
+	for index = 2, #subtags do
+		local subtag = subtags[index]
+		if subtag == "hant" then
+			return true
+		elseif subtag == "hans" then
+			return false
+		elseif TRADITIONAL_CHINESE_REGIONS[subtag] then
+			return true
+		end
+	end
+
+	return false
+end
+
+--[=[
+	Whether two locales are close enough that one can be read in place of the other: the same
+	language, written in the same script.
+
+	Regional variants of a language substitute for one another, so `es-mx` reads `es-es` and
+	`en-gb` reads `en-us`. Scripts do not: Traditional and Simplified Chinese are not mutually
+	readable, so `zh-tw` never reads `zh-cn`, whether the script is spelled out (`zh-Hant` vs
+	`zh-Hans`) or implied by region (`zh-tw` vs `zh-cn`). The same holds for any language
+	whose locales carry differing script subtags, such as `sr-Latn` and `sr-Cyrl`.
+
+	```lua
+	ResolveLocaleUtils.isCompatibleLocale("es-mx", "es-es") --> true
+	ResolveLocaleUtils.isCompatibleLocale("zh-tw", "zh-cn") --> false
+	ResolveLocaleUtils.isCompatibleLocale("pt-br", "en-us") --> false
+	```
+
+	@param locale string?
+	@param otherLocale string?
+	@return boolean
+	@within ResolveLocaleUtils
+]=]
+function ResolveLocaleUtils.isCompatibleLocale(locale: string?, otherLocale: string?): boolean
+	local languageSubtag = ResolveLocaleUtils.getLanguageSubtag(locale)
+	local otherLanguageSubtag = ResolveLocaleUtils.getLanguageSubtag(otherLocale)
+
+	if not languageSubtag or not otherLanguageSubtag or languageSubtag ~= otherLanguageSubtag then
+		return false
+	end
+
+	-- Chinese carries its script in the region as often as in a script subtag, so it needs
+	-- the dedicated check rather than the generic one below.
+	if languageSubtag == "zh" then
+		return ResolveLocaleUtils.isTraditionalChinese(locale) == ResolveLocaleUtils.isTraditionalChinese(otherLocale)
+	end
+
+	-- Only when both name a script: a bare `sr` is readable as either, and demanding a match
+	-- would break the regional fallback this exists to preserve.
+	local script = ResolveLocaleUtils.getScriptSubtag(locale)
+	local otherScript = ResolveLocaleUtils.getScriptSubtag(otherLocale)
+	if script and otherScript and script ~= otherScript then
+		return false
+	end
+
+	return true
 end
 
 --[=[

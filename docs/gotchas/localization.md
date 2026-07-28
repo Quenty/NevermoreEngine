@@ -54,9 +54,24 @@ The behaviors above were established empirically against Open Cloud; see
   knows, it returns the player-locale text and **succeeds** — so a fallback chain that tries it
   first silently serves the wrong language after a locale swap.
 
-`JSONTranslator._doTranslation` therefore only consults a translator whose language subtag matches
-the locale being translated for, before falling back to the source translator (whose job is to
-answer in another language).
+`JSONTranslator._doTranslation` therefore only consults a translator that
+`ResolveLocaleUtils.isCompatibleLocale` accepts for the locale being translated for, before falling
+back to the source translator (whose job is to answer in another language).
+
+Compatible means same language **and same script**, which is not the same as sharing a language
+subtag:
+
+- Regional variants substitute: `es-mx` reads `es-es`, `en-gb` reads `en-us`, `pt-br` reads
+  `pt-pt`. Losing this would break the regional fallback games rely on.
+- Scripts do not: `zh-tw` never reads `zh-cn`. Chinese carries its script in the region
+  (`zh-tw`/`zh-hk`/`zh-mo` are Traditional) as often as in a script subtag (`zh-Hant`), so both
+  spellings have to be understood. The same holds for any language with differing script subtags,
+  such as `sr-Latn` and `sr-Cyrl`.
+- A locale that names no script reads as either, so `sr` and `sr-Cyrl` substitute.
+
+Note this is a different question from `ResolveLocaleUtils.resolveClosestKey`, which picks the
+best available key from a table the caller owns and may deliberately route `zh-tw` to a
+Simplified key when that is all that exists (fine for number formatting, wrong for text).
 
 ## Localization writes are batched, so a key is not readable the instant it is registered
 

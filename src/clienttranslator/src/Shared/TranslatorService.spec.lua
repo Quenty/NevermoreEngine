@@ -355,9 +355,10 @@ describe("TranslatorService write cost while streaming in", function()
 		service:FlushEntryForKey("streamed.key1")
 
 		-- The read lands its own key's locales and nothing else, so the batch survives to be
-		-- coalesced into the single end-of-frame write.
+		-- coalesced into the single end-of-frame write. Landing a locale dequeues it, so the
+		-- repeated read locales cost nothing and this is exactly one write.
 		local writesAfterRead = service:GetLocalizationWriteCount()
-		expect(writesAfterRead <= 4).toBe(true)
+		expect(writesAfterRead).toBe(1)
 		expect(service:IsTranslationReady("streamed.key100")).toBe(false)
 
 		controller.awaitEntriesWritten()

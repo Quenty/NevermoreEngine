@@ -18,7 +18,6 @@ local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
-local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
 local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
@@ -45,6 +44,13 @@ type PendingEntry = {
 -- also lets a single-key flush ([TranslatorService.FlushEntryForKey]) find its entry in O(1).
 type PendingEntries = { [string]: PendingEntry }
 
+-- One subscriber to a key's readiness. Flagged rather than only removed from its list, so a
+-- fan-out already in progress over a copy of that list can skip it.
+type ReadyObserver = {
+	Callback: (boolean) -> (),
+	Disconnected: boolean,
+}
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
@@ -58,8 +64,8 @@ export type TranslatorService = typeof(setmetatable(
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
 		_pendingEntries: PendingEntries,
-		_readySignals: { [string]: Signal.Signal<boolean> },
-		_readySignalMaid: Maid.Maid,
+		_readyObservers: { [string]: { ReadyObserver } },
+		_isDestroyed: boolean,
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
@@ -75,8 +81,8 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._tieRealmService = serviceBag:GetService(TieRealmService) :: any
 
 	self._pendingEntries = {}
-	self._readySignals = {}
-	self._readySignalMaid = self._maid:Add(Maid.new())
+	self._readyObservers = {}
+	self._isDestroyed = false
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
 
@@ -131,8 +137,9 @@ end
 	synchronously, so a burst of translators loading does not each pay the cost of
 	mutating (and re-replicating) the shared localization table in the load path.
 
-	Await [TranslatorService.PromiseEntriesWritten] before reading a translation to
-	guarantee the pending writes have landed.
+	A key is therefore not readable the instant it is registered. Gate reads on
+	[TranslatorService.ObserveTranslationReady], which tracks the key you are about to read
+	rather than whichever batch happened to be pending.
 
 	@param translationKey string
 	@param source string
@@ -148,9 +155,15 @@ function TranslatorService.SetEntryValue(
 	localeId: string,
 	text: string
 )
-	local entry = self:_getPendingEntry(translationKey, source, context)
+	local entry, becamePending = self:_getPendingEntry(translationKey, source, context)
 	entry.Values[localeId] = text
 	self:_scheduleFlush()
+
+	-- Announced only once the value is stored and the flush is scheduled, so a subscriber
+	-- reacting to "not ready" sees state that agrees with it.
+	if becamePending then
+		self:_fireTranslationReady(translationKey, false)
+	end
 end
 
 --[=[
@@ -168,29 +181,33 @@ function TranslatorService.SetEntryExample(
 	context: string,
 	example: string
 )
-	local entry = self:_getPendingEntry(translationKey, source, context)
+	local entry, becamePending = self:_getPendingEntry(translationKey, source, context)
 	entry.Example = example
 	self:_scheduleFlush()
+
+	if becamePending then
+		self:_fireTranslationReady(translationKey, false)
+	end
 end
 
+-- Returns the pending delta for a key, and whether this call is what made the key pending
+-- (the caller announces that, once the write it is making has actually been stored).
 function TranslatorService._getPendingEntry(
 	self: TranslatorService,
 	translationKey: string,
 	source: string,
 	context: string
-): PendingEntry
+): (PendingEntry, boolean)
 	local entry = self._pendingEntries[translationKey]
 	if not entry then
-		entry = {
+		local newEntry: PendingEntry = {
 			Key = translationKey,
 			Source = source,
 			Context = context,
 			Values = {},
 		}
-		self._pendingEntries[translationKey] = entry
-
-		-- Queuing is the only transition into "not ready", so observers hear about it here.
-		self:_fireTranslationReady(translationKey, false)
+		self._pendingEntries[translationKey] = newEntry
+		return newEntry, true
 	else
 		-- The table keys entries by translation key alone, so a second write for the same key
 		-- with a different source/context overwrites in place (as SetEntryValue would) rather
@@ -198,14 +215,18 @@ function TranslatorService._getPendingEntry(
 		entry.Source = source
 		entry.Context = context
 	end
-	return entry
+
+	return entry, false
 end
 
 --[=[
 	Returns a promise that resolves once all currently-queued localization writes
 	have been flushed to the table. Resolves immediately if nothing is pending.
 
-	Read paths should await this so translation never reads before the writes land.
+	This answers for the batch pending when it is called, which is not necessarily the batch
+	carrying the data a reader wants: writes queued while this flush resolves land in the
+	next one. Gate reads on [TranslatorService.ObserveTranslationReady] instead -- this is for
+	callers that want the current batch settled, such as tests.
 
 	@return Promise
 ]=]
@@ -261,40 +282,57 @@ function TranslatorService.ObserveTranslationReady(
 	assert(type(translationKey) == "string", "Bad translationKey")
 
 	return Observable.new(function(sub)
-		local maid = Maid.new()
-
-		local signal = self._readySignals[translationKey]
-		if not signal then
-			signal = Signal.new() :: any
-			self._readySignals[translationKey] = signal
-			self._readySignalMaid[translationKey] = signal
+		-- Observers are held per key so queuing a write costs one lookup rather than a
+		-- fan-out over every subscriber in the game.
+		local observers = self._readyObservers[translationKey]
+		if not observers then
+			observers = {}
+			self._readyObservers[translationKey] = observers
 		end
 
-		maid:GiveTask(signal:Connect(function(isReady: boolean)
-			sub:Fire(isReady)
-		end))
-
-		-- Signals are created per observed key so queuing a write costs one lookup rather
-		-- than a fan-out over every subscriber. Drop the signal once its last observer goes,
-		-- so a game that observes many keys transiently does not accumulate them.
-		maid:GiveTask(function()
-			if signal:GetConnectionCount() == 0 and self._readySignals[translationKey] == signal then
-				self._readySignals[translationKey] = nil
-				self._readySignalMaid[translationKey] = nil
-			end
-		end)
+		local observer: ReadyObserver = {
+			Callback = function(isReady: boolean)
+				sub:Fire(isReady)
+			end,
+			Disconnected = false,
+		}
+		table.insert(observers, observer)
 
 		sub:Fire(self:IsTranslationReady(translationKey))
 
-		return maid
+		return function()
+			observer.Disconnected = true
+
+			local index = table.find(observers, observer)
+			if index then
+				table.remove(observers, index)
+			end
+
+			-- Dropping the last observer's list keeps a game that observes many keys
+			-- transiently from accumulating them.
+			if #observers == 0 and self._readyObservers[translationKey] == observers then
+				self._readyObservers[translationKey] = nil
+			end
+		end
 	end) :: any
 end
 
--- Fires an observed key's readiness signal, if anything is observing it.
+-- Tells a key's observers about a readiness change.
 function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string, isReady: boolean)
-	local signal = self._readySignals[translationKey]
-	if signal then
-		signal:Fire(isReady)
+	local observers = self._readyObservers[translationKey]
+	if not observers then
+		return
+	end
+
+	-- Over a copy, and skipping observers disconnected mid-fan-out: a handler is consumer
+	-- code, and one that tears down UI can unsubscribe its siblings. The disconnected check
+	-- has to be per observer rather than a membership test, since a handler may also
+	-- subscribe -- a new observer has already been told the current state directly.
+	for _, observer in table.clone(observers) do
+		if not observer.Disconnected then
+			-- Spawned so a raising handler cannot abort the fan-out and strand the rest.
+			task.spawn(observer.Callback, isReady)
+		end
 	end
 end
 
@@ -390,7 +428,9 @@ function TranslatorService.GetLocalizationWriteCount(self: TranslatorService): n
 end
 
 function TranslatorService._scheduleFlush(self: TranslatorService)
-	if self._flushScheduled then
+	-- A write after teardown must not re-arm the flush: the deferred callback would outlive
+	-- the service and write the whole stale queue back into the shared table a frame later.
+	if self._flushScheduled or self._isDestroyed then
 		return
 	end
 
@@ -415,6 +455,13 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	local pendingEntries = self._pendingEntries
 	self._pendingEntries = {}
 
+	-- Taken before anything can run consumer code. Firing readiness below re-enters this
+	-- service -- a handler that registers a key schedules the next flush, which installs its
+	-- own promise -- so reading this field afterwards would resolve that batch's promise
+	-- instead of this one, and strand everyone awaiting this one.
+	local promise = self._pendingFlushPromise
+	self._pendingFlushPromise = nil
+
 	if next(pendingEntries) then
 		self:_applyPendingEntries(pendingEntries)
 	end
@@ -422,13 +469,15 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	-- After the table is written, so an observer that re-reads on this emission sees the
 	-- landed values. Fires for every key in the batch, including ones _applyPendingEntries
 	-- skipped as already-matching -- their data is in the table either way, and a key that
-	-- never went ready would strand its readers.
+	-- never went ready would strand its readers. A key a handler has already re-queued during
+	-- this very loop is skipped: it is pending again, and claiming otherwise would publish a
+	-- ready state that IsTranslationReady contradicts.
 	for translationKey in pendingEntries do
-		self:_fireTranslationReady(translationKey, true)
+		if self._pendingEntries[translationKey] == nil then
+			self:_fireTranslationReady(translationKey, true)
+		end
 	end
 
-	local promise = self._pendingFlushPromise
-	self._pendingFlushPromise = nil
 	if promise then
 		promise:Resolve()
 	end
@@ -675,10 +724,20 @@ function TranslatorService._observeLoadedPlayer(self: TranslatorService): Observ
 end
 
 function TranslatorService.Destroy(self: TranslatorService)
-	-- Ensures a still-pending deferred flush no-ops instead of recreating the table.
+	-- Ensures a still-pending deferred flush no-ops instead of recreating the table, and that
+	-- a later write cannot arm a new one.
+	self._isDestroyed = true
 	self._flushScheduled = false
+	table.clear(self._pendingEntries)
+	table.clear(self._readyObservers)
 
-	table.clear(self._readySignals)
+	-- Settled rather than left pending: an awaiter of a batch that will now never be written
+	-- would otherwise hang for the lifetime of the place.
+	local promise = self._pendingFlushPromise
+	self._pendingFlushPromise = nil
+	if promise then
+		promise:Resolve()
+	end
 
 	self._maid:DoCleaning()
 end
