@@ -45,7 +45,7 @@ AccessCommandUtils.OverrideValues = {
 
 local DECIDED_MARKER = " <-- decided"
 local SOURCE_WIDTH = 16
-local NAMED_FACT_LIMIT = 4
+local NAMED_LIMIT = 4
 
 --[[
 	GOTCHA: keeps the LAST emission, not the first. A fact opens on unresolved before anything is looked
@@ -348,20 +348,21 @@ function AccessCommandUtils.formatPlayerState(
 end
 
 --[=[
-	How a list of facts reads back in a confirmation. Names them while there are few enough to check at a
+	How a list of names reads back in a confirmation. Names them while there are few enough to check at a
 	glance, and counts them once naming them would be a wall -- which is exactly what `*` produces.
 
-	@param factNames { string }
+	@param names { string }
+	@param noun string -- plural, for the count and empty forms: "facts", "policies"
 	@return string
 ]=]
-function AccessCommandUtils.describeFactList(factNames: { string }): string
-	if #factNames == 0 then
-		return "no facts"
-	elseif #factNames <= NAMED_FACT_LIMIT then
-		return table.concat(factNames, ", ")
+function AccessCommandUtils.describeNameList(names: { string }, noun: string): string
+	if #names == 0 then
+		return `no {noun}`
+	elseif #names <= NAMED_LIMIT then
+		return table.concat(names, ", ")
 	end
 
-	return `{#factNames} facts`
+	return `{#names} {noun}`
 end
 
 --[=[
@@ -516,6 +517,21 @@ function AccessCommandUtils.registerTypes(cmdr: any, accessDataService: any, get
 		end,
 	}
 
+	local policyName = {
+		Transform = function(text: string)
+			return cmdr.Util.MakeFuzzyFinder(if getPolicyNames then getPolicyNames() else { text })(text)
+		end,
+		Validate = function(keys)
+			return #keys > 0, "No policy registered by that name."
+		end,
+		Autocomplete = function(keys)
+			return keys
+		end,
+		Parse = function(keys)
+			return keys[1]
+		end,
+	}
+
 	cmdr.Registry:RegisterType("accessFactName", factName)
 	-- Listable, which is what buys `access-override . * false`: Cmdr only expands `*` and `**` for a type
 	-- that says it takes a list. `all` is the spelled-out alias, the same one the built-in players type
@@ -529,20 +545,17 @@ function AccessCommandUtils.registerTypes(cmdr: any, accessDataService: any, get
 		})
 	)
 	cmdr.Registry:RegisterType("accessFeatureName", featureName)
-	cmdr.Registry:RegisterType("accessPolicyName", {
-		Transform = function(text: string)
-			return cmdr.Util.MakeFuzzyFinder(if getPolicyNames then getPolicyNames() else { text })(text)
-		end,
-		Validate = function(keys)
-			return #keys > 0, "No policy registered by that name."
-		end,
-		Autocomplete = function(keys)
-			return keys
-		end,
-		Parse = function(keys)
-			return keys[1]
-		end,
-	})
+	cmdr.Registry:RegisterType("accessPolicyName", policyName)
+	-- Same as the facts, and for the same reason: `access-policy * off` is how somebody switches every
+	-- consequence off to see the game without them.
+	cmdr.Registry:RegisterType(
+		"accessPolicyNames",
+		cmdr.Util.MakeListableType(policyName, {
+			ArgumentOperatorAliases = {
+				all = "*",
+			},
+		})
+	)
 	cmdr.Registry:RegisterType(
 		"accessToggle",
 		cmdr.Util.MakeEnumType("accessToggle", {
