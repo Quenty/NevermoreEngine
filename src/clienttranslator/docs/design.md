@@ -23,6 +23,29 @@ JSONTranslator          per-translator: owns a loader, resolves text for a key
 Loaders only ever *queue*. Everything that touches the `LocalizationTable` goes through
 `TranslatorService`.
 
+## One table per realm, and what that costs
+
+`TranslatorService.GetLocalizationTable` names the table by realm — `GeneratedJSONTable_Server` on
+the server, `GeneratedJSONTable_Client` on the client — both under `LocalizationService`. They were
+a single `GeneratedJSONTable` until `c1a7b0a` (2023), whose message says only "fix localization
+table replication". The failure it removes is visible in the shape it replaced: with one name the
+server created the table, it replicated, and the client then wrote its own entries into a
+server-owned instance — writes that stay local, and that the server's next `SetEntries` re-
+replicates the whole entry list over.
+
+The consequence is easy to miss, because nothing in the API hints at it. `ToTranslationKey(prefix,
+text)` returns a key **and registers `text` as that key's source** — into the table of the realm it
+ran on. A key minted on the server therefore reaches the client with nothing behind it. The
+client's table never saw the source, and the cloud translator does not know keys registered at
+runtime either, so `_doTranslation` falls through every translator and returns the key, which is
+what the player reads. Nothing corrects it later: there is no translation on its way.
+
+**So mint on the realm that renders.** Send the authored text (or the prefix and text) rather than
+only the key, and let the reading realm call `ToTranslationKey` or `ObserveTranslation` — since
+registration is a side effect of minting, one call does both, and the derivation is deterministic
+so both realms land on the same key. The server may keep minting its own copy for the CSV export;
+the two registrations are the same entry with the same source.
+
 ## Writes are batched, and that is not negotiable
 
 Every raw write to a `LocalizationTable` invalidates every `AutoLocalize` entry in the engine. A
@@ -116,6 +139,19 @@ ValueObject that a locale subscription updates. Signal handlers fire **newest-co
 such a subscription can still hold the previous locale's translator while a reader is translating
 for the new one — which rendered the source language permanently when swapping back to an
 already-loaded locale.
+
+## Sharp edge: the source locale is a constant
+
+`ToTranslationKey` registers its source under `"en"` — not under the table's `SourceLocaleId`, and
+not under the locale the `JSONTranslator` was constructed for. Synchronous reads survive that by
+coincidence. `FormatByKey` lands its key through `FlushEntryForKey`, which flushes only the locales
+a read can consult (the current locale, the table's `SourceLocaleId`, and both language subtags),
+and a fresh `LocalizationTable`'s `SourceLocaleId` is `en-us`, whose subtag is `en`.
+
+Reuse a `GeneratedJSONTable_Client` shipped in a place file with a different source locale and the
+`"en"` value falls in none of those buckets: it stays queued past the read, `FormatByKey` misses,
+and since that path is one-shot the key renders for the life of whatever drew it. Taking the source
+locale from the translator would remove the coincidence. Not fixed today.
 
 ## Locale compatibility vs closest key
 

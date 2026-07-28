@@ -38,6 +38,34 @@ translation key itself (`quests.groups.theBeginning`), and one warning is logged
 signal that a key is missing everywhere, not just in the current language — a key missing only in
 the current language quietly falls back to the source locale instead.
 
+## Keys you generate at runtime belong to the realm that generated them
+
+`JSONTranslator:ToTranslationKey(prefix, text)` hands back a key *and* registers `text` as the
+source behind it — into that realm's localization table. The server and the client each have their
+own (`GeneratedJSONTable_Server` and `GeneratedJSONTable_Client`), and neither sees the other's.
+
+So if your server turns an authored string into a key and sends the client only the key, the client
+has nothing to render but the key. Uploaded cloud translations do not cover it either: they only
+know keys that existed when you exported the CSV, and this one was generated at runtime.
+
+Mint on the realm that renders. Send the text — or the prefix and the text — and let the client
+call `ToTranslationKey` or `ObserveTranslation`, which registers the source as it derives the same
+key:
+
+```lua
+-- Server: mint so the string lands in the CSV export, but send the text, not the key.
+translator:ToTranslationKey("npcs", displayName)
+remote:FireClient(player, displayName)
+
+-- Client: the same call derives the same key, and registers the source while doing it.
+maid:GiveTask(translator:ObserveTranslation("npcs", displayName):Subscribe(function(text)
+    label.Text = text
+end))
+```
+
+Unlike a key whose data is merely still queued, this does not fix itself a frame later — there is
+no translation on the way.
+
 ## Text may correct itself a frame after it appears
 
 `ObserveFormatByKey` emits immediately so a label is never blank, then re-emits the real
