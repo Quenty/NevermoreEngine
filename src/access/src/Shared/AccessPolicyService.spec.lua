@@ -19,14 +19,24 @@ local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+-- `tieRealm` is what the bag is *told* it is, which is not always what RunService reports -- a test
+-- booting both halves in one DataModel is the whole reason that distinction exists. Passing it is how a
+-- client-realm policy can be exercised at all from a runner that is technically a server.
+local function setup(tieRealm: string?)
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
+	if tieRealm then
+		-- Before Init, which only infers a realm when it has not been given one.
+		local tieRealmService: any = serviceBag:GetService(TieRealmService)
+		tieRealmService:SetTieRealm(tieRealm)
+	end
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	local accessPolicyService: AccessPolicyService.AccessPolicyService =
 		serviceBag:GetService(AccessPolicyService) :: any
@@ -646,6 +656,60 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		controller.accessPolicyService:AddPlayer(player)
 
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "clientOnly")).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	-- The realm has to come from the bag, not from RunService. Read from RunService, a client-realm policy
+	-- in a bag told it is a client never runs: registered, listed, enabled, and silently doing nothing.
+	it("runs a client-realm policy in a bag that was told it is a client", function()
+		local controller = setup(TieRealms.CLIENT)
+		local applied = { n = 0 }
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
+				policyName = "clientOnly",
+				realm = AccessPolicyRealm.CLIENT,
+				isEnabledByDefault = true,
+				apply = function()
+					applied.n += 1
+
+					return function()
+						applied.n -= 1
+					end
+				end,
+			})))
+		)
+
+		local player = controller.fakePlayer()
+		controller.accessPolicyService:AddPlayer(player)
+
+		expect(applied.n).toEqual(1)
+		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "clientOnly")).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("still refuses a server-realm policy in a bag that was told it is a client", function()
+		local controller = setup(TieRealms.CLIENT)
+		local applied = { n = 0 }
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
+				policyName = "serverOnly",
+				realm = AccessPolicyRealm.SERVER,
+				isEnabledByDefault = true,
+				apply = function()
+					applied.n += 1
+
+					return nil
+				end,
+			})))
+		)
+
+		local player = controller.fakePlayer()
+		controller.accessPolicyService:AddPlayer(player)
+
+		expect(applied.n).toEqual(0)
+		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "serverOnly")).toEqual(false)
 
 		controller:destroy()
 	end)

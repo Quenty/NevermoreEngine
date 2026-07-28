@@ -22,7 +22,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local AccessDataService = require("AccessDataService")
 local AccessFactNames = require("AccessFactNames")
@@ -39,6 +38,7 @@ local Promise = require("Promise")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 
 local AccessPolicyService = {}
 AccessPolicyService.ServiceName = "AccessPolicyService"
@@ -328,8 +328,24 @@ function AccessPolicyService.IsPolicyActiveForPlayer(
 
 	return policy ~= nil
 		and self:IsPolicyEnabled(policyName)
-		and policy:RunsInRealm(RunService:IsServer())
+		and self:_runsHere(policy)
 		and self._playerMaids[player] ~= nil
+end
+
+--[[
+	The realm this **bag** was told it is, not the one RunService reports.
+
+	The two come apart wherever a bag is told its realm -- a test booting both halves in one DataModel is
+	the whole reason [TieRealmService] exists -- and reading RunService there means a client-realm policy
+	never runs however the bag is configured. That failure is silent: the policy is registered, listed,
+	enabled, and simply does nothing. Every other realm branch in this package already reads the tie
+	realm; this one was the odd one out.
+
+	Anything not explicitly the client counts as the server, matching how [AccessDataService] branches, so
+	a shared bag still runs server-realm enforcement.
+]]
+function AccessPolicyService._runsHere(self: AccessPolicyService, policy: AccessPolicy.AccessPolicy): boolean
+	return policy:RunsInRealm(self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT)
 end
 
 --[=[
@@ -444,7 +460,7 @@ function AccessPolicyService._applyPolicy(self: AccessPolicyService, policyName:
 
 	-- Registered here, but not ours to run. Enabling a server policy from the client's registry must not
 	-- half-enforce it locally.
-	if not policy:RunsInRealm(RunService:IsServer()) then
+	if not self:_runsHere(policy) then
 		return nil
 	end
 
