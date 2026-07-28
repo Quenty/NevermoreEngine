@@ -194,7 +194,7 @@ what a policy reads shows up in a readout like everything else.
 | `access-feature <players> <feature> [subject]` | one verdict and the facts it was reached from |
 | `access-override <players> <facts> <true\|false\|unresolved>` | force facts — `*` or `all` for every one |
 | `access-policies` | every policy and whether it is running |
-| `access-policy <policy> <on\|off>` | turn a consequence on or off |
+| `access-policy <policies> <on\|off>` | turn consequences on or off — `*` or `all` for every one |
 
 Every command is admin-gated by `CmdrService`. Overrides appear as their own layer with the real answer
 still visible underneath, so nobody mistakes one left on after a QA session for a genuine entitlement.

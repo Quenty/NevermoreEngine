@@ -324,6 +324,7 @@ describe("AccessCommandUtils.registerTypes", function()
 				"accessFactNames",
 				"accessFeatureName",
 				"accessPolicyName",
+				"accessPolicyNames",
 				"accessOverrideValue",
 				"accessRealm",
 				"accessToggle",
@@ -421,18 +422,65 @@ describe("overriding every fact at once", function()
 	end)
 end)
 
-describe("AccessCommandUtils.describeFactList", function()
+describe("toggling every policy at once", function()
+	-- `access-policy * off` is how somebody sees the game with every consequence switched off. Same
+	-- requirements as the fact list, asserted separately because the two types are built from different
+	-- name sources and only one of them is optional.
+	local function policyNamesType()
+		local cmdr, registered = strictCmdr()
+		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
+			return { "kick-on-non-admin", "watch-shop" }
+		end)
+		return registered.accessPolicyNames
+	end
+
+	it("is listable, which is the only reason * expands at all", function()
+		expect(policyNamesType().Listable).toEqual(true)
+	end)
+
+	it("matches every policy on an empty segment, which is what * expands to", function()
+		local policyType = policyNamesType()
+
+		expect(policyType.Autocomplete(policyType.Transform(""))).toEqual({ "kick-on-non-admin", "watch-shop" })
+	end)
+
+	it("still resolves one typed name", function()
+		local policyType = policyNamesType()
+
+		expect(policyType.Parse(policyType.Transform("kick-on-non-admin"))).toEqual({ "kick-on-non-admin" })
+	end)
+
+	it("offers `all` as the spelled-out wildcard", function()
+		expect(policyNamesType().ArgumentOperatorAliases.all).toEqual("*")
+	end)
+
+	it("leaves the single-policy type alone, which is what the readout commands take", function()
+		local cmdr, registered = strictCmdr()
+		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
+			return { "kick-on-non-admin" }
+		end)
+
+		expect(registered.accessPolicyName.Listable).toEqual(nil)
+	end)
+end)
+
+describe("AccessCommandUtils.describeNameList", function()
 	it("names them while a person can still check them", function()
-		expect(AccessCommandUtils.describeFactList({ "ownsGame", "isStaff" })).toEqual("ownsGame, isStaff")
+		expect(AccessCommandUtils.describeNameList({ "ownsGame", "isStaff" }, "facts")).toEqual("ownsGame, isStaff")
 	end)
 
 	it("counts them once naming them would be a wall", function()
 		-- Which is exactly what * produces.
-		expect(AccessCommandUtils.describeFactList({ "a", "b", "c", "d", "e" })).toEqual("5 facts")
+		expect(AccessCommandUtils.describeNameList({ "a", "b", "c", "d", "e" }, "facts")).toEqual("5 facts")
 	end)
 
 	it("says something rather than nothing for an empty list", function()
-		expect(AccessCommandUtils.describeFactList({})).toEqual("no facts")
+		expect(AccessCommandUtils.describeNameList({}, "facts")).toEqual("no facts")
+	end)
+
+	it("names whatever it was given, so a policy list does not read as facts", function()
+		expect(AccessCommandUtils.describeNameList({ "a", "b", "c", "d", "e" }, "policies")).toEqual("5 policies")
+		expect(AccessCommandUtils.describeNameList({}, "policies")).toEqual("no policies")
 	end)
 end)
 
