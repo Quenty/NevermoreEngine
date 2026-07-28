@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/receiptprocessing@7.42.1`
+  - fix(receiptprocessing): unregister a receipt processor instead of erroring [#769](https://github.com/Quenty/NevermoreEngine/pull/769) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/access@1.3.3`
   - fix(access): run client-realm policies for the local player [#768](https://github.com/Quenty/NevermoreEngine/pull/768) ([@Quenty](https://github.com/Quenty))
 
