@@ -1,19 +1,13 @@
-# v1.3.3 (Tue Jul 28 2026)
-
-#### 🐛 Bug Fix
-
-- fix(access): run client-realm policies for the local player [#768](https://github.com/Quenty/NevermoreEngine/pull/768) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.2...@quenty/access@1.3.3) (2026-07-28)
+
+### Bug Fixes
+
+- **access:** run client-realm policies for the local player ([#768](https://github.com/Quenty/NevermoreEngine/issues/768)) ([7b6004c](https://github.com/Quenty/NevermoreEngine/commit/7b6004cced1628e3cd8f60d76e0b985a9c40d396))
 
 ## [1.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.1...@quenty/access@1.3.2) (2026-07-28)
 
