@@ -7,13 +7,17 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local AccessCommandUtils = require("AccessCommandUtils")
 local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
 local AccessFactNames = require("AccessFactNames")
+local AccessFactPriority = require("AccessFactPriority")
+local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
@@ -188,6 +192,309 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 		remove()
 
 		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
+
+		controller:destroy()
+	end)
+end)
+
+describe("declared context in a report", function()
+	it("prints the non-fact inputs beside the facts", function()
+		-- The whole point of declaring them: a per-thing refusal is explained by the context as often as by
+		-- the facts, and before this it was only ever visible inside somebody's closure.
+		local controller = setup()
+
+		local owned = controller.maid:Add(ValueObject.new(true)) :: any
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("holdsEgg", {
+				resolve = function()
+					return owned
+				end,
+			})))
+		)
+
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
+			facts = { "holdsEgg" },
+			context = {
+				hasCollected = function(subject)
+					return Rx.of(subject == "blueEgg")
+				end,
+			},
+			observeCompute = function(observeFacts)
+				return observeFacts:Pipe({
+					Rx.map(function(factState: any)
+						return AccessStateUtils.fromFacts(factState, { "holdsEgg" })
+					end) :: any,
+				}) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+
+		local report = nil
+		controller.maid:GiveTask(
+			controller.accessDataService
+				:ObserveFeatureReport(controller.fakePlayer(), feature, "blueEgg")
+				:Subscribe(function(value)
+					report = value
+				end)
+		)
+
+		expect((report :: any).context.hasCollected).toEqual(true)
+		expect(string.find(AccessCommandUtils.formatFeatureReport(report, "blueEgg"), "hasCollected") ~= nil).toEqual(
+			true
+		)
+
+		controller:destroy()
+	end)
+end)
+
+describe("a feature reading another feature", function()
+	--[[
+		FeatureAccessFact converts a feature into a *fact*, which collapses the verdict to a boolean and
+		drops the reason. A gate that has to tell "bought access is switched off" apart from "does not own
+		it" needs the whole state, so it declares the feature and gets the verdict.
+	]]
+	local function entitlement(controller: any, reason: string?)
+		local feature = controller.maid:Add(AccessFeature.new("chapterEntitlement", {
+			facts = {},
+			observeCompute = function()
+				return Rx.of(
+					if reason then AccessStateUtils.disallowed(reason) else AccessStateUtils.allowed({ "ownsGame" })
+				) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		return feature
+	end
+
+	local function reader(controller: any, source: any)
+		local feature = controller.maid:Add(AccessFeature.new("canPlayHere", {
+			facts = {},
+			features = { source },
+			observeCompute = function(_observeFacts, _subject, input)
+				return input.observeFeatures:Pipe({
+					Rx.map(function(verdicts: any)
+						-- Passed straight through, reason and all. That is the point.
+						return verdicts.chapterEntitlement
+					end) :: any,
+				}) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		return feature
+	end
+
+	it("keeps the refusal reason instead of collapsing it to a boolean", function()
+		local controller = setup()
+		local feature = reader(controller, entitlement(controller, "boughtAccessDisabled"))
+
+		local last = nil
+		controller.maid:GiveTask(
+			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function(state)
+				last = state
+			end)
+		)
+
+		expect((last :: any).reason).toEqual("boughtAccessDisabled")
+
+		controller:destroy()
+	end)
+
+	it("carries an allowed verdict through with what granted it", function()
+		local controller = setup()
+		local feature = reader(controller, entitlement(controller, nil))
+
+		local last = nil
+		controller.maid:GiveTask(
+			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function(state)
+				last = state
+			end)
+		)
+
+		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect((last :: any).grantedBy).toEqual({ "ownsGame" })
+
+		controller:destroy()
+	end)
+
+	it("names the inherited verdict in the report, so the readout can explain it", function()
+		local controller = setup()
+		local source = entitlement(controller, "boughtAccessDisabled")
+		local feature = reader(controller, source)
+
+		expect(feature:GetFeatureInputs()[1]).toEqual(source)
+
+		local report = nil
+		controller.maid:GiveTask(
+			controller.accessDataService
+				:ObserveFeatureReport(controller.fakePlayer(), feature)
+				:Subscribe(function(value)
+					report = value
+				end)
+		)
+
+		expect((report :: any).features.chapterEntitlement.reason).toEqual("boughtAccessDisabled")
+
+		local text = AccessCommandUtils.formatFeatureReport(report)
+		expect(string.find(text, "chapterEntitlement") ~= nil).toEqual(true)
+		expect(string.find(text, "boughtAccessDisabled") ~= nil).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("hands a feature that declared none an empty map rather than nothing", function()
+		-- So a compute can combine it unconditionally instead of stalling forever on a source that never
+		-- fires.
+		local controller = setup()
+		local seen = nil
+		local feature = controller.maid:Add(AccessFeature.new("standalone", {
+			facts = {},
+			observeCompute = function(_observeFacts, _subject, input)
+				return input.observeFeatures:Pipe({
+					Rx.map(function(verdicts: any)
+						seen = verdicts
+						return AccessStateUtils.allowed()
+					end) :: any,
+				}) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		controller.maid:GiveTask(
+			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function() end)
+		)
+
+		expect(seen).toEqual({})
+
+		controller:destroy()
+	end)
+
+	it("gives the compute the player it is deciding for", function()
+		-- Without this a per-thing feature whose context is also per-player has to smuggle the player
+		-- through the subject.
+		local controller = setup()
+		local player = controller.fakePlayer()
+		local seen = nil
+
+		local feature = controller.maid:Add(AccessFeature.new("needsPlayer", {
+			facts = {},
+			observeCompute = function(_observeFacts, _subject, input)
+				seen = input.player
+				return Rx.of(AccessStateUtils.allowed()) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function() end))
+
+		expect(seen).toEqual(player)
+
+		controller:destroy()
+	end)
+end)
+
+describe("push ownership", function()
+	it("keeps a fact alive while a second caller still wants it", function()
+		-- A no-op remover for a repeat push looked harmless and was not: whoever pushed first ended up
+		-- owning the name, and their remover took it from everyone.
+		local controller = setup()
+		local first = controller.ownsGame:PushFactNameAllowsFeature("gamePass")
+		local second = controller.ownsGame:PushFactNameAllowsFeature("gamePass")
+
+		first()
+
+		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME, "gamePass" })
+
+		second()
+
+		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
+
+		controller:destroy()
+	end)
+end)
+
+describe("a feature that requires a subject", function()
+	it("refuses to be evaluated without one rather than running the compute against nil", function()
+		-- Skipping it in the per-player tracker was never enough on its own: a direct call, a console
+		-- command with the argument left off, or a policy all reach the service too.
+		local controller = setup()
+
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
+			facts = {},
+			requiresSubject = true,
+			observeCompute = function()
+				return Rx.of(AccessStateUtils.allowed()) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+
+		expect(function()
+			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature)
+		end).toThrow("requires a subject")
+
+		controller:destroy()
+	end)
+
+	it("is fine once it is given one", function()
+		local controller = setup()
+
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase2", {
+			facts = {},
+			requiresSubject = true,
+			observeCompute = function()
+				return Rx.of(AccessStateUtils.allowed()) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+
+		expect(function()
+			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature, "blueEgg")
+		end).never.toThrow()
+
+		controller:destroy()
+	end)
+end)
+
+describe("the registered fact-name list", function()
+	it("does not re-emit when a layer is added to a fact already present", function()
+		-- Anything switchMapping over this drops its shareReplay when it fires, so every resolver for every
+		-- player re-runs. A second layer of an existing fact changes no names and must stay quiet.
+		local controller = setup()
+		local emissions = 0
+		controller.maid:GiveTask(controller.accessDataService:ObserveFactNames():Subscribe(function()
+			emissions += 1
+		end))
+
+		local before = emissions
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new(AccessFactNames.OWNS_GAME, {
+				resolve = function()
+					return nil
+				end,
+				priority = AccessFactPriority.ELEVATED,
+				source = "gameAllowlist",
+			})))
+		)
+
+		expect(emissions).toEqual(before)
+
+		controller:destroy()
+	end)
+
+	it("does emit when a genuinely new fact arrives", function()
+		local controller = setup()
+		local emissions = 0
+		controller.maid:GiveTask(controller.accessDataService:ObserveFactNames():Subscribe(function()
+			emissions += 1
+		end))
+
+		local before = emissions
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("brandNew", {
+				resolve = function()
+					return nil
+				end,
+			})))
+		)
+
+		expect(emissions > before).toEqual(true)
 
 		controller:destroy()
 	end)

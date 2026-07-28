@@ -24,7 +24,8 @@
 	registered, named, declaring consumer whose inputs show up in a readout, not an anonymous `if`
 	somewhere in a UI file.
 
-	Policies are registered disabled. Turning one on is a deliberate act -- from a console command or a
+	Policies are registered disabled unless built with `isEnabledByDefault = true`. Turning one on is a deliberate
+	act -- from a console command or a
 	test -- which is what makes a consequence as blunt as kicking safe to ship in the box.
 
 	Registration happens in **both realms**, so a console on either side knows every policy name. An
@@ -73,6 +74,7 @@ export type AccessPolicyOptions = {
 	facts: { string }?,
 	features: { AccessFeature.AccessFeature }?,
 	realm: string?,
+	isEnabledByDefault: boolean?,
 	apply: AccessPolicyApply,
 }
 
@@ -86,6 +88,7 @@ export type AccessPolicy =
 			_features: any,
 			_apply: AccessPolicyApply,
 			_realm: string,
+			_isEnabledByDefault: boolean,
 			_serviceBag: ServiceBag.ServiceBag,
 			_tieRealmService: any,
 		},
@@ -113,6 +116,10 @@ function AccessPolicy.new(serviceBag: ServiceBag.ServiceBag, options: AccessPoli
 	assert(type(options.facts) == "table" or options.facts == nil, "Bad options.facts")
 	assert(type(options.features) == "table" or options.features == nil, "Bad options.features")
 	assert(type(options.realm) == "string" or options.realm == nil, "Bad options.realm")
+	assert(
+		type(options.isEnabledByDefault) == "boolean" or options.isEnabledByDefault == nil,
+		"Bad options.isEnabledByDefault"
+	)
 
 	local self: AccessPolicy = setmetatable(BaseObject.new() :: any, AccessPolicy)
 
@@ -123,8 +130,26 @@ function AccessPolicy.new(serviceBag: ServiceBag.ServiceBag, options: AccessPoli
 	self._features = if options.features then table.clone(options.features) else {}
 	self._apply = options.apply
 	self._realm = options.realm or AccessPolicyRealm.BOTH
+	self._isEnabledByDefault = options.isEnabledByDefault == true
 
 	return self
+end
+
+--[=[
+	Whether registering this policy also switches it on.
+
+	False unless the policy asked for it. A policy is a consequence -- a kick, a teleport, a door -- and one
+	that ran the moment a package was added would be a side effect nobody chose. `isEnabledByDefault = true` is for
+	the case where the consequence *is* the reason the policy exists, and it reads as a deliberate line at
+	the point somebody writes it.
+
+	This is the starting state, not the current one. [AccessPolicyService.SetPolicyEnabled] and the console
+	both override it, and [AccessPolicyService.IsPolicyEnabled] is what says whether it is on now.
+
+	@return boolean
+]=]
+function AccessPolicy.IsEnabledByDefault(self: AccessPolicy): boolean
+	return self._isEnabledByDefault
 end
 
 --[=[
@@ -200,6 +225,7 @@ function AccessPolicy.GetDebugState(self: AccessPolicy): {
 	realm: string,
 	facts: { string },
 	features: { string },
+	isEnabledByDefault: boolean,
 }
 	local featureNames = {}
 	for _, feature in self._features do
@@ -209,6 +235,9 @@ function AccessPolicy.GetDebugState(self: AccessPolicy): {
 	return {
 		policyName = self._policyName,
 		realm = self._realm,
+		-- In the readout because "this is on and I never turned it on" is otherwise a hunt for a console
+		-- command that was never run.
+		isEnabledByDefault = self._isEnabledByDefault,
 		facts = self:GetFactNames(),
 		features = featureNames,
 	}
@@ -283,11 +312,14 @@ function AccessPolicy.Apply(self: AccessPolicy, context: AccessPolicyContext): M
 
 	-- Held by the policy as well as the caller, so destroying a policy stops everything it started even
 	-- if whoever applied it forgets.
-	local applicationMaid = self._maid:Add(Maid.new())
+	-- Keyed by the maid itself rather than Add'd: Maid.Add files a task under a numeric index, so the
+	-- disposal below could never find it again and every application left an empty maid behind -- one per
+	-- player-session per enabled policy, for the life of the server.
+	local applicationMaid = Maid.new()
+	self._maid[applicationMaid] = applicationMaid
 	applicationMaid:GiveTask(task)
 
 	return function()
-		applicationMaid:DoCleaning()
 		self._maid[applicationMaid] = nil
 	end
 end

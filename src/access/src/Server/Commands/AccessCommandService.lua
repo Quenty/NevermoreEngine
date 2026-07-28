@@ -170,20 +170,31 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 				Type = "accessFeatureName",
 				Description = "The feature to explain.",
 			},
+			{
+				Name = "Subject",
+				Type = "string",
+				Description = "What to evaluate it against, for a per-thing feature: a world index, a chapter.",
+				Default = "",
+			},
 		},
-	}, function(_context, players: { Player }, featureName: string)
+	}, function(_context, players: { Player }, featureName: string, subjectText: string)
 		local feature = self._accessDataService:GetFeature(featureName)
 		if not feature then
 			return `No feature registered named {featureName}`
 		end
 
+		-- Without this a per-thing feature could only ever be inspected in its subject-less form, which is
+		-- the one case nobody needs to debug: "can this player enter a world" is never the question, "can
+		-- they enter world 3" is.
+		local subject = AccessCommandUtils.parseSubject(subjectText)
+
 		return self:_render(players, function(player)
-			local report = readOnce(self._accessDataService:ObserveFeatureReport(player, feature))
+			local report = readOnce(self._accessDataService:ObserveFeatureReport(player, feature, subject))
 			if not report then
 				return "  (no verdict available)"
 			end
 
-			return `  {AccessCommandUtils.formatFeatureReport(report)}`
+			return `  {AccessCommandUtils.formatFeatureReport(report, subject)}`
 		end)
 	end)
 

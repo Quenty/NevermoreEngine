@@ -28,10 +28,10 @@ local RxAccessStateUtils = {}
 	every subscriber completes, the share drops its upstream, and the next reader re-runs the resolver from
 	scratch. A fact is a live value that happens not to change, not a stream that ended.
 
-	@param value boolean?
-	@return Observable<boolean?>
+	@param value any
+	@return Observable<any>
 ]=]
-function RxAccessStateUtils.ofStatic(value: boolean?): Observable.Observable<boolean?>
+function RxAccessStateUtils.ofStatic(value: any): Observable.Observable<any>
 	return Observable.new(function(sub)
 		sub:Fire(value)
 

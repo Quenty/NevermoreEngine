@@ -64,7 +64,9 @@ launch is a change to one feature rather than a hunt through every surface that 
 
 **Policies** are consequences — the parts with **side effects on the real game**. *Kick anyone who is
 not staff.* Policies are the only kind that *do* anything, which is why they are the only kind that
-ships **disabled**, that declares its inputs, and that has a lifetime you can end.
+ships **disabled**, that declares its inputs, and that has a lifetime you can end. A policy whose
+consequence is the whole reason it exists can opt out with `isEnabledByDefault = true`, and the readout
+says so — otherwise "this is on and I never turned it on" is a hunt for a command nobody ran.
 
 The three-way split is a convenience, not a law. A fact may aggregate other facts; a feature may be
 trivial; where a rule belongs is sometimes a judgement call. What the split buys is that when
@@ -125,6 +127,54 @@ the two realms reaching different verdicts is exactly what this package exists t
 Replication widens a feature on the client, it does not own it: a fact pushed there in shared code is
 never taken back, whatever the server is saying.
 
+## Composing a feature
+
+`anyOf` is one shape of three, and the other two exist because writing them by hand gets the unresolved
+rule wrong:
+
+```lua
+local Chapters = AccessFeature.anyOf("chapters", { "ownsGame", "isEarlyAccessTester" })
+local EarlyAccess = AccessFeature.allOf("earlyAccess", { "isEarlyAccessTester", "testerFlagOn" })
+local CanPurchase = AccessFeature.noneOf("gamePurchase", { "ownsGame" })
+```
+
+`allOf` refuses as soon as one term denies — no later answer can rescue an and — and stays unresolved
+while a term is unanswered and none has denied. `noneOf` is why a plain `not` is wrong: inverting a
+value turns unresolved into `true`, which on a purchase gate offers to sell somebody what they may
+already own. Facts pushed onto an `allOf` or `noneOf` still *widen* it rather than joining the fold,
+because `PushFactAllowsFeature` promises it can grant and never deny.
+
+A feature that needs more than facts declares it, rather than closing over it:
+
+```lua
+local EggPurchase = AccessFeature.new("eggPurchase", {
+    facts = { "ownsGame" },
+    requiresSubject = true,
+    -- Per-*thing* inputs. Facts are per-player, so these cannot be facts.
+    context = {
+        assetId = function(eggName) return observeEggAssetId(eggName) end,
+        hasCollected = function(eggName) return observeCollected(eggName) end,
+    },
+    -- Other features whose whole verdict this one reads, reason intact.
+    features = { ChapterEntitlement },
+    observeCompute = function(observeFacts, eggName, input)
+        return Rx.combineLatest({
+            facts = observeFacts,
+            context = input.observeContext,
+            entitlement = input.observeFeatures,
+        }):Pipe({ Rx.map(computeEggPurchase) })
+    end,
+})
+```
+
+Everything declared this way is printed in the report next to the facts — an input nobody can see is an
+input nobody can debug. `features` keeps the whole verdict rather than a boolean, so a refusal for
+`boughtAccessDisabled` stays distinguishable from one for `notOwned`; converting a feature to a *fact*
+with `FeatureAccessFact` is the lossy option, and it exists for when a boolean is genuinely all you want.
+
+`input` also carries the `player`, so a per-thing feature whose context is also per-player does not have
+to smuggle one through the subject.
+
 ## What you can't do
 
 There is no `ObserveFact`. Facts are addressable so they can be inspected and overridden, but you cannot
@@ -141,13 +191,19 @@ what a policy reads shows up in a readout like everything else.
 | --- | --- |
 | `access-state <players> [server\|client\|both]` | everything: every feature verdict, every policy, every fact |
 | `access-facts <players>` | every fact with its layers and which one decided |
-| `access-feature <players> <feature>` | one verdict and the facts it was reached from |
+| `access-feature <players> <feature> [subject]` | one verdict and the facts it was reached from |
 | `access-override <players> <fact> <true\|false\|unresolved>` | force a fact, including forcing *unresolved* |
 | `access-policies` | every policy and whether it is running |
 | `access-policy <policy> <on\|off>` | turn a consequence on or off |
 
 Every command is admin-gated by `CmdrService`. Overrides appear as their own layer with the real answer
 still visible underneath, so nobody mistakes one left on after a QA session for a genuine entitlement.
+
+A per-thing gate takes its subject as the last argument — `access-feature . can-enter-world 3`. Without
+it there is no way to ask the question anybody actually has: "can they enter a world" has no answer,
+"can they enter world 3" does. A feature declared `requiresSubject = true` is listed by `access-state`
+rather than answered there, and left out of the per-player tracking entirely, so nothing evaluates it
+against a subject it was never written for.
 
 `access-state ... both` asks the player's own client what *it* resolved and prints it beside the server's
 view. Both blocks come from one collector, so a difference between them is a real difference and not two

@@ -71,6 +71,25 @@ function AccessFactContributionStateUtils.isDefinite(state: string): boolean
 end
 
 --[=[
+	The opposite answer, where there is one.
+
+	@param state string
+	@return string
+]=]
+function AccessFactContributionStateUtils.invert(state: string): string
+	if state == AccessFactContributionState.ALLOW then
+		return AccessFactContributionState.DENY
+	elseif state == AccessFactContributionState.DENY then
+		return AccessFactContributionState.ALLOW
+	end
+
+	-- UNRESOLVED and ABSTAIN invert to themselves, and that is the whole point. "We could not confirm they
+	-- own it" must not become "they definitely do not own it" -- a plain `not value` does exactly that, and
+	-- turns a failed lookup into a confident yes on a purchase gate.
+	return state
+end
+
+--[=[
 	@param value any
 	@return boolean
 ]=]

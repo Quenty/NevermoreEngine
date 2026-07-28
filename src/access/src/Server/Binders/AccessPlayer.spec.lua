@@ -10,9 +10,11 @@ local AccessFeature = require("AccessFeature")
 local AccessPlayer = require("AccessPlayer")
 local AccessPlayerInterface = require("AccessPlayerInterface")
 local AccessService = require("AccessService")
+local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerMockService = require("PlayerMockService")
+local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
 
@@ -194,6 +196,54 @@ describe("AccessPlayer", function()
 		local state = accessPlayer:GetDebugState()
 
 		expect(state.featureStates[chapters:GetFeatureName()].allowed).toEqual(true)
+
+		controller:destroy()
+	end)
+end)
+
+describe("AccessPlayer and per-thing features", function()
+	it("leaves a subject-requiring feature out of the blanket tracking", function()
+		-- The tracker walks every registered feature with no subject. A per-thing gate has no answer to
+		-- that question, and running its compute against a nil it was never written for is what crashed a
+		-- purchase gate.
+		local controller = setup()
+		local evaluated = false
+
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
+			facts = {},
+			requiresSubject = true,
+			observeCompute = function()
+				evaluated = true
+				return Rx.of(AccessStateUtils.allowed()) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+
+		controller.accessPlayerFor(controller.fakePlayer())
+
+		expect(evaluated).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("still answers a per-thing feature when asked with its subject", function()
+		-- Skipping it in the tracker must not make it unreachable.
+		local controller = setup()
+
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase2", {
+			facts = {},
+			requiresSubject = true,
+			observeCompute = function(_observeFacts, subject)
+				return Rx.of(
+						if subject == "blueEgg" then AccessStateUtils.allowed() else AccessStateUtils.unresolved()
+					) :: any
+			end,
+		}))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+
+		local accessPlayer = controller.accessPlayerFor(controller.fakePlayer())
+
+		expect(accessPlayer:IsFeatureAllowed(feature, "blueEgg")).toEqual(true)
 
 		controller:destroy()
 	end)

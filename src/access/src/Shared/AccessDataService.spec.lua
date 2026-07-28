@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
+local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactNames = require("AccessFactNames")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
@@ -253,13 +254,25 @@ describe("AccessDataService.ObserveFeature", function()
 		controller:destroy()
 	end)
 
-	it("still errors when a missing fact is asked for directly", function()
-		-- Direct calls are a human asking about a specific fact, where silence is the unhelpful answer.
+	it("reads a fact nothing here has heard of as unresolved rather than throwing", function()
+		-- It used to throw, which made the readout die on exactly the case it exists to explain: a feature
+		-- widened by a server-only push names facts this realm may never have a resolver for. It warns
+		-- instead, once, and reports the honest answer.
 		local controller = setup()
+		local report = nil
 
 		expect(function()
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "nosuch")
-		end).toThrow("is registered here and none has been replicated")
+			controller.maid:GiveTask(
+				controller.accessDataService
+					:ObserveFactReport(controller.fakePlayer(), "nosuch")
+					:Subscribe(function(value)
+						report = value
+					end)
+			)
+		end).never.toThrow()
+
+		expect((report :: any).state).toEqual(AccessFactContributionState.UNRESOLVED)
+		expect((report :: any).value).toEqual(nil)
 
 		controller:destroy()
 	end)

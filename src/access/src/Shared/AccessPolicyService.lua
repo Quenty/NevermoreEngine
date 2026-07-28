@@ -2,10 +2,14 @@
 --[=[
 	Registers [AccessPolicy] objects and runs the enabled ones against each player.
 
-	Policies register **disabled**. A policy that is off is still listed, still autocompletes, and still
-	names what it reads -- it simply is not running. That is what makes a consequence as blunt as kicking
-	safe to ship in the box: turning it on is a deliberate act you can see in a readout, and turning it
-	off again is one command rather than a deploy.
+	Policies register **disabled** unless they asked not to. A policy that is off is still listed, still
+	autocompletes, and still names what it reads -- it simply is not running. That is what makes a
+	consequence as blunt as kicking safe to ship in the box: turning it on is a deliberate act you can see
+	in a readout, and turning it off again is one command rather than a deploy.
+
+	A policy built with `isEnabledByDefault = true` runs from the moment it is registered, for the case where the
+	consequence is the whole reason it exists. It says so in the readout, so nobody goes looking for the
+	command that turned it on.
 
 	Shared, and registration happens in both realms, so a console on either side can name and autocomplete
 	every policy. Where a policy's consequence actually runs is its [AccessPolicyRealm] -- kicking on the
@@ -111,7 +115,8 @@ function AccessPolicyService.Start(self: AccessPolicyService): ()
 end
 
 --[=[
-	Registers a policy, disabled.
+	Registers a policy. Disabled, unless the policy was built with `isEnabledByDefault = true` -- see
+	[AccessPolicy.IsEnabledByDefault] for when that is the right call.
 
 	Registering does not take ownership. A policy has a lifetime of its own, so give it to a maid at the
 	point you make it and the disposer to a maid too.
@@ -129,6 +134,12 @@ function AccessPolicyService.RegisterPolicy(self: AccessPolicyService, policy: A
 	)
 
 	local remove = self._policies:Set(policyName, policy)
+
+	-- After the registry write, because enabling applies the policy to everyone already here and that
+	-- path looks the policy up by name.
+	if policy:IsEnabledByDefault() then
+		self:SetPolicyEnabled(policyName, true)
+	end
 
 	return function()
 		-- Teardown order is not ours to control: a maid holding both this and the service bag may already

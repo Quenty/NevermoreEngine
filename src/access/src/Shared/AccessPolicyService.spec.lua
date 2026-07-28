@@ -51,9 +51,10 @@ local function setup()
 	}
 end
 
-local function countingPolicy(controller: any, policyName: string, applied: { n: number })
+local function countingPolicy(controller: any, policyName: string, applied: { n: number }, isEnabledByDefault: boolean?)
 	return controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
 		policyName = policyName,
+		isEnabledByDefault = isEnabledByDefault,
 		apply = function()
 			applied.n += 1
 
@@ -76,6 +77,64 @@ describe("AccessPolicyService.RegisterPolicy", function()
 
 		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(false)
 		expect(applied.n).toEqual(0)
+
+		controller:destroy()
+	end)
+
+	it("registers a policy that asked to be on already running", function()
+		-- The opt-in half of the same rule: a consequence that IS the reason the policy exists should not
+		-- need a second line at every registration site to switch it on.
+		local controller = setup()
+		local applied = { n = 0 }
+
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied, true))
+		)
+		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
+
+		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(true)
+		expect(applied.n).toEqual(1)
+
+		controller:destroy()
+	end)
+
+	it("applies a default-enabled policy to players already here", function()
+		-- Registration order is not the caller's to control: a policy registered after a player joined has
+		-- to reach them, the same way SetPolicyEnabled does.
+		local controller = setup()
+		local applied = { n = 0 }
+		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
+
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied, true))
+		)
+
+		expect(applied.n).toEqual(1)
+
+		controller:destroy()
+	end)
+
+	it("lets the console turn a default-enabled policy back off", function()
+		-- Default-enabled is a starting state, not a lock.
+		local controller = setup()
+		local applied = { n = 0 }
+
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied, true))
+		)
+		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
+		controller.accessPolicyService:SetPolicyEnabled("noop", false)
+
+		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(false)
+		expect(applied.n).toEqual(0)
+
+		controller:destroy()
+	end)
+
+	it("ships the built-in kick policy off, whatever this option allows", function()
+		local controller = setup()
+
+		expect(controller.accessPolicyService:IsPolicyEnabled(AccessPolicyNames.KICK_ON_NON_ADMIN)).toEqual(false)
 
 		controller:destroy()
 	end)

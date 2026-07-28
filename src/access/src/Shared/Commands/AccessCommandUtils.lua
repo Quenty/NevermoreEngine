@@ -164,15 +164,24 @@ end
 	A feature's verdict followed by every fact it read. The whole answer to a complaint in one block.
 
 	@param report AccessFeatureReport
+	@param subject any -- what it was evaluated against, named on the verdict line
 	@return string
 ]=]
-function AccessCommandUtils.formatFeatureReport(report: any): string
+function AccessCommandUtils.formatFeatureReport(report: any, subject: any?): string
 	local state = report.state
 	local verdict = if state.type == "allowed"
 		then `allowed (granted by {table.concat(state.grantedBy, ", ")})`
 		else `disallowed ({state.reason})`
 
-	local lines = { `{report.featureName} = {verdict}` }
+	local lines = { `{report.featureName}{AccessCommandUtils.describeSubject(subject)} = {verdict}` }
+
+	for _, line in AccessCommandUtils.formatContext(report.context) do
+		table.insert(lines, line)
+	end
+
+	for _, line in AccessCommandUtils.formatFeatureInputs(report.features) do
+		table.insert(lines, line)
+	end
 
 	local factNames = {}
 	for factName in report.facts do
@@ -189,6 +198,65 @@ function AccessCommandUtils.formatFeatureReport(report: any): string
 	end
 
 	return table.concat(lines, "\n")
+end
+
+--[=[
+	A feature's non-fact inputs, one per line, sorted. Empty when the feature declared none -- a feature
+	with no context should read exactly as it did before there was such a thing.
+
+	@param context { [string]: any }?
+	@return { string }
+]=]
+function AccessCommandUtils.formatContext(context: { [string]: any }?): { string }
+	if context == nil then
+		return {}
+	end
+
+	local names = {}
+	for name in context do
+		table.insert(names, name)
+	end
+	table.sort(names)
+
+	local lines = {}
+	for _, name in names do
+		table.insert(lines, string.format("  %-" .. SOURCE_WIDTH .. "s %s", name, tostring(context[name])))
+	end
+
+	return lines
+end
+
+--[=[
+	The verdicts this feature inherited from other features, one per line, sorted.
+
+	Named and reasoned rather than reduced to true/false: "refused because bought access is switched off"
+	and "refused because they do not own it" are different answers to the person complaining, and a
+	boolean loses both.
+
+	@param features { [string]: AccessState }?
+	@return { string }
+]=]
+function AccessCommandUtils.formatFeatureInputs(features: { [string]: any }?): { string }
+	if features == nil then
+		return {}
+	end
+
+	local names = {}
+	for name in features do
+		table.insert(names, name)
+	end
+	table.sort(names)
+
+	local lines = {}
+	for _, name in names do
+		local state = features[name]
+		local verdict = if state.type == "allowed"
+			then `allowed (granted by {table.concat(state.grantedBy, ", ")})`
+			else `disallowed ({state.reason})`
+		table.insert(lines, string.format("  %-" .. SOURCE_WIDTH .. "s %s", name, verdict))
+	end
+
+	return lines
 end
 
 --[=[
@@ -231,7 +299,8 @@ end
 function AccessCommandUtils.formatPlayerState(
 	featureReports: { any },
 	factReports: { [string]: any },
-	policies: { any }?
+	policies: { any }?,
+	featureNamesNeedingSubject: { string }?
 ): string
 	local lines = { "FEATURES" }
 
@@ -246,6 +315,11 @@ function AccessCommandUtils.formatPlayerState(
 			else `disallowed ({state.reason})`
 
 		table.insert(lines, `  {report.featureName} = {verdict}`)
+	end
+
+	for _, featureName in (featureNamesNeedingSubject or {}) :: { string } do
+		-- Listed rather than answered, and pointed somewhere that can answer it.
+		table.insert(lines, `  {featureName} = needs a subject: access-feature <player> {featureName} <subject>`)
 	end
 
 	table.insert(lines, "")
@@ -273,6 +347,41 @@ function AccessCommandUtils.formatPlayerState(
 end
 
 --[=[
+	Turns what somebody typed into the subject a per-thing feature is evaluated against.
+
+	Numeric text becomes a number, because the subjects that actually get typed are ids -- a world index, a
+	chapter -- and a feature comparing `subject == 3` would silently deny for `"3"`. Anything else is
+	passed through as the string it was. Empty means no subject.
+
+	@param text string?
+	@return any
+]=]
+function AccessCommandUtils.parseSubject(text: string?): any
+	if text == nil or text == "" then
+		return nil
+	end
+
+	return tonumber(text) or text
+end
+
+--[=[
+	How a subject reads on a verdict line. Empty when there is none, because most features never take one
+	and "(no subject)" on every line would read as a missing input rather than as a feature that has no
+	such input. Where the absence does matter -- a whole-player dump, where a per-thing gate is being shown
+	in the one form nobody needs -- [AccessCommandUtils.formatPlayerState] says so once instead.
+
+	@param subject any
+	@return string
+]=]
+function AccessCommandUtils.describeSubject(subject: any): string
+	if subject == nil then
+		return ""
+	end
+
+	return ` (subject {tostring(subject)})`
+end
+
+--[=[
 	Everything a readout needs about one player, gathered from whichever realm this runs on.
 
 	Shared rather than written twice, because the whole value of showing the client's view next to the
@@ -290,11 +399,14 @@ function AccessCommandUtils.collectPlayerState(accessDataService: any, accessPol
 	assert(player, "No player")
 
 	local featureReports = {}
+	local needSubject = {}
 	for _, featureName in accessDataService:GetFeatureNames() do
 		local feature = accessDataService:GetFeature(featureName)
-		if feature then
-			-- Subject-parameterized features are evaluated with no subject, which is the honest answer to
-			-- "what does this feature say about the player alone".
+		if feature and feature:RequiresSubject() then
+			-- Named, not evaluated. A dump cannot pass a subject, and a per-thing gate answered with none is
+			-- a verdict for a question nobody asked -- worse than saying the question needs an argument.
+			table.insert(needSubject, featureName)
+		elseif feature then
 			local report = readOnce(accessDataService:ObserveFeatureReport(player, feature))
 			if report then
 				table.insert(featureReports, report)
@@ -318,6 +430,7 @@ function AccessCommandUtils.collectPlayerState(accessDataService: any, accessPol
 
 	return {
 		featureReports = featureReports,
+		featureNamesNeedingSubject = needSubject,
 		factReports = readOnce(accessDataService:ObserveFactReports(player)) or {},
 		policies = policies,
 	}
@@ -330,7 +443,12 @@ end
 	@return string
 ]=]
 function AccessCommandUtils.formatCollectedPlayerState(collected: any): string
-	return AccessCommandUtils.formatPlayerState(collected.featureReports, collected.factReports, collected.policies)
+	return AccessCommandUtils.formatPlayerState(
+		collected.featureReports,
+		collected.factReports,
+		collected.policies,
+		collected.featureNamesNeedingSubject
+	)
 end
 
 --[=[

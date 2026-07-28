@@ -54,6 +54,7 @@ export type AccessKickPolicyOptions = {
 	facts: { string }?,
 	features: { AccessFeature.AccessFeature }?,
 	message: string?,
+	isEnabledByDefault: boolean?,
 	observeShouldKick: AccessKickTrigger,
 }
 
@@ -80,6 +81,7 @@ function AccessKickPolicy.new(serviceBag: any, options: AccessKickPolicyOptions)
 		-- Kicking is enforcement. The client registers this policy too, so its name autocompletes, but
 		-- only the server ever runs it.
 		realm = AccessPolicyRealm.SERVER,
+		isEnabledByDefault = options.isEnabledByDefault,
 		apply = function(context)
 			return options.observeShouldKick(context):Subscribe(function(shouldKick: boolean)
 				if shouldKick then
@@ -100,7 +102,7 @@ end
 	@param policyName string
 	@param factName string
 	@param value boolean
-	@param options { message: string? }?
+	@param options { message: string?, isEnabledByDefault: boolean? }?
 	@return AccessPolicy
 ]=]
 function AccessKickPolicy.whenFactIs(
@@ -108,7 +110,7 @@ function AccessKickPolicy.whenFactIs(
 	policyName: string,
 	factName: string,
 	value: boolean,
-	options: { message: string? }?
+	options: { message: string?, isEnabledByDefault: boolean? }?
 ): AccessPolicy.AccessPolicy
 	assert(type(factName) == "string", "Bad factName")
 	assert(type(value) == "boolean", "Bad value")
@@ -117,6 +119,7 @@ function AccessKickPolicy.whenFactIs(
 		policyName = policyName,
 		facts = { factName },
 		message = if options then options.message else nil,
+		isEnabledByDefault = if options then options.isEnabledByDefault else nil,
 		observeShouldKick = function(context)
 			return context.observeFact(factName):Pipe({
 				Rx.map(function(current: boolean?)
@@ -136,14 +139,14 @@ end
 	@param serviceBag ServiceBag
 	@param policyName string
 	@param feature AccessFeature
-	@param options { message: string? }?
+	@param options { message: string?, isEnabledByDefault: boolean? }?
 	@return AccessPolicy
 ]=]
 function AccessKickPolicy.whenFeatureDisallowed(
 	serviceBag: any,
 	policyName: string,
 	feature: AccessFeature.AccessFeature,
-	options: { message: string? }?
+	options: { message: string?, isEnabledByDefault: boolean? }?
 ): AccessPolicy.AccessPolicy
 	assert(AccessFeature.isAccessFeature(feature), "Bad feature")
 
@@ -151,6 +154,7 @@ function AccessKickPolicy.whenFeatureDisallowed(
 		policyName = policyName,
 		features = { feature },
 		message = if options then options.message else nil,
+		isEnabledByDefault = if options then options.isEnabledByDefault else nil,
 		observeShouldKick = function(context)
 			return context.observeFeature(feature):Pipe({
 				Rx.map(function(state: AccessStateUtils.AccessState)

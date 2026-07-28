@@ -13,6 +13,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessFactContributionState = require("AccessFactContributionState")
+local AccessFactContributionStateUtils = require("AccessFactContributionStateUtils")
 
 local AccessStateUtils = {}
 
@@ -146,6 +147,95 @@ function AccessStateUtils.fromFacts(factState: AccessFactState, factNames: { str
 		return AccessStateUtils.allowed(grantedBy)
 	elseif anyUnresolved then
 		return AccessStateUtils.unresolved()
+	end
+
+	return AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED)
+end
+
+--[=[
+	Granted only when **every** named fact allows, unresolved while any is unanswered, refused as soon as
+	one denies.
+
+	The and-of that every flag-gated grant actually is -- `isEarlyAccessTester` *and*
+	`testerEarlyAccessEnabled` -- so a feature can declare its shape rather than hand-write the fold.
+
+	@param factState AccessFactState
+	@param factNames { string }
+	@return AccessState
+]=]
+function AccessStateUtils.fromAllFacts(factState: AccessFactState, factNames: { string }): AccessState
+	local anyUnresolved = false
+
+	for _, factName in factNames do
+		local state = factState[factName]
+		if state == AccessFactContributionState.DENY then
+			-- A definite no ends it. Unlike an any-of, no later answer can rescue an and-of, so there is
+			-- nothing to wait for and reporting unresolved would be a stall with a known answer behind it.
+			return AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED)
+		elseif state ~= AccessFactContributionState.ALLOW then
+			anyUnresolved = true
+		end
+	end
+
+	if anyUnresolved then
+		return AccessStateUtils.unresolved()
+	end
+
+	return AccessStateUtils.allowed(table.clone(factNames))
+end
+
+--[=[
+	Granted when every named fact is definitely **false**, unresolved while any is unanswered.
+
+	The gate "does not own the game" needs this rather than a `not`: inverting the value turns unresolved
+	into true, which is the difference between "we could not confirm" and "definitely does not own it" --
+	and on a purchase gate that difference is offering to sell something somebody already has.
+
+	@param factState AccessFactState
+	@param factNames { string }
+	@return AccessState
+]=]
+function AccessStateUtils.fromNoFacts(factState: AccessFactState, factNames: { string }): AccessState
+	local inverted = {}
+	for _, factName in factNames do
+		inverted[factName] =
+			AccessFactContributionStateUtils.invert(factState[factName] or AccessFactContributionState.UNRESOLVED)
+	end
+
+	return AccessStateUtils.fromAllFacts(inverted, factNames)
+end
+
+--[=[
+	The first allowed verdict among these, else unresolved if any is, else the first refusal.
+
+	An or-fold over whole verdicts rather than over facts, which is what lets a composed feature keep both
+	halves' reasoning instead of collapsing to a boolean on the way.
+
+	@param states { AccessState }
+	@return AccessState
+]=]
+function AccessStateUtils.anyAllowed(states: { AccessState }): AccessState
+	local grantedBy = {}
+	local anyUnresolved = false
+
+	for _, state in states do
+		if AccessStateUtils.isAllowed(state) then
+			for _, name in (state :: any).grantedBy do
+				table.insert(grantedBy, name)
+			end
+		elseif AccessStateUtils.isUnresolved(state) then
+			anyUnresolved = true
+		end
+	end
+
+	if #grantedBy > 0 then
+		return AccessStateUtils.allowed(grantedBy)
+	elseif anyUnresolved then
+		return AccessStateUtils.unresolved()
+	end
+
+	for _, state in states do
+		return state
 	end
 
 	return AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED)

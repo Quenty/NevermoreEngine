@@ -193,16 +193,27 @@ describe("feature composition across realms", function()
 
 	it("leaves a fact the client pushed itself alone", function()
 		-- Replication widens a feature on the client; it does not own it.
+		--
+		-- Pushed on *both* realms, and in the order that used to break it: the reconciler claims the name
+		-- first, the client's own code claims it second, and the server then drops it. A push that returned
+		-- a no-op remover for an already-present name gave the reconciler sole ownership, so its remover
+		-- took away a grant the client had made and expected to keep.
 		local controller = setup()
-		controller:registerFeature(controller.server, { "ownsGame" })
+		local serverFeature = controller:registerFeature(controller.server, { "ownsGame" })
 		local clientFeature = controller:registerFeature(controller.client, { "ownsGame" })
 
-		controller.maid:GiveTask(clientFeature:PushFactNameAllowsFeature("clientOnlyAllowlist"))
+		local removeOnServer = serverFeature:PushFactNameAllowsFeature("sharedAllowlist")
+		waitForFactNames(clientFeature, { "ownsGame", "sharedAllowlist" })
 
-		expect(waitForFactNames(clientFeature, { "ownsGame", "clientOnlyAllowlist" })).toEqual({
-			"ownsGame",
-			"clientOnlyAllowlist",
-		})
+		controller.maid:GiveTask(clientFeature:PushFactNameAllowsFeature("sharedAllowlist"))
+		removeOnServer()
+
+		-- Several frames, so the reconcile that follows the server's drop has certainly run.
+		for _ = 1, 10 do
+			task.wait()
+		end
+
+		expect(clientFeature:GetFactNames()).toEqual({ "ownsGame", "sharedAllowlist" })
 
 		controller:destroy()
 	end)

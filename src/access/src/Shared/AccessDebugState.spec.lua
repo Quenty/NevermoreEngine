@@ -106,6 +106,7 @@ describe("AccessPolicy.GetDebugState", function()
 			realm = AccessPolicyRealm.CLIENT,
 			facts = { "isStaff" },
 			features = { "shop" },
+			isEnabledByDefault = false,
 		})
 
 		controller:destroy()

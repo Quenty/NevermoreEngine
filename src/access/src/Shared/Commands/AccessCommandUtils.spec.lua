@@ -177,6 +177,15 @@ describe("AccessCommandUtils.formatPlayerState", function()
 		expect(string.find(text, "decided") ~= nil).toEqual(true)
 	end)
 
+	it("names a per-thing gate as needing a subject instead of answering it", function()
+		-- access-state cannot pass a subject, and a verdict for a question nobody asked is worse than
+		-- saying the question takes an argument. So it is listed, and pointed at the command that can.
+		local text = AccessCommandUtils.formatPlayerState({}, {}, nil, { "canEnterWorld" })
+
+		expect(string.find(text, "canEnterWorld = needs a subject") ~= nil).toEqual(true)
+		expect(string.find(text, "access%-feature") ~= nil).toEqual(true)
+	end)
+
 	it("says so plainly when there is nothing registered", function()
 		-- Features, policies and facts each say it, rather than a section silently vanishing.
 		local text = AccessCommandUtils.formatPlayerState({}, {})
@@ -330,6 +339,43 @@ describe("AccessCommandUtils.registerTypes", function()
 	end)
 end)
 
+describe("AccessCommandUtils.parseSubject", function()
+	it("turns typed digits into a number, which is what a subject usually is", function()
+		-- A world index or a chapter compared with `subject == 3` would silently deny for "3", and a silent
+		-- denial in a debugging tool is worse than no tool.
+		expect(AccessCommandUtils.parseSubject("3")).toEqual(3)
+	end)
+
+	it("passes anything else through as typed", function()
+		expect(AccessCommandUtils.parseSubject("blueEgg")).toEqual("blueEgg")
+	end)
+
+	it("reads a missing argument as no subject at all", function()
+		expect(AccessCommandUtils.parseSubject("")).toEqual(nil)
+		expect(AccessCommandUtils.parseSubject(nil)).toEqual(nil)
+	end)
+end)
+
+describe("AccessCommandUtils.describeSubject", function()
+	it("names the subject a verdict was reached against", function()
+		expect(AccessCommandUtils.describeSubject(3)).toEqual(" (subject 3)")
+	end)
+
+	it("says nothing when there is none, so a feature that takes no subject reads clean", function()
+		expect(AccessCommandUtils.describeSubject(nil)).toEqual("")
+	end)
+
+	it("puts the subject on the verdict line, not after the facts", function()
+		local text = AccessCommandUtils.formatFeatureReport({
+			featureName = "canEnterWorld",
+			state = AccessStateUtils.allowed({ "isStaff" }),
+			facts = { isStaff = staffReport() },
+		}, 3)
+
+		expect(string.split(text, "\n")[1]).toEqual("canEnterWorld (subject 3) = allowed (granted by isStaff)")
+	end)
+end)
+
 describe("AccessCommandUtils.collectPlayerState", function()
 	local function collectingDataService()
 		return {
@@ -337,7 +383,12 @@ describe("AccessCommandUtils.collectPlayerState", function()
 				return { "chapters" }
 			end,
 			GetFeature = function(_self, featureName: string)
-				return { featureName = featureName }
+				return {
+					featureName = featureName,
+					RequiresSubject = function()
+						return false
+					end,
+				}
 			end,
 			ObserveFeatureReport = function()
 				return Rx.of({
@@ -386,15 +437,17 @@ describe("AccessCommandUtils.collectPlayerState", function()
 		expect(collected.policies).toEqual({})
 	end)
 
-	it("renders identically to the readout the server builds by hand", function()
-		-- The point of sharing the collector: two realms shown side by side differ only where they
-		-- actually disagree, never because two formatters phrased the same state differently.
+	it("renders every section it gathered, so nothing collected goes unprinted", function()
+		-- Was written as formatCollected(x) == formatPlayerState(x...), which is the literal body of the
+		-- first -- it passed no matter what either function did. Assert the output instead.
 		local collected =
 			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), PLAYER)
+		local text = AccessCommandUtils.formatCollectedPlayerState(collected)
 
-		expect(AccessCommandUtils.formatCollectedPlayerState(collected)).toEqual(
-			AccessCommandUtils.formatPlayerState(collected.featureReports, collected.factReports, collected.policies)
-		)
+		expect(string.find(text, "chapters") ~= nil).toEqual(true)
+		expect(string.find(text, "isStaff") ~= nil).toEqual(true)
+		expect(string.find(text, "kick%-on%-non%-admin") ~= nil).toEqual(true)
+		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
 	end)
 
 	it("refuses to collect without a player rather than reading a blank state", function()

@@ -366,7 +366,9 @@ function AccessPlayerBase._trackRegisteredFeatures(self: AccessPlayerBase): ()
 
 		for _, featureName in featureNames do
 			local feature = self._accessDataService:GetFeature(featureName)
-			if feature then
+			-- A per-thing feature has no answer without the thing. Evaluating it with nil here is what
+			-- crashed a purchase gate that had every right to assume it had a subject.
+			if feature and not feature:RequiresSubject() then
 				featureMaid:GiveTask(self:ObserveFeatureAllowedState(feature):Subscribe(function(state)
 					self._stateByFeatureName[featureName] = state
 					self.FeatureAllowedChanged:Fire(featureName, AccessStateUtils.isAllowed(state), state)

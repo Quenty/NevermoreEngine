@@ -39,7 +39,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local AccessDataServiceInterface = require("AccessDataServiceInterface")
 local AccessFact = require("AccessFact")
@@ -132,6 +131,11 @@ export type AccessFeatureReport = {
 	featureName: string,
 	state: AccessStateUtils.AccessState,
 	facts: { [string]: AccessFactReport },
+	-- The feature's declared non-fact inputs, resolved for this subject. Empty for a feature with none.
+	context: { [string]: any },
+	-- The whole verdict of each feature this one reads, so a refusal inherited from another feature keeps
+	-- the reason it was refused for.
+	features: { [string]: AccessStateUtils.AccessState },
 }
 
 -- An override is boxed because the value it carries may be nil -- forcing a fact to unresolved is a thing
@@ -241,7 +245,9 @@ function AccessDataService.Start(self: AccessDataService): ()
 	--
 	-- On ReplicatedStorage because this is a singleton and ReplicatedStorage is the one adornee both
 	-- realms already agree on -- no folder to create, nothing to find.
-	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
+	self._maid:GiveTask(
+		AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(tieRealm), tieRealm)
+	)
 end
 
 --[[
@@ -345,10 +351,16 @@ end
 
 --[[
 	This class is shared, but the tie declares the override setters SERVER-only and refuses a client
-	implementation that exposes one. So the implementer is built for the realm rather than being `self`:
-	on a client the setters are simply not there.
+	implementation that *carries* one -- it filters nothing, it errors. So the implementer is built for the
+	realm the tie is being told about rather than being `self`: on a client the setters are simply not
+	there.
+
+	GOTCHA: built from that realm and not from [RunService]. They differ wherever a bag is told its realm
+	-- a test booting both halves in one DataModel is the whole reason [TieRealmService] exists -- and
+	getting it from RunService there means a client implementation carrying server members, which throws
+	inside `ServiceBag:Start`'s `task.spawn` and is therefore silent.
 ]]
-function AccessDataService._buildTieImplementer(self: AccessDataService): any
+function AccessDataService._buildTieImplementer(self: AccessDataService, tieRealm: string): any
 	local implementer = {}
 
 	local shared = {
@@ -385,7 +397,7 @@ function AccessDataService._buildTieImplementer(self: AccessDataService): any
 		delegate(methodName)
 	end
 
-	if RunService:IsServer() then
+	if tieRealm ~= TieRealms.CLIENT then
 		for _, methodName in serverOnly do
 			delegate(methodName)
 		end
@@ -639,12 +651,38 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 	end
 end
 
+--[[
+	Only assigns when the set actually changed.
+
+	GetFactNames builds a fresh table every call and ValueObject compares by identity, so assigning
+	unconditionally fires on every registration -- including a second *layer* of a fact already present,
+	which changes no names at all. Anything switchMapping over this then drops its shareReplay, and every
+	resolver for every player re-runs: the marketplace lookups, the permission lookups, and a flap through
+	all-unresolved that replicates to every client on the way.
+]]
 function AccessDataService._refreshFactNames(self: AccessDataService): ()
 	if not self._factNames then
 		return
 	end
 
-	self._factNames.Value = self:GetFactNames()
+	local names = self:GetFactNames()
+	local current = self._factNames.Value
+
+	if current and #current == #names then
+		local same = true
+		for index, name in names do
+			if current[index] ~= name then
+				same = false
+				break
+			end
+		end
+
+		if same then
+			return
+		end
+	end
+
+	self._factNames.Value = names
 end
 
 --[=[
@@ -785,6 +823,15 @@ function AccessDataService.ObserveFeature(
 ): Observable.Observable<AccessStateUtils.AccessState>
 	assert(player, "Bad player")
 	assert(AccessFeature.isAccessFeature(feature), "Bad feature")
+	-- Refused rather than answered. Asking a per-thing gate about no thing has no meaning, and the compute
+	-- behind it was written expecting the thing -- which is how the flag's absence crashed a purchase gate
+	-- in the first place. Skipping it in the tracker was never enough on its own: a direct call, a console
+	-- command with the argument left off, or a policy all reach here too.
+	assert(
+		not (feature:RequiresSubject() and subject == nil),
+		`[AccessDataService] - Feature {feature:GetFeatureName()} requires a subject. Pass the thing being `
+			.. `asked about -- a world index, a chapter -- rather than nothing.`
+	)
 
 	-- Re-derived when the feature's fact list changes, so a fact pushed onto a feature reaches everything
 	-- already watching it rather than only whoever subscribes next.
@@ -794,10 +841,40 @@ function AccessDataService.ObserveFeature(
 		end) :: any,
 	}) :: any
 
-	return feature:ObserveCompute(observeFacts, subject):Pipe({
-		RxAccessStateUtils.distinctState() :: any,
-		RxAccessStateUtils.completeOn(self:_observePlayerRemoving(player)) :: any,
-	}) :: any
+	return feature
+		:ObserveCompute(observeFacts, subject, {
+			observeFeatures = self:_observeFeatureInputs(player, feature, subject),
+			player = player,
+		})
+		:Pipe({
+			RxAccessStateUtils.distinctState() :: any,
+			RxAccessStateUtils.completeOn(self:_observePlayerRemoving(player)) :: any,
+		}) :: any
+end
+
+--[[
+	The whole verdict of each feature this one declared, keyed by name.
+
+	Whole verdicts rather than booleans: a feature reading another through [FeatureAccessFact] gets a
+	yes/no and loses why, and "refused because bought access is switched off" is a different thing to tell
+	somebody than "refused because they do not own it".
+]]
+function AccessDataService._observeFeatureInputs(
+	self: AccessDataService,
+	player: Player,
+	feature: AccessFeature.AccessFeature,
+	subject: any?
+): Observable.Observable<{ [string]: AccessStateUtils.AccessState }>
+	local sources: { [string]: any } = {}
+	for _, input in feature:GetFeatureInputs() do
+		sources[input:GetFeatureName()] = self:ObserveFeature(player, input, subject)
+	end
+
+	if next(sources) == nil then
+		return RxAccessStateUtils.ofStatic({}) :: any
+	end
+
+	return Rx.combineLatest(sources) :: any
 end
 
 --[=[
@@ -955,11 +1032,13 @@ function AccessDataService.ObserveFactReport(
 	factName: string
 ): Observable.Observable<AccessFactReport>
 	assert(player, "Bad player")
-	assert(
-		self:HasFact(factName) or self:_hasServerFactValue(player, factName),
-		`[AccessDataService] - No fact named {factName} is registered here and none has been replicated. `
-			.. `Register it in shared code, or let the server replicate it.`
-	)
+
+	-- Warned about, not thrown on, and for the same reason _observeFactState tolerates it: a feature
+	-- widened by a server-only push names facts this realm may never have heard of, and the readout that
+	-- would explain that is the last thing that should be the one to die.
+	if not (self:HasFact(factName) or self:_hasServerFactValue(player, factName)) then
+		self:_warnMissingFactOnce(factName)
+	end
 
 	-- May legitimately be empty: a fact the client cannot compute is registered only on the server, and
 	-- reaches this realm purely as a replicated value.
@@ -1029,37 +1108,6 @@ function AccessDataService.ObserveFactReport(
 end
 
 --[=[
-	Folds the server's replicated answer into a locally-merged report, per the fact's
-	[AccessFactServerOverrideBehavior]. The local answer is kept alongside rather than replaced, so a
-	readout can show what this realm thought and what the server said.
-
-	@param report AccessFactReport
-	@param serverEntry { value: boolean?, abstained: boolean? }?
-	@param behavior string?
-	@return AccessFactReport
-	@private
-]=]
-function AccessDataService._applyServerValue(
-	report: AccessFactReport,
-	serverEntry: { value: boolean?, abstained: boolean? }?,
-	behavior: string?
-): AccessFactReport
-	local localValue = report.value
-	local serverValue = if serverEntry then serverEntry.value else nil
-	local serverState = AccessReplicationStateUtils.fromEntry(serverEntry)
-	local combined = AccessFactServerOverrideBehavior.combine(localValue, serverValue, serverState, behavior)
-
-	report.localValue = localValue
-	report.serverValue = serverValue
-	report.serverState = serverState
-	report.serverOverrideBehavior = behavior or AccessFactServerOverrideBehavior.DEFAULT
-	report.serverOverrode = combined ~= localValue
-	report.value = combined
-
-	return report
-end
-
---[=[
 	Every registered fact for this player, fully explained.
 
 	@param player Player
@@ -1120,12 +1168,19 @@ function AccessDataService.ObserveFeatureReport(
 	return Rx.combineLatest({
 		state = self:ObserveFeature(player, feature, subject),
 		facts = Rx.combineLatest(factSources),
+		-- Reported beside the facts, because for a per-thing gate the answer is as often "this egg is
+		-- already collected" as it is "this player does not own the game", and only one of those was
+		-- visible before.
+		context = feature:ObserveContext(subject),
+		features = self:_observeFeatureInputs(player, feature, subject),
 	}):Pipe({
 		Rx.map(function(latest: any): AccessFeatureReport
 			return {
 				featureName = feature:GetFeatureName(),
 				state = latest.state,
 				facts = latest.facts or {},
+				context = latest.context or {},
+				features = latest.features or {},
 			}
 		end) :: any,
 	}) :: any
@@ -1223,7 +1278,7 @@ function AccessDataService._mergeContributions(
 		metadata = nil,
 		decidedBy = nil,
 		layers = {},
-		-- Filled in by _applyServerValue; declared here so the shape is complete from the start rather
+		-- Filled in by ObserveFactReport; declared here so the shape is complete from the start rather
 		-- than growing fields partway through the pipeline.
 		localValue = nil,
 		serverValue = nil,
