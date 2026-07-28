@@ -1,24 +1,13 @@
-# v1.6.0 (Tue Jul 28 2026)
-
-#### 🚀 Enhancement
-
-- Users/quenty/access [#759](https://github.com/Quenty/NevermoreEngine/pull/759) ([@Quenty](https://github.com/Quenty))
-- feat: Mock player utils + Player mock ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge remote-tracking branch 'origin/main' into users/quenty/access ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.2...@quenty/playermock@1.6.0) (2026-07-28)
+
+### Features
+
+- Mock player utils + Player mock ([4caed96](https://github.com/Quenty/NevermoreEngine/commit/4caed968ad05b1bce254fbafb0998a7a1b207f29))
 
 ## [1.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.1...@quenty/playermock@1.5.2) (2026-07-27)
 

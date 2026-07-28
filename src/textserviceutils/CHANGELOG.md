@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.44.2...@quenty/textserviceutils@13.45.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/textserviceutils
+
 ## [13.44.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textserviceutils@13.44.1...@quenty/textserviceutils@13.44.2) (2026-07-27)
 
 **Note:** Version bump only for package @quenty/textserviceutils

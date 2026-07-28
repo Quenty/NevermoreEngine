@@ -1,3 +1,23 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2026-07-28)
+
+### Bug Fixes
+
+- More improvements ([f038ade](https://github.com/Quenty/NevermoreEngine/commit/f038ade7f94ca7af5bf0ec767ef4938a6caa5f30))
+
+### Features
+
+- Access features ([48d977b](https://github.com/Quenty/NevermoreEngine/commit/48d977b40b42b6cc17ec79f2d1f585a8725ee77f))
+- Access implementations and stuff ([a8983eb](https://github.com/Quenty/NevermoreEngine/commit/a8983eb4f68130f317cb43dfc5c37c43b1d9b32b))
+- Access improvements ([e3d1bf8](https://github.com/Quenty/NevermoreEngine/commit/e3d1bf81ff7201b07d30d227a1b2ffeeb56dd5b1))
+- Add access system to Nevermore that standardizes access mechanisms ([1b21d65](https://github.com/Quenty/NevermoreEngine/commit/1b21d65540cd18eb30e5f9378f7b9267cb953167))
+- Add policy, player API surfaces and more ([29cac1a](https://github.com/Quenty/NevermoreEngine/commit/29cac1acbe3ad2426ff097f9dd532b7d180bd9d3))
+- Query client state ([24a4e4c](https://github.com/Quenty/NevermoreEngine/commit/24a4e4c2c72ef131c5ed99dd78816f799dc42894))
+
 # v1.1.0 (Tue Jul 28 2026)
 
 #### 🚀 Enhancement

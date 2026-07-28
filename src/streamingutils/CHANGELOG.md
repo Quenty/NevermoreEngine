@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.27.2...@quenty/streamingutils@10.28.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
 ## [10.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.27.1...@quenty/streamingutils@10.27.2) (2026-07-27)
 
 **Note:** Version bump only for package @quenty/streamingutils
