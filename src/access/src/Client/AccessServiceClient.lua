@@ -17,11 +17,14 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local AccessCommandServiceClient = require("AccessCommandServiceClient")
 local AccessDataService = require("AccessDataService")
 local AccessPlayerClient = require("AccessPlayerClient")
 local AccessPolicyService = require("AccessPolicyService")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
 local AccessServiceClient = {}
@@ -44,14 +47,30 @@ function AccessServiceClient.Init(self: AccessServiceClient, serviceBag: Service
 	self._maid = Maid.new()
 
 	self._accessDataService = self._serviceBag:GetService(AccessDataService) :: any
-	-- Registered here purely so the console knows every policy name. Server-realm policies never run
-	-- client-side; the service skips them.
 	self._accessPolicyService = self._serviceBag:GetService(AccessPolicyService) :: any
 	self._serviceBag:GetService(AccessCommandServiceClient)
 	self._serviceBag:GetService(AccessPlayerClient)
 end
 
-function AccessServiceClient.Start(_self: AccessServiceClient): () end
+--[[
+	The client half of what [AccessService] does on join: without this a client-realm policy is registered,
+	enabled, listed by `access-policies` -- and never applied to anybody, because a policy only runs against
+	a player somebody added.
+
+	The local player and nobody else. Player instances replicate, so this realm can answer questions about
+	everyone here, but a client-realm consequence is presentation *for the person at this client* -- adding
+	the rest would raise this client's paywall on a stranger's verdict.
+
+	Read once, matching production: `Players.LocalPlayer` exists before any LocalScript runs, and a headless
+	test designates its [PlayerMock] before booting bags for the same reason. A realm with neither simply
+	runs no client policies, which is what a bag with no client to speak for should do.
+]]
+function AccessServiceClient.Start(self: AccessServiceClient): ()
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer then
+		self._maid:GiveTask(self._accessPolicyService:AddPlayer(localPlayer))
+	end
+end
 
 --[=[
 	The shared registry, for a game registering its facts and features.
