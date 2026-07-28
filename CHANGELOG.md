@@ -1,3 +1,16 @@
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.1.0`, `@quenty/attributeutils@14.36.0`, `@quenty/playermock@1.6.0`, `@quenty/playerutils@8.41.0`
+  - Users/quenty/access [#759](https://github.com/Quenty/NevermoreEngine/pull/759) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Jul 27 2026)
 
 #### 🚀 Enhancement

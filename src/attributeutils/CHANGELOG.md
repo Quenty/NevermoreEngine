@@ -1,3 +1,20 @@
+# v14.36.0 (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- Users/quenty/access [#759](https://github.com/Quenty/NevermoreEngine/pull/759) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge remote-tracking branch 'origin/main' into users/quenty/access ([@Quenty](https://github.com/Quenty))
+- fix: EncodedAttributeValue stores the defaultValue ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
