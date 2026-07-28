@@ -1,19 +1,13 @@
-# v1.3.0 (Tue Jul 28 2026)
-
-#### 🚀 Enhancement
-
-- feat(access): toggle several policies at once with access-policy [#765](https://github.com/Quenty/NevermoreEngine/pull/765) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.2.0...@quenty/access@1.3.0) (2026-07-28)
+
+### Features
+
+- **access:** toggle several policies at once with access-policy ([#765](https://github.com/Quenty/NevermoreEngine/issues/765)) ([04d1950](https://github.com/Quenty/NevermoreEngine/commit/04d1950b6e86edaeec2b275ce01db5df6c905516))
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.1.2...@quenty/access@1.2.0) (2026-07-28)
 
