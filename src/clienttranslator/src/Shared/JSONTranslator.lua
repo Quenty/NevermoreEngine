@@ -26,6 +26,7 @@ local NumberLocalizationUtils = require("NumberLocalizationUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local PseudoLocalize = require("PseudoLocalize")
+local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
@@ -210,58 +211,29 @@ function JSONTranslator.ObserveFormatByKey(
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	local translationObservable = Rx.combineLatest({
+	return Rx.combineLatest({
 		cloudTranslator = self:ObserveTranslator(),
 		translationKey = translationKey,
 		translationArgs = self:_observeArgs(translationArgs),
 	}):Pipe({
 		Rx.switchMap(function(mainState): any
-			if mainState.cloudTranslator then
-				return self._translatorService:ObserveLocaleId():Pipe({
-					Rx.map(function()
-						return self:_doTranslation(
-							mainState.cloudTranslator,
-							mainState.translationKey,
-							mainState.translationArgs
-						)
-					end) :: any,
-				})
-			end
-
-			-- Fall back to local or source translator
+			-- The local translator is deliberately not a re-emission source, though
+			-- _doTranslation reads it: it swaps at the start of a locale change, before that
+			-- locale's data has landed, so re-emitting on it would publish a source-language
+			-- fallback over a good translation until the flush.
 			return Rx.combineLatest({
-				localTranslator = self._localTranslator:Observe(),
+				readyLocaleId = self:_observeTranslationTrigger(mainState.translationKey),
 				sourceTranslator = self._sourceTranslator:Observe(),
 			}):Pipe({
-				Rx.map(function(state): string?
-					if state.localTranslator then
-						return self:_doTranslation(
-							state.localTranslator,
-							mainState.translationKey,
-							mainState.translationArgs
-						)
-					elseif state.sourceTranslator then
-						return self:_doTranslation(
-							state.sourceTranslator,
-							mainState.translationKey,
-							mainState.translationArgs
-						)
-					else
-						return nil
-					end
-				end) :: any,
-				Rx.where(function(value)
-					return value ~= nil
+				Rx.map(function(state): string
+					return self:_doTranslation(
+						mainState.cloudTranslator,
+						mainState.translationKey,
+						mainState.translationArgs,
+						state.readyLocaleId
+					)
 				end) :: any,
 			})
-		end) :: any,
-	})
-
-	-- Wait for the deferred entry writes to land before translating, so we never read a
-	-- key before it has been written.
-	return Rx.fromPromise(self._translatorService:PromiseEntriesWritten()):Pipe({
-		Rx.switchMap(function(): any
-			return translationObservable
 		end) :: any,
 	}) :: any
 end
@@ -282,16 +254,94 @@ function JSONTranslator.PromiseFormatByKey(self: JSONTranslator, translationKey:
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
-	-- Wait for the deferred entry writes to land, then for the translator, so we never
-	-- read a key before it has been written.
-	return self._translatorService
-		:PromiseEntriesWritten()
+	-- Wait for this key's queued writes to land, then for the translator, so we never read a
+	-- key before it has been written. Only this key is waited on -- the rest of the batch
+	-- stays queued for the normal end-of-frame flush.
+	return Rx.toPromise(self:ObserveTranslationReady(translationKey):Pipe({
+		Rx.where(function(readyLocaleId)
+			return readyLocaleId ~= nil
+		end) :: any,
+	}) :: any)
 		:Then(function()
 			return self:PromiseTranslator()
 		end)
 		:Then(function(translator)
 			return self:_doTranslation(translator, translationKey, args)
 		end)
+end
+
+--[=[
+	Observes when a translation key is readable for the current locale, emitting the locale
+	id it is readable for, or nil while its data is still queued.
+
+	Localization writes are batched to the end of the frame (see
+	[TranslatorService.SetEntryValue]), because a game streaming in can register thousands of
+	entries in a single frame and each raw table write invalidates every AutoLocalize entry
+	in the engine. That means a key is not readable the instant it is registered. Rather than
+	forcing a flush, gate on this:
+
+	```lua
+	maid:GiveTask(translator:ObserveTranslationReady("actions.respawn"):Subscribe(function(localeId)
+		if localeId then
+			-- the key is readable for localeId now
+		end
+	end))
+	```
+
+	Re-emits whenever the locale changes or new data lands for the key, so a locale swap is
+	picked up without resubscribing. Nothing here yields.
+
+	@param translationKey string
+	@return Observable<string?>
+]=]
+function JSONTranslator.ObserveTranslationReady(
+	self: JSONTranslator,
+	translationKey: string
+): Observable.Observable<string?>
+	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
+	assert(type(translationKey) == "string", "Key must be a string")
+
+	return self._translatorService:ObserveLocaleId():Pipe({
+		Rx.switchMap(function(localeId: string): any
+			-- Queue the locale's file here rather than trusting the subscription in Init to
+			-- have run first. Loading is idempotent and only queues -- it never writes the
+			-- table -- so readiness is accurate whatever order subscribers run in.
+			self._loader:LoadLocale(localeId)
+
+			return self._translatorService:ObserveTranslationReady(translationKey):Pipe({
+				Rx.map(function(isReady: boolean): string?
+					return if isReady then localeId else nil
+				end) :: any,
+			})
+		end) :: any,
+		-- Queuing the new locale's file above happens while the outgoing locale's readiness
+		-- is still subscribed, so a swap reports not-ready once for each locale. This is a
+		-- state, not a pulse: collapse the repeat.
+		Rx.distinct() :: any,
+	}) :: any
+end
+
+-- Drives re-translation. Emits once on subscribe whatever the readiness state, so a reader
+-- always has something to paint instead of waiting a frame on the batch, and thereafter only
+-- when the key is ready: a locale swap must not flicker a good translation back to a
+-- fallback while the new locale's data is still queued.
+function JSONTranslator._observeTranslationTrigger(
+	self: JSONTranslator,
+	translationKey: string
+): Observable.Observable<string?>
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+		local hasFired = false
+
+		maid:GiveTask(self:ObserveTranslationReady(translationKey):Subscribe(function(readyLocaleId: string?)
+			if readyLocaleId ~= nil or not hasFired then
+				hasFired = true
+				sub:Fire(readyLocaleId)
+			end
+		end))
+
+		return maid
+	end) :: any
 end
 
 --[=[
@@ -441,7 +491,10 @@ function JSONTranslator.FormatByKey(self: JSONTranslator, translationKey: string
 	assert(type(translationKey) == "string", "Key must be a string")
 
 	-- Synchronous read: land just this key's queued writes before reading, rather than
-	-- forcing the whole deferred batch (and its full table write cost) early.
+	-- forcing the whole deferred batch (and its full table write cost) early. The current
+	-- locale is queued first, since a synchronous read cannot wait on the subscription in
+	-- Init to have queued it.
+	self._loader:LoadLocale(self._translatorService:GetLocaleId())
 	self._translatorService:FlushEntryForKey(translationKey)
 
 	local translator = self._translatorService:GetTranslator()
@@ -467,53 +520,70 @@ end
 
 function JSONTranslator._doTranslation(
 	self: JSONTranslator,
-	translator: Translator,
+	translator: Translator?,
 	translationKey: string,
-	args
+	args,
+	localeId: string?
 ): string
-	assert(typeof(translator) == "Instance", "Bad translator")
 	assert(type(translationKey) == "string", "Bad translationKey")
 
-	local translation: string
-	local ok, err = pcall(function()
-		translation = translator:FormatByKey(translationKey, args)
-	end)
+	local targetLocaleId = localeId or self._translatorService:GetLocaleId()
+
+	-- A translator answers in the language it was built for, so one built for another
+	-- language returns fluent text in the wrong language instead of failing. The cloud
+	-- translator is bound to the player's Roblox locale, which a forced locale (a language
+	-- selector) does not move, so it is only consulted when the languages agree.
+	-- The source translator is exempt: answering in another language is its whole job.
+	local translation = self:_tryTranslate(translator, translationKey, args, targetLocaleId)
+		or self:_tryTranslate(self._localTranslator.Value, translationKey, args, targetLocaleId)
+		or self:_tryTranslate(self._sourceTranslator.Value, translationKey, args, nil)
 
 	if translation then
 		return translation
 	end
 
-	if err then
-		warn(err)
-	else
-		warn("Failed to localize '" .. translationKey .. "'")
-	end
-
-	-- Try the local translator next (not from cloud)
-	local localTranslator = self._localTranslator.Value
-	if localTranslator then
-		ok, err = pcall(function()
-			translation = localTranslator:FormatByKey(translationKey, args)
-		end)
-
-		if translation then
-			return translation
-		end
-	end
-
-	-- Try the source translator next (we're missing the locale id)
-	local sourceTranslator = self._sourceTranslator.Value
-	if sourceTranslator then
-		ok, err = pcall(function()
-			translation = sourceTranslator:FormatByKey(translationKey, args)
-		end)
-	end
-
-	if ok and not err and translation then
-		return translation
+	-- Only a key no translator could resolve is worth reporting. A miss on any single
+	-- translator is routine -- the cloud translator does not know keys registered at runtime,
+	-- and a key whose writes are still queued is not readable yet by design -- so warning per
+	-- miss floods the console with one line per key per locale swap.
+	if self._translatorService:IsTranslationReady(translationKey) then
+		warn(string.format("[JSONTranslator] - Failed to localize '%s'", translationKey))
 	end
 
 	return translationKey
+end
+
+-- Translates through one translator, returning nil when it cannot answer: it is absent, it
+-- is built for another language than requiredLocaleId (nil to accept any), or it does not
+-- have the key. Roblox raises rather than returning nil for a missing key, hence the pcall.
+function JSONTranslator._tryTranslate(
+	_self: JSONTranslator,
+	translator: Translator?,
+	translationKey: string,
+	args,
+	requiredLocaleId: string?
+): string?
+	if not translator then
+		return nil
+	end
+
+	if requiredLocaleId then
+		local languageSubtag = ResolveLocaleUtils.getLanguageSubtag(requiredLocaleId)
+		if languageSubtag and ResolveLocaleUtils.getLanguageSubtag(translator.LocaleId) ~= languageSubtag then
+			return nil
+		end
+	end
+
+	local translation: string?
+
+	local ok = pcall(function()
+		translation = (translator :: any):FormatByKey(translationKey, args)
+	end)
+	if not ok then
+		return nil
+	end
+
+	return translation
 end
 
 --[=[

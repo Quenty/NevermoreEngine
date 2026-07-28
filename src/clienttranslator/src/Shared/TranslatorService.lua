@@ -18,6 +18,7 @@ local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
 local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
 local TieRealmService = require("TieRealmService")
 local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
@@ -57,6 +58,8 @@ export type TranslatorService = typeof(setmetatable(
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
 		_pendingEntries: PendingEntries,
+		_readySignals: { [string]: Signal.Signal<boolean> },
+		_readySignalMaid: Maid.Maid,
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
@@ -72,6 +75,8 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._tieRealmService = serviceBag:GetService(TieRealmService) :: any
 
 	self._pendingEntries = {}
+	self._readySignals = {}
+	self._readySignalMaid = self._maid:Add(Maid.new())
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
 
@@ -183,6 +188,9 @@ function TranslatorService._getPendingEntry(
 			Values = {},
 		}
 		self._pendingEntries[translationKey] = entry
+
+		-- Queuing is the only transition into "not ready", so observers hear about it here.
+		self:_fireTranslationReady(translationKey, false)
 	else
 		-- The table keys entries by translation key alone, so a second write for the same key
 		-- with a different source/context overwrites in place (as SetEntryValue would) rather
@@ -207,6 +215,87 @@ function TranslatorService.PromiseEntriesWritten(self: TranslatorService): Promi
 	end
 
 	return assert(self._pendingFlushPromise, "Flush scheduled without a pending promise")
+end
+
+--[=[
+	Whether a read of this key would see everything queued for it. False while the key has
+	writes waiting on the end-of-frame flush.
+
+	A key nothing has ever queued is ready: there is nothing pending to wait for, and a read
+	should fall through to whatever the translators can offer rather than block forever.
+
+	@param translationKey string
+	@return boolean
+]=]
+function TranslatorService.IsTranslationReady(self: TranslatorService, translationKey: string): boolean
+	assert(type(translationKey) == "string", "Bad translationKey")
+
+	return self._pendingEntries[translationKey] == nil
+end
+
+--[=[
+	Observes whether a read of this key would see everything queued for it, firing the
+	current state immediately and again on every change.
+
+	This is the reactive counterpart to the batching: writes are deliberately deferred to the
+	end of the frame (see [TranslatorService.SetEntryValue]), so a reader that translates the
+	instant a key is registered reads before the write lands. Rather than forcing the flush --
+	which would defeat the batching that keeps a streaming-in game from writing the table
+	thousands of times a frame -- readers observe this and re-read when it goes ready.
+
+	```lua
+	maid:GiveTask(translatorService:ObserveTranslationReady("actions.respawn"):Subscribe(function(isReady)
+		print(isReady) --> false, then true once the batch lands
+	end))
+	```
+
+	Emissions are driven by the queue and flush directly, so nothing here yields.
+
+	@param translationKey string
+	@return Observable<boolean>
+]=]
+function TranslatorService.ObserveTranslationReady(
+	self: TranslatorService,
+	translationKey: string
+): Observable.Observable<boolean>
+	assert(type(translationKey) == "string", "Bad translationKey")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local signal = self._readySignals[translationKey]
+		if not signal then
+			signal = Signal.new() :: any
+			self._readySignals[translationKey] = signal
+			self._readySignalMaid[translationKey] = signal
+		end
+
+		maid:GiveTask(signal:Connect(function(isReady: boolean)
+			sub:Fire(isReady)
+		end))
+
+		-- Signals are created per observed key so queuing a write costs one lookup rather
+		-- than a fan-out over every subscriber. Drop the signal once its last observer goes,
+		-- so a game that observes many keys transiently does not accumulate them.
+		maid:GiveTask(function()
+			if signal:GetConnectionCount() == 0 and self._readySignals[translationKey] == signal then
+				self._readySignals[translationKey] = nil
+				self._readySignalMaid[translationKey] = nil
+			end
+		end)
+
+		sub:Fire(self:IsTranslationReady(translationKey))
+
+		return maid
+	end) :: any
+end
+
+-- Fires an observed key's readiness signal, if anything is observing it.
+function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string, isReady: boolean)
+	local signal = self._readySignals[translationKey]
+	if signal then
+		signal:Fire(isReady)
+	end
 end
 
 --[=[
@@ -328,6 +417,14 @@ function TranslatorService._flushWrites(self: TranslatorService)
 
 	if next(pendingEntries) then
 		self:_applyPendingEntries(pendingEntries)
+	end
+
+	-- After the table is written, so an observer that re-reads on this emission sees the
+	-- landed values. Fires for every key in the batch, including ones _applyPendingEntries
+	-- skipped as already-matching -- their data is in the table either way, and a key that
+	-- never went ready would strand its readers.
+	for translationKey in pendingEntries do
+		self:_fireTranslationReady(translationKey, true)
 	end
 
 	local promise = self._pendingFlushPromise
@@ -580,6 +677,9 @@ end
 function TranslatorService.Destroy(self: TranslatorService)
 	-- Ensures a still-pending deferred flush no-ops instead of recreating the table.
 	self._flushScheduled = false
+
+	table.clear(self._readySignals)
+
 	self._maid:DoCleaning()
 end
 

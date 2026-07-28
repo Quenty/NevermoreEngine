@@ -1244,6 +1244,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/string':
         specifier: workspace:*
         version: link:../string

@@ -42,3 +42,42 @@ written both as a collectable name and again as a generated dialog line), crashi
 
 The behaviors above were established empirically against Open Cloud; see
 `TranslatorService.spec.lua` ("TranslatorService entry merging") for the regression tests.
+
+## A translator answers in its own locale, and will happily answer in the wrong language
+
+`Translator:FormatByKey` is bound to the locale the translator was built for. Two consequences:
+
+- A key with no value for that locale **raises** (`Key <key> not found for locale <locale>`)
+  rather than returning nil or falling back to the source locale. Every read has to be wrapped.
+- The cloud translator from `LocalizationService:GetTranslatorForPlayerAsync` is bound to the
+  **player's Roblox locale**, which an in-game language selector does not move. Asked for a key it
+  knows, it returns the player-locale text and **succeeds** — so a fallback chain that tries it
+  first silently serves the wrong language after a locale swap.
+
+`JSONTranslator._doTranslation` therefore only consults a translator whose language subtag matches
+the locale being translated for, before falling back to the source translator (whose job is to
+answer in another language).
+
+## Localization writes are batched, so a key is not readable the instant it is registered
+
+`TranslatorService` defers writes to the end of the frame, because a game streaming in registers
+thousands of entries in a single frame and every raw table write invalidates every `AutoLocalize`
+entry in the engine. A read taken the moment a key is registered therefore misses.
+
+Do **not** gate reads on `PromiseEntriesWritten`. It resolves for the batch pending *when it was
+called*, which is not the batch containing the data you are about to read — writes queued during
+that flush's own resolution land in the next batch, and a caller who asks while nothing is pending
+gets an already-resolved promise. Gate on the key instead:
+
+- `TranslatorService:ObserveTranslationReady(key)` — emits `false`/`true` as that key's writes
+  land, driven by the queue and the flush, so nothing yields.
+- `JSONTranslator:ObserveTranslationReady(key)` — the locale-aware wrapper. Emits the locale the
+  key is readable for, or nil while it is queued, and re-emits across locale swaps.
+
+A key nothing ever registered reads as ready, so an unknown key falls through to the fallback
+instead of hanging. Synchronous reads (`JSONTranslator:FormatByKey`) use `FlushEntryForKey` to land
+only the locales that read can consult, leaving the rest of the batch queued.
+
+See `JSONTranslator.TranslationReady.spec.lua` for the readiness contract and
+`TranslatorService.spec.lua` ("TranslatorService write cost while streaming in") for the batching
+cost this is protecting.

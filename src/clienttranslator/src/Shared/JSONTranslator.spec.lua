@@ -229,7 +229,9 @@ describe("JSONTranslator:FormatByKey", function()
 end)
 
 describe("JSONTranslator:ObserveFormatByKey", function()
-	it("does not emit until the deferred entry writes have flushed", function()
+	-- Emitting something immediately matters more than emitting the right thing immediately:
+	-- a subscriber that gets nothing until the batch lands leaves its UI blank for a frame.
+	it("emits a fallback before the deferred entry writes flush, then the translation", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({
 			actions = {
@@ -244,7 +246,7 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 			end)
 		)
 
-		expect(received).toBeNil()
+		expect(received).toBe("actions.respawn")
 
 		controller.awaitEntriesWritten()
 		expect(received).toBe("Respawn Quenty")

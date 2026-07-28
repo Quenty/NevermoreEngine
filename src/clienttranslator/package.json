@@ -39,6 +39,7 @@
     "@quenty/pseudolocalize": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
