@@ -242,6 +242,11 @@ end
 	Whether a read of this key would see everything queued for it. False while the key has
 	writes waiting on the end-of-frame flush.
 
+	:::warning
+	This is an implementation detail of the translation stack, exposed for diagnostics.
+	Reading a translation through [JSONTranslator] already accounts for it.
+	:::
+
 	A key nothing has ever queued is ready: there is nothing pending to wait for, and a read
 	should fall through to whatever the translators can offer rather than block forever.
 
@@ -258,17 +263,18 @@ end
 	Observes whether a read of this key would see everything queued for it, firing the
 	current state immediately and again on every change.
 
+	:::warning
+	This is an implementation detail of the translation stack, exposed for diagnostics. Every
+	way of reading a translation through [JSONTranslator] already waits for the key it reads,
+	so consumers should not have to gate on this themselves.
+	:::
+
 	This is the reactive counterpart to the batching: writes are deliberately deferred to the
 	end of the frame (see [TranslatorService.SetEntryValue]), so a reader that translates the
 	instant a key is registered reads before the write lands. Rather than forcing the flush --
 	which would defeat the batching that keeps a streaming-in game from writing the table
-	thousands of times a frame -- readers observe this and re-read when it goes ready.
-
-	```lua
-	maid:GiveTask(translatorService:ObserveTranslationReady("actions.respawn"):Subscribe(function(isReady)
-		print(isReady) --> false, then true once the batch lands
-	end))
-	```
+	thousands of times a frame -- [JSONTranslator] observes this and re-reads when it goes
+	ready.
 
 	Emissions are driven by the queue and flush directly, so nothing here yields.
 

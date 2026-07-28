@@ -270,19 +270,19 @@ end
 	Observes when a translation key is readable for the current locale, emitting the locale
 	id it is readable for, or nil while its data is still queued.
 
+	:::warning
+	This is an implementation detail, exposed for the translation stack itself and for
+	diagnostics. You should not need it: every way of reading a translation
+	([JSONTranslator.ObserveFormatByKey], [JSONTranslator.PromiseFormatByKey],
+	[JSONTranslator.FormatByKey], [JSONTranslator.ObserveTranslation]) already waits for the
+	key it reads, and re-reads when a locale swap brings new data in.
+	:::
+
 	Localization writes are batched to the end of the frame (see
 	[TranslatorService.SetEntryValue]), because a game streaming in can register thousands of
 	entries in a single frame and each raw table write invalidates every AutoLocalize entry
-	in the engine. That means a key is not readable the instant it is registered. Rather than
-	forcing a flush, gate on this:
-
-	```lua
-	maid:GiveTask(translator:ObserveTranslationReady("actions.respawn"):Subscribe(function(localeId)
-		if localeId then
-			-- the key is readable for localeId now
-		end
-	end))
-	```
+	in the engine. That means a key is not readable the instant it is registered, and this is
+	how the read paths above find out that it is.
 
 	Re-emits whenever the locale changes or new data lands for the key, so a locale swap is
 	picked up without resubscribing. Nothing here yields.

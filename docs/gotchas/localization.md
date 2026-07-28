@@ -79,19 +79,25 @@ Simplified key when that is all that exists (fine for number formatting, wrong f
 thousands of entries in a single frame and every raw table write invalidates every `AutoLocalize`
 entry in the engine. A read taken the moment a key is registered therefore misses.
 
-Do **not** gate reads on `PromiseEntriesWritten`. It resolves for the batch pending *when it was
-called*, which is not the batch containing the data you are about to read — writes queued during
-that flush's own resolution land in the next batch, and a caller who asks while nothing is pending
-gets an already-resolved promise. Gate on the key instead:
+**You do not have to do anything about this.** Every way of reading a translation —
+`ObserveFormatByKey`, `PromiseFormatByKey`, `FormatByKey`, `ObserveTranslation` — already waits for
+the key it is reading and re-reads when a locale swap brings new data in. The rest of this section
+is about how, and matters only if you are working on the translation stack itself.
 
-- `TranslatorService:ObserveTranslationReady(key)` — emits `false`/`true` as that key's writes
-  land, driven by the queue and the flush, so nothing yields.
-- `JSONTranslator:ObserveTranslationReady(key)` — the locale-aware wrapper. Emits the locale the
-  key is readable for, or nil while it is queued, and re-emits across locale swaps.
+Readiness is tracked **per key**, by `TranslatorService:ObserveTranslationReady` /
+`IsTranslationReady`, and consumed by `JSONTranslator`. Do **not** reach for
+`PromiseEntriesWritten` instead: it resolves for the batch pending *when it was called*, which is
+not the batch containing the data you are about to read — writes queued during that flush's own
+resolution land in the next batch, and a caller who asks while nothing is pending gets an
+already-resolved promise.
 
 A key nothing ever registered reads as ready, so an unknown key falls through to the fallback
 instead of hanging. Synchronous reads (`JSONTranslator:FormatByKey`) use `FlushEntryForKey` to land
 only the locales that read can consult, leaving the rest of the batch queued.
+
+`ObserveFormatByKey` emits a best-effort value immediately rather than withholding its first
+emission, so a UI bound to it is never blank for a frame; it re-emits the correct text once the key
+lands. It will not flicker a good translation back to a fallback during a locale swap.
 
 See `JSONTranslator.TranslationReady.spec.lua` for the readiness contract and
 `TranslatorService.spec.lua` ("TranslatorService write cost while streaming in") for the batching
