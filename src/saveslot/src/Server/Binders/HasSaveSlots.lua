@@ -40,13 +40,6 @@ export type SummaryProvider = (Player, DataStoreStage.DataStoreStage) -> Observa
 -- identity, so it never collides with a real value (even an empty table) a provider might emit.
 local NONE = {}
 
--- An ephemeral slot carries no meaningful index -- a real slot's index positions it in the save list and
--- routes its store, neither of which applies to a throwaway slot. The authoritative "is ephemeral"
--- discriminator is the slot's own IsEphemeral property (see _isEphemeral), and every index-accounting path
--- skips ephemeral slots, so this value never routes anything and any number of ephemeral slots can coexist.
--- 0 is used because a real index is always >= 1 (DEFAULT_SLOT_INDEX is 1, PromiseCreateSlot rejects < 1).
-local EPHEMERAL_SLOT_INDEX = 0
-
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
 -- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
 export type SaveSlotCreateMetadata = {
@@ -458,7 +451,7 @@ function HasSaveSlots.PromiseSelectTransferableEphemeralSlot(
 			local slotId = HttpService:GenerateGUID(false)
 			self:_buildSlot(slotId, {
 				SlotId = slotId,
-				SlotIndex = EPHEMERAL_SLOT_INDEX,
+				SlotIndex = SaveSlotConstants.EPHEMERAL_SLOT_INDEX,
 				SlotName = export.slotName or "Transfer",
 				CreatedTime = os.time(),
 				Summary = export.summary,
@@ -638,6 +631,12 @@ end
 	copying its saved data. Resolves to the new slot's id. The copy is not selected,
 	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
 	" (Copy)". Rejects when the source slot is missing or every index is in use.
+
+	An ephemeral slot may be duplicated: the copy is a real, persisted slot seeded with the ephemeral
+	slot's live in-memory data, which is how a throwaway session is turned into a save. It keeps the
+	source's name unsuffixed (the copy is the first real slot for that session, not a second copy of an
+	existing save) and, like any duplicate, is not selected -- see
+	[HasSaveSlots.PromisePersistEphemeralSlot] for the version that continues play on the new slot.
 ]=]
 function HasSaveSlots.PromiseDuplicateSlot(
 	self: HasSaveSlots,
@@ -649,9 +648,7 @@ function HasSaveSlots.PromiseDuplicateSlot(
 			return (Promise :: any).rejected(`Slot \{{slotId}\} not found`)
 		end
 
-		if self:_isEphemeral(slotId) then
-			return (Promise :: any).rejected("Cannot duplicate an ephemeral slot")
-		end
+		local sourceIsEphemeral = self:_isEphemeral(slotId)
 
 		-- Lowest free positive index, filling gaps left by deletions (mirrors PromiseSelectNewSaveSlot).
 		local usedIndices = {}
@@ -677,34 +674,89 @@ function HasSaveSlots.PromiseDuplicateSlot(
 			local slotData = if type(sourceData) == "table" then table.clone(sourceData) else {}
 			slotData[SaveSlotConstants.SYSTEM_STORE_KEY] = nil
 
-			return self:PromiseCreateSlot(freeIndex, {
-				SlotName = `{sourceMetadata.SlotName} (Copy)`,
-				Summary = sourceMetadata.Summary,
-			}):Then(function(newSlotId: SaveSlotData.SlotId)
-				local destStore = self:_getSlotStore(newSlotId)
+			return self
+				:PromiseCreateSlot(freeIndex, {
+					SlotName = if sourceIsEphemeral
+						then sourceMetadata.SlotName
+						else `{sourceMetadata.SlotName} (Copy)`,
+					Summary = sourceMetadata.Summary,
+				})
+				:Then(function(newSlotId: SaveSlotData.SlotId)
+					local destStore = self:_getSlotStore(newSlotId)
 
-				if destStore == self._dataStore then
-					-- The copy is the default slot, whose store is the shared root. Merge so the SaveSlots
-					-- system store living alongside it survives (a plain Overwrite would wipe it).
-					destStore:OverwriteMerge(slotData)
-				else
-					destStore:Overwrite(slotData)
-				end
+					if destStore == self._dataStore then
+						-- The copy is the default slot, whose store is the shared root. Merge so the SaveSlots
+						-- system store living alongside it survives (a plain Overwrite would wipe it).
+						destStore:OverwriteMerge(slotData)
+					else
+						destStore:Overwrite(slotData)
+					end
 
-				-- Flush so the duplicated data survives a crash before the next autosave.
-				return self._dataStore:Save():Then(function()
-					return newSlotId
+					-- Flush so the duplicated data survives a crash before the next autosave.
+					return self._dataStore:Save():Then(function()
+						return newSlotId
+					end)
 				end)
+		end)
+	end)
+end
+
+--[=[
+	Turns an ephemeral slot into a real save: duplicates it into a fresh persisted slot at the lowest free
+	index (see [HasSaveSlots.PromiseDuplicateSlot]) and selects that slot, so play continues on data that
+	is now being written. Defaults to the active slot, which in practice is the only ephemeral slot there
+	is -- one stops existing the moment it stops being active. Resolves to the new slot's id.
+
+	The copy is taken from the ephemeral slot's live in-memory data at the moment this runs, and selecting
+	the new slot retires the ephemeral one, so anything written to the old store between the copy and the
+	selection is dropped. Rejects when no slot is active, the slot is missing, the slot is not ephemeral,
+	or every index is in use.
+
+	@param slotId SlotId? -- defaults to the active slot
+	@return Promise<SlotId>
+]=]
+function HasSaveSlots.PromisePersistEphemeralSlot(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId?
+): Promise.Promise<SaveSlotData.SlotId>
+	return (self._loadPromise :: any):Then(function()
+		local targetSlotId = slotId or self.ActiveSlotId.Value
+		if not targetSlotId then
+			return (Promise :: any).rejected("No slot to persist")
+		end
+
+		if not self._slotMap[targetSlotId] then
+			return (Promise :: any).rejected(`Slot \{{targetSlotId}\} not found`)
+		end
+
+		if not self:_isEphemeral(targetSlotId) then
+			return (Promise :: any).rejected(`Slot \{{targetSlotId}\} is already persisted`)
+		end
+
+		return self:PromiseDuplicateSlot(targetSlotId):Then(function(newSlotId: SaveSlotData.SlotId)
+			return self:PromiseSelectSlot(newSlotId):Then(function()
+				return newSlotId
 			end)
 		end)
 	end)
 end
 
 --[=[
-	Deletes the slot with the given ID
+	Deletes the slot with the given ID. Deleting an ephemeral slot ends that session -- it is deselected
+	and retired along with its in-memory store -- rather than being refused for being the active slot.
 ]=]
 function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData.SlotId): Promise.Promise<any>
 	return (self._loadPromise :: any):Then(function()
+		-- An ephemeral slot only exists while it is active, so deleting one is retiring it. Nothing was
+		-- ever persisted, so there is no stored data to wipe afterwards -- hence the early return.
+		if self:_isEphemeral(slotId) then
+			if slotId == self.ActiveSlotId.Value then
+				return self:PromiseDeselectSlot()
+			end
+			self:_destroyEphemeralSlot(slotId)
+			return (Promise :: any).resolved()
+		end
+
 		if slotId == self.ActiveSlotId.Value then
 			return (Promise :: any).rejected("Cannot delete active slot")
 		end
@@ -1003,7 +1055,7 @@ function HasSaveSlots.PromiseSelectEphemeralSlot(
 		local slotId = HttpService:GenerateGUID(false)
 		local data = {
 			SlotId = slotId,
-			SlotIndex = EPHEMERAL_SLOT_INDEX,
+			SlotIndex = SaveSlotConstants.EPHEMERAL_SLOT_INDEX,
 			SlotName = (metadata and metadata.SlotName) or "Ephemeral",
 			CreatedTime = os.time(),
 			Summary = metadata and metadata.Summary,

@@ -1717,7 +1717,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		context.destroy()
 	end)
 
-	it("refuses to reset or duplicate an ephemeral slot", function()
+	it("refuses to reset an ephemeral slot", function()
 		local context = setup()
 
 		local ephemeralId = selectEphemeral(context)
@@ -1726,9 +1726,78 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(PromiseTestUtils.awaitSettled(resetPromise, 10)).toEqual(true)
 		expect((resetPromise:Yield())).toEqual(false)
 
-		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(ephemeralId)
-		expect(PromiseTestUtils.awaitSettled(duplicatePromise, 10)).toEqual(true)
-		expect((duplicatePromise:Yield())).toEqual(false)
+		context.destroy()
+	end)
+
+	it("duplicates an ephemeral slot into a real slot carrying its live data", function()
+		local context = setup()
+
+		createAndSelectReal(context, 1)
+		local ephemeralId = selectEphemeral(context, { SlotName = "Lobby run" })
+		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("Coins", 12)
+
+		local newSlotId = resolve(context.hasSaveSlots:PromiseDuplicateSlot(ephemeralId))
+
+		local metadata = resolve(context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId))
+		expect(metadata.IsEphemeral).never.toEqual(true)
+		expect(metadata.SlotName).toEqual("Lobby run")
+
+		local export = resolve(context.hasSaveSlots:PromiseExportSlot(newSlotId))
+		expect(export.data.Coins).toEqual(12)
+
+		-- Duplicating leaves the session running on the ephemeral slot, like any other duplicate.
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(ephemeralId)
+
+		context.destroy()
+	end)
+
+	it("persists the ephemeral slot and continues play on the new real slot", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context, { SlotName = "Lobby run" })
+		resolve(context.hasSaveSlots:PromiseActiveSlotStore()):Store("Coins", 12)
+
+		local newSlotId = resolve(context.hasSaveSlots:PromisePersistEphemeralSlot())
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(newSlotId)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
+
+		local listedIds = {}
+		for _, metadata in (SaveSlotDataService :: any):GetSlotList(context.fakePlayer) do
+			listedIds[metadata.SlotId] = true
+		end
+		expect(listedIds[newSlotId]).toEqual(true)
+
+		-- The copy landed on the default index, whose store is the player's root: the session's data is
+		-- there and the SaveSlots system data alongside it survived the merge.
+		local data = resolve(resolve(context.hasSaveSlots:PromiseActiveSlotStore()):LoadAll({}))
+		expect(data.Coins).toEqual(12)
+		expect(data.SaveSlots).never.toBeNil()
+
+		context.destroy()
+	end)
+
+	it("refuses to persist when the active slot is a real one", function()
+		local context = setup()
+
+		createAndSelectReal(context, 1)
+
+		local persistPromise = context.hasSaveSlots:PromisePersistEphemeralSlot()
+		expect(PromiseTestUtils.awaitSettled(persistPromise, 10)).toEqual(true)
+		expect((persistPromise:Yield())).toEqual(false)
+
+		context.destroy()
+	end)
+
+	it("ends the session when the ephemeral slot is deleted", function()
+		local context = setup()
+
+		local ephemeralId = selectEphemeral(context)
+		resolve(context.hasSaveSlots:PromiseDeleteSlot(ephemeralId))
+
+		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(nil)
+		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
+		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
 
 		context.destroy()
 	end)

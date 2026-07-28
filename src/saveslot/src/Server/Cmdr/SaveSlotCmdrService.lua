@@ -10,6 +10,7 @@ local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local SaveSlotCmdrUtils = require("SaveSlotCmdrUtils")
+local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
 
@@ -78,6 +79,14 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				local isActive = (slot.SlotId == activeSlotId)
 				listString ..= `\n"{slot.SlotName}" ({slot.SlotIndex}){isActive and " — Active" or ""}\n{slot.Summary}\n`
 			end
+
+			-- An ephemeral session is not a save, so it is absent from the slot list above -- but it is what
+			-- the player is playing right now and the thing persist-save-slot acts on, so list it under the
+			-- reserved index the other commands address it by.
+			if self._saveSlotDataService:IsActiveSlotEphemeral(player) then
+				local metadata = self._saveSlotDataService:GetActiveSlotMetadata(player)
+				listString ..= `\n"{metadata.SlotName}" ({metadata.SlotIndex}) — Active, ephemeral\n{metadata.Summary}\n`
+			end
 		end
 
 		return listString
@@ -128,7 +137,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		},
 	}, function(_context, players: { Player }, slotIndex: number)
 		local lines = self:_promisePlayerLines(players, function(hasSaveSlots, player)
-			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(player, slotIndex)
+			local slotId = self:_getSlotIdFromIndex(player, slotIndex)
 			if not slotId then
 				return `{player.Name} has no slot with index {slotIndex}.`
 			end
@@ -268,29 +277,34 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return "No matching slots to delete."
 		end
 
-		local lines = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
-			-- The active slot can't be deleted while selected, so deselect it first (flushing its
-			-- progress) when reached. Read live rather than up front, since an earlier deletion in
-			-- this batch may have already deselected it.
-			local deselect = if entry.slotId == self._saveSlotDataService:GetActiveSlotId(player)
-				then hasSaveSlots:PromiseDeselectSlot()
-				else Promise.resolved()
+		local lines = self
+			:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+				-- The active slot can't be deleted while selected, so deselect it first (flushing its
+				-- progress) when reached. Read live rather than up front, since an earlier deletion in
+				-- this batch may have already deselected it. An ephemeral session is left alone:
+				-- PromiseDeleteSlot retires it itself, and deselecting first would retire it early,
+				-- leaving nothing behind to delete.
+				local isActive = (entry.slotId == self._saveSlotDataService:GetActiveSlotId(player))
+				local deselect = if isActive and not self._saveSlotDataService:IsActiveSlotEphemeral(player)
+					then hasSaveSlots:PromiseDeselectSlot()
+					else Promise.resolved()
 
-			return deselect
-				:Then(function()
-					return hasSaveSlots:PromiseDeleteSlot(entry.slotId)
-				end)
-				:Then(function()
-					return `{player.Name} deleted slot {entry.slotIndex}.`
-				end)
-		end):Wait()
+				return deselect
+					:Then(function()
+						return hasSaveSlots:PromiseDeleteSlot(entry.slotId)
+					end)
+					:Then(function()
+						return `{player.Name} deleted slot {entry.slotIndex}.`
+					end)
+			end)
+			:Wait()
 
 		return `Deleted:\n{table.concat(lines, "\n")}`
 	end)
 
 	self._cmdrService:RegisterCommand({
 		Name = "duplicate-save-slot",
-		Description = "Duplicates save slots into new slots at the lowest free indices.",
+		Description = "Duplicates save slots into new slots at the lowest free indices. Duplicating an ephemeral session saves it without switching onto the copy -- see persist-save-slot.",
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -321,6 +335,36 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			:Wait()
 
 		return `Duplicated:\n{table.concat(lines, "\n")}`
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "persist-save-slot",
+		Description = "Turns an ephemeral session into a real save slot and switches onto it.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Players",
+				Type = "players",
+				Description = "Players to persist the session of (e.g. . for yourself, or * for everyone).",
+			},
+		},
+	}, function(_context, players: { Player })
+		-- Takes no slot argument: an ephemeral slot exists only while it is active, so the active slot is
+		-- the only one there is to persist.
+		local lines = self
+			:_promisePlayerLines(players, function(hasSaveSlots, player)
+				if not self._saveSlotDataService:IsActiveSlotEphemeral(player) then
+					return `{player.Name} has no ephemeral session active.`
+				end
+
+				return hasSaveSlots:PromisePersistEphemeralSlot():Then(function(newSlotId)
+					local metadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
+					return `{player.Name} persisted their session to slot {metadata.SlotIndex} ("{metadata.SlotName}").`
+				end)
+			end)
+			:Wait()
+
+		return table.concat(lines, "\n")
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -489,6 +533,20 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 end
 
+-- Resolves a slot index to the player's slot id, including the reserved ephemeral index (see
+-- [SaveSlotCmdrUtils]). The data service's index lookup only walks the save list, which an ephemeral slot
+-- is excluded from, so that one index resolves against the active slot instead.
+function SaveSlotCmdrService._getSlotIdFromIndex(self: SaveSlotCmdrService, player: Player, slotIndex: number): string?
+	if slotIndex == SaveSlotConstants.EPHEMERAL_SLOT_INDEX then
+		if self._saveSlotDataService:IsActiveSlotEphemeral(player) then
+			return self._saveSlotDataService:GetActiveSlotId(player)
+		end
+		return nil
+	end
+
+	return self._saveSlotDataService:GetSlotIdFromIndex(player, slotIndex)
+end
+
 -- Resolves a slotIndices argument (or nil = the active slot) into de-duplicated { slotIndex, slotId }
 -- entries for the player. An empty result means nothing matched, and the caller reports it.
 function SaveSlotCmdrService._resolveSlotEntries(
@@ -507,7 +565,7 @@ function SaveSlotCmdrService._resolveSlotEntries(
 	else
 		local seen = {}
 		for _, slotIndex in slotIndices do
-			local slotId = self._saveSlotDataService:GetSlotIdFromIndex(player, slotIndex)
+			local slotId = self:_getSlotIdFromIndex(player, slotIndex)
 			if slotId and not seen[slotId] then
 				seen[slotId] = true
 				table.insert(entries, { slotIndex = slotIndex, slotId = slotId })
