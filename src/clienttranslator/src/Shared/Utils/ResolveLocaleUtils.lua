@@ -57,10 +57,12 @@ end
 -- it, and Table.readonly raises on a missing index.
 local TRADITIONAL_CHINESE_REGIONS: { [string]: boolean } = table.freeze({ tw = true, hk = true, mo = true })
 
--- Splits a locale into its lowercased subtags, accepting either separator. Returns nil when
--- there is nothing to split.
+-- Splits a locale into its lowercased subtags, accepting either separator. Returns nil for
+-- anything without a language subtag to lead it, so every function built on this agrees with
+-- getLanguageSubtag on what counts as a locale at all -- `419-hant` has no language, so it has
+-- no script either.
 local function getSubtags(locale: string?): { string }?
-	if type(locale) ~= "string" or locale == "" then
+	if type(locale) ~= "string" then
 		return nil
 	end
 
@@ -69,7 +71,7 @@ local function getSubtags(locale: string?): { string }?
 		table.insert(subtags, subtag)
 	end
 
-	if #subtags == 0 then
+	if not subtags[1] or not string.match(subtags[1], "^%a+$") then
 		return nil
 	end
 

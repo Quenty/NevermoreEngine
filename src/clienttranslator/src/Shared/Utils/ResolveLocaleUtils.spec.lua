@@ -80,6 +80,12 @@ describe("ResolveLocaleUtils.getScriptSubtag", function()
 		expect(ResolveLocaleUtils.getScriptSubtag("zh")).toBe(nil)
 		expect(ResolveLocaleUtils.getScriptSubtag(nil)).toBe(nil)
 	end)
+
+	it("agrees with getLanguageSubtag on what counts as a locale", function()
+		expect(ResolveLocaleUtils.getLanguageSubtag("419-hant")).toBe(nil)
+		expect(ResolveLocaleUtils.getScriptSubtag("419-hant")).toBe(nil)
+		expect(ResolveLocaleUtils.isTraditionalChinese("419-tw")).toBe(false)
+	end)
 end)
 
 describe("ResolveLocaleUtils.isCompatibleLocale", function()

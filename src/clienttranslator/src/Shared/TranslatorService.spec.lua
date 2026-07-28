@@ -294,12 +294,9 @@ describe("TranslatorService localization write cost", function()
 end)
 
 describe("TranslatorService write cost while streaming in", function()
-	-- A miniature of the load this batching exists for: a game streaming in registers
-	-- thousands of entries across many translators inside a single frame. Every raw write to
-	-- a LocalizationTable invalidates every AutoLocalize entry in the engine, so the cost
-	-- that matters is writes per frame, not entries per frame. Unbatched, each of these
-	-- registrations is its own write; batched, the count has to stay flat as entries grow.
-	local function countWritesForEntries(entryCount: number): number
+	-- Unbatched, each registration below is its own table write; batched, the count has to
+	-- stay flat as the entry count grows.
+	local function countWritesForEntries(entryCount: number): (number, any)
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
@@ -312,16 +309,21 @@ describe("TranslatorService write cost while streaming in", function()
 		controller.awaitEntriesWritten()
 
 		local writeCount = service:GetLocalizationWriteCount()
-		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
-		expect(entries[string.format("streamed.key%d", entryCount)].Values["en"]).toBeTruthy()
+		local lastEntry =
+			TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())[string.format("streamed.key%d", entryCount)]
 
 		controller:destroy()
-		return writeCount
+		return writeCount, lastEntry
 	end
 
 	it("costs one table write regardless of how many entries register in the frame", function()
-		expect(countWritesForEntries(10)).toBe(1)
-		expect(countWritesForEntries(500)).toBe(1)
+		local fewWrites, fewLastEntry = countWritesForEntries(10)
+		local manyWrites, manyLastEntry = countWritesForEntries(500)
+
+		expect(fewWrites).toBe(1)
+		expect(manyWrites).toBe(1)
+		expect(fewLastEntry.Values["en"]).toBe("streamed.key10")
+		expect(manyLastEntry.Values["en"]).toBe("streamed.key500")
 	end)
 
 	it("costs one table write when many translators register in the same frame", function()

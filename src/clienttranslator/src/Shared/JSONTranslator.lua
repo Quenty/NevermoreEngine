@@ -194,7 +194,15 @@ function JSONTranslator.ObserveAbbreviatedNumber(
 end
 
 --[=[
-	Observes the translated value
+	Observes the translated value, re-emitting as the locale changes and as the key's data
+	becomes readable.
+
+	Emits immediately on subscribe with the best text available rather than withholding, so a
+	bound label is never blank for a frame. Until a key's data has landed that best text may be
+	the source language, or the translation key itself for a key registered this frame; the
+	correct translation replaces it once the key is readable. It will not go the other way: a
+	locale swap never replaces good text with a fallback.
+
 	@param translationKey string
 	@param translationArgs table? -- May have observables (or convertable to observables) in it.
 	@return Observable<string>
@@ -488,6 +496,9 @@ end
 	to locale changing.
 	:::
 
+	Queues the current locale's entries if they are not loaded yet, so a first synchronous read
+	of a locale costs that decode; the observable path pays the same cost on subscribe.
+
 	@param translationKey string
 	@param args table?
 	@return string
@@ -613,6 +624,7 @@ end
 	Should be called by [ServiceBag]
 ]=]
 function JSONTranslator.Destroy(self: JSONTranslator)
+	table.clear(self._localTranslators)
 	self._maid:DoCleaning()
 	setmetatable(self :: any, nil)
 end

@@ -139,6 +139,29 @@ Do not collapse them.
 - The local translator is deliberately **not** a re-emission source, though `_doTranslation` reads
   it: it swaps at the *start* of a locale change, before that locale's data has landed.
 
+### Rejected: reading the pending queue instead
+
+There is a tempting simplification here, and it was considered and turned down.
+
+During the window between a locale swap and that frame's flush, the new locale's text is already
+queued in `_pendingEntries` — we have it, the engine just cannot see it yet. So `_doTranslation`
+could grow a rung between the local translator and the source translator that reads the queued
+value directly. There would then be no wrong state to suppress, which means the latch, the
+first-emission exception, and `Rx.distinct` all delete themselves, and first paint would show real
+text instead of the translation key.
+
+The blocker is formatting. A queued value is the raw source string (`"Ciao {name}"`); turning it
+into `"Ciao James"` is `Translator:FormatByKey`'s job, and Roblox's formatting is documented but
+not simple — it is more than `{param}` substitution. Doing it ourselves for one frame risks output
+that differs from the engine's in ways that are silent, locale-specific, and would only show up for
+players in the affected languages.
+
+A frame of stale-but-correct text beats a frame of subtly wrong text. The latch stays.
+
+If this is revisited, the deciding question is exactly what `FormatByKey` does beyond parameter
+substitution — verify that first (see [engine-behavior.md](engine-behavior.md) for how), because
+everything else about the change is mechanical.
+
 ## Warnings
 
 `_doTranslation` warns only when no translator resolved the key, and only when the key is ready.

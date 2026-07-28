@@ -229,8 +229,6 @@ describe("JSONTranslator:FormatByKey", function()
 end)
 
 describe("JSONTranslator:ObserveFormatByKey", function()
-	-- Emitting something immediately matters more than emitting the right thing immediately:
-	-- a subscriber that gets nothing until the batch lands leaves its UI blank for a frame.
 	it("emits a fallback before the deferred entry writes flush, then the translation", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({

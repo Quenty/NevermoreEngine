@@ -451,7 +451,6 @@ describe("TranslatorService teardown", function()
 		service:Destroy()
 		service:SetEntryValue("k.late", "Late", "ctx", "en", "Late")
 
-		-- A dropped write must not pin the key not-ready for anything that asks afterwards.
 		expect(service:IsTranslationReady("k.late")).toBe(true)
 		expect(collect(controller, service:ObserveIsTranslationReady("k.late"))).toEqual({ true })
 		controller:destroy()
@@ -556,21 +555,13 @@ describe("TranslatorService teardown", function()
 end)
 
 describe("JSONTranslator:ObserveFormatByKey readiness", function()
-	it("emits immediately rather than waiting a frame for the batch", function()
+	it("emits a fallback immediately, then the translation once the batch lands", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 
 		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		expect(received).toEqual({ "greeting" })
 
-		expect(#received).toBe(1)
-		controller:destroy()
-	end)
-
-	it("replaces the first emission with the translation once the batch lands", function()
-		local controller = TranslatorTestUtils.setup()
-		local translator = controller.newTranslator({ greeting = "Hello" })
-
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
 		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Hello")
@@ -650,12 +641,14 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		controller.setForcedLocaleId("fr")
 		controller.awaitEntriesWritten()
 
-		local frTranslator = controller.getLocalizationTable():GetTranslator("fr")
-		local enTranslator = controller.getLocalizationTable():GetTranslator("en")
+		-- A translator built for another language answers fluently rather than failing, so the
+		-- target locale has to win over whichever translator is consulted first.
+		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		expect(received[#received]).toBe("Bonjour")
 
+		local enTranslator = controller.getLocalizationTable():GetTranslator("en")
 		expect(translator:_doTranslation(enTranslator, "greeting", nil, "fr")).toBe("Bonjour")
-		expect(translator:_doTranslation(frTranslator, "greeting", nil, "fr")).toBe("Bonjour")
-		expect(translator:_doTranslation(frTranslator, "greeting", nil, "en")).toBe("Hello")
+		expect(translator:_doTranslation(enTranslator, "greeting", nil, "en")).toBe("Hello")
 		controller:destroy()
 	end)
 
