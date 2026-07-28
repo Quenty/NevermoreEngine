@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/clienttranslator@14.47.2`
+  - docs(clienttranslator): write down that localization tables are per realm [#770](https://github.com/Quenty/NevermoreEngine/pull/770) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/receiptprocessing@7.42.1`
   - fix(receiptprocessing): unregister a receipt processor instead of erroring [#769](https://github.com/Quenty/NevermoreEngine/pull/769) ([@Quenty](https://github.com/Quenty))
 
