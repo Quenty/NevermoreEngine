@@ -248,9 +248,23 @@ local function strictCmdr()
 	local registered = {}
 
 	local util = setmetatable({
+		-- Narrows, rather than handing back the whole list whatever it was given. A finder that ignores its
+		-- argument makes "resolves the name you typed" pass on any list of one, and pass on a longer one
+		-- purely by what happens to be first.
 		MakeFuzzyFinder = function(list: { string })
-			return function()
-				return list
+			return function(text: string)
+				if text == "" then
+					return list
+				end
+
+				local matches = {}
+				for _, name in list do
+					if string.find(name, text, 1, true) then
+						table.insert(matches, name)
+					end
+				end
+
+				return matches
 			end
 		end,
 		-- Mirrors the real one closely enough to matter: it marks the type Listable (the flag Cmdr gates `*`
@@ -312,7 +326,7 @@ describe("AccessCommandUtils.registerTypes", function()
 		end).never.toThrow()
 	end)
 
-	it("registers every argument type the commands reference", function()
+	it("registers every argument type it offers", function()
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
 			return { "kick-on-non-admin" }
@@ -423,9 +437,11 @@ describe("overriding every fact at once", function()
 end)
 
 describe("toggling every policy at once", function()
-	-- `access-policy * off` is how somebody sees the game with every consequence switched off. Same
-	-- requirements as the fact list, asserted separately because the two types are built from different
-	-- name sources and only one of them is optional.
+	--[[
+		`access-policy * off` is how somebody sees the game with every consequence switched off. Asserted
+		separately from the fact list because the two types are built from different name sources, and only
+		the policy one is optional -- a client that registers without it gets a type that suggests nothing.
+	]]
 	local function policyNamesType()
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
@@ -454,7 +470,10 @@ describe("toggling every policy at once", function()
 		expect(policyNamesType().ArgumentOperatorAliases.all).toEqual("*")
 	end)
 
-	it("leaves the single-policy type alone, which is what the readout commands take", function()
+	it("leaves the singular type alone, since both are built from the one table", function()
+		-- Nothing in this package takes accessPolicyName any more, the same way nothing takes
+		-- accessFactName. Both stay registered for consumers writing their own commands, and neither may be
+		-- turned listable by the registration of the plural next to it.
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
 			return { "kick-on-non-admin" }
@@ -466,7 +485,16 @@ end)
 
 describe("AccessCommandUtils.describeNameList", function()
 	it("names them while a person can still check them", function()
-		expect(AccessCommandUtils.describeNameList({ "ownsGame", "isStaff" }, "facts")).toEqual("ownsGame, isStaff")
+		-- Sorted: Cmdr hands a list argument back in the hash order of its dedupe table, so naming them in
+		-- the order they arrive is naming them in an order that means nothing.
+		expect(AccessCommandUtils.describeNameList({ "ownsGame", "isStaff" }, "facts")).toEqual("isStaff, ownsGame")
+	end)
+
+	it("leaves the caller's list untouched, which is the one the command still has to toggle", function()
+		local names = { "ownsGame", "isStaff" }
+		AccessCommandUtils.describeNameList(names, "facts")
+
+		expect(names).toEqual({ "ownsGame", "isStaff" })
 	end)
 
 	it("counts them once naming them would be a wall", function()
