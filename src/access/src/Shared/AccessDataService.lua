@@ -653,7 +653,13 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 	end)
 	self:_refreshFactNames()
 
-	return function()
+	local unregistered = false
+	local function unregister()
+		if unregistered then
+			return
+		end
+		unregistered = true
+
 		local current = self._layersByFactName[factName]
 		if not current then
 			return
@@ -670,6 +676,15 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 
 		self:_refreshFactNames()
 	end
+
+	-- A destroyed fact must never stay a registered layer. One maid commonly holds both the fact and this
+	-- disposer, and DoCleaning runs its tasks in no particular order -- so relying on the caller to
+	-- unregister first is relying on luck. BaseObject runs the object's own maid *before* nilling its
+	-- metatable, so hooking it here takes the layer out while it is still a usable object; a moment later
+	-- every method call on it would fail instead.
+	fact._maid:GiveTask(unregister)
+
+	return unregister
 end
 
 --[[
@@ -753,8 +768,14 @@ function AccessDataService.RegisterFeature(self: AccessDataService, feature: Acc
 	)
 
 	local remove = self._features:Set(featureName, feature)
+	local unregistered = false
 
-	return function()
+	local function unregister()
+		if unregistered then
+			return
+		end
+		unregistered = true
+
 		-- The removers held here close over *this* feature object. Once it is gone they have nothing to act
 		-- on, and leaving them keyed by name means a feature later registered under the same name is skipped
 		-- as already-pushed and silently gates on the narrower rule.
@@ -762,6 +783,12 @@ function AccessDataService.RegisterFeature(self: AccessDataService, feature: Acc
 
 		remove()
 	end
+
+	-- Same reason as a fact's: a destroyed feature left in the registry is one every reader would call
+	-- methods on. See RegisterFact.
+	feature._maid:GiveTask(unregister)
+
+	return unregister
 end
 
 --[=[
