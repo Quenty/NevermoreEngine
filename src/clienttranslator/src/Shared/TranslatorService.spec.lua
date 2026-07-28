@@ -293,6 +293,82 @@ describe("TranslatorService localization write cost", function()
 	end)
 end)
 
+describe("TranslatorService write cost while streaming in", function()
+	-- Unbatched, each registration below is its own table write; batched, the count has to
+	-- stay flat as the entry count grows.
+	local function countWritesForEntries(entryCount: number): (number, any)
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		for index = 1, entryCount do
+			local key = string.format("streamed.key%d", index)
+			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
+			service:SetEntryExample(key, key, string.format("ctx%d", index), key)
+		end
+
+		controller.awaitEntriesWritten()
+
+		local writeCount = service:GetLocalizationWriteCount()
+		local lastEntry =
+			TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())[string.format("streamed.key%d", entryCount)]
+
+		controller:destroy()
+		return writeCount, lastEntry
+	end
+
+	it("costs one table write regardless of how many entries register in the frame", function()
+		local fewWrites, fewLastEntry = countWritesForEntries(10)
+		local manyWrites, manyLastEntry = countWritesForEntries(500)
+
+		expect(fewWrites).toBe(1)
+		expect(manyWrites).toBe(1)
+		expect(fewLastEntry.Values["en"]).toBe("streamed.key10")
+		expect(manyLastEntry.Values["en"]).toBe("streamed.key500")
+	end)
+
+	it("costs one table write when many translators register in the same frame", function()
+		local controller = TranslatorTestUtils.setup()
+
+		local defs = {}
+		for index = 1, 25 do
+			table.insert(defs, {
+				name = string.format("Translator%d", index),
+				data = { [string.format("pkg%d", index)] = { one = "One", two = "Two" } },
+			})
+		end
+
+		local service = controller.newPackageServiceBag(defs :: { { name: string, data: any } })
+		controller.awaitEntriesWritten(service)
+
+		expect(service:GetLocalizationWriteCount()).toBe(1)
+		expect(Table.count(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable()))).toBe(50)
+		controller:destroy()
+	end)
+
+	it("keeps a synchronous read from flushing the rest of the batch", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		for index = 1, 100 do
+			local key = string.format("streamed.key%d", index)
+			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
+		end
+
+		service:FlushEntryForKey("streamed.key1")
+
+		-- The read lands its own key's locales and nothing else, so the batch survives to be
+		-- coalesced into the single end-of-frame write. Landing a locale dequeues it, so the
+		-- repeated read locales cost nothing and this is exactly one write.
+		local writesAfterRead = service:GetLocalizationWriteCount()
+		expect(writesAfterRead).toBe(1)
+		expect(service:IsTranslationReady("streamed.key100")).toBe(false)
+
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationWriteCount()).toBe(writesAfterRead + 1)
+		controller:destroy()
+	end)
+end)
+
 describe("TranslatorService entry merging", function()
 	it("coalesces three translators initializing together into one write with no drops", function()
 		local controller = TranslatorTestUtils.setup()
