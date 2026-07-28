@@ -32,15 +32,28 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | How one package works inside, and why | `src/<package>/docs/` — see below |
 | Ambiguous case not covered above | Resolve it, then add a row to this table |
 
-### Package-local docs
+### Package docs
 
-`docs/` here is for **consumers** of Nevermore. Knowledge that only matters to someone changing one
-package — internal design, why an implementation is shaped the way it is, engine behavior it
-depends on — goes in `src/<package>/docs/` instead, linked from that package's `README.md` under a
-"Working on this package" heading.
+`docs/` here is for **consumers** of Nevermore. A package may also carry its own
+`src/<package>/docs/`, linked from its `README.md` under "Working on this package".
 
-Split them by audience, not by topic: if a game developer using the package would act on it, it
-belongs in `docs/`; if only a maintainer of that package would, it belongs in the package. When a
+Package docs are for **design intent and design decisions that cannot live in code**: why an
+implementation is shaped the way it is, what was tried and rejected and why, the outside behavior
+it is built around. They answer "why is this like this" for the person who changes it next.
+
+They are **public documents** — they live in a public repo and ship inside the published npm
+package. A different reader, not a lower standard.
+
+Two rules:
+
+- **Same quality bar as these docs.** Written for a person, context before rules, edited, kept
+  true as the code changes. A package doc that has gone stale is worse than no package doc.
+- **Used sparingly.** These are not scratch notes, a changelog, or a place to restate what the
+  code already says. If the knowledge fits in a comment beside the code, it goes there instead.
+  Prefer improving an existing page over adding another. Most packages should have none.
+
+Split by audience, not topic: if a game developer using the package would act on it, it belongs in
+`docs/`; if only someone changing that package would, it belongs in the package. When a
 consumer-facing page has a matching package doc, link to it so readers can find the "why".
 
 `src/clienttranslator/docs/` is the reference example
@@ -67,4 +80,4 @@ consumer-facing page has a matching package doc, link to it so readers can find 
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
 | [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
-| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, self-correcting text, one entry per key. Internals live in `src/clienttranslator/docs/` |
+| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, self-correcting text, one entry per key. Design intent lives in `src/clienttranslator/docs/` |

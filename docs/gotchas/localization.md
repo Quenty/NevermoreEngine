@@ -8,9 +8,9 @@ sidebar_position: 3
 What surprises people using the translation stack in a game.
 
 :::note
-This page is about using the stack. The internals — batched localization writes, per-key readiness,
-the translator fallback chain, and the verified engine behavior all of it is built on — are
-documented in the package itself, in
+This page is about using the stack. Why it behaves this way — batched localization writes, per-key
+readiness, the translator fallback chain, and the engine behavior all of it is built around — is
+documented alongside the package, in
 [`src/clienttranslator/docs/`](https://github.com/Quenty/NevermoreEngine/tree/main/src/clienttranslator/docs).
 Go there if you are changing the stack, or if you want to know *why* something below behaves the
 way it does.
@@ -25,7 +25,9 @@ A player's locale is matched to your locale files by **language and script**, no
 - **Scripts never substitute.** A `zh-tw` player will **not** read `zh-cn.json`. Traditional and
   Simplified are separate: ship both. Chinese carries its script in the region (`zh-tw`, `zh-hk`,
   `zh-mo` are Traditional) as often as in the name (`zh-hant`), and both spellings work.
-- The same applies to any language with distinct scripts, such as `sr-latn` and `sr-cyrl`.
+- The same applies to any language with distinct scripts, such as `sr-latn` and `sr-cyrl`. Where a
+  file names no script at all it reads as either, so `sr.json` serves both — except in Chinese,
+  where a bare `zh.json` counts as Simplified.
 
 When nothing matches, the player gets the source locale — usually your `en.json`.
 

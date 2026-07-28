@@ -138,7 +138,7 @@ end
 	mutating (and re-replicating) the shared localization table in the load path.
 
 	A key is therefore not readable the instant it is registered. Gate reads on
-	[TranslatorService.ObserveTranslationReady], which tracks the key you are about to read
+	[TranslatorService.ObserveIsTranslationReady], which tracks the key you are about to read
 	rather than whichever batch happened to be pending.
 
 	@param translationKey string
@@ -155,6 +155,12 @@ function TranslatorService.SetEntryValue(
 	localeId: string,
 	text: string
 )
+	if self._isDestroyed then
+		-- Dropped rather than queued: nothing will flush it, and a queued entry would pin the
+		-- key not-ready forever for anything that asks afterwards.
+		return
+	end
+
 	local entry, becamePending = self:_getPendingEntry(translationKey, source, context)
 	entry.Values[localeId] = text
 	self:_scheduleFlush()
@@ -162,7 +168,7 @@ function TranslatorService.SetEntryValue(
 	-- Announced only once the value is stored and the flush is scheduled, so a subscriber
 	-- reacting to "not ready" sees state that agrees with it.
 	if becamePending then
-		self:_fireTranslationReady(translationKey, false)
+		self:_fireTranslationReady(translationKey)
 	end
 end
 
@@ -181,12 +187,16 @@ function TranslatorService.SetEntryExample(
 	context: string,
 	example: string
 )
+	if self._isDestroyed then
+		return
+	end
+
 	local entry, becamePending = self:_getPendingEntry(translationKey, source, context)
 	entry.Example = example
 	self:_scheduleFlush()
 
 	if becamePending then
-		self:_fireTranslationReady(translationKey, false)
+		self:_fireTranslationReady(translationKey)
 	end
 end
 
@@ -225,7 +235,7 @@ end
 
 	This answers for the batch pending when it is called, which is not necessarily the batch
 	carrying the data a reader wants: writes queued while this flush resolves land in the
-	next one. Gate reads on [TranslatorService.ObserveTranslationReady] instead -- this is for
+	next one. Gate reads on [TranslatorService.ObserveIsTranslationReady] instead -- this is for
 	callers that want the current batch settled, such as tests.
 
 	@return Promise
@@ -260,6 +270,39 @@ function TranslatorService.IsTranslationReady(self: TranslatorService, translati
 end
 
 --[=[
+	Whether a read of this key **in this locale** would see everything queued for it. Narrower
+	than [TranslatorService.IsTranslationReady], which is false while any locale is queued.
+
+	:::warning
+	This is an implementation detail of the translation stack, exposed for diagnostics.
+	:::
+
+	The distinction matters after a single-key flush ([TranslatorService.FlushEntryForKey]),
+	which lands the locales a read can consult but leaves the entry queued for the rest. The
+	key is readable in that locale while still not ready overall, so a failure to translate it
+	is a real failure and worth reporting.
+
+	@param translationKey string
+	@param localeId string
+	@return boolean
+]=]
+function TranslatorService.IsTranslationReadyForLocale(
+	self: TranslatorService,
+	translationKey: string,
+	localeId: string
+): boolean
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(localeId) == "string", "Bad localeId")
+
+	local entry = self._pendingEntries[translationKey]
+	if not entry then
+		return true
+	end
+
+	return entry.Values[localeId] == nil
+end
+
+--[=[
 	Observes whether a read of this key would see everything queued for it, firing the
 	current state immediately and again on every change.
 
@@ -281,7 +324,7 @@ end
 	@param translationKey string
 	@return Observable<boolean>
 ]=]
-function TranslatorService.ObserveTranslationReady(
+function TranslatorService.ObserveIsTranslationReady(
 	self: TranslatorService,
 	translationKey: string
 ): Observable.Observable<boolean>
@@ -323,8 +366,10 @@ function TranslatorService.ObserveTranslationReady(
 	end) :: any
 end
 
--- Tells a key's observers about a readiness change.
-function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string, isReady: boolean)
+-- Tells a key's observers about a readiness change. The state is read per observer rather
+-- than captured once: a handler earlier in the fan-out can re-queue the key, and handing the
+-- observers after it a value that is already false would leave them believing the key landed.
+function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string)
 	local observers = self._readyObservers[translationKey]
 	if not observers then
 		return
@@ -337,7 +382,7 @@ function TranslatorService._fireTranslationReady(self: TranslatorService, transl
 	for _, observer in table.clone(observers) do
 		if not observer.Disconnected then
 			-- Spawned so a raising handler cannot abort the fan-out and strand the rest.
-			task.spawn(observer.Callback, isReady)
+			task.spawn(observer.Callback, self:IsTranslationReady(translationKey))
 		end
 	end
 end
@@ -480,7 +525,7 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	-- ready state that IsTranslationReady contradicts.
 	for translationKey in pendingEntries do
 		if self._pendingEntries[translationKey] == nil then
-			self:_fireTranslationReady(translationKey, true)
+			self:_fireTranslationReady(translationKey)
 		end
 	end
 
@@ -734,11 +779,17 @@ function TranslatorService.Destroy(self: TranslatorService)
 	-- a later write cannot arm a new one.
 	self._isDestroyed = true
 	self._flushScheduled = false
-	table.clear(self._pendingEntries)
+
+	-- Everything waiting on a batch that will now never be written is released rather than
+	-- left hanging for the lifetime of the place: readiness observers of still-pending keys
+	-- first, then the flush promise. Ready is the honest answer -- nothing is queued anymore.
+	local pendingEntries = self._pendingEntries
+	self._pendingEntries = {}
+	for translationKey in pendingEntries do
+		self:_fireTranslationReady(translationKey)
+	end
 	table.clear(self._readyObservers)
 
-	-- Settled rather than left pending: an awaiter of a batch that will now never be written
-	-- would otherwise hang for the lifetime of the place.
 	local promise = self._pendingFlushPromise
 	self._pendingFlushPromise = nil
 	if promise then

@@ -207,29 +207,28 @@ function JSONTranslator.ObserveFormatByKey(
 	assert((self :: any) ~= JSONTranslator, "Construct a new version of this class to use it")
 	assert(type(translationKey) == "string", "Key must be a string")
 
+	-- Flat, so every source is subscribed exactly once for the life of the subscription. The
+	-- trigger carries a latch that suppresses a not-ready state after its first emission, and
+	-- it is a cold observable: nesting it under a switchMap would resubscribe it -- and reset
+	-- that latch -- every time an arg emitted, letting a locale swap flicker good text back to
+	-- the source language mid-swap.
+	--
+	-- The local translator is deliberately absent though _doTranslation reads it: it swaps at
+	-- the start of a locale change, before that locale's data has landed, so re-emitting on it
+	-- would publish a source-language fallback over a good translation until the flush.
 	return Rx.combineLatest({
 		cloudTranslator = self:ObserveTranslator(),
-		translationKey = translationKey,
+		sourceTranslator = self._sourceTranslator:Observe(),
+		readyLocaleId = self:_observeTranslationTrigger(translationKey),
 		translationArgs = self:_observeArgs(translationArgs),
 	}):Pipe({
-		Rx.switchMap(function(mainState): any
-			-- The local translator is deliberately not a re-emission source, though
-			-- _doTranslation reads it: it swaps at the start of a locale change, before that
-			-- locale's data has landed, so re-emitting on it would publish a source-language
-			-- fallback over a good translation until the flush.
-			return Rx.combineLatest({
-				readyLocaleId = self:_observeTranslationTrigger(mainState.translationKey),
-				sourceTranslator = self._sourceTranslator:Observe(),
-			}):Pipe({
-				Rx.map(function(state): string
-					return self:_doTranslation(
-						mainState.cloudTranslator,
-						mainState.translationKey,
-						mainState.translationArgs,
-						state.readyLocaleId
-					)
-				end) :: any,
-			})
+		Rx.map(function(state): string
+			return self:_doTranslation(
+				state.cloudTranslator,
+				translationKey,
+				state.translationArgs,
+				state.readyLocaleId
+			)
 		end) :: any,
 	}) :: any
 end
@@ -253,7 +252,7 @@ function JSONTranslator.PromiseFormatByKey(self: JSONTranslator, translationKey:
 	-- Wait for this key's queued writes to land, then for the translator, so we never read a
 	-- key before it has been written. Only this key is waited on -- the rest of the batch
 	-- stays queued for the normal end-of-frame flush.
-	return Rx.toPromise(self:ObserveTranslationReady(translationKey):Pipe({
+	return Rx.toPromise(self:_observeTranslationReady(translationKey):Pipe({
 		Rx.where(function(readyLocaleId)
 			return readyLocaleId ~= nil
 		end) :: any,
@@ -290,7 +289,7 @@ end
 	@param translationKey string
 	@return Observable<string?>
 ]=]
-function JSONTranslator.ObserveTranslationReady(
+function JSONTranslator._observeTranslationReady(
 	self: JSONTranslator,
 	translationKey: string
 ): Observable.Observable<string?>
@@ -301,10 +300,14 @@ function JSONTranslator.ObserveTranslationReady(
 		Rx.switchMap(function(localeId: string): any
 			-- Queue the locale's file here rather than trusting the subscription in Init to
 			-- have run first. Loading is idempotent and only queues -- it never writes the
-			-- table -- so readiness is accurate whatever order subscribers run in.
-			self._loader:LoadLocale(localeId)
+			-- table -- so readiness is accurate whatever order subscribers run in. Guarded on
+			-- liveness because a consumer's subscription can outlive this translator, and a
+			-- destroyed one must not keep queueing writes on every locale change.
+			if self.Destroy then
+				self._loader:LoadLocale(localeId)
+			end
 
-			return self._translatorService:ObserveTranslationReady(translationKey):Pipe({
+			return self._translatorService:ObserveIsTranslationReady(translationKey):Pipe({
 				Rx.map(function(isReady: boolean): string?
 					return if isReady then localeId else nil
 				end) :: any,
@@ -329,7 +332,7 @@ function JSONTranslator._observeTranslationTrigger(
 		local maid = Maid.new()
 		local hasFired = false
 
-		maid:GiveTask(self:ObserveTranslationReady(translationKey):Subscribe(function(readyLocaleId: string?)
+		maid:GiveTask(self:_observeTranslationReady(translationKey):Subscribe(function(readyLocaleId: string?)
 			-- Readiness belongs to the TranslatorService, which outlives this translator (the
 			-- service bag tears services down in reverse init order), so a consumer's
 			-- subscription can still be fed after Destroy has stripped the metatable.
@@ -549,8 +552,11 @@ function JSONTranslator._doTranslation(
 	-- translator is routine -- the cloud translator does not know keys registered at runtime,
 	-- and a key whose writes are still queued is not readable yet by design -- so warning per
 	-- miss floods the console with one line per key per locale swap.
-	if self._translatorService:IsTranslationReady(translationKey) then
-		warn(string.format("[JSONTranslator] - Failed to localize '%s'", translationKey))
+	if self._translatorService:IsTranslationReadyForLocale(translationKey, targetLocaleId) then
+		-- The locale is the actionable half: the key usually exists, just not for this one.
+		warn(
+			string.format("[JSONTranslator] - Failed to localize '%s' for locale '%s'", translationKey, targetLocaleId)
+		)
 	end
 
 	return translationKey

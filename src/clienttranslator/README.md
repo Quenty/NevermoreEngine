@@ -22,11 +22,12 @@ npm install @quenty/clienttranslator --save
 
 ## Working on this package
 
-Read these before changing the translation stack. They exist because most of this package's
-behavior is driven by engine quirks that are not obvious from the code:
+Read these before changing the translation stack. They record design intent that cannot live in
+the code, because most of this package's shape is driven by engine behavior that is not obvious
+from reading it:
 
-- [`docs/design.md`](docs/design.md) — how the stack fits together and why: batched localization
-  writes, per-key readiness, the translator fallback chain, re-entrancy rules.
+- [`docs/design.md`](docs/design.md) — why the stack is shaped the way it is: batched
+  localization writes, per-key readiness, the translator fallback chain, re-entrancy rules.
 - [`docs/engine-behavior.md`](docs/engine-behavior.md) — verified `LocalizationTable` and
   `Translator` behavior the design rests on, and how to verify more of it.
 

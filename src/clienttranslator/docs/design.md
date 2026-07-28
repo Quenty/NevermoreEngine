@@ -1,7 +1,7 @@
 # ClientTranslator design
 
-How the translation stack works internally, and why. This is for people changing this package —
-consumers do not need any of it. Consumer-facing behavior lives in
+Why the translation stack is shaped the way it is. Written for whoever changes this package next;
+consumers do not need any of it. What a game developer acts on lives in
 [`docs/gotchas/localization.md`](../../../docs/gotchas/localization.md) at the repo root.
 
 The engine behavior this design rests on is written down separately in
@@ -54,12 +54,13 @@ So readiness is tracked **per translation key**:
 | API | Answers |
 |---|---|
 | `TranslatorService:IsTranslationReady(key)` | is nothing queued for this key |
-| `TranslatorService:ObserveTranslationReady(key)` | `false`/`true` as that key's writes land |
-| `JSONTranslator:ObserveTranslationReady(key)` | the locale the key is readable for, or nil |
+| `TranslatorService:ObserveIsTranslationReady(key)` | `false`/`true` as that key's writes land |
+| `JSONTranslator:_observeTranslationReady(key)` | the locale the key is readable for, or nil |
 
-All three are implementation detail. Every public read path (`ObserveFormatByKey`,
-`PromiseFormatByKey`, `FormatByKey`, `ObserveTranslation`) already consumes them, and the docstrings
-warn consumers off.
+None of this is something a consumer should reach for. The `JSONTranslator` one is private; the two
+on the service are public only because `JSONTranslator` is a separate class that consumes them, and
+their docstrings say as much. Every read path (`ObserveFormatByKey`, `PromiseFormatByKey`,
+`FormatByKey`, `ObserveTranslation`) already handles readiness on the caller's behalf.
 
 Key invariants:
 
@@ -121,7 +122,8 @@ already-loaded locale.
 Two different questions, deliberately two functions:
 
 - `isCompatibleLocale(a, b)` — can one be *read in place of* the other. Same language **and same
-  script**. `es-mx` reads `es-es`; `zh-tw` never reads `zh-cn`.
+  script**. `es-mx` reads `es-es`; `zh-tw` never reads `zh-cn`. Bare `zh` counts as Simplified, so
+  it substitutes with `zh-cn` and not with `zh-tw`.
 - `resolveClosestKey(locale, available)` — pick the best key from a table the caller owns. It may
   route `zh-tw` to a Simplified key when that is all that exists. Fine for number formatting
   (grouping is the same), wrong for text.
