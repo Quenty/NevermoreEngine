@@ -80,4 +80,4 @@ consumer-facing page has a matching package doc, link to it so readers can find 
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
 | [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
-| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, self-correcting text, one entry per key. Design intent lives in `src/clienttranslator/docs/` |
+| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, runtime-generated keys belonging to the realm that generated them, self-correcting text, one entry per key. Design intent lives in `src/clienttranslator/docs/` |
