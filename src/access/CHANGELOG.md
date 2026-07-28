@@ -1,20 +1,13 @@
-# v1.1.1 (Tue Jul 28 2026)
-
-#### 🐛 Bug Fix
-
-- fix(access): unregister a fact, feature or policy when it is destroyed [#761](https://github.com/Quenty/NevermoreEngine/pull/761) ([@Quenty](https://github.com/Quenty))
-- fix(access): unregister a fact, feature or policy when it is destroyed ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.1.0...@quenty/access@1.1.1) (2026-07-28)
+
+### Bug Fixes
+
+- **access:** unregister a fact, feature or policy when it is destroyed ([06757f0](https://github.com/Quenty/NevermoreEngine/commit/06757f0baeecb37fd167aadcdc3b0216c8e963d1))
 
 # 1.1.0 (2026-07-28)
 
