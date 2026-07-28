@@ -141,7 +141,14 @@ function AccessPolicyService.RegisterPolicy(self: AccessPolicyService, policy: A
 		self:SetPolicyEnabled(policyName, true)
 	end
 
-	return function()
+	local unregistered = false
+
+	local function unregister()
+		if unregistered then
+			return
+		end
+		unregistered = true
+
 		-- Teardown order is not ours to control: a maid holding both this and the service bag may already
 		-- have destroyed the registry underneath us. Unregistering a policy from a dead service is a
 		-- no-op, not an error.
@@ -156,6 +163,12 @@ function AccessPolicyService.RegisterPolicy(self: AccessPolicyService, policy: A
 
 		remove()
 	end
+
+	-- A destroyed policy left registered would be applied to the next player who joined. See
+	-- AccessDataService.RegisterFact for why the object's own maid is the right hook.
+	policy._maid:GiveTask(unregister)
+
+	return unregister
 end
 
 --[=[

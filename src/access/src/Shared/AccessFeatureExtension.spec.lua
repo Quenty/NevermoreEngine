@@ -499,3 +499,87 @@ describe("the registered fact-name list", function()
 		controller:destroy()
 	end)
 end)
+
+describe("a registered object that gets destroyed", function()
+	--[[
+		One maid usually holds both the object and its unregister disposer, and DoCleaning runs tasks in no
+		particular order. Left registered, a destroyed object is one every reader calls methods on -- and
+		BaseObject nils the metatable, so those calls fail rather than returning nothing.
+	]]
+	it("takes its fact layer out of the registry", function()
+		local controller = setup()
+		local fact = AccessFact.new("selfDestructing", {
+			resolve = function()
+				return nil
+			end,
+		})
+		controller.accessDataService:RegisterFact(fact)
+		expect(controller.accessDataService:HasFact("selfDestructing")).toEqual(true)
+
+		fact:Destroy()
+
+		expect(controller.accessDataService:HasFact("selfDestructing")).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("leaves a live report readable rather than calling into the wreckage", function()
+		-- The crash this fixes: a merge emission reaches for the layer's override behaviour and finds a
+		-- table with no metatable.
+		local controller = setup()
+		local player = controller.fakePlayer()
+		local fact = AccessFact.new("selfDestructing2", {
+			resolve = function()
+				return true
+			end,
+		})
+		controller.accessDataService:RegisterFact(fact)
+
+		local report = nil
+		controller.maid:GiveTask(
+			controller.accessDataService:ObserveFactReport(player, "selfDestructing2"):Subscribe(function(value)
+				report = value
+			end)
+		)
+		expect((report :: any).value).toEqual(true)
+
+		expect(function()
+			fact:Destroy()
+		end).never.toThrow()
+
+		controller:destroy()
+	end)
+
+	it("takes its feature out of the registry", function()
+		local controller = setup()
+		local feature = AccessFeature.anyOf("selfDestructingFeature", { "ownsGame" })
+		controller.accessDataService:RegisterFeature(feature)
+		expect(controller.accessDataService:GetFeature("selfDestructingFeature")).never.toEqual(nil)
+
+		feature:Destroy()
+
+		expect(controller.accessDataService:GetFeature("selfDestructingFeature")).toEqual(nil)
+
+		controller:destroy()
+	end)
+
+	it("does not mind the disposer being called as well", function()
+		-- The ordinary path still runs it, and both orders have to be fine.
+		local controller = setup()
+		local fact = AccessFact.new("selfDestructing3", {
+			resolve = function()
+				return nil
+			end,
+		})
+		local unregister = controller.accessDataService:RegisterFact(fact)
+
+		unregister()
+
+		expect(function()
+			fact:Destroy()
+			unregister()
+		end).never.toThrow()
+
+		controller:destroy()
+	end)
+end)
