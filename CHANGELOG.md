@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/access@1.3.0`
+  - feat(access): toggle several policies at once with access-policy [#765](https://github.com/Quenty/NevermoreEngine/pull/765) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/saveslot@2.6.0`
   - feat(saveslot): let save-slot commands address ephemeral slots and persist them [#764](https://github.com/Quenty/NevermoreEngine/pull/764) ([@Quenty](https://github.com/Quenty))
 

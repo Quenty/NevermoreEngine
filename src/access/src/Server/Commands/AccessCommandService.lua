@@ -209,13 +209,13 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "access-policy",
-		Description = "Turns an access policy on or off for everybody.",
+		Description = "Turns access policies on or off for everybody.",
 		Group = "Access",
 		Args = {
 			{
-				Name = "Policy",
-				Type = "accessPolicyName",
-				Description = "The policy to toggle.",
+				Name = "Policies",
+				Type = "accessPolicyNames",
+				Description = "The policies to toggle. Comma-separated, or * for every registered policy.",
 			},
 			{
 				Name = "State",
@@ -223,15 +223,28 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 				Description = "on or off.",
 			},
 		},
-	}, function(_context, policyName: string, state: string)
+	}, function(_context, policyNames: { string }, state: string)
 		local enabled = state == AccessCommandUtils.ToggleValues.ON
-		if not self._accessPolicyService:GetPolicy(policyName) then
-			return `No policy registered named {policyName}`
+
+		-- Checked before anything is toggled, so a typo in a list does not leave half of it switched.
+		local missing = {}
+		for _, policyName in policyNames do
+			if not self._accessPolicyService:GetPolicy(policyName) then
+				table.insert(missing, policyName)
+			end
 		end
 
-		self._accessPolicyService:SetPolicyEnabled(policyName, enabled)
+		if #missing > 0 then
+			return `No policy registered named {table.concat(missing, ", ")}`
+		end
 
-		return `{policyName} is now {if enabled then "ENABLED" else "disabled"}.`
+		for _, policyName in policyNames do
+			self._accessPolicyService:SetPolicyEnabled(policyName, enabled)
+		end
+
+		local toggled = AccessCommandUtils.describeNameList(policyNames, "policies")
+
+		return `{if enabled then "ENABLED" else "disabled"} {toggled}.`
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -264,7 +277,7 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 			end
 		end
 
-		return `Set {AccessCommandUtils.describeFactList(factNames)} to {value} for {#players} player(s). `
+		return `Set {AccessCommandUtils.describeNameList(factNames, "facts")} to {value} for {#players} player(s). `
 			.. `Each shows as its own layer in access-facts, so the real answer stays visible underneath.`
 	end)
 
