@@ -31,6 +31,7 @@ local AccessPolicy = require("AccessPolicy")
 local AccessPolicyContextUtils = require("AccessPolicyContextUtils")
 local AccessPolicyNames = require("AccessPolicyNames")
 local AccessPolicyServiceInterface = require("AccessPolicyServiceInterface")
+local JSONAttributeValue = require("JSONAttributeValue")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
@@ -39,6 +40,8 @@ local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 local TieRealms = require("TieRealms")
+
+local REPLICATED_ENABLED_ATTRIBUTE = "AccessPolicyEnabled"
 
 local AccessPolicyService = {}
 AccessPolicyService.ServiceName = "AccessPolicyService"
@@ -54,6 +57,9 @@ export type AccessPolicyService = typeof(setmetatable(
 		-- One maid per player, holding one task per enabled policy, keyed by policy name so a policy can be
 		-- switched off for everyone without disturbing the others.
 		_playerMaids: { [any]: any },
+		-- What the server says each policy's switch is set to. Empty on the server itself, which holds the
+		-- real thing in _enabled.
+		_replicatedEnabled: { [string]: boolean },
 		_alive: boolean,
 	},
 	{} :: typeof({ __index = AccessPolicyService })
@@ -74,6 +80,7 @@ function AccessPolicyService.Init(self: AccessPolicyService, serviceBag: Service
 	self._enabled = enabled :: any
 	self._maid:GiveTask(enabled)
 	self._playerMaids = {}
+	self._replicatedEnabled = {}
 	self._alive = true
 
 	self:_registerBuiltInPolicies()
@@ -107,11 +114,99 @@ function AccessPolicyService.Start(self: AccessPolicyService): ()
 		self:RemovePlayer(player)
 	end))
 
+	-- Branching on the tie realm rather than RunService, for the same reason _runsHere does.
+	if self._tieRealmService:GetTieRealm() == TieRealms.CLIENT then
+		self:_consumeReplicatedPolicyEnabled()
+	else
+		self:_replicatePolicyEnabled()
+	end
+
 	-- Same adornee as AccessDataServiceInterface: this is a singleton, and ReplicatedStorage is the one
 	-- instance both realms already agree on.
 	self._maid:GiveTask(
 		AccessPolicyServiceInterface:Implement(ReplicatedStorage, self :: any, self._tieRealmService:GetTieRealm())
 	)
+end
+
+--[[
+	Publishes which policies are switched on, so a console session on the server reaches the realm the
+	policy actually runs in.
+
+	This is the half that was missing. `AccessPolicyServiceInterface` is query-only on purpose -- letting
+	anything that merely found an interface start a kick would make "can see the registry" and "can
+	enforce" the same permission -- but that left a client-realm policy with no off switch at all: the
+	command is server-side, the consequence is client-side, and nothing joined them. So enablement
+	replicates one way, server to client, as state rather than as a callable.
+
+	The whole effective map is published rather than the changes to it, and includes the policies that are
+	*off*: a client whose own `isEnabledByDefault` switched something on has to hear that the server says
+	otherwise, and "absent from the payload" cannot carry that.
+]]
+function AccessPolicyService._replicatePolicyEnabled(self: AccessPolicyService): ()
+	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, REPLICATED_ENABLED_ATTRIBUTE, {})
+	local lastPublished: string? = nil
+
+	-- Cleared when this service goes, but only if what is there is still ours -- another live service may
+	-- have published since, and clearing unconditionally would switch off policies somebody is relying on.
+	-- Same reasoning as AccessDataService's feature-fact publication.
+	self._maid:GiveTask(function()
+		if lastPublished ~= nil and ReplicatedStorage:GetAttribute(REPLICATED_ENABLED_ATTRIBUTE) == lastPublished then
+			replicated.Value = nil
+		end
+	end)
+
+	local function publish()
+		local payload = {}
+		for _, policyName in self:GetPolicyNames() do
+			payload[policyName] = self:IsPolicyEnabled(policyName)
+		end
+
+		replicated.Value = payload
+		lastPublished = ReplicatedStorage:GetAttribute(REPLICATED_ENABLED_ATTRIBUTE)
+	end
+
+	-- Both, because either can change what the map should say: a registration adds a name, and a toggle
+	-- changes a value. `_enabled` only ever holds `true` -- SetPolicyEnabled removes the key rather than
+	-- storing false -- so watching its key list catches every toggle.
+	self._maid:GiveTask(self._policies:ObserveKeyList():Subscribe(publish))
+	self._maid:GiveTask(self._enabled:ObserveKeyList():Subscribe(publish))
+end
+
+function AccessPolicyService._consumeReplicatedPolicyEnabled(self: AccessPolicyService): ()
+	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, REPLICATED_ENABLED_ATTRIBUTE, {})
+
+	self._maid:GiveTask(replicated:Observe():Subscribe(function(payload: any)
+		self:SetReplicatedPolicyEnabled(payload or {})
+	end))
+
+	-- A policy registered after the payload landed still picks it up. Neither order is ours to control.
+	self._maid:GiveTask(self._policies:ObserveKeyList():Subscribe(function()
+		self:_reconcileReplicatedPolicyEnabled()
+	end))
+end
+
+--[=[
+	Applies what the server says each policy's switch is set to. The entry point the client's replication
+	arrives through, and the seam a test drives directly.
+
+	The server wins where it has spoken. A policy it has never heard of -- one registered only in this
+	realm -- is left entirely alone.
+
+	@param payload { [string]: boolean }
+]=]
+function AccessPolicyService.SetReplicatedPolicyEnabled(self: AccessPolicyService, payload: { [string]: boolean }): ()
+	assert(type(payload) == "table", "Bad payload")
+
+	self._replicatedEnabled = payload
+	self:_reconcileReplicatedPolicyEnabled()
+end
+
+function AccessPolicyService._reconcileReplicatedPolicyEnabled(self: AccessPolicyService): ()
+	for policyName, enabled in self._replicatedEnabled do
+		if self._policies:ContainsKey(policyName) and self:IsPolicyEnabled(policyName) ~= enabled then
+			self:SetPolicyEnabled(policyName, enabled)
+		end
+	end
 end
 
 --[=[
