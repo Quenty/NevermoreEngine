@@ -23,6 +23,9 @@ local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
 local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
 local AccessFeature = require("AccessFeature")
+local AccessPolicy = require("AccessPolicy")
+local AccessPolicyRealm = require("AccessPolicyRealm")
+local AccessPolicyService = require("AccessPolicyService")
 local AccessService = require("AccessService")
 local AccessServiceClient = require("AccessServiceClient")
 local AccessStateUtils = require("AccessStateUtils")
@@ -422,5 +425,105 @@ describe("the published composition and the service that wrote it", function()
 		controller:destroy()
 
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(nil)
+	end)
+end)
+
+local policyCounter = 0
+
+-- Returns whatever the client has if the realms never agree, so a failure prints the real state.
+local function waitForPolicyEnabled(accessPolicyService: any, policyName: string, expected: boolean): boolean
+	for _ = 1, CONVERGE_FRAMES do
+		if accessPolicyService:IsPolicyEnabled(policyName) == expected then
+			return expected
+		end
+
+		task.wait()
+	end
+
+	return accessPolicyService:IsPolicyEnabled(policyName)
+end
+
+local function setupPolicies()
+	local maid = Maid.new()
+
+	local function bag(tieRealm: string)
+		local serviceBag = maid:Add(ServiceBag.new());
+		(serviceBag:GetService(TieRealmService) :: any):SetTieRealm(tieRealm)
+		local accessPolicyService = serviceBag:GetService(AccessPolicyService) :: any
+		serviceBag:Init()
+		serviceBag:Start()
+
+		return { serviceBag = serviceBag, accessPolicyService = accessPolicyService }
+	end
+
+	local server = bag(TieRealms.SERVER)
+	local client = bag(TieRealms.CLIENT)
+
+	policyCounter += 1
+
+	return {
+		maid = maid,
+		server = server,
+		client = client,
+		-- Unique per test: the registries are per-bag, but the attribute they meet on is not.
+		policyName = `chapterPaywall{policyCounter}`,
+		register = function(self, realmBag: any, isEnabledByDefault: boolean)
+			local policy = maid:Add(AccessPolicy.new(realmBag.serviceBag, {
+				policyName = self.policyName,
+				-- Client realm: a server-realm policy was already togglable from the console.
+				realm = AccessPolicyRealm.CLIENT,
+				isEnabledByDefault = isEnabledByDefault,
+				apply = function()
+					return nil
+				end,
+			}))
+			maid:GiveTask(realmBag.accessPolicyService:RegisterPolicy(policy))
+
+			return policy
+		end,
+		destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+end
+
+describe("policy enablement across realms", function()
+	it("carries a policy switched off on the server to the client", function()
+		-- The console command is server-side and this consequence is not.
+		local controller = setupPolicies()
+		controller:register(controller.server, true)
+		controller:register(controller.client, true)
+
+		controller.server.accessPolicyService:SetPolicyEnabled(controller.policyName, false)
+
+		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, false)).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("carries a policy switched on on the server to the client", function()
+		local controller = setupPolicies()
+		controller:register(controller.server, false)
+		controller:register(controller.client, false)
+
+		controller.server.accessPolicyService:SetPolicyEnabled(controller.policyName, true)
+
+		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, true)).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("leaves a policy the server never registered alone", function()
+		-- Replication widens what the client knows; it does not own the client's registry.
+		local controller = setupPolicies()
+		controller:register(controller.client, true)
+
+		for _ = 1, 20 do
+			task.wait()
+		end
+
+		expect(controller.client.accessPolicyService:IsPolicyEnabled(controller.policyName)).toEqual(true)
+
+		controller:destroy()
 	end)
 end)
