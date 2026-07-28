@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/access@1.1.2`
+  - fix(access): keep a destroyed layer out of a merge already in flight [#762](https://github.com/Quenty/NevermoreEngine/pull/762) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/access@1.1.1`
   - fix(access): unregister a fact, feature or policy when it is destroyed [#761](https://github.com/Quenty/NevermoreEngine/pull/761) ([@Quenty](https://github.com/Quenty))
 

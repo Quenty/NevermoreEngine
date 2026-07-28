@@ -1,3 +1,16 @@
+# v1.1.2 (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- fix(access): keep a destroyed layer out of a merge already in flight [#762](https://github.com/Quenty/NevermoreEngine/pull/762) ([@Quenty](https://github.com/Quenty))
+- fix(access): keep a destroyed layer out of a merge already in flight ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
