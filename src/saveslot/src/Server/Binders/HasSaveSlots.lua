@@ -173,6 +173,22 @@ function HasSaveSlots.PromiseHasSlot(self: HasSaveSlots, slotId: SaveSlotData.Sl
 	end)
 end
 
+-- SaveSlotService owns the callbacks and runs them. Reached through the module instance rather than by
+-- name, because `require("SaveSlotService")` from here -- at any depth, even inside this function -- is a
+-- cyclic module dependency: SaveSlotService requires this module. A binder bound without the service in
+-- its bag has nothing to ask, and allows the selection.
+function HasSaveSlots._promisePreSelectFromSaveSlotService(
+	self: HasSaveSlots,
+	slotId: SaveSlotData.SlotId
+): Promise.Promise<boolean>
+	local serviceModule = script.Parent.Parent:FindFirstChild("SaveSlotService")
+	if not serviceModule or not self._serviceBag:HasService(serviceModule) then
+		return (Promise :: any).resolved(true)
+	end
+
+	return self._serviceBag:GetService(serviceModule):PromisePreSelect(self._obj, slotId, self.ActiveSlotId.Value)
+end
+
 --[=[
 	Selects the slot with the given ID
 ]=]
@@ -192,20 +208,28 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 			SaveSlotData.LastPlayedTime:Set(slot, os.time())
 		end
 
+		local function promiseSetSlot()
+			return self:_promisePreSelectFromSaveSlotService(slotId):Then(function(allowed: boolean)
+				if not allowed then
+					return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
+				end
+
+				return setSlot()
+			end)
+		end
+
 		-- Initialize or save and switch
 		if self.ActiveSlotId.Value == nil then
-			setSlot()
-			return
+			return promiseSetSlot()
 		end
 
 		-- Leaving an ephemeral slot has nothing to persist, so switch without a datastore flush (the flush
 		-- exists to save the outgoing slot's progress, and an ephemeral slot has none).
 		if self:_isEphemeral(self.ActiveSlotId.Value) then
-			setSlot()
-			return
+			return promiseSetSlot()
 		end
 
-		return self._dataStore:Save():Then(setSlot)
+		return self._dataStore:Save():Then(promiseSetSlot)
 	end)
 end
 
