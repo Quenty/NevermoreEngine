@@ -253,8 +253,20 @@ local function strictCmdr()
 				return list
 			end
 		end,
-		MakeListableType = function(typeObject: any)
-			return typeObject
+		-- Mirrors the real one closely enough to matter: it marks the type Listable (the flag Cmdr gates `*`
+		-- expansion on), wraps Parse to return a list, and merges the override table.
+		MakeListableType = function(typeObject: any, override: any?)
+			local listable = table.clone(typeObject)
+			listable.Listable = true
+			listable.Parse = function(...)
+				return { typeObject.Parse(...) }
+			end
+
+			for key, value in override or {} do
+				listable[key] = value
+			end
+
+			return listable
 		end,
 		MakeEnumType = function(_name: string, values: { string })
 			return { values = values }
@@ -373,6 +385,54 @@ describe("AccessCommandUtils.describeSubject", function()
 		}, 3)
 
 		expect(string.split(text, "\n")[1]).toEqual("canEnterWorld (subject 3) = allowed (granted by isStaff)")
+	end)
+end)
+
+describe("overriding every fact at once", function()
+	--[[
+		`access-override . * false` is how somebody shuts the whole thing down to see what breaks. Cmdr
+		builds that expansion itself, but only for a type that says it is Listable and whose autocomplete
+		over an empty segment returns everything -- so those are what is worth asserting here.
+	]]
+	local function factNamesType()
+		local cmdr, registered = strictCmdr()
+		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService())
+		return registered.accessFactNames
+	end
+
+	it("is listable, which is the only reason * expands at all", function()
+		expect(factNamesType().Listable).toEqual(true)
+	end)
+
+	it("matches every fact on an empty segment, which is what * expands to", function()
+		local factType = factNamesType()
+
+		expect(factType.Autocomplete(factType.Transform(""))).toEqual({ "playerIsAdmin" })
+	end)
+
+	it("still resolves one typed name", function()
+		local factType = factNamesType()
+
+		expect(factType.Parse(factType.Transform("playerIsAdmin"))).toEqual({ "playerIsAdmin" })
+	end)
+
+	it("offers `all` as the spelled-out wildcard", function()
+		expect(factNamesType().ArgumentOperatorAliases.all).toEqual("*")
+	end)
+end)
+
+describe("AccessCommandUtils.describeFactList", function()
+	it("names them while a person can still check them", function()
+		expect(AccessCommandUtils.describeFactList({ "ownsGame", "isStaff" })).toEqual("ownsGame, isStaff")
+	end)
+
+	it("counts them once naming them would be a wall", function()
+		-- Which is exactly what * produces.
+		expect(AccessCommandUtils.describeFactList({ "a", "b", "c", "d", "e" })).toEqual("5 facts")
+	end)
+
+	it("says something rather than nothing for an empty list", function()
+		expect(AccessCommandUtils.describeFactList({})).toEqual("no facts")
 	end)
 end)
 

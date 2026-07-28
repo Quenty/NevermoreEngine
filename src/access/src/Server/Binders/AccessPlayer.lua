@@ -45,6 +45,7 @@ function AccessPlayer.new(player: Player, serviceBag: ServiceBag.ServiceBag): Ac
 	self._remoting.GetClientAccessState:DeclareMethod()
 
 	self:_replicateFacts()
+	self:_replicateOverrides()
 
 	return self
 end
@@ -70,6 +71,30 @@ function AccessPlayer._replicateFacts(self: AccessPlayer): ()
 		end
 
 		self._replicatedFacts.Value = entries
+	end))
+end
+
+--[[
+	Sends the overrides this server has in force for the player, so a console session takes effect in both
+	realms rather than only where the command ran.
+
+	Overrides ride separately from the fact values they change. A value alone is not enough: under the
+	default behaviour a server `false` cannot close a gate the client opened for itself, and even where it
+	could the client's readout would say "replicated" -- so somebody debugging sees the override on one
+	realm and an unexplained answer on the other.
+
+	The `value` key is absent for an override forcing unresolved. That is a thing people deliberately do,
+	and JSON drops nil, so presence of the entry is what says an override exists at all.
+]]
+function AccessPlayer._replicateOverrides(self: AccessPlayer): ()
+	self._maid:GiveTask(self._accessDataService:ObserveFactOverrides(self._obj):Subscribe(function(overrides: any)
+		local entries = {}
+
+		for factName, box in overrides do
+			entries[factName] = { value = box.value }
+		end
+
+		self._replicatedOverrides.Value = entries
 	end))
 end
 

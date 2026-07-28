@@ -174,6 +174,9 @@ export type AccessDataService = typeof(setmetatable(
 		_factNames: any,
 		-- What the server said, per player, per fact. Empty on the server itself.
 		_serverValuesByPlayer: { [any]: any },
+		-- The overrides the server has in force, per player. Empty on the server itself, which holds its
+		-- own in _overridesByPlayer.
+		_serverOverridesByPlayer: { [any]: any },
 		-- The fact names the server says each feature reads. Empty on the server itself.
 		_replicatedFeatureFactNames: { [string]: { string } },
 		-- Removers for the pushes this realm made on the server's behalf, so reconciling can take back
@@ -197,6 +200,7 @@ function AccessDataService.Init(self: AccessDataService, serviceBag: ServiceBag.
 	self._warnedMissingFacts = {}
 	self._factNames = self._maid:Add(ValueObject.new({})) :: any
 	self._serverValuesByPlayer = setmetatable({}, { __mode = "k" }) :: any
+	self._serverOverridesByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._replicatedFeatureFactNames = {}
 	self._pushedFeatureFactRemovers = {}
 
@@ -259,6 +263,20 @@ end
 ]]
 function AccessDataService._replicateFeatureFactNames(self: AccessDataService): ()
 	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, FEATURE_FACT_NAMES_ATTRIBUTE, {})
+	local lastPublished: string? = nil
+
+	-- Cleared when this service goes, because the attribute outlives the object that wrote it and the next
+	-- service up would read a dead one's composition as current.
+	--
+	-- Only if what is there is still ours, though. The attribute is one slot on ReplicatedStorage and
+	-- nothing stops another live service from having published since -- clearing unconditionally would
+	-- take down a composition somebody is currently gating on, which is worse than the stale payload this
+	-- is here to prevent.
+	self._maid:GiveTask(function()
+		if lastPublished ~= nil and ReplicatedStorage:GetAttribute(FEATURE_FACT_NAMES_ATTRIBUTE) == lastPublished then
+			replicated.Value = nil
+		end
+	end)
 
 	local function publish()
 		local payload = {}
@@ -270,6 +288,7 @@ function AccessDataService._replicateFeatureFactNames(self: AccessDataService): 
 		end
 
 		replicated.Value = payload
+		lastPublished = ReplicatedStorage:GetAttribute(FEATURE_FACT_NAMES_ATTRIBUTE)
 	end
 
 	self._maid:GiveTask(self._features:ObserveKeyList():Subscribe(function(featureNames: { string })
@@ -527,10 +546,12 @@ function AccessDataService.TeardownPlayer(self: AccessDataService, player: Playe
 	-- Fired first, so subscribers complete and promises reject while the state they read still exists.
 	self:_getPresence(player).Value = false
 
-	local overrides = self._overridesByPlayer[player]
-	if overrides then
-		overrides:Destroy()
-		self._overridesByPlayer[player] = nil
+	for _, byPlayer in { self._overridesByPlayer, self._serverOverridesByPlayer } do
+		local overrides = byPlayer[player]
+		if overrides then
+			overrides:Destroy()
+			byPlayer[player] = nil
+		end
 	end
 
 	for _, layers in self._layersByFactName do
@@ -731,7 +752,16 @@ function AccessDataService.RegisterFeature(self: AccessDataService, feature: Acc
 		`[AccessDataService] - Feature {featureName} is already registered`
 	)
 
-	return self._features:Set(featureName, feature)
+	local remove = self._features:Set(featureName, feature)
+
+	return function()
+		-- The removers held here close over *this* feature object. Once it is gone they have nothing to act
+		-- on, and leaving them keyed by name means a feature later registered under the same name is skipped
+		-- as already-pushed and silently gates on the narrower rule.
+		self._pushedFeatureFactRemovers[featureName] = nil
+
+		remove()
+	end
 end
 
 --[=[
@@ -972,6 +1002,12 @@ function AccessDataService.SetFactOverride(
 
 	return function()
 		local current = overrides.Value :: OverrideState
+		if not current then
+			-- Teardown order is not ours to control: one maid may hold both this disposer and the service
+			-- bag, and lifting an override off a player who is already gone is a no-op, not an error.
+			return
+		end
+
 		-- Only clear our own box; a later override for the same fact replaced this one and owns it now.
 		if current[factName] ~= box then
 			return
@@ -1045,6 +1081,7 @@ function AccessDataService.ObserveFactReport(
 	local layers: { any } = self._layersByFactName[factName] or {}
 	local sources: { [string]: any } = {
 		overrides = self:_observeOverrides(player),
+		replicatedOverrides = self:_observeReplicatedOverrides(player),
 		serverValue = self:_observeServerFactValue(player, factName),
 	}
 
@@ -1056,18 +1093,29 @@ function AccessDataService.ObserveFactReport(
 		RxAccessStateUtils.completeOn(self:_observePlayerRemoving(player)) :: any,
 		Rx.map(function(latest: { [string]: any }): AccessFactReport
 			local overrides = (latest.overrides or EMPTY_OVERRIDE_STATE) :: OverrideState
+			local replicatedOverrides = (latest.replicatedOverrides or EMPTY_OVERRIDE_STATE) :: OverrideState
 			local behavior = if layers[1] then layers[1]:GetServerOverrideBehavior() else nil
+
+			-- An override set in this realm shadows one the server sent, so a local investigation is not
+			-- fighting a console session somebody left running elsewhere.
+			local overrideBox = overrides[factName]
+			local overrideCameFromServer = overrideBox == nil and replicatedOverrides[factName] ~= nil
+			overrideBox = overrideBox or replicatedOverrides[factName]
 
 			-- Override sits above everything, and abstains when nothing is set rather than being absent:
 			-- every row in a report is a layer, so a readout shows what it would have done.
-			local overrideBox = overrides[factName]
 			local contributions: { any } = {
 				{
 					source = OVERRIDE_SOURCE,
 					priority = AccessFactPriority.OVERRIDE,
 					terminating = true,
 					contribution = if overrideBox
-						then AccessFact.contribution(overrideBox.value)
+						then AccessFact.contribution(
+							overrideBox.value,
+							-- Named in the readout, because "I cleared that override and it is still set"
+							-- is otherwise a very confusing half hour.
+							if overrideCameFromServer then { replicated = true } else nil
+						)
 						else AccessFact.contributionOfState(AccessFactContributionState.ABSTAIN),
 				},
 			}
@@ -1474,6 +1522,73 @@ function AccessDataService._observeOverrides(
 	player: Player
 ): Observable.Observable<OverrideState>
 	return self:_getOverrides(player):Observe() :: any
+end
+
+--[=[
+	The overrides in force for this player in *this* realm, live.
+
+	What [AccessPlayer] replicates. A box is present for every overridden fact, and its `value` is absent
+	when the override forces unresolved -- which is a thing somebody deliberately does, and so has to
+	survive the trip rather than looking like no override at all.
+
+	@param player Player
+	@return Observable<{ [string]: { value: boolean? } }>
+]=]
+function AccessDataService.ObserveFactOverrides(
+	self: AccessDataService,
+	player: Player
+): Observable.Observable<OverrideState>
+	assert(player, "Bad player")
+
+	return self:_observeOverrides(player)
+end
+
+--[=[
+	Applies the overrides the server has in force. The entry point the client's replication arrives
+	through, and the seam a test drives directly.
+
+	Overrides are debugging instructions, not entitlements, and an instruction that only took effect in one
+	realm would be the worst of both: a console session that opens the server's gate while the client still
+	renders it shut, with nothing in either readout saying why.
+
+	An override set locally shadows one that arrives here, so a person investigating in this realm is not
+	fighting somebody else's console.
+
+	@param player Player
+	@param entries { [string]: { value: boolean? } }
+]=]
+function AccessDataService.SetReplicatedFactOverrides(
+	self: AccessDataService,
+	player: Player,
+	entries: { [string]: { value: boolean? } }
+): ()
+	assert(player, "Bad player")
+	assert(type(entries) == "table", "Bad entries")
+
+	self:_getReplicatedOverrides(player).Value = entries
+end
+
+function AccessDataService._observeReplicatedOverrides(
+	self: AccessDataService,
+	player: Player
+): Observable.Observable<OverrideState>
+	return self:_getReplicatedOverrides(player):Observe() :: any
+end
+
+-- Same weak-keyed, made-on-first-use shape as the local overrides, and for the same reasons.
+function AccessDataService._getReplicatedOverrides(
+	self: AccessDataService,
+	player: Player
+): ValueObject.ValueObject<OverrideState>
+	local existing = self._serverOverridesByPlayer[player]
+	if existing then
+		return existing
+	end
+
+	local overrides = ValueObject.new(EMPTY_OVERRIDE_STATE :: any)
+	self._serverOverridesByPlayer[player] = overrides
+
+	return overrides
 end
 
 --[[

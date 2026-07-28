@@ -16,6 +16,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local AccessDataService = require("AccessDataService")
 local AccessFact = require("AccessFact")
 local AccessFactServerOverrideBehavior = require("AccessFactServerOverrideBehavior")
@@ -325,6 +328,40 @@ describe("per-player facts across realms", function()
 		return false
 	end
 
+	it("carries a console override to the client, closing a gate the client had opened", function()
+		-- The reason overrides replicate as overrides rather than as values: the client resolves ownsGame
+		-- for itself and says yes, and under the default behaviour a replicated `false` can never take that
+		-- back. An override is a debugging instruction and has to land in both realms or it is worse than
+		-- not landing at all -- the server's gate open, the client's shut, neither readout saying why.
+		local controller = setupPlayers()
+		local resolved = controller.maid:Add(ValueObject.new(true)) :: any
+		controller.maid:GiveTask(
+			controller.client:RegisterFact(controller.maid:Add(AccessFact.new(controller.factName, {
+				resolve = function()
+					return resolved
+				end,
+			})))
+		)
+		controller.maid:GiveTask(
+			controller.server:RegisterFact(controller.maid:Add(AccessFact.new(controller.factName, {
+				resolve = function()
+					return resolved
+				end,
+			})))
+		)
+
+		local state = controller:clientFeature()
+		expect(waitUntil(function()
+			return AccessStateUtils.isAllowed(state() :: any)
+		end)).toEqual(true)
+
+		controller.maid:GiveTask(controller.server:SetFactOverride(controller.player, controller.factName, false))
+
+		expect(waitUntil(function()
+			return not AccessStateUtils.isAllowed(state() :: any)
+		end)).toEqual(true)
+	end)
+
 	it("carries a fact only the server can resolve to the client", function()
 		local controller = setupPlayers()
 		controller:serverFact(true)
@@ -349,5 +386,41 @@ describe("per-player facts across realms", function()
 		expect(waitUntil(function()
 			return not AccessStateUtils.isAllowed(state() :: any)
 		end)).toEqual(true)
+	end)
+end)
+
+describe("the published composition and the service that wrote it", function()
+	it("leaves a payload alone once somebody else has published over it", function()
+		-- One attribute, one slot. Taking down a composition another live service is gating on is worse
+		-- than the stale payload the cleanup exists to prevent.
+		local controller = setup()
+		controller:registerFeature(controller.server, { "ownsGame" })
+		for _ = 1, 10 do
+			task.wait()
+		end
+
+		local other = { someoneElse = { "theirFact" } }
+		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", HttpService:JSONEncode(other))
+
+		controller:destroy()
+
+		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(HttpService:JSONEncode(other))
+		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", nil)
+	end)
+
+	it("does not outlive the server that published it", function()
+		-- The attribute lives on ReplicatedStorage, which outlives any service bag. A stale payload left
+		-- behind is read by the next service to come up as though it were current.
+		local controller = setup()
+		controller:registerFeature(controller.server, { "ownsGame" })
+
+		for _ = 1, 10 do
+			task.wait()
+		end
+		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).never.toEqual(nil)
+
+		controller:destroy()
+
+		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(nil)
 	end)
 end)

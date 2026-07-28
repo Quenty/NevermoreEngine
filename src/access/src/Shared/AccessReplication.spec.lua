@@ -412,3 +412,128 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 		controller:destroy()
 	end)
 end)
+
+describe("replicated feature facts across a feature's lifetime", function()
+	it("re-applies to a feature registered again under the same name", function()
+		-- The removers are keyed by name but close over the feature object. Left behind, they make the
+		-- replacement look already-pushed, and it silently gates on the narrower rule.
+		local controller = setup()
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "gamePass" } })
+
+		local first = controller.maid:Add(AccessFeature.anyOf("chapters", { "ownsGame" }))
+		local unregister = controller.accessDataService:RegisterFeature(first)
+		expect(first:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
+
+		unregister()
+
+		local second = controller.maid:Add(AccessFeature.anyOf("chapters", { "ownsGame" }))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(second))
+
+		expect(second:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
+
+		controller:destroy()
+	end)
+end)
+
+describe("AccessDataService.SetReplicatedFactOverrides", function()
+	--[[
+		An override is a debugging instruction, not an entitlement. One that took effect in only one realm
+		would be the worst of both: the server's gate open while the client still renders it shut, and
+		nothing in either readout saying why.
+	]]
+	it("closes a gate the local answer had opened", function()
+		-- The case a replicated *value* cannot reach: under the default behaviour a server false never
+		-- overrides a local true, so without this the override simply would not land.
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local player = controller.fakePlayer()
+		expect(controller.report(player, "ownsGame").value).toEqual(true)
+
+		controller.accessDataService:SetReplicatedFactOverrides(player, { ownsGame = { value = false } })
+
+		expect(controller.report(player, "ownsGame").value).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("shows up as an override rather than as an unexplained replicated value", function()
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetReplicatedFactOverrides(player, { ownsGame = { value = false } })
+
+		local report = controller.report(player, "ownsGame")
+		expect(report.decidedBy).toEqual("override")
+
+		local overrideLayer = nil
+		for _, layer in report.layers do
+			if layer.source == "override" then
+				overrideLayer = layer
+			end
+		end
+
+		-- Named as the server's, so "I cleared that override and it is still set" is a short conversation.
+		expect((overrideLayer :: any).metadata.replicated).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("carries a forced-unresolved override, which is a thing people deliberately do", function()
+		-- The entry exists with no value. JSON drops nil, so presence is what says an override is set at
+		-- all -- otherwise "force this to unresolved" arrives as "no override".
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetReplicatedFactOverrides(player, { ownsGame = {} })
+
+		expect(controller.report(player, "ownsGame").value).toEqual(nil)
+
+		controller:destroy()
+	end)
+
+	it("lets a local override shadow the server's", function()
+		-- So somebody investigating in this realm is not fighting a console session left running elsewhere.
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetReplicatedFactOverrides(player, { ownsGame = { value = false } })
+		controller.maid:GiveTask(controller.accessDataService:SetFactOverride(player, "ownsGame", true))
+
+		local report = controller.report(player, "ownsGame")
+		expect(report.value).toEqual(true)
+		expect(report.layers[1].metadata).toEqual(nil)
+
+		controller:destroy()
+	end)
+
+	it("lifts again when the server clears it", function()
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local player = controller.fakePlayer()
+		controller.accessDataService:SetReplicatedFactOverrides(player, { ownsGame = { value = false } })
+		controller.accessDataService:SetReplicatedFactOverrides(player, {})
+
+		expect(controller.report(player, "ownsGame").value).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("keeps one player's override off another", function()
+		local controller = setup()
+		controller.localFact("ownsGame", true)
+
+		local told = controller.fakePlayer()
+		local other = controller.fakePlayer()
+		controller.accessDataService:SetReplicatedFactOverrides(told, { ownsGame = { value = false } })
+
+		expect(controller.report(told, "ownsGame").value).toEqual(false)
+		expect(controller.report(other, "ownsGame").value).toEqual(true)
+
+		controller:destroy()
+	end)
+end)

@@ -245,9 +245,9 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 				Description = "Players to override the fact for.",
 			},
 			{
-				Name = "Fact",
-				Type = "accessFactName",
-				Description = "The fact to force.",
+				Name = "Facts",
+				Type = "accessFactNames",
+				Description = "The facts to force. Comma-separated, or * for every registered fact.",
 			},
 			{
 				Name = "Value",
@@ -255,15 +255,17 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 				Description = "true, false, or unresolved.",
 			},
 		},
-	}, function(_context, players: { Player }, factName: string, value: string)
+	}, function(_context, players: { Player }, factNames: { string }, value: string)
 		local overrideValue = AccessCommandUtils.parseOverrideValue(value)
 
 		for _, player in players do
-			self._accessDataService:SetFactOverride(player, factName, overrideValue)
+			for _, factName in factNames do
+				self._accessDataService:SetFactOverride(player, factName, overrideValue)
+			end
 		end
 
-		return `Set {factName} to {value} for {#players} player(s). It shows as its own layer in `
-			.. `access-facts, so the real answer stays visible underneath.`
+		return `Set {AccessCommandUtils.describeFactList(factNames)} to {value} for {#players} player(s). `
+			.. `Each shows as its own layer in access-facts, so the real answer stays visible underneath.`
 	end)
 
 	self._cmdrService:RegisterCommand({

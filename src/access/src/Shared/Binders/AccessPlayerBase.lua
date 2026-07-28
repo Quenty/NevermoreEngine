@@ -60,6 +60,7 @@ local Signal = require("Signal")
 	@within AccessPlayerBase
 ]=]
 local REPLICATED_FACTS_ATTRIBUTE = "AccessFacts"
+local REPLICATED_OVERRIDES_ATTRIBUTE = "AccessFactOverrides"
 
 local AccessPlayerBase = setmetatable({}, BaseObject)
 AccessPlayerBase.ClassName = "AccessPlayerBase"
@@ -72,6 +73,7 @@ export type AccessPlayerBase =
 			_accessDataService: any,
 			_stateByFeatureName: { [string]: any },
 			_replicatedFacts: any,
+			_replicatedOverrides: any,
 			FeatureAllowedChanged: any,
 		},
 		{} :: typeof({ __index = AccessPlayerBase })
@@ -90,6 +92,7 @@ function AccessPlayerBase.new(player: Player, serviceBag: ServiceBag.ServiceBag)
 	self._accessDataService = self._serviceBag:GetService(AccessDataService)
 	self._stateByFeatureName = {}
 	self._replicatedFacts = JSONAttributeValue.new(player, REPLICATED_FACTS_ATTRIBUTE, {})
+	self._replicatedOverrides = JSONAttributeValue.new(player, REPLICATED_OVERRIDES_ATTRIBUTE, {})
 
 	--[=[
 		Fires when a feature's verdict changes for this player, with the feature name, whether it is now
@@ -395,5 +398,13 @@ function AccessPlayerBase._readOnce(observable: any): any
 end
 
 AccessPlayerBase.REPLICATED_FACTS_ATTRIBUTE = REPLICATED_FACTS_ATTRIBUTE
+
+--[=[
+	The attribute the server's fact overrides arrive on.
+
+	@prop REPLICATED_OVERRIDES_ATTRIBUTE string
+	@within AccessPlayerBase
+]=]
+AccessPlayerBase.REPLICATED_OVERRIDES_ATTRIBUTE = REPLICATED_OVERRIDES_ATTRIBUTE
 
 return AccessPlayerBase

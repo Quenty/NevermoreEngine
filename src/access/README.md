@@ -192,12 +192,19 @@ what a policy reads shows up in a readout like everything else.
 | `access-state <players> [server\|client\|both]` | everything: every feature verdict, every policy, every fact |
 | `access-facts <players>` | every fact with its layers and which one decided |
 | `access-feature <players> <feature> [subject]` | one verdict and the facts it was reached from |
-| `access-override <players> <fact> <true\|false\|unresolved>` | force a fact, including forcing *unresolved* |
+| `access-override <players> <facts> <true\|false\|unresolved>` | force facts — `*` or `all` for every one |
 | `access-policies` | every policy and whether it is running |
 | `access-policy <policy> <on\|off>` | turn a consequence on or off |
 
 Every command is admin-gated by `CmdrService`. Overrides appear as their own layer with the real answer
 still visible underneath, so nobody mistakes one left on after a QA session for a genuine entitlement.
+
+Overrides replicate, and arrive on the client **as overrides** rather than as values. That matters twice
+over: a replicated value cannot close a gate the client opened for itself — the default behaviour only
+lets allows through — and even where it could, the client's readout would say "replicated" while the
+server's said "override", which is the drift a debugging tool exists to remove. A replicated override is
+marked as the server's in the readout, and an override set locally shadows it, so investigating in one
+realm does not mean fighting a console session left running in the other.
 
 A per-thing gate takes its subject as the last argument — `access-feature . can-enter-world 3`. Without
 it there is no way to ask the question anybody actually has: "can they enter a world" has no answer,

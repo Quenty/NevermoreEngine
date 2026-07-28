@@ -37,6 +37,7 @@ function AccessPlayerClient.new(player: Player, serviceBag: ServiceBag.ServiceBa
 	self._maid:GiveTask((AccessPlayerInterface :: any).Client:Implement(self._obj :: Instance, self))
 
 	self:_consumeReplicatedFacts()
+	self:_consumeReplicatedOverrides()
 	self:_answerDebugRequests()
 
 	return self
@@ -58,6 +59,16 @@ function AccessPlayerClient._answerDebugRequests(self: AccessPlayerClient): ()
 
 	self._maid:GiveTask(remoting.GetClientAccessState:Bind(function()
 		return AccessCommandUtils.collectPlayerState(self._accessDataService, accessPolicyService, self._obj :: any)
+	end))
+end
+
+--[[
+	Feeds the server's overrides in, so a console session applies here too and shows up as an override in
+	this realm's readout rather than as an unexplained replicated value.
+]]
+function AccessPlayerClient._consumeReplicatedOverrides(self: AccessPlayerClient): ()
+	self._maid:GiveTask(self._replicatedOverrides:Observe():Subscribe(function(entries: any)
+		self._accessDataService:SetReplicatedFactOverrides(self._obj, entries or {})
 	end))
 end
 

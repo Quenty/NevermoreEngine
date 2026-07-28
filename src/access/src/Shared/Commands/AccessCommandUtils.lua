@@ -45,6 +45,7 @@ AccessCommandUtils.OverrideValues = {
 
 local DECIDED_MARKER = " <-- decided"
 local SOURCE_WIDTH = 16
+local NAMED_FACT_LIMIT = 4
 
 --[[
 	GOTCHA: keeps the LAST emission, not the first. A fact opens on unresolved before anything is looked
@@ -347,6 +348,23 @@ function AccessCommandUtils.formatPlayerState(
 end
 
 --[=[
+	How a list of facts reads back in a confirmation. Names them while there are few enough to check at a
+	glance, and counts them once naming them would be a wall -- which is exactly what `*` produces.
+
+	@param factNames { string }
+	@return string
+]=]
+function AccessCommandUtils.describeFactList(factNames: { string }): string
+	if #factNames == 0 then
+		return "no facts"
+	elseif #factNames <= NAMED_FACT_LIMIT then
+		return table.concat(factNames, ", ")
+	end
+
+	return `{#factNames} facts`
+end
+
+--[=[
 	Turns what somebody typed into the subject a per-thing feature is evaluated against.
 
 	Numeric text becomes a number, because the subjects that actually get typed are ids -- a world index, a
@@ -468,6 +486,8 @@ function AccessCommandUtils.registerTypes(cmdr: any, accessDataService: any, get
 
 	local factName = {
 		Transform = function(text: string)
+			-- An empty search matches everything, which is what makes `*` expand: Cmdr builds the wildcard
+			-- from this type's autocomplete over an empty segment.
 			return cmdr.Util.MakeFuzzyFinder(accessDataService:GetFactNames())(text)
 		end,
 		Validate = function(keys)
@@ -497,7 +517,17 @@ function AccessCommandUtils.registerTypes(cmdr: any, accessDataService: any, get
 	}
 
 	cmdr.Registry:RegisterType("accessFactName", factName)
-	cmdr.Registry:RegisterType("accessFactNames", cmdr.Util.MakeListableType(factName))
+	-- Listable, which is what buys `access-override . * false`: Cmdr only expands `*` and `**` for a type
+	-- that says it takes a list. `all` is the spelled-out alias, the same one the built-in players type
+	-- offers, because a wildcard is worth being able to type deliberately.
+	cmdr.Registry:RegisterType(
+		"accessFactNames",
+		cmdr.Util.MakeListableType(factName, {
+			ArgumentOperatorAliases = {
+				all = "*",
+			},
+		})
+	)
 	cmdr.Registry:RegisterType("accessFeatureName", featureName)
 	cmdr.Registry:RegisterType("accessPolicyName", {
 		Transform = function(text: string)
