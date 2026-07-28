@@ -34,12 +34,14 @@ local function setup()
 			return maid:Add(PlayerMock.new()) :: any
 		end,
 		registerAllowed = function(featureName: string, allowed: boolean)
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(`{featureName}Fact`, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(`{featureName}Fact`, {
 				resolve = function()
 					return allowed
 				end,
-			})))
-			maid:GiveTask(accessDataService:RegisterFeature(AccessFeature.anyOf(featureName, { `{featureName}Fact` })))
+			}))))
+			maid:GiveTask(
+				accessDataService:RegisterFeature(maid:Add(AccessFeature.anyOf(featureName, { `{featureName}Fact` })))
+			)
 		end,
 		destroy = function(_self)
 			maid:DoCleaning()
@@ -106,13 +108,17 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 	it("fails closed on unresolved, since a boolean cannot carry a third answer", function()
 		local controller = setup()
-		controller.maid:GiveTask(controller.accessDataService:RegisterFact(AccessFact.new("pending", {
-			resolve = function()
-				return nil
-			end,
-		})))
 		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFeature(AccessFeature.anyOf("chapters", { "pending" }))
+			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("pending", {
+				resolve = function()
+					return nil
+				end,
+			})))
+		)
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFeature(
+				controller.maid:Add(AccessFeature.anyOf("chapters", { "pending" }))
+			)
 		)
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)

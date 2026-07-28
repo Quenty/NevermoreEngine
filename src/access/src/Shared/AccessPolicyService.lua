@@ -82,12 +82,14 @@ end
 function AccessPolicyService._registerBuiltInPolicies(self: AccessPolicyService): ()
 	self._maid:GiveTask(
 		self:RegisterPolicy(
-			AccessKickPolicy.whenFactIs(
-				self._serviceBag,
-				AccessPolicyNames.KICK_ON_NON_ADMIN,
-				AccessFactNames.PLAYER_IS_ADMIN,
-				false,
-				{ message = "This place is currently limited to the development team." }
+			self._maid:Add(
+				AccessKickPolicy.whenFactIs(
+					self._serviceBag,
+					AccessPolicyNames.KICK_ON_NON_ADMIN,
+					AccessFactNames.PLAYER_IS_ADMIN,
+					false,
+					{ message = "This place is currently limited to the development team." }
+				)
 			)
 		)
 	)
@@ -110,6 +112,9 @@ end
 
 --[=[
 	Registers a policy, disabled.
+
+	Registering does not take ownership. A policy has a lifetime of its own, so give it to a maid at the
+	point you make it and the disposer to a maid too.
 
 	@param policy AccessPolicy
 	@return () -> () -- Removes the policy

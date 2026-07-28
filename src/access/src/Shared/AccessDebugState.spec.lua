@@ -48,13 +48,14 @@ end
 
 describe("AccessFact.GetDebugState", function()
 	it("reports the things that decide a merge", function()
-		local fact = AccessFact.new("isStaff", {
+		local maid = Maid.new()
+		local fact = maid:Add(AccessFact.new("isStaff", {
 			resolve = function()
 				return nil
 			end,
 			priority = AccessFactPriority.ELEVATED,
 			source = "allowlist",
-		})
+		}))
 
 		expect(fact:GetDebugState()).toEqual({
 			factName = "isStaff",
@@ -62,30 +63,35 @@ describe("AccessFact.GetDebugState", function()
 			source = "allowlist",
 			serverOverrideBehavior = AccessFactServerOverrideBehavior.DEFAULT,
 		})
+
+		maid:DoCleaning()
 	end)
 end)
 
 describe("AccessFeature.GetDebugState", function()
 	it("includes facts pushed on after the feature was written", function()
 		-- Reading the source of a feature is no longer enough to know what it reads.
-		local feature = AccessFeature.anyOf("shop", { "ownsGame" })
-		feature:PushFactAllowsFeature(AccessFact.new("isStaff", {
+		local maid = Maid.new()
+		local feature = maid:Add(AccessFeature.anyOf("shop", { "ownsGame" }))
+		maid:GiveTask(feature:PushFactAllowsFeature(maid:Add(AccessFact.new("isStaff", {
 			resolve = function()
 				return nil
 			end,
-		}))
+		}))))
 
 		local state = feature:GetDebugState()
 		expect(state.featureName).toEqual("shop")
 		expect(#state.facts).toEqual(2)
+
+		maid:DoCleaning()
 	end)
 end)
 
 describe("AccessPolicy.GetDebugState", function()
 	it("says where a policy runs and what it reads", function()
 		local controller = setup()
-		local feature = AccessFeature.anyOf("shop", {})
-		local policy = AccessPolicy.new(controller.serviceBag, {
+		local feature = controller.maid:Add(AccessFeature.anyOf("shop", {}))
+		local policy = controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
 			policyName = "closeShop",
 			facts = { "isStaff" },
 			features = { feature },
@@ -93,7 +99,7 @@ describe("AccessPolicy.GetDebugState", function()
 			apply = function()
 				return nil
 			end,
-		})
+		}))
 
 		expect(policy:GetDebugState()).toEqual({
 			policyName = "closeShop",
@@ -120,13 +126,15 @@ describe("AccessDataService.GetDebugState", function()
 	it("shows a second layer once one is added", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFact(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
-				resolve = function()
-					return nil
-				end,
-				priority = AccessFactPriority.ELEVATED,
-				source = "gameAllowlist",
-			}))
+			controller.accessDataService:RegisterFact(
+				controller.maid:Add(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
+					resolve = function()
+						return nil
+					end,
+					priority = AccessFactPriority.ELEVATED,
+					source = "gameAllowlist",
+				}))
+			)
 		)
 
 		local state = controller.accessDataService:GetDebugState()

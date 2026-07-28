@@ -41,11 +41,11 @@ local function setup()
 		-- Registers a fact the test drives, and pushes it onto owns-game as another way in.
 		pushGrant = function(factName: string, initial: boolean?)
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(factName, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
 				end,
-			})))
+			}))))
 			maid:GiveTask(ownsGame:PushFactAllowsFeature(accessDataService:GetFactLayers(factName)[1]))
 			return valueObject
 		end,
@@ -156,11 +156,13 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 	it("narrows again when the push is disposed", function()
 		local controller = setup()
 		local valueObject = controller.maid:Add(ValueObject.new(true :: boolean?)) :: any
-		controller.maid:GiveTask(controller.accessDataService:RegisterFact(AccessFact.new("ownsGamePass", {
-			resolve = function()
-				return valueObject
-			end,
-		})))
+		controller.maid:GiveTask(
+			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("ownsGamePass", {
+				resolve = function()
+					return valueObject
+				end,
+			})))
+		)
 
 		local remove =
 			controller.ownsGame:PushFactAllowsFeature(controller.accessDataService:GetFactLayers("ownsGamePass")[1])

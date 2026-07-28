@@ -6,15 +6,15 @@
 	staff" is another. Bind them at the registration site, where both halves read in a line:
 
 	```lua
-	accessPolicyService:RegisterPolicy(
-		AccessKickPolicy.whenFactIs(serviceBag, "kick-on-non-admin", AccessFactNames.PLAYER_IS_ADMIN, false, {
+	maid:GiveTask(accessPolicyService:RegisterPolicy(
+		maid:Add(AccessKickPolicy.whenFactIs(serviceBag, "kick-on-non-admin", AccessFactNames.PLAYER_IS_ADMIN, false, {
 			message = "This place is currently limited to the development team.",
-		})
-	)
+		}))
+	))
 
-	accessPolicyService:RegisterPolicy(
-		AccessKickPolicy.whenFeatureDisallowed(serviceBag, "kick-without-chapter-access", MyFeatures.Chapters)
-	)
+	maid:GiveTask(accessPolicyService:RegisterPolicy(
+		maid:Add(AccessKickPolicy.whenFeatureDisallowed(serviceBag, "kick-without-chapter-access", MyFeatures.Chapters))
+	))
 	```
 
 	GOTCHA, and the reason this is a class rather than a pattern to copy: **a kick never fires on an

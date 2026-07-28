@@ -49,12 +49,12 @@ local function setup()
 		end,
 		localFact = function(factName: string, initial: boolean?, behavior: string?)
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(factName, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
 				end,
 				serverOverrideBehavior = behavior,
-			})))
+			}))))
 			return valueObject
 		end,
 		report = function(player: Player, factName: string): any
@@ -217,7 +217,7 @@ describe("AccessDataService.SetServerFactValue", function()
 		local controller = setup()
 		controller.localFact("serverOnly", nil)
 
-		local feature = AccessFeature.anyOf("chapters", { "serverOnly" })
+		local feature = controller.maid:Add(AccessFeature.anyOf("chapters", { "serverOnly" }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		local player = controller.fakePlayer()
@@ -258,7 +258,7 @@ describe("facts the client cannot compute at all", function()
 		local controller = setup()
 		controller.localFact("entitled", nil)
 
-		local feature = AccessFeature.anyOf("chapter2", { "entitled" })
+		local feature = controller.maid:Add(AccessFeature.anyOf("chapter2", { "entitled" }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		local player = controller.fakePlayer()
@@ -282,7 +282,7 @@ describe("facts the client cannot compute at all", function()
 		-- here only as a replicated value.
 		local controller = setup()
 
-		local feature = AccessFeature.anyOf("chapter2", { "serverOnlyEntitlement" })
+		local feature = controller.maid:Add(AccessFeature.anyOf("chapter2", { "serverOnlyEntitlement" }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		local player = controller.fakePlayer()
@@ -310,6 +310,104 @@ describe("facts the client cannot compute at all", function()
 		controller.accessDataService:SetServerFactValue(player, "ownsGame", false)
 
 		expect(controller.report(player, "ownsGame").value).toEqual(true)
+
+		controller:destroy()
+	end)
+end)
+
+describe("AccessDataService.SetReplicatedFeatureFactNames", function()
+	--[[
+		A fact's value replicates per player; which facts a feature reads is game-wide. A game that widens a
+		feature only on the server would otherwise leave the client gating on the narrower rule -- the two
+		realms reaching different verdicts, which is the failure this package exists to prevent.
+	]]
+	local function registerFeature(controller: any, featureName: string, factNames: { string })
+		local feature = controller.maid:Add(AccessFeature.anyOf(featureName, factNames))
+		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		return feature
+	end
+
+	it("widens a feature this realm never pushed onto", function()
+		local controller = setup()
+		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+
+		controller.accessDataService:SetReplicatedFeatureFactNames({
+			chapters = { "ownsGame", "gamePass" },
+		})
+
+		expect(feature:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
+
+		controller:destroy()
+	end)
+
+	it("carries a verdict through the fact it was told about", function()
+		-- The point of being told at all: the client has no resolver for the pushed fact, so its answer
+		-- can only come from the per-player replication.
+		local controller = setup()
+		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		controller.localFact("ownsGame", false)
+
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame", "gamePass" } })
+
+		local player = controller.fakePlayer()
+		local last = nil
+		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
+			last = state
+		end))
+
+		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+
+		controller.accessDataService:SetServerFactValue(player, "gamePass", true)
+
+		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("applies to a feature registered after the payload arrived", function()
+		-- Registration order is not ours to control, and either signal may land first.
+		local controller = setup()
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "gamePass" } })
+
+		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+
+		expect(feature:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
+
+		controller:destroy()
+	end)
+
+	it("takes back a fact the server stops naming", function()
+		local controller = setup()
+		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame", "gamePass" } })
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame" } })
+
+		expect(feature:GetFactNames()).toEqual({ "ownsGame" })
+
+		controller:destroy()
+	end)
+
+	it("never takes back a fact this realm pushed itself", function()
+		-- Replication widens a feature here, it does not own it. A game that pushed in shared code keeps
+		-- its grant whatever the server happens to be saying.
+		local controller = setup()
+		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		controller.maid:GiveTask(feature:PushFactNameAllowsFeature("staffAllowlist"))
+
+		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame" } })
+
+		expect(feature:GetFactNames()).toEqual({ "ownsGame", "staffAllowlist" })
+
+		controller:destroy()
+	end)
+
+	it("ignores a feature this realm does not have", function()
+		local controller = setup()
+
+		expect(function()
+			controller.accessDataService:SetReplicatedFeatureFactNames({ neverRegistered = { "gamePass" } })
+		end).never.toThrow()
 
 		controller:destroy()
 	end)

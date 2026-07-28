@@ -77,7 +77,7 @@ describe("PlayerIsAdminAccessFact", function()
 			source = "gameAllowlist",
 		}))
 
-		local feature = AccessFeature.anyOf("staffTools", { AccessFactNames.PLAYER_IS_ADMIN })
+		local feature = controller.maid:Add(AccessFeature.anyOf("staffTools", { AccessFactNames.PLAYER_IS_ADMIN }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		local last = nil

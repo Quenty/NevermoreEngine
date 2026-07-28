@@ -27,6 +27,7 @@ local function setup()
 	local accessService = serviceBag:GetService(AccessService) :: any
 
 	return {
+		maid = maid,
 		serviceBag = serviceBag,
 		accessService = accessService,
 		destroy = function(_self)
@@ -64,7 +65,7 @@ describe("AccessService", function()
 		controller.serviceBag:Init()
 
 		local accessDataService = controller.accessService:GetAccessDataService()
-		accessDataService:RegisterFeature(AccessFeature.alwaysAllowed("hub"))
+		accessDataService:RegisterFeature(controller.maid:Add(AccessFeature.alwaysAllowed("hub")))
 
 		expect(accessDataService:GetFeatureNames()).toEqual({ "hub", WellKnownAccessFeatureNames.OWNS_GAME })
 

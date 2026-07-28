@@ -39,11 +39,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local AccessStateUtils = require("AccessStateUtils")
+local BaseObject = require("BaseObject")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local ValueObject = require("ValueObject")
 
-local AccessFeature = {}
+local AccessFeature = setmetatable({}, BaseObject)
 AccessFeature.ClassName = "AccessFeature"
 AccessFeature.__index = AccessFeature
 
@@ -61,16 +62,18 @@ export type AccessFeatureOptions = {
 	observeCompute: AccessFeatureCompute,
 }
 
-export type AccessFeature = typeof(setmetatable(
-	{} :: {
-		_featureName: string,
-		-- Typed loosely on purpose: naming the generic here makes every type that holds an AccessFeature
-		-- fail to unify with itself under the old solver, and the cascade reaches half the package.
-		_factNames: any,
-		_compute: AccessFeatureCompute,
-	},
-	{} :: typeof({ __index = AccessFeature })
-))
+export type AccessFeature =
+	typeof(setmetatable(
+		{} :: {
+			_featureName: string,
+			-- Typed loosely on purpose: naming the generic here makes every type that holds an AccessFeature
+			-- fail to unify with itself under the old solver, and the cascade reaches half the package.
+			_factNames: any,
+			_compute: AccessFeatureCompute,
+		},
+		{} :: typeof({ __index = AccessFeature })
+	))
+	& BaseObject.BaseObject
 
 --[=[
 	@param featureName string
@@ -83,10 +86,10 @@ function AccessFeature.new(featureName: string, options: AccessFeatureOptions): 
 	assert(type(options.facts) == "table", "Bad options.facts")
 	assert(type(options.observeCompute) == "function", "Bad options.observeCompute")
 
-	local self: AccessFeature = setmetatable({} :: any, AccessFeature)
+	local self: AccessFeature = setmetatable(BaseObject.new() :: any, AccessFeature)
 
 	self._featureName = featureName
-	self._factNames = ValueObject.new(table.clone(options.facts))
+	self._factNames = self._maid:Add(ValueObject.new(table.clone(options.facts)))
 	self._compute = options.observeCompute
 
 	return self
@@ -190,13 +193,33 @@ end
 	Pushing is strictly widening: a pushed fact can grant, never deny. Anything else would make "add a way
 	in" able to take one away, which is exactly the sort of surprise this API should not have.
 
+	A push made on the server reaches the client -- [AccessDataService] replicates what each feature reads,
+	and the client widens by name. So this is safe to call from server-only code without the two realms
+	drifting apart on what the feature means.
+
 	@param fact AccessFact
 	@return () -> () -- Removes the fact from this feature
 ]=]
 function AccessFeature.PushFactAllowsFeature(self: AccessFeature, fact: any): () -> ()
 	assert(type(fact) == "table" and type(fact.GetFactName) == "function", "Bad fact")
 
-	local factName = fact:GetFactName()
+	return self:PushFactNameAllowsFeature(fact:GetFactName())
+end
+
+--[=[
+	The same widening by name rather than by object, for a realm that has the name but not the fact.
+
+	This is what server-to-client replication of a push arrives through: the client learns that a fact
+	grants a feature before -- or without ever -- having a resolver for it, and the value comes over the
+	per-player fact replication. Prefer [AccessFeature.PushFactAllowsFeature] anywhere the fact is in hand,
+	because passing the object is what makes it obvious the fact has to exist somewhere.
+
+	@param factName string
+	@return () -> () -- Removes the fact from this feature
+]=]
+function AccessFeature.PushFactNameAllowsFeature(self: AccessFeature, factName: string): () -> ()
+	assert(type(factName) == "string" and factName ~= "", "Bad factName")
+
 	local current = self._factNames.Value
 
 	if table.find(current, factName) then
@@ -217,8 +240,15 @@ function AccessFeature.PushFactAllowsFeature(self: AccessFeature, fact: any): ()
 		end
 		removed = true
 
+		local names = self._factNames.Value
+		if not names then
+			-- Teardown order is not ours to control: one maid may hold both this remover and the feature,
+			-- and taking a fact off a feature that is already gone is a no-op, not an error.
+			return
+		end
+
 		local without = {}
-		for _, name in self._factNames.Value do
+		for _, name in names do
 			if name ~= factName then
 				table.insert(without, name)
 			end

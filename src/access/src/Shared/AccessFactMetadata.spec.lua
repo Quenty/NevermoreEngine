@@ -39,13 +39,13 @@ local function setup()
 		end,
 		attributedFact = function(factName: string, initial: any, options: { priority: number?, source: string? }?)
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(factName, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
 				end,
 				priority = if options then options.priority else nil,
 				source = if options then options.source else nil,
-			})))
+			}))))
 			return valueObject
 		end,
 		report = function(player: Player, factName: string): any
@@ -139,7 +139,7 @@ describe("AccessFact.contribution", function()
 		local controller = setup()
 		controller.attributedFact("ownsGamePass", AccessFact.contribution(true, { gamePassId = 12345 }))
 
-		local feature = AccessFeature.anyOf("shop", { "ownsGamePass" })
+		local feature = controller.maid:Add(AccessFeature.anyOf("shop", { "ownsGamePass" }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "shop")).toEqual(true)

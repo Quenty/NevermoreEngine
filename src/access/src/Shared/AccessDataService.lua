@@ -52,6 +52,7 @@ local AccessFeature = require("AccessFeature")
 local AccessReplicationState = require("AccessReplicationState")
 local AccessReplicationStateUtils = require("AccessReplicationStateUtils")
 local AccessStateUtils = require("AccessStateUtils")
+local JSONAttributeValue = require("JSONAttributeValue")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
@@ -140,6 +141,7 @@ type OverrideState = { [string]: OverrideBox }
 local EMPTY_OVERRIDE_STATE: OverrideState = {}
 local OVERRIDE_SOURCE = "override"
 local REPLICATED_SOURCE = "replicated"
+local FEATURE_FACT_NAMES_ATTRIBUTE = "AccessFeatureFactNames"
 
 local AccessDataService = {}
 AccessDataService.ServiceName = "AccessDataService"
@@ -164,6 +166,11 @@ export type AccessDataService = typeof(setmetatable(
 		_warnedMissingFacts: { [string]: boolean },
 		-- What the server said, per player, per fact. Empty on the server itself.
 		_serverValuesByPlayer: { [any]: any },
+		-- The fact names the server says each feature reads. Empty on the server itself.
+		_replicatedFeatureFactNames: { [string]: { string } },
+		-- Removers for the pushes this realm made on the server's behalf, so reconciling can take back
+		-- exactly what it added and nothing a game pushed itself.
+		_pushedFeatureFactRemovers: { [string]: { [string]: () -> () } },
 	},
 	{} :: typeof({ __index = AccessDataService })
 ))
@@ -181,6 +188,8 @@ function AccessDataService.Init(self: AccessDataService, serviceBag: ServiceBag.
 	self._presenceByPlayer = setmetatable({}, { __mode = "k" }) :: any
 	self._warnedMissingFacts = {}
 	self._serverValuesByPlayer = setmetatable({}, { __mode = "k" }) :: any
+	self._replicatedFeatureFactNames = {}
+	self._pushedFeatureFactRemovers = {}
 
 	self:_registerBuiltInFacts()
 end
@@ -190,13 +199,15 @@ end
 	existing. All at AccessFactPriority.BUILT_IN, so a game that disagrees layers over them.
 ]]
 function AccessDataService._registerBuiltInFacts(self: AccessDataService): ()
-	self._maid:GiveTask(self:RegisterFact(PlayerIsAdminAccessFact.new(self._serviceBag)))
-	self._maid:GiveTask(self:RegisterFact(OwnsGameAccessFact.new(self._serviceBag)))
+	self._maid:GiveTask(self:RegisterFact(self._maid:Add(PlayerIsAdminAccessFact.new(self._serviceBag))))
+	self._maid:GiveTask(self:RegisterFact(self._maid:Add(OwnsGameAccessFact.new(self._serviceBag))))
 
 	-- Ships reading only the purchase. A game widens it with PushFactAllowsFeature rather than replacing
 	-- it, so anything already gating on owns-game picks the new ways in up.
 	self._maid:GiveTask(
-		self:RegisterFeature(AccessFeature.anyOf(WellKnownAccessFeatureNames.OWNS_GAME, { AccessFactNames.OWNS_GAME }))
+		self:RegisterFeature(
+			self._maid:Add(AccessFeature.anyOf(WellKnownAccessFeatureNames.OWNS_GAME, { AccessFactNames.OWNS_GAME }))
+		)
 	)
 end
 
@@ -206,6 +217,118 @@ function AccessDataService.Start(self: AccessDataService): ()
 	local tieRealm = self._tieRealmService:GetTieRealm()
 
 	self._maid:GiveTask(AccessDataServiceInterface:Implement(ReplicatedStorage, self:_buildTieImplementer(), tieRealm))
+
+	-- Reconciles in either realm on a registry change: the payload is empty on the server, so this costs
+	-- nothing there, and on the client a feature registered after the payload landed still picks up its
+	-- pushes. Either signal may arrive first and neither order is ours to control.
+	self._maid:GiveTask(self._features:ObserveKeyList():Subscribe(function()
+		self:_reconcileReplicatedFeatureFacts()
+	end))
+
+	if RunService:IsServer() then
+		self:_replicateFeatureFactNames()
+	else
+		self:_consumeReplicatedFeatureFactNames()
+	end
+end
+
+--[[
+	Publishes what every registered feature reads, so a push made only on the server reaches the client.
+
+	A fact's *value* replicates per player; which facts a feature reads is game-wide, so it goes on
+	ReplicatedStorage rather than on a Player. Rebuilt wholesale rather than diffed: there are few
+	features, and a half-applied composition would have a client gating on a rule the server does not have.
+]]
+function AccessDataService._replicateFeatureFactNames(self: AccessDataService): ()
+	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, FEATURE_FACT_NAMES_ATTRIBUTE, {})
+
+	local function publish()
+		local payload = {}
+		for _, featureName in self:GetFeatureNames() do
+			local feature = self._features:Get(featureName)
+			if feature then
+				payload[featureName] = feature:GetFactNames()
+			end
+		end
+
+		replicated.Value = payload
+	end
+
+	self._maid:GiveTask(self._features:ObserveKeyList():Subscribe(function(featureNames: { string })
+		local maid = Maid.new()
+
+		for _, featureName in featureNames do
+			local feature = self._features:Get(featureName)
+			if feature then
+				maid:GiveTask(feature:ObserveFactNames():Subscribe(publish))
+			end
+		end
+
+		self._maid._featureFactNamesMaid = maid
+	end))
+end
+
+function AccessDataService._consumeReplicatedFeatureFactNames(self: AccessDataService): ()
+	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, FEATURE_FACT_NAMES_ATTRIBUTE, {})
+
+	self._maid:GiveTask(replicated:Observe():Subscribe(function(payload: any)
+		self:SetReplicatedFeatureFactNames(payload or {})
+	end))
+end
+
+--[=[
+	Applies what the server says each feature reads. The entry point the client's replication arrives
+	through, and the seam a test drives directly.
+
+	Facts named here need no resolver in this realm -- an unregistered fact reads as unresolved locally and
+	takes its answer from the per-player replication, which is the whole point of being told about it.
+
+	@param payload { [string]: { string } }
+]=]
+function AccessDataService.SetReplicatedFeatureFactNames(self: AccessDataService, payload: { [string]: { string } }): ()
+	assert(type(payload) == "table", "Bad payload")
+
+	self._replicatedFeatureFactNames = payload
+	self:_reconcileReplicatedFeatureFacts()
+end
+
+--[[
+	Only ever takes back its own pushes. A game that pushed a fact onto a feature in shared code keeps it,
+	whatever the server happens to be saying -- replication widens a feature here, it does not own it.
+]]
+function AccessDataService._reconcileReplicatedFeatureFacts(self: AccessDataService): ()
+	local payload = self._replicatedFeatureFactNames
+
+	for featureName, pushed in self._pushedFeatureFactRemovers do
+		local wanted = payload[featureName]
+
+		for factName, remove in pushed do
+			if not (wanted and table.find(wanted, factName)) then
+				pushed[factName] = nil
+				remove()
+			end
+		end
+	end
+
+	for featureName, factNames in payload do
+		local feature = self._features:Get(featureName)
+		if not feature then
+			continue
+		end
+
+		local pushed = self._pushedFeatureFactRemovers[featureName]
+		if not pushed then
+			pushed = {}
+			self._pushedFeatureFactRemovers[featureName] = pushed
+		end
+
+		local already = feature:GetFactNames()
+		for _, factName in factNames do
+			if not pushed[factName] and not table.find(already, factName) then
+				pushed[factName] = feature:PushFactNameAllowsFeature(factName)
+			end
+		end
+	end
 end
 
 --[[
@@ -440,6 +563,9 @@ end
 	winner depend on registration order, and equal sources would leave a readout unable to say which layer
 	decided -- both are refused at registration rather than discovered while someone is complaining.
 
+	Registering does not take ownership. A fact has a lifetime of its own, so give it to a maid at the
+	point you make it and the disposer to a maid too.
+
 	@param fact AccessFact
 	@return () -> () -- Removes the layer
 ]=]
@@ -505,10 +631,13 @@ end
 	owns which realm has the fact, and a server-only call leaves the client with a fact that never
 	resolves, which stalls every feature declaring it.
 
+	Unlike [AccessDataService.RegisterFact], the returned disposer also destroys the fact: it is made here
+	and never handed out, so there is no call site that could own it.
+
 	@param factName string
 	@param value ValueObject.Mountable<boolean?>
 	@param options AccessFactOptions?
-	@return () -> () -- Removes the layer
+	@return () -> () -- Removes the layer and destroys the fact
 ]=]
 function AccessDataService.AddAccessFact(
 	self: AccessDataService,
@@ -519,7 +648,13 @@ function AccessDataService.AddAccessFact(
 	local merged: AccessFact.AccessFactOptions = if options then table.clone(options) else {}
 	merged.value = value
 
-	return self:RegisterFact(AccessFact.new(factName, merged))
+	local fact = AccessFact.new(factName, merged)
+	local unregister = self:RegisterFact(fact)
+
+	return function()
+		unregister()
+		fact:Destroy()
+	end
 end
 
 --[=[

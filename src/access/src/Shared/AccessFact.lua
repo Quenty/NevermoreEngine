@@ -8,16 +8,19 @@
 
 	```lua
 	-- Per-player: a resolver, run once per player and shared between every consumer.
-	AccessFact.new("ownsFullAccessPass", {
+	maid:Add(AccessFact.new("ownsFullAccessPass", {
 		resolve = function(serviceBag, player)
 			return serviceBag:GetService(GameProductDataService)
 				:ObservePlayerOwnership(player, GameConfigAssetTypes.PASS, FULL_ACCESS_GAME_PASS_KEY)
 		end,
-	})
+	}))
 
 	-- Game-wide: one [ValueObject.Mountable] every player reads the same answer from.
-	AccessFact.new("eventIsRunning", { value = eventRunningValueObject })
+	maid:Add(AccessFact.new("eventIsRunning", { value = eventRunningValueObject }))
 	```
+
+	A fact has a lifetime -- it holds a shared observable per player -- so give it to a maid where you make
+	it. Registering it does not take ownership.
 
 	Several layers may answer the same fact -- a group rank and an allowlist both saying whether someone is
 	staff. Each declares an [AccessFactPriority], and the highest layer that *contributes* decides. Return

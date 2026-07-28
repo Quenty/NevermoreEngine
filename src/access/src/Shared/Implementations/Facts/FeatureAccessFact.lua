@@ -4,10 +4,10 @@
 
 	```lua
 	-- "may enter a chapter" becomes one of the ways "may see the shop" is granted
-	local chaptersFact = FeatureAccessFact.new("allowedChapters", Chapters)
+	local chaptersFact = maid:Add(FeatureAccessFact.new("allowedChapters", Chapters))
 
-	accessDataService:RegisterFact(chaptersFact)
-	shop:PushFactAllowsFeature(chaptersFact)
+	maid:GiveTask(accessDataService:RegisterFact(chaptersFact))
+	maid:GiveTask(shop:PushFactAllowsFeature(chaptersFact))
 	```
 
 	Features do not read other features directly, on purpose. Facts are already the one currency

@@ -4,7 +4,7 @@
 	and a policy is the consequence -- kicking, teleporting, closing a door.
 
 	```lua
-	AccessPolicy.new(serviceBag, {
+	maid:Add(AccessPolicy.new(serviceBag, {
 		policyName = "kickOnNonAdmin",
 		facts = { AccessFactNames.PLAYER_IS_ADMIN },
 		apply = function(context)
@@ -14,8 +14,10 @@
 				end
 			end)
 		end,
-	})
+	}))
 	```
+
+	A policy has a lifetime, so give it to a maid where you make it. Registering it does not take ownership.
 
 	A policy declares what it reads, the same way a feature does, and its context only hands back what it
 	declared. That is why policies may read facts directly when ordinary call sites may not: a policy is a
@@ -79,7 +81,9 @@ export type AccessPolicy =
 		{} :: {
 			_policyName: string,
 			_factNames: { string },
-			_features: { AccessFeature.AccessFeature },
+			-- Loosely typed for the same reason AccessDataService's fact layers are: an array of a
+			-- BaseObject-derived class does not unify with itself under the old solver.
+			_features: any,
 			_apply: AccessPolicyApply,
 			_realm: string,
 			_serviceBag: ServiceBag.ServiceBag,

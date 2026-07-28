@@ -116,6 +116,15 @@ Everything already gating on `owns-game` picks these up, including subscriptions
 push. Pushing only ever widens — a pushed fact can grant, never deny — so "add a way in" can't take one
 away.
 
+A push made only on the server reaches the client. A fact's *value* replicates per player, on the player
+instance; which facts a feature reads is game-wide, so it replicates on its own. The client widens the
+feature by name and takes the value from the per-player replication, so a fact it has no resolver for
+still grants. This is what stops a server-side push leaving the client gating on the narrower rule —
+the two realms reaching different verdicts is exactly what this package exists to prevent.
+
+Replication widens a feature on the client, it does not own it: a fact pushed there in shared code is
+never taken back, whatever the server is saying.
+
 ## What you can't do
 
 There is no `ObserveFact`. Facts are addressable so they can be inspected and overridden, but you cannot

@@ -42,19 +42,21 @@ end)
 
 describe("AccessFeature.GetFactNames", function()
 	it("hands back a copy, so a caller cannot widen what the feature depends on", function()
-		local feature = AccessFeature.anyOf("thing", { "a" })
+		local maid = Maid.new()
+		local feature = maid:Add(AccessFeature.anyOf("thing", { "a" }))
 
 		local names = feature:GetFactNames()
 		table.insert(names, "sneakilyAdded")
 
 		expect(feature:GetFactNames()).toEqual({ "a" })
+		maid:DoCleaning()
 	end)
 end)
 
 describe("AccessFeature.anyOf", function()
 	it("allows when a declared fact is true", function()
 		local maid = Maid.new()
-		local feature = AccessFeature.anyOf("thing", { "a", "b" })
+		local feature = maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
 
 		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, b = ALLOW }) :: any), maid)
 
@@ -64,7 +66,7 @@ describe("AccessFeature.anyOf", function()
 
 	it("stays unresolved while a declared fact is unanswered", function()
 		local maid = Maid.new()
-		local feature = AccessFeature.anyOf("thing", { "a", "b" })
+		local feature = maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
 
 		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY }) :: any), maid)
 
@@ -74,7 +76,7 @@ describe("AccessFeature.anyOf", function()
 
 	it("is unaffected by a fact it did not declare", function()
 		local maid = Maid.new()
-		local feature = AccessFeature.anyOf("thing", { "a" })
+		local feature = maid:Add(AccessFeature.anyOf("thing", { "a" }))
 
 		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, unrelated = ALLOW }) :: any), maid)
 
@@ -86,7 +88,7 @@ end)
 describe("AccessFeature.alwaysAllowed", function()
 	it("allows without reading any fact", function()
 		local maid = Maid.new()
-		local feature = AccessFeature.alwaysAllowed("hub")
+		local feature = maid:Add(AccessFeature.alwaysAllowed("hub"))
 
 		expect(feature:GetFactNames()).toEqual({})
 		expect(AccessStateUtils.isAllowed(lastState(feature:ObserveCompute(Rx.of({}) :: any), maid) :: any)).toEqual(
@@ -102,13 +104,13 @@ describe("AccessFeature.ObserveCompute", function()
 		local maid = Maid.new()
 		local seen = nil
 
-		local feature = AccessFeature.new("eggPurchase", {
+		local feature = maid:Add(AccessFeature.new("eggPurchase", {
 			facts = {},
 			observeCompute = function(_observeFacts, subject)
 				seen = subject
 				return Rx.of(AccessStateUtils.allowed()) :: any
 			end,
-		})
+		}))
 
 		lastState(feature:ObserveCompute(Rx.of({}) :: any, "blueEgg"), maid)
 
@@ -121,7 +123,7 @@ describe("AccessFeature.ObserveCompute", function()
 		-- it has been collected are per-egg, not per-player, so they are not facts.
 		local maid = Maid.new()
 
-		local feature = AccessFeature.new("eggPurchase", {
+		local feature = maid:Add(AccessFeature.new("eggPurchase", {
 			facts = { "ownsGame" },
 			observeCompute = function(observeFacts: any): any
 				return Rx.combineLatest({
@@ -137,7 +139,7 @@ describe("AccessFeature.ObserveCompute", function()
 					end) :: any,
 				}) :: any
 			end,
-		})
+		}))
 
 		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = ALLOW }) :: any), maid)
 
@@ -146,15 +148,17 @@ describe("AccessFeature.ObserveCompute", function()
 	end)
 
 	it("refuses a observeCompute that returns a verdict instead of an observable", function()
-		local feature = AccessFeature.new("thing", {
+		local maid = Maid.new()
+		local feature = maid:Add(AccessFeature.new("thing", {
 			facts = {},
 			observeCompute = function()
 				return AccessStateUtils.allowed() :: any
 			end,
-		})
+		}))
 
 		expect(function()
 			feature:ObserveCompute(Rx.of({}) :: any)
 		end).toThrow("must return an Observable")
+		maid:DoCleaning()
 	end)
 end)

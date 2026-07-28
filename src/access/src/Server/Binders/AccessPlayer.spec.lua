@@ -53,13 +53,13 @@ local function makeController()
 			featureCounter += 1
 			local featureName = `{rawName}{featureCounter}`
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(`{featureName}Fact`, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(`{featureName}Fact`, {
 				resolve = function()
 					return valueObject
 				end,
-			})))
+			}))))
 
-			local feature = AccessFeature.anyOf(featureName, { `{featureName}Fact` })
+			local feature = maid:Add(AccessFeature.anyOf(featureName, { `{featureName}Fact` }))
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 
 			return feature, valueObject

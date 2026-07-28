@@ -51,8 +51,8 @@ local function setup()
 	}
 end
 
-local function countingPolicy(serviceBag: any, policyName: string, applied: { n: number })
-	return AccessPolicy.new(serviceBag, {
+local function countingPolicy(controller: any, policyName: string, applied: { n: number })
+	return controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
 		policyName = policyName,
 		apply = function()
 			applied.n += 1
@@ -61,7 +61,7 @@ local function countingPolicy(serviceBag: any, policyName: string, applied: { n:
 				applied.n -= 1
 			end
 		end,
-	})
+	}))
 end
 
 describe("AccessPolicyService.RegisterPolicy", function()
@@ -70,7 +70,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 		local applied = { n = 0 }
 
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", applied))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied))
 		)
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
 
@@ -83,7 +83,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 	it("lists a disabled policy anyway, so it can be discovered", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 
 		expect(controller.accessPolicyService:GetPolicyNames()).toEqual({ AccessPolicyNames.KICK_ON_NON_ADMIN, "noop" })
@@ -94,11 +94,11 @@ describe("AccessPolicyService.RegisterPolicy", function()
 	it("refuses two policies under one name", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 
 		expect(function()
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		end).toThrow("already registered")
 
 		controller:destroy()
@@ -121,7 +121,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		local applied = { n = 0 }
 
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", applied))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied))
 		)
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
@@ -138,7 +138,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		local applied = { n = 0 }
 
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", applied))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied))
 		)
 		controller.accessPolicyService:SetPolicyEnabled("noop", true)
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
@@ -153,7 +153,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		local applied = { n = 0 }
 
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", applied))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied))
 		)
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
 		controller.accessPolicyService:SetPolicyEnabled("noop", true)
@@ -170,7 +170,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		local applied = { n = 0 }
 
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", applied))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", applied))
 		)
 		local player = controller.fakePlayer()
 		controller.accessPolicyService:AddPlayer(player)
@@ -187,12 +187,8 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		local controller = setup()
 		local a, b = { n = 0 }, { n = 0 }
 
-		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "a", a))
-		)
-		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "b", b))
-		)
+		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "a", a)))
+		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "b", b)))
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
 		controller.accessPolicyService:SetPolicyEnabled("a", true)
 		controller.accessPolicyService:SetPolicyEnabled("b", true)
@@ -211,12 +207,14 @@ describe("AccessPolicy declarations", function()
 		-- The declaration in a readout has to be the whole truth about a policy's inputs.
 		local controller = setup()
 
-		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(AccessPolicy.new(controller.serviceBag, {
-			policyName = "sneaky",
-			apply = function(context)
-				return context.observeFact(AccessFactNames.PLAYER_IS_ADMIN):Subscribe(function() end)
-			end,
-		})))
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
+				policyName = "sneaky",
+				apply = function(context)
+					return context.observeFact(AccessFactNames.PLAYER_IS_ADMIN):Subscribe(function() end)
+				end,
+			})))
+		)
 		controller.accessPolicyService:AddPlayer(controller.fakePlayer())
 
 		expect(function()
@@ -233,7 +231,14 @@ describe("AccessKickPolicy.whenFactIs", function()
 	local function armed(controller: any)
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(
-				AccessKickPolicy.whenFactIs(controller.serviceBag, POLICY_NAME, AccessFactNames.PLAYER_IS_ADMIN, false)
+				controller.maid:Add(
+					AccessKickPolicy.whenFactIs(
+						controller.serviceBag,
+						POLICY_NAME,
+						AccessFactNames.PLAYER_IS_ADMIN,
+						false
+					)
+				)
 			)
 		)
 		controller.accessPolicyService:SetPolicyEnabled(POLICY_NAME, true)
@@ -301,7 +306,14 @@ describe("AccessKickPolicy.whenFactIs", function()
 		local controller = setup()
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(
-				AccessKickPolicy.whenFactIs(controller.serviceBag, POLICY_NAME, AccessFactNames.PLAYER_IS_ADMIN, false)
+				controller.maid:Add(
+					AccessKickPolicy.whenFactIs(
+						controller.serviceBag,
+						POLICY_NAME,
+						AccessFactNames.PLAYER_IS_ADMIN,
+						false
+					)
+				)
 			)
 		)
 
@@ -318,14 +330,16 @@ describe("AccessKickPolicy.whenFactIs", function()
 		local controller = setup()
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(
-				AccessKickPolicy.whenFactIs(
-					controller.serviceBag,
-					POLICY_NAME,
-					AccessFactNames.PLAYER_IS_ADMIN,
-					false,
-					{
-						message = "staff only",
-					}
+				controller.maid:Add(
+					AccessKickPolicy.whenFactIs(
+						controller.serviceBag,
+						POLICY_NAME,
+						AccessFactNames.PLAYER_IS_ADMIN,
+						false,
+						{
+							message = "staff only",
+						}
+					)
 				)
 			)
 		)
@@ -343,13 +357,15 @@ describe("AccessKickPolicy.whenFactIs", function()
 	it("is outranked by a game's own layer of the same fact", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFact(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
-				resolve = function()
-					return true
-				end,
-				priority = AccessFactPriority.ELEVATED,
-				source = "gameAllowlist",
-			}))
+			controller.accessDataService:RegisterFact(
+				controller.maid:Add(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
+					resolve = function()
+						return true
+					end,
+					priority = AccessFactPriority.ELEVATED,
+					source = "gameAllowlist",
+				}))
+			)
 		)
 		armed(controller)
 
@@ -378,14 +394,14 @@ describe("AccessKickPolicy.whenFeatureDisallowed", function()
 	local function armed(controller: any, feature: any)
 		controller.maid:GiveTask(
 			controller.accessPolicyService:RegisterPolicy(
-				AccessKickPolicy.whenFeatureDisallowed(controller.serviceBag, POLICY_NAME, feature)
+				controller.maid:Add(AccessKickPolicy.whenFeatureDisallowed(controller.serviceBag, POLICY_NAME, feature))
 			)
 		)
 		controller.accessPolicyService:SetPolicyEnabled(POLICY_NAME, true)
 	end
 
 	local function feature(controller: any, factName: string)
-		local built = AccessFeature.anyOf("chapters", { factName })
+		local built = controller.maid:Add(AccessFeature.anyOf("chapters", { factName }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(built))
 		return built
 	end
@@ -450,7 +466,7 @@ describe("AccessPolicyService query API", function()
 	it("tracks a policy being switched on and off, live", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 
 		local last = nil
@@ -494,7 +510,7 @@ describe("AccessPolicyService query API", function()
 
 		local before = #(last :: any)
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 
 		expect(#(last :: any)).toEqual(before + 1)
@@ -516,15 +532,17 @@ describe("AccessPolicyService query API", function()
 
 	it("answers which policies read a feature", function()
 		local controller = setup()
-		local feature = AccessFeature.anyOf("shop", {})
+		local feature = controller.maid:Add(AccessFeature.anyOf("shop", {}))
 
-		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(AccessPolicy.new(controller.serviceBag, {
-			policyName = "watchShop",
-			features = { feature },
-			apply = function()
-				return nil
-			end,
-		})))
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
+				policyName = "watchShop",
+				features = { feature },
+				apply = function()
+					return nil
+				end,
+			})))
+		)
 
 		expect(controller.accessPolicyService:GetPolicyNamesReadingFeature(feature)).toEqual({ "watchShop" })
 
@@ -537,7 +555,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		-- Three things have to be true, and IsPolicyEnabled alone misleads about two of them.
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 		controller.accessPolicyService:SetPolicyEnabled("noop", true)
 
@@ -554,13 +572,15 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 
 	it("is false for a policy that belongs to the other realm", function()
 		local controller = setup()
-		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(AccessPolicy.new(controller.serviceBag, {
-			policyName = "clientOnly",
-			realm = AccessPolicyRealm.CLIENT,
-			apply = function()
-				return nil
-			end,
-		})))
+		controller.maid:GiveTask(
+			controller.accessPolicyService:RegisterPolicy(controller.maid:Add(AccessPolicy.new(controller.serviceBag, {
+				policyName = "clientOnly",
+				realm = AccessPolicyRealm.CLIENT,
+				apply = function()
+					return nil
+				end,
+			})))
+		)
 		controller.accessPolicyService:SetPolicyEnabled("clientOnly", true)
 
 		local player = controller.fakePlayer()
@@ -586,7 +606,7 @@ describe("AccessPolicyService per-player policy queries", function()
 	it("is false while the policy is on but this player is not tracked", function()
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 		controller.accessPolicyService:SetPolicyEnabled("noop", true)
 
@@ -610,7 +630,7 @@ describe("AccessPolicyService per-player policy queries", function()
 		-- "Not yet" is not an outcome worth settling a promise on.
 		local controller = setup()
 		controller.maid:GiveTask(
-			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller.serviceBag, "noop", { n = 0 }))
+			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		)
 
 		local player = controller.fakePlayer()
@@ -634,7 +654,7 @@ describe("AccessPolicy self-query through the tie", function()
 		-- ReplicatedStorage and the test place has several live bags, so Find may resolve another one.
 		-- An untracked player is false in every bag, which is the part that is actually deterministic.
 		local controller = setup()
-		local policy = countingPolicy(controller.serviceBag, "noop", { n = 0 })
+		local policy = countingPolicy(controller, "noop", { n = 0 })
 		controller.maid:GiveTask(controller.accessPolicyService:RegisterPolicy(policy))
 		controller.accessPolicyService:SetPolicyEnabled("noop", true)
 
@@ -649,7 +669,7 @@ describe("AccessPolicy self-query through the tie", function()
 		-- Never registered anywhere, so no service can report it active. Asserted against an untracked
 		-- player because the tie lives on ReplicatedStorage and this place has several live bags.
 		local controller = setup()
-		local policy = countingPolicy(controller.serviceBag, "orphan", { n = 0 })
+		local policy = countingPolicy(controller, "orphan", { n = 0 })
 
 		expect(policy:IsPolicyActiveForPlayer(controller.fakePlayer())).toEqual(false)
 

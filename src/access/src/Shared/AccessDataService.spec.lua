@@ -43,26 +43,26 @@ local function setup()
 			options: { priority: number?, source: string? }?
 		): ValueObject.ValueObject<boolean?>
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(factName, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
 				end,
 				priority = if options then options.priority else nil,
 				source = if options then options.source else nil,
-			})))
+			}))))
 			return valueObject
 		end,
 		abstainingFact = function(factName: string, options: { priority: number, source: string })
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(factName, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return AccessFact.ABSTAIN
 				end,
 				priority = options.priority,
 				source = options.source,
-			})))
+			}))))
 		end,
 		feature = function(featureName: string, factNames: { string }): AccessFeature.AccessFeature
-			local feature = AccessFeature.anyOf(featureName, factNames)
+			local feature = maid:Add(AccessFeature.anyOf(featureName, factNames))
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 			return feature
 		end,
@@ -128,11 +128,11 @@ describe("AccessDataService registration", function()
 	it("unregisters a fact when the registration is disposed", function()
 		local controller = setup()
 
-		local dispose = controller.accessDataService:RegisterFact(AccessFact.new("temporary", {
+		local dispose = controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("temporary", {
 			resolve = function()
 				return true
 			end,
-		}))
+		})))
 		expect(controller.accessDataService:HasFact("temporary")).toEqual(true)
 
 		dispose()
@@ -268,11 +268,11 @@ describe("AccessDataService.ObserveFeature", function()
 		local controller = setup()
 		local byPlayer: { [any]: boolean } = {}
 
-		controller.maid:GiveTask(controller.accessDataService:RegisterFact(AccessFact.new("owns", {
+		controller.maid:GiveTask(controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("owns", {
 			resolve = function(_bag, player)
 				return byPlayer[player] == true
 			end,
-		})))
+		}))))
 		local feature = controller.feature("chapters", { "owns" })
 
 		local allowed = controller.fakePlayer()

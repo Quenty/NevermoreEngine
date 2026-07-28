@@ -35,13 +35,13 @@ local function setup()
 		-- A feature granted by one fact the test drives.
 		featureOn = function(featureName: string, initial: boolean?)
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
-			maid:GiveTask(accessDataService:RegisterFact(AccessFact.new(`{featureName}Fact`, {
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(`{featureName}Fact`, {
 				resolve = function()
 					return valueObject
 				end,
-			})))
+			}))))
 
-			local feature = AccessFeature.anyOf(featureName, { `{featureName}Fact` })
+			local feature = maid:Add(AccessFeature.anyOf(featureName, { `{featureName}Fact` }))
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 
 			return feature, valueObject
@@ -66,10 +66,10 @@ describe("FeatureAccessFact", function()
 		local controller = setup()
 		local chapters, ownsChapters = controller.featureOn("chapters", true)
 
-		local shop = AccessFeature.anyOf("shop", {})
+		local shop = controller.maid:Add(AccessFeature.anyOf("shop", {}))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(shop))
 
-		local asFact = FeatureAccessFact.new("allowedChapters", chapters)
+		local asFact = controller.maid:Add(FeatureAccessFact.new("allowedChapters", chapters))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFact(asFact))
 		controller.maid:GiveTask(shop:PushFactAllowsFeature(asFact))
 
@@ -87,10 +87,10 @@ describe("FeatureAccessFact", function()
 		local controller = setup()
 		local chapters = controller.featureOn("chapters", nil)
 
-		local shop = AccessFeature.anyOf("shop", {})
+		local shop = controller.maid:Add(AccessFeature.anyOf("shop", {}))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(shop))
 
-		local asFact = FeatureAccessFact.new("allowedChapters", chapters)
+		local asFact = controller.maid:Add(FeatureAccessFact.new("allowedChapters", chapters))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFact(asFact))
 		controller.maid:GiveTask(shop:PushFactAllowsFeature(asFact))
 
@@ -104,7 +104,7 @@ describe("FeatureAccessFact", function()
 		local controller = setup()
 		local chapters = controller.featureOn("chapters", true)
 
-		local asFact = FeatureAccessFact.new("allowedChapters", chapters)
+		local asFact = controller.maid:Add(FeatureAccessFact.new("allowedChapters", chapters))
 
 		expect(asFact:GetSource()).toEqual("feature:chapters")
 
@@ -118,7 +118,7 @@ describe("FeatureAccessFact", function()
 		local controller = setup()
 		local chapters = controller.featureOn("chapters", false)
 
-		local asFact = FeatureAccessFact.new("allowedChapters", chapters)
+		local asFact = controller.maid:Add(FeatureAccessFact.new("allowedChapters", chapters))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFact(asFact))
 		controller.maid:GiveTask(chapters:PushFactAllowsFeature(asFact))
 
