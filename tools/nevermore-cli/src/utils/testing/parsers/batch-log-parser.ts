@@ -8,6 +8,12 @@ export interface BatchPackageResult {
   /** Inner pcall execution time reported by the Luau batch runner. */
   durationMs?: number;
   testCounts?: ParsedTestCounts;
+  /**
+   * Luau tracebacks found in this package's section. Reported, not gated on:
+   * jest cannot count these, since a deferred-callback crash fires outside any
+   * test — often after the test that scheduled it already passed.
+   */
+  tracebackCount: number;
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
@@ -55,6 +61,7 @@ export function parseBatchTestLogs(
   let currentSlug: string | null = null;
   let currentLines: string[] = [];
   let summaryLineIndex = -1;
+  let beginMarkersSeen = 0;
 
   // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
   const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
@@ -65,6 +72,7 @@ export function parseBatchTestLogs(
     if (trimmed.startsWith(BEGIN_MARKER) && trimmed.endsWith('===')) {
       currentSlug = trimmed.slice(BEGIN_MARKER.length, -3);
       currentLines = [];
+      beginMarkersSeen++;
       continue;
     }
 
@@ -144,6 +152,19 @@ export function parseBatchTestLogs(
     );
   }
 
+  // The summary is printed last, so it survives a log fetch that dropped the
+  // output above it. Summary present with no sections is exactly that case, and
+  // it is invisible to the check above — the results below would then be built
+  // from pcall exit status alone, knowing nothing about what actually ran.
+  const lostSectionOutput = logSections.size === 0 && summaryResults.size > 0;
+  if (lostSectionOutput) {
+    OutputHelper.warn(
+      `[batch-log-parser] Parsed a summary but found no per-package log sections ` +
+        `(${beginMarkersSeen} BEGIN markers, ${lines.length} lines, ${rawLogs.length} chars). ` +
+        'Test output was lost between the engine and here, so no result below carries test counts.'
+    );
+  }
+
   // ── Pass 3: Combine log sections with summary results ──
 
   // When the batch produced zero output, surface the raw error in every
@@ -173,6 +194,13 @@ export function parseBatchTestLogs(
     }
 
     const testCounts = sectionLogs ? parseTestCounts(sectionLogs) : undefined;
+    const tracebackCount = countTracebacks(sectionLogs);
+    if (tracebackCount > 0) {
+      OutputHelper.warn(
+        `[batch-log-parser] ${slug}: ${tracebackCount} Luau traceback(s) in output. ` +
+          'Jest does not count these — a deferred-callback crash fires outside any test.'
+      );
+    }
     // Prefer the JSON summary (authoritative, immune to log reordering);
     // fall back to the END-marker value if the summary was truncated.
     const durationMs = summaryDurations.get(slug) ?? markerDurations.get(slug);
@@ -182,10 +210,26 @@ export function parseBatchTestLogs(
       logs: sectionLogs,
       durationMs,
       testCounts,
+      tracebackCount,
     });
   }
 
   return results;
+}
+
+/**
+ * Count Luau tracebacks in log output.
+ *
+ * Reported separately from test counts because jest never sees these: a crash in
+ * a deferred callback fires outside any test, so a run can print
+ * "Tests: 155 passed, 0 failed" while something is genuinely broken.
+ */
+export function countTracebacks(rawOutput: string): number {
+  if (!rawOutput) {
+    return 0;
+  }
+  const cleanLogs = OutputHelper.stripAnsi(rawOutput);
+  return cleanLogs.match(/Stack Begin\s/g)?.length ?? 0;
 }
 
 /**

@@ -337,6 +337,7 @@ export class OpenCloudClient {
     const apiKey = await this._resolveApiKeyAsync();
     const messages: string[] = [];
     let pageToken: string | undefined;
+    let pagesFetched = 0;
 
     do {
       const url = new URL(`https://apis.roblox.com/cloud/v2/${taskPath}/logs`);
@@ -379,10 +380,20 @@ export class OpenCloudClient {
         }
       }
 
+      pagesFetched++;
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
 
-    return messages.join('\n');
+    const text = messages.join('\n');
+
+    // Log volume is the prime suspect when engine output goes missing between
+    // the task and the parser, and the parser cannot tell a short run from a
+    // truncated fetch. Record what arrived so a real run can settle it.
+    OutputHelper.verbose(
+      `[open-cloud] Task logs: ${pagesFetched} page(s), ${messages.length} messages, ${text.length} chars`
+    );
+
+    return text;
   }
 
   /**
