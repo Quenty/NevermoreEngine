@@ -1,19 +1,13 @@
-# v7.42.1 (Tue Jul 28 2026)
-
-#### 🐛 Bug Fix
-
-- fix(receiptprocessing): unregister a receipt processor instead of erroring [#769](https://github.com/Quenty/NevermoreEngine/pull/769) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.42.0...@quenty/receiptprocessing@7.42.1) (2026-07-28)
+
+### Bug Fixes
+
+- **receiptprocessing:** unregister a receipt processor instead of erroring ([#769](https://github.com/Quenty/NevermoreEngine/issues/769)) ([06d65ac](https://github.com/Quenty/NevermoreEngine/commit/06d65acc1ecdd8bd00a58753b21b52f33211a261))
 
 # [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/receiptprocessing@7.41.2...@quenty/receiptprocessing@7.42.0) (2026-07-28)
 
