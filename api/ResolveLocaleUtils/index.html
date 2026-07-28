@@ -16,8 +16,8 @@ dialog pacing, and any other locale-sensitive feature resolve identically.
 Locale ids follow BCP-47-ish shapes: a language subtag, then optional script
 and/or region subtags separated by `-` (or sometimes `_`), e.g. `en`, `en-us`,
 `pt-br`, `zh-Hant-TW`. Matching is case-insensitive."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/ResolveLocaleUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ResolveLocaleUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/ResolveLocaleUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.3374647f.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.1b166e2e.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.8db12e59.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.00d6e285.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -44,13 +44,38 @@ ResolveLocaleUtils<span class="token punctuation">.</span><span class="token fun
 ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">getLanguageSubtag</span><span class="token punctuation">(</span><span class="token string">"PT-BR"</span><span class="token punctuation">)</span> <span class="token comment">--> "pt"</span>
 ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">getLanguageSubtag</span><span class="token punctuation">(</span><span class="token keyword">nil</span><span class="token punctuation">)</span> <span class="token comment">--> nil</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isTraditionalChinese"><code style="text-decoration:none">isTraditionalChinese</code><a href="#isTraditionalChinese" class="hash-link" aria-label="Direct link to isTraditionalChinese" title="Direct link to isTraditionalChinese" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L63"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">isTraditionalChinese</code><code>(</code><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getScriptSubtag"><code style="text-decoration:none">getScriptSubtag</code><a href="#getScriptSubtag" class="hash-link" aria-label="Direct link to getScriptSubtag" title="Direct link to getScriptSubtag" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L95"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">getScriptSubtag</code><code>(</code><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>) → </code><code class="blue_P4bS">string?</code></div><div>
 <p>
-  Whether a Chinese locale is Traditional. <code>hant</code>, and the <code>tw</code> / <code>hk</code> / <code>mo</code>
-  regions are Traditional; everything else (<code>hans</code>, <code>cn</code>, <code>sg</code>, bare <code>zh</code>) is
+  Returns the script subtag, or nil when the locale does not carry one. A script subtag is
+  the four-letter subtag directly after the language (<code>zh-Hant</code>, <code>zh-Hant-TW</code>, <code>sr-Latn</code>);
+  a two-letter or three-digit subtag in that position is a region, not a script.
+</p>
+<pre class="language-lua"><code class="language-lua">ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">getScriptSubtag</span><span class="token punctuation">(</span><span class="token string">"zh-Hant-TW"</span><span class="token punctuation">)</span> <span class="token comment">--> "hant"</span>
+ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">getScriptSubtag</span><span class="token punctuation">(</span><span class="token string">"zh-TW"</span><span class="token punctuation">)</span> <span class="token comment">--> nil</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isTraditionalChinese"><code style="text-decoration:none">isTraditionalChinese</code><a href="#isTraditionalChinese" class="hash-link" aria-label="Direct link to isTraditionalChinese" title="Direct link to isTraditionalChinese" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L118"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">isTraditionalChinese</code><code>(</code><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>
+  Whether a Chinese locale is Traditional. The <code>hant</code> script subtag, and the <code>tw</code> / <code>hk</code> /
+  <code>mo</code> regions, are Traditional; everything else (<code>hans</code>, <code>cn</code>, <code>sg</code>, bare <code>zh</code>) is
   Simplified. Only meaningful for <code>zh</code> locales.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolveClosestKey"><code style="text-decoration:none">resolveClosestKey</code><a href="#resolveClosestKey" class="hash-link" aria-label="Direct link to resolveClosestKey" title="Direct link to resolveClosestKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L92"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">resolveClosestKey</code><code>(</code><div class="inset_uKQm"><div><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>availableLocales<!-- -->: </code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div></div><code>) → </code><code class="blue_P4bS">string?</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isCompatibleLocale"><code style="text-decoration:none">isCompatibleLocale</code><a href="#isCompatibleLocale" class="hash-link" aria-label="Direct link to isCompatibleLocale" title="Direct link to isCompatibleLocale" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L161"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">isCompatibleLocale</code><code>(</code><div class="inset_uKQm"><div><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>otherLocale<!-- -->: </code><code class="blue_P4bS">string?</code></div></div><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+<p>
+  Whether two locales are close enough that one can be read in place of the other: the same
+  language, written in the same script.
+</p>
+<p>
+  Regional variants of a language substitute for one another, so <code>es-mx</code> reads <code>es-es</code> and
+  <code>en-gb</code> reads <code>en-us</code>. Scripts do not: Traditional and Simplified Chinese are not mutually
+  readable, so <code>zh-tw</code> never reads <code>zh-cn</code>, whether the script is spelled out (<code>zh-Hant</code> vs
+  <code>zh-Hans</code>) or implied by region (<code>zh-tw</code> vs <code>zh-cn</code>). The same holds for any language
+  whose locales carry differing script subtags, such as <code>sr-Latn</code> and <code>sr-Cyrl</code>.
+</p>
+<pre class="language-lua"><code class="language-lua">ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">isCompatibleLocale</span><span class="token punctuation">(</span><span class="token string">"es-mx"</span><span class="token punctuation">,</span> <span class="token string">"es-es"</span><span class="token punctuation">)</span> <span class="token comment">--> true</span>
+ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">isCompatibleLocale</span><span class="token punctuation">(</span><span class="token string">"zh-tw"</span><span class="token punctuation">,</span> <span class="token string">"zh-cn"</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
+ResolveLocaleUtils<span class="token punctuation">.</span><span class="token function">isCompatibleLocale</span><span class="token punctuation">(</span><span class="token string">"pt-br"</span><span class="token punctuation">,</span> <span class="token string">"en-us"</span><span class="token punctuation">)</span> <span class="token comment">--> false</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolveClosestKey"><code style="text-decoration:none">resolveClosestKey</code><a href="#resolveClosestKey" class="hash-link" aria-label="Direct link to resolveClosestKey" title="Direct link to resolveClosestKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua#L203"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>ResolveLocaleUtils<!-- -->.</code><code class="green_DgR4">resolveClosestKey</code><code>(</code><div class="inset_uKQm"><div><code>locale<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>availableLocales<!-- -->: </code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">T</code><code class="purple_ieR2">}</code></div></div><code>) → </code><code class="blue_P4bS">string?</code></div><div>
 <p>Resolves a locale to the best-matching key present in <code>availableLocales</code>:</p>
 <ol>
   <li>Exact (case-insensitive) match.</li>
@@ -90,8 +115,30 @@ ResolveLocaleUtils<span class="token punctuation">.</span><span class="token fun
             }
         },
         {
+            &quot;name&quot;: &quot;getScriptSubtag&quot;,
+            &quot;desc&quot;: &quot;Returns the script subtag, or nil when the locale does not carry one. A script subtag is\nthe four-letter subtag directly after the language (`zh-Hant`, `zh-Hant-TW`, `sr-Latn`);\na two-letter or three-digit subtag in that position is a region, not a script.\n\n```lua\nResolveLocaleUtils.getScriptSubtag(\&quot;zh-Hant-TW\&quot;) --&gt; \&quot;hant\&quot;\nResolveLocaleUtils.getScriptSubtag(\&quot;zh-TW\&quot;) --&gt; nil\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;locale&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 95,
+                &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;isTraditionalChinese&quot;,
-            &quot;desc&quot;: &quot;Whether a Chinese locale is Traditional. `hant`, and the `tw` / `hk` / `mo`\nregions are Traditional; everything else (`hans`, `cn`, `sg`, bare `zh`) is\nSimplified. Only meaningful for `zh` locales.&quot;,
+            &quot;desc&quot;: &quot;Whether a Chinese locale is Traditional. The `hant` script subtag, and the `tw` / `hk` /\n`mo` regions, are Traditional; everything else (`hans`, `cn`, `sg`, bare `zh`) is\nSimplified. Only meaningful for `zh` locales.&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;locale&quot;,
@@ -107,7 +154,34 @@ ResolveLocaleUtils<span class="token punctuation">.</span><span class="token fun
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 63,
+                &quot;line&quot;: 118,
+                &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;isCompatibleLocale&quot;,
+            &quot;desc&quot;: &quot;Whether two locales are close enough that one can be read in place of the other: the same\nlanguage, written in the same script.\n\nRegional variants of a language substitute for one another, so `es-mx` reads `es-es` and\n`en-gb` reads `en-us`. Scripts do not: Traditional and Simplified Chinese are not mutually\nreadable, so `zh-tw` never reads `zh-cn`, whether the script is spelled out (`zh-Hant` vs\n`zh-Hans`) or implied by region (`zh-tw` vs `zh-cn`). The same holds for any language\nwhose locales carry differing script subtags, such as `sr-Latn` and `sr-Cyrl`.\n\n```lua\nResolveLocaleUtils.isCompatibleLocale(\&quot;es-mx\&quot;, \&quot;es-es\&quot;) --&gt; true\nResolveLocaleUtils.isCompatibleLocale(\&quot;zh-tw\&quot;, \&quot;zh-cn\&quot;) --&gt; false\nResolveLocaleUtils.isCompatibleLocale(\&quot;pt-br\&quot;, \&quot;en-us\&quot;) --&gt; false\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;locale&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;otherLocale&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 161,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua&quot;
             }
         },
@@ -134,7 +208,7 @@ ResolveLocaleUtils<span class="token punctuation">.</span><span class="token fun
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 92,
+                &quot;line&quot;: 203,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua&quot;
             }
         }
@@ -147,6 +221,6 @@ ResolveLocaleUtils<span class="token punctuation">.</span><span class="token fun
         &quot;line&quot;: 13,
         &quot;path&quot;: &quot;src/clienttranslator/src/Shared/Utils/ResolveLocaleUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#getLanguageSubtag" class="table-of-contents__link toc-highlight">.getLanguageSubtag</a></li><li><a href="#isTraditionalChinese" class="table-of-contents__link toc-highlight">.isTraditionalChinese</a></li><li><a href="#resolveClosestKey" class="table-of-contents__link toc-highlight">.resolveClosestKey</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#getLanguageSubtag" class="table-of-contents__link toc-highlight">.getLanguageSubtag</a></li><li><a href="#getScriptSubtag" class="table-of-contents__link toc-highlight">.getScriptSubtag</a></li><li><a href="#isCompatibleLocale" class="table-of-contents__link toc-highlight">.isCompatibleLocale</a></li><li><a href="#isTraditionalChinese" class="table-of-contents__link toc-highlight">.isTraditionalChinese</a></li><li><a href="#resolveClosestKey" class="table-of-contents__link toc-highlight">.resolveClosestKey</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>

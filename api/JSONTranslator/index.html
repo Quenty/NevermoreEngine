@@ -22,8 +22,8 @@ To get translations uploaded.
 4. Stop the game
 5. In Studio, go to plugins &gt; &quot;Localization Tools&quot;
 6. Upload the CSV (update)"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/JSONTranslator"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/JSONTranslator" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/JSONTranslator" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.3374647f.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.1b166e2e.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.8db12e59.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.00d6e285.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -40,7 +40,7 @@ To get translations uploaded.
   <li>In Studio, go to plugins > "Localization Tools"</li>
   <li>Upload the CSV (update)</li>
 </ol>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L99"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>translatorName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L100"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><div class="inset_uKQm"><div><code>translatorName<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Name of the translator. Used for source.</p>
 </span></span></div><div><code>localeId<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>dataTable<!-- -->: </code><code class="blue_P4bS">table</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code></div><div>
 <p>Constructs a new JSONTranslator from the given args.</p>
@@ -62,11 +62,21 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
 <pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> translator <span class="token operator">=</span> JSONTranslator<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>script<span class="token punctuation">)</span>
 <span class="token comment">-- assume there is an `en.json` underneath the script with valid JSON.</span>
 </code></pre>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveFormatByKey"><code style="text-decoration:none">ObserveFormatByKey</code><a href="#ObserveFormatByKey" class="hash-link" aria-label="Direct link to ObserveFormatByKey" title="Direct link to ObserveFormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L205"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveFormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>translationArgs<!-- -->: </code><code class="blue_P4bS">table?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveFormatByKey"><code style="text-decoration:none">ObserveFormatByKey</code><a href="#ObserveFormatByKey" class="hash-link" aria-label="Direct link to ObserveFormatByKey" title="Direct link to ObserveFormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L210"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveFormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>translationArgs<!-- -->: </code><code class="blue_P4bS">table?</code><span class="inlineDescription_G7Er">-- <span>
 <p>May have observables (or convertable to observables) in it.</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
-<p>Observes the translated value</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseFormatByKey"><code style="text-decoration:none">PromiseFormatByKey</code><a href="#PromiseFormatByKey" class="hash-link" aria-label="Direct link to PromiseFormatByKey" title="Direct link to PromiseFormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L281"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseFormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>args<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
+<p>
+  Observes the translated value, re-emitting as the locale changes and as the key's data
+  becomes readable.
+</p>
+<p>
+  Emits immediately on subscribe with the best text available rather than withholding, so a
+  bound label is never blank for a frame. Until a key's data has landed that best text may be
+  the source language, or the translation key itself for a key registered this frame; the
+  correct translation replaces it once the key is readable. It will not go the other way: a
+  locale swap never replaces good text with a fallback.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseFormatByKey"><code style="text-decoration:none">PromiseFormatByKey</code><a href="#PromiseFormatByKey" class="hash-link" aria-label="Direct link to PromiseFormatByKey" title="Direct link to PromiseFormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L256"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseFormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>args<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Formats the resulting entry by args.</p>
 
   
@@ -88,29 +98,68 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseTranslator"><code style="text-decoration:none">PromiseTranslator</code><a href="#PromiseTranslator" class="hash-link" aria-label="Direct link to PromiseTranslator" title="Direct link to PromiseTranslator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L301"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseTranslator</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Translator" target="_blank" rel="noopener noreferrer">Translator<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="_observeTranslationReady"><code style="text-decoration:none">_observeTranslationReady</code><a href="#_observeTranslationReady" class="hash-link" aria-label="Direct link to _observeTranslationReady" title="Direct link to _observeTranslationReady" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L300"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">_observeTranslationReady</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string?</code><code class="op_lSLc">&gt;</code></div><div>
+<p>
+  Observes when a translation key is readable for the current locale, emitting the locale
+  id it is readable for, or nil while its data is still queued.
+</p>
+
+  
+    
+    
+      <div class="admonition admonition-warning alert alert--warning">
+        <div class="admonition-heading">
+          <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path>
+              </svg></span><span class="admonition-title">WARNING</span></h5>
+        </div>
+        <div class="admonition-content">
+          <p>
+            This is an implementation detail, exposed for the translation stack itself and for
+            diagnostics. You should not need it: every way of reading a translation
+            (<a href="/NevermoreEngine/api/JSONTranslator#ObserveFormatByKey">JSONTranslator.ObserveFormatByKey</a>, <a href="/NevermoreEngine/api/JSONTranslator#PromiseFormatByKey">JSONTranslator.PromiseFormatByKey</a>,
+            <a href="/NevermoreEngine/api/JSONTranslator#FormatByKey">JSONTranslator.FormatByKey</a>, <a href="/NevermoreEngine/api/JSONTranslator#ObserveTranslation">JSONTranslator.ObserveTranslation</a>) already waits for the
+            key it reads, and re-reads when a locale swap brings new data in.
+          </p>
+        </div>
+      </div>
+    
+  
+
+<p>
+  Localization writes are batched to the end of the frame (see
+  <a href="/NevermoreEngine/api/TranslatorService#SetEntryValue">TranslatorService.SetEntryValue</a>), because a game streaming in can register thousands of
+  entries in a single frame and each raw table write invalidates every AutoLocalize entry
+  in the engine. That means a key is not readable the instant it is registered, and this is
+  how the read paths above find out that it is.
+</p>
+<p>
+  Re-emits whenever the locale changes or new data lands for the key, so a locale swap is
+  picked up without resubscribing. Nothing here yields.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseTranslator"><code style="text-decoration:none">PromiseTranslator</code><a href="#PromiseTranslator" class="hash-link" aria-label="Direct link to PromiseTranslator" title="Direct link to PromiseTranslator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L365"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseTranslator</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Translator" target="_blank" rel="noopener noreferrer">Translator<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Returns a promise that will resolve once the Roblox translator is loaded from the cloud.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveTranslator"><code style="text-decoration:none">ObserveTranslator</code><a href="#ObserveTranslator" class="hash-link" aria-label="Direct link to ObserveTranslator" title="Direct link to ObserveTranslator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L310"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveTranslator</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Translator" target="_blank" rel="noopener noreferrer">Translator<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveTranslator"><code style="text-decoration:none">ObserveTranslator</code><a href="#ObserveTranslator" class="hash-link" aria-label="Direct link to ObserveTranslator" title="Direct link to ObserveTranslator" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L374"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveTranslator</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Translator" target="_blank" rel="noopener noreferrer">Translator<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes the current Roblox translator for this translator.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveLocaleId"><code style="text-decoration:none">ObserveLocaleId</code><a href="#ObserveLocaleId" class="hash-link" aria-label="Direct link to ObserveLocaleId" title="Direct link to ObserveLocaleId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L319"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveLocaleId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveLocaleId"><code style="text-decoration:none">ObserveLocaleId</code><a href="#ObserveLocaleId" class="hash-link" aria-label="Direct link to ObserveLocaleId" title="Direct link to ObserveLocaleId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L383"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveLocaleId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes the current locale id for this translator.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetEntryValue"><code style="text-decoration:none">SetEntryValue</code><a href="#SetEntryValue" class="hash-link" aria-label="Direct link to SetEntryValue" title="Direct link to SetEntryValue" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L334"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">SetEntryValue</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>source<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>context<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>localeId<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="SetEntryValue"><code style="text-decoration:none">SetEntryValue</code><a href="#SetEntryValue" class="hash-link" aria-label="Direct link to SetEntryValue" title="Direct link to SetEntryValue" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L398"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">SetEntryValue</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>source<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>context<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>localeId<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Adds an entry value to the localization table itself. This can be useful
   for ensuring pseudo localization and/or generating localization values
   from the game data itself.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveTranslation"><code style="text-decoration:none">ObserveTranslation</code><a href="#ObserveTranslation" class="hash-link" aria-label="Direct link to ObserveTranslation" title="Direct link to ObserveTranslation" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L369"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveTranslation</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>prefix<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>translationArgs<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ObserveTranslation"><code style="text-decoration:none">ObserveTranslation</code><a href="#ObserveTranslation" class="hash-link" aria-label="Direct link to ObserveTranslation" title="Direct link to ObserveTranslation" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L433"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ObserveTranslation</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>prefix<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>translationArgs<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Observable">Observable</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">string</code><code class="op_lSLc">&gt;</code></div><div>
 <p>Observes a translation key and formats it with the given args.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ToTranslationKey"><code style="text-decoration:none">ToTranslationKey</code><a href="#ToTranslationKey" class="hash-link" aria-label="Direct link to ToTranslationKey" title="Direct link to ToTranslationKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L388"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ToTranslationKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>prefix<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="ToTranslationKey"><code style="text-decoration:none">ToTranslationKey</code><a href="#ToTranslationKey" class="hash-link" aria-label="Direct link to ToTranslationKey" title="Direct link to ToTranslationKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L452"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">ToTranslationKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>prefix<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>text<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Converts the given prefix and text into a translation key.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetLocaleId"><code style="text-decoration:none">GetLocaleId</code><a href="#GetLocaleId" class="hash-link" aria-label="Direct link to GetLocaleId" title="Direct link to GetLocaleId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L406"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">GetLocaleId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetLocaleId"><code style="text-decoration:none">GetLocaleId</code><a href="#GetLocaleId" class="hash-link" aria-label="Direct link to GetLocaleId" title="Direct link to GetLocaleId" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L470"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">GetLocaleId</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Gets the current localeId of the translator if it's initialized, or a default if it is not.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetLocalizationTable"><code style="text-decoration:none">GetLocalizationTable</code><a href="#GetLocalizationTable" class="hash-link" aria-label="Direct link to GetLocalizationTable" title="Direct link to GetLocalizationTable" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L415"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">GetLocalizationTable</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/LocalizationTable" target="_blank" rel="noopener noreferrer">LocalizationTable<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="GetLocalizationTable"><code style="text-decoration:none">GetLocalizationTable</code><a href="#GetLocalizationTable" class="hash-link" aria-label="Direct link to GetLocalizationTable" title="Direct link to GetLocalizationTable" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L479"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">GetLocalizationTable</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/LocalizationTable" target="_blank" rel="noopener noreferrer">LocalizationTable<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div><div>
 <p>Gets the localization table the translation is using.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLoaded"><code style="text-decoration:none">PromiseLoaded</code><a href="#PromiseLoaded" class="hash-link" aria-label="Direct link to PromiseLoaded" title="Direct link to PromiseLoaded" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L423"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseLoaded</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseLoaded"><code style="text-decoration:none">PromiseLoaded</code><a href="#PromiseLoaded" class="hash-link" aria-label="Direct link to PromiseLoaded" title="Direct link to PromiseLoaded" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L487"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">PromiseLoaded</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code></div><div>
 <p>Returns a promise that will resolve once the translator is loaded from the cloud.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FormatByKey"><code style="text-decoration:none">FormatByKey</code><a href="#FormatByKey" class="hash-link" aria-label="Direct link to FormatByKey" title="Direct link to FormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L439"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">FormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>args<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="FormatByKey"><code style="text-decoration:none">FormatByKey</code><a href="#FormatByKey" class="hash-link" aria-label="Direct link to FormatByKey" title="Direct link to FormatByKey" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L506"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">FormatByKey</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>,</code></div><div><code>translationKey<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>args<!-- -->: </code><code class="blue_P4bS">table?</code></div></div><code>) → </code><code class="blue_P4bS">string</code></div><div>
 <p>Formats or errors if the cloud translations are not loaded.</p>
 
   
@@ -132,7 +181,11 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
     
   
 
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L523"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code>(</code><code>)</code></div><div>
+<p>
+  Queues the current locale's entries if they are not loaded yet, so a first synchronous read
+  of a locale costs that decode; the observable path pays the same cost on subscribe.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Destroy"><code style="text-decoration:none">Destroy</code><a href="#Destroy" class="hash-link" aria-label="Direct link to Destroy" title="Direct link to Destroy" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/clienttranslator/src/Shared/JSONTranslator.lua#L626"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JSONTranslator<!-- -->.</code><code class="green_DgR4">Destroy</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/JSONTranslator">JSONTranslator</a></code><code>) → </code><code>(</code><code>)</code></div><div>
 <p>
   Cleans up the translator and deletes the localization table if it exists.
   Should be called by <a href="/NevermoreEngine/api/ServiceBag">ServiceBag</a>
@@ -167,13 +220,13 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 99,
+                &quot;line&quot;: 100,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
         {
             &quot;name&quot;: &quot;ObserveFormatByKey&quot;,
-            &quot;desc&quot;: &quot;Observes the translated value&quot;,
+            &quot;desc&quot;: &quot;Observes the translated value, re-emitting as the locale changes and as the key&#x27;s data\nbecomes readable.\n\nEmits immediately on subscribe with the best text available rather than withholding, so a\nbound label is never blank for a frame. Until a key&#x27;s data has landed that best text may be\nthe source language, or the translation key itself for a key registered this frame; the\ncorrect translation replaces it once the key is readable. It will not go the other way: a\nlocale swap never replaces good text with a fallback.&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -199,7 +252,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 205,
+                &quot;line&quot;: 210,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -231,7 +284,34 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 281,
+                &quot;line&quot;: 256,
+                &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;_observeTranslationReady&quot;,
+            &quot;desc&quot;: &quot;Observes when a translation key is readable for the current locale, emitting the locale\nid it is readable for, or nil while its data is still queued.\n\n:::warning\nThis is an implementation detail, exposed for the translation stack itself and for\ndiagnostics. You should not need it: every way of reading a translation\n([JSONTranslator.ObserveFormatByKey], [JSONTranslator.PromiseFormatByKey],\n[JSONTranslator.FormatByKey], [JSONTranslator.ObserveTranslation]) already waits for the\nkey it reads, and re-reads when a locale swap brings new data in.\n:::\n\nLocalization writes are batched to the end of the frame (see\n[TranslatorService.SetEntryValue]), because a game streaming in can register thousands of\nentries in a single frame and each raw table write invalidates every AutoLocalize entry\nin the engine. That means a key is not readable the instant it is registered, and this is\nhow the read paths above find out that it is.\n\nRe-emits whenever the locale changes or new data lands for the key, so a locale swap is\npicked up without resubscribing. Nothing here yields.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;JSONTranslator&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;translationKey&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;string&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Observable&lt;string?&gt;&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 300,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -253,7 +333,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 301,
+                &quot;line&quot;: 365,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -275,7 +355,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 310,
+                &quot;line&quot;: 374,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -297,7 +377,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 319,
+                &quot;line&quot;: 383,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -339,7 +419,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 334,
+                &quot;line&quot;: 398,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -376,7 +456,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 369,
+                &quot;line&quot;: 433,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -408,7 +488,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 388,
+                &quot;line&quot;: 452,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -430,7 +510,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 406,
+                &quot;line&quot;: 470,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -452,7 +532,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 415,
+                &quot;line&quot;: 479,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -474,13 +554,13 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 423,
+                &quot;line&quot;: 487,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
         {
             &quot;name&quot;: &quot;FormatByKey&quot;,
-            &quot;desc&quot;: &quot;Formats or errors if the cloud translations are not loaded.\n\n:::tip\nYou should use [JSONTranslator.ObserveFormatByKey] instead of this to respond\nto locale changing.\n:::&quot;,
+            &quot;desc&quot;: &quot;Formats or errors if the cloud translations are not loaded.\n\n:::tip\nYou should use [JSONTranslator.ObserveFormatByKey] instead of this to respond\nto locale changing.\n:::\n\nQueues the current locale&#x27;s entries if they are not loaded yet, so a first synchronous read\nof a locale costs that decode; the observable path pays the same cost on subscribe.&quot;,
             &quot;params&quot;: [
                 {
                     &quot;name&quot;: &quot;self&quot;,
@@ -506,7 +586,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 439,
+                &quot;line&quot;: 506,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         },
@@ -523,7 +603,7 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
             &quot;returns&quot;: [],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 523,
+                &quot;line&quot;: 626,
                 &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
             }
         }
@@ -536,6 +616,6 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
         &quot;line&quot;: 16,
         &quot;path&quot;: &quot;src/clienttranslator/src/Shared/JSONTranslator.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#FormatByKey" class="table-of-contents__link toc-highlight">.FormatByKey</a></li><li><a href="#GetLocaleId" class="table-of-contents__link toc-highlight">.GetLocaleId</a></li><li><a href="#GetLocalizationTable" class="table-of-contents__link toc-highlight">.GetLocalizationTable</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li><li><a href="#ObserveFormatByKey" class="table-of-contents__link toc-highlight">.ObserveFormatByKey</a></li><li><a href="#ObserveLocaleId" class="table-of-contents__link toc-highlight">.ObserveLocaleId</a></li><li><a href="#ObserveTranslation" class="table-of-contents__link toc-highlight">.ObserveTranslation</a></li><li><a href="#ObserveTranslator" class="table-of-contents__link toc-highlight">.ObserveTranslator</a></li><li><a href="#PromiseFormatByKey" class="table-of-contents__link toc-highlight">.PromiseFormatByKey</a></li><li><a href="#PromiseLoaded" class="table-of-contents__link toc-highlight">.PromiseLoaded</a></li><li><a href="#PromiseTranslator" class="table-of-contents__link toc-highlight">.PromiseTranslator</a></li><li><a href="#SetEntryValue" class="table-of-contents__link toc-highlight">.SetEntryValue</a></li><li><a href="#ToTranslationKey" class="table-of-contents__link toc-highlight">.ToTranslationKey</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#_observeTranslationReady" class="table-of-contents__link toc-highlight">._observeTranslationReady</a></li><li><a href="#Destroy" class="table-of-contents__link toc-highlight">.Destroy</a></li><li><a href="#FormatByKey" class="table-of-contents__link toc-highlight">.FormatByKey</a></li><li><a href="#GetLocaleId" class="table-of-contents__link toc-highlight">.GetLocaleId</a></li><li><a href="#GetLocalizationTable" class="table-of-contents__link toc-highlight">.GetLocalizationTable</a></li><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li><li><a href="#ObserveFormatByKey" class="table-of-contents__link toc-highlight">.ObserveFormatByKey</a></li><li><a href="#ObserveLocaleId" class="table-of-contents__link toc-highlight">.ObserveLocaleId</a></li><li><a href="#ObserveTranslation" class="table-of-contents__link toc-highlight">.ObserveTranslation</a></li><li><a href="#ObserveTranslator" class="table-of-contents__link toc-highlight">.ObserveTranslator</a></li><li><a href="#PromiseFormatByKey" class="table-of-contents__link toc-highlight">.PromiseFormatByKey</a></li><li><a href="#PromiseLoaded" class="table-of-contents__link toc-highlight">.PromiseLoaded</a></li><li><a href="#PromiseTranslator" class="table-of-contents__link toc-highlight">.PromiseTranslator</a></li><li><a href="#SetEntryValue" class="table-of-contents__link toc-highlight">.SetEntryValue</a></li><li><a href="#ToTranslationKey" class="table-of-contents__link toc-highlight">.ToTranslationKey</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
