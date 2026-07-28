@@ -237,6 +237,8 @@ function AccessCommandService._registerCommands(self: AccessCommandService): ()
 		end
 
 		if #missing > 0 then
+			table.sort(missing)
+
 			return `No policy registered named: {table.concat(missing, ", ")}`
 		end
 

@@ -17,14 +17,14 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 --[[
-	Commands are registered directly rather than through Start, which waits on the real CmdrService and with
-	it a whole console. What is worth reaching is what a handler does with the list Cmdr already parsed for
-	it, and a stand-in that keeps the callbacks reaches exactly that.
+	Commands are registered directly rather than through Start. CmdrService rejects its cmdr promise outright
+	when the game is not running, so Start in a test registers nothing at all, silently. A stand-in that keeps
+	the callbacks reaches what is actually worth asserting: what a handler does with the list Cmdr parsed.
 ]]
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	serviceBag:GetService(AccessDataService)
+	local accessDataService = serviceBag:GetService(AccessDataService)
 	local accessPolicyService: AccessPolicyService.AccessPolicyService =
 		serviceBag:GetService(AccessPolicyService) :: any
 	serviceBag:Init()
@@ -33,6 +33,7 @@ local function setup()
 	local commands = {}
 	local service = setmetatable({
 		_maid = maid,
+		_accessDataService = accessDataService,
 		_accessPolicyService = accessPolicyService,
 		_cmdrService = {
 			RegisterCommand = function(_self, definition: any, callback: any)
@@ -44,7 +45,6 @@ local function setup()
 	service:_registerCommands()
 
 	return {
-		maid = maid,
 		accessPolicyService = accessPolicyService,
 		command = function(name: string): any
 			return assert(commands[name], `No command registered named {name}`)
@@ -107,6 +107,17 @@ describe("access-policy", function()
 
 		expect(controller.accessPolicyService:IsPolicyEnabled("kickOnNonAdmin")).toEqual(false)
 		expect(string.find(result, "nosuch") ~= nil).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("names every unknown one, in the same checkable order as the rest", function()
+		local controller = setup()
+		controller.registerPolicy("kickOnNonAdmin")
+
+		local result = controller.command("access-policy").run(nil, { "kickOnNonAdmin", "zzz", "aaa" }, "on")
+
+		expect(result).toEqual("No policy registered named: aaa, zzz")
 
 		controller:destroy()
 	end)

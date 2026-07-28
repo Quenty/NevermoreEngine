@@ -250,16 +250,15 @@ local function strictCmdr()
 	local util = setmetatable({
 		-- Narrows, rather than handing back the whole list whatever it was given. A finder that ignores its
 		-- argument makes "resolves the name you typed" pass on any list of one, and pass on a longer one
-		-- purely by what happens to be first.
+		-- purely by what happens to be first. Exact matches go to the front for the same reason the real one
+		-- does it: Parse takes the first, so `shop` must not resolve to `watchShop`.
 		MakeFuzzyFinder = function(list: { string })
 			return function(text: string)
-				if text == "" then
-					return list
-				end
-
 				local matches = {}
 				for _, name in list do
-					if string.find(name, text, 1, true) then
+					if name == text then
+						table.insert(matches, 1, name)
+					elseif string.find(name, text, 1, true) then
 						table.insert(matches, name)
 					end
 				end
@@ -472,8 +471,8 @@ describe("toggling every policy at once", function()
 
 	it("leaves the singular type alone, since both are built from the one table", function()
 		-- Nothing in this package takes accessPolicyName any more, the same way nothing takes
-		-- accessFactName. Both stay registered for consumers writing their own commands, and neither may be
-		-- turned listable by the registration of the plural next to it.
+		-- accessFactName. It stays registered for consumers writing their own commands, and must not be
+		-- turned listable by the registration of the plural built from it.
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
 			return { "kick-on-non-admin" }
@@ -484,9 +483,7 @@ describe("toggling every policy at once", function()
 end)
 
 describe("AccessCommandUtils.describeNameList", function()
-	it("names them while a person can still check them", function()
-		-- Sorted: Cmdr hands a list argument back in the hash order of its dedupe table, so naming them in
-		-- the order they arrive is naming them in an order that means nothing.
+	it("names them in a sorted order, since the one they arrive in means nothing", function()
 		expect(AccessCommandUtils.describeNameList({ "ownsGame", "isStaff" }, "facts")).toEqual("isStaff, ownsGame")
 	end)
 

@@ -352,8 +352,7 @@ end
 	glance, and counts them once naming them would be a wall -- which is exactly what `*` produces.
 
 	Sorted, because Cmdr builds a list argument by iterating its dedupe table: the order it hands back is
-	hash order, not the order anybody typed. Naming them is only worth doing if they can be checked against
-	something, and an arbitrary order is checkable against nothing.
+	hash order, not the order anybody typed.
 
 	@param names { string }
 	@param noun string -- plural, for the count and empty forms: "facts", "policies"
