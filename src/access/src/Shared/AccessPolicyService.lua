@@ -129,26 +129,20 @@ function AccessPolicyService.Start(self: AccessPolicyService): ()
 end
 
 --[[
-	Publishes which policies are switched on, so a console session on the server reaches the realm the
-	policy actually runs in.
+	Publishes which policies are switched on, so a server-side console reaches the realm a policy runs in.
 
-	This is the half that was missing. `AccessPolicyServiceInterface` is query-only on purpose -- letting
-	anything that merely found an interface start a kick would make "can see the registry" and "can
-	enforce" the same permission -- but that left a client-realm policy with no off switch at all: the
-	command is server-side, the consequence is client-side, and nothing joined them. So enablement
-	replicates one way, server to client, as state rather than as a callable.
+	State rather than a tie method: [AccessPolicyServiceInterface] stays query-only, so finding the
+	registry is not permission to start enforcing.
 
-	The whole effective map is published rather than the changes to it, and includes the policies that are
-	*off*: a client whose own `isEnabledByDefault` switched something on has to hear that the server says
-	otherwise, and "absent from the payload" cannot carry that.
+	The whole effective map is published, including the policies that are *off* -- a client whose own
+	`isEnabledByDefault` switched something on has to hear that the server says otherwise, and
+	absent-from-the-payload cannot carry that.
 ]]
 function AccessPolicyService._replicatePolicyEnabled(self: AccessPolicyService): ()
 	local replicated: any = JSONAttributeValue.new(ReplicatedStorage, REPLICATED_ENABLED_ATTRIBUTE, {})
 	local lastPublished: string? = nil
 
-	-- Cleared when this service goes, but only if what is there is still ours -- another live service may
-	-- have published since, and clearing unconditionally would switch off policies somebody is relying on.
-	-- Same reasoning as AccessDataService's feature-fact publication.
+	-- Only if what is there is still ours: another live service may have published since.
 	self._maid:GiveTask(function()
 		if lastPublished ~= nil and ReplicatedStorage:GetAttribute(REPLICATED_ENABLED_ATTRIBUTE) == lastPublished then
 			replicated.Value = nil
@@ -165,9 +159,8 @@ function AccessPolicyService._replicatePolicyEnabled(self: AccessPolicyService):
 		lastPublished = ReplicatedStorage:GetAttribute(REPLICATED_ENABLED_ATTRIBUTE)
 	end
 
-	-- Both, because either can change what the map should say: a registration adds a name, and a toggle
-	-- changes a value. `_enabled` only ever holds `true` -- SetPolicyEnabled removes the key rather than
-	-- storing false -- so watching its key list catches every toggle.
+	-- `_enabled` only ever holds `true` (SetPolicyEnabled removes the key rather than storing false), so
+	-- its key list catches every toggle.
 	self._maid:GiveTask(self._policies:ObserveKeyList():Subscribe(publish))
 	self._maid:GiveTask(self._enabled:ObserveKeyList():Subscribe(publish))
 end
@@ -179,7 +172,7 @@ function AccessPolicyService._consumeReplicatedPolicyEnabled(self: AccessPolicyS
 		self:SetReplicatedPolicyEnabled(payload or {})
 	end))
 
-	-- A policy registered after the payload landed still picks it up. Neither order is ours to control.
+	-- A policy registered after the payload landed still picks it up.
 	self._maid:GiveTask(self._policies:ObserveKeyList():Subscribe(function()
 		self:_reconcileReplicatedPolicyEnabled()
 	end))
@@ -189,8 +182,7 @@ end
 	Applies what the server says each policy's switch is set to. The entry point the client's replication
 	arrives through, and the seam a test drives directly.
 
-	The server wins where it has spoken. A policy it has never heard of -- one registered only in this
-	realm -- is left entirely alone.
+	A policy the server never registered is left alone.
 
 	@param payload { [string]: boolean }
 ]=]
@@ -428,16 +420,10 @@ function AccessPolicyService.IsPolicyActiveForPlayer(
 end
 
 --[[
-	The realm this **bag** was told it is, not the one RunService reports.
+	The realm this bag was told it is, not the one RunService reports. The two come apart wherever a bag
+	is told its realm, and reading RunService there means a client-realm policy silently never runs.
 
-	The two come apart wherever a bag is told its realm -- a test booting both halves in one DataModel is
-	the whole reason [TieRealmService] exists -- and reading RunService there means a client-realm policy
-	never runs however the bag is configured. That failure is silent: the policy is registered, listed,
-	enabled, and simply does nothing. Every other realm branch in this package already reads the tie
-	realm; this one was the odd one out.
-
-	Anything not explicitly the client counts as the server, matching how [AccessDataService] branches, so
-	a shared bag still runs server-realm enforcement.
+	Anything not explicitly the client counts as the server, matching how [AccessDataService] branches.
 ]]
 function AccessPolicyService._runsHere(self: AccessPolicyService, policy: AccessPolicy.AccessPolicy): boolean
 	return policy:RunsInRealm(self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT)

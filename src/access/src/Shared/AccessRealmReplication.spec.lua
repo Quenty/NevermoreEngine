@@ -430,8 +430,7 @@ end)
 
 local policyCounter = 0
 
--- Returns as soon as the client agrees, and returns whatever it has if it never does -- so a failure
--- prints the real state rather than a timeout.
+-- Returns whatever the client has if the realms never agree, so a failure prints the real state.
 local function waitForPolicyEnabled(accessPolicyService: any, policyName: string, expected: boolean): boolean
 	for _ = 1, CONVERGE_FRAMES do
 		if accessPolicyService:IsPolicyEnabled(policyName) == expected then
@@ -471,8 +470,7 @@ local function setupPolicies()
 		register = function(self, realmBag: any, isEnabledByDefault: boolean)
 			local policy = maid:Add(AccessPolicy.new(realmBag.serviceBag, {
 				policyName = self.policyName,
-				-- Client realm throughout: a server-realm policy would be togglable from the console
-				-- already, and the gap this closes is the one where the consequence is on the other side.
+				-- Client realm: a server-realm policy was already togglable from the console.
 				realm = AccessPolicyRealm.CLIENT,
 				isEnabledByDefault = isEnabledByDefault,
 				apply = function()
@@ -491,8 +489,7 @@ end
 
 describe("policy enablement across realms", function()
 	it("carries a policy switched off on the server to the client", function()
-		-- The gap this closes: the console command is server-side and a client-realm consequence is not,
-		-- so before this there was no way to switch off the policy you were trying to test around.
+		-- The console command is server-side and this consequence is not.
 		local controller = setupPolicies()
 		controller:register(controller.server, true)
 		controller:register(controller.client, true)
@@ -517,8 +514,7 @@ describe("policy enablement across realms", function()
 	end)
 
 	it("leaves a policy the server never registered alone", function()
-		-- Replication widens what the client knows; it does not own the client's registry. A policy that
-		-- exists only in this realm keeps whatever it was built with.
+		-- Replication widens what the client knows; it does not own the client's registry.
 		local controller = setupPolicies()
 		controller:register(controller.client, true)
 

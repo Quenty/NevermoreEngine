@@ -26,9 +26,8 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- `tieRealm` is what the bag is *told* it is, which is not always what RunService reports -- a test
--- booting both halves in one DataModel is the whole reason that distinction exists. Passing it is how a
--- client-realm policy can be exercised at all from a runner that is technically a server.
+-- `tieRealm` is what the bag is told it is, which is how a client-realm policy can be exercised from a
+-- runner that is technically a server.
 local function setup(tieRealm: string?)
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
@@ -660,8 +659,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		controller:destroy()
 	end)
 
-	-- The realm has to come from the bag, not from RunService. Read from RunService, a client-realm policy
-	-- in a bag told it is a client never runs: registered, listed, enabled, and silently doing nothing.
+	-- Read from RunService, this policy is registered, listed, enabled -- and silently does nothing.
 	it("runs a client-realm policy in a bag that was told it is a client", function()
 		local controller = setup(TieRealms.CLIENT)
 		local applied = { n = 0 }
