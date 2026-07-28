@@ -660,17 +660,20 @@ function AccessDataService.RegisterFact(self: AccessDataService, fact: AccessFac
 		end
 		unregistered = true
 
-		local current = self._layersByFactName[factName]
-		if not current then
-			return
-		end
-
-		local index = table.find(current, fact)
+		-- The array this fact was inserted into, not whatever the registry currently points at. Destroy
+		-- clears the registry table, but a live report closure still holds the array -- so going through
+		-- the registry would find nothing, leave the fact in that array, and let the next emission call a
+		-- method on an object whose metatable is about to be nil.
+		-- The array this fact was inserted into, not whatever the registry currently points at. The two come
+		-- apart in two ways: Destroy clears the registry table, and re-registering the same name after the
+		-- last layer left builds a fresh array. Either way a report already subscribed still holds the old
+		-- one, and going through the registry would leave the dead fact sitting in it.
+		local index = table.find(layers, fact)
 		if index then
-			table.remove(current, index)
+			table.remove(layers, index)
 		end
 
-		if #current == 0 then
+		if #layers == 0 and self._layersByFactName[factName] == layers then
 			self._layersByFactName[factName] = nil
 		end
 
@@ -1121,7 +1124,16 @@ function AccessDataService.ObserveFactReport(
 		Rx.map(function(latest: { [string]: any }): AccessFactReport
 			local overrides = (latest.overrides or EMPTY_OVERRIDE_STATE) :: OverrideState
 			local replicatedOverrides = (latest.replicatedOverrides or EMPTY_OVERRIDE_STATE) :: OverrideState
-			local behavior = if layers[1] then layers[1]:GetServerOverrideBehavior() else nil
+			-- Only a live layer is asked anything. Unregistering on destroy keeps dead ones out of here in
+			-- the first place, but teardown order is not ours to control and a merge already in flight must
+			-- not be taken down by a layer that went while it was running -- a destroyed BaseObject has no
+			-- metatable, so every method on it is missing rather than merely unhelpful.
+			-- Only a live layer is asked anything. Unregistering on destroy should keep dead ones out of
+			-- here, and this is the belt: teardown order is not ours to control, and a merge already in
+			-- flight must not be taken down by a layer that went while it was running. A destroyed
+			-- BaseObject has no metatable, so every method on it is missing rather than merely unhelpful.
+			local first = if AccessFact.isAccessFact(layers[1]) then layers[1] else nil
+			local behavior = if first then first:GetServerOverrideBehavior() else nil
 
 			-- An override set in this realm shadows one the server sent, so a local investigation is not
 			-- fighting a console session somebody left running elsewhere.
@@ -1156,6 +1168,10 @@ function AccessDataService.ObserveFactReport(
 			end
 
 			for index, layer in layers do
+				if not AccessFact.isAccessFact(layer) then
+					continue
+				end
+
 				table.insert(
 					contributions,
 					{
@@ -1642,6 +1658,12 @@ function AccessDataService.Destroy(self: AccessDataService): ()
 		overrides:Destroy()
 	end
 	table.clear(self._overridesByPlayer :: any)
+
+	-- Emptied, not just dropped: a report already subscribed holds the array itself, and clearing only the
+	-- keys would leave it pointing at layers about to lose their metatables.
+	for _, layers in self._layersByFactName do
+		table.clear(layers)
+	end
 	table.clear(self._layersByFactName :: any)
 
 	self._maid:DoCleaning()

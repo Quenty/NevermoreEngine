@@ -583,3 +583,88 @@ describe("a registered object that gets destroyed", function()
 		controller:destroy()
 	end)
 end)
+
+describe("a layer destroyed under a live report", function()
+	it("stops contributing instead of taking the next merge down with it", function()
+		-- The crash this guards is not the destroy itself, it is the *next* emission: a report already
+		-- subscribed holds the layer array, and a destroyed BaseObject has no metatable, so every method on
+		-- it is missing rather than merely unhelpful. Something always emits afterwards -- an override, a
+		-- player leaving, another layer registering.
+		local maid = Maid.new()
+		local serviceBag = maid:Add(ServiceBag.new())
+		local accessDataService: any = serviceBag:GetService(AccessDataService)
+		serviceBag:Init()
+		serviceBag:Start()
+
+		local player = maid:Add(PlayerMock.new()) :: any
+		maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new("layered", {
+			resolve = function()
+				return false
+			end,
+		}))))
+
+		-- A second layer, so destroying the first leaves the fact registered and the report alive.
+		local elevated = AccessFact.new("layered", {
+			resolve = function()
+				return true
+			end,
+			priority = AccessFactPriority.ELEVATED,
+			source = "allowlist",
+		})
+		accessDataService:RegisterFact(elevated)
+
+		local report = nil
+		maid:GiveTask(accessDataService:ObserveFactReport(player, "layered"):Subscribe(function(value)
+			report = value
+		end))
+		expect((report :: any).value).toEqual(true)
+
+		elevated:Destroy()
+
+		-- Forces the merge to run again over the array that layer was in.
+		expect(function()
+			maid:GiveTask(accessDataService:SetFactOverride(player, "layered", true))
+		end).never.toThrow()
+
+		expect((report :: any).value).toEqual(true)
+
+		maid:DoCleaning()
+	end)
+
+	it("takes the destroyed layer out of the readout rather than leaving a dead row", function()
+		local maid = Maid.new()
+		local serviceBag = maid:Add(ServiceBag.new())
+		local accessDataService: any = serviceBag:GetService(AccessDataService)
+		serviceBag:Init()
+		serviceBag:Start()
+
+		local player = maid:Add(PlayerMock.new()) :: any
+		maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new("layered2", {
+			resolve = function()
+				return false
+			end,
+		}))))
+
+		local elevated = AccessFact.new("layered2", {
+			resolve = function()
+				return true
+			end,
+			priority = AccessFactPriority.ELEVATED,
+			source = "allowlist",
+		})
+		accessDataService:RegisterFact(elevated)
+
+		local report = nil
+		maid:GiveTask(accessDataService:ObserveFactReport(player, "layered2"):Subscribe(function(value)
+			report = value
+		end))
+
+		local before = #(report :: any).layers
+		elevated:Destroy()
+		maid:GiveTask(accessDataService:SetFactOverride(player, "layered2", nil))
+
+		expect(#(report :: any).layers).toEqual(before - 1)
+
+		maid:DoCleaning()
+	end)
+end)
