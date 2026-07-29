@@ -1,19 +1,13 @@
-# v9.67.4 (Wed Jul 29 2026)
-
-#### 🐛 Bug Fix
-
-- fix(chatproviderservice): let a PlayerMock be chat tagged [#776](https://github.com/Quenty/NevermoreEngine/pull/776) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [9.67.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.3...@quenty/chatproviderservice@9.67.4) (2026-07-29)
+
+### Bug Fixes
+
+- **chatproviderservice:** let a PlayerMock be chat tagged ([#776](https://github.com/Quenty/NevermoreEngine/issues/776)) ([7d1843b](https://github.com/Quenty/NevermoreEngine/commit/7d1843b24225a3d3e2f70c2743688b28a0e2acb4))
 
 ## [9.67.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.2...@quenty/chatproviderservice@9.67.3) (2026-07-29)
 
