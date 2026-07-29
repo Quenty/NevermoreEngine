@@ -8,6 +8,9 @@ import {
   isUnreportedTestRun,
 } from './progress-format.js';
 
+/** Below this, a phase timing is noise rather than information. */
+const PHASE_REPORT_FLOOR_MS = 1000;
+
 export interface GroupedReporterOptions {
   showLogs: boolean;
   verbose: boolean;
@@ -55,18 +58,23 @@ export class GroupedReporter extends BaseReporter {
     this._lastPhase = undefined;
   }
 
-  override onPackagePhaseChange(name: string, phase: JobPhase): void {
-    if (!this._options.verbose) {
+  override onPackagePhaseChange(_name: string, phase: JobPhase): void {
+    if (!this._options.verbose || phase === this._lastPhase) {
+      // Aggregated mode broadcasts one transition to every package, so the same
+      // phase arrives dozens of times. Report the transition, not each recipient.
       return;
     }
 
     // Group output is buffered and flushed at the end, so every line lands on
-    // the same timestamp and a five-minute step reads as instantaneous. Print
-    // how long the phase it just left actually took.
+    // the same timestamp and a five-minute step reads as instantaneous. Report
+    // how long the phase just left actually took — but only when it was long
+    // enough to account for, or the timings bury what they were meant to show.
     const now = Date.now();
-    if (this._lastPhase !== undefined) {
-      const elapsed = formatDurationMs(now - this._phaseStartedMs);
-      OutputHelper.info(`  [${name}] ${this._lastPhase} took ${elapsed}`);
+    const elapsedMs = now - this._phaseStartedMs;
+    if (this._lastPhase !== undefined && elapsedMs >= PHASE_REPORT_FLOOR_MS) {
+      OutputHelper.info(
+        `  ${this._lastPhase} took ${formatDurationMs(elapsedMs)}`
+      );
     }
     this._lastPhase = phase;
     this._phaseStartedMs = now;
