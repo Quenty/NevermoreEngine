@@ -1,3 +1,15 @@
+# v4.41.1 (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- fix(cli): stop reporting a test pass that no test output backs [#771](https://github.com/Quenty/NevermoreEngine/pull/771) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,16 @@
+# (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.17.1`, `@quenty/nevermore-cli@4.41.1`
+  - fix(cli): stop reporting a test pass that no test output backs [#771](https://github.com/Quenty/NevermoreEngine/pull/771) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Jul 28 2026)
 
 #### 🐛 Bug Fix
