@@ -26,6 +26,8 @@ export interface SingleTestResult {
    * non-aggregated cloud/local runs — callers should fall back to wall-clock.
    */
   durationMs?: number;
+  /** Why the run failed, when the runner can say more than "it failed". */
+  error?: string;
 }
 
 export interface SingleTestOptions {
@@ -109,6 +111,7 @@ export async function runSingleTestAsync(
       logs: parsed.logs,
       testCounts: parseTestCounts(parsed.logs),
       durationMs: result.durationMs,
+      error: result.errorMessage,
     };
   } finally {
     await context.releaseAsync(deployment);

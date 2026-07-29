@@ -85,9 +85,15 @@ export class SimpleReporter extends BaseReporter {
     const showLogs = this._alwaysShowLogs || !result.success;
 
     if (result.logs && showLogs) {
-      console.log(result.logs);
+      // Engine logs carry jest-lua's own escape codes, which chalk never sees.
+      // NO_COLOR is the caller's way to ask for text that greps without a sed.
+      console.log(
+        process.env.NO_COLOR ? OutputHelper.stripAnsi(result.logs) : result.logs
+      );
     } else if (showLogs && !result.error) {
-      OutputHelper.info('(no output)');
+      // Says only what is known: no logs reached this result. Whether none were
+      // produced or none could be attributed is the parser's to report.
+      OutputHelper.warn('(no logs attached to this result)');
     }
 
     if (result.error) {

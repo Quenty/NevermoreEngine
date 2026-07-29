@@ -19,6 +19,7 @@ export function createTestCommentConfig(): GithubCommentTableConfig {
     sectionId: 'tests',
     extraColumns: createTestColumns(),
     errorHeading: 'Test Results',
+    expectsTestCounts: true,
   };
 }
 

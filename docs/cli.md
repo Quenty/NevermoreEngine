@@ -155,6 +155,9 @@ nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to de
 | `--output <file>` | Write JSON results to a file. |
 | `--timeout <seconds>` | Max execution time, sent to Open Cloud so Roblox cancels server-side on overrun (default: 120). |
 
+Engine logs are echoed with jest-lua's own colour codes, which the CLI's formatter
+never sees. Set `NO_COLOR=1` to strip them when you intend to grep the output.
+
 ### `nevermore deploy`
 
 Builds a Rojo project and uploads it to a Roblox place. `run` is the default subcommand, so `nevermore deploy` and `nevermore deploy <target>` both deploy. Full walkthrough in [Deploying with the CLI](deploy.md).

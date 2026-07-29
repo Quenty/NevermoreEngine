@@ -19,6 +19,7 @@ import {
   formatProgressInline,
   formatProgressResult,
   isEmptyTestRun,
+  isUnreportedTestRun,
 } from '../progress-format.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
@@ -45,8 +46,14 @@ export interface GithubCommentTableConfig {
   successLabel?: string;
   /** Label for failed results, e.g. "Failed". Default: "Failed" */
   failureLabel?: string;
-  /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
+  /** Verb in the footer, e.g. "tested" in "X packages tested, Y passed, Z failed". Default: "tested" */
   summaryVerb?: string;
+  /**
+   * When true, a successful result that carries no test counts renders as a
+   * warning rather than a pass. Set by test reporters: a green check with no
+   * counts behind it is indistinguishable from a run that never tested anything.
+   */
+  expectsTestCounts?: boolean;
   /**
    * When set, the PR comment reporter uses section-based merging.
    * Multiple configs with different sectionIds share a single PR comment,
@@ -135,13 +142,17 @@ export function formatRunningStatus(
 export function formatResultStatus(
   pkg: PackageResult,
   successLabel: string,
-  failureLabel: string
+  failureLabel: string,
+  expectsTestCounts = false
 ): string {
   const duration = formatDurationMs(pkg.durationMs);
   const progressText = formatProgressResult(pkg.progressSummary);
   const empty = isEmptyTestRun(pkg.progressSummary);
 
   if (pkg.success) {
+    if (expectsTestCounts && isUnreportedTestRun(pkg.progressSummary)) {
+      return `⚠️ **Unverified** — no test counts reported (${duration})`;
+    }
     const label = progressText
       ? `${successLabel} ${progressText}`
       : successLabel;
@@ -281,7 +292,8 @@ export function formatGithubTableBody(
         statusText = formatResultStatus(
           pkg.result!,
           config.successLabel ?? 'Passed',
-          config.failureLabel ?? 'Failed'
+          config.failureLabel ?? 'Failed',
+          config.expectsTestCounts ?? false
         );
         break;
       default:
@@ -302,15 +314,30 @@ export function formatGithubTableBody(
   if (allDone) {
     const passed = packages.filter((p) => p.status === 'passed').length;
     const failed = packages.filter((p) => p.status === 'failed').length;
-    const emptyRuns = packages.filter((p) => isEmptyTestRun(p.progress)).length;
+    // Read the final result, not the live progress — progress is cleared once a
+    // package resolves, so an end-of-run check against it never fires.
+    const emptyRuns = packages.filter((p) =>
+      isEmptyTestRun(p.result?.progressSummary ?? p.progress)
+    ).length;
+    const unreported = config.expectsTestCounts
+      ? packages.filter(
+          (p) =>
+            p.status === 'passed' &&
+            isUnreportedTestRun(p.result?.progressSummary)
+        ).length
+      : 0;
     const verb = config.summaryVerb ?? 'tested';
+    const unit = packages.length === 1 ? 'package' : 'packages';
     footer = `**${
       packages.length
-    } ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
+    } ${unit} ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
       elapsedMs
     )}`;
     if (emptyRuns > 0) {
       footer += `\n⚠️ ${emptyRuns} package(s) ran 0 tests — check test discovery`;
+    }
+    if (unreported > 0) {
+      footer += `\n⚠️ ${unreported} package(s) reported no test counts — a pass here proves nothing about whether tests ran`;
     }
   } else {
     const done = packages.filter(
