@@ -17,10 +17,12 @@ local TranslationKeyUtils = {}
 	@return string
 ]=]
 function TranslationKeyUtils.getTranslationKey(prefix: string, text: string): string
-	-- Camel-case first so spaces act as word boundaries ("Play Now" -> "playNow"),
-	-- then cap the result. Stripping whitespace up-front would collapse the boundaries
-	-- and lowercase everything ("playnow").
-	local firstWords = string.sub(String.toLowerCamelCase(text), 1, 20)
+	--[[
+		Frozen derivation -- the key it returns is a persisted identifier, not an implementation
+		detail. See TranslationKeyUtils.spec.lua before touching it.
+	]]
+	local firstWordsBeginning = string.sub(string.gsub(text, "%s", ""), 1, 20)
+	local firstWords = String.toLowerCamelCase(firstWordsBeginning)
 
 	return prefix .. "." .. firstWords
 end

@@ -168,7 +168,7 @@ describe("JSONTranslator:ToTranslationKey", function()
 	it("derives a stable translation key from a prefix and text", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({})
-		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playNow")
+		expect(translator:ToTranslationKey("button", "Play Now")).toBe("button.playnow")
 		controller:destroy()
 	end)
 

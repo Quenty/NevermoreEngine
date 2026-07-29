@@ -76,6 +76,18 @@ it with the new language's text and never with a fallback.
 You do not need to wait for anything to make this work. Every read path — `ObserveFormatByKey`,
 `PromiseFormatByKey`, `FormatByKey`, `ObserveTranslation` — already handles it.
 
+## A generated key is a data format, not a detail
+
+`ToTranslationKey` and `ObserveTranslation` derive their key from your source text, so that key ends
+up written down: in whatever locale tables your build step produced, in the cloud localization table,
+and in any key your game replicates or stores. None of that is regenerated when the derivation
+changes.
+
+That makes the derivation frozen, and it is pinned by vectors in `TranslationKeyUtils.spec.lua`. If
+you maintain your own build step that has to produce the same keys, derive its vectors from that
+module rather than reimplementing the rule — the two drifting apart is invisible until a player sees
+English, because an unbound key falls back to its registered source text.
+
 ## One entry per translation key
 
 A `LocalizationTable` treats the translation key as the whole identity of an entry. Registering the
