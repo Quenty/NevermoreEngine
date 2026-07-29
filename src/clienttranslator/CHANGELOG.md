@@ -1,19 +1,13 @@
-# v14.47.3 (Wed Jul 29 2026)
-
-#### 🐛 Bug Fix
-
-- fix(clienttranslator): freeze the translation key derivation [#774](https://github.com/Quenty/NevermoreEngine/pull/774) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.47.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.2...@quenty/clienttranslator@14.47.3) (2026-07-29)
+
+### Bug Fixes
+
+- **clienttranslator:** freeze the translation key derivation ([#774](https://github.com/Quenty/NevermoreEngine/issues/774)) ([302729d](https://github.com/Quenty/NevermoreEngine/commit/302729dd3c66777ce2fc2f0066514696fc303676)), closes [#737](https://github.com/Quenty/NevermoreEngine/issues/737) [pre-#737](https://github.com/pre-/issues/737) [#737](https://github.com/Quenty/NevermoreEngine/issues/737)
 
 ## [14.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.1...@quenty/clienttranslator@14.47.2) (2026-07-28)
 
