@@ -1169,6 +1169,9 @@ importers:
       '@quenty/playerbinder':
         specifier: workspace:*
         version: link:../playerbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/playerutils':
         specifier: workspace:*
         version: link:../playerutils

@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local TextChatService = game:GetService("TextChatService")
 
 local Binder = require("Binder")
@@ -49,6 +50,12 @@ function ChatProviderServiceClient.Init(self: ChatProviderServiceClient, service
 end
 
 function ChatProviderServiceClient.Start(self: ChatProviderServiceClient): ()
+	-- The engine rejects this assignment outside a client, and a headless test that boots a client bag
+	-- on the server would take the whole bag down with it. Nothing to render there anyway.
+	if not RunService:IsClient() then
+		return
+	end
+
 	TextChatService.OnIncomingMessage = function(textChatMessage): TextChatMessageProperties?
 		self.MessageIncoming:Fire(textChatMessage)
 

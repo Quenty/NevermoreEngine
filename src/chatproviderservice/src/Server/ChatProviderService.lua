@@ -17,6 +17,7 @@ local LocalizedTextUtils = require("LocalizedTextUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
+local PlayerMock = require("PlayerMock")
 local PreferredParentUtils = require("PreferredParentUtils")
 local Promise = require("Promise")
 local Rx = require("Rx")
@@ -173,7 +174,7 @@ function ChatProviderService.PromiseAddChatTag(
 	player: Player,
 	chatTagData: ChatTagDataUtils.ChatTagData
 ): Promise.Promise<Instance>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(ChatTagDataUtils.isChatTagData(chatTagData), "Bad chatTagData")
 
 	local hasChatTagBinder = self._serviceBag:GetService(HasChatTags)
@@ -189,7 +190,7 @@ end
 	@param player Player
 ]=]
 function ChatProviderService.ClearChatTags(self: ChatProviderService, player: Player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	local hasChatTagBinder = self._serviceBag:GetService(HasChatTags)
 	local hasChatTags = hasChatTagBinder:Get(player)
