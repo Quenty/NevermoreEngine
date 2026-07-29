@@ -1,5 +1,18 @@
 # (Wed Jul 29 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.3`
+  - fix(clienttranslator): freeze the translation key derivation [#774](https://github.com/Quenty/NevermoreEngine/pull/774) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 29 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/nevermore-cli@4.42.0`
