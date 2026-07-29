@@ -43,6 +43,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/permissionprovider": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/preferredparentutils": "workspace:*",
     "@quenty/promise": "workspace:*",
