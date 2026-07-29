@@ -1,19 +1,13 @@
-# v4.42.0 (Wed Jul 29 2026)
-
-#### 🚀 Enhancement
-
-- feat(cli): make a passing test run mean tests were seen to pass [#772](https://github.com/Quenty/NevermoreEngine/pull/772) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.42.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.41.1...@quenty/nevermore-cli@4.42.0) (2026-07-29)
+
+### Features
+
+- **cli:** make a passing test run mean tests were seen to pass ([#772](https://github.com/Quenty/Nevermore/issues/772)) ([d8ba58c](https://github.com/Quenty/Nevermore/commit/d8ba58ce4f0badbf91cbba98d6d864dd4c85a731))
 
 ## [4.41.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.41.0...@quenty/nevermore-cli@4.41.1) (2026-07-29)
 
