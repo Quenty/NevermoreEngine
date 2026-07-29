@@ -17,7 +17,12 @@ describe('formatResultStatus', () => {
   it('shows a pass with its test counts', () => {
     const status = formatResultStatus(
       buildResult({
-        progressSummary: { kind: 'test-counts', passed: 275, failed: 0, total: 275 },
+        progressSummary: {
+          kind: 'test-counts',
+          passed: 275,
+          failed: 0,
+          total: 275,
+        },
       }),
       'Passed',
       'Failed',
@@ -41,7 +46,12 @@ describe('formatResultStatus', () => {
   it('still warns when the runner reported zero tests', () => {
     const status = formatResultStatus(
       buildResult({
-        progressSummary: { kind: 'test-counts', passed: 0, failed: 0, total: 0 },
+        progressSummary: {
+          kind: 'test-counts',
+          passed: 0,
+          failed: 0,
+          total: 0,
+        },
       }),
       'Passed',
       'Failed',

@@ -376,7 +376,10 @@ export class OpenCloudClient {
           // Keep createTime alongside the text: the API does not guarantee
           // chronological order, and readers downstream assume it.
           for (const msg of entry.structuredMessages) {
-            structured.push({ message: msg.message, createTime: msg.createTime });
+            structured.push({
+              message: msg.message,
+              createTime: msg.createTime,
+            });
           }
         } else if (entry.messages?.length) {
           messages.push(...entry.messages);
