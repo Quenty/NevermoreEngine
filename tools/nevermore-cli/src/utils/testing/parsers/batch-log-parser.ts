@@ -185,8 +185,7 @@ export function parseBatchTestLogs(
   // Reporting "(no output)" over it hides the very thing needed to diagnose the
   // parse failure, so it is shown verbatim instead. Only safe to hand to a
   // single package: with several, there is no way to say whose output this is.
-  const fallbackLogs =
-    noOutputAtAll || lostSectionOutput ? rawLogs.trim() : '';
+  const fallbackLogs = noOutputAtAll || lostSectionOutput ? rawLogs.trim() : '';
 
   // The unattributed stream is the same text for every package, so it is
   // attached once rather than repeated per package across a large log.
