@@ -128,12 +128,11 @@ export class GroupedReporter extends BaseReporter {
             : result.logs
         );
       } else {
-        // Logs were requested and none arrived — whatever verdict accompanies
-        // this was reached without reading any output.
+        // Says only what is known: this package has no logs attached. Whether
+        // the run produced none, or produced some that could not be attributed,
+        // is the parser's to report — claiming either here would be a guess.
         console.log(
-          OutputHelper.formatWarning(
-            '  (no output) — nothing was read to reach the result above'
-          )
+          OutputHelper.formatWarning('  (no logs attached to this package)')
         );
       }
       if (result.error) {

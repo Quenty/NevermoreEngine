@@ -91,11 +91,9 @@ export class SimpleReporter extends BaseReporter {
         process.env.NO_COLOR ? OutputHelper.stripAnsi(result.logs) : result.logs
       );
     } else if (showLogs && !result.error) {
-      // Not benign: logs were asked for and none arrived, so whatever verdict
-      // follows was reached without reading any output.
-      OutputHelper.warn(
-        '(no output) — the run produced no logs, so its result is unverified'
-      );
+      // Says only what is known: no logs reached this result. Whether none were
+      // produced or none could be attributed is the parser's to report.
+      OutputHelper.warn('(no logs attached to this result)');
     }
 
     if (result.error) {

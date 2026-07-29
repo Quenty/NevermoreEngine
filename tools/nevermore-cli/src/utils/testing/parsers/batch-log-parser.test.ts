@@ -23,17 +23,35 @@ describe('parseBatchTestLogs', () => {
     expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
   });
 
-  it('reports no test counts when the section output was lost', () => {
-    // The summary prints last, so it survives a fetch that dropped everything
-    // above it. The pcall said success, but nothing here saw a test run.
+  it('fails a pass it cannot read, rather than trusting the pcall', () => {
+    // The summary prints last, so it survives a log window that dropped the
+    // head. The pcall said success, but nothing here saw a test run.
     const logs = [
+      'Tests:  275 passed, 275 total',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
       '===BATCH_TEST_SUMMARY===',
       '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
     ].join('\n');
 
     const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
 
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('No test output could be attributed');
     expect(result?.testCounts).toBeUndefined();
+  });
+
+  it('still shows output it could not attribute', () => {
+    // 330KB of real test output was being reported as "(no output)" because no
+    // BEGIN marker survived to delimit it.
+    const logs = [
+      'PlayerBadgeHelper: attempt to index nil',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.logs).toContain('PlayerBadgeHelper');
   });
 
   it('counts tracebacks that jest reports as a clean pass', () => {

@@ -8,6 +8,8 @@ export interface BatchPackageResult {
   /** Inner pcall execution time reported by the Luau batch runner. */
   durationMs?: number;
   testCounts?: ParsedTestCounts;
+  /** Why this package failed, when the failure is the parser's own verdict. */
+  error?: string;
   /**
    * Luau tracebacks found in this package's section. Reported, not gated on:
    * jest cannot count these, since a deferred-callback crash fires outside any
@@ -161,10 +163,11 @@ export function parseBatchTestLogs(
   const lostSectionOutput = logSections.size === 0 && summaryResults.size > 0;
   if (lostSectionOutput) {
     OutputHelper.warn(
-      `[batch-log-parser] Parsed a summary but found no per-package log sections ` +
+      `[batch-log-parser] Received ${rawLogs.length} chars of output but could not ` +
+        `attribute any of it to a package section ` +
         `(${beginMarkersSeen} BEGIN, ${endMarkersSeen} END markers; summary at line ` +
-        `${summaryLineIndex} of ${lines.length}; ${rawLogs.length} chars). ` +
-        'Test output was lost between the engine and here, so no result below carries test counts.'
+        `${summaryLineIndex} of ${lines.length}). ` +
+        'Test counts are not derived from unattributed output.'
     );
     // BEGIN is printed first and the summary last, so their positions separate
     // the two ways this happens: a log window that dropped the head keeps the
@@ -178,22 +181,50 @@ export function parseBatchTestLogs(
 
   // ── Pass 3: Combine log sections with summary results ──
 
-  // When the batch produced zero output, surface the raw error in every
-  // package's logs so reporters show the actual failure instead of "(no output)".
-  const fallbackLogs = noOutputAtAll ? rawLogs.trim() : '';
+  // Output that arrived but could not be split into sections is still output.
+  // Reporting "(no output)" over it hides the very thing needed to diagnose the
+  // parse failure, so it is shown verbatim instead. Only safe to hand to a
+  // single package: with several, there is no way to say whose output this is.
+  const fallbackLogs =
+    noOutputAtAll || lostSectionOutput ? rawLogs.trim() : '';
+
+  // The unattributed stream is the same text for every package, so it is
+  // attached once rather than repeated per package across a large log.
+  let unattributedClaimed = false;
 
   for (const [packageName, slug] of slugMap) {
-    const sectionLogs = logSections.get(slug) ?? fallbackLogs;
+    const attributedLogs = logSections.get(slug);
+    let sectionLogs = attributedLogs ?? '';
+    if (!attributedLogs && fallbackLogs && !unattributedClaimed) {
+      sectionLogs = fallbackLogs;
+      unattributedClaimed = true;
+    }
     const summarySuccess = summaryResults.get(slug);
 
     // The JSON summary (pcall result) is the primary success signal.
     // Jest failure detection provides a secondary override.
+    //
+    // Gate on attributed output only. Unattributed output is shown but not
+    // judged: whatever broke attribution is reason enough not to trust which
+    // package a failure line belongs to.
     let success = summarySuccess ?? false;
-    if (success && sectionLogs) {
-      const hasJestFailures = _hasJestFailuresInLogs(sectionLogs);
+    let error: string | undefined;
+    if (success && attributedLogs) {
+      const hasJestFailures = _hasJestFailuresInLogs(attributedLogs);
       if (hasJestFailures) {
         success = false;
+        error = 'Jest reported failing tests';
       }
+    }
+
+    // A pass we cannot read is not a pass. The pcall only proves the script did
+    // not throw, which says nothing about whether any test ran or passed.
+    if (success && !attributedLogs) {
+      success = false;
+      error =
+        `No test output could be attributed to this package ` +
+        `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found). ` +
+        'Unattributed output follows.';
     }
 
     if (!success && !noOutputAtAll) {
@@ -204,7 +235,12 @@ export function parseBatchTestLogs(
       );
     }
 
-    const testCounts = sectionLogs ? parseTestCounts(sectionLogs) : undefined;
+    // Deliberately not parsed from unattributed output: attribution is exactly
+    // what failed, so a count read from it could belong to anything. The logs
+    // are still shown, so the jest summary remains readable by eye.
+    const testCounts = attributedLogs
+      ? parseTestCounts(attributedLogs)
+      : undefined;
     const tracebackCount = countTracebacks(sectionLogs);
     if (tracebackCount > 0) {
       OutputHelper.warn(
@@ -222,6 +258,7 @@ export function parseBatchTestLogs(
       durationMs,
       testCounts,
       tracebackCount,
+      error,
     });
   }
 

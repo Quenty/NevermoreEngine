@@ -252,6 +252,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
             : undefined,
+          error: result.error,
         };
       },
     });
