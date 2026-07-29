@@ -1,5 +1,10 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type ParsedTestCounts, parseTestCounts } from '../test-log-parser.js';
+import {
+  type ParsedTestCounts,
+  evaluateTestOutcome,
+  parseTestCounts,
+} from '../test-log-parser.js';
+import { formatTracebacks, parseTracebacks } from './traceback-parser.js';
 
 export interface BatchPackageResult {
   slug: string;
@@ -59,12 +64,17 @@ export function parseBatchTestLogs(
   // ── Pass 1: Extract per-package log sections from markers ──
 
   const logSections = new Map<string, string>();
+  /** Sections closed by an END whose BEGIN never arrived — start of output lost. */
+  const partialSections = new Set<string>();
   const markerDurations = new Map<string, number>();
   let currentSlug: string | null = null;
   let currentLines: string[] = [];
   let summaryLineIndex = -1;
   let beginMarkersSeen = 0;
   let endMarkersSeen = 0;
+  let strayEndMarkers = 0;
+  /** Only one section can have lost its head: the one the log was cut inside. */
+  let headSectionClaimed = false;
 
   // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
   const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
@@ -86,16 +96,36 @@ export function parseBatchTestLogs(
       const endSlug = match ? match[1] : inner;
       const durationStr = match?.[2];
 
-      if (currentSlug && endSlug === currentSlug) {
-        logSections.set(currentSlug, currentLines.join('\n'));
+      // A section normally closes on the END matching its own BEGIN.
+      const closesOwnSection = endSlug === currentSlug;
+
+      // Open Cloud keeps only the tail of a long run's log, so BEGIN — printed
+      // first — can be lost while END and the summary survive. Recovering that
+      // means letting an END with no open section claim what precedes it, but
+      // only where the head can actually have been dropped: before any BEGIN
+      // has survived, and only once. Past that point the log is well-formed,
+      // and a BEGIN-less END is a message delivered out of order (the API does
+      // not order them), which must not be allowed to claim another package's
+      // output.
+      const closesDroppedHead =
+        currentSlug === null && beginMarkersSeen === 0 && !headSectionClaimed;
+
+      if (closesOwnSection || closesDroppedHead) {
+        logSections.set(endSlug, currentLines.join('\n'));
+        if (closesDroppedHead) {
+          partialSections.add(endSlug);
+          headSectionClaimed = true;
+        }
         if (durationStr !== undefined) {
-          markerDurations.set(currentSlug, parseInt(durationStr, 10));
+          markerDurations.set(endSlug, parseInt(durationStr, 10));
         }
         currentSlug = null;
         currentLines = [];
+      } else {
+        // Reordered marker from another package. Ignore it without resetting
+        // state, so the section it interrupted still closes on its own END.
+        strayEndMarkers++;
       }
-      // If endSlug doesn't match currentSlug, this is a reordered marker
-      // from another package — ignore it without resetting state.
       continue;
     }
 
@@ -104,9 +134,9 @@ export function parseBatchTestLogs(
       break;
     }
 
-    if (currentSlug) {
-      currentLines.push(lines[i]);
-    }
+    // Accumulate unconditionally: output that precedes the first surviving
+    // BEGIN still belongs to whichever package's END closes it.
+    currentLines.push(lines[i]);
   }
 
   // ── Pass 2: Parse the JSON summary for authoritative pcall results ──
@@ -114,12 +144,16 @@ export function parseBatchTestLogs(
   const summaryResults = new Map<string, boolean>();
   const summaryDurations = new Map<string, number>();
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
-    const jsonLine = lines
-      .slice(summaryLineIndex + 1)
-      .join('\n')
-      .trim();
-    try {
-      const entries = JSON.parse(jsonLine) as SummaryEntry[];
+    const entries = findSummaryEntries(lines, summaryLineIndex + 1);
+    if (entries === undefined) {
+      OutputHelper.verbose(
+        `[batch-log-parser] Failed to parse JSON summary after line ${summaryLineIndex}: ` +
+          lines
+            .slice(summaryLineIndex + 1, summaryLineIndex + 3)
+            .join('\n')
+            .slice(0, 200)
+      );
+    } else {
       for (const entry of entries) {
         summaryResults.set(entry.slug, entry.success);
         if (typeof entry.durationMs === 'number') {
@@ -134,19 +168,19 @@ export function parseBatchTestLogs(
         );
       }
       console.error(
-        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} failures`
-      );
-    } catch {
-      OutputHelper.verbose(
-        `[batch-log-parser] Failed to parse JSON summary: ${jsonLine.slice(
-          0,
-          200
-        )}`
+        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} pcall failures`
       );
     }
   }
 
   // ── Warn when the batch produced no recognizable output ──
+
+  if (strayEndMarkers > 0) {
+    OutputHelper.verbose(
+      `[batch-log-parser] Ignored ${strayEndMarkers} out-of-order END marker(s); ` +
+        'their sections closed on their own boundaries.'
+    );
+  }
 
   const noOutputAtAll = logSections.size === 0 && summaryResults.size === 0;
   if (noOutputAtAll) {
@@ -199,54 +233,68 @@ export function parseBatchTestLogs(
       unattributedClaimed = true;
     }
     const summarySuccess = summaryResults.get(slug);
+    const reasons: string[] = [];
 
-    // The JSON summary (pcall result) is the primary success signal.
-    // Jest failure detection provides a secondary override.
-    //
-    // Gate on attributed output only. Unattributed output is shown but not
-    // judged: whatever broke attribution is reason enough not to trust which
-    // package a failure line belongs to.
+    // The pcall result only proves the script did not throw. It is a floor, not
+    // a verdict — everything below can fail a run it called successful.
     let success = summarySuccess ?? false;
-    let error: string | undefined;
-    if (success && attributedLogs) {
-      const hasJestFailures = _hasJestFailuresInLogs(attributedLogs);
-      if (hasJestFailures) {
+    if (summarySuccess === false) {
+      reasons.push('the batch runner reported a Luau error');
+    } else if (summarySuccess === undefined) {
+      // Absent from the summary is a different fault from failing in it, and
+      // conflating them sends you hunting for a Luau error that never happened.
+      reasons.push('this package is missing from the batch summary');
+    }
+
+    if (attributedLogs !== undefined) {
+      const outcome = evaluateTestOutcome(attributedLogs, {
+        requireTestReport: true,
+      });
+      if (!outcome.success) {
         success = false;
-        error = 'Jest reported failing tests';
+        reasons.push(...outcome.failureReasons);
       }
-    }
-
-    // A pass we cannot read is not a pass. The pcall only proves the script did
-    // not throw, which says nothing about whether any test ran or passed.
-    if (success && !attributedLogs) {
+    } else {
+      // Judged unreadable rather than judged by content: whatever broke
+      // attribution is reason enough not to trust which package a line is from.
       success = false;
-      error =
-        `No test output could be attributed to this package ` +
-        `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found). ` +
-        'Unattributed output follows.';
-    }
-
-    if (!success && !noOutputAtAll) {
-      console.error(
-        `[batch-log-parser] ${slug}: summarySuccess=${summarySuccess} hasLogs=${
-          sectionLogs.length > 0
-        } logsLen=${sectionLogs.length}`
+      reasons.push(
+        `no output could be attributed to this package ` +
+          `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found)`
       );
     }
 
-    // Deliberately not parsed from unattributed output: attribution is exactly
-    // what failed, so a count read from it could belong to anything. The logs
-    // are still shown, so the jest summary remains readable by eye.
+    if (partialSections.has(slug)) {
+      OutputHelper.warn(
+        `[batch-log-parser] ${slug}: section closed by its END marker with no BEGIN — ` +
+          'the start of this output was dropped by the log window, so the section is partial.'
+      );
+    }
+
+    // Attribute by script path, not by log position: a deferred callback can
+    // fire during another package's section.
+    const tracebacks = parseTracebacks(sectionLogs);
+    const tracebackCount = tracebacks.reduce((sum, t) => sum + t.count, 0);
+    const owned = tracebacks.filter((t) => !t.owner || t.owner === slug);
+    if (tracebacks.length > owned.length) {
+      OutputHelper.verbose(
+        `[batch-log-parser] ${slug}: ignored ${
+          tracebacks.length - owned.length
+        } traceback(s) belonging to other packages`
+      );
+    }
+    if (owned.length > 0) {
+      OutputHelper.warn(
+        `[batch-log-parser] ${slug}: ${owned.length} distinct traceback(s):\n` +
+          formatTracebacks(owned)
+      );
+    }
+
+    const error = reasons.length > 0 ? reasons.join('; ') : undefined;
+
     const testCounts = attributedLogs
       ? parseTestCounts(attributedLogs)
       : undefined;
-    const tracebackCount = countTracebacks(sectionLogs);
-    if (tracebackCount > 0) {
-      OutputHelper.warn(
-        `[batch-log-parser] ${slug}: ${tracebackCount} Luau traceback(s) in output. ` +
-          'Jest does not count these — a deferred-callback crash fires outside any test.'
-      );
-    }
     // Prefer the JSON summary (authoritative, immune to log reordering);
     // fall back to the END-marker value if the summary was truncated.
     const durationMs = summaryDurations.get(slug) ?? markerDurations.get(slug);
@@ -265,31 +313,44 @@ export function parseBatchTestLogs(
 }
 
 /**
- * Count Luau tracebacks in log output.
+ * Find the summary array in the lines following the summary marker.
  *
- * Reported separately from test counts because jest never sees these: a crash in
- * a deferred callback fires outside any test, so a run can print
- * "Tests: 155 passed, 0 failed" while something is genuinely broken.
+ * The marker is printed last, but the API does not deliver messages in order,
+ * so unrelated output can land after it. Treating everything past the marker as
+ * one JSON blob therefore fails intermittently — the same batch parses on one
+ * run and not the next. Scan for the array instead of assuming it is alone.
  */
-export function countTracebacks(rawOutput: string): number {
-  if (!rawOutput) {
-    return 0;
+export function findSummaryEntries(
+  lines: string[],
+  startIndex: number
+): SummaryEntry[] | undefined {
+  const MAX_SPAN = 50;
+
+  for (let i = startIndex; i < lines.length; i++) {
+    if (!lines[i].trim().startsWith('[')) {
+      continue;
+    }
+
+    // Normally one line, but allow the array to span a few in case the runner
+    // or the transport breaks it up.
+    for (let end = i; end < Math.min(lines.length, i + MAX_SPAN); end++) {
+      try {
+        const parsed = JSON.parse(
+          lines
+            .slice(i, end + 1)
+            .join('\n')
+            .trim()
+        );
+        if (Array.isArray(parsed)) {
+          return parsed as SummaryEntry[];
+        }
+      } catch {
+        // Incomplete so far — grow the window and try again.
+      }
+    }
   }
-  const cleanLogs = OutputHelper.stripAnsi(rawOutput);
-  return cleanLogs.match(/Stack Begin\s/g)?.length ?? 0;
+
+  return undefined;
 }
 
-/**
- * Check specifically for Jest test suite/test failures in logs.
- * Unlike parseTestLogs, this ignores "Stack Begin" runtime errors since
- * those can come from deferred callbacks of other packages in batch mode.
- */
-function _hasJestFailuresInLogs(rawOutput: string): boolean {
-  const cleanLogs = OutputHelper.stripAnsi(rawOutput);
-  const failedSuites = cleanLogs.match(/Test Suites:\s*(\d+)\s+failed/);
-  const failedTests = cleanLogs.match(/Tests:\s*(\d+)\s+failed/);
-  return (
-    (failedSuites != null && parseInt(failedSuites[1], 10) > 0) ||
-    (failedTests != null && parseInt(failedTests[1], 10) > 0)
-  );
-}
+export { countTracebacks } from '../test-log-parser.js';

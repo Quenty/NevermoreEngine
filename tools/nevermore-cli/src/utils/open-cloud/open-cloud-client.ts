@@ -339,6 +339,7 @@ export class OpenCloudClient {
     const structured: { message: string; createTime: string }[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
+    let entriesFetched = 0;
 
     do {
       const url = new URL(`https://apis.roblox.com/cloud/v2/${taskPath}/logs`);
@@ -386,6 +387,7 @@ export class OpenCloudClient {
         }
       }
 
+      entriesFetched += (data.luauExecutionSessionTaskLogs ?? []).length;
       pagesFetched++;
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
@@ -402,7 +404,8 @@ export class OpenCloudClient {
     // the task and the parser, and the parser cannot tell a short run from a
     // truncated fetch. Record what arrived so a real run can settle it.
     OutputHelper.verbose(
-      `[open-cloud] Task logs: ${pagesFetched} page(s), ${messages.length} messages, ${text.length} chars`
+      `[open-cloud] Task logs: ${pagesFetched} page(s), ${entriesFetched} entries, ` +
+        `${messages.length} messages, ${text.length} chars`
     );
 
     return text;
