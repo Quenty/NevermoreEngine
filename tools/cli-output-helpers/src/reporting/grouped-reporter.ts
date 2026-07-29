@@ -1,6 +1,6 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs, isCI } from '../cli-utils.js';
-import { type PackageResult, BaseReporter } from './reporter.js';
+import { type JobPhase, type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import {
   formatProgressResult,
@@ -32,6 +32,8 @@ export class GroupedReporter extends BaseReporter {
   private _state: IStateTracker;
   private _options: GroupedReporterOptions;
   private _isCI: boolean;
+  private _phaseStartedMs = Date.now();
+  private _lastPhase?: JobPhase;
 
   constructor(state: IStateTracker, options: GroupedReporterOptions) {
     super();
@@ -49,6 +51,25 @@ export class GroupedReporter extends BaseReporter {
     if (this._isCI) {
       console.log(`::group::${name}`);
     }
+    this._phaseStartedMs = Date.now();
+    this._lastPhase = undefined;
+  }
+
+  override onPackagePhaseChange(name: string, phase: JobPhase): void {
+    if (!this._options.verbose) {
+      return;
+    }
+
+    // Group output is buffered and flushed at the end, so every line lands on
+    // the same timestamp and a five-minute step reads as instantaneous. Print
+    // how long the phase it just left actually took.
+    const now = Date.now();
+    if (this._lastPhase !== undefined) {
+      const elapsed = formatDurationMs(now - this._phaseStartedMs);
+      OutputHelper.info(`  [${name}] ${this._lastPhase} took ${elapsed}`);
+    }
+    this._lastPhase = phase;
+    this._phaseStartedMs = now;
   }
 
   override onPackageResult(

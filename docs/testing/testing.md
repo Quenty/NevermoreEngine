@@ -430,12 +430,28 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run tests via Open Cloud instead of locally |
-| `--logs` | Show execution logs |
+| `--logs` | Show execution logs. On by default with `--script-text` |
 | `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
 | `--universe-id` | Override universe ID from deploy.nevermore.json |
 | `--place-id` | Override place ID from deploy.nevermore.json |
 | `--script-template` | Override script template path |
 | `--script-text` | Luau code to execute directly instead of the configured template |
+| `--timeout` | Max execution seconds, sent to Open Cloud. Max 300 (API limit), which is also the default |
+
+### Which command is the gate
+
+`nevermore batch test --cloud` is what CI runs, and it is the authority on whether
+a commit is green. `nevermore test --cloud` runs a single package through the same
+rules — useful while iterating, but it only sees the package you are standing in.
+
+Both apply one rule: a run passes when a test report is present, no suite or test
+failed, and no Luau traceback appeared. **Tracebacks fail a run even when every
+test passed** — jest cannot see a crash in a deferred callback, because it fires
+outside any test, so a suite can report all-green while something is genuinely
+broken. Failure output names each traceback and the package that owns it.
+
+A run with no test report is reported as failed rather than passed. A `--script-text`
+probe is exempt, having no jest in it to report.
 
 ### Batch testing
 
@@ -463,6 +479,19 @@ Options:
 | `--base` | Git ref to diff against (default: `origin/main`) |
 | `--concurrency` | Max parallel tests (default: 1 local, 3 cloud) |
 | `--output` | Write JSON results to a file |
+| `--chunk-size` | Packages per execution task in `--aggregated` mode (default: 16) |
+
+#### Why batches run in chunks
+
+Open Cloud retains only the tail of a task's log. One task covering every package
+therefore loses the output of the packages that ran first: measured across 73
+packages, the first 14 came back unreadable while the rest were fine. Those
+packages are reported as failed — the CLI will not call a run green when it could
+not read the result.
+
+Chunking keeps each task's log inside that window, and gives each chunk its own
+execution budget rather than sharing a single 300s ceiling. Raise `--chunk-size`
+only if your packages are quiet; lower it if a chunk starts losing its head.
 | `--limit` | Max number of packages to test |
 | `--logs` | Show execution logs for all packages |
 
