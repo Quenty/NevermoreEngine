@@ -28,8 +28,8 @@ export namespace Rx {
     event: RBXScriptSignal<T>
   ): Observable<
     T extends (...args: infer U) => void
-      ? U['length'] extends 1
-        ? U[0]
+      ? U extends [infer Single]
+        ? Single
         : LuaTuple<U>
       : never
   >;
@@ -81,15 +81,15 @@ export namespace Rx {
   function distinct<T>(): Operator<T, T>;
   function mapTo<T>(...args: ToTuple<T>): Operator<unknown, T>;
   function map<T, S extends T, U>(
-    project: (...args: ToTuple<S>) => U
+    project: (...args: S extends LuaTuple<infer V> ? V : [S]) => U
   ): Operator<T, U>;
   function mergeAll<T>(): Operator<Observable<T>, T>;
   function switchAll<T>(): Operator<Observable<T>, T>;
-  function flatMap<T, U>(
-    project: (...args: ToTuple<T>) => Observable<U>
+  function flatMap<T, S extends T, U>(
+    project: (...args: S extends LuaTuple<infer V> ? V : [S]) => Observable<U>
   ): Operator<T, U>;
-  function switchMap<T, U>(
-    project: (...args: ToTuple<T>) => Observable<U>
+  function switchMap<T, S extends T, U>(
+    project: (...args: S extends LuaTuple<infer V> ? V : [S]) => Observable<U>
   ): Operator<T, U>;
   function takeUntil<T>(notifier: Observable<unknown>): Operator<T, T>;
   function packed<T>(...args: ToTuple<T>): Observable<T>;
