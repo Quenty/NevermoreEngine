@@ -51,6 +51,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   batchPlaceId?: number;
   batchUniverseId?: number;
   timeout?: number;
+  chunkSize?: number;
 }
 
 export const batchTestCommand: CommandModule<
@@ -116,7 +117,12 @@ export const batchTestCommand: CommandModule<
         })
         .option('timeout', {
           describe:
-            'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
+            'Max script execution time in seconds per chunk. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
+          type: 'number',
+        })
+        .option('chunk-size', {
+          describe:
+            'Packages per execution task (--aggregated only). Open Cloud keeps only the tail of a task log, so one task for every package loses the ones that ran first. (default: 16)',
           type: 'number',
         })
         // Accepted only to fail with a useful message. A batch runs one shared
@@ -243,6 +249,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
         batchTimeoutMs: timeoutMs,
+        chunkSize: args.chunkSize,
         reporter,
       })
     : innerContext;
