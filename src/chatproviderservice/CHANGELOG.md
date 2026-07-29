@@ -1,3 +1,15 @@
+# v9.67.4 (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- fix(chatproviderservice): let a PlayerMock be chat tagged [#776](https://github.com/Quenty/NevermoreEngine/pull/776) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
