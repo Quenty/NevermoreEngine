@@ -171,6 +171,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
               showLogs: args.logs ?? false,
               verbose: args.verbose,
               actionVerb: 'Testing',
+              expectsTestCounts: true,
             })
           : new SpinnerReporter(state, {
               showLogs: args.logs ?? false,

@@ -62,6 +62,7 @@ export function parseBatchTestLogs(
   let currentLines: string[] = [];
   let summaryLineIndex = -1;
   let beginMarkersSeen = 0;
+  let endMarkersSeen = 0;
 
   // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
   const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
@@ -78,6 +79,7 @@ export function parseBatchTestLogs(
 
     if (trimmed.startsWith(END_MARKER) && trimmed.endsWith('===')) {
       const inner = trimmed.slice(END_MARKER.length, -3);
+      endMarkersSeen++;
       const match = endInnerPattern.exec(inner);
       const endSlug = match ? match[1] : inner;
       const durationStr = match?.[2];
@@ -160,8 +162,17 @@ export function parseBatchTestLogs(
   if (lostSectionOutput) {
     OutputHelper.warn(
       `[batch-log-parser] Parsed a summary but found no per-package log sections ` +
-        `(${beginMarkersSeen} BEGIN markers, ${lines.length} lines, ${rawLogs.length} chars). ` +
+        `(${beginMarkersSeen} BEGIN, ${endMarkersSeen} END markers; summary at line ` +
+        `${summaryLineIndex} of ${lines.length}; ${rawLogs.length} chars). ` +
         'Test output was lost between the engine and here, so no result below carries test counts.'
+    );
+    // BEGIN is printed first and the summary last, so their positions separate
+    // the two ways this happens: a log window that dropped the head keeps the
+    // summary at the end, while reordered messages put it early.
+    OutputHelper.warn(
+      summaryLineIndex >= lines.length - 2
+        ? '[batch-log-parser] Summary sits at the end of the log — consistent with the head being dropped by a log size/retention limit.'
+        : '[batch-log-parser] Summary sits early in the log — consistent with out-of-order messages ending the scan prematurely.'
     );
   }
 

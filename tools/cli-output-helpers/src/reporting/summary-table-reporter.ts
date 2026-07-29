@@ -77,8 +77,9 @@ export class SummaryTableReporter extends BaseReporter {
     const totalTime = OutputHelper.formatDim(
       `in ${formatDurationMs(durationMs)}`
     );
+    const unit = results.length === 1 ? 'package' : 'packages';
     console.log(
-      `${results.length} ${this._summaryVerb}, ${passedText}, ${failedText} ${totalTime}`
+      `${results.length} ${unit} ${this._summaryVerb}, ${passedText}, ${failedText} ${totalTime}`
     );
 
     if (emptyRunCount > 0) {

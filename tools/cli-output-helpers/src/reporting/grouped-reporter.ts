@@ -2,7 +2,11 @@ import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs, isCI } from '../cli-utils.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
-import { formatProgressResult, isEmptyTestRun } from './progress-format.js';
+import {
+  formatProgressResult,
+  isEmptyTestRun,
+  isUnreportedTestRun,
+} from './progress-format.js';
 
 export interface GroupedReporterOptions {
   showLogs: boolean;
@@ -13,6 +17,11 @@ export interface GroupedReporterOptions {
   successLabel?: string;
   /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
   failureLabel?: string;
+  /**
+   * When true, a success carrying no test counts prints as unverified. Set by
+   * test runs: a ✓ with no numbers behind it looks identical to a real pass.
+   */
+  expectsTestCounts?: boolean;
 }
 
 /**
@@ -77,16 +86,24 @@ export class GroupedReporter extends BaseReporter {
     const progressText = formatProgressResult(result.progressSummary);
     const empty = isEmptyTestRun(result.progressSummary);
 
+    const unverified =
+      (this._options.expectsTestCounts ?? false) &&
+      isUnreportedTestRun(result.progressSummary);
+
     if (result.success) {
-      const label = progressText
+      const label = unverified
+        ? 'Unverified — no test counts reported'
+        : progressText
         ? `${successLabel} ${progressText}`
         : successLabel;
-      const formatted = empty
-        ? OutputHelper.formatWarning(`${label} ⚠`)
-        : OutputHelper.formatSuccess(label);
-      const icon = empty
-        ? OutputHelper.formatWarning('⚠')
-        : OutputHelper.formatSuccess('✓');
+      const formatted =
+        empty || unverified
+          ? OutputHelper.formatWarning(`${label} ⚠`)
+          : OutputHelper.formatSuccess(label);
+      const icon =
+        empty || unverified
+          ? OutputHelper.formatWarning('⚠')
+          : OutputHelper.formatSuccess('✓');
       console.log(
         `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
       );
@@ -104,9 +121,20 @@ export class GroupedReporter extends BaseReporter {
 
     if (showLogs) {
       if (result.logs) {
-        console.log(result.logs);
+        // jest-lua's escape codes reach here as log content, past chalk.
+        console.log(
+          process.env.NO_COLOR
+            ? OutputHelper.stripAnsi(result.logs)
+            : result.logs
+        );
       } else {
-        console.log(OutputHelper.formatDim('  (no output)'));
+        // Logs were requested and none arrived — whatever verdict accompanies
+        // this was reached without reading any output.
+        console.log(
+          OutputHelper.formatWarning(
+            '  (no output) — nothing was read to reach the result above'
+          )
+        );
       }
       if (result.error) {
         console.log(`  ${OutputHelper.formatError(result.error)}`);
