@@ -15,7 +15,10 @@ local require = require(script.Parent.loader).load(script)
 local ChatProviderService = require("ChatProviderService")
 local ChatTagConstants = require("ChatTagConstants")
 local ChatTagDataUtils = require("ChatTagDataUtils")
+local HasChatTagsConstants = require("HasChatTagsConstants")
 local Jest = require("Jest")
+local PermissionProviderUtils = require("PermissionProviderUtils")
+local PermissionService = require("PermissionService")
 local PlayerMockService = require("PlayerMockService")
 local ServiceBag = require("ServiceBag")
 
@@ -40,39 +43,84 @@ afterEach(function()
 	end
 end)
 
-local function setup()
+local remoteNameCounter = 0
+
+-- Polls rather than observes: the tag arrives through a binder, a permission promise and an Rx chain,
+-- and the point of these tests is the end state rather than which hop delivered it.
+local function waitForTagCount(player: Player, expected: number, timeout: number): number
+	local deadline = os.clock() + timeout
+
+	repeat
+		local container = player:FindFirstChild(HasChatTagsConstants.TAG_CONTAINER_NAME)
+		local count = if container then #container:GetChildren() else 0
+		if count == expected then
+			return count
+		end
+		task.wait(0.1)
+	until os.clock() > deadline
+
+	local container = player:FindFirstChild(HasChatTagsConstants.TAG_CONTAINER_NAME)
+	return if container then #container:GetChildren() else 0
+end
+
+-- creatorUserId, when given, makes that user the creator so the built-in developer tag actually
+-- applies to them. Left nil, both built-in tags are switched off: they resolve through
+-- PermissionService, which is a different question than whether a mock can be tagged at all.
+local function setup(creatorUserId: number?)
 	local serviceBag = ServiceBag.new()
 	local container = Instance.new("Folder")
 	container.Name = "ChatProviderServiceSpecContainer"
 	container.Parent = workspace
 
 	local chatProviderService: any = serviceBag:GetService(ChatProviderService)
+	local permissionService: any = serviceBag:GetService(PermissionService)
 	local playerMockService: any = serviceBag:GetService(PlayerMockService)
 
 	serviceBag:Init()
+
+	if creatorUserId then
+		remoteNameCounter += 1
+		permissionService:SetProviderFromConfig(PermissionProviderUtils.createSingleUserConfig({
+			userId = creatorUserId,
+			remoteFunctionName = string.format("ChatProviderServiceSpecRemote%d", remoteNameCounter),
+		}))
+	end
+
 	serviceBag:Start()
 
-	chatProviderService:SetDeveloperTag(nil)
-	chatProviderService:SetAdminTag(nil)
+	if not creatorUserId then
+		chatProviderService:SetDeveloperTag(nil)
+		chatProviderService:SetAdminTag(nil)
+	end
 
 	local mocks: { Player } = {}
+	local bagDestroyed = false
+
+	local function destroyBag()
+		if not bagDestroyed then
+			bagDestroyed = true
+			serviceBag:Destroy()
+		end
+	end
 
 	local controller
 	controller = {
 		chatProviderService = chatProviderService,
-		newMock = function(): Player
-			local mock = playerMockService:CreatePlayer()
+		newMock = function(userId: number?): Player
+			local mock = playerMockService:CreatePlayer(if userId then { UserId = userId } else nil)
 			mock.Parent = container
 			table.insert(mocks, mock)
 			return mock
 		end,
+		destroyBag = destroyBag,
 		destroy = function()
+			destroyBag()
+
 			for _, mock in mocks do
 				mock:Destroy()
 			end
 			table.clear(mocks)
 
-			serviceBag:Destroy()
 			container:Destroy()
 		end,
 	}
@@ -100,6 +148,38 @@ describe("ChatProviderService.PromiseAddChatTag", function()
 		tag:Destroy()
 
 		expect(tag:IsDescendantOf(player)).toBe(false)
+	end)
+end)
+
+describe("ChatProviderService.SetDeveloperTag", function()
+	local CREATOR_USER_ID = 4242
+
+	it("tags the creator", function()
+		local controller = setup(CREATOR_USER_ID)
+		local player = controller.newMock(CREATOR_USER_ID)
+
+		expect(waitForTagCount(player, 1, 10)).toBe(1)
+	end)
+
+	it("leaves everybody else alone", function()
+		local controller = setup(CREATOR_USER_ID)
+		local player = controller.newMock(CREATOR_USER_ID + 1)
+
+		expect(waitForTagCount(player, 0, 3)).toBe(0)
+	end)
+
+	--[[
+		The tag holds a subscription to every player in the place, so without a Destroy it outlived its
+		own bag: a destroyed service went on resolving permissions and reaching for binders through
+		services it no longer owned.
+	]]
+	it("stops tagging once its bag is destroyed", function()
+		local controller = setup(CREATOR_USER_ID)
+		controller.destroyBag()
+
+		local player = controller.newMock(CREATOR_USER_ID)
+
+		expect(waitForTagCount(player, 0, 3)).toBe(0)
 	end)
 end)
 

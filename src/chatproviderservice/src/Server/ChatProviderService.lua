@@ -301,4 +301,15 @@ function ChatProviderService._promiseSpeaker(self: ChatProviderService, speakerN
 	end)
 end
 
+--[=[
+	Cleans up the service. Should be done via [ServiceBag].
+
+	Load-bearing rather than tidy: the developer and admin tags hold a subscription to every player in
+	the place, which outlived this service without it. A destroyed bag then went on resolving
+	permissions and tagging players through services it no longer owns.
+]=]
+function ChatProviderService.Destroy(self: ChatProviderService)
+	self._maid:DoCleaning()
+end
+
 return ChatProviderService
