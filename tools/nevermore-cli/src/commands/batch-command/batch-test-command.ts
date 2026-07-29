@@ -60,64 +60,84 @@ export const batchTestCommand: CommandModule<
   command: 'test',
   describe: 'Run tests for changed packages with test targets',
   builder: (yargs) => {
-    return yargs
-      .option('cloud', {
-        describe: 'Run tests via Open Cloud instead of locally',
-        type: 'boolean',
-        default: false,
-      })
-      .option('api-key', {
-        describe: 'Roblox Open Cloud API key (--cloud only)',
-        type: 'string',
-      })
-      .option('all', {
-        describe: 'Test all packages with test targets, not just changed',
-        type: 'boolean',
-        default: false,
-      })
-      .option('base', {
-        describe: 'Git ref to diff against for change detection',
-        type: 'string',
-        default: 'origin/main',
-      })
-      .option('concurrency', {
-        describe: 'Max parallel tests (0 = unlimited, default: unlimited)',
-        type: 'number',
-      })
-      .option('output', {
-        describe: 'Write JSON results to this file',
-        type: 'string',
-      })
-      .option('limit', {
-        describe: 'Max number of packages to test (for local debugging)',
-        type: 'number',
-      })
-      .option('logs', {
-        describe: 'Show execution logs for all packages (not just failures)',
-        type: 'boolean',
-        default: false,
-      })
-      .option('aggregated', {
-        describe:
-          'Build all packages into a single place and execute one batch script',
-        type: 'boolean',
-        default: true,
-      })
-      .option('batch-place-id', {
-        describe:
-          'Override placeId for the aggregated batch upload (--aggregated only)',
-        type: 'number',
-      })
-      .option('batch-universe-id', {
-        describe:
-          'Override universeId for the aggregated batch upload (--aggregated only)',
-        type: 'number',
-      })
-      .option('timeout', {
-        describe:
-          'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
-        type: 'number',
-      });
+    return (
+      yargs
+        .option('cloud', {
+          describe: 'Run tests via Open Cloud instead of locally',
+          type: 'boolean',
+          default: false,
+        })
+        .option('api-key', {
+          describe: 'Roblox Open Cloud API key (--cloud only)',
+          type: 'string',
+        })
+        .option('all', {
+          describe: 'Test all packages with test targets, not just changed',
+          type: 'boolean',
+          default: false,
+        })
+        .option('base', {
+          describe: 'Git ref to diff against for change detection',
+          type: 'string',
+          default: 'origin/main',
+        })
+        .option('concurrency', {
+          describe: 'Max parallel tests (0 = unlimited, default: unlimited)',
+          type: 'number',
+        })
+        .option('output', {
+          describe: 'Write JSON results to this file',
+          type: 'string',
+        })
+        .option('limit', {
+          describe: 'Max number of packages to test (for local debugging)',
+          type: 'number',
+        })
+        .option('logs', {
+          describe: 'Show execution logs for all packages (not just failures)',
+          type: 'boolean',
+          default: false,
+        })
+        .option('aggregated', {
+          describe:
+            'Build all packages into a single place and execute one batch script',
+          type: 'boolean',
+          default: true,
+        })
+        .option('batch-place-id', {
+          describe:
+            'Override placeId for the aggregated batch upload (--aggregated only)',
+          type: 'number',
+        })
+        .option('batch-universe-id', {
+          describe:
+            'Override universeId for the aggregated batch upload (--aggregated only)',
+          type: 'number',
+        })
+        .option('timeout', {
+          describe:
+            'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
+          type: 'number',
+        })
+        // Accepted only to fail with a useful message. A batch runs one shared
+        // script across packages, so there is nothing for arbitrary Luau to mean
+        // here — but yargs strict mode would otherwise reject it with a bare
+        // "Unknown argument" that does not say where to go instead.
+        .option('script-text', {
+          hidden: true,
+          type: 'string',
+        })
+        .check((args) => {
+          if (args.scriptText !== undefined) {
+            throw new Error(
+              '--script-text is not supported by "batch test", which runs one shared script for all packages.\n' +
+                'Run it against a single package instead:\n' +
+                '  cd <package> && nevermore test --cloud --script-text \'print("hi")\''
+            );
+          }
+          return true;
+        })
+    );
   },
   handler: async (args) => {
     try {

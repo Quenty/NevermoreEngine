@@ -56,9 +56,9 @@ export class TestProjectCommand<T>
       type: 'string',
     });
     args.option('logs', {
-      describe: 'Show execution logs',
+      describe:
+        'Show execution logs. Defaults on with --script-text, whose output is the whole point of the run',
       type: 'boolean',
-      default: false,
     });
     args.option('universe-id', {
       describe:
@@ -84,7 +84,7 @@ export class TestProjectCommand<T>
     });
     args.option('timeout', {
       describe:
-        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
+        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
       type: 'number',
     });
 
@@ -94,7 +94,10 @@ export class TestProjectCommand<T>
   public handler = async (args: TestProjectArgs) => {
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-    const showLogs = args.logs ?? false;
+    // A probe run exists to show its output. Hiding it behind an opt-in flag
+    // made --script-text look broken enough that a workaround was written into
+    // the docs instead of a bug report.
+    const showLogs = args.logs ?? args.scriptText !== undefined;
     const useSpinner = process.stdout.isTTY && !args.verbose;
 
     const reporter = new CompositeReporter(

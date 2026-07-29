@@ -30,6 +30,25 @@ export interface SingleTestResult {
   error?: string;
 }
 
+/**
+ * Combine failure reasons from the job context with those read from the logs.
+ *
+ * In batch mode the context has already evaluated these same logs, so the two
+ * sources overlap. Merging on the individual reason keeps the overlap from
+ * reading as double the failures.
+ */
+export function mergeFailureReasons(
+  contextError: string | undefined,
+  logReasons: string[]
+): string[] {
+  return [
+    ...new Set([
+      ...(contextError ? contextError.split('; ') : []),
+      ...logReasons,
+    ]),
+  ];
+}
+
 export interface SingleTestOptions {
   packagePath: string;
   packageName: string;
@@ -56,7 +75,10 @@ export async function runSingleTestAsync(
   const {
     packagePath,
     packageName,
-    timeoutMs = 120_000,
+    // 300s is the Open Cloud maximum. The old 120s default failed real suites
+    // with no jest summary at all, so "--timeout 300" had become folklore
+    // everyone had to know before their first useful run.
+    timeoutMs = 300_000,
     scriptText,
     target,
   } = options;
@@ -104,14 +126,24 @@ export async function runSingleTestAsync(
     });
 
     const rawLogs = await context.getLogsAsync(deployment);
-    const parsed = parseTestLogs(rawLogs);
+    // A probe script is arbitrary Luau with no jest in it, so demanding a test
+    // report would fail every --script-text run. Everything else must prove a
+    // runner spoke before it can pass.
+    const parsed = parseTestLogs(rawLogs, {
+      requireTestReport: scriptText === undefined,
+    });
+
+    const reasons = mergeFailureReasons(
+      result.errorMessage,
+      parsed.failureReasons
+    );
 
     return {
       success: result.success && parsed.success,
       logs: parsed.logs,
       testCounts: parseTestCounts(parsed.logs),
       durationMs: result.durationMs,
-      error: result.errorMessage,
+      error: reasons.length > 0 ? reasons.join('; ') : undefined,
     };
   } finally {
     await context.releaseAsync(deployment);

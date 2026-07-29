@@ -23,10 +23,11 @@ describe('parseBatchTestLogs', () => {
     expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
   });
 
-  it('fails a pass it cannot read, rather than trusting the pcall', () => {
-    // The summary prints last, so it survives a log window that dropped the
-    // head. The pcall said success, but nothing here saw a test run.
+  it('attributes a section closed by END when its BEGIN was dropped', () => {
+    // Open Cloud keeps only the tail of a long run's log, so BEGIN — printed
+    // first — is the first casualty while END and the summary survive.
     const logs = [
+      '  ✓ some test that survived (3 ms)',
       'Tests:  275 passed, 275 total',
       '===BATCH_TEST_END egghunt2026 PASS 1000===',
       '===BATCH_TEST_SUMMARY===',
@@ -35,8 +36,23 @@ describe('parseBatchTestLogs', () => {
 
     const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
 
+    expect(result?.success).toBe(true);
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('fails a pass it cannot read, rather than trusting the pcall', () => {
+    // No END marker either, so there is no boundary to attribute output with.
+    // The pcall said success, but nothing here saw a test run.
+    const logs = [
+      'Tests:  275 passed, 275 total',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
     expect(result?.success).toBe(false);
-    expect(result?.error).toContain('No test output could be attributed');
+    expect(result?.error).toContain('no output could be attributed');
     expect(result?.testCounts).toBeUndefined();
   });
 
