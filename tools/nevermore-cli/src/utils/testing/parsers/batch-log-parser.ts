@@ -72,6 +72,9 @@ export function parseBatchTestLogs(
   let summaryLineIndex = -1;
   let beginMarkersSeen = 0;
   let endMarkersSeen = 0;
+  let strayEndMarkers = 0;
+  /** Only one section can have lost its head: the one the log was cut inside. */
+  let headSectionClaimed = false;
 
   // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
   const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
@@ -93,21 +96,36 @@ export function parseBatchTestLogs(
       const endSlug = match ? match[1] : inner;
       const durationStr = match?.[2];
 
-      // Close on END, not on a matching BEGIN. Open Cloud keeps only the tail
-      // of a long run's log, so BEGIN — printed first — is the first thing
-      // lost, while END and the summary always survive. Everything since the
-      // last boundary belongs to the package this END names.
-      if (currentSlug === null || endSlug === currentSlug) {
+      // A section normally closes on the END matching its own BEGIN.
+      const closesOwnSection = endSlug === currentSlug;
+
+      // Open Cloud keeps only the tail of a long run's log, so BEGIN — printed
+      // first — can be lost while END and the summary survive. Recovering that
+      // means letting an END with no open section claim what precedes it, but
+      // only where the head can actually have been dropped: before any BEGIN
+      // has survived, and only once. Past that point the log is well-formed,
+      // and a BEGIN-less END is a message delivered out of order (the API does
+      // not order them), which must not be allowed to claim another package's
+      // output.
+      const closesDroppedHead =
+        currentSlug === null && beginMarkersSeen === 0 && !headSectionClaimed;
+
+      if (closesOwnSection || closesDroppedHead) {
         logSections.set(endSlug, currentLines.join('\n'));
-        if (currentSlug === null) {
+        if (closesDroppedHead) {
           partialSections.add(endSlug);
+          headSectionClaimed = true;
         }
         if (durationStr !== undefined) {
           markerDurations.set(endSlug, parseInt(durationStr, 10));
         }
+        currentSlug = null;
+        currentLines = [];
+      } else {
+        // Reordered marker from another package. Ignore it without resetting
+        // state, so the section it interrupted still closes on its own END.
+        strayEndMarkers++;
       }
-      currentSlug = null;
-      currentLines = [];
       continue;
     }
 
@@ -126,12 +144,16 @@ export function parseBatchTestLogs(
   const summaryResults = new Map<string, boolean>();
   const summaryDurations = new Map<string, number>();
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
-    const jsonLine = lines
-      .slice(summaryLineIndex + 1)
-      .join('\n')
-      .trim();
-    try {
-      const entries = JSON.parse(jsonLine) as SummaryEntry[];
+    const entries = findSummaryEntries(lines, summaryLineIndex + 1);
+    if (entries === undefined) {
+      OutputHelper.verbose(
+        `[batch-log-parser] Failed to parse JSON summary after line ${summaryLineIndex}: ` +
+          lines
+            .slice(summaryLineIndex + 1, summaryLineIndex + 3)
+            .join('\n')
+            .slice(0, 200)
+      );
+    } else {
       for (const entry of entries) {
         summaryResults.set(entry.slug, entry.success);
         if (typeof entry.durationMs === 'number') {
@@ -146,19 +168,19 @@ export function parseBatchTestLogs(
         );
       }
       console.error(
-        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} failures`
-      );
-    } catch {
-      OutputHelper.verbose(
-        `[batch-log-parser] Failed to parse JSON summary: ${jsonLine.slice(
-          0,
-          200
-        )}`
+        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} pcall failures`
       );
     }
   }
 
   // ── Warn when the batch produced no recognizable output ──
+
+  if (strayEndMarkers > 0) {
+    OutputHelper.verbose(
+      `[batch-log-parser] Ignored ${strayEndMarkers} out-of-order END marker(s); ` +
+        'their sections closed on their own boundaries.'
+    );
+  }
 
   const noOutputAtAll = logSections.size === 0 && summaryResults.size === 0;
   if (noOutputAtAll) {
@@ -216,8 +238,12 @@ export function parseBatchTestLogs(
     // The pcall result only proves the script did not throw. It is a floor, not
     // a verdict — everything below can fail a run it called successful.
     let success = summarySuccess ?? false;
-    if (!success) {
+    if (summarySuccess === false) {
       reasons.push('the batch runner reported a Luau error');
+    } else if (summarySuccess === undefined) {
+      // Absent from the summary is a different fault from failing in it, and
+      // conflating them sends you hunting for a Luau error that never happened.
+      reasons.push('this package is missing from the batch summary');
     }
 
     if (attributedLogs !== undefined) {
@@ -284,6 +310,47 @@ export function parseBatchTestLogs(
   }
 
   return results;
+}
+
+/**
+ * Find the summary array in the lines following the summary marker.
+ *
+ * The marker is printed last, but the API does not deliver messages in order,
+ * so unrelated output can land after it. Treating everything past the marker as
+ * one JSON blob therefore fails intermittently — the same batch parses on one
+ * run and not the next. Scan for the array instead of assuming it is alone.
+ */
+export function findSummaryEntries(
+  lines: string[],
+  startIndex: number
+): SummaryEntry[] | undefined {
+  const MAX_SPAN = 50;
+
+  for (let i = startIndex; i < lines.length; i++) {
+    if (!lines[i].trim().startsWith('[')) {
+      continue;
+    }
+
+    // Normally one line, but allow the array to span a few in case the runner
+    // or the transport breaks it up.
+    for (let end = i; end < Math.min(lines.length, i + MAX_SPAN); end++) {
+      try {
+        const parsed = JSON.parse(
+          lines
+            .slice(i, end + 1)
+            .join('\n')
+            .trim()
+        );
+        if (Array.isArray(parsed)) {
+          return parsed as SummaryEntry[];
+        }
+      } catch {
+        // Incomplete so far — grow the window and try again.
+      }
+    }
+  }
+
+  return undefined;
 }
 
 export { countTracebacks } from '../test-log-parser.js';

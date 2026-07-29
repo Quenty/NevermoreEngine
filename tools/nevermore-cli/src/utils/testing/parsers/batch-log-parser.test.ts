@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { countTracebacks, parseBatchTestLogs } from './batch-log-parser.js';
+import {
+  countTracebacks,
+  findSummaryEntries,
+  parseBatchTestLogs,
+} from './batch-log-parser.js';
 
 const SLUG_MAP = new Map([['egghunt2026', 'egghunt2026']]);
 
@@ -38,6 +42,31 @@ describe('parseBatchTestLogs', () => {
 
     expect(result?.success).toBe(true);
     expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('does not let an out-of-order END steal another package’s output', () => {
+    // The API does not deliver messages in order, so a stray END can arrive
+    // mid-section. Only the first section can have lost its head; past that the
+    // log is well-formed and a BEGIN-less END must not claim anything.
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END beta PASS 5===',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.testCounts?.total).toBe(10);
+    // beta never had a section of its own; it must not inherit alpha's.
+    expect(results.get('beta')?.testCounts).toBeUndefined();
+    expect(results.get('beta')?.success).toBe(false);
   });
 
   it('fails a pass it cannot read, rather than trusting the pcall', () => {
@@ -85,6 +114,26 @@ describe('parseBatchTestLogs', () => {
 
     expect(result?.testCounts?.failed).toBe(0);
     expect(result?.tracebackCount).toBe(1);
+  });
+});
+
+describe('findSummaryEntries', () => {
+  it('finds the summary even when output landed after it', () => {
+    // Messages are not delivered in order, so a stray line can follow the
+    // summary. Treating the whole remainder as one JSON blob made the same
+    // batch parse on one run and fail on the next.
+    const lines = [
+      '[{"slug":"alpha","success":true}]',
+      '  ✓ a stray line that arrived late',
+    ];
+
+    expect(findSummaryEntries(lines, 0)).toEqual([
+      { slug: 'alpha', success: true },
+    ]);
+  });
+
+  it('returns undefined when there is no array to find', () => {
+    expect(findSummaryEntries(['not json at all'], 0)).toBeUndefined();
   });
 });
 
