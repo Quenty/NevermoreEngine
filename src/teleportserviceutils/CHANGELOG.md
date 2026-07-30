@@ -1,19 +1,13 @@
-# v10.3.1 (Thu Jul 30 2026)
-
-#### 🐛 Bug Fix
-
-- fix(teleportserviceutils): let a server teleport hear a refusal raised after acceptance [#779](https://github.com/Quenty/NevermoreEngine/pull/779) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.3.0...@quenty/teleportserviceutils@10.3.1) (2026-07-30)
+
+### Bug Fixes
+
+- **teleportserviceutils:** let a server teleport hear a refusal raised after acceptance ([#779](https://github.com/Quenty/NevermoreEngine/issues/779)) ([77ac1e4](https://github.com/Quenty/NevermoreEngine/commit/77ac1e42074174b77c8fb559b3b1cdebb46a7ec9))
 
 # [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.3...@quenty/teleportserviceutils@10.3.0) (2026-07-28)
 
