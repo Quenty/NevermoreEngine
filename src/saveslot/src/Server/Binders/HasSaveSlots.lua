@@ -1191,6 +1191,10 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 							self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
 						end
 					end))
+
+					-- Matches the liveness-guard returns above, which make this callback's inferred return
+					-- type nil; falling off the end instead returns no values at all.
+					return nil
 				end)
 		end)
 	end)
