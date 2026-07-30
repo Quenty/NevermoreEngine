@@ -103,13 +103,38 @@ function DataStoreTestUtils.setup()
 end
 
 --[=[
+	Simulates what a real Roblox server does when it shuts down, which is the only accurate model for
+	the save path: Roblox fires PlayerRemoving for every player still in the server, giving those
+	handlers the same "hold the shutdown open for me" treatment BindToClose gets. So the removals are
+	what save and close each session; the close callback's job is only to wait for them to flush.
+
+	Destroying the manager is NOT a shutdown and never has been -- nothing in a live server destroys it.
+
+	@param manager PlayerDataStoreManager
+	@param userIds { PlayerUserId }? -- players still in the server when it began closing
+	@return Promise -- what BindToCloseService yields on, so the server cannot die until it settles
+]=]
+function DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
+	for _, userId in userIds or {} do
+		manager:RemovePlayerDataStore(userId)
+	end
+
+	return manager:PromiseAllSaves()
+end
+
+--[=[
 	Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to
-	a fresh [DataStoreMock] (keyed `user_<userId>`), all owned by a Maid. `destroy()` tears down the
-	manager (and the loaded stores whose auto-save loops it owns) and the service bag.
+	a fresh [DataStoreMock] (keyed `user_<userId>`), all owned by a Maid.
+
+	`destroy()` shuts the server down the way Roblox would (see
+	[DataStoreTestUtils.promiseSimulatedShutdown]) and then tears the objects down. The shutdown is not
+	optional bookkeeping: a store the spec loaded keeps its auto-save loop running until something
+	removes it, and in the shared test place that loop outlives the spec and fires inside a later
+	package's window.
 
 	Fields: `manager`, `mock`, `serviceBag`.
 	Helpers: `storeAndAwaitLock()` -> boolean -- stores a value on user 1's store and waits for the
-	session-locked load to write the lock envelope.
+	session-locked load to write the lock envelope. `promiseShutdown(userIds?)` -> Promise.
 
 	@return { manager: PlayerDataStoreManager, mock: DataStoreMock, ... }
 ]=]
@@ -123,6 +148,7 @@ function DataStoreTestUtils.setupDataStoreManager()
 		return "user_" .. tostring(userId)
 	end, true))
 
+	-- Returns exactly one value: specs call this straight through expect(), which rejects a second arg.
 	local function storeAndAwaitLock()
 		local dataStore = manager:GetDataStore(1)
 		dataStore:Store("coins", 5)
@@ -133,12 +159,18 @@ function DataStoreTestUtils.setupDataStoreManager()
 		end, 10)
 	end
 
+	local function promiseShutdown(userIds)
+		return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
+	end
+
 	return {
 		manager = manager,
 		mock = mock,
 		serviceBag = serviceBag,
 		storeAndAwaitLock = storeAndAwaitLock,
+		promiseShutdown = promiseShutdown,
 		destroy = function()
+			PromiseTestUtils.awaitSettled(promiseShutdown(), 5)
 			maid:DoCleaning()
 		end,
 	}
