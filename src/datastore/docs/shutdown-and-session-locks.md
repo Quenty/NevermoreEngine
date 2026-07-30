@@ -81,9 +81,27 @@ already-fulfilled promise, `BindToCloseService` stops yielding, and Roblox kills
 leaving the session locked, with nobody able to release it, and the next server paying the ~80 seconds.
 Any consumer with an async removing or saving callback hits this, which is most of them.
 
-Waiting on `_removingPromises` fixes it because those entries are inserted synchronously by
-`_removePlayerDataStore`, before anything can yield, and cleared in an identity-guarded `Finally` — so a
-fast leave/rejoin cannot clobber the entry the close is waiting on.
+Waiting on `_removingPromises` fixes that, because the entry is inserted synchronously and cleared in an
+identity-guarded `Finally`, so a fast leave/rejoin cannot clobber the entry the close is waiting on.
+
+It does not close the hole completely, and the remaining sliver is worth knowing rather than
+rediscovering. `_removePlayerDataStore` latches `_removing[userId] = true` *before* it invokes the
+removing callbacks, and only inserts into `_removingPromises` *after* that loop returns. A callback that
+yields inside the loop — or throws out of it — leaves a window where the removal is latched but untracked,
+and a close landing in that window early-returns on the `_removing` guard and again finds nothing to wait
+on. A throwing callback makes it permanent: `_removing` stays true, so that store can never be removed.
+
+This is pre-existing, not introduced by the change that added the wait, and the window is far smaller
+than what it replaced: previously the miss lasted the whole removal for *any* non-synchronous chain,
+where now it lasts only while a consumer callback is on the stack inside one loop.
+`RemovalCallbacks.spec.lua` characterizes both callback behaviours, though neither test drives a close
+across the window, so the sliver itself is uncovered.
+
+Closing it means publishing the tracking entry before any consumer code runs — a pending promise
+inserted at latch time and resolved to the real chain afterwards. That is a change to
+`_removePlayerDataStore` itself, so it wants its own review, and note it only fixes the yielding case:
+after a *throw* the placeholder is never resolved, so the close would hang on it instead of resolving
+early. Arguably the better failure, but it needs the callback loop isolated to actually be closed.
 
 ## Rejected: flushing the stores on manager teardown
 
@@ -145,9 +163,14 @@ auto-save loop running — and a `PlayerMock` never fires the real `Players.Play
 else removes them either. Any spec built that way has to shut down explicitly before it tears down.
 
 Resist the urge to fix that by re-adding a destroy on the manager's maid. A destroy-only teardown is
-worse than the leak: it would leave `_datastores` populated with destroyed stores, so a `PlayerRemoving`
-arriving afterwards would call `SaveAndCloseSession()` on a nil metatable, and clearing `_datastores`
-too would silently drop the save. The leak is a harness problem; keep the fix in the harness.
+worse than the leak: it would leave `_datastores` populated with destroyed stores, and clearing
+`_datastores` too would silently drop the save instead.
+
+Not via a later `PlayerRemoving`, though — `Maid.DoCleaning` disconnects every `RBXScriptConnection` in a
+dedicated first pass before it runs any function task, so the manager's `PlayerRemoving` handler is
+already gone by then. The reachable case is a removal *already in flight*: a removing callback that
+yielded resumes to find the store destroyed under it, and `SaveAndCloseSession()` hits a nil metatable.
+The leak is a harness problem; keep the fix in the harness.
 
 `manager:Destroy()` is not a shutdown and specs must not use it as one — several did, which is how the
 teardown flush looked well covered while being wrong. Drive

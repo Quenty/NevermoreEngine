@@ -137,11 +137,29 @@ end
 	@param playerDataStoreService PlayerDataStoreService
 	@param userIds { PlayerUserId }?
 	@param timeout number? -- defaults to 5
-	@return boolean -- whether the shutdown settled
+	@return boolean -- false only if a shutdown was started and did not settle in time
 ]=]
 function DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService, userIds, timeout)
+	local managerPromise = playerDataStoreService:PromiseManager()
+
+	-- Nothing to shut down yet, so return rather than sit out the timeout. The manager is only
+	-- constructed inside the last link of PromiseManager's chain, so a promise still pending here means
+	-- that link never ran: no manager exists, so _createDataStore was never called and no store exists to
+	-- leak. That holds whatever the promise is waiting on -- a ServiceBag that was never started, or a
+	-- real datastore still resolving. Specs that start the bag per-test would otherwise pay the full
+	-- timeout on every teardown.
+	if managerPromise:IsPending() then
+		return true
+	end
+
 	return PromiseTestUtils.awaitSettled(
-		playerDataStoreService:PromiseManager():Then(function(manager)
+		managerPromise:Then(function(manager)
+			-- Promise runs handlers without a pcall, so calling a destroyed manager would throw straight
+			-- out of the spec's teardown rather than fail it.
+			if not manager.Destroy then
+				return nil
+			end
+
 			return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
 		end),
 		timeout or 5
