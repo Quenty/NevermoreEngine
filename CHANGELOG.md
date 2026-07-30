@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/gameproductservice@14.66.5`
+  - fix(gameproductservice): stop ownership queries spamming the log with failures they cannot avoid [#778](https://github.com/Quenty/NevermoreEngine/pull/778) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/teleportserviceutils@10.3.1`
   - fix(teleportserviceutils): let a server teleport hear a refusal raised after acceptance [#779](https://github.com/Quenty/NevermoreEngine/pull/779) ([@Quenty](https://github.com/Quenty))
 
