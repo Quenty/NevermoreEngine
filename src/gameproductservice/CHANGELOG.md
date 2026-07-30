@@ -1,19 +1,13 @@
-# v14.66.5 (Thu Jul 30 2026)
-
-#### 🐛 Bug Fix
-
-- fix(gameproductservice): stop ownership queries spamming the log with failures they cannot avoid [#778](https://github.com/Quenty/NevermoreEngine/pull/778) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.66.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.4...@quenty/gameproductservice@14.66.5) (2026-07-30)
+
+### Bug Fixes
+
+- **gameproductservice:** stop ownership queries spamming the log with failures they cannot avoid ([#778](https://github.com/Quenty/NevermoreEngine/issues/778)) ([2413adb](https://github.com/Quenty/NevermoreEngine/commit/2413adbabcfbd4df3dc639c1ef40ec2ffcfe0571))
 
 ## [14.66.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.3...@quenty/gameproductservice@14.66.4) (2026-07-29)
 
