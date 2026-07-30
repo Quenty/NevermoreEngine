@@ -1102,61 +1102,81 @@ function HasSaveSlots.PromiseIncomingSlotId(self: HasSaveSlots): Promise.Promise
 		end)
 end
 
+-- Every hop is maid-owned and re-checks we are alive before touching anything, for the same reason as the
+-- selection chain in SaveSlotService: a session-locked or retrying read settles long after the player left,
+-- and a continuation queued before the maid died still runs. Calling into this destroyed
+-- (metatable-stripped) object -- or into its destroyed stores -- throws. Because a datastore load resolves
+-- inside its UpdateAsync transform, that throw surfaces as a "Transform function error" and takes the
+-- transform's write down with it. See SaveSlotLateSettle.spec.
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
-	return self._playerDataStoreService:PromiseDataStore(self._obj):Then(function(dataStore)
+	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj)):Then(function(dataStore)
+		if not self.Destroy then
+			return nil -- Died while the datastore resolved
+		end
+
 		self._dataStore = dataStore
 		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
 		self._metadataStore = self._systemStore:GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
 
-		return self._metadataStore:LoadAll({}):Then(function(metadata)
+		return self._maid:GivePromise(self._metadataStore:LoadAll({})):Then(function(metadata)
+			if not self.Destroy then
+				return nil -- Died while the metadata load settled
+			end
+
 			for slotId, data in metadata do
 				self:_buildSlot(slotId, data)
 			end
 
-			return self._systemStore:Load("activeSlotId"):Then(function(activeId: SaveSlotData.SlotId?)
-				self._lastActiveSlotId = activeId
-				self.LastActiveSlotId.Value = activeId
+			return self._maid
+				:GivePromise(self._systemStore:Load("activeSlotId"))
+				:Then(function(activeId: SaveSlotData.SlotId?)
+					if not self.Destroy then
+						return nil -- Died while the active-slot read settled
+					end
 
-				-- The persisted active-slot pointer and the replicated "Continue" target only ever track real
-				-- slots. This replaces StoreOnValueChange so an ephemeral selection is invisible to both:
-				-- entering one leaves them pinned to the real slot, and the ephemeral slot is torn down the
-				-- moment it stops being active. We track the id we are leaving to know which of those to do.
-				local previousActiveSlotId: SaveSlotData.SlotId? = activeId
+					self._lastActiveSlotId = activeId
+					self.LastActiveSlotId.Value = activeId
 
-				self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
-					local active = self.ActiveSlotId.Value
+					-- The persisted active-slot pointer and the replicated "Continue" target only ever track real
+					-- slots. This replaces StoreOnValueChange so an ephemeral selection is invisible to both:
+					-- entering one leaves them pinned to the real slot, and the ephemeral slot is torn down the
+					-- moment it stops being active. We track the id we are leaving to know which of those to do.
+					local previousActiveSlotId: SaveSlotData.SlotId? = activeId
 
-					-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
-					-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
-					self.ActiveTransferableEphemeralKey.Value = if active
-						then self._transferableEphemeralKeys[active]
-						else nil
+					self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
+						local active = self.ActiveSlotId.Value
 
-					local leftSlotId = previousActiveSlotId
-					-- Read before the retire below, while the outgoing slot is still in the map.
-					local leavingEphemeral = self:_isEphemeral(leftSlotId)
-					previousActiveSlotId = active
+						-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
+						-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
+						self.ActiveTransferableEphemeralKey.Value = if active
+							then self._transferableEphemeralKeys[active]
+							else nil
 
-					-- Persist the pointer + remember the Continue target only for real-slot transitions
-					-- (real -> real, real -> nil deselect, nil -> real). Skip both ephemeral cases: entering an
-					-- ephemeral slot must stay invisible to persistence, and leaving one back to no slot must
-					-- leave the real pointer pinned where it was.
-					local enteringEphemeral = self:_isEphemeral(active)
-					local leavingEphemeralToMenu = leavingEphemeral and active == nil
-					if not (enteringEphemeral or leavingEphemeralToMenu) then
-						self._systemStore:Store("activeSlotId", active)
-						if active ~= nil then
-							self._lastActiveSlotId = active
-							self.LastActiveSlotId.Value = active
+						local leftSlotId = previousActiveSlotId
+						-- Read before the retire below, while the outgoing slot is still in the map.
+						local leavingEphemeral = self:_isEphemeral(leftSlotId)
+						previousActiveSlotId = active
+
+						-- Persist the pointer + remember the Continue target only for real-slot transitions
+						-- (real -> real, real -> nil deselect, nil -> real). Skip both ephemeral cases: entering an
+						-- ephemeral slot must stay invisible to persistence, and leaving one back to no slot must
+						-- leave the real pointer pinned where it was.
+						local enteringEphemeral = self:_isEphemeral(active)
+						local leavingEphemeralToMenu = leavingEphemeral and active == nil
+						if not (enteringEphemeral or leavingEphemeralToMenu) then
+							self._systemStore:Store("activeSlotId", active)
+							if active ~= nil then
+								self._lastActiveSlotId = active
+								self.LastActiveSlotId.Value = active
+							end
 						end
-					end
 
-					-- An ephemeral slot exists only while it is the active slot; retire the one we just left.
-					if leavingEphemeral and leftSlotId ~= active then
-						self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
-					end
-				end))
-			end)
+						-- An ephemeral slot exists only while it is the active slot; retire the one we just left.
+						if leavingEphemeral and leftSlotId ~= active then
+							self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
+						end
+					end))
+				end)
 		end)
 	end)
 end
