@@ -418,7 +418,13 @@ function HasSaveSlots.PromiseImportSlotFromSharedDataStore(
 	self: HasSaveSlots,
 	key: string
 ): Promise.Promise<SaveSlotData.SlotId>
-	return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+	-- Maid-owned like the other shared-store reads: this one is not even gated behind _loadPromise, so
+	-- nothing upstream rejects it when the player leaves mid-read.
+	return self._maid:GivePromise(self._sharedSaveSlotDataStoreService:PromiseRead(key)):Then(function(export)
+		if not self.Destroy then
+			return (Promise :: any).rejected() -- Destroyed. Empty, so it stays out of the logs
+		end
+
 		if export == nil then
 			return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
 		end
@@ -444,7 +450,9 @@ function HasSaveSlots.PromiseSelectTransferableEphemeralSlot(
 		-- arriving with an ephemeral key) and outlives a leave, and its continuation builds a slot.
 		return self._maid:GivePromise(self._sharedSaveSlotDataStoreService:PromiseRead(key)):Then(function(export)
 			if not self.Destroy then
-				return nil -- Destroyed
+				-- Destroyed. Rejecting keeps the Promise<SlotId> contract honest -- a nil fulfilment reads as
+				-- "imported, no slot" to a caller like SaveSlotCmdrService. Empty, so it stays out of the logs.
+				return (Promise :: any).rejected()
 			end
 
 			if export == nil then
@@ -1113,8 +1121,8 @@ end
 -- cancellation, so owning only the outermost promise detaches nothing upstream. Calling into this destroyed
 -- (metatable-stripped) object -- or into its destroyed stores -- throws, and because a datastore load
 -- resolves inside its UpdateAsync transform, that throw surfaces as a "Transform function error" and takes
--- the transform's write down with it. The liveness checks cover a continuation queued before the maid died.
--- See SaveSlotLateSettle.spec.
+-- the transform's write down with it. The liveness checks cover a settle that lands mid-teardown, before
+-- this promise's own maid task was reached. See SaveSlotLateSettle.spec.
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj)):Then(function(dataStore)
 		if not self.Destroy then

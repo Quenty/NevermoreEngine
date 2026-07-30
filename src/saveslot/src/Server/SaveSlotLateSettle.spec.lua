@@ -140,9 +140,11 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		expect(hasSlotStatus).toEqual("resolved")
 		expect(hasSlot).toEqual(true)
 
-		local activeStatus, lastActive = PromiseTestUtils.awaitOutcome(hasSaveSlots:PromiseLastActiveSlotId(), 10)
-		expect(activeStatus).toEqual("resolved")
-		expect(lastActive).toEqual(EXISTING_SLOT_ID)
+		-- Waiting on the selection itself, rather than PromiseLastActiveSlotId (which can answer from
+		-- _lastActiveSlotId while the selection is still in flight), also quiesces the chain before teardown.
+		expect(PromiseTestUtils.awaitValue(function()
+			return hasSaveSlots.ActiveSlotId.Value == EXISTING_SLOT_ID
+		end, 10)).toEqual(true)
 
 		controller:destroy()
 	end)
