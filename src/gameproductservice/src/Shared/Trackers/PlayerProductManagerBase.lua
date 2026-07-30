@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 
 local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
@@ -24,6 +25,7 @@ local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 
 local PlayerProductManagerBase = setmetatable({}, BaseObject)
 PlayerProductManagerBase.ClassName = "PlayerProductManagerBase"
@@ -135,6 +137,21 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 		end
 	end))
 
+	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
+		local playerMembershipType = if PlayerMock.isMock(self._player)
+			then PlayerMock.read(self._player, "MembershipType")
+			else self._player.MembershipType
+		return Promise.resolved(playerMembershipType == membershipType)
+	end)
+
+	-- Everything below asks the cloud, which a client may only do about itself (see
+	-- _canQueryCloudOwnership). Left unwired otherwise, so an unanswerable query is a rejection naming
+	-- the missing callback rather than a doomed request per player per asset. Membership is wired
+	-- above either way: it reads a replicated property rather than asking anybody.
+	if not self:_canQueryCloudOwnership() then
+		return self
+	end
+
 	-- Configure gamepass to be a bit special
 	passOwnership:SetQueryOwnershipCallback(function(gamePassId)
 		local userId = if PlayerMock.isMock(self._player)
@@ -161,19 +178,46 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 		end)
 	end)
 
-	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
-		local playerMembershipType = if PlayerMock.isMock(self._player)
-			then PlayerMock.read(self._player, "MembershipType")
-			else self._player.MembershipType
-		return Promise.resolved(playerMembershipType == membershipType)
-	end)
-
 	-- Paid-access game ownership is queried through PlayerOwnsAssetAsync
 	gameOwnership:SetQueryOwnershipCallback(function(assetId)
 		return MarketplaceUtils.promisePlayerOwnsAssetAsync(self._player, assetId)
 	end)
 
 	return self
+end
+
+--[[
+	Whether this realm can ask the cloud about this player's ownership.
+
+	A client can only ask about the local player: UserOwnsGamePassAsync refuses outright ("can only query
+	local player") and the inventory endpoints answer HTTP 403. It holds a manager for everybody
+	regardless -- the PlayerProductManager tag replicates, so the binder builds one per player -- and
+	wiring the queries there spends a request per player per asset to reach a refusal every time. Server
+	realms can ask about anybody, which is where a client's unanswered question belongs.
+
+	Ownership overrides are unaffected: they are replicated and short-circuit the query, so a client
+	still answers for another player wherever the server has said something (see
+	[PlayerAssetOwnershipTracker]).
+
+	A [PlayerMock] never reaches the engine -- its ownership is read through PlayerMock.readLookup -- so a
+	simulated player stays answerable in either realm, which is what lets a headless test drive ownership
+	for players other than the one standing in for the local one.
+]]
+function PlayerProductManagerBase._canQueryCloudOwnership(self: PlayerProductManagerBase): boolean
+	if self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT then
+		return true
+	end
+
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+
+	-- No local player to be is not a client to speak for (a bare unit test), and the local player is
+	-- the one a client may always ask about. Checked before the mock exemption below so that the
+	-- player this manager is about is never left unwired by a mistake in it.
+	if localPlayer == nil or self._player == localPlayer then
+		return true
+	end
+
+	return PlayerMock.isMock(self._player)
 end
 
 --[=[
