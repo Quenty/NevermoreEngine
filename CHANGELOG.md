@@ -1,3 +1,16 @@
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/teleportserviceutils@10.3.1`
+  - fix(teleportserviceutils): let a server teleport hear a refusal raised after acceptance [#779](https://github.com/Quenty/NevermoreEngine/pull/779) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Jul 29 2026)
 
 #### 🐛 Bug Fix
