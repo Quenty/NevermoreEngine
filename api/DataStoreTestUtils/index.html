@@ -12,8 +12,8 @@ loaded, the helpers, the manager, and the service bag."><meta data-rh="true" pro
 (a [PlayerDataStoreManager]) -- each own a [Maid] and register everything they create on it, so a
 single `controller:destroy()` tears it all down: the stores, the auto-save loop each starts once
 loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/DataStoreTestUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreTestUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/DataStoreTestUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.c266a584.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.4c387652.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.f867e5de.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.8d987369.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -41,31 +41,66 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
   <code>newServer(opts?)</code> (returns <code>dataStore, helper?</code>; <code>opts</code> = <code>{ key?, messaging?, autoCloseOnRequest? }</code>).
   Helpers: <code>awaitOwn(dataStore)</code> -> boolean (loads and reports whether we own the session).
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="setupDataStoreManager"><code style="text-decoration:none">setupDataStoreManager</code><a href="#setupDataStoreManager" class="hash-link" aria-label="Direct link to setupDataStoreManager" title="Direct link to setupDataStoreManager" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L116"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">setupDataStoreManager</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><div class="inset_uKQm"><code>manager<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/PlayerDataStoreManager">PlayerDataStoreManager</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">...</code></div><code class="purple_ieR2">}</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="promiseSimulatedShutdown"><code style="text-decoration:none">promiseSimulatedShutdown</code><a href="#promiseSimulatedShutdown" class="hash-link" aria-label="Direct link to promiseSimulatedShutdown" title="Direct link to promiseSimulatedShutdown" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L117"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">promiseSimulatedShutdown</code><code>(</code><div class="inset_uKQm"><div><code>manager<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/PlayerDataStoreManager">PlayerDataStoreManager</a></code><code>,</code></div><div><code>userIds<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">PlayerUserId</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+<p>players still in the server when it began closing</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code><span class="inlineDescription_G7Er">-- <span>
+<p>what BindToCloseService yields on, so the server cannot die until it settles</p>
+</span></span></div><div>
+<p>
+  Simulates what a real Roblox server does when it shuts down, which is the only accurate model for
+  the save path: Roblox fires PlayerRemoving for every player still in the server, giving those
+  handlers the same "hold the shutdown open for me" treatment BindToClose gets. So the removals are
+  what save and close each session; the close callback's job is only to wait for them to flush.
+</p>
+<p>Destroying the manager is NOT a shutdown and never has been -- nothing in a live server destroys it.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="awaitServiceShutdown"><code style="text-decoration:none">awaitServiceShutdown</code><a href="#awaitServiceShutdown" class="hash-link" aria-label="Direct link to awaitServiceShutdown" title="Direct link to awaitServiceShutdown" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L142"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">awaitServiceShutdown</code><code>(</code><div class="inset_uKQm"><div><code>playerDataStoreService<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/PlayerDataStoreService">PlayerDataStoreService</a></code><code>,</code></div><div><code>userIds<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">PlayerUserId</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><code>,</code></div><div><code>timeout<!-- -->: </code><code class="blue_P4bS">number?</code><span class="inlineDescription_G7Er">-- <span>
+<p>defaults to 5</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS">boolean</code><span class="inlineDescription_G7Er">-- <span>
+<p>false only if a shutdown was started and did not settle in time</p>
+</span></span></div><div>
+<p>Shuts down the manager a <a href="/NevermoreEngine/api/PlayerDataStoreService">PlayerDataStoreService</a> owns, the way Roblox would, and waits for it.</p>
+<p>
+  Call this from the <code>destroy()</code> of any spec that injects a datastore into the service and tears down
+  by destroying its ServiceBag. <code>manager:Destroy()</code> destroys no stores -- they are only ever destroyed
+  by a removal -- and a <a href="/NevermoreEngine/api/PlayerMock">PlayerMock</a> never fires the real <code>Players.PlayerRemoving</code>, so without this
+  every store the spec loaded outlives it with its <code>task.spawn</code> auto-save loop running. In the shared
+  test place that loop later fires inside another package's window and fails it.
+</p>
+<p>
+  <code>userIds</code> is only needed to model "PlayerRemoving landed first" for an ordering assertion. For
+  cleanup, omit it: the close removes every store the manager still owns.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="setupDataStoreManager"><code style="text-decoration:none">setupDataStoreManager</code><a href="#setupDataStoreManager" class="hash-link" aria-label="Direct link to setupDataStoreManager" title="Direct link to setupDataStoreManager" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L185"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">setupDataStoreManager</code><code>(</code><code>) → </code><code class="purple_ieR2">{</code><div class="inset_uKQm"><code>manager<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/PlayerDataStoreManager">PlayerDataStoreManager</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code class="purple_ieR2">,</code></div><div class="inset_uKQm"><code class="blue_P4bS">...</code></div><code class="purple_ieR2">}</code></div><div>
 <p>
   Builds the controller the <a href="/NevermoreEngine/api/PlayerDataStoreManager">PlayerDataStoreManager</a> specs share: a session-locked manager wired to
-  a fresh <a href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a> (keyed <code>user_&#x3C;userId></code>), all owned by a Maid. <code>destroy()</code> tears down the
-  manager (and the loaded stores whose auto-save loops it owns) and the service bag.
+  a fresh <a href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a> (keyed <code>user_&#x3C;userId></code>), all owned by a Maid.
+</p>
+<p>
+  <code>destroy()</code> shuts the server down the way Roblox would (see
+  <a href="/NevermoreEngine/api/DataStoreTestUtils#promiseSimulatedShutdown">DataStoreTestUtils.promiseSimulatedShutdown</a>) and then tears the objects down. The shutdown is not
+  optional bookkeeping: a store the spec loaded keeps its auto-save loop running until something
+  removes it, and in the shared test place that loop outlives the spec and fires inside a later
+  package's window.
 </p>
 <p>
   Fields: <code>manager</code>, <code>mock</code>, <code>serviceBag</code>.
   Helpers: <code>storeAndAwaitLock()</code> -> boolean -- stores a value on user 1's store and waits for the
-  session-locked load to write the lock envelope.
+  session-locked load to write the lock envelope. <code>promiseShutdown(userIds?)</code> -> Promise.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newServiceBag"><code style="text-decoration:none">newServiceBag</code><a href="#newServiceBag" class="hash-link" aria-label="Direct link to newServiceBag" title="Direct link to newServiceBag" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L155"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newServiceBag</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>robloxMessagingService<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MessagingServiceMock">MessagingServiceMock?</a></code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newServiceBag"><code style="text-decoration:none">newServiceBag</code><a href="#newServiceBag" class="hash-link" aria-label="Direct link to newServiceBag" title="Direct link to newServiceBag" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L231"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newServiceBag</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>robloxMessagingService<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/MessagingServiceMock">MessagingServiceMock?</a></code><span class="inlineDescription_G7Er">-- <span>
 <p>injected when provided</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code></div><div>
 <p>
   Builds a <a href="/NevermoreEngine/api/ServiceBag">ServiceBag</a> with PlaceMessagingService registered and Init/Start'd, owned by the maid.
   Pass a Roblox MessagingService mock to inject it into PlaceMessagingService between Init and Start.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newDataStore"><code style="text-decoration:none">newDataStore</code><a href="#newDataStore" class="hash-link" aria-label="Direct link to newDataStore" title="Direct link to newDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L174"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newDataStore</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newDataStore"><code style="text-decoration:none">newDataStore</code><a href="#newDataStore" class="hash-link" aria-label="Direct link to newDataStore" title="Direct link to newDataStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L250"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newDataStore</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div><div>
 <p>Builds a <a href="/NevermoreEngine/api/DataStore">DataStore</a> over <code>mock</code> and owns it with the maid.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newSessionLockedStore"><code style="text-decoration:none">newSessionLockedStore</code><a href="#newSessionLockedStore" class="hash-link" aria-label="Direct link to newSessionLockedStore" title="Direct link to newSessionLockedStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L187"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newSessionLockedStore</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>userIdList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newSessionLockedStore"><code style="text-decoration:none">newSessionLockedStore</code><a href="#newSessionLockedStore" class="hash-link" aria-label="Direct link to newSessionLockedStore" title="Direct link to newSessionLockedStore" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L263"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newSessionLockedStore</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>mock<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMock">DataStoreMock</a></code><code>,</code></div><div><code>key<!-- -->: </code><code class="blue_P4bS">string</code><code>,</code></div><div><code>userIdList<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS">number</code><code class="purple_ieR2">}</code><code class="blue_P4bS">?</code><span class="inlineDescription_G7Er">-- <span>
 <p>defaults to { 1 }</p>
 </span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div><div>
 <p>Builds a session-locked <a href="/NevermoreEngine/api/DataStore">DataStore</a> over <code>mock</code> and owns it with the maid.</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newMessageHelper"><code style="text-decoration:none">newMessageHelper</code><a href="#newMessageHelper" class="hash-link" aria-label="Direct link to newMessageHelper" title="Direct link to newMessageHelper" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L202"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newMessageHelper</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>serviceBag<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code><code>,</code></div><div><code>dataStore<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMessageHelper">DataStoreMessageHelper</a></code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="newMessageHelper"><code style="text-decoration:none">newMessageHelper</code><a href="#newMessageHelper" class="hash-link" aria-label="Direct link to newMessageHelper" title="Direct link to newMessageHelper" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/datastore/src/Server/DataStoreTestUtils.lua#L278"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>DataStoreTestUtils<!-- -->.</code><code class="green_DgR4">newMessageHelper</code><code>(</code><div class="inset_uKQm"><div><code>maid<!-- -->: </code><code class="blue_P4bS">Maid</code><code>,</code></div><div><code>serviceBag<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/ServiceBag">ServiceBag</a></code><code>,</code></div><div><code>dataStore<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStore">DataStore</a></code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/DataStoreMessageHelper">DataStoreMessageHelper</a></code></div><div>
 <p>Builds a <a href="/NevermoreEngine/api/DataStoreMessageHelper">DataStoreMessageHelper</a> over <code>dataStore</code> and owns it with the maid.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -86,8 +121,67 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             }
         },
         {
+            &quot;name&quot;: &quot;promiseSimulatedShutdown&quot;,
+            &quot;desc&quot;: &quot;Simulates what a real Roblox server does when it shuts down, which is the only accurate model for\nthe save path: Roblox fires PlayerRemoving for every player still in the server, giving those\nhandlers the same \&quot;hold the shutdown open for me\&quot; treatment BindToClose gets. So the removals are\nwhat save and close each session; the close callback&#x27;s job is only to wait for them to flush.\n\nDestroying the manager is NOT a shutdown and never has been -- nothing in a live server destroys it.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;manager&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;PlayerDataStoreManager&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;userIds&quot;,
+                    &quot;desc&quot;: &quot;players still in the server when it began closing&quot;,
+                    &quot;lua_type&quot;: &quot;{ PlayerUserId }?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;what BindToCloseService yields on, so the server cannot die until it settles&quot;,
+                    &quot;lua_type&quot;: &quot;Promise&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 117,
+                &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;awaitServiceShutdown&quot;,
+            &quot;desc&quot;: &quot;Shuts down the manager a [PlayerDataStoreService] owns, the way Roblox would, and waits for it.\n\nCall this from the `destroy()` of any spec that injects a datastore into the service and tears down\nby destroying its ServiceBag. `manager:Destroy()` destroys no stores -- they are only ever destroyed\nby a removal -- and a [PlayerMock] never fires the real `Players.PlayerRemoving`, so without this\nevery store the spec loaded outlives it with its `task.spawn` auto-save loop running. In the shared\ntest place that loop later fires inside another package&#x27;s window and fails it.\n\n`userIds` is only needed to model \&quot;PlayerRemoving landed first\&quot; for an ordering assertion. For\ncleanup, omit it: the close removes every store the manager still owns.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;playerDataStoreService&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;PlayerDataStoreService&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;userIds&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;{ PlayerUserId }?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;timeout&quot;,
+                    &quot;desc&quot;: &quot;defaults to 5&quot;,
+                    &quot;lua_type&quot;: &quot;number?&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;false only if a shutdown was started and did not settle in time&quot;,
+                    &quot;lua_type&quot;: &quot;boolean&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 142,
+                &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
+            }
+        },
+        {
             &quot;name&quot;: &quot;setupDataStoreManager&quot;,
-            &quot;desc&quot;: &quot;Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to\na fresh [DataStoreMock] (keyed `user_&lt;userId&gt;`), all owned by a Maid. `destroy()` tears down the\nmanager (and the loaded stores whose auto-save loops it owns) and the service bag.\n\nFields: `manager`, `mock`, `serviceBag`.\nHelpers: `storeAndAwaitLock()` -&gt; boolean -- stores a value on user 1&#x27;s store and waits for the\nsession-locked load to write the lock envelope.&quot;,
+            &quot;desc&quot;: &quot;Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to\na fresh [DataStoreMock] (keyed `user_&lt;userId&gt;`), all owned by a Maid.\n\n`destroy()` shuts the server down the way Roblox would (see\n[DataStoreTestUtils.promiseSimulatedShutdown]) and then tears the objects down. The shutdown is not\noptional bookkeeping: a store the spec loaded keeps its auto-save loop running until something\nremoves it, and in the shared test place that loop outlives the spec and fires inside a later\npackage&#x27;s window.\n\nFields: `manager`, `mock`, `serviceBag`.\nHelpers: `storeAndAwaitLock()` -&gt; boolean -- stores a value on user 1&#x27;s store and waits for the\nsession-locked load to write the lock envelope. `promiseShutdown(userIds?)` -&gt; Promise.&quot;,
             &quot;params&quot;: [],
             &quot;returns&quot;: [
                 {
@@ -97,7 +191,7 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 116,
+                &quot;line&quot;: 185,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
             }
         },
@@ -124,7 +218,7 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 155,
+                &quot;line&quot;: 231,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
             }
         },
@@ -156,7 +250,7 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 174,
+                &quot;line&quot;: 250,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
             }
         },
@@ -193,7 +287,7 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 187,
+                &quot;line&quot;: 263,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
             }
         },
@@ -225,7 +319,7 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 202,
+                &quot;line&quot;: 278,
                 &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
             }
         }
@@ -238,6 +332,6 @@ loaded, the helpers, the manager, and the service bag."><link data-rh="true" rel
         &quot;line&quot;: 11,
         &quot;path&quot;: &quot;src/datastore/src/Server/DataStoreTestUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#newDataStore" class="table-of-contents__link toc-highlight">.newDataStore</a></li><li><a href="#newMessageHelper" class="table-of-contents__link toc-highlight">.newMessageHelper</a></li><li><a href="#newServiceBag" class="table-of-contents__link toc-highlight">.newServiceBag</a></li><li><a href="#newSessionLockedStore" class="table-of-contents__link toc-highlight">.newSessionLockedStore</a></li><li><a href="#setup" class="table-of-contents__link toc-highlight">.setup</a></li><li><a href="#setupDataStoreManager" class="table-of-contents__link toc-highlight">.setupDataStoreManager</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#awaitServiceShutdown" class="table-of-contents__link toc-highlight">.awaitServiceShutdown</a></li><li><a href="#newDataStore" class="table-of-contents__link toc-highlight">.newDataStore</a></li><li><a href="#newMessageHelper" class="table-of-contents__link toc-highlight">.newMessageHelper</a></li><li><a href="#newServiceBag" class="table-of-contents__link toc-highlight">.newServiceBag</a></li><li><a href="#newSessionLockedStore" class="table-of-contents__link toc-highlight">.newSessionLockedStore</a></li><li><a href="#promiseSimulatedShutdown" class="table-of-contents__link toc-highlight">.promiseSimulatedShutdown</a></li><li><a href="#setup" class="table-of-contents__link toc-highlight">.setup</a></li><li><a href="#setupDataStoreManager" class="table-of-contents__link toc-highlight">.setupDataStoreManager</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
