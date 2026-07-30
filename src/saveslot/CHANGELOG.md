@@ -1,3 +1,20 @@
+# v2.6.2 (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- fix(datastore): stop manager teardown from destroying stores before PlayerRemoving saves them [#780](https://github.com/Quenty/NevermoreEngine/pull/780) ([@Quenty](https://github.com/Quenty))
+- fix(saveslot): give the slots-load continuation a consistent return so the type check passes ([@Quenty](https://github.com/Quenty))
+- fix(saveslot): guard the import read, and reject rather than fulfil nil when destroyed ([@Quenty](https://github.com/Quenty))
+- fix(saveslot): guard the transferable-ephemeral read, and pin the seeded slot ([@Quenty](https://github.com/Quenty))
+- fix(saveslot): guard the slots load against settling after the player left ([@Quenty](https://github.com/Quenty))
+- test(saveslot): shut the datastore down before tearing these harnesses down ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

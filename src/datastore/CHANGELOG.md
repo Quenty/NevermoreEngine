@@ -1,3 +1,19 @@
+# v13.51.1 (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- fix(datastore): stop manager teardown from destroying stores before PlayerRemoving saves them [#780](https://github.com/Quenty/NevermoreEngine/pull/780) ([@Quenty](https://github.com/Quenty))
+- fix(datastore): stop the spec shutdown helper stalling on a bag that was never started ([@Quenty](https://github.com/Quenty))
+- test(saveslot): shut the datastore down before tearing these harnesses down ([@Quenty](https://github.com/Quenty))
+- docs(datastore): correct the shutdown doc's causal story and retry-ladder math ([@Quenty](https://github.com/Quenty))
+- fix(datastore): stop manager teardown from destroying stores before PlayerRemoving saves them ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
