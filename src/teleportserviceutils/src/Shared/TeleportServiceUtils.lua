@@ -69,7 +69,12 @@ export type MockTeleport = {
 	call may pass one on its own instead of a config. A client has only `teleportData`, which is read
 	back out of the options when a call passes those instead.
 
-	@type TeleportConfig { teleportData: { [string]: any }?, teleportOptions: TeleportOptions?, maxAttempts: number?, retryWait: number?, exponential: number?, printWarning: boolean? }
+	`initFailedGraceSeconds` is how long a *server* attempt keeps listening for a refusal the engine
+	raises after it has already accepted the request (see
+	[TeleportServiceUtils._promiseTeleportServerAttempt]). Unset -- the default -- resolves on acceptance,
+	which is what every server call did before this existed.
+
+	@type TeleportConfig { teleportData: { [string]: any }?, teleportOptions: TeleportOptions?, maxAttempts: number?, retryWait: number?, exponential: number?, printWarning: boolean?, initFailedGraceSeconds: number? }
 	@within TeleportServiceUtils
 ]=]
 export type TeleportConfig = {
@@ -79,6 +84,7 @@ export type TeleportConfig = {
 	retryWait: number?,
 	exponential: number?,
 	printWarning: boolean?,
+	initFailedGraceSeconds: number?,
 }
 
 --[=[
@@ -326,6 +332,13 @@ end
 	until they are. Destroying it stops the retries and rejects with nothing either way, so a caller can
 	tell its own teardown from a hop that genuinely failed.
 
+	A server teleport resolves as soon as the engine accepts the request, which is not the same as the
+	player going anywhere: a refusal raised afterwards (`Unauthorized`, most of all) would otherwise
+	never reach the caller at all. `config.initFailedGraceSeconds` holds each attempt open that long to
+	catch one -- see [TeleportServiceUtils._promiseTeleportServerAttempt]. Worth setting wherever
+	something is waiting on the hop, because without it a refused teleport is indistinguishable from one
+	still on its way.
+
 	Rejects with the [TeleportFailedReportUtils.TeleportReport] itself when a refusal ends it, and with
 	the retry wrapper's summary once the attempts are spent -- a report renders itself, so either reads
 	as text.
@@ -555,13 +568,76 @@ function TeleportServiceUtils._promiseTeleportOnce(
 			teleportOptions = options
 		end
 
-		return TeleportServiceUtils.promiseTeleportServerOnce(placeId, batch, teleportOptions)
+		return TeleportServiceUtils._promiseTeleportServerAttempt(
+			placeId,
+			batch,
+			teleportOptions,
+			config.initFailedGraceSeconds
+		)
 	end
 
 	local player: Player = if type(players) == "table" then players[1] else players :: Player
 	assert(player, "No player to teleport")
 
 	return TeleportServiceUtils.promiseTeleportClientOnce(placeId, player, config.teleportData) :: any
+end
+
+--[[
+	The server's own request, plus the grace window a config asked for.
+
+	`TeleportAsync` comes back as soon as the engine has ACCEPTED the request. A refusal it makes after
+	that -- a paid-access `Unauthorized` above all, which is raised rather than thrown -- arrives later
+	through `TeleportInitFailed`, by which time a promise that resolved on acceptance has already called
+	the hop underway and has nothing left to reject with. That is how a caller ends up waiting forever on
+	a teleport that is never coming: the request was accepted, so nothing ever failed, so nothing ever
+	settled.
+
+	A config that asks for a window holds the attempt open that long after acceptance and rejects with
+	the report if a refusal lands inside it -- handing the retry wrapper the same
+	[TeleportFailedReportUtils.TeleportReport] a client attempt would, so `Unauthorized` ends the hop at
+	once and `GameFull` spends an attempt like any other.
+
+	Opt-in, because resolving late changes when an existing server caller hears back. What a resolution
+	*means* is unchanged either way: the engine accepted the request.
+]]
+function TeleportServiceUtils._promiseTeleportServerAttempt(
+	placeId: number,
+	batch: { Player },
+	teleportOptions: TeleportOptions?,
+	graceSeconds: number?
+): Promise.Promise<TeleportAsyncResult?>
+	local accepted = TeleportServiceUtils.promiseTeleportServerOnce(placeId, batch, teleportOptions)
+	if graceSeconds == nil or graceSeconds <= 0 then
+		return accepted
+	end
+
+	local promise = Promise.new()
+
+	PromiseMaidUtils.whilePromise(promise, function(maid)
+		-- Listening starts before the request settles: the engine can refuse one player of a batch while
+		-- TeleportAsync is still yielding over the rest.
+		for _, player in batch do
+			TeleportServiceUtils._connectTeleportReported(maid, placeId, player, function(report)
+				if TeleportFailedReportUtils.isInFlight(report) then
+					return
+				end
+
+				promise:Reject(report)
+			end)
+		end
+
+		-- Not held by the maid: an engine request in flight cannot be cancelled, so there is nothing for
+		-- a teardown to take back. Its rejection is consumed here either way.
+		accepted:Then(function(result)
+			maid:GiveTask(task.delay(graceSeconds, function()
+				promise:Resolve(result)
+			end))
+		end, function(err)
+			promise:Reject(err)
+		end)
+	end)
+
+	return promise
 end
 
 --[[
