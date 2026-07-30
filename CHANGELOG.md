@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/datastore@13.51.1`, `@quenty/saveslot@2.6.2`
+  - fix(datastore): stop manager teardown from destroying stores before PlayerRemoving saves them [#780](https://github.com/Quenty/NevermoreEngine/pull/780) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/gameproductservice@14.66.5`
   - fix(gameproductservice): stop ownership queries spamming the log with failures they cannot avoid [#778](https://github.com/Quenty/NevermoreEngine/pull/778) ([@Quenty](https://github.com/Quenty))
 

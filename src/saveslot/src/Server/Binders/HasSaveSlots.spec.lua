@@ -10,6 +10,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -72,6 +73,11 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 		end
 
 		destroyed = true
+
+		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
+		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
+		-- this spec and fires inside a later package's window.
+		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end
@@ -1873,8 +1879,9 @@ describe("HasSaveSlots continue pointer across sessions", function()
 	local function rejoin(context: any)
 		resolve(dataStoreFor(context):Save())
 
-		-- Closed before the next session opens, not left to afterEach: two live sessions for one UserId is
-		-- exactly what the mock refuses.
+		-- Closed here rather than left to afterEach: two live sessions for one UserId is exactly what the
+		-- mock refuses. Teardown runs the store through the real shutdown, so the session lock is released
+		-- for the next session rather than left for it to contend with.
 		context.destroy()
 
 		local nextContext = setup(context.mock)

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.6.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.1...@quenty/saveslot@2.6.2) (2026-07-30)
+
+### Bug Fixes
+
+- **saveslot:** give the slots-load continuation a consistent return so the type check passes ([43dd6e7](https://github.com/Quenty/NevermoreEngine/commit/43dd6e7a7bc1dc87f3c2e2936f4c05f064edba2b))
+- **saveslot:** guard the import read, and reject rather than fulfil nil when destroyed ([14d551b](https://github.com/Quenty/NevermoreEngine/commit/14d551b7adebae6780cac69b57676328c30ab821))
+- **saveslot:** guard the slots load against settling after the player left ([d274aee](https://github.com/Quenty/NevermoreEngine/commit/d274aee8f135fa0ae3eaccf29c121acda2ea0be6))
+- **saveslot:** guard the transferable-ephemeral read, and pin the seeded slot ([2b76762](https://github.com/Quenty/NevermoreEngine/commit/2b76762320468ba9c0d496857bff5c34b87e1c39))
+
 ## [2.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.0...@quenty/saveslot@2.6.1) (2026-07-30)
 
 **Note:** Version bump only for package @quenty/saveslot

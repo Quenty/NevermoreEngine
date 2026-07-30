@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.51.0...@quenty/datastore@13.51.1) (2026-07-30)
+
+### Bug Fixes
+
+- **datastore:** stop manager teardown from destroying stores before PlayerRemoving saves them ([44d786e](https://github.com/Quenty/NevermoreEngine/commit/44d786edb1501c37d540d6a3226084f4d0859f8b))
+- **datastore:** stop the spec shutdown helper stalling on a bag that was never started ([0696638](https://github.com/Quenty/NevermoreEngine/commit/0696638700a33cbcedc85f4c75099f54cb952a6c))
+
 # [13.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.50.2...@quenty/datastore@13.51.0) (2026-07-28)
 
 **Note:** Version bump only for package @quenty/datastore

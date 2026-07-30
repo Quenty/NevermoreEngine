@@ -22,12 +22,11 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-describe("clean session end releases the lock (server-shutdown teardown path)", function()
-	it("manager teardown closes the session so the next server loads immediately", function()
+describe("clean session end releases the lock (server-shutdown path)", function()
+	it("a closing server releases the session so the next server loads immediately", function()
 		local mock = DataStoreMock.new()
 
-		-- Server A: the manager still owns the store at teardown (nothing removed the player
-		-- first), which is exactly what a ServiceBag destroy after a clean session looks like.
+		-- Server A: a player in the server with a live session, about to be shut down.
 		local maidA = Maid.new()
 		local serviceBagA = DataStoreTestUtils.newServiceBag(maidA, MessagingServiceMock.new())
 		local managerA = maidA:Add(PlayerDataStoreManager.new(serviceBagA, mock :: any, function(userId)
@@ -47,14 +46,17 @@ describe("clean session end releases the lock (server-shutdown teardown path)", 
 			return
 		end
 
-		-- Clean shutdown: the whole session tears down without the player ever "removing".
+		-- Clean shutdown: Roblox fires PlayerRemoving for the player still in the server, and holds the
+		-- close open until that removal has flushed.
+		if not PromiseTestUtils.awaitSettled(DataStoreTestUtils.promiseSimulatedShutdown(managerA, { 1 }), 10) then
+			expect("A's shutdown never flushed").toEqual("A's shutdown flushed")
+			maidA:DoCleaning()
+			return
+		end
 		maidA:DoCleaning()
 
-		-- The teardown flush must write the graceful close: data saved, lock released.
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
-			return raw ~= nil and raw.lock == nil
-		end, 5)).toEqual(true)
+		-- The close must have written the graceful release: data saved, lock gone.
+		expect(mock:GetRaw("user_1").lock).toEqual(nil)
 		expect(mock:GetRaw("user_1").coins).toEqual(42)
 
 		-- Server B: an immediate clean takeover -- bounded well under the 5s graceful-close

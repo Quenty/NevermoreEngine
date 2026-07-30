@@ -130,12 +130,6 @@ function PlayerDataStoreManager.new(
 		self:_removePlayerDataStore(player.UserId)
 	end))
 
-	-- On teardown (e.g. a hot-reloaded ServiceBag, or unit tests) flush and destroy any datastores we
-	-- still own. See _flushAndDestroyAll.
-	self._maid:GiveTask(function()
-		self:_flushAndDestroyAll()
-	end)
-
 	if skipBindingToClose ~= true then
 		-- Route through BindToCloseService so the callback is unregistered on :Destroy()
 		-- (unlike a raw game:BindToClose, which can never be unbound and would leak on hot reload).
@@ -150,33 +144,6 @@ function PlayerDataStoreManager.new(
 	end
 
 	return self
-end
-
---[=[
-	Flushes and tears down every datastore we still own. Runs on manager teardown (a hot-reloaded
-	ServiceBag, or a unit test). SaveAndCloseSession() is a best-effort synchronous write: the
-	underlying UpdateAsync request is dispatched before Destroy() cancels the promise, so a live
-	server usually honors it, but it is not guaranteed. A store whose load failed rejects, so the
-	rejection is swallowed. Stores handed off gracefully via _removePlayerDataStore have already been
-	pulled out of _datastores, so this only covers the ones nothing else cleaned up.
-]=]
-function PlayerDataStoreManager._flushAndDestroyAll(self: PlayerDataStoreManager): ()
-	for userId, datastore in self._datastores do
-		-- Cast past the DataStore intersection type: the solver otherwise blows up ("code too complex")
-		-- resolving :SaveAndCloseSession()/:Destroy() through it.
-		local store = datastore :: any
-		-- A failed load makes the save reject unconditionally; skip it so teardown does not
-		-- manufacture a guaranteed rejection.
-		if not store:DidLoadFail() then
-			-- Close the session, don't just save: this teardown ends the session, so it must also
-			-- release the session lock. A lock left held here reads as a live foreign session to the
-			-- next server that loads the key, which then grinds through the whole graceful-close/steal
-			-- retry ladder against a holder that no longer exists before it can load.
-			store:SaveAndCloseSession()
-		end
-		store:Destroy()
-		self._datastores[userId] = nil
-	end
 end
 
 --[=[
@@ -315,13 +282,36 @@ end
 --[=[
 	Removes all player data stores, and returns a promise that
 	resolves when all pending saves are saved.
+
+	On a closing server Roblox fires PlayerRemoving for every player, so a removal is usually already
+	in flight by the time this runs. Those removals do the real save-and-close themselves; this waits
+	for them rather than starting anything of its own.
+
 	@return Promise
 ]=]
 function PlayerDataStoreManager.PromiseAllSaves(self: PlayerDataStoreManager): Promise.Promise<()>
 	for userId, _ in self._datastores do
 		self:_removePlayerDataStore(userId)
 	end
-	return self._maid:GivePromise(PromiseUtils.all(self._pendingSaves:GetAll()))
+
+	local promises: { Promise.Promise<any> } = {}
+
+	-- Wait on the removals still in flight, not just on _pendingSaves. A removal only reaches its write
+	-- after the removing callbacks and then DataStore's own saving callbacks resolve, and Saving fires at
+	-- the very end of that sync -- so _pendingSaves can be empty while a PlayerRemoving triggered moments
+	-- earlier is still working toward its UpdateAsync. Resolving on that empty set lets BindToClose
+	-- return and the server die mid-write, leaving the session locked with nobody able to release it: a
+	-- lock belongs to the server that holds it, so the next server can only recover by grinding the
+	-- graceful-close handshake against a dead JobId and then stealing it.
+	for _, removalPromise in self._removingPromises do
+		table.insert(promises, removalPromise :: any)
+	end
+
+	for _, savePromise in self._pendingSaves:GetAll() do
+		table.insert(promises, savePromise :: any)
+	end
+
+	return self._maid:GivePromise(PromiseUtils.all(promises))
 end
 
 function PlayerDataStoreManager._createDataStore(
