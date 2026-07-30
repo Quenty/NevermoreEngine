@@ -19,6 +19,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+import { isBasePlaceVersionKeyword } from '../build/deploy-config.js';
 
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
@@ -193,11 +194,29 @@ export abstract class BaseJobContext implements JobContext {
     const resolvedName = options.packageName ?? '';
 
     this._reporter.onPackagePhaseChange(resolvedName, 'downloading');
-    OutputHelper.verbose(
-      basePlace.version != null
-        ? `Downloading base place (pinned v${basePlace.version}) for merge...`
-        : 'Downloading base place (latest) for merge...'
-    );
+
+    // A `"saved"` / `"published"` pin has to be turned into a concrete version
+    // number before the download, since the Asset Delivery API only addresses
+    // versions numerically.
+    let version: number | undefined;
+    if (basePlace.version == null) {
+      OutputHelper.verbose('Downloading base place (latest) for merge...');
+    } else if (isBasePlaceVersionKeyword(basePlace.version)) {
+      version = await this._openCloudClient.resolveLatestPlaceVersionAsync(
+        basePlace.universeId,
+        basePlace.placeId,
+        basePlace.version
+      );
+      OutputHelper.verbose(
+        `Downloading base place (latest ${basePlace.version}: v${version}) for merge...`
+      );
+    } else {
+      version = basePlace.version;
+      OutputHelper.verbose(
+        `Downloading base place (pinned v${version}) for merge...`
+      );
+    }
+
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
       basePlace.placeId,
@@ -208,7 +227,7 @@ export abstract class BaseJobContext implements JobContext {
           totalBytes: total,
         });
       },
-      basePlace.version
+      version
     );
     const basePath = mergeContext.resolvePath('base.rbxl');
     await fs.writeFile(basePath, buffer);

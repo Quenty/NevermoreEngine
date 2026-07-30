@@ -126,7 +126,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         return yargs
           .command(
             'upgrade [target]',
-            'Re-pin every basePlace to its latest published version',
+            'Re-pin every numeric basePlace to its latest published version',
             (upgradeYargs) => {
               return upgradeYargs
                 .positional('target', {

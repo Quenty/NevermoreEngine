@@ -1,17 +1,46 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+/**
+ * The two symbolic `basePlace.version` pins. Unlike a number, these resolve at
+ * deploy time against the base place's version history:
+ *
+ * - `"published"` — the newest version that has been published live.
+ * - `"saved"` — the newest version of any kind, including Studio saves that
+ *   were never published.
+ *
+ * They match the `versionType` vocabulary the Open Cloud place-publishing API
+ * uses when uploading, so a config reads the same way in both directions.
+ */
+export const BASE_PLACE_VERSION_KEYWORDS = ['saved', 'published'] as const;
+
+export type BasePlaceVersionKeyword =
+  typeof BASE_PLACE_VERSION_KEYWORDS[number];
+
+/** An exact version number, or a keyword resolved at deploy time. */
+export type BasePlaceVersion = number | BasePlaceVersionKeyword;
+
+export function isBasePlaceVersionKeyword(
+  version: BasePlaceVersion
+): version is BasePlaceVersionKeyword {
+  return typeof version === 'string';
+}
+
 export interface BasePlaceConfig {
   universeId: number;
   placeId: number;
   /**
-   * Pin the base place to a specific published version. When set, the deploy
-   * downloads exactly this version instead of whatever is currently live, so
-   * builds are reproducible and a broken Studio edit can't leak into a deploy.
-   * Omit to always pull the latest version. Bump it with
-   * `nevermore deploy version upgrade`.
+   * Pin the base place to a specific version. A number downloads exactly that
+   * version, so builds are reproducible and a broken Studio edit can't leak
+   * into a deploy — bump it with `nevermore deploy version upgrade`.
+   *
+   * `"published"` and `"saved"` instead track the base place's newest published
+   * / newest saved version, resolved fresh on every deploy. Use these when the
+   * base place is meant to move with Studio rather than be held still.
+   *
+   * Omit to download whatever the Asset Delivery API serves as current.
    */
-  version?: number;
+  version?: BasePlaceVersion;
 }
 
 export interface DeployTarget {
@@ -64,6 +93,28 @@ function _isMultiPlace(
   return Array.isArray((target as MultiPlaceTargetConfig).places);
 }
 
+function _validateBasePlaceVersion(label: string, version: unknown): void {
+  if (version == null) {
+    return;
+  }
+  if (typeof version === 'string') {
+    if (!(BASE_PLACE_VERSION_KEYWORDS as readonly string[]).includes(version)) {
+      throw new Error(
+        `${label} basePlace "version" must be a positive integer, ` +
+          `${BASE_PLACE_VERSION_KEYWORDS.map((k) => `"${k}"`).join(' or ')}` +
+          ` — got "${version}"`
+      );
+    }
+    return;
+  }
+  if (!Number.isInteger(version) || (version as number) < 1) {
+    throw new Error(
+      `${label} basePlace "version" must be a positive integer, ` +
+        `${BASE_PLACE_VERSION_KEYWORDS.map((k) => `"${k}"`).join(' or ')}`
+    );
+  }
+}
+
 function _validatePlace(label: string, place: DeployTarget): void {
   if (typeof place.universeId !== 'number') {
     throw new Error(`${label} is missing or has invalid "universeId"`);
@@ -83,15 +134,7 @@ function _validatePlace(label: string, place: DeployTarget): void {
     if (typeof place.basePlace.placeId !== 'number') {
       throw new Error(`${label} basePlace is missing or has invalid "placeId"`);
     }
-    if (
-      place.basePlace.version != null &&
-      (!Number.isInteger(place.basePlace.version) ||
-        place.basePlace.version < 1)
-    ) {
-      throw new Error(
-        `${label} basePlace "version" must be a positive integer when set`
-      );
-    }
+    _validateBasePlaceVersion(label, place.basePlace.version);
   }
 }
 

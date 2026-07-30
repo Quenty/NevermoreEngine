@@ -7,10 +7,12 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import {
+  isBasePlaceVersionKeyword,
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   type BasePlaceConfig,
+  type BasePlaceVersion,
   type DeployConfig,
 } from '../../utils/build/deploy-config.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
@@ -26,8 +28,8 @@ interface BasePlaceRef {
 /** A pending change: set `ref.basePlace.version` to `to`. */
 interface PinChange {
   ref: BasePlaceRef;
-  from?: number;
-  to: number;
+  from?: BasePlaceVersion;
+  to: BasePlaceVersion;
 }
 
 export interface VersionPromoteArgs extends DeployArgs {
@@ -148,13 +150,43 @@ export async function handleVersionUpgradeAsync(
   }
 
   const targetNames = args.target ? [args.target] : Object.keys(config.targets);
-  const refs = _collectBasePlaceRefs(config, targetNames);
+  const allRefs = _collectBasePlaceRefs(config, targetNames);
 
-  if (refs.length === 0) {
+  if (allRefs.length === 0) {
     OutputHelper.warn(
       args.target
         ? `Target "${args.target}" has no basePlace to pin.`
         : 'No basePlace found in deploy.nevermore.json — nothing to pin.'
+    );
+    return;
+  }
+
+  // A "saved"/"published" pin already tracks the base place on every deploy.
+  // Rewriting it to a number would silently freeze it, which is the opposite of
+  // what the config asked for, so those are left alone.
+  const isDynamic = (ref: BasePlaceRef) =>
+    ref.basePlace.version != null &&
+    isBasePlaceVersionKeyword(ref.basePlace.version);
+  const refs = allRefs.filter((ref) => !isDynamic(ref));
+  const dynamicRefs = allRefs.filter(isDynamic);
+
+  if (dynamicRefs.length > 0) {
+    OutputHelper.info(
+      `Skipping ${dynamicRefs.length} base place${_plural(
+        dynamicRefs.length
+      )} that already track a version type: ` +
+        dynamicRefs
+          .map(
+            (ref) =>
+              `${ref.placeLabel} (${_formatVersion(ref.basePlace.version)})`
+          )
+          .join(', ')
+    );
+  }
+
+  if (refs.length === 0) {
+    OutputHelper.info(
+      'Every basePlace tracks "saved" or "published" — nothing to pin.'
     );
     return;
   }
@@ -178,9 +210,10 @@ export async function handleVersionUpgradeAsync(
   await Promise.all(
     uniquePlaceIds.map(async (placeId) => {
       const ref = refs.find((r) => r.basePlace.placeId === placeId)!;
-      const latest = await client.getLatestPlaceVersionAsync(
+      const latest = await client.resolveLatestPlaceVersionAsync(
         ref.basePlace.universeId,
-        placeId
+        placeId,
+        'published'
       );
       latestByPlaceId.set(placeId, latest);
     })
@@ -237,7 +270,7 @@ export async function handleVersionPromoteAsync(
   // Map base place id -> pinned version from the source target. A source with
   // the same base place pinned to two different versions is inconsistent, so
   // fail loudly rather than pick one arbitrarily.
-  const versionByPlaceId = new Map<number, number>();
+  const versionByPlaceId = new Map<number, BasePlaceVersion>();
   for (const ref of _collectBasePlaceRefs(config, [fromTarget])) {
     const version = ref.basePlace.version;
     if (version == null) {
@@ -247,7 +280,9 @@ export async function handleVersionPromoteAsync(
     if (existing != null && existing !== version) {
       throw new Error(
         `Target "${fromTarget}" pins base place ${ref.basePlace.placeId} to ` +
-          `two different versions (v${existing} and v${version}). ` +
+          `two different versions (${_formatVersion(
+            existing
+          )} and ${_formatVersion(version)}). ` +
           `Run "nevermore deploy version upgrade ${fromTarget}" to make it consistent first.`
       );
     }
@@ -304,8 +339,16 @@ export async function handleVersionPromoteAsync(
   await _commitPinChangesAsync(configPath, config, changes, args);
 }
 
+function _formatVersion(version?: BasePlaceVersion): string {
+  if (version == null) {
+    return '(latest)';
+  }
+  return typeof version === 'string' ? `"${version}"` : `v${version}`;
+}
+
 function _formatChange(change: PinChange): string {
-  const from = change.from != null ? `v${change.from}` : '(latest)';
   const unchanged = change.from === change.to ? '  (unchanged)' : '';
-  return `${from} → v${change.to}${unchanged}`;
+  return `${_formatVersion(change.from)} → ${_formatVersion(
+    change.to
+  )}${unchanged}`;
 }

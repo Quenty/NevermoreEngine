@@ -155,7 +155,7 @@ Other flags:
 | `targets.<name>.project` | yes | Path to the Rojo project file, relative to the package directory. |
 | `targets.<name>.scriptTemplate` | no | Luau file `nevermore test` executes via Open Cloud after upload. Not used by `nevermore deploy` itself. |
 | `targets.<name>.basePlace` | no | Universe/place to download and merge with the rojo build before uploading. See [Merging with an existing place](testing/integration-testing.md#merging-with-an-existing-place-baseplace). |
-| `targets.<name>.basePlace.version` | no | Pin the base place to a specific published version instead of pulling the latest. See [Pinning base place versions](#pinning-base-place-versions). |
+| `targets.<name>.basePlace.version` | no | Pin the base place to an exact version number, or track its newest `"published"` / `"saved"` version, instead of pulling the latest. See [Pinning base place versions](#pinning-base-place-versions). |
 
 You can declare any number of targets. A common setup is one `test` target for CI and a separate `production` or `staging` target for live deploys:
 
@@ -254,7 +254,32 @@ To make deploys reproducible, pin the base place to a specific version with an o
 }
 ```
 
-With `version` set, the deploy downloads exactly that version of the base place. Omit it to keep pulling the latest (the previous behaviour — nothing changes for configs that don't opt in).
+With `version` set to a number, the deploy downloads exactly that version of the base place. Omit it to keep pulling the latest (the previous behaviour — nothing changes for configs that don't opt in).
+
+### Tracking a version type instead of a number
+
+A number holds the base place still. Sometimes you want the opposite: follow the base place as Studio moves it, but be precise about *which* movement counts. `version` also accepts two keywords, resolved fresh on every deploy:
+
+| Value | Resolves to |
+|-------|-------------|
+| `"published"` | The newest version of the base place that has been **published live**. Studio saves are ignored until someone publishes. |
+| `"saved"` | The newest version of any kind, including a **Studio save that was never published**. |
+
+```json
+{
+  "basePlace": {
+    "universeId": 12345,
+    "placeId": 11111,
+    "version": "published"
+  }
+}
+```
+
+`"published"` is the useful default for a shared base place: the team can save work-in-progress in Studio all day without it leaking into a deploy, and publishing the base place is the deliberate act that ships it. `"saved"` is for a Team Create place where saving *is* how content is handed off, and nobody publishes the base place at all.
+
+Both keywords cost one extra Open Cloud call per base place at deploy time, resolved against the place's version history newest-first — so it stays cheap even on a place with tens of thousands of versions.
+
+These are the same words the Open Cloud place-publishing API uses for `versionType` when *uploading*, so a config reads the same in both directions. Anything else — `"latest"`, `"live"` — is rejected when the config loads rather than at deploy time.
 
 ### Bumping the pin
 
@@ -272,6 +297,8 @@ nevermore deploy version upgrade --dryrun
 ```
 
 `upgrade` walks every `basePlace` in `deploy.nevermore.json` (or just the named target), resolves each place's current latest published version, prints an old → new table, and — after a confirmation prompt — writes the new `version` values back into the file. Base places shared by several targets are resolved once. Pass `--yes` to skip the prompt (for scripting), or `--dryrun` to preview only.
+
+Base places pinned to `"saved"` or `"published"` are skipped and reported, not rewritten — those already track the place on every deploy, and freezing them to a number is the opposite of what the config asked for. To convert one back to a fixed pin, replace the keyword with a number by hand and run `upgrade` again.
 
 Commit the updated `deploy.nevermore.json`, then deploy as usual. This gives you a reviewable, git-tracked record of exactly which base-place content each deploy shipped.
 

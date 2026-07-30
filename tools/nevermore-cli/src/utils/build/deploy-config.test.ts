@@ -94,6 +94,41 @@ describe('loadDeployConfigAsync basePlace.version', () => {
     expect(target.basePlace?.version).toBe(42);
   });
 
+  it.each(['saved', 'published'])(
+    'accepts a "%s" version pin',
+    async (keyword) => {
+      const configPath = await writeTempConfigAsync({
+        targets: {
+          test: {
+            universeId: 1,
+            placeId: 2,
+            project: 'default.project.json',
+            basePlace: { universeId: 1, placeId: 3, version: keyword },
+          },
+        },
+      });
+      const config = await loadDeployConfigAsync(configPath);
+      const target = config.targets['test'] as DeployTarget;
+      expect(target.basePlace?.version).toBe(keyword);
+    }
+  );
+
+  it('rejects an unrecognized version keyword', async () => {
+    const configPath = await writeTempConfigAsync({
+      targets: {
+        test: {
+          universeId: 1,
+          placeId: 2,
+          project: 'default.project.json',
+          basePlace: { universeId: 1, placeId: 3, version: 'latest' },
+        },
+      },
+    });
+    await expect(loadDeployConfigAsync(configPath)).rejects.toThrowError(
+      /got "latest"/
+    );
+  });
+
   it('rejects a non-integer version pin', async () => {
     const configPath = await writeTempConfigAsync({
       targets: {

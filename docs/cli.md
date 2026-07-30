@@ -192,7 +192,7 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
 
-**`nevermore deploy version upgrade [target]`** — re-pins every `basePlace` in `deploy.nevermore.json` to its current latest published version, so deploys pull a fixed, git-tracked base place instead of whatever is live. Without a target it walks every target. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
+**`nevermore deploy version upgrade [target]`** — re-pins every numeric `basePlace` in `deploy.nevermore.json` to its current latest published version, so deploys pull a fixed, git-tracked base place instead of whatever is live. Base places set to `"saved"` or `"published"` are reported and left alone. Without a target it walks every target. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
 
 | Flag | Description |
 |------|-------------|

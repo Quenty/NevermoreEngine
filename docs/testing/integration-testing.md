@@ -218,7 +218,7 @@ Add `basePlace` to your deploy target:
 
 The `basePlace` place is the source of truth for Studio-authored content. The target `placeId` is where the merged result gets uploaded. These can be in the same universe or different ones.
 
-By default the CLI downloads the **latest published version** of the base place on every deploy. To make deploys reproducible — so a broken Studio edit can't leak into a deploy — pin a specific version with an optional `basePlace.version`, and bump it deliberately with `nevermore deploy version upgrade`. See [Pinning base place versions](../deploy.md#pinning-base-place-versions).
+By default the CLI downloads the **latest published version** of the base place on every deploy. To make deploys reproducible — so a broken Studio edit can't leak into a deploy — pin a specific version with an optional `basePlace.version`, and bump it deliberately with `nevermore deploy version upgrade`. Setting it to `"published"` or `"saved"` instead keeps following the base place but pins down which kind of Studio change counts. See [Pinning base place versions](../deploy.md#pinning-base-place-versions).
 
 ### How the merge works
 
