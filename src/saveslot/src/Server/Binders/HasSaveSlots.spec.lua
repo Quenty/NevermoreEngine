@@ -17,6 +17,7 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Rx = require("Rx")
+local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
@@ -24,11 +25,25 @@ local ValueObject = require("ValueObject")
 local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
 
+local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local FAKE_USER_ID = 424242
+
+-- Every session setup() hands out, so teardown can be guaranteed from afterEach. A test that ends early --
+-- a failed assertion, or resolve() erroring below -- never reaches its own destroy(), and a mock left
+-- parented is refused as a second live PlayerMockService (see PlayerMockServiceBase), which then fails every
+-- later test in the file rather than just the one that broke.
+local openSessions: { any } = {}
+
+afterEach(function()
+	for index = #openSessions, 1, -1 do
+		openSessions[index].destroy()
+		openSessions[index] = nil
+	end
+end)
 
 local function setup(mock: DataStoreMock.DataStoreMock?)
 	mock = mock or DataStoreMock.new()
@@ -49,12 +64,19 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
+	-- Idempotent, so the tests that already tear themselves down keep working and afterEach is only a net.
+	local destroyed = false
 	local function destroy()
+		if destroyed then
+			return
+		end
+
+		destroyed = true
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end
 
-	return {
+	local context = {
 		serviceBag = serviceBag,
 		binder = binder,
 		fakePlayer = fakePlayer,
@@ -62,6 +84,25 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 		mock = mock,
 		destroy = destroy,
 	}
+
+	table.insert(openSessions, context)
+
+	return context
+end
+
+--[[
+	Settles `promise` and hands back its value. Errors rather than asserting and falling through on a
+	promise that never settles: Yield() on a pending promise blocks forever, which would turn one failed
+	assertion into a whole-run timeout with no summary to read.
+]]
+local function resolve(promise: any, timeout: number?): any
+	if not PromiseTestUtils.awaitSettled(promise, timeout or 10) then
+		error("Promise never settled", 2)
+	end
+
+	local ok, value = promise:Yield()
+	expect(ok).toEqual(true)
+	return value
 end
 
 describe("HasSaveSlots against a fake player (healthy datastore)", function()
@@ -1442,13 +1483,6 @@ describe("HasSaveSlots against a fake player (datastore down)", function()
 end)
 
 describe("HasSaveSlots ephemeral slots", function()
-	local function resolve(promise, timeout: number?)
-		expect(PromiseTestUtils.awaitSettled(promise, timeout or 10)).toEqual(true)
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
-		return value
-	end
-
 	local function selectEphemeral(context: any, metadata: any?)
 		return resolve(context.hasSaveSlots:PromiseSelectEphemeralSlot(metadata))
 	end
@@ -1816,5 +1850,175 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(realId)
 
 		context.destroy()
+	end)
+end)
+
+describe("HasSaveSlots continue pointer across sessions", function()
+	local function dataStoreFor(context: any)
+		local playerDataStoreService = context.serviceBag:GetService(PlayerDataStoreService)
+		return resolve(playerDataStoreService:PromiseDataStore(FAKE_USER_ID))
+	end
+
+	-- The substore both slot pointers live in, for asserting on (and seeding) what is actually persisted
+	-- rather than only what the binder reports.
+	local function systemStore(context: any)
+		return dataStoreFor(context):GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
+	end
+
+	--[[
+		Rejoins: flushes this session to the mock datastore, tears the whole service bag down, and binds a
+		fresh binder over the same stored bytes. Nothing carries across in memory, so whatever the returned
+		session knows about the player is what the last one persisted.
+	]]
+	local function rejoin(context: any)
+		resolve(dataStoreFor(context):Save())
+
+		-- Closed before the next session opens, not left to afterEach: two live sessions for one UserId is
+		-- exactly what the mock refuses.
+		context.destroy()
+
+		local nextContext = setup(context.mock)
+		resolve(nextContext.hasSaveSlots:PromiseSlotsLoaded())
+		return nextContext
+	end
+
+	it("still has a slot to continue after a session that ended back at the menu", function()
+		local context = setup()
+
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(1))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+		-- Backing out to the menu clears the active slot, which is exactly the state that used to take the
+		-- resume pointer with it and leave the next session with slots but no "Continue".
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		local rejoined = rejoin(context)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+		expect(resolve(rejoined.hasSaveSlots:PromiseLastActiveSlotId())).toEqual(slotId)
+		expect(resolve(rejoined.hasSaveSlots:PromiseSelectLastSaveSlot())).toEqual(slotId)
+	end)
+
+	it("continues on the slot selected last where a session used several", function()
+		local context = setup()
+
+		local firstSlotId = resolve(context.hasSaveSlots:PromiseCreateSlot(1))
+		local secondSlotId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(firstSlotId))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(secondSlotId))
+		resolve(context.hasSaveSlots:PromiseDeselectSlot())
+
+		local rejoined = rejoin(context)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toEqual(secondSlotId)
+	end)
+
+	it("has nothing to continue on once the slot it pointed at is deleted", function()
+		local context = setup()
+
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+
+		-- Ending this session *inside* the slot is what leaves the active-slot pointer naming it, so the
+		-- delete below has to invalidate that key too and not just the resume one.
+		local deletingSession = rejoin(context)
+		expect(deletingSession.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+
+		resolve(deletingSession.hasSaveSlots:PromiseDeleteSlot(slotId))
+		expect(deletingSession.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
+
+		local rejoined = rejoin(deletingSession)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
+		expect(resolve(rejoined.hasSaveSlots:PromiseSelectLastSaveSlot())).toBeNil()
+	end)
+
+	it("has nothing to continue on after every slot is deleted from the menu", function()
+		local context = setup()
+
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+
+		-- Deleting with nothing selected is the case the selection hook cannot cover: clearing an already
+		-- clear selection writes nothing, so the delete has to retire the persisted active slot itself.
+		local deletingSession = rejoin(context)
+		resolve(deletingSession.hasSaveSlots:PromiseDeleteAllSlots())
+
+		local rejoined = rejoin(deletingSession)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
+		expect(resolve(systemStore(rejoined):Load(SaveSlotConstants.ACTIVE_SLOT_ID_KEY))).toBeNil()
+	end)
+
+	it("reads the pointer left by a build that only persisted the active slot", function()
+		local context = setup()
+
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+
+		-- Strips the session back to what an older build wrote: the active slot alone, with no Continue key
+		-- beside it. Falling back to it is what keeps Continue for every player who already has save data.
+		systemStore(context):Store(SaveSlotConstants.LAST_ACTIVE_SLOT_ID_KEY, nil)
+
+		local rejoined = rejoin(context)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
+	end)
+
+	it("still points at the real slot after a session spent in an ephemeral one", function()
+		local context = setup()
+
+		local realId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(realId))
+
+		-- Ending the session inside an ephemeral slot must leave no trace on either persisted pointer.
+		resolve(context.hasSaveSlots:PromiseSelectEphemeralSlot())
+
+		local rejoined = rejoin(context)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toEqual(realId)
+	end)
+
+	it("continues on the fresh slot after a non-active reset, across a rejoin", function()
+		local context = setup()
+
+		local slotId = resolve(context.hasSaveSlots:PromiseCreateSlot(2))
+		resolve(context.hasSaveSlots:PromiseSelectSlot(slotId))
+
+		-- Ending the session inside the slot leaves the persisted active slot naming it. Resetting it from the
+		-- menu next session swaps it for a fresh id and carries the Continue pointer across -- so the stale
+		-- active key has to be retired with the slot it named, or it shadows the fresh pointer on the rejoin
+		-- below and takes Continue down with it.
+		local resettingSession = rejoin(context)
+		local freshSlotId = resolve(resettingSession.hasSaveSlots:PromiseResetSlot(slotId))
+		expect(freshSlotId).never.toEqual(slotId)
+
+		local rejoined = rejoin(resettingSession)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toEqual(freshSlotId)
+		expect(resolve(rejoined.hasSaveSlots:PromiseSelectLastSaveSlot())).toEqual(freshSlotId)
+	end)
+
+	it("drops a pointer that names a slot the player no longer has, keeping the slots that remain", function()
+		local context = setup()
+
+		local survivingSlotId = resolve(context.hasSaveSlots:PromiseCreateSlot(1))
+
+		-- What a slot deleted by another server leaves behind: pointers with no slot under them. Nothing in
+		-- this session saw the slot go, so the load path is the only thing that can catch it -- and now that
+		-- the pointer survives a deselect, nothing else would ever clear it.
+		systemStore(context):Store(SaveSlotConstants.ACTIVE_SLOT_ID_KEY, "slot-that-is-gone")
+		systemStore(context):Store(SaveSlotConstants.LAST_ACTIVE_SLOT_ID_KEY, "slot-that-is-gone")
+
+		local rejoined = rejoin(context)
+
+		expect(rejoined.hasSaveSlots.LastActiveSlotId.Value).toBeNil()
+		expect(resolve(systemStore(rejoined):Load(SaveSlotConstants.ACTIVE_SLOT_ID_KEY))).toBeNil()
+		expect(resolve(systemStore(rejoined):Load(SaveSlotConstants.LAST_ACTIVE_SLOT_ID_KEY))).toBeNil()
+
+		-- Retiring the pointer must cost the player nothing else: the slot that is still there is still there,
+		-- and still selectable.
+		expect(resolve(rejoined.hasSaveSlots:PromiseHasSlot(survivingSlotId))).toEqual(true)
+		resolve(rejoined.hasSaveSlots:PromiseSelectSlot(survivingSlotId))
+		expect(rejoined.hasSaveSlots.ActiveSlotId.Value).toEqual(survivingSlotId)
 	end)
 end)

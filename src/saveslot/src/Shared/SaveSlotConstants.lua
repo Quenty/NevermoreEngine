@@ -11,6 +11,11 @@ return Table.readonly({
 	SYSTEM_STORE_KEY = "SaveSlots",
 	SLOT_STORE_KEY = "slots",
 	METADATA_STORE_KEY = "slotMetadata",
+	-- The slot selected right now, cleared on a deselect.
+	ACTIVE_SLOT_ID_KEY = "activeSlotId",
+	-- The slot "Continue" resumes. Persisted apart from ACTIVE_SLOT_ID_KEY because a deselect clears that
+	-- one by design, and the slot to resume has to outlive backing out to the menu.
+	LAST_ACTIVE_SLOT_ID_KEY = "lastActiveSlotId",
 	METADATA_CONTAINER_NAME = "SaveSlots",
 	TELEPORT_DATA_SLOT_KEY = "IncomingSaveSlotId",
 	-- Carries the shared-store key of a transferable ephemeral slot across a teleport (trusted band).
