@@ -436,6 +436,96 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 	end)
 end)
 
+describe("PlayerAssetOwnershipTracker query failures", function()
+	--[[
+		The report is counted by swapping the method on the class rather than by watching `warn`: the
+		claim under test is *where* a failure is reported -- once at the query -- and not once per
+		consumer, which is what an unhandled rejection on each consumer's continuation would produce.
+	]]
+	local function withReportsRecorded(func: ({ any }) -> ())
+		local trackerClass: any = PlayerAssetOwnershipTracker
+		local reports = {}
+		local original = trackerClass._warnQueryFailedOnce
+
+		trackerClass._warnQueryFailedOnce = function(_self, assetId, err)
+			table.insert(reports, { assetId = assetId, err = err })
+		end
+
+		-- Restored even when an expectation inside fails, so one red test cannot silence the reporting
+		-- for every test after it.
+		local ok, err = (pcall :: any)(func, reports)
+		trackerClass._warnQueryFailedOnce = original
+
+		if not ok then
+			error(err)
+		end
+	end
+
+	it("should report a failed query once however many consumers ask", function()
+		local context = setup()
+		local capturedReports
+
+		withReportsRecorded(function(reports)
+			capturedReports = reports
+
+			context.tracker:SetQueryOwnershipCallback(function()
+				return Promise.rejected("cloud refused")
+			end)
+
+			local promise = context.tracker:PromiseOwnsAsset("swordKey")
+			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+			-- Yielded, not merely awaited: reading the outcome is this caller consuming its own copy of
+			-- the rejection, which is what a real caller does with the promise it asked for.
+			local ok = promise:Yield()
+			expect(ok).toEqual(false)
+
+			local values = {}
+			-- Typed `any`: the test place holds more than one copy of Subscription (a package graph
+			-- duplicated per dependent), and a list inferred from one copy rejects another.
+			local subs: { any } = {}
+			for _ = 1, 3 do
+				table.insert(
+					subs,
+					context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
+						table.insert(values, value)
+					end)
+				)
+			end
+
+			-- An unresolvable asset emits nothing at all: silence reads as unresolved, where `false`
+			-- would read as "does not own it" and turn a failed lookup into a refusal.
+			expect(PromiseTestUtils.awaitValue(function()
+				return #values > 0
+			end, 0.5)).toEqual(false)
+
+			for _, sub in subs do
+				sub:Destroy()
+			end
+		end)
+
+		expect(#capturedReports).toEqual(1)
+		expect(capturedReports[1].assetId).toEqual(KEY_TO_ID.swordKey)
+		context.destroy()
+	end)
+
+	it("should not report an asset it was never given a callback to query", function()
+		local context = setup()
+		local capturedReports
+
+		withReportsRecorded(function(reports)
+			capturedReports = reports
+
+			-- No callback set: the realm cannot ask rather than having asked and failed, so the
+			-- rejection explains itself and nothing is reported.
+			local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("swordKey"), 5)
+			expect(outcome).toEqual("rejected")
+		end)
+
+		expect(#capturedReports).toEqual(0)
+		context.destroy()
+	end)
+end)
+
 describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 	it("should emit the override value and revert to the cloud query when cleared", function()
 		local context = setup()
