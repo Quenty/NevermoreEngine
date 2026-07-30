@@ -488,6 +488,102 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 		expect(outcome).toEqual("rejected")
 		expect(err).toContain("3 times")
 	end)
+
+	-- The engine accepts the request and refuses it a moment later, which is what a paid-access
+	-- destination does. Without a grace window that refusal reaches nobody: the promise has already
+	-- resolved, so whatever was waiting on the hop waits forever.
+	describe("initFailedGraceSeconds", function()
+		it("rejects with a refusal raised after the request was accepted", function()
+			local player = newMock(887010)
+
+			local promise = TeleportServiceUtils.promiseTeleport(844, { player }, {
+				maxAttempts = 1,
+				retryWait = 0,
+				printWarning = false,
+				initFailedGraceSeconds = 5,
+			})
+
+			awaitHop(player, 844)
+			report(player, 844, Enum.TeleportResult.Unauthorized, "buy the game")
+
+			local outcome, err = PromiseTestUtils.awaitOutcome(promise)
+			expect(outcome).toEqual("rejected")
+			expect(err.result).toEqual(Enum.TeleportResult.Unauthorized)
+			expect(tostring(err)).toContain("buy the game")
+		end)
+
+		it("resolves once the window passes quietly, the hop being underway", function()
+			local player = newMock(887011)
+
+			local promise = TeleportServiceUtils.promiseTeleport(845, { player }, {
+				maxAttempts = 1,
+				retryWait = 0,
+				initFailedGraceSeconds = 0.2,
+			})
+
+			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+			local ok, result = promise:Yield()
+			expect(ok).toEqual(true)
+			-- Nil is what an all-mock batch resolves with: no engine call was made to return a result.
+			expect(result).toEqual(nil)
+		end)
+
+		it("ignores a report that means the hop is still running", function()
+			local player = newMock(887012)
+
+			local promise = TeleportServiceUtils.promiseTeleport(846, { player }, {
+				maxAttempts = 1,
+				retryWait = 0,
+				initFailedGraceSeconds = 0.4,
+			})
+
+			awaitHop(player, 846)
+			report(player, 846, Enum.TeleportResult.Success, "on your way")
+
+			local ok = promise:Yield()
+			expect(ok).toEqual(true)
+		end)
+
+		it("spends an attempt on a refusal worth retrying", function()
+			local player = newMock(887013)
+			local attempts = 0
+
+			local promise = TeleportServiceUtils.promiseTeleport(847, { player }, {
+				maxAttempts = 2,
+				retryWait = 0,
+				printWarning = false,
+				initFailedGraceSeconds = 5,
+			})
+
+			-- Each attempt writes its own hop record; clearing it is how the next one becomes visible,
+			-- and the message has to differ or the backing attribute reports no change.
+			for _ = 1, 2 do
+				awaitHop(player, 847)
+				attempts += 1
+				clearHop(player, 847)
+				report(player, 847, Enum.TeleportResult.GameFull, `full {attempts}`)
+			end
+
+			local outcome = PromiseTestUtils.awaitOutcome(promise)
+			expect(outcome).toEqual("rejected")
+			expect(attempts).toEqual(2)
+		end)
+
+		it("resolves on acceptance without a window, as every server call did before", function()
+			local player = newMock(887014)
+
+			local promise = TeleportServiceUtils.promiseTeleport(848, { player }, { maxAttempts = 1, retryWait = 0 })
+
+			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+
+			-- Reported afterwards and unheard, which is the behaviour a caller opts out of by leaving the
+			-- window unset rather than something this test wants.
+			report(player, 848, Enum.TeleportResult.Unauthorized, "too late to matter")
+
+			local ok = promise:Yield()
+			expect(ok).toEqual(true)
+		end)
+	end)
 end)
 
 describe("TeleportServiceUtils.promiseTeleportClient", function()
