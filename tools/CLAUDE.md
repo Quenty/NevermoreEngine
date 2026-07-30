@@ -10,6 +10,7 @@ The `tools/` directory holds the CLI tools that drive Nevermore's development wo
 | `studio-bridge` | WebSocket bridge for running Luau scripts in Roblox Studio (`studio-bridge exec`) |
 | `cli-output-helpers` | Shared formatting and reporting (chalk, OutputHelper, Reporter) |
 | `nevermore-cli-helpers` | Shared utilities (VersionChecker, semver handling) |
+| `nevermore-deploy-config` | Sole owner of `deploy.nevermore.json` and `deploy.nevermore.lock.json`: schema, validation, and base place version resolution. Schema and policy only — no network, no yargs — so lock semantics can't drift between commands. Reaches Open Cloud through the `PlaceVersionSource` port, which `OpenCloudClient` satisfies structurally. |
 | `nevermore-template-helpers` | Scaffolding and template substitution for `init package` |
 | `nevermore-vscode` | VS Code extension (snippets, integration) |
 | `nevermore-claude` | Claude Code plugin (ships the `strict-typing-luau` skill). Not TypeScript — see below. |

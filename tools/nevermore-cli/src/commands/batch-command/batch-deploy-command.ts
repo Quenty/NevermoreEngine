@@ -28,6 +28,7 @@ import {
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type BatchTarget,
   discoverAllTargetPackagesAsync,
@@ -214,7 +215,11 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     apiKey,
     rateLimiter: new RateLimiter(),
   });
-  const context = new CloudJobContext(reporter, client);
+  const context = new CloudJobContext(
+    reporter,
+    client,
+    createBasePlaceResolver(client, args)
+  );
 
   // Gathered once so every deployed package shares one timestamp and commit.
   const deployGitInfo = gatherGitDeployInfo();

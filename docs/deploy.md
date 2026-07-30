@@ -277,9 +277,44 @@ A number holds the base place still. Sometimes you want the opposite: follow the
 
 `"published"` is the useful default for a shared base place: the team can save work-in-progress in Studio all day without it leaking into a deploy, and publishing the base place is the deliberate act that ships it. `"saved"` is for a Team Create place where saving *is* how content is handed off, and nobody publishes the base place at all.
 
-Both keywords cost one extra Open Cloud call per base place at deploy time, resolved against the place's version history newest-first — so it stays cheap even on a place with tens of thousands of versions.
+Both keywords cost one extra Open Cloud call per base place at deploy time, resolved against the place's version history newest-first — so it stays cheap even on a place with tens of thousands of versions. What they resolve to is written to the [lock file](#the-lock-file), so a keyword pin still produces a reproducible build.
 
 These are the same words the Open Cloud place-publishing API uses for `versionType` when *uploading*, so a config reads the same in both directions. Anything else — `"latest"`, `"live"` — is rejected when the config loads rather than at deploy time.
+
+## The lock file
+
+`deploy.nevermore.json` says what you want; `deploy.nevermore.lock.json` records what that turned out to be. It sits beside the config, and **you commit it**.
+
+```json
+{
+  "lockfileVersion": 1,
+  "basePlaces": {
+    "11111": { "version": 158, "from": "published" }
+  }
+}
+```
+
+Without it, a commit doesn't fully describe its own deploy: two builds of the same code can merge against different base-place content, and nothing in git says so. That's the same reason `package-lock.json` exists.
+
+The CLI writes it for you. On a deploy, every base place that isn't pinned to an exact number is resolved and recorded; on later deploys the recorded version is used directly, with **no network call**, until you deliberately roll it forward. Entries are keyed by base place id, so one entry covers a base place shared by several targets, and multi-place targets need nothing special.
+
+Three things it deliberately does not have: timestamps (git already records when an entry changed, and ties it to an author and a commit), entries for numeric pins (those are already exact, and a second copy is a second thing to edit), and content hashes (a Roblox place version is immutable, so there's nothing to verify).
+
+The `from` field is what makes the lock notice you changed your mind: flip a config from `"published"` to `"saved"` and the stale entry is discarded rather than silently re-served.
+
+### Freezing it in CI
+
+`--frozen-lockfile` makes the CLI refuse to resolve anything the lock doesn't already answer, so a base place that moved fails the build instead of shipping:
+
+```bash
+nevermore deploy run production --frozen-lockfile
+```
+
+It's **off by default, including in CI** — a repo that hasn't committed a lock file yet shouldn't start failing. Turn it on in your workflow once the lock is committed. It applies to every command that can merge a base place: `deploy run`, `batch deploy`, `test`, and `batch test`.
+
+### When it conflicts
+
+The lock is regenerable. Take either side of the conflict, then run `nevermore deploy version upgrade` and commit the result. A lock file that fails to parse is reported as an error rather than silently rewritten, precisely so a bad merge can't quietly drop whatever the other side pinned.
 
 ### Bumping the pin
 
@@ -296,11 +331,18 @@ nevermore deploy version upgrade production
 nevermore deploy version upgrade --dryrun
 ```
 
-`upgrade` walks every `basePlace` in `deploy.nevermore.json` (or just the named target), resolves each place's current latest published version, prints an old → new table, and — after a confirmation prompt — writes the new `version` values back into the file. Base places shared by several targets are resolved once. Pass `--yes` to skip the prompt (for scripting), or `--dryrun` to preview only.
+`upgrade` walks every `basePlace` in `deploy.nevermore.json` (or just the named target), resolves each place's newest version, prints an old → new table, and — after a confirmation prompt — writes the result. Base places shared by several targets are resolved once. Pass `--yes` to skip the prompt (for scripting), or `--dryrun` to preview only.
 
-Base places pinned to `"saved"` or `"published"` are skipped and reported, not rewritten — those already track the place on every deploy, and freezing them to a number is the opposite of what the config asked for. To convert one back to a fixed pin, replace the keyword with a number by hand and run `upgrade` again.
+Which file it writes depends on how the base place is pinned:
 
-Commit the updated `deploy.nevermore.json`, then deploy as usual. This gives you a reviewable, git-tracked record of exactly which base-place content each deploy shipped.
+| Pin | `upgrade` writes | Resolved against |
+|-----|------------------|------------------|
+| a number, or no `version` at all | `deploy.nevermore.json` | latest **published** |
+| `"published"` / `"saved"` | `deploy.nevermore.lock.json` | whichever type it tracks |
+
+That split is the point: a keyword pin says "follow this place," so `upgrade` moves the recorded fact without overwriting the intent. A numeric pin says "hold still," so `upgrade` is the deliberate act that moves it. Run unscoped (no target), `upgrade` also drops lock entries for base places the config no longer references.
+
+Commit the updated files, then deploy as usual. This gives you a reviewable, git-tracked record of exactly which base-place content each deploy shipped.
 
 Resolving the latest version uses the same `legacy-asset:manage` scope already required for `basePlace` downloads, so no extra credentials are needed.
 

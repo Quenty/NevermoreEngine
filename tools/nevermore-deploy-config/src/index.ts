@@ -25,3 +25,20 @@ export {
   type ManifestPlaceInfo,
   type MultiPlaceTargetConfig,
 } from './deploy-config.js';
+
+export {
+  BasePlaceResolver,
+  type BasePlaceResolverOptions,
+} from './base-place-resolver.js';
+
+export {
+  DEPLOY_LOCK_VERSION,
+  createEmptyDeployLock,
+  loadDeployLockAsync,
+  resolveDeployLockPath,
+  saveDeployLockAsync,
+  type BasePlaceLockEntry,
+  type DeployLock,
+} from './deploy-lock.js';
+
+export { type PlaceVersionSource } from './place-version-source.js';

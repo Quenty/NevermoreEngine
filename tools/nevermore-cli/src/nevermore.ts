@@ -59,6 +59,15 @@ yargs(hideBin(process.argv))
     global: true,
     type: 'boolean',
   })
+  // Global rather than per-command so every command that can merge a base place
+  // gets identical lock semantics from one definition.
+  .option('frozen-lockfile', {
+    description:
+      'Fail instead of resolving a base place version that deploy.nevermore.lock.json does not already pin',
+    default: false,
+    global: true,
+    type: 'boolean',
+  })
   .middleware((argv) => {
     OutputHelper.setVerbose(argv.verbose as boolean);
   })

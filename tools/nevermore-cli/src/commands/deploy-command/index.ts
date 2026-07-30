@@ -15,6 +15,7 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type BatchDeployResult,
   createDeployCommentConfig,
@@ -385,7 +386,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       apiKey,
       rateLimiter: new RateLimiter(),
     });
-    const context = new CloudJobContext(reporter, client);
+    const context = new CloudJobContext(
+      reporter,
+      client,
+      createBasePlaceResolver(client, args)
+    );
 
     await reporter.startAsync();
 

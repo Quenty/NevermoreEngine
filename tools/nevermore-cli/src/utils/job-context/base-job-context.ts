@@ -19,7 +19,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
-import { isBasePlaceVersionKeyword } from '@quenty/nevermore-deploy-config';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy-config';
 
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
@@ -64,12 +64,18 @@ class TrackedBuiltPlace implements BuiltPlace {
 export abstract class BaseJobContext implements JobContext {
   protected _reporter: Reporter;
   protected _openCloudClient: OpenCloudClient | undefined;
+  private _basePlaceResolver: BasePlaceResolver | undefined;
   private _builtPlaces = new Set<TrackedBuiltPlace>();
   private _sharedRojoBuilds = new Map<string, SharedRojoBuild>();
 
-  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
+  constructor(
+    reporter: Reporter,
+    openCloudClient?: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
     this._reporter = reporter;
     this._openCloudClient = openCloudClient;
+    this._basePlaceResolver = basePlaceResolver;
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
@@ -181,8 +187,18 @@ export abstract class BaseJobContext implements JobContext {
     options: BuildPlaceOptions
   ): Promise<void> {
     const { basePlace } = tracked.target;
-    if (!basePlace || !this._openCloudClient) {
+    if (!basePlace) {
       return;
+    }
+
+    // Silently building without the base place would report success on a place
+    // that is missing all of its Studio-authored content, so a context that
+    // cannot download one says so instead.
+    if (!this._openCloudClient || !this._basePlaceResolver) {
+      throw new Error(
+        `Target has a basePlace (${basePlace.placeId}) but this run has no Open ` +
+          `Cloud access to download it. Re-run with --cloud, or pass --api-key.`
+      );
     }
 
     // Merge artifacts (base.rbxl, merged.rbxl) are per-place — siblings sharing
@@ -195,27 +211,20 @@ export abstract class BaseJobContext implements JobContext {
 
     this._reporter.onPackagePhaseChange(resolvedName, 'downloading');
 
-    // A `"saved"` / `"published"` pin has to be turned into a concrete version
-    // number before the download, since the Asset Delivery API only addresses
-    // versions numerically.
-    let version: number | undefined;
-    if (basePlace.version == null) {
-      OutputHelper.verbose('Downloading base place (latest) for merge...');
-    } else if (isBasePlaceVersionKeyword(basePlace.version)) {
-      version = await this._openCloudClient.resolveLatestPlaceVersionAsync(
-        basePlace.universeId,
-        basePlace.placeId,
-        basePlace.version
-      );
-      OutputHelper.verbose(
-        `Downloading base place (latest ${basePlace.version}: v${version}) for merge...`
-      );
-    } else {
-      version = basePlace.version;
-      OutputHelper.verbose(
-        `Downloading base place (pinned v${version}) for merge...`
-      );
-    }
+    // Every pin — number, keyword, or absent — becomes a concrete version here,
+    // both because the Asset Delivery API only addresses versions numerically
+    // and so the lock file records exactly what this build merged against.
+    const version = await this._basePlaceResolver.resolveAsync(
+      options.packagePath ?? process.cwd(),
+      basePlace
+    );
+    OutputHelper.verbose(
+      typeof basePlace.version === 'number'
+        ? `Downloading base place (pinned v${version}) for merge...`
+        : `Downloading base place (${
+            basePlace.version ?? 'published'
+          } → v${version}) for merge...`
+    );
 
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
@@ -291,6 +300,14 @@ export abstract class BaseJobContext implements JobContext {
   abstract releaseAsync(deployment: Deployment): Promise<void>;
 
   async disposeAsync(): Promise<void> {
+    // Hangs off the lifecycle every entry point already runs in a `finally`, so
+    // no command has to remember to persist what it resolved.
+    if (this._basePlaceResolver) {
+      for (const lockPath of await this._basePlaceResolver.flushAsync()) {
+        OutputHelper.info(`Updated ${lockPath}`);
+      }
+    }
+
     for (const tracked of [...this._builtPlaces]) {
       await this.releaseBuiltPlaceAsync(tracked);
     }

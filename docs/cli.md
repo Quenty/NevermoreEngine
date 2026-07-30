@@ -69,6 +69,7 @@ These apply to every command:
 | `--yes` | Never prompt; fail instead of asking. Use in CI and scripts. |
 | `--dryrun` | Describe what would happen without touching the file system or Roblox. |
 | `--verbose` | Show intermediate output (building, uploading, credential loading). Also disables the live spinner in favor of plain, scrollable logs. |
+| `--frozen-lockfile` | Fail instead of resolving a base place version that `deploy.nevermore.lock.json` doesn't already pin. Off by default, including in CI. See [The lock file](deploy.md#the-lock-file). |
 | `--help` | Show help for the current command. |
 | `--version` | Print the installed CLI version. |
 
@@ -192,7 +193,7 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
 
-**`nevermore deploy version upgrade [target]`** — re-pins every numeric `basePlace` in `deploy.nevermore.json` to its current latest published version, so deploys pull a fixed, git-tracked base place instead of whatever is live. Base places set to `"saved"` or `"published"` are reported and left alone. Without a target it walks every target. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
+**`nevermore deploy version upgrade [target]`** — rolls every `basePlace` forward, so deploys pull a fixed, git-tracked base place instead of whatever is live. Numeric (and unpinned) base places are re-pinned in `deploy.nevermore.json`; base places tracking `"saved"` or `"published"` have their resolved version rewritten in `deploy.nevermore.lock.json` instead. Without a target it walks every target and prunes unreferenced lock entries. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
 
 | Flag | Description |
 |------|-------------|
