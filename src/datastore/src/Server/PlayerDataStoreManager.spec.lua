@@ -8,6 +8,7 @@ local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
+local PromiseUtils = require("PromiseUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -189,44 +190,10 @@ describe("PlayerDataStoreManager.PromiseAllSaves", function()
 	end)
 end)
 
-describe("PlayerDataStoreManager teardown", function()
-	it("destroys the datastores it still owns when the manager is destroyed", function()
-		local controller = DataStoreTestUtils.setupDataStoreManager()
-
-		local dataStore = controller.manager:GetDataStore(1)
-		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
-			controller:destroy()
-			return
-		end
-
-		controller.manager:Destroy()
-
-		expect(getmetatable(dataStore)).toBeNil()
-
-		controller:destroy()
-	end)
-
-	it("flushes staged data synchronously to the underlying store when destroyed", function()
-		local controller = DataStoreTestUtils.setupDataStoreManager()
-
-		local dataStore = controller.manager:GetDataStore(1)
-		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
-			controller:destroy()
-			return
-		end
-
-		dataStore:Store("coins", 5)
-
-		controller.manager:Destroy()
-
-		local raw = controller.mock:GetRaw("user_1")
-		expect(raw).never.toBeNil()
-		expect(raw.coins).toEqual(5)
-
-		controller:destroy()
-	end)
-
-	it("releases the session lock when destroyed, not just the staged data", function()
+-- Models a closing server the way Roblox actually behaves: PlayerRemoving fires for everyone still in
+-- the server and does the save-and-close, and the close is held open until those removals flush.
+describe("PlayerDataStoreManager server shutdown", function()
+	it("saves the staged data and releases the lock for the leaving player", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		if not controller.storeAndAwaitLock() then
@@ -235,18 +202,19 @@ describe("PlayerDataStoreManager teardown", function()
 			return
 		end
 
-		controller.manager:Destroy()
+		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
+			controller:destroy()
+			return
+		end
 
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = controller.mock:GetRaw("user_1")
-			return raw ~= nil and raw.lock == nil
-		end, 5)).toEqual(true)
-		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
+		local raw = controller.mock:GetRaw("user_1")
+		expect(raw.coins).toEqual(5)
+		expect(raw.lock).toEqual(nil)
 
 		controller:destroy()
 	end)
 
-	it("releases the lock for every store it still owns", function()
+	it("releases the lock for every player still in the server", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		controller.manager:GetDataStore(1):Store("coins", 1)
@@ -263,20 +231,74 @@ describe("PlayerDataStoreManager teardown", function()
 			return
 		end
 
-		controller.manager:Destroy()
+		if not expectSettled(controller.promiseShutdown({ 1, 2 }), 10) then
+			controller:destroy()
+			return
+		end
 
-		expect(PromiseTestUtils.awaitValue(function()
-			local rawOne = controller.mock:GetRaw("user_1")
-			local rawTwo = controller.mock:GetRaw("user_2")
-			return rawOne ~= nil and rawOne.lock == nil and rawTwo ~= nil and rawTwo.lock == nil
-		end, 5)).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
+		expect(controller.mock:GetRaw("user_2").lock).toEqual(nil)
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(1)
 		expect(controller.mock:GetRaw("user_2").coins).toEqual(2)
 
 		controller:destroy()
 	end)
 
-	it("tears down cleanly when a store's load failed, leaking no rejection and writing no lock", function()
+	it("destroys each store once its removal has flushed", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local dataStore = controller.manager:GetDataStore(1)
+		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
+			controller:destroy()
+			return
+		end
+
+		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
+			controller:destroy()
+			return
+		end
+
+		expect(getmetatable(dataStore)).toBeNil()
+
+		controller:destroy()
+	end)
+
+	it("does not resolve the close while a PlayerRemoving save is still in flight", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		-- An async removing callback pushes the write past the moment the close is requested, which is
+		-- exactly the window where waiting on pending saves alone finds nothing to wait for.
+		controller.manager:AddRemovingCallback(function()
+			return PromiseUtils.delayed(0.5)
+		end)
+
+		if not controller.storeAndAwaitLock() then
+			expect("lock was never acquired").toEqual("lock was acquired")
+			controller:destroy()
+			return
+		end
+
+		-- PlayerRemoving lands first, then the server begins closing.
+		controller.manager:RemovePlayerDataStore(1)
+
+		local closePromise = controller.manager:PromiseAllSaves()
+		expect(closePromise:IsPending()).toEqual(true)
+
+		if not expectSettled(closePromise, 10) then
+			controller:destroy()
+			return
+		end
+
+		-- The close resolving has to mean the write landed. If it can resolve first, the real server
+		-- dies here with the session still locked and no other server able to release it.
+		local raw = controller.mock:GetRaw("user_1")
+		expect(raw.coins).toEqual(5)
+		expect(raw.lock).toEqual(nil)
+
+		controller:destroy()
+	end)
+
+	it("closes cleanly when a store's load failed, leaking no rejection and writing no lock", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		controller.mock:FailAllRequests()
@@ -290,7 +312,10 @@ describe("PlayerDataStoreManager teardown", function()
 		end
 		expect((loaded:Wait())).toEqual(false)
 
-		controller.manager:Destroy()
+		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
+			controller:destroy()
+			return
+		end
 
 		expect(controller.mock:GetRaw("user_1")).toBeNil()
 

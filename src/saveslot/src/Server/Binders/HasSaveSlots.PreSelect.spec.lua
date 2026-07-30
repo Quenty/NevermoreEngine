@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
@@ -73,6 +74,10 @@ local function setup()
 			activeContext = nil
 		end
 
+		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
+		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
+		-- this spec and fires inside a later package's window.
+		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end

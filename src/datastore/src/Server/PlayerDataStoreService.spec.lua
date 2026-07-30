@@ -5,8 +5,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -26,10 +28,26 @@ local function setup(mock)
 		serviceBag:Start()
 	end
 
+	-- Drives the real close path: the manager the service owns, shut down the way Roblox does. Without a
+	-- mock the bag was never started, so there is no manager to reach and nothing to shut down.
+	local function promiseShutdown(userIds)
+		if not mock then
+			return Promise.resolved()
+		end
+
+		return service:PromiseManager():Then(function(manager)
+			return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
+		end)
+	end
+
 	return {
 		service = service,
 		mock = mock,
+		promiseShutdown = promiseShutdown,
 		destroy = function()
+			-- Otherwise a store the spec loaded outlives it with its auto-save loop running, and fires
+			-- inside a later package's window in the shared test place.
+			PromiseTestUtils.awaitSettled(promiseShutdown(), 5)
 			maid:DoCleaning()
 		end,
 	}
@@ -157,30 +175,10 @@ describe("PlayerDataStoreService failure handling", function()
 	end)
 end)
 
-describe("PlayerDataStoreService teardown", function()
-	it("destroys the datastore its manager owns when the service is destroyed", function()
-		local controller = setup(DataStoreMock.new())
-
-		local promise = controller.service:PromiseDataStore(1)
-		if not PromiseTestUtils.awaitSettled(promise, 10) then
-			expect("hung").toEqual("settled")
-			controller:destroy()
-			return
-		end
-		local _ok, dataStore = promise:Yield()
-
-		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10) then
-			expect("load hung").toEqual("load settled")
-			controller:destroy()
-			return
-		end
-
-		controller:destroy()
-
-		expect(getmetatable(dataStore)).toBeNil()
-	end)
-
-	it("flushes staged data synchronously to the underlying store when destroyed", function()
+-- The service registers manager:PromiseAllSaves() as its BindToClose callback, so a closing server is
+-- PlayerRemoving doing the save-and-close with that callback held open until it flushes.
+describe("PlayerDataStoreService server shutdown", function()
+	it("saves the staged data and destroys the store when the server closes", function()
 		local controller = setup(DataStoreMock.new())
 
 		local promise = controller.service:PromiseDataStore(1)
@@ -199,10 +197,17 @@ describe("PlayerDataStoreService teardown", function()
 
 		dataStore:Store("coins", 7)
 
-		controller:destroy()
+		if not PromiseTestUtils.awaitSettled(controller.promiseShutdown({ 1 }), 10) then
+			expect("shutdown never flushed").toEqual("shutdown flushed")
+			controller:destroy()
+			return
+		end
 
 		local raw = controller.mock:GetRaw("1")
 		expect(raw).never.toBeNil()
 		expect(raw.coins).toEqual(7)
+		expect(getmetatable(dataStore)).toBeNil()
+
+		controller:destroy()
 	end)
 end)

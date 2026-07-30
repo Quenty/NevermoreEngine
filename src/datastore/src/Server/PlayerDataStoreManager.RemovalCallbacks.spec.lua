@@ -57,6 +57,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 				error("removing callback boom")
 			end)
 
+			local dataStore = controller.manager:GetDataStore(1)
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 
 			expect(function()
@@ -64,6 +65,10 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			end).toThrow("removing callback boom")
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
+			-- The throw latched _removing before the store left _datastores, so no later removal can
+			-- reach it and nothing else destroys it. Kill its auto-save loop by hand, or it outlives this
+			-- spec and fires inside a later package's window.
+			dataStore:Destroy()
 			controller:destroy()
 		end)
 

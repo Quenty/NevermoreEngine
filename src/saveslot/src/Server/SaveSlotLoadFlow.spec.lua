@@ -10,6 +10,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -34,6 +35,10 @@ local function setup(mock)
 		playerDataStoreService = playerDataStoreService,
 		mock = mock,
 		destroy = function()
+			-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
+			-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
+			-- this spec and fires inside a later package's window.
+			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			maid:DoCleaning()
 		end,
 	}
