@@ -2,7 +2,7 @@ import {
   getApiKeyAsync,
   type CredentialArgs,
 } from '@quenty/nevermore-cli-helpers';
-import { type DeployTarget } from './deploy-config.js';
+import { type DeployTarget } from '@quenty/nevermore-deploy-config';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 import { type BuiltPlace } from './build.js';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';

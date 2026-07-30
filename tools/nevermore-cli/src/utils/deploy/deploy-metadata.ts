@@ -7,7 +7,7 @@ import {
 } from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type BuiltPlace } from '../build/build.js';
-import { type ManifestPlaceInfo } from '../build/deploy-config.js';
+import { type ManifestPlaceInfo } from '@quenty/nevermore-deploy-config';
 
 /** npm name of the package that ships the manifest module. */
 export const MANIFEST_PACKAGE_NAME = '@quenty/nevermoreclimanifest';

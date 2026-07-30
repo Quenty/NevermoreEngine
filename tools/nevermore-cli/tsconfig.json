@@ -8,10 +8,23 @@
     "declaration": true
   },
   "references": [
-    { "path": "../cli-output-helpers" },
-    { "path": "../nevermore-template-helpers" },
-    { "path": "../nevermore-cli-helpers" },
-    { "path": "../studio-bridge" }
+    {
+      "path": "../cli-output-helpers"
+    },
+    {
+      "path": "../nevermore-template-helpers"
+    },
+    {
+      "path": "../nevermore-cli-helpers"
+    },
+    {
+      "path": "../studio-bridge"
+    },
+    {
+      "path": "../nevermore-deploy-config"
+    }
   ],
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }

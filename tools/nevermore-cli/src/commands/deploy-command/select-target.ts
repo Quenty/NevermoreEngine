@@ -5,7 +5,7 @@ import {
   resolveDefaultTargetName,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy-config';
 
 export interface SelectTargetOptions {
   explicitTarget?: string;

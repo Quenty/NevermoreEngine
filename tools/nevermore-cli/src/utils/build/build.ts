@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BuildContext } from '@quenty/nevermore-template-helpers';
-import { DeployTarget } from './deploy-config.js';
+import { DeployTarget } from '@quenty/nevermore-deploy-config';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface DeployOverrides {

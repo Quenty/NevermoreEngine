@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-deploy-config": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
     "@quenty/studio-bridge": "workspace:*",
     "execa": "^9.6.1",

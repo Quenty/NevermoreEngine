@@ -39,7 +39,7 @@ import {
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   toManifestPlaceInfo,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy-config';
 import { handleInitAsync } from './deploy-init.js';
 import {
   handleVersionUpgradeAsync,
