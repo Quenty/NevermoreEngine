@@ -93,6 +93,22 @@ local function setup()
 	return controller
 end
 
+-- A returning player's persisted slot, written straight into the mock the way a previous session left it.
+local function seedExistingSlot(controller: any)
+	controller.mock:SetRaw(tostring(USER_ID), {
+		[SaveSlotConstants.SYSTEM_STORE_KEY] = {
+			[SaveSlotConstants.METADATA_STORE_KEY] = {
+				[EXISTING_SLOT_ID] = {
+					SlotIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX,
+					SlotName = "Slot 1",
+					CreatedTime = 1,
+				},
+			},
+			activeSlotId = EXISTING_SLOT_ID,
+		},
+	})
+end
+
 describe("SaveSlotService selection chain vs a player who leaves mid-load", function()
 	it("consumes a slots-load still pending when the binder dies", function()
 		local controller = setup()
@@ -109,24 +125,35 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		controller:destroy()
 	end)
 
+	-- Pins that seedExistingSlot really lands where the load reads it. Without this, drift in the raw
+	-- layout would quietly reduce the late-settle test below to the empty-metadata case it exists to
+	-- replace -- green, and no longer reaching _buildSlot at all.
+	it("loads the seeded slot when the player stays", function()
+		local controller = setup()
+		seedExistingSlot(controller)
+
+		local hasSaveSlots =
+			assert(controller.hasSaveSlotsBinder:Bind(controller.fakePlayer), "Failed to bind HasSaveSlots")
+		expect(PromiseTestUtils.awaitSettled(hasSaveSlots:PromiseSlotsLoaded(), 10)).toEqual(true)
+
+		local hasSlotStatus, hasSlot = PromiseTestUtils.awaitOutcome(hasSaveSlots:PromiseHasSlot(EXISTING_SLOT_ID), 10)
+		expect(hasSlotStatus).toEqual("resolved")
+		expect(hasSlot).toEqual(true)
+
+		local activeStatus, lastActive = PromiseTestUtils.awaitOutcome(hasSaveSlots:PromiseLastActiveSlotId(), 10)
+		expect(activeStatus).toEqual("resolved")
+		expect(lastActive).toEqual(EXISTING_SLOT_ID)
+
+		controller:destroy()
+	end)
+
 	it("consumes a returning player's slots-load that settles after the binder died", function()
 		local controller = setup()
 
 		-- A returning player, so the load settles with metadata to build slots from. The empty-metadata
 		-- case above never reaches _buildSlot, which is how a live server kept throwing there
 		-- ("attempt to call missing method '_buildSlot'") while that test stayed green.
-		controller.mock:SetRaw(tostring(USER_ID), {
-			[SaveSlotConstants.SYSTEM_STORE_KEY] = {
-				[SaveSlotConstants.METADATA_STORE_KEY] = {
-					[EXISTING_SLOT_ID] = {
-						SlotIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX,
-						SlotName = "Slot 1",
-						CreatedTime = 1,
-					},
-				},
-				activeSlotId = EXISTING_SLOT_ID,
-			},
-		})
+		seedExistingSlot(controller)
 
 		local hasSaveSlots =
 			assert(controller.hasSaveSlotsBinder:Bind(controller.fakePlayer), "Failed to bind HasSaveSlots")

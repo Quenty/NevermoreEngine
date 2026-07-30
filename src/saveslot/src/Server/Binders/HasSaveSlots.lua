@@ -440,7 +440,13 @@ function HasSaveSlots.PromiseSelectTransferableEphemeralSlot(
 	key: string
 ): Promise.Promise<SaveSlotData.SlotId>
 	return (self._loadPromise :: any):Then(function()
-		return self._sharedSaveSlotDataStoreService:PromiseRead(key):Then(function(export)
+		-- Maid-owned for the same reason as _promiseLoadSlots: this read runs on the join path (a teleport
+		-- arriving with an ephemeral key) and outlives a leave, and its continuation builds a slot.
+		return self._maid:GivePromise(self._sharedSaveSlotDataStoreService:PromiseRead(key)):Then(function(export)
+			if not self.Destroy then
+				return nil -- Destroyed
+			end
+
 			if export == nil then
 				return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
 			end
@@ -1102,16 +1108,17 @@ function HasSaveSlots.PromiseIncomingSlotId(self: HasSaveSlots): Promise.Promise
 		end)
 end
 
--- Every hop is maid-owned and re-checks we are alive before touching anything, for the same reason as the
--- selection chain in SaveSlotService: a session-locked or retrying read settles long after the player left,
--- and a continuation queued before the maid died still runs. Calling into this destroyed
--- (metatable-stripped) object -- or into its destroyed stores -- throws. Because a datastore load resolves
--- inside its UpdateAsync transform, that throw surfaces as a "Transform function error" and takes the
--- transform's write down with it. See SaveSlotLateSettle.spec.
+-- Maid-owning every hop is what makes this safe, for the same reason as the selection chain in
+-- SaveSlotService: a session-locked or retrying read settles long after the player left, and Promise has no
+-- cancellation, so owning only the outermost promise detaches nothing upstream. Calling into this destroyed
+-- (metatable-stripped) object -- or into its destroyed stores -- throws, and because a datastore load
+-- resolves inside its UpdateAsync transform, that throw surfaces as a "Transform function error" and takes
+-- the transform's write down with it. The liveness checks cover a continuation queued before the maid died.
+-- See SaveSlotLateSettle.spec.
 function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj)):Then(function(dataStore)
 		if not self.Destroy then
-			return nil -- Died while the datastore resolved
+			return nil -- Destroyed
 		end
 
 		self._dataStore = dataStore
@@ -1120,7 +1127,7 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 
 		return self._maid:GivePromise(self._metadataStore:LoadAll({})):Then(function(metadata)
 			if not self.Destroy then
-				return nil -- Died while the metadata load settled
+				return nil -- Destroyed
 			end
 
 			for slotId, data in metadata do
@@ -1131,7 +1138,7 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 				:GivePromise(self._systemStore:Load("activeSlotId"))
 				:Then(function(activeId: SaveSlotData.SlotId?)
 					if not self.Destroy then
-						return nil -- Died while the active-slot read settled
+						return nil -- Destroyed
 					end
 
 					self._lastActiveSlotId = activeId
