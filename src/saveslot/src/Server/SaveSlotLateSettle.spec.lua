@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local DataStoreMock = require("DataStoreMock")
+local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
@@ -73,6 +74,10 @@ local function setup()
 			if activeController == self then
 				activeController = nil
 			end
+			-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
+			-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
+			-- this spec and fires inside a later package's window.
+			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			serviceBag:Destroy()
 			maid:DoCleaning()
 			-- Any straggler continuation blows up here, inside the test that owns it, rather

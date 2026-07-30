@@ -123,6 +123,32 @@ function DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
 end
 
 --[=[
+	Shuts down the manager a [PlayerDataStoreService] owns, the way Roblox would, and waits for it.
+
+	Call this from the `destroy()` of any spec that injects a datastore into the service and tears down
+	by destroying its ServiceBag. `manager:Destroy()` destroys no stores -- they are only ever destroyed
+	by a removal -- and a [PlayerMock] never fires the real `Players.PlayerRemoving`, so without this
+	every store the spec loaded outlives it with its `task.spawn` auto-save loop running. In the shared
+	test place that loop later fires inside another package's window and fails it.
+
+	`userIds` is only needed to model "PlayerRemoving landed first" for an ordering assertion. For
+	cleanup, omit it: the close removes every store the manager still owns.
+
+	@param playerDataStoreService PlayerDataStoreService
+	@param userIds { PlayerUserId }?
+	@param timeout number? -- defaults to 5
+	@return boolean -- whether the shutdown settled
+]=]
+function DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService, userIds, timeout)
+	return PromiseTestUtils.awaitSettled(
+		playerDataStoreService:PromiseManager():Then(function(manager)
+			return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
+		end),
+		timeout or 5
+	)
+end
+
+--[=[
 	Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to
 	a fresh [DataStoreMock] (keyed `user_<userId>`), all owned by a Maid.
 
