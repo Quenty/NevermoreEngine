@@ -110,6 +110,48 @@ function PlayerAssetOwnershipTracker:SetQueryOwnershipCallback(promiseOwnsAsset:
 	self._ownershipCallback.Value = promiseOwnsAsset
 end
 
+--[=[
+	Names an asset this tracker could not answer for. Reached once per query rather than once per
+	consumer of it: every caller and every subscriber attaches its own continuation to the same cached
+	query, so a rejection nobody handles is reported once per continuation -- hundreds of anonymous
+	"[Promise] - Uncaught exception" lines for one failure.
+
+	A query never made -- no callback for this realm -- is not reported: the rejection it returns says
+	so in full, and a realm that cannot ask is not a fault.
+
+	@param assetId number
+	@param err any
+	@private
+]=]
+function PlayerAssetOwnershipTracker._warnQueryFailed(self: any, assetId: number, err: any): ()
+	-- An empty rejection is our own teardown cancelling the query, not the query failing.
+	if err == nil then
+		return
+	end
+
+	warn(
+		string.format(
+			"[PlayerAssetOwnershipTracker] - Ownership query failed for assetType %q assetId %d: %s",
+			tostring(self._assetType),
+			assetId,
+			tostring(err)
+		)
+	)
+end
+
+--[=[
+	Swallows a query failure on behalf of one subscriber. Named rather than inline because it is the
+	whole of what stops the noise: [PlayerAssetOwnershipTracker._warnQueryFailed] has already named the
+	failure once, and every subscriber after it lands on the same rejection with nothing to add.
+
+	Nothing is emitted, so the observable stays silent -- unresolved, which is not the same as "does not
+	own it".
+
+	@param _err any
+	@private
+]=]
+function PlayerAssetOwnershipTracker._consumeObservedQueryFailure(_self: any, _err: any): () end
+
 function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number): Promise.Promise<boolean>?
 	assert(type(assetId) == "number", "Bad assetId")
 
@@ -143,6 +185,11 @@ function PlayerAssetOwnershipTracker:_promiseQueryAssetId(assetId: number): Prom
 		if ownsItem then
 			self:SetOwnership(assetId, true)
 		end
+	end, function(err)
+		-- Reported here, at the one place the query is actually made, and consumed so the failure is
+		-- named once rather than once per consumer. Callers still see it: the rejection is handed to
+		-- each of them through their own continuation on this promise.
+		(self :: any):_warnQueryFailed(assetId, err)
 	end)
 
 	self._assetOwnershipPromiseCache[assetId] = promise
@@ -366,6 +413,8 @@ function PlayerAssetOwnershipTracker._observeBaseOwnsAssetId(self: any, assetId:
 			maid:GiveTask(self._ownedAssetIdSet:ObserveContains(assetId):Subscribe(function(value)
 				sub:Fire(value)
 			end))
+		end, function(err)
+			self:_consumeObservedQueryFailure(err)
 		end)
 
 		return maid

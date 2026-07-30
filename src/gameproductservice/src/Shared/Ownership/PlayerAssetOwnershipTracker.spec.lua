@@ -23,6 +23,7 @@ local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Signal = require("Signal")
 
+local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
@@ -433,6 +434,135 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("doesNotExist"), 5)
 		expect(outcome).toEqual("rejected")
 		context.destroy()
+	end)
+end)
+
+describe("PlayerAssetOwnershipTracker query failures", function()
+	--[[
+		Both seams the tracker handles a failure through, counted rather than watched: `warn` cannot be
+		intercepted from here, and an unhandled rejection announces itself in the log rather than to the
+		test. So the claim is pinned structurally -- the failure is reported once at the query, and every
+		subscriber's continuation is consumed -- which is exactly what deleting either handler undoes.
+
+		Spied on the class, so an instance built inside `func` is already covered. Restored in afterEach
+		as well: a test killed mid-yield would otherwise leave the recorder installed for the whole run.
+	]]
+	local trackerClass: any = PlayerAssetOwnershipTracker
+	local realWarn = trackerClass._warnQueryFailed
+	local realConsume = trackerClass._consumeObservedQueryFailure
+
+	local reports: { any } = {}
+	local consumed: { any } = {}
+
+	local function recordFailureHandling(): ()
+		table.clear(reports)
+		table.clear(consumed)
+
+		trackerClass._warnQueryFailed = function(_self, assetId, err)
+			table.insert(reports, { assetId = assetId, err = err })
+		end
+		trackerClass._consumeObservedQueryFailure = function(_self, err)
+			table.insert(consumed, err)
+		end
+	end
+
+	afterEach(function()
+		trackerClass._warnQueryFailed = realWarn
+		trackerClass._consumeObservedQueryFailure = realConsume
+	end)
+
+	it("should report once at the query and consume every subscriber's copy", function()
+		local context = setup()
+		recordFailureHandling()
+
+		-- Pending until we say otherwise, which is the shape the live failure had: a marketplace call
+		-- still out when the subscribers attach. An already-rejected promise would let Then hand back the
+		-- parent instead of a child, so no consumer would have a rejection to leave unhandled and the
+		-- test would pass with the handlers deleted.
+		local pending = Promise.new()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return pending
+		end)
+
+		local values = {}
+		-- Typed `any`: the test place holds more than one copy of Subscription (a package graph
+		-- duplicated per dependent), and a list inferred from one copy rejects another.
+		local subs: { any } = {}
+		for _ = 1, 3 do
+			table.insert(
+				subs,
+				context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
+					table.insert(values, value)
+				end)
+			)
+		end
+
+		local asked = context.tracker:PromiseOwnsAsset("swordKey")
+		pending:Reject("cloud refused")
+
+		expect(PromiseTestUtils.awaitSettled(asked, 5)).toEqual(true)
+		-- Yielded, not merely awaited: reading the outcome is this caller consuming its own copy, which is
+		-- what a real caller does with the promise it asked for. Bound first, because Yield returns the
+		-- rejection alongside the outcome and expect takes one argument.
+		local askedOk = asked:Yield()
+		expect(askedOk).toEqual(false)
+
+		expect(PromiseTestUtils.awaitValue(function()
+			return #consumed >= 3
+		end, 5)).toEqual(true)
+
+		-- One report for the query, one consumption per subscriber.
+		expect(#reports).toEqual(1)
+		expect(reports[1].assetId).toEqual(KEY_TO_ID.swordKey)
+		expect(reports[1].err).toEqual("cloud refused")
+		expect(#consumed).toEqual(3)
+
+		-- An unresolvable asset emits nothing at all: silence reads as unresolved, where `false` would
+		-- read as "does not own it" and turn a failed lookup into a refusal.
+		expect(#values).toEqual(0)
+
+		for _, sub in subs do
+			sub:Destroy()
+		end
+		context.destroy()
+	end)
+
+	it("should not report an asset it was never given a callback to query", function()
+		local context = setup()
+		recordFailureHandling()
+
+		-- No callback set: this realm cannot ask, rather than having asked and failed, so the rejection
+		-- explains itself and nothing is reported.
+		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("swordKey"), 5)
+		expect(outcome).toEqual("rejected")
+
+		expect(#reports).toEqual(0)
+		context.destroy()
+	end)
+
+	it("should not report a query cancelled by teardown as a failure", function()
+		local context = setup()
+		recordFailureHandling()
+
+		local pending = Promise.new()
+		context.tracker:SetQueryOwnershipCallback(function()
+			return pending
+		end)
+
+		local asked = context.tracker:PromiseOwnsAsset("swordKey")
+
+		-- Destroying the tracker rejects the query with nothing, which is teardown rather than a refusal.
+		-- The real _warnQueryFailed drops it on the nil check; here we see it arrive and assert the shape.
+		context.destroy()
+		expect(PromiseTestUtils.awaitSettled(asked, 5)).toEqual(true)
+		local askedOk = asked:Yield()
+		expect(askedOk).toEqual(false)
+
+		for _, report in reports do
+			expect(report.err).toEqual(nil)
+		end
+
+		pending:Destroy()
 	end)
 end)
 

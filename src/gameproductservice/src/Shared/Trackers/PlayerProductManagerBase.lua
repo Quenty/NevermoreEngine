@@ -8,6 +8,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
@@ -135,6 +137,21 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 		end
 	end))
 
+	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
+		local playerMembershipType = if PlayerMock.isMock(self._player)
+			then PlayerMock.read(self._player, "MembershipType")
+			else self._player.MembershipType
+		return Promise.resolved(playerMembershipType == membershipType)
+	end)
+
+	-- Everything below asks the cloud, which a client may only do about its own player (see
+	-- _canQueryCloudOwnership). Left unwired otherwise, so an unanswerable query rejects naming the
+	-- missing callback rather than spending a doomed request per player per asset. Membership is wired
+	-- above either way: it reads a replicated property rather than asking anybody.
+	if not self:_canQueryCloudOwnership() then
+		return self
+	end
+
 	-- Configure gamepass to be a bit special
 	passOwnership:SetQueryOwnershipCallback(function(gamePassId)
 		local userId = if PlayerMock.isMock(self._player)
@@ -161,19 +178,59 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 		end)
 	end)
 
-	membershipOwnership:SetQueryOwnershipCallback(function(membershipType)
-		local playerMembershipType = if PlayerMock.isMock(self._player)
-			then PlayerMock.read(self._player, "MembershipType")
-			else self._player.MembershipType
-		return Promise.resolved(playerMembershipType == membershipType)
-	end)
-
 	-- Paid-access game ownership is queried through PlayerOwnsAssetAsync
 	gameOwnership:SetQueryOwnershipCallback(function(assetId)
 		return MarketplaceUtils.promisePlayerOwnsAssetAsync(self._player, assetId)
 	end)
 
 	return self
+end
+
+--[=[
+	Whether this realm can ask the cloud about this player's ownership.
+
+	A client process may only ask about its own player: UserOwnsGamePassAsync refuses outright ("can only
+	query local player") and the inventory endpoints answer HTTP 403. It holds a manager for everybody
+	regardless -- the PlayerProductManager tag replicates, so the binder builds one per player -- so
+	wiring the queries there spends a request per player per asset to reach the same refusal every time.
+
+	Asked of the process rather than of the tie realm, because the engine's restriction is the process's:
+	a bag told it is [TieRealms].SHARED is still a client where a marketplace call is concerned, and
+	[PlayerProductManagerClient] gates its bulk-purchase listener on RunService for the same reason.
+
+	Ownership overrides are unaffected: they replicate and short-circuit the query, so a client still
+	answers for another player wherever the server has said something (see [PlayerAssetOwnershipTracker]).
+
+	A [PlayerMock] never reaches the engine -- its ownership is read through PlayerMock.readLookup -- so a
+	simulated player stays answerable anywhere, which is what lets a headless test drive ownership for
+	players other than the one standing in for the local one.
+
+	@return boolean
+	@private
+]=]
+function PlayerProductManagerBase._canQueryCloudOwnership(self: PlayerProductManagerBase): boolean
+	if not PlayerProductManagerBase._isClientProcess() then
+		return true
+	end
+
+	if PlayerMock.isMock(self._player) then
+		return true
+	end
+
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+
+	-- No local player to be is not a client to speak for: left able to ask, rather than unwiring
+	-- ownership for the very player this manager is about.
+	return localPlayer == nil or self._player == localPlayer
+end
+
+--[[
+	Whether this is a client process, behind a seam because a test needs to drive both: --cloud runs
+	server-side, where the client branch would otherwise be unreachable. Mirrors
+	[TeleportServiceUtils]._isServer, which exists for the same reason.
+]]
+function PlayerProductManagerBase._isClientProcess(): boolean
+	return RunService:IsClient() and not RunService:IsServer()
 end
 
 --[=[
