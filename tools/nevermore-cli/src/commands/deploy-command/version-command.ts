@@ -18,7 +18,7 @@ import {
   type BasePlaceConfig,
   type BasePlaceVersion,
   type DeployConfig,
-} from '@quenty/nevermore-deploy-config';
+} from '@quenty/nevermore-deploy';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { DeployArgs } from './index.js';

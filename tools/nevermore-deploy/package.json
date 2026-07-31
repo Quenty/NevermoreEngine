@@ -1,5 +1,5 @@
 {
-  "name": "@quenty/nevermore-deploy-config",
+  "name": "@quenty/nevermore-deploy",
   "version": "1.0.0",
   "description": "Schema, validation, and base place version resolution for deploy.nevermore.json and its lock file",
   "type": "module",
@@ -18,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/Nevermore.git",
-    "directory": "tools/nevermore-deploy-config/"
+    "directory": "tools/nevermore-deploy/"
   },
   "license": "UNLICENSED",
   "contributors": [

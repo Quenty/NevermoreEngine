@@ -16,7 +16,7 @@ import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveSingleDeployTarget,
-} from '@quenty/nevermore-deploy-config';
+} from '@quenty/nevermore-deploy';
 import {
   type Reporter,
   type LiveStateTracker,

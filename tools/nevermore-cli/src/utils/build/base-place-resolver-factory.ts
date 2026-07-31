@@ -1,4 +1,4 @@
-import { BasePlaceResolver } from '@quenty/nevermore-deploy-config';
+import { BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 
 /**

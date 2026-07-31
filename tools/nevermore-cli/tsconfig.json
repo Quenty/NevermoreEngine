@@ -21,7 +21,7 @@
       "path": "../studio-bridge"
     },
     {
-      "path": "../nevermore-deploy-config"
+      "path": "../nevermore-deploy"
     }
   ],
   "include": [

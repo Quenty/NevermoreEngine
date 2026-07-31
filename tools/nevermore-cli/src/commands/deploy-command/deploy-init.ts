@@ -5,7 +5,7 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployConfig,
   discoverUniverseIdAsync,
-} from '@quenty/nevermore-deploy-config';
+} from '@quenty/nevermore-deploy';
 import {
   getRobloxCookieAsync,
   createPlaceInUniverseAsync,

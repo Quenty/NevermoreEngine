@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
-import { type DeployTarget } from '@quenty/nevermore-deploy-config';
+import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type JobContext } from '../../job-context/job-context.js';
 import {
   type ParsedTestCounts,

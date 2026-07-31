@@ -19,7 +19,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
-import { type BasePlaceResolver } from '@quenty/nevermore-deploy-config';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,

@@ -8,7 +8,7 @@ import {
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   toManifestPlaceInfo,
-} from '@quenty/nevermore-deploy-config';
+} from '@quenty/nevermore-deploy';
 
 export interface TargetPackage {
   name: string;

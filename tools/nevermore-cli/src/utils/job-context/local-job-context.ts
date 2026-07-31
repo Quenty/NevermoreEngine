@@ -7,7 +7,7 @@ import {
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
-import { type BasePlaceResolver } from '@quenty/nevermore-deploy-config';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 

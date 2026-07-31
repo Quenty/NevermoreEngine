@@ -6326,9 +6326,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
-      '@quenty/nevermore-deploy-config':
+      '@quenty/nevermore-deploy':
         specifier: workspace:*
-        version: link:../nevermore-deploy-config
+        version: link:../nevermore-deploy
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
@@ -6407,7 +6407,7 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
 
-  tools/nevermore-deploy-config:
+  tools/nevermore-deploy:
     devDependencies:
       '@types/node':
         specifier: ^18.11.4

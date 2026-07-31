@@ -5,7 +5,7 @@ import {
   resolvePackagePath,
 } from '@quenty/nevermore-template-helpers';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { type DeployTarget } from '@quenty/nevermore-deploy-config';
+import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type BatchTarget } from '../../batch/changed-packages-utils.js';
 
 export interface CombinedProjectResult {
