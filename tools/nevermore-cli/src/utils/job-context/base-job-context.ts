@@ -300,14 +300,6 @@ export abstract class BaseJobContext implements JobContext {
   abstract releaseAsync(deployment: Deployment): Promise<void>;
 
   async disposeAsync(): Promise<void> {
-    // Hangs off the lifecycle every entry point already runs in a `finally`, so
-    // no command has to remember to persist what it resolved.
-    if (this._basePlaceResolver) {
-      for (const lockPath of await this._basePlaceResolver.flushAsync()) {
-        OutputHelper.info(`Updated ${lockPath}`);
-      }
-    }
-
     for (const tracked of [...this._builtPlaces]) {
       await this.releaseBuiltPlaceAsync(tracked);
     }
@@ -320,6 +312,25 @@ export abstract class BaseJobContext implements JobContext {
         // best effort
       }
       this._sharedRojoBuilds.delete(key);
+    }
+
+    // Hangs off the lifecycle every entry point already runs in a `finally`, so
+    // no command has to remember to persist what it resolved. Last and
+    // best-effort: dispose runs on the failure path too, and a lock that cannot
+    // be written must not bury the error the user actually needs to read, nor
+    // skip the cleanup above it.
+    if (this._basePlaceResolver) {
+      try {
+        for (const lockPath of await this._basePlaceResolver.flushAsync()) {
+          OutputHelper.info(`Updated ${lockPath}`);
+        }
+      } catch (err) {
+        OutputHelper.warn(
+          `Could not write the deploy lock file: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
     }
   }
 }

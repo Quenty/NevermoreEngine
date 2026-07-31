@@ -34,6 +34,19 @@ function makeBasePlace(over: Partial<BasePlaceConfig> = {}): BasePlaceConfig {
   return { universeId: 1, placeId: 33, ...over };
 }
 
+function makeCountingSource(version = 158) {
+  let calls = 0;
+  return {
+    calls: () => calls,
+    resolveLatestPlaceVersionAsync: async () => {
+      calls++;
+      // Yield so a second caller lands while this one is still in flight.
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      return version;
+    },
+  };
+}
+
 async function writeLockAsync(lock: DeployLock): Promise<void> {
   await saveDeployLockAsync(resolveDeployLockPath(packageDir), lock);
 }
@@ -160,6 +173,73 @@ describe('BasePlaceResolver', () => {
     }
   });
 
+  it('records every place when one package resolves them concurrently', async () => {
+    // A multi-place target fans out ~10 wide against a single package
+    // directory, so all of these share one lock file.
+    const source = makeSource({ 11: 110, 22: 220, 33: 330 });
+    const resolver = new BasePlaceResolver({ source });
+
+    await Promise.all(
+      [11, 22, 33].map((placeId) =>
+        resolver.resolveAsync(
+          packageDir,
+          makeBasePlace({ placeId, version: 'published' })
+        )
+      )
+    );
+    await resolver.flushAsync();
+
+    expect((await readLockAsync())?.basePlaces).toEqual({
+      '11': { version: 110, from: 'published' },
+      '22': { version: 220, from: 'published' },
+      '33': { version: 330, from: 'published' },
+    });
+  });
+
+  it('asks the source separately for the saved and published versions', async () => {
+    const source = {
+      resolveLatestPlaceVersionAsync: vi.fn(
+        async (_universeId: number, _placeId: number, versionType: string) =>
+          versionType === 'saved' ? 999 : 100
+      ),
+    };
+    const resolver = new BasePlaceResolver({ source });
+    const otherDir = await fs.mkdtemp(path.join(os.tmpdir(), 'other-pkg-'));
+
+    try {
+      // Same place id, different keyword: the dedupe cache must not serve one
+      // question's answer to the other.
+      expect(
+        await resolver.resolveAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBe(100);
+      expect(
+        await resolver.resolveAsync(
+          otherDir,
+          makeBasePlace({ version: 'saved' })
+        )
+      ).toBe(999);
+      expect(source.resolveLatestPlaceVersionAsync).toHaveBeenCalledTimes(2);
+    } finally {
+      await fs.rm(otherDir, { recursive: true, force: true });
+    }
+  });
+
+  it('refuses a base place tracked as two version types in one lock', async () => {
+    const resolver = new BasePlaceResolver({ source: makeSource() });
+
+    await resolver.resolveAsync(
+      packageDir,
+      makeBasePlace({ version: 'published' })
+    );
+
+    await expect(
+      resolver.resolveAsync(packageDir, makeBasePlace({ version: 'saved' }))
+    ).rejects.toThrowError(/tracked as both "published" and "saved"/);
+  });
+
   it('leaves untouched entries in place rather than pruning them', async () => {
     await writeLockAsync({
       lockfileVersion: 1,
@@ -272,6 +352,20 @@ describe('BasePlaceResolver', () => {
         makeBasePlace({ version: 'saved' })
       )
     ).toBe(158);
+  });
+
+  it('loads the lock once when callers race for the same package', async () => {
+    const source = makeCountingSource();
+    const resolver = new BasePlaceResolver({ source });
+
+    await Promise.all([
+      resolver.resolveAsync(packageDir, makeBasePlace({ version: 'saved' })),
+      resolver.resolveAsync(packageDir, makeBasePlace({ version: 'saved' })),
+    ]);
+
+    expect(source.calls()).toBe(1);
+    await resolver.flushAsync();
+    expect((await readLockAsync())?.basePlaces['33']?.version).toBe(158);
   });
 
   it('surfaces a corrupt lock rather than regenerating it', async () => {

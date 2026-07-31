@@ -33,6 +33,8 @@ interface TrackedLock {
   path: string;
   lock: DeployLock;
   dirty: boolean;
+  /** Version type each base place was resolved as during this run. */
+  claims: Map<string, BasePlaceVersionKeyword>;
 }
 
 /**
@@ -52,8 +54,11 @@ interface TrackedLock {
 export class BasePlaceResolver {
   private _source: PlaceVersionSource;
   private _frozen: boolean;
-  private _locks = new Map<string, TrackedLock>();
-  private _inflight = new Map<number, Promise<number>>();
+  // Keyed on the promise, not the resolved value: concurrent callers for one
+  // package must share the same TrackedLock, or whichever finishes second
+  // replaces the first and its recorded entries are never written.
+  private _locks = new Map<string, Promise<TrackedLock>>();
+  private _inflight = new Map<string, Promise<number>>();
 
   constructor(options: BasePlaceResolverOptions) {
     this._source = options.source;
@@ -92,18 +97,41 @@ export class BasePlaceResolver {
     }
 
     if (this._frozen) {
+      // `deploy version upgrade` only writes the lock for an explicit keyword;
+      // an absent pin is treated as a config pin and gets a number written
+      // there instead, so pointing at the lock file would be a dead end.
+      const remedy =
+        basePlace.version == null
+          ? `Run "nevermore deploy version upgrade" — an unpinned basePlace is ` +
+            `pinned in deploy.nevermore.json — and commit the result.`
+          : `Run "nevermore deploy version upgrade" and commit ${tracked.path}.`;
       throw new Error(
         entry
           ? `Base place ${basePlace.placeId} is locked to its ${entry.from} ` +
             `version, but deploy.nevermore.json now asks for ${versionType}. ` +
-            `Run "nevermore deploy version upgrade" and commit ${tracked.path}.`
+            remedy
           : `Base place ${basePlace.placeId} has no entry in ${tracked.path}, ` +
-            `and --frozen-lockfile forbids resolving it. Run ` +
-            `"nevermore deploy version upgrade" and commit the lock file.`
+            `and --frozen-lockfile forbids resolving it. ${remedy}`
       );
     }
 
     const version = await this._resolveVersionAsync(basePlace, versionType);
+
+    // One entry per base place means one version type per base place. Two
+    // targets tracking the same base place as "saved" and "published" would
+    // otherwise overwrite each other on every run, and never satisfy
+    // --frozen-lockfile, so say so instead of writing a lock that churns.
+    const claimed = tracked.claims.get(key);
+    if (claimed && claimed !== versionType) {
+      throw new Error(
+        `Base place ${basePlace.placeId} is tracked as both "${claimed}" and ` +
+          `"${versionType}" in the same deploy. The lock records one version ` +
+          `per base place, so pick one keyword for it, or pin an explicit ` +
+          `version number.`
+      );
+    }
+    tracked.claims.set(key, versionType);
+
     if (entry?.version !== version || entry?.from !== versionType) {
       tracked.lock.basePlaces[key] = { version, from: versionType };
       tracked.dirty = true;
@@ -121,7 +149,8 @@ export class BasePlaceResolver {
    */
   async flushAsync(): Promise<string[]> {
     const written: string[] = [];
-    for (const tracked of this._locks.values()) {
+    for (const pending of this._locks.values()) {
+      const tracked = await pending;
       if (!tracked.dirty) {
         continue;
       }
@@ -137,7 +166,10 @@ export class BasePlaceResolver {
     versionType: BasePlaceVersionKeyword
   ): Promise<number> {
     // Several places in one target commonly share a base place; resolve once.
-    const inflight = this._inflight.get(basePlace.placeId);
+    // The version type is part of the key — the newest saved and the newest
+    // published version of one place are different questions.
+    const key = `${basePlace.placeId}:${versionType}`;
+    const inflight = this._inflight.get(key);
     if (inflight) {
       return inflight;
     }
@@ -147,29 +179,37 @@ export class BasePlaceResolver {
       basePlace.placeId,
       versionType
     );
-    this._inflight.set(basePlace.placeId, promise);
+    this._inflight.set(key, promise);
     try {
       return await promise;
     } catch (err) {
       // A failed lookup must not poison later attempts in the same run.
-      this._inflight.delete(basePlace.placeId);
+      this._inflight.delete(key);
       throw err;
     }
   }
 
-  private async _getLockAsync(packagePath: string): Promise<TrackedLock> {
+  private _getLockAsync(packagePath: string): Promise<TrackedLock> {
     const existing = this._locks.get(packagePath);
     if (existing) {
       return existing;
     }
 
-    const lockPath = resolveDeployLockPath(packagePath);
-    const tracked: TrackedLock = {
-      path: lockPath,
-      lock: (await loadDeployLockAsync(lockPath)) ?? createEmptyDeployLock(),
-      dirty: false,
-    };
-    this._locks.set(packagePath, tracked);
-    return tracked;
+    // Stored before the first await so concurrent callers queue on this same
+    // promise rather than each loading their own copy of the lock.
+    const pending = (async (): Promise<TrackedLock> => {
+      const lockPath = resolveDeployLockPath(packagePath);
+      return {
+        path: lockPath,
+        lock: (await loadDeployLockAsync(lockPath)) ?? createEmptyDeployLock(),
+        dirty: false,
+        claims: new Map(),
+      };
+    })();
+    this._locks.set(packagePath, pending);
+    // An unreadable lock must not stay cached as a rejection that flushAsync
+    // would then rethrow over the top of the real error.
+    void pending.catch(() => this._locks.delete(packagePath));
+    return pending;
   }
 }

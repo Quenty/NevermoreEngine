@@ -315,6 +315,35 @@ describe('OpenCloudClient.resolveLatestPlaceVersionAsync', () => {
     ).rejects.toThrowError(/no longer paging newest-first/);
   });
 
+  it('refuses a "saved" lookup when the page is not newest-first', async () => {
+    // "saved" answers from the first entry, so the ordering guard has to check
+    // the whole page before returning or this silently pins the oldest build.
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [{ version: 1 }, { version: 2 }, { version: 3 }],
+      ]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
+    ).rejects.toThrowError(/no longer paging newest-first/);
+  });
+
+  it('reports the scan limit when every page is unpublished', async () => {
+    const pages = Array.from({ length: 25 }, (_, page) =>
+      Array.from({ length: 2 }, (_, i) => ({ version: 1000 - page * 2 - i }))
+    );
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(pages),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/in its most recent 1000 versions/);
+  });
+
   it('throws on an unparseable version path', async () => {
     const fakeLimiter = {
       fetchAsync: vi.fn(

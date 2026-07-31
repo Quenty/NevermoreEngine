@@ -568,12 +568,16 @@ export class OpenCloudClient {
         nextPageToken?: string;
       };
 
-      for (const assetVersion of data.assetVersions ?? []) {
-        const versionNumber = _parseAssetVersionNumber(placeId, assetVersion);
+      const page = (data.assetVersions ?? []).map((assetVersion) => ({
+        versionNumber: _parseAssetVersionNumber(placeId, assetVersion),
+        published: assetVersion.published === true,
+      }));
 
-        // Everything here rests on the API paging newest-first. If that ever
-        // changes, the first entry stops being the newest version and we would
-        // quietly pin a years-old build — so refuse rather than guess.
+      // Everything here rests on the API paging newest-first, and a `saved`
+      // lookup answers from the very first entry — so the whole page is checked
+      // before anything is returned. Validating only as far as the match would
+      // leave the common case unchecked and quietly pin a years-old build.
+      for (const { versionNumber } of page) {
         if (previousVersion != null && versionNumber >= previousVersion) {
           throw new Error(
             `Read place version failed: place ${placeId} returned version ` +
@@ -583,11 +587,14 @@ export class OpenCloudClient {
           );
         }
         previousVersion = versionNumber;
+      }
 
-        // `published` is omitted rather than false on save-only versions.
-        if (versionType === 'saved' || assetVersion.published === true) {
-          return versionNumber;
-        }
+      // `published` is omitted rather than false on save-only versions.
+      const match = page.find(
+        (entry) => versionType === 'saved' || entry.published
+      );
+      if (match) {
+        return match.versionNumber;
       }
 
       pageToken = data.nextPageToken;

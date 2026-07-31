@@ -254,11 +254,13 @@ To make deploys reproducible, pin the base place to a specific version with an o
 }
 ```
 
-With `version` set to a number, the deploy downloads exactly that version of the base place. Omit it to keep pulling the latest (the previous behaviour — nothing changes for configs that don't opt in).
+With `version` set to a number, the deploy downloads exactly that version of the base place.
+
+Omitting it no longer means "always latest". The first deploy resolves the base place's published head and records it in the [lock file](#the-lock-file); every later deploy reuses that until you roll it forward. This is deliberate — it's what makes a config that never opted into pinning reproducible anyway — but it does mean an existing config stops silently following the base place the first time you deploy with this version of the CLI. To keep following it, say so explicitly with `"saved"` or `"published"` below and re-run `nevermore deploy version upgrade` when you want it to move.
 
 ### Tracking a version type instead of a number
 
-A number holds the base place still. Sometimes you want the opposite: follow the base place as Studio moves it, but be precise about *which* movement counts. `version` also accepts two keywords, resolved fresh on every deploy:
+A number holds the base place still. Sometimes you want the opposite: follow the base place as Studio moves it, but be precise about *which* movement counts. `version` also accepts two keywords:
 
 | Value | Resolves to |
 |-------|-------------|
@@ -277,7 +279,9 @@ A number holds the base place still. Sometimes you want the opposite: follow the
 
 `"published"` is the useful default for a shared base place: the team can save work-in-progress in Studio all day without it leaking into a deploy, and publishing the base place is the deliberate act that ships it. `"saved"` is for a Team Create place where saving *is* how content is handed off, and nobody publishes the base place at all.
 
-Both keywords cost one extra Open Cloud call per base place at deploy time, resolved against the place's version history newest-first — so it stays cheap even on a place with tens of thousands of versions. What they resolve to is written to the [lock file](#the-lock-file), so a keyword pin still produces a reproducible build.
+A keyword says which end of the base place's history to follow — not that it is re-checked on every build. The first deploy resolves it against the place's version history (newest-first, so it stays cheap even on a place with tens of thousands of versions) and writes the answer to the [lock file](#the-lock-file); later deploys reuse that, with no network call, until `nevermore deploy version upgrade` moves it. That is what keeps a keyword pin reproducible: the keyword is the intent, the lock is the fact.
+
+The practical difference between a keyword and a number, then, is which one `upgrade` rolls forward and which file records it — not whether the deploy is deterministic. Both are.
 
 These are the same words the Open Cloud place-publishing API uses for `versionType` when *uploading*, so a config reads the same in both directions. Anything else — `"latest"`, `"live"` — is rejected when the config loads rather than at deploy time.
 
@@ -310,7 +314,9 @@ The `from` field is what makes the lock notice you changed your mind: flip a con
 nevermore deploy run production --frozen-lockfile
 ```
 
-It's **off by default, including in CI** — a repo that hasn't committed a lock file yet shouldn't start failing. Turn it on in your workflow once the lock is committed. It applies to every command that can merge a base place: `deploy run`, `batch deploy`, `test`, and `batch test`.
+It's **off by default, including in CI** — a repo that hasn't committed a lock file yet shouldn't start failing. Turn it on in your workflow once the lock is committed. It applies to `deploy run`, `batch deploy`, `test`, and `batch test --no-aggregated`.
+
+`nevermore batch test` in its default aggregated mode is the exception: it combines every package into one place, so there is no per-package place to merge a base place into and none is downloaded. Packages configured with a `basePlace` are named in a warning at the start of the run, since their Studio-authored content is not present in that place. Test those with `--no-aggregated`, or through an integration deploy.
 
 ### When it conflicts
 

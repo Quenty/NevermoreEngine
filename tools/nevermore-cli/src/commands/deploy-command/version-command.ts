@@ -184,7 +184,9 @@ export async function handleVersionUpgradeAsync(
   if (configRefs.length > 0) {
     await _upgradeConfigPinsAsync(configPath, config, configRefs, client, args);
   }
-  if (lockRefs.length > 0) {
+  // Runs even with no keyword pins left, so converting the last one back to a
+  // number still lets an unscoped upgrade clear its orphaned lock entry.
+  if (lockRefs.length > 0 || !args.target) {
     await _upgradeLockPinsAsync(cwd, lockRefs, client, args, !args.target);
   }
 }
@@ -258,16 +260,22 @@ async function _upgradeLockPinsAsync(
   prune: boolean
 ): Promise<void> {
   const lockPath = resolveDeployLockPath(packagePath);
-  const lock = (await loadDeployLockAsync(lockPath)) ?? createEmptyDeployLock();
+  const existingLock = await loadDeployLockAsync(lockPath);
+  if (!existingLock && refs.length === 0) {
+    return;
+  }
+  const lock = existingLock ?? createEmptyDeployLock();
 
   const uniqueRefs = [
     ...new Map(refs.map((ref) => [ref.basePlace.placeId, ref])).values(),
   ];
-  OutputHelper.info(
-    `Resolving tracked version for ${uniqueRefs.length} base place${_plural(
-      uniqueRefs.length
-    )}...`
-  );
+  if (uniqueRefs.length > 0) {
+    OutputHelper.info(
+      `Resolving tracked version for ${uniqueRefs.length} base place${_plural(
+        uniqueRefs.length
+      )}...`
+    );
+  }
 
   const changes: PinChange[] = [];
   await Promise.all(
@@ -292,9 +300,11 @@ async function _upgradeLockPinsAsync(
     { header: 'Locked', value: (c) => _formatChange(c) },
   ];
 
-  console.log('');
-  console.log(formatTable(changes, columns, { indent: '  ' }));
-  console.log('');
+  if (changes.length > 0) {
+    console.log('');
+    console.log(formatTable(changes, columns, { indent: '  ' }));
+    console.log('');
+  }
 
   const referenced = new Set(
     uniqueRefs.map((r) => String(r.basePlace.placeId))
@@ -302,7 +312,17 @@ async function _upgradeLockPinsAsync(
   const stale = prune
     ? Object.keys(lock.basePlaces).filter((id) => !referenced.has(id))
     : [];
-  const moved = changes.filter((c) => c.from !== c.to);
+  // An entry is stale if either half is wrong. Comparing only the version
+  // number strands a config that switched "published" -> "saved" while the
+  // number happened to stay put: nothing would be rewritten, and every later
+  // --frozen-lockfile build would fail telling the user to run this command.
+  const moved = changes.filter((change) => {
+    const entry = lock.basePlaces[String(change.ref.basePlace.placeId)];
+    return (
+      entry?.version !== change.to ||
+      entry?.from !== _asKeyword(change.ref.basePlace.version)
+    );
+  });
 
   if (moved.length === 0 && stale.length === 0) {
     OutputHelper.info('Nothing to change — lock is already up to date.');
@@ -319,9 +339,8 @@ async function _upgradeLockPinsAsync(
 
   if (args.dryrun) {
     OutputHelper.info(
-      `[DRYRUN] Would update ${moved.length} lock entr${
-        moved.length === 1 ? 'y' : 'ies'
-      } in ${lockPath}`
+      `[DRYRUN] Would update ${moved.length} and drop ${stale.length} lock ` +
+        `entr${moved.length + stale.length === 1 ? 'y' : 'ies'} in ${lockPath}`
     );
     return;
   }
@@ -331,9 +350,10 @@ async function _upgradeLockPinsAsync(
       {
         type: 'confirm',
         name: 'confirm',
-        message: `Update ${moved.length} entr${
-          moved.length === 1 ? 'y' : 'ies'
-        } in deploy.nevermore.lock.json?`,
+        message:
+          `Update ${moved.length} and drop ${stale.length} entr` +
+          `${moved.length + stale.length === 1 ? 'y' : 'ies'} in ` +
+          `deploy.nevermore.lock.json?`,
         default: true,
       },
     ]);

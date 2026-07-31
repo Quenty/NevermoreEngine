@@ -9,6 +9,10 @@ import * as path from 'path';
  * - `"saved"` — the newest version of any kind, including Studio saves that
  *   were never published.
  *
+ * "Resolved at deploy time" means the first deploy after the pin changes; the
+ * answer is then held in `deploy.nevermore.lock.json` so builds stay
+ * reproducible.
+ *
  * They match the `versionType` vocabulary the Open Cloud place-publishing API
  * uses when uploading, so a config reads the same way in both directions.
  */
@@ -34,11 +38,14 @@ export interface BasePlaceConfig {
    * version, so builds are reproducible and a broken Studio edit can't leak
    * into a deploy — bump it with `nevermore deploy version upgrade`.
    *
-   * `"published"` and `"saved"` instead track the base place's newest published
-   * / newest saved version, resolved fresh on every deploy. Use these when the
-   * base place is meant to move with Studio rather than be held still.
+   * `"published"` and `"saved"` instead name which end of the base place's
+   * history to follow. They are resolved once and recorded in
+   * `deploy.nevermore.lock.json`, then reused until `deploy version upgrade`
+   * moves them — the keyword is the intent, the lock holds the fact. Use these
+   * when the base place is meant to move with Studio rather than be held still.
    *
-   * Omit to download whatever the Asset Delivery API serves as current.
+   * Omitting it behaves as `"published"`, so a config that never opted into
+   * pinning still deploys reproducibly.
    */
   version?: BasePlaceVersion;
 }
