@@ -39,6 +39,8 @@ import {
   readPackageVersionAsync,
 } from '../../utils/nevermore-cli-utils.js';
 import {
+  WATCH_MODES,
+  buildWatchMonitorName,
   formatTargetSelector,
   isBasePlaceVersionKeyword,
   loadDeployConfigAsync,
@@ -46,9 +48,11 @@ import {
   parseWatchOption,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
+  resolveWatchDelivery,
   toManifestPlaceInfo,
   type BasePlaceResolver,
   type DeployConfig,
+  type WatchMode,
 } from '@quenty/nevermore-deploy';
 import {
   registerWatchesAsync,
@@ -130,6 +134,7 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   output?: string;
   logs?: boolean;
   watch?: string;
+  watchMode?: WatchMode;
   watchShareApiKey?: boolean;
   watchUseGhAuth?: boolean;
 }
@@ -303,6 +308,16 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
               'Takes the register endpoint URL, ending in the lease: https://<watch-service>/v1/register/7d',
             type: 'string',
           })
+          .option('watch-mode', {
+            describe:
+              'How the watch reaches whoever rebuilds: "dispatch" fires the workflow, ' +
+              '"notify" holds a stream here and rebuilds in this terminal. ' +
+              'Defaults to "auto", which dispatches on GitHub Actions and notifies elsewhere — ' +
+              'set it explicitly in any other automated context, where notifying would hang the run.',
+            type: 'string',
+            choices: WATCH_MODES,
+            default: 'auto',
+          })
           .option('watch-use-gh-auth', {
             describe:
               'Let the GitHub CLI supply the watch token when no environment variable does. ' +
@@ -420,7 +435,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         // registration skips those.
         await registerWatchesAsync({
           option: watchOption,
-          monitorName: `${packageName}/${watchedTarget}/dryrun`,
+          monitorName: buildWatchMonitorName({
+            packageName,
+            targetName: watchedTarget,
+            dryrun: true,
+          }),
           resolver: createLockOnlyBasePlaceResolver(),
           useGhAuth: args.watchUseGhAuth,
           triggerAfterRegister: true,
@@ -636,7 +655,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       // Only after a clean deploy: what happens next records the base place
       // version that just shipped, which is not a fact yet if the deploy failed.
       if (watchOption && first.failed === 0) {
-        if (isCI()) {
+        if (resolveWatchDelivery(args.watchMode, isCI()) === 'dispatch') {
           // The monitor is named for the whole target, so it has to carry every
           // place in that target — not just the ones this invocation deployed.
           // Re-registering replaces its watch list, so a narrowed selector
@@ -644,9 +663,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           // places' watches. Places that did not deploy keep their lock baseline.
           watchResult = await registerWatchesAsync({
             option: watchOption,
-            // Scoped to this package and target, so deploying one package can
-            // never replace the watch list another package registered.
-            monitorName: `${packageName}/${watchedTarget}`,
+            monitorName: buildWatchMonitorName({
+              packageName,
+              targetName: watchedTarget,
+            }),
             resolver: first.resolver,
             useGhAuth: args.watchUseGhAuth,
             robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
@@ -680,7 +700,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
 
           const notify = await tryRegisterNotifyWatchesAsync({
             option: watchOption,
-            monitorName: `${packageName}/${watchedTarget}`,
+            monitorName: buildWatchMonitorName({
+              packageName,
+              targetName: watchedTarget,
+            }),
             entries: localEntries,
             useGhAuth: args.watchUseGhAuth,
             robloxApiKey: args.watchShareApiKey ? apiKey : undefined,

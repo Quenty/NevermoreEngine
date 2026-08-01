@@ -135,6 +135,59 @@ export function sanitizeWatchName(name: string): string {
     : cleaned;
 }
 
+/**
+ * The one name a package's watches live under.
+ *
+ * A monitor is identified by `(repository, name)`, so two spellings of the same
+ * thing are not two names — they are two monitors watching one base place. One
+ * publish then dispatches twice, and each rebuild races the other's lock write.
+ * `deploy run --watch` and `batch deploy --watch` both register the same
+ * package's places, so both derive the name here rather than each spelling it.
+ *
+ * Scoped by package because that is the unit a watch list belongs to: the lock
+ * file supplying the baselines is per package, and re-registering replaces a
+ * monitor's whole list, so one package must never be able to delete another's
+ * watches. The ref is appended later, at the point one is known.
+ */
+export function buildWatchMonitorName(options: {
+  packageName: string;
+  targetName: string;
+  /** Registers beside the real monitor rather than over it. */
+  dryrun?: boolean;
+}): string {
+  const name = `${options.packageName}/${options.targetName}`;
+  return options.dryrun ? `${name}/dryrun` : name;
+}
+
+/** How a watch reaches whoever rebuilds. `auto` decides from the environment. */
+export const WATCH_MODES = ['auto', 'dispatch', 'notify'] as const;
+
+export type WatchMode = typeof WATCH_MODES[number];
+
+/** The two things a watch can actually do, once `auto` has been resolved. */
+export type WatchDelivery = Exclude<WatchMode, 'auto'>;
+
+/**
+ * Dispatch a workflow when the base place moves, or hold a stream and be told.
+ *
+ * Detection is only the default, because the two wrong guesses cost very
+ * different amounts. Guessing dispatch on a laptop registers a monitor that
+ * fires a workflow: visible, and undone by re-registering. Guessing notify in
+ * an automated context leaves the run holding a stream that nothing will ever
+ * close — no error, no output, just a job burning its timeout. Any automated
+ * context that is not GitHub Actions detects as local and lands exactly there,
+ * so the mode is settable and the hang is reachable only on purpose.
+ */
+export function resolveWatchDelivery(
+  mode: WatchMode | undefined,
+  automated: boolean
+): WatchDelivery {
+  if (mode != null && mode !== 'auto') {
+    return mode;
+  }
+  return automated ? 'dispatch' : 'notify';
+}
+
 /** One place that will be watched, paired with what to dispatch when it moves. */
 export interface WatchPlanEntry {
   /** Selector the dispatched workflow re-deploys, e.g. `integration.places.hub`. */

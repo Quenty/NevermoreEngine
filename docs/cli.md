@@ -193,7 +193,8 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--place-file <path>` | Upload a pre-built `.rbxl` instead of building via rojo (single-place targets only). |
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
-| `--watch <url>` | After a successful deploy: in CI, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch <url>` | After a successful deploy: on GitHub Actions, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-mode <auto\|dispatch\|notify>` | Which of those two `--watch` does. Defaults to `auto`, which detects GitHub Actions. Pass `dispatch` in any other automated context — detection reads it as local, and notifying there holds a stream forever. |
 | `--watch-use-gh-auth` | Let the GitHub CLI supply the watch token when no environment variable does. Off by default — registering sends the token to the watch service. |
 | `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll a private base place. Off by default. |
 
@@ -248,7 +249,7 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--logs` | Show build/upload logs for every package. |
 | `--output <file>` | Write JSON results to a file. |
 | `--api-key <key>` | Open Cloud API key. |
-| `--watch <url>` | After deploying, register one monitor named for the target, holding a watch for **every** package with that target — not just the changed ones, since a re-apply replaces the monitor's whole list. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch <url>` | After deploying, register one monitor per package — `<package>/<target>/<ref>`, the same name `deploy run --watch` uses — covering **every** package with that target, not just the changed ones, since a re-apply replaces a monitor's whole list. Registers even when nothing changed, so the lease doesn't lapse. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
 | `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll private base places. Off by default. |
 
 ### `nevermore tools`

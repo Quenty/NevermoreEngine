@@ -433,8 +433,10 @@ In CI, keep the host in a secret and interpolate it into the argument, alongside
 
 | Where | What `--watch` does |
 |-------|--------------------|
-| CI (`$CI` set) | Registers a watch that dispatches your workflow when a base place moves. |
+| GitHub Actions (`$GITHUB_ACTIONS` set) | Registers a watch that dispatches your workflow when a base place moves. |
 | Locally | Registers a watch that **notifies this process**, holds the connection open, and **rebuilds in place** when a base place moves — until you Ctrl-C. |
+
+**Anywhere else automated, pass `--watch-mode dispatch`.** Detection keys on GitHub Actions specifically, so a container, another CI, `act`, or a cron box reads as local — and notifying there holds a stream nothing will ever close: no error, no output, just a job burning its timeout. `--watch-mode dispatch|notify|auto` overrides it, and `auto` is the default, so the hang is reachable only on purpose.
 
 ```bash
 nevermore deploy run integration --watch https://watch.example.com/v1/register/2h
@@ -568,6 +570,8 @@ tidiest place to keep the host out of a public workflow file.
 
 Because the non-dispatch path re-registers with `--watch`, every scheduled or pushed build renews the lease. A project that builds weekly never lets a 7-day watch lapse.
 
+A heartbeat build that finds nothing changed renews too. `batch deploy` normally stops early when no package differs from `--base`, but with `--watch` it registers before returning: renewal derives from committed config plus the lock, so it never needed this run to deploy anything. Otherwise a repo whose scheduled builds all diff clean would quietly stop being watched, with no failure anywhere to notice.
+
 ### Known gap: the refreshed lock has to get committed
 
 `--refresh-base-place` writes the new version into `deploy.nevermore.lock.json` — on the runner. **Nothing commits it yet**, and that leaves the loop open:
@@ -613,7 +617,11 @@ That drives the one behavior here worth knowing:
 | Command | Monitor name | Watches registered |
 |---------|--------------|--------------------|
 | `nevermore deploy run --watch` | `<package>/<target>/<ref>` | Every place in that target |
-| `nevermore batch deploy --watch` | `<target>/<ref>` | **Every** package with that target |
+| `nevermore batch deploy --watch` | `<package>/<target>/<ref>`, one per package | **Every** package with that target |
+
+Both spell the name the same way on purpose. A monitor is identified by its name, so two spellings of one package's watches are two monitors on the same base place — one publish dispatches twice, and each rebuild races the other's lock write. A repo that registers from both paths (plausible: one is "deploy everything", the other is "rebuild the place that moved") would hit that on the first publish. Registering from either command now replaces the same list instead.
+
+That's also why `batch deploy` writes one monitor per package rather than one for the batch: a watch list belongs to a package, since the lock file supplying its baselines does.
 
 The git ref is part of the monitor name because it's part of what the monitor *does* — every dispatch runs at the ref it was registered from. Without it in the name, a `batch deploy --watch` from a feature branch would re-point the production monitor's entire watch list at that branch. Registering from a pull request's merge ref (`42/merge`) is refused outright: that ref exists only for the check run and can't be dispatched against.
 

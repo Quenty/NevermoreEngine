@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { type DeployTarget } from './deploy-config.js';
 import {
+  buildWatchMonitorName,
   buildWatchPlan,
   parseWatchDuration,
   parseWatchOption,
+  resolveWatchDelivery,
   sanitizeWatchName,
 } from './watch-config.js';
 
@@ -289,5 +291,65 @@ describe('buildWatchPlan', () => {
     expect(plan.skipped.map((s) => s.selector)).toEqual([
       'integration.places.lobby',
     ]);
+  });
+});
+
+describe('buildWatchMonitorName', () => {
+  it('scopes the name to the package and target', () => {
+    expect(
+      buildWatchMonitorName({
+        packageName: 'egg-hunt-2026',
+        targetName: 'demo',
+      })
+    ).toBe('egg-hunt-2026/demo');
+  });
+
+  it('gives a dryrun its own name', () => {
+    const real = buildWatchMonitorName({
+      packageName: 'egg-hunt-2026',
+      targetName: 'demo',
+    });
+    const dryrun = buildWatchMonitorName({
+      packageName: 'egg-hunt-2026',
+      targetName: 'demo',
+      dryrun: true,
+    });
+
+    expect(dryrun).not.toBe(real);
+    expect(dryrun).toBe('egg-hunt-2026/demo/dryrun');
+  });
+
+  it('gives every caller registering one package the same name', () => {
+    // The point of the function. `deploy run` knows the package it is in and
+    // `batch deploy` discovers it, but a monitor is keyed by name — so two
+    // spellings would be two monitors on one base place, dispatching twice per
+    // publish and racing each other's lock write.
+    const fromDeployRun = buildWatchMonitorName({
+      packageName: '@quenty/hub',
+      targetName: 'demo',
+    });
+    const fromBatch = buildWatchMonitorName({
+      packageName: '@quenty/hub',
+      targetName: 'demo',
+    });
+
+    expect(fromBatch).toBe(fromDeployRun);
+  });
+});
+
+describe('resolveWatchDelivery', () => {
+  it('dispatches when automated and notifies when not', () => {
+    expect(resolveWatchDelivery('auto', true)).toBe('dispatch');
+    expect(resolveWatchDelivery('auto', false)).toBe('notify');
+    expect(resolveWatchDelivery(undefined, true)).toBe('dispatch');
+    expect(resolveWatchDelivery(undefined, false)).toBe('notify');
+  });
+
+  it('lets an explicit mode override detection either way', () => {
+    // The reachable half. An automated context that is not GitHub Actions
+    // detects as local, and notifying there holds a stream nothing will close:
+    // no error, no output, just a job burning its timeout.
+    expect(resolveWatchDelivery('dispatch', false)).toBe('dispatch');
+    expect(resolveWatchDelivery('notify', true)).toBe('notify');
   });
 });

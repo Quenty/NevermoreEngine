@@ -43,8 +43,16 @@ import {
   readPackageVersionAsync,
 } from '../../utils/nevermore-cli-utils.js';
 import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
-import { parseWatchOption } from '@quenty/nevermore-deploy';
-import { registerWatchesAsync } from '../../utils/watch/register-watches.js';
+import {
+  buildWatchMonitorName,
+  parseWatchOption,
+  type BasePlaceResolver,
+  type WatchOption,
+} from '@quenty/nevermore-deploy';
+import {
+  registerWatchesAsync,
+  type WatchCandidate,
+} from '../../utils/watch/register-watches.js';
 
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
@@ -185,6 +193,27 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           'Use --all to deploy every package with this target, or --base <ref> to change the comparison ref.'
       );
     }
+    // Renew anyway. Registration derives from committed config plus the lock,
+    // so it does not need this run to have deployed anything — and the lease is
+    // the only thing keeping the watch alive. Returning here instead is how a
+    // repo whose scheduled builds all diff clean quietly stops being watched,
+    // with no failure anywhere to notice.
+    if (watchOption) {
+      OutputHelper.info(
+        'Renewing watches anyway, so the lease does not lapse.'
+      );
+      await _registerWatchesAsync({
+        targetName,
+        option: watchOption,
+        // Nothing deployed, so the lock is the whole truth about what each
+        // place was built from.
+        resolver: createLockOnlyBasePlaceResolver(),
+        useGhAuth: args.watchUseGhAuth,
+        shareApiKey: args.watchShareApiKey,
+        resolveApiKeyAsync: () => getApiKeyAsync(args),
+        dryrun: args.dryrun,
+      });
+    }
     return;
   }
 
@@ -197,20 +226,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     // lock file, so it runs for real even on a dryrun — that is what makes the
     // watch path testable without shipping a build.
     if (watchOption) {
-      OutputHelper.info(
-        '[DRYRUN] Registering separate dryrun watches and firing them, to ' +
-          'prove routing works. This does not build or upload here — but ' +
-          'firing really does dispatch the workflow once per package, and ' +
-          'each of those runs a real deploy on the runner.'
-      );
-      if (args.watchShareApiKey) {
-        OutputHelper.warn(
-          '[DRYRUN] Registering without the Open Cloud key, so a "saved" base ' +
-            'place is skipped here even though a real run would watch it.'
-        );
-      }
-      const allPackages = await discoverAllTargetPackagesAsync(targetName);
-      // Under its own monitor name, never the one a real run owns.
+      // Under its own monitor names, never the ones a real run owns.
       //
       // Re-registering replaces a monitor's entire watch list, and a dryrun
       // cannot reproduce a real registration: the Open Cloud key is resolved
@@ -219,18 +235,13 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       // driver and its content-hash vocabulary, dropping the baselines, and
       // deleting any "saved" watch outright, because an anonymous
       // registration skips those.
-      await registerWatchesAsync({
+      await _registerWatchesAsync({
+        targetName,
         option: watchOption,
-        monitorName: `${targetName}/dryrun`,
         resolver: createLockOnlyBasePlaceResolver(),
         useGhAuth: args.watchUseGhAuth,
-        triggerAfterRegister: true,
-        candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
-          targetName,
-          packageName: buildTarget.packageName,
-          packagePath: buildTarget.path,
-          place: buildTarget.target,
-        })),
+        shareApiKey: args.watchShareApiKey,
+        dryrun: true,
       });
     }
     return;
@@ -394,25 +405,13 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     // re-registers the same wrong baseline. The failure becomes permanent and
     // invisible.
     if (watchOption && results.summary.failed === 0) {
-      // Deliberately every package with this target, not just the ones that
-      // deployed. One monitor holds the repo's watches for a target and a
-      // re-apply replaces its whole list, so registering only what changed
-      // would delete the watches of every package that happened not to change
-      // this run. Packages that did not deploy still have a lock entry, which
-      // is the correct baseline for them.
-      const allPackages = await discoverAllTargetPackagesAsync(targetName);
-      await registerWatchesAsync({
+      await _registerWatchesAsync({
+        targetName,
         option: watchOption,
-        monitorName: targetName,
         resolver: basePlaceResolver,
         useGhAuth: args.watchUseGhAuth,
-        robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
-        candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
-          targetName,
-          packageName: buildTarget.packageName,
-          packagePath: buildTarget.path,
-          place: buildTarget.target,
-        })),
+        shareApiKey: args.watchShareApiKey,
+        resolveApiKeyAsync: async () => apiKey,
       });
     }
   } catch (err) {
@@ -424,6 +423,101 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
 
   await reporter.stopAsync();
   process.exit(exitCode);
+}
+
+/**
+ * Register one monitor per package, covering every package with this target.
+ *
+ * Per package rather than one for the batch, because `deploy run --watch`
+ * registers a package's places too. Two names for one package's watches means
+ * two monitors on the same base place, so one artist publish dispatches twice
+ * and each rebuild races the other's lock write. Both paths take the name from
+ * `buildWatchMonitorName`, so registering from either replaces the same list.
+ *
+ * Every package with the target, never just the ones that deployed: a re-apply
+ * replaces a monitor's whole list, and a package that didn't change still has a
+ * lock entry, which is exactly the right baseline for it.
+ */
+async function _registerWatchesAsync(options: {
+  targetName: string;
+  option: WatchOption;
+  resolver: BasePlaceResolver;
+  useGhAuth?: boolean;
+  /** Whether `--watch-share-api-key` was passed. A dryrun never shares one. */
+  shareApiKey?: boolean;
+  /** Called only if a key is actually going to be sent. */
+  resolveApiKeyAsync?: () => Promise<string>;
+  dryrun?: boolean;
+}): Promise<void> {
+  const { targetName } = options;
+
+  if (options.dryrun) {
+    OutputHelper.info(
+      '[DRYRUN] Registering separate dryrun watches and firing them, to ' +
+        'prove routing works. This does not build or upload here — but ' +
+        'firing really does dispatch the workflow once per package, and ' +
+        'each of those runs a real deploy on the runner.'
+    );
+    if (options.shareApiKey) {
+      OutputHelper.warn(
+        '[DRYRUN] Registering without the Open Cloud key, so a "saved" base ' +
+          'place is skipped here even though a real run would watch it.'
+      );
+    }
+  }
+
+  const robloxApiKey =
+    options.shareApiKey && !options.dryrun
+      ? await options.resolveApiKeyAsync?.()
+      : undefined;
+
+  const allPackages = await discoverAllTargetPackagesAsync(targetName);
+
+  // Places that never asked to be watched are dropped here rather than passed
+  // in to be reported as skips. Most places in a batch are in that state, and
+  // per-package registration would otherwise warn about each package that has
+  // no watch at all. A place that asked and can't be watched still goes
+  // through, because that is the case worth saying out loud.
+  const byPackage = new Map<string, WatchCandidate[]>();
+  for (const buildTarget of flattenToBatchTargets(allPackages)) {
+    if (buildTarget.target.watch == null) {
+      continue;
+    }
+    const candidates = byPackage.get(buildTarget.packageName) ?? [];
+    candidates.push({
+      targetName,
+      packageName: buildTarget.packageName,
+      packagePath: buildTarget.path,
+      place: buildTarget.target,
+    });
+    byPackage.set(buildTarget.packageName, candidates);
+  }
+
+  if (byPackage.size === 0) {
+    OutputHelper.warn(
+      `--watch was requested, but no place in a "${targetName}" target has a ` +
+        '"watch" field. Add one naming the workflow that rebuilds it.'
+    );
+    return;
+  }
+
+  for (const [packageName, candidates] of byPackage) {
+    await registerWatchesAsync({
+      option: options.option,
+      monitorName: buildWatchMonitorName({
+        packageName,
+        targetName,
+        dryrun: options.dryrun,
+      }),
+      resolver: options.resolver,
+      useGhAuth: options.useGhAuth,
+      robloxApiKey,
+      // Firing proves the workflow really receives the selector, which is the
+      // half that historically breaks. Only a dryrun asks for it.
+      triggerAfterRegister: options.dryrun,
+      candidates,
+    });
+  }
 }
 
 function _annotateSmokeTestFailure(logs: string): string {
