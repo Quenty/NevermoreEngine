@@ -138,6 +138,9 @@ export async function runStreamWatchLoopAsync(
    * credential-free driver cannot.
    */
   const abandonIfNothingLeftToWatch = (): boolean => {
+    // Counted against every entry this run owns, not against what the last
+    // frame happened to mention: a watch the service has stopped reporting
+    // altogether can no more produce a notification than one it cannot read.
     if (unreadable.size < byWatchName.size) {
       return false;
     }
@@ -260,13 +263,26 @@ export async function runStreamWatchLoopAsync(
           // monitor exists but holds none of our watches, so nothing can ever
           // arrive for us. Reachable when another checkout re-registered this
           // monitor name with different place names.
-          if (ours.length === 0) {
+          // A watch the monitor does not hold at all is as dead as one it
+          // cannot read — no frame can ever name it. Folding the missing into
+          // the same set means a partial snapshot falls back too, instead of
+          // holding the socket for the ones that remain and silently never
+          // rebuilding the rest.
+          const missing = [...byWatchName.keys()].filter(
+            (name) => !ready.watches.some((s) => s.name === name)
+          );
+          for (const name of missing) {
+            if (unreadable.has(name)) {
+              continue;
+            }
+            unreadable.add(name);
             OutputHelper.warn(
-              'The watch monitor holds none of the places this run is ' +
-                'watching — another checkout has probably re-registered it.'
+              `The watch monitor no longer holds ${
+                byWatchName.get(name)!.label
+              } — another checkout has probably re-registered it.`
             );
-            unobservable = true;
-            controller.abort();
+          }
+          if (abandonIfNothingLeftToWatch()) {
             return;
           }
 

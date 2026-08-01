@@ -83,11 +83,6 @@ export interface WatchStreamEvent {
   };
 }
 
-export type WatchStreamMessage =
-  | WatchStreamReady
-  | WatchStreamNotify
-  | WatchStreamEvent;
-
 export interface WatchStreamHandlers {
   /**
    * Called on connect and on every reconnect. This is the reconcile point: the

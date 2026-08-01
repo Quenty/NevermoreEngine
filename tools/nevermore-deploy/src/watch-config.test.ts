@@ -150,7 +150,6 @@ describe('buildWatchPlan', () => {
       {
         selector: 'integration.places.hub',
         workflow: '.github/workflows/build.yml',
-        place,
       },
     ]);
   });

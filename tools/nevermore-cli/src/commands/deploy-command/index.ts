@@ -397,13 +397,30 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       OutputHelper.info('[DRYRUN] Would build and upload');
       if (watchOption) {
         OutputHelper.info(
-          '[DRYRUN] Registering the watch and firing it, to prove routing works. ' +
-            'Neither touches the deploy.'
+          '[DRYRUN] Registering a separate dryrun watch and firing it, to ' +
+            'prove routing works. This does not build or upload here — but ' +
+            'firing really does dispatch the workflow, which runs a real ' +
+            'deploy on the runner. That is the half being proved.'
         );
+        if (args.watchShareApiKey) {
+          OutputHelper.warn(
+            '[DRYRUN] Registering without the Open Cloud key, so a "saved" ' +
+              'base place is skipped here even though a real run would watch it.'
+          );
+        }
         const watchedTarget = parseTargetSelector(targetName).targetName;
+        // Under its own monitor name, never the one a real run owns.
+        //
+        // Re-registering replaces a monitor's entire watch list, and a dryrun
+        // cannot reproduce a real registration: the Open Cloud key is resolved
+        // after this point, so it would register anonymously — stripping the key
+        // from the live monitor, moving every source back to the anonymous
+        // driver and its content-hash vocabulary, dropping the baselines, and
+        // deleting any "saved" watch outright, because an anonymous
+        // registration skips those.
         await registerWatchesAsync({
           option: watchOption,
-          monitorName: `${packageName}/${watchedTarget}`,
+          monitorName: `${packageName}/${watchedTarget}/dryrun`,
           resolver: createLockOnlyBasePlaceResolver(),
           useGhAuth: args.watchUseGhAuth,
           triggerAfterRegister: true,
@@ -548,6 +565,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           const builtPlace = await context.buildPlaceAsync({
             target: buildTarget.target,
             outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
+            packagePath: buildTarget.path,
             packageName: buildTarget.name,
             overrides: isMultiPlace ? undefined : args,
           });
@@ -670,20 +688,34 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           // is unavailable, polling from here still works.
           let pollInstead = true;
           if (notify.success) {
-            const loop = await runStreamWatchLoopAsync({
-              entries: notify.entries,
-              stream: new WebSocketWatchStream({
-                registerUrl: watchOption.registerUrl,
-              }),
-              // The stream says a place moved; Open Cloud says what it moved
-              // to. The two speak different version vocabularies, and only this
-              // one matches what the lock records.
-              source: client,
-              monitorId: notify.monitorId,
-              credential: notify.credential,
-              redeployAsync,
-            });
-            if (loop.failures > 0) exitCode = 1;
+            // Anything the stream throws is still just "streaming did not
+            // work", and the promise above says polling covers that however it
+            // happens. Letting it escape to the handler's catch would exit the
+            // run instead — reporting a failure for a watch that could simply
+            // have carried on here.
+            let loop;
+            try {
+              loop = await runStreamWatchLoopAsync({
+                entries: notify.entries,
+                stream: new WebSocketWatchStream({
+                  registerUrl: watchOption.registerUrl,
+                }),
+                // The stream says a place moved; Open Cloud says what it moved
+                // to. The two speak different version vocabularies, and only
+                // this one matches what the lock records.
+                source: client,
+                monitorId: notify.monitorId,
+                credential: notify.credential,
+                redeployAsync,
+              });
+            } catch (err) {
+              OutputHelper.warn(
+                'Could not hold the watch stream: ' +
+                  (err instanceof Error ? err.message : String(err))
+              );
+              loop = undefined;
+            }
+            if (loop && loop.failures > 0) exitCode = 1;
             // The service could not read any of these places — a private base
             // place, say. This machine has credentials it does not, so the
             // watch carries on here rather than waiting on a socket that will
@@ -693,7 +725,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             // finally, and the user asked to keep watching either way — exiting
             // there would report success while silently doing nothing.
             pollInstead =
-              loop.unobservable || loop.monitorGone || loop.rejected;
+              loop == null ||
+              loop.unobservable ||
+              loop.monitorGone ||
+              loop.rejected;
             if (pollInstead) {
               OutputHelper.info(
                 'Watching from here instead, using your own Open Cloud key.'

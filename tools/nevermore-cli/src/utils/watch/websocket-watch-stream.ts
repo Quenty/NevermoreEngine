@@ -108,6 +108,8 @@ export interface WebSocketWatchStreamOptions {
   registerUrl: string;
   /** Injected in tests. */
   connect?: (url: string, headers: Record<string, string>) => WebSocket;
+  /** Injected in tests; a real session cannot wait ten seconds per assertion. */
+  healthyConnectionMs?: number;
 }
 
 export class WebSocketWatchStream implements WatchStream {
@@ -116,11 +118,14 @@ export class WebSocketWatchStream implements WatchStream {
     url: string,
     headers: Record<string, string>
   ) => WebSocket;
+  private readonly _healthyConnectionMs: number;
 
   public constructor(options: WebSocketWatchStreamOptions) {
     this._registerUrl = options.registerUrl;
     this._connect =
       options.connect ?? ((url, headers) => new WebSocket(url, { headers }));
+    this._healthyConnectionMs =
+      options.healthyConnectionMs ?? HEALTHY_CONNECTION_MS;
   }
 
   public async runAsync(
@@ -162,15 +167,20 @@ export class WebSocketWatchStream implements WatchStream {
       // a delay from a problem that is over. Both halves matter: a server that
       // sends `ready` and then drops would otherwise never back off at all.
       const healthy =
-        outcome.wasReady && outcome.livedMs >= HEALTHY_CONNECTION_MS;
+        outcome.wasReady && outcome.livedMs >= this._healthyConnectionMs;
       attempt = healthy ? 0 : attempt + 1;
       reconnects++;
-      const delay = outcome.immediate
-        ? RECONNECT_MIN_MS
-        : Math.max(RECONNECT_MIN_MS, _backoffMs(attempt));
-      // A retirement is scheduled maintenance rather than a drop; reporting it
-      // would put an hourly warning in front of a developer for no reason.
-      if (!outcome.routine) {
+      // Backoff applies to every close, including the ones that mean "come back
+      // now". A healthy connection has already reset `attempt`, so a real
+      // shutdown or the hourly retirement reconnects promptly anyway — while a
+      // server stuck emitting one of those codes still backs off instead of
+      // being hammered at a flat rate forever.
+      const delay = Math.max(RECONNECT_MIN_MS, _backoffMs(attempt));
+      // A retirement is scheduled maintenance rather than a drop, and saying so
+      // hourly would train people to ignore it. But it is only maintenance if
+      // the connection actually lasted; arriving on a short-lived one means
+      // something is wrong, and silence would hide it completely.
+      if (!outcome.routine || !healthy) {
         options.handlers.onReconnect?.(reconnects, outcome.reason);
       }
       await _sleepAsync(delay, options.signal);

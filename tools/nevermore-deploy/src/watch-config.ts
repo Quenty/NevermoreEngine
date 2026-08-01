@@ -141,7 +141,6 @@ export interface WatchPlanEntry {
   selector: string;
   /** Repo-relative workflow path, from the place's `watch` field. */
   workflow: string;
-  place: DeployTarget;
 }
 
 /**
@@ -248,7 +247,7 @@ export function buildWatchPlan(
       skipped.push({ selector, reason: 'saved-needs-api-key' });
       continue;
     }
-    entries.push({ selector, workflow: place.watch, place });
+    entries.push({ selector, workflow: place.watch });
   }
 
   return { entries, skipped };
@@ -299,12 +298,6 @@ export interface WatchNotifyAction {
 }
 
 export type WatchAction = WatchWorkflowDispatchAction | WatchNotifyAction;
-
-export function isWatchNotifyAction(
-  action: WatchAction
-): action is WatchNotifyAction {
-  return action.type === 'notify';
-}
 
 /** One "if this moves, run that" pair inside a monitor. */
 export interface WatchEntry {

@@ -59,9 +59,18 @@ export class HttpWatchRegistry implements WatchRegistry {
           placeId: watch.source.placeId,
           versionType: watch.source.versionType,
         },
+        // The kind travels with the value or not at all. Without it the service
+        // ignores a baseline outright on the one transition it matters for —
+        // the first registration that supplies an Open Cloud key — and the 422
+        // that should catch a vocabulary mismatch can never fire.
         ...(watch.baselineVersion == null
           ? {}
-          : { baselineVersion: watch.baselineVersion }),
+          : {
+              baselineVersion: watch.baselineVersion,
+              ...(watch.baselineVersionKind == null
+                ? {}
+                : { baselineVersionKind: watch.baselineVersionKind }),
+            }),
         action: watch.action,
       })),
       ...(request.cooldownSeconds == null

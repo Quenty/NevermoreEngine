@@ -21,6 +21,7 @@ function makeRequest(
           versionType: 'published',
         },
         baselineVersion: '158',
+        baselineVersionKind: 'roblox-place-version',
         action: {
           type: 'github-workflow-dispatch',
           workflow: '.github/workflows/build.yml',
@@ -87,6 +88,7 @@ describe('HttpWatchRegistry', () => {
             versionType: 'published',
           },
           baselineVersion: '158',
+          baselineVersionKind: 'roblox-place-version',
           action: {
             type: 'github-workflow-dispatch',
             workflow: '.github/workflows/build.yml',
@@ -130,6 +132,21 @@ describe('HttpWatchRegistry', () => {
     expect(
       JSON.parse(calls[0]!.init.body as string).auth.robloxOpenCloud
     ).toEqual({ apiKey: 'oc-key' });
+  });
+
+  // The kind describes the value, so sending it alone would declare the
+  // vocabulary of a baseline that is not there.
+  it('omits the declared kind along with the baseline', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const base = makeRequest();
+    await registryReturning(makeResponse('{}'), calls).registerAsync({
+      ...base,
+      watches: [{ ...base.watches[0]!, baselineVersion: undefined }],
+    });
+
+    expect(
+      JSON.parse(calls[0]!.init.body as string).watches[0]
+    ).not.toHaveProperty('baselineVersionKind');
   });
 
   it('omits baselineVersion when there is no baseline', async () => {

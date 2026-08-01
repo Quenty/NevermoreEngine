@@ -20,7 +20,18 @@ export interface BuildPlaceOptions {
    */
   target: DeployTarget;
   outputFileName?: string;
-  packagePath?: string;
+  /**
+   * Directory the package lives in. Required, not defaulted.
+   *
+   * Everything downstream is resolved against it: the project file, the build
+   * cache key, and which `deploy.nevermore.lock.json` a base place pin is
+   * written to. Falling back to `process.cwd()` is silently wrong in a batch —
+   * every package sharing a relative `project` path collapses onto one cache
+   * key, so one package's build gets uploaded to another's place. It was
+   * optional once, and a refactor dropped it from a call site with nothing to
+   * catch it.
+   */
+  packagePath: string;
   overrides?: DeployOverrides;
   reporter?: Reporter;
   packageName?: string;

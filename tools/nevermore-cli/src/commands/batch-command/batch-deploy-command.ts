@@ -198,13 +198,30 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     // watch path testable without shipping a build.
     if (watchOption) {
       OutputHelper.info(
-        '[DRYRUN] Registering watches and firing them, to prove routing works. ' +
-          'Neither touches the deploy.'
+        '[DRYRUN] Registering separate dryrun watches and firing them, to ' +
+          'prove routing works. This does not build or upload here — but ' +
+          'firing really does dispatch the workflow once per package, and ' +
+          'each of those runs a real deploy on the runner.'
       );
+      if (args.watchShareApiKey) {
+        OutputHelper.warn(
+          '[DRYRUN] Registering without the Open Cloud key, so a "saved" base ' +
+            'place is skipped here even though a real run would watch it.'
+        );
+      }
       const allPackages = await discoverAllTargetPackagesAsync(targetName);
+      // Under its own monitor name, never the one a real run owns.
+      //
+      // Re-registering replaces a monitor's entire watch list, and a dryrun
+      // cannot reproduce a real registration: the Open Cloud key is resolved
+      // after this point, so it would register anonymously — stripping the key
+      // from the live monitor, moving every source back to the anonymous
+      // driver and its content-hash vocabulary, dropping the baselines, and
+      // deleting any "saved" watch outright, because an anonymous
+      // registration skips those.
       await registerWatchesAsync({
         option: watchOption,
-        monitorName: targetName,
+        monitorName: `${targetName}/dryrun`,
         resolver: createLockOnlyBasePlaceResolver(),
         useGhAuth: args.watchUseGhAuth,
         triggerAfterRegister: true,
@@ -291,6 +308,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         const builtPlace = await context.buildPlaceAsync({
           target: buildTarget.target,
           outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
+          packagePath: buildTarget.path,
           packageName: buildTarget.name,
         });
 
@@ -367,7 +385,13 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     });
     if (results.summary.failed > 0) exitCode = 1;
 
-    if (watchOption) {
+    // Only after a clean run, matching `deploy run`. A package that resolved its
+    // base place and then failed to upload has a lock naming a version it never
+    // shipped; registering that as the baseline tells the service the watch is
+    // up to date, so the rebuild never fires and the next successful run
+    // re-registers the same wrong baseline. The failure becomes permanent and
+    // invisible.
+    if (watchOption && results.summary.failed === 0) {
       // Deliberately every package with this target, not just the ones that
       // deployed. One monitor holds the repo's watches for a target and a
       // re-apply replaces its whole list, so registering only what changed

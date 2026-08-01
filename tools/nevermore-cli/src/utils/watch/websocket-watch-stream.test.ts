@@ -443,7 +443,12 @@ describe('WebSocketWatchStream', () => {
       }
     });
 
-    const stream = new WebSocketWatchStream({ registerUrl: harness.url });
+    // Treat any connection that got its `ready` frame as healthy, so the
+    // retirement reads as the scheduled one it is rather than as a flap.
+    const stream = new WebSocketWatchStream({
+      registerUrl: harness.url,
+      healthyConnectionMs: 0,
+    });
     const reported: string[] = [];
     let readyCount = 0;
 
@@ -466,6 +471,32 @@ describe('WebSocketWatchStream', () => {
     expect(readyCount).toBe(2);
     expect(reported).toEqual([]);
     expect(result.reconnects).toBe(1);
+  });
+
+  // Suppressing 4005 unconditionally would hide a server stuck emitting it —
+  // the client would reconnect forever while the developer saw nothing.
+  it('does report a retirement that arrives on a short-lived connection', async () => {
+    const controller = new AbortController();
+    const harness = await startServerAsync((socket) => {
+      socket.send(JSON.stringify(makeReady()));
+      socket.close(4005, 'Reconnect to re-authorize');
+    });
+
+    const stream = new WebSocketWatchStream({ registerUrl: harness.url });
+    const reported: string[] = [];
+
+    setTimeout(() => controller.abort(), 900);
+    await stream.runAsync({
+      monitorId: 'mon_abc',
+      credential: 'token',
+      signal: controller.signal,
+      handlers: {
+        ...noopHandlers(),
+        onReconnect: (_attempt, reason) => reported.push(reason),
+      },
+    });
+
+    expect(reported.length).toBeGreaterThan(0);
   });
 
   // A frame from a newer service is not a reason to drop a working connection.

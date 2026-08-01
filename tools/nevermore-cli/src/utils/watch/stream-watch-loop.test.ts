@@ -456,6 +456,36 @@ describe('runStreamWatchLoopAsync live poll failures', () => {
     expect(result.unobservable).toBe(false);
   });
 
+  // A snapshot naming only some of our watches leaves the rest unable to ever
+  // fire; holding the socket for the readable one would silently strand it.
+  it('falls back when one watch is unreadable and another has vanished', async () => {
+    const result = await runAsync(
+      [
+        makeEntry({ baseline: 158 }),
+        makeEntry({
+          label: 'integration.places.lobby',
+          watchName: 'integration.places.lobby',
+          placeId: 21,
+          baseline: 158,
+        }),
+      ],
+      async (options) => {
+        await options.handlers.onReadyAsync(
+          makeReady([
+            makeStatus({
+              sourceError: 'nope',
+              sourceConsecutiveFailures: 3,
+            }),
+          ])
+        );
+      },
+      async () => {},
+      { source: makeSource(158) }
+    );
+
+    expect(result.unobservable).toBe(true);
+  });
+
   it('ignores a poll failure for a watch this run does not own', async () => {
     const result = await runAsync(
       [makeEntry({ baseline: 158 })],
