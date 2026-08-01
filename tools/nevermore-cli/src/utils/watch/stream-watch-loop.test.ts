@@ -391,6 +391,89 @@ describe('runStreamWatchLoopAsync unobservable edge cases', () => {
   });
 });
 
+describe('runStreamWatchLoopAsync live poll failures', () => {
+  function pollFailed(watchName: string) {
+    return {
+      type: 'event' as const,
+      event: {
+        id: 2,
+        watchName,
+        type: 'poll-failed',
+        message: `Could not read ${watchName} after 3 attempts: Authentication required to access Asset.`,
+        createdAt: '2026-07-31T00:00:00Z',
+      },
+    };
+  }
+
+  // A connection opened before the service's first failed poll gets a clean
+  // snapshot, and the next `ready` is an hour away — so without the live tail a
+  // private base place looks healthy for an hour while doing nothing.
+  it('gives up when the tail reports every source unreadable', async () => {
+    const result = await runAsync(
+      [makeEntry({ baseline: 158 })],
+      async (options) => {
+        await options.handlers.onReadyAsync(
+          makeReady([makeStatus({ currentVersion: TOKEN_A })])
+        );
+        options.handlers.onEvent?.(pollFailed('integration.places.hub'));
+        await new Promise((resolve) => setTimeout(resolve, 5));
+      },
+      async () => {},
+      { source: makeSource(158) }
+    );
+
+    expect(result.unobservable).toBe(true);
+  });
+
+  it('keeps streaming while something is still readable', async () => {
+    const result = await runAsync(
+      [
+        makeEntry({ baseline: 158 }),
+        makeEntry({
+          label: 'integration.places.lobby',
+          watchName: 'integration.places.lobby',
+          placeId: 21,
+          baseline: 158,
+        }),
+      ],
+      async (options) => {
+        await options.handlers.onReadyAsync(
+          makeReady([
+            makeStatus({ currentVersion: TOKEN_A }),
+            makeStatus({
+              name: 'integration.places.lobby',
+              currentVersion: TOKEN_A,
+            }),
+          ])
+        );
+        options.handlers.onEvent?.(pollFailed('integration.places.hub'));
+        await new Promise((resolve) => setTimeout(resolve, 5));
+      },
+      async () => {},
+      { source: makeSource(158) }
+    );
+
+    expect(result.unobservable).toBe(false);
+  });
+
+  it('ignores a poll failure for a watch this run does not own', async () => {
+    const result = await runAsync(
+      [makeEntry({ baseline: 158 })],
+      async (options) => {
+        await options.handlers.onReadyAsync(
+          makeReady([makeStatus({ currentVersion: TOKEN_A })])
+        );
+        options.handlers.onEvent?.(pollFailed('someone-elses-place'));
+        await new Promise((resolve) => setTimeout(resolve, 5));
+      },
+      async () => {},
+      { source: makeSource(158) }
+    );
+
+    expect(result.unobservable).toBe(false);
+  });
+});
+
 describe('runStreamWatchLoopAsync notifications', () => {
   it('rebuilds when told the source moved', async () => {
     const built: number[] = [];

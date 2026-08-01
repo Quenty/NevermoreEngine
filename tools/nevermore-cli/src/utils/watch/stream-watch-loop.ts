@@ -121,6 +121,31 @@ export async function runStreamWatchLoopAsync(
   let lastDropReason: string | undefined;
   let unobservable = false;
 
+  /**
+   * Watches the service has told us it cannot read, from either direction:
+   * the `ready` snapshot on connect, or a `poll-failed` event as it happens.
+   *
+   * Both are needed. A connection opened before the service's first failed
+   * poll gets a clean snapshot, and the next one is an hour away — so without
+   * the live tail a private base place would look fine for an hour before the
+   * watch admitted it was doing nothing.
+   */
+  const unreadable = new Set<string>();
+
+  /**
+   * Give up the stream once nothing on it can ever fire, so the caller can
+   * poll instead — this machine's credentials reach places the service's
+   * credential-free driver cannot.
+   */
+  const abandonIfNothingLeftToWatch = (): boolean => {
+    if (unreadable.size < byWatchName.size) {
+      return false;
+    }
+    unobservable = true;
+    controller.abort();
+    return true;
+  };
+
   OutputHelper.info(
     `Watching ${entries.length} base place${
       entries.length === 1 ? '' : 's'
@@ -229,7 +254,7 @@ export async function runStreamWatchLoopAsync(
           // and a notify that reaches nobody is a success — so a watch whose
           // place is private sits at "pending" forever and never reaches
           // "failed". `sourceError` is the service's answer to exactly this.
-          const unreadable = ours.filter((s) => _isUnreadable(s));
+          const failedToRead = ours.filter((s) => _isUnreadable(s));
 
           // An empty intersection is the same silent wait by another route: the
           // monitor exists but holds none of our watches, so nothing can ever
@@ -245,30 +270,23 @@ export async function runStreamWatchLoopAsync(
             return;
           }
 
-          if (unreadable.length === ours.length) {
-            for (const status of unreadable) {
-              OutputHelper.warn(
-                `The watch service cannot read ${
-                  byWatchName.get(status.name)!.label
-                }` + (status.sourceError ? `: ${status.sourceError}` : '.')
-              );
+          for (const status of failedToRead) {
+            if (unreadable.has(status.name)) {
+              continue;
             }
-            unobservable = true;
-            controller.abort();
-            return;
-          }
-
-          for (const status of unreadable) {
+            unreadable.add(status.name);
             OutputHelper.warn(
               `The watch service cannot read ${
                 byWatchName.get(status.name)!.label
-              }, so it will not be hot-reloaded` +
-                (status.sourceError ? `: ${status.sourceError}` : '.')
+              }` + (status.sourceError ? `: ${status.sourceError}` : '.')
             );
+          }
+          if (abandonIfNothingLeftToWatch()) {
+            return;
           }
 
           for (const status of ours) {
-            if (!_isUnreadable(status)) {
+            if (!unreadable.has(status.name)) {
               await settleAsync(
                 byWatchName.get(status.name)!,
                 status.currentVersion
@@ -293,6 +311,28 @@ export async function runStreamWatchLoopAsync(
           OutputHelper.verbose(
             `  [${message.event.type}] ${message.event.message}`
           );
+
+          // The service only logs this once it has failed several polls in a
+          // row, so it already means "not a blip". There is no matching
+          // recovered event, so this is one-way — but the cost of being wrong
+          // is polling something that could have been streamed, which still
+          // works.
+          const name = message.event.watchName;
+          if (
+            message.event.type !== 'poll-failed' ||
+            name == null ||
+            !byWatchName.has(name) ||
+            unreadable.has(name)
+          ) {
+            return;
+          }
+          unreadable.add(name);
+          OutputHelper.warn(
+            `The watch service cannot read ${byWatchName.get(name)!.label}: ${
+              message.event.message
+            }`
+          );
+          abandonIfNothingLeftToWatch();
         },
 
         // The stream swallows a handler's throw so it cannot strand the watch
