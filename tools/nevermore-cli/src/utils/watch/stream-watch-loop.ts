@@ -96,41 +96,50 @@ export async function runStreamWatchLoopAsync(
     process.on('SIGINT', onSigint);
   }
 
-  const byWatchName = new Map(entries.map((e) => [e.watchName, e]));
+  /** Everything this loop knows about one watch, in one place. */
+  interface WatchState {
+    entry: StreamWatchEntry;
+    /**
+     * What the place has actually been built from here, as an Open Cloud place
+     * version. Seeded from the lock and advanced only by a rebuild that
+     * succeeded: the service moves its own baseline whether or not anyone was
+     * listening, so this is the only durable record of what exists.
+     */
+    built: number | undefined;
+    /**
+     * The last service-side token this watch was settled at. Purely an
+     * optimization — a reconnect that reports the same token needs no Open
+     * Cloud call — and deliberately not advanced when a rebuild fails, so the
+     * next `ready` retries it.
+     */
+    settledAt?: string;
+    /**
+     * Set once the service has told us it cannot read this source, from either
+     * direction: the `ready` snapshot on connect, or a `poll-failed` event as
+     * it happens.
+     *
+     * Both are needed. A connection opened before the service's first failed
+     * poll gets a clean snapshot, and the next one is an hour away — so without
+     * the live tail a private base place would look fine for an hour before the
+     * watch admitted it was doing nothing.
+     */
+    unreadable: boolean;
+  }
 
-  /**
-   * What each place has actually been built from here, as an Open Cloud place
-   * version. Seeded from the lock and advanced only by a rebuild that
-   * succeeded: the service moves its own baseline whether or not anyone was
-   * listening, so this map is the only durable record of what exists.
-   */
-  const built = new Map<string, number | undefined>(
-    entries.map((e) => [e.watchName, e.baseline])
+  // One record per watch rather than parallel maps under the same key: every
+  // field above is a fact about the same thing, and holding them apart only
+  // creates the possibility of disagreeing about which watches exist.
+  const watches = new Map<string, WatchState>(
+    entries.map((e) => [
+      e.watchName,
+      { entry: e, built: e.baseline, unreadable: false },
+    ])
   );
-
-  /**
-   * The last service-side token each watch was settled at. Purely an
-   * optimization — a reconnect that reports the same token needs no Open Cloud
-   * call — and deliberately not advanced when a rebuild fails, so the next
-   * `ready` retries it.
-   */
-  const settledAt = new Map<string, string>();
 
   let redeploys = 0;
   let failures = 0;
   let lastDropReason: string | undefined;
   let unobservable = false;
-
-  /**
-   * Watches the service has told us it cannot read, from either direction:
-   * the `ready` snapshot on connect, or a `poll-failed` event as it happens.
-   *
-   * Both are needed. A connection opened before the service's first failed
-   * poll gets a clean snapshot, and the next one is an hour away — so without
-   * the live tail a private base place would look fine for an hour before the
-   * watch admitted it was doing nothing.
-   */
-  const unreadable = new Set<string>();
 
   /**
    * Give up the stream once nothing on it can ever fire, so the caller can
@@ -141,11 +150,22 @@ export async function runStreamWatchLoopAsync(
     // Counted against every entry this run owns, not against what the last
     // frame happened to mention: a watch the service has stopped reporting
     // altogether can no more produce a notification than one it cannot read.
-    if (unreadable.size < byWatchName.size) {
+    const all = [...watches.values()];
+    if (all.length === 0 || !all.every((w) => w.unreadable)) {
       return false;
     }
     unobservable = true;
     controller.abort();
+    return true;
+  };
+
+  /** Marks a watch unreadable, and says whether that was news worth printing. */
+  const markUnreadable = (name: string): boolean => {
+    const state = watches.get(name);
+    if (state == null || state.unreadable) {
+      return false;
+    }
+    state.unreadable = true;
     return true;
   };
 
@@ -172,10 +192,11 @@ export async function runStreamWatchLoopAsync(
    * what the place is actually at, which is the same number the build records.
    */
   const settleAsync = async (
-    entry: StreamWatchEntry,
+    state: WatchState,
     token: string | null
   ): Promise<void> => {
-    if (token != null && settledAt.get(entry.watchName) === token) {
+    const entry = state.entry;
+    if (token != null && state.settledAt === token) {
       return;
     }
 
@@ -196,17 +217,17 @@ export async function runStreamWatchLoopAsync(
       return;
     }
 
-    const previous = built.get(entry.watchName);
+    const previous = state.built;
     const settle = () => {
       if (token != null) {
-        settledAt.set(entry.watchName, token);
+        state.settledAt = token;
       }
     };
 
     if (previous === undefined) {
       // Never built here and nothing locked: adopt what is there rather than
       // reading "unknown -> something" as a change.
-      built.set(entry.watchName, latest);
+      state.built = latest;
       settle();
       return;
     }
@@ -221,7 +242,7 @@ export async function runStreamWatchLoopAsync(
     try {
       await redeployAsync(entry, latest);
       redeploys++;
-      built.set(entry.watchName, latest);
+      state.built = latest;
       settle();
       OutputHelper.info(`${entry.label}: rebuilt from v${latest}.`);
     } catch (err) {
@@ -244,7 +265,7 @@ export async function runStreamWatchLoopAsync(
         // Every connection starts here, including reconnects. Nothing is
         // replayed while a client is away, so this is the whole catch-up.
         onReadyAsync: async (ready: WatchStreamReady) => {
-          const ours = ready.watches.filter((s) => byWatchName.has(s.name));
+          const ours = ready.watches.filter((s) => watches.has(s.name));
 
           // A source the service cannot read never fires, and the socket says
           // nothing about it — the failure is visible only here. Waiting
@@ -268,17 +289,16 @@ export async function runStreamWatchLoopAsync(
           // the same set means a partial snapshot falls back too, instead of
           // holding the socket for the ones that remain and silently never
           // rebuilding the rest.
-          const missing = [...byWatchName.keys()].filter(
+          const missing = [...watches.keys()].filter(
             (name) => !ready.watches.some((s) => s.name === name)
           );
           for (const name of missing) {
-            if (unreadable.has(name)) {
+            if (!markUnreadable(name)) {
               continue;
             }
-            unreadable.add(name);
             OutputHelper.warn(
               `The watch monitor no longer holds ${
-                byWatchName.get(name)!.label
+                watches.get(name)!.entry.label
               } — another checkout has probably re-registered it.`
             );
           }
@@ -287,13 +307,12 @@ export async function runStreamWatchLoopAsync(
           }
 
           for (const status of failedToRead) {
-            if (unreadable.has(status.name)) {
+            if (!markUnreadable(status.name)) {
               continue;
             }
-            unreadable.add(status.name);
             OutputHelper.warn(
               `The watch service cannot read ${
-                byWatchName.get(status.name)!.label
+                watches.get(status.name)!.entry.label
               }` + (status.sourceError ? `: ${status.sourceError}` : '.')
             );
           }
@@ -302,25 +321,23 @@ export async function runStreamWatchLoopAsync(
           }
 
           for (const status of ours) {
-            if (!unreadable.has(status.name)) {
-              await settleAsync(
-                byWatchName.get(status.name)!,
-                status.currentVersion
-              );
+            const state = watches.get(status.name)!;
+            if (!state.unreadable) {
+              await settleAsync(state, status.currentVersion);
             }
           }
         },
 
         onNotifyAsync: async (notify: WatchStreamNotify) => {
-          const entry = byWatchName.get(notify.watchName);
-          if (!entry) {
+          const state = watches.get(notify.watchName);
+          if (!state) {
             OutputHelper.verbose(
               `Ignoring a notification for "${notify.watchName}", which this ` +
                 'run does not watch.'
             );
             return;
           }
-          await settleAsync(entry, notify.version);
+          await settleAsync(state, notify.version);
         },
 
         onEvent: (message) => {
@@ -334,17 +351,14 @@ export async function runStreamWatchLoopAsync(
           // is polling something that could have been streamed, which still
           // works.
           const name = message.event.watchName;
-          if (
-            message.event.type !== 'poll-failed' ||
-            name == null ||
-            !byWatchName.has(name) ||
-            unreadable.has(name)
-          ) {
+          if (message.event.type !== 'poll-failed' || name == null) {
             return;
           }
-          unreadable.add(name);
+          if (!markUnreadable(name)) {
+            return;
+          }
           OutputHelper.warn(
-            `The watch service cannot read ${byWatchName.get(name)!.label}: ${
+            `The watch service cannot read ${watches.get(name)!.entry.label}: ${
               message.event.message
             }`
           );
