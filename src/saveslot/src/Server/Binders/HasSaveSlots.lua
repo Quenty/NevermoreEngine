@@ -202,7 +202,8 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 		end
 
 		local function promiseSetSlot()
-			return self._maid:GivePromise(self:_promisePreSelectFromSaveSlotService(slotId))
+			return self._maid
+				:GivePromise(self:_promisePreSelectFromSaveSlotService(slotId))
 				:Then(function(allowed: boolean)
 					if not allowed then
 						return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)

@@ -150,8 +150,7 @@ export abstract class BaseJobContext implements JobContext {
       // Waiter: the in-flight build was started under a different
       // packageName, so emit our own 'building' phase change for the reporter.
       const resolvedName =
-        options.packageName ??
-        path.basename(options.packagePath);
+        options.packageName ?? path.basename(options.packagePath);
       this._reporter.onPackagePhaseChange(resolvedName, 'building');
       return existing.promise;
     }

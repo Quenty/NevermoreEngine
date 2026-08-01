@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   describeMissingWatchToken,
   parseGithubRepository,
@@ -34,6 +34,15 @@ describe('tryResolveGithubDispatchContext token', () => {
     'git remote get-url origin': 'git@github.com:Quenty/Nevermore.git',
     'git rev-parse': 'main',
   };
+
+  // Cleared so these exercise the git fallback rather than whatever the host
+  // happens to export. Actions sets both, and on a pull request GITHUB_REF_NAME
+  // is a merge ref — which resolution rightly refuses, so without this the
+  // whole describe passes locally and fails only in CI.
+  beforeEach(() => {
+    vi.stubEnv('GITHUB_REPOSITORY', '');
+    vi.stubEnv('GITHUB_REF_NAME', '');
+  });
 
   // Registering ships the token to the watch service, so it has to be one the
   // user handed over. Nearly every dev machine has a logged-in `gh`, so reading
