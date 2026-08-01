@@ -70,7 +70,12 @@ export interface DeployTarget {
    * `basePlace` gains a new version, so a Studio edit upstream rebuilds and
    * redeploys without anyone pushing a commit.
    *
-   * It is only ever a dispatch address. Nothing here reads the workflow file,
+   * Named to match `--watch` on purpose. The cloud path dispatches this
+   * workflow and a local run rebuilds in the terminal instead, but they are one
+   * feature with one vocabulary, and a config field named for the mechanism
+   * would split that in two — leave it as `watch`.
+   *
+   * It is only ever a dispatch address: nothing here reads the workflow file,
    * and a place without a `basePlace` has nothing to watch — `--watch` skips it
    * rather than registering a watch that can never fire.
    */
