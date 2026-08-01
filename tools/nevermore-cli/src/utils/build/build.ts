@@ -44,6 +44,16 @@ export interface BuildPlaceOptions {
 export interface BuiltPlace {
   rbxlPath: string;
   target: DeployTarget;
+  /**
+   * Concrete version of the base place this build merged against, once one has
+   * been merged.
+   *
+   * Resolved during the merge and carried out because nothing downstream can
+   * recover it: a `"published"` pin resolves at deploy time, and by the time
+   * the place is running, the base place has usually moved on. Without it, a
+   * build in game cannot say which upstream content it is actually made of.
+   */
+  basePlaceVersion?: number;
 }
 
 export interface BuildPlaceResult extends BuiltPlace {

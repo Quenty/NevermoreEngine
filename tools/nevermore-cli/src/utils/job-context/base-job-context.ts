@@ -37,6 +37,7 @@ class TrackedBuiltPlace implements BuiltPlace {
   target: BuiltPlace['target'];
   sharedKey?: string;
   ownContext?: BuildContext;
+  basePlaceVersion?: number;
 
   constructor(
     rbxlPath: string,
@@ -121,7 +122,7 @@ export abstract class BaseJobContext implements JobContext {
     if (options.overrides?.placeFile) {
       return undefined;
     }
-    const packagePath = options.packagePath ?? process.cwd();
+    const packagePath = options.packagePath;
     const projectPath = path.resolve(packagePath, options.target.project);
     const outputFileName = options.outputFileName ?? 'build.rbxl';
     return `${projectPath}|${outputFileName}`;
@@ -150,7 +151,7 @@ export abstract class BaseJobContext implements JobContext {
       // packageName, so emit our own 'building' phase change for the reporter.
       const resolvedName =
         options.packageName ??
-        path.basename(options.packagePath ?? process.cwd());
+        path.basename(options.packagePath);
       this._reporter.onPackagePhaseChange(resolvedName, 'building');
       return existing.promise;
     }
@@ -215,9 +216,13 @@ export abstract class BaseJobContext implements JobContext {
     // both because the Asset Delivery API only addresses versions numerically
     // and so the lock file records exactly what this build merged against.
     const version = await this._basePlaceResolver.resolveAsync(
-      options.packagePath ?? process.cwd(),
+      options.packagePath,
       basePlace
     );
+    // Carried out to the caller so it can be stamped into the place: this is
+    // the only point where a "published" pin becomes a concrete number, and the
+    // base place will have moved on by the time anyone asks in game.
+    tracked.basePlaceVersion = version;
     OutputHelper.verbose(
       typeof basePlace.version === 'number'
         ? `Downloading base place (pinned v${version}) for merge...`
@@ -242,7 +247,7 @@ export abstract class BaseJobContext implements JobContext {
     await fs.writeFile(basePath, buffer);
 
     this._reporter.onPackagePhaseChange(resolvedName, 'merging');
-    const packagePath = options.packagePath ?? process.cwd();
+    const packagePath = options.packagePath;
     const projectPath = path.resolve(packagePath, tracked.target.project);
     const mergedPath = mergeContext.resolvePath('merged.rbxl');
 

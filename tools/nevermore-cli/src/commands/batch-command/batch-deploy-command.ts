@@ -323,6 +323,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               universeId: buildTarget.target.universeId,
               placeId: buildTarget.target.placeId,
               packageVersion: await readPackageVersionAsync(buildTarget.path),
+              basePlaceId: buildTarget.target.basePlace?.placeId,
+              basePlaceVersion: builtPlace.basePlaceVersion,
             },
             buildTarget.manifestPlaces
           )

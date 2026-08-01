@@ -699,7 +699,11 @@ else
 end
 ```
 
-`metadata.deployed` is the source of truth for "is this a real deploy?" — it's only ever `true` when the CLI injected it, so it stays `false` in Studio and in any place that wasn't deployed through the CLI. The full field list (`commit`, `version`, `branch`, `target`, `timestamp`, `published`, `placeId`, `universeId`) is documented in the [package README](https://github.com/Quenty/NevermoreEngine/tree/main/src/nevermore-cli-manifest). Consumers like `GameConfig`, `GameVersionUtils`, and PlayerMetrics read from this module rather than reaching for the raw attributes.
+`metadata.deployed` is the source of truth for "is this a real deploy?" — it's only ever `true` when the CLI injected it, so it stays `false` in Studio and in any place that wasn't deployed through the CLI. The full field list (`commit`, `version`, `branch`, `target`, `timestamp`, `published`, `placeId`, `universeId`, `basePlaceId`, `basePlaceVersion`) is documented in the [package README](https://github.com/Quenty/NevermoreEngine/tree/main/src/nevermore-cli-manifest). Consumers like `GameConfig`, `GameVersionUtils`, and PlayerMetrics read from this module rather than reaching for the raw attributes.
+
+`basePlaceVersion` deserves a note, because it is the one fact nothing else can recover. A `basePlace` pinned to `"published"` resolves at deploy time, and the base place keeps moving afterwards — so once a build is running, there is no way to ask which upstream Studio content it was made from. Stamping it at merge time is the only record. It is absent on a build that merged no base place, and it is paired with `basePlaceId`, since a version number means nothing without knowing which place it counts.
+
+That makes it the field to report when someone asks "is the live game running the latest Studio edit?" — compare it against the base place's current version.
 
 ### Showing the running version to humans
 

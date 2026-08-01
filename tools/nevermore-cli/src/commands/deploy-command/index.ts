@@ -581,6 +581,8 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
                 universeId: args.universeId ?? buildTarget.target.universeId,
                 placeId: args.placeId ?? buildTarget.target.placeId,
                 packageVersion,
+                basePlaceId: buildTarget.target.basePlace?.placeId,
+                basePlaceVersion: builtPlace.basePlaceVersion,
               },
               buildTarget.manifestPlaces
             )

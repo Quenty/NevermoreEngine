@@ -77,6 +77,17 @@ export interface DeployPlaceInfo {
   universeId: number;
   /** `version` from the deploying package's package.json (e.g. "1.0.0"), if any. */
   packageVersion?: string;
+  /**
+   * The base place this build was merged from, when there is one.
+   *
+   * `basePlaceVersion` is the answer to "which upstream content is this?" — a
+   * `"published"` pin resolves at deploy time and the base place moves on
+   * afterwards, so this is the only record of what the running build was made
+   * of. Reported alongside its place id, since a version number means nothing
+   * without knowing which place it counts.
+   */
+  basePlaceId?: number;
+  basePlaceVersion?: number;
 }
 
 /**
@@ -111,6 +122,15 @@ export function buildDeployMetadataAttributes(
   if (git.version) attributes.Version = git.version;
   if (git.branch) attributes.Branch = git.branch;
   if (place.packageVersion) attributes.PackageVersion = place.packageVersion;
+  // Stringified for the same reason as the other ids — see above. The version
+  // is small enough today to survive float32, but it travels with the id and
+  // the pair reads better as one kind of value.
+  if (place.basePlaceId != null) {
+    attributes.BasePlaceId = String(place.basePlaceId);
+  }
+  if (place.basePlaceVersion != null) {
+    attributes.BasePlaceVersion = String(place.basePlaceVersion);
+  }
   if (places && places.length > 0) {
     attributes.Places = JSON.stringify(
       places.map((p) => ({
