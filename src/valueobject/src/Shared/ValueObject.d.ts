@@ -33,7 +33,7 @@ export interface ValueObject<T> extends ValueObjectLike<T> {
 
 interface ValueObjectConstructor {
   readonly ClassName: 'ValueObject';
-  new <T = unknown>(): ValueObject<T>;
+  new <T = never>(): ValueObject<T>;
   new <T>(value: T, checkType?: CheckType): ValueObject<T>;
 
   fromObservable: <T>(observable: Observable<T>) => ValueObject<T>;
