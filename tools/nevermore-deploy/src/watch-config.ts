@@ -1,5 +1,6 @@
 import {
   isBasePlaceVersionKeyword,
+  type BasePlaceConfig,
   type BasePlaceVersionKeyword,
   type DeployTarget,
 } from './deploy-config.js';
@@ -257,13 +258,60 @@ export interface WatchPlanOptions {
   credentialed?: boolean;
 }
 
+/** Why a base place cannot be watched. */
+export type BasePlaceWatchIssue = Exclude<
+  WatchPlanSkip['reason'],
+  'no-watch-field'
+>;
+
 /**
- * Decide which of a target's places get watched.
+ * Whether a base place is one a watch could ever fire on, and if so, which
+ * kind of version it follows.
+ *
+ * The single copy of that rule. A local watch and a registered one disagree
+ * about the *workflow* — one dispatches, the other rebuilds in the terminal —
+ * but they must agree exactly about the base place, or a place watchable by one
+ * path and skipped by the other is a rebuild that silently never happens.
+ *
+ * `versionType` comes back rather than being re-derived by each caller, because
+ * defaulting an absent version to `"published"` is part of the same rule: it is
+ * what makes an unversioned base place watchable at all.
+ */
+export type BasePlaceWatchCheck =
+  | { watchable: true; versionType: BasePlaceVersionKeyword }
+  | { watchable: false; issue: BasePlaceWatchIssue };
+
+export function checkBasePlaceWatchable(
+  basePlace: BasePlaceConfig | undefined,
+  options: WatchPlanOptions = {}
+): BasePlaceWatchCheck {
+  if (basePlace == null) {
+    return { watchable: false, issue: 'no-base-place' };
+  }
+  const version = basePlace.version;
+  // An exact version pin means "hold this base place still", which is the
+  // opposite of watching it: every rebuild would download the same version no
+  // matter how many times the watch fired.
+  if (version != null && !isBasePlaceVersionKeyword(version)) {
+    return { watchable: false, issue: 'pinned-base-place' };
+  }
+  if (!options.credentialed && version === 'saved') {
+    return { watchable: false, issue: 'saved-needs-api-key' };
+  }
+  return { watchable: true, versionType: version ?? 'published' };
+}
+
+/**
+ * Decide which of a target's places get watched, for a registration that
+ * dispatches.
  *
  * A place needs both halves: `watch` says what to dispatch, `basePlace` says
  * what to watch for. Missing either is normal — most places in a config are
- * neither — so they are reported as skips rather than errors, and only become
- * a hard failure if that leaves nothing to register at all.
+ * neither — so they are reported as skips rather than errors, and only become a
+ * hard failure if that leaves nothing to register at all.
+ *
+ * A local watch dispatches nothing, so it wants only the base place half; it
+ * calls `checkBasePlaceWatchable` directly rather than reimplementing it.
  */
 export function buildWatchPlan(
   targetName: string,
@@ -282,22 +330,9 @@ export function buildWatchPlan(
       skipped.push({ selector, reason: 'no-watch-field' });
       continue;
     }
-    if (place.basePlace == null) {
-      skipped.push({ selector, reason: 'no-base-place' });
-      continue;
-    }
-    // An exact version pin means "hold this base place still", which is the
-    // opposite of watching it: every rebuild would download the same version no
-    // matter how many times the watch fired.
-    if (
-      place.basePlace.version != null &&
-      !isBasePlaceVersionKeyword(place.basePlace.version)
-    ) {
-      skipped.push({ selector, reason: 'pinned-base-place' });
-      continue;
-    }
-    if (!options.credentialed && place.basePlace.version === 'saved') {
-      skipped.push({ selector, reason: 'saved-needs-api-key' });
+    const check = checkBasePlaceWatchable(place.basePlace, options);
+    if (!check.watchable) {
+      skipped.push({ selector, reason: check.issue });
       continue;
     }
     entries.push({ selector, workflow: place.watch });

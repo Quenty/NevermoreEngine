@@ -61,6 +61,7 @@ export {
   WATCH_MODES,
   buildWatchMonitorName,
   buildWatchPlan,
+  checkBasePlaceWatchable,
   describeWatchPlanSkip,
   parseWatchDuration,
   parseWatchOption,

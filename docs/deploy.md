@@ -451,7 +451,7 @@ integration.places.hub: base place moved v158 → v159, rebuilding...
 integration.places.hub: rebuilt from v159.
 ```
 
-Local watching is deliberately more permissive than the cloud path. A place does **not** need a `watch` field — that names a workflow to dispatch, and nothing is dispatched locally — and `"saved"` works, because your machine has the Open Cloud credentials the service doesn't. An exact version pin is still skipped: it means "hold this still".
+Local watching is more permissive than the cloud path in exactly one way: a place does **not** need a `watch` field, because that names a workflow to dispatch and nothing is dispatched locally. Everything about the base place itself is the same rule — `"saved"` works because your machine has the Open Cloud credentials the service doesn't, and an exact version pin is still skipped, since it means "hold this still".
 
 Rebuilds re-resolve the pin automatically, so you don't need `--refresh-base-place` locally. A failed rebuild is retried rather than skipped, and losing the connection or failing to reach Open Cloud is reported without ending the watch.
 

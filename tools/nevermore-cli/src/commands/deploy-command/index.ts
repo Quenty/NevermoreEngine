@@ -41,8 +41,8 @@ import {
 import {
   WATCH_MODES,
   buildWatchMonitorName,
+  checkBasePlaceWatchable,
   formatTargetSelector,
-  isBasePlaceVersionKeyword,
   loadDeployConfigAsync,
   parseTargetSelector,
   parseWatchOption,
@@ -81,14 +81,10 @@ const MULTI_PLACE_CONCURRENCY = 10;
 /**
  * Which base places a local watch polls.
  *
- * Deliberately looser than the cloud plan. `watch` is a GitHub workflow path —
- * a dispatch address — and nothing is dispatched locally, so requiring it would
- * only stop a developer hot-reloading a place that never intends to use CI.
- * `"saved"` is fair game too: the service cannot poll it yet, but this machine
- * has Open Cloud credentials and can.
- *
- * An exact version pin is still excluded, for the same reason as always: it
- * means "hold this still", so there is nothing to follow.
+ * Deliberately looser than the cloud plan, in exactly one way: `watch` is a
+ * dispatch address, nothing is dispatched locally, so requiring it would only
+ * stop a developer hot-reloading a place that never intends to use CI.
+ * Everything about the base place itself is the shared rule.
  */
 async function _buildLocalWatchEntriesAsync(
   config: DeployConfig,
@@ -99,21 +95,19 @@ async function _buildLocalWatchEntriesAsync(
   const entries: LocalWatchEntry[] = [];
   for (const place of resolveDeployTargetPlaces(config, targetName)) {
     const basePlace = place.basePlace;
-    if (basePlace == null) {
+    // The same rule a registration uses, asked with `credentialed: true`: this
+    // machine holds the Open Cloud key, so "saved" is readable here even when
+    // the service could not see it. Only the workflow half differs, and a local
+    // watch has nothing to dispatch.
+    const check = checkBasePlaceWatchable(basePlace, { credentialed: true });
+    if (basePlace == null || !check.watchable) {
       continue;
     }
-    if (
-      basePlace.version != null &&
-      !isBasePlaceVersionKeyword(basePlace.version)
-    ) {
-      continue;
-    }
-    const versionType = basePlace.version ?? 'published';
     entries.push({
       label: formatTargetSelector({ targetName, placeName: place.name }),
       universeId: basePlace.universeId,
       placeId: basePlace.placeId,
-      versionType,
+      versionType: check.versionType,
       baseline: await resolver.peekAsync(packagePath, basePlace),
     });
   }

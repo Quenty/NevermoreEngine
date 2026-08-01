@@ -3,6 +3,7 @@ import { type DeployTarget } from './deploy-config.js';
 import {
   buildWatchMonitorName,
   buildWatchPlan,
+  checkBasePlaceWatchable,
   parseWatchDuration,
   parseWatchOption,
   resolveWatchDelivery,
@@ -180,7 +181,10 @@ describe('buildWatchPlan', () => {
 
   it('skips a watch with nothing to watch for', () => {
     const plan = buildWatchPlan('integration', [
-      makePlace({ name: 'hub', watch: '.github/workflows/build.yml' }),
+      makePlace({
+        name: 'hub',
+        watch: '.github/workflows/build.yml',
+      }),
     ]);
 
     expect(plan.entries).toEqual([]);
@@ -351,5 +355,59 @@ describe('resolveWatchDelivery', () => {
     // no error, no output, just a job burning its timeout.
     expect(resolveWatchDelivery('dispatch', false)).toBe('dispatch');
     expect(resolveWatchDelivery('notify', true)).toBe('notify');
+  });
+});
+
+describe('checkBasePlaceWatchable', () => {
+  it('resolves the version type an absent version implies', () => {
+    expect(checkBasePlaceWatchable({ universeId: 10, placeId: 20 })).toEqual({
+      watchable: true,
+      versionType: 'published',
+    });
+  });
+
+  it('reports each reason a base place cannot be followed', () => {
+    expect(checkBasePlaceWatchable(undefined)).toEqual({
+      watchable: false,
+      issue: 'no-base-place',
+    });
+    expect(
+      checkBasePlaceWatchable({ universeId: 10, placeId: 20, version: 158 })
+    ).toEqual({ watchable: false, issue: 'pinned-base-place' });
+    expect(
+      checkBasePlaceWatchable({ universeId: 10, placeId: 20, version: 'saved' })
+    ).toEqual({ watchable: false, issue: 'saved-needs-api-key' });
+  });
+
+  it('allows "saved" once a key is shared', () => {
+    expect(
+      checkBasePlaceWatchable(
+        { universeId: 10, placeId: 20, version: 'saved' },
+        { credentialed: true }
+      )
+    ).toEqual({ watchable: true, versionType: 'saved' });
+  });
+
+  // The reason this is a function rather than two copies of the rule. A local
+  // watch and a registered one differ only over the workflow; if they disagreed
+  // about the base place, a place watchable one way and skipped the other would
+  // be a rebuild that silently never happens.
+  it('agrees with the plan a registration builds', () => {
+    const basePlace = {
+      universeId: 10,
+      placeId: 20,
+      version: 'saved',
+    } as const;
+    const plan = buildWatchPlan('integration', [
+      makePlace({
+        name: 'hub',
+        watch: '.github/workflows/build.yml',
+        basePlace,
+      }),
+    ]);
+
+    expect(plan.skipped[0]!.reason).toBe(
+      (checkBasePlaceWatchable(basePlace) as { issue: string }).issue
+    );
   });
 });
