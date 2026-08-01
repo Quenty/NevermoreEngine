@@ -1,5 +1,9 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import {
+  formatTargetSelector,
+  parseTargetSelector,
+} from './target-selector.js';
 
 /**
  * The two symbolic `basePlace.version` pins. Unlike a number, these resolve at
@@ -58,6 +62,19 @@ export interface DeployTarget {
   project: string;
   scriptTemplate?: string;
   basePlace?: BasePlaceConfig;
+  /**
+   * Repo-relative path to the GitHub workflow that rebuilds this place, e.g.
+   * `.github/workflows/build.yml`. Declaring it makes the place eligible for
+   * `--watch`: a watch registration asks for that workflow to be dispatched
+   * with this place's selector (`integration.places.hub`) whenever the place's
+   * `basePlace` gains a new version, so a Studio edit upstream rebuilds and
+   * redeploys without anyone pushing a commit.
+   *
+   * It is only ever a dispatch address. Nothing here reads the workflow file,
+   * and a place without a `basePlace` has nothing to watch — `--watch` skips it
+   * rather than registering a watch that can never fire.
+   */
+  watch?: string;
 }
 
 /** Wire-format shape: a target may be a single place or a `{ places: [...] }` group. */
@@ -132,6 +149,21 @@ function _validatePlace(label: string, place: DeployTarget): void {
   if (typeof place.project !== 'string') {
     throw new Error(`${label} is missing or has invalid "project"`);
   }
+  if (place.watch != null) {
+    if (typeof place.watch !== 'string' || place.watch === '') {
+      throw new Error(
+        `${label} "watch" must be a path to a GitHub workflow, ` +
+          'e.g. ".github/workflows/build.yml"'
+      );
+    }
+    if (path.isAbsolute(place.watch)) {
+      // The path is sent to a dispatcher that resolves it inside the repo, so a
+      // machine-local absolute path would name a file that side cannot see.
+      throw new Error(
+        `${label} "watch" must be repo-relative, got "${place.watch}"`
+      );
+    }
+  }
   if (place.basePlace != null) {
     if (typeof place.basePlace.universeId !== 'number') {
       throw new Error(
@@ -187,12 +219,18 @@ export async function loadDeployConfigAsync(
 /**
  * Expand a target into one DeployTarget per place. Single-place targets resolve
  * to a 1-element array; multi-place targets expand to one entry per `places[]`.
+ *
+ * `selector` is a target name, or a name narrowed to one place inside it
+ * (`integration.places.hub`), in which case exactly that place is returned.
+ * Narrowing matches on `name` whether or not the target is multi-place, so a
+ * selector keeps working when a target grows from one place to several.
  */
 export function resolveDeployTargetPlaces(
   config: DeployConfig,
-  targetName: string
+  selector: string
 ): DeployTarget[] {
   const availableTargets = Object.keys(config.targets);
+  const { targetName, placeName } = parseTargetSelector(selector);
   const target = config.targets[targetName];
 
   if (!target) {
@@ -204,29 +242,60 @@ export function resolveDeployTargetPlaces(
     );
   }
 
-  return _isMultiPlace(target) ? target.places : [target];
+  const places = _isMultiPlace(target) ? target.places : [target];
+  if (placeName == null) {
+    return places;
+  }
+
+  const place = places.find((p) => p.name === placeName);
+  if (!place) {
+    const named = places.flatMap((p) => (p.name == null ? [] : [p.name]));
+    throw new Error(
+      [
+        `Target "${targetName}" has no place named "${placeName}".`,
+        named.length > 0
+          ? `Available places: ${named.join(', ')}`
+          : `That target's places have no "name" field to select by.`,
+      ].join('\n')
+    );
+  }
+  return [place];
 }
 
 /**
- * Like `resolveDeployTarget`, but throws when the target is multi-place. Use
- * in single-shot commands (`nevermore deploy`, `nevermore test`) where it is
- * not meaningful to deploy to "the first place" of a multi-chapter target —
- * the caller should pick one explicitly or use the batch commands.
+ * Like `resolveDeployTarget`, but throws when the selector resolves to more
+ * than one place. Use in single-shot commands (`nevermore deploy`,
+ * `nevermore test`) where it is not meaningful to deploy to "the first place"
+ * of a multi-chapter target — the caller should narrow to one place or use the
+ * batch commands.
  */
 export function resolveSingleDeployTarget(
   config: DeployConfig,
-  targetName: string,
+  selector: string,
   commandHint = 'nevermore batch deploy'
 ): DeployTarget {
-  const places = resolveDeployTargetPlaces(config, targetName);
+  const places = resolveDeployTargetPlaces(config, selector);
   if (places.length > 1) {
+    const { targetName } = parseTargetSelector(selector);
     const placeNames = places
       .map((p, i) => p.name ?? `places[${i}]`)
       .join(', ');
+    const named = places.flatMap((p) => (p.name == null ? [] : [p.name]));
+    const remedies = [
+      `Use \`${commandHint} --target ${targetName}\` to fan out across every place.`,
+    ];
+    if (named[0] != null) {
+      remedies.unshift(
+        `Narrow to one place, e.g. \`${formatTargetSelector({
+          targetName,
+          placeName: named[0],
+        })}\`.`
+      );
+    }
     throw new Error(
       [
         `Target "${targetName}" has multiple places (${placeNames}); cannot deploy to it as a single place.`,
-        `Use \`${commandHint} --target ${targetName}\` to fan out across every place.`,
+        ...remedies,
       ].join('\n')
     );
   }

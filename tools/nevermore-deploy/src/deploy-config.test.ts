@@ -7,6 +7,8 @@ import {
   type DeployTarget,
   loadDeployConfigAsync,
   resolveDefaultTargetName,
+  resolveDeployTargetPlaces,
+  resolveSingleDeployTarget,
 } from './deploy-config.js';
 
 async function writeTempConfigAsync(config: unknown): Promise<string> {
@@ -179,6 +181,139 @@ describe('loadDeployConfigAsync basePlace.version', () => {
     });
     await expect(loadDeployConfigAsync(configPath)).rejects.toThrowError(
       /chapter0.*version.*positive integer/
+    );
+  });
+});
+
+describe('loadDeployConfigAsync watch', () => {
+  it('accepts a repo-relative workflow path', async () => {
+    const configPath = await writeTempConfigAsync({
+      targets: {
+        integration: {
+          universeId: 1,
+          placeId: 2,
+          project: 'default.project.json',
+          watch: '.github/workflows/build.yml',
+        },
+      },
+    });
+    const config = await loadDeployConfigAsync(configPath);
+    expect((config.targets['integration'] as DeployTarget).watch).toBe(
+      '.github/workflows/build.yml'
+    );
+  });
+
+  it('rejects a non-string watch', async () => {
+    const configPath = await writeTempConfigAsync({
+      targets: {
+        integration: {
+          universeId: 1,
+          placeId: 2,
+          project: 'default.project.json',
+          watch: true,
+        },
+      },
+    });
+    await expect(loadDeployConfigAsync(configPath)).rejects.toThrowError(
+      /"watch" must be a path/
+    );
+  });
+
+  it('rejects an absolute watch path', async () => {
+    const configPath = await writeTempConfigAsync({
+      targets: {
+        integration: {
+          universeId: 1,
+          placeId: 2,
+          project: 'default.project.json',
+          watch: '/home/me/repo/.github/workflows/build.yml',
+        },
+      },
+    });
+    await expect(loadDeployConfigAsync(configPath)).rejects.toThrowError(
+      /must be repo-relative/
+    );
+  });
+});
+
+describe('resolveDeployTargetPlaces', () => {
+  const hub: DeployTarget = {
+    name: 'hub',
+    universeId: 1,
+    placeId: 2,
+    project: 'default.project.json',
+  };
+  const lobby: DeployTarget = {
+    name: 'lobby',
+    universeId: 1,
+    placeId: 3,
+    project: 'default.project.json',
+  };
+  const config: DeployConfig = {
+    targets: {
+      integration: { places: [hub, lobby] },
+      solo: makeTarget(9),
+    },
+  };
+
+  it('expands a multi-place target', () => {
+    expect(resolveDeployTargetPlaces(config, 'integration')).toEqual([
+      hub,
+      lobby,
+    ]);
+  });
+
+  it('narrows to one place by selector', () => {
+    expect(resolveDeployTargetPlaces(config, 'integration.places.hub')).toEqual(
+      [hub]
+    );
+  });
+
+  it('lists the available places when the selector names none of them', () => {
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'integration.places.nope')
+    ).toThrowError(/no place named "nope"[\s\S]*hub, lobby/);
+  });
+
+  it('explains that a selector cannot match places without names', () => {
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'solo.places.hub')
+    ).toThrowError(/no "name" field/);
+  });
+
+  it('still reports an unknown target by its name alone', () => {
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'missing.places.hub')
+    ).toThrowError(/Target "missing" not found/);
+  });
+});
+
+describe('resolveSingleDeployTarget', () => {
+  const hub: DeployTarget = {
+    name: 'hub',
+    universeId: 1,
+    placeId: 2,
+    project: 'default.project.json',
+  };
+  const lobby: DeployTarget = {
+    name: 'lobby',
+    universeId: 1,
+    placeId: 3,
+    project: 'default.project.json',
+  };
+  const config: DeployConfig = {
+    targets: { integration: { places: [hub, lobby] } },
+  };
+
+  it('resolves a narrowed multi-place target', () => {
+    expect(resolveSingleDeployTarget(config, 'integration.places.lobby')).toBe(
+      lobby
+    );
+  });
+
+  it('suggests narrowing when the target is still multi-place', () => {
+    expect(() => resolveSingleDeployTarget(config, 'integration')).toThrowError(
+      /integration\.places\.hub/
     );
   });
 });

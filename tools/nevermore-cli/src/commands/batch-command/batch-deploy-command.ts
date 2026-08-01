@@ -40,6 +40,8 @@ import {
   readPackageVersionAsync,
 } from '../../utils/nevermore-cli-utils.js';
 import { parseTestLogs } from '../../utils/testing/test-log-parser.js';
+import { parseWatchOption } from '@quenty/nevermore-deploy';
+import { registerWatchesAsync } from '../../utils/watch/register-watches.js';
 
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
@@ -58,6 +60,8 @@ interface BatchDeployArgs extends NevermoreGlobalArgs {
   logs?: boolean;
   target?: string;
   smokeTest?: boolean;
+  watch?: string;
+  watchShareApiKey?: boolean;
 }
 
 export const batchDeployCommand: CommandModule<
@@ -116,6 +120,20 @@ export const batchDeployCommand: CommandModule<
           '(executes server scripts via Open Cloud and waits for errors)',
         type: 'boolean',
         default: false,
+      })
+      .option('watch', {
+        describe:
+          'After deploying, register a cloud watch for every place with a "watch" field, ' +
+          'so it rebuilds when its base place changes. Takes the register endpoint ' +
+          'URL, ending in the lease: https://<watch-service>/v1/register/7d',
+        type: 'string',
+      })
+      .option('watch-share-api-key', {
+        describe:
+          'Share the Open Cloud API key with the watch service, so it can poll private base places. ' +
+          'Off by default — the key is stored by the service.',
+        type: 'boolean',
+        default: false,
       });
   },
   handler: async (args) => {
@@ -130,6 +148,9 @@ export const batchDeployCommand: CommandModule<
 
 async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const targetName = args.target ?? 'test';
+  // Parsed up front so a typo'd duration fails before anything is deployed.
+  const watchOption =
+    args.watch == null ? undefined : parseWatchOption(args.watch);
 
   const discovered = args.all
     ? await discoverAllTargetPackagesAsync(targetName)
@@ -160,6 +181,26 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     OutputHelper.info(
       `[DRYRUN] Would deploy ${batchTargets.length} targets: ${names}`
     );
+    // Registration is idempotent and derives from committed config plus the
+    // lock file, so it runs for real even on a dryrun — that is what makes the
+    // watch path testable without shipping a build.
+    if (watchOption) {
+      OutputHelper.info(
+        '[DRYRUN] Registering watches and firing them, to prove routing works. ' +
+          'Neither touches the deploy.'
+      );
+      const allPackages = await discoverAllTargetPackagesAsync(targetName);
+      await registerWatchesAsync({
+        option: watchOption,
+        monitorName: targetName,
+        triggerAfterRegister: true,
+        candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
+          targetName,
+          packageName: buildTarget.packageName,
+          place: buildTarget.target,
+        })),
+      });
+    }
     return;
   }
 
@@ -215,11 +256,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
     apiKey,
     rateLimiter: new RateLimiter(),
   });
-  const context = new CloudJobContext(
-    reporter,
-    client,
-    createBasePlaceResolver(client, args)
-  );
+  const basePlaceResolver = createBasePlaceResolver(client, args);
+  const context = new CloudJobContext(reporter, client, basePlaceResolver);
 
   // Gathered once so every deployed package shares one timestamp and commit.
   const deployGitInfo = gatherGitDeployInfo();
@@ -238,7 +276,6 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         const builtPlace = await context.buildPlaceAsync({
           target: buildTarget.target,
           outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
-          packagePath: buildTarget.path,
           packageName: buildTarget.name,
         });
 
@@ -314,6 +351,26 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       },
     });
     if (results.summary.failed > 0) exitCode = 1;
+
+    if (watchOption) {
+      // Deliberately every package with this target, not just the ones that
+      // deployed. One monitor holds the repo's watches for a target and a
+      // re-apply replaces its whole list, so registering only what changed
+      // would delete the watches of every package that happened not to change
+      // this run. Packages that did not deploy still have a lock entry, which
+      // is the correct baseline for them.
+      const allPackages = await discoverAllTargetPackagesAsync(targetName);
+      await registerWatchesAsync({
+        option: watchOption,
+        monitorName: targetName,
+        robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
+        candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
+          targetName,
+          packageName: buildTarget.packageName,
+          place: buildTarget.target,
+        })),
+      });
+    }
   } catch (err) {
     OutputHelper.error(err instanceof Error ? err.message : String(err));
     exitCode = 1;

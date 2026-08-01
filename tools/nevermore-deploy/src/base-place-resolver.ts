@@ -27,6 +27,19 @@ export interface BasePlaceResolverOptions {
    * this so a moved base place fails the build instead of silently shipping.
    */
   frozen?: boolean;
+  /**
+   * Re-resolve `"saved"`/`"published"` pins instead of reusing the locked
+   * answer, and write what comes back.
+   *
+   * This is what makes a watch-dispatched rebuild do anything. The lock holds a
+   * keyword pin still until `deploy version upgrade` moves it, so a build
+   * triggered *because* the base place moved would otherwise download the
+   * version it was already locked to and republish an identical place. Numeric
+   * pins are untouched — those are a deliberate "hold still".
+   *
+   * Mutually exclusive with `frozen`, which says the opposite thing.
+   */
+  refresh?: boolean;
 }
 
 interface TrackedLock {
@@ -54,6 +67,7 @@ interface TrackedLock {
 export class BasePlaceResolver {
   private _source: PlaceVersionSource;
   private _frozen: boolean;
+  private _refresh: boolean;
   // Keyed on the promise, not the resolved value: concurrent callers for one
   // package must share the same TrackedLock, or whichever finishes second
   // replaces the first and its recorded entries are never written.
@@ -61,12 +75,23 @@ export class BasePlaceResolver {
   private _inflight = new Map<string, Promise<number>>();
 
   constructor(options: BasePlaceResolverOptions) {
+    if (options.frozen && options.refresh) {
+      throw new Error(
+        'A base place resolver cannot be both frozen and refreshing: one ' +
+          'forbids resolving base places, the other forces it.'
+      );
+    }
     this._source = options.source;
     this._frozen = options.frozen ?? false;
+    this._refresh = options.refresh ?? false;
   }
 
   get frozen(): boolean {
     return this._frozen;
+  }
+
+  get refreshing(): boolean {
+    return this._refresh;
   }
 
   /**
@@ -92,7 +117,9 @@ export class BasePlaceResolver {
     const key = String(basePlace.placeId);
     const entry = tracked.lock.basePlaces[key];
 
-    if (entry && entry.from === versionType) {
+    // `refresh` deliberately falls through to a live lookup: the locked answer
+    // is exactly what a watch-triggered rebuild must not reuse.
+    if (entry && entry.from === versionType && !this._refresh) {
       return entry.version;
     }
 
@@ -137,6 +164,29 @@ export class BasePlaceResolver {
       tracked.dirty = true;
     }
     return version;
+  }
+
+  /**
+   * Read the version a base place currently resolves to, without recording
+   * anything. Returns undefined for a base place the lock does not answer.
+   *
+   * Watch registration uses this to say what it is watching *from*, and must not
+   * disturb the lock while doing so — asking a question is not a deploy.
+   */
+  async peekAsync(
+    packagePath: string,
+    basePlace: BasePlaceConfig
+  ): Promise<number | undefined> {
+    if (
+      basePlace.version != null &&
+      !isBasePlaceVersionKeyword(basePlace.version)
+    ) {
+      return basePlace.version;
+    }
+    const versionType = basePlace.version ?? DEFAULT_VERSION_TYPE;
+    const tracked = await this._getLockAsync(packagePath);
+    const entry = tracked.lock.basePlaces[String(basePlace.placeId)];
+    return entry?.from === versionType ? entry.version : undefined;
   }
 
   /**

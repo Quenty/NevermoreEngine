@@ -36,11 +36,31 @@ import {
   readPackageVersionAsync,
 } from '../../utils/nevermore-cli-utils.js';
 import {
+  formatTargetSelector,
+  isBasePlaceVersionKeyword,
   loadDeployConfigAsync,
+  parseTargetSelector,
+  parseWatchOption,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   toManifestPlaceInfo,
+  type BasePlaceResolver,
+  type DeployConfig,
 } from '@quenty/nevermore-deploy';
+import {
+  registerWatchesAsync,
+  type RegisterWatchesResult,
+} from '../../utils/watch/register-watches.js';
+import {
+  runLocalWatchLoopAsync,
+  type LocalWatchEntry,
+} from '../../utils/watch/local-watch-loop.js';
+import {
+  describeNotifyWatchFallback,
+  tryRegisterNotifyWatchesAsync,
+} from '../../utils/watch/register-notify-watches.js';
+import { runStreamWatchLoopAsync } from '../../utils/watch/stream-watch-loop.js';
+import { WebSocketWatchStream } from '../../utils/watch/websocket-watch-stream.js';
 import { handleInitAsync } from './deploy-init.js';
 import {
   handleVersionUpgradeAsync,
@@ -50,6 +70,48 @@ import {
 import { selectTargetAsync } from './select-target.js';
 
 const MULTI_PLACE_CONCURRENCY = 10;
+
+/**
+ * Which base places a local watch polls.
+ *
+ * Deliberately looser than the cloud plan. `watch` is a GitHub workflow path —
+ * a dispatch address — and nothing is dispatched locally, so requiring it would
+ * only stop a developer hot-reloading a place that never intends to use CI.
+ * `"saved"` is fair game too: the service cannot poll it yet, but this machine
+ * has Open Cloud credentials and can.
+ *
+ * An exact version pin is still excluded, for the same reason as always: it
+ * means "hold this still", so there is nothing to follow.
+ */
+async function _buildLocalWatchEntriesAsync(
+  config: DeployConfig,
+  targetName: string,
+  packagePath: string,
+  resolver: BasePlaceResolver
+): Promise<LocalWatchEntry[]> {
+  const entries: LocalWatchEntry[] = [];
+  for (const place of resolveDeployTargetPlaces(config, targetName)) {
+    const basePlace = place.basePlace;
+    if (basePlace == null) {
+      continue;
+    }
+    if (
+      basePlace.version != null &&
+      !isBasePlaceVersionKeyword(basePlace.version)
+    ) {
+      continue;
+    }
+    const versionType = basePlace.version ?? 'published';
+    entries.push({
+      label: formatTargetSelector({ targetName, placeName: place.name }),
+      universeId: basePlace.universeId,
+      placeId: basePlace.placeId,
+      versionType,
+      baseline: await resolver.peekAsync(packagePath, basePlace),
+    });
+  }
+  return entries;
+}
 
 export interface DeployArgs extends NevermoreGlobalArgs {
   apiKey?: string;
@@ -64,6 +126,8 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   placeFile?: string;
   output?: string;
   logs?: boolean;
+  watch?: string;
+  watchShareApiKey?: boolean;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -228,6 +292,19 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             describe: 'Show build/upload logs (not just on failure)',
             type: 'boolean',
             default: false,
+          })
+          .option('watch', {
+            describe:
+              'After deploying, register a cloud watch so this target rebuilds when its base place changes. ' +
+              'Takes the register endpoint URL, ending in the lease: https://<watch-service>/v1/register/7d',
+            type: 'string',
+          })
+          .option('watch-share-api-key', {
+            describe:
+              'Share the Open Cloud API key with the watch service, so it can poll a private base place. ' +
+              'Off by default — the key is stored by the service.',
+            type: 'boolean',
+            default: false,
           });
       },
       async (runArgs) => {
@@ -246,10 +323,10 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
   public handler = async () => {};
 
   private static async _handleRunAsync(args: DeployArgs): Promise<void> {
-    if (args.dryrun) {
-      OutputHelper.info(`[DRYRUN] Would build and upload`);
-      return;
-    }
+    // Parsed before anything is built so a typo'd duration fails immediately
+    // rather than after a full deploy has already shipped.
+    const watchOption =
+      args.watch == null ? undefined : parseWatchOption(args.watch);
 
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
@@ -300,6 +377,34 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           },
         ];
 
+    // Registering a watch is idempotent and derives entirely from committed
+    // config and the lock file, so it is safe to do for real on a dryrun — and
+    // doing it for real is the only way to exercise the watch path without
+    // shipping a build.
+    if (args.dryrun) {
+      OutputHelper.info('[DRYRUN] Would build and upload');
+      if (watchOption) {
+        OutputHelper.info(
+          '[DRYRUN] Registering the watch and firing it, to prove routing works. ' +
+            'Neither touches the deploy.'
+        );
+        const watchedTarget = parseTargetSelector(targetName).targetName;
+        await registerWatchesAsync({
+          option: watchOption,
+          monitorName: `${packageName}/${watchedTarget}`,
+          triggerAfterRegister: true,
+          candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
+            (place) => ({
+              targetName: watchedTarget,
+              packageName,
+              place,
+            })
+          ),
+        });
+      }
+      return;
+    }
+
     const publish = args.publish ?? false;
     const showLogs = args.logs ?? false;
 
@@ -323,9 +428,46 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       OutputHelper.info(`Using target '${targetName}'.`);
     }
 
-    const reporter = new CompositeReporter(
-      targetNames,
-      (state: LiveStateTracker) => {
+    const apiKey = await getApiKeyAsync(args);
+    const client = new OpenCloudClient({
+      apiKey,
+      rateLimiter: new RateLimiter(),
+    });
+
+    // Captured only for the success message printed after the run.
+    let publishedVersion: number | undefined;
+    let publishedPlaceId: number | undefined;
+
+    // One deploy, start to finish. Factored out because a local watch runs it
+    // again on every base place change, and each pass needs its own reporter,
+    // resolver and job context — sharing them across passes would replay a
+    // finished progress display and reuse an already-flushed lock.
+    const runDeployPassAsync = async (
+      refresh: boolean
+    ): Promise<{ failed: number; resolver: BasePlaceResolver }> => {
+      const reporter = _buildReporter();
+      // A rebuild triggered by the base place moving must re-resolve the pin,
+      // or it rebuilds the version it already shipped.
+      const basePlaceResolver = createBasePlaceResolver(client, {
+        frozenLockfile: refresh ? false : args.frozenLockfile,
+        refreshBasePlace: refresh || args.refreshBasePlace,
+      });
+      const context = new CloudJobContext(reporter, client, basePlaceResolver);
+
+      await reporter.startAsync();
+      let failed = 0;
+      try {
+        const results = await _runBatchAsync(context, reporter);
+        failed = results.summary.failed;
+      } finally {
+        await context.disposeAsync();
+      }
+      await reporter.stopAsync();
+      return { failed, resolver: basePlaceResolver };
+    };
+
+    function _buildReporter(): CompositeReporter {
+      return new CompositeReporter(targetNames, (state: LiveStateTracker) => {
         const reporters: Reporter[] = [];
         if (isMultiPlace) {
           reporters.push(
@@ -378,29 +520,11 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           );
         }
         return reporters;
-      }
-    );
+      });
+    }
 
-    const apiKey = await getApiKeyAsync(args);
-    const client = new OpenCloudClient({
-      apiKey,
-      rateLimiter: new RateLimiter(),
-    });
-    const context = new CloudJobContext(
-      reporter,
-      client,
-      createBasePlaceResolver(client, args)
-    );
-
-    await reporter.startAsync();
-
-    let exitCode = 0;
-    // Captured only for the single-place success message printed after the run.
-    let publishedVersion: number | undefined;
-    let publishedPlaceId: number | undefined;
-
-    try {
-      const results = await runBatchAsync<BatchTarget, BatchDeployResult>({
+    function _runBatchAsync(context: CloudJobContext, reporter: Reporter) {
+      return runBatchAsync<BatchTarget, BatchDeployResult>({
         items: batchTargets,
         concurrency: isMultiPlace ? MULTI_PLACE_CONCURRENCY : 1,
         reporter,
@@ -409,7 +533,6 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           const builtPlace = await context.buildPlaceAsync({
             target: buildTarget.target,
             outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
-            packagePath: buildTarget.path,
             packageName: buildTarget.name,
             overrides: isMultiPlace ? undefined : args,
           });
@@ -465,15 +588,121 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           };
         },
       });
-      if (results.summary.failed > 0) exitCode = 1;
+    }
+
+    let exitCode = 0;
+    let watchResult: RegisterWatchesResult | undefined;
+    const watchedTarget = parseTargetSelector(targetName).targetName;
+
+    try {
+      const first = await runDeployPassAsync(args.refreshBasePlace ?? false);
+      if (first.failed > 0) exitCode = 1;
+
+      // Only after a clean deploy: what happens next records the base place
+      // version that just shipped, which is not a fact yet if the deploy failed.
+      if (watchOption && first.failed === 0) {
+        if (isCI()) {
+          // The monitor is named for the whole target, so it has to carry every
+          // place in that target — not just the ones this invocation deployed.
+          // Re-registering replaces its watch list, so a narrowed selector
+          // (`integration.places.hub`) would otherwise delete the sibling
+          // places' watches. Places that did not deploy keep their lock baseline.
+          watchResult = await registerWatchesAsync({
+            option: watchOption,
+            // Scoped to this package and target, so deploying one package can
+            // never replace the watch list another package registered.
+            monitorName: `${packageName}/${watchedTarget}`,
+            robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
+            candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
+              (place) => ({
+                targetName: watchedTarget,
+                packageName,
+                place,
+              })
+            ),
+          });
+        } else {
+          // Locally the rebuild belongs here, not on a runner, so the watch
+          // asks to be told rather than to dispatch. Being told beats polling —
+          // no Open Cloud quota per developer, and the rebuild starts when the
+          // change lands — but polling still works everywhere, so it is what
+          // this falls back to.
+          const localEntries = await _buildLocalWatchEntriesAsync(
+            config,
+            watchedTarget,
+            cwd,
+            first.resolver
+          );
+          const redeployAsync = async () => {
+            const pass = await runDeployPassAsync(true);
+            if (pass.failed > 0) {
+              throw new Error('deploy failed');
+            }
+          };
+
+          const notify = await tryRegisterNotifyWatchesAsync({
+            option: watchOption,
+            monitorName: `${packageName}/${watchedTarget}`,
+            entries: localEntries,
+            robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
+          });
+
+          // Streaming is preferred but never required: whatever the reason it
+          // is unavailable, polling from here still works.
+          let pollInstead = true;
+          if (notify.success) {
+            const loop = await runStreamWatchLoopAsync({
+              entries: notify.entries,
+              stream: new WebSocketWatchStream({
+                registerUrl: watchOption.registerUrl,
+              }),
+              // The stream says a place moved; Open Cloud says what it moved
+              // to. The two speak different version vocabularies, and only this
+              // one matches what the lock records.
+              source: client,
+              monitorId: notify.monitorId,
+              credential: notify.credential,
+              redeployAsync,
+            });
+            if (loop.failures > 0) exitCode = 1;
+            // The service could not read any of these places — a private base
+            // place, say. This machine has credentials it does not, so the
+            // watch carries on here rather than waiting on a socket that will
+            // never say anything.
+            //
+            // A lapsed lease or a refused handshake ends the stream just as
+            // finally, and the user asked to keep watching either way — exiting
+            // there would report success while silently doing nothing.
+            pollInstead =
+              loop.unobservable || loop.monitorGone || loop.rejected;
+            if (pollInstead) {
+              OutputHelper.info(
+                'Watching from here instead, using your own Open Cloud key.'
+              );
+            }
+          } else if (notify.reason !== 'no_entries') {
+            OutputHelper.verbose(
+              `Polling instead of streaming: ${describeNotifyWatchFallback(
+                notify
+              )}.`
+            );
+          }
+
+          if (pollInstead) {
+            const loop = await runLocalWatchLoopAsync({
+              entries: localEntries,
+              source: client,
+              durationMs: watchOption.durationMs,
+              redeployAsync,
+            });
+            if (loop.failures > 0) exitCode = 1;
+          }
+        }
+      }
     } catch (err) {
       OutputHelper.error(err instanceof Error ? err.message : String(err));
       exitCode = 1;
-    } finally {
-      await context.disposeAsync();
     }
-
-    await reporter.stopAsync();
 
     if (publishedVersion !== undefined) {
       const placeUrl =
@@ -494,6 +723,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         );
         OutputHelper.hint('Use --publish to make it live in game.');
       }
+    }
+
+    if (watchResult && watchResult.registered > 0) {
+      OutputHelper.hint(
+        'The watch rebuilds this target when its base place moves. Re-run ' +
+          'with --watch to renew the lease before it expires.'
+      );
     }
 
     if (exitCode !== 0) process.exit(exitCode);

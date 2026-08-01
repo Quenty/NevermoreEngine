@@ -321,8 +321,23 @@ export abstract class BaseJobContext implements JobContext {
     // skip the cleanup above it.
     if (this._basePlaceResolver) {
       try {
-        for (const lockPath of await this._basePlaceResolver.flushAsync()) {
+        const written = await this._basePlaceResolver.flushAsync();
+        for (const lockPath of written) {
           OutputHelper.info(`Updated ${lockPath}`);
+        }
+        // A refreshed pin only survives if the lock is committed. Nothing here
+        // commits it, so on a CI runner the file is written and then thrown
+        // away — and the next build that does not refresh reads the old
+        // version out of the repo and republishes the base place this run just
+        // moved past. Silent, and it looks like the watch never fired.
+        if (written.length > 0 && this._basePlaceResolver.refreshing) {
+          OutputHelper.warn(
+            `--refresh-base-place moved ${written.length} lock file${
+              written.length === 1 ? '' : 's'
+            }. Commit the change, or the next build without ` +
+              `--refresh-base-place will rebuild the previous base place ` +
+              `version and revert this deploy.`
+          );
         }
       } catch (err) {
         OutputHelper.warn(

@@ -11,10 +11,17 @@ import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
  */
 export function createBasePlaceResolver(
   openCloudClient: OpenCloudClient,
-  args: { frozenLockfile?: boolean }
+  args: { frozenLockfile?: boolean; refreshBasePlace?: boolean }
 ): BasePlaceResolver {
+  if (args.frozenLockfile && args.refreshBasePlace) {
+    throw new Error(
+      '--frozen-lockfile and --refresh-base-place contradict each other: ' +
+        'one forbids resolving base places, the other forces it.'
+    );
+  }
   return new BasePlaceResolver({
     source: openCloudClient,
     frozen: args.frozenLockfile ?? false,
+    refresh: args.refreshBasePlace ?? false,
   });
 }

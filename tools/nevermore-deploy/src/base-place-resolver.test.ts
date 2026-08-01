@@ -333,6 +333,126 @@ describe('BasePlaceResolver', () => {
     });
   });
 
+  describe('refresh', () => {
+    it('re-resolves past a matching lock entry and records the new version', async () => {
+      await writeLockAsync({
+        lockfileVersion: 1,
+        basePlaces: { '33': { version: 100, from: 'published' } },
+      });
+      const source = makeSource();
+      const resolver = new BasePlaceResolver({ source, refresh: true });
+
+      expect(
+        await resolver.resolveAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBe(158);
+      expect(source.resolveLatestPlaceVersionAsync).toHaveBeenCalled();
+
+      expect(await resolver.flushAsync()).toEqual([
+        resolveDeployLockPath(packageDir),
+      ]);
+      expect((await readLockAsync())?.basePlaces['33']).toEqual({
+        version: 158,
+        from: 'published',
+      });
+    });
+
+    it('leaves a numeric pin alone', async () => {
+      const source = makeSource();
+      const resolver = new BasePlaceResolver({ source, refresh: true });
+
+      expect(
+        await resolver.resolveAsync(packageDir, makeBasePlace({ version: 42 }))
+      ).toBe(42);
+      expect(source.resolveLatestPlaceVersionAsync).not.toHaveBeenCalled();
+    });
+
+    it('does not dirty the lock when the version has not moved', async () => {
+      await writeLockAsync({
+        lockfileVersion: 1,
+        basePlaces: { '33': { version: 158, from: 'published' } },
+      });
+      const resolver = new BasePlaceResolver({
+        source: makeSource(),
+        refresh: true,
+      });
+
+      await resolver.resolveAsync(
+        packageDir,
+        makeBasePlace({ version: 'published' })
+      );
+
+      expect(await resolver.flushAsync()).toEqual([]);
+    });
+
+    it('cannot be combined with frozen', () => {
+      expect(
+        () =>
+          new BasePlaceResolver({
+            source: makeSource(),
+            frozen: true,
+            refresh: true,
+          })
+      ).toThrowError(/cannot be both frozen and refreshing/);
+    });
+  });
+
+  describe('peekAsync', () => {
+    it('reads a locked version without recording anything', async () => {
+      await writeLockAsync({
+        lockfileVersion: 1,
+        basePlaces: { '33': { version: 100, from: 'published' } },
+      });
+      const source = makeSource();
+      const resolver = new BasePlaceResolver({ source });
+
+      expect(
+        await resolver.peekAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBe(100);
+      expect(source.resolveLatestPlaceVersionAsync).not.toHaveBeenCalled();
+      expect(await resolver.flushAsync()).toEqual([]);
+    });
+
+    it('returns undefined when the lock tracks a different version type', async () => {
+      await writeLockAsync({
+        lockfileVersion: 1,
+        basePlaces: { '33': { version: 100, from: 'published' } },
+      });
+      const resolver = new BasePlaceResolver({ source: makeSource() });
+
+      expect(
+        await resolver.peekAsync(
+          packageDir,
+          makeBasePlace({ version: 'saved' })
+        )
+      ).toBeUndefined();
+    });
+
+    it('returns undefined when the lock has no entry', async () => {
+      const resolver = new BasePlaceResolver({ source: makeSource() });
+
+      expect(
+        await resolver.peekAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBeUndefined();
+    });
+
+    it('returns a numeric pin as-is', async () => {
+      const resolver = new BasePlaceResolver({ source: makeSource() });
+
+      expect(
+        await resolver.peekAsync(packageDir, makeBasePlace({ version: 7 }))
+      ).toBe(7);
+    });
+  });
+
   it('lets a later attempt retry after a failed lookup', async () => {
     const source = {
       resolveLatestPlaceVersionAsync: vi

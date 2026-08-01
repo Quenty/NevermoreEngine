@@ -67,9 +67,10 @@ These apply to every command:
 | Flag | Description |
 |------|-------------|
 | `--yes` | Never prompt; fail instead of asking. Use in CI and scripts. |
-| `--dryrun` | Describe what would happen without touching the file system or Roblox. |
+| `--dryrun` | Describe what would happen without touching the file system or Roblox. Exception: `--watch` registration still runs for real, since it has no deploy side effects and that is how you test it. |
 | `--verbose` | Show intermediate output (building, uploading, credential loading). Also disables the live spinner in favor of plain, scrollable logs. |
 | `--frozen-lockfile` | Fail instead of resolving a base place version that `deploy.nevermore.lock.json` doesn't already pin. Off by default, including in CI. See [The lock file](deploy.md#the-lock-file). |
+| `--refresh-base-place` | Re-resolve `"saved"`/`"published"` base place pins instead of reusing the locked version, and write the result back. Required in watch-triggered builds, which would otherwise rebuild the version they already shipped. Rejected alongside `--frozen-lockfile`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
 | `--help` | Show help for the current command. |
 | `--version` | Print the installed CLI version. |
 
@@ -182,7 +183,7 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--create-place` | Auto-create a new place in the universe (uses cookie auth). |
 | `--force` | Overwrite an existing `deploy.nevermore.json`. |
 
-**`nevermore deploy run [target]`** — builds and uploads a target. Defaults to the only target if there's one, otherwise `test`.
+**`nevermore deploy run [target]`** — builds and uploads a target. Defaults to the only target if there's one, otherwise `test`. `target` may narrow to one place of a multi-place target with the `<target>.places.<place>` form (e.g. `integration.places.hub`).
 
 | Flag | Description |
 |------|-------------|
@@ -192,6 +193,8 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--place-file <path>` | Upload a pre-built `.rbxl` instead of building via rojo (single-place targets only). |
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
+| `--watch <url>` | After a successful deploy: in CI, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll a private base place. Off by default. |
 
 **`nevermore deploy version upgrade [target]`** — rolls every `basePlace` forward, so deploys pull a fixed, git-tracked base place instead of whatever is live. Numeric (and unpinned) base places are re-pinned in `deploy.nevermore.json`; base places tracking `"saved"` or `"published"` have their resolved version rewritten in `deploy.nevermore.lock.json` instead. Without a target it walks every target and prunes unreferenced lock entries. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
 
@@ -244,6 +247,8 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--logs` | Show build/upload logs for every package. |
 | `--output <file>` | Write JSON results to a file. |
 | `--api-key <key>` | Open Cloud API key. |
+| `--watch <duration\|url>` | After deploying, register one monitor named for the target, holding a watch for **every** package with that target — not just the changed ones, since a re-apply replaces the monitor's whole list. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll private base places. Off by default. |
 
 ### `nevermore tools`
 
