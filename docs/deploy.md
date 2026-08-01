@@ -205,7 +205,7 @@ A "saved" version is uploaded but not visible to players. You can publish it lat
 | `--place-id <id>` | Override the target's `placeId` |
 | `--place-file <path>` | Skip the rojo build and upload an existing `.rbxl` instead |
 | `--output <path>` | Write a JSON record of the deploy result to this path |
-| `--watch <duration\|url>` | After a successful deploy, register a watch so this target rebuilds when its base place changes. See [Rebuilding when the base place changes](#rebuilding-when-the-base-place-changes). |
+| `--watch <url>` | After a successful deploy, register a watch so this target rebuilds when its base place changes. Takes the register endpoint URL, ending in the lease. See [Rebuilding when the base place changes](#rebuilding-when-the-base-place-changes). |
 
 Global flags (available on every `nevermore` command):
 
@@ -425,7 +425,7 @@ nevermore deploy run --watch https://watch.example.com/v1/register/7d/
 nevermore batch deploy --watch https://watch.example.com/v1/register/7d
 ```
 
-In CI, set it from a secret alongside the dispatch token. A bare duration with no endpoint configured fails immediately, naming the variable.
+In CI, keep the host in a secret and interpolate it into the argument, alongside the dispatch token. A value that is not a URL, or a URL not ending in a lease, is refused before the deploy runs rather than after it has shipped.
 
 ### Locally, `--watch` rebuilds here instead
 
@@ -499,7 +499,7 @@ would turn a command that watches locally into one that quietly ships a token.
 
 #### When it polls instead
 
-Streaming needs a watch service and a GitHub identity to register under. When either is missing, `--watch` falls back to polling Open Cloud directly from here — slower to notice a change and it spends your own quota, but it works with no service at all. Run with `--verbose` to see which mode you got and why.
+Streaming needs a watch service and a GitHub identity to register under. When either is missing, `--watch` falls back to polling Open Cloud directly from here — slower to notice a change and it spends your own quota, but it works with no service at all. It says which mode you got, and why, whenever it is not the streaming one.
 
 It falls back when:
 
@@ -670,7 +670,7 @@ The service's source carries a `versionType`, and the CLI sends the one your `ba
   "published" to make it watchable.
 ```
 
-The rest of the monitor registers normally. When the service gains support, flipping `SAVED_WATCH_SUPPORTED` in `watch-config.ts` is the only change needed.
+The rest of the monitor registers normally. Sharing a key is what lifts this — `buildWatchPlan` gates it on whether the run is credentialed.
 
 ## Batch deploys
 

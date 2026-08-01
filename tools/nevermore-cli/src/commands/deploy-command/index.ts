@@ -735,8 +735,12 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
               );
             }
           } else if (notify.reason !== 'no_entries') {
-            OutputHelper.verbose(
-              `Polling instead of streaming: ${describeNotifyWatchFallback(
+            // Not cosmetic, so not verbose-only: polling spends this machine's
+            // Open Cloud quota on a timer and notices a change up to an
+            // interval late, and the usual cause is one flag away from being
+            // fixed. A user who never sees why cannot choose.
+            OutputHelper.info(
+              `Watching by polling rather than streaming: ${describeNotifyWatchFallback(
                 notify
               )}.`
             );

@@ -1,10 +1,16 @@
 /**
- * Everything that reads or writes `deploy.nevermore.json`.
+ * The deploy config format, and the rules that read it.
  *
- * This package is the single owner of the deploy config format. It is schema
- * and policy only — no network, no CLI framework, and no file access beyond the
- * config files themselves — so the rules stay identical no matter which command
- * (or which repo) is asking.
+ * This package is the single owner of `deploy.nevermore.json` and its lock
+ * file: schema, validation, target selectors, base place version resolution,
+ * and watch policy. Schema and policy only — no network, no CLI framework, and
+ * no file access beyond the config files themselves — so the rules stay
+ * identical no matter which command, or which repo, is asking.
+ *
+ * It reaches the outside world through three ports, each implemented in the
+ * CLI: `PlaceVersionSource`, `WatchRegistry`, and `WatchStream`. The watch
+ * types are declared here so the vocabulary a config implies and the vocabulary
+ * sent to a watch service cannot drift apart.
  */
 export {
   BASE_PLACE_VERSION_KEYWORDS,

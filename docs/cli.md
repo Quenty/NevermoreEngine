@@ -248,7 +248,7 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--logs` | Show build/upload logs for every package. |
 | `--output <file>` | Write JSON results to a file. |
 | `--api-key <key>` | Open Cloud API key. |
-| `--watch <duration\|url>` | After deploying, register one monitor named for the target, holding a watch for **every** package with that target — not just the changed ones, since a re-apply replaces the monitor's whole list. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch <url>` | After deploying, register one monitor named for the target, holding a watch for **every** package with that target — not just the changed ones, since a re-apply replaces the monitor's whole list. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
 | `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll private base places. Off by default. |
 
 ### `nevermore tools`
