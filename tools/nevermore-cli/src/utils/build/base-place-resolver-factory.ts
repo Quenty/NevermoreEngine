@@ -9,6 +9,28 @@ import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
  * policy. `OpenCloudClient` satisfies the resolver's `PlaceVersionSource` port
  * structurally — the deploy-config package never learns about Open Cloud.
  */
+/**
+ * A resolver that can only answer from the lock file.
+ *
+ * Watch registration reads baselines with `peekAsync`, which never leaves disk,
+ * so registering needs no Open Cloud credentials. A dryrun has no client to
+ * build a real resolver from and must not acquire one just to register — and if
+ * some future caller does ask this to resolve, throwing beats quietly reaching
+ * the network on a dryrun.
+ */
+export function createLockOnlyBasePlaceResolver(): BasePlaceResolver {
+  return new BasePlaceResolver({
+    source: {
+      resolveLatestPlaceVersionAsync: async () => {
+        throw new Error(
+          'This resolver answers from deploy.nevermore.lock.json only and ' +
+            'cannot reach Open Cloud.'
+        );
+      },
+    },
+  });
+}
+
 export function createBasePlaceResolver(
   openCloudClient: OpenCloudClient,
   args: { frozenLockfile?: boolean; refreshBasePlace?: boolean }

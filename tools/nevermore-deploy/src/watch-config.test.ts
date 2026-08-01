@@ -216,10 +216,10 @@ describe('buildWatchPlan', () => {
     expect(plan.skipped).toEqual([]);
   });
 
-  // The service accepts versionType "saved" in its schema but refuses it at
-  // registration, and that refusal fails the whole request — so it has to be
-  // caught here rather than sent.
-  it('skips a base place tracking saved, which the service cannot poll yet', () => {
+  // Reading anonymously, the service sees asset delivery, which reports
+  // published content only — it refuses "saved" at registration, and one
+  // refusal fails the whole request, taking every unrelated watch with it.
+  it('skips a "saved" base place when no key is shared', () => {
     const plan = buildWatchPlan('integration', [
       makePlace({
         name: 'hub',
@@ -230,7 +230,46 @@ describe('buildWatchPlan', () => {
 
     expect(plan.entries).toEqual([]);
     expect(plan.skipped).toEqual([
-      { selector: 'integration.places.hub', reason: 'saved-not-supported' },
+      { selector: 'integration.places.hub', reason: 'saved-needs-api-key' },
+    ]);
+  });
+
+  // A shared Open Cloud key selects a credentialed driver that reads version
+  // history, which is where a saved-but-unpublished version is visible at all.
+  it('watches a "saved" base place when a key is shared', () => {
+    const plan = buildWatchPlan(
+      'integration',
+      [
+        makePlace({
+          name: 'hub',
+          watch: '.github/workflows/build.yml',
+          basePlace: { universeId: 10, placeId: 20, version: 'saved' },
+        }),
+      ],
+      { credentialed: true }
+    );
+
+    expect(plan.skipped).toEqual([]);
+    expect(plan.entries).toHaveLength(1);
+  });
+
+  // A key changes what can be *seen*, not what it means to hold a version
+  // still. A numeric pin is still the opposite of watching.
+  it('still skips an exact pin even with a key', () => {
+    const plan = buildWatchPlan(
+      'integration',
+      [
+        makePlace({
+          name: 'hub',
+          watch: '.github/workflows/build.yml',
+          basePlace: { universeId: 10, placeId: 20, version: 158 },
+        }),
+      ],
+      { credentialed: true }
+    );
+
+    expect(plan.skipped).toEqual([
+      { selector: 'integration.places.hub', reason: 'pinned-base-place' },
     ]);
   });
 

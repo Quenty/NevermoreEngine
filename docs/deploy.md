@@ -283,7 +283,7 @@ A number holds the base place still. Sometimes you want the opposite: follow the
 
 `"published"` is the useful default for a shared base place: the team can save work-in-progress in Studio all day without it leaking into a deploy, and publishing the base place is the deliberate act that ships it. `"saved"` is for a Team Create place where saving *is* how content is handed off, and nobody publishes the base place at all.
 
-One caveat if you also want [`--watch`](#rebuilding-when-the-base-place-changes): the watch service cannot poll `"saved"` yet, so a place tracking it deploys normally but is left out of watch registration.
+One caveat if you also want [`--watch`](#rebuilding-when-the-base-place-changes): the watch service can only see `"saved"` versions when you share an Open Cloud key, so without `--watch-share-api-key` a place tracking it deploys normally but is left out of watch registration.
 
 A keyword says which end of the base place's history to follow — not that it is re-checked on every build. The first deploy resolves it against the place's version history (newest-first, so it stays cheap even on a place with tens of thousands of versions) and writes the answer to the [lock file](#the-lock-file); later deploys reuse that, with no network call, until `nevermore deploy version upgrade` moves it. That is what keeps a keyword pin reproducible: the keyword is the intent, the lock is the fact.
 
@@ -455,18 +455,32 @@ Rebuilds re-resolve the pin automatically, so you don't need `--refresh-base-pla
 
 **Pick a short lease locally.** Holding the connection keeps the watch alive, so the lease is only how long it outlives a dropped link — not how long you get to work. a lease of `30m` and then leaving the terminal open all day is the intended shape: the watch lapses shortly after you close it, instead of being polled for a week.
 
-#### The base place has to be publicly readable
+#### A private base place needs `--watch-share-api-key`
 
-The watch service observes a place through Roblox's asset-delivery endpoint, which takes no
-credentials — so a base place that is private or otherwise not publicly readable answers
-`401 Authentication required to access Asset.` and the watch never fires. It shows up as a
-`poll-failed` event on the monitor rather than as a registration error, because nothing is wrong
-with the config.
+How the service observes a place depends on whether you share an Open Cloud key, and that decides
+three things at once:
 
-`--watch-share-api-key` does not currently help: the service stores the Open Cloud key but has no
-credentialed driver to poll with yet, which is the same gap that keeps `"saved"` unsupported. Until
-there is one, the cloud path needs a base place anyone can read. Local polling has no such limit —
-your machine authenticates with your own key.
+| | Without a key | With `--watch-share-api-key` |
+|---|---|---|
+| How it reads | Roblox asset delivery, anonymously | Place version history, as you |
+| Private base place | `401`, never fires | Readable |
+| `basePlace.version: "saved"` | Refused at registration | Watchable |
+| Versions written in | A content hash | The same place version your lock holds |
+
+Without a key, a private base place shows up as a `poll-failed` event on the monitor rather than a
+registration error — nothing is wrong with the config, the service simply cannot see the place. The
+CLI notices and falls back to watching from here, since your machine has credentials the service
+doesn't.
+
+The last row is the one with a non-obvious consequence. Reading anonymously, the service's versions
+are content hashes and your lock file's are place versions, so no baseline can be sent — the first
+poll adopts whatever is current. That is fine for a place that just deployed, but it means a place
+that *didn't* deploy this run silently forgets a change that already happened. Share a key and the
+two sides speak the same language, so `batch deploy --watch` sends each package's locked version and
+the service notices what it missed.
+
+The key is stored by the service, encrypted, and only ever used to read version history. It is off
+by default.
 
 #### When it polls instead
 
@@ -476,7 +490,7 @@ It falls back when:
 
 - the service refuses the registration, or cannot be reached;
 - there is no `NEVERMORE_WATCH_TOKEN`/`GITHUB_TOKEN`, or the checkout has no GitHub remote — registering needs a write-scoped PAT even though a notify never spends it, because the repository is the only identity the service has;
-- any watched place tracks `"saved"`, which the service can't poll. The whole run falls back rather than splitting, so two loops can't disagree about what's current.
+- any watched place tracks `"saved"` and no key is shared. The whole run falls back rather than splitting, so two loops can't disagree about what's current.
 
 ### Testing a watch with `--dryrun`
 

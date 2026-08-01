@@ -1,10 +1,12 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
+  WATCH_BASELINE_KIND,
   WATCH_INPUT_NAME,
   buildWatchPlan,
   describeWatchPlanSkip,
   parseTargetSelector,
   sanitizeWatchName,
+  type BasePlaceResolver,
   type DeployTarget,
   type WatchEntry,
   type WatchOption,
@@ -40,6 +42,8 @@ export interface WatchCandidate {
   targetName: string;
   /** npm package name, used to keep watch names unique across a batch. */
   packageName: string;
+  /** Package directory, used to read the base place version out of the lock. */
+  packagePath: string;
   place: DeployTarget;
 }
 
@@ -53,8 +57,13 @@ export interface RegisterWatchesOptions {
    */
   monitorName: string;
   candidates: WatchCandidate[];
-  /** Open Cloud key to share, so the service can poll private base places. */
+  /**
+   * Open Cloud key to share, so the service can read private base places, see
+   * `"saved"` versions, and report versions in the same vocabulary as the lock.
+   */
   robloxApiKey?: string;
+  /** Reads base place versions out of the lock, for baselines. */
+  resolver: BasePlaceResolver;
   /**
    * Force a dispatch immediately after registering, ignoring drift.
    *
@@ -90,7 +99,9 @@ export interface RegisterWatchesResult {
 export async function registerWatchesAsync(
   options: RegisterWatchesOptions
 ): Promise<RegisterWatchesResult> {
-  const { option, candidates } = options;
+  const { option, candidates, resolver } = options;
+  // What the service can see, and what language it will answer in.
+  const credentialed = options.robloxApiKey != null;
 
   const watches: DispatchWatchEntry[] = [];
   const skipped: string[] = [];
@@ -102,7 +113,9 @@ export async function registerWatchesAsync(
 
   for (const candidate of candidates) {
     const { targetName } = parseTargetSelector(candidate.targetName);
-    const plan = buildWatchPlan(targetName, [candidate.place]);
+    const plan = buildWatchPlan(targetName, [candidate.place], {
+      credentialed,
+    });
     for (const skip of plan.skipped) {
       const described = describeWatchPlanSkip(skip);
       skipped.push(described);
@@ -111,7 +124,15 @@ export async function registerWatchesAsync(
       }
     }
     for (const entry of plan.entries) {
-      watches.push(_buildWatchEntry(candidate, targetName, entry));
+      watches.push(
+        await _buildWatchEntryAsync(
+          resolver,
+          candidate,
+          targetName,
+          entry,
+          credentialed
+        )
+      );
     }
   }
 
@@ -294,12 +315,26 @@ function _disambiguateWatchNames(watches: WatchEntry[]): void {
   }
 }
 
-function _buildWatchEntry(
+async function _buildWatchEntryAsync(
+  resolver: BasePlaceResolver,
   candidate: WatchCandidate,
   targetName: string,
-  entry: { selector: string; workflow: string }
-): DispatchWatchEntry {
+  entry: { selector: string; workflow: string },
+  credentialed: boolean
+): Promise<DispatchWatchEntry> {
   const basePlace = candidate.place.basePlace!;
+
+  // From the lock, not the network: this is the version the build we just
+  // shipped was made from. A package that did not deploy this run still has a
+  // lock entry, which is exactly the right baseline for it — it is how the
+  // service notices a change that happened while that package was untouched.
+  //
+  // Only when a key is shared. Reading anonymously, the service compares
+  // asset-delivery content hashes, and a place version number could never match
+  // one — it would read as drift and rebuild on the first poll.
+  const baseline = credentialed
+    ? await resolver.peekAsync(candidate.packagePath, basePlace)
+    : undefined;
 
   return {
     name: sanitizeWatchName(
@@ -313,17 +348,14 @@ function _buildWatchEntry(
       // builds with, so the watch observes exactly what the build used.
       versionType: basePlace.version === 'saved' ? 'saved' : 'published',
     },
-    // Deliberately no `baselineVersion`.
-    //
-    // The service's version token for a Roblox place is the asset-delivery
-    // content hash, and it compares tokens by string equality. Our lock file
-    // holds the Open Cloud place version — a number, in a different vocabulary
-    // — so handing it over would never match, and the first poll would read it
-    // as drift and dispatch a rebuild of something already current.
-    //
-    // Omitting it means the first poll adopts what it observes, which is what
-    // supplying a baseline was meant to achieve. The only thing given up is a
-    // change landing in the seconds between the deploy and this call.
+    ...(baseline == null
+      ? {}
+      : {
+          baselineVersion: String(baseline),
+          // Declared so a vocabulary mismatch is a 422 at the moment the
+          // manifest changed, rather than one silent rebuild later.
+          baselineVersionKind: WATCH_BASELINE_KIND,
+        }),
     action: {
       type: 'github-workflow-dispatch',
       workflow: entry.workflow,

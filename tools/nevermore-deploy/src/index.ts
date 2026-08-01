@@ -50,6 +50,7 @@ export {
 } from './target-selector.js';
 
 export {
+  WATCH_BASELINE_KIND,
   WATCH_INPUT_NAME,
   buildWatchPlan,
   describeWatchPlanSkip,
@@ -63,6 +64,7 @@ export {
   type WatchOption,
   type WatchPlan,
   type WatchPlanEntry,
+  type WatchPlanOptions,
   type WatchPlanSkip,
   type WatchRegistrationRequest,
   type WatchRegistrationResult,

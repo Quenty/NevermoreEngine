@@ -232,6 +232,38 @@ describe('HttpWatchRegistry', () => {
       );
     });
 
+    // Observed against prod: a notify-only monitor was refused 422 because the
+    // Open Cloud key lacked a scope, and the reply appended "Referenced: ." plus
+    // advice about a workflow path — under a message that had nothing to do with
+    // workflows. 422 now covers several causes and the service names which.
+    it('adds no workflow advice when the monitor dispatches none', async () => {
+      const request = makeRequest();
+      request.watches = request.watches.map((watch) => ({
+        ...watch,
+        action: { type: 'notify' as const, payload: { target: 'x' } },
+      }));
+
+      await expect(
+        registryReturning(
+          makeResponse(
+            JSON.stringify({
+              error: 'The Open Cloud key is not allowed to read place 1 (403).',
+            }),
+            { status: 422, statusText: 'Unprocessable Entity' }
+          )
+        ).registerAsync(request)
+      ).rejects.toThrowError(/not allowed to read place 1/);
+
+      await expect(
+        registryReturning(
+          makeResponse(JSON.stringify({ error: 'nope' }), {
+            status: 422,
+            statusText: 'Unprocessable Entity',
+          })
+        ).registerAsync(request)
+      ).rejects.not.toThrowError(/Referenced|workflow/);
+    });
+
     it('surfaces the API error body', async () => {
       await expect(
         registryReturning(

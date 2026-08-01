@@ -228,8 +228,11 @@ function _describeFailure(
         'Release monitors you no longer need, or let their leases expire.'
       );
     case 422: {
-      // Only a dispatching watch names a workflow, and only a workflow that is
-      // missing produces this — a notify-only monitor cannot get here.
+      // 422 is the service's "your config cannot work" answer, and it covers
+      // several unrelated causes now — a missing workflow, an Open Cloud key
+      // without universe.place:read, a "saved" watch with no key, a baseline in
+      // the wrong vocabulary. Its own message names which, so the only thing
+      // worth adding is a remedy that could not already be in it.
       const workflows = [
         ...new Set(
           request.watches.flatMap((w) =>
@@ -239,9 +242,14 @@ function _describeFailure(
           )
         ),
       ];
+      // Volunteering a workflow remedy for a monitor that dispatches none once
+      // produced "Referenced: ." under a message about an API key scope.
+      if (workflows.length === 0) {
+        return compose('The watch service rejected the configuration.');
+      }
       return compose(
         `A referenced workflow does not exist in ${request.repository}.`,
-        `Referenced: ${workflows.join(', ')}. The "watch" path in ` +
+        `Workflows referenced: ${workflows.join(', ')}. A "watch" path in ` +
           'deploy.nevermore.json must name a workflow that exists on the ' +
           'dispatched ref.'
       );

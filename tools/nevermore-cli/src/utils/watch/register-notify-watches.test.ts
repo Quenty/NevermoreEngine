@@ -72,6 +72,7 @@ describe('tryRegisterNotifyWatchesAsync', () => {
     // content hash) by string equality, so the lock's Open Cloud version number
     // would read as drift on the first poll. The `ready` reconcile covers it.
     expect(request.watches[0]!.baselineVersion).toBeUndefined();
+    expect(request.watches[0]!.baselineVersionKind).toBeUndefined();
     expect(request.watches[0]!.source).toEqual({
       type: 'roblox-place',
       universeId: 10,
@@ -163,6 +164,25 @@ describe('tryRegisterNotifyWatchesAsync', () => {
 describe('tryRegisterNotifyWatchesAsync falling back', () => {
   // Every failure here has a working answer already — poll Open Cloud from this
   // machine — so none of them may throw.
+  it('watches a "saved" place when a key is shared', async () => {
+    const registry = makeRecordingRegistry();
+
+    const result = await tryRegisterNotifyWatchesAsync({
+      option: watchOption(),
+      monitorName: 'egg-hunt/integration',
+      entries: [makeEntry({ versionType: 'saved', baseline: 158 })],
+      robloxApiKey: 'secret',
+      createRegistry: registry.create,
+    });
+
+    expect(result.success).toBe(true);
+    const watch = registry.requests[0]!.watches[0]!;
+    expect(watch.source.versionType).toBe('saved');
+    // Same vocabulary once a key is in play, so the lock value is sendable.
+    expect(watch.baselineVersion).toBe('158');
+    expect(watch.baselineVersionKind).toBe('roblox-place-version');
+  });
+
   it('declines a "saved" base place the service cannot poll', async () => {
     const registry = makeRecordingRegistry();
 

@@ -145,18 +145,16 @@ export interface WatchPlanEntry {
 }
 
 /**
- * Whether the watch service can poll a `"saved"` base place yet.
+ * What the service writes versions in once it is reading with the caller's Open
+ * Cloud key: the same place version integer a publish returns and the lock file
+ * records. Declared on a watch so a vocabulary mismatch is refused at
+ * registration rather than discovered as one spurious rebuild later.
  *
- * Its source schema accepts `versionType: "saved"`, but registration refuses it
- * until a credentialed driver exists — a watch that could never fire is not
- * stored. That refusal is per-request, and a request carries every watch in the
- * monitor, so one `"saved"` place would fail the whole registration and take
- * every unrelated watch down with it. Filtering here keeps the blast radius to
- * the place that asked for it.
- *
- * Flip to `true` when the service supports it; nothing else needs to change.
+ * Without a key the service reads asset delivery instead and speaks content
+ * hashes, which nothing here can produce — hence no baseline at all on that
+ * path.
  */
-const SAVED_WATCH_SUPPORTED = false;
+export const WATCH_BASELINE_KIND = 'roblox-place-version';
 
 /** A place that declared no watch, or nothing to watch, and why it was left out. */
 export interface WatchPlanSkip {
@@ -165,7 +163,7 @@ export interface WatchPlanSkip {
     | 'no-watch-field'
     | 'no-base-place'
     | 'pinned-base-place'
-    | 'saved-not-supported';
+    | 'saved-needs-api-key';
 }
 
 /** Why a place was left out, in words a user can act on. */
@@ -180,11 +178,11 @@ export function describeWatchPlanSkip(skip: WatchPlanSkip): string {
         `${skip.selector} pins its basePlace to an exact version — ` +
         'change it to "published" to make it watchable'
       );
-    case 'saved-not-supported':
+    case 'saved-needs-api-key':
       return (
         `${skip.selector} tracks its basePlace as "saved", which the watch ` +
-        'service cannot poll yet — it watches published versions only. Track ' +
-        '"published" to make it watchable.'
+        'service can only see with an Open Cloud key. Pass ' +
+        '--watch-share-api-key, or track "published".'
       );
   }
 }
@@ -192,6 +190,19 @@ export function describeWatchPlanSkip(skip: WatchPlanSkip): string {
 export interface WatchPlan {
   entries: WatchPlanEntry[];
   skipped: WatchPlanSkip[];
+}
+
+export interface WatchPlanOptions {
+  /**
+   * Whether an Open Cloud key is being shared with the service.
+   *
+   * It decides what the service can see. Reading anonymously through asset
+   * delivery reports published content only, so a `"saved"` watch would poll
+   * cleanly and never fire — the service refuses it, and one refusal fails the
+   * whole request, taking every unrelated watch with it. Filtering here keeps
+   * the blast radius to the place that asked for it.
+   */
+  credentialed?: boolean;
 }
 
 /**
@@ -204,7 +215,8 @@ export interface WatchPlan {
  */
 export function buildWatchPlan(
   targetName: string,
-  places: DeployTarget[]
+  places: DeployTarget[],
+  options: WatchPlanOptions = {}
 ): WatchPlan {
   const entries: WatchPlanEntry[] = [];
   const skipped: WatchPlanSkip[] = [];
@@ -232,8 +244,8 @@ export function buildWatchPlan(
       skipped.push({ selector, reason: 'pinned-base-place' });
       continue;
     }
-    if (!SAVED_WATCH_SUPPORTED && place.basePlace.version === 'saved') {
-      skipped.push({ selector, reason: 'saved-not-supported' });
+    if (!options.credentialed && place.basePlace.version === 'saved') {
+      skipped.push({ selector, reason: 'saved-needs-api-key' });
       continue;
     }
     entries.push({ selector, workflow: place.watch, place });
@@ -301,10 +313,17 @@ export interface WatchEntry {
   source: WatchSource;
   /**
    * The version this watch was last built against — the resolved value from the
-   * lock file. Supplying it means registering never itself triggers a dispatch.
-   * Omitted, the first poll adopts whatever it observes, which behaves the same.
+   * lock file, and only sendable when the service is reading in the same
+   * vocabulary (see `WATCH_BASELINE_KIND`).
+   *
+   * It matters most for a place that did *not* deploy this run: its lock still
+   * names an older version, so a baseline makes the service notice a change
+   * that already happened. Omitted, the first poll adopts whatever is current
+   * and that change is never seen.
    */
   baselineVersion?: string;
+  /** What `baselineVersion` is written in. A mismatch is refused at registration. */
+  baselineVersionKind?: string;
   action: WatchAction;
 }
 

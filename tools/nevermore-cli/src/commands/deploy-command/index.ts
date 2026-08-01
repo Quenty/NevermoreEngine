@@ -15,7 +15,10 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
-import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
+import {
+  createBasePlaceResolver,
+  createLockOnlyBasePlaceResolver,
+} from '../../utils/build/base-place-resolver-factory.js';
 import {
   type BatchDeployResult,
   createDeployCommentConfig,
@@ -301,7 +304,8 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           })
           .option('watch-share-api-key', {
             describe:
-              'Share the Open Cloud API key with the watch service, so it can poll a private base place. ' +
+              'Share the Open Cloud API key with the watch service, so it can read a private base place, ' +
+              'see "saved" versions, and report versions in the same vocabulary as the lock file. ' +
               'Off by default — the key is stored by the service.',
             type: 'boolean',
             default: false,
@@ -392,11 +396,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
         await registerWatchesAsync({
           option: watchOption,
           monitorName: `${packageName}/${watchedTarget}`,
+          resolver: createLockOnlyBasePlaceResolver(),
           triggerAfterRegister: true,
           candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
             (place) => ({
               targetName: watchedTarget,
               packageName,
+              packagePath: cwd,
               place,
             })
           ),
@@ -612,11 +618,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             // Scoped to this package and target, so deploying one package can
             // never replace the watch list another package registered.
             monitorName: `${packageName}/${watchedTarget}`,
+            resolver: first.resolver,
             robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
             candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
               (place) => ({
                 targetName: watchedTarget,
                 packageName,
+                packagePath: cwd,
                 place,
               })
             ),

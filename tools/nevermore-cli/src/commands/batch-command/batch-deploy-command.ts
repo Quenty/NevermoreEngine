@@ -28,7 +28,10 @@ import {
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
-import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
+import {
+  createBasePlaceResolver,
+  createLockOnlyBasePlaceResolver,
+} from '../../utils/build/base-place-resolver-factory.js';
 import {
   type BatchTarget,
   discoverAllTargetPackagesAsync,
@@ -130,7 +133,8 @@ export const batchDeployCommand: CommandModule<
       })
       .option('watch-share-api-key', {
         describe:
-          'Share the Open Cloud API key with the watch service, so it can poll private base places. ' +
+          'Share the Open Cloud API key with the watch service, so it can read private base places, ' +
+          'see "saved" versions, and report versions in the same vocabulary as the lock file. ' +
           'Off by default — the key is stored by the service.',
         type: 'boolean',
         default: false,
@@ -193,10 +197,12 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       await registerWatchesAsync({
         option: watchOption,
         monitorName: targetName,
+        resolver: createLockOnlyBasePlaceResolver(),
         triggerAfterRegister: true,
         candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
           targetName,
           packageName: buildTarget.packageName,
+          packagePath: buildTarget.path,
           place: buildTarget.target,
         })),
       });
@@ -363,10 +369,12 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       await registerWatchesAsync({
         option: watchOption,
         monitorName: targetName,
+        resolver: basePlaceResolver,
         robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
         candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
           targetName,
           packageName: buildTarget.packageName,
+          packagePath: buildTarget.path,
           place: buildTarget.target,
         })),
       });

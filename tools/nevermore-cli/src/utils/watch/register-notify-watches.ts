@@ -1,5 +1,6 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
+  WATCH_BASELINE_KIND,
   WATCH_INPUT_NAME,
   sanitizeWatchName,
   type WatchEntry,
@@ -60,11 +61,15 @@ export async function tryRegisterNotifyWatchesAsync(
     return { success: false, reason: 'no_entries' };
   }
 
-  // The service refuses `"saved"` at registration, and one request carries the
-  // whole monitor, so a single such place would fail all of them. Rather than
-  // watch some places one way and some the other, the whole run falls back to
-  // polling — which handles every version type this machine has credentials for.
-  const unwatchable = entries.filter((e) => e.versionType !== 'published');
+  // Without a shared key the service reads asset delivery, which reports
+  // published content only — it refuses `"saved"` at registration, and one
+  // refusal fails the whole request. Rather than watch some places one way and
+  // some the other, the whole run falls back to polling, which handles every
+  // version type this machine has credentials for.
+  const credentialed = options.robloxApiKey != null;
+  const unwatchable = credentialed
+    ? []
+    : entries.filter((e) => e.versionType !== 'published');
   if (unwatchable.length > 0) {
     return {
       success: false,
@@ -97,13 +102,17 @@ export async function tryRegisterNotifyWatchesAsync(
       type: 'roblox-place',
       universeId: entry.universeId,
       placeId: entry.placeId,
-      versionType: 'published',
+      versionType: entry.versionType,
     },
-    // No `baselineVersion`, for the same reason as a dispatching watch: the
-    // service compares its own token (an asset-delivery content hash) by string
-    // equality, and the lock's Open Cloud version number would never match it.
-    // The `ready` reconcile covers what a baseline was for — it re-checks every
-    // watch against Open Cloud on connect.
+    // Only when a key is shared do the two sides speak the same language; the
+    // `ready` reconcile covers this either way, by re-checking every watch
+    // against Open Cloud on connect.
+    ...(credentialed && entry.baseline != null
+      ? {
+          baselineVersion: String(entry.baseline),
+          baselineVersionKind: WATCH_BASELINE_KIND,
+        }
+      : {}),
     action: {
       type: 'notify',
       // Same key a dispatching watch puts the selector under, so the two modes
@@ -161,8 +170,8 @@ export function describeNotifyWatchFallback(
       return 'nothing to watch';
     case 'unwatchable_version_type':
       return (
-        `the watch service polls published versions only, and ` +
-        `${result.detail} tracks "saved"`
+        `${result.detail} tracks "saved", which the service can only see ` +
+        'with a shared Open Cloud key (--watch-share-api-key)'
       );
     case 'no_github_context':
       return 'this checkout has no GitHub repository to register under';

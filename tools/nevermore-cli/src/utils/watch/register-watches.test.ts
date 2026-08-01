@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import {
+  BasePlaceResolver,
   parseWatchOption,
   resolveDeployLockPath,
   saveDeployLockAsync,
@@ -31,6 +32,17 @@ function dispatchAction(
   const action = request.watches[index]!.action;
   expect(action.type).toBe('github-workflow-dispatch');
   return action as WatchWorkflowDispatchAction;
+}
+
+/** Answers from the lock only; the network source is never the right baseline. */
+function makeResolver(): BasePlaceResolver {
+  return new BasePlaceResolver({
+    source: {
+      resolveLatestPlaceVersionAsync: async () => {
+        throw new Error('a baseline must come from the lock, not the network');
+      },
+    },
+  });
 }
 
 let packageDir: string;
@@ -65,6 +77,7 @@ function makeCandidate(
   return {
     targetName: 'integration',
     packageName: '@quenty/egg-hunt-hub',
+    packagePath: packageDir,
     place: makePlace(),
     ...overrides,
   };
@@ -113,6 +126,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({ place: makePlace({ name: 'hub' }) }),
         makeCandidate({ place: makePlace({ name: 'lobby' }) }),
@@ -170,6 +184,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate({ targetName: 'integration.places.hub' })],
       createRegistry: registry.create,
     });
@@ -185,6 +200,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -201,6 +217,7 @@ describe('registerWatchesAsync', () => {
       registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         createRegistry: fakeRegistry({}),
       })
@@ -216,6 +233,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({
           place: makePlace({
@@ -250,6 +268,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({
           place: makePlace({
@@ -274,6 +293,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({
           place: makePlace({ basePlace: { universeId: 10, placeId: 20 } }),
@@ -293,6 +313,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({ place: makePlace({ name: 'hub' }) }),
         makeCandidate({ place: makePlace({ name: 'lobby' }) }),
@@ -312,6 +333,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: '@quenty/egg-hunt-hub/integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -324,17 +346,78 @@ describe('registerWatchesAsync', () => {
     );
   });
 
-  // The service's version token for a place is the asset-delivery content
-  // hash and it compares by string equality, so the lock's Open Cloud version
-  // number could only ever look like drift — dispatching a rebuild of what was
-  // just built. Omitting it makes the first poll adopt what is there.
-  it('never sends a baseline, whatever the lock holds', async () => {
+  // Reading anonymously, the service compares asset-delivery content hashes, and
+  // the lock's Open Cloud version number could only ever look like drift —
+  // dispatching a rebuild of what was just built. Omitting makes the first poll
+  // adopt what is there.
+  it('sends no baseline when no key is shared', async () => {
     const registry = makeRecordingRegistry();
     await writeLockAsync(20, 42);
 
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
+      candidates: [makeCandidate()],
+      createRegistry: registry.create,
+    });
+
+    expect(registry.requests[0]!.watches[0]!.baselineVersion).toBeUndefined();
+    expect(
+      registry.requests[0]!.watches[0]!.baselineVersionKind
+    ).toBeUndefined();
+  });
+
+  // With a key the service reads version history and answers in place versions
+  // — the same language the lock is written in — so a baseline finally means
+  // what it says.
+  it('sends the lock baseline, declared, when a key is shared', async () => {
+    const registry = makeRecordingRegistry();
+    await writeLockAsync(20, 42);
+
+    await registerWatchesAsync({
+      option: watchOption(),
+      monitorName: 'integration',
+      resolver: makeResolver(),
+      robloxApiKey: 'secret',
+      candidates: [makeCandidate()],
+      createRegistry: registry.create,
+    });
+
+    expect(registry.requests[0]!.watches[0]!.baselineVersion).toBe('42');
+    expect(registry.requests[0]!.watches[0]!.baselineVersionKind).toBe(
+      'roblox-place-version'
+    );
+  });
+
+  // This is what a baseline is for in a batch: a package that did not deploy
+  // this run still has a lock entry, and without it the first poll would adopt
+  // current and never notice the change that already happened.
+  it('takes the baseline from the lock, never the network', async () => {
+    const registry = makeRecordingRegistry();
+    await writeLockAsync(20, 42);
+
+    await registerWatchesAsync({
+      option: watchOption(),
+      monitorName: 'integration',
+      resolver: makeResolver(),
+      robloxApiKey: 'secret',
+      candidates: [makeCandidate()],
+      createRegistry: registry.create,
+    });
+
+    // makeResolver throws if anything reaches for the network.
+    expect(registry.requests[0]!.watches[0]!.baselineVersion).toBe('42');
+  });
+
+  it('omits the baseline when the lock has no entry for the place', async () => {
+    const registry = makeRecordingRegistry();
+
+    await registerWatchesAsync({
+      option: watchOption(),
+      monitorName: 'integration',
+      resolver: makeResolver(),
+      robloxApiKey: 'secret',
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -348,6 +431,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate({ place: makePlace({ watch: undefined }) })],
       createRegistry: registry.create,
     });
@@ -362,6 +446,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({
           place: makePlace({
@@ -382,6 +467,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [
         makeCandidate({ place: makePlace({ name: 'hub' }) }),
         makeCandidate({
@@ -403,6 +489,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -411,6 +498,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       robloxApiKey: 'oc-key',
       candidates: [makeCandidate()],
       createRegistry: registry.create,
@@ -422,6 +510,7 @@ describe('registerWatchesAsync', () => {
     const result = await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: fakeRegistry({
         registerAsync: async () => ({ changed: false }),
@@ -438,6 +527,7 @@ describe('registerWatchesAsync', () => {
       const result = await registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         triggerAfterRegister: true,
         createRegistry: fakeRegistry({
@@ -461,6 +551,7 @@ describe('registerWatchesAsync', () => {
       const result = await registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         createRegistry: fakeRegistry({
           registerAsync: async () => ({ monitorId: 'mon_7' }),
@@ -477,6 +568,7 @@ describe('registerWatchesAsync', () => {
       const result = await registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         triggerAfterRegister: true,
         createRegistry: fakeRegistry({
@@ -495,6 +587,7 @@ describe('registerWatchesAsync', () => {
       const result = await registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         triggerAfterRegister: true,
         createRegistry: fakeRegistry({
@@ -518,6 +611,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: parseWatchOption('https://watch.example.com/v1/register/2w/'),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: (url) => {
         urls.push(url);
@@ -541,6 +635,7 @@ describe('registerWatchesAsync', () => {
         registerWatchesAsync({
           option: watchOption(),
           monitorName: 'integration',
+          resolver: makeResolver(),
           candidates: [makeCandidate()],
           createRegistry: fakeRegistry({}),
         })
@@ -557,6 +652,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -575,6 +671,7 @@ describe('registerWatchesAsync', () => {
     await registerWatchesAsync({
       option: watchOption(),
       monitorName: 'integration',
+      resolver: makeResolver(),
       candidates: [makeCandidate()],
       createRegistry: registry.create,
     });
@@ -590,6 +687,7 @@ describe('registerWatchesAsync', () => {
       registerWatchesAsync({
         option: watchOption(),
         monitorName: 'integration',
+        resolver: makeResolver(),
         candidates: [makeCandidate()],
         createRegistry: fakeRegistry({}),
       })
