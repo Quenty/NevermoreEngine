@@ -482,6 +482,21 @@ the service notices what it missed.
 The key is stored by the service, encrypted, and only ever used to read version history. It is off
 by default.
 
+#### Giving it a GitHub token
+
+Set `NEVERMORE_WATCH_TOKEN` (or `GITHUB_TOKEN`), or pass `--watch-use-gh-auth` to use the token
+`gh` is already holding:
+
+```bash
+nevermore deploy run integration   --watch https://watch.example.com/v1/register/30m   --watch-use-gh-auth
+```
+
+Reading `gh` is opt-in rather than automatic, and deliberately so. Registering sends the token to
+the watch service and creates a monitor against your repository, so it should be a credential you
+handed over — setting an environment variable is handing it over, reading whatever `gh` happens to
+be logged into is not. Almost every developer machine has a logged-in `gh`, so defaulting it on
+would turn a command that watches locally into one that quietly ships a token.
+
 #### When it polls instead
 
 Streaming needs a watch service and a GitHub identity to register under. When either is missing, `--watch` falls back to polling Open Cloud directly from here — slower to notice a change and it spends your own quota, but it works with no service at all. Run with `--verbose` to see which mode you got and why.
@@ -489,7 +504,7 @@ Streaming needs a watch service and a GitHub identity to register under. When ei
 It falls back when:
 
 - the service refuses the registration, or cannot be reached;
-- there is no `NEVERMORE_WATCH_TOKEN`/`GITHUB_TOKEN`, or the checkout has no GitHub remote — registering needs a write-scoped PAT even though a notify never spends it, because the repository is the only identity the service has;
+- there is no GitHub token, or the checkout has no GitHub remote — registering needs a write-scoped PAT even though a notify never spends it, because the repository is the only identity the service has;
 - any watched place tracks `"saved"` and no key is shared. The whole run falls back rather than splitting, so two loops can't disagree about what's current.
 
 ### Testing a watch with `--dryrun`

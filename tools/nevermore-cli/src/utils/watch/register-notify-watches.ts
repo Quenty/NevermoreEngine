@@ -19,6 +19,8 @@ export interface RegisterNotifyWatchesOptions {
   entries: LocalWatchEntry[];
   /** Open Cloud key to share, so the service can poll a private base place. */
   robloxApiKey?: string;
+  /** Let the GitHub CLI supply the token when no env var does. */
+  useGhAuth?: boolean;
   /** Injected in tests; defaults to the HTTP registry. */
   createRegistry?: (registerUrl: string) => WatchRegistry;
 }
@@ -78,7 +80,9 @@ export async function tryRegisterNotifyWatchesAsync(
     };
   }
 
-  const contextResult = tryResolveGithubDispatchContext();
+  const contextResult = tryResolveGithubDispatchContext({
+    useGhAuth: options.useGhAuth,
+  });
   if (!contextResult.success) {
     return { success: false, reason: 'no_github_context' };
   }
@@ -176,7 +180,10 @@ export function describeNotifyWatchFallback(
     case 'no_github_context':
       return 'this checkout has no GitHub repository to register under';
     case 'no_token':
-      return 'no GitHub token is set (NEVERMORE_WATCH_TOKEN or GITHUB_TOKEN)';
+      return (
+        'no GitHub token — set NEVERMORE_WATCH_TOKEN, or pass ' +
+        '--watch-use-gh-auth to use the one `gh` already holds'
+      );
     case 'no_monitor_id':
       return 'the service registered the monitor but returned no id';
     case 'register_failed':

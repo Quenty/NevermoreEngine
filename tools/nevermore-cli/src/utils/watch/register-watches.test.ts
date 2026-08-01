@@ -691,6 +691,6 @@ describe('registerWatchesAsync', () => {
         candidates: [makeCandidate()],
         createRegistry: fakeRegistry({}),
       })
-    ).rejects.toThrowError(/No dispatch token/);
+    ).rejects.toThrowError(/No GitHub token found/);
   });
 });

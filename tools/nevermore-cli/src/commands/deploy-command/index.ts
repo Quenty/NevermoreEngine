@@ -131,6 +131,7 @@ export interface DeployArgs extends NevermoreGlobalArgs {
   logs?: boolean;
   watch?: string;
   watchShareApiKey?: boolean;
+  watchUseGhAuth?: boolean;
 }
 
 export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
@@ -302,6 +303,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
               'Takes the register endpoint URL, ending in the lease: https://<watch-service>/v1/register/7d',
             type: 'string',
           })
+          .option('watch-use-gh-auth', {
+            describe:
+              'Let the GitHub CLI supply the watch token when no environment variable does. ' +
+              'Off by default: registering sends the token to the watch service, so it should be one you handed over.',
+            type: 'boolean',
+            default: false,
+          })
           .option('watch-share-api-key', {
             describe:
               'Share the Open Cloud API key with the watch service, so it can read a private base place, ' +
@@ -397,6 +405,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           option: watchOption,
           monitorName: `${packageName}/${watchedTarget}`,
           resolver: createLockOnlyBasePlaceResolver(),
+          useGhAuth: args.watchUseGhAuth,
           triggerAfterRegister: true,
           candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
             (place) => ({
@@ -619,6 +628,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             // never replace the watch list another package registered.
             monitorName: `${packageName}/${watchedTarget}`,
             resolver: first.resolver,
+            useGhAuth: args.watchUseGhAuth,
             robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
             candidates: resolveDeployTargetPlaces(config, watchedTarget).map(
               (place) => ({
@@ -652,6 +662,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             option: watchOption,
             monitorName: `${packageName}/${watchedTarget}`,
             entries: localEntries,
+            useGhAuth: args.watchUseGhAuth,
             robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
           });
 

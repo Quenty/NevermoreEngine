@@ -194,6 +194,7 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
 | `--watch <url>` | After a successful deploy: in CI, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-use-gh-auth` | Let the GitHub CLI supply the watch token when no environment variable does. Off by default — registering sends the token to the watch service. |
 | `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll a private base place. Off by default. |
 
 **`nevermore deploy version upgrade [target]`** — rolls every `basePlace` forward, so deploys pull a fixed, git-tracked base place instead of whatever is live. Numeric (and unpinned) base places are re-pinned in `deploy.nevermore.json`; base places tracking `"saved"` or `"published"` have their resolved version rewritten in `deploy.nevermore.lock.json` instead. Without a target it walks every target and prunes unreferenced lock entries. See [Pinning base place versions](deploy.md#pinning-base-place-versions).

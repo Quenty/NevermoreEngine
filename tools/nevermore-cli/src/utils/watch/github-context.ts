@@ -18,6 +18,21 @@ export interface GithubDispatchContext {
   token?: string;
 }
 
+export interface GithubContextOptions {
+  /**
+   * Read the token from the GitHub CLI when no environment variable supplies
+   * one.
+   *
+   * Off unless asked for, and that is the whole point. Registering sends a PAT
+   * to the watch service and creates a monitor against the repository, so the
+   * credential has to be one the user handed over — an env var is handing it
+   * over, reading whatever `gh` happens to be holding is not. Nearly every
+   * developer machine has a logged-in `gh`, so defaulting this on would turn a
+   * command that used to watch locally into one that quietly ships a token.
+   */
+  useGhAuth?: boolean;
+}
+
 export type GithubContextResult =
   | { success: true; context: GithubDispatchContext }
   | {
@@ -52,7 +67,9 @@ function _env(name: string): string | undefined {
  * remote so `--watch <url>` also works from a developer's machine. Best-effort:
  * outside a git repo with no Actions env there is simply nothing to dispatch.
  */
-export function tryResolveGithubDispatchContext(): GithubContextResult {
+export function tryResolveGithubDispatchContext(
+  options: GithubContextOptions = {}
+): GithubContextResult {
   const repository = _env('GITHUB_REPOSITORY') ?? _repositoryFromRemote();
   if (!repository) {
     return { success: false, reason: 'no_repository' };
@@ -68,7 +85,10 @@ export function tryResolveGithubDispatchContext(): GithubContextResult {
     return { success: false, reason: 'undispatchable_ref' };
   }
 
-  const token = _env(WATCH_TOKEN_ENV) ?? _env('GITHUB_TOKEN');
+  const token =
+    _env(WATCH_TOKEN_ENV) ??
+    _env('GITHUB_TOKEN') ??
+    (options.useGhAuth ? _githubCliToken() : undefined);
 
   return { success: true, context: { repository, ref, token } };
 }
@@ -100,11 +120,12 @@ export function describeGithubContextFailure(
 
 /** Hint printed when a cloud registration has no credential to hand over. */
 export function describeMissingWatchToken(): string {
-  return (
-    `No dispatch token found. Set ${WATCH_TOKEN_ENV} (or GITHUB_TOKEN) to a ` +
-    'token with "actions: write" on the repository, so the watch service can ' +
-    'dispatch the workflow when the base place moves.'
-  );
+  return [
+    'No GitHub token found. The watch service identifies you by repository, ' +
+      'so registering needs a token with "actions: write" on it. Either:',
+    `  - Set: ${WATCH_TOKEN_ENV} (or GITHUB_TOKEN)`,
+    '  - Pass: --watch-use-gh-auth, to use the token `gh` already holds',
+  ].join('\n');
 }
 
 /**
@@ -129,15 +150,35 @@ function _repositoryFromRemote(): string | undefined {
   return remote == null ? undefined : parseGithubRepository(remote);
 }
 
+/**
+ * The token `gh` is already holding, if it is installed and logged in.
+ *
+ * Only ever called when the caller opted in. Not stored anywhere by us on
+ * purpose: `gh` owns its own refresh, and copying a token into `~/.nevermore`
+ * would leave a stale duplicate to expire behind everyone's back — the point is
+ * reading the live one, for the one run that asked.
+ */
+function _githubCliToken(): string | undefined {
+  const token = _run('gh', ['auth', 'token']);
+  // A logged-out `gh` exits non-zero, but an odd version could print a notice
+  // on stdout instead; a token is never whitespace.
+  return token == null || /\s/.test(token) ? undefined : token;
+}
+
 function _git(args: string[]): string | undefined {
+  return _run('git', args);
+}
+
+function _run(command: string, args: string[]): string | undefined {
   try {
-    const output = execSync(`git ${args.join(' ')}`, {
+    const output = execSync(`${command} ${args.join(' ')}`, {
       encoding: 'utf-8',
       timeout: 5000,
       stdio: ['pipe', 'pipe', 'pipe'],
     }).trim();
     return output === '' ? undefined : output;
   } catch {
+    // Not installed, not logged in, or not a repo — all "no answer here".
     return undefined;
   }
 }

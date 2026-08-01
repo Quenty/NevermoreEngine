@@ -65,6 +65,7 @@ interface BatchDeployArgs extends NevermoreGlobalArgs {
   smokeTest?: boolean;
   watch?: string;
   watchShareApiKey?: boolean;
+  watchUseGhAuth?: boolean;
 }
 
 export const batchDeployCommand: CommandModule<
@@ -130,6 +131,13 @@ export const batchDeployCommand: CommandModule<
           'so it rebuilds when its base place changes. Takes the register endpoint ' +
           'URL, ending in the lease: https://<watch-service>/v1/register/7d',
         type: 'string',
+      })
+      .option('watch-use-gh-auth', {
+        describe:
+          'Let the GitHub CLI supply the watch token when no environment variable does. ' +
+          'Off by default: registering sends the token to the watch service, so it should be one you handed over.',
+        type: 'boolean',
+        default: false,
       })
       .option('watch-share-api-key', {
         describe:
@@ -198,6 +206,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         option: watchOption,
         monitorName: targetName,
         resolver: createLockOnlyBasePlaceResolver(),
+        useGhAuth: args.watchUseGhAuth,
         triggerAfterRegister: true,
         candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
           targetName,
@@ -370,6 +379,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         option: watchOption,
         monitorName: targetName,
         resolver: basePlaceResolver,
+        useGhAuth: args.watchUseGhAuth,
         robloxApiKey: args.watchShareApiKey ? apiKey : undefined,
         candidates: flattenToBatchTargets(allPackages).map((buildTarget) => ({
           targetName,

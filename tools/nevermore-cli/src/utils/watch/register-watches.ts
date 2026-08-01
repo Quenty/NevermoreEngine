@@ -64,6 +64,8 @@ export interface RegisterWatchesOptions {
   robloxApiKey?: string;
   /** Reads base place versions out of the lock, for baselines. */
   resolver: BasePlaceResolver;
+  /** Let the GitHub CLI supply the token when no env var does. */
+  useGhAuth?: boolean;
   /**
    * Force a dispatch immediately after registering, ignoring drift.
    *
@@ -166,7 +168,9 @@ export async function registerWatchesAsync(
     );
   }
 
-  const contextResult = tryResolveGithubDispatchContext();
+  const contextResult = tryResolveGithubDispatchContext({
+    useGhAuth: options.useGhAuth,
+  });
   if (!contextResult.success) {
     throw new Error(describeGithubContextFailure(contextResult.reason));
   }
