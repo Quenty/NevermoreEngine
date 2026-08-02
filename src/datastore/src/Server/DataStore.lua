@@ -205,6 +205,16 @@ function DataStore.SetSessionLockingEnabled(self: DataStore, sessionLockingEnabl
 end
 
 --[=[
+	Whether the first load is still outstanding. A store destroyed in this window is destroyed
+	under an active request.
+
+	@return boolean
+]=]
+function DataStore.IsLoadPending(self: DataStore): boolean
+	return self._firstLoadPromise ~= nil and self._firstLoadPromise:IsPending()
+end
+
+--[=[
 	Sets session messaging enabled.
 
 	Currently this only works in conjunction with session locking, and allows for a session lock
@@ -587,8 +597,20 @@ function DataStore._doDataSync(
 		promise:Resolve(
 			maid:GivePromise(
 				DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
-					if self._sessionLockingEnabledHelper then
-						local unlocked = self._sessionLockingEnabledHelper:ToUnlockedProfile(original)
+					-- A raw field read plus getmetatable, never a method call. This transform can
+					-- run after Destroy: [Promise.spawn] does not retain the request thread, so the
+					-- promise a teardown cancels is not the call -- and by then [BaseObject.Destroy]
+					-- has stripped the metatable of this store AND of its helpers, so any method
+					-- dispatch on either (including on self) raises out of the transform and aborts
+					-- the write Roblox was about to commit. A helper whose metatable is gone is
+					-- proof of teardown: cancel the write instead.
+					local lockHelper = self._sessionLockingEnabledHelper
+					if lockHelper ~= nil and getmetatable(lockHelper :: any) == nil then
+						return nil
+					end
+
+					if lockHelper then
+						local unlocked = lockHelper:ToUnlockedProfile(original)
 						if unlocked.isValid then
 							original = unlocked.unlockedProfile
 						else
@@ -636,8 +658,8 @@ function DataStore._doDataSync(
 						metadata = datastoreKeyInfo:GetMetadata()
 					end
 
-					if self._sessionLockingEnabledHelper then
-						result = self._sessionLockingEnabledHelper:ToLockedProfile(result, doCloseSession)
+					if lockHelper then
+						result = lockHelper:ToLockedProfile(result, doCloseSession)
 					end
 
 					return result, userIdList, metadata
@@ -693,7 +715,17 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 								)
 							end
 
-							local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
+							-- A raw field read plus getmetatable, never a method call on self -- see
+							-- the teardown guard in _doDataSync for why. A stripped helper means this
+							-- store was destroyed while the request was in flight; every promise this
+							-- load would settle was already rejected by the teardown, so cancel the
+							-- write.
+							local lockHelper = self._sessionLockingEnabledHelper
+							if lockHelper == nil or getmetatable(lockHelper :: any) == nil then
+								return nil
+							end
+
+							local lockResult = lockHelper:AcquireLock(data, canStealLock)
 							if not lockResult.isValid then
 								if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then
 									-- Gracefully kick to avoid losing memory

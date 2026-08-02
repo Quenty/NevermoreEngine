@@ -90,6 +90,7 @@ export type DataStoreMock = typeof(setmetatable(
 		_errorInjector: ErrorInjector?,
 		_blocked: boolean,
 		_maxValueLength: number?,
+		_lastTransformError: string?,
 	},
 	{} :: typeof({ __index = DataStoreMock })
 ))
@@ -129,6 +130,7 @@ function DataStoreMock.new(name: string?, scope: string?): DataStoreMock
 	self._errorInjector = nil
 	self._blocked = false
 	self._maxValueLength = nil
+	self._lastTransformError = nil
 
 	return self
 end
@@ -249,6 +251,16 @@ function DataStoreMock.GetCallCount(self: DataStoreMock, method: string?): numbe
 		return self._totalCalls
 	end
 	return self._callCounts[method] or 0
+end
+
+--[=[
+	The message from the most recent UpdateAsync transform that threw, or nil if none has. Lets a
+	spec assert that a transform bailed cleanly rather than raising.
+
+	@return string?
+]=]
+function DataStoreMock.GetLastTransformError(self: DataStoreMock): string?
+	return self._lastTransformError
 end
 
 --[=[
@@ -463,7 +475,16 @@ function DataStoreMock.UpdateAsync(
 	local current = deepCopy(self._store[key])
 	local keyInfo = self:_makeKeyInfo(key)
 
-	local newValue, userIds, metadata = transformFunction(current, keyInfo)
+	-- Recorded rather than only re-raised: a transform that throws is reported by Roblox as a
+	-- "Transform function error" and then swallowed by the pcall in [DataStorePromises], so a spec
+	-- has no other way to tell an aborted write from a cancelled one. Re-raised with level 0 to
+	-- keep the original message, the way the real UpdateAsync surfaces it.
+	local ok, newValue, userIds, metadata = pcall(transformFunction, current, keyInfo)
+	if not ok then
+		self._lastTransformError = tostring(newValue)
+		error(newValue, 0)
+	end
+
 	if newValue == nil then
 		-- Update cancelled; nothing written
 		return nil, keyInfo
