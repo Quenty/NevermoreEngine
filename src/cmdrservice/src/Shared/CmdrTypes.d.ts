@@ -168,9 +168,70 @@ interface TypeDefinition {
   Listable?: boolean;
 }
 
-interface CommandArgument {
-  /** The argument type (case sensitive), or an inline TypeDefinition object */
-  Type: string | TypeDefinition;
+type BuiltInTypeName =
+  | 'string'
+  | 'strings'
+  | 'number'
+  | 'numbers'
+  | 'integer'
+  | 'integers'
+  | 'digit'
+  | 'digits'
+  | 'positiveInteger'
+  | 'positiveIntegers'
+  | 'nonNegativeInteger'
+  | 'nonNegativeIntegers'
+  | 'byte'
+  | 'bytes'
+  | 'boolean'
+  | 'booleans'
+  | 'player'
+  | 'players'
+  | 'playerId'
+  | 'playerIds'
+  | 'team'
+  | 'teams'
+  | 'brickColor'
+  | 'brickColors'
+  | 'teamColor'
+  | 'teamColors'
+  | 'color3'
+  | 'color3s'
+  | 'hexColor3'
+  | 'hexColor3s'
+  | 'brickColor3'
+  | 'brickColor3s'
+  | 'vector3'
+  | 'vector3s'
+  | 'vector2'
+  | 'vector2s'
+  | 'positionVector3'
+  | 'positionVector3s'
+  | 'duration'
+  | 'durations'
+  | 'command'
+  | 'commands'
+  | 'type'
+  | 'types'
+  | 'storedKey'
+  | 'storedKeys'
+  | 'url'
+  | 'urls'
+  | 'teamPlayers'
+  | 'conditionFunction'
+  | 'bindableResource'
+  | 'json';
+
+type CommandArgument = (
+  | {
+      /** The argument type (case sensitive), or an inline TypeDefinition object */
+      Type: BuiltInTypeName;
+    }
+  | {
+      /** The argument type (case sensitive), or an inline TypeDefinition object */
+      Type: string | TypeDefinition;
+    }
+) & {
   /** The argument name, this is displayed to the user as they type. */
   Name: string;
   /** A description of what the argument is, this is also displayed to the user. */
@@ -179,7 +240,7 @@ interface CommandArgument {
   Optional?: boolean;
   /** If present, the argument will be optional and if the user doesn't supply a value, your function will receive whatever you set this to. Default being set implies Optional = true, so Optional can be omitted. */
   Default?: unknown;
-}
+};
 
 interface CommandDefinition {
   /** The name that's in auto complete and displayed to user. */
@@ -377,12 +438,12 @@ export {
   ArgumentContext,
   Cmdr,
   CmdrClient,
-  CommandContext,
-  Dispatcher,
-  TypeDefinition,
   CommandArgument,
+  CommandContext,
   CommandDefinition,
-  Registry,
+  Dispatcher,
   NamedObject,
+  Registry,
+  TypeDefinition,
   Util,
 };
