@@ -48,17 +48,86 @@ the two registrations are the same entry with the same source.
 
 ## Writes are batched, and that is not negotiable
 
-Every raw write to a `LocalizationTable` invalidates every `AutoLocalize` entry in the engine. A
+Every mutating call to a `LocalizationTable` — `SetEntries` and `SetEntryValue` alike — invalidates
+the engine's cached table contents, raises a property change, and fires its retranslation signal. A
 game streaming in registers thousands of entries in a single frame, so writing per entry is a
-frame-killer. `TranslatorService` accumulates deltas and applies them with **one `SetEntries` call
-per frame**, via `task.defer`.
+frame-killer. `TranslatorService` accumulates deltas and applies them **once per frame**, via
+`task.defer`.
 
 `TranslatorService.spec.lua` ("write cost while streaming in") pins this: the write count is `1`
 whether ten or five hundred entries register in the frame. If a change makes that number scale with
 entry count, the change is wrong, however clean it looks.
 
 The cost of batching is that **a key is not readable the instant it is registered**. Everything
-below exists to pay that cost without giving up the batching.
+under "Readiness is per key" exists to pay that cost without giving up the batching.
+
+### Two write regimes, chosen by batch size
+
+Batching alone is not enough, because `SetEntries` is not free either: it re-serializes **every**
+entry in the table. Once a game's table holds thousands of entries, rebuilding all of them so that
+one newly-shown label can register its key is its own frame cost — and that is the steady state,
+since text appearing on screen is what registers keys.
+
+So a flush picks:
+
+| Batch | Route | Why |
+|---|---|---|
+| Small relative to the table | one `SetEntryValue`/`SetEntryExample` per changed field | a few invalidations, nothing re-serialized |
+| Large relative to the table | one `SetEntries` | one invalidation instead of hundreds, at the price of one rebuild |
+
+The crossover is `INVALIDATION_ENTRY_COST` in `TranslatorService`: an invalidation is treated as
+costing about as much as re-serializing 100 entries. It is a judgment call about the ratio of two
+engine-internal costs, not a measured constant — tune it if the profile says otherwise, but keep
+both regimes. Loading a locale (hundreds of entries at once) must not become hundreds of
+invalidations, and showing one label must not rebuild the whole table.
+
+Pinned by "lands a later handful of keys without rebuilding the whole table" and "rebuilds rather
+than writing hundreds of entries one at a time", via `GetLocalizationRebuildCount`.
+
+The targeted route trusts each call to leave the rest of the entry alone, and source and context
+ride along only on a value write that actually changes a value — a `SetEntryValue` that rewrites the
+text a locale already holds lands nothing, new metadata included. So a batch that changes nothing
+but an entry's metadata is rebuilt rather than written. That is rare next to the value writes this
+path exists for, and the alternative is a metadata change that silently does not land. What the
+engine does and does not guarantee here is written up in
+[`engine-behavior.md`](engine-behavior.md), pinned by "LocalizationTable behavior the targeted
+writes rest on" and "queues a write that changes only the source or context".
+
+### Registering unchanged text is free
+
+`ToTranslationKey` registers its source text as a side effect of minting the key, so **every** label
+built through `ObserveTranslation` re-registers text the table already holds. Queuing those would
+schedule a flush, take the key not-ready, and drive a re-translation pass through every reader of
+it — per label, per frame, in the source language, where there is nothing to translate at all.
+
+`SetEntryValue`/`SetEntryExample` therefore drop a write the table already agrees with before it
+queues. Source and context count as part of the value: a change in either still writes.
+
+### The table is mirrored
+
+Deciding any of the above means knowing what the table currently holds, and `GetEntries` copies and
+re-materializes every entry in it — an O(table) read per flush, which is the cost being avoided.
+
+So `TranslatorService` keeps a mirror of each table's entries, built once and kept in step with
+every write. It is keyed by the `LocalizationTable` instance (weakly) and **shared across
+`TranslatorService` instances**, because the table itself is shared: it is found by realm-scoped
+name, so a second service bag in the same realm — a story, a test — writes into the same instance,
+and a per-service mirror would go stale behind it.
+
+A mirror that disagrees with the table fails silently and permanently: a write the mirror thinks is
+already there is dropped, so the key never lands and nothing says so. Targeted writes cannot cause
+that — they touch one field of one entry — but a rebuild writes the whole entry list back, and
+would drop an entry the mirror never saw.
+
+So the rebuild path reads the table back first and re-applies the batch on top of what it finds.
+That is the O(table) read this mirror exists to avoid, and it is close to free next to the rebuild
+it precedes — while the hot path, the targeted writes, never pays it. It also re-syncs the mirror,
+so a foreign write costs at most the writes dropped between one rebuild and the next rather than
+poisoning the mirror for the life of the place.
+
+This package is still meant to be the only writer of `GeneratedJSONTable_*`, which the design
+already requires elsewhere. The reconciliation is what keeps a violation recoverable rather than
+fatal. Pinned by "preserves an entry written directly to the table after the mirror was built".
 
 ## Readiness is per key, not per batch
 
