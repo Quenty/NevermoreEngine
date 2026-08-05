@@ -1,54 +1,54 @@
-export const BuiltInCmdrType: Readonly<{
-  string: 'string';
-  strings: 'strings';
-  number: 'number';
-  numbers: 'numbers';
-  integer: 'integer';
-  integers: 'integers';
-  digit: 'digit';
-  digits: 'digits';
-  positiveInteger: 'positiveInteger';
-  positiveIntegers: 'positiveIntegers';
-  nonNegativeInteger: 'nonNegativeInteger';
-  nonNegativeIntegers: 'nonNegativeIntegers';
-  byte: 'byte';
-  bytes: 'bytes';
-  boolean: 'boolean';
-  booleans: 'booleans';
-  player: 'player';
-  players: 'players';
-  playerId: 'playerId';
-  playerIds: 'playerIds';
-  team: 'team';
-  teams: 'teams';
-  brickColor: 'brickColor';
-  brickColors: 'brickColors';
-  teamColor: 'teamColor';
-  teamColors: 'teamColors';
-  color3: 'color3';
-  color3s: 'color3s';
-  hexColor3: 'hexColor3';
-  hexColor3s: 'hexColor3s';
-  brickColor3: 'brickColor3';
-  brickColor3s: 'brickColor3s';
-  vector3: 'vector3';
-  vector3s: 'vector3s';
-  vector2: 'vector2';
-  vector2s: 'vector2s';
-  positionVector3: 'positionVector3';
-  positionVector3s: 'positionVector3s';
-  duration: 'duration';
-  durations: 'durations';
-  command: 'command';
-  commands: 'commands';
-  type: 'type';
-  types: 'types';
-  storedKey: 'storedKey';
-  storedKeys: 'storedKeys';
-  url: 'url';
-  urls: 'urls';
-  teamPlayers: 'teamPlayers';
-  conditionFunction: 'conditionFunction';
-  bindableResource: 'bindableResource';
-  json: 'json';
-}>;
+export const enum BuiltInCmdrType {
+  string = 'string',
+  strings = 'strings',
+  number = 'number',
+  numbers = 'numbers',
+  integer = 'integer',
+  integers = 'integers',
+  digit = 'digit',
+  digits = 'digits',
+  positiveInteger = 'positiveInteger',
+  positiveIntegers = 'positiveIntegers',
+  nonNegativeInteger = 'nonNegativeInteger',
+  nonNegativeIntegers = 'nonNegativeIntegers',
+  byte = 'byte',
+  bytes = 'bytes',
+  boolean = 'boolean',
+  booleans = 'booleans',
+  player = 'player',
+  players = 'players',
+  playerId = 'playerId',
+  playerIds = 'playerIds',
+  team = 'team',
+  teams = 'teams',
+  brickColor = 'brickColor',
+  brickColors = 'brickColors',
+  teamColor = 'teamColor',
+  teamColors = 'teamColors',
+  color3 = 'color3',
+  color3s = 'color3s',
+  hexColor3 = 'hexColor3',
+  hexColor3s = 'hexColor3s',
+  brickColor3 = 'brickColor3',
+  brickColor3s = 'brickColor3s',
+  vector3 = 'vector3',
+  vector3s = 'vector3s',
+  vector2 = 'vector2',
+  vector2s = 'vector2s',
+  positionVector3 = 'positionVector3',
+  positionVector3s = 'positionVector3s',
+  duration = 'duration',
+  durations = 'durations',
+  command = 'command',
+  commands = 'commands',
+  type = 'type',
+  types = 'types',
+  storedKey = 'storedKey',
+  storedKeys = 'storedKeys',
+  url = 'url',
+  urls = 'urls',
+  teamPlayers = 'teamPlayers',
+  conditionFunction = 'conditionFunction',
+  bindableResource = 'bindableResource',
+  json = 'json',
+}
