@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.7...@quenty/access@1.3.8) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/access
+
 ## [1.3.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.6...@quenty/access@1.3.7) (2026-07-30)
 
 **Note:** Version bump only for package @quenty/access

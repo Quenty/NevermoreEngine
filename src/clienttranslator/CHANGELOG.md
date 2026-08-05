@@ -1,22 +1,14 @@
-# v14.47.4 (Wed Aug 05 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Prevent redundant localization table rebuilding [#786](https://github.com/Quenty/NevermoreEngine/pull/786) ([@alex-y-z](https://github.com/alex-y-z))
-- doc: Promote method comments ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Rebuild for metadata change ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Prevent redundant table rebuilding ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.47.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.3...@quenty/clienttranslator@14.47.4) (2026-08-05)
+
+### Bug Fixes
+
+- Prevent redundant table rebuilding ([cbd4e62](https://github.com/Quenty/NevermoreEngine/commit/cbd4e620b1e0737a5d679412c82451ff6719a294))
+- Rebuild for metadata change ([dc160d9](https://github.com/Quenty/NevermoreEngine/commit/dc160d9aa5e09e3d35d1d486f5d1f6d2245c6ccd))
 
 ## [14.47.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.2...@quenty/clienttranslator@14.47.3) (2026-07-29)
 

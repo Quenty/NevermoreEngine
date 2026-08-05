@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.62.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.3...@quenty/gameconfig@12.62.4) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
 ## [12.62.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.2...@quenty/gameconfig@12.62.3) (2026-07-29)
 
 **Note:** Version bump only for package @quenty/gameconfig
