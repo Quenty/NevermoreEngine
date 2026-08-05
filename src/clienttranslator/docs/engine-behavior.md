@@ -13,7 +13,12 @@ from these is in [`design.md`](design.md).
 Source and context are metadata; they do **not** widen an entry's identity.
 
 - `SetEntryValue(key, sourceA, contextA, ...)` then `SetEntryValue(key, sourceB, contextB, ...)`
-  leaves a **single** entry — the second call overwrites source/context in place.
+  leaves a **single** entry — the second call overwrites source/context in place, **provided it
+  also changes the value**. Called with the text the locale already holds it lands nothing at all,
+  source and context included: the new metadata is silently discarded. There is therefore no
+  targeted call that changes only an entry's metadata, and `TranslatorService` rebuilds the table
+  for a batch that changes nothing else. Pinned by `TranslatorService.spec.lua` ("queues a write
+  that changes only the source or context").
 - `SetEntries` **rejects** an array holding two entries that share a key, even with differing
   source and context:
 
@@ -43,10 +48,9 @@ rest on"), because `TranslatorService` lands small batches as targeted writes an
 result rather than reading the table back — a call that clobbered a neighbouring field would put
 the mirror permanently out of step with the table, silently.
 
-What is **not** established is whether `SetEntryExample` overwrites source and context in place the
-way `SetEntryValue` does. Only the `SetEntryValue` behavior above was verified, so the flush never
-lets an example write be the call that lands new metadata; see
-[`design.md`](design.md) ("Two write regimes").
+What is **not** established is whether `SetEntryExample` overwrites source and context in place at
+all. It does not need to be: no targeted call lands metadata on its own (see above), so the flush
+never asks an example write to carry it; see [`design.md`](design.md) ("Two write regimes").
 
 ## Write cost: assumed, not measured
 

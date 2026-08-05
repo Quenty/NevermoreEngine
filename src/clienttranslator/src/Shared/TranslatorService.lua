@@ -594,14 +594,14 @@ function TranslatorService._landEntryLocale(
 	local cache = self:_getEntryCache(localizationTable)
 	local existing = cache.ByKey[entry.Key]
 
-	-- Already there (another translator registered the same text). Still dequeued, so the
-	-- flush does not write it either.
-	if
-		existing
-		and existing.Source == entry.Source
-		and existing.Context == entry.Context
-		and existing.Values[localeId] == text
-	then
+	-- The text a read needs is already there (another translator registered the same value).
+	-- Dequeued so the flush does not write it either.
+	--
+	-- Deliberately not conditioned on the source/context matching too: a SetEntryValue that
+	-- does not change the value does not land new metadata either (engine-behavior.md), so
+	-- writing here would move the mirror and not the table. A metadata change stays queued for
+	-- the flush, which rebuilds for it.
+	if existing and existing.Values[localeId] == text then
 		entry.Values[localeId] = nil
 		return
 	end
@@ -857,23 +857,15 @@ function TranslatorService._mergePendingEntries(
 			end
 		end
 
-		-- Source and context ride along on whichever call carries them, so a batch that
-		-- changes only those still needs one call to carry them: rewriting a locale it already
-		-- has does that, since SetEntryValue overwrites metadata in place.
-		--
-		-- Only SetEntryValue is known to do so (engine-behavior.md pins that call and no
-		-- other), so a metadata change is carried by a value write or not at all -- and it is
-		-- queued ahead of the example write below, so SetEntryExample is never the call that
-		-- has to land new metadata.
+		-- Source and context ride along on the value write that changes the entry, and there is
+		-- no targeted call that lands them on their own: SetEntryValue updates them only when
+		-- it actually changes a value, and rewriting a locale with the text it already holds is
+		-- a no-op the metadata does not survive (engine-behavior.md). So a batch that changes
+		-- nothing but metadata is rebuilt rather than written -- rare next to the value writes
+		-- this path exists for, and the alternative is a metadata change that silently does not
+		-- land.
 		if metadataChanged and not valueWritten then
-			local localeId = next(entry.Values)
-			if localeId ~= nil then
-				table.insert(writes, { Entry = entry, LocaleId = localeId })
-			else
-				-- Nothing to carry it: an entry holding no values at all can only be written
-				-- through SetEntries.
-				bulkRequired = true
-			end
+			bulkRequired = true
 		end
 
 		if delta.Example ~= nil and entry.Example ~= delta.Example then

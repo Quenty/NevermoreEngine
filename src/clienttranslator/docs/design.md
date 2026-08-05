@@ -84,13 +84,14 @@ invalidations, and showing one label must not rebuild the whole table.
 Pinned by "lands a later handful of keys without rebuilding the whole table" and "rebuilds rather
 than writing hundreds of entries one at a time", via `GetLocalizationRebuildCount`.
 
-The targeted route trusts each call to leave the rest of the entry alone, and only `SetEntryValue`
-is known to overwrite source and context in place. So a batch that changes only an entry's metadata
-is carried by a value write — rewriting a locale the entry already has — queued ahead of any
-example write for that entry, and a batch with no value to carry it goes to `SetEntries` instead.
-`SetEntryExample` is therefore never the call that lands new metadata. The three assumptions this
-rests on are pinned against the engine by "LocalizationTable behavior the targeted writes rest on"
-and written up in [`engine-behavior.md`](engine-behavior.md).
+The targeted route trusts each call to leave the rest of the entry alone, and source and context
+ride along only on a value write that actually changes a value — a `SetEntryValue` that rewrites the
+text a locale already holds lands nothing, new metadata included. So a batch that changes nothing
+but an entry's metadata is rebuilt rather than written. That is rare next to the value writes this
+path exists for, and the alternative is a metadata change that silently does not land. What the
+engine does and does not guarantee here is written up in
+[`engine-behavior.md`](engine-behavior.md), pinned by "LocalizationTable behavior the targeted
+writes rest on" and "queues a write that changes only the source or context".
 
 ### Registering unchanged text is free
 

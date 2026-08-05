@@ -575,7 +575,8 @@ describe("TranslatorService entry merging", function()
 			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
 		end
 		controller.awaitEntriesWritten()
-		expect(service:GetLocalizationRebuildCount()).toBe(2)
+		-- The first flush landed its one entry as a targeted write, so this is the first rebuild.
+		expect(service:GetLocalizationRebuildCount()).toBe(1)
 
 		local entries = TranslatorTestUtils.getEntryMap(localizationTable)
 		expect(entries["external.key"].Values["en"]).toBe("External")
