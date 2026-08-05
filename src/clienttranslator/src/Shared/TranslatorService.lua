@@ -261,8 +261,16 @@ function TranslatorService.SetEntryExample(
 	end
 end
 
--- Returns the pending delta for a key, and whether this call is what made the key pending
--- (the caller announces that, once the write it is making has actually been stored).
+--[=[
+	Returns the pending delta for a key, and whether this call is what made the key pending
+	(the caller announces that, once the write it is making has actually been stored).
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@return (PendingEntry, boolean)
+	@private
+]=]
 function TranslatorService._getPendingEntry(
 	self: TranslatorService,
 	translationKey: string,
@@ -290,7 +298,13 @@ function TranslatorService._getPendingEntry(
 	return entry, false
 end
 
--- The mirror of a table's entries, built from the table the first time anything needs it.
+--[=[
+	The mirror of a table's entries, built from the table the first time anything needs it.
+
+	@param localizationTable LocalizationTable
+	@return EntryCache
+	@private
+]=]
 function TranslatorService._getEntryCache(_self: TranslatorService, localizationTable: LocalizationTable): EntryCache
 	local existing = entryCachesByTable[localizationTable]
 	if existing then
@@ -308,13 +322,23 @@ function TranslatorService._getEntryCache(_self: TranslatorService, localization
 	return cache
 end
 
--- Whether the table already holds exactly this value, making the write nothing but cost.
---
--- Re-registering unchanged text is the common case rather than the exception: minting a
--- translation key ([JSONTranslator.ToTranslationKey]) registers its source text every time a
--- label is built, and a loader re-queues a locale it has already loaded. Queuing such a write
--- would schedule a flush, and -- because the key goes not-ready and back -- drive a
--- re-translation pass through every reader of that key, all to write back what is there.
+--[=[
+	Whether the table already holds exactly this value, making the write nothing but cost.
+
+	Re-registering unchanged text is the common case rather than the exception: minting a
+	translation key ([JSONTranslator.ToTranslationKey]) registers its source text every time a
+	label is built, and a loader re-queues a locale it has already loaded. Queuing such a write
+	would schedule a flush, and -- because the key goes not-ready and back -- drive a
+	re-translation pass through every reader of that key, all to write back what is there.
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param localeId string
+	@param text string
+	@return boolean
+	@private
+]=]
 function TranslatorService._isEntryValueCurrent(
 	self: TranslatorService,
 	translationKey: string,
@@ -338,7 +362,16 @@ function TranslatorService._isEntryValueCurrent(
 	return entry.Source == source and entry.Context == context and entry.Values[localeId] == text
 end
 
--- Whether the table already holds exactly this example. See [TranslatorService._isEntryValueCurrent].
+--[=[
+	Whether the table already holds exactly this example. See [TranslatorService._isEntryValueCurrent].
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param example string
+	@return boolean
+	@private
+]=]
 function TranslatorService._isEntryExampleCurrent(
 	self: TranslatorService,
 	translationKey: string,
@@ -495,9 +528,14 @@ function TranslatorService.ObserveIsTranslationReady(
 	end) :: any
 end
 
--- Tells a key's observers about a readiness change. The state is read per observer rather
--- than captured once: a handler earlier in the fan-out can re-queue the key, and handing the
--- observers after it a value that is already false would leave them believing the key landed.
+--[=[
+	Tells a key's observers about a readiness change. The state is read per observer rather
+	than captured once: a handler earlier in the fan-out can re-queue the key, and handing the
+	observers after it a value that is already false would leave them believing the key landed.
+
+	@param translationKey string
+	@private
+]=]
 function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string)
 	local observers = self._readyObservers[translationKey]
 	if not observers then
@@ -577,9 +615,16 @@ function TranslatorService.FlushEntryForKey(self: TranslatorService, translation
 	end
 end
 
--- Writes one locale's value for a pending entry straight to the table and dequeues just
--- that locale, so the deferred batch flush does not write it again. No-ops if the entry has
--- nothing pending for the locale.
+--[=[
+	Writes one locale's value for a pending entry straight to the table and dequeues just
+	that locale, so the deferred batch flush does not write it again. No-ops if the entry has
+	nothing pending for the locale.
+
+	@param localizationTable LocalizationTable
+	@param entry PendingEntry
+	@param localeId string
+	@private
+]=]
 function TranslatorService._landEntryLocale(
 	self: TranslatorService,
 	localizationTable: LocalizationTable,
@@ -708,9 +753,14 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	end
 end
 
--- Merges the pending entry deltas into the table's entries and writes back whatever actually
--- changed, by whichever route is cheaper for the size of the batch: a handful of targeted
--- SetEntryValue/SetEntryExample calls, or one SetEntries that rebuilds the table.
+--[=[
+	Merges the pending entry deltas into the table's entries and writes back whatever actually
+	changed, by whichever route is cheaper for the size of the batch: a handful of targeted
+	SetEntryValue/SetEntryExample calls, or one SetEntries that rebuilds the table.
+
+	@param pendingEntries PendingEntries
+	@private
+]=]
 function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: PendingEntries)
 	local localizationTable = self:GetLocalizationTable()
 	local cache = self:_getEntryCache(localizationTable)
@@ -756,9 +806,16 @@ function TranslatorService._applyPendingEntries(self: TranslatorService, pending
 	self._localizationRebuildCount += 1
 end
 
--- Rebuilds the mirror from what the table actually holds, with this batch's merged entries
--- kept on top. Anything a foreign writer added or changed is adopted; the keys in this batch
--- win, since the table has not been told about their new values yet.
+--[=[
+	Rebuilds the mirror from what the table actually holds, with this batch's merged entries
+	kept on top. Anything a foreign writer added or changed is adopted; the keys in this batch
+	win, since the table has not been told about their new values yet.
+
+	@param localizationTable LocalizationTable
+	@param cache EntryCache
+	@param pendingEntries PendingEntries
+	@private
+]=]
 function TranslatorService._reconcileEntryCache(
 	_self: TranslatorService,
 	localizationTable: LocalizationTable,
@@ -793,9 +850,16 @@ function TranslatorService._reconcileEntryCache(
 	cache.ByKey = byKey
 end
 
--- Whether to land this many targeted writes rather than rebuild the whole table. One
--- SetEntries costs one invalidation plus re-serializing every entry; N targeted writes cost N
--- invalidations and re-serialize nothing. See INVALIDATION_ENTRY_COST.
+--[=[
+	Whether to land this many targeted writes rather than rebuild the whole table. One
+	SetEntries costs one invalidation plus re-serializing every entry; N targeted writes cost N
+	invalidations and re-serialize nothing. See INVALIDATION_ENTRY_COST.
+
+	@param writeCount number
+	@param entryCount number
+	@return boolean
+	@private
+]=]
 function TranslatorService._shouldWriteIndividually(
 	_self: TranslatorService,
 	writeCount: number,
@@ -804,9 +868,16 @@ function TranslatorService._shouldWriteIndividually(
 	return (writeCount - 1) * INVALIDATION_ENTRY_COST < entryCount
 end
 
--- Merges the deltas into the mirror and returns the targeted writes that would bring the
--- table in line with it, or nil when the batch cannot be expressed as targeted writes at all
--- and has to go through SetEntries.
+--[=[
+	Merges the deltas into the mirror and returns the targeted writes that would bring the
+	table in line with it, or nil when the batch cannot be expressed as targeted writes at all
+	and has to go through SetEntries.
+
+	@param cache EntryCache
+	@param pendingEntries PendingEntries
+	@return { PendingWrite }?
+	@private
+]=]
 function TranslatorService._mergePendingEntries(
 	_self: TranslatorService,
 	cache: EntryCache,
