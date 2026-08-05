@@ -193,18 +193,26 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		controller:destroy()
 	end)
 
-	it("fires ready even when the queued value already matched the table", function()
+	-- A write the table already holds never gets queued at all (TranslatorService.spec.lua,
+	-- "does not queue a write the table already holds"), so the way a key reaches the flush
+	-- with nothing left to write is a single-key read landing its value first. The key is in
+	-- the table either way, and a key that never went ready would strand its readers.
+	it("fires ready even when the flush found nothing left to write", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		controller.awaitEntriesWritten()
-
 		local received = collect(controller, service:ObserveIsTranslationReady("k.one"))
-		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		expect(received).toEqual({ false })
+
+		-- Lands the value and dequeues that locale, leaving the entry queued for the flush.
+		service:FlushEntryForKey("k.one")
+		local writesAfterRead = service:GetLocalizationWriteCount()
+
 		controller.awaitEntriesWritten()
 
-		expect(received).toEqual({ true, false, true })
+		expect(received).toEqual({ false, true })
+		expect(service:GetLocalizationWriteCount()).toBe(writesAfterRead)
 		controller:destroy()
 	end)
 

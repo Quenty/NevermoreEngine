@@ -277,6 +277,44 @@ describe("TranslatorService localization write cost", function()
 		controller:destroy()
 	end)
 
+	it("does not queue a write the table already holds", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		service:SetEntryExample("k.one", "One", "c1", "One")
+		controller.awaitEntriesWritten()
+
+		-- Registering unchanged text is the common case (every label built through
+		-- ObserveTranslation mints -- and so re-registers -- its key), so it has to be dropped
+		-- before it queues: a queued write schedules a flush and takes the key not-ready, which
+		-- drives a re-translation pass through every reader of it.
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		service:SetEntryExample("k.one", "One", "c1", "One")
+
+		expect(service:IsTranslationReady("k.one")).toBe(true)
+		expect(service:PromiseEntriesWritten():IsPending()).toBe(false)
+		controller:destroy()
+	end)
+
+	it("queues a write that changes only the source or context", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		controller.awaitEntriesWritten()
+
+		service:SetEntryValue("k.one", "Uno", "c2", "en", "One")
+		expect(service:IsTranslationReady("k.one")).toBe(false)
+		controller.awaitEntriesWritten()
+
+		local entry = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.one"]
+		expect(entry.Source).toBe("Uno")
+		expect(entry.Context).toBe("c2")
+		expect(entry.Values["en"]).toBe("One")
+		controller:destroy()
+	end)
+
 	it("writes when a queued entry changes an existing value", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
@@ -342,6 +380,61 @@ describe("TranslatorService write cost while streaming in", function()
 
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 		expect(Table.count(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable()))).toBe(50)
+		controller:destroy()
+	end)
+
+	it("lands a later handful of keys without rebuilding the whole table", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		for index = 1, 400 do
+			local key = string.format("streamed.key%d", index)
+			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
+		end
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationRebuildCount()).toBe(1)
+
+		-- The load rebuilt the table once, which is right. A UI opening afterwards registers a
+		-- couple of keys into that same 400-entry table, and rebuilding it again for two keys
+		-- costs re-serializing all 400 -- so those land as targeted writes instead.
+		service:SetEntryValue("late.one", "Late one", "lc1", "en", "Late one")
+		service:SetEntryValue("late.two", "Late two", "lc2", "en", "Late two")
+		controller.awaitEntriesWritten()
+
+		expect(service:GetLocalizationRebuildCount()).toBe(1)
+		expect(service:GetLocalizationWriteCount()).toBe(3)
+
+		local entries = TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())
+		expect(entries["late.one"].Values["en"]).toBe("Late one")
+		expect(entries["late.two"].Values["en"]).toBe("Late two")
+		-- The targeted writes must not have cost the entries already in the table.
+		expect(entries["streamed.key1"].Values["en"]).toBe("streamed.key1")
+		expect(entries["streamed.key400"].Values["en"]).toBe("streamed.key400")
+		controller:destroy()
+	end)
+
+	it("rebuilds rather than writing hundreds of entries one at a time", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		for index = 1, 50 do
+			local key = string.format("streamed.key%d", index)
+			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
+		end
+		controller.awaitEntriesWritten()
+
+		-- A batch large next to the table it writes into goes the other way: each targeted
+		-- write invalidates the engine's cached contents just as hard as a rebuild does, so
+		-- hundreds of them cost hundreds of invalidations to save one re-serialization.
+		for index = 1, 300 do
+			local key = string.format("later.key%d", index)
+			service:SetEntryValue(key, key, string.format("lctx%d", index), "en", key)
+		end
+		controller.awaitEntriesWritten()
+
+		expect(service:GetLocalizationWriteCount()).toBe(2)
+		expect(service:GetLocalizationRebuildCount()).toBe(2)
+		expect(Table.count(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable()))).toBe(350)
 		controller:destroy()
 	end)
 
@@ -459,5 +552,75 @@ describe("TranslatorService entry merging", function()
 		expect(entries["internal.key"].Values["en"]).toBe("Internal")
 		expect(service:GetLocalizationWriteCount()).toBe(1)
 		controller:destroy()
+	end)
+
+	-- The service mirrors the table's contents rather than reading it back per flush, so an
+	-- entry written behind that mirror is one a rebuild could drop: a rebuild writes the whole
+	-- entry list back. The rebuild path reads the table first for exactly this reason.
+	it("preserves an entry written directly to the table after the mirror was built", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+		local localizationTable = service:GetLocalizationTable()
+
+		-- Builds the mirror, so the write below lands behind it rather than in front of it.
+		service:SetEntryValue("internal.one", "Internal one", "intctx", "en", "Internal one")
+		controller.awaitEntriesWritten()
+
+		localizationTable:SetEntryValue("external.key", "External", "extctx", "en", "External")
+
+		-- A batch large next to the table it writes into rebuilds rather than landing targeted
+		-- writes, so this is the flush that writes the whole list back.
+		for index = 1, 50 do
+			local key = string.format("internal.key%d", index)
+			service:SetEntryValue(key, key, string.format("ctx%d", index), "en", key)
+		end
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationRebuildCount()).toBe(2)
+
+		local entries = TranslatorTestUtils.getEntryMap(localizationTable)
+		expect(entries["external.key"].Values["en"]).toBe("External")
+		expect(entries["internal.one"].Values["en"]).toBe("Internal one")
+		expect(entries["internal.key50"].Values["en"]).toBe("internal.key50")
+		expect(Table.count(entries)).toBe(52)
+		controller:destroy()
+	end)
+end)
+
+-- The batched flush lands small batches as targeted SetEntryValue/SetEntryExample calls
+-- rather than rebuilding the table, which means trusting those calls to leave the rest of the
+-- entry alone. Nothing in the package would notice if they stopped: the mirror would simply
+-- disagree with the table from then on, and a write it thinks is redundant is dropped. So the
+-- assumptions are pinned here, against the engine, not against the service.
+--
+-- The third assumption -- that SetEntryValue overwrites source/context in place -- is written
+-- up in docs/engine-behavior.md and pinned by "queues a write that changes only the source or
+-- context" above.
+describe("LocalizationTable behavior the targeted writes rest on", function()
+	it("SetEntryValue leaves the entry's example alone", function()
+		local localizationTable = Instance.new("LocalizationTable")
+
+		localizationTable:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		localizationTable:SetEntryExample("k.one", "One", "ctx", "An example")
+		localizationTable:SetEntryValue("k.one", "One", "ctx", "fr", "Un")
+
+		local entry = TranslatorTestUtils.getEntryMap(localizationTable)["k.one"]
+		expect(entry.Example).toBe("An example")
+		expect(entry.Values["en"]).toBe("One")
+		expect(entry.Values["fr"]).toBe("Un")
+		localizationTable:Destroy()
+	end)
+
+	it("SetEntryExample leaves the entry's values alone", function()
+		local localizationTable = Instance.new("LocalizationTable")
+
+		localizationTable:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		localizationTable:SetEntryValue("k.one", "One", "ctx", "fr", "Un")
+		localizationTable:SetEntryExample("k.one", "One", "ctx", "An example")
+
+		local entry = TranslatorTestUtils.getEntryMap(localizationTable)["k.one"]
+		expect(entry.Values["en"]).toBe("One")
+		expect(entry.Values["fr"]).toBe("Un")
+		expect(entry.Example).toBe("An example")
+		localizationTable:Destroy()
 	end)
 end)

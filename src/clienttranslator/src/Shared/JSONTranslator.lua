@@ -456,7 +456,9 @@ function JSONTranslator.ToTranslationKey(self: JSONTranslator, prefix: string, t
 	local translationKey = TranslationKeyUtils.getTranslationKey(prefix, text)
 	local context = string.format("automatic.%s", translationKey)
 
-	-- TODO: Only set if we don't need it
+	-- Registration is unconditional, and cheap when nothing changed: the service drops a write
+	-- the table already agrees with before it queues anything. This is a hot path -- every
+	-- label built through ObserveTranslation mints its key -- so it has to stay that way.
 	self:SetEntryValue(translationKey, text, context, "en", text)
 
 	return translationKey

@@ -35,6 +35,32 @@ game registered the same key twice (e.g. `collectable.toolUnlocked` written as a
 and again as a generated dialog line), crashing the flush. Pinned by
 `TranslatorService.spec.lua` ("entry merging").
 
+## A targeted write leaves the rest of the entry alone
+
+`SetEntryValue` does not disturb the entry's example, and `SetEntryExample` does not disturb its
+values. Pinned by `TranslatorService.spec.lua` ("LocalizationTable behavior the targeted writes
+rest on"), because `TranslatorService` lands small batches as targeted writes and mirrors the
+result rather than reading the table back — a call that clobbered a neighbouring field would put
+the mirror permanently out of step with the table, silently.
+
+What is **not** established is whether `SetEntryExample` overwrites source and context in place the
+way `SetEntryValue` does. Only the `SetEntryValue` behavior above was verified, so the flush never
+lets an example write be the call that lands new metadata; see
+[`design.md`](design.md) ("Two write regimes").
+
+## Write cost: assumed, not measured
+
+The two write regimes rest on a cost model that was reasoned about rather than profiled:
+
+- every mutating call — `SetEntries` and `SetEntryValue` alike — invalidates the engine's cached
+  table contents, so N targeted writes cost N invalidations;
+- `SetEntries` additionally re-serializes every entry in the table, so its cost scales with the
+  table rather than with the batch.
+
+The symptom that motivated it is real and reproducible — a frame spike each time new text appeared
+on screen, on a table holding thousands of entries — but `INVALIDATION_ENTRY_COST` (the ratio
+between the two) is a judgment call. If you profile this properly, write the numbers here.
+
 ## `Translator:FormatByKey` raises for a missing key
 
 It does not return nil, and it does not fall back to the table's source locale. The error text is:
