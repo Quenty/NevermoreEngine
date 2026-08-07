@@ -188,6 +188,47 @@ describe("JSONTranslator:ToTranslationKey", function()
 		expect(entry.Source).toBe("Play Now")
 		controller:destroy()
 	end)
+
+	it("does not re-register a key a locale file already loaded", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+		local translator = controller.newTranslator({ button = { playnow = "Play Now" } })
+
+		controller.awaitEntriesWritten()
+		local rebuildsAfterLoad = service:GetLocalizationRebuildCount()
+
+		-- An authored line is normally both loaded at boot and minted again when it is first
+		-- shown, and the two describe the same entry with different contexts. A metadata-only
+		-- write cannot be landed by a targeted call, so registering over it rebuilt the whole
+		-- table -- once per line, on the frame that line first reached the screen.
+		local key = translator:ToTranslationKey("button", "Play Now")
+
+		expect(service:IsTranslationReady(key)).toBe(true)
+		expect(service:PromiseEntriesWritten():IsPending()).toBe(false)
+
+		controller.awaitEntriesWritten()
+		expect(service:GetLocalizationRebuildCount()).toBe(rebuildsAfterLoad)
+		controller:destroy()
+	end)
+
+	it("still registers when the text behind an existing key changed", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+		local translator = controller.newTranslator({ button = { playnow = "Play Now" } })
+		controller.awaitEntriesWritten()
+
+		-- The key derivation folds whitespace, so different text can mint the same key. Skipping
+		-- registration is only safe while the source text agrees.
+		local key = translator:ToTranslationKey("button", "Play  Now")
+		expect(key).toBe("button.playnow")
+		expect(service:IsTranslationReady(key)).toBe(false)
+
+		controller.awaitEntriesWritten()
+		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())[key]
+		expect(entry.Source).toBe("Play  Now")
+		expect(entry.Values["en"]).toBe("Play  Now")
+		controller:destroy()
+	end)
 end)
 
 describe("JSONTranslator:GetLocalizationTable / GetLocaleId", function()

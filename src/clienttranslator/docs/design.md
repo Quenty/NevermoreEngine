@@ -84,12 +84,13 @@ invalidations, and showing one label must not rebuild the whole table.
 Pinned by "lands a later handful of keys without rebuilding the whole table" and "rebuilds rather
 than writing hundreds of entries one at a time", via `GetLocalizationRebuildCount`.
 
-The targeted route trusts each call to leave the rest of the entry alone, and source and context
-ride along only on a value write that actually changes a value — a `SetEntryValue` that rewrites the
-text a locale already holds lands nothing, new metadata included. So a batch that changes nothing
-but an entry's metadata is rebuilt rather than written. That is rare next to the value writes this
-path exists for, and the alternative is a metadata change that silently does not land. What the
-engine does and does not guarantee here is written up in
+The targeted route trusts each call to leave the rest of the entry alone, and it cannot carry source
+or context: on an entry that already exists those are arguments `SetEntryValue` matches on rather
+than fields it writes, so the entry keeps the metadata it was created with. A batch that changes any
+metadata is therefore rebuilt rather than written — rare next to the value writes this path exists
+for, and the alternative is a metadata change that silently does not land while the mirror believes
+it did. The same reason keeps `FlushEntryForKey` from moving the mirror's metadata when it lands a
+value early. What the engine does and does not guarantee here is written up in
 [`engine-behavior.md`](engine-behavior.md), pinned by "LocalizationTable behavior the targeted
 writes rest on" and "queues a write that changes only the source or context".
 
@@ -102,6 +103,47 @@ it — per label, per frame, in the source language, where there is nothing to t
 
 `SetEntryValue`/`SetEntryExample` therefore drop a write the table already agrees with before it
 queues. Source and context count as part of the value: a change in either still writes.
+
+#### …but minting does not ask about context
+
+That last sentence had a sharp edge, and it cost a frame spike per line of dialog.
+
+An authored line is normally registered **twice**: once by the loader at boot, from the locale
+file, and again by `ToTranslationKey` the first time the line is shown. They agree on the key, the
+source, and the text, and they disagree on the context — the loader writes `Generated from <name>
+with key <key>`, minting writes `automatic.<key>`. So the currency check above let the write
+through, and it was a write that changed *nothing but metadata*, which no targeted call can land
+(see "Two write regimes"). Every such line therefore rebuilt the whole table on the frame it first
+reached the screen: correct output, one full re-serialization per new line of dialog, and silence
+afterwards because the mirror then agreed.
+
+So `ToTranslationKey` asks `TranslatorService:IsEntryRegistered`, which compares key, source and
+text and is **blind to context**. Nothing a player or a reader can observe depends on which of the
+two descriptions won, and the CSV export is fine with either.
+
+The context still matters where it is load-bearing — it is what keeps `SetEntries` from rejecting
+two entries as duplicates — so it is written whenever the entry is created, and a genuine
+metadata change still rebuilds. What is gone is the manufactured one. Pinned by "does not
+re-register a key a locale file already loaded".
+
+Which of the two descriptions an entry ends up carrying is decided by flush timing, and that is
+fine but worth knowing before you go looking for it in a CSV export. A key that is minted after
+its loader's batch has landed keeps the loader's context, because the mint is skipped outright. A
+key minted in the *same frame* as the load — the ordinary boot, where `Init` queues the source
+locale and the UI paints from it before the deferred flush runs — is still pending, so
+`IsEntryRegistered` refuses to conclude anything (see `_getCurrentEntry`), the mint proceeds, and
+it overwrites the queued entry's context with `automatic.<key>`. That costs no rebuild — the two
+writes merge into one pending entry that has yet to be created — and uniqueness survives either
+way, since both spellings are derived from the key. So a real table holds a mix of both, split on
+when each line first reached the screen.
+
+Minting was also carrying something it had no business carrying: the Studio pseudo-locale value,
+written as a side effect of `SetEntryValue` on that second registration. Skipping the second
+registration therefore took pseudo-localization with it for keys the loaders own — silently, and
+only in Studio, where no cloud test can see it. The parser had been attaching that value to the
+entry all along (`LocalizationEntryParserUtils`); `TableLocaleLoader` forwarded it and
+`InstanceLocaleLoader` did not. Now both do, on the source-locale pass, which is where it is
+derived from anyway. Minting backfilling it was always the accident.
 
 ### The table is mirrored
 
@@ -273,6 +315,19 @@ everything else about the change is mechanical.
 Warning per miss floods the console with one line per key per locale swap — the cloud translator
 does not know keys registered at runtime, and a queued key is not readable yet by design. Both are
 routine, neither is a problem.
+
+"Ready" is per locale, and per locale means per fallback set. A key queued under `en` is not ready
+for a player on `en-us`, because that is the value the read would have resolved through
+(engine-behavior.md, "A regional translator resolves values stored under the bare language").
+Comparing the exact locale alone made the gate a no-op for every regional player: a boot warned
+once for each key the first frame it was painted, all of them real keys that read correctly a frame
+later.
+
+The fallback set includes the table's source locale, so the gate is now nearly as wide as
+`IsTranslationReady` — almost every queued entry carries a source-locale value. The cost is a
+genuine "this key has no French" going unwarned while anything is queued under `en` for it, which
+is the right trade here: the alternative is the flood above, and a missing translation is visible
+in the output either way. Anything that needs the strict answer should ask a translator, not this.
 
 ## Testing notes
 
