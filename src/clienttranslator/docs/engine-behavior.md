@@ -65,6 +65,14 @@ The symptom that motivated it is real and reproducible — a frame spike each ti
 on screen, on a table holding thousands of entries — but `INVALIDATION_ENTRY_COST` (the ratio
 between the two) is a judgment call. If you profile this properly, write the numbers here.
 
+The symptom outlived the first fix in a narrower form: a spike on text the player had not seen
+before, and none on repeats. That was not the cost model being wrong, it was a metadata-only write
+manufactured per line by `ToTranslationKey`, forcing the rebuild path; see
+[`design.md`](design.md) ("…but minting does not ask about context"). Worth remembering as a
+diagnostic: `GetLocalizationRebuildCount` climbing once per newly-shown line means something is
+queueing a change that cannot be expressed as a targeted write, not that the crossover is
+mistuned.
+
 ## `Translator:FormatByKey` raises for a missing key
 
 It does not return nil, and it does not fall back to the table's source locale. The error text is:
@@ -101,6 +109,21 @@ Not `en`. Relevant because loaders key source-locale data under whatever the fol
 (usually `en`), so the table's source locale and the data's source locale are not the same string.
 `FlushEntryForKey` therefore lands the locale, the table's source locale, and the bare language
 subtag of each.
+
+## A regional translator resolves values stored under the bare language
+
+A translator for `en-us` answers keys whose entry only carries an `en` value, and reports
+`LocaleId = "en-us"` while doing it. Checked against a running game whose table stored every value
+under `en`:
+
+```lua
+tbl:GetTranslator("en-us"):FormatByKey("adventureLog.eggs") --> "Eggs"
+```
+
+This is what makes the loaders' `en`-keyed data readable for a real player at all, so anything
+reasoning about whether a key is readable **in a locale** has to reason about the same fallback
+set — a queued `en` value blocks a read for `en-us`, even though the entry has nothing queued
+under `en-us` (`IsTranslationReadyForLocale`).
 
 ## How to check any of this yourself
 

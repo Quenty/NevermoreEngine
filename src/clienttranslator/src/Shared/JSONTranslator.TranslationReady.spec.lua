@@ -449,6 +449,31 @@ describe("TranslatorService:IsTranslationReadyForLocale", function()
 		expect(controller.translatorService:IsTranslationReadyForLocale("never.registered", "en")).toBe(true)
 		controller:destroy()
 	end)
+
+	it("is false for a regional locale while the language value it falls back to is queued", function()
+		local controller = TranslatorTestUtils.setup()
+		controller.setForcedLocaleId("en-us")
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
+		expect(service:IsTranslationReadyForLocale("k.one", "en-us")).toBe(false)
+
+		controller.awaitEntriesWritten()
+
+		expect(service:IsTranslationReadyForLocale("k.one", "en-us")).toBe(true)
+		controller:destroy()
+	end)
+
+	it("is true while only a locale the read cannot consult is queued", function()
+		local controller = TranslatorTestUtils.setup()
+		controller.setForcedLocaleId("en-us")
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "ctx", "fr", "Un")
+
+		expect(service:IsTranslationReadyForLocale("k.one", "en-us")).toBe(true)
+		controller:destroy()
+	end)
 end)
 
 describe("TranslatorService teardown", function()

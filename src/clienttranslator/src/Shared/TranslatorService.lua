@@ -323,6 +323,66 @@ function TranslatorService._getEntryCache(_self: TranslatorService, localization
 end
 
 --[=[
+	Whether the table already carries this key with this source text, whatever context it was
+	registered under.
+
+	This is the question [JSONTranslator.ToTranslationKey] asks before registering, and it is
+	deliberately blind to context: a key loaded from a locale file and the same key minted at
+	runtime describe themselves differently ("Generated from X with key Y" vs "automatic.Y")
+	while meaning the same thing. Rewriting the context changes nothing a reader can observe,
+	and there is no targeted call that lands metadata on its own -- so it would cost a full
+	table rebuild (see [TranslatorService._mergePendingEntries]) for every authored line the
+	first time it appeared on screen.
+
+	Takes the same arguments as [TranslatorService.SetEntryValue] minus the context it ignores,
+	and in the same order. Worth keeping that way: at the only call site the source and the text
+	are the same string, so a transposition would type-check, pass these asserts, and read
+	correctly.
+
+	@param translationKey string
+	@param source string
+	@param localeId string
+	@param text string
+	@return boolean
+]=]
+function TranslatorService.IsEntryRegistered(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	localeId: string,
+	text: string
+): boolean
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(source) == "string", "Bad source")
+	assert(type(localeId) == "string", "Bad localeId")
+	assert(type(text) == "string", "Bad text")
+
+	local entry = self:_getCurrentEntry(translationKey)
+	if not entry then
+		return false
+	end
+
+	return entry.Source == source and entry.Values[localeId] == text
+end
+
+--[=[
+	The entry the table currently holds for a key, or nil when it holds none -- or when the key
+	has a delta queued, which makes it mid-change: the flush decides what the table ends up
+	with, so nothing may be concluded from what is there now.
+
+	@param translationKey string
+	@return LocalizationEntry?
+	@private
+]=]
+function TranslatorService._getCurrentEntry(self: TranslatorService, translationKey: string): LocalizationEntry?
+	if self._pendingEntries[translationKey] then
+		return nil
+	end
+
+	return self:_getEntryCache(self:GetLocalizationTable()).ByKey[translationKey]
+end
+
+--[=[
 	Whether the table already holds exactly this value, making the write nothing but cost.
 
 	Re-registering unchanged text is the common case rather than the exception: minting a
@@ -347,12 +407,7 @@ function TranslatorService._isEntryValueCurrent(
 	localeId: string,
 	text: string
 ): boolean
-	-- A key with a delta queued is mid-change; the flush decides what the table ends up with.
-	if self._pendingEntries[translationKey] then
-		return false
-	end
-
-	local entry = self:_getEntryCache(self:GetLocalizationTable()).ByKey[translationKey]
+	local entry = self:_getCurrentEntry(translationKey)
 	if not entry then
 		return false
 	end
@@ -379,11 +434,7 @@ function TranslatorService._isEntryExampleCurrent(
 	context: string,
 	example: string
 ): boolean
-	if self._pendingEntries[translationKey] then
-		return false
-	end
-
-	local entry = self:_getEntryCache(self:GetLocalizationTable()).ByKey[translationKey]
+	local entry = self:_getCurrentEntry(translationKey)
 	if not entry then
 		return false
 	end
@@ -433,7 +484,11 @@ end
 
 --[=[
 	Whether a read of this key **in this locale** would see everything queued for it. Narrower
-	than [TranslatorService.IsTranslationReady], which is false while any locale is queued.
+	than [TranslatorService.IsTranslationReady], which is false while any locale is queued --
+	though only barely, in practice. The fallback set below includes the table's source locale,
+	and nearly every queued entry carries a source-locale value (the loaders write the source
+	file first, minting writes `en`), so the two answers differ only for an entry queued
+	*exclusively* in a locale this one cannot read through.
 
 	:::warning
 	This is an implementation detail of the translation stack, exposed for diagnostics.
@@ -443,6 +498,12 @@ end
 	which lands the locales a read can consult but leaves the entry queued for the rest. The
 	key is readable in that locale while still not ready overall, so a failure to translate it
 	is a real failure and worth reporting.
+
+	Readable means readable the way a translator reads: every locale a read of this locale may
+	fall back through has to have landed, not just the exact locale asked about. Loaders key
+	their data under the language ("en"), while a player's locale is normally a regional variant
+	("en-us"), so asking about the regional locale alone would call every queued key ready --
+	its pending values are under the language it would fall back to.
 
 	@param translationKey string
 	@param localeId string
@@ -461,7 +522,42 @@ function TranslatorService.IsTranslationReadyForLocale(
 		return true
 	end
 
-	return entry.Values[localeId] == nil
+	for _, readLocale in self:_getReadLocales(localeId) do
+		if entry.Values[readLocale] ~= nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+-- Appends a locale to the read set, skipping the ones already in it.
+local function insertReadLocale(readLocales: { string }, localeId: string?)
+	if localeId ~= nil and not table.find(readLocales, localeId) then
+		table.insert(readLocales, localeId)
+	end
+end
+
+--[=[
+	The locales a read for this locale may consult, without repeats: the locale itself and the
+	table's source locale, each plus its bare language subtag, since the Roblox translator falls
+	a regional locale back to its language (e.g. en-us -> en, and the loaders key the source
+	under "en").
+
+	@param localeId string
+	@return { string }
+	@private
+]=]
+function TranslatorService._getReadLocales(self: TranslatorService, localeId: string): { string }
+	local sourceLocaleId = self:GetLocalizationTable().SourceLocaleId
+
+	local readLocales: { string } = {}
+	insertReadLocale(readLocales, localeId)
+	insertReadLocale(readLocales, sourceLocaleId)
+	insertReadLocale(readLocales, ResolveLocaleUtils.getLanguageSubtag(localeId))
+	insertReadLocale(readLocales, ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId))
+
+	return readLocales
 end
 
 --[=[
@@ -592,24 +688,13 @@ function TranslatorService.FlushEntryForKey(self: TranslatorService, translation
 
 	local localizationTable = self:GetLocalizationTable()
 
-	-- The locales a synchronous read may consult: the current locale and the table's source
-	-- locale, each plus its bare language subtag, since the Roblox translator falls a
-	-- regional locale back to its language (e.g. en-us -> en, and the loaders key the source
-	-- under "en"). Landing just these avoids writing every locale in the entry.
-	local localeId = self:GetLocaleId()
-	local sourceLocaleId = localizationTable.SourceLocaleId
-	local readLocales = { localeId, sourceLocaleId }
-	local localeSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
-	if localeSubtag then
-		table.insert(readLocales, localeSubtag)
-	end
-	local sourceSubtag = ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId)
-	if sourceSubtag then
-		table.insert(readLocales, sourceSubtag)
-	end
+	-- Landing only the locales a synchronous read may consult avoids writing every locale in
+	-- the entry.
+	local readLocales = self:_getReadLocales(self:GetLocaleId())
 
-	-- Land each read locale for this key's pending entry. A landed locale is dequeued, so a
-	-- repeated read locale (e.g. localeId already its own subtag) just no-ops the second time.
+	-- Land each read locale for this key's pending entry. A landed locale is dequeued, and the
+	-- read set carries no repeats, so this is at most one write per distinct locale a read of
+	-- this key could resolve through.
 	for _, readLocale in readLocales do
 		self:_landEntryLocale(localizationTable, entry, readLocale)
 	end

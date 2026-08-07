@@ -315,6 +315,28 @@ describe("TranslatorService localization write cost", function()
 		controller:destroy()
 	end)
 
+	it("reports an entry registered whatever context it was registered under", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		expect(service:IsEntryRegistered("k.one", "One", "en", "One")).toBe(false)
+
+		service:SetEntryValue("k.one", "One", "c1", "en", "One")
+		-- Mid-change: what the table holds now says nothing about what the flush will leave.
+		expect(service:IsEntryRegistered("k.one", "One", "en", "One")).toBe(false)
+		controller.awaitEntriesWritten()
+
+		-- Registered under "c1", and there is no context to ask about: a caller minting a key it
+		-- would describe differently is asking whether the entry is there, not whose it is.
+		expect(service:IsEntryRegistered("k.one", "One", "en", "One")).toBe(true)
+
+		-- Source and text still count. Both are what a reader sees.
+		expect(service:IsEntryRegistered("k.one", "Uno", "en", "One")).toBe(false)
+		expect(service:IsEntryRegistered("k.one", "One", "en", "Uno")).toBe(false)
+		expect(service:IsEntryRegistered("k.one", "One", "fr", "One")).toBe(false)
+		controller:destroy()
+	end)
+
 	it("writes when a queued entry changes an existing value", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService

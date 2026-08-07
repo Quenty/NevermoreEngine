@@ -14,6 +14,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
+local PseudoLocalize = require("PseudoLocalize")
 local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local ServiceBag = require("ServiceBag")
 local TranslatorService = require("TranslatorService")
@@ -129,14 +130,28 @@ function InstanceLocaleLoader._loadFile(self: InstanceLocaleLoader, fileLocale: 
 		self._lookupTable
 	)
 
+	local pseudoLocaleId = PseudoLocalize.getDefaultPseudoLocaleId()
+
 	for _, item in entries do
 		local text = item.Values[fileLocale]
 		if text ~= nil then
 			self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, fileLocale, text)
 		end
-		-- The example only comes from the source locale.
+
+		-- The example and the pseudo-localized value both come from the source locale only --
+		-- the parser derives the latter from the source text, in Studio, and no other file's
+		-- decode produces one.
 		if fileLocale == self._sourceLocaleId then
 			self._translatorService:SetEntryExample(item.Key, item.Source, item.Context, item.Example)
+
+			-- Queued here because nothing else does it: a key a locale file already registered
+			-- is not re-registered by [JSONTranslator.ToTranslationKey] when it first appears on
+			-- screen, so the pseudo value it used to backfill would never reach the table and
+			-- the forced pseudo locale would fall back to the source language in Studio.
+			local pseudoText = item.Values[pseudoLocaleId]
+			if pseudoText ~= nil then
+				self._translatorService:SetEntryValue(item.Key, item.Source, item.Context, pseudoLocaleId, pseudoText)
+			end
 		end
 	end
 end
