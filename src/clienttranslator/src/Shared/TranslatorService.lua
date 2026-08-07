@@ -738,8 +738,14 @@ function TranslatorService._landEntryLocale(
 
 	local cached: LocalizationEntry
 	if existing then
+		-- The mirror keeps the metadata it has, because the table does: the source and context
+		-- below are matched against an existing entry rather than written to it
+		-- (engine-behavior.md). Moving them here would put the mirror out of step with the table
+		-- and, worse, hide the change from the flush -- which rebuilds for it, and is the only
+		-- thing that can land it.
 		cached = existing
 	else
+		-- A new entry is created by the write below, carrying this metadata.
 		cached = {
 			Key = entry.Key,
 			Source = entry.Source,
@@ -751,8 +757,6 @@ function TranslatorService._landEntryLocale(
 		table.insert(cache.List, cached)
 	end
 
-	cached.Source = entry.Source
-	cached.Context = entry.Context
 	cached.Values[localeId] = text
 
 	localizationTable:SetEntryValue(entry.Key, entry.Source, entry.Context, localeId, text)
@@ -1004,23 +1008,20 @@ function TranslatorService._mergePendingEntries(
 		entry.Source = delta.Source
 		entry.Context = delta.Context
 
-		local valueWritten = false
 		for localeId, text in delta.Values do
 			if entry.Values[localeId] ~= text then
 				entry.Values[localeId] = text
 				table.insert(writes, { Entry = entry, LocaleId = localeId })
-				valueWritten = true
 			end
 		end
 
-		-- Source and context ride along on the value write that changes the entry, and there is
-		-- no targeted call that lands them on their own: SetEntryValue updates them only when
-		-- it actually changes a value, and rewriting a locale with the text it already holds is
-		-- a no-op the metadata does not survive (engine-behavior.md). So a batch that changes
-		-- nothing but metadata is rebuilt rather than written -- rare next to the value writes
-		-- this path exists for, and the alternative is a metadata change that silently does not
-		-- land.
-		if metadataChanged and not valueWritten then
+		-- No targeted call lands source or context on an entry that already exists: they are
+		-- arguments SetEntryValue matches on, not fields it writes, so the entry keeps the
+		-- metadata it was created with whether or not the call also changes a value
+		-- (engine-behavior.md). So any batch that changes metadata is rebuilt rather than
+		-- written -- rare next to the value writes this path exists for, and the alternative is
+		-- a metadata change that silently does not land while the mirror believes it did.
+		if metadataChanged then
 			bulkRequired = true
 		end
 

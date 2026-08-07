@@ -84,12 +84,13 @@ invalidations, and showing one label must not rebuild the whole table.
 Pinned by "lands a later handful of keys without rebuilding the whole table" and "rebuilds rather
 than writing hundreds of entries one at a time", via `GetLocalizationRebuildCount`.
 
-The targeted route trusts each call to leave the rest of the entry alone, and source and context
-ride along only on a value write that actually changes a value — a `SetEntryValue` that rewrites the
-text a locale already holds lands nothing, new metadata included. So a batch that changes nothing
-but an entry's metadata is rebuilt rather than written. That is rare next to the value writes this
-path exists for, and the alternative is a metadata change that silently does not land. What the
-engine does and does not guarantee here is written up in
+The targeted route trusts each call to leave the rest of the entry alone, and it cannot carry source
+or context: on an entry that already exists those are arguments `SetEntryValue` matches on rather
+than fields it writes, so the entry keeps the metadata it was created with. A batch that changes any
+metadata is therefore rebuilt rather than written — rare next to the value writes this path exists
+for, and the alternative is a metadata change that silently does not land while the mirror believes
+it did. The same reason keeps `FlushEntryForKey` from moving the mirror's metadata when it lands a
+value early. What the engine does and does not guarantee here is written up in
 [`engine-behavior.md`](engine-behavior.md), pinned by "LocalizationTable behavior the targeted
 writes rest on" and "queues a write that changes only the source or context".
 

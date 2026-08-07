@@ -13,12 +13,18 @@ from these is in [`design.md`](design.md).
 Source and context are metadata; they do **not** widen an entry's identity.
 
 - `SetEntryValue(key, sourceA, contextA, ...)` then `SetEntryValue(key, sourceB, contextB, ...)`
-  leaves a **single** entry — the second call overwrites source/context in place, **provided it
-  also changes the value**. Called with the text the locale already holds it lands nothing at all,
-  source and context included: the new metadata is silently discarded. There is therefore no
-  targeted call that changes only an entry's metadata, and `TranslatorService` rebuilds the table
-  for a batch that changes nothing else. Pinned by `TranslatorService.spec.lua` ("queues a write
-  that changes only the source or context").
+  leaves a **single** entry, and it keeps `sourceA`/`contextA`. On an entry that already exists the
+  source and context are matched against, not written — the second call updates the value and
+  silently discards the new metadata, whether or not it changes a value. There is therefore **no
+  targeted call that lands metadata at all**, and `TranslatorService` rebuilds the table for any
+  batch that changes some. Pinned by `TranslatorService.spec.lua` ("SetEntryValue leaves an
+  existing entry's source and context alone", "queues a write that changes only the source or
+  context", "rewrites a key with a new source/context across flushes without duplicating it").
+
+  This was first written down as metadata landing *provided the call also changed a value*, which
+  was a guess that read plausibly and was never pinned: the spec behind it went through the rebuild
+  path. It cost a silent mirror desync — the mirror recorded metadata the table had refused — until
+  a test asserted the source after a value-changing rewrite.
 - `SetEntries` **rejects** an array holding two entries that share a key, even with differing
   source and context:
 
