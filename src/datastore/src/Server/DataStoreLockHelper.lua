@@ -102,6 +102,16 @@ function DataStoreLockHelper.ToUnlockedProfile(self: DataStoreLockHelper, origin
 				isValid = true,
 				unlockedProfile = self:ToRawUnlockedProfile(original),
 			}
+		elseif self:_isLockStale(parsedLockData) then
+			-- Held by a session this protocol already considers dead. AcquireLock would take this
+			-- lock rather than wait for it, so reporting theft here would have the two halves
+			-- disagreeing about the same predicate -- and the cost of that disagreement is a
+			-- kicked player and the save that was about to land, over a session that died hours
+			-- ago and is never coming back to claim it.
+			return {
+				isValid = true,
+				unlockedProfile = self:ToRawUnlockedProfile(original),
+			}
 		else
 			-- Someone else owns the lock
 			return {
@@ -157,6 +167,35 @@ function DataStoreLockHelper.ToLockedProfile(self: DataStoreLockHelper, original
 
 		return copy
 	end
+end
+
+--[=[
+	Whether a lock is old enough that the session holding it is assumed dead.
+
+	A session refreshes its lock whenever it actually writes, so a lock that has gone several
+	auto-save intervals without moving most likely belongs to a server that crashed. (A live but
+	fully idle session can go quiet that long too, since a save with nothing staged skips the
+	write -- the load side has always accepted stealing such a lock, and that session's own next
+	real save then reads as theft and closes it out.) Both halves of the protocol ask this
+	predicate, and they have to agree: a lock the load will take is one the save must not report
+	as theft.
+
+	@private
+	@param parsedLockData LockData?
+	@return boolean
+]=]
+function DataStoreLockHelper._isLockStale(self: DataStoreLockHelper, parsedLockData: LockData?): boolean
+	if parsedLockData == nil or parsedLockData.LastUpdateTime == nil then
+		return false
+	end
+
+	local autoSaveSeconds = self._dataStore:GetAutoSaveTimeSeconds()
+	if not autoSaveSeconds then
+		return false
+	end
+
+	local timeElapsed = os.time() - parsedLockData.LastUpdateTime
+	return timeElapsed > (autoSaveSeconds * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER)
 end
 
 function DataStoreLockHelper._isInSession(self: DataStoreLockHelper, sessionData: LockedSessionData): boolean
@@ -266,15 +305,7 @@ function DataStoreLockHelper.AcquireLock(self: DataStoreLockHelper, data: any, c
 
 	-- We're locked out, but there's conditions where it's ok to steal the lock
 
-	local lockStealingOk = canStealLock
-	if parsedLockData and parsedLockData.LastUpdateTime then
-		-- Assume the server crashed if it's been a while since the last update
-		local timeElapsed = os.time() - parsedLockData.LastUpdateTime
-		local autoSaveSeconds = self._dataStore:GetAutoSaveTimeSeconds()
-		if autoSaveSeconds and timeElapsed > (autoSaveSeconds * UNLOCK_BY_DEFAULT_TIME_MULTIPLIER) then
-			lockStealingOk = true
-		end
-	end
+	local lockStealingOk = canStealLock or self:_isLockStale(parsedLockData)
 
 	if ALWAYS_STEAL_LOCKS_IN_STUDIO and RunService:IsStudio() then
 		lockStealingOk = true
