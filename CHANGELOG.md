@@ -1,3 +1,16 @@
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.5`
+  - fix: Prevent more redundant localization table rebuilding [#788](https://github.com/Quenty/NevermoreEngine/pull/788) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Wed Aug 05 2026)
 
 #### 🐛 Bug Fix
