@@ -1,3 +1,29 @@
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/highlight@10.49.1`, `@quenty/performanceutils@4.12.1`, `@quenty/sounds@10.27.1`
+  - Update PerformanceUtils.lua [#787](https://github.com/Quenty/NevermoreEngine/pull/787) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.5`
+  - fix: Prevent more redundant localization table rebuilding [#788](https://github.com/Quenty/NevermoreEngine/pull/788) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Wed Aug 05 2026)
 
 #### 🐛 Bug Fix
