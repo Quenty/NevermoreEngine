@@ -1,3 +1,17 @@
+# v14.47.5 (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Prevent more redundant localization table rebuilding [#788](https://github.com/Quenty/NevermoreEngine/pull/788) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Stale metadata ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Prevent more redundant table rebuilding ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
