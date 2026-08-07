@@ -1,21 +1,11 @@
-# v4.12.1 (Fri Aug 07 2026)
-
-#### 🐛 Bug Fix
-
-- Update PerformanceUtils.lua [#787](https://github.com/Quenty/NevermoreEngine/pull/787) ([@euvinkeel](https://github.com/euvinkeel))
-- Merge branch 'main' into users/euvinkeel/performanceutils ([@euvinkeel](https://github.com/euvinkeel))
-- Update PerformanceUtils.lua ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.12.0...@quenty/performanceutils@4.12.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/performanceutils
 
 # [4.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.11.1...@quenty/performanceutils@4.12.0) (2026-07-23)
 

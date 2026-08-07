@@ -1,21 +1,11 @@
-# v10.49.1 (Fri Aug 07 2026)
-
-#### 🐛 Bug Fix
-
-- Update PerformanceUtils.lua [#787](https://github.com/Quenty/NevermoreEngine/pull/787) ([@euvinkeel](https://github.com/euvinkeel))
-- Merge branch 'main' into users/euvinkeel/performanceutils ([@euvinkeel](https://github.com/euvinkeel))
-- leak fix ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.49.0...@quenty/highlight@10.49.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/highlight
 
 # [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.48.2...@quenty/highlight@10.49.0) (2026-07-28)
 
