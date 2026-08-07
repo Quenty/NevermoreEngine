@@ -14,7 +14,9 @@ local PromiseUtils = require("PromiseUtils")
 local SoundPromiseUtils = {}
 
 --[=[
-	Promises that a sound is loaded
+	Promises that a sound is loaded. Connections clean when the promise settles or the
+	source instance is destroyed (pending promise rejects).
+
 	@param sound Sound
 	@return Promise
 ]=]
@@ -36,6 +38,10 @@ function SoundPromiseUtils.promiseLoaded(sound: Sound | VideoFrame): Promise.Pro
 		if sound.IsLoaded then
 			promise:Resolve()
 		end
+	end))
+
+	maid:GiveTask(sound.Destroying:Connect(function()
+		promise:Reject()
 	end))
 
 	promise:Finally(function()
