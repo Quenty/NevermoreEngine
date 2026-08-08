@@ -633,6 +633,10 @@ end
 	Takes in a brio and returns an observable that emits the brio, and then completes
 	on death.
 
+	Mapped results go through [BrioUtils.first], which roots a Maid on the outer brio
+	until that outer dies. Long-lived outers (e.g. PlayerScripts) therefore retain every
+	`first` forever unless we Kill them when this projection unsubscribes or emits again.
+
 	@since 3.6.0
 	@param project (value: TBrio) -> TProject | Brio<TProject>
 	@return (Brio<TBrio>) -> Brio<TProject>
@@ -650,9 +654,42 @@ function RxBrioUtils.mapBrioBrio(project)
 		local observable = project(brio:GetValue())
 		assert(Observable.isObservable(observable), "Not an observable")
 
-		return RxBrioUtils.completeOnDeath(brio, observable):Pipe({
-			Rx.map(RxBrioUtils._mapResult(brio)) :: any,
-		}) :: any
+		-- NOTE(perf-leak): do not return a bare Pipe here. switchMap/flatMapBrio unsub
+		-- must Kill last `first` or session-scoped outers retain them across characters.
+		return Observable.new(function(sub)
+			local maid = Maid.new()
+			local lastMapped: any = nil
+
+			local function rememberAndFire(result: any)
+				if Brio.isBrio(result) then
+					if lastMapped and lastMapped ~= result and not lastMapped:IsDead() then
+						lastMapped:Kill()
+					end
+					lastMapped = result
+				end
+
+				sub:Fire(result)
+			end
+
+			maid:GiveTask(RxBrioUtils.completeOnDeath(brio, observable)
+				:Pipe({
+					Rx.map(RxBrioUtils._mapResult(brio)) :: any,
+				})
+				:Subscribe(rememberAndFire, function(...)
+					sub:Fail(...)
+				end, function(...)
+					sub:Complete(...)
+				end))
+
+			maid:GiveTask(function()
+				if lastMapped and not lastMapped:IsDead() then
+					lastMapped:Kill()
+				end
+				lastMapped = nil
+			end)
+
+			return maid
+		end)
 	end
 end
 

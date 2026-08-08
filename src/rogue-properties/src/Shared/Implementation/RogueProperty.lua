@@ -70,40 +70,61 @@ function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag,
 	-- Prefer AncestryChanged (Parent=nil): on the client, LoadCharacter teardown
 	-- often parents characters out without firing Destroying. Destroying is kept
 	-- as a backup for explicit :Destroy().
-	local function clearObserveCaches()
-		if rawget(self, "_observeCachesCleared") then
-			return
-		end
-		rawset(self, "_observeCachesCleared", true)
+	--
+	-- Do NOT one-shot this: Observe() can rebuild caches after clear while something
+	-- still holds the property; Parent=nil must clear again every time.
+	--
+	-- Callbacks hold `lifetime` (weak→property), not `self`, so Instance connections
+	-- don't pin the property after nothing else references it.
+	local lifetime = setmetatable({ property = self }, { __mode = "v" })
 
-		rawset(self, "_observeCache", nil)
-		rawset(self, "_observeModifierSortedListCache", nil)
-		rawset(self, "_observeParentBrioCache", nil)
-		rawset(self, "_observeBaseValueBrioCache", nil)
-		rawset(self, "_baseValueInstanceCache", nil)
-
-		local ancestryConn = rawget(self, "_adorneeAncestryConn")
-		if ancestryConn then
-			ancestryConn:Disconnect()
-			rawset(self, "_adorneeAncestryConn", nil)
-		end
-		local destroyingConn = rawget(self, "_adorneeDestroyingConn")
-		if destroyingConn then
-			destroyingConn:Disconnect()
-			rawset(self, "_adorneeDestroyingConn", nil)
-		end
+	local function clearObserveCachesOn(property: any)
+		rawset(property, "_observeCache", nil)
+		rawset(property, "_observeModifierSortedListCache", nil)
+		rawset(property, "_observeParentBrioCache", nil)
+		rawset(property, "_observeBaseValueBrioCache", nil)
+		rawset(property, "_baseValueInstanceCache", nil)
+		rawset(property, "_observeCachesCleared", true)
 	end
 
 	rawset(
 		self,
 		"_adorneeAncestryConn",
 		adornee.AncestryChanged:Connect(function(_, parent)
+			local property = lifetime.property
+			if not property then
+				return
+			end
 			if parent == nil then
-				clearObserveCaches()
+				clearObserveCachesOn(property)
+			else
+				-- Adornee re-entered the tree (rare); allow fresh Observe caches.
+				rawset(property, "_observeCachesCleared", nil)
 			end
 		end)
 	)
-	rawset(self, "_adorneeDestroyingConn", adornee.Destroying:Connect(clearObserveCaches))
+	rawset(
+		self,
+		"_adorneeDestroyingConn",
+		adornee.Destroying:Connect(function()
+			local property = lifetime.property
+			if not property then
+				return
+			end
+			clearObserveCachesOn(property)
+
+			local ancestryConn = rawget(property, "_adorneeAncestryConn")
+			if ancestryConn then
+				ancestryConn:Disconnect()
+				rawset(property, "_adorneeAncestryConn", nil)
+			end
+			local destroyingConn = rawget(property, "_adorneeDestroyingConn")
+			if destroyingConn then
+				destroyingConn:Disconnect()
+				rawset(property, "_adorneeDestroyingConn", nil)
+			end
+		end)
+	)
 
 	return setmetatable(self, RogueProperty)
 end
@@ -203,6 +224,10 @@ function RogueProperty.GetBaseValueObject(self: RogueProperty, roguePropertyBase
 end
 
 function RogueProperty._observeParentBrio(self: RogueProperty): any
+	if rawget(self :: any, "_observeCachesCleared") then
+		return Rx.EMPTY
+	end
+
 	local cache = rawget(self :: any, "_observeParentBrioCache")
 	if cache then
 		return cache
@@ -223,6 +248,10 @@ function RogueProperty._observeParentBrio(self: RogueProperty): any
 end
 
 function RogueProperty._observeBaseValueBrio(self: RogueProperty): any
+	if rawget(self :: any, "_observeCachesCleared") then
+		return Rx.EMPTY
+	end
+
 	local cache = rawget(self :: any, "_observeBaseValueBrioCache")
 	if cache then
 		return cache
@@ -451,6 +480,15 @@ function RogueProperty.GetRogueModifiers(self: RogueProperty): { any }
 end
 
 function RogueProperty._observeModifierSortedList(self: RogueProperty): any
+	local adornee = rawget(self :: any, "_adornee")
+	if typeof(adornee) == "Instance" and adornee.Parent == nil then
+		rawset(self :: any, "_observeCachesCleared", true)
+		return Rx.EMPTY
+	end
+	if rawget(self :: any, "_observeCachesCleared") then
+		return Rx.EMPTY
+	end
+
 	local cache = rawget(self :: any, "_observeModifierSortedListCache")
 	if cache then
 		return cache
@@ -485,11 +523,31 @@ function RogueProperty._observeModifierSortedList(self: RogueProperty): any
 		Rx.cache(),
 	})
 
+	-- Re-check after build: AncestryChanged may have cleared mid-construction.
+	if rawget(self :: any, "_observeCachesCleared") or (typeof(adornee) == "Instance" and adornee.Parent == nil) then
+		rawset(self :: any, "_observeCachesCleared", true)
+		return Rx.EMPTY
+	end
+
 	rawset(self :: any, "_observeModifierSortedListCache", cache)
 	return cache
 end
 
 function RogueProperty.Observe(self: RogueProperty): Observable.Observable<any>
+	-- Never rebuild a sticky shareReplay graph for an adornee that already left the tree.
+	-- Callers that still hold this property after LoadCharacter would otherwise re-seed
+	-- `_observeCache` after Ancestry clear (see clearObserveCaches).
+	local adornee = rawget(self :: any, "_adornee")
+	if typeof(adornee) == "Instance" and adornee.Parent == nil then
+		rawset(self :: any, "_observeCachesCleared", true)
+		rawset(self :: any, "_observeCache", nil)
+		rawset(self :: any, "_observeModifierSortedListCache", nil)
+		return Rx.EMPTY :: any
+	end
+	if rawget(self :: any, "_observeCachesCleared") then
+		return Rx.EMPTY :: any
+	end
+
 	local cache: any = rawget(self :: any, "_observeCache")
 	if cache then
 		return cache
@@ -532,6 +590,15 @@ function RogueProperty.Observe(self: RogueProperty): Observable.Observable<any>
 		end),
 		Rx.cache(),
 	} :: { any })
+
+	-- Re-check after build: Parent=nil / clear may have raced during pipe construction.
+	if rawget(self :: any, "_observeCachesCleared") or (typeof(adornee) == "Instance" and adornee.Parent == nil) then
+		rawset(self :: any, "_observeCachesCleared", true)
+		rawset(self :: any, "_observeCache", nil)
+		rawset(self :: any, "_observeModifierSortedListCache", nil)
+		return Rx.EMPTY :: any
+	end
+
 	rawset(self :: any, "_observeCache", cache)
 	return cache
 end

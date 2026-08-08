@@ -47,38 +47,54 @@ function RoguePropertyTable.new(
 
 	-- Table-only Observe caches: same lifetime as RogueProperty.new (Ancestry Parent=nil
 	-- primary; Destroying backup). Separate conn keys so we don't clobber the base.
-	local function clearTableObserveCaches()
-		if rawget(self :: any, "_tableObserveCachesCleared") then
-			return
-		end
-		rawset(self :: any, "_tableObserveCachesCleared", true)
+	-- Clear every Parent=nil — Observe helpers can rebuild after a one-shot clear.
+	-- Weak lifetime holder so connections don't pin the table after release.
+	local lifetime = setmetatable({ property = self }, { __mode = "v" })
 
-		rawset(self :: any, "_observeContainerCache", nil)
-		rawset(self :: any, "_observeDictionaryCache", nil)
-		rawset(self :: any, "_containerCache", nil)
-
-		local ancestryConn = rawget(self :: any, "_tableAdorneeAncestryConn")
-		if ancestryConn then
-			ancestryConn:Disconnect()
-			rawset(self :: any, "_tableAdorneeAncestryConn", nil)
-		end
-		local destroyingConn = rawget(self :: any, "_tableAdorneeDestroyingConn")
-		if destroyingConn then
-			destroyingConn:Disconnect()
-			rawset(self :: any, "_tableAdorneeDestroyingConn", nil)
-		end
+	local function clearTableObserveCachesOn(property: any)
+		rawset(property, "_observeContainerCache", nil)
+		rawset(property, "_observeDictionaryCache", nil)
+		rawset(property, "_containerCache", nil)
+		rawset(property, "_tableObserveCachesCleared", true)
 	end
 
 	rawset(
 		self :: any,
 		"_tableAdorneeAncestryConn",
 		adornee.AncestryChanged:Connect(function(_, parent)
+			local property = lifetime.property
+			if not property then
+				return
+			end
 			if parent == nil then
-				clearTableObserveCaches()
+				clearTableObserveCachesOn(property)
+			else
+				rawset(property, "_tableObserveCachesCleared", nil)
 			end
 		end)
 	)
-	rawset(self :: any, "_tableAdorneeDestroyingConn", adornee.Destroying:Connect(clearTableObserveCaches))
+	rawset(
+		self :: any,
+		"_tableAdorneeDestroyingConn",
+		adornee.Destroying:Connect(function()
+			local property = lifetime.property
+			if not property then
+				return
+			end
+			clearTableObserveCachesOn(property)
+
+			local ancestryConn = rawget(property, "_tableAdorneeAncestryConn")
+			if ancestryConn then
+				ancestryConn:Disconnect()
+				rawset(property, "_tableAdorneeAncestryConn", nil)
+			end
+			local destroyingConn = rawget(property, "_tableAdorneeDestroyingConn")
+			if destroyingConn then
+				destroyingConn:Disconnect()
+				rawset(property, "_tableAdorneeDestroyingConn", nil)
+			end
+		end)
+	)
 
 	return self
 end
@@ -101,6 +117,15 @@ function RoguePropertyTable.SetCanInitialize(self: RoguePropertyTable, canInitia
 end
 
 function RoguePropertyTable.ObserveContainerBrio(self: RoguePropertyTable): Observable.Observable<any>
+	local adornee = rawget(self :: any, "_adornee")
+	if typeof(adornee) == "Instance" and adornee.Parent == nil then
+		rawset(self :: any, "_tableObserveCachesCleared", true)
+		return Rx.EMPTY :: any
+	end
+	if rawget(self :: any, "_tableObserveCachesCleared") then
+		return Rx.EMPTY :: any
+	end
+
 	local cache: any = rawget(self :: any, "_observeContainerCache")
 	if cache then
 		return cache
@@ -127,6 +152,14 @@ function RoguePropertyTable.ObserveContainerBrio(self: RoguePropertyTable): Obse
 	end
 
 	cache = cache
+	-- Re-check after build: Ancestry clear may have raced mid-construction.
+	local adornee = rawget(self :: any, "_adornee")
+	if
+		rawget(self :: any, "_tableObserveCachesCleared") or (typeof(adornee) == "Instance" and adornee.Parent == nil)
+	then
+		rawset(self :: any, "_tableObserveCachesCleared", true)
+		return Rx.EMPTY :: any
+	end
 	rawset(self :: any, "_observeContainerCache", cache)
 	return cache
 end
@@ -275,6 +308,15 @@ function RoguePropertyTable.Observe(self: RoguePropertyTable): Observable.Observ
 end
 
 function RoguePropertyTable._observeDictionary(self: RoguePropertyTable): Observable.Observable<any>
+	local adornee = rawget(self :: any, "_adornee")
+	if typeof(adornee) == "Instance" and adornee.Parent == nil then
+		rawset(self :: any, "_tableObserveCachesCleared", true)
+		return Rx.EMPTY :: any
+	end
+	if rawget(self :: any, "_tableObserveCachesCleared") then
+		return Rx.EMPTY :: any
+	end
+
 	-- ok, this is definitely slow
 	local cache: any = rawget(self :: any, "_observeDictionaryCache")
 	if cache then
@@ -298,6 +340,13 @@ function RoguePropertyTable._observeDictionary(self: RoguePropertyTable): Observ
 		cache = (Rx.combineLatest(toObserve) :: any):Pipe({
 			Rx.cache(),
 		})
+	end
+
+	if
+		rawget(self :: any, "_tableObserveCachesCleared") or (typeof(adornee) == "Instance" and adornee.Parent == nil)
+	then
+		rawset(self :: any, "_tableObserveCachesCleared", true)
+		return Rx.EMPTY :: any
 	end
 
 	rawset(self :: any, "_observeDictionaryCache", cache)

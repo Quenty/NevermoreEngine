@@ -21,6 +21,7 @@ local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local RemotingMember = require("RemotingMember")
 local RemotingRealmUtils = require("RemotingRealmUtils")
 local RemotingRealms = require("RemotingRealms")
+local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local promiseChild = require("promiseChild")
@@ -715,8 +716,15 @@ function Remoting._observeRemoteFunctionBrio(self: Remoting, memberName: string)
 
 	local remoteFunctionName = self:_getMemberName(memberName, REMOTE_FUNCTION_SUFFIX)
 
+	-- NOTE(perf-leak): flatten folder then switchMap — switchMapBrio roots BrioUtils.first
+	-- on the folder brio; Connect unsub alone does not release those on long-lived instances.
 	return self:_observeFolderBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(item)
+		RxBrioUtils.flattenToValueAndNil,
+		Rx.switchMap(function(item)
+			if not item then
+				return Rx.EMPTY
+			end
+
 			if self._useDummyObject then
 				return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableFunction", remoteFunctionName)
 			else
@@ -732,7 +740,12 @@ function Remoting._observeRemoteEventBrio(self: Remoting, memberName: string)
 	local remoteFunctionName = self:_getMemberName(memberName, REMOTE_EVENT_SUFFIX)
 
 	return self:_observeFolderBrio():Pipe({
-		RxBrioUtils.switchMapBrio(function(item)
+		RxBrioUtils.flattenToValueAndNil,
+		Rx.switchMap(function(item)
+			if not item then
+				return Rx.EMPTY
+			end
+
 			if self._useDummyObject then
 				return RxInstanceUtils.observeLastNamedChildBrio(item, "BindableEvent", remoteFunctionName)
 			else
