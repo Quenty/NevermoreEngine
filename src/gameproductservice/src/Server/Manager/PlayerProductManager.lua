@@ -32,6 +32,7 @@ export type PlayerProductManager =
 		{} :: {
 			_serviceBag: ServiceBag.ServiceBag,
 			_receiptProcessingService: any, -- ReceiptProcessingService.ReceiptProcessingService
+			_gameProductDataService: any, -- GameProductDataService.GameProductDataService
 			_remoting: any,
 		},
 		{} :: typeof({ __index = PlayerProductManager })
@@ -51,6 +52,7 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService) :: any
+	self._gameProductDataService = self._serviceBag:GetService(GameProductDataService) :: any
 
 	-- Route internal setup through an `any` view: resolving these heavy-`self` method
 	-- calls against the intersected type otherwise overwhelms the old solver.
@@ -67,7 +69,7 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 
 	-- Initialize attributes
 
-	local serverOnlyPrompting = self._serviceBag:GetService(GameProductDataService):GetServerOnlyPromptingValue()
+	local serverOnlyPrompting = self._gameProductDataService:GetServerOnlyPromptingValue()
 	self._maid:GiveTask(serverOnlyPrompting:Observe():Subscribe(function(value)
 		self._obj:SetAttribute(GameProductDataService.ServerOnlyPromptingAttribute, value)
 	end))
@@ -144,6 +146,17 @@ function PlayerProductManager._setupPassTracker(self: PlayerProductManager): ()
 
 		if not isPurchased then
 			tracker:HandlePurchaseEvent(gamePassId, false)
+			return
+		end
+
+		-- Verification rides on server-only prompting rather than a switch of its own. Enabling it is a
+		-- game saying the server drives purchases, which is also what makes the ownership check safe to
+		-- pay for. Left off, this stays on the client's word -- knowingly, because
+		-- UserOwnsGamePassAsync answers from a per-server cache that can still read `false` for the
+		-- purchase that just completed, and denying on that stale read loses a pass the player paid for.
+		-- See [GameProductService.SetServerOnlyPromptingEnabled].
+		if not self._gameProductDataService:GetServerOnlyPromptingValue().Value then
+			tracker:HandlePurchaseEvent(gamePassId, true)
 			return
 		end
 
