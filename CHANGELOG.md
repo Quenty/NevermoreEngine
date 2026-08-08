@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/gameproductservice@14.66.9`
+  - fix: Server pass purchase validation gate [#792](https://github.com/Quenty/NevermoreEngine/pull/792) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/gameproductservice@14.66.8`
   - fix: Validate game pass ownership on server [#791](https://github.com/Quenty/NevermoreEngine/pull/791) ([@alex-y-z](https://github.com/alex-y-z))
 

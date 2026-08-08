@@ -1,3 +1,16 @@
+# v14.66.9 (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Server pass purchase validation gate [#792](https://github.com/Quenty/NevermoreEngine/pull/792) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Server validation gate ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
