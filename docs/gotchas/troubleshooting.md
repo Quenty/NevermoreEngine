@@ -82,6 +82,34 @@ instrumentation that still times out tells you nothing. Two distinct causes to r
   step detached (`task.spawn`) so the test body returns, and have a later test in the same suite
   sample and print the detached thread's `coroutine.status`/`debug.traceback`.
 
+### A dual-realm spec hangs on a tie/binder that resolves fine on the other realm
+
+Symptom: one realm's `TieDefinition:Promise(...)` never resolves (jest reports a 5s timeout) while the
+identical call on the other realm passes, and the only warning is a downstream "failed to find X for
+player". The cause is usually **not** the package under test — it's a stale `node_modules`.
+
+`node_modules` is untracked, so `git stash -u` and a clean checkout both leave it stale; the failure
+looks pre-existing and reproducible when it is purely local. When a workspace dependency was added to
+some transitive package's `package.json` since your last install, the symlink is missing and the
+loader throws `[Loader] - "SomeModule" is not available` from inside that package's `Init`. ServiceBag
+does not abort the boot on a failed service `Init`, so the bag comes up **half-registered**: services
+the aborted `Init` had not reached yet are never added. Anything that later calls
+`serviceBag:GetService(...)` for one of them (a binder constructor, for instance) throws
+`Cannot initialize service "..." after start`, the bind silently fails, and the tie for that realm
+never gets an implementation.
+
+Fix: run `pnpm install` from the repo root. To confirm before you start editing source, run the boot
+with `--logs` and read the *first* error in the log, not the last — the loader failure appears many
+lines above the symptom.
+
+### `--script-text` only runs the first line on Windows
+
+Multi-line strings passed to `nevermore test --cloud --script-text` are truncated at the first newline
+when the CLI is invoked through PowerShell or Git Bash, and the run reports `Tests passed!` having
+executed one line. Join the script into a single line before passing it
+(`(Get-Content diag.lua) -join ' '`), and drop any `--` comments and the `--!strict`/`--!nonstrict`
+header first — the header is otherwise parsed as a CLI flag.
+
 ### Test fails with `loader is not a valid member of ModuleScript "..."`
 
 The standard file header `require(script.Parent.loader).load(script)` deliberately does not

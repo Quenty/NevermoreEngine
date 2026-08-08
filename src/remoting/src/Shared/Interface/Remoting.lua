@@ -19,6 +19,8 @@ local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local RemoteFunctionUtils = require("RemoteFunctionUtils")
 local RemotingMember = require("RemotingMember")
+local RemotingObservableClientRelay = require("RemotingObservableClientRelay")
+local RemotingObservableServerRelay = require("RemotingObservableServerRelay")
 local RemotingRealmUtils = require("RemotingRealmUtils")
 local RemotingRealms = require("RemotingRealms")
 local RxBrioUtils = require("RxBrioUtils")
@@ -65,12 +67,20 @@ export type Remoting = typeof(setmetatable(
 		_remotingRealm: RemotingRealms.RemotingRealm,
 		_useDummyObject: boolean,
 		_remoteFolderName: string,
+		_observableRelays: { [string]: any },
+		_boundMemberKinds: { [string]: string },
 
 		-- Public methods
 		DeclareEvent: (self: Remoting, memberName: string) -> (),
 		DeclareMethod: (self: Remoting, memberName: string) -> (),
 		Connect: (self: Remoting, memberName: string, callback: (...any) -> ()) -> Maid.Maid,
 		Bind: (self: Remoting, memberName: string, callback: (...any) -> ()) -> Maid.Maid,
+		BindObservable: (
+			self: Remoting,
+			memberName: string,
+			factory: RemotingObservableServerRelay.ObservableFactory
+		) -> Maid.Maid,
+		Observe: (self: Remoting, memberName: string, ...any) -> Observable.Observable<...any>,
 		FireClient: (self: Remoting, memberName: string, player: Player, ...any) -> (),
 		FireAllClients: (self: Remoting, memberName: string, ...any) -> (),
 		FireAllClientsExcept: (self: Remoting, memberName: string, excludePlayer: Player, ...any) -> (),
@@ -97,10 +107,23 @@ export type Remoting = typeof(setmetatable(
 			self: Remoting,
 			memberName: string
 		) -> Observable.Observable<Brio.Brio<RemoteFunction>>,
+		_observeUpstreamRemoteEventBrio: (
+			self: Remoting,
+			memberName: string
+		) -> Observable.Observable<Brio.Brio<RemoteEvent | BindableEvent>>,
+		_fireUpstreamRemoteEvent: (self: Remoting, remoteEvent: RemoteEvent | BindableEvent, ...any) -> (),
 		_promiseContainer: (self: Remoting, maid: Maid.Maid) -> Promise.Promise<Folder>,
 		_promiseRemoteEvent: (self: Remoting, maid: Maid.Maid, memberName: string) -> Promise.Promise<RemoteEvent>,
-		_getOrCreateRemoteEvent: (self: Remoting, memberName: string) -> RemoteEvent | BindableEvent,
-		_getOrCreateRemoteFunction: (self: Remoting, memberName: string) -> RemoteFunction | BindableFunction,
+		_getOrCreateRemoteEvent: (
+			self: Remoting,
+			memberName: string,
+			attachHandler: ((RemoteEvent | BindableEvent) -> ())?
+		) -> RemoteEvent | BindableEvent,
+		_getOrCreateRemoteFunction: (
+			self: Remoting,
+			memberName: string,
+			attachHandler: ((RemoteFunction | BindableFunction) -> ())?
+		) -> RemoteFunction | BindableFunction,
 		_promiseRemoteFunction: (
 			self: Remoting,
 			maid: Maid.Maid,
@@ -143,6 +166,8 @@ function Remoting.new(instance: Instance, name: string, remotingRealm: RemotingR
 
 	self._remoteFolderName = string.format("%sRemotes", self._name)
 	self._remoteObjects = {}
+	self._observableRelays = {}
+	self._boundMemberKinds = {}
 
 	return self
 end
@@ -172,15 +197,14 @@ function Remoting.Connect(self: Remoting, memberName: string, callback: (...any)
 
 	if self._remotingRealm == RemotingRealms.SERVER then
 		if self._useDummyObject then
-			self:DeclareEvent(memberName)
-
 			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnClientEvent"))
-			local bindableEvent: BindableEvent =
-				self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnServerEvent")) :: any
-			connectMaid:GiveTask(bindableEvent.Event:Connect(callback))
+			self:_getOrCreateRemoteEvent(self:_getDummyMemberName(memberName, "OnServerEvent"), function(event)
+				connectMaid:GiveTask((event :: BindableEvent).Event:Connect(callback))
+			end)
 		else
-			local remoteEvent: RemoteEvent = self:_getOrCreateRemoteEvent(memberName) :: any
-			connectMaid:GiveTask(remoteEvent.OnServerEvent:Connect(callback))
+			self:_getOrCreateRemoteEvent(memberName, function(event)
+				connectMaid:GiveTask((event :: RemoteEvent).OnServerEvent:Connect(callback))
+			end)
 		end
 
 		-- TODO: Cleanup if nothing else is expecting this
@@ -242,19 +266,25 @@ end
 function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) -> ...any): Maid.Maid
 	assert(type(memberName) == "string", "Bad memberName")
 	assert(type(callback) == "function", "Bad callback")
+	assert(
+		self._boundMemberKinds[memberName] ~= "Observable",
+		string.format("[Remoting.Bind] - %q is already bound as an observable", self:_getDebugMemberName(memberName))
+	)
+
+	self._boundMemberKinds[memberName] = "Method"
 
 	local bindMaid: Maid.Maid = Maid.new()
 
 	if self._remotingRealm == RemotingRealms.SERVER then
 		if self._useDummyObject then
-			self:DeclareMethod(memberName)
-
-			local bindableFunction: BindableFunction =
-				self:_getOrCreateRemoteFunction(self:_getDummyMemberName(memberName, "OnServerInvoke")) :: any
-			bindableFunction.OnInvoke = self:_translateCallback(bindMaid, memberName, callback)
+			self:_getOrCreateRemoteFunction(self:_getDummyMemberName(memberName, "OnServerInvoke"), function(func)
+				(func :: BindableFunction).OnInvoke = self:_translateCallback(bindMaid, memberName, callback)
+			end)
+			self:_getOrCreateRemoteFunction(self:_getDummyMemberName(memberName, "OnClientInvoke"))
 		else
-			local remoteFunction: RemoteFunction = self:_getOrCreateRemoteFunction(memberName) :: any
-			remoteFunction.OnServerInvoke = self:_translateCallback(bindMaid, memberName, callback)
+			self:_getOrCreateRemoteFunction(memberName, function(func)
+				(func :: RemoteFunction).OnServerInvoke = self:_translateCallback(bindMaid, memberName, callback)
+			end)
 		end
 
 		-- TODO: Cleanup if nothing else is expecting this
@@ -306,6 +336,104 @@ function Remoting.Bind(self: Remoting, memberName: string, callback: (...any) ->
 	end)
 
 	return bindMaid
+end
+
+--[=[
+	Binds an observable factory to the member. The factory is invoked once per client
+	subscription, so it can vary the stream by player and by the arguments the client
+	passed to [Remoting.Observe].
+
+	```lua
+	remoting:BindObservable("Health", function(player, entityId)
+		return observeHealth(player, entityId)
+	end)
+	```
+
+	The stream lives for as long as the client stays subscribed. It is torn down when the
+	client unsubscribes, when the source completes or fails, when the player leaves, or
+	when this remoting is destroyed.
+
+	@server
+	@param memberName string
+	@param factory (player: Player, ...any) -> Observable
+	@return MaidTask
+]=]
+function Remoting.BindObservable(
+	self: Remoting,
+	memberName: string,
+	factory: RemotingObservableServerRelay.ObservableFactory
+): Maid.Maid
+	assert(type(memberName) == "string", "Bad memberName")
+	assert(type(factory) == "function", "Bad factory")
+	assert(self._remotingRealm == RemotingRealms.SERVER, "BindObservable must be called on server")
+	assert(
+		self._boundMemberKinds[memberName] ~= "Method",
+		string.format(
+			"[Remoting.BindObservable] - %q is already bound as a method",
+			self:_getDebugMemberName(memberName)
+		)
+	)
+	assert(
+		not self._observableRelays[memberName],
+		string.format(
+			"[Remoting.BindObservable] - %q is already bound as an observable",
+			self:_getDebugMemberName(memberName)
+		)
+	)
+
+	self._boundMemberKinds[memberName] = "Observable"
+
+	local relay = RemotingObservableServerRelay.new(self, memberName, factory)
+	self._observableRelays[memberName] = relay
+
+	local bindMaid = Maid.new()
+	bindMaid:GiveTask(function()
+		-- Destroy already drained the table, so it owns the teardown in that case
+		if self._observableRelays[memberName] == relay then
+			self._observableRelays[memberName] = nil
+			self._boundMemberKinds[memberName] = nil
+			relay:Destroy()
+		end
+	end)
+
+	self._maid[bindMaid] = bindMaid
+	bindMaid:GiveTask(function()
+		self._maid[bindMaid] = nil
+	end)
+
+	return bindMaid
+end
+
+--[=[
+	Observes the member bound on the server with [Remoting.BindObservable].
+
+	```lua
+	maid:GiveTask(remoting:Observe("Health", entityId):Subscribe(print))
+	```
+
+	The observable is cold. Every subscription opens its own stream on the server, so pipe
+	it through [Rx.share] if more than one consumer needs the same values.
+
+	Unlike most observables in Nevermore this cannot emit synchronously on subscribe. The
+	first value is at least one round trip away, and combinators like [Rx.combineLatest]
+	will not emit until it lands.
+
+	@client
+	@param memberName string
+	@param ... any
+	@return Observable<...any>
+]=]
+function Remoting.Observe(self: Remoting, memberName: string, ...): Observable.Observable<...any>
+	assert(type(memberName) == "string", "Bad memberName")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "Observe must be called on client")
+
+	local relay = self._observableRelays[memberName]
+	if not relay then
+		relay = RemotingObservableClientRelay.new(self, memberName)
+		self._observableRelays[memberName] = relay
+	end
+
+	return relay:Observe(...)
 end
 
 --[=[
@@ -572,11 +700,15 @@ function Remoting.PromiseFireServer(self: Remoting, memberName: string, ...)
 		end)
 	end
 
-	promise:Finally(function()
-		self._maid[fireMaid] = nil
-	end)
+	-- Registered before Finally is attached: the promise settles synchronously whenever the
+	-- remote already exists, and a Finally attached first would fire before there was
+	-- anything to remove, stranding the maid for the lifetime of the remoting
 	self._maid[fireMaid] = fireMaid
 	fireMaid:GiveTask(function()
+		self._maid[fireMaid] = nil
+	end)
+
+	promise:Finally(function()
 		self._maid[fireMaid] = nil
 	end)
 
@@ -633,11 +765,13 @@ function Remoting.PromiseInvokeServer(self: Remoting, memberName: string, ...): 
 		end)
 	end
 
-	promise:Finally(function()
-		self._maid[invokeMaid] = nil
-	end)
+	-- Registered before Finally is attached -- see PromiseFireServer
 	self._maid[invokeMaid] = invokeMaid
 	invokeMaid:GiveTask(function()
+		self._maid[invokeMaid] = nil
+	end)
+
+	promise:Finally(function()
 		self._maid[invokeMaid] = nil
 	end)
 
@@ -671,12 +805,13 @@ function Remoting.PromiseInvokeClient(self: Remoting, memberName: string, player
 		promise = invokeMaid:GivePromise(RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...))
 	end
 
-	promise:Finally(function()
+	-- Registered before Finally is attached -- see PromiseFireServer
+	self._maid[invokeMaid] = invokeMaid
+	invokeMaid:GiveTask(function()
 		self._maid[invokeMaid] = nil
 	end)
 
-	self._maid[invokeMaid] = invokeMaid
-	invokeMaid:GiveTask(function()
+	promise:Finally(function()
 		self._maid[invokeMaid] = nil
 	end)
 
@@ -737,6 +872,31 @@ function Remoting._observeRemoteEventBrio(self: Remoting, memberName: string)
 	})
 end
 
+--[[
+	Resolves the raw event the client sends relay messages over. Sends bypass
+	PromiseFireServer so ordering is preserved -- see RemotingObservableClientRelay.
+]]
+function Remoting._observeUpstreamRemoteEventBrio(self: Remoting, memberName: string)
+	assert(type(memberName) == "string", "Bad memberName")
+	assert(self._remotingRealm == RemotingRealms.CLIENT, "Upstream events are only observed on the client")
+
+	if self._useDummyObject then
+		return self:_observeRemoteEventBrio(self:_getDummyMemberName(memberName, "OnServerEvent"))
+	else
+		return self:_observeRemoteEventBrio(memberName)
+	end
+end
+
+function Remoting._fireUpstreamRemoteEvent(self: Remoting, remoteEvent: RemoteEvent | BindableEvent, ...)
+	if self._useDummyObject then
+		local bindableEvent = remoteEvent :: BindableEvent
+		bindableEvent:Fire(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer(), ...)
+	else
+		local realRemoteEvent = remoteEvent :: RemoteEvent
+		realRemoteEvent:FireServer(...)
+	end
+end
+
 function Remoting._promiseContainer(self: Remoting, maid: Maid.Maid): Promise.Promise<Folder>
 	return maid:GivePromise(promiseChild(self._instance, self._remoteFolderName, 5))
 end
@@ -769,13 +929,29 @@ function Remoting._observeFolderBrio(self: Remoting): Observable.Observable<Brio
 		) :: any
 end
 
-function Remoting._getOrCreateRemoteFunction(self: Remoting, memberName: string): RemoteFunction | BindableFunction
+--[[
+	Creates the remote function if it does not exist yet, otherwise returns the existing one.
+
+	attachHandler runs against the function before it is parented, so a caller watching for the
+	function to appear can never see one that exists but has no invoke bound. Existing functions
+	are already parented, so it runs immediately for them.
+]]
+function Remoting._getOrCreateRemoteFunction(
+	self: Remoting,
+	memberName: string,
+	attachHandler: ((RemoteFunction | BindableFunction) -> ())?
+): RemoteFunction | BindableFunction
 	assert(type(memberName) == "string", "Bad memberName")
 
 	local remoteFunctionName = self:_getMemberName(memberName, REMOTE_FUNCTION_SUFFIX)
 
-	if self._remoteObjects[remoteFunctionName] then
-		return self._remoteObjects[remoteFunctionName] :: any
+	local existing = self._remoteObjects[remoteFunctionName]
+	if existing then
+		if attachHandler then
+			attachHandler(existing :: any)
+		end
+
+		return existing :: any
 	end
 
 	local container = self:_ensureContainer()
@@ -789,21 +965,42 @@ function Remoting._getOrCreateRemoteFunction(self: Remoting, memberName: string)
 
 	remoteFunction.Name = remoteFunctionName
 	remoteFunction.Archivable = false
-	remoteFunction.Parent = container
 
 	self._remoteObjects[remoteFunctionName] = remoteFunction :: any
 	self._maid[remoteFunction] = remoteFunction
 
+	if attachHandler then
+		attachHandler(remoteFunction :: any)
+	end
+
+	remoteFunction.Parent = container
+
 	return remoteFunction :: any
 end
 
-function Remoting._getOrCreateRemoteEvent(self: Remoting, memberName: string): RemoteEvent | BindableEvent
+--[[
+	Creates the remote event if it does not exist yet, otherwise returns the existing one.
+
+	attachHandler runs against the event before it is parented, so a listener watching for the
+	event to appear can never see one that exists but is not yet handling anything. Existing
+	events are already parented, so it runs immediately for them.
+]]
+function Remoting._getOrCreateRemoteEvent(
+	self: Remoting,
+	memberName: string,
+	attachHandler: ((RemoteEvent | BindableEvent) -> ())?
+): RemoteEvent | BindableEvent
 	assert(type(memberName) == "string", "Bad memberName")
 
 	local remoteEventName = self:_getMemberName(memberName, REMOTE_EVENT_SUFFIX)
 
-	if self._remoteObjects[remoteEventName] then
-		return self._remoteObjects[remoteEventName] :: any
+	local existing = self._remoteObjects[remoteEventName]
+	if existing then
+		if attachHandler then
+			attachHandler(existing :: any)
+		end
+
+		return existing :: any
 	end
 
 	local container = self:_ensureContainer()
@@ -817,10 +1014,15 @@ function Remoting._getOrCreateRemoteEvent(self: Remoting, memberName: string): R
 
 	remoteEvent.Name = remoteEventName
 	remoteEvent.Archivable = false
-	remoteEvent.Parent = container
 
 	self._maid[remoteEvent] = remoteEvent
 	self._remoteObjects[remoteEventName] = remoteEvent :: any
+
+	if attachHandler then
+		attachHandler(remoteEvent :: any)
+	end
+
+	remoteEvent.Parent = container
 
 	return remoteEvent :: any
 end
@@ -843,6 +1045,14 @@ end
 	Cleans up the remoting object
 ]=]
 function Remoting.Destroy(self: Remoting)
+	-- Drained before the maid so relays can end their streams while the remotes still exist
+	local relays = self._observableRelays
+	self._observableRelays = {}
+
+	for _, relay in relays do
+		relay:Destroy()
+	end
+
 	self._maid:DoCleaning()
 	setmetatable(self :: any, nil)
 end

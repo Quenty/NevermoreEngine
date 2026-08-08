@@ -151,3 +151,11 @@ These are the types you'll use most often:
 - `Signal.new() :: any` — when the signal type would be too complex to annotate inline
 
 **Prefer fixing upstream types** over casting. If a type is wrong, fix it in the source package.
+
+## Type system limits worth knowing
+
+Two limits show up often enough to cost real time if you rediscover them.
+
+**Singleton types are strings and booleans only.** `"server" :: "server"` is how the enum packages pin a literal, so `OPCODE_FIRE = 3 :: 3` looks like it should work too. It doesn't — numeric singletons don't exist, and the failure is a *parse* error rather than a type error, so stylua and selene report a cascade of confusing syntax complaints starting at the enclosing call rather than the offending line. Write the number plain.
+
+**A class stored behind a table index type loses its generic methods.** Our classes are `typeof(setmetatable(...))` types whose methods are generic (`Maid.Add` is `<T>(self, T) -> T`). Put one in a field or index type — `_subscriptions: { [string]: Maid.Maid }` — and calling a method on a value read back out fails with the memorable `Expected this to be 'Maid', but got 'Maid'`, or refuses `==` between two of them because "they do not have the same metatable". Type the stored value `any` and note why; the annotation was never buying much, since it stops checking at exactly the point you'd use it.

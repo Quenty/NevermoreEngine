@@ -23,4 +23,5 @@ npm install @quenty/remoting --save
 ## Features
 
 * Promise implementation available
+* Observable streams across the client/server boundary via `BindObservable`/`Observe`
 * Always safe-to-use remotes if acquired
