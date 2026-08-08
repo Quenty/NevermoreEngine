@@ -1,22 +1,15 @@
-# v14.66.8 (Sat Aug 08 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Validate game pass ownership on server [#791](https://github.com/Quenty/NevermoreEngine/pull/791) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Check if remoting is alive ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Check if alive ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Validate game pass ownership on server ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.66.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.7...@quenty/gameproductservice@14.66.8) (2026-08-08)
+
+### Bug Fixes
+
+- Check if alive ([b90db63](https://github.com/Quenty/NevermoreEngine/commit/b90db636b620e939929d64803e40aaa2de63616f))
+- Check if remoting is alive ([59b14cf](https://github.com/Quenty/NevermoreEngine/commit/59b14cff7b327cdab7e3510d593879a6cb0bf259))
+- Validate game pass ownership on server ([c89a788](https://github.com/Quenty/NevermoreEngine/commit/c89a788eee031ff955f1310902c5cf92bad76686))
 
 ## [14.66.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.6...@quenty/gameproductservice@14.66.7) (2026-08-07)
 
