@@ -16,7 +16,15 @@ local scriptSources = {}
 for _, slug in packageSlugs do
 	local tagged = CollectionService:GetTagged(`_BatchTest_{slug}`)
 	local inst = tagged[1]
-	if inst then
+	if #tagged > 1 then
+		-- Refused rather than picked. Running whichever one the tag listed first is how this fails
+		-- quietly: a script that returns without erroring reports as a pass having tested nothing.
+		local fullNames = {}
+		for _, taggedInstance in tagged do
+			table.insert(fullNames, taggedInstance:GetFullName())
+		end
+		warn(`[BatchTest] {slug}: {#tagged} instances tagged _BatchTest_{slug}: {table.concat(fullNames, ", ")}`)
+	elseif inst then
 		scriptSources[slug] = inst.Source
 	else
 		warn(`[BatchTest] Failed to find script source for {slug}`)
@@ -42,7 +50,7 @@ for _, slug in packageSlugs do
 	local scriptSource = scriptSources[slug]
 	if not scriptSource then
 		print("===BATCH_TEST_BEGIN " .. slug .. "===")
-		warn(`[BatchTest] {slug}: No test script found for {slug}. Is it tagged with _BatchTest_{slug}?`)
+		warn(`[BatchTest] {slug}: No test script to run. Is exactly one instance tagged _BatchTest_{slug}?`)
 		print("===BATCH_TEST_END " .. slug .. " FAIL 0===")
 		table.insert(results, { slug = slug, success = false, durationMs = 0, error = "No test script found" })
 		continue

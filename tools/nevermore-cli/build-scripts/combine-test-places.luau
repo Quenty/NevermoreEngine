@@ -7,6 +7,11 @@
 --   1. Deserializes the .rbxl
 --   2. Reparents ServerScriptService children (the package root) into the combined ServerScriptService
 --   3. Reads the test script file and creates a Script under ReplicatedStorage._BatchScripts
+--
+-- The injected script is the ONLY thing tagged `_BatchTest_<slug>`, because that tag is how
+-- batch-test-runner picks what to execute and it can only execute one thing. This used to tag every
+-- Script under ServerScriptService instead, which is the same script right up until a project has
+-- two -- and then the runner ran whichever the tag happened to list first, silently testing nothing.
 
 local fs = require("@lune/fs")
 local process = require("@lune/process")
@@ -40,16 +45,32 @@ local baseContents = fs.readFile(packages[1].rbxlPath)
 local game = roblox.deserializePlace(baseContents)
 
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 ServerScriptService.LoadStringEnabled = true
 
--- Process first package
-for _, descendant in ServerScriptService:GetDescendants() do
-	if descendant:IsA("Script") then
-		descendant:AddTag("_BatchTest_" .. packages[1].slug)
+local batchScripts = roblox.Instance.new("Folder")
+batchScripts.Name = "_BatchScripts"
+batchScripts.Parent = ReplicatedStorage
+
+-- Carries the package's entry point as source for the runner to loadstring. Never runs on its own:
+-- a Script under ReplicatedStorage is inert, and the runner wants to choose when it runs anyway.
+local function injectTestScript(pkg)
+	if not fs.isFile(pkg.scriptPath) then
+		print(`[CombinePlaces] No script template for {pkg.slug} at {pkg.scriptPath}`)
+		process.exit(1)
 	end
+
+	local testScript = roblox.Instance.new("Script")
+	testScript.Name = pkg.slug
+	testScript.Source = fs.readFile(pkg.scriptPath)
+	testScript:AddTag("_BatchTest_" .. pkg.slug)
+	testScript.Parent = batchScripts
 end
+
+-- Process first package
+injectTestScript(packages[1])
 
 -- Process remaining packages: deserialize each and reparent ServerScriptService children.
 -- NOTE: ObjectValues (links) within each package's subtree are preserved when the
@@ -69,11 +90,7 @@ for idx = 2, #packages do
 		HttpService.HttpEnabled = true
 	end
 
-	for _, descendant in packageServerScriptService:GetDescendants() do
-		if descendant:IsA("Script") then
-			descendant:AddTag("_BatchTest_" .. pkg.slug)
-		end
-	end
+	injectTestScript(pkg)
 
 	-- Reparent all ServerScriptService children (non-recursively, just move the roots)
 	for _, child in packageServerScriptService:GetChildren() do
