@@ -1273,6 +1273,53 @@ describe("HasSaveSlots playtime tracking", function()
 
 		context.destroy()
 	end)
+
+	it("carries the source slot's playtime onto a duplicate, live session included", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+
+		-- Rewind the live session's clock so the duplicate observes ~120s that no flush has written yet.
+		local tracker: any = context.hasSaveSlots
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = duplicatePromise:Wait()
+
+		local copied = getMetadata(context, newSlotId).TimePlayed
+		expect(copied ~= nil and copied >= 120).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("leaves a duplicate of a never-played slot without playtime", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+
+		expect(getMetadata(context, duplicatePromise:Wait()).TimePlayed).toBeNil()
+
+		context.destroy()
+	end)
 end)
 
 describe("HasSaveSlots summary providers", function()
