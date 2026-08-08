@@ -1,12 +1,15 @@
 import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs, isCI } from '../cli-utils.js';
-import { type PackageResult, BaseReporter } from './reporter.js';
+import { type JobPhase, type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import {
   formatProgressResult,
   isEmptyTestRun,
   isUnreportedTestRun,
 } from './progress-format.js';
+
+/** Below this, a phase timing is noise rather than information. */
+const PHASE_REPORT_FLOOR_MS = 1000;
 
 export interface GroupedReporterOptions {
   showLogs: boolean;
@@ -32,6 +35,8 @@ export class GroupedReporter extends BaseReporter {
   private _state: IStateTracker;
   private _options: GroupedReporterOptions;
   private _isCI: boolean;
+  private _phaseStartedMs = Date.now();
+  private _lastPhase?: JobPhase;
 
   constructor(state: IStateTracker, options: GroupedReporterOptions) {
     super();
@@ -49,6 +54,30 @@ export class GroupedReporter extends BaseReporter {
     if (this._isCI) {
       console.log(`::group::${name}`);
     }
+    this._phaseStartedMs = Date.now();
+    this._lastPhase = undefined;
+  }
+
+  override onPackagePhaseChange(_name: string, phase: JobPhase): void {
+    if (!this._options.verbose || phase === this._lastPhase) {
+      // Aggregated mode broadcasts one transition to every package, so the same
+      // phase arrives dozens of times. Report the transition, not each recipient.
+      return;
+    }
+
+    // Group output is buffered and flushed at the end, so every line lands on
+    // the same timestamp and a five-minute step reads as instantaneous. Report
+    // how long the phase just left actually took — but only when it was long
+    // enough to account for, or the timings bury what they were meant to show.
+    const now = Date.now();
+    const elapsedMs = now - this._phaseStartedMs;
+    if (this._lastPhase !== undefined && elapsedMs >= PHASE_REPORT_FLOOR_MS) {
+      OutputHelper.info(
+        `  ${this._lastPhase} took ${formatDurationMs(elapsedMs)}`
+      );
+    }
+    this._lastPhase = phase;
+    this._phaseStartedMs = now;
   }
 
   override onPackageResult(

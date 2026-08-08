@@ -259,8 +259,12 @@ export function parseBatchTestLogs(
       // attribution is reason enough not to trust which package a line is from.
       success = false;
       reasons.push(
-        `no output could be attributed to this package ` +
-          `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found)`
+        strayEndMarkers > 0
+          ? `no output could be attributed to this package — ${strayEndMarkers} marker(s) ` +
+              'arrived out of order, so its section could not be closed without risking ' +
+              "another package's output"
+          : `no output could be attributed to this package ` +
+              `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found)`
       );
     }
 
