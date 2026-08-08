@@ -14,7 +14,9 @@ local Players = game:GetService("Players")
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
+local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerBinder = require("PlayerBinder")
+local PlayerMock = require("PlayerMock")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local ReceiptProcessingService = require("ReceiptProcessingService")
@@ -136,9 +138,37 @@ function PlayerProductManager._setupPassTracker(self: PlayerProductManager): ()
 		assert(type(gamePassId) == "number", "Bad gamePassId")
 		assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-		-- TODO: Validate in purchased scenario
+		-- Closing the prompt is safe to take on the client's word: it only unblocks pending prompt
+		-- state and grants nothing.
 		tracker:HandlePromptClosedEvent(gamePassId)
-		tracker:HandlePurchaseEvent(gamePassId, isPurchased)
+
+		if not isPurchased then
+			tracker:HandlePurchaseEvent(gamePassId, false)
+			return
+		end
+
+		-- The purchase itself is not. This event is fired by the client, so `isPurchased == true` is an
+		-- unverified claim -- a client can fire it for any gamepass id without ever paying, and granting
+		-- ownership on it hands the pass out for free. Confirm against the marketplace before it counts,
+		-- so only a pass the player genuinely owns is recorded as purchased.
+		local userId = if PlayerMock.isMock(self._obj) then PlayerMock.read(self._obj, "UserId") else self._obj.UserId
+
+		self._maid:GivePromise(MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)):Then(function(ownsPass)
+			tracker:HandlePurchaseEvent(gamePassId, ownsPass == true)
+		end, function(err)
+			-- The ownership check could not answer (a marketplace hiccup, not a purchase). Grant nothing
+			-- on the failure, and resolve the pending prompt as unbought so a server-initiated caller is
+			-- not left waiting forever.
+			warn(
+				string.format(
+					"[PlayerProductManager] - Failed to verify gamepass %d ownership for %s: %s",
+					gamePassId,
+					tostring(self._obj),
+					tostring(err)
+				)
+			)
+			tracker:HandlePurchaseEvent(gamePassId, false)
+		end)
 	end))
 end
 

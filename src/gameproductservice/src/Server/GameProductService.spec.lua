@@ -286,7 +286,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 end)
 
 describe("client-initiated gamepass prompt", function()
-	it("resolves true on accept, replicates to the server, and fires both realms' purchase signals", function()
+	it("grants server ownership once the marketplace confirms the client's purchase", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
 
@@ -295,8 +295,18 @@ describe("client-initiated gamepass prompt", function()
 		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
 			table.insert(serverFired, { player = player, gamePassId = gamePassId })
 		end)
+		-- The pass is not owned when the prompt opens, so the client genuinely prompts. Model the
+		-- purchase going through by marking the marketplace as owning it the instant the client reports
+		-- success -- the same false-before / true-after transition a real purchase produces, and what
+		-- the server's verification then reads.
 		controller.gameProductServiceClient.GamePassPurchased:Connect(function(gamePassId)
 			table.insert(clientFired, gamePassId)
+			PlayerMock.writeLookup(
+				controller.playerMock,
+				"MarketplaceService.UserOwnsGamePassAsync",
+				GAME_PASS_ID,
+				true
+			)
 		end)
 
 		expect(
@@ -333,6 +343,53 @@ describe("client-initiated gamepass prompt", function()
 				)
 			)
 		).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("does not grant server ownership for a purchase the marketplace never confirms", function()
+		local controller = setup()
+		-- The client reports the prompt succeeded, but the marketplace never shows the player owning the
+		-- pass (UserOwnsGamePassAsync stays at its false default). A client saying "I bought it" is an
+		-- unverified claim -- on its own it must grant nothing, or any client could fire this remote for
+		-- any gamepass id and be handed the pass for free.
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
+
+		local serverFired = {}
+		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
+			table.insert(serverFired, { player = player, gamePassId = gamePassId })
+		end)
+
+		-- The client still resolves its own prompt as accepted: its local UX is not the trust boundary.
+		expect(
+			controller.awaitBool(
+				controller.gameProductServiceClient:PromisePromptPurchase(
+					controller.playerMock,
+					GameConfigAssetTypes.PASS,
+					GAME_PASS_ID
+				)
+			)
+		).toEqual(true)
+
+		-- The server rejects the unverified claim: no ownership, no session purchase, no purchase signal.
+		-- Awaiting the ownership query also lets the server's verification settle first.
+		expect(
+			controller.awaitBool(
+				controller.gameProductService:PromisePlayerOwnership(
+					controller.playerMock,
+					GameConfigAssetTypes.PASS,
+					GAME_PASS_ID
+				)
+			)
+		).toEqual(false)
+		expect(#serverFired).toEqual(0)
+		expect(
+			controller.gameProductService:HasPlayerPurchasedThisSession(
+				controller.playerMock,
+				GameConfigAssetTypes.PASS,
+				GAME_PASS_ID
+			)
+		).toEqual(false)
 
 		controller:destroy()
 	end)
