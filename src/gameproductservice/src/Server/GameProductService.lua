@@ -309,6 +309,17 @@ end
 	rejects); prompts must be initiated from the server, where the developer can validate
 	the asset id. Defaults to disabled.
 
+	Enabling this also makes the server verify gamepass purchases against the marketplace
+	before granting them, instead of trusting the client's report that the prompt
+	succeeded. The two travel together deliberately: a game that has moved prompting to
+	the server is one that wants purchases established server-side.
+
+	Be aware of what that verification costs. `UserOwnsGamePassAsync` answers from a cache
+	held per server, so immediately after a real purchase it can still report the player
+	does not own the pass -- and a purchase that fails to verify is granted nothing. Games
+	whose flows depend on the pass being usable the instant the prompt closes should leave
+	this disabled until they can tolerate that delay.
+
 	@param enabled boolean
 ]=]
 function GameProductService.SetServerOnlyPromptingEnabled(self: GameProductService, enabled: boolean)
