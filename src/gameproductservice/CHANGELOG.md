@@ -1,20 +1,13 @@
-# v14.66.9 (Sat Aug 08 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Server pass purchase validation gate [#792](https://github.com/Quenty/NevermoreEngine/pull/792) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Server validation gate ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [14.66.9](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.8...@quenty/gameproductservice@14.66.9) (2026-08-08)
+
+### Bug Fixes
+
+- Server validation gate ([90ee99b](https://github.com/Quenty/NevermoreEngine/commit/90ee99be70cb20ddb01dc8cc43ed12974405d22e))
 
 ## [14.66.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.7...@quenty/gameproductservice@14.66.8) (2026-08-08)
 
