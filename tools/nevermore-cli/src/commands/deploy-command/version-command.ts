@@ -7,12 +7,18 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import {
+  createEmptyDeployLock,
+  isBasePlaceVersionKeyword,
   loadDeployConfigAsync,
+  loadDeployLockAsync,
   resolveDeployConfigPath,
+  resolveDeployLockPath,
   resolveDeployTargetPlaces,
+  saveDeployLockAsync,
   type BasePlaceConfig,
+  type BasePlaceVersion,
   type DeployConfig,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { DeployArgs } from './index.js';
@@ -26,8 +32,8 @@ interface BasePlaceRef {
 /** A pending change: set `ref.basePlace.version` to `to`. */
 interface PinChange {
   ref: BasePlaceRef;
-  from?: number;
-  to: number;
+  from?: BasePlaceVersion;
+  to: BasePlaceVersion;
 }
 
 export interface VersionPromoteArgs extends DeployArgs {
@@ -148,9 +154,9 @@ export async function handleVersionUpgradeAsync(
   }
 
   const targetNames = args.target ? [args.target] : Object.keys(config.targets);
-  const refs = _collectBasePlaceRefs(config, targetNames);
+  const allRefs = _collectBasePlaceRefs(config, targetNames);
 
-  if (refs.length === 0) {
+  if (allRefs.length === 0) {
     OutputHelper.warn(
       args.target
         ? `Target "${args.target}" has no basePlace to pin.`
@@ -159,14 +165,15 @@ export async function handleVersionUpgradeAsync(
     return;
   }
 
-  // Resolve the latest version once per unique base place id — several targets
-  // (e.g. integration/prod) commonly point at the same base place.
-  const uniquePlaceIds = [...new Set(refs.map((r) => r.basePlace.placeId))];
-  OutputHelper.info(
-    `Resolving latest version for ${uniquePlaceIds.length} base place${_plural(
-      uniquePlaceIds.length
-    )}...`
-  );
+  // Two kinds of pin, two files. A number (or an absent pin being frozen for
+  // the first time) is intent and belongs in the config; a "saved"/"published"
+  // pin is intent that stays put while only the resolved fact moves, so those
+  // roll forward in the lock instead.
+  const isDynamic = (ref: BasePlaceRef) =>
+    ref.basePlace.version != null &&
+    isBasePlaceVersionKeyword(ref.basePlace.version);
+  const configRefs = allRefs.filter((ref) => !isDynamic(ref));
+  const lockRefs = allRefs.filter(isDynamic);
 
   const apiKey = await getApiKeyAsync(args);
   const client = new OpenCloudClient({
@@ -174,15 +181,45 @@ export async function handleVersionUpgradeAsync(
     rateLimiter: new RateLimiter(),
   });
 
+  if (configRefs.length > 0) {
+    await _upgradeConfigPinsAsync(configPath, config, configRefs, client, args);
+  }
+  // Runs even with no keyword pins left, so converting the last one back to a
+  // number still lets an unscoped upgrade clear its orphaned lock entry.
+  if (lockRefs.length > 0 || !args.target) {
+    await _upgradeLockPinsAsync(cwd, lockRefs, client, args, !args.target);
+  }
+}
+
+/** Roll numeric (and not-yet-pinned) base places forward in the config. */
+async function _upgradeConfigPinsAsync(
+  configPath: string,
+  config: DeployConfig,
+  refs: BasePlaceRef[],
+  client: OpenCloudClient,
+  args: DeployArgs
+): Promise<void> {
+  // Resolve the latest version once per unique base place id — several targets
+  // (e.g. integration/prod) commonly point at the same base place.
+  const uniquePlaceIds = [...new Set(refs.map((r) => r.basePlace.placeId))];
+  OutputHelper.info(
+    `Resolving latest published version for ${
+      uniquePlaceIds.length
+    } base place${_plural(uniquePlaceIds.length)}...`
+  );
+
   const latestByPlaceId = new Map<number, number>();
   await Promise.all(
     uniquePlaceIds.map(async (placeId) => {
       const ref = refs.find((r) => r.basePlace.placeId === placeId)!;
-      const latest = await client.getLatestPlaceVersionAsync(
-        ref.basePlace.universeId,
-        placeId
+      latestByPlaceId.set(
+        placeId,
+        await client.resolveLatestPlaceVersionAsync(
+          ref.basePlace.universeId,
+          placeId,
+          'published'
+        )
       );
-      latestByPlaceId.set(placeId, latest);
     })
   );
 
@@ -204,6 +241,153 @@ export async function handleVersionUpgradeAsync(
   console.log('');
 
   await _commitPinChangesAsync(configPath, config, changes, args);
+}
+
+/**
+ * Roll `"saved"`/`"published"` base places forward in the lock file. Each is
+ * resolved against the version type it actually tracks, so a `"saved"` pin is
+ * never quietly re-pointed at a published version.
+ *
+ * `prune` drops entries for base places the config no longer references. It is
+ * only safe when this ran unscoped, since a single target does not know about
+ * the base places belonging to the others.
+ */
+async function _upgradeLockPinsAsync(
+  packagePath: string,
+  refs: BasePlaceRef[],
+  client: OpenCloudClient,
+  args: DeployArgs,
+  prune: boolean
+): Promise<void> {
+  const lockPath = resolveDeployLockPath(packagePath);
+  const existingLock = await loadDeployLockAsync(lockPath);
+  if (!existingLock && refs.length === 0) {
+    return;
+  }
+  const lock = existingLock ?? createEmptyDeployLock();
+
+  const uniqueRefs = [
+    ...new Map(refs.map((ref) => [ref.basePlace.placeId, ref])).values(),
+  ];
+  if (uniqueRefs.length > 0) {
+    OutputHelper.info(
+      `Resolving tracked version for ${uniqueRefs.length} base place${_plural(
+        uniqueRefs.length
+      )}...`
+    );
+  }
+
+  const changes: PinChange[] = [];
+  await Promise.all(
+    uniqueRefs.map(async (ref) => {
+      const latest = await client.resolveLatestPlaceVersionAsync(
+        ref.basePlace.universeId,
+        ref.basePlace.placeId,
+        _asKeyword(ref.basePlace.version)
+      );
+      changes.push({
+        ref,
+        from: lock.basePlaces[String(ref.basePlace.placeId)]?.version,
+        to: latest,
+      });
+    })
+  );
+
+  const columns: TableColumn<PinChange>[] = [
+    { header: 'Place', value: (c) => c.ref.placeLabel },
+    { header: 'Base place', value: (c) => String(c.ref.basePlace.placeId) },
+    { header: 'Tracks', value: (c) => String(c.ref.basePlace.version) },
+    { header: 'Locked', value: (c) => _formatChange(c) },
+  ];
+
+  if (changes.length > 0) {
+    console.log('');
+    console.log(formatTable(changes, columns, { indent: '  ' }));
+    console.log('');
+  }
+
+  const referenced = new Set(
+    uniqueRefs.map((r) => String(r.basePlace.placeId))
+  );
+  const stale = prune
+    ? Object.keys(lock.basePlaces).filter((id) => !referenced.has(id))
+    : [];
+  // An entry is stale if either half is wrong. Comparing only the version
+  // number strands a config that switched "published" -> "saved" while the
+  // number happened to stay put: nothing would be rewritten, and every later
+  // --frozen-lockfile build would fail telling the user to run this command.
+  const moved = changes.filter((change) => {
+    const entry = lock.basePlaces[String(change.ref.basePlace.placeId)];
+    return (
+      entry?.version !== change.to ||
+      entry?.from !== _asKeyword(change.ref.basePlace.version)
+    );
+  });
+
+  if (moved.length === 0 && stale.length === 0) {
+    OutputHelper.info('Nothing to change — lock is already up to date.');
+    return;
+  }
+
+  if (stale.length > 0) {
+    OutputHelper.info(
+      `Dropping ${stale.length} lock entr${
+        stale.length === 1 ? 'y' : 'ies'
+      } no longer referenced by deploy.nevermore.json: ${stale.join(', ')}`
+    );
+  }
+
+  if (args.dryrun) {
+    OutputHelper.info(
+      `[DRYRUN] Would update ${moved.length} and drop ${stale.length} lock ` +
+        `entr${moved.length + stale.length === 1 ? 'y' : 'ies'} in ${lockPath}`
+    );
+    return;
+  }
+
+  if (!args.yes) {
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message:
+          `Update ${moved.length} and drop ${stale.length} entr` +
+          `${moved.length + stale.length === 1 ? 'y' : 'ies'} in ` +
+          `deploy.nevermore.lock.json?`,
+        default: true,
+      },
+    ]);
+    if (!confirm) {
+      OutputHelper.info('Aborted — no changes written.');
+      return;
+    }
+  }
+
+  for (const id of stale) {
+    delete lock.basePlaces[id];
+  }
+  for (const change of moved) {
+    lock.basePlaces[String(change.ref.basePlace.placeId)] = {
+      version: change.to as number,
+      from: _asKeyword(change.ref.basePlace.version),
+    };
+  }
+
+  await saveDeployLockAsync(lockPath, lock);
+  OutputHelper.info(`Updated ${lockPath}`);
+  OutputHelper.hint(
+    'Commit deploy.nevermore.lock.json to roll base places forward.'
+  );
+}
+
+/** Narrow a pin already known to be a keyword; the caller filtered for it. */
+function _asKeyword(version: BasePlaceVersion | undefined) {
+  if (version == null || !isBasePlaceVersionKeyword(version)) {
+    throw new Error(
+      `Expected a "saved"/"published" pin, got ${_formatVersion(version)}`
+    );
+  }
+  return version;
 }
 
 /**
@@ -237,7 +421,7 @@ export async function handleVersionPromoteAsync(
   // Map base place id -> pinned version from the source target. A source with
   // the same base place pinned to two different versions is inconsistent, so
   // fail loudly rather than pick one arbitrarily.
-  const versionByPlaceId = new Map<number, number>();
+  const versionByPlaceId = new Map<number, BasePlaceVersion>();
   for (const ref of _collectBasePlaceRefs(config, [fromTarget])) {
     const version = ref.basePlace.version;
     if (version == null) {
@@ -247,7 +431,9 @@ export async function handleVersionPromoteAsync(
     if (existing != null && existing !== version) {
       throw new Error(
         `Target "${fromTarget}" pins base place ${ref.basePlace.placeId} to ` +
-          `two different versions (v${existing} and v${version}). ` +
+          `two different versions (${_formatVersion(
+            existing
+          )} and ${_formatVersion(version)}). ` +
           `Run "nevermore deploy version upgrade ${fromTarget}" to make it consistent first.`
       );
     }
@@ -304,8 +490,16 @@ export async function handleVersionPromoteAsync(
   await _commitPinChangesAsync(configPath, config, changes, args);
 }
 
+function _formatVersion(version?: BasePlaceVersion): string {
+  if (version == null) {
+    return '(latest)';
+  }
+  return typeof version === 'string' ? `"${version}"` : `v${version}`;
+}
+
 function _formatChange(change: PinChange): string {
-  const from = change.from != null ? `v${change.from}` : '(latest)';
   const unchanged = change.from === change.to ? '  (unchanged)' : '';
-  return `${from} → v${change.to}${unchanged}`;
+  return `${_formatVersion(change.from)} → ${_formatVersion(
+    change.to
+  )}${unchanged}`;
 }

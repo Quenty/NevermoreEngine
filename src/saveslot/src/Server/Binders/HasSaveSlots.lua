@@ -202,13 +202,15 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 		end
 
 		local function promiseSetSlot()
-			return self:_promisePreSelectFromSaveSlotService(slotId):Then(function(allowed: boolean)
-				if not allowed then
-					return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
-				end
+			return self._maid
+				:GivePromise(self:_promisePreSelectFromSaveSlotService(slotId))
+				:Then(function(allowed: boolean)
+					if not allowed then
+						return (Promise :: any).rejected(`Slot \{{slotId}\} refused by a pre-select callback`)
+					end
 
-				return setSlot()
-			end)
+					return setSlot()
+				end)
 		end
 
 		-- Initialize or save and switch
@@ -222,7 +224,7 @@ function HasSaveSlots.PromiseSelectSlot(self: HasSaveSlots, slotId: SaveSlotData
 			return promiseSetSlot()
 		end
 
-		return self._dataStore:Save():Then(promiseSetSlot)
+		return self._maid:GivePromise(self._dataStore:Save()):Then(promiseSetSlot)
 	end)
 end
 

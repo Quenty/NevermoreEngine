@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BuildContext } from '@quenty/nevermore-template-helpers';
-import { DeployTarget } from './deploy-config.js';
+import { DeployTarget } from '@quenty/nevermore-deploy';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface DeployOverrides {
@@ -20,7 +20,18 @@ export interface BuildPlaceOptions {
    */
   target: DeployTarget;
   outputFileName?: string;
-  packagePath?: string;
+  /**
+   * Directory the package lives in. Required, not defaulted.
+   *
+   * Everything downstream is resolved against it: the project file, the build
+   * cache key, and which `deploy.nevermore.lock.json` a base place pin is
+   * written to. Falling back to `process.cwd()` is silently wrong in a batch —
+   * every package sharing a relative `project` path collapses onto one cache
+   * key, so one package's build gets uploaded to another's place. It was
+   * optional once, and a refactor dropped it from a call site with nothing to
+   * catch it.
+   */
+  packagePath: string;
   overrides?: DeployOverrides;
   reporter?: Reporter;
   packageName?: string;
@@ -33,6 +44,16 @@ export interface BuildPlaceOptions {
 export interface BuiltPlace {
   rbxlPath: string;
   target: DeployTarget;
+  /**
+   * Concrete version of the base place this build merged against, once one has
+   * been merged.
+   *
+   * Resolved during the merge and carried out because nothing downstream can
+   * recover it: a `"published"` pin resolves at deploy time, and by the time
+   * the place is running, the base place has usually moved on. Without it, a
+   * build in game cannot say which upstream content it is actually made of.
+   */
+  basePlaceVersion?: number;
 }
 
 export interface BuildPlaceResult extends BuiltPlace {

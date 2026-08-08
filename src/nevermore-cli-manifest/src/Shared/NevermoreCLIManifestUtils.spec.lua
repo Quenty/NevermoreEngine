@@ -24,6 +24,8 @@ local function makeInjectedInstance(): Instance
 	instance:SetAttribute("Published", false)
 	instance:SetAttribute("PlaceId", "136978232832565")
 	instance:SetAttribute("UniverseId", "9716264427")
+	instance:SetAttribute("BasePlaceId", "71403466083947")
+	instance:SetAttribute("BasePlaceVersion", "158")
 	instance:SetAttribute(
 		"Places",
 		'[{"name":"chapter0","placeId":97235312452456,"universeId":9716264427},'
@@ -62,6 +64,23 @@ describe("NevermoreCLIManifestUtils injection", function()
 		expect(metadata.placeId > 0).toEqual(true)
 		expect(type(metadata.universeId)).toEqual("number")
 		expect(metadata.universeId > 0).toEqual(true)
+
+		-- Written as strings for the same reason as the ids, and read back as
+		-- numbers so a caller can compare versions without converting.
+		expect(metadata.basePlaceId).toEqual(71403466083947)
+		expect(metadata.basePlaceVersion).toEqual(158)
+	end)
+
+	it("leaves the base place fields nil on a build that merged none", function()
+		local instance = makeInjectedInstance()
+		instance:SetAttribute("BasePlaceId", nil)
+		instance:SetAttribute("BasePlaceVersion", nil)
+
+		local metadata = NevermoreCLIManifestUtils.getGameMetadata(instance)
+
+		expect(metadata.basePlaceId).toBeNil()
+		expect(metadata.basePlaceVersion).toBeNil()
+		expect(metadata.deployed).toEqual(true)
 	end)
 
 	it("observes the injected metadata", function()

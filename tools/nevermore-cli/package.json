@@ -27,6 +27,7 @@
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-deploy": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
     "@quenty/studio-bridge": "workspace:*",
     "execa": "^9.6.1",
@@ -34,11 +35,13 @@
     "inquirer": "^13.2.0",
     "node-fetch": "^3.3.2",
     "typescript-memoize": "^1.1.1",
+    "ws": "^8.18.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.9",
     "@types/node": "^18.11.4",
+    "@types/ws": "^8.5.13",
     "@types/yargs": "^17.0.13",
     "prettier": "2.7.1",
     "typescript": "^5.9.3",

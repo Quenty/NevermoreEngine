@@ -54,6 +54,13 @@ end
 | `published` | `boolean?` | `true` if published live (`--publish`), `false` if only Saved |
 | `placeId` | `number?` | Roblox place ID deployed to |
 | `universeId` | `number?` | Roblox universe ID deployed to |
+| `basePlaceId` | `number?` | Roblox place ID of the base place this build merged from |
+| `basePlaceVersion` | `number?` | Version of that base place the build was made from |
+
+`basePlaceVersion` is the only record of which upstream Studio content a build
+contains: a `"published"` base place pin resolves at deploy time and the base
+place keeps moving afterwards, so it cannot be recovered later. Both base place
+fields are absent on a build that merged none.
 
 Use `NevermoreCLIManifestUtils.observeGameMetadata()` for an `Observable` that
 fires the current snapshot and again whenever a field changes (for example when

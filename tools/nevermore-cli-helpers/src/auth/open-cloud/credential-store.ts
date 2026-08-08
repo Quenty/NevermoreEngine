@@ -28,6 +28,11 @@ export function printApiKeySetupHelp(): void {
     '  - legacy-asset:manage             (download base places for integration builds)'
   );
   console.log('');
+  console.log('Only needed for `--watch --watch-share-api-key`:');
+  console.log(
+    '  - universe.place:read             (let the watch service observe a private base place)'
+  );
+  console.log('');
 }
 
 interface StoredCredentials {

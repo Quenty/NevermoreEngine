@@ -19,6 +19,7 @@ import {
   type ScriptRunResult,
 } from './job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
@@ -36,6 +37,7 @@ class TrackedBuiltPlace implements BuiltPlace {
   target: BuiltPlace['target'];
   sharedKey?: string;
   ownContext?: BuildContext;
+  basePlaceVersion?: number;
 
   constructor(
     rbxlPath: string,
@@ -63,12 +65,18 @@ class TrackedBuiltPlace implements BuiltPlace {
 export abstract class BaseJobContext implements JobContext {
   protected _reporter: Reporter;
   protected _openCloudClient: OpenCloudClient | undefined;
+  private _basePlaceResolver: BasePlaceResolver | undefined;
   private _builtPlaces = new Set<TrackedBuiltPlace>();
   private _sharedRojoBuilds = new Map<string, SharedRojoBuild>();
 
-  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
+  constructor(
+    reporter: Reporter,
+    openCloudClient?: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
     this._reporter = reporter;
     this._openCloudClient = openCloudClient;
+    this._basePlaceResolver = basePlaceResolver;
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {
@@ -114,7 +122,7 @@ export abstract class BaseJobContext implements JobContext {
     if (options.overrides?.placeFile) {
       return undefined;
     }
-    const packagePath = options.packagePath ?? process.cwd();
+    const packagePath = options.packagePath;
     const projectPath = path.resolve(packagePath, options.target.project);
     const outputFileName = options.outputFileName ?? 'build.rbxl';
     return `${projectPath}|${outputFileName}`;
@@ -142,8 +150,7 @@ export abstract class BaseJobContext implements JobContext {
       // Waiter: the in-flight build was started under a different
       // packageName, so emit our own 'building' phase change for the reporter.
       const resolvedName =
-        options.packageName ??
-        path.basename(options.packagePath ?? process.cwd());
+        options.packageName ?? path.basename(options.packagePath);
       this._reporter.onPackagePhaseChange(resolvedName, 'building');
       return existing.promise;
     }
@@ -180,8 +187,18 @@ export abstract class BaseJobContext implements JobContext {
     options: BuildPlaceOptions
   ): Promise<void> {
     const { basePlace } = tracked.target;
-    if (!basePlace || !this._openCloudClient) {
+    if (!basePlace) {
       return;
+    }
+
+    // Silently building without the base place would report success on a place
+    // that is missing all of its Studio-authored content, so a context that
+    // cannot download one says so instead.
+    if (!this._openCloudClient || !this._basePlaceResolver) {
+      throw new Error(
+        `Target has a basePlace (${basePlace.placeId}) but this run has no Open ` +
+          `Cloud access to download it. Re-run with --cloud, or pass --api-key.`
+      );
     }
 
     // Merge artifacts (base.rbxl, merged.rbxl) are per-place — siblings sharing
@@ -193,11 +210,26 @@ export abstract class BaseJobContext implements JobContext {
     const resolvedName = options.packageName ?? '';
 
     this._reporter.onPackagePhaseChange(resolvedName, 'downloading');
-    OutputHelper.verbose(
-      basePlace.version != null
-        ? `Downloading base place (pinned v${basePlace.version}) for merge...`
-        : 'Downloading base place (latest) for merge...'
+
+    // Every pin — number, keyword, or absent — becomes a concrete version here,
+    // both because the Asset Delivery API only addresses versions numerically
+    // and so the lock file records exactly what this build merged against.
+    const version = await this._basePlaceResolver.resolveAsync(
+      options.packagePath,
+      basePlace
     );
+    // Carried out to the caller so it can be stamped into the place: this is
+    // the only point where a "published" pin becomes a concrete number, and the
+    // base place will have moved on by the time anyone asks in game.
+    tracked.basePlaceVersion = version;
+    OutputHelper.verbose(
+      typeof basePlace.version === 'number'
+        ? `Downloading base place (pinned v${version}) for merge...`
+        : `Downloading base place (${
+            basePlace.version ?? 'published'
+          } → v${version}) for merge...`
+    );
+
     const buffer = await this._openCloudClient.downloadPlaceAsync(
       basePlace.universeId,
       basePlace.placeId,
@@ -208,13 +240,13 @@ export abstract class BaseJobContext implements JobContext {
           totalBytes: total,
         });
       },
-      basePlace.version
+      version
     );
     const basePath = mergeContext.resolvePath('base.rbxl');
     await fs.writeFile(basePath, buffer);
 
     this._reporter.onPackagePhaseChange(resolvedName, 'merging');
-    const packagePath = options.packagePath ?? process.cwd();
+    const packagePath = options.packagePath;
     const projectPath = path.resolve(packagePath, tracked.target.project);
     const mergedPath = mergeContext.resolvePath('merged.rbxl');
 
@@ -284,6 +316,40 @@ export abstract class BaseJobContext implements JobContext {
         // best effort
       }
       this._sharedRojoBuilds.delete(key);
+    }
+
+    // Hangs off the lifecycle every entry point already runs in a `finally`, so
+    // no command has to remember to persist what it resolved. Last and
+    // best-effort: dispose runs on the failure path too, and a lock that cannot
+    // be written must not bury the error the user actually needs to read, nor
+    // skip the cleanup above it.
+    if (this._basePlaceResolver) {
+      try {
+        const written = await this._basePlaceResolver.flushAsync();
+        for (const lockPath of written) {
+          OutputHelper.info(`Updated ${lockPath}`);
+        }
+        // A refreshed pin only survives if the lock is committed. Nothing here
+        // commits it, so on a CI runner the file is written and then thrown
+        // away — and the next build that does not refresh reads the old
+        // version out of the repo and republishes the base place this run just
+        // moved past. Silent, and it looks like the watch never fired.
+        if (written.length > 0 && this._basePlaceResolver.refreshing) {
+          OutputHelper.warn(
+            `--refresh-base-place moved ${written.length} lock file${
+              written.length === 1 ? '' : 's'
+            }. Commit the change, or the next build without ` +
+              `--refresh-base-place will rebuild the previous base place ` +
+              `version and revert this deploy.`
+          );
+        }
+      } catch (err) {
+        OutputHelper.warn(
+          `Could not write the deploy lock file: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
     }
   }
 }
