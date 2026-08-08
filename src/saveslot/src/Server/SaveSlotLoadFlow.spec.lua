@@ -76,7 +76,7 @@ describe("save slot load flow (healthy datastore)", function()
 		expect(metaOk).toEqual(true)
 		expect(metadata).toEqual({})
 
-		local activePromise = systemStore:Load("activeSlotId")
+		local activePromise = systemStore:Load(SaveSlotConstants.ACTIVE_SLOT_ID_KEY)
 		if not PromiseTestUtils.awaitSettled(activePromise, 10) then
 			expect("activeSlotId load hung").toEqual("activeSlotId load settled")
 			controller:destroy()

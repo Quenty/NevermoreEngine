@@ -19,6 +19,7 @@ local ObservableMap = require("ObservableMap")
 local PlayerBinder = require("PlayerBinder")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local Remoting = require("Remoting")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
@@ -74,6 +75,7 @@ export type HasSaveSlots =
 			_metadataStore: any,
 			_summaryProviders: ObservableMap.ObservableMap<string, SummaryProvider>,
 			_lastActiveSlotId: SaveSlotData.SlotId?,
+			_persistedActiveSlotId: SaveSlotData.SlotId?,
 			_teleportDataService: any,
 			_sharedSaveSlotDataStoreService: any,
 			_playSessionSlotId: SaveSlotData.SlotId?,
@@ -782,12 +784,15 @@ function HasSaveSlots.PromiseDeleteSlot(self: HasSaveSlots, slotId: SaveSlotData
 
 		self._maid[slotId] = nil
 
-		-- The continue pointer must not outlive its slot. When the deleted slot is the one the player
-		-- would resume on (e.g. the just-deselected active slot, or a never-reselected last-active),
-		-- clear the last-active memory so "Continue" stops offering a slot that no longer exists.
+		-- Neither pointer may outlive its slot, and they are checked apart: the persisted active slot
+		-- outlives the session that wrote it, so it can still name this slot while a different one is
+		-- selected now. Each is retired only when it is this slot that is going.
 		if slotId == self._lastActiveSlotId then
-			self._lastActiveSlotId = nil
-			self.LastActiveSlotId.Value = nil
+			self:_setContinueSlotId(nil)
+		end
+
+		if slotId == self._persistedActiveSlotId then
+			self:_setPersistedActiveSlotId(nil)
 		end
 
 		-- Wipe default slot
@@ -826,8 +831,11 @@ function HasSaveSlots.PromiseDeleteAllSlots(self: HasSaveSlots): Promise.Promise
 	return (self._loadPromise :: any):Then(function()
 		-- Clear the selection first so the previously active slot is deletable
 		self.ActiveSlotId.Value = nil
-		self._lastActiveSlotId = nil
-		self.LastActiveSlotId.Value = nil
+
+		-- Every slot is going, so both pointers are retired outright rather than left to the selection hook
+		-- above: it writes nothing when no slot was selected, and skips an ephemeral deselect.
+		self:_setContinueSlotId(nil)
+		self:_setPersistedActiveSlotId(nil)
 
 		local slotIds = {}
 		for slotId in self._slotMap do
@@ -898,8 +906,7 @@ function HasSaveSlots.PromiseResetSlot(
 				-- Non-active reset never reselects, so carry the resume pointer onto the fresh id
 				-- ourselves when this slot was the one "Continue" would resume.
 				if wasLastActive then
-					self._lastActiveSlotId = newSlotId
-					self.LastActiveSlotId.Value = newSlotId
+					self:_setContinueSlotId(newSlotId)
 				end
 
 				return newSlotId
@@ -1133,7 +1140,9 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 		self._systemStore = dataStore:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
 		self._metadataStore = self._systemStore:GetSubStore(SaveSlotConstants.METADATA_STORE_KEY)
 
-		return self._maid:GivePromise(self._metadataStore:LoadAll({})):Then(function(metadata)
+		-- Annotated because the branches differ: the liveness guard returns nil where the body returns the
+		-- seeding promise, and inferring from the first of those makes the other an error.
+		return self._maid:GivePromise(self._metadataStore:LoadAll({})):Then(function(metadata): any
 			if not self.Destroy then
 				return nil -- Destroyed
 			end
@@ -1142,62 +1151,101 @@ function HasSaveSlots._promiseLoadSlots(self: HasSaveSlots): Promise.Promise<{}>
 				self:_buildSlot(slotId, data)
 			end
 
-			return self._maid
-				:GivePromise(self._systemStore:Load("activeSlotId"))
-				:Then(function(activeId: SaveSlotData.SlotId?)
-					if not self.Destroy then
-						return nil -- Destroyed
-					end
-
-					self._lastActiveSlotId = activeId
-					self.LastActiveSlotId.Value = activeId
-
-					-- The persisted active-slot pointer and the replicated "Continue" target only ever track real
-					-- slots. This replaces StoreOnValueChange so an ephemeral selection is invisible to both:
-					-- entering one leaves them pinned to the real slot, and the ephemeral slot is torn down the
-					-- moment it stops being active. We track the id we are leaving to know which of those to do.
-					local previousActiveSlotId: SaveSlotData.SlotId? = activeId
-
-					self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
-						local active = self.ActiveSlotId.Value
-
-						-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
-						-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
-						self.ActiveTransferableEphemeralKey.Value = if active
-							then self._transferableEphemeralKeys[active]
-							else nil
-
-						local leftSlotId = previousActiveSlotId
-						-- Read before the retire below, while the outgoing slot is still in the map.
-						local leavingEphemeral = self:_isEphemeral(leftSlotId)
-						previousActiveSlotId = active
-
-						-- Persist the pointer + remember the Continue target only for real-slot transitions
-						-- (real -> real, real -> nil deselect, nil -> real). Skip both ephemeral cases: entering an
-						-- ephemeral slot must stay invisible to persistence, and leaving one back to no slot must
-						-- leave the real pointer pinned where it was.
-						local enteringEphemeral = self:_isEphemeral(active)
-						local leavingEphemeralToMenu = leavingEphemeral and active == nil
-						if not (enteringEphemeral or leavingEphemeralToMenu) then
-							self._systemStore:Store("activeSlotId", active)
-							if active ~= nil then
-								self._lastActiveSlotId = active
-								self.LastActiveSlotId.Value = active
-							end
-						end
-
-						-- An ephemeral slot exists only while it is the active slot; retire the one we just left.
-						if leavingEphemeral and leftSlotId ~= active then
-							self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
-						end
-					end))
-
-					-- Matches the liveness-guard returns above, which make this callback's inferred return
-					-- type nil; falling off the end instead returns no values at all.
-					return nil
-				end)
+			return self:_promiseSeedSlotPointers()
 		end)
 	end)
+end
+
+-- Moves the "Continue" pointer: what this session reads, what replicates to the client, and what carries
+-- to the next session. All three together, or a consumer reads one the others have retired.
+function HasSaveSlots._setContinueSlotId(self: HasSaveSlots, slotId: SaveSlotData.SlotId?): ()
+	self._lastActiveSlotId = slotId
+	self.LastActiveSlotId.Value = slotId
+	self._systemStore:Store(SaveSlotConstants.LAST_ACTIVE_SLOT_ID_KEY, slotId)
+end
+
+-- Moves the persisted active slot, mirrored in memory so a delete can tell whether the key names the slot
+-- going away. Only ever written for real-slot transitions -- see the selection hook below.
+function HasSaveSlots._setPersistedActiveSlotId(self: HasSaveSlots, slotId: SaveSlotData.SlotId?): ()
+	self._persistedActiveSlotId = slotId
+	self._systemStore:Store(SaveSlotConstants.ACTIVE_SLOT_ID_KEY, slotId)
+end
+
+-- Restores the Continue pointer from whichever key the last session left it in, then keeps both keys in
+-- step with every selection this one makes. The active slot is deliberately not restored -- a session
+-- starts at no slot however the last one ended.
+--
+-- The read is maid-owned and the continuation re-checks we are alive, for the same reason as the rest of the
+-- load it is a hop of: see _promiseLoadSlots.
+function HasSaveSlots._promiseSeedSlotPointers(self: HasSaveSlots): Promise.Promise<()>
+	return self._maid
+		:GivePromise(PromiseUtils.all({
+			self._systemStore:Load(SaveSlotConstants.ACTIVE_SLOT_ID_KEY),
+			self._systemStore:Load(SaveSlotConstants.LAST_ACTIVE_SLOT_ID_KEY),
+		}))
+		:Then(function(activeId: SaveSlotData.SlotId?, continueId: SaveSlotData.SlotId?)
+			if not self.Destroy then
+				return nil -- Destroyed
+			end
+
+			-- The active slot is read first because it is the only pointer data written before the Continue key
+			-- existed has -- that fallback is what keeps Continue for a player upgrading onto this build.
+			self._persistedActiveSlotId = activeId
+			self._lastActiveSlotId = activeId or continueId
+			self.LastActiveSlotId.Value = self._lastActiveSlotId
+
+			-- Every slot this player has is built above, so a pointer naming none of them names a slot that went
+			-- away -- deleted by another server, or by a session that left this key behind. Retire it on disk too:
+			-- now that the pointer outlives a deselect, nothing else ever would.
+			local seeded = self._lastActiveSlotId
+			if seeded ~= nil and (self._slotMap[seeded] :: Folder?) == nil then
+				self:_setContinueSlotId(nil)
+				self:_setPersistedActiveSlotId(nil)
+			end
+
+			-- The persisted active-slot pointer and the replicated "Continue" target only ever track real
+			-- slots. This replaces StoreOnValueChange so an ephemeral selection is invisible to both:
+			-- entering one leaves them pinned to the real slot, and the ephemeral slot is torn down the
+			-- moment it stops being active. We track the id we are leaving to know which of those to do.
+			local previousActiveSlotId: SaveSlotData.SlotId? = activeId
+
+			self._maid:GiveTask(self.ActiveSlotId.Changed:Connect(function()
+				local active = self.ActiveSlotId.Value
+
+				-- Replicate the active transferable-ephemeral slot's shared-store key (nil otherwise) so a
+				-- client-initiated teleport can carry it forward (SaveSlotServiceClient's provider reads this).
+				self.ActiveTransferableEphemeralKey.Value = if active
+					then self._transferableEphemeralKeys[active]
+					else nil
+
+				local leftSlotId = previousActiveSlotId
+				-- Read before the retire below, while the outgoing slot is still in the map.
+				local leavingEphemeral = self:_isEphemeral(leftSlotId)
+				previousActiveSlotId = active
+
+				-- Persist the pointer + remember the Continue target only for real-slot transitions
+				-- (real -> real, real -> nil deselect, nil -> real). Skip both ephemeral cases: entering an
+				-- ephemeral slot must stay invisible to persistence, and leaving one back to no slot must
+				-- leave the real pointer pinned where it was.
+				local enteringEphemeral = self:_isEphemeral(active)
+				local leavingEphemeralToMenu = leavingEphemeral and active == nil
+				if not (enteringEphemeral or leavingEphemeralToMenu) then
+					self:_setPersistedActiveSlotId(active)
+					if active ~= nil then
+						self:_setContinueSlotId(active)
+					end
+				end
+
+				-- An ephemeral slot exists only while it is the active slot; retire the one we just left.
+				if leavingEphemeral and leftSlotId ~= active then
+					self:_destroyEphemeralSlot(leftSlotId :: SaveSlotData.SlotId)
+				end
+			end))
+
+			-- Matches the liveness-guard return above, which makes this callback's inferred return type nil;
+			-- falling off the end instead returns no values at all.
+			return nil
+		end)
 end
 
 function HasSaveSlots._getSlotStore(self: HasSaveSlots, slotId: SaveSlotData.SlotId): DataStoreStage.DataStoreStage
