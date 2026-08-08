@@ -108,9 +108,6 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 			local isPurchased =
 				PlayerMock.readLookup(self._player, "MarketplaceService.PromptGamePassPurchase", gamePassId)
 			self._maid:GiveTask(task.defer(function()
-				if not self.Destroy then
-					return
-				end
 				(self :: any):_handleGamePassPromptFinished(gamePassId, isPurchased)
 			end))
 			return
