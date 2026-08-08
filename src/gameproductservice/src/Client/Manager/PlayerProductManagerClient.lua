@@ -265,6 +265,10 @@ function PlayerProductManagerClient._handleGamePassPromptFinished(
 ): ()
 	PlayerProductManagerBase._handleGamePassPromptFinished(self, gamePassId, isPurchased)
 
+	if not self._remoting.Destroy then
+		return
+	end
+
 	self._remoting.PromptGamePassPurchaseFinished:FireServer(gamePassId, isPurchased)
 end
 
