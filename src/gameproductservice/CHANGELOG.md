@@ -1,3 +1,18 @@
+# v14.66.8 (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Validate game pass ownership on server [#791](https://github.com/Quenty/NevermoreEngine/pull/791) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Check if remoting is alive ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Check if alive ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Validate game pass ownership on server ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
