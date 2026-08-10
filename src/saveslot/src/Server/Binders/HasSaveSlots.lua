@@ -42,9 +42,12 @@ local NONE = {}
 
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
 -- itself (from a fresh GUID and the slotIndex argument), so they are never taken from here.
+-- TimePlayed seeds the new slot's accrued playtime, which is what lets a copy of a slot (duplicate or
+-- export/import) carry the playtime that belongs to the progress being copied.
 export type SaveSlotCreateMetadata = {
 	SlotName: string?,
 	Summary: SaveSlotData.SaveSlotSummary?,
+	TimePlayed: number?,
 }
 
 local HasSaveSlots = setmetatable({}, HasSaveSlotsBase)
@@ -283,6 +286,7 @@ function HasSaveSlots.PromiseCreateSlot(
 			SlotName = (metadata and metadata.SlotName) or `Slot {slotIndex}`,
 			CreatedTime = os.time(),
 			Summary = metadata and metadata.Summary,
+			TimePlayed = metadata and metadata.TimePlayed,
 		}
 
 		self:_buildSlot(slotId, data, true)
@@ -322,6 +326,10 @@ function HasSaveSlots.PromiseExportSlot(
 			return (Promise :: any).rejected("Cannot export the main slot")
 		end
 
+		-- As in PromiseDuplicateSlot: bring the live session's accrued time into TimePlayed before it is
+		-- read, so an export of the active slot carries its playtime up to this moment.
+		self:_flushPlaytime()
+
 		local metadata = SaveSlotData:Get(slot)
 		return self:_getSlotStore(slotId):LoadAll({}):Then(function(sourceData)
 			local data = if type(sourceData) == "table" then table.clone(sourceData) else {}
@@ -334,7 +342,7 @@ function HasSaveSlots.PromiseExportSlot(
 				data[SaveSlotConstants.SYSTEM_STORE_KEY] = nil
 			end
 
-			return SaveSlotExportUtils.create(data, metadata.SlotName, metadata.Summary)
+			return SaveSlotExportUtils.create(data, metadata.SlotName, metadata.Summary, metadata.TimePlayed)
 		end)
 	end)
 end
@@ -376,6 +384,8 @@ function HasSaveSlots.PromiseImportSlot(
 		return self:PromiseCreateSlot(freeIndex, {
 			SlotName = export.slotName,
 			Summary = export.summary,
+			-- Absent on exports taken before playtime was carried; those import as before, with no playtime.
+			TimePlayed = export.timePlayed,
 		}):Then(function(newSlotId: SaveSlotData.SlotId)
 			-- freeIndex is always > DEFAULT_SLOT_INDEX, so this store is an isolated substore
 			-- (never the shared root); a plain Overwrite cannot touch system or global data.
@@ -644,8 +654,8 @@ end
 
 --[=[
 	Duplicates the slot with the given ID into a new slot at the lowest free index,
-	copying its saved data. Resolves to the new slot's id. The copy is not selected,
-	its metadata (playtime, timestamps) starts fresh, and its name is suffixed with
+	copying its saved data and accrued playtime. Resolves to the new slot's id. The copy is not
+	selected, its timestamps and session counters start fresh, and its name is suffixed with
 	" (Copy)". Rejects when the source slot is missing or every index is in use.
 
 	An ephemeral slot may be duplicated: the copy is a real, persisted slot seeded with the ephemeral
@@ -665,6 +675,10 @@ function HasSaveSlots.PromiseDuplicateSlot(
 		end
 
 		local sourceIsEphemeral = self:_isEphemeral(slotId)
+
+		-- The source is usually the live active slot, whose current session has not landed in TimePlayed
+		-- yet; fold it in first so the copy carries the playtime the player is actually looking at.
+		self:_flushPlaytime()
 
 		-- Lowest free positive index, filling gaps left by deletions (mirrors PromiseSelectNewSaveSlot).
 		local usedIndices = {}
@@ -696,6 +710,9 @@ function HasSaveSlots.PromiseDuplicateSlot(
 						then sourceMetadata.SlotName
 						else `{sourceMetadata.SlotName} (Copy)`,
 					Summary = sourceMetadata.Summary,
+					-- Playtime describes the progress being copied, not the slot it happens to live in, so
+					-- it travels with that progress rather than resetting the copy to a never-played slot.
+					TimePlayed = sourceMetadata.TimePlayed,
 				})
 				:Then(function(newSlotId: SaveSlotData.SlotId)
 					local destStore = self:_getSlotStore(newSlotId)
