@@ -1,3 +1,15 @@
+# v14.66.10 (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/euvinkeel/memleak2 ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

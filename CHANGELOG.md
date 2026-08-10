@@ -1,3 +1,16 @@
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@12.41.1`, `@quenty/rogue-properties@11.57.1`
+  - Users/euvinkeel/memleak2 [#789](https://github.com/Quenty/NevermoreEngine/pull/789) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Sat Aug 08 2026)
 
 #### 🐛 Bug Fix
