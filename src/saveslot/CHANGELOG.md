@@ -1,25 +1,14 @@
-# v2.7.0 (Mon Aug 10 2026)
-
-#### 🚀 Enhancement
-
-- feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge remote-tracking branch 'origin/main' into users/quenty/nevermore-cli-publishing-improvements ([@Quenty](https://github.com/Quenty))
-- fix(nevermore-cli): make the watch context tests independent of the host ([@Quenty](https://github.com/Quenty))
-- fix: Fix save slots ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.3...@quenty/saveslot@2.7.0) (2026-08-10)
+
+### Bug Fixes
+
+- Fix save slots ([579c587](https://github.com/Quenty/NevermoreEngine/commit/579c587ebfadaedaab91e774f8441d78a8d6fe99))
+- **nevermore-cli:** make the watch context tests independent of the host ([453f415](https://github.com/Quenty/NevermoreEngine/commit/453f415460db72eec511ecbea34434c82afb61c8))
 
 ## [2.6.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.2...@quenty/saveslot@2.6.3) (2026-08-10)
 

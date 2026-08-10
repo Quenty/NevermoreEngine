@@ -1,19 +1,11 @@
-# v1.4.0 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- Merge remote-tracking branch 'origin/main' into users/quenty/nevermore-cli-publishing-improvements ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.12...@quenty/access@1.4.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/access
 
 ## [1.3.12](https://github.com/Quenty/NevermoreEngine/compare/@quenty/access@1.3.11...@quenty/access@1.3.12) (2026-08-10)
 
