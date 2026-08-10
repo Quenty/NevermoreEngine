@@ -1,0 +1,478 @@
+import {
+  isBasePlaceVersionKeyword,
+  type BasePlaceConfig,
+  type BasePlaceVersionKeyword,
+  type DeployTarget,
+} from './deploy-config.js';
+import { formatTargetSelector } from './target-selector.js';
+
+const DURATION_UNITS_MS: Record<string, number> = {
+  s: 1000,
+  m: 60 * 1000,
+  h: 60 * 60 * 1000,
+  d: 24 * 60 * 60 * 1000,
+  w: 7 * 24 * 60 * 60 * 1000,
+};
+
+/**
+ * Lease spelling the service accepts in the register path: digits plus a unit,
+ * either case. Mirrors the API's own pattern — a bare number is rejected there
+ * as ambiguous, so it is rejected here too rather than sent to be refused.
+ */
+const LEASE_PATTERN = /^[0-9]+[smhdwSMHDW]$/;
+
+/** Characters the service allows in a monitor or watch name. */
+const NAME_PATTERN = /^[A-Za-z0-9._/-]+$/;
+
+/** Service cap on both `MonitorRequest.name` and `Watch.name`. */
+const MAX_NAME_LENGTH = 100;
+
+/**
+ * Name of the `workflow_dispatch` input the dispatched workflow reads the
+ * target selector from. Fixed rather than configurable: both halves of the
+ * handshake are Nevermore's, and a mismatch surfaces as a workflow that
+ * silently deploys the wrong target.
+ */
+export const WATCH_INPUT_NAME = 'target';
+
+/** `7d`, `12h`, `30m`, `90s`, `2w`. Returns milliseconds. */
+export function parseWatchDuration(text: string): number {
+  const match = /^(\d+)([smhdw])$/i.exec(text);
+  if (!match) {
+    throw new Error(
+      `Invalid watch duration "${text}" — expected a number followed by ` +
+        `${Object.keys(DURATION_UNITS_MS).join('/')}, e.g. "7d".`
+    );
+  }
+  const amount = Number(match[1]);
+  if (amount <= 0) {
+    throw new Error(`Watch duration must be greater than zero, got "${text}"`);
+  }
+  return amount * DURATION_UNITS_MS[match[2]!.toLowerCase()]!;
+}
+
+/**
+ * A resolved `--watch` value: the endpoint to register with, and the lease it
+ * asks for.
+ */
+export interface WatchOption {
+  registerUrl: string;
+  /** The lease as the service spells it (`7d`), taken from the register path. */
+  lease: string;
+  /** The same lease in milliseconds, for reporting. */
+  durationMs: number;
+}
+
+/**
+ * Parse the `--watch` value, which is the register endpoint in full:
+ * `--watch https://<host>/v1/register/7d`.
+ *
+ * A URL rather than a bare duration, deliberately. Nevermore is published from
+ * a public repo and has no business knowing a watch service address, so there
+ * is nothing for a duration to compose onto — a shorthand would only work by
+ * shipping a default host or by depending on an environment variable being set
+ * somewhere out of sight. Naming the endpoint at the call site keeps the whole
+ * address in the caller's hands and this package free of it.
+ *
+ * The lease has to be the last path segment, because that is where the API
+ * takes it. A URL without one is rejected here rather than sent to be refused
+ * with a 400 after the deploy has already shipped.
+ */
+export function parseWatchOption(value: string): WatchOption {
+  if (!/^https?:\/\//i.test(value)) {
+    throw new Error(
+      `--watch takes the register endpoint URL, not "${value}". ` +
+        'Pass the full endpoint including the lease, e.g. ' +
+        '--watch https://<watch-service>/v1/register/7d'
+    );
+  }
+
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`Invalid --watch URL "${value}"`);
+  }
+
+  const lease = url.pathname.split('/').filter(Boolean).pop();
+  if (lease == null || !LEASE_PATTERN.test(lease)) {
+    throw new Error(
+      `--watch URL "${value}" does not end in a lease. The register ` +
+        `endpoint takes it as the last path segment, e.g. ` +
+        `".../v1/register/7d".`
+    );
+  }
+
+  return {
+    registerUrl: value,
+    lease,
+    durationMs: parseWatchDuration(lease),
+  };
+}
+
+/**
+ * Coerce a name into the service's character set.
+ *
+ * npm scopes are the reason this exists: `@quenty/hub` carries an `@`, which
+ * the service rejects, but the rest of the name is meaningful and worth
+ * keeping. Anything else outside the set becomes `-`.
+ *
+ * This is lossy and can map two distinct inputs onto one name, so it is not a
+ * uniqueness mechanism — callers that need unique names must ensure that
+ * themselves, after sanitizing.
+ */
+export function sanitizeWatchName(name: string): string {
+  const cleaned = name
+    .replace(/^@/, '')
+    .replace(/[^A-Za-z0-9._/-]/g, '-')
+    .replace(/^[/.-]+/, '');
+  if (cleaned === '' || !NAME_PATTERN.test(cleaned)) {
+    throw new Error(`Cannot derive a watch name from "${name}"`);
+  }
+  // Keep the tail: the distinguishing part of a package/target name is at the
+  // end, so truncating the front loses less than truncating the back.
+  return cleaned.length > MAX_NAME_LENGTH
+    ? cleaned.slice(cleaned.length - MAX_NAME_LENGTH)
+    : cleaned;
+}
+
+/**
+ * The one name a package's watches live under.
+ *
+ * A monitor is identified by `(repository, name)`, so two spellings of the same
+ * thing are not two names — they are two monitors watching one base place. One
+ * publish then dispatches twice, and each rebuild races the other's lock write.
+ * `deploy run --watch` and `batch deploy --watch` both register the same
+ * package's places, so both derive the name here rather than each spelling it.
+ *
+ * Scoped by package because that is the unit a watch list belongs to: the lock
+ * file supplying the baselines is per package, and re-registering replaces a
+ * monitor's whole list, so one package must never be able to delete another's
+ * watches. The ref is appended later, at the point one is known.
+ */
+export function buildWatchMonitorName(options: {
+  packageName: string;
+  targetName: string;
+  /** Registers beside the real monitor rather than over it. */
+  dryrun?: boolean;
+}): string {
+  const name = `${options.packageName}/${options.targetName}`;
+  return options.dryrun ? `${name}/dryrun` : name;
+}
+
+/** How a watch reaches whoever rebuilds. `auto` decides from the environment. */
+export const WATCH_MODES = ['auto', 'dispatch', 'notify'] as const;
+
+export type WatchMode = typeof WATCH_MODES[number];
+
+/** The two things a watch can actually do, once `auto` has been resolved. */
+export type WatchDelivery = Exclude<WatchMode, 'auto'>;
+
+/**
+ * Dispatch a workflow when the base place moves, or hold a stream and be told.
+ *
+ * Detection is only the default, because the two wrong guesses cost very
+ * different amounts. Guessing dispatch on a laptop registers a monitor that
+ * fires a workflow: visible, and undone by re-registering. Guessing notify in
+ * an automated context leaves the run holding a stream that nothing will ever
+ * close — no error, no output, just a job burning its timeout. Any automated
+ * context that is not GitHub Actions detects as local and lands exactly there,
+ * so the mode is settable and the hang is reachable only on purpose.
+ */
+export function resolveWatchDelivery(
+  mode: WatchMode | undefined,
+  automated: boolean
+): WatchDelivery {
+  if (mode != null && mode !== 'auto') {
+    return mode;
+  }
+  return automated ? 'dispatch' : 'notify';
+}
+
+/** One place that will be watched, paired with what to dispatch when it moves. */
+export interface WatchPlanEntry {
+  /** Selector the dispatched workflow re-deploys, e.g. `integration.places.hub`. */
+  selector: string;
+  /** Repo-relative workflow path, from the place's `watch` field. */
+  workflow: string;
+}
+
+/**
+ * What the service writes versions in once it is reading with the caller's Open
+ * Cloud key: the same place version integer a publish returns and the lock file
+ * records. Declared on a watch so a vocabulary mismatch is refused at
+ * registration rather than discovered as one spurious rebuild later.
+ *
+ * Without a key the service reads asset delivery instead and speaks content
+ * hashes, which nothing here can produce — hence no baseline at all on that
+ * path.
+ */
+export const WATCH_BASELINE_KIND = 'roblox-place-version';
+
+/** A place that declared no watch, or nothing to watch, and why it was left out. */
+export interface WatchPlanSkip {
+  selector: string;
+  reason:
+    | 'no-watch-field'
+    | 'no-base-place'
+    | 'pinned-base-place'
+    | 'saved-needs-api-key';
+}
+
+/** Why a place was left out, in words a user can act on. */
+export function describeWatchPlanSkip(skip: WatchPlanSkip): string {
+  switch (skip.reason) {
+    case 'no-watch-field':
+      return `${skip.selector} has no "watch" field`;
+    case 'no-base-place':
+      return `${skip.selector} has no "basePlace" to watch`;
+    case 'pinned-base-place':
+      return (
+        `${skip.selector} pins its basePlace to an exact version — ` +
+        'change it to "published" to make it watchable'
+      );
+    case 'saved-needs-api-key':
+      return (
+        `${skip.selector} tracks its basePlace as "saved", which the watch ` +
+        'service can only see with an Open Cloud key. Pass ' +
+        '--watch-share-api-key, or track "published".'
+      );
+  }
+}
+
+export interface WatchPlan {
+  entries: WatchPlanEntry[];
+  skipped: WatchPlanSkip[];
+}
+
+export interface WatchPlanOptions {
+  /**
+   * Whether an Open Cloud key is being shared with the service.
+   *
+   * It decides what the service can see. Reading anonymously through asset
+   * delivery reports published content only, so a `"saved"` watch would poll
+   * cleanly and never fire — the service refuses it, and one refusal fails the
+   * whole request, taking every unrelated watch with it. Filtering here keeps
+   * the blast radius to the place that asked for it.
+   */
+  credentialed?: boolean;
+}
+
+/** Why a base place cannot be watched. */
+export type BasePlaceWatchIssue = Exclude<
+  WatchPlanSkip['reason'],
+  'no-watch-field'
+>;
+
+/**
+ * Whether a base place is one a watch could ever fire on, and if so, which
+ * kind of version it follows.
+ *
+ * The single copy of that rule. A local watch and a registered one disagree
+ * about the *workflow* — one dispatches, the other rebuilds in the terminal —
+ * but they must agree exactly about the base place, or a place watchable by one
+ * path and skipped by the other is a rebuild that silently never happens.
+ *
+ * `versionType` comes back rather than being re-derived by each caller, because
+ * defaulting an absent version to `"published"` is part of the same rule: it is
+ * what makes an unversioned base place watchable at all.
+ */
+export type BasePlaceWatchCheck =
+  | { watchable: true; versionType: BasePlaceVersionKeyword }
+  | { watchable: false; issue: BasePlaceWatchIssue };
+
+export function checkBasePlaceWatchable(
+  basePlace: BasePlaceConfig | undefined,
+  options: WatchPlanOptions = {}
+): BasePlaceWatchCheck {
+  if (basePlace == null) {
+    return { watchable: false, issue: 'no-base-place' };
+  }
+  const version = basePlace.version;
+  // An exact version pin means "hold this base place still", which is the
+  // opposite of watching it: every rebuild would download the same version no
+  // matter how many times the watch fired.
+  if (version != null && !isBasePlaceVersionKeyword(version)) {
+    return { watchable: false, issue: 'pinned-base-place' };
+  }
+  if (!options.credentialed && version === 'saved') {
+    return { watchable: false, issue: 'saved-needs-api-key' };
+  }
+  return { watchable: true, versionType: version ?? 'published' };
+}
+
+/**
+ * Decide which of a target's places get watched, for a registration that
+ * dispatches.
+ *
+ * A place needs both halves: `watch` says what to dispatch, `basePlace` says
+ * what to watch for. Missing either is normal — most places in a config are
+ * neither — so they are reported as skips rather than errors, and only become a
+ * hard failure if that leaves nothing to register at all.
+ *
+ * A local watch dispatches nothing, so it wants only the base place half; it
+ * calls `checkBasePlaceWatchable` directly rather than reimplementing it.
+ */
+export function buildWatchPlan(
+  targetName: string,
+  places: DeployTarget[],
+  options: WatchPlanOptions = {}
+): WatchPlan {
+  const entries: WatchPlanEntry[] = [];
+  const skipped: WatchPlanSkip[] = [];
+
+  for (const place of places) {
+    const selector = formatTargetSelector({
+      targetName,
+      placeName: place.name,
+    });
+    if (place.watch == null) {
+      skipped.push({ selector, reason: 'no-watch-field' });
+      continue;
+    }
+    const check = checkBasePlaceWatchable(place.basePlace, options);
+    if (!check.watchable) {
+      skipped.push({ selector, reason: check.issue });
+      continue;
+    }
+    entries.push({ selector, workflow: place.watch });
+  }
+
+  return { entries, skipped };
+}
+
+/**
+ * The base place a watch observes.
+ *
+ * `versionType` mirrors `basePlace.version` and is part of the source's
+ * identity on the service: the same place watched for publishes and for saves
+ * are two sources, polled separately. Sent explicitly rather than leaning on
+ * the schema default, so what the config asked for is what gets stored even if
+ * that default moves.
+ */
+export interface WatchSource {
+  type: 'roblox-place';
+  universeId: number;
+  placeId: number;
+  versionType: BasePlaceVersionKeyword;
+}
+
+/** Dispatch a GitHub workflow when the source moves. */
+export interface WatchWorkflowDispatchAction {
+  type: 'github-workflow-dispatch';
+  /** Workflow path or file name; only the file name reaches GitHub. */
+  workflow: string;
+  /** Ref to run at. Omitted means the repository's default branch. */
+  ref?: string;
+  /** Forwarded verbatim as workflow inputs. */
+  inputs?: Record<string, string>;
+}
+
+/**
+ * Hand the change to whoever is holding the monitor's stream, instead of
+ * spending a workflow run to say it.
+ *
+ * This is what makes a local `--watch` worth registering at all. Dispatching is
+ * the wrong shape on a laptop — it rebuilds on a runner rather than in the
+ * terminal the developer is watching — so a local run asks to be told and does
+ * the rebuild itself.
+ *
+ * `payload` is opaque to the service and forwarded verbatim, exactly like
+ * `inputs`, so the selector vocabulary crosses unchanged.
+ */
+export interface WatchNotifyAction {
+  type: 'notify';
+  payload?: Record<string, string>;
+}
+
+export type WatchAction = WatchWorkflowDispatchAction | WatchNotifyAction;
+
+/** One "if this moves, run that" pair inside a monitor. */
+export interface WatchEntry {
+  /** Unique within the monitor; echoed back in status and events. */
+  name: string;
+  source: WatchSource;
+  /**
+   * The version this watch was last built against — the resolved value from the
+   * lock file, and only sendable when the service is reading in the same
+   * vocabulary (see `WATCH_BASELINE_KIND`).
+   *
+   * It matters most for a place that did *not* deploy this run: its lock still
+   * names an older version, so a baseline makes the service notice a change
+   * that already happened. Omitted, the first poll adopts whatever is current
+   * and that change is never seen.
+   */
+  baselineVersion?: string;
+  /** What `baselineVersion` is written in. A mismatch is refused at registration. */
+  baselineVersionKind?: string;
+  action: WatchAction;
+}
+
+/**
+ * One monitor: every watch a single CLI invocation is responsible for.
+ *
+ * The service is idempotent on `(repository, name)` and replaces the whole
+ * watch list on re-apply, so a registration has to carry every watch that name
+ * owns — not just the ones whose places happened to deploy this run.
+ */
+export interface WatchRegistrationRequest {
+  /** Lease key within the repository. */
+  monitorName: string;
+  /** `owner/repo`. */
+  repository: string;
+  /** GitHub token the service dispatches with. */
+  githubToken: string;
+  /** Open Cloud key the service polls private base places with, if shared. */
+  robloxApiKey?: string;
+  watches: WatchEntry[];
+  /** Minimum gap between dispatches for one watch. */
+  cooldownSeconds?: number;
+}
+
+export interface WatchRegistrationResult {
+  monitorId?: string;
+  /** Content hash of the stored config; credentials and lease excluded. */
+  revision?: string;
+  leaseExpiresAt?: string;
+  /** False when the applied config was identical to what was already stored. */
+  changed?: boolean;
+  /** How many watches the service reports the monitor holding. */
+  watchCount?: number;
+}
+
+/** What one watch's forced dispatch did. */
+export interface WatchTriggerOutcome {
+  watchName?: string;
+  ok?: boolean;
+  detail?: string;
+}
+
+export interface WatchTriggerResult {
+  results: WatchTriggerOutcome[];
+}
+
+/**
+ * The one thing watch registration needs from the outside world.
+ *
+ * Declared as a port for the same reason as `PlaceVersionSource`: this package
+ * stays free of network and auth, so the rules about what gets watched can't
+ * drift between callers. The HTTP implementation lives in the CLI.
+ */
+export interface WatchRegistry {
+  registerAsync(
+    request: WatchRegistrationRequest
+  ): Promise<WatchRegistrationResult>;
+
+  /**
+   * Fire a monitor's actions immediately, ignoring drift and cooldown.
+   *
+   * This is how a dryrun proves the routing works: registering only says the
+   * service accepted the config, while a forced dispatch shows the workflow
+   * actually receiving the selector.
+   */
+  triggerAsync(
+    monitorId: string,
+    credential: string,
+    options?: { watchName?: string }
+  ): Promise<WatchTriggerResult>;
+}

@@ -31,6 +31,8 @@ When a section grows to 10+ items, graduate it to its own doc.
 
 ## nevermore-cli
 
+- **The watch service and the lock file do not share a version vocabulary.** A watch's `baselineVersion`, and the `currentVersion` it reports back, are the *asset-delivery content hash* for the place — that's what the service's Roblox driver reads, and it compares them by string equality. `deploy.nevermore.lock.json` holds the *Open Cloud place version* (an integer). They are never equal, so handing the lock's number over as a baseline reads as drift on the very first poll and dispatches a rebuild of the build that just shipped. The CLI therefore sends no baseline at all — the service's first poll adopts what it sees, which is what a baseline was for — and treats every version the service reports as an opaque "something moved" token, asking Open Cloud what the place is actually at before deciding to rebuild. Anything comparing a service version against a lock version is wrong even when the types line up.
+
 - **`--script-text` loses everything after the first line when invoked through `npx` on Windows**: the `npx.cmd` shim truncates a multi-line argument, so `nevermore test --cloud --script-text '<line 1>\n<line 2>'` silently runs only line 1 (and prints `(no output)` when line 1 produced none). Either write the script as a single line with `;` separators, or bypass the shim: `node tools/nevermore-cli/dist/nevermore.js test --cloud --script-text '...'`, which passes newlines through intact.
 
 ## Claude Code hooks

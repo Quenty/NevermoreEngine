@@ -6326,6 +6326,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
+      '@quenty/nevermore-deploy':
+        specifier: workspace:*
+        version: link:../nevermore-deploy
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
@@ -6347,6 +6350,9 @@ importers:
       typescript-memoize:
         specifier: ^1.1.1
         version: 1.1.1
+      ws:
+        specifier: ^8.18.0
+        version: 8.20.0
       yargs:
         specifier: ^18.0.0
         version: 18.0.0
@@ -6357,6 +6363,9 @@ importers:
       '@types/node':
         specifier: ^18.11.4
         version: 18.19.130
+      '@types/ws':
+        specifier: ^8.5.13
+        version: 8.18.1
       '@types/yargs':
         specifier: ^17.0.13
         version: 17.0.35
@@ -6400,6 +6409,21 @@ importers:
       typescript-memoize:
         specifier: ^1.1.1
         version: 1.1.1
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
+
+  tools/nevermore-deploy:
+    devDependencies:
+      '@types/node':
+        specifier: ^18.11.4
+        version: 18.19.130
+      prettier:
+        specifier: 2.7.1
+        version: 2.7.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)

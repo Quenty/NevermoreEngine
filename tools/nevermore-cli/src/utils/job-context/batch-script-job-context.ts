@@ -43,6 +43,12 @@ interface CombinedBuildState {
  * execution. Wraps an inner context (cloud or local) and intercepts all methods
  * using the lazy-promise pattern: the first concurrent call triggers the shared
  * operation, all others await the same promise.
+ *
+ * Note that a `basePlace` cannot be honoured here: every package is combined
+ * into one place, so there is no per-package place to merge Studio content
+ * into. Rather than silently drop that content, the constructor warns for any
+ * package configured with one — those belong in `nevermore batch test
+ * --no-aggregated`, or in an integration deploy.
  */
 export class BatchScriptJobContext implements JobContext {
   private _inner: JobContext;
@@ -80,6 +86,18 @@ export class BatchScriptJobContext implements JobContext {
     this._batchUniverseId = options?.batchUniverseId;
     this._batchTimeoutMs = options?.batchTimeoutMs ?? 300_000;
     this._reporter = options?.reporter;
+
+    const withBasePlace = batchTargets.filter((t) => t.target.basePlace);
+    if (withBasePlace.length > 0) {
+      OutputHelper.warn(
+        `${withBasePlace.length} package${
+          withBasePlace.length === 1 ? '' : 's'
+        } configure a basePlace, which an aggregated batch run cannot merge — ` +
+          `their Studio-authored content is NOT in this place: ` +
+          withBasePlace.map((t) => t.packageName).join(', ') +
+          `. Use --no-aggregated to test them against their base place.`
+      );
+    }
   }
 
   async buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace> {

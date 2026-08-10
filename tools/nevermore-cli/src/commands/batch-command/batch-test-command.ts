@@ -8,6 +8,7 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type JobContext,
   BatchScriptJobContext,
@@ -234,9 +235,14 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     ? _createBroadcastReporter(reporter, packageNames)
     : reporter;
 
+  // Local runs get a resolver too — a package with a basePlace still has to
+  // merge it, and the client resolves its API key lazily so a run that never
+  // touches one is not prompted for credentials.
+  const basePlaceResolver = createBasePlaceResolver(client, args);
+
   const innerContext: JobContext = cloud
-    ? new CloudJobContext(innerReporter, client)
-    : new LocalJobContext(innerReporter, client);
+    ? new CloudJobContext(innerReporter, client, basePlaceResolver)
+    : new LocalJobContext(innerReporter, client, basePlaceResolver);
 
   const context: JobContext = args.aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
