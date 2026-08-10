@@ -1,3 +1,15 @@
+# v4.43.1 (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): stop failing a batch run whose tests all passed [#794](https://github.com/Quenty/NevermoreEngine/pull/794) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/nevermore-cli@4.43.1`
+  - fix(nevermore-cli): stop failing a batch run whose tests all passed [#794](https://github.com/Quenty/NevermoreEngine/pull/794) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/saveslot@2.7.1`
   - fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
 
