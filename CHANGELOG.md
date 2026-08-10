@@ -1,5 +1,18 @@
 # (Mon Aug 10 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.7.1`
+  - fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Aug 10 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/nevermoreclimanifest@1.9.0`, `@quenty/saveslot@2.7.0`, `@quenty/nevermore-cli-helpers@1.17.0`, `@quenty/nevermore-cli@4.43.0`, `@quenty/nevermore-deploy@1.1.0`

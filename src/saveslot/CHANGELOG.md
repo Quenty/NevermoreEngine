@@ -1,3 +1,16 @@
+# v2.7.1 (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Carry accrued playtime onto a copied slot ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
