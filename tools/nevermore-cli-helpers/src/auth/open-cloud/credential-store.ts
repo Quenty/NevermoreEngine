@@ -30,7 +30,7 @@ export function printApiKeySetupHelp(): void {
   console.log('');
   console.log('Only needed for `--watch --watch-share-api-key`:');
   console.log(
-    '  - universe.place:read             (let the watch service observe a private base place)'
+    '  - asset:read                      (let the watch service read base place versions)'
   );
   console.log('');
 }

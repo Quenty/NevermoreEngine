@@ -502,10 +502,14 @@ export class OpenCloudClient {
 
   /**
    * Resolve the newest saved or published version number of a place, via the
-   * Open Cloud Assets API (`asset:read` scope; `legacy-asset:manage` also
-   * grants it). The returned number is the same value the Asset Delivery API's
-   * `/version/{n}` route expects, so it can be written straight into a
-   * `basePlace.version` pin.
+   * Open Cloud Assets API (`asset:read` scope). The returned number is the same
+   * value the Asset Delivery API's `/version/{n}` route expects, so it can be
+   * written straight into a `basePlace.version` pin.
+   *
+   * This used to add that `legacy-asset:manage` grants `asset:read` too. They
+   * are separate boxes on the credentials page and nothing here ever verified
+   * the implication, so the claim is gone rather than restated — it had already
+   * been copied into the `nevermore login` instructions as fact once.
    *
    * `saved` is the newest version of any kind — Studio saves and publishes
    * share one increasing version sequence. `published` is the newest version

@@ -239,9 +239,11 @@ function _describeFailure(
     case 422: {
       // 422 is the service's "your config cannot work" answer, and it covers
       // several unrelated causes now — a missing workflow, an Open Cloud key
-      // without universe.place:read, a "saved" watch with no key, a baseline in
-      // the wrong vocabulary. Its own message names which, so the only thing
-      // worth adding is a remedy that could not already be in it.
+      // that cannot read a base place, a "saved" watch with no key, a baseline
+      // in the wrong vocabulary. Its own message names which, so the only thing
+      // worth adding is a remedy that could not already be in it. The scope
+      // itself is deliberately not named here: this file would then be a second
+      // place to correct when it is wrong, and it already has been once.
       const workflows = [
         ...new Set(
           request.watches.flatMap((w) =>
