@@ -1,20 +1,13 @@
-# v2.7.1 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Carry accrued playtime onto a copied slot ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.7.0...@quenty/saveslot@2.7.1) (2026-08-10)
+
+### Bug Fixes
+
+- Carry accrued playtime onto a copied slot ([90be930](https://github.com/Quenty/NevermoreEngine/commit/90be9301629ee967f52be7ad947f3f1568b48f29))
 
 # [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.3...@quenty/saveslot@2.7.0) (2026-08-10)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/saveslot",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "PlayerDataStoreService wrapper for save slots",
   "keywords": [
     "Roblox",
