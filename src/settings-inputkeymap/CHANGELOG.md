@@ -1,19 +1,11 @@
-# v10.70.7 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/euvinkeel/memleak2 ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.70.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.6...@quenty/settings-inputkeymap@10.70.7) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
 
 ## [10.70.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.5...@quenty/settings-inputkeymap@10.70.6) (2026-08-07)
 

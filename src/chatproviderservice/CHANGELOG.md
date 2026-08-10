@@ -1,19 +1,11 @@
-# v9.67.8 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/euvinkeel/memleak2 ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [9.67.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.7...@quenty/chatproviderservice@9.67.8) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
 
 ## [9.67.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.6...@quenty/chatproviderservice@9.67.7) (2026-08-07)
 

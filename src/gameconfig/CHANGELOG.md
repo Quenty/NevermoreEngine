@@ -1,19 +1,11 @@
-# v12.62.6 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/euvinkeel/memleak2 ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.62.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.5...@quenty/gameconfig@12.62.6) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameconfig
 
 ## [12.62.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.4...@quenty/gameconfig@12.62.5) (2026-08-07)
 

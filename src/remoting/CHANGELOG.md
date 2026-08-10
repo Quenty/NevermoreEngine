@@ -1,21 +1,11 @@
-# v12.41.1 (Mon Aug 10 2026)
-
-#### 🐛 Bug Fix
-
-- Users/euvinkeel/memleak2 [#789](https://github.com/Quenty/NevermoreEngine/pull/789) ([@euvinkeel](https://github.com/euvinkeel))
-- Merge branch 'main' into users/euvinkeel/memleak2 ([@euvinkeel](https://github.com/euvinkeel))
-- set maid before finally ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.41.0...@quenty/remoting@12.41.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/remoting
 
 # [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/remoting@12.40.2...@quenty/remoting@12.41.0) (2026-07-28)
 
