@@ -99,6 +99,42 @@ describe('parseBatchTestLogs', () => {
     expect(result?.logs).toContain('PlayerBadgeHelper');
   });
 
+  it('closes a section whose END was delivered after the summary', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  1014 passed, 1077 total',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":110467}]',
+      '===BATCH_TEST_END egghunt2026 PASS 110467===',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.error).toBeUndefined();
+    expect(result?.testCounts).toEqual({
+      passed: 1014,
+      failed: 0,
+      total: 1077,
+    });
+  });
+
+  it('keeps the summary payload out of the section it interrupts', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true},' +
+        '{"slug":"other","success":false,"error":"boom"}]',
+      '===BATCH_TEST_END egghunt2026 PASS 10===',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.logs).not.toContain('boom');
+    expect(result?.success).toBe(true);
+  });
+
   it('counts tracebacks that jest reports as a clean pass', () => {
     const logs = buildLogs(
       [

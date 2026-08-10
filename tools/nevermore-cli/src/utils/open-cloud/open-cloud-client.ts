@@ -342,8 +342,10 @@ export class OpenCloudClient {
 
   private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
     const apiKey = await this._resolveApiKeyAsync();
+    // Arrival order, deliberately. Do not sort by createTime: every print in a
+    // single frame shares one value, so it cannot order them anyway, and the
+    // fractional digit count varies, so comparing the strings reorders them.
     const messages: string[] = [];
-    const structured: { message: string; createTime: string }[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
     let entriesFetched = 0;
@@ -381,14 +383,7 @@ export class OpenCloudClient {
 
       for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
         if (entry.structuredMessages?.length) {
-          // Keep createTime alongside the text: the API does not guarantee
-          // chronological order, and readers downstream assume it.
-          for (const msg of entry.structuredMessages) {
-            structured.push({
-              message: msg.message,
-              createTime: msg.createTime,
-            });
-          }
+          messages.push(...entry.structuredMessages.map((msg) => msg.message));
         } else if (entry.messages?.length) {
           messages.push(...entry.messages);
         }
@@ -398,12 +393,6 @@ export class OpenCloudClient {
       pagesFetched++;
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
-
-    // Out-of-order messages silently destroy marker-delimited parsing: a
-    // trailing summary that arrives early ends the scan before any of the
-    // output it summarizes has been read.
-    structured.sort((a, b) => a.createTime.localeCompare(b.createTime));
-    messages.push(...structured.map((m) => m.message));
 
     const text = messages.join('\n');
 
