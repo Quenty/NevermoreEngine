@@ -454,9 +454,21 @@ function JSONTranslator.ToTranslationKey(self: JSONTranslator, prefix: string, t
 	assert(type(text) == "string", "Bad text")
 
 	local translationKey = TranslationKeyUtils.getTranslationKey(prefix, text)
-	local context = string.format("automatic.%s", translationKey)
 
-	-- TODO: Only set if we don't need it
+	-- This is a hot path -- every label built through ObserveTranslation mints its key, and the
+	-- keys a game shows are new to the table one at a time as text reaches the screen -- so the
+	-- registration has to cost nothing once the key is there.
+	--
+	-- Asked ignoring context, because the context below is not the one a key loaded from a locale
+	-- file carries, and an authored line is normally both: loaded at boot and minted again when
+	-- it is first shown. Registering over it would change nothing but metadata, and a
+	-- metadata-only write cannot be landed by a targeted call -- so it rebuilt the whole table,
+	-- once per line, on the frame that line first appeared.
+	if self._translatorService:IsEntryRegistered(translationKey, text, "en", text) then
+		return translationKey
+	end
+
+	local context = string.format("automatic.%s", translationKey)
 	self:SetEntryValue(translationKey, text, context, "en", text)
 
 	return translationKey

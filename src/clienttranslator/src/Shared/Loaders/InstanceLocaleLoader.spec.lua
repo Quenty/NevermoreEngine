@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local InstanceLocaleLoader = require("InstanceLocaleLoader")
 local Jest = require("Jest")
 local LocaleLoaderTestUtils = require("LocaleLoaderTestUtils")
+local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -33,6 +34,23 @@ describe("InstanceLocaleLoader.LoadSourceLocale", function()
 		expect(entry.Values["fr"]).toBeNil()
 		-- The source locale carries the example.
 		expect(entry.Example).toBe("Hello")
+
+		controller:destroy()
+	end)
+
+	it("writes every value the source decode produced, including the Studio pseudo locale", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader, folder =
+			controller.newInstanceLoader({ en = { greeting = "Hello" }, fr = { greeting = "Bonjour" } })
+
+		loader:LoadSourceLocale()
+		controller.flush()
+
+		-- Decoded again rather than hardcoded, because the parser attaches a pseudo-localized
+		-- value only in Studio: the invariant is that the loader forwards whatever the decode
+		-- produced, which holds in both environments. Nothing else queues that value.
+		local decoded = LocalizationEntryParserUtils.decodeLocaleFromInstance("T", "en", "en", folder, {})[1]
+		expect(controller.getEntryMap()["greeting"].Values).toEqual(decoded.Values)
 
 		controller:destroy()
 	end)

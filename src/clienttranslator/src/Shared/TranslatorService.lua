@@ -25,8 +25,17 @@ local ValueObject = require("ValueObject")
 local TranslatorService = {}
 TranslatorService.ServiceName = "TranslatorService"
 
--- An accumulated localization entry delta that is merged into the table and applied in a
--- single SetEntries call on flush.
+-- How many entries re-serializing costs about as much as one invalidation of the engine's
+-- cached table contents. Every mutating call to a LocalizationTable -- SetEntries and
+-- SetEntryValue alike -- invalidates that cache, raises a property change, and fires the
+-- engine's retranslation signal; on top of that SetEntries re-serializes every entry in the
+-- table, while SetEntryValue touches only one. So the surgical path wins while the batch is
+-- small *relative to the table it writes into*: rewriting 20 entries of 20 is a full rebuild
+-- either way, rewriting 20 of 8000 is not. See docs/design.md ("Writes are batched").
+local INVALIDATION_ENTRY_COST = 100
+
+-- An accumulated localization entry delta, merged into the table on flush along with the rest
+-- of the frame's batch.
 type PendingEntry = {
 	Key: string,
 	Source: string,
@@ -51,6 +60,44 @@ type ReadyObserver = {
 	Disconnected: boolean,
 }
 
+-- An entry as the LocalizationTable stores it (the shape GetEntries returns and SetEntries
+-- takes).
+type LocalizationEntry = {
+	Key: string,
+	Source: string,
+	Context: string,
+	Example: string,
+	Values: { [string]: string },
+}
+
+-- What the localization table currently holds, indexed both ways: the array is what a bulk
+-- SetEntries writes back, the map is how a write finds the entry for its key.
+type EntryCache = {
+	List: { LocalizationEntry },
+	ByKey: { [string]: LocalizationEntry },
+}
+
+-- One targeted table write the flush still owes: a locale's value, or (LocaleId nil) the
+-- entry's example.
+type PendingWrite = {
+	Entry: LocalizationEntry,
+	LocaleId: string?,
+}
+
+-- Mirrors of the localization tables' contents, so neither a write nor a flush has to read
+-- the table back. GetEntries copies and re-materializes every entry in the table, so calling
+-- it per flush makes a frame that touches one key cost O(table) -- exactly the cost the
+-- batching exists to avoid.
+--
+-- Keyed by the table itself, and shared across TranslatorService instances rather than held
+-- per service, because the table is shared: it is found by realm-scoped name, so a second
+-- service bag in the same realm (a story, a test) writes into the same instance and a
+-- private mirror would go stale behind it. Weak so a destroyed table's mirror goes with it.
+--
+-- This assumes this package is the only writer of GeneratedJSONTable_*, which the design
+-- already requires (everything goes through TranslatorService).
+local entryCachesByTable: { [LocalizationTable]: EntryCache } = setmetatable({}, { __mode = "k" }) :: any
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
@@ -69,6 +116,7 @@ export type TranslatorService = typeof(setmetatable(
 		_flushScheduled: boolean,
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
+		_localizationRebuildCount: number,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
@@ -85,6 +133,7 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._isDestroyed = false
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
+	self._localizationRebuildCount = 0
 
 	self._forcedLocaleId = self._maid:Add(ValueObject.new(nil))
 
@@ -141,6 +190,10 @@ end
 	[TranslatorService.ObserveIsTranslationReady], which tracks the key you are about to read
 	rather than whichever batch happened to be pending.
 
+	Registering what the table already holds is free: the write is dropped before it queues, so
+	it neither schedules a flush nor takes the key not-ready. Re-registering unchanged text is
+	the common case rather than the exception.
+
 	@param translationKey string
 	@param source string
 	@param context string
@@ -158,6 +211,10 @@ function TranslatorService.SetEntryValue(
 	if self._isDestroyed then
 		-- Dropped rather than queued: nothing will flush it, and a queued entry would pin the
 		-- key not-ready forever for anything that asks afterwards.
+		return
+	end
+
+	if self:_isEntryValueCurrent(translationKey, source, context, localeId, text) then
 		return
 	end
 
@@ -191,6 +248,10 @@ function TranslatorService.SetEntryExample(
 		return
 	end
 
+	if self:_isEntryExampleCurrent(translationKey, source, context, example) then
+		return
+	end
+
 	local entry, becamePending = self:_getPendingEntry(translationKey, source, context)
 	entry.Example = example
 	self:_scheduleFlush()
@@ -200,8 +261,16 @@ function TranslatorService.SetEntryExample(
 	end
 end
 
--- Returns the pending delta for a key, and whether this call is what made the key pending
--- (the caller announces that, once the write it is making has actually been stored).
+--[=[
+	Returns the pending delta for a key, and whether this call is what made the key pending
+	(the caller announces that, once the write it is making has actually been stored).
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@return (PendingEntry, boolean)
+	@private
+]=]
 function TranslatorService._getPendingEntry(
 	self: TranslatorService,
 	translationKey: string,
@@ -227,6 +296,150 @@ function TranslatorService._getPendingEntry(
 	end
 
 	return entry, false
+end
+
+--[=[
+	The mirror of a table's entries, built from the table the first time anything needs it.
+
+	@param localizationTable LocalizationTable
+	@return EntryCache
+	@private
+]=]
+function TranslatorService._getEntryCache(_self: TranslatorService, localizationTable: LocalizationTable): EntryCache
+	local existing = entryCachesByTable[localizationTable]
+	if existing then
+		return existing
+	end
+
+	local list: { LocalizationEntry } = localizationTable:GetEntries() :: any
+	local byKey: { [string]: LocalizationEntry } = {}
+	for _, entry in list do
+		byKey[entry.Key] = entry
+	end
+
+	local cache: EntryCache = { List = list, ByKey = byKey }
+	entryCachesByTable[localizationTable] = cache
+	return cache
+end
+
+--[=[
+	Whether the table already carries this key with this source text, whatever context it was
+	registered under.
+
+	This is the question [JSONTranslator.ToTranslationKey] asks before registering, and it is
+	deliberately blind to context: a key loaded from a locale file and the same key minted at
+	runtime describe themselves differently ("Generated from X with key Y" vs "automatic.Y")
+	while meaning the same thing. Rewriting the context changes nothing a reader can observe,
+	and there is no targeted call that lands metadata on its own -- so it would cost a full
+	table rebuild (see [TranslatorService._mergePendingEntries]) for every authored line the
+	first time it appeared on screen.
+
+	Takes the same arguments as [TranslatorService.SetEntryValue] minus the context it ignores,
+	and in the same order. Worth keeping that way: at the only call site the source and the text
+	are the same string, so a transposition would type-check, pass these asserts, and read
+	correctly.
+
+	@param translationKey string
+	@param source string
+	@param localeId string
+	@param text string
+	@return boolean
+]=]
+function TranslatorService.IsEntryRegistered(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	localeId: string,
+	text: string
+): boolean
+	assert(type(translationKey) == "string", "Bad translationKey")
+	assert(type(source) == "string", "Bad source")
+	assert(type(localeId) == "string", "Bad localeId")
+	assert(type(text) == "string", "Bad text")
+
+	local entry = self:_getCurrentEntry(translationKey)
+	if not entry then
+		return false
+	end
+
+	return entry.Source == source and entry.Values[localeId] == text
+end
+
+--[=[
+	The entry the table currently holds for a key, or nil when it holds none -- or when the key
+	has a delta queued, which makes it mid-change: the flush decides what the table ends up
+	with, so nothing may be concluded from what is there now.
+
+	@param translationKey string
+	@return LocalizationEntry?
+	@private
+]=]
+function TranslatorService._getCurrentEntry(self: TranslatorService, translationKey: string): LocalizationEntry?
+	if self._pendingEntries[translationKey] then
+		return nil
+	end
+
+	return self:_getEntryCache(self:GetLocalizationTable()).ByKey[translationKey]
+end
+
+--[=[
+	Whether the table already holds exactly this value, making the write nothing but cost.
+
+	Re-registering unchanged text is the common case rather than the exception: minting a
+	translation key ([JSONTranslator.ToTranslationKey]) registers its source text every time a
+	label is built, and a loader re-queues a locale it has already loaded. Queuing such a write
+	would schedule a flush, and -- because the key goes not-ready and back -- drive a
+	re-translation pass through every reader of that key, all to write back what is there.
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param localeId string
+	@param text string
+	@return boolean
+	@private
+]=]
+function TranslatorService._isEntryValueCurrent(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	localeId: string,
+	text: string
+): boolean
+	local entry = self:_getCurrentEntry(translationKey)
+	if not entry then
+		return false
+	end
+
+	-- Source and context are part of what a write would land, so a change in either is still
+	-- a change even when the text matches.
+	return entry.Source == source and entry.Context == context and entry.Values[localeId] == text
+end
+
+--[=[
+	Whether the table already holds exactly this example. See [TranslatorService._isEntryValueCurrent].
+
+	@param translationKey string
+	@param source string
+	@param context string
+	@param example string
+	@return boolean
+	@private
+]=]
+function TranslatorService._isEntryExampleCurrent(
+	self: TranslatorService,
+	translationKey: string,
+	source: string,
+	context: string,
+	example: string
+): boolean
+	local entry = self:_getCurrentEntry(translationKey)
+	if not entry then
+		return false
+	end
+
+	return entry.Source == source and entry.Context == context and entry.Example == example
 end
 
 --[=[
@@ -271,7 +484,11 @@ end
 
 --[=[
 	Whether a read of this key **in this locale** would see everything queued for it. Narrower
-	than [TranslatorService.IsTranslationReady], which is false while any locale is queued.
+	than [TranslatorService.IsTranslationReady], which is false while any locale is queued --
+	though only barely, in practice. The fallback set below includes the table's source locale,
+	and nearly every queued entry carries a source-locale value (the loaders write the source
+	file first, minting writes `en`), so the two answers differ only for an entry queued
+	*exclusively* in a locale this one cannot read through.
 
 	:::warning
 	This is an implementation detail of the translation stack, exposed for diagnostics.
@@ -281,6 +498,12 @@ end
 	which lands the locales a read can consult but leaves the entry queued for the rest. The
 	key is readable in that locale while still not ready overall, so a failure to translate it
 	is a real failure and worth reporting.
+
+	Readable means readable the way a translator reads: every locale a read of this locale may
+	fall back through has to have landed, not just the exact locale asked about. Loaders key
+	their data under the language ("en"), while a player's locale is normally a regional variant
+	("en-us"), so asking about the regional locale alone would call every queued key ready --
+	its pending values are under the language it would fall back to.
 
 	@param translationKey string
 	@param localeId string
@@ -299,7 +522,42 @@ function TranslatorService.IsTranslationReadyForLocale(
 		return true
 	end
 
-	return entry.Values[localeId] == nil
+	for _, readLocale in self:_getReadLocales(localeId) do
+		if entry.Values[readLocale] ~= nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+-- Appends a locale to the read set, skipping the ones already in it.
+local function insertReadLocale(readLocales: { string }, localeId: string?)
+	if localeId ~= nil and not table.find(readLocales, localeId) then
+		table.insert(readLocales, localeId)
+	end
+end
+
+--[=[
+	The locales a read for this locale may consult, without repeats: the locale itself and the
+	table's source locale, each plus its bare language subtag, since the Roblox translator falls
+	a regional locale back to its language (e.g. en-us -> en, and the loaders key the source
+	under "en").
+
+	@param localeId string
+	@return { string }
+	@private
+]=]
+function TranslatorService._getReadLocales(self: TranslatorService, localeId: string): { string }
+	local sourceLocaleId = self:GetLocalizationTable().SourceLocaleId
+
+	local readLocales: { string } = {}
+	insertReadLocale(readLocales, localeId)
+	insertReadLocale(readLocales, sourceLocaleId)
+	insertReadLocale(readLocales, ResolveLocaleUtils.getLanguageSubtag(localeId))
+	insertReadLocale(readLocales, ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId))
+
+	return readLocales
 end
 
 --[=[
@@ -366,9 +624,14 @@ function TranslatorService.ObserveIsTranslationReady(
 	end) :: any
 end
 
--- Tells a key's observers about a readiness change. The state is read per observer rather
--- than captured once: a handler earlier in the fan-out can re-queue the key, and handing the
--- observers after it a value that is already false would leave them believing the key landed.
+--[=[
+	Tells a key's observers about a readiness change. The state is read per observer rather
+	than captured once: a handler earlier in the fan-out can re-queue the key, and handing the
+	observers after it a value that is already false would leave them believing the key landed.
+
+	@param translationKey string
+	@private
+]=]
 function TranslatorService._fireTranslationReady(self: TranslatorService, translationKey: string)
 	local observers = self._readyObservers[translationKey]
 	if not observers then
@@ -425,32 +688,28 @@ function TranslatorService.FlushEntryForKey(self: TranslatorService, translation
 
 	local localizationTable = self:GetLocalizationTable()
 
-	-- The locales a synchronous read may consult: the current locale and the table's source
-	-- locale, each plus its bare language subtag, since the Roblox translator falls a
-	-- regional locale back to its language (e.g. en-us -> en, and the loaders key the source
-	-- under "en"). Landing just these avoids writing every locale in the entry.
-	local localeId = self:GetLocaleId()
-	local sourceLocaleId = localizationTable.SourceLocaleId
-	local readLocales = { localeId, sourceLocaleId }
-	local localeSubtag = ResolveLocaleUtils.getLanguageSubtag(localeId)
-	if localeSubtag then
-		table.insert(readLocales, localeSubtag)
-	end
-	local sourceSubtag = ResolveLocaleUtils.getLanguageSubtag(sourceLocaleId)
-	if sourceSubtag then
-		table.insert(readLocales, sourceSubtag)
-	end
+	-- Landing only the locales a synchronous read may consult avoids writing every locale in
+	-- the entry.
+	local readLocales = self:_getReadLocales(self:GetLocaleId())
 
-	-- Land each read locale for this key's pending entry. A landed locale is dequeued, so a
-	-- repeated read locale (e.g. localeId already its own subtag) just no-ops the second time.
+	-- Land each read locale for this key's pending entry. A landed locale is dequeued, and the
+	-- read set carries no repeats, so this is at most one write per distinct locale a read of
+	-- this key could resolve through.
 	for _, readLocale in readLocales do
 		self:_landEntryLocale(localizationTable, entry, readLocale)
 	end
 end
 
--- Writes one locale's value for a pending entry straight to the table and dequeues just
--- that locale, so the deferred batch flush does not write it again. No-ops if the entry has
--- nothing pending for the locale.
+--[=[
+	Writes one locale's value for a pending entry straight to the table and dequeues just
+	that locale, so the deferred batch flush does not write it again. No-ops if the entry has
+	nothing pending for the locale.
+
+	@param localizationTable LocalizationTable
+	@param entry PendingEntry
+	@param localeId string
+	@private
+]=]
 function TranslatorService._landEntryLocale(
 	self: TranslatorService,
 	localizationTable: LocalizationTable,
@@ -461,6 +720,44 @@ function TranslatorService._landEntryLocale(
 	if text == nil then
 		return
 	end
+
+	local cache = self:_getEntryCache(localizationTable)
+	local existing = cache.ByKey[entry.Key]
+
+	-- The text a read needs is already there (another translator registered the same value).
+	-- Dequeued so the flush does not write it either.
+	--
+	-- Deliberately not conditioned on the source/context matching too: a SetEntryValue that
+	-- does not change the value does not land new metadata either (engine-behavior.md), so
+	-- writing here would move the mirror and not the table. A metadata change stays queued for
+	-- the flush, which rebuilds for it.
+	if existing and existing.Values[localeId] == text then
+		entry.Values[localeId] = nil
+		return
+	end
+
+	local cached: LocalizationEntry
+	if existing then
+		-- The mirror keeps the metadata it has, because the table does: the source and context
+		-- below are matched against an existing entry rather than written to it
+		-- (engine-behavior.md). Moving them here would put the mirror out of step with the table
+		-- and, worse, hide the change from the flush -- which rebuilds for it, and is the only
+		-- thing that can land it.
+		cached = existing
+	else
+		-- A new entry is created by the write below, carrying this metadata.
+		cached = {
+			Key = entry.Key,
+			Source = entry.Source,
+			Context = entry.Context,
+			Example = "",
+			Values = {},
+		}
+		cache.ByKey[entry.Key] = cached
+		table.insert(cache.List, cached)
+	end
+
+	cached.Values[localeId] = text
 
 	localizationTable:SetEntryValue(entry.Key, entry.Source, entry.Context, localeId, text)
 	entry.Values[localeId] = nil
@@ -476,6 +773,17 @@ end
 ]=]
 function TranslatorService.GetLocalizationWriteCount(self: TranslatorService): number
 	return self._localizationWriteCount
+end
+
+--[=[
+	Returns how many of those writes were full-table `SetEntries` rebuilds, which additionally
+	re-serialize every entry in the table. A flush picks between rebuilding and landing
+	targeted writes, so this is how a test tells which path a batch took.
+
+	@return number
+]=]
+function TranslatorService.GetLocalizationRebuildCount(self: TranslatorService): number
+	return self._localizationRebuildCount
 end
 
 function TranslatorService._scheduleFlush(self: TranslatorService)
@@ -534,25 +842,148 @@ function TranslatorService._flushWrites(self: TranslatorService)
 	end
 end
 
--- Merges the pending entry deltas into the table's current entries and writes them back
--- in a single SetEntries call, so a whole frame's worth of translation entries costs one
--- AutoLocalize invalidation instead of one per value/example.
+--[=[
+	Merges the pending entry deltas into the table's entries and writes back whatever actually
+	changed, by whichever route is cheaper for the size of the batch: a handful of targeted
+	SetEntryValue/SetEntryExample calls, or one SetEntries that rebuilds the table.
+
+	@param pendingEntries PendingEntries
+	@private
+]=]
 function TranslatorService._applyPendingEntries(self: TranslatorService, pendingEntries: PendingEntries)
 	local localizationTable = self:GetLocalizationTable()
+	local cache = self:_getEntryCache(localizationTable)
+
+	local writes = self:_mergePendingEntries(cache, pendingEntries)
+
+	-- Every queued write already matched the table, so there is nothing to land. Writing
+	-- anyway would invalidate the engine's cached contents for no reason.
+	if writes and #writes == 0 then
+		return
+	end
+
+	if writes and self:_shouldWriteIndividually(#writes, #cache.List) then
+		for _, write in writes do
+			local entry = write.Entry
+			local localeId = write.LocaleId
+			if localeId ~= nil then
+				localizationTable:SetEntryValue(
+					entry.Key,
+					entry.Source,
+					entry.Context,
+					localeId,
+					entry.Values[localeId]
+				)
+			else
+				localizationTable:SetEntryExample(entry.Key, entry.Source, entry.Context, entry.Example)
+			end
+			self._localizationWriteCount += 1
+		end
+		return
+	end
+
+	-- A rebuild writes the whole entry list back, so it is the one path that can drop an entry
+	-- the mirror never saw. Read the table back first and re-apply this batch on top: this is
+	-- the O(table) read the mirror exists to keep out of the hot path, and next to the rebuild
+	-- it is about to pay for it is close to free. It also re-syncs the mirror with anything
+	-- written behind our back, so a foreign write cannot leave the currency check dropping
+	-- writes against a stale mirror indefinitely.
+	self:_reconcileEntryCache(localizationTable, cache, pendingEntries)
+
+	localizationTable:SetEntries(cache.List :: any)
+	self._localizationWriteCount += 1
+	self._localizationRebuildCount += 1
+end
+
+--[=[
+	Rebuilds the mirror from what the table actually holds, with this batch's merged entries
+	kept on top. Anything a foreign writer added or changed is adopted; the keys in this batch
+	win, since the table has not been told about their new values yet.
+
+	@param localizationTable LocalizationTable
+	@param cache EntryCache
+	@param pendingEntries PendingEntries
+	@private
+]=]
+function TranslatorService._reconcileEntryCache(
+	_self: TranslatorService,
+	localizationTable: LocalizationTable,
+	cache: EntryCache,
+	pendingEntries: PendingEntries
+)
+	local list: { LocalizationEntry } = localizationTable:GetEntries() :: any
+	local byKey: { [string]: LocalizationEntry } = {}
+
+	for index, entry in list do
+		local merged = if pendingEntries[entry.Key] then cache.ByKey[entry.Key] else nil
+		if merged then
+			list[index] = merged
+			byKey[entry.Key] = merged
+		else
+			byKey[entry.Key] = entry
+		end
+	end
+
+	-- Keys this batch is creating are not in the table yet, so the read back cannot have them.
+	for translationKey in pendingEntries do
+		if byKey[translationKey] == nil then
+			local merged = cache.ByKey[translationKey]
+			if merged then
+				byKey[translationKey] = merged
+				table.insert(list, merged)
+			end
+		end
+	end
+
+	cache.List = list
+	cache.ByKey = byKey
+end
+
+--[=[
+	Whether to land this many targeted writes rather than rebuild the whole table. One
+	SetEntries costs one invalidation plus re-serializing every entry; N targeted writes cost N
+	invalidations and re-serialize nothing. See INVALIDATION_ENTRY_COST.
+
+	@param writeCount number
+	@param entryCount number
+	@return boolean
+	@private
+]=]
+function TranslatorService._shouldWriteIndividually(
+	_self: TranslatorService,
+	writeCount: number,
+	entryCount: number
+): boolean
+	return (writeCount - 1) * INVALIDATION_ENTRY_COST < entryCount
+end
+
+--[=[
+	Merges the deltas into the mirror and returns the targeted writes that would bring the
+	table in line with it, or nil when the batch cannot be expressed as targeted writes at all
+	and has to go through SetEntries.
+
+	@param cache EntryCache
+	@param pendingEntries PendingEntries
+	@return { PendingWrite }?
+	@private
+]=]
+function TranslatorService._mergePendingEntries(
+	_self: TranslatorService,
+	cache: EntryCache,
+	pendingEntries: PendingEntries
+): { PendingWrite }?
+	local writes: { PendingWrite } = {}
+	local bulkRequired = false
 
 	-- A LocalizationTable keys its entries by translation key alone: SetEntries rejects two
 	-- entries sharing a key even when their source/context differ, so we index existing
 	-- entries by key and merge each delta into the one entry for its key.
-	local existingByKey: { [string]: any } = {}
-	local entries = localizationTable:GetEntries()
-	for _, entry in entries do
-		existingByKey[entry.Key] = entry
-	end
-
-	local changed = false
 	for _, delta in pendingEntries do
-		local entry = existingByKey[delta.Key]
-		if not entry then
+		local existing = cache.ByKey[delta.Key]
+		local entry: LocalizationEntry
+		if existing then
+			entry = existing
+		else
 			entry = {
 				Key = delta.Key,
 				Source = delta.Source,
@@ -560,42 +991,51 @@ function TranslatorService._applyPendingEntries(self: TranslatorService, pending
 				Example = "",
 				Values = {},
 			}
-			existingByKey[delta.Key] = entry
-			table.insert(entries, entry)
-			changed = true
+			cache.ByKey[delta.Key] = entry
+			table.insert(cache.List, entry)
+
+			-- A targeted write lands on an entry that exists, and only SetEntryValue is known
+			-- to create one, so a new entry carrying nothing but an example cannot be
+			-- expressed that way.
+			if next(delta.Values) == nil then
+				bulkRequired = true
+			end
 		end
 
 		-- Keep the source/context in step with the latest write for this key, mirroring how
 		-- SetEntryValue overwrites them in place.
-		if entry.Source ~= delta.Source then
-			entry.Source = delta.Source
-			changed = true
-		end
-		if entry.Context ~= delta.Context then
-			entry.Context = delta.Context
-			changed = true
-		end
-		if delta.Example ~= nil and entry.Example ~= delta.Example then
-			entry.Example = delta.Example
-			changed = true
-		end
+		local metadataChanged = entry.Source ~= delta.Source or entry.Context ~= delta.Context
+		entry.Source = delta.Source
+		entry.Context = delta.Context
+
 		for localeId, text in delta.Values do
 			if entry.Values[localeId] ~= text then
 				entry.Values[localeId] = text
-				changed = true
+				table.insert(writes, { Entry = entry, LocaleId = localeId })
 			end
+		end
+
+		-- No targeted call lands source or context on an entry that already exists: they are
+		-- arguments SetEntryValue matches on, not fields it writes, so the entry keeps the
+		-- metadata it was created with whether or not the call also changes a value
+		-- (engine-behavior.md). So any batch that changes metadata is rebuilt rather than
+		-- written -- rare next to the value writes this path exists for, and the alternative is
+		-- a metadata change that silently does not land while the mirror believes it did.
+		if metadataChanged then
+			bulkRequired = true
+		end
+
+		if delta.Example ~= nil and entry.Example ~= delta.Example then
+			entry.Example = delta.Example
+			table.insert(writes, { Entry = entry, LocaleId = nil })
 		end
 	end
 
-	-- If every queued write already matched the table there is nothing to do. Skipping the
-	-- SetEntries call avoids invalidating every AutoLocalize entry for no reason (there is
-	-- no partial-update API that invalidates once, so a redundant SetEntries is pure cost).
-	if not changed then
-		return
+	if bulkRequired then
+		return nil
 	end
 
-	localizationTable:SetEntries(entries)
-	self._localizationWriteCount += 1
+	return writes
 end
 
 --[=[

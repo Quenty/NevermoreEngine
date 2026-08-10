@@ -63,6 +63,48 @@ function RogueProperty.new(adornee: Instance, serviceBag: ServiceBag.ServiceBag,
 	self._definition = assert(definition, "Bad definition")
 	self._canInitialize = false
 
+	-- Drop Observe caches when the adornee leaves the DataModel so this property
+	-- stops strongly retaining shareReplay graphs. Weak adornee→property lookup
+	-- alone isn't enough if something still holds the property.
+	--
+	-- Prefer AncestryChanged (Parent=nil): on the client, LoadCharacter teardown
+	-- often parents characters out without firing Destroying. Destroying is kept
+	-- as a backup for explicit :Destroy().
+	local function clearObserveCaches()
+		if rawget(self, "_observeCachesCleared") then
+			return
+		end
+		rawset(self, "_observeCachesCleared", true)
+
+		rawset(self, "_observeCache", nil)
+		rawset(self, "_observeModifierSortedListCache", nil)
+		rawset(self, "_observeParentBrioCache", nil)
+		rawset(self, "_observeBaseValueBrioCache", nil)
+		rawset(self, "_baseValueInstanceCache", nil)
+
+		local ancestryConn = rawget(self, "_adorneeAncestryConn")
+		if ancestryConn then
+			ancestryConn:Disconnect()
+			rawset(self, "_adorneeAncestryConn", nil)
+		end
+		local destroyingConn = rawget(self, "_adorneeDestroyingConn")
+		if destroyingConn then
+			destroyingConn:Disconnect()
+			rawset(self, "_adorneeDestroyingConn", nil)
+		end
+	end
+
+	rawset(
+		self,
+		"_adorneeAncestryConn",
+		adornee.AncestryChanged:Connect(function(_, parent)
+			if parent == nil then
+				clearObserveCaches()
+			end
+		end)
+	)
+	rawset(self, "_adorneeDestroyingConn", adornee.Destroying:Connect(clearObserveCaches))
+
 	return setmetatable(self, RogueProperty)
 end
 
