@@ -14,12 +14,15 @@ local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotExportUtils = {}
 
 -- A slot's saved data plus the presentation metadata worth carrying with it. `data` is the merged,
--- serializable view of the slot's store; slotName/summary seed the imported slot's metadata so a
--- restored slot is still recognizable.
+-- serializable view of the slot's store; slotName/summary/timePlayed seed the imported slot's metadata
+-- so a restored slot is still recognizable and still owns the playtime behind its progress. timePlayed
+-- is absent from exports written before it was carried; those import with no accrued playtime, exactly
+-- as they did when they were written.
 export type SaveSlotExport = {
 	data: { [string]: any },
 	slotName: string?,
 	summary: any?,
+	timePlayed: number?,
 }
 
 --[=[
@@ -50,6 +53,9 @@ function SaveSlotExportUtils.isSaveSlotExport(value: any): boolean
 	if value.slotName ~= nil and type(value.slotName) ~= "string" then
 		return false
 	end
+	if value.timePlayed ~= nil and type(value.timePlayed) ~= "number" then
+		return false
+	end
 	return true
 end
 
@@ -59,13 +65,20 @@ end
 	@param data { [string]: any }
 	@param slotName string?
 	@param summary any?
+	@param timePlayed number? -- the source slot's accrued playtime, in seconds
 	@return SaveSlotExport
 ]=]
-function SaveSlotExportUtils.create(data: { [string]: any }, slotName: string?, summary: any?): SaveSlotExport
+function SaveSlotExportUtils.create(
+	data: { [string]: any },
+	slotName: string?,
+	summary: any?,
+	timePlayed: number?
+): SaveSlotExport
 	return {
 		data = data,
 		slotName = slotName,
 		summary = summary,
+		timePlayed = timePlayed,
 	}
 end
 
