@@ -19,7 +19,7 @@ UIConverter.__index = UIConverter
 function UIConverter.new()
 	local self = setmetatable(BaseObject.new(), UIConverter)
 
-	self._apiDump = self._maid:Add(RobloxApiDump.new(RobloxApiUtils.promiseDump()))
+	self._apiDump = self._maid:Add(RobloxApiDump.new(RobloxApiUtils.promiseDump))
 
 	self._promiseDefaultValueCache = {}
 	self._propertyPromisesForClass = {}

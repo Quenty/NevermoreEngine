@@ -16,6 +16,7 @@ local function renderPane(plugin, target)
 	local pane = ConverterPane.new()
 	maid:GiveTask(pane)
 
+	pane:SetPlugin(plugin)
 	pane:SetSelected(game.Selection:Get())
 
 	maid:GiveTask(game.Selection.SelectionChanged:Connect(function()

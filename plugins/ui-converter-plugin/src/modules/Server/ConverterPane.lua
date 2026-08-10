@@ -5,6 +5,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
+local ScriptEditorService = game:GetService("ScriptEditorService")
+local ServerStorage = game:GetService("ServerStorage")
 
 local BasicPane = require("BasicPane")
 local Blend = require("Blend")
@@ -26,6 +28,8 @@ local ConverterPane = setmetatable({}, BasicPane)
 ConverterPane.ClassName = "ConverterPane"
 ConverterPane.__index = ConverterPane
 
+local OUTPUT_SCRIPT_NAME = "UIConverterOutput"
+
 function ConverterPane.new()
 	local self = setmetatable(BasicPane.new(), ConverterPane)
 
@@ -43,6 +47,7 @@ function ConverterPane.new()
 	self._copyPreview = self._maid:Add(ValueObject.new(nil))
 	self._renderPreview = self._maid:Add(ValueObject.new(nil))
 	self._libraryName = self._maid:Add(ValueObject.new("Blend"))
+	self._openScriptStatus = self._maid:Add(ValueObject.new(nil))
 
 	self._maid:GiveTask(Rx.combineLatest({
 		library = self._libraryName:Observe(),
@@ -52,6 +57,10 @@ function ConverterPane.new()
 	end))
 
 	return self
+end
+
+function ConverterPane:SetPlugin(plugin: Plugin)
+	self._plugin = plugin
 end
 
 function ConverterPane:SetupSettings(plugin: Plugin)
@@ -633,6 +642,157 @@ function ConverterPane:_previewCode(codeValue)
 	}
 end
 
+function ConverterPane:_setOpenScriptStatus(text: string?)
+	self._maid._openScriptStatusMaid = nil
+
+	self._openScriptStatus.Value = text
+
+	if text == nil then
+		return
+	end
+
+	local maid = Maid.new()
+
+	local alive = true
+	maid:GiveTask(function()
+		alive = false
+	end)
+
+	task.delay(2, function()
+		if alive then
+			self._openScriptStatus.Value = nil
+		end
+	end)
+
+	self._maid._openScriptStatusMaid = maid
+end
+
+function ConverterPane:_getOrCreateOutputScript(): (ModuleScript, boolean)
+	local existing = self._outputScript
+	if existing and existing.Parent then
+		return existing, false
+	end
+
+	local outputScript = Instance.new("ModuleScript")
+	outputScript.Name = OUTPUT_SCRIPT_NAME
+	outputScript.Parent = ServerStorage
+
+	return outputScript, true
+end
+
+function ConverterPane:_writeOutputSource(outputScript: ModuleScript, code: string): boolean
+	local ok, err = pcall(function()
+		if ScriptEditorService:FindScriptDocument(outputScript) then
+			ScriptEditorService:UpdateSourceAsync(outputScript, function()
+				return code
+			end)
+		else
+			outputScript.Source = code
+		end
+	end)
+
+	if not ok then
+		warn(string.format("[ConverterPane] - Failed to write script source - %s", tostring(err)))
+	end
+
+	return ok
+end
+
+function ConverterPane:_watchOutputScript(outputScript: ModuleScript)
+	if self._outputScript == outputScript then
+		return
+	end
+
+	self._outputScript = outputScript
+
+	local maid = Maid.new()
+
+	local alive = true
+	maid:GiveTask(function()
+		alive = false
+		self._outputScript = nil
+
+		if outputScript.Parent then
+			outputScript:Destroy()
+		end
+	end)
+
+	maid:GiveTask(ScriptEditorService.TextDocumentDidClose:Connect(function()
+		task.defer(function()
+			if not alive or outputScript.Parent == nil then
+				return
+			end
+
+			if ScriptEditorService:FindScriptDocument(outputScript) then
+				return
+			end
+
+			outputScript:Destroy()
+			self._maid._outputScriptMaid = nil
+		end)
+	end))
+
+	self._maid._outputScriptMaid = maid
+end
+
+function ConverterPane:OpenInScript()
+	if not self._plugin then
+		self:_setOpenScriptStatus("No plugin")
+		return
+	end
+
+	local code = self._code.Value
+	if type(code) ~= "string" or #code == 0 then
+		self:_setOpenScriptStatus("Nothing to open")
+		return
+	end
+
+	local outputScript, created = self:_getOrCreateOutputScript()
+
+	if not self:_writeOutputSource(outputScript, code) then
+		if created then
+			outputScript:Destroy()
+		end
+
+		self:_setOpenScriptStatus("Needs script injection")
+		return
+	end
+
+	self._plugin:OpenScript(outputScript)
+	self:_watchOutputScript(outputScript)
+
+	self:_setOpenScriptStatus("Opened!")
+end
+
+function ConverterPane:_renderOpenInScriptButton()
+	return Blend.New "TextButton" {
+		Name = "OpenInScript",
+		AutoButtonColor = true,
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(1, -18, 1, -10),
+		Size = UDim2.fromOffset(120, 22),
+		BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+		TextColor3 = Color3.fromRGB(200, 200, 200),
+		Font = Enum.Font.Arial,
+		TextSize = 12,
+		ZIndex = 10,
+
+		Text = Blend.Computed(self._openScriptStatus, function(status)
+			return status or "Open in Script"
+		end),
+
+		[Blend.OnEvent "Activated"] = function()
+			self:OpenInScript()
+		end,
+
+		[Blend.Children] = {
+			Blend.New "UICorner" {
+				CornerRadius = UDim.new(0, 4),
+			},
+		},
+	}
+end
+
 function ConverterPane:Render(props)
 	local handleInputEnd = function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -808,7 +968,10 @@ function ConverterPane:Render(props)
 						return string.format("Quenty's UI Converter - %s Code %s", libraryName, name)
 					end)),
 
-					content(self:_previewCode(self._code)),
+					content({
+						self:_previewCode(self._code),
+						self:_renderOpenInScriptButton(),
+					}),
 				},
 			},
 		},
