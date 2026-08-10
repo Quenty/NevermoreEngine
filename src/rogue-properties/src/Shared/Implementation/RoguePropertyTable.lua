@@ -45,6 +45,41 @@ function RoguePropertyTable.new(
 		rawset(self :: any, "_arrayHelper", RoguePropertyArrayHelper.new(serviceBag, arrayDefinitionHelper, self))
 	end
 
+	-- Table-only Observe caches: same lifetime as RogueProperty.new (Ancestry Parent=nil
+	-- primary; Destroying backup). Separate conn keys so we don't clobber the base.
+	local function clearTableObserveCaches()
+		if rawget(self :: any, "_tableObserveCachesCleared") then
+			return
+		end
+		rawset(self :: any, "_tableObserveCachesCleared", true)
+
+		rawset(self :: any, "_observeContainerCache", nil)
+		rawset(self :: any, "_observeDictionaryCache", nil)
+		rawset(self :: any, "_containerCache", nil)
+
+		local ancestryConn = rawget(self :: any, "_tableAdorneeAncestryConn")
+		if ancestryConn then
+			ancestryConn:Disconnect()
+			rawset(self :: any, "_tableAdorneeAncestryConn", nil)
+		end
+		local destroyingConn = rawget(self :: any, "_tableAdorneeDestroyingConn")
+		if destroyingConn then
+			destroyingConn:Disconnect()
+			rawset(self :: any, "_tableAdorneeDestroyingConn", nil)
+		end
+	end
+
+	rawset(
+		self :: any,
+		"_tableAdorneeAncestryConn",
+		adornee.AncestryChanged:Connect(function(_, parent)
+			if parent == nil then
+				clearTableObserveCaches()
+			end
+		end)
+	)
+	rawset(self :: any, "_tableAdorneeDestroyingConn", adornee.Destroying:Connect(clearTableObserveCaches))
+
 	return self
 end
 

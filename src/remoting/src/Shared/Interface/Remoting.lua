@@ -572,10 +572,12 @@ function Remoting.PromiseFireServer(self: Remoting, memberName: string, ...)
 		end)
 	end
 
+	-- Finally() is suspected to run synchronously if the remote already exists,
+	-- so put it *after*, so there's no risk of orphaning the maid
+	self._maid[fireMaid] = fireMaid
 	promise:Finally(function()
 		self._maid[fireMaid] = nil
 	end)
-	self._maid[fireMaid] = fireMaid
 	fireMaid:GiveTask(function()
 		self._maid[fireMaid] = nil
 	end)
@@ -633,10 +635,12 @@ function Remoting.PromiseInvokeServer(self: Remoting, memberName: string, ...): 
 		end)
 	end
 
+	-- Finally() runs synchronously if the remote already exists,
+	-- so register the maid first to avoid orphaning it.
+	self._maid[invokeMaid] = invokeMaid
 	promise:Finally(function()
 		self._maid[invokeMaid] = nil
 	end)
-	self._maid[invokeMaid] = invokeMaid
 	invokeMaid:GiveTask(function()
 		self._maid[invokeMaid] = nil
 	end)
@@ -671,11 +675,12 @@ function Remoting.PromiseInvokeClient(self: Remoting, memberName: string, player
 		promise = invokeMaid:GivePromise(RemoteFunctionUtils.promiseInvokeClient(remoteFunction, player, ...))
 	end
 
+	-- Finally() is suspected to run synchronously if the remote already exists,
+	-- so put it *after*, so there's no risk of orphaning the maid
+	self._maid[invokeMaid] = invokeMaid
 	promise:Finally(function()
 		self._maid[invokeMaid] = nil
 	end)
-
-	self._maid[invokeMaid] = invokeMaid
 	invokeMaid:GiveTask(function()
 		self._maid[invokeMaid] = nil
 	end)
