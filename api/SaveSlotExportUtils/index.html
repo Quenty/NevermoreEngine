@@ -8,8 +8,8 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
 [HasSaveSlots.PromiseImportSlot]."><meta data-rh="true" property="og:description" content="Pure helpers describing an exported save slot and the main-slot guard that keeps export/import
 away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExportSlot] and
 [HasSaveSlots.PromiseImportSlot]."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/SaveSlotExportUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/SaveSlotExportUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/SaveSlotExportUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.0040924c.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.5765adbb.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.766c7d2b.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.d816274c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -21,15 +21,17 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
   away from the player's shared root datastore. See <a href="/NevermoreEngine/api/HasSaveSlots#PromiseExportSlot">HasSaveSlots.PromiseExportSlot</a> and
   <a href="/NevermoreEngine/api/HasSaveSlots#PromiseImportSlot">HasSaveSlots.PromiseImportSlot</a>.
 </p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isMainSlotIndex"><code style="text-decoration:none">isMainSlotIndex</code><a href="#isMainSlotIndex" class="hash-link" aria-label="Direct link to isMainSlotIndex" title="Direct link to isMainSlotIndex" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L33"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">isMainSlotIndex</code><code>(</code><code>slotIndex<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isMainSlotIndex"><code style="text-decoration:none">isMainSlotIndex</code><a href="#isMainSlotIndex" class="hash-link" aria-label="Direct link to isMainSlotIndex" title="Direct link to isMainSlotIndex" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L36"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">isMainSlotIndex</code><code>(</code><code>slotIndex<!-- -->: </code><code class="blue_P4bS">number</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>
   Returns whether the given index is the main/default slot -- the one whose store is the player's
   shared root datastore (it shares that key with the SaveSlots system data and universe-scoped
   global data). Export/import refuse this index in both directions.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isSaveSlotExport"><code style="text-decoration:none">isSaveSlotExport</code><a href="#isSaveSlotExport" class="hash-link" aria-label="Direct link to isSaveSlotExport" title="Direct link to isSaveSlotExport" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L43"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">isSaveSlotExport</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isSaveSlotExport"><code style="text-decoration:none">isSaveSlotExport</code><a href="#isSaveSlotExport" class="hash-link" aria-label="Direct link to isSaveSlotExport" title="Direct link to isSaveSlotExport" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L46"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">isSaveSlotExport</code><code>(</code><code>value<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Returns whether the value is a well-formed [SaveSlotExport].</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="create"><code style="text-decoration:none">create</code><a href="#create" class="hash-link" aria-label="Direct link to create" title="Direct link to create" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L64"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">create</code><code>(</code><div class="inset_uKQm"><div><code>data<!-- -->: </code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code>,</code></div><div><code>slotName<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>summary<!-- -->: </code><code class="blue_P4bS">any?</code></div></div><code>) → </code><code class="blue_P4bS">SaveSlotExport</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="create"><code style="text-decoration:none">create</code><a href="#create" class="hash-link" aria-label="Direct link to create" title="Direct link to create" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/saveslot/src/Shared/SaveSlotExportUtils.lua#L71"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>SaveSlotExportUtils<!-- -->.</code><code class="green_DgR4">create</code><code>(</code><div class="inset_uKQm"><div><code>data<!-- -->: </code><code class="purple_ieR2">{</code><span><code>[</code><code class="blue_P4bS">string</code><code>]</code></span><code>: </code><code class="blue_P4bS">any</code><code class="purple_ieR2">}</code><code>,</code></div><div><code>slotName<!-- -->: </code><code class="blue_P4bS">string?</code><code>,</code></div><div><code>summary<!-- -->: </code><code class="blue_P4bS">any?</code><code>,</code></div><div><code>timePlayed<!-- -->: </code><code class="blue_P4bS">number?</code><span class="inlineDescription_G7Er">-- <span>
+<p>the source slot's accrued playtime, in seconds</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS">SaveSlotExport</code></div><div>
 <p>Builds a [SaveSlotExport] from a slot's data table and its metadata.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -51,7 +53,7 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 33,
+                &quot;line&quot;: 36,
                 &quot;path&quot;: &quot;src/saveslot/src/Shared/SaveSlotExportUtils.lua&quot;
             }
         },
@@ -73,7 +75,7 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 43,
+                &quot;line&quot;: 46,
                 &quot;path&quot;: &quot;src/saveslot/src/Shared/SaveSlotExportUtils.lua&quot;
             }
         },
@@ -95,6 +97,11 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
                     &quot;name&quot;: &quot;summary&quot;,
                     &quot;desc&quot;: &quot;&quot;,
                     &quot;lua_type&quot;: &quot;any?&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;timePlayed&quot;,
+                    &quot;desc&quot;: &quot;the source slot&#x27;s accrued playtime, in seconds&quot;,
+                    &quot;lua_type&quot;: &quot;number?&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -105,7 +112,7 @@ away from the player&#x27;s shared root datastore. See [HasSaveSlots.PromiseExpo
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 64,
+                &quot;line&quot;: 71,
                 &quot;path&quot;: &quot;src/saveslot/src/Shared/SaveSlotExportUtils.lua&quot;
             }
         }
