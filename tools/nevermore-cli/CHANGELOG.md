@@ -1,3 +1,37 @@
+# v4.43.0 (Mon Aug 10 2026)
+
+#### 🚀 Enhancement
+
+- feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): stamp the base place version into the built place ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): let `gh` supply the watch token, when asked ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): use the shared Open Cloud key the service now spends ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): rebuild a place when its base place changes ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-deploy-config): add deploy.nevermore.lock.json ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): let basePlace.version track "saved" or "published" ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): stop naming an Open Cloud scope that does not exist ([@Quenty](https://github.com/Quenty))
+- Merge remote-tracking branch 'origin/main' into users/quenty/nevermore-cli-publishing-improvements ([@Quenty](https://github.com/Quenty))
+- refactor(nevermore-cli): hold one record per watch in the stream loop ([@Quenty](https://github.com/Quenty))
+- refactor(nevermore-deploy): keep one copy of the base-place watch rule ([@Quenty](https://github.com/Quenty))
+- docs(nevermore-cli): warn that npx runs a linked CLI, version spec and all ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-cli): close three defects found consuming --watch ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-cli): make the watch context tests independent of the host ([@Quenty](https://github.com/Quenty))
+- docs(deploy): correct three places the docs described code that is gone ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-cli): close the defects a pre-merge review found ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-cli): notice an unreadable base place from the live event tail ([@Quenty](https://github.com/Quenty))
+- refactor(nevermore-deploy): rename the package from nevermore-deploy-config ([@Quenty](https://github.com/Quenty))
+- fix(nevermore-deploy-config): close lock resolution races found in review ([@Quenty](https://github.com/Quenty))
+- refactor(nevermore-deploy-config): extract deploy config parsing into its own package ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

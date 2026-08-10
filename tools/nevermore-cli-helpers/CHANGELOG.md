@@ -1,3 +1,21 @@
+# v1.17.0 (Mon Aug 10 2026)
+
+#### 🚀 Enhancement
+
+- feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): let `gh` supply the watch token, when asked ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): stop naming an Open Cloud scope that does not exist ([@Quenty](https://github.com/Quenty))
+- Merge remote-tracking branch 'origin/main' into users/quenty/nevermore-cli-publishing-improvements ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

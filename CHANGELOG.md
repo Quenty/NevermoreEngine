@@ -1,5 +1,18 @@
 # (Mon Aug 10 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.9.0`, `@quenty/saveslot@2.7.0`, `@quenty/nevermore-cli-helpers@1.17.0`, `@quenty/nevermore-cli@4.43.0`, `@quenty/nevermore-deploy@1.1.0`
+  - feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/remoting@12.41.1`, `@quenty/rogue-properties@11.57.1`
