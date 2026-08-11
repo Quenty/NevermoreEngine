@@ -29,12 +29,57 @@ for _, child in ServerScriptService:GetChildren() do
 	allPackages[child.Name] = child
 end
 
+-- Tag on a NevermoreTestRunnerUtils results table. A test script returns one;
+-- one written before the convention returns nil, and a probe returns whatever
+-- it likes, so only a tagged table is read as results.
+local RESULTS_FORMAT = "nevermore-test-results@1"
+
+type TestCounts = {
+	passed: number,
+	failed: number,
+	skipped: number,
+	total: number,
+	suitesPassed: number,
+	suitesFailed: number,
+	suitesTotal: number,
+}
+
 type Result = {
 	success: boolean,
 	slug: string,
 	durationMs: number,
 	error: string?,
+	-- Absent when the package's test script returned nothing structured, which
+	-- is the only case where a reader still has to fall back to its logs.
+	counts: TestCounts?,
+	-- False for a smoke test, whose counts are zero because nothing counted them.
+	-- Carried so a reader never has to guess whether zero means "no tests".
+	ranJest: boolean?,
 }
+
+-- Counts only. This summary is printed as one log line and read back by the
+-- CLI, so it stays short enough to survive whatever the engine does to a long
+-- line; the failure text a run also returns is per-package and already in that
+-- package's own log section.
+local function toCounts(returned: any): TestCounts?
+	if type(returned) ~= "table" or returned.format ~= RESULTS_FORMAT then
+		return nil
+	end
+
+	local counts: { [string]: number } = {}
+	for _, field in { "passed", "failed", "skipped", "total", "suitesPassed", "suitesFailed", "suitesTotal" } do
+		if type(returned[field]) ~= "number" then
+			return nil
+		end
+		counts[field] = returned[field]
+	end
+
+	return counts :: any
+end
+
+local function isStructuredFailure(returned: any): boolean
+	return type(returned) == "table" and returned.format == RESULTS_FORMAT and returned.success ~= true
+end
 
 local results: { Result } = {}
 
@@ -76,12 +121,12 @@ for _, slug in packageSlugs do
 	-- is amortized across all packages and would otherwise dominate fast tests.
 	local startClock = os.clock()
 
-	local testOk, testErr = pcall(function()
+	local testOk, returned = pcall(function()
 		local fn, compileErr = loadstring(scriptSource, slug)
 		if not fn then
 			error("Compile error: " .. tostring(compileErr))
 		end
-		fn()
+		return fn()
 	end)
 
 	local durationMs = math.floor((os.clock() - startClock) * 1000 + 0.5)
@@ -118,14 +163,30 @@ for _, slug in packageSlugs do
 		RunService.Heartbeat:Wait()
 	end
 
-	if testOk then
-		print("===BATCH_TEST_END " .. slug .. " PASS " .. tostring(durationMs) .. "===")
-		table.insert(results, { slug = slug, success = true, durationMs = durationMs })
-	else
-		warn("[BatchTest] " .. slug .. ": " .. tostring(testErr))
-		print("===BATCH_TEST_END " .. slug .. " FAIL " .. tostring(durationMs) .. "===")
-		table.insert(results, { slug = slug, success = false, durationMs = durationMs, error = tostring(testErr) })
+	-- A test script that does not throw has still failed if the results it
+	-- returned say so, which is the whole reason it returns them: a failing suite
+	-- used to announce itself by erroring, and an error carries no counts.
+	local counts = if testOk then toCounts(returned) else nil
+	local success = testOk and not isStructuredFailure(returned)
+	local failureReason: string? = nil
+	if not testOk then
+		failureReason = tostring(returned)
+	elseif not success then
+		failureReason = tostring((returned :: any).error or "the test runner reported the run as failed")
 	end
+
+	if failureReason then
+		warn("[BatchTest] " .. slug .. ": " .. failureReason)
+	end
+	print("===BATCH_TEST_END " .. slug .. (if success then " PASS " else " FAIL ") .. tostring(durationMs) .. "===")
+	table.insert(results, {
+		slug = slug,
+		success = success,
+		durationMs = durationMs,
+		error = failureReason,
+		counts = counts,
+		ranJest = if counts then (returned :: any).ranJest == true else nil,
+	})
 end
 
 -- Restore all packages

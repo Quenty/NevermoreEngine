@@ -10,8 +10,9 @@ local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root.game) then
-	return
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root.game)
+if results then
+	return results
 end
 
 local serviceBag = require("ServiceBag").new()

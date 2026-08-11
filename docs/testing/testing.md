@@ -394,12 +394,18 @@ local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
-	return
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+if results then
+	return results
 end
 ```
 
 Replace `mypackage` with the key used in your Rojo project tree.
+
+Returning `results` is what tells the CLI how the run went. Test output is log text and the
+engine truncates a long run's logs, so counts scraped back out of it are exactly what goes
+missing on the runs where they matter most; returning the table sends them out as a value
+instead. A script that returns nothing still works — the CLI falls back to reading the logs.
 
 ### NevermoreTestRunnerUtils
 
@@ -408,6 +414,9 @@ The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`,
 - If a `jest.config` is found under the given root, it runs Jest tests
 - If no `jest.config` is found, boot success is the test (smoke test)
 - Detects Open Cloud vs local execution context and exits appropriately
+- Returns a [TestRunResults](/api/NevermoreTestRunnerUtils) table — counts, a capped failure
+  list, and the run's verdict — or `nil` when no test run was attempted, which is how a real
+  game server tells itself apart from a test place and falls through to its normal boot
 
 ## Running tests
 

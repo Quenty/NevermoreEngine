@@ -11,4 +11,4 @@ local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+return NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
