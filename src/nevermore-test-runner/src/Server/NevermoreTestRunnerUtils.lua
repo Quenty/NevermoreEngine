@@ -299,13 +299,26 @@ function NevermoreTestRunnerUtils._resultsFromJest(resolved: any): TestRunResult
 	results.suitesTotal = toCount(result.numTotalTestSuites)
 	results.failures, results.omittedFailures = NevermoreTestRunnerUtils._collectFailures(result)
 
+	-- A snapshot check can fail a run without failing a test, so the counts alone
+	-- do not cover it.
+	local snapshotFailed = typeof(result.snapshot) == "table" and result.snapshot.failure == true
+
+	-- `result.success` is deliberately not consulted. jest-lua inverted it: its
+	-- TestScheduler assigns `anyTestFailures or snapshot.failure or
+	-- anyReporterErrors` where upstream jest negates that whole expression
+	-- (TestScheduler.lua:434), so the field is true exactly when the run failed.
+	-- Reading it either way is a trap — the sense flips the day the missing `not`
+	-- is restored — so the underlying signals are read instead. The one signal
+	-- that leaves no other trace is a reporter error, which the AggregatedResult
+	-- does not expose at all.
+	--
 	-- A suite that dies before its first test contributes no failed test, and an
 	-- interrupted run's counts describe only what it got through, so neither is
-	-- visible in the test counts alone.
+	-- visible in the test counts alone either.
 	results.success = results.failed == 0
 		and results.suitesFailed == 0
 		and result.wasInterrupted ~= true
-		and result.success ~= false
+		and not snapshotFailed
 
 	-- Printed as well as returned. It is the one line that proves the counts were
 	-- read off a result this module understood, whatever happens to the return
@@ -323,15 +336,32 @@ function NevermoreTestRunnerUtils._resultsFromJest(resolved: any): TestRunResult
 	)
 
 	if not results.success then
-		if result.wasInterrupted == true then
-			results.error = "[NevermoreTestRunner] Jest run was interrupted"
-		else
-			results.error = string.format(
-				"[NevermoreTestRunner] %d test(s) and %d test suite(s) failed",
-				results.failed,
-				results.suitesFailed
-			)
+		-- Built from the causes that actually hold, never formatted from counts
+		-- that may be zero. "0 test(s) and 0 test suite(s) failed" was a real
+		-- failure reason this used to emit, and a reason saying nothing failed is
+		-- unreadable as either a pass or a failure — which is what made the bug
+		-- behind it hard to see.
+		local causes = {}
+		if results.failed > 0 then
+			table.insert(causes, string.format("%d test(s) failed", results.failed))
 		end
+		if results.suitesFailed > 0 then
+			table.insert(causes, string.format("%d test suite(s) failed", results.suitesFailed))
+		end
+		if result.wasInterrupted == true then
+			table.insert(causes, "the run was interrupted")
+		end
+		if snapshotFailed then
+			table.insert(causes, "a snapshot check failed")
+		end
+		if #causes == 0 then
+			-- Unreachable while every condition above is also a cause here. If it
+			-- is ever reached, the two lists have drifted apart, and saying so is
+			-- worth more than a reason built out of zeros.
+			table.insert(causes, "the run failed for a reason this runner could not identify")
+		end
+
+		results.error = "[NevermoreTestRunner] " .. table.concat(causes, ", ")
 		warn(results.error)
 	end
 
