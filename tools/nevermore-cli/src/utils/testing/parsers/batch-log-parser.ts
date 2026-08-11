@@ -5,6 +5,7 @@ import {
   parseTestCounts,
 } from '../test-log-parser.js';
 import { formatTracebacks, parseTracebacks } from './traceback-parser.js';
+import { type StructuredTestResults } from '../structured-test-results.js';
 
 export interface BatchPackageResult {
   slug: string;
@@ -21,6 +22,26 @@ export interface BatchPackageResult {
    * test — often after the test that scheduled it already passed.
    */
   tracebackCount: number;
+  /**
+   * Where `testCounts` came from. `returned` means the run handed them over as a
+   * value; `scraped` means they were read out of log text, which is the channel
+   * truncation destroys. Absent when there are no counts at all.
+   *
+   * Recorded because the two are otherwise indistinguishable in the output, and
+   * a structured channel that quietly stopped flowing looks exactly like one
+   * that never existed.
+   */
+  countsSource?: 'returned' | 'scraped';
+  /**
+   * What this package's own run returned, recovered from the batch summary.
+   *
+   * One execution covers every package, so its return value belongs to none of
+   * them — the batch runner splits the per-package results into the summary
+   * instead, and this puts them back in the shape a single run's results have.
+   * Lossy by design: the summary carries counts, not failure text, which is
+   * per-package and already in that package's log section.
+   */
+  testResults?: StructuredTestResults;
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
@@ -50,6 +71,8 @@ interface SummaryEntry {
   durationMs?: number;
   error?: string;
   counts?: SummaryCounts;
+  /** False for a smoke test, so zero counts are not read as "no tests found". */
+  ranJest?: boolean;
 }
 
 /** Read counts off a summary entry, ignoring anything malformed. */
@@ -200,6 +223,7 @@ export function parseBatchTestLogs(
   const summaryDurations = new Map<string, number>();
   const summaryErrors = new Map<string, string>();
   const summaryCounts = new Map<string, SummaryCounts>();
+  const summaryRanJest = new Map<string, boolean>();
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
     const entries = findSummaryEntries(lines, summaryLineIndex + 1);
     if (entries === undefined) {
@@ -222,6 +246,7 @@ export function parseBatchTestLogs(
         const counts = readSummaryCounts(entry);
         if (counts) {
           summaryCounts.set(entry.slug, counts);
+          summaryRanJest.set(entry.slug, entry.ranJest === true);
         }
       }
       // Log any failures the Luau template reported
@@ -288,6 +313,10 @@ export function parseBatchTestLogs(
   // The unattributed stream is the same text for every package, so it is
   // attached once rather than repeated per package across a large log.
   let unattributedClaimed = false;
+
+  /** Packages whose run returned its counts, and those left to log scraping. */
+  const structuredSlugs: string[] = [];
+  const scrapedSlugs: string[] = [];
 
   for (const [packageName, slug] of slugMap) {
     const attributedLogs = logSections.get(slug);
@@ -373,11 +402,38 @@ export function parseBatchTestLogs(
 
     // Counts the runner returned outrank counts scraped from the section: the
     // same numbers when the log survived, real numbers when it did not.
-    const testCounts = counts
-      ? { passed: counts.passed, failed: counts.failed, total: counts.total }
-      : attributedLogs
+    const scrapedCounts = attributedLogs
       ? parseTestCounts(attributedLogs)
       : undefined;
+    const testCounts = counts
+      ? { passed: counts.passed, failed: counts.failed, total: counts.total }
+      : scrapedCounts;
+    const countsSource = counts
+      ? ('returned' as const)
+      : scrapedCounts
+      ? ('scraped' as const)
+      : undefined;
+
+    if (counts) {
+      structuredSlugs.push(slug);
+    } else {
+      scrapedSlugs.push(slug);
+    }
+
+    // Two channels reporting the same run must agree. When they do not, one of
+    // them is lying about what happened and neither total can be trusted on its
+    // own — said out loud because a returned count that is quietly wrong reads
+    // like a clean run, which is how a broken structured read stays invisible.
+    if (counts && scrapedCounts && counts.total !== scrapedCounts.total) {
+      OutputHelper.warn(
+        `[batch-log-parser] ${slug}: returned counts disagree with the log — ` +
+          `the run returned ${counts.passed} passed / ${counts.failed} failed / ` +
+          `${counts.total} total, its jest report says ${scrapedCounts.passed} / ` +
+          `${scrapedCounts.failed} / ${scrapedCounts.total}. Reporting the returned ` +
+          `counts; one of the two channels is wrong.`
+      );
+    }
+
     // Prefer the JSON summary (authoritative, immune to log reordering);
     // fall back to the END-marker value if the summary was truncated.
     const durationMs = summaryDurations.get(slug) ?? markerDurations.get(slug);
@@ -388,11 +444,58 @@ export function parseBatchTestLogs(
       durationMs,
       testCounts,
       tracebackCount,
+      countsSource,
+      testResults: counts
+        ? {
+            success: summarySuccess === true,
+            ranJest: summaryRanJest.get(slug) === true,
+            ...counts,
+            failures: [],
+            omittedFailures: 0,
+            error: summaryErrors.get(slug),
+          }
+        : undefined,
       error,
     });
   }
 
+  reportCountsProvenance(structuredSlugs, scrapedSlugs);
+
   return results;
+}
+
+/**
+ * Say where this batch's counts came from, every run.
+ *
+ * The structured channel exists because Open Cloud truncates a long run's logs.
+ * A channel that is plumbed but not flowing produces output identical to one
+ * that is working, so silence here is not evidence of anything — the count is
+ * stated unconditionally and the fallback is a warning, not a debug line.
+ */
+function reportCountsProvenance(
+  structuredSlugs: string[],
+  scrapedSlugs: string[]
+): void {
+  const total = structuredSlugs.length + scrapedSlugs.length;
+  if (total === 0) {
+    return;
+  }
+
+  OutputHelper.info(
+    `[batch-log-parser] Counts returned by the run for ${structuredSlugs.length} ` +
+      `of ${total} package(s); ${scrapedSlugs.length} scraped from logs.`
+  );
+
+  if (scrapedSlugs.length > 0) {
+    OutputHelper.warn(
+      `[batch-log-parser] ${scrapedSlugs.length} package(s) returned no test ` +
+        `results, so their counts were scraped from log text — the channel Open ` +
+        `Cloud truncates on long runs: ${scrapedSlugs.join(
+          ', '
+        )}. Their test ` +
+        `script should end with "return results" (see docs/testing/testing.md).`
+    );
+  }
 }
 
 /**

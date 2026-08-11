@@ -9,10 +9,12 @@ import {
   parseTestCounts,
 } from '../test-log-parser.js';
 import {
+  type StructuredTestResults,
   findStructuredTestResults,
   structuredFailureReasons,
   toParsedTestCounts,
 } from '../structured-test-results.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   buildDeployMetadataAttributes,
   gatherGitDeployInfo,
@@ -33,6 +35,12 @@ export interface SingleTestResult {
   durationMs?: number;
   /** Why the run failed, when the runner can say more than "it failed". */
   error?: string;
+  /**
+   * Where `testCounts` came from. `returned` means the run handed them over as a
+   * value; `scraped` means they were read out of log text, which is the channel
+   * truncation destroys. Absent when there are no counts at all.
+   */
+  countsSource?: 'returned' | 'scraped';
 }
 
 /**
@@ -136,7 +144,12 @@ export async function runSingleTestAsync(
     // task. It returns its verdict now, so the verdict has to be read: without
     // this, a failing suite whose report fell outside the truncated log window
     // would come back a pass.
-    const structured = findStructuredTestResults(result.returnValues);
+    //
+    // A context that already resolved the results (aggregated batch, where one
+    // execution's return value belongs to no single package) hands them over
+    // directly; otherwise they are decoded from what the script returned.
+    const structured =
+      result.testResults ?? findStructuredTestResults(result.returnValues);
 
     // A probe script is arbitrary Luau with no jest in it, so demanding a test
     // report would fail every --script-text run. Everything else must prove a
@@ -151,21 +164,94 @@ export async function runSingleTestAsync(
       ...parsed.failureReasons,
     ]);
 
+    // Returned counts outrank scraped ones: same numbers when the log
+    // survived, real numbers when it did not.
+    const scrapedCounts = parseTestCounts(parsed.logs);
+    const testCounts = structured
+      ? toParsedTestCounts(structured)
+      : scrapedCounts;
+
+    reportCountsProvenance({
+      packageName,
+      structured,
+      scrapedCounts,
+      // A probe is not a test run, so it has no results to be missing. Neither
+      // is one package of an aggregated batch, whose context reported the whole
+      // batch's provenance in one line already.
+      silent: scriptText !== undefined || result.testResults !== undefined,
+      hadReturnChannel: result.returnValues !== undefined,
+    });
+
     return {
       success:
         result.success && parsed.success && (structured?.success ?? true),
       logs: parsed.logs,
-      // Returned counts outrank scraped ones: same numbers when the log
-      // survived, real numbers when it did not.
-      testCounts: structured
-        ? toParsedTestCounts(structured)
-        : parseTestCounts(parsed.logs),
+      testCounts,
+      countsSource: structured
+        ? 'returned'
+        : scrapedCounts
+        ? 'scraped'
+        : undefined,
       durationMs: result.durationMs,
       error: reasons.length > 0 ? reasons.join('; ') : undefined,
     };
   } finally {
     await context.releaseAsync(deployment);
   }
+}
+
+/**
+ * Say where a run's counts came from, and complain when they had to be scraped.
+ *
+ * The structured channel exists because Open Cloud truncates a long run's logs.
+ * A channel that is plumbed but not flowing produces output identical to one
+ * that works, so the fallback is a warning rather than silence — the first
+ * version of this shipped inert and looked green.
+ */
+function reportCountsProvenance(options: {
+  packageName: string;
+  structured?: StructuredTestResults;
+  scrapedCounts?: ParsedTestCounts;
+  silent: boolean;
+  hadReturnChannel: boolean;
+}): void {
+  const { packageName, structured, scrapedCounts, silent, hadReturnChannel } =
+    options;
+
+  if (silent) {
+    return;
+  }
+
+  if (structured) {
+    OutputHelper.info(
+      `${packageName}: counts returned by the run — ` +
+        `${structured.passed} passed, ${structured.failed} failed, ` +
+        `${structured.total} total.`
+    );
+
+    // Two channels reporting the same run must agree. When they do not, one is
+    // lying and neither total stands on its own.
+    if (scrapedCounts && scrapedCounts.total !== structured.total) {
+      OutputHelper.warn(
+        `${packageName}: returned counts disagree with the log — the run returned ` +
+          `${structured.passed}/${structured.failed}/${structured.total} ` +
+          `(passed/failed/total), its jest report says ` +
+          `${scrapedCounts.passed}/${scrapedCounts.failed}/${scrapedCounts.total}. ` +
+          `Reporting the returned counts; one of the two channels is wrong.`
+      );
+    }
+    return;
+  }
+
+  OutputHelper.warn(
+    `${packageName}: the run returned no test results, so its counts were ` +
+      (scrapedCounts ? 'scraped from log text' : 'unavailable') +
+      ` — the channel Open Cloud truncates on long runs. ` +
+      (hadReturnChannel
+        ? 'The run delivered a return channel but nothing recognizable in it: the ' +
+          'test script should end with "return results" (see docs/testing/testing.md).'
+        : 'No return channel was delivered at all, so the transport lost it.')
+  );
 }
 
 /**

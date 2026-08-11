@@ -52,6 +52,9 @@ type Result = {
 	-- Absent when the package's test script returned nothing structured, which
 	-- is the only case where a reader still has to fall back to its logs.
 	counts: TestCounts?,
+	-- False for a smoke test, whose counts are zero because nothing counted them.
+	-- Carried so a reader never has to guess whether zero means "no tests".
+	ranJest: boolean?,
 }
 
 -- Counts only. This summary is printed as one log line and read back by the
@@ -182,6 +185,7 @@ for _, slug in packageSlugs do
 		durationMs = durationMs,
 		error = failureReason,
 		counts = counts,
+		ranJest = if counts then (returned :: any).ranJest == true else nil,
 	})
 end
 
