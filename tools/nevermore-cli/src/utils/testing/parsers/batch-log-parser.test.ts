@@ -1,10 +1,29 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 import {
   countTracebacks,
   findSummaryEntries,
   parseBatchTestLogs,
 } from './batch-log-parser.js';
+
+/** Collect what the parser said out loud, so silence can be asserted on. */
+function captureWarnings(): () => string[] {
+  const warnings: string[] = [];
+  vi.spyOn(OutputHelper, 'warn').mockImplementation((message: string) => {
+    warnings.push(message);
+  });
+  vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+  return () => warnings;
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+const RETURNED_COUNTS =
+  '"counts":{"passed":273,"failed":2,"skipped":1,"total":276,' +
+  '"suitesPassed":8,"suitesFailed":1,"suitesTotal":9},"ranJest":true';
 
 const SLUG_MAP = new Map([['egghunt2026', 'egghunt2026']]);
 
@@ -229,6 +248,85 @@ describe('parseBatchTestLogs', () => {
 
     expect(result?.success).toBe(true);
     expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('records where each package’s counts came from', () => {
+    // The structured channel and log scraping produce identical-looking output,
+    // so a channel that quietly stopped flowing is invisible without this.
+    const scraped = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total'),
+      SLUG_MAP
+    ).get('egghunt2026');
+    expect(scraped?.countsSource).toBe('scraped');
+    expect(scraped?.testResults).toBeUndefined();
+
+    const returned = parseBatchTestLogs(
+      buildLogs('Tests:  2 failed, 273 passed, 276 total').replace(
+        '"durationMs":1000',
+        `"durationMs":1000,${RETURNED_COUNTS}`
+      ),
+      SLUG_MAP
+    ).get('egghunt2026');
+    expect(returned?.countsSource).toBe('returned');
+    expect(returned?.testResults).toMatchObject({
+      ranJest: true,
+      passed: 273,
+      failed: 2,
+      skipped: 1,
+      total: 276,
+      suitesFailed: 1,
+    });
+  });
+
+  it('warns out loud when a package fell back to log scraping', () => {
+    const warnings = captureWarnings();
+
+    parseBatchTestLogs(buildLogs('Tests:  275 passed, 275 total'), SLUG_MAP);
+
+    expect(
+      warnings().some(
+        (w) =>
+          w.includes('returned no test results') && w.includes('egghunt2026')
+      )
+    ).toBe(true);
+  });
+
+  it('says nothing about a fallback when every package returned its counts', () => {
+    const warnings = captureWarnings();
+
+    parseBatchTestLogs(
+      buildLogs('Tests:  2 failed, 273 passed, 276 total').replace(
+        '"durationMs":1000',
+        `"durationMs":1000,${RETURNED_COUNTS}`
+      ),
+      SLUG_MAP
+    );
+
+    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
+      false
+    );
+  });
+
+  it('warns when the returned counts and the log disagree', () => {
+    // The exact failure that shipped once: the runner read the wrong level of
+    // jest's result, so every count came back zero and read as a clean run.
+    const warnings = captureWarnings();
+
+    const result = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total').replace(
+        '"durationMs":1000',
+        '"durationMs":1000,"counts":{"passed":0,"failed":0,"skipped":0,' +
+          '"total":0,"suitesPassed":0,"suitesFailed":0,"suitesTotal":0},"ranJest":true'
+      ),
+      SLUG_MAP
+    );
+
+    expect(
+      warnings().some((w) =>
+        w.includes('returned counts disagree with the log')
+      )
+    ).toBe(true);
+    expect(result.get('egghunt2026')?.countsSource).toBe('returned');
   });
 });
 

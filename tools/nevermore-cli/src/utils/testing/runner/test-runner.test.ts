@@ -1,8 +1,17 @@
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 import { mergeFailureReasons, runSingleTestAsync } from './test-runner.js';
 import { TEST_RESULTS_FORMAT } from '../structured-test-results.js';
@@ -34,6 +43,20 @@ function structuredResults(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+/** Collect what the runner said out loud, so silence can be asserted on. */
+function captureWarnings(): () => string[] {
+  const warnings: string[] = [];
+  vi.spyOn(OutputHelper, 'warn').mockImplementation((message: string) => {
+    warnings.push(message);
+  });
+  vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+  return () => warnings;
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 /**
  * A context that runs nothing: it hands back the run result and logs the test
@@ -157,6 +180,64 @@ describe('runSingleTestAsync', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('nothing proves any test ran');
+  });
+
+  it('records where the counts came from', async () => {
+    const returned = await runAsync(
+      { success: true, returnValues: [structuredResults()] },
+      PASSING_LOGS
+    );
+    expect(returned.countsSource).toBe('returned');
+
+    const scraped = await runAsync(
+      { success: true, returnValues: [] },
+      PASSING_LOGS
+    );
+    expect(scraped.countsSource).toBe('scraped');
+  });
+
+  it('warns out loud when the run returned no results', async () => {
+    // Silence here is what let the structured channel ship inert: a run that
+    // fell back to scraping produced output identical to one that did not.
+    const warnings = captureWarnings();
+
+    await runAsync({ success: true, returnValues: [] }, PASSING_LOGS);
+
+    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
+      true
+    );
+  });
+
+  it('takes results a context resolved for it, without re-reporting', async () => {
+    // Aggregated batch mode: one execution covers every package, so the batch
+    // log parser splits the per-package results out and has already reported
+    // provenance for the whole batch.
+    const warnings = captureWarnings();
+
+    const result = await runAsync(
+      {
+        success: true,
+        testResults: {
+          success: false,
+          ranJest: true,
+          passed: 273,
+          failed: 2,
+          skipped: 0,
+          total: 275,
+          suitesPassed: 8,
+          suitesFailed: 1,
+          suitesTotal: 9,
+          failures: [],
+          omittedFailures: 0,
+        },
+      },
+      '(this package’s section was truncated away)'
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.countsSource).toBe('returned');
+    expect(result.testCounts).toEqual({ passed: 273, failed: 2, total: 275 });
+    expect(warnings()).toHaveLength(0);
   });
 });
 
