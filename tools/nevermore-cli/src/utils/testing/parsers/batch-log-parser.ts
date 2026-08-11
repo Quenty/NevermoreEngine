@@ -27,11 +27,53 @@ const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
 const END_MARKER = '===BATCH_TEST_END ';
 const SUMMARY_MARKER = '===BATCH_TEST_SUMMARY===';
 
+/**
+ * Counts the batch runner folds in from what a package's test script returned.
+ *
+ * Present only for a package whose script returns its results. Carried in the
+ * summary rather than left to the logs because the summary prints last and
+ * survives a truncated log window, which is where scraped counts are lost.
+ */
+interface SummaryCounts {
+  passed: number;
+  failed: number;
+  skipped: number;
+  total: number;
+  suitesPassed: number;
+  suitesFailed: number;
+  suitesTotal: number;
+}
+
 interface SummaryEntry {
   slug: string;
   success: boolean;
   durationMs?: number;
   error?: string;
+  counts?: SummaryCounts;
+}
+
+/** Read counts off a summary entry, ignoring anything malformed. */
+function readSummaryCounts(entry: SummaryEntry): SummaryCounts | undefined {
+  const counts = entry.counts;
+  if (typeof counts !== 'object' || counts === null) {
+    return undefined;
+  }
+
+  const fields: (keyof SummaryCounts)[] = [
+    'passed',
+    'failed',
+    'skipped',
+    'total',
+    'suitesPassed',
+    'suitesFailed',
+    'suitesTotal',
+  ];
+  for (const field of fields) {
+    if (!Number.isFinite(counts[field])) {
+      return undefined;
+    }
+  }
+  return counts;
 }
 
 /**
@@ -156,6 +198,8 @@ export function parseBatchTestLogs(
 
   const summaryResults = new Map<string, boolean>();
   const summaryDurations = new Map<string, number>();
+  const summaryErrors = new Map<string, string>();
+  const summaryCounts = new Map<string, SummaryCounts>();
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
     const entries = findSummaryEntries(lines, summaryLineIndex + 1);
     if (entries === undefined) {
@@ -172,16 +216,23 @@ export function parseBatchTestLogs(
         if (typeof entry.durationMs === 'number') {
           summaryDurations.set(entry.slug, entry.durationMs);
         }
+        if (typeof entry.error === 'string' && entry.error.length > 0) {
+          summaryErrors.set(entry.slug, entry.error);
+        }
+        const counts = readSummaryCounts(entry);
+        if (counts) {
+          summaryCounts.set(entry.slug, counts);
+        }
       }
-      // Log any pcall failures from the Luau template
+      // Log any failures the Luau template reported
       const failures = entries.filter((e) => !e.success);
       if (failures.length > 0) {
         console.error(
-          `[batch-log-parser] Luau pcall failures: ${JSON.stringify(failures)}`
+          `[batch-log-parser] Luau runner failures: ${JSON.stringify(failures)}`
         );
       }
       console.error(
-        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} pcall failures`
+        `[batch-log-parser] Parsed ${entries.length} summary entries, ${failures.length} reported failures`
       );
     }
   }
@@ -246,17 +297,32 @@ export function parseBatchTestLogs(
       unattributedClaimed = true;
     }
     const summarySuccess = summaryResults.get(slug);
+    const counts = summaryCounts.get(slug);
     const reasons: string[] = [];
 
-    // The pcall result only proves the script did not throw. It is a floor, not
-    // a verdict — everything below can fail a run it called successful.
+    // The summary verdict is a floor, not the whole verdict — everything below
+    // can fail a run it called successful. It covers both a script that threw
+    // and one whose returned results said it failed, so the reason comes from
+    // the runner rather than being guessed at here.
     let success = summarySuccess ?? false;
     if (summarySuccess === false) {
-      reasons.push('the batch runner reported a Luau error');
+      reasons.push(
+        summaryErrors.get(slug) ?? 'the batch runner reported this as failed'
+      );
     } else if (summarySuccess === undefined) {
       // Absent from the summary is a different fault from failing in it, and
       // conflating them sends you hunting for a Luau error that never happened.
       reasons.push('this package is missing from the batch summary');
+    }
+
+    // Returned counts are structural, so a summary that called this a pass
+    // while reporting failed tests is not believed — no log line involved.
+    if (success && counts && (counts.failed > 0 || counts.suitesFailed > 0)) {
+      success = false;
+      reasons.push(
+        `the batch summary reported a pass alongside ${counts.failed} failed ` +
+          `test(s) and ${counts.suitesFailed} failed test suite(s)`
+      );
     }
 
     if (attributedLogs !== undefined) {
@@ -305,7 +371,11 @@ export function parseBatchTestLogs(
 
     const error = reasons.length > 0 ? reasons.join('; ') : undefined;
 
-    const testCounts = attributedLogs
+    // Counts the runner returned outrank counts scraped from the section: the
+    // same numbers when the log survived, real numbers when it did not.
+    const testCounts = counts
+      ? { passed: counts.passed, failed: counts.failed, total: counts.total }
+      : attributedLogs
       ? parseTestCounts(attributedLogs)
       : undefined;
     // Prefer the JSON summary (authoritative, immune to log reordering);
