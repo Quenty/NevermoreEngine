@@ -135,9 +135,10 @@ export class BatchScriptJobContext implements JobContext {
       success: result.success,
       durationMs: result.durationMs,
       errorMessage: result.error,
-      // returnValues stays absent: one execution covers every package, so the
-      // single return value it produces has to be split per package before any
-      // of it can surface here.
+      // returnValues stays absent: one execution covers every package, so
+      // nothing it returns belongs to any single one of them. Each package's
+      // own results reach the parser through the batch summary instead, which
+      // the batch runner folds them into.
     };
   }
 

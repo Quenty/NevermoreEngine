@@ -9,6 +9,11 @@ import {
   parseTestCounts,
 } from '../test-log-parser.js';
 import {
+  findStructuredTestResults,
+  structuredFailureReasons,
+  toParsedTestCounts,
+} from '../structured-test-results.js';
+import {
   buildDeployMetadataAttributes,
   gatherGitDeployInfo,
   injectDeployMetadataInPlaceAsync,
@@ -126,22 +131,35 @@ export async function runSingleTestAsync(
     });
 
     const rawLogs = await context.getLogsAsync(deployment);
+
+    // The runner used to announce a failing suite by throwing, which failed the
+    // task. It returns its verdict now, so the verdict has to be read: without
+    // this, a failing suite whose report fell outside the truncated log window
+    // would come back a pass.
+    const structured = findStructuredTestResults(result.returnValues);
+
     // A probe script is arbitrary Luau with no jest in it, so demanding a test
     // report would fail every --script-text run. Everything else must prove a
-    // runner spoke before it can pass.
+    // runner spoke before it can pass — and returned results are that proof,
+    // where a scraped report is only what survived truncation.
     const parsed = parseTestLogs(rawLogs, {
-      requireTestReport: scriptText === undefined,
+      requireTestReport: scriptText === undefined && structured === undefined,
     });
 
-    const reasons = mergeFailureReasons(
-      result.errorMessage,
-      parsed.failureReasons
-    );
+    const reasons = mergeFailureReasons(result.errorMessage, [
+      ...(structured ? structuredFailureReasons(structured) : []),
+      ...parsed.failureReasons,
+    ]);
 
     return {
-      success: result.success && parsed.success,
+      success:
+        result.success && parsed.success && (structured?.success ?? true),
       logs: parsed.logs,
-      testCounts: parseTestCounts(parsed.logs),
+      // Returned counts outrank scraped ones: same numbers when the log
+      // survived, real numbers when it did not.
+      testCounts: structured
+        ? toParsedTestCounts(structured)
+        : parseTestCounts(parsed.logs),
       durationMs: result.durationMs,
       error: reasons.length > 0 ? reasons.join('; ') : undefined,
     };

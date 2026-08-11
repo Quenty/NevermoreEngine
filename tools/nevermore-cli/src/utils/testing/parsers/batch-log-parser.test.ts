@@ -151,6 +151,85 @@ describe('parseBatchTestLogs', () => {
     expect(result?.testCounts?.failed).toBe(0);
     expect(result?.tracebackCount).toBe(1);
   });
+
+  it('prefers the counts the runner returned over the ones in the section', () => {
+    // The whole point of returning them: these are the numbers a truncated log
+    // window cannot take away.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '(the section this run printed is gone)',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"counts":' +
+        '{"passed":275,"failed":0,"skipped":2,"total":277,' +
+        '"suitesPassed":9,"suitesFailed":0,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 277 });
+  });
+
+  it('ignores malformed counts instead of reporting zeroes', () => {
+    const logs = buildLogs('Tests:  275 passed, 275 total').replace(
+      '"durationMs":1000',
+      '"durationMs":1000,"counts":{"passed":"lots"}'
+    );
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('reports why the runner failed a package rather than guessing', () => {
+    // A failing suite used to reach here as a Luau error. It arrives as a
+    // verdict now, and saying "Luau error" about it sends you hunting for one.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  2 failed, 273 passed, 275 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false,"durationMs":1000,' +
+        '"error":"[NevermoreTestRunner] 2 test(s) and 0 test suite(s) failed",' +
+        '"counts":{"passed":273,"failed":2,"skipped":0,"total":275,' +
+        '"suitesPassed":8,"suitesFailed":0,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('[NevermoreTestRunner] 2 test(s)');
+    expect(result?.error).not.toContain('Luau error');
+    expect(result?.testCounts).toEqual({ passed: 273, failed: 2, total: 275 });
+  });
+
+  it('does not believe a pass reported alongside failed tests', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  275 passed, 275 total',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"counts":' +
+        '{"passed":273,"failed":2,"skipped":0,"total":275,' +
+        '"suitesPassed":8,"suitesFailed":1,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('2 failed test(s)');
+  });
+
+  it('still reads a summary from a package that returned no counts', () => {
+    // A test script written before results were returned.
+    const result = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total'),
+      SLUG_MAP
+    ).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
 });
 
 describe('findSummaryEntries', () => {
