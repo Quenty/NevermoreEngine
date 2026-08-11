@@ -110,6 +110,38 @@ local function toCount(value: any): number
 end
 
 --[=[
+	Finds the AggregatedResult in whatever Jest.runCLI resolved with.
+
+	jest-lua resolves `{ globalConfig, results }` and the counts live on the inner
+	`results`. Reading the wrapper finds no `numTotalTests` and every count comes
+	back zero, which is indistinguishable from a run that passed — this is why the
+	`numFailedTests > 0` check this module used to gate `error()` on never fired
+	once. Both shapes are accepted so a jest-lua change cannot silently zero the
+	counts again, and an unrecognized shape returns nil so the caller can refuse
+	to call it a pass.
+
+	Note `numTotalTests == 0` is a recognized result: a package with no specs ran
+	and found nothing, which is a legitimate pass. Only a *missing* count means
+	the shape is not understood.
+]=]
+local function findAggregatedResult(resolved: any): any?
+	if typeof(resolved) ~= "table" then
+		return nil
+	end
+
+	if type(resolved.numTotalTests) == "number" then
+		return resolved
+	end
+
+	local inner = resolved.results
+	if typeof(inner) == "table" and type(inner.numTotalTests) == "number" then
+		return inner
+	end
+
+	return nil
+end
+
+--[=[
 	Returns true if running inside an Open Cloud Luau Execution context.
 ]=]
 function NevermoreTestRunnerUtils.isOpenCloud(): boolean
@@ -242,12 +274,17 @@ function NevermoreTestRunnerUtils._runTestsAsync(root: Instance): TestRunResults
 	return NevermoreTestRunnerUtils._resultsFromJest(result)
 end
 
-function NevermoreTestRunnerUtils._resultsFromJest(result: any): TestRunResults
+function NevermoreTestRunnerUtils._resultsFromJest(resolved: any): TestRunResults
 	local results = NevermoreTestRunnerUtils.newResults(true)
 
-	if typeof(result) ~= "table" then
+	-- Fail closed on a shape this cannot read. Defaulting the counts to zero
+	-- instead is what let a wrong read of the result go unnoticed: no failures
+	-- and no tests reads exactly like a clean run, so the mistake shipped green.
+	local result = findAggregatedResult(resolved)
+	if not result then
 		results.success = false
-		results.error = "[NevermoreTestRunner] Jest returned no result table"
+		results.error = "[NevermoreTestRunner] Jest resolved without a readable AggregatedResult, "
+			.. "so this run has no counts and cannot be called a pass"
 		warn(results.error)
 
 		return results
@@ -269,6 +306,21 @@ function NevermoreTestRunnerUtils._resultsFromJest(result: any): TestRunResults
 		and results.suitesFailed == 0
 		and result.wasInterrupted ~= true
 		and result.success ~= false
+
+	-- Printed as well as returned. It is the one line that proves the counts were
+	-- read off a result this module understood, whatever happens to the return
+	-- channel on the way out.
+	print(
+		string.format(
+			"[NevermoreTestRunner] Results: %d passed, %d failed, %d skipped, %d total; %d of %d suite(s) failed",
+			results.passed,
+			results.failed,
+			results.skipped,
+			results.total,
+			results.suitesFailed,
+			results.suitesTotal
+		)
+	)
 
 	if not results.success then
 		if result.wasInterrupted == true then
