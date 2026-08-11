@@ -55,6 +55,7 @@ export type {
   DataModelInstance,
   ErrorCode,
   SerializedValue,
+  SerializedReturnValue,
 } from './server/web-socket-protocol.js';
 
 // Lower-level exports for advanced usage / testing

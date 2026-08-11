@@ -403,4 +403,115 @@ table.insert(tests, {
 	end,
 })
 
+-- ===========================================================================
+-- Return value marshalling
+-- ===========================================================================
+
+table.insert(tests, {
+	name = "returnValues: empty when the script returns nothing",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "local x = 1" }, "req-rv0", "sess-rv0")
+		assertNotNil(result.returnValues, "returnValues should be present on a successful run")
+		assertEqual(#result.returnValues, 0, "no values returned")
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: carries every returned value in order",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return 'str', 42, true" }, "req-rv1", "sess-rv1")
+		assertEqual(#result.returnValues, 3, "three values returned")
+		assertEqual(result.returnValues[1], "str")
+		assertEqual(result.returnValues[2], 42)
+		assertEqual(result.returnValues[3], true)
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: nested tables survive as tables",
+	fn = function()
+		local result = ExecuteAction.handleExecute(
+			{ code = "return { slug = 'maid', counts = { passed = 1014, failed = 0 } }" },
+			"req-rv2",
+			"sess-rv2"
+		)
+		assertEqual(#result.returnValues, 1, "one value returned")
+		local value = result.returnValues[1]
+		assertEqual(value.slug, "maid")
+		assertEqual(value.counts.passed, 1014)
+		assertEqual(value.counts.failed, 0)
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: array-like tables stay arrays",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return { 10, 20, 30 }" }, "req-rv3", "sess-rv3")
+		local value = result.returnValues[1]
+		assertEqual(#value, 3, "array length")
+		assertEqual(value[1], 10)
+		assertEqual(value[3], 30)
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: non-string keys become strings so the table can be encoded",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return { [1] = 'a', name = 'b' }" }, "req-rv4", "sess-rv4")
+		local value = result.returnValues[1]
+		assertEqual(value["1"], "a", "numeric key stringified")
+		assertEqual(value.name, "b")
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: a returned nil keeps its position",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return nil, 7" }, "req-rv5", "sess-rv5")
+		assertEqual(#result.returnValues, 2, "two values returned")
+		assertEqual(result.returnValues[1].type, "Nil", "nil marker")
+		assertEqual(result.returnValues[2], 7)
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: a cycle is reported instead of recursing forever",
+	fn = function()
+		local result =
+			ExecuteAction.handleExecute({ code = "local t = {}; t.self = t; return t" }, "req-rv6", "sess-rv6")
+		local value = result.returnValues[1]
+		assertEqual(value.self.type, "Unsupported", "cycle is marked unsupported")
+		assertContains(value.self.toString, "cycle")
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: non-finite numbers are marked, not emitted as invalid JSON",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return math.huge, 0 / 0" }, "req-rv7", "sess-rv7")
+		assertEqual(result.returnValues[1].type, "Unsupported", "inf is marked")
+		assertEqual(result.returnValues[1].typeName, "number")
+		assertEqual(result.returnValues[2].type, "Unsupported", "nan is marked")
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: functions are marked unsupported rather than dropped",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "return function() end" }, "req-rv8", "sess-rv8")
+		assertEqual(#result.returnValues, 1, "one value returned")
+		assertEqual(result.returnValues[1].type, "Unsupported")
+		assertEqual(result.returnValues[1].typeName, "function")
+	end,
+})
+
+table.insert(tests, {
+	name = "returnValues: absent on a failed run",
+	fn = function()
+		local result = ExecuteAction.handleExecute({ code = "error('boom')" }, "req-rv9", "sess-rv9")
+		assertFalse(result.success)
+		assertNil(result.returnValues, "a failed run reports no return values")
+	end,
+})
+
 return tests
