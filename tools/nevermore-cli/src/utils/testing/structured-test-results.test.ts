@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import {
   TEST_RESULTS_FORMAT,
   decodeStructuredTestResults,
+  describeUnexplainedVerdict,
   findStructuredTestResults,
   structuredFailureReasons,
   toParsedTestCounts,
@@ -170,6 +171,86 @@ describe('structuredFailureReasons', () => {
     );
 
     expect(reasons).toContain('[NevermoreTestRunner] Jest run failed');
+  });
+});
+
+describe('structuredFailureReasons wording', () => {
+  it('never builds a reason out of zeros', () => {
+    // "0 test(s) and 0 test suite(s) failed" was a real failure reason once. A
+    // reason saying nothing failed is unreadable as either verdict, and it is
+    // what made the bug behind it hard to see.
+    for (const overrides of [
+      { success: false },
+      { success: false, failed: 0, suitesFailed: 0 },
+      {
+        success: false,
+        error: '[NevermoreTestRunner] the run was interrupted',
+      },
+    ]) {
+      const reasons = structuredFailureReasons(
+        decodeStructuredTestResults(results(overrides))!
+      );
+
+      expect(reasons.length).toBeGreaterThan(0);
+      for (const reason of reasons) {
+        expect(reason).not.toMatch(/\b0 test\(s\)/);
+        expect(reason).not.toMatch(/\b0 test suite\(s\)/);
+      }
+    }
+  });
+
+  it('does not restate the counts the reasons already carry', () => {
+    const reasons = structuredFailureReasons(
+      decodeStructuredTestResults(
+        results({
+          success: false,
+          failed: 2,
+          suitesFailed: 1,
+          error:
+            '[NevermoreTestRunner] 2 test(s) failed, 1 test suite(s) failed',
+        })
+      )!
+    );
+
+    expect(reasons).toEqual(['1 test suite(s) failed', '2 test(s) failed']);
+  });
+});
+
+describe('describeUnexplainedVerdict', () => {
+  it('is silent about a passing run', () => {
+    // The direction that broke: a fully passing result must read as a pass and
+    // raise nothing at all.
+    expect(
+      describeUnexplainedVerdict(decodeStructuredTestResults(results())!)
+    ).toBeUndefined();
+  });
+
+  it('is silent about a failure its counts explain', () => {
+    expect(
+      describeUnexplainedVerdict(
+        decodeStructuredTestResults(results({ success: false, failed: 2 }))!
+      )
+    ).toBeUndefined();
+    expect(
+      describeUnexplainedVerdict(
+        decodeStructuredTestResults(
+          results({ success: false, suitesFailed: 1 })
+        )!
+      )
+    ).toBeUndefined();
+  });
+
+  it('describes a failure no count supports', () => {
+    // The exact signature of a runner reading the wrong field: plausible counts,
+    // and every package failed anyway.
+    const description = describeUnexplainedVerdict(
+      decodeStructuredTestResults(
+        results({ success: false, passed: 311, failed: 0, total: 311 })
+      )!
+    );
+
+    expect(description).toContain('nothing failed');
+    expect(description).toContain('311 passed');
   });
 });
 

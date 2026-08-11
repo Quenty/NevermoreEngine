@@ -317,6 +317,8 @@ export function parseBatchTestLogs(
   /** Packages whose run returned its counts, and those left to log scraping. */
   const structuredSlugs: string[] = [];
   const scrapedSlugs: string[] = [];
+  /** Packages reported as failed by a run whose counts show nothing failed. */
+  const unexplainedFailures: string[] = [];
 
   for (const [packageName, slug] of slugMap) {
     const attributedLogs = logSections.get(slug);
@@ -352,6 +354,18 @@ export function parseBatchTestLogs(
         `the batch summary reported a pass alongside ${counts.failed} failed ` +
           `test(s) and ${counts.suitesFailed} failed test suite(s)`
       );
+    }
+
+    // The reverse contradiction: failure reported over counts where nothing
+    // failed. Left as a failure but said out loud — a runner reading the wrong
+    // field produces exactly this, for every package at once.
+    if (
+      !success &&
+      counts &&
+      counts.failed === 0 &&
+      counts.suitesFailed === 0
+    ) {
+      unexplainedFailures.push(slug);
     }
 
     if (attributedLogs !== undefined) {
@@ -459,7 +473,7 @@ export function parseBatchTestLogs(
     });
   }
 
-  reportCountsProvenance(structuredSlugs, scrapedSlugs);
+  reportCountsProvenance(structuredSlugs, scrapedSlugs, unexplainedFailures);
 
   return results;
 }
@@ -474,7 +488,8 @@ export function parseBatchTestLogs(
  */
 function reportCountsProvenance(
   structuredSlugs: string[],
-  scrapedSlugs: string[]
+  scrapedSlugs: string[],
+  unexplainedFailures: string[]
 ): void {
   const total = structuredSlugs.length + scrapedSlugs.length;
   if (total === 0) {
@@ -485,6 +500,20 @@ function reportCountsProvenance(
     `[batch-log-parser] Counts returned by the run for ${structuredSlugs.length} ` +
       `of ${total} package(s); ${scrapedSlugs.length} scraped from logs.`
   );
+
+  // Failing every package while every package's counts are clean is a signature,
+  // not a coincidence: it means the runner's verdict, not the tests, is wrong.
+  if (unexplainedFailures.length > 0) {
+    OutputHelper.warn(
+      `[batch-log-parser] ${unexplainedFailures.length} of ${total} package(s) were ` +
+        `failed by a run whose own counts show nothing failed: ` +
+        `${unexplainedFailures.join(
+          ', '
+        )}. The failures stand — a runner may know ` +
+        `something its counts cannot express — but a verdict no count supports is ` +
+        `far more likely to be the runner reading the wrong field.`
+    );
+  }
 
   if (scrapedSlugs.length > 0) {
     OutputHelper.warn(

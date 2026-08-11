@@ -10,6 +10,7 @@ import {
 } from '../test-log-parser.js';
 import {
   type StructuredTestResults,
+  describeUnexplainedVerdict,
   findStructuredTestResults,
   structuredFailureReasons,
   toParsedTestCounts,
@@ -228,6 +229,11 @@ function reportCountsProvenance(options: {
         `${structured.passed} passed, ${structured.failed} failed, ` +
         `${structured.total} total.`
     );
+
+    const unexplained = describeUnexplainedVerdict(structured);
+    if (unexplained) {
+      OutputHelper.warn(`${packageName}: ${unexplained}`);
+    }
 
     // Two channels reporting the same run must agree. When they do not, one is
     // lying and neither total stands on its own.

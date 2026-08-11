@@ -307,6 +307,74 @@ describe('parseBatchTestLogs', () => {
     );
   });
 
+  it('passes every package whose returned counts are clean', () => {
+    // The regression this guards: a runner consulted jest-lua's inverted
+    // AggregatedResult.success and failed all four packages in a batch, three of
+    // which had every test passing.
+    const warnings = captureWarnings();
+    const fourPackages = new Map([
+      ['access', 'access'],
+      ['animations', 'animations'],
+      ['binder', 'binder'],
+      ['blend', 'blend'],
+    ]);
+
+    const clean = (slug: string, passed: number) =>
+      [
+        `===BATCH_TEST_BEGIN ${slug}===`,
+        `Tests:  ${passed} passed, ${passed} total`,
+        `===BATCH_TEST_END ${slug} PASS 100===`,
+      ].join('\n');
+
+    const entry = (slug: string, passed: number) =>
+      `{"slug":"${slug}","success":true,"durationMs":100,"ranJest":true,` +
+      `"counts":{"passed":${passed},"failed":0,"skipped":0,"total":${passed},` +
+      `"suitesPassed":1,"suitesFailed":0,"suitesTotal":1}}`;
+
+    const logs = [
+      clean('access', 311),
+      clean('animations', 8),
+      clean('binder', 99),
+      clean('blend', 3),
+      '===BATCH_TEST_SUMMARY===',
+      `[${entry('access', 311)},${entry('animations', 8)},` +
+        `${entry('binder', 99)},${entry('blend', 3)}]`,
+    ].join('\n');
+
+    const parsed = parseBatchTestLogs(logs, fourPackages);
+
+    expect([...parsed.values()].filter((r) => r.success)).toHaveLength(4);
+    expect(parsed.get('access')?.testCounts).toEqual({
+      passed: 311,
+      failed: 0,
+      total: 311,
+    });
+    expect(warnings()).toHaveLength(0);
+  });
+
+  it('warns when a failure’s own counts show nothing failed', () => {
+    const warnings = captureWarnings();
+
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  311 passed, 311 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 100===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false,"durationMs":100,"ranJest":true,' +
+        '"error":"[NevermoreTestRunner] something","counts":{"passed":311,' +
+        '"failed":0,"skipped":0,"total":311,"suitesPassed":19,"suitesFailed":0,' +
+        '"suitesTotal":19}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    // The verdict stands — it is not the parser's to overturn — but it is loud.
+    expect(result?.success).toBe(false);
+    expect(
+      warnings().some((w) => w.includes('own counts show nothing failed'))
+    ).toBe(true);
+  });
+
   it('warns when the returned counts and the log disagree', () => {
     // The exact failure that shipped once: the runner read the wrong level of
     // jest's result, so every count came back zero and read as a clean run.
