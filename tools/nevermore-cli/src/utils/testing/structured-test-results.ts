@@ -126,6 +126,36 @@ export function findStructuredTestResults(
   return undefined;
 }
 
+/**
+ * Describe a verdict the run's own counts do not support, for a warning.
+ *
+ * A run reporting failure while nothing in it failed is self-contradicting, and
+ * it is precisely what a runner reading the wrong field produces: the counts
+ * stay plausible, so nothing looks wrong except that every package fails at
+ * once. That shipped once — a runner consulted jest-lua's inverted
+ * `AggregatedResult.success` and failed every passing suite.
+ *
+ * Reported, never corrected. A runner that says it failed may know something its
+ * counts cannot express (an interrupted run, a snapshot check, a reporter
+ * error), so the verdict stands and the contradiction is made loud instead.
+ */
+export function describeUnexplainedVerdict(
+  results: StructuredTestResults
+): string | undefined {
+  if (results.success || results.failed > 0 || results.suitesFailed > 0) {
+    return undefined;
+  }
+
+  return (
+    `the run reports failure but its own counts show nothing failed ` +
+    `(${results.passed} passed, 0 failed, ${results.total} total, ` +
+    `0 of ${results.suitesTotal} suite(s) failed)` +
+    (results.error
+      ? `. It says: ${results.error}`
+      : ' and gives no reason at all')
+  );
+}
+
 /** Counts in the shape the reporters already render. */
 export function toParsedTestCounts(
   results: StructuredTestResults
@@ -157,11 +187,13 @@ export function structuredFailureReasons(
   if (results.failed > 0) {
     reasons.push(`${results.failed} test(s) failed`);
   }
-  if (results.error) {
-    reasons.push(results.error);
-  }
+
+  // The runner's own message restates those two lines when a count explains the
+  // failure, so it is only worth repeating when nothing else can say why —
+  // an interrupted run, a failed snapshot check, a result shape it could not
+  // read. That case is also the one where a reason is most needed.
   if (reasons.length === 0) {
-    reasons.push('the test runner reported the run as failed');
+    reasons.push(results.error ?? 'the test runner reported the run as failed');
   }
   return reasons;
 }
