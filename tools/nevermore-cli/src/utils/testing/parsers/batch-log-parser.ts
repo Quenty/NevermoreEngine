@@ -57,6 +57,10 @@ export interface ParseBatchTestLogsOptions {
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
 const END_MARKER = '===BATCH_TEST_END ';
 const SUMMARY_MARKER = '===BATCH_TEST_SUMMARY===';
+const MARKER_SUFFIX = '===';
+
+// Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
+const END_INNER_PATTERN = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
 
 /**
  * Counts the batch runner folds in from what a package's test script returned.
@@ -109,6 +113,54 @@ function readSummaryCounts(entry: SummaryEntry): SummaryCounts | undefined {
   return counts;
 }
 
+interface BeginToken {
+  kind: 'begin';
+  slug: string;
+}
+
+interface EndToken {
+  kind: 'end';
+  slug: string;
+  durationMs?: number;
+}
+
+interface SummaryToken {
+  kind: 'summary';
+  /** Where the marker sat, so the JSON payload can be looked up around it. */
+  lineIndex: number;
+}
+
+interface SummaryPayloadToken {
+  kind: 'summaryPayload';
+}
+
+interface ContentToken {
+  kind: 'content';
+  /** The untrimmed line, since section logs are shown to a human verbatim. */
+  line: string;
+}
+
+/** One log line, classified. Every line becomes exactly one token. */
+type BatchLogToken =
+  | BeginToken
+  | EndToken
+  | SummaryToken
+  | SummaryPayloadToken
+  | ContentToken;
+
+interface FoldedSections {
+  /** Log text of each section that closed, by slug. */
+  sections: Map<string, string>;
+  /** Sections closed by an END whose BEGIN never arrived — start of output lost. */
+  partialSections: Set<string>;
+  /** Durations read off END markers, by slug. */
+  markerDurations: Map<string, number>;
+  /** Slugs of ENDs that closed nothing, so claimed no output. */
+  strayEndSlugs: string[];
+  /** Slugs of sections a second BEGIN reopened, discarding their output. */
+  orphanedBeginSlugs: string[];
+}
+
 /**
  * Parse the single batch execution's logs into per-package results.
  *
@@ -143,94 +195,27 @@ export function parseBatchTestLogs(
 
   // ── Pass 1: Extract per-package log sections from markers ──
 
-  const logSections = new Map<string, string>();
-  /** Sections closed by an END whose BEGIN never arrived — start of output lost. */
-  const partialSections = new Set<string>();
-  const markerDurations = new Map<string, number>();
-  let currentSlug: string | null = null;
-  let currentLines: string[] = [];
-  let summaryLineIndex = -1;
-  /** True between the summary marker and its JSON payload. */
-  let summaryPayloadPending = false;
-  let beginMarkersSeen = 0;
-  let endMarkersSeen = 0;
-  let strayEndMarkers = 0;
-  /** Only one section can have lost its head: the one the log was cut inside. */
-  let headSectionClaimed = false;
+  const tokens = tokenizeBatchLog(lines);
+  const {
+    sections: logSections,
+    partialSections,
+    markerDurations,
+    strayEndSlugs,
+    orphanedBeginSlugs,
+  } = foldTokensIntoSections(tokens);
 
-  // Matches "<slug> PASS|FAIL [<durationMs>]" — slugs have no whitespace.
-  const endInnerPattern = /^(\S+)\s+(?:PASS|FAIL)(?:\s+(\d+))?$/;
-
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trimEnd();
-
-    if (trimmed.startsWith(BEGIN_MARKER) && trimmed.endsWith('===')) {
-      currentSlug = trimmed.slice(BEGIN_MARKER.length, -3);
-      currentLines = [];
-      beginMarkersSeen++;
-      continue;
-    }
-
-    if (trimmed.startsWith(END_MARKER) && trimmed.endsWith('===')) {
-      const inner = trimmed.slice(END_MARKER.length, -3);
-      endMarkersSeen++;
-      const match = endInnerPattern.exec(inner);
-      const endSlug = match ? match[1] : inner;
-      const durationStr = match?.[2];
-
-      // A section normally closes on the END matching its own BEGIN.
-      const closesOwnSection = endSlug === currentSlug;
-
-      // Open Cloud keeps only the tail of a long run's log, so BEGIN — printed
-      // first — can be lost while END and the summary survive. Recovering that
-      // means letting an END with no open section claim what precedes it, but
-      // only where the head can actually have been dropped: before any BEGIN
-      // has survived, and only once. Past that point the log is well-formed,
-      // and a BEGIN-less END is a message delivered out of order (the API does
-      // not order them), which must not be allowed to claim another package's
-      // output.
-      const closesDroppedHead =
-        currentSlug === null && beginMarkersSeen === 0 && !headSectionClaimed;
-
-      if (closesOwnSection || closesDroppedHead) {
-        logSections.set(endSlug, currentLines.join('\n'));
-        if (closesDroppedHead) {
-          partialSections.add(endSlug);
-          headSectionClaimed = true;
-        }
-        if (durationStr !== undefined) {
-          markerDurations.set(endSlug, parseInt(durationStr, 10));
-        }
-        currentSlug = null;
-        currentLines = [];
-      } else {
-        // Reordered marker from another package. Ignore it without resetting
-        // state, so the section it interrupted still closes on its own END.
-        strayEndMarkers++;
-      }
-      continue;
-    }
-
-    if (trimmed === SUMMARY_MARKER) {
-      // Keep scanning: the summary prints last but is not always delivered last,
-      // and a section's END can follow it.
-      if (summaryLineIndex < 0) {
-        summaryLineIndex = i;
-      }
-      summaryPayloadPending = true;
-      continue;
-    }
-
-    // The summary's JSON payload belongs to no section.
-    if (summaryPayloadPending && trimmed.trimStart().startsWith('[')) {
-      summaryPayloadPending = false;
-      continue;
-    }
-
-    // Accumulate unconditionally: output that precedes the first surviving
-    // BEGIN still belongs to whichever package's END closes it.
-    currentLines.push(lines[i]);
-  }
+  // Diagnostics are read back off the token list rather than counted alongside
+  // the fold, so nothing the warnings report can also steer the parse.
+  const beginMarkersSeen = tokensOfKind(tokens, 'begin').length;
+  const endMarkersSeen = tokensOfKind(tokens, 'end').length;
+  const summaryLineIndex = tokensOfKind(tokens, 'summary')[0]?.lineIndex ?? -1;
+  const unknownEndSlugs = [
+    ...new Set(
+      tokensOfKind(tokens, 'end')
+        .map((token) => token.slug)
+        .filter((slug) => !slugToPackage.has(slug))
+    ),
+  ];
 
   // ── Pass 2: Parse the JSON summary for authoritative pcall results ──
 
@@ -279,10 +264,29 @@ export function parseBatchTestLogs(
 
   // ── Warn when the batch produced no recognizable output ──
 
-  if (strayEndMarkers > 0) {
+  if (strayEndSlugs.length > 0) {
     OutputHelper.verbose(
-      `[batch-log-parser] Ignored ${strayEndMarkers} out-of-order END marker(s); ` +
+      `[batch-log-parser] Ignored ${strayEndSlugs.length} out-of-order END marker(s); ` +
         'their sections closed on their own boundaries.'
+    );
+  }
+
+  // Reported, not acted on: a slug the batch never asked for means the markers
+  // and the package list disagree, which no per-package verdict can express.
+  if (unknownEndSlugs.length > 0) {
+    OutputHelper.warn(
+      `[batch-log-parser] END marker(s) for slug(s) not in this batch: ` +
+        `${unknownEndSlugs.join(', ')}.`
+    );
+  }
+
+  if (orphanedBeginSlugs.length > 0) {
+    OutputHelper.warn(
+      `[batch-log-parser] ${orphanedBeginSlugs.length} section(s) reopened by a ` +
+        `second BEGIN before their own END arrived (${orphanedBeginSlugs.join(
+          ', '
+        )}); ` +
+        'the output collected so far was discarded.'
     );
   }
 
@@ -573,6 +577,177 @@ function reportCountsProvenance(
         `script should end with "return results" (see docs/testing/testing.md).`
     );
   }
+}
+
+/**
+ * Classify every log line, so section splitting reads tokens instead of text.
+ */
+function tokenizeBatchLog(lines: string[]): BatchLogToken[] {
+  const tokens: BatchLogToken[] = [];
+  /** True between the summary marker and its JSON payload. */
+  let summaryPayloadPending = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trimEnd();
+
+    if (trimmed.startsWith(BEGIN_MARKER) && trimmed.endsWith(MARKER_SUFFIX)) {
+      tokens.push({
+        kind: 'begin',
+        slug: trimmed.slice(BEGIN_MARKER.length, -MARKER_SUFFIX.length),
+      });
+      continue;
+    }
+
+    if (trimmed.startsWith(END_MARKER) && trimmed.endsWith(MARKER_SUFFIX)) {
+      tokens.push(
+        parseEndToken(trimmed.slice(END_MARKER.length, -MARKER_SUFFIX.length))
+      );
+      continue;
+    }
+
+    if (trimmed === SUMMARY_MARKER) {
+      // Keep scanning: the summary prints last but is not always delivered last,
+      // and a section's END can follow it.
+      tokens.push({ kind: 'summary', lineIndex: i });
+      summaryPayloadPending = true;
+      continue;
+    }
+
+    // The summary's JSON payload belongs to no section.
+    if (summaryPayloadPending && trimmed.trimStart().startsWith('[')) {
+      summaryPayloadPending = false;
+      tokens.push({ kind: 'summaryPayload' });
+      continue;
+    }
+
+    tokens.push({ kind: 'content', line: lines[i] });
+  }
+
+  return tokens;
+}
+
+/**
+ * Read an END marker's inner text.
+ *
+ * The PASS|FAIL verdict and the duration are both optional, so inner text that
+ * does not parse is taken whole as the slug rather than dropped.
+ */
+function parseEndToken(inner: string): EndToken {
+  const match = END_INNER_PATTERN.exec(inner);
+  if (!match) {
+    return { kind: 'end', slug: inner };
+  }
+
+  const durationStr = match[2];
+  return {
+    kind: 'end',
+    slug: match[1],
+    durationMs:
+      durationStr === undefined ? undefined : parseInt(durationStr, 10),
+  };
+}
+
+/**
+ * Fold tokens into per-package log sections.
+ *
+ * Sections close on END, not on the next BEGIN, because END is what survives:
+ * see the head-claiming rule below.
+ */
+function foldTokensIntoSections(
+  tokens: readonly BatchLogToken[]
+): FoldedSections {
+  const sections = new Map<string, string>();
+  const partialSections = new Set<string>();
+  const markerDurations = new Map<string, number>();
+  const strayEndSlugs: string[] = [];
+  const orphanedBeginSlugs: string[] = [];
+
+  let openSlug: string | null = null;
+  let openLines: string[] = [];
+  /**
+   * Whether the log can still be one whose head was dropped.
+   *
+   * Open Cloud keeps only the tail of a long run's log, so BEGIN — printed
+   * first — can be lost while END and the summary survive. Recovering that
+   * means letting an END with no open section claim what precedes it, but
+   * only where the head can actually have been dropped: before any BEGIN
+   * has survived, and only once. Past that point the log is well-formed,
+   * and a BEGIN-less END is a message delivered out of order (the API does
+   * not order them), which must not be allowed to claim another package's
+   * output.
+   */
+  let headClaimable = true;
+
+  for (const token of tokens) {
+    switch (token.kind) {
+      case 'begin': {
+        if (openSlug !== null) {
+          orphanedBeginSlugs.push(openSlug);
+        }
+        openSlug = token.slug;
+        openLines = [];
+        headClaimable = false;
+        break;
+      }
+
+      case 'end': {
+        // A section normally closes on the END matching its own BEGIN.
+        const closesOwnSection = token.slug === openSlug;
+        // Mutually exclusive with the above: an unclaimed head means no BEGIN
+        // has arrived, so no section is open to match.
+        const closesDroppedHead = headClaimable;
+
+        if (!closesOwnSection && !closesDroppedHead) {
+          // Reordered marker from another package. Ignore it without resetting
+          // state, so the section it interrupted still closes on its own END.
+          strayEndSlugs.push(token.slug);
+          break;
+        }
+
+        sections.set(token.slug, openLines.join('\n'));
+        if (closesDroppedHead) {
+          partialSections.add(token.slug);
+        }
+        if (token.durationMs !== undefined) {
+          markerDurations.set(token.slug, token.durationMs);
+        }
+        openSlug = null;
+        openLines = [];
+        headClaimable = false;
+        break;
+      }
+
+      case 'content': {
+        // Accumulate unconditionally: output that precedes the first surviving
+        // BEGIN still belongs to whichever package's END closes it.
+        openLines.push(token.line);
+        break;
+      }
+
+      case 'summary':
+      case 'summaryPayload': {
+        break;
+      }
+    }
+  }
+
+  return {
+    sections,
+    partialSections,
+    markerDurations,
+    strayEndSlugs,
+    orphanedBeginSlugs,
+  };
+}
+
+/** Select the tokens of one kind, for counting and reporting. */
+function tokensOfKind<K extends BatchLogToken['kind']>(
+  tokens: readonly BatchLogToken[],
+  kind: K
+): Extract<BatchLogToken, { kind: K }>[] {
+  return tokens.filter(
+    (token): token is Extract<BatchLogToken, { kind: K }> => token.kind === kind
+  );
 }
 
 /**
