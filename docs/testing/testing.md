@@ -413,8 +413,22 @@ end
 
 Replace `mypackage` with the key used in your Rojo project tree.
 
+A script that returns the guard's result instead of discarding it reports its counts as a
+value rather than as log text:
+
+```luau
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+if results then
+	return results
+end
+```
+
+The engine truncates a long run's logs, so counts scraped back out of them are exactly what
+goes missing on the runs where they matter most. Discarding the table is still supported —
+the CLI falls back to reading the logs — so a package can move over whenever it suits.
+
 A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
-keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `false` when script
+keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `nil` when script
 source is unreadable, which is the case during ordinary play, so the demo still runs when you join the
 place and only the cloud/local test runs take the early return.
 
@@ -425,6 +439,9 @@ The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`,
 - If a `jest.config` is found under the given root, it runs Jest tests
 - If no `jest.config` is found, boot success is the test (smoke test)
 - Detects Open Cloud vs local execution context and exits appropriately
+- Returns a [TestRunResults](/api/NevermoreTestRunnerUtils) table — counts, a capped failure
+  list, and the run's verdict — or `nil` when no test run was attempted, which is how a real
+  game server tells itself apart from a test place and falls through to its normal boot
 
 ## Running tests
 
