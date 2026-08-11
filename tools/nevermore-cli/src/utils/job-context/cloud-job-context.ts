@@ -1,5 +1,6 @@
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
+  getTaskReturnValues,
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
@@ -134,6 +135,7 @@ export class CloudJobContext extends BaseJobContext {
       success: completedTask.state === 'COMPLETE',
       taskState: completedTask.state,
       errorMessage,
+      returnValues: getTaskReturnValues(completedTask),
     };
   }
 

@@ -28,6 +28,27 @@ export interface ScriptRunResult {
   taskState?: string;
   /** Error message from the execution backend, if any. */
   errorMessage?: string;
+  /**
+   * Everything the executed script returned, in order — the structured channel
+   * out of a run, as opposed to its printed output. Engine logs are truncated
+   * by Open Cloud on long runs, so anything a caller must read back exactly
+   * belongs here rather than in the log text.
+   *
+   * `undefined` means the transport never delivered a return channel: a cloud
+   * task that ended without an `output` (a FAILED task carries none, and an
+   * oversize return value fails the task rather than truncating the value), a
+   * bridge run that timed out or disconnected, or a context that does not
+   * carry return values at all. That is deliberately distinct from `[]`, which
+   * means the script ran and returned nothing — a caller that needs the value
+   * can fall back to parsing logs in the first case but not the second.
+   *
+   * Values are JSON-shaped, but the two transports spell exotic Luau types
+   * differently: Open Cloud auto-serializes them, while the Studio bridge
+   * marshals them into `{ type, value }` wrappers (`SerializedReturnValue`).
+   * Plain tables of strings, numbers and booleans come back identically on
+   * both, so structured results should stay inside that subset.
+   */
+  returnValues?: unknown[];
 }
 
 /**

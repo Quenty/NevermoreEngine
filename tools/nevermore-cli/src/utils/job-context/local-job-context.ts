@@ -69,7 +69,7 @@ export class LocalJobContext extends BaseJobContext {
         timeoutMs,
       });
       localDeployment.cachedLogs = result.logs;
-      return { success: result.success };
+      return { success: result.success, returnValues: result.returnValues };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
