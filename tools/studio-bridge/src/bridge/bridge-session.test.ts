@@ -174,6 +174,51 @@ describe('BridgeSession', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe('boom');
     });
+
+    it('surfaces the values the script returned', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: {
+          success: true,
+          returnValues: [{ counts: { passed: 3 } }, 42],
+        },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync('return results, 42');
+
+      expect(result.returnValues).toEqual([{ counts: { passed: 3 } }, 42]);
+    });
+
+    it('leaves returnValues undefined when the plugin reported none', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync('print("hello")');
+
+      expect(result.returnValues).toBeUndefined();
+    });
+
+    it('leaves returnValues undefined on an error response', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'error',
+        sessionId: 'session-1',
+        payload: { code: 'SCRIPT_RUNTIME_ERROR', message: 'boom' },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync('error("boom")');
+
+      expect(result.returnValues).toBeUndefined();
+    });
   });
 
   describe('queryStateAsync', () => {

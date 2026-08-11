@@ -26,6 +26,7 @@ import {
   type Capability,
   type PluginMessage,
   type ServerMessage,
+  type SerializedReturnValue,
   encodeMessage,
   decodePluginMessage,
 } from './web-socket-protocol.js';
@@ -106,6 +107,14 @@ export interface ExecuteOptions {
 export interface StudioBridgeResult {
   success: boolean;
   logs: string;
+  /**
+   * Everything the script returned, in order, marshalled by the plugin.
+   * Absent whenever no `scriptComplete` carrying a return channel arrived —
+   * a timeout, a disconnect, a plugin error, or an older plugin build — which
+   * is what separates "we never learned what it returned" from `[]`, "it
+   * returned nothing".
+   */
+  returnValues?: SerializedReturnValue[];
 }
 
 type BridgeState =
@@ -797,6 +806,7 @@ export class StudioBridgeServer {
             finish({
               success: msg.payload.success,
               logs: logLines.join('\n'),
+              returnValues: msg.payload.returnValues,
             });
             break;
           }
