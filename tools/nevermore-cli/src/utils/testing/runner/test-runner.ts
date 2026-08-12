@@ -160,7 +160,24 @@ export async function runSingleTestAsync(
       requireTestReport: scriptText === undefined && structured === undefined,
     });
 
+    // A run that reports it never reached jest, for a package that has a
+    // jest.config on disk, did not test anything — the built place lost the
+    // config. Before results were returned, the required jest report caught this
+    // as "nothing proves any test ran"; a smoke-test result would otherwise
+    // retire that check and pass with zero tests.
+    const smokeTestedWithSpecs =
+      structured !== undefined &&
+      !structured.ranJest &&
+      scriptText === undefined &&
+      (await packageHasJestConfigAsync(packagePath));
+
     const reasons = mergeFailureReasons(result.errorMessage, [
+      ...(smokeTestedWithSpecs
+        ? [
+            'this package has a jest.config but the run reported no jest.config ' +
+              'in the built place, so none of its specs ran',
+          ]
+        : []),
       ...(structured ? structuredFailureReasons(structured) : []),
       ...parsed.failureReasons,
     ]);
@@ -185,7 +202,10 @@ export async function runSingleTestAsync(
 
     return {
       success:
-        result.success && parsed.success && (structured?.success ?? true),
+        result.success &&
+        parsed.success &&
+        (structured?.success ?? true) &&
+        !smokeTestedWithSpecs,
       logs: parsed.logs,
       testCounts,
       countsSource: structured
@@ -235,6 +255,14 @@ function reportCountsProvenance(options: {
       OutputHelper.warn(`${packageName}: ${unexplained}`);
     }
 
+    // A suite that runs and counts nothing is not the same as one that passed.
+    if (structured.ranJest && structured.total === 0) {
+      OutputHelper.warn(
+        `${packageName}: jest ran but found no tests to run. If this package has ` +
+          `specs, they are not reaching the test place.`
+      );
+    }
+
     // Two channels reporting the same run must agree. When they do not, one is
     // lying and neither total stands on its own.
     if (scrapedCounts && scrapedCounts.total !== structured.total) {
@@ -258,6 +286,54 @@ function reportCountsProvenance(options: {
           'test script should end with "return results" (see docs/testing/testing.md).'
         : 'No return channel was delivered at all, so the transport lost it.')
   );
+}
+
+/**
+ * Whether this package ships a jest.config, i.e. whether it has specs to run.
+ *
+ * Deliberately a bounded walk, not a recursive glob: every package under `src/`
+ * has a symlinked, self-referential `node_modules`, so recursive search here
+ * hangs. Two levels covers the layouts in use (`src/jest.config.lua` for a
+ * package, `src/modules/jest.config.lua` for a game) without needing a list of
+ * them.
+ */
+export async function packageHasJestConfigAsync(
+  packagePath: string
+): Promise<boolean> {
+  async function scanAsync(dir: string, depth: number): Promise<boolean> {
+    let entries;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      return false;
+    }
+
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.startsWith('jest.config')) {
+        return true;
+      }
+    }
+
+    if (depth === 0) {
+      return false;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+      // `test` holds the test place, never the specs the place runs.
+      if (entry.name === 'node_modules' || entry.name === 'test') {
+        continue;
+      }
+      if (await scanAsync(path.join(dir, entry.name), depth - 1)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  return scanAsync(packagePath, 2);
 }
 
 /**

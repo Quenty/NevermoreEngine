@@ -375,6 +375,98 @@ describe('parseBatchTestLogs', () => {
     ).toBe(true);
   });
 
+  it('accepts returned counts in place of a jest report the log lost', () => {
+    // The CI case this whole channel exists for: dozens of packages share one log
+    // window, so a section keeps its END marker long after its jest summary was
+    // dropped. Requiring the report there failed the package anyway.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '  ✓ one line of output that survived',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"ranJest":true,' +
+        '"counts":{"passed":311,"failed":0,"skipped":0,"total":311,' +
+        '"suitesPassed":19,"suitesFailed":0,"suitesTotal":19}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.error).toBeUndefined();
+    expect(result?.testCounts).toEqual({ passed: 311, failed: 0, total: 311 });
+  });
+
+  it('still demands a jest report from a package that returned no counts', () => {
+    // Nothing structural to stand in for it, so the stand-in stays.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '  ✓ one line of output that survived',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('nothing proves any test ran');
+  });
+
+  it('judges a package whose section was lost entirely on its counts', () => {
+    const warnings = captureWarnings();
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true,"durationMs":10,"ranJest":true,' +
+        '"counts":{"passed":10,"failed":0,"skipped":0,"total":10,"suitesPassed":1,' +
+        '"suitesFailed":0,"suitesTotal":1}},' +
+        '{"slug":"beta","success":true,"durationMs":20,"ranJest":true,' +
+        '"counts":{"passed":7,"failed":0,"skipped":0,"total":7,"suitesPassed":1,' +
+        '"suitesFailed":0,"suitesTotal":1}}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    // beta's section never arrived; its counts did.
+    expect(results.get('beta')?.success).toBe(true);
+    expect(results.get('beta')?.testCounts).toEqual({
+      passed: 7,
+      failed: 0,
+      total: 7,
+    });
+    // Narrower than a verdict with a section: nothing checked it for tracebacks.
+    expect(
+      warnings().some((w) => w.includes('not checked for Luau tracebacks'))
+    ).toBe(true);
+  });
+
+  it('still fails a lost section when no counts came back either', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('beta')?.success).toBe(false);
+    expect(results.get('beta')?.error).toContain(
+      'no output could be attributed'
+    );
+  });
+
   it('warns when the returned counts and the log disagree', () => {
     // The exact failure that shipped once: the runner read the wrong level of
     // jest's result, so every count came back zero and read as a clean run.

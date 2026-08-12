@@ -319,6 +319,8 @@ export function parseBatchTestLogs(
   const scrapedSlugs: string[] = [];
   /** Packages reported as failed by a run whose counts show nothing failed. */
   const unexplainedFailures: string[] = [];
+  /** Packages judged on returned counts alone, their log section having been lost. */
+  const sectionlessButCounted: string[] = [];
 
   for (const [packageName, slug] of slugMap) {
     const attributedLogs = logSections.get(slug);
@@ -369,14 +371,20 @@ export function parseBatchTestLogs(
     }
 
     if (attributedLogs !== undefined) {
+      // Demanding a jest report in the section is a stand-in for proof the
+      // runner ran, and it is the first thing a truncated log window costs.
+      // Returned counts are that proof directly, so they retire the stand-in —
+      // without this the whole structured channel changed nothing in a CI batch,
+      // where dozens of packages share one log window and a section keeps its
+      // END marker long after its jest summary was dropped.
       const outcome = evaluateTestOutcome(attributedLogs, {
-        requireTestReport: true,
+        requireTestReport: counts === undefined,
       });
       if (!outcome.success) {
         success = false;
         reasons.push(...outcome.failureReasons);
       }
-    } else {
+    } else if (counts === undefined) {
       // Judged unreadable rather than judged by content: whatever broke
       // attribution is reason enough not to trust which package a line is from.
       success = false;
@@ -384,6 +392,11 @@ export function parseBatchTestLogs(
         `no output could be attributed to this package ` +
           `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found)`
       );
+    } else {
+      // The counts say what happened even though the log does not. Tracebacks
+      // cannot be checked without the text, though, so this is a narrower
+      // verdict than a package with a section gets — hence the warning.
+      sectionlessButCounted.push(slug);
     }
 
     if (partialSections.has(slug)) {
@@ -473,7 +486,12 @@ export function parseBatchTestLogs(
     });
   }
 
-  reportCountsProvenance(structuredSlugs, scrapedSlugs, unexplainedFailures);
+  reportCountsProvenance(
+    structuredSlugs,
+    scrapedSlugs,
+    unexplainedFailures,
+    sectionlessButCounted
+  );
 
   return results;
 }
@@ -489,11 +507,26 @@ export function parseBatchTestLogs(
 function reportCountsProvenance(
   structuredSlugs: string[],
   scrapedSlugs: string[],
-  unexplainedFailures: string[]
+  unexplainedFailures: string[],
+  sectionlessButCounted: string[]
 ): void {
   const total = structuredSlugs.length + scrapedSlugs.length;
   if (total === 0) {
     return;
+  }
+
+  // Not a failure — this is the case the structured channel was built for — but
+  // these packages were judged without their log text, so nothing checked them
+  // for tracebacks, which jest cannot count and only the log shows.
+  if (sectionlessButCounted.length > 0) {
+    OutputHelper.warn(
+      `[batch-log-parser] ${sectionlessButCounted.length} package(s) were judged on ` +
+        `their returned counts alone, with no log section to read: ` +
+        `${sectionlessButCounted.join(
+          ', '
+        )}. Their counts are exact; they were ` +
+        `not checked for Luau tracebacks, which only the log shows.`
+    );
   }
 
   OutputHelper.info(
