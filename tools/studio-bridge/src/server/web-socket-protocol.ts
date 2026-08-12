@@ -69,6 +69,22 @@ export type SerializedValue =
   | { type: 'Instance'; className: string; path: string }
   | { type: 'Unsupported'; typeName: string; toString: string };
 
+/**
+ * A value returned by an executed script, marshalled for the wire: everything
+ * `SerializedValue` covers, plus tables, which the plugin walks recursively
+ * (array-like tables stay arrays, anything else becomes an object with string
+ * keys).
+ *
+ * `{ type: 'Nil' }` stands in for a `nil` return value: a JSON array cannot
+ * hold a hole, and dropping the entry would silently shift every value after
+ * it, misreporting which value was returned where.
+ */
+export type SerializedReturnValue =
+  | SerializedValue
+  | { type: 'Nil' }
+  | SerializedReturnValue[]
+  | { [key: string]: SerializedReturnValue };
+
 export interface DataModelInstance {
   name: string;
   className: string;
@@ -99,6 +115,13 @@ export interface ScriptCompleteMessage extends BaseMessage {
     success: boolean;
     error?: string;
     output?: Array<{ level: string; body: string; timestamp: number }>;
+    /**
+     * Everything the script returned, in order, marshalled by the plugin.
+     * Absent when the plugin never reported a return channel (an older plugin
+     * build, or a script that failed before returning) — distinct from `[]`,
+     * which means the script ran and returned nothing.
+     */
+    returnValues?: SerializedReturnValue[];
   };
 }
 
@@ -354,6 +377,11 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
                 timestamp: typeof e.timestamp === 'number' ? e.timestamp : 0,
               }))
           : undefined;
+        // The values themselves are whatever the script returned, so they are
+        // carried through as-is; only the array wrapper is checked.
+        const returnValues = Array.isArray(payload.returnValues)
+          ? (payload.returnValues as SerializedReturnValue[])
+          : undefined;
         return {
           type: 'scriptComplete',
           sessionId,
@@ -363,6 +391,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
             error:
               typeof payload.error === 'string' ? payload.error : undefined,
             output,
+            returnValues,
           },
         };
       }
