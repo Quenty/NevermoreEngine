@@ -18,7 +18,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
 local ValueObject = require("ValueObject")
-local t = require("t")
+local t: any = require("t")
 
 local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
