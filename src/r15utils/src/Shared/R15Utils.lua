@@ -11,6 +11,8 @@ export type R15Side = "Left" | "Right"
 
 export type AnimationConstraintOrMotor6D = AnimationConstraint | Motor6D
 
+export type WeldOrAnimationConstraintOrMotor6D = AnimationConstraint | Motor6D | Weld
+
 --[=[
 	Searches the rig for an attachment
 ]=]
@@ -54,6 +56,13 @@ end
 ]=]
 function R15Utils.isAnimationConstraintOrMotor6D(instance: Instance): boolean
 	return instance:IsA("Motor6D") or instance:IsA("AnimationConstraint")
+end
+
+--[=[
+	Determines if the instance is a Weld, Motor6D or AnimationConstraint
+]=]
+function R15Utils.isWeldOrAnimationConstraintOrMotor6D(instance: Instance): boolean
+	return instance:IsA("Weld") or R15Utils.isAnimationConstraintOrMotor6D(instance)
 end
 
 --[=[
@@ -115,14 +124,14 @@ end
 --[=[
 	Retrieves grip weld
 ]=]
-function R15Utils.getGripWeld(character: Model, side: R15Side): AnimationConstraintOrMotor6D?
+function R15Utils.getGripWeld(character: Model, side: R15Side): WeldOrAnimationConstraintOrMotor6D?
 	local rightHand = R15Utils.getHand(character, side)
 	if rightHand == nil then
 		return nil
 	end
 
 	local result: any = rightHand:FindFirstChild(R15Utils.getGripWeldName(side))
-	if result == nil or not R15Utils.isAnimationConstraintOrMotor6D(result) then
+	if result == nil or not R15Utils.isWeldOrAnimationConstraintOrMotor6D(result) then
 		return nil
 	end
 
