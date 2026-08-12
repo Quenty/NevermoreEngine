@@ -22,10 +22,36 @@ export interface LuauTask {
     | 'FAILED';
   script: string;
   timeout?: string;
-  /** Script return value (populated on COMPLETE). */
-  output?: { results?: Array<{ value?: string }> };
+  /**
+   * What the script returned, populated on COMPLETE. `results` is a flat array
+   * of the returned values — `return t, "s", 42` arrives as three entries —
+   * natively typed: Roblox serializes them itself, so a returned Lua table is
+   * real nested JSON here, not a JSON string. (Which is also why a script must
+   * not JSONEncode its result: that lands as a double-encoded string.)
+   *
+   * Absent whenever the task produced no result. A FAILED task carries no
+   * `output` at all, with no error message explaining why — and an oversize
+   * return value (~4MB observed; ~2MB still arrives complete) fails the task
+   * exactly that way rather than truncating the value.
+   */
+  output?: { results?: unknown[] };
   /** Error details (populated on FAILED). */
   error?: { code?: string; message?: string };
+}
+
+/**
+ * The values a finished task's script returned, or `undefined` when the task
+ * reported no result at all.
+ *
+ * The distinction matters: `undefined` means nothing came back to read, so a
+ * caller can fall back to the task's logs, while `[]` means the task did report
+ * a result and the script returned nothing — no fallback will find more.
+ */
+export function getTaskReturnValues(task: LuauTask): unknown[] | undefined {
+  if (!task.output) {
+    return undefined;
+  }
+  return task.output.results ?? [];
 }
 
 export interface OpenCloudClientOptions {
