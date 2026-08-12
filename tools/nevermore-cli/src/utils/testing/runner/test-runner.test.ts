@@ -208,6 +208,51 @@ describe('runSingleTestAsync', () => {
     );
   });
 
+  it('fails a package with specs whose run never reached jest', async () => {
+    // A Rojo regression that stops shipping jest.config turns a real suite into
+    // a smoke test. Before results were returned, the required jest report caught
+    // that; a smoke-test result retires the report and would otherwise pass with
+    // zero tests.
+    await fs.mkdir(path.join(packagePath, 'src'), { recursive: true });
+    await fs.writeFile(
+      path.join(packagePath, 'src', 'jest.config.lua'),
+      'return {}\n'
+    );
+
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [
+          structuredResults({ ranJest: false, passed: 0, total: 0 }),
+        ],
+      },
+      '[NevermoreTestRunner] No jest.config found — smoke test passed (boot success)'
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('none of its specs ran');
+
+    await fs.rm(path.join(packagePath, 'src'), {
+      recursive: true,
+      force: true,
+    });
+  });
+
+  it('passes a package with no specs that smoke tested', async () => {
+    // No jest.config on disk, so a smoke test is the whole contract.
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [
+          structuredResults({ ranJest: false, passed: 0, total: 0 }),
+        ],
+      },
+      '[NevermoreTestRunner] No jest.config found — smoke test passed (boot success)'
+    );
+
+    expect(result.success).toBe(true);
+  });
+
   it('takes results a context resolved for it, without re-reporting', async () => {
     // Aggregated batch mode: one execution covers every package, so the batch
     // log parser splits the per-package results out and has already reported
