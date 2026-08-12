@@ -166,6 +166,37 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		controller:destroy()
 	end)
 
+	-- The save side has to reach the same verdict as AcquireLock on the same lock. Where it did
+	-- not, a stale foreign lock that outlived a load made the next save report theft, kicking the
+	-- player and dropping the write, forever -- the lock was never rewritten, so every later
+	-- session repeated it.
+	it("validates a profile whose foreign lock has gone stale, as AcquireLock would", function()
+		local controller = DataStoreTestUtils.setup()
+		local helper = controller.newLockHelper()
+		-- Older than GetAutoSaveTimeSeconds() * 2.1 (300 * 2.1 = 630s).
+		local result = helper:ToUnlockedProfile(lockedBy(foreignSession(), os.time() - 700, { coins = 5 }))
+		expect(result.isValid).toEqual(true)
+		expect(result.unlockedProfile.coins).toEqual(5)
+		expect(result.unlockedProfile.lock).toEqual(nil)
+		controller:destroy()
+	end)
+
+	it("still invalidates a foreign lock that is only slightly old", function()
+		local controller = DataStoreTestUtils.setup()
+		local helper = controller.newLockHelper()
+		local result = helper:ToUnlockedProfile(lockedBy(foreignSession(), os.time() - 100, { coins = 5 }))
+		expect(result.isValid).toEqual(false)
+		controller:destroy()
+	end)
+
+	it("still invalidates a foreign lock with no LastUpdateTime (cannot judge staleness)", function()
+		local controller = DataStoreTestUtils.setup()
+		local helper = controller.newLockHelper()
+		local result = helper:ToUnlockedProfile(lockedBy(foreignSession(), nil, { coins = 5 }))
+		expect(result.isValid).toEqual(false)
+		controller:destroy()
+	end)
+
 	it("validates a profile that has no lock", function()
 		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()

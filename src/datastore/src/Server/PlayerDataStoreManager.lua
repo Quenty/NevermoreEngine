@@ -373,6 +373,17 @@ function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreMana
 		return
 	end
 
+	-- Removing a store whose first load has not settled destroys it under an active request. The
+	-- store survives that now (see the teardown guards in DataStore._doDataSync and
+	-- DataStore._promiseGetAsyncNoCache), but the removal still discards a load nobody asked to
+	-- cancel, so name the caller that did it. Gated on the in-flight window rather than logged
+	-- per removal, which would be one traceback per player per shutdown.
+	if (datastore :: any):IsLoadPending() then
+		warn(
+			`[PlayerDataStoreManager] - Removing {userId} while its first load is still in flight.\n{debug.traceback()}`
+		)
+	end
+
 	self._removing[userId] = true
 
 	local removingPromises: { Promise.Promise<any?> } = {}
