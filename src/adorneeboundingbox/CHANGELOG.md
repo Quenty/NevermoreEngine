@@ -1,3 +1,15 @@
+# v8.47.1 (Wed Aug 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix: A series of misc fixes + upgrade rojo [#798](https://github.com/Quenty/NevermoreEngine/pull/798) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

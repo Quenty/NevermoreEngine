@@ -1,3 +1,16 @@
+# (Wed Aug 12 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.47.1`, `@quenty/motor6d@7.52.1`, `@quenty/r15utils@13.36.2`, `@quenty/nevermore-cli@4.43.2`
+  - fix: A series of misc fixes + upgrade rojo [#798](https://github.com/Quenty/NevermoreEngine/pull/798) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Aug 10 2026)
 
 #### 🐛 Bug Fix
