@@ -18,6 +18,7 @@ local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
 local ValueObject = require("ValueObject")
+local t = require("t")
 
 local AdorneeBoundingBox = setmetatable({}, BaseObject)
 AdorneeBoundingBox.ClassName = "AdorneeBoundingBox"
@@ -40,9 +41,9 @@ export type AdorneeBoundingBox =
 function AdorneeBoundingBox.new(initialAdornee: Instance?): AdorneeBoundingBox
 	local self = setmetatable(BaseObject.new() :: any, AdorneeBoundingBox)
 
-	self._adornee = self._maid:Add(ValueObject.new(initialAdornee))
-	self._bbCFrame = self._maid:Add(ValueObject.new(nil))
-	self._bbSize = self._maid:Add(ValueObject.new(Vector3.zero, "Vector3"))
+	self._adornee = self._maid:Add(ValueObject.new(initialAdornee, t.optional(t.Instance)))
+	self._bbCFrame = self._maid:Add(ValueObject.new(nil, t.optional(t.CFrame)))
+	self._bbSize = self._maid:Add(ValueObject.new(nil, t.optional(t.Vector3)))
 
 	self._maid:GiveTask(self._adornee
 		:ObserveBrio(function(adornee)
@@ -148,6 +149,9 @@ end
 function AdorneeBoundingBox._setup(self: AdorneeBoundingBox, maid: Maid.Maid, adornee: Instance)
 	if adornee:IsA("BasePart") then
 		maid:GiveTask(self:_setupPart(adornee))
+	elseif adornee:IsA("Tool") then
+		-- Tool inherits from Model, so this has to be checked first to be reachable
+		maid:GiveTask(self:_setupTool(adornee))
 	elseif adornee:IsA("Model") then
 		maid:GiveTask(self:_setupModel(adornee))
 	elseif adornee:IsA("Attachment") then
@@ -159,8 +163,6 @@ function AdorneeBoundingBox._setup(self: AdorneeBoundingBox, maid: Maid.Maid, ad
 		warn("[AdorneeBoundingBox] - Accessories and clothing not supported yet")
 		self._bbCFrame.Value = nil
 		self._bbSize.Value = Vector3.zero
-	elseif adornee:IsA("Tool") then
-		maid:GiveTask(self:_setupTool(adornee))
 	else
 		self._bbCFrame.Value = nil
 		self._bbSize.Value = Vector3.zero
@@ -173,7 +175,7 @@ function AdorneeBoundingBox._setupTool(self: AdorneeBoundingBox, tool: Tool): Ma
 
 	local topMaid = Maid.new()
 
-	topMaid:GiveTask(RxInstanceUtils.observeLastNamedChildBrio(tool, "Handle", "BasePart"):Subscribe(function(brio)
+	topMaid:GiveTask(RxInstanceUtils.observeLastNamedChildBrio(tool, "BasePart", "Handle"):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end
