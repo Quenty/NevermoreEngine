@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Drives the command bodies directly against a player who is not in this server. The service is built
 	by hand rather than through a ServiceBag so the real CmdrService (and the Cmdr instance tree behind
@@ -32,8 +32,9 @@ local ABSENT_USER_ID = 5150
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local playerDataStoreService = serviceBag:GetService(PlayerDataStoreService)
-	local saveSlotService = serviceBag:GetService(SaveSlotService)
+	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
 	serviceBag:Init()
 
 	local mock = DataStoreMock.new()

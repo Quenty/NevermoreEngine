@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Save slots opened for a player who is not in this server. What is worth pinning down is that the
 	roster read is the same one the player would have seen, that writes land in their real datastore,
@@ -26,8 +26,9 @@ local ABSENT_USER_ID = 90210
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local playerDataStoreService = serviceBag:GetService(PlayerDataStoreService)
-	local saveSlotService = serviceBag:GetService(SaveSlotService)
+	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
 	serviceBag:Init()
 
 	local mock = DataStoreMock.new()

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[[
 	Drives the command bodies directly. The service is built by hand rather than through a ServiceBag
 	so the real CmdrService (and the Cmdr instance tree behind it) stays out of the test place --
@@ -68,15 +68,18 @@ local function setup()
 		end,
 	}
 
-	local service = setmetatable({}, { __index = DataStoreCmdrService })
-	service._maid = Maid.new()
-	service._knownSubStoreNames = {}
-	service._cmdrService = cmdrService
-	service._playerDataStoreService = {
-		PromiseManager = function()
-			return Promise.resolved(controller.manager)
-		end,
-	}
+	local serviceMaid = Maid.new()
+	local service = setmetatable({
+		_maid = serviceMaid,
+		_knownSubStoreNames = {},
+		_cmdrService = cmdrService,
+		_playerDataStoreService = {
+			PromiseManager = function()
+				return Promise.resolved(controller.manager)
+			end,
+		},
+	}, { __index = DataStoreCmdrService }) :: any
+
 	service:Start()
 
 	return {
@@ -97,8 +100,8 @@ local function setup()
 			table.sort(names)
 			return names
 		end,
-		destroy = function()
-			service._maid:DoCleaning()
+		destroy = function(_self)
+			serviceMaid:DoCleaning()
 			controller:destroy()
 		end,
 	}
