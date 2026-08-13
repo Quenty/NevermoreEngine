@@ -704,7 +704,9 @@ function SaveSlotCmdrService._runSlotLines(
 						return handleSlot(slots, entry, name)
 					end)
 					:Then(function(line)
-						table.insert(lines, line)
+						if line ~= nil then
+							table.insert(lines, line)
+						end
 					end)
 					:Catch(function(err)
 						table.insert(lines, `{name} slot {entry.slotIndex}: {tostring(err)}`)
