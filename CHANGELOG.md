@@ -1,5 +1,18 @@
 # (Thu Aug 13 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/bufferencoder@1.1.1`, `@quenty/queue@2.4.3`, `@quenty/racketingropeconstraint@12.51.1`, `@quenty/cli-output-helpers@1.17.2`, `nevermore-claude@0.2.1`, `@quenty/nevermore-cli-helpers@1.17.1`, `@quenty/nevermore-cli@4.43.3`, `@quenty/nevermore-deploy@1.1.1`, `@quenty/nevermore-template-helpers@1.18.2`, `nevermore-vscode@0.3.2`
+  - chore(package): correct repository directory and url metadata [#801](https://github.com/Quenty/NevermoreEngine/pull/801) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/chatproviderservice@9.68.0`, `@quenty/cmdrservice@13.57.0`, `@quenty/datastore@13.52.0`, `@quenty/saveslot@2.8.0`, `@quenty/secrets@7.65.0`, `@quenty/settings@11.68.0`

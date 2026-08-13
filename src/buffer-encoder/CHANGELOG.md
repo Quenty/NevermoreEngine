@@ -1,3 +1,15 @@
+# v1.1.1 (Thu Aug 13 2026)
+
+#### 🐛 Bug Fix
+
+- chore(package): correct repository directory and url metadata [#801](https://github.com/Quenty/NevermoreEngine/pull/801) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
