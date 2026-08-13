@@ -5,6 +5,8 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
+
 local CmdrService = require("CmdrService")
 local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
@@ -59,12 +61,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to list slots for (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to list slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 		},
-	}, function(_context, players: { Player })
-		local listString = ""
+	}, function(_context, userIds: { number })
+		local players, missing = self:_resolvePlayers(userIds)
+		local listString = if #missing > 0 then `{table.concat(missing, "\n")}\n` else ""
 
 		for _, player in players do
 			local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
@@ -99,12 +102,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to query (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to query (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 		},
-	}, function(_context, players: { Player })
-		local lines = {}
+	}, function(_context, userIds: { number })
+		local players, lines = self:_resolvePlayers(userIds)
 
 		for _, player in players do
 			local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
@@ -126,8 +129,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to switch (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to switch (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slot",
@@ -135,8 +138,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot index to switch to, or . for your current slot.",
 			},
 		},
-	}, function(_context, players: { Player }, slotIndex: number)
-		local lines = self:_promisePlayerLines(players, function(hasSaveSlots, player)
+	}, function(_context, userIds: { number }, slotIndex: number)
+		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
 			local slotId = self:_getSlotIdFromIndex(player, slotIndex)
 			if not slotId then
 				return `{player.Name} has no slot with index {slotIndex}.`
@@ -161,12 +164,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to deselect (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to deselect (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 		},
-	}, function(_context, players: { Player })
-		local lines = self:_promisePlayerLines(players, function(hasSaveSlots, player)
+	}, function(_context, userIds: { number })
+		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
 			if not self._saveSlotDataService:GetActiveSlotId(player) then
 				return `{player.Name} has no active slot.`
 			end
@@ -186,8 +189,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to create slots for (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to create slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slots",
@@ -196,8 +199,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Optional = true,
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number }?)
-		local lines = self:_promisePlayerLines(players, function(hasSaveSlots, player)
+	}, function(_context, userIds: { number }, slotIndices: { number }?)
+		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
 			-- The cap is per-player, so it has to come off each target rather than the executor, whose
 			-- cap may be larger. Read from the binder rather than the mirrored attribute, since that is
 			-- what PromiseCreateSlot itself validates against.
@@ -262,8 +265,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to delete slots for (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to delete slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slots",
@@ -271,14 +274,14 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot indices to delete (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number })
-		local targets = self:_resolveTargets(players, slotIndices)
+	}, function(_context, userIds: { number }, slotIndices: { number })
+		local targets, missing = self:_resolveTargets(userIds, slotIndices)
 		if #targets == 0 then
-			return "No matching slots to delete."
+			return self:_joinLines(missing, "No matching slots to delete.")
 		end
 
 		local lines = self
-			:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+			:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
 				-- The active slot can't be deleted while selected, so deselect it first (flushing its
 				-- progress) when reached. Read live rather than up front, since an earlier deletion in
 				-- this batch may have already deselected it. An ephemeral session is left alone:
@@ -309,8 +312,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to duplicate slots for (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to duplicate slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slots",
@@ -318,15 +321,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot indices to duplicate (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number })
-		local targets = self:_resolveTargets(players, slotIndices)
+	}, function(_context, userIds: { number }, slotIndices: { number })
+		local targets, missing = self:_resolveTargets(userIds, slotIndices)
 		if #targets == 0 then
-			return "No matching slots to duplicate."
+			return self:_joinLines(missing, "No matching slots to duplicate.")
 		end
 
 		-- Each copy consumes a free index the next one must see, which the sequential walk guarantees.
 		local lines = self
-			:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+			:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
 				return hasSaveSlots:PromiseDuplicateSlot(entry.slotId):Then(function(newSlotId)
 					local newMetadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
 					return `{player.Name} slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
@@ -344,15 +347,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to persist the session of (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to persist the session of (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 		},
-	}, function(_context, players: { Player })
+	}, function(_context, userIds: { number })
 		-- Takes no slot argument: an ephemeral slot exists only while it is active, so the active slot is
 		-- the only one there is to persist.
 		local lines = self
-			:_promisePlayerLines(players, function(hasSaveSlots, player)
+			:_promisePlayerLines(userIds, function(hasSaveSlots, player)
 				if not self._saveSlotDataService:IsActiveSlotEphemeral(player) then
 					return `{player.Name} has no ephemeral session active.`
 				end
@@ -374,8 +377,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to reset slots for (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to reset slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				-- Required rather than defaulting to the active slot: with Players ahead of it, an
@@ -386,13 +389,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot indices to reset (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number })
-		local targets = self:_resolveTargets(players, slotIndices)
+	}, function(_context, userIds: { number }, slotIndices: { number })
+		local targets, missing = self:_resolveTargets(userIds, slotIndices)
 		if #targets == 0 then
-			return "No matching slots to reset."
+			return self:_joinLines(missing, "No matching slots to reset.")
 		end
 
-		local lines = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+		local lines = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
 			return hasSaveSlots:PromiseResetSlot(entry.slotId):Then(function()
 				return `{player.Name} reset slot {entry.slotIndex}.`
 			end)
@@ -408,8 +411,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to export from (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to export from (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slots",
@@ -418,15 +421,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Optional = true,
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number }?)
-		local targets = self:_resolveTargets(players, slotIndices)
+	}, function(_context, userIds: { number }, slotIndices: { number }?)
+		local targets, missing = self:_resolveTargets(userIds, slotIndices)
 		if #targets == 0 then
-			return "No matching slots to export."
+			return self:_joinLines(missing, "No matching slots to export.")
 		end
 
 		-- Admin tooling exports the main slot too, which the normal path refuses. See
 		-- HasSaveSlots.PromiseExportSlot for what that carries.
-		local lines = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+		local lines = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
 			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId, true):Then(function(code)
 				return `{player.Name} slot {entry.slotIndex} → {code}`
 			end)
@@ -442,8 +445,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Players",
-				Type = "players",
-				Description = "Players to export from (e.g. . for yourself, or * for everyone).",
+				Type = "playerIds",
+				Description = "Players to export from (e.g. . for yourself, * for everyone here, a username, or #userId).",
 			},
 			{
 				Name = "Slots",
@@ -452,15 +455,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Optional = true,
 			},
 		},
-	}, function(_context, players: { Player }, slotIndices: { number }?)
-		local targets = self:_resolveTargets(players, slotIndices)
+	}, function(_context, userIds: { number }, slotIndices: { number }?)
+		local targets, missing = self:_resolveTargets(userIds, slotIndices)
 		if #targets == 0 then
-			return "No matching slots to export."
+			return self:_joinLines(missing, "No matching slots to export.")
 		end
 
 		-- Admin tooling exports the main slot too, which the normal path refuses. See
 		-- HasSaveSlots.PromiseExportSlot for what that carries.
-		local blocks = self:_promiseSlotLines(targets, function(hasSaveSlots, entry, player)
+		local blocks = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
 			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId, true):Then(function(json)
 				return `-- {player.Name} slot {entry.slotIndex}\n{json}`
 			end)
@@ -476,8 +479,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Player",
-				Type = "player",
-				Description = "Player to import into (e.g. . for yourself).",
+				Type = "playerId",
+				Description = "Player to import into (e.g. . for yourself, a username, or #userId).",
 			},
 			{
 				Name = "Code",
@@ -485,7 +488,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "The code to import.",
 			},
 		},
-	}, function(_context, player: Player, code: string)
+	}, function(_context, userId: number, code: string)
+		local player = Players:GetPlayerByUserId(userId)
+		if not player then
+			return `{userId} is not in this server.`
+		end
+
 		return self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
 			:Then(function(hasSaveSlots)
@@ -508,8 +516,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 		Args = {
 			{
 				Name = "Player",
-				Type = "player",
-				Description = "Player to import into (e.g. . for yourself).",
+				Type = "playerId",
+				Description = "Player to import into (e.g. . for yourself, a username, or #userId).",
 			},
 			{
 				Name = "Code",
@@ -517,7 +525,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "The code to load.",
 			},
 		},
-	}, function(_context, player: Player, code: string)
+	}, function(_context, userId: number, code: string)
+		local player = Players:GetPlayerByUserId(userId)
+		if not player then
+			return `{userId} is not in this server.`
+		end
+
 		return self._maid
 			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
 			:Then(function(hasSaveSlots)
@@ -575,14 +588,45 @@ function SaveSlotCmdrService._resolveSlotEntries(
 	return entries
 end
 
+-- Resolves target userIds to the players in this server, reporting the rest rather than dropping
+-- them. Every command here acts through the HasSaveSlots binder, which exists only for a player who
+-- is actually here, so a userId that resolves to nobody is a result the operator needs to see.
+function SaveSlotCmdrService._resolvePlayers(_self: SaveSlotCmdrService, userIds: { number }): ({ Player }, { string })
+	local players = {}
+	local missing = {}
+
+	for _, userId in userIds do
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			table.insert(players, player)
+		else
+			table.insert(missing, `{userId} is not in this server.`)
+		end
+	end
+
+	return players, missing
+end
+
+-- Puts the unreachable targets ahead of a single summary line, for the commands that bail out before
+-- they have any per-slot output to report alongside.
+function SaveSlotCmdrService._joinLines(_self: SaveSlotCmdrService, missing: { string }, line: string): string
+	if #missing == 0 then
+		return line
+	end
+
+	return `{table.concat(missing, "\n")}\n{line}`
+end
+
 -- Pairs each player with their resolved slots, dropping players with nothing to act on. Note that
 -- Cmdr resolves the "." and "*" slot operators against the executor's slot list, since types only
 -- see the executor, so indices given that way come from the executor's slots.
 function SaveSlotCmdrService._resolveTargets(
 	self: SaveSlotCmdrService,
-	players: { Player },
+	userIds: { number },
 	slotIndices: { number }?
-): { { player: Player, entries: SlotEntries } }
+): ({ { player: Player, entries: SlotEntries } }, { string })
+	local players, missing = self:_resolvePlayers(userIds)
+
 	local targets = {}
 	for _, player in players do
 		local entries = self:_resolveSlotEntries(player, slotIndices)
@@ -590,7 +634,8 @@ function SaveSlotCmdrService._resolveTargets(
 			table.insert(targets, { player = player, entries = entries })
 		end
 	end
-	return targets
+
+	return targets, missing
 end
 
 -- Runs handlePlayer once per player, sequentially, to avoid concurrent datastore writes. For the
@@ -598,11 +643,13 @@ end
 -- return a line directly to report without doing any work.
 function SaveSlotCmdrService._promisePlayerLines(
 	self: SaveSlotCmdrService,
-	players: { Player },
+	userIds: { number },
 	handlePlayer: (any, Player) -> any
 ): any
+	local players, missing = self:_resolvePlayers(userIds)
+
 	local promise = Promise.resolved()
-	local results: { string } = {}
+	local results: { string } = missing
 
 	for _, player in players do
 		promise = promise:Then(function()
@@ -631,10 +678,11 @@ end
 function SaveSlotCmdrService._promiseSlotLines(
 	self: SaveSlotCmdrService,
 	targets: { { player: Player, entries: SlotEntries } },
+	seedLines: { string },
 	handleSlot: (any, SlotEntry, Player) -> any
 ): any
 	local promise = Promise.resolved()
-	local results: { string } = {}
+	local results: { string } = seedLines
 
 	for _, target in targets do
 		promise = promise:Then(function()
