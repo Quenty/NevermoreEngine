@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/chatproviderservice@9.68.0`, `@quenty/cmdrservice@13.57.0`, `@quenty/datastore@13.52.0`, `@quenty/saveslot@2.8.0`, `@quenty/secrets@7.65.0`, `@quenty/settings@11.68.0`
+  - feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
 - chore(hooks): lint the worktree the push actually targets [#800](https://github.com/Quenty/NevermoreEngine/pull/800) ([@Quenty](https://github.com/Quenty))
 - `@quenty/humanoidutils@2.18.0`
   - feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
