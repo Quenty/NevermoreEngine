@@ -1,3 +1,17 @@
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- chore(hooks): lint the worktree the push actually targets [#800](https://github.com/Quenty/NevermoreEngine/pull/800) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidutils@2.18.0`
+  - feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Aug 12 2026)
 
 #### 🐛 Bug Fix

@@ -1,3 +1,15 @@
+# v2.18.0 (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
