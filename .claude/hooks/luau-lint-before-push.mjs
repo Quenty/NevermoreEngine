@@ -14,6 +14,54 @@
 //   2  -> lint failed -> block the push and hand the errors back to Claude
 
 import { spawnSync } from "node:child_process";
+import { existsSync, statSync } from "node:fs";
+import { isAbsolute, resolve } from "node:path";
+
+// A path argument, quoted or bare.
+const PATH_ARG = `"[^"]+"|'[^']+'|\\S+`;
+// Global options that may sit between `git` and the `push` subcommand, so
+// `git -C <dir> push` is recognized as a push and not waved through unchecked.
+const GIT_OPTS = `(?:-C\\s+(?:${PATH_ARG})\\s+|-c\\s+\\S+\\s+|--\\S+\\s+)*`;
+// `git push` in command position only -- at the start of the line or right
+// after a shell separator (; && || | ( { newline). This avoids firing on
+// commands that merely mention the string (echo, grep, comments, etc.).
+const pushRe = () => new RegExp(`(?:^|[\\n;&|({])\\s*git\\s+${GIT_OPTS}push\\b`);
+
+// Pull the directory the push actually targets out of the command: either a
+// `cd <dir>` earlier in the chain or `git -C <dir> push`. Falls back to the
+// payload cwd when there is none, or when the parsed path is not a directory.
+function resolvePushCwd(command, fallbackCwd) {
+  const unquote = (value) => value.replace(/^["']|["']$/g, "");
+
+  // `git -C <dir> push` wins -- it is the directory git itself will use.
+  const dashC = new RegExp(
+    `(?:^|[\\n;&|({])\\s*git\\s+${GIT_OPTS}-C\\s+(${PATH_ARG})\\s+${GIT_OPTS}push\\b`,
+  ).exec(command);
+  // Otherwise take the last `cd <dir>` that precedes the push.
+  const cd = /(?:^|[\n;&|({])\s*cd\s+("[^"]+"|'[^']+'|[^\n;&|]+?)\s*(?:&&|;|\|\||\n)/g;
+
+  let candidate;
+  if (dashC) {
+    candidate = unquote(dashC[1]);
+  } else {
+    const pushIndex = command.search(pushRe());
+    for (let match = cd.exec(command); match; match = cd.exec(command)) {
+      if (match.index < pushIndex) {
+        candidate = unquote(match[1].trim());
+      }
+    }
+  }
+
+  if (!candidate) {
+    return fallbackCwd;
+  }
+
+  const resolved = isAbsolute(candidate) ? candidate : resolve(fallbackCwd, candidate);
+  if (existsSync(resolved) && statSync(resolved).isDirectory()) {
+    return resolved;
+  }
+  return fallbackCwd;
+}
 
 let raw = "";
 process.stdin.setEncoding("utf8");
@@ -27,15 +75,16 @@ process.stdin.on("end", () => {
   }
 
   const command = payload?.tool_input?.command ?? "";
-  // Match `git push` only in command position -- at the start of the line or
-  // right after a shell separator (; && || | ( { newline). This avoids firing
-  // on commands that merely mention the string (echo, grep, comments, etc.).
-  if (!/(?:^|[\n;&|({])\s*git\s+push\b/.test(command)) {
+  if (!pushRe().test(command)) {
     process.exit(0); // not an actual git push invocation
   }
 
-  const cwd = payload.cwd || process.cwd();
-  process.stderr.write("pre-push: running luau type check (npm run lint:luau)...\n");
+  // Lint the tree that is actually being pushed. Pushes from a linked worktree
+  // are issued as `cd <worktree> && git push ...`, but the payload cwd is always
+  // the session's primary worktree -- linting that one would check the wrong
+  // branch entirely.
+  const cwd = resolvePushCwd(command, payload.cwd || process.cwd());
+  process.stderr.write(`pre-push: running luau type check (npm run lint:luau) in ${cwd}...\n`);
 
   const res = spawnSync("npm run lint:luau", {
     cwd,
