@@ -45,6 +45,7 @@ function SecretsService.Init(self: SecretsService, serviceBag: ServiceBag.Servic
 
 	-- External
 	self._serviceBag:GetService(require("CmdrService"))
+	self._serviceBag:GetService(require("DataStoreService"))
 	self._gameDataStoreService = self._serviceBag:GetService(require("GameDataStoreService"))
 	self._permissionsService = self._serviceBag:GetService(require("PermissionService"))
 

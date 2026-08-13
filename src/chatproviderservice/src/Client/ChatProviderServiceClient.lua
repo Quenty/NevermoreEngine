@@ -41,6 +41,7 @@ function ChatProviderServiceClient.Init(self: ChatProviderServiceClient, service
 
 	-- External
 	self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 
 	-- Binders
 	self._serviceBag:GetService(require("ChatTagClient"))

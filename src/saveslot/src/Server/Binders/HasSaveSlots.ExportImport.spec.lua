@@ -176,7 +176,7 @@ describe("HasSaveSlots.PromiseExportSlot / PromiseImportSlot", function()
 			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
 
 			-- Rewind the live session's clock so the export observes ~120s of unflushed play.
-			local tracker: any = hasSaveSlots
+			local tracker: any = hasSaveSlots:GetSlotsDataStore()
 			tracker._playSessionStart = os.time() - 120
 			tracker._playSessionLastFlush = os.time() - 120
 

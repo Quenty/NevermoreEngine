@@ -11,8 +11,10 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
+local PlayerDataStoreHandle = require("PlayerDataStoreHandle")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local Promise = require("Promise")
+local PromiseRetryUtils = require("PromiseRetryUtils")
 local ServiceBag = require("ServiceBag")
 
 local PlayerDataStoreService = {}
@@ -28,6 +30,10 @@ export type PlayerDataStoreService = typeof(setmetatable(
 		_bindToCloseService: any,
 		_promiseStarted: Promise.Promise<()>,
 		_robloxDataStoreOverride: any?,
+		_loadRetryOptions: PromiseRetryUtils.RetryOptions?,
+		_autoSaveTimeSeconds: number?,
+		_autoSaveTimeSecondsSet: boolean,
+		_sessionMessagingCloseDelaySeconds: number?,
 	},
 	{} :: typeof({ __index = PlayerDataStoreService })
 ))
@@ -44,10 +50,14 @@ function PlayerDataStoreService.Init(self: PlayerDataStoreService, serviceBag: S
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 	self._serviceBag:GetService(require("PlaceMessagingService"))
 
+	-- Internal
+	self._serviceBag:GetService(require("DataStoreCmdrService"))
+
 	-- State
 	self._promiseStarted = self._maid:Add(Promise.new())
 	self._dataStoreName = "PlayerData"
 	self._dataStoreScope = "SaveData"
+	self._autoSaveTimeSecondsSet = false
 end
 
 --[=[
@@ -93,6 +103,65 @@ function PlayerDataStoreService.SetDataStoreScope(self: PlayerDataStoreService, 
 end
 
 --[=[
+	Overrides the load retry backoff on every player datastore. See
+	[PlayerDataStoreManager.SetLoadRetryOptions] -- this is what decides how long a player waits on a
+	lock held by a dead server before it is stolen.
+
+	:::info
+	Must be done before start and after init.
+	:::
+
+	@param options RetryOptions
+]=]
+function PlayerDataStoreService.SetLoadRetryOptions(
+	self: PlayerDataStoreService,
+	options: PromiseRetryUtils.RetryOptions
+): ()
+	assert(type(options) == "table", "Bad options")
+	assert(self._promiseStarted, "Not initialized")
+	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
+
+	self._loadRetryOptions = options
+end
+
+--[=[
+	Sets the autosave interval on every player datastore. See
+	[PlayerDataStoreManager.SetAutoSaveTimeSeconds].
+
+	:::info
+	Must be done before start and after init.
+	:::
+
+	@param autoSaveTimeSeconds number?
+]=]
+function PlayerDataStoreService.SetAutoSaveTimeSeconds(self: PlayerDataStoreService, autoSaveTimeSeconds: number?): ()
+	assert(type(autoSaveTimeSeconds) == "number" or autoSaveTimeSeconds == nil, "Bad autoSaveTimeSeconds")
+	assert(self._promiseStarted, "Not initialized")
+	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
+
+	self._autoSaveTimeSeconds = autoSaveTimeSeconds
+	self._autoSaveTimeSecondsSet = true
+end
+
+--[=[
+	Sets the post-graceful-close replication delay on every player datastore. See
+	[PlayerDataStoreManager.SetSessionMessagingCloseDelaySeconds].
+
+	:::info
+	Must be done before start and after init.
+	:::
+
+	@param seconds number
+]=]
+function PlayerDataStoreService.SetSessionMessagingCloseDelaySeconds(self: PlayerDataStoreService, seconds: number): ()
+	assert(type(seconds) == "number" and seconds >= 0, "Bad seconds")
+	assert(self._promiseStarted, "Not initialized")
+	assert(self._promiseStarted:IsPending(), "Already started, cannot configure")
+
+	self._sessionMessagingCloseDelaySeconds = seconds
+end
+
+--[=[
 	Injects the underlying datastore the manager wraps, instead of resolving a real one. Accepts
 	a real datastore or a [DataStoreMock]. Intended for testing; must be called before the manager
 	is first built.
@@ -123,6 +192,39 @@ function PlayerDataStoreService.PromiseDataStore(
 ): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
 		return manager:PromiseDataStore(player)
+	end)
+end
+
+--[=[
+	Borrows the player's [DataStore] as a [PlayerDataStoreHandle], which releases the session when
+	destroyed. Prefer this over [PlayerDataStoreService.PromiseDataStore] when acting on a player by
+	userId, since it is what makes the release hard to forget -- see [PlayerDataStoreHandle].
+
+	@param playerOrUserId Player | number
+	@return Promise<PlayerDataStoreHandle>
+]=]
+function PlayerDataStoreService.PromiseDataStoreHandle(
+	self: PlayerDataStoreService,
+	playerOrUserId: Player | number
+): Promise.Promise<PlayerDataStoreHandle.PlayerDataStoreHandle>
+	return self:PromiseManager():Then(function(manager)
+		return manager:PromiseDataStoreHandle(playerOrUserId)
+	end)
+end
+
+--[=[
+	Resolves once any removal in flight for this player has saved and closed their session -- see
+	[PlayerDataStoreManager.PromiseSessionClosed].
+
+	@param playerOrUserId Player | number
+	@return Promise<()>
+]=]
+function PlayerDataStoreService.PromiseSessionClosed(
+	self: PlayerDataStoreService,
+	playerOrUserId: Player | number
+): Promise.Promise<()>
+	return self:PromiseManager():Then(function(manager)
+		return manager:PromiseSessionClosed(playerOrUserId)
 	end)
 end
 
@@ -166,6 +268,16 @@ function PlayerDataStoreService.PromiseManager(
 					return tostring(player.UserId)
 				end
 			end, true))
+
+			if self._loadRetryOptions then
+				manager:SetLoadRetryOptions(self._loadRetryOptions)
+			end
+			if self._autoSaveTimeSecondsSet then
+				manager:SetAutoSaveTimeSeconds(self._autoSaveTimeSeconds)
+			end
+			if self._sessionMessagingCloseDelaySeconds then
+				manager:SetSessionMessagingCloseDelaySeconds(self._sessionMessagingCloseDelaySeconds)
+			end
 
 			-- A lot safer if we're hot reloading or need to monitor bind to close calls
 			self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()

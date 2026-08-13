@@ -34,6 +34,7 @@ function SecretsServiceClient.Init(self: SecretsServiceClient, serviceBag: Servi
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 	self._permissionsService = self._serviceBag:GetService(require("PermissionServiceClient"))
 end
 
