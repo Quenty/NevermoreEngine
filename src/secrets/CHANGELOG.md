@@ -1,20 +1,13 @@
-# v7.65.0 (Thu Aug 13 2026)
-
-#### 🚀 Enhancement
-
-- feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
-- feat: Fix a lot of cmdr issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.64.2...@quenty/secrets@7.65.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
 
 ## [7.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.64.1...@quenty/secrets@7.64.2) (2026-08-10)
 

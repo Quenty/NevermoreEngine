@@ -1,6 +1,6 @@
 {
   "name": "@quenty/access",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Feature access gating: facts about a player, features that decide",
   "keywords": [
     "Roblox",

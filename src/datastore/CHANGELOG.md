@@ -1,30 +1,22 @@
-# v13.52.0 (Thu Aug 13 2026)
-
-#### 🚀 Enhancement
-
-- feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
-- feat: Fix a lot of cmdr issues ([@Quenty](https://github.com/Quenty))
-- feat(saveslot): make every save slot command work on players who are not in this server ([@Quenty](https://github.com/Quenty))
-- feat(datastore): release borrowed sessions through a counted handle ([@Quenty](https://github.com/Quenty))
-- feat(datastore): add Cmdr commands for session locks and stored data ([@Quenty](https://github.com/Quenty))
-- feat(datastore): read and write a key's session lock without opening a session ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix(datastore): break the cmdr/service require cycle ([@Quenty](https://github.com/Quenty))
-- fix(datastore): release a borrowed session even when the caller is torn down ([@Quenty](https://github.com/Quenty))
-- chore(saveslot): type check the new specs under strict mode ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.51.1...@quenty/datastore@13.52.0) (2026-08-13)
+
+### Bug Fixes
+
+- **datastore:** break the cmdr/service require cycle ([b7ece57](https://github.com/Quenty/NevermoreEngine/commit/b7ece577b509e2a394b864e4a538070fbe94ffc9))
+- **datastore:** release a borrowed session even when the caller is torn down ([2537a0b](https://github.com/Quenty/NevermoreEngine/commit/2537a0b8e90a658cca96f83a515b5ffac8662518))
+
+### Features
+
+- **datastore:** add Cmdr commands for session locks and stored data ([adc36ac](https://github.com/Quenty/NevermoreEngine/commit/adc36ac2a25dc5aa0c481b6746b78fec331951e4))
+- **datastore:** read and write a key's session lock without opening a session ([21da4a6](https://github.com/Quenty/NevermoreEngine/commit/21da4a6b9fa4ce7752a41a386385033a785becef))
+- **datastore:** release borrowed sessions through a counted handle ([8c3d2f8](https://github.com/Quenty/NevermoreEngine/commit/8c3d2f8f32595be89f6297e4a223d858c3634822))
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+- **saveslot:** make every save slot command work on players who are not in this server ([795549c](https://github.com/Quenty/NevermoreEngine/commit/795549cdcb4c8584a4acd22eb7377c7aea149182))
 
 ## [13.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.51.0...@quenty/datastore@13.51.1) (2026-07-30)
 

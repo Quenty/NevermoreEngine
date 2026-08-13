@@ -1,20 +1,13 @@
-# v9.68.0 (Thu Aug 13 2026)
-
-#### 🚀 Enhancement
-
-- feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
-- feat: Fix a lot of cmdr issues ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.8...@quenty/chatproviderservice@9.68.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
 
 ## [9.67.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.7...@quenty/chatproviderservice@9.67.8) (2026-08-10)
 
