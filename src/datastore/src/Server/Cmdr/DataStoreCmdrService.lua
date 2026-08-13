@@ -50,7 +50,6 @@ local DataStoreLockUtils = require("DataStoreLockUtils")
 local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
-local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
@@ -99,7 +98,13 @@ function DataStoreCmdrService.Init(self: DataStoreCmdrService, serviceBag: Servi
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(CmdrService)
-	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
+
+	-- Reached through the module instance rather than by name, because
+	-- `require("PlayerDataStoreService")` from here is a cyclic module dependency:
+	-- PlayerDataStoreService registers this service. Mirrors SaveSlotCmdrService._getSaveSlotService.
+	local serviceModule =
+		assert(script.Parent.Parent:FindFirstChild("PlayerDataStoreService"), "No PlayerDataStoreService")
+	self._playerDataStoreService = self._serviceBag:GetService(serviceModule)
 end
 
 --[=[
