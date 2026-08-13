@@ -11,8 +11,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quenty/Nevermore.git",
-    "directory": "tools/nevermore-cli/"
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "tools/nevermore-vscode/"
   },
   "publisher": "Quenty",
   "scripts": {
