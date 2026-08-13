@@ -5,6 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Brio = require("Brio")
@@ -15,6 +16,7 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableMap = require("ObservableMap")
 local ObservableSet = require("ObservableSet")
+local OfflineSaveSlots = require("OfflineSaveSlots")
 local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local Remoting = require("Remoting")
@@ -51,6 +53,8 @@ export type SaveSlotService = typeof(setmetatable(
 		_preSelectCallbacks: any,
 		_remoting: any,
 		_teleportDataService: any,
+		_playerDataStoreService: any,
+		_sharedSaveSlotDataStoreService: any,
 		_codeGenerator: SaveSlotCodeUtils.CodeGenerator?,
 	},
 	{} :: typeof({ __index = SaveSlotService })
@@ -62,12 +66,12 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	self._maid = Maid.new()
 
 	-- External
-	self._serviceBag:GetService(require("PlayerDataStoreService"))
+	self._playerDataStoreService = self._serviceBag:GetService(require("PlayerDataStoreService"))
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
 
 	-- Registered here (pre-start) so the HasSaveSlots binder can acquire it when a player binds,
 	-- which happens after Start. Mirrors how PlayerDataStoreService/TeleportDataService are pulled in.
-	self._serviceBag:GetService(SaveSlotSharedDataStoreService)
+	self._sharedSaveSlotDataStoreService = self._serviceBag:GetService(SaveSlotSharedDataStoreService)
 
 	-- Internal
 	self._serviceBag:GetService(require("SaveSlotCmdrService"))
@@ -268,6 +272,43 @@ end
 ]=]
 function SaveSlotService.SetUnlimitedSlots(self: SaveSlotService): ()
 	self:SetMaxSlotCount(math.huge)
+end
+
+--[=[
+	Opens the save slots of a player who is **not in this server**, as an [OfflineSaveSlots] the caller
+	must destroy. The game's slot count and code generator are applied, so an offline edit behaves like
+	an online one.
+
+	:::warning
+	This steals the player's session lock, kicking them from wherever they are playing, and holds it
+	until the returned object is destroyed. It backs admin tooling ([SaveSlotCmdrService]); it is not
+	something to reach for on a normal code path.
+	:::
+
+	Rejects for a player who *is* in this server: they already have a live [HasSaveSlots] holding their
+	session, and a second copy of their data would be written from underneath it. Use the binder.
+
+	@param userId number
+	@return Promise<OfflineSaveSlots>
+]=]
+function SaveSlotService.PromiseOfflineSaveSlots(
+	self: SaveSlotService,
+	userId: number
+): Promise.Promise<OfflineSaveSlots.OfflineSaveSlots>
+	assert(type(userId) == "number", "Bad userId")
+
+	if Players:GetPlayerByUserId(userId) then
+		return Promise.rejected(`{userId} is in this server -- use their HasSaveSlots binder`)
+	end
+
+	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStoreHandle(userId)):Then(function(handle)
+		return OfflineSaveSlots.new(handle, {
+			SharedDataStoreService = self._sharedSaveSlotDataStoreService,
+			MaxSlotCount = self._maxSlotCount,
+			CodeGenerator = self._codeGenerator,
+			UserId = userId,
+		})
+	end)
 end
 
 --[=[

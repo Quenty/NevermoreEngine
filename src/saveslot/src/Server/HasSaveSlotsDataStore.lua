@@ -202,6 +202,109 @@ function HasSaveSlotsDataStore.GetSlotFolder(self: HasSaveSlotsDataStore, slotId
 end
 
 --[=[
+	Returns the active slot's id, or nil when nothing is selected.
+
+	@return SlotId?
+]=]
+function HasSaveSlotsDataStore.GetActiveSlotId(self: HasSaveSlotsDataStore): SaveSlotData.SlotId?
+	return self.ActiveSlotId.Value
+end
+
+--[=[
+	Returns the slot the player is on, or would resume on: the active slot when one is selected, and
+	the persisted "Continue" target otherwise. The synchronous twin of
+	[HasSaveSlotsDataStore.PromiseLastActiveSlotId].
+
+	This is the one to read when acting on "their current slot" without a live session. Freshly opened
+	against a datastore, nothing is selected yet -- the stored pointer loads as the last-active slot,
+	and [HasSaveSlotsDataStore.GetActiveSlotId] stays nil until something selects.
+
+	@return SlotId?
+]=]
+function HasSaveSlotsDataStore.GetLastActiveSlotId(self: HasSaveSlotsDataStore): SaveSlotData.SlotId?
+	return self.ActiveSlotId.Value or self._lastActiveSlotId
+end
+
+--[=[
+	Returns whether the active slot is an ephemeral (session-only) one. False when nothing is active.
+
+	@return boolean
+]=]
+function HasSaveSlotsDataStore.IsActiveSlotEphemeral(self: HasSaveSlotsDataStore): boolean
+	return self:_isEphemeral(self.ActiveSlotId.Value)
+end
+
+--[=[
+	Returns the slot's metadata, or nil when there is no such slot.
+
+	@param slotId SlotId?
+	@return SaveSlotMetadata?
+]=]
+function HasSaveSlotsDataStore.GetSlotMetadata(
+	self: HasSaveSlotsDataStore,
+	slotId: SaveSlotData.SlotId?
+): SaveSlotData.SaveSlotMetadata?
+	local slot = self:GetSlotFolder(slotId)
+	if not slot then
+		return nil
+	end
+	return SaveSlotData:Get(slot)
+end
+
+--[=[
+	Returns the active slot's metadata, or nil when nothing is selected. Unlike
+	[HasSaveSlotsDataStore.GetSlotList] this does see an ephemeral slot, which is the only way to read
+	the metadata of a session in progress.
+
+	@return SaveSlotMetadata?
+]=]
+function HasSaveSlotsDataStore.GetActiveSlotMetadata(self: HasSaveSlotsDataStore): SaveSlotData.SaveSlotMetadata?
+	return self:GetSlotMetadata(self.ActiveSlotId.Value)
+end
+
+--[=[
+	Returns the persisted slots, ordered by index. Ephemeral slots are excluded, matching
+	[SaveSlotDataService.GetSlotList] -- read the active slot directly with
+	[HasSaveSlotsDataStore.GetActiveSlotMetadata] to see one.
+
+	Ordered because the underlying map is not: an unordered listing would shuffle between calls, and
+	the tooling reading this prints it.
+
+	@return { SaveSlotMetadata }
+]=]
+function HasSaveSlotsDataStore.GetSlotList(self: HasSaveSlotsDataStore): { SaveSlotData.SaveSlotMetadata }
+	local slotList = {}
+
+	for slotId, slot in self._slotMap do
+		if not self:_isEphemeral(slotId) then
+			table.insert(slotList, SaveSlotData:Get(slot))
+		end
+	end
+
+	table.sort(slotList, function(a, b)
+		return a.SlotIndex < b.SlotIndex
+	end)
+
+	return slotList
+end
+
+--[=[
+	Returns the id of the persisted slot at the given index, or nil when there is none. Ephemeral
+	slots are never addressable by index.
+
+	@param slotIndex number
+	@return SlotId?
+]=]
+function HasSaveSlotsDataStore.GetSlotIdFromIndex(self: HasSaveSlotsDataStore, slotIndex: number): SaveSlotData.SlotId?
+	for slotId, slot in self._slotMap do
+		if not self:_isEphemeral(slotId) and slotIndex == SaveSlotData.SlotIndex:Get(slot) then
+			return slotId
+		end
+	end
+	return nil
+end
+
+--[=[
 	Returns the [DataStoreStage] backing the slot's saved data. For the default slot this is the
 	player's root store; for an ephemeral slot it is an in-memory store.
 

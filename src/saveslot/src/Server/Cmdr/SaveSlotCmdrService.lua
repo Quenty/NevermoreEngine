@@ -1,5 +1,19 @@
 --!strict
 --[=[
+	Save slot admin commands.
+
+	Every command takes `playerIds`, so it reaches a player who is not in this server as readily as one
+	who is: a player here is acted on through their bound [HasSaveSlots], and an absent player through
+	an [OfflineSaveSlots] opened over their datastore. Both hand back the same
+	[HasSaveSlotsDataStore], so the command bodies below never branch on which it was.
+
+	:::warning
+	Acting on an absent player **steals their session lock**, kicking them from wherever they are
+	playing. That is accepted for admin tooling -- the session is released again as soon as the command
+	finishes, so they can rejoin -- but it is why these are admin commands.
+	:::
+
+	@server
 	@class SaveSlotCmdrService
 ]=]
 
@@ -53,6 +67,10 @@ function SaveSlotCmdrService.Start(self: SaveSlotCmdrService)
 	end)
 end
 
+-- Shared across every command, so the "which player" argument reads the same everywhere.
+local PLAYERS_ARG_DESCRIPTION =
+	"Players to act on (e.g. . for yourself, * for everyone here, a username, or #userId). A player who is not in this server is acted on offline, which kicks them."
+
 function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	self._cmdrService:RegisterCommand({
 		Name = "list-save-slots",
@@ -62,18 +80,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to list slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
 	}, function(_context, userIds: { number })
-		local players, missing = self:_resolvePlayers(userIds)
-		local listString = if #missing > 0 then `{table.concat(missing, "\n")}\n` else ""
+		return self:_runLines(userIds, function(slots, name)
+			local activeSlotId = slots:GetActiveSlotId()
+			local slotList = slots:GetSlotList()
 
-		for _, player in players do
-			local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
-			local slotList = self._saveSlotDataService:GetSlotList(player)
-
-			listString ..= `\n{player.Name}:\n`
+			local listString = `\n{name}:\n`
 			if #slotList == 0 then
 				listString ..= "No slots.\n"
 			end
@@ -86,13 +101,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			-- An ephemeral session is not a save, so it is absent from the slot list above -- but it is what
 			-- the player is playing right now and the thing persist-save-slot acts on, so list it under the
 			-- reserved index the other commands address it by.
-			if self._saveSlotDataService:IsActiveSlotEphemeral(player) then
-				local metadata = self._saveSlotDataService:GetActiveSlotMetadata(player)
+			if slots:IsActiveSlotEphemeral() then
+				local metadata = slots:GetActiveSlotMetadata()
 				listString ..= `\n"{metadata.SlotName}" ({metadata.SlotIndex}) — Active, ephemeral\n{metadata.Summary}\n`
 			end
-		end
 
-		return listString
+			return listString
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -103,23 +118,27 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to query (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
 	}, function(_context, userIds: { number })
-		local players, lines = self:_resolvePlayers(userIds)
-
-		for _, player in players do
-			local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
+		return self:_runLines(userIds, function(slots, name)
+			local activeSlotId = slots:GetActiveSlotId()
 			if activeSlotId then
-				local slotData = self._saveSlotDataService:GetSlotMetadata(player, activeSlotId)
-				table.insert(lines, `{player.Name} is using slot {slotData.SlotIndex} ("{slotData.SlotName}").`)
-			else
-				table.insert(lines, `{player.Name} has no active slot.`)
+				local slotData = slots:GetSlotMetadata(activeSlotId)
+				return `{name} is using slot {slotData.SlotIndex} ("{slotData.SlotName}").`
 			end
-		end
 
-		return table.concat(lines, "\n")
+			-- Nobody is playing an offline session, so report what they would resume on instead of
+			-- flatly saying there is no slot.
+			local lastSlotId = slots:GetLastActiveSlotId()
+			local lastMetadata = if lastSlotId then slots:GetSlotMetadata(lastSlotId) else nil
+			if lastMetadata then
+				return `{name} has no active slot; would resume on slot {lastMetadata.SlotIndex} ("{lastMetadata.SlotName}").`
+			end
+
+			return `{name} has no active slot.`
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -130,7 +149,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to switch (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slot",
@@ -139,22 +158,20 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndex: number)
-		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
-			local slotId = self:_getSlotIdFromIndex(player, slotIndex)
+		return self:_runLines(userIds, function(slots, name)
+			local slotId = self:_getSlotIdFromIndex(slots, slotIndex)
 			if not slotId then
-				return `{player.Name} has no slot with index {slotIndex}.`
+				return `{name} has no slot with index {slotIndex}.`
 			end
 
-			if slotId == self._saveSlotDataService:GetActiveSlotId(player) then
-				return `{player.Name} already has slot {slotIndex} active.`
+			if slotId == slots:GetActiveSlotId() then
+				return `{name} already has slot {slotIndex} active.`
 			end
 
-			return hasSaveSlots:PromiseSelectSlot(slotId):Then(function()
-				return `{player.Name} switched to slot {slotIndex}.`
+			return slots:PromiseSelectSlot(slotId):Then(function()
+				return `{name} switched to slot {slotIndex}.`
 			end)
-		end):Wait()
-
-		return table.concat(lines, "\n")
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -165,21 +182,19 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to deselect (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
 	}, function(_context, userIds: { number })
-		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
-			if not self._saveSlotDataService:GetActiveSlotId(player) then
-				return `{player.Name} has no active slot.`
+		return self:_runLines(userIds, function(slots, name)
+			if not slots:GetActiveSlotId() then
+				return `{name} has no active slot.`
 			end
 
-			return hasSaveSlots:PromiseDeselectSlot():Then(function()
-				return `{player.Name} deselected active slot.`
+			return slots:PromiseDeselectSlot():Then(function()
+				return `{name} deselected active slot.`
 			end)
-		end):Wait()
-
-		return table.concat(lines, "\n")
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -190,7 +205,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to create slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slots",
@@ -200,15 +215,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number }?)
-		local lines = self:_promisePlayerLines(userIds, function(hasSaveSlots, player)
+		return self:_runLines(userIds, function(slots, name)
 			-- The cap is per-player, so it has to come off each target rather than the executor, whose
-			-- cap may be larger. Read from the binder rather than the mirrored attribute, since that is
-			-- what PromiseCreateSlot itself validates against.
-			local maxSlotCount = hasSaveSlots.MaxSlotCount.Value
+			-- cap may be larger. Read from the slot system rather than a mirrored attribute, since that
+			-- is what PromiseCreateSlot itself validates against.
+			local maxSlotCount = slots.MaxSlotCount.Value
 
 			-- Track indices already taken so a batch fills gaps and never collides within itself.
 			local used = {}
-			for _, metadata in self._saveSlotDataService:GetSlotList(player) do
+			for _, metadata in slots:GetSlotList() do
 				used[metadata.SlotIndex] = true
 			end
 
@@ -221,7 +236,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				end
 
 				if freeIndex > maxSlotCount then
-					return `{player.Name}: all slots are already in use.`
+					return `{name}: all slots are already in use.`
 				end
 
 				table.insert(toCreate, freeIndex)
@@ -230,10 +245,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				local seen = {}
 				for _, slotIndex in slotIndices do
 					if (slotIndex < 1) or (slotIndex > maxSlotCount) then
-						return `{player.Name}: index must be in range [1, {maxSlotCount}].`
+						return `{name}: index must be in range [1, {maxSlotCount}].`
 					end
 					if used[slotIndex] then
-						return `{player.Name}: slot {slotIndex} already exists.`
+						return `{name}: slot {slotIndex} already exists.`
 					end
 					if not seen[slotIndex] then
 						seen[slotIndex] = true
@@ -246,16 +261,14 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			local promise = Promise.resolved()
 			for _, slotIndex in toCreate do
 				promise = promise:Then(function()
-					return hasSaveSlots:PromiseCreateSlot(slotIndex)
+					return slots:PromiseCreateSlot(slotIndex)
 				end)
 			end
 
 			return promise:Then(function()
-				return `{player.Name} created slot(s) {table.concat(toCreate, ", ")}.`
+				return `{name} created slot(s) {table.concat(toCreate, ", ")}.`
 			end)
-		end):Wait()
-
-		return table.concat(lines, "\n")
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -266,7 +279,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to delete slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slots",
@@ -275,34 +288,25 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number })
-		local targets, missing = self:_resolveTargets(userIds, slotIndices)
-		if #targets == 0 then
-			return self:_joinLines(missing, "No matching slots to delete.")
-		end
+		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+			-- The active slot can't be deleted while selected, so deselect it first (flushing its
+			-- progress) when reached. Read live rather than up front, since an earlier deletion in
+			-- this batch may have already deselected it. An ephemeral session is left alone:
+			-- PromiseDeleteSlot retires it itself, and deselecting first would retire it early,
+			-- leaving nothing behind to delete.
+			local isActive = (entry.slotId == slots:GetActiveSlotId())
+			local deselect = if isActive and not slots:IsActiveSlotEphemeral()
+				then slots:PromiseDeselectSlot()
+				else Promise.resolved()
 
-		local lines = self
-			:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
-				-- The active slot can't be deleted while selected, so deselect it first (flushing its
-				-- progress) when reached. Read live rather than up front, since an earlier deletion in
-				-- this batch may have already deselected it. An ephemeral session is left alone:
-				-- PromiseDeleteSlot retires it itself, and deselecting first would retire it early,
-				-- leaving nothing behind to delete.
-				local isActive = (entry.slotId == self._saveSlotDataService:GetActiveSlotId(player))
-				local deselect = if isActive and not self._saveSlotDataService:IsActiveSlotEphemeral(player)
-					then hasSaveSlots:PromiseDeselectSlot()
-					else Promise.resolved()
-
-				return deselect
-					:Then(function()
-						return hasSaveSlots:PromiseDeleteSlot(entry.slotId)
-					end)
-					:Then(function()
-						return `{player.Name} deleted slot {entry.slotIndex}.`
-					end)
-			end)
-			:Wait()
-
-		return `Deleted:\n{table.concat(lines, "\n")}`
+			return deselect
+				:Then(function()
+					return slots:PromiseDeleteSlot(entry.slotId)
+				end)
+				:Then(function()
+					return `{name} deleted slot {entry.slotIndex}.`
+				end)
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -313,7 +317,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to duplicate slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slots",
@@ -322,22 +326,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number })
-		local targets, missing = self:_resolveTargets(userIds, slotIndices)
-		if #targets == 0 then
-			return self:_joinLines(missing, "No matching slots to duplicate.")
-		end
-
 		-- Each copy consumes a free index the next one must see, which the sequential walk guarantees.
-		local lines = self
-			:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
-				return hasSaveSlots:PromiseDuplicateSlot(entry.slotId):Then(function(newSlotId)
-					local newMetadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
-					return `{player.Name} slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
-				end)
+		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+			return slots:PromiseDuplicateSlot(entry.slotId):Then(function(newSlotId)
+				local newMetadata = slots:GetSlotMetadata(newSlotId)
+				return `{name} slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
 			end)
-			:Wait()
-
-		return `Duplicated:\n{table.concat(lines, "\n")}`
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -348,26 +343,23 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to persist the session of (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
 	}, function(_context, userIds: { number })
 		-- Takes no slot argument: an ephemeral slot exists only while it is active, so the active slot is
-		-- the only one there is to persist.
-		local lines = self
-			:_promisePlayerLines(userIds, function(hasSaveSlots, player)
-				if not self._saveSlotDataService:IsActiveSlotEphemeral(player) then
-					return `{player.Name} has no ephemeral session active.`
-				end
+		-- the only one there is to persist. An absent player has no session at all, so this only ever
+		-- reports on them.
+		return self:_runLines(userIds, function(slots, name)
+			if not slots:IsActiveSlotEphemeral() then
+				return `{name} has no ephemeral session active.`
+			end
 
-				return hasSaveSlots:PromisePersistEphemeralSlot():Then(function(newSlotId)
-					local metadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
-					return `{player.Name} persisted their session to slot {metadata.SlotIndex} ("{metadata.SlotName}").`
-				end)
+			return slots:PromisePersistEphemeralSlot():Then(function(newSlotId)
+				local metadata = slots:GetSlotMetadata(newSlotId)
+				return `{name} persisted their session to slot {metadata.SlotIndex} ("{metadata.SlotName}").`
 			end)
-			:Wait()
-
-		return table.concat(lines, "\n")
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -378,7 +370,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to reset slots for (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				-- Required rather than defaulting to the active slot: with Players ahead of it, an
@@ -390,18 +382,11 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number })
-		local targets, missing = self:_resolveTargets(userIds, slotIndices)
-		if #targets == 0 then
-			return self:_joinLines(missing, "No matching slots to reset.")
-		end
-
-		local lines = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
-			return hasSaveSlots:PromiseResetSlot(entry.slotId):Then(function()
-				return `{player.Name} reset slot {entry.slotIndex}.`
+		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+			return slots:PromiseResetSlot(entry.slotId):Then(function()
+				return `{name} reset slot {entry.slotIndex}.`
 			end)
-		end):Wait()
-
-		return `Reset:\n{table.concat(lines, "\n")}`
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -412,7 +397,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to export from (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slots",
@@ -422,20 +407,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number }?)
-		local targets, missing = self:_resolveTargets(userIds, slotIndices)
-		if #targets == 0 then
-			return self:_joinLines(missing, "No matching slots to export.")
-		end
-
 		-- Admin tooling exports the main slot too, which the normal path refuses. See
-		-- HasSaveSlots.PromiseExportSlot for what that carries.
-		local lines = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
-			return hasSaveSlots:PromiseExportSaveSlotToCode(entry.slotId, true):Then(function(code)
-				return `{player.Name} slot {entry.slotIndex} → {code}`
+		-- HasSaveSlotsDataStore.PromiseExportSlot for what that carries.
+		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+			return slots:PromiseExportSaveSlotToCode(entry.slotId, true):Then(function(code)
+				return `{name} slot {entry.slotIndex} → {code}`
 			end)
-		end):Wait()
-
-		return `Exported:\n{table.concat(lines, "\n")}`
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -446,7 +424,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Players",
 				Type = "playerIds",
-				Description = "Players to export from (e.g. . for yourself, * for everyone here, a username, or #userId).",
+				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 			{
 				Name = "Slots",
@@ -456,20 +434,13 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userIds: { number }, slotIndices: { number }?)
-		local targets, missing = self:_resolveTargets(userIds, slotIndices)
-		if #targets == 0 then
-			return self:_joinLines(missing, "No matching slots to export.")
-		end
-
 		-- Admin tooling exports the main slot too, which the normal path refuses. See
-		-- HasSaveSlots.PromiseExportSlot for what that carries.
-		local blocks = self:_promiseSlotLines(targets, missing, function(hasSaveSlots, entry, player)
-			return hasSaveSlots:PromiseExportSaveSlotToJson(entry.slotId, true):Then(function(json)
-				return `-- {player.Name} slot {entry.slotIndex}\n{json}`
+		-- HasSaveSlotsDataStore.PromiseExportSlot for what that carries.
+		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+			return slots:PromiseExportSaveSlotToJson(entry.slotId, true):Then(function(json)
+				return `-- {name} slot {entry.slotIndex}\n{json}`
 			end)
-		end):Wait()
-
-		return table.concat(blocks, "\n\n")
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -480,7 +451,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Player",
 				Type = "playerId",
-				Description = "Player to import into (e.g. . for yourself, a username, or #userId).",
+				Description = "Player to import into (e.g. . for yourself, a username, or #userId). A player who is not in this server is imported into offline, which kicks them.",
 			},
 			{
 				Name = "Code",
@@ -489,24 +460,12 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userId: number, code: string)
-		local player = Players:GetPlayerByUserId(userId)
-		if not player then
-			return `{userId} is not in this server.`
-		end
-
-		return self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
-			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseImportSlotFromSharedDataStore(code)
+		return self:_runLines({ userId }, function(slots, name)
+			return slots:PromiseImportSlotFromSharedDataStore(code):Then(function(newSlotId)
+				local metadata = slots:GetSlotMetadata(newSlotId)
+				return `Imported save slot from code into {name} slot {metadata.SlotIndex} ("{metadata.SlotName}").`
 			end)
-			:Then(function(newSlotId)
-				local metadata = self._saveSlotDataService:GetSlotMetadata(player, newSlotId)
-				return `Imported save slot from code into {player.Name} slot {metadata.SlotIndex} ("{metadata.SlotName}").`
-			end)
-			:Catch(function(err)
-				return `Import failed: {tostring(err)}`
-			end)
-			:Wait()
+		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
@@ -517,7 +476,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Player",
 				Type = "playerId",
-				Description = "Player to import into (e.g. . for yourself, a username, or #userId).",
+				Description = "Player to import into (e.g. . for yourself, a username, or #userId). Must be in this server.",
 			},
 			{
 				Name = "Code",
@@ -526,59 +485,71 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 		},
 	}, function(_context, userId: number, code: string)
+		-- The one command with no offline meaning: an ephemeral slot exists only for the duration of a
+		-- live session, so importing one for an absent player would create it and immediately discard it.
 		local player = Players:GetPlayerByUserId(userId)
 		if not player then
-			return `{userId} is not in this server.`
+			return `{userId} is not in this server, and an ephemeral slot needs a live session.`
 		end
 
-		return self._maid
-			:GivePromise(self._hasSaveSlotsBinder:Promise(player))
-			:Then(function(hasSaveSlots)
-				return hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code)
+		return self:_runLines({ userId }, function(slots, name)
+			return slots:PromiseImportEphemeralSaveSlotFromCode(code):Then(function()
+				return `Imported ephemeral save slot into {name} from code: {code}`
 			end)
-			:Then(function()
-				return `Imported ephemeral save slot into {player.Name} from code: {code}`
-			end)
-			:Catch(function(err)
-				return `Load failed: {tostring(err)}`
-			end)
-			:Wait()
+		end)
 	end)
 end
 
--- Resolves a slot index to the player's slot id, including the reserved ephemeral index (see
--- [SaveSlotCmdrUtils]). The data service's index lookup only walks the save list, which an ephemeral slot
--- is excluded from, so that one index resolves against the active slot instead.
-function SaveSlotCmdrService._getSlotIdFromIndex(self: SaveSlotCmdrService, player: Player, slotIndex: number): string?
+-- SaveSlotService owns the offline entry point. Reached through the module instance rather than by
+-- name, because `require("SaveSlotService")` from here is a cyclic module dependency: SaveSlotService
+-- registers this service. Mirrors HasSaveSlots._promisePreSelectFromSaveSlotService.
+function SaveSlotCmdrService._getSaveSlotService(self: SaveSlotCmdrService): any
+	local serviceModule = script.Parent.Parent:FindFirstChild("SaveSlotService")
+	if not serviceModule or not self._serviceBag:HasService(serviceModule) then
+		return nil
+	end
+
+	return self._serviceBag:GetService(serviceModule)
+end
+
+-- Resolves a slot index to the target's slot id, including the reserved ephemeral index (see
+-- [SaveSlotCmdrUtils]). The index lookup only walks the save list, which an ephemeral slot is excluded
+-- from, so that one index resolves against the active slot instead.
+function SaveSlotCmdrService._getSlotIdFromIndex(_self: SaveSlotCmdrService, slots: any, slotIndex: number): string?
 	if slotIndex == SaveSlotConstants.EPHEMERAL_SLOT_INDEX then
-		if self._saveSlotDataService:IsActiveSlotEphemeral(player) then
-			return self._saveSlotDataService:GetActiveSlotId(player)
+		if slots:IsActiveSlotEphemeral() then
+			return slots:GetActiveSlotId()
 		end
 		return nil
 	end
 
-	return self._saveSlotDataService:GetSlotIdFromIndex(player, slotIndex)
+	return slots:GetSlotIdFromIndex(slotIndex)
 end
 
 -- Resolves a slotIndices argument (or nil = the active slot) into de-duplicated { slotIndex, slotId }
--- entries for the player. An empty result means nothing matched, and the caller reports it.
+-- entries. An empty result means nothing matched, and the caller reports it.
 function SaveSlotCmdrService._resolveSlotEntries(
 	self: SaveSlotCmdrService,
-	player: Player,
+	slots: any,
 	slotIndices: { number }?
 ): SlotEntries
 	local entries = {}
 	if slotIndices == nil then
-		local activeSlotId = self._saveSlotDataService:GetActiveSlotId(player)
-		if not activeSlotId then
+		-- The slot they are on, or would resume on. Nothing is ever *selected* in an offline session,
+		-- so defaulting to the active slot alone would make every omitted-slot command a no-op there.
+		local currentSlotId = slots:GetLastActiveSlotId()
+		if not currentSlotId then
 			return entries
 		end
-		local metadata = self._saveSlotDataService:GetSlotMetadata(player, activeSlotId)
-		table.insert(entries, { slotIndex = metadata.SlotIndex, slotId = activeSlotId })
+		local metadata = slots:GetSlotMetadata(currentSlotId)
+		if not metadata then
+			return entries
+		end
+		table.insert(entries, { slotIndex = metadata.SlotIndex, slotId = currentSlotId })
 	else
 		local seen = {}
 		for _, slotIndex in slotIndices do
-			local slotId = self:_getSlotIdFromIndex(player, slotIndex)
+			local slotId = self:_getSlotIdFromIndex(slots, slotIndex)
 			if slotId and not seen[slotId] then
 				seen[slotId] = true
 				table.insert(entries, { slotIndex = slotIndex, slotId = slotId })
@@ -588,81 +559,74 @@ function SaveSlotCmdrService._resolveSlotEntries(
 	return entries
 end
 
--- Resolves target userIds to the players in this server, reporting the rest rather than dropping
--- them. Every command here acts through the HasSaveSlots binder, which exists only for a player who
--- is actually here, so a userId that resolves to nobody is a result the operator needs to see.
-function SaveSlotCmdrService._resolvePlayers(_self: SaveSlotCmdrService, userIds: { number }): ({ Player }, { string })
-	local players = {}
-	local missing = {}
+-- Opens a slot system for the target and runs handler against it, whichever realm the target is in:
+-- the bound binder's for a player here, a borrowed offline one otherwise. The offline session is
+-- always released, including when the handler fails -- holding it would leave the player unable to
+-- rejoin.
+--
+-- Waits for the slots to load first, because the read accessors handler uses are synchronous and see
+-- an empty roster until they have.
+function SaveSlotCmdrService._promiseWithSlots(
+	self: SaveSlotCmdrService,
+	userId: number,
+	handler: (any, string) -> any
+): any
+	local player = Players:GetPlayerByUserId(userId)
+
+	if player then
+		return self._maid:GivePromise(self._hasSaveSlotsBinder:Promise(player)):Then(function(hasSaveSlots)
+			local slots = hasSaveSlots:GetSlotsDataStore()
+			return slots:PromiseSlotsLoaded():Then(function()
+				return handler(slots, player.Name)
+			end)
+		end)
+	end
+
+	local saveSlotService = self:_getSaveSlotService()
+	if not saveSlotService then
+		return Promise.rejected("not in this server, and offline save slots are unavailable")
+	end
+
+	return self._maid:GivePromise(saveSlotService:PromiseOfflineSaveSlots(userId)):Then(function(offline)
+		local function release(): ()
+			offline:Destroy()
+		end
+
+		return offline
+			:PromiseSlotsLoaded()
+			:Then(function()
+				return handler(offline:GetSlotsDataStore(), tostring(userId))
+			end)
+			:Then(function(result)
+				release()
+				return result
+			end, function(err)
+				release()
+				return Promise.rejected(err)
+			end)
+	end)
+end
+
+-- Runs handler once per target, sequentially, to avoid concurrent datastore writes and to keep only
+-- one stolen session open at a time. Reports per target, so one failure still surfaces the successes.
+function SaveSlotCmdrService._promiseTargetLines(
+	self: SaveSlotCmdrService,
+	userIds: { number },
+	handler: (any, string) -> any
+): any
+	local promise = Promise.resolved()
+	local results: { string } = {}
 
 	for _, userId in userIds do
-		local player = Players:GetPlayerByUserId(userId)
-		if player then
-			table.insert(players, player)
-		else
-			table.insert(missing, `{userId} is not in this server.`)
-		end
-	end
-
-	return players, missing
-end
-
--- Puts the unreachable targets ahead of a single summary line, for the commands that bail out before
--- they have any per-slot output to report alongside.
-function SaveSlotCmdrService._joinLines(_self: SaveSlotCmdrService, missing: { string }, line: string): string
-	if #missing == 0 then
-		return line
-	end
-
-	return `{table.concat(missing, "\n")}\n{line}`
-end
-
--- Pairs each player with their resolved slots, dropping players with nothing to act on. Note that
--- Cmdr resolves the "." and "*" slot operators against the executor's slot list, since types only
--- see the executor, so indices given that way come from the executor's slots.
-function SaveSlotCmdrService._resolveTargets(
-	self: SaveSlotCmdrService,
-	userIds: { number },
-	slotIndices: { number }?
-): ({ { player: Player, entries: SlotEntries } }, { string })
-	local players, missing = self:_resolvePlayers(userIds)
-
-	local targets = {}
-	for _, player in players do
-		local entries = self:_resolveSlotEntries(player, slotIndices)
-		if #entries > 0 then
-			table.insert(targets, { player = player, entries = entries })
-		end
-	end
-
-	return targets, missing
-end
-
--- Runs handlePlayer once per player, sequentially, to avoid concurrent datastore writes. For the
--- commands that act on a player as a whole rather than on a resolved slot list. handlePlayer may
--- return a line directly to report without doing any work.
-function SaveSlotCmdrService._promisePlayerLines(
-	self: SaveSlotCmdrService,
-	userIds: { number },
-	handlePlayer: (any, Player) -> any
-): any
-	local players, missing = self:_resolvePlayers(userIds)
-
-	local promise = Promise.resolved()
-	local results: { string } = missing
-
-	for _, player in players do
 		promise = promise:Then(function()
-			return self._maid
-				:GivePromise(self._hasSaveSlotsBinder:Promise(player))
-				:Then(function(hasSaveSlots)
-					return handlePlayer(hasSaveSlots, player)
-				end)
+			return self:_promiseWithSlots(userId, handler)
 				:Then(function(line)
-					table.insert(results, line)
+					if line ~= nil then
+						table.insert(results, line)
+					end
 				end)
 				:Catch(function(err)
-					table.insert(results, `{player.Name}: {tostring(err)}`)
+					table.insert(results, `{userId}: {tostring(err)}`)
 				end)
 		end)
 	end
@@ -672,40 +636,56 @@ function SaveSlotCmdrService._promisePlayerLines(
 	end)
 end
 
--- Runs handleSlot over every resolved slot of every target, sequentially, to avoid concurrent
--- datastore writes. Reports per-slot so a mid-batch failure (e.g. one player's slot failing to
--- load) still surfaces the successes.
-function SaveSlotCmdrService._promiseSlotLines(
+-- Blocking form of _promiseTargetLines, for the command bodies. Cmdr runs commands on their own
+-- thread, so yielding here is what lets a command report a finished result.
+function SaveSlotCmdrService._runLines(
 	self: SaveSlotCmdrService,
-	targets: { { player: Player, entries: SlotEntries } },
-	seedLines: { string },
-	handleSlot: (any, SlotEntry, Player) -> any
-): any
-	local promise = Promise.resolved()
-	local results: { string } = seedLines
-
-	for _, target in targets do
-		promise = promise:Then(function()
-			return self._maid:GivePromise(self._hasSaveSlotsBinder:Promise(target.player)):Then(function(hasSaveSlots)
-				local slotPromise = Promise.resolved()
-				for _, entry in target.entries do
-					slotPromise = slotPromise:Then(function()
-						return handleSlot(hasSaveSlots, entry, target.player)
-							:Then(function(line)
-								table.insert(results, line)
-							end)
-							:Catch(function(err)
-								table.insert(results, `{target.player.Name} slot {entry.slotIndex}: {tostring(err)}`)
-							end)
-					end)
-				end
-				return slotPromise
-			end)
-		end)
+	userIds: { number },
+	handler: (any, string) -> any
+): string
+	if #userIds == 0 then
+		return "No players to act on."
 	end
 
-	return promise:Then(function()
-		return results
+	local lines = self:_promiseTargetLines(userIds, handler):Wait()
+	return table.concat(lines, "\n")
+end
+
+-- As _runLines, but resolves each target's slot argument first and runs handleSlot once per matching
+-- slot. Reports per slot, so one bad slot does not hide the rest.
+function SaveSlotCmdrService._runSlotLines(
+	self: SaveSlotCmdrService,
+	userIds: { number },
+	slotIndices: { number }?,
+	handleSlot: (any, SlotEntry, string) -> any
+): string
+	return self:_runLines(userIds, function(slots, name)
+		local entries = self:_resolveSlotEntries(slots, slotIndices)
+		if #entries == 0 then
+			return `{name}: no matching slots.`
+		end
+
+		local lines: { string } = {}
+		local promise = Promise.resolved()
+
+		for _, entry in entries do
+			promise = promise:Then(function()
+				return Promise.resolved()
+					:Then(function()
+						return handleSlot(slots, entry, name)
+					end)
+					:Then(function(line)
+						table.insert(lines, line)
+					end)
+					:Catch(function(err)
+						table.insert(lines, `{name} slot {entry.slotIndex}: {tostring(err)}`)
+					end)
+			end)
+		end
+
+		return promise:Then(function()
+			return table.concat(lines, "\n")
+		end)
 	end)
 end
 

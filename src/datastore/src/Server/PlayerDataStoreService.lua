@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
+local PlayerDataStoreHandle = require("PlayerDataStoreHandle")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local Promise = require("Promise")
 local PromiseRetryUtils = require("PromiseRetryUtils")
@@ -188,6 +189,23 @@ function PlayerDataStoreService.PromiseDataStore(
 ): Promise.Promise<DataStore.DataStore>
 	return self:PromiseManager():Then(function(manager)
 		return manager:PromiseDataStore(player)
+	end)
+end
+
+--[=[
+	Borrows the player's [DataStore] as a [PlayerDataStoreHandle], which releases the session when
+	destroyed. Prefer this over [PlayerDataStoreService.PromiseDataStore] when acting on a player by
+	userId, since it is what makes the release hard to forget -- see [PlayerDataStoreHandle].
+
+	@param playerOrUserId Player | number
+	@return Promise<PlayerDataStoreHandle>
+]=]
+function PlayerDataStoreService.PromiseDataStoreHandle(
+	self: PlayerDataStoreService,
+	playerOrUserId: Player | number
+): Promise.Promise<PlayerDataStoreHandle.PlayerDataStoreHandle>
+	return self:PromiseManager():Then(function(manager)
+		return manager:PromiseDataStoreHandle(playerOrUserId)
 	end)
 end
 
