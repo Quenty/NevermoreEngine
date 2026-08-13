@@ -297,8 +297,10 @@ function HasSaveSlots.PromiseImportSlotFromSharedDataStore(
 end
 
 --[=[
-	Loads the export stored under the given shared-store key into a fresh ephemeral slot and selects it.
-	See [HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot].
+	Resumes a transfer from the given shared-store key into a fresh ephemeral slot and selects it. Only
+	entries written as transfers are accepted; a share code is redeemed through
+	[HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode]. See
+	[HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot].
 
 	@param key string
 	@return Promise<SlotId>
@@ -326,10 +328,12 @@ end
 	the common case, e.g. a menu resume hop -- carries it too; a server-initiated teleport still works via
 	the trusted band. Resolves to the slot id, or nil when none arrived.
 
-	Because the client band is honored, a client can present any key it knows. The key resolves to a
-	server-side shared-store entry and only ever seeds a throwaway (never-persisted) slot, so the exposure
-	is read-only visibility of a snapshot whose code you already have -- acceptable for the dev/Cmdr tooling
-	this backs. Harden (longer code entropy / ownership) before exposing it to a player-facing surface.
+	Because the client band is honored, a client can present any key it knows -- which is why the entry
+	behind it must have been written as a transfer (see [SaveSlotExportUtils.Kind]). A share code, the one
+	key players deliberately pass around, is refused here, so redeeming one stays a decision the server
+	makes in [HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode] rather than something a teleport can do.
+	A transfer key is itself replicated (see `ActiveTransferableEphemeralKey`) and only ever seeds a
+	throwaway, never-persisted slot, so what it exposes is read-only visibility of that snapshot.
 
 	@return Promise<SlotId?>
 ]=]
@@ -374,8 +378,9 @@ function HasSaveSlots.PromiseExportSaveSlotToCode(
 end
 
 --[=[
-	Loads the slot stored under the given code into a fresh transferable ephemeral slot and selects it.
-	See [HasSaveSlotsDataStore.PromiseImportEphemeralSaveSlotFromCode].
+	Redeems a share code into a fresh transferable ephemeral slot and selects it. The slot transfers
+	onward under a freshly minted key, never the code itself. See
+	[HasSaveSlotsDataStore.PromiseImportEphemeralSaveSlotFromCode].
 
 	@param code string
 	@return Promise<SlotId>

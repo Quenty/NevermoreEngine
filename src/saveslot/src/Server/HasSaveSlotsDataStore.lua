@@ -620,7 +620,8 @@ end
 
 --[=[
 	Exports a non-main slot (see [HasSaveSlotsDataStore.PromiseExportSlot]) and writes it to the shared
-	save slot store under the given key.
+	save slot store under the given key, tagged as a share code (see [SaveSlotExportUtils.Kind]) so the
+	teleport arrival path will not load it.
 
 	@param slotId SlotId
 	@param key string
@@ -634,13 +635,28 @@ function HasSaveSlotsDataStore.PromiseSaveSlotToSharedDataStore(
 	allowMainSlot: boolean?
 ): Promise.Promise<boolean>
 	return self:PromiseExportSlot(slotId, allowMainSlot):Then(function(export)
-		return self._sharedSaveSlotDataStoreService:PromiseWrite(key, export)
+		return self._sharedSaveSlotDataStoreService:PromiseWrite(
+			key,
+			SaveSlotExportUtils.withKind(export, SaveSlotExportUtils.Kind.CODE),
+			self:_ownerUserIds()
+		)
 	end)
 end
 
+-- The owning user ids to tag a shared-store write with, so the entry is discoverable by the
+-- data-erasure tooling that answers for the player whose save it holds. Empty offline, where the
+-- identity is not injected.
+function HasSaveSlotsDataStore._ownerUserIds(self: HasSaveSlotsDataStore): { number }?
+	return if self._userId then { self._userId } else nil
+end
+
 --[=[
-	Reads an export from the shared save slot store and imports it into a fresh non-main slot (see
-	[HasSaveSlotsDataStore.PromiseImportSlot]). Rejects when no export is stored under the key.
+	Reads a share code's export from the shared save slot store and imports it into a fresh non-main
+	slot (see [HasSaveSlotsDataStore.PromiseImportSlot]). Rejects when no export is stored under the
+	key, or when the entry there is a transfer snapshot rather than a share code -- a transfer key is
+	replicated to every client (see the arrival path in
+	[HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot]), so redeeming one into a kept slot
+	would turn a public handle into a permanent copy of someone else's save.
 
 	@param key string
 	@return Promise<SlotId>
@@ -659,15 +675,29 @@ function HasSaveSlotsDataStore.PromiseImportSlotFromSharedDataStore(
 		if export == nil then
 			return (Promise :: any).rejected(`No save slot stored under \{{key}\}`)
 		end
+		if
+			SaveSlotExportUtils.isSaveSlotExport(export)
+			and not SaveSlotExportUtils.canLoadAs(export, SaveSlotExportUtils.Kind.CODE)
+		then
+			return (Promise :: any).rejected(`\{{key}\} is not a share code`)
+		end
+
 		return self:PromiseImportSlot(export)
 	end)
 end
 
 --[=[
-	Loads the export stored under the given shared-store key into a fresh ephemeral slot and selects it,
-	remembering the key so a teleport can carry the slot forward (see the transferable-ephemeral teleport
-	provider in [SaveSlotService]). Like every ephemeral slot it is never persisted, stays out of the slot
-	list, and is torn down on deselect. Rejects when no valid export is stored under the key.
+	Resumes a transfer: loads the snapshot stored under the given shared-store key into a fresh
+	ephemeral slot and selects it, keeping the key so the next teleport carries the slot forward again
+	(see the transferable-ephemeral teleport provider in [SaveSlotService]). Like every ephemeral slot it
+	is never persisted, stays out of the slot list, and is torn down on deselect.
+
+	:::warning
+	The key comes from the arriving client's teleport band, so this loads whatever a client asks for.
+	Only entries written as transfers are accepted -- a share code, which players hand to each other, is
+	refused here and redeemed through [HasSaveSlotsDataStore.PromiseImportEphemeralSaveSlotFromCode]
+	instead. Entries predating that tag are refused too; see [SaveSlotExportUtils.canLoadAs].
+	:::
 
 	@param key string
 	@return Promise<SlotId>
@@ -675,6 +705,40 @@ end
 function HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot(
 	self: HasSaveSlotsDataStore,
 	key: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self:_promiseSelectEphemeralFromSharedStore(key, SaveSlotExportUtils.Kind.TRANSFER, key)
+end
+
+--[=[
+	Redeems a share code into a fresh transferable ephemeral slot and selects it (see
+	[HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot] for what that slot is).
+
+	The slot transfers onward under a freshly minted key rather than the code it came from: the transfer
+	key is handed to the client to carry across teleports, so reusing the code as that key would publish
+	the code and hand every holder of it a slot the arrival path would load. The code entry is left
+	untouched, so the same code still redeems for whoever else holds it.
+
+	@param code string
+	@return Promise<SlotId>
+]=]
+function HasSaveSlotsDataStore.PromiseImportEphemeralSaveSlotFromCode(
+	self: HasSaveSlotsDataStore,
+	code: string
+): Promise.Promise<SaveSlotData.SlotId>
+	return self:_promiseSelectEphemeralFromSharedStore(
+		code,
+		SaveSlotExportUtils.Kind.CODE,
+		HttpService:GenerateGUID(false)
+	)
+end
+
+-- Shared body of the two ways into a transferable ephemeral slot: read `key`, accept it only as
+-- `kind`, and select the resulting slot as one that transfers onward under `transferKey`.
+function HasSaveSlotsDataStore._promiseSelectEphemeralFromSharedStore(
+	self: HasSaveSlotsDataStore,
+	key: string,
+	kind: SaveSlotExportUtils.SaveSlotExportKind,
+	transferKey: string
 ): Promise.Promise<SaveSlotData.SlotId>
 	return (self._loadPromise :: any):Then(function()
 		-- Maid-owned for the same reason as _promiseLoadSlots: this read runs on the join path (a teleport
@@ -692,6 +756,9 @@ function HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot(
 			if not SaveSlotExportUtils.isSaveSlotExport(export) then
 				return (Promise :: any).rejected("Bad save slot export in shared store")
 			end
+			if not SaveSlotExportUtils.canLoadAs(export, kind) then
+				return (Promise :: any).rejected(`\{{key}\} is not a save slot {kind}`)
+			end
 
 			local slotId = HttpService:GenerateGUID(false)
 			self:_buildSlot(slotId, {
@@ -705,7 +772,7 @@ function HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot(
 			-- Seed the in-memory store before selecting so a consumer of ObserveActiveSlotStoreBrio never
 			-- observes an empty active slot; then remember the key this slot transfers under.
 			self:_getSlotStore(slotId):Overwrite(export.data)
-			self._transferableEphemeralKeys[slotId] = key
+			self._transferableEphemeralKeys[slotId] = transferKey
 
 			return self:PromiseSelectSlot(slotId):Then(function()
 				return slotId
@@ -738,7 +805,13 @@ function HasSaveSlotsDataStore.PromiseBuildEphemeralTransferSlice(
 
 		return self:PromiseExportSlot(slotId)
 			:Then(function(export)
-				return self._sharedSaveSlotDataStoreService:PromiseWrite(storeKey, export)
+				-- Tagged as a transfer, which is what makes it loadable from the key the client carries --
+				-- and what keeps a share code, written under its own key as a code, out of that path.
+				return self._sharedSaveSlotDataStoreService:PromiseWrite(
+					storeKey,
+					SaveSlotExportUtils.withKind(export, SaveSlotExportUtils.Kind.TRANSFER),
+					self:_ownerUserIds()
+				)
 			end)
 			:Then(function()
 				return { [SaveSlotConstants.TELEPORT_DATA_EPHEMERAL_KEY] = storeKey }
@@ -806,20 +879,6 @@ function HasSaveSlotsDataStore.PromiseExportSaveSlotToCode(
 			return code
 		end)
 	end)
-end
-
---[=[
-	Loads the slot stored under the given code into a fresh transferable ephemeral slot and selects it
-	(see [HasSaveSlotsDataStore.PromiseSelectTransferableEphemeralSlot]). Resolves to the new slot id.
-
-	@param code string
-	@return Promise<SlotId>
-]=]
-function HasSaveSlotsDataStore.PromiseImportEphemeralSaveSlotFromCode(
-	self: HasSaveSlotsDataStore,
-	code: string
-): Promise.Promise<SaveSlotData.SlotId>
-	return self:PromiseSelectTransferableEphemeralSlot(code)
 end
 
 --[=[

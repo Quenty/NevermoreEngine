@@ -14,6 +14,7 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 
@@ -121,6 +122,42 @@ describe("HasSaveSlots shared-store save/import", function()
 	it("rejects import from a missing key", function()
 		runWithContext(function(context)
 			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("nope"))).toEqual(false)
+		end)
+	end)
+
+	it("tags what it writes as a share code, keeping it out of the teleport arrival path", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-kind"))
+
+			local stored = awaitValueOf(context.sharedService:PromiseRead("code-kind"))
+			expect(stored.kind).toEqual(SaveSlotExportUtils.Kind.CODE)
+		end)
+	end)
+
+	it("refuses to import a transfer snapshot, whose key every client can read", function()
+		runWithContext(function(context)
+			awaitValueOf(
+				context.sharedService:PromiseWrite(
+					"transfer-key",
+					SaveSlotExportUtils.withKind({ data = { Coins = 5 } }, SaveSlotExportUtils.Kind.TRANSFER)
+				)
+			)
+
+			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("transfer-key"))).toEqual(
+				false
+			)
+		end)
+	end)
+
+	it("still imports an entry written before kinds existed", function()
+		runWithContext(function(context)
+			awaitValueOf(context.sharedService:PromiseWrite("legacy-code", { data = { Coins = 5 } }))
+
+			local newSlotId = awaitValueOf(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("legacy-code"))
+			local reexport = awaitValueOf(context.hasSaveSlots:PromiseExportSlot(newSlotId))
+			expect(reexport.data.Coins).toEqual(5)
 		end)
 	end)
 

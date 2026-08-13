@@ -40,10 +40,13 @@ local function setup()
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
+	-- The store behind share codes, mocked separately from the player store the slots themselves live in.
+	local sharedService: any = serviceBag:GetService(require("SaveSlotSharedDataStoreService"))
 	serviceBag:Init()
 
 	local mock = DataStoreMock.new()
 	playerDataStoreService:SetRobloxDataStore(mock)
+	sharedService:SetRobloxDataStore(DataStoreMock.new())
 	saveSlotService:SetMaxSlotCount(5)
 	serviceBag:Start()
 
@@ -288,6 +291,34 @@ describe("SaveSlotCmdrService against an absent player", function()
 
 		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 1)
 		expect(string.find(output, "main slot (1) cannot be copied onto", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("round-trips a slot through export and import, the console's own share-code loop", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = { SlotIndex = 2, SlotName = "Alpha" },
+				},
+				slots = {
+					["slot-a"] = { coins = 100 },
+				},
+			},
+		})
+
+		local exported = controller.run("saveslot-export", { ABSENT_USER_ID }, { 2 })
+		local code = string.match(exported, "→ (%S+)")
+		expect(code).never.toBeNil()
+
+		-- Imported onto a second player, which is what a hand-off across the console looks like.
+		local output = controller.run("saveslot-import", OTHER_USER_ID, code)
+		expect(string.find(output, "Imported save slot from code", 1, true) ~= nil).toEqual(true)
+
+		local listed = controller.run("saveslot-list", { OTHER_USER_ID })
+		expect(string.find(listed, '"Alpha"', 1, true) ~= nil).toEqual(true)
 
 		controller.destroy()
 	end)

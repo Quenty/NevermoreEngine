@@ -17,10 +17,12 @@
 	| `saveslot-read-json` / `saveslot-write-json` | Moves a slot as raw JSON, no shared store |
 	| `saveslot-import-ephemeral` | Loads a code into a throwaway session |
 
-	Every command takes `playerIds`, so it reaches a player who is not in this server as readily as one
-	who is: a player here is acted on through their bound [HasSaveSlots], and an absent player through
-	an [OfflineSaveSlots] opened over their datastore. Both hand back the same
-	[HasSaveSlotsDataStore], so the command bodies below never branch on which it was.
+	Commands take players as ids, so they reach a player who is not in this server as readily as one who
+	is: a player here is acted on through their bound [HasSaveSlots], and an absent player through an
+	[OfflineSaveSlots] opened over their datastore. Both hand back the same [HasSaveSlotsDataStore], so
+	the command bodies below never branch on which it was. `saveslot-import-ephemeral` is the one
+	exception, and refuses an absent player outright -- an ephemeral session only exists while it is
+	being played.
 
 	:::warning
 	Acting on an absent player **steals their session lock**, kicking them from wherever they are
@@ -107,10 +109,15 @@ end
 local PLAYERS_ARG_DESCRIPTION =
 	"Players to act on (e.g. . for yourself, * for everyone here, a username, or #userId). A player who is not in this server is acted on offline, which kicks them."
 
+-- Tail on every description, because Cmdr's help list is where an admin reads about a command before
+-- running it -- the class docstring above is not, and neither is the argument description, which only
+-- surfaces once they are already typing the command out.
+local REMOTE_NOTE = "Works remotely and on players in-game; a player reached remotely is kicked."
+
 function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-list",
-		Description = "Lists all save slots.",
+		Description = `Lists each player's save slots with their playtime, timestamps and summary, marking the one being played. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -149,7 +156,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-get-active",
-		Description = "Returns the active save slot.",
+		Description = `Reports the slot each player is playing, or the one they would resume on when none is active. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -180,7 +187,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-select",
-		Description = "Switches to the given save slot.",
+		Description = `Switches each player onto the given save slot, saving the slot they were on first. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -213,7 +220,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-deselect",
-		Description = "Clears the active save slot, returning to a no-slot state.",
+		Description = `Returns each player to the no-slot state, saving their active slot first and remembering it as the one they would resume on. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -236,7 +243,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-create",
-		Description = "Creates save slots. Defaults to the lowest free index when none is given.",
+		Description = `Creates empty save slots, defaulting to the lowest free index when none is given. Creates nothing at all when any index in the batch is taken or past the player's slot cap. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -310,7 +317,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-delete",
-		Description = "Deletes the given save slots.",
+		Description = `Permanently deletes the given save slots. Deleting the slot a player is on deselects it first; deleting their ephemeral session ends it. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -335,7 +342,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	self._cmdrService:RegisterCommand(
 		{
 			Name = "saveslot-copy",
-			Description = "Copies one player's save slot onto other players' slots. Defaults to the lowest free index when no destination is given, and OVERWRITES the destination slot when one already exists there. Copying an ephemeral session saves it without switching onto the copy -- see saveslot-persist.",
+			Description = "Copies one player's save slot onto other players' slots, OVERWRITING an occupied destination and defaulting to the lowest free index. Copying an ephemeral session saves it without switching onto the copy -- see saveslot-persist. Works remotely and on players in-game; every player reached remotely is kicked, the source as readily as a destination.",
 			Group = "SaveSlots",
 			Args = {
 				{
@@ -438,7 +445,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-persist",
-		Description = "Turns an ephemeral session into a real save slot and switches onto it.",
+		Description = "Turns each player's ephemeral session into a real save slot at their lowest free index and switches them onto it. Only a player in this server has a session to persist, so this can do nothing for a remote player except kick them to find that out.",
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -465,7 +472,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-reset",
-		Description = "Resets save slots to fresh empty ones, keeping their index and name.",
+		Description = `Empties save slots, keeping their index and name but permanently clearing their saved data and timestamps. Resetting the slot a player is on rebuilds it under them. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -492,7 +499,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-export",
-		Description = "Exports save slots to the shared store and prints their codes.",
+		Description = `Copies save slots into the shared store and prints a code for each, to be redeemed with saveslot-import. Reads only; the slot itself is left alone. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -503,7 +510,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
+				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for each player's current slot.",
 				Optional = true,
 			},
 		},
@@ -519,7 +526,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-read-json",
-		Description = "Reads save slots as raw JSON (no shared store) and prints them.",
+		Description = `Prints save slots as raw JSON, writing nothing to the shared store. Pairs with saveslot-write-json. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -530,7 +537,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to read (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
+				Description = "Slot indices to read (e.g. 1,2, . for your current slot, or * for all). Omit for each player's current slot.",
 				Optional = true,
 			},
 		},
@@ -546,7 +553,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-write-json",
-		Description = "Writes raw JSON (as printed by saveslot-read-json) into a save slot. Defaults to the lowest free index when no destination is given, and OVERWRITES the destination slot when one already exists there.",
+		Description = `Writes raw JSON, as printed by saveslot-read-json, into a save slot. OVERWRITES an occupied destination and defaults to the lowest free index. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -600,7 +607,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-import",
-		Description = "Imports a save slot code into a new persisted (non-main) slot.",
+		Description = `Redeems a saveslot-export code into a new slot at the player's lowest free index, leaving their existing slots alone. {REMOTE_NOTE}`,
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -625,7 +632,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "saveslot-import-ephemeral",
-		Description = "Imports a save slot code into a throwaway ephemeral slot and selects it.",
+		Description = "Loads a saveslot-export code into a throwaway session and switches the player onto it, saving nothing and touching none of their slots. The one command that cannot work remotely, and so the one that never kicks: an ephemeral session only exists while it is being played.",
 		Group = "SaveSlots",
 		Args = {
 			{
