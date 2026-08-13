@@ -113,6 +113,15 @@ Guidelines:
 - A plain object with no `ServiceBag` can skip the controller: create it in the test and
   `object:Destroy()` at the end (and in any early-return guard).
 
+**Read a failure list from the top.** A failing `expect` throws, so the trailing
+`controller:destroy()` never runs and that test leaks everything it built into the shared place.
+Later tests then fail for reasons of their own — timing out on an observable, seeing a slot that
+should have been filtered — and those look like independent bugs. They are usually one bug plus its
+wake. Fix the earliest failure and re-run before investigating any of the others; the count often
+drops by more than one. (This is why the guideline above matters even though it reads as
+belt-and-braces: teardown you only reach on the happy path is teardown you lose exactly when a test
+is failing.)
+
 ### Consume every rejection (or Jest passes but the run still fails)
 
 Jest only tracks assertions that run inside an `it`. Any **uncaught Luau error** raised outside that —
