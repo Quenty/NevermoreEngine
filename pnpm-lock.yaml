@@ -1690,6 +1690,9 @@ importers:
       '@quenty/bindtocloseservice':
         specifier: workspace:*
         version: link:../bindtocloseservice
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
