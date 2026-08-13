@@ -210,6 +210,22 @@ function PlayerDataStoreService.PromiseDataStoreHandle(
 end
 
 --[=[
+	Resolves once any removal in flight for this player has saved and closed their session -- see
+	[PlayerDataStoreManager.PromiseSessionClosed].
+
+	@param playerOrUserId Player | number
+	@return Promise<()>
+]=]
+function PlayerDataStoreService.PromiseSessionClosed(
+	self: PlayerDataStoreService,
+	playerOrUserId: Player | number
+): Promise.Promise<()>
+	return self:PromiseManager():Then(function(manager)
+		return manager:PromiseSessionClosed(playerOrUserId)
+	end)
+end
+
+--[=[
 	Adds a removing callback to the manager.
 	@param callback function -- May return a promise
 	@return Promise

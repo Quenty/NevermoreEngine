@@ -71,6 +71,7 @@ local function setup()
 	service._maid = Maid.new()
 	service._serviceBag = serviceBag
 	service._cmdrService = cmdrService
+	service._playerDataStoreService = playerDataStoreService
 	service._saveSlotDataService = serviceBag:GetService(require("SaveSlotDataService"))
 	service._hasSaveSlotsBinder = serviceBag:GetService(require("HasSaveSlots"))
 	-- Shadows the module-instance lookup, which resolves SaveSlotService through the script tree to

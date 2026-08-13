@@ -317,6 +317,26 @@ function PlayerDataStoreManager._releaseDataStoreHandle(self: PlayerDataStoreMan
 end
 
 --[=[
+	Resolves once any removal in flight for this player has saved and closed their session, and
+	immediately when there is nothing being removed.
+
+	Destroying the last handle for an absent player *starts* the save-and-close; it does not wait for
+	it. Tooling that reports back to an operator waits here first, so it says the lock is released
+	only once the write that releases it has actually landed.
+
+	@param playerOrUserId Player | number
+	@return Promise<()>
+]=]
+function PlayerDataStoreManager.PromiseSessionClosed(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<()>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	return self:_promiseWaitForRemoving(userId)
+end
+
+--[=[
 	Gets the datastore for a player. If it does not exist, it will create one.
 
 	:::tip

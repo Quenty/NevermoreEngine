@@ -301,13 +301,33 @@ function SaveSlotService.PromiseOfflineSaveSlots(
 		return Promise.rejected(`{userId} is in this server -- use their HasSaveSlots binder`)
 	end
 
-	return self._maid:GivePromise(self._playerDataStoreService:PromiseDataStoreHandle(userId)):Then(function(handle)
+	-- Deliberately not `_maid:GivePromise`, which cancels nothing upstream: on teardown the handle
+	-- still resolves, into a continuation the maid has already skipped, and the session it took stays
+	-- locked for the rest of the server's life. The maid is probed for liveness instead, so a handle
+	-- that arrives too late is handed straight back rather than orphaned.
+	local probe = {}
+	self._maid[probe] = probe
+
+	return self._playerDataStoreService:PromiseDataStoreHandle(userId):Then(function(handle)
+		local isAlive = self._maid[probe] == probe
+		self._maid[probe] = nil
+
+		if not isAlive then
+			handle:Destroy()
+			-- Cast because this branch makes the callback return a union with the slots below, which
+			-- the solver otherwise tries to unify into one type.
+			return (Promise :: any).rejected(`Destroyed while opening the datastore for {userId}`)
+		end
+
 		return OfflineSaveSlots.new(handle, {
 			SharedDataStoreService = self._sharedSaveSlotDataStoreService,
 			MaxSlotCount = self._maxSlotCount,
 			CodeGenerator = self._codeGenerator,
 			UserId = userId,
 		})
+	end, function(err)
+		self._maid[probe] = nil
+		return Promise.rejected(err)
 	end)
 end
 

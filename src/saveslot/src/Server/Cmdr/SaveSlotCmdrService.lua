@@ -24,6 +24,7 @@ local Players = game:GetService("Players")
 local CmdrService = require("CmdrService")
 local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
+local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
 local SaveSlotCmdrUtils = require("SaveSlotCmdrUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
@@ -42,6 +43,7 @@ export type SaveSlotCmdrService = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_cmdrService: any,
 		_hasSaveSlotsBinder: any,
+		_playerDataStoreService: any,
 		_saveSlotDataService: any,
 	},
 	{} :: typeof({ __index = SaveSlotCmdrService })
@@ -54,6 +56,7 @@ function SaveSlotCmdrService.Init(self: SaveSlotCmdrService, serviceBag: Service
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(CmdrService)
+	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
 
 	-- Internal
 	self._hasSaveSlotsBinder = self._serviceBag:GetService(HasSaveSlots)
@@ -587,9 +590,30 @@ function SaveSlotCmdrService._promiseWithSlots(
 		return Promise.rejected("not in this server, and offline save slots are unavailable")
 	end
 
-	return self._maid:GivePromise(saveSlotService:PromiseOfflineSaveSlots(userId)):Then(function(offline)
-		local function release(): ()
+	-- Deliberately not `_maid:GivePromise`, which cancels nothing upstream: on teardown these slots
+	-- still resolve, into a continuation the maid has already skipped, and the session they took stays
+	-- locked for the rest of the server's life. The maid is probed for liveness instead, and then
+	-- handed the slots themselves.
+	local probe = {}
+	self._maid[probe] = probe
+
+	return saveSlotService:PromiseOfflineSaveSlots(userId):Then(function(offline)
+		local isAlive = self._maid[probe] == probe
+		self._maid[probe] = nil
+
+		if not isAlive then
 			offline:Destroy()
+			return Promise.rejected(`Destroyed while opening the save slots for {userId}`)
+		end
+
+		local offlineId = self._maid:GiveTask(offline :: any)
+
+		local function release(): any
+			self._maid[offlineId] = nil
+
+			-- Destroying only *starts* the borrowed session's save-and-close, so wait for it here: the
+			-- command reports success once the lock it took is gone, not while it is still held.
+			return self._playerDataStoreService:PromiseSessionClosed(userId)
 		end
 
 		return offline
@@ -598,12 +622,17 @@ function SaveSlotCmdrService._promiseWithSlots(
 				return handler(offline:GetSlotsDataStore(), tostring(userId))
 			end)
 			:Then(function(result)
-				release()
-				return result
+				return release():Then(function()
+					return result
+				end)
 			end, function(err)
-				release()
-				return Promise.rejected(err)
+				return release():Then(function()
+					return Promise.rejected(err)
+				end)
 			end)
+	end, function(err)
+		self._maid[probe] = nil
+		return Promise.rejected(err)
 	end)
 end
 

@@ -286,7 +286,24 @@ function DataStoreCmdrService._promiseWithDataStore(
 ): Promise.Promise<any>
 	local isInThisServer = Players:GetPlayerByUserId(userId) ~= nil
 
-	return self._maid:GivePromise(manager:PromiseDataStoreHandle(userId)):Then(function(handle)
+	-- Deliberately not `_maid:GivePromise`, which cancels nothing upstream: on teardown the handle
+	-- still resolves, into a continuation the maid has already skipped, and the session it took stays
+	-- locked for the rest of the server's life. The maid is probed for liveness instead, and then
+	-- handed the handle itself.
+	local probe = {}
+	self._maid[probe] = probe
+
+	return manager:PromiseDataStoreHandle(userId):Then(function(handle)
+		local isAlive = self._maid[probe] == probe
+		self._maid[probe] = nil
+
+		if not isAlive then
+			handle:Destroy()
+			return Promise.rejected(`Destroyed while opening the datastore for {userId}`)
+		end
+
+		local handleId = self._maid:GiveTask(handle :: any)
+
 		local function release(): Promise.Promise<()>
 			-- Destroying the handle closes a borrowed session and flushes it. A live player's store is
 			-- not the handle's to close, so that one is saved explicitly instead.
@@ -296,7 +313,11 @@ function DataStoreCmdrService._promiseWithDataStore(
 			end
 
 			return savePromise:Finally(function()
-				handle:Destroy()
+				self._maid[handleId] = nil
+
+				-- Destroying the handle only *starts* the save-and-close, so wait for it here: the
+				-- command reports success once the lock it took is gone, not while it is still held.
+				return manager:PromiseSessionClosed(userId)
 			end)
 		end
 
@@ -309,6 +330,10 @@ function DataStoreCmdrService._promiseWithDataStore(
 				return Promise.rejected(err)
 			end)
 		end)
+	end, function(err)
+		-- The open failed, so there is no handle to hand to the maid. Take the probe back out.
+		self._maid[probe] = nil
+		return Promise.rejected(err)
 	end)
 end
 
