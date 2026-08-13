@@ -62,6 +62,7 @@ local DataStoreLockUtils = require("DataStoreLockUtils")
 local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
+local PlayerDataStoreHandle = require("PlayerDataStoreHandle")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseRetryUtils = require("PromiseRetryUtils")
@@ -85,6 +86,7 @@ export type PlayerDataStoreManager =
 			_datastores: { [PlayerUserId]: DataStore.DataStore },
 			_removing: { [PlayerUserId]: boolean },
 			_removingPromises: { [PlayerUserId]: Promise.Promise<any> },
+			_handleCounts: { [PlayerUserId]: number },
 			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
 			_removingCallbacks: { RemovingCallback },
 			_disableSavingInStudio: boolean?,
@@ -128,6 +130,7 @@ function PlayerDataStoreManager.new(
 	self._datastores = {} -- [userId] = datastore
 	self._removing = {} -- [player] = true
 	self._removingPromises = {} -- [player] = removal promise
+	self._handleCounts = {} -- [userId] = outstanding PlayerDataStoreHandle count
 	self._pendingSaves = PendingPromiseTracker.new()
 	self._removingCallbacks = {} -- [func, ...]
 	self._hasCreatedDataStore = false
@@ -242,6 +245,73 @@ function PlayerDataStoreManager.RemovePlayerDataStore(
 	playerOrUserId: Player | PlayerUserId
 ): ()
 	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	self:_removePlayerDataStore(userId)
+end
+
+--[=[
+	Gets the datastore for a player as a counted handle, opening a session if none is live.
+
+	Prefer this over [PlayerDataStoreManager.PromiseDataStore] for anything acting on a player who may
+	not be in this server. Opening their store takes the session lock, which kicks them from wherever
+	they were and keeps them from rejoining until it is dropped -- and destroying the handle is what
+	drops it.
+
+	Handles are counted, so several systems can hold the same player's store at once and the session
+	survives until the last handle is destroyed.
+
+	:::note
+	The join/leave path deliberately does *not* run through handles. Making a player's presence just
+	another reference would be tidier, but removal is reached from several directions already -- a
+	stolen session, a close request, a failed lock, PlayerRemoving, server shutdown -- and a handle
+	leaked on any of them would hold a player's save open instead of closing it, which is worse than
+	the asymmetry. So a handle never removes a store belonging to a player who is in this server;
+	their own path owns that.
+	:::
+
+	@param playerOrUserId Player | number
+	@return Promise<PlayerDataStoreHandle>
+]=]
+function PlayerDataStoreManager.PromiseDataStoreHandle(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<PlayerDataStoreHandle.PlayerDataStoreHandle>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	-- Counted before the open rather than after, so a second caller arriving while this one is still
+	-- loading cannot see a count of zero and release the store out from under it.
+	self._handleCounts[userId] = (self._handleCounts[userId] or 0) + 1
+
+	return self:_promiseDataStoreByUserId(userId):Then(function(dataStore)
+		return PlayerDataStoreHandle.new(dataStore, function()
+			self:_releaseDataStoreHandle(userId)
+		end)
+	end, function(err)
+		-- The open failed, so there is no handle to be destroyed later. Give the count back.
+		self:_releaseDataStoreHandle(userId)
+		return Promise.rejected(err)
+	end)
+end
+
+function PlayerDataStoreManager._releaseDataStoreHandle(self: PlayerDataStoreManager, userId: PlayerUserId): ()
+	local count = self._handleCounts[userId]
+	if not count then
+		return
+	end
+
+	count -= 1
+	if count > 0 then
+		self._handleCounts[userId] = count
+		return
+	end
+
+	self._handleCounts[userId] = nil
+
+	-- A player in this server owns their own session through the join/leave path. Only a store opened
+	-- on behalf of someone absent is ours to close.
+	if Players:GetPlayerByUserId(userId) then
+		return
+	end
 
 	self:_removePlayerDataStore(userId)
 end

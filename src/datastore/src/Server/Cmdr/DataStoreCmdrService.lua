@@ -263,10 +263,13 @@ end
 	Opens the store for `userId`, runs `handler` against it, and puts it back.
 
 	[PlayerDataStoreManager.PromiseDataStore] opens a real session, which takes the lock from whoever
-	holds it. What happens afterwards depends on who that was: a store belonging to a player in this
-	server is left alone -- its own save path owns it, and removing it would strand a live session --
-	while one opened for an absent player is released, so the tooling does not leave behind exactly
-	the kind of orphaned lock `datastore-unlock` exists to clear.
+	holds it -- kicking that player when their server notices the theft. Releasing what was taken is
+	therefore the part that matters: an orphaned lock is exactly what `datastore-unlock` exists to
+	clear, and until it is dropped the player cannot rejoin.
+
+	So a store opened for an absent player is closed again, and the promise waits for that flush to
+	land rather than reporting success while the lock is still held. A store belonging to a player in
+	this server is left alone instead: no session was stolen, and removing it would strand a live one.
 
 	@param manager PlayerDataStoreManager
 	@param userId number
@@ -283,27 +286,26 @@ function DataStoreCmdrService._promiseWithDataStore(
 ): Promise.Promise<any>
 	local isInThisServer = Players:GetPlayerByUserId(userId) ~= nil
 
-	local function release(dataStore: any): Promise.Promise<()>
-		if not isInThisServer then
-			-- Saves, closes the session and drops the lock.
-			manager:RemovePlayerDataStore(userId)
-			return Promise.resolved()
+	return self._maid:GivePromise(manager:PromiseDataStoreHandle(userId)):Then(function(handle)
+		local function release(): Promise.Promise<()>
+			-- Destroying the handle closes a borrowed session and flushes it. A live player's store is
+			-- not the handle's to close, so that one is saved explicitly instead.
+			local savePromise: Promise.Promise<()> = Promise.resolved()
+			if isInThisServer and doesWrite then
+				savePromise = handle:GetDataStore():Save()
+			end
+
+			return savePromise:Finally(function()
+				handle:Destroy()
+			end)
 		end
 
-		if doesWrite then
-			return dataStore:Save()
-		end
-
-		return Promise.resolved()
-	end
-
-	return self._maid:GivePromise(manager:PromiseDataStore(userId)):Then(function(dataStore)
-		return handler(dataStore):Then(function(result)
-			return release(dataStore):Then(function()
+		return handler(handle:GetDataStore()):Then(function(result)
+			return release():Then(function()
 				return result
 			end)
 		end, function(err)
-			return release(dataStore):Then(function()
+			return release():Then(function()
 				return Promise.rejected(err)
 			end)
 		end)
