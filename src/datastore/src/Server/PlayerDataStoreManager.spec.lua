@@ -322,3 +322,89 @@ describe("PlayerDataStoreManager server shutdown", function()
 		controller:destroy()
 	end)
 end)
+
+describe("PlayerDataStoreManager datastore configuration", function()
+	it("applies the configured autosave interval to created datastores", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:SetAutoSaveTimeSeconds(14)
+
+		local dataStore = controller.manager:GetDataStore(1)
+		expect((dataStore:GetAutoSaveTimeSeconds())).toEqual(14)
+
+		controller:destroy()
+	end)
+
+	it("leaves the datastore default alone when unconfigured", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local dataStore = controller.manager:GetDataStore(1)
+		expect((dataStore:GetAutoSaveTimeSeconds())).toEqual(60 * 5)
+
+		controller:destroy()
+	end)
+
+	it("applies nil autosave (syncing disabled) rather than treating it as unconfigured", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:SetAutoSaveTimeSeconds(nil)
+
+		local dataStore = controller.manager:GetDataStore(1)
+		expect(dataStore:GetAutoSaveTimeSeconds()).toBeNil()
+
+		controller:destroy()
+	end)
+
+	it("configures every datastore it creates, not just the first", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:SetAutoSaveTimeSeconds(14)
+
+		controller.manager:GetDataStore(1)
+		local second = controller.manager:GetDataStore(2)
+		expect((second:GetAutoSaveTimeSeconds())).toEqual(14)
+
+		controller:destroy()
+	end)
+
+	it("rejects configuration once a datastore has been created", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:GetDataStore(1)
+
+		expect(function()
+			controller.manager:SetAutoSaveTimeSeconds(14)
+		end).toThrow()
+		expect(function()
+			controller.manager:SetLoadRetryOptions({ initialWaitTime = 1, maxAttempts = 2, printWarning = false })
+		end).toThrow()
+		expect(function()
+			controller.manager:SetSessionMessagingCloseDelaySeconds(0.5)
+		end).toThrow()
+
+		controller:destroy()
+	end)
+
+	it("forwards load retry options to created datastores", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local retryOptions = { exponential = 1, initialWaitTime = 0.1, maxAttempts = 2, printWarning = false }
+		controller.manager:SetLoadRetryOptions(retryOptions)
+
+		local dataStore = controller.manager:GetDataStore(1)
+		expect((dataStore:GetLoadRetryOptions())).toEqual(retryOptions)
+
+		controller:destroy()
+	end)
+
+	it("forwards the session messaging close delay to created datastores", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		controller.manager:SetSessionMessagingCloseDelaySeconds(0.5)
+
+		local dataStore = controller.manager:GetDataStore(1)
+		expect((dataStore:GetSessionMessagingCloseDelaySeconds())).toEqual(0.5)
+
+		controller:destroy()
+	end)
+end)

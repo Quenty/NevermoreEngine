@@ -346,6 +346,14 @@ function DataStore.SetLoadRetryOptions(self: DataStore, options: PromiseRetryUti
 end
 
 --[=[
+	Returns the load retry backoff in use.
+	@return RetryOptions
+]=]
+function DataStore.GetLoadRetryOptions(self: DataStore): PromiseRetryUtils.RetryOptions
+	return self._loadRetryOptions
+end
+
+--[=[
 	Overrides how long to wait for Roblox to replicate a released lock after a graceful session-close
 	request before retrying the load. Defaults to 5 seconds. Mainly useful for tests.
 
@@ -355,6 +363,14 @@ function DataStore.SetSessionMessagingCloseDelaySeconds(self: DataStore, seconds
 	assert(type(seconds) == "number" and seconds >= 0, "Bad seconds")
 
 	self._sessionMessagingCloseDelaySeconds = seconds
+end
+
+--[=[
+	Returns the post-graceful-close replication delay in use.
+	@return number
+]=]
+function DataStore.GetSessionMessagingCloseDelaySeconds(self: DataStore): number
+	return self._sessionMessagingCloseDelaySeconds
 end
 
 --[=[

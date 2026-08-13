@@ -51,16 +51,20 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local BaseObject = require("BaseObject")
 local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
+local DataStoreLockUtils = require("DataStoreLockUtils")
+local DataStorePromises = require("DataStorePromises")
 local Maid = require("Maid")
 local PendingPromiseTracker = require("PendingPromiseTracker")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
+local PromiseRetryUtils = require("PromiseRetryUtils")
 local PromiseUtils = require("PromiseUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -84,6 +88,11 @@ export type PlayerDataStoreManager =
 			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
 			_removingCallbacks: { RemovingCallback },
 			_disableSavingInStudio: boolean?,
+			_hasCreatedDataStore: boolean,
+			_loadRetryOptions: PromiseRetryUtils.RetryOptions?,
+			_autoSaveTimeSeconds: number?,
+			_autoSaveTimeSecondsSet: boolean,
+			_sessionMessagingCloseDelaySeconds: number?,
 		},
 		{} :: typeof({ __index = PlayerDataStoreManager })
 	))
@@ -121,6 +130,8 @@ function PlayerDataStoreManager.new(
 	self._removingPromises = {} -- [player] = removal promise
 	self._pendingSaves = PendingPromiseTracker.new()
 	self._removingCallbacks = {} -- [func, ...]
+	self._hasCreatedDataStore = false
+	self._autoSaveTimeSecondsSet = false
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
 		if self._disableSavingInStudio then
@@ -153,6 +164,64 @@ function PlayerDataStoreManager.DisableSaveOnCloseStudio(self: PlayerDataStoreMa
 	assert(RunService:IsStudio(), "Must invoke in studio")
 
 	self._disableSavingInStudio = true
+end
+
+--[=[
+	Overrides the load retry backoff on every datastore this manager creates. See
+	[DataStore.SetLoadRetryOptions].
+
+	This is the knob that decides how long a player waits on a lock held by a dead server: the ladder
+	runs, and only once it is exhausted is the lock stolen unconditionally. Defaults to ~49s.
+
+	:::info
+	Must be set before the first datastore is created.
+	:::
+
+	@param options RetryOptions
+]=]
+function PlayerDataStoreManager.SetLoadRetryOptions(
+	self: PlayerDataStoreManager,
+	options: PromiseRetryUtils.RetryOptions
+): ()
+	assert(not self._hasCreatedDataStore, "Must configure before the first datastore is created")
+	assert(type(options) == "table", "Bad options")
+
+	self._loadRetryOptions = options
+end
+
+--[=[
+	Sets the autosave interval on every datastore this manager creates. See
+	[DataStore.SetAutoSaveTimeSeconds]. Passing nil disables syncing entirely.
+
+	:::info
+	Must be set before the first datastore is created.
+	:::
+
+	@param autoSaveTimeSeconds number?
+]=]
+function PlayerDataStoreManager.SetAutoSaveTimeSeconds(self: PlayerDataStoreManager, autoSaveTimeSeconds: number?): ()
+	assert(not self._hasCreatedDataStore, "Must configure before the first datastore is created")
+	assert(type(autoSaveTimeSeconds) == "number" or autoSaveTimeSeconds == nil, "Bad autoSaveTimeSeconds")
+
+	self._autoSaveTimeSeconds = autoSaveTimeSeconds
+	self._autoSaveTimeSecondsSet = true
+end
+
+--[=[
+	Sets the post-graceful-close replication delay on every datastore this manager creates. See
+	[DataStore.SetSessionMessagingCloseDelaySeconds].
+
+	:::info
+	Must be set before the first datastore is created.
+	:::
+
+	@param seconds number
+]=]
+function PlayerDataStoreManager.SetSessionMessagingCloseDelaySeconds(self: PlayerDataStoreManager, seconds: number): ()
+	assert(not self._hasCreatedDataStore, "Must configure before the first datastore is created")
+	assert(type(seconds) == "number" and seconds >= 0, "Bad seconds")
+
+	self._sessionMessagingCloseDelaySeconds = seconds
 end
 
 --[=[
@@ -280,6 +349,116 @@ function PlayerDataStoreManager:_toPlayerUserIdOrError(playerOrUserId: Player | 
 end
 
 --[=[
+	Reads the session lock on a player's key without opening a session on it.
+
+	This is the read side of the tooling path: it answers "who holds this key, and how stale is that
+	claim", whether or not the player is in this server. Resolves nil when the key is unlocked or
+	absent. Reads the stored key, so for a player in this server it reflects their last save rather
+	than unsaved in-memory state.
+
+	@param playerOrUserId Player | number
+	@return Promise<LockData?>
+]=]
+function PlayerDataStoreManager.PromiseReadSessionLock(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<DataStoreLockUtils.LockData?>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	return DataStorePromises.getAsync(self._robloxDataStore, self:_getKey(userId)):Then(function(data)
+		return DataStoreLockUtils.readLock(data)
+	end)
+end
+
+--[=[
+	Clears the session lock on a player's key with a raw write, releasing a claim left behind by a
+	server that died without closing its session.
+
+	:::warning
+	This is a soft lock. A loading session steals it anyway once its retry ladder is exhausted (see
+	[PlayerDataStoreManager.SetLoadRetryOptions]) -- clearing it early only saves the player that wait.
+	:::
+
+	:::danger
+	Permitted against a session this server holds, which desynchronizes that session from the key --
+	its next save either re-writes the lock or reads this as a theft and kicks the player. That is a
+	debug/stress-test capability, not a normal one.
+	:::
+
+	@param playerOrUserId Player | number
+	@return Promise<LockData?> -- the lock that was cleared, or nil if it was already unlocked
+]=]
+function PlayerDataStoreManager.PromiseUnlockSession(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<DataStoreLockUtils.LockData?>
+	return self:_promiseWriteRawSessionLock(self:_toPlayerUserIdOrError(playerOrUserId), nil)
+end
+
+--[=[
+	Claims a player's key with a raw write, under a session this server will never answer for. Parks
+	the key so an inspection is not racing a live server.
+
+	:::warning
+	This is a soft lock, and holds only for as long as a loading session's retry ladder. It is not a
+	way to keep a player out of their data.
+	:::
+
+	:::danger
+	Permitted against a session this server holds, with the same desynchronizing effect described on
+	[PlayerDataStoreManager.PromiseUnlockSession].
+	:::
+
+	@param playerOrUserId Player | number
+	@return Promise<LockData?> -- the lock that was replaced, or nil if it was unlocked
+]=]
+function PlayerDataStoreManager.PromiseLockSession(
+	self: PlayerDataStoreManager,
+	playerOrUserId: Player | PlayerUserId
+): Promise.Promise<DataStoreLockUtils.LockData?>
+	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+
+	return self:_promiseWriteRawSessionLock(
+		userId,
+		DataStoreLockUtils.createLockData({
+			SessionId = HttpService:GenerateGUID(false),
+			PlaceId = game.PlaceId,
+			JobId = game.JobId,
+		})
+	)
+end
+
+function PlayerDataStoreManager._promiseWriteRawSessionLock(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId,
+	lockData: DataStoreLockUtils.LockData?
+): Promise.Promise<DataStoreLockUtils.LockData?>
+	-- Deliberately unguarded against a session this server owns. A raw write underneath one
+	-- desynchronizes that session from the key: on its next save it either re-writes this lock, or
+	-- reads it as a theft and kicks the player. That is precisely the failure the lock/unlock tools
+	-- exist to provoke, so stress-testing against a live local session is allowed rather than refused.
+	-- Callers reaching for this outside of debug tooling want the live [DataStore] instead.
+	local previousLock: DataStoreLockUtils.LockData? = nil
+
+	return DataStorePromises.updateAsync(self._robloxDataStore, self:_getKey(userId), function(data, datastoreKeyInfo)
+		previousLock = DataStoreLockUtils.readLock(data)
+
+		-- Nothing stored and nothing to clear, so cancel rather than create an empty entry.
+		if data == nil and lockData == nil then
+			return nil
+		end
+
+		-- UpdateAsync drops both when the transform omits them, so carry them through untouched.
+		local userIdList = if datastoreKeyInfo then datastoreKeyInfo:GetUserIds() else { userId }
+		local metadata = if datastoreKeyInfo then datastoreKeyInfo:GetMetadata() else nil
+
+		return DataStoreLockUtils.withLock(data, lockData), userIdList, metadata
+	end):Then(function()
+		return previousLock
+	end)
+end
+
+--[=[
 	Removes all player data stores, and returns a promise that
 	resolves when all pending saves are saved.
 
@@ -322,8 +501,21 @@ function PlayerDataStoreManager._createDataStore(
 
 	local maid = Maid.new()
 
+	self._hasCreatedDataStore = true
+
 	-- DataStore is cleaned up very carefully in _removePlayerDataStore
 	local datastore = DataStore.new(self._robloxDataStore, self:_getKey(userId))
+
+	if self._loadRetryOptions then
+		datastore:SetLoadRetryOptions(self._loadRetryOptions)
+	end
+	if self._autoSaveTimeSecondsSet then
+		datastore:SetAutoSaveTimeSeconds(self._autoSaveTimeSeconds)
+	end
+	if self._sessionMessagingCloseDelaySeconds then
+		datastore:SetSessionMessagingCloseDelaySeconds(self._sessionMessagingCloseDelaySeconds)
+	end
+
 	datastore:SetSessionLockingEnabled(true)
 	datastore:SetSessionMessagingEnabled(true, self._serviceBag)
 	datastore:SetUserIdList({ userId })

@@ -211,3 +211,68 @@ describe("PlayerDataStoreService server shutdown", function()
 		controller:destroy()
 	end)
 end)
+
+describe("PlayerDataStoreService datastore configuration", function()
+	-- The shared setup() starts the bag as soon as it has a mock, and these setters must land between
+	-- Init and Start -- the same window SetDataStoreName uses.
+	local function setupConfigured(configure)
+		local maid = Maid.new()
+
+		local mock = DataStoreMock.new()
+		local serviceBag = maid:Add(ServiceBag.new())
+		local service = serviceBag:GetService(require("PlayerDataStoreService"))
+		serviceBag:Init()
+
+		service:SetRobloxDataStore(mock)
+		configure(service)
+		serviceBag:Start()
+
+		return {
+			service = service,
+			mock = mock,
+			destroy = function()
+				DataStoreTestUtils.awaitServiceShutdown(service)
+				maid:DoCleaning()
+			end,
+		}
+	end
+
+	it("forwards configuration through to the datastores the manager creates", function()
+		local retryOptions = { exponential = 1, initialWaitTime = 0.1, maxAttempts = 2, printWarning = false }
+		local controller = setupConfigured(function(service)
+			service:SetAutoSaveTimeSeconds(14)
+			service:SetLoadRetryOptions(retryOptions)
+			service:SetSessionMessagingCloseDelaySeconds(0.5)
+		end)
+
+		local promise = controller.service:PromiseDataStore(1)
+		if not PromiseTestUtils.awaitSettled(promise, 10) then
+			expect("hung").toEqual("settled")
+			controller:destroy()
+			return
+		end
+		local _ok, dataStore = promise:Yield()
+
+		expect((dataStore:GetAutoSaveTimeSeconds())).toEqual(14)
+		expect((dataStore:GetLoadRetryOptions())).toEqual(retryOptions)
+		expect((dataStore:GetSessionMessagingCloseDelaySeconds())).toEqual(0.5)
+
+		controller:destroy()
+	end)
+
+	it("rejects configuration after start", function()
+		local controller = setupConfigured(function() end)
+
+		expect(function()
+			controller.service:SetAutoSaveTimeSeconds(14)
+		end).toThrow()
+		expect(function()
+			controller.service:SetLoadRetryOptions({ initialWaitTime = 1, maxAttempts = 2, printWarning = false })
+		end).toThrow()
+		expect(function()
+			controller.service:SetSessionMessagingCloseDelaySeconds(0.5)
+		end).toThrow()
+
+		controller:destroy()
+	end)
+end)
