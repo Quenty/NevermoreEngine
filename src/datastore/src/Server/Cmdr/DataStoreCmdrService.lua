@@ -42,9 +42,12 @@ local require = require(script.Parent.loader).load(script)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
+local CmdrReplyUtils = require("CmdrReplyUtils")
 local CmdrService = require("CmdrService")
+local CmdrTypes = require("CmdrTypes")
 local DataStoreCmdrUtils = require("DataStoreCmdrUtils")
 local DataStoreLockUtils = require("DataStoreLockUtils")
+local DataStoreStage = require("DataStoreStage")
 local Maid = require("Maid")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PlayerDataStoreService = require("PlayerDataStoreService")
@@ -60,13 +63,29 @@ export type DataStoreCmdrService = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_cmdrService: any,
 		_playerDataStoreService: any,
-		_knownSubStoreNames: { [string]: true },
+		_replyConfig: CmdrReplyUtils.CmdrReplyConfig,
 	},
 	{} :: typeof({ __index = DataStoreCmdrService })
 ))
 
 type Manager = PlayerDataStoreManager.PlayerDataStoreManager
 type UserIdHandler = (Manager, number) -> Promise.Promise<string>
+type CommandContext = CmdrTypes.CommandContext
+
+--[[
+	Walks a sub-store path from a store, returning the store itself for an empty path.
+]]
+local function resolveSubStore(
+	dataStoreStage: DataStoreStage.DataStoreStage,
+	path: { string }
+): DataStoreStage.DataStoreStage
+	local current = dataStoreStage
+	for _, segment in path do
+		current = current:GetSubStore(segment)
+	end
+
+	return current
+end
 
 --[=[
 	Initializes the service. Should be done via [ServiceBag.Init].
@@ -76,7 +95,7 @@ function DataStoreCmdrService.Init(self: DataStoreCmdrService, serviceBag: Servi
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
-	self._knownSubStoreNames = {}
+	self._replyConfig = CmdrReplyUtils.createConfig()
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(CmdrService)
@@ -84,13 +103,26 @@ function DataStoreCmdrService.Init(self: DataStoreCmdrService, serviceBag: Servi
 end
 
 --[=[
+	Sets how long a command may run before it tells the executor it is still working, and how that
+	line is colored.
+
+	@param replyConfig CmdrReplyConfig -- see [CmdrReplyUtils.createConfig]
+]=]
+function DataStoreCmdrService.SetReplyConfig(
+	self: DataStoreCmdrService,
+	replyConfig: CmdrReplyUtils.CmdrReplyConfig
+): ()
+	assert(CmdrReplyUtils.isCmdrReplyConfig(replyConfig), "Bad replyConfig")
+
+	self._replyConfig = replyConfig
+end
+
+--[=[
 	Registers the commands. Should be done via [ServiceBag.Start].
 ]=]
 function DataStoreCmdrService.Start(self: DataStoreCmdrService): ()
 	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
-		DataStoreCmdrUtils.registerSubStoreType(cmdr, function()
-			return self:_getKnownSubStoreNames()
-		end)
+		DataStoreCmdrUtils.registerSubStoreType(cmdr)
 
 		self:_registerCommands()
 	end)
@@ -112,11 +144,11 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-lock-info",
-		Description = "Reads the session lock on each player's datastore key.",
+		Description = "Reads the session lock on each player's datastore key. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = { playersArg },
-	}, function(_context, userIds: { number })
-		return self:_executeForUserIds(userIds, function(manager, userId)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return manager:PromiseReadSessionLock(userId):Then(function(lockData)
 				return `{userId}: {DataStoreLockUtils.toHumanReadable(lockData)}`
 			end)
@@ -125,11 +157,11 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-unlock",
-		Description = "Clears the session lock on each player's datastore key, releasing a claim left behind by a dead server.",
+		Description = "Clears the session lock on each player's datastore key, releasing a claim left behind by a dead server. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = { playersArg },
-	}, function(_context, userIds: { number })
-		return self:_executeForUserIds(userIds, function(manager, userId)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return manager:PromiseUnlockSession(userId):Then(function(previousLock)
 				if previousLock == nil or previousLock.ActiveSession == nil then
 					return `{userId} was already unlocked. Nothing to do.`
@@ -142,11 +174,11 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-lock",
-		Description = "Claims each player's datastore key so an inspection is not racing a live server. Soft: a loading session steals it once its retry ladder runs out.",
+		Description = "Claims each player's datastore key so an inspection is not racing a live server. Soft: a loading session steals it once its retry ladder runs out. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = { playersArg },
-	}, function(_context, userIds: { number })
-		return self:_executeForUserIds(userIds, function(manager, userId)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return manager:PromiseLockSession(userId):Then(function(previousLock)
 				if previousLock == nil or previousLock.ActiveSession == nil then
 					return `Locked {userId}.`
@@ -159,14 +191,13 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-read-json",
-		Description = "Reads each player's datastore as JSON. Steals the session.",
+		Description = "Reads each player's datastore as JSON. Steals the session. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = { playersArg, subStoreArg },
-	}, function(_context, userIds: { number }, path: { string }?)
-		return self:_executeForUserIds(userIds, function(manager, userId)
+	}, function(context: CommandContext, userIds: { number }, path: { string }?)
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return self:_promiseWithDataStore(manager, userId, false, function(dataStore)
-				return DataStoreCmdrUtils.resolveSubStore(dataStore, path or {}):LoadAll({}):Then(function(data)
-					self:_rememberSubStoreNames(data, path)
+				return resolveSubStore(dataStore, path or {}):LoadAll({}):Then(function(data)
 					return `-- {userId} {self:_describePath(path)}\n{HttpService:JSONEncode(data)}`
 				end)
 			end)
@@ -175,7 +206,7 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-write-json",
-		Description = "Overwrites each player's datastore with the given JSON. Steals the session.",
+		Description = "Overwrites each player's datastore with the given JSON. Steals the session. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = {
 			playersArg,
@@ -187,15 +218,15 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 			},
 			subStoreArg,
 		},
-	}, function(_context, userIds: { number }, json: string, path: { string }?)
+	}, function(context: CommandContext, userIds: { number }, json: string, path: { string }?)
 		local ok, decoded = pcall(HttpService.JSONDecode, HttpService, json)
 		if not ok then
 			return `Failed: could not decode JSON: {tostring(decoded)}`
 		end
 
-		return self:_executeForUserIds(userIds, function(manager, userId)
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return self:_promiseWithDataStore(manager, userId, true, function(dataStore)
-				DataStoreCmdrUtils.resolveSubStore(dataStore, path or {}):Overwrite(decoded)
+				resolveSubStore(dataStore, path or {}):Overwrite(decoded)
 				return Promise.resolved(`Wrote {userId} {self:_describePath(path)}.`)
 			end)
 		end)
@@ -203,13 +234,13 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-delete",
-		Description = "Wipes each player's datastore, or one sub-store of it. Steals the session.",
+		Description = "Wipes each player's datastore, or one sub-store of it. Steals the session. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = { playersArg, subStoreArg },
-	}, function(_context, userIds: { number }, path: { string }?)
-		return self:_executeForUserIds(userIds, function(manager, userId)
+	}, function(context: CommandContext, userIds: { number }, path: { string }?)
+		return self:_executeForUserIds(context, userIds, function(manager, userId)
 			return self:_promiseWithDataStore(manager, userId, true, function(dataStore)
-				DataStoreCmdrUtils.resolveSubStore(dataStore, path or {}):Wipe()
+				resolveSubStore(dataStore, path or {}):Wipe()
 				return Promise.resolved(`Deleted {userId} {self:_describePath(path)}.`)
 			end)
 		end)
@@ -217,7 +248,7 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 
 	self._cmdrService:RegisterCommand({
 		Name = "datastore-copy",
-		Description = "Copies one player's datastore over others'. Steals the session from every player involved.",
+		Description = "Copies one player's datastore over others'. Steals the session from every player involved. Works remotely and on players in-game.",
 		Group = "DataStore",
 		Args = {
 			{
@@ -232,27 +263,27 @@ function DataStoreCmdrService._registerCommands(self: DataStoreCmdrService): ()
 			},
 			subStoreArg,
 		},
-	}, function(_context, fromUserId: number, toUserIds: { number }, path: { string }?)
+	}, function(context: CommandContext, fromUserId: number, toUserIds: { number }, path: { string }?)
 		local readPromise = self._playerDataStoreService:PromiseManager():Then(function(manager)
 			return self:_promiseWithDataStore(manager, fromUserId, false, function(dataStore)
-				return DataStoreCmdrUtils.resolveSubStore(dataStore, path or {}):LoadAll({})
+				return resolveSubStore(dataStore, path or {}):LoadAll({})
 			end)
 		end)
+
+		CmdrReplyUtils.replyWhenSlow(self._replyConfig, context, readPromise, `{fromUserId}: still reading...`)
 
 		local ok, source = self._maid:GivePromise(readPromise):Yield()
 		if not ok then
 			return `Failed to read {fromUserId}: {tostring(source)}`
 		end
 
-		self:_rememberSubStoreNames(source, path)
-
-		return self:_executeForUserIds(toUserIds, function(manager, userId)
+		return self:_executeForUserIds(context, toUserIds, function(manager, userId)
 			if userId == fromUserId then
 				return Promise.resolved(`{userId} is the source. Skipped.`)
 			end
 
 			return self:_promiseWithDataStore(manager, userId, true, function(dataStore)
-				DataStoreCmdrUtils.resolveSubStore(dataStore, path or {}):Overwrite(source)
+				resolveSubStore(dataStore, path or {}):Overwrite(source)
 				return Promise.resolved(`Copied {fromUserId} {self:_describePath(path)} onto {userId}.`)
 			end)
 		end)
@@ -305,19 +336,25 @@ function DataStoreCmdrService._promiseWithDataStore(
 		local handleId = self._maid:GiveTask(handle :: any)
 
 		local function release(): Promise.Promise<()>
-			-- Destroying the handle closes a borrowed session and flushes it. A live player's store is
-			-- not the handle's to close, so that one is saved explicitly instead.
-			local savePromise: Promise.Promise<()> = Promise.resolved()
-			if isInThisServer and doesWrite then
-				savePromise = handle:GetDataStore():Save()
-			end
+			-- A write only stages, so a command can reach here with the opening load still in flight.
+			-- Releasing then destroys the store out from under it, and the UpdateAsync Roblox has
+			-- already dispatched calls back into the wreckage. Let the load settle first. Resolves
+			-- either way -- a load that failed is still a load that is no longer running.
+			return handle:GetDataStore():PromiseLoadSuccessful():Then(function()
+				-- Destroying the handle closes a borrowed session and flushes it. A live player's store
+				-- is not the handle's to close, so that one is saved explicitly instead.
+				local savePromise: Promise.Promise<()> = Promise.resolved()
+				if isInThisServer and doesWrite then
+					savePromise = handle:GetDataStore():Save()
+				end
 
-			return savePromise:Finally(function()
-				self._maid[handleId] = nil
+				return savePromise:Finally(function()
+					self._maid[handleId] = nil
 
-				-- Destroying the handle only *starts* the save-and-close, so wait for it here: the
-				-- command reports success once the lock it took is gone, not while it is still held.
-				return manager:PromiseSessionClosed(userId)
+					-- Destroying the handle only *starts* the save-and-close, so wait for it here: the
+					-- command reports success once the lock it took is gone, not while it is still held.
+					return manager:PromiseSessionClosed(userId)
+				end)
 			end)
 		end
 
@@ -344,12 +381,18 @@ end
 	fails reports on its own line rather than throwing into Cmdr or costing the rest of the batch its
 	result.
 
+	Nothing reaches the console until every target is done, and a single target can sit in a load
+	retry ladder for a long time, so a target still going after the reply config's
+	`slowReplySeconds` says so.
+
+	@param context CommandContext
 	@param userIds { number }
 	@param handler (PlayerDataStoreManager, number) -> Promise<string>
 	@return string
 ]=]
 function DataStoreCmdrService._executeForUserIds(
 	self: DataStoreCmdrService,
+	context: CommandContext,
 	userIds: { number },
 	handler: UserIdHandler
 ): string
@@ -363,7 +406,12 @@ function DataStoreCmdrService._executeForUserIds(
 
 		for _, userId in userIds do
 			chain = chain:Then(function()
-				return handler(manager, userId)
+				return CmdrReplyUtils.replyWhenSlow(
+					self._replyConfig,
+					context,
+					handler(manager, userId),
+					`{userId}: still working...`
+				)
 					:Then(function(line)
 						table.insert(lines, line)
 					end)
@@ -392,21 +440,6 @@ function DataStoreCmdrService._describePath(_self: DataStoreCmdrService, path: {
 	end
 
 	return table.concat(path, "/")
-end
-
-function DataStoreCmdrService._rememberSubStoreNames(self: DataStoreCmdrService, data: any, path: { string }?): ()
-	local prefix = if path and #path > 0 then table.concat(path, "/") else nil
-	DataStoreCmdrUtils.harvestSubStoreNames(self._knownSubStoreNames, data, prefix)
-end
-
-function DataStoreCmdrService._getKnownSubStoreNames(self: DataStoreCmdrService): { string }
-	local names = {}
-	for name, _ in self._knownSubStoreNames do
-		table.insert(names, name)
-	end
-	table.sort(names)
-
-	return names
 end
 
 function DataStoreCmdrService.Destroy(self: DataStoreCmdrService): ()

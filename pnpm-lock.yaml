@@ -1346,6 +1346,9 @@ importers:
       '@quentystudios/cmdr':
         specifier: ^1.12.0-quenty.0
         version: 1.12.0-quenty.0
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/collectionserviceutils:
     dependencies:

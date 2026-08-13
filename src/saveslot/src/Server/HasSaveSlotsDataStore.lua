@@ -550,17 +550,21 @@ function HasSaveSlotsDataStore.PromiseExportSlot(
 end
 
 --[=[
-	Imports an exported slot into a fresh slot at the lowest free non-main index, seeding the new
-	slot's store with the exported data. Never uses the main/default index -- importing onto the
-	shared root store would wipe the player's global data. Resolves to the new slot's id. Rejects a
-	malformed export, or when no non-main index is free.
+	Imports an exported slot into a fresh slot, seeding the new slot's store with the exported data.
+	The destination defaults to the lowest free non-main index; passing `targetSlotIndex` puts the
+	import at that index instead, which must be free (delete or reset what is there first). Never uses
+	the main/default index either way -- importing onto the shared root store would wipe the player's
+	global data. Resolves to the new slot's id. Rejects a malformed export, a taken or main-slot
+	destination, or when no non-main index is free.
 
 	@param export SaveSlotExportUtils.SaveSlotExport
+	@param targetSlotIndex number? -- defaults to the lowest free non-main index
 	@return Promise<SlotId>
 ]=]
 function HasSaveSlotsDataStore.PromiseImportSlot(
 	self: HasSaveSlotsDataStore,
-	export: SaveSlotExportUtils.SaveSlotExport
+	export: SaveSlotExportUtils.SaveSlotExport,
+	targetSlotIndex: number?
 ): Promise.Promise<SaveSlotData.SlotId>
 	return (self._loadPromise :: any):Then(function()
 		if not SaveSlotExportUtils.isSaveSlotExport(export) then
@@ -575,12 +579,25 @@ function HasSaveSlotsDataStore.PromiseImportSlot(
 				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
 			end
 		end
-		local freeIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX + 1
-		while usedIndices[freeIndex] do
-			freeIndex += 1
-		end
-		if freeIndex > self.MaxSlotCount.Value then
-			return (Promise :: any).rejected("No free non-main slot index available")
+
+		local freeIndex: number
+		if targetSlotIndex then
+			if targetSlotIndex <= SaveSlotConstants.DEFAULT_SLOT_INDEX then
+				return (Promise :: any).rejected("Cannot import onto the main slot")
+			end
+			if usedIndices[targetSlotIndex] then
+				return (Promise :: any).rejected(`Slot {targetSlotIndex} already exists`)
+			end
+
+			freeIndex = targetSlotIndex
+		else
+			freeIndex = SaveSlotConstants.DEFAULT_SLOT_INDEX + 1
+			while usedIndices[freeIndex] do
+				freeIndex += 1
+			end
+			if freeIndex > self.MaxSlotCount.Value then
+				return (Promise :: any).rejected("No free non-main slot index available")
+			end
 		end
 
 		return self:PromiseCreateSlot(freeIndex, {
@@ -866,6 +883,7 @@ function HasSaveSlotsDataStore.PromiseDuplicateSlot(
 				usedIndices[SaveSlotData.SlotIndex:Get(slot)] = true
 			end
 		end
+
 		local freeIndex = 1
 		while usedIndices[freeIndex] do
 			freeIndex += 1

@@ -12,6 +12,7 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local CmdrReplyUtils = require("CmdrReplyUtils")
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
@@ -28,6 +29,10 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local ABSENT_USER_ID = 5150
+local OTHER_USER_ID = 5151
+
+-- Short enough that the progress test does not have to sit through the real threshold.
+local SLOW_REPLY_SECONDS = 0.05
 
 local function setup()
 	local maid = Maid.new()
@@ -67,7 +72,9 @@ local function setup()
 		end,
 	}
 
-	local service = setmetatable({}, { __index = SaveSlotCmdrService })
+	-- Typed loosely: the fields are filled in by hand below rather than by Init, so the table is not a
+	-- SaveSlotCmdrService until the last of them lands.
+	local service: any = setmetatable({}, { __index = SaveSlotCmdrService })
 	service._maid = Maid.new()
 	service._serviceBag = serviceBag
 	service._cmdrService = cmdrService
@@ -79,22 +86,31 @@ local function setup()
 	service._getSaveSlotService = function()
 		return saveSlotService
 	end
+	service:SetReplyConfig(CmdrReplyUtils.createConfig({ slowReplySeconds = SLOW_REPLY_SECONDS }))
 	service:Start()
 
 	maid:GiveTask(function()
 		service._maid:Destroy()
 	end)
 
+	local replies: { string } = {}
+	local context = {
+		Reply = function(_self, text: string)
+			table.insert(replies, text)
+		end,
+	}
+
 	return {
 		mock = mock,
+		replies = replies,
 		run = function(commandName: string, ...)
-			return registered[commandName](nil, ...)
+			return registered[commandName](context, ...)
 		end,
-		seed = function(raw)
-			mock:SetRaw(tostring(ABSENT_USER_ID), raw)
+		seed = function(raw, userId: number?)
+			mock:SetRaw(tostring(userId or ABSENT_USER_ID), raw)
 		end,
-		readRaw = function()
-			return mock:GetRaw(tostring(ABSENT_USER_ID))
+		readRaw = function(userId: number?)
+			return mock:GetRaw(tostring(userId or ABSENT_USER_ID))
 		end,
 		destroy = function()
 			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
@@ -115,9 +131,35 @@ describe("SaveSlotCmdrService against an absent player", function()
 			},
 		})
 
-		local output = controller.run("list-save-slots", { ABSENT_USER_ID })
+		local output = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(output, "Alpha", 1, true) ~= nil).toEqual(true)
 		expect(string.find(output, tostring(ABSENT_USER_ID), 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("lists a slot's summary and playtime, which is what the listing is read for", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = {
+						SlotIndex = 1,
+						SlotName = "Alpha",
+						TimePlayed = 5000,
+						PlayCount = 4,
+						Summary = { progress = { chapter = 3 } },
+					},
+				},
+			},
+		})
+
+		local output = controller.run("saveslot-list", { ABSENT_USER_ID })
+		expect(string.find(output, "progress: chapter = 3", 1, true) ~= nil).toEqual(true)
+		expect(string.find(output, "played 1h 23m, 4 session(s)", 1, true) ~= nil).toEqual(true)
+		-- The bug this replaced: a structured summary printed as "table: 0x...".
+		expect(string.find(output, "table: 0x", 1, true)).toBeNil()
 
 		controller.destroy()
 	end)
@@ -125,7 +167,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 	it("creates a slot that lands in their datastore", function()
 		local controller = setup()
 
-		local output = controller.run("create-save-slot", { ABSENT_USER_ID }, { 2 })
+		local output = controller.run("saveslot-create", { ABSENT_USER_ID }, { 2 })
 		expect(string.find(output, "created slot(s) 2", 1, true) ~= nil).toEqual(true)
 
 		-- The session is released when the command finishes, which is what flushes the write.
@@ -134,7 +176,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(raw.SaveSlots).never.toBeNil()
 
 		-- And a second command sees it, which it only can if the first one really persisted.
-		local listed = controller.run("list-save-slots", { ABSENT_USER_ID })
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
 
 		controller.destroy()
@@ -143,14 +185,147 @@ describe("SaveSlotCmdrService against an absent player", function()
 	it("deletes a stored slot", function()
 		local controller = setup()
 
-		controller.run("create-save-slot", { ABSENT_USER_ID }, { 1, 2 })
+		controller.run("saveslot-create", { ABSENT_USER_ID }, { 1, 2 })
 
-		local output = controller.run("delete-save-slot", { ABSENT_USER_ID }, { 1 })
+		local output = controller.run("saveslot-delete", { ABSENT_USER_ID }, { 1 })
 		expect(string.find(output, "deleted slot 1", 1, true) ~= nil).toEqual(true)
 
-		local listed = controller.run("list-save-slots", { ABSENT_USER_ID })
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "(1)", 1, true)).toBeNil()
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("copies a slot into the lowest free index when no destination is given", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = { SlotIndex = 1, SlotName = "Alpha" },
+				},
+			},
+		})
+
+		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 1, { ABSENT_USER_ID })
+		expect(string.find(output, "slot 1 →", 1, true) ~= nil).toEqual(true)
+
+		-- Inside one roster the copy is suffixed, so it does not sit beside the original under its name.
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
+		expect(string.find(listed, "Alpha (Copy)", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("copies one player's slot onto another player's, in their own datastore", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = { SlotIndex = 2, SlotName = "Alpha" },
+				},
+				slots = {
+					["slot-a"] = { coins = 100 },
+				},
+			},
+		})
+
+		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { OTHER_USER_ID })
+		expect(string.find(output, `Copied {ABSENT_USER_ID} slot 2 → {OTHER_USER_ID} slot 2`, 1, true) ~= nil).toEqual(
+			true
+		)
+
+		-- Landed in the other player's own key, keeping the source's name -- only a copy inside one
+		-- roster is suffixed.
+		expect(controller.readRaw(OTHER_USER_ID)).never.toBeNil()
+		local listed = controller.run("saveslot-list", { OTHER_USER_ID })
+		expect(string.find(listed, '"Alpha" (2)', 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("copies onto the named destination, overwriting the slot already there", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = { SlotIndex = 2, SlotName = "Alpha" },
+					["slot-b"] = { SlotIndex = 3, SlotName = "Beta" },
+				},
+			},
+		})
+
+		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 3)
+		expect(string.find(output, "overwriting what was there", 1, true) ~= nil).toEqual(true)
+
+		-- Beta is gone, and slot 3 is now the copy of Alpha rather than a fourth slot.
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
+		expect(string.find(listed, "Beta", 1, true)).toBeNil()
+		expect(string.find(listed, "(4)", 1, true)).toBeNil()
+		expect(string.find(listed, 'Alpha (Copy)" (3)', 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("refuses a copy whose source and destination are the same slot", function()
+		local controller = setup()
+
+		controller.run("saveslot-create", { ABSENT_USER_ID }, { 2 })
+
+		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 2)
+		expect(string.find(output, "both the source and the destination", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("refuses the main slot as a destination, whose store is the player's root data", function()
+		local controller = setup()
+
+		controller.run("saveslot-create", { ABSENT_USER_ID }, { 1, 2 })
+
+		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 1)
+		expect(string.find(output, "main slot (1) cannot be copied onto", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("round-trips a slot through read-json and write-json", function()
+		local controller = setup()
+
+		controller.seed({
+			SaveSlots = {
+				slotMetadata = {
+					["slot-a"] = { SlotIndex = 2, SlotName = "Alpha" },
+				},
+				slots = {
+					["slot-a"] = { coins = 100 },
+				},
+			},
+		})
+
+		local read = controller.run("saveslot-read-json", { ABSENT_USER_ID }, { 2 })
+		-- The command prefixes a "-- player slot N" comment line; the JSON is the rest.
+		local json = string.match(read, "\n(.+)$")
+		expect(json).never.toBeNil()
+
+		local output = controller.run("saveslot-write-json", { ABSENT_USER_ID }, json)
+		expect(string.find(output, "wrote JSON → slot 3", 1, true) ~= nil).toEqual(true)
+
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
+		expect(string.find(listed, "(3)", 1, true) ~= nil).toEqual(true)
+
+		controller.destroy()
+	end)
+
+	it("reports malformed write-json input without touching anyone's data", function()
+		local controller = setup()
+
+		local output = controller.run("saveslot-write-json", { ABSENT_USER_ID }, "not json")
+		expect(string.find(output, "could not decode JSON", 1, true) ~= nil).toEqual(true)
+		expect(controller.readRaw()).toBeNil()
 
 		controller.destroy()
 	end)
@@ -167,7 +342,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 			},
 		})
 
-		local output = controller.run("get-active-save-slot", { ABSENT_USER_ID })
+		local output = controller.run("saveslot-get-active", { ABSENT_USER_ID })
 		expect(string.find(output, "would resume on slot 3", 1, true) ~= nil).toEqual(true)
 
 		controller.destroy()
@@ -176,15 +351,15 @@ describe("SaveSlotCmdrService against an absent player", function()
 	it("releases the session, so back-to-back commands both work", function()
 		local controller = setup()
 
-		controller.run("create-save-slot", { ABSENT_USER_ID }, { 1 })
+		controller.run("saveslot-create", { ABSENT_USER_ID }, { 1 })
 
 		-- A leaked session would leave the second command waiting on a lock this server still holds.
 		local promise = Promise.new(function(resolve)
-			resolve(controller.run("create-save-slot", { ABSENT_USER_ID }, { 2 }))
+			resolve(controller.run("saveslot-create", { ABSENT_USER_ID }, { 2 }))
 		end)
 		expect(PromiseTestUtils.awaitSettled(promise, 10)).toEqual(true)
 
-		local listed = controller.run("list-save-slots", { ABSENT_USER_ID })
+		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "(1)", 1, true) ~= nil).toEqual(true)
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
 
@@ -194,7 +369,20 @@ describe("SaveSlotCmdrService against an absent player", function()
 	it("reports an empty target list rather than doing nothing quietly", function()
 		local controller = setup()
 
-		expect(controller.run("list-save-slots", {})).toEqual("No players to act on.")
+		expect(controller.run("saveslot-list", {})).toEqual("No players to act on.")
+
+		controller.destroy()
+	end)
+
+	it("reports a target that is taking a while", function()
+		local controller = setup()
+
+		controller.mock:SetYieldTime(SLOW_REPLY_SECONDS * 2)
+
+		controller.run("saveslot-list", { ABSENT_USER_ID })
+
+		expect(#controller.replies).toEqual(1)
+		expect(string.find(controller.replies[1], tostring(ABSENT_USER_ID), 1, true) ~= nil).toEqual(true)
 
 		controller.destroy()
 	end)

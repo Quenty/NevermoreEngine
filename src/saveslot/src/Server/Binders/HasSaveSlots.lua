@@ -249,17 +249,19 @@ function HasSaveSlots.PromiseExportSlot(
 end
 
 --[=[
-	Imports an exported slot into a fresh slot at the lowest free non-main index. See
+	Imports an exported slot into a fresh slot, at the lowest free non-main index by default. See
 	[HasSaveSlotsDataStore.PromiseImportSlot].
 
 	@param export SaveSlotExportUtils.SaveSlotExport
+	@param targetSlotIndex number? -- defaults to the lowest free non-main index
 	@return Promise<SlotId>
 ]=]
 function HasSaveSlots.PromiseImportSlot(
 	self: HasSaveSlots,
-	export: SaveSlotExportUtils.SaveSlotExport
+	export: SaveSlotExportUtils.SaveSlotExport,
+	targetSlotIndex: number?
 ): Promise.Promise<SaveSlotData.SlotId>
-	return self._slotsDataStore:PromiseImportSlot(export)
+	return self._slotsDataStore:PromiseImportSlot(export, targetSlotIndex)
 end
 
 --[=[

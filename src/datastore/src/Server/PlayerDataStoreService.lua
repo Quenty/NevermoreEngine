@@ -50,6 +50,9 @@ function PlayerDataStoreService.Init(self: PlayerDataStoreService, serviceBag: S
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
 	self._serviceBag:GetService(require("PlaceMessagingService"))
 
+	-- Internal
+	self._serviceBag:GetService(require("DataStoreCmdrService"))
+
 	-- State
 	self._promiseStarted = self._maid:Add(Promise.new())
 	self._dataStoreName = "PlayerData"

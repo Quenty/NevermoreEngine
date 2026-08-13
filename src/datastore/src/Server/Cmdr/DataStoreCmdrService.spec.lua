@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
 
+local CmdrReplyUtils = require("CmdrReplyUtils")
 local DataStoreCmdrService = require("DataStoreCmdrService")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
@@ -21,6 +22,9 @@ local Promise = require("Promise")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+
+-- Short enough that the progress tests do not have to sit through the real threshold.
+local SLOW_REPLY_SECONDS = 0.05
 
 local FOREIGN_LOCK = {
 	LastUpdateTime = os.time(),
@@ -42,19 +46,6 @@ local function setup()
 				registeredTypes[name] = definition
 			end,
 		},
-		Util = {
-			MakeFuzzyFinder = function(names)
-				return function(text)
-					local matches = {}
-					for _, name in names do
-						if string.find(string.lower(name), string.lower(text), 1, true) then
-							table.insert(matches, name)
-						end
-					end
-					return matches
-				end
-			end,
-		},
 	}
 	local cmdrService = {
 		RegisterCommand = function(_self, definition, execute)
@@ -68,10 +59,16 @@ local function setup()
 		end,
 	}
 
+	local replies: { string } = {}
+	local context = {
+		Reply = function(_self, text: string)
+			table.insert(replies, text)
+		end,
+	}
+
 	local serviceMaid = Maid.new()
 	local service = setmetatable({
 		_maid = serviceMaid,
-		_knownSubStoreNames = {},
 		_cmdrService = cmdrService,
 		_playerDataStoreService = {
 			PromiseManager = function()
@@ -80,6 +77,7 @@ local function setup()
 		},
 	}, { __index = DataStoreCmdrService }) :: any
 
+	service:SetReplyConfig(CmdrReplyUtils.createConfig({ slowReplySeconds = SLOW_REPLY_SECONDS }))
 	service:Start()
 
 	return {
@@ -90,8 +88,9 @@ local function setup()
 			return registeredTypes.dataStoreSubStore
 		end,
 		run = function(commandName: string, ...)
-			return registered[commandName](nil, ...)
+			return registered[commandName](context, ...)
 		end,
+		replies = replies,
 		registeredNames = function()
 			local names = {}
 			for name, _ in registered do
@@ -136,6 +135,30 @@ describe("DataStoreCmdrService registration", function()
 		local controller = setup()
 
 		expect(controller.run("datastore-lock-info", {})).toEqual("No players to act on.")
+
+		controller:destroy()
+	end)
+
+	it("stays quiet while a command is quick", function()
+		local controller = setup()
+
+		controller.run("datastore-lock-info", { 1 })
+		task.wait(SLOW_REPLY_SECONDS * 2)
+
+		expect(#controller.replies).toEqual(0)
+
+		controller:destroy()
+	end)
+
+	it("reports a target that is taking a while", function()
+		local controller = setup()
+
+		controller.mock:SetYieldTime(SLOW_REPLY_SECONDS * 2)
+
+		controller.run("datastore-lock-info", { 1 })
+
+		expect(#controller.replies).toEqual(1)
+		expect(string.find(controller.replies[1], "1: ", 1, true) ~= nil).toEqual(true)
 
 		controller:destroy()
 	end)
@@ -315,6 +338,20 @@ describe("datastore-copy", function()
 		controller.mock:SetRaw("user_2", { profile = { level = 1 } })
 
 		controller.run("datastore-copy", 1, { 2 }, { "profile" })
+		expect(controller.mock:GetRaw("user_2").profile.level).toEqual(7)
+
+		controller:destroy()
+	end)
+
+	it("copies onto an absent player through a store that yields", function()
+		local controller = setup()
+
+		controller.mock:SetRaw("user_1", { profile = { level = 7 } })
+		controller.mock:SetRaw("user_2", { profile = { level = 1 } })
+		controller.mock:SetYieldTime(0.05)
+
+		controller.run("datastore-copy", 1, { 2 }, { "profile" })
+
 		expect(controller.mock:GetRaw("user_2").profile.level).toEqual(7)
 
 		controller:destroy()

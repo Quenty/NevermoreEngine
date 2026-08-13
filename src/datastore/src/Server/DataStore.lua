@@ -709,6 +709,11 @@ function DataStore._promiseGetAsyncNoCache(self: DataStore): Promise.Promise<()>
 								)
 							end
 
+							-- TODO: Bail out when this store was destroyed mid-load instead of erroring here.
+							-- Releasing the last handle for an absent player destroys the lock helper while
+							-- this UpdateAsync is still outstanding, and a destroyed BaseObject has no
+							-- methods left. Roblox aborts the update on a transform error, so this is noise
+							-- rather than a lost write.
 							local lockResult = self._sessionLockingEnabledHelper:AcquireLock(data, canStealLock)
 							if not lockResult.isValid then
 								if self._sessionMessagingEnabledHelper and tryMessagingServiceSessionClose then

@@ -434,7 +434,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	end)
 
 	it("deleting the last-active slot clears the continue pointer", function()
-		-- Repro for the `delete-save-slot *` bug: deleting the (deselected) active slot left
+		-- Repro for the `saveslot-delete *` bug: deleting the (deselected) active slot left
 		-- LastActiveSlotId dangling, so the menu kept offering "Continue" for a slot that was gone.
 		local context = setup()
 

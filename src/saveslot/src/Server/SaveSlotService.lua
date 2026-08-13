@@ -66,6 +66,7 @@ function SaveSlotService.Init(self: SaveSlotService, serviceBag: ServiceBag.Serv
 	self._maid = Maid.new()
 
 	-- External
+	self._serviceBag:GetService(require("DataStoreService"))
 	self._playerDataStoreService = self._serviceBag:GetService(require("PlayerDataStoreService"))
 	self._teleportDataService = self._serviceBag:GetService(TeleportDataService)
 

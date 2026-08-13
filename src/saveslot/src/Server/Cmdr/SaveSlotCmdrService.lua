@@ -2,6 +2,21 @@
 --[=[
 	Save slot admin commands.
 
+	| Command | What it does |
+	| --- | --- |
+	| `saveslot-list` | Lists every slot with its playtime, timestamps and summary |
+	| `saveslot-get-active` | Reports the slot being played, or the one that would resume |
+	| `saveslot-select` | Switches onto a slot |
+	| `saveslot-deselect` | Returns to the no-slot state |
+	| `saveslot-create` | Creates slots, defaulting to the lowest free index |
+	| `saveslot-delete` | Deletes slots |
+	| `saveslot-copy` | Copies one player's slot onto other players', **overwriting an occupied destination** |
+	| `saveslot-persist` | Turns the ephemeral session into a save and switches onto it |
+	| `saveslot-reset` | Empties slots, keeping their index and name |
+	| `saveslot-export` / `saveslot-import` | Moves a slot through the shared store as a code |
+	| `saveslot-read-json` / `saveslot-write-json` | Moves a slot as raw JSON, no shared store |
+	| `saveslot-import-ephemeral` | Loads a code into a throwaway session |
+
 	Every command takes `playerIds`, so it reaches a player who is not in this server as readily as one
 	who is: a player here is acted on through their bound [HasSaveSlots], and an absent player through
 	an [OfflineSaveSlots] opened over their datastore. Both hand back the same
@@ -19,9 +34,12 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
+local CmdrReplyUtils = require("CmdrReplyUtils")
 local CmdrService = require("CmdrService")
+local CmdrTypes = require("CmdrTypes")
 local HasSaveSlots = require("HasSaveSlots")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
@@ -36,6 +54,7 @@ SaveSlotCmdrService.ServiceName = "SaveSlotCmdrService"
 
 type SlotEntry = { slotIndex: number, slotId: string }
 type SlotEntries = { SlotEntry }
+type CommandContext = CmdrTypes.CommandContext
 
 export type SaveSlotCmdrService = typeof(setmetatable(
 	{} :: {
@@ -45,6 +64,7 @@ export type SaveSlotCmdrService = typeof(setmetatable(
 		_hasSaveSlotsBinder: any,
 		_playerDataStoreService: any,
 		_saveSlotDataService: any,
+		_replyConfig: CmdrReplyUtils.CmdrReplyConfig,
 	},
 	{} :: typeof({ __index = SaveSlotCmdrService })
 ))
@@ -53,6 +73,7 @@ function SaveSlotCmdrService.Init(self: SaveSlotCmdrService, serviceBag: Service
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
+	self._replyConfig = CmdrReplyUtils.createConfig()
 
 	-- External
 	self._cmdrService = self._serviceBag:GetService(CmdrService)
@@ -61,6 +82,18 @@ function SaveSlotCmdrService.Init(self: SaveSlotCmdrService, serviceBag: Service
 	-- Internal
 	self._hasSaveSlotsBinder = self._serviceBag:GetService(HasSaveSlots)
 	self._saveSlotDataService = self._serviceBag:GetService(SaveSlotDataService)
+end
+
+--[=[
+	Sets how long a command may run before it tells the executor it is still working, and how that
+	line is colored.
+
+	@param replyConfig CmdrReplyConfig -- see [CmdrReplyUtils.createConfig]
+]=]
+function SaveSlotCmdrService.SetReplyConfig(self: SaveSlotCmdrService, replyConfig: CmdrReplyUtils.CmdrReplyConfig): ()
+	assert(CmdrReplyUtils.isCmdrReplyConfig(replyConfig), "Bad replyConfig")
+
+	self._replyConfig = replyConfig
 end
 
 function SaveSlotCmdrService.Start(self: SaveSlotCmdrService)
@@ -76,7 +109,7 @@ local PLAYERS_ARG_DESCRIPTION =
 
 function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	self._cmdrService:RegisterCommand({
-		Name = "list-save-slots",
+		Name = "saveslot-list",
 		Description = "Lists all save slots.",
 		Group = "SaveSlots",
 		Args = {
@@ -86,35 +119,36 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
-	}, function(_context, userIds: { number })
-		return self:_runLines(userIds, function(slots, name)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_runLines(context, userIds, function(slots, name)
 			local activeSlotId = slots:GetActiveSlotId()
-			local slotList = slots:GetSlotList()
 
-			local listString = `\n{name}:\n`
-			if #slotList == 0 then
-				listString ..= "No slots.\n"
-			end
-
-			for _, slot in slotList do
-				local isActive = (slot.SlotId == activeSlotId)
-				listString ..= `\n"{slot.SlotName}" ({slot.SlotIndex}){isActive and " — Active" or ""}\n{slot.Summary}\n`
+			local blocks = {}
+			for _, metadata in slots:GetSlotList() do
+				local status = if metadata.SlotId == activeSlotId then "Active" else nil
+				table.insert(blocks, SaveSlotCmdrUtils.formatSlotBlock(metadata, status))
 			end
 
 			-- An ephemeral session is not a save, so it is absent from the slot list above -- but it is what
-			-- the player is playing right now and the thing persist-save-slot acts on, so list it under the
+			-- the player is playing right now and the thing saveslot-persist acts on, so list it under the
 			-- reserved index the other commands address it by.
 			if slots:IsActiveSlotEphemeral() then
-				local metadata = slots:GetActiveSlotMetadata()
-				listString ..= `\n"{metadata.SlotName}" ({metadata.SlotIndex}) — Active, ephemeral\n{metadata.Summary}\n`
+				table.insert(
+					blocks,
+					SaveSlotCmdrUtils.formatSlotBlock(slots:GetActiveSlotMetadata(), "Active, ephemeral")
+				)
 			end
 
-			return listString
+			if #blocks == 0 then
+				return `\n{name}:\nNo slots.`
+			end
+
+			return `\n{name}:\n\n{table.concat(blocks, "\n\n")}`
 		end)
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "get-active-save-slot",
+		Name = "saveslot-get-active",
 		Description = "Returns the active save slot.",
 		Group = "SaveSlots",
 		Args = {
@@ -124,8 +158,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
-	}, function(_context, userIds: { number })
-		return self:_runLines(userIds, function(slots, name)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_runLines(context, userIds, function(slots, name)
 			local activeSlotId = slots:GetActiveSlotId()
 			if activeSlotId then
 				local slotData = slots:GetSlotMetadata(activeSlotId)
@@ -145,7 +179,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "set-save-slot",
+		Name = "saveslot-select",
 		Description = "Switches to the given save slot.",
 		Group = "SaveSlots",
 		Args = {
@@ -160,8 +194,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot index to switch to, or . for your current slot.",
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndex: number)
-		return self:_runLines(userIds, function(slots, name)
+	}, function(context: CommandContext, userIds: { number }, slotIndex: number)
+		return self:_runLines(context, userIds, function(slots, name)
 			local slotId = self:_getSlotIdFromIndex(slots, slotIndex)
 			if not slotId then
 				return `{name} has no slot with index {slotIndex}.`
@@ -178,7 +212,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "deselect-save-slot",
+		Name = "saveslot-deselect",
 		Description = "Clears the active save slot, returning to a no-slot state.",
 		Group = "SaveSlots",
 		Args = {
@@ -188,8 +222,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
-	}, function(_context, userIds: { number })
-		return self:_runLines(userIds, function(slots, name)
+	}, function(context: CommandContext, userIds: { number })
+		return self:_runLines(context, userIds, function(slots, name)
 			if not slots:GetActiveSlotId() then
 				return `{name} has no active slot.`
 			end
@@ -201,7 +235,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "create-save-slot",
+		Name = "saveslot-create",
 		Description = "Creates save slots. Defaults to the lowest free index when none is given.",
 		Group = "SaveSlots",
 		Args = {
@@ -217,8 +251,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Optional = true,
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndices: { number }?)
-		return self:_runLines(userIds, function(slots, name)
+	}, function(context: CommandContext, userIds: { number }, slotIndices: { number }?)
+		return self:_runLines(context, userIds, function(slots, name)
 			-- The cap is per-player, so it has to come off each target rather than the executor, whose
 			-- cap may be larger. Read from the slot system rather than a mirrored attribute, since that
 			-- is what PromiseCreateSlot itself validates against.
@@ -275,7 +309,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "delete-save-slot",
+		Name = "saveslot-delete",
 		Description = "Deletes the given save slots.",
 		Group = "SaveSlots",
 		Args = {
@@ -290,56 +324,120 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "Slot indices to delete (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndices: { number })
-		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
-			-- The active slot can't be deleted while selected, so deselect it first (flushing its
-			-- progress) when reached. Read live rather than up front, since an earlier deletion in
-			-- this batch may have already deselected it. An ephemeral session is left alone:
-			-- PromiseDeleteSlot retires it itself, and deselecting first would retire it early,
-			-- leaving nothing behind to delete.
-			local isActive = (entry.slotId == slots:GetActiveSlotId())
-			local deselect = if isActive and not slots:IsActiveSlotEphemeral()
-				then slots:PromiseDeselectSlot()
-				else Promise.resolved()
-
-			return deselect
-				:Then(function()
-					return slots:PromiseDeleteSlot(entry.slotId)
-				end)
-				:Then(function()
-					return `{name} deleted slot {entry.slotIndex}.`
-				end)
-		end)
-	end)
-
-	self._cmdrService:RegisterCommand({
-		Name = "duplicate-save-slot",
-		Description = "Duplicates save slots into new slots at the lowest free indices. Duplicating an ephemeral session saves it without switching onto the copy -- see persist-save-slot.",
-		Group = "SaveSlots",
-		Args = {
-			{
-				Name = "Players",
-				Type = "playerIds",
-				Description = PLAYERS_ARG_DESCRIPTION,
-			},
-			{
-				Name = "Slots",
-				Type = "slotIndices",
-				Description = "Slot indices to duplicate (e.g. 1,2, . for your current slot, or * for all).",
-			},
-		},
-	}, function(_context, userIds: { number }, slotIndices: { number })
-		-- Each copy consumes a free index the next one must see, which the sequential walk guarantees.
-		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
-			return slots:PromiseDuplicateSlot(entry.slotId):Then(function(newSlotId)
-				local newMetadata = slots:GetSlotMetadata(newSlotId)
-				return `{name} slot {entry.slotIndex} → slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}")`
+	}, function(context: CommandContext, userIds: { number }, slotIndices: { number })
+		return self:_runSlotLines(context, userIds, slotIndices, function(slots, entry, name)
+			return self:_promiseClearSlot(slots, entry.slotId):Then(function()
+				return `{name} deleted slot {entry.slotIndex}.`
 			end)
 		end)
 	end)
 
+	self._cmdrService:RegisterCommand(
+		{
+			Name = "saveslot-copy",
+			Description = "Copies one player's save slot onto other players' slots. Defaults to the lowest free index when no destination is given, and OVERWRITES the destination slot when one already exists there. Copying an ephemeral session saves it without switching onto the copy -- see saveslot-persist.",
+			Group = "SaveSlots",
+			Args = {
+				{
+					Name = "FromPlayer",
+					Type = "playerId",
+					Description = "Player to copy from (e.g. . for yourself, a username, or #userId). A player who is not in this server is read offline, which kicks them.",
+				},
+				{
+					Name = "FromSlot",
+					Type = "slotIndex",
+					Description = "Slot index to copy from, or . for your current slot.",
+				},
+				{
+					Name = "ToPlayers",
+					Type = "playerIds",
+					Description = PLAYERS_ARG_DESCRIPTION,
+				},
+				{
+					Name = "ToSlot",
+					Type = "slotIndex",
+					Description = "Slot index to copy onto. Omit for the lowest free index. An existing slot there is deleted first.",
+					Optional = true,
+				},
+			},
+		},
+		function(
+			context: CommandContext,
+			fromUserId: number,
+			fromSlotIndex: number,
+			toUserIds: { number },
+			toSlotIndex: number?
+		)
+			-- Rejected once for the whole command rather than per target, since neither destination depends
+			-- on who is being written to. An ephemeral session exists only while it is active, so it can be
+			-- a source (that is how a session becomes a save) but never a destination. The main slot is
+			-- refused because its store is the player's shared root: an import there would land on top of
+			-- their universe-wide data (see HasSaveSlotsDataStore.PromiseImportSlot).
+			if toSlotIndex == SaveSlotConstants.EPHEMERAL_SLOT_INDEX then
+				return "An ephemeral session cannot be copied onto."
+			elseif toSlotIndex == SaveSlotConstants.DEFAULT_SLOT_INDEX then
+				return `The main slot ({SaveSlotConstants.DEFAULT_SLOT_INDEX}) cannot be copied onto.`
+			end
+
+			-- Read the source once, up front, and give its session back before any destination is opened:
+			-- the source player may also be a destination, and a second session on the same player would be
+			-- racing the first for their own lock. Mirrors datastore-copy.
+			local readPromise = self:_promiseWithSlots(fromUserId, function(slots, name)
+				local sourceSlotId = self:_getSlotIdFromIndex(slots, fromSlotIndex)
+				if not sourceSlotId then
+					return Promise.rejected(`{name} has no slot with index {fromSlotIndex}`)
+				end
+
+				-- Admin tooling copies the main slot too, which the normal path refuses. See
+				-- HasSaveSlotsDataStore.PromiseExportSlot for what that carries.
+				return slots:PromiseExportSlot(sourceSlotId, true):Then(function(export)
+					return { export = export, slotId = sourceSlotId, name = name }
+				end)
+			end)
+
+			local ok, source = CmdrReplyUtils.replyWhenSlow(
+				self._replyConfig,
+				context,
+				self._maid:GivePromise(readPromise),
+				`{fromUserId}: still reading...`
+			):Yield()
+			if not ok then
+				return `Failed to read {fromUserId}: {tostring(source)}`
+			end
+
+			return self:_runLines(context, toUserIds, function(slots, name, userId)
+				local existingSlotId = if toSlotIndex then slots:GetSlotIdFromIndex(toSlotIndex) else nil
+				if (userId == fromUserId) and (existingSlotId == source.slotId) then
+					return `{name}: slot {fromSlotIndex} is both the source and the destination.`
+				end
+
+				-- Within one roster the copy would otherwise sit beside the original under its name, so it
+				-- is suffixed the way a duplicate always was. Across players it keeps the name it had.
+				local export = source.export
+				if (userId == fromUserId) and export.slotName then
+					export = table.clone(export)
+					export.slotName = `{export.slotName} (Copy)`
+				end
+
+				local clear = if existingSlotId
+					then self:_promiseClearSlot(slots, existingSlotId)
+					else Promise.resolved()
+
+				return clear
+					:Then(function()
+						return slots:PromiseImportSlot(export, toSlotIndex)
+					end)
+					:Then(function(newSlotId)
+						local newMetadata = slots:GetSlotMetadata(newSlotId)
+						local overwrote = if existingSlotId then ", overwriting what was there" else ""
+						return `Copied {source.name} slot {fromSlotIndex} → {name} slot {newMetadata.SlotIndex} ("{newMetadata.SlotName}"){overwrote}`
+					end)
+			end)
+		end
+	)
+
 	self._cmdrService:RegisterCommand({
-		Name = "persist-save-slot",
+		Name = "saveslot-persist",
 		Description = "Turns an ephemeral session into a real save slot and switches onto it.",
 		Group = "SaveSlots",
 		Args = {
@@ -349,11 +447,11 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = PLAYERS_ARG_DESCRIPTION,
 			},
 		},
-	}, function(_context, userIds: { number })
+	}, function(context: CommandContext, userIds: { number })
 		-- Takes no slot argument: an ephemeral slot exists only while it is active, so the active slot is
 		-- the only one there is to persist. An absent player has no session at all, so this only ever
 		-- reports on them.
-		return self:_runLines(userIds, function(slots, name)
+		return self:_runLines(context, userIds, function(slots, name)
 			if not slots:IsActiveSlotEphemeral() then
 				return `{name} has no ephemeral session active.`
 			end
@@ -366,7 +464,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "reset-save-slot",
+		Name = "saveslot-reset",
 		Description = "Resets save slots to fresh empty ones, keeping their index and name.",
 		Group = "SaveSlots",
 		Args = {
@@ -377,15 +475,15 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			},
 			{
 				-- Required rather than defaulting to the active slot: with Players ahead of it, an
-				-- optional Slots would leave `reset-save-slot *` as valid syntax that wipes the active
+				-- optional Slots would leave `saveslot-reset *` as valid syntax that wipes the active
 				-- slot of every player in the server.
 				Name = "Slots",
 				Type = "slotIndices",
 				Description = "Slot indices to reset (e.g. 1,2, . for your current slot, or * for all).",
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndices: { number })
-		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+	}, function(context: CommandContext, userIds: { number }, slotIndices: { number })
+		return self:_runSlotLines(context, userIds, slotIndices, function(slots, entry, name)
 			return slots:PromiseResetSlot(entry.slotId):Then(function()
 				return `{name} reset slot {entry.slotIndex}.`
 			end)
@@ -393,7 +491,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "export-save-slot",
+		Name = "saveslot-export",
 		Description = "Exports save slots to the shared store and prints their codes.",
 		Group = "SaveSlots",
 		Args = {
@@ -409,10 +507,10 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Optional = true,
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndices: { number }?)
+	}, function(context: CommandContext, userIds: { number }, slotIndices: { number }?)
 		-- Admin tooling exports the main slot too, which the normal path refuses. See
 		-- HasSaveSlotsDataStore.PromiseExportSlot for what that carries.
-		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+		return self:_runSlotLines(context, userIds, slotIndices, function(slots, entry, name)
 			return slots:PromiseExportSaveSlotToCode(entry.slotId, true):Then(function(code)
 				return `{name} slot {entry.slotIndex} → {code}`
 			end)
@@ -420,8 +518,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "export-save-slot-json",
-		Description = "Exports save slots as raw JSON (no shared store) and prints them.",
+		Name = "saveslot-read-json",
+		Description = "Reads save slots as raw JSON (no shared store) and prints them.",
 		Group = "SaveSlots",
 		Args = {
 			{
@@ -432,14 +530,14 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			{
 				Name = "Slots",
 				Type = "slotIndices",
-				Description = "Slot indices to export (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
+				Description = "Slot indices to read (e.g. 1,2, . for your current slot, or * for all). Omit for each player's active slot.",
 				Optional = true,
 			},
 		},
-	}, function(_context, userIds: { number }, slotIndices: { number }?)
-		-- Admin tooling exports the main slot too, which the normal path refuses. See
+	}, function(context: CommandContext, userIds: { number }, slotIndices: { number }?)
+		-- Admin tooling reads the main slot too, which the normal path refuses. See
 		-- HasSaveSlotsDataStore.PromiseExportSlot for what that carries.
-		return self:_runSlotLines(userIds, slotIndices, function(slots, entry, name)
+		return self:_runSlotLines(context, userIds, slotIndices, function(slots, entry, name)
 			return slots:PromiseExportSaveSlotToJson(entry.slotId, true):Then(function(json)
 				return `-- {name} slot {entry.slotIndex}\n{json}`
 			end)
@@ -447,7 +545,61 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "import-save-slot",
+		Name = "saveslot-write-json",
+		Description = "Writes raw JSON (as printed by saveslot-read-json) into a save slot. Defaults to the lowest free index when no destination is given, and OVERWRITES the destination slot when one already exists there.",
+		Group = "SaveSlots",
+		Args = {
+			{
+				Name = "Players",
+				Type = "playerIds",
+				Description = PLAYERS_ARG_DESCRIPTION,
+			},
+			-- Ahead of the optional slot, since Cmdr can only leave trailing arguments off.
+			{
+				Name = "Json",
+				Type = "string",
+				Description = "Save slot JSON to write.",
+			},
+			{
+				Name = "ToSlot",
+				Type = "slotIndex",
+				Description = "Slot index to write onto. Omit for the lowest free index. An existing slot there is deleted first.",
+				Optional = true,
+			},
+		},
+	}, function(context: CommandContext, userIds: { number }, json: string, toSlotIndex: number?)
+		-- Decoded once, up front: a malformed argument is the whole command's problem, not something to
+		-- discover separately against each target after stealing their session.
+		local ok, export = pcall(HttpService.JSONDecode, HttpService, json)
+		if not ok then
+			return `Failed: could not decode JSON: {tostring(export)}`
+		end
+
+		-- Refused for the same reasons saveslot-copy refuses them, and likewise once for the whole command.
+		if toSlotIndex == SaveSlotConstants.EPHEMERAL_SLOT_INDEX then
+			return "An ephemeral session cannot be written onto."
+		elseif toSlotIndex == SaveSlotConstants.DEFAULT_SLOT_INDEX then
+			return `The main slot ({SaveSlotConstants.DEFAULT_SLOT_INDEX}) cannot be written onto.`
+		end
+
+		return self:_runLines(context, userIds, function(slots, name)
+			local existingSlotId = if toSlotIndex then slots:GetSlotIdFromIndex(toSlotIndex) else nil
+			local clear = if existingSlotId then self:_promiseClearSlot(slots, existingSlotId) else Promise.resolved()
+
+			return clear
+				:Then(function()
+					return slots:PromiseImportSlot(export, toSlotIndex)
+				end)
+				:Then(function(newSlotId)
+					local metadata = slots:GetSlotMetadata(newSlotId)
+					local overwrote = if existingSlotId then ", overwriting what was there" else ""
+					return `{name} wrote JSON → slot {metadata.SlotIndex} ("{metadata.SlotName}"){overwrote}`
+				end)
+		end)
+	end)
+
+	self._cmdrService:RegisterCommand({
+		Name = "saveslot-import",
 		Description = "Imports a save slot code into a new persisted (non-main) slot.",
 		Group = "SaveSlots",
 		Args = {
@@ -462,8 +614,8 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "The code to import.",
 			},
 		},
-	}, function(_context, userId: number, code: string)
-		return self:_runLines({ userId }, function(slots, name)
+	}, function(context: CommandContext, userId: number, code: string)
+		return self:_runLines(context, { userId }, function(slots, name)
 			return slots:PromiseImportSlotFromSharedDataStore(code):Then(function(newSlotId)
 				local metadata = slots:GetSlotMetadata(newSlotId)
 				return `Imported save slot from code into {name} slot {metadata.SlotIndex} ("{metadata.SlotName}").`
@@ -472,7 +624,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 	end)
 
 	self._cmdrService:RegisterCommand({
-		Name = "import-ephemeral-save-slot",
+		Name = "saveslot-import-ephemeral",
 		Description = "Imports a save slot code into a throwaway ephemeral slot and selects it.",
 		Group = "SaveSlots",
 		Args = {
@@ -487,7 +639,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 				Description = "The code to load.",
 			},
 		},
-	}, function(_context, userId: number, code: string)
+	}, function(context: CommandContext, userId: number, code: string)
 		-- The one command with no offline meaning: an ephemeral slot exists only for the duration of a
 		-- live session, so importing one for an absent player would create it and immediately discard it.
 		local player = Players:GetPlayerByUserId(userId)
@@ -495,7 +647,7 @@ function SaveSlotCmdrService._registerCommands(self: SaveSlotCmdrService): ()
 			return `{userId} is not in this server, and an ephemeral slot needs a live session.`
 		end
 
-		return self:_runLines({ userId }, function(slots, name)
+		return self:_runLines(context, { userId }, function(slots, name)
 			return slots:PromiseImportEphemeralSaveSlotFromCode(code):Then(function()
 				return `Imported ephemeral save slot into {name} from code: {code}`
 			end)
@@ -527,6 +679,24 @@ function SaveSlotCmdrService._getSlotIdFromIndex(_self: SaveSlotCmdrService, slo
 	end
 
 	return slots:GetSlotIdFromIndex(slotIndex)
+end
+
+-- Deletes a slot, handling the case where it is the one being played. Backs saveslot-delete, and the
+-- overwriting half of saveslot-copy and saveslot-write-json, which make room by deleting first.
+--
+-- The active slot can't be deleted while selected, so deselect it first (flushing its progress) when
+-- reached. Read live rather than up front, since an earlier deletion in the same batch may have
+-- already deselected it. An ephemeral session is left alone: PromiseDeleteSlot retires it itself, and
+-- deselecting first would retire it early, leaving nothing behind to delete.
+function SaveSlotCmdrService._promiseClearSlot(_self: SaveSlotCmdrService, slots: any, slotId: string): any
+	local isActive = (slotId == slots:GetActiveSlotId())
+	local deselect = if isActive and not slots:IsActiveSlotEphemeral()
+		then slots:PromiseDeselectSlot()
+		else Promise.resolved()
+
+	return deselect:Then(function()
+		return slots:PromiseDeleteSlot(slotId)
+	end)
 end
 
 -- Resolves a slotIndices argument (or nil = the active slot) into de-duplicated { slotIndex, slotId }
@@ -572,7 +742,7 @@ end
 function SaveSlotCmdrService._promiseWithSlots(
 	self: SaveSlotCmdrService,
 	userId: number,
-	handler: (any, string) -> any
+	handler: (any, string, number) -> any
 ): any
 	local player = Players:GetPlayerByUserId(userId)
 
@@ -580,7 +750,7 @@ function SaveSlotCmdrService._promiseWithSlots(
 		return self._maid:GivePromise(self._hasSaveSlotsBinder:Promise(player)):Then(function(hasSaveSlots)
 			local slots = hasSaveSlots:GetSlotsDataStore()
 			return slots:PromiseSlotsLoaded():Then(function()
-				return handler(slots, player.Name)
+				return handler(slots, player.Name, userId)
 			end)
 		end)
 	end
@@ -619,7 +789,7 @@ function SaveSlotCmdrService._promiseWithSlots(
 		return offline
 			:PromiseSlotsLoaded()
 			:Then(function()
-				return handler(offline:GetSlotsDataStore(), tostring(userId))
+				return handler(offline:GetSlotsDataStore(), tostring(userId), userId)
 			end)
 			:Then(function(result)
 				return release():Then(function()
@@ -638,17 +808,26 @@ end
 
 -- Runs handler once per target, sequentially, to avoid concurrent datastore writes and to keep only
 -- one stolen session open at a time. Reports per target, so one failure still surfaces the successes.
+--
+-- Nothing reaches the console until every target is done, and opening an absent player's session can
+-- take a while, so a target still going after the reply config's slowReplySeconds says so.
 function SaveSlotCmdrService._promiseTargetLines(
 	self: SaveSlotCmdrService,
+	context: CommandContext,
 	userIds: { number },
-	handler: (any, string) -> any
+	handler: (any, string, number) -> any
 ): any
 	local promise = Promise.resolved()
 	local results: { string } = {}
 
 	for _, userId in userIds do
 		promise = promise:Then(function()
-			return self:_promiseWithSlots(userId, handler)
+			return CmdrReplyUtils.replyWhenSlow(
+				self._replyConfig,
+				context,
+				self:_promiseWithSlots(userId, handler),
+				`{userId}: still working...`
+			)
 				:Then(function(line)
 					if line ~= nil then
 						table.insert(results, line)
@@ -669,14 +848,15 @@ end
 -- thread, so yielding here is what lets a command report a finished result.
 function SaveSlotCmdrService._runLines(
 	self: SaveSlotCmdrService,
+	context: CommandContext,
 	userIds: { number },
-	handler: (any, string) -> any
+	handler: (any, string, number) -> any
 ): string
 	if #userIds == 0 then
 		return "No players to act on."
 	end
 
-	local lines = self:_promiseTargetLines(userIds, handler):Wait()
+	local lines = self:_promiseTargetLines(context, userIds, handler):Wait()
 	return table.concat(lines, "\n")
 end
 
@@ -684,11 +864,12 @@ end
 -- slot. Reports per slot, so one bad slot does not hide the rest.
 function SaveSlotCmdrService._runSlotLines(
 	self: SaveSlotCmdrService,
+	context: CommandContext,
 	userIds: { number },
 	slotIndices: { number }?,
 	handleSlot: (any, SlotEntry, string) -> any
 ): string
-	return self:_runLines(userIds, function(slots, name)
+	return self:_runLines(context, userIds, function(slots, name)
 		local entries = self:_resolveSlotEntries(slots, slotIndices)
 		if #entries == 0 then
 			return `{name}: no matching slots.`

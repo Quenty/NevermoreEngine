@@ -32,6 +32,7 @@ function SettingsService.Init(self: SettingsService, serviceBag: ServiceBag.Serv
 	self._maid = Maid.new()
 
 	-- External
+	self._serviceBag:GetService(require("DataStoreService"))
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
 	self._serviceBag:GetService((require :: any)("SettingsCmdrService"))
 
