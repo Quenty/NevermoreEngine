@@ -1,19 +1,13 @@
-# v15.65.0 (Fri Aug 14 2026)
-
-#### 🚀 Enhancement
-
-- feat(ragdoll): add ragdoll and unragdoll cmdr commands [#802](https://github.com/Quenty/NevermoreEngine/pull/802) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.2...@quenty/ragdoll@15.65.0) (2026-08-14)
+
+### Features
+
+- **ragdoll:** add ragdoll and unragdoll cmdr commands ([#802](https://github.com/Quenty/NevermoreEngine/issues/802)) ([dd3d887](https://github.com/Quenty/NevermoreEngine/commit/dd3d887b920fe80cc21f86bd1eceb58f43ad0e00))
 
 ## [15.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.1...@quenty/ragdoll@15.64.2) (2026-08-12)
 
