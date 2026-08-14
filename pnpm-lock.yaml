@@ -4111,6 +4111,9 @@ importers:
       '@quenty/characterutils':
         specifier: workspace:*
         version: link:../characterutils
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/draw':
         specifier: workspace:*
         version: link:../draw
@@ -4144,6 +4147,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/playerutils':
+        specifier: workspace:*
+        version: link:../playerutils
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
