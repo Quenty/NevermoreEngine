@@ -1,20 +1,13 @@
-# v15.66.1 (Fri Aug 14 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
-- fix(ragdoll): Clean up previous motor state when ragdoll inputs change ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [15.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.66.0...@quenty/ik@15.66.1) (2026-08-14)
+
+### Bug Fixes
+
+- **ragdoll:** Clean up previous motor state when ragdoll inputs change ([9731cf7](https://github.com/Quenty/NevermoreEngine/commit/9731cf70a88f3924a5232c21aacc0ffc40b61826))
 
 # [15.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.65.2...@quenty/ik@15.66.0) (2026-08-14)
 

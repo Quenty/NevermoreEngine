@@ -1,21 +1,14 @@
-# v11.48.2 (Fri Aug 14 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
-- fix: This can break replication sometimes it looks like ([@Quenty](https://github.com/Quenty))
-- fix: Parent stuff to the right place ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.48.1...@quenty/templateprovider@11.48.2) (2026-08-14)
+
+### Bug Fixes
+
+- Parent stuff to the right place ([bb33329](https://github.com/Quenty/NevermoreEngine/commit/bb3332922e6048b9467d8cb6e11a23806080e8b7))
+- This can break replication sometimes it looks like ([69dd09a](https://github.com/Quenty/NevermoreEngine/commit/69dd09a614de40b6e5240b1dc228364b2f56b396))
 
 ## [11.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.48.0...@quenty/templateprovider@11.48.1) (2026-08-10)
 

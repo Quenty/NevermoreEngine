@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textboxutils@7.33.0...@quenty/textboxutils@7.33.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/textboxutils
+
 # [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/textboxutils@7.32.0...@quenty/textboxutils@7.33.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/textboxutils

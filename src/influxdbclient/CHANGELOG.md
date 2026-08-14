@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.42.1...@quenty/influxdbclient@7.42.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/influxdbclient
+
 ## [7.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.42.0...@quenty/influxdbclient@7.42.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/influxdbclient
