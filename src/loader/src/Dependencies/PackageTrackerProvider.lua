@@ -16,7 +16,6 @@ export type PackageTrackerProvider = typeof(setmetatable(
 	{} :: {
 		_packageTrackersRoots: { [Instance]: PackageTracker.PackageTracker },
 		_maid: Maid.Maid,
-		_trackCount: number,
 	},
 	{} :: typeof({ __index = PackageTrackerProvider })
 ))
@@ -26,7 +25,6 @@ function PackageTrackerProvider.new(): PackageTrackerProvider
 
 	self._maid = Maid.new()
 	self._packageTrackersRoots = {}
-	self._trackCount = 0
 
 	return self
 end
@@ -40,8 +38,6 @@ function PackageTrackerProvider.AddPackageRoot(
 	if self._packageTrackersRoots[instance] then
 		return self._packageTrackersRoots[instance]
 	end
-
-	self._trackCount += 1
 
 	local maid = Maid.new()
 
@@ -78,6 +74,7 @@ end
 
 function PackageTrackerProvider.Destroy(self: PackageTrackerProvider)
 	self._maid:DoCleaning()
+	setmetatable(self :: any, nil)
 end
 
 return PackageTrackerProvider

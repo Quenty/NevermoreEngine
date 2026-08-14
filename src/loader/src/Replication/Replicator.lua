@@ -580,7 +580,7 @@ function Replicator._doObjectValueReplication(self: Replicator, child: ValueBase
 				(copy :: any).Value = newValue
 			else
 				-- Fall back to original value (pointing outside of tree)
-				newValue = childValue
+				(copy :: any).Value = childValue
 			end
 		end))
 
