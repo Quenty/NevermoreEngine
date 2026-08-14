@@ -1,3 +1,16 @@
+# (Fri Aug 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@15.65.0`
+  - feat(ragdoll): add ragdoll and unragdoll cmdr commands [#802](https://github.com/Quenty/NevermoreEngine/pull/802) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Aug 13 2026)
 
 #### 🐛 Bug Fix
