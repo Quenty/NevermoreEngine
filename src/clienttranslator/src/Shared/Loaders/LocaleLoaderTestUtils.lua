@@ -59,32 +59,48 @@ function LocaleLoaderTestUtils.setup(options)
 		serviceBag:GetService(TieRealmService):SetTieRealm(options.tieRealm)
 	end
 	local translatorService = serviceBag:GetService(TranslatorService)
+
+	-- Init but deliberately not Start. A loader is a service that pulls in services of its
+	-- own, and a bag rejects service types added after it has started -- so the tests build
+	-- their loaders in the same window production builds them in (during Init, from the
+	-- JSONTranslator consuming them). Nothing here defines Start, so nothing is skipped.
 	serviceBag:Init()
-	serviceBag:Start()
+
+	-- Adds one "<locale>.json" StringValue to a folder, as Rojo would.
+	local function addLocaleFile(folder, localeId, dataTable)
+		local stringValue = Instance.new("StringValue")
+		stringValue.Name = localeId .. ".json"
+		stringValue.Value = HttpService:JSONEncode(dataTable)
+		stringValue.Parent = folder
+		return stringValue
+	end
 
 	-- Builds a Folder of per-locale StringValues (named "<locale>.json") whose values are
 	-- the JSON-encoded tables, matching the instance-decoded translator layout.
 	local function newInstanceFolder(jsonByLocale)
 		local folder = giveTask(Instance.new("Folder"))
 		for localeId, dataTable in jsonByLocale do
-			local stringValue = Instance.new("StringValue")
-			stringValue.Name = localeId .. ".json"
-			stringValue.Value = HttpService:JSONEncode(dataTable)
-			stringValue.Parent = folder
+			addLocaleFile(folder, localeId, dataTable)
 		end
 		return folder
+	end
+
+	-- Builds an InstanceLocaleLoader over a folder the caller assembled itself. Each loader
+	-- is its own service type, so a test may build several.
+	local function newLoaderFromFolder(folder, sourceLocaleId)
+		return serviceBag:GetService(InstanceLocaleLoader.new("T", sourceLocaleId or "en", folder))
 	end
 
 	-- Builds an InstanceLocaleLoader wired to the real TranslatorService via the bag.
 	local function newInstanceLoader(jsonByLocale, sourceLocaleId)
 		local folder = newInstanceFolder(jsonByLocale)
-		return InstanceLocaleLoader.new(serviceBag, "T", sourceLocaleId or "en", folder), folder
+		return newLoaderFromFolder(folder, sourceLocaleId), folder
 	end
 
 	-- Builds a TableLocaleLoader over an already-decoded in-memory table.
 	local function newTableLoader(dataTable, localeId)
 		local entries = LocalizationEntryParserUtils.decodeFromTable("T", localeId or "en", dataTable)
-		return TableLocaleLoader.new(serviceBag, entries)
+		return serviceBag:GetService(TableLocaleLoader.new("T", entries))
 	end
 
 	-- Flushes the deferred localization writes synchronously so the table can be read.
@@ -119,7 +135,9 @@ function LocaleLoaderTestUtils.setup(options)
 		serviceBag = serviceBag,
 		translatorService = translatorService,
 		newInstanceLoader = newInstanceLoader,
+		newLoaderFromFolder = newLoaderFromFolder,
 		newInstanceFolder = newInstanceFolder,
+		addLocaleFile = addLocaleFile,
 		newTableLoader = newTableLoader,
 		flush = flush,
 		getEntryMap = getEntryMap,

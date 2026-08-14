@@ -73,8 +73,12 @@ function TranslatorTestUtils.setup(options)
 			serviceBag:GetService(TieRealmService):SetTieRealm(tieRealm)
 		end
 		serviceBag:GetService(TranslatorService)
+
+		-- Init but deliberately not Start: the translator factories below initialize their
+		-- translators against this bag, and a translator registers its loader (which
+		-- registers a TemplateProvider) as it initializes. A bag rejects service types added
+		-- after it has started. Nothing in this stack defines Start, so nothing is skipped.
 		serviceBag:Init()
-		serviceBag:Start()
 		return serviceBag:GetService(TranslatorService), serviceBag
 	end
 
@@ -109,9 +113,9 @@ function TranslatorTestUtils.setup(options)
 		return folder
 	end
 
-	-- Creates a JSONTranslator initialized against the real service bag. The translator
-	-- is initialized directly (like a service consuming it during its own Init) rather
-	-- than registered on the bag, which is already started.
+	-- Creates a JSONTranslator initialized against the real service bag. The translator is
+	-- initialized directly, like a service consuming it during its own Init, rather than
+	-- registered on the bag.
 	local function newTranslator(dataTable, localeId)
 		local translator = JSONTranslator.new("TestTranslator", localeId or "en", dataTable)
 		translator:Init(serviceBag)
