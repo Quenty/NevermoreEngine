@@ -181,7 +181,7 @@ function TemplateProvider._setupTemplateCache(self: TemplateProvider): ()
 			end
 
 			local copy = self._tombstoneLookup[tombstoneId]:Clone()
-			copy.Parent = playerGui
+			copy.Parent = replicationParent
 
 			task.delay(0.1, function()
 				(copy :: any):Remove()
