@@ -5,11 +5,14 @@
 	To get translations uploaded.
 
 	1. Run the game
-	2. On the client, check LocalizationService.GeneratedJSONTable
-	3. Right click > Save as CSV
-	4. Stop the game
-	5. In Studio, go to plugins > "Localization Tools"
-	6. Upload the CSV (update)
+	2. Run `prepare-localization-export` in the Cmdr console. Translators load lazily -- the
+	   source language, plus whichever one a player reads -- so until you ask, no realm holds
+	   every locale (see [TranslatorCmdrService])
+	3. On the server, check LocalizationService.GeneratedJSONTable_Server
+	4. Right click > Save as CSV
+	5. Stop the game
+	6. In Studio, go to plugins > "Localization Tools"
+	7. Upload the CSV (update)
 
 	@class JSONTranslator
 ]=]
@@ -25,6 +28,7 @@ local Maid = require("Maid")
 local NumberLocalizationUtils = require("NumberLocalizationUtils")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local PseudoLocalize = require("PseudoLocalize")
 local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
@@ -44,9 +48,11 @@ JSONTranslator.__index = JSONTranslator
 
 -- The common surface of [TableLocaleLoader] and [InstanceLocaleLoader]. Both queue
 -- localization entries onto the [TranslatorService] they were constructed with; the
--- instance loader defers per locale.
+-- instance loader defers per locale and fetches each file on demand, so its source locale
+-- is the one thing a reader may have to wait for.
 type LocaleLoader = {
 	LoadSourceLocale: (self: any) -> (),
+	PromiseSourceLocale: (self: any) -> Promise.Promise<()>,
 	LoadLocale: (self: any, localeId: string) -> (),
 	LoadAllLocales: (self: any) -> (),
 }
@@ -58,7 +64,7 @@ export type JSONTranslator = typeof(setmetatable(
 		_translatorService: TranslatorService.TranslatorService,
 		_tieRealmService: TieRealmService.TieRealmService,
 		_translatorName: string,
-		_createLoader: (serviceBag: ServiceBag.ServiceBag) -> LocaleLoader,
+		_createLoader: () -> LocaleLoader,
 		_loader: LocaleLoader,
 		_localizationTable: any,
 		_localTranslators: { [string]: any },
@@ -87,14 +93,19 @@ export type JSONTranslator = typeof(setmetatable(
 	end))
 	```
 
+	Instead of a locale and a table, the second argument may be an Instance holding one
+	`<locale>.json` StringValue or ModuleScript per locale. Those are decoded lazily, a locale
+	at a time, and fetched on demand rather than replicated to every client at join -- see
+	[InstanceLocaleLoader].
+
 	```lua
-	local translator = JSONTranslator.new(script)
+	local translator = JSONTranslator.new("MyTranslator", script)
 	-- assume there is an `en.json` underneath the script with valid JSON.
 	```
 
 	@param translatorName string -- Name of the translator. Used for source.
-	@param localeId string
-	@param dataTable table
+	@param localeId string | Instance -- a locale id, or the folder holding the locale files
+	@param dataTable table? -- required with a locale id, unused with a folder
 	@return JSONTranslator
 ]=]
 function JSONTranslator.new(translatorName: string, localeId: string, dataTable): JSONTranslator
@@ -106,18 +117,18 @@ function JSONTranslator.new(translatorName: string, localeId: string, dataTable)
 	self.ServiceName = translatorName
 
 	if type(localeId) == "string" and type(dataTable) == "table" then
-		-- Table-driven data is already in memory; decode it now. The loader needs the service
-		-- bag, so defer its construction to Init via a callback.
+		-- Table-driven data is already in memory; decode it now. The loader is a service, so
+		-- defer its construction to Init where it can be registered on the bag.
 		local entries = LocalizationEntryParserUtils.decodeFromTable(self._translatorName, localeId, dataTable)
-		self._createLoader = function(serviceBag)
-			return TableLocaleLoader.new(serviceBag, entries) :: any
+		self._createLoader = function()
+			return TableLocaleLoader.new(self._translatorName, entries) :: any
 		end
 	elseif typeof(localeId) == "Instance" then
 		-- Instance-driven translators (per-locale JSON StringValues / ModuleScripts) defer
 		-- decoding to the loader; it too is built in Init once the bag is available.
 		local folder = localeId
-		self._createLoader = function(serviceBag)
-			return InstanceLocaleLoader.new(serviceBag, self._translatorName, "en", folder) :: any
+		self._createLoader = function()
+			return InstanceLocaleLoader.new(self._translatorName, "en", folder) :: any
 		end
 	else
 		error("Must pass a localeId and dataTable")
@@ -137,8 +148,14 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 
 	self._localizationTable = self._translatorService:GetLocalizationTable()
 
-	-- The loader resolves the TranslatorService from the bag and writes to it directly.
-	self._loader = self._createLoader(self._serviceBag)
+	-- Registered rather than constructed here: an instance-driven loader pulls in a
+	-- TemplateProvider of its own, and going through the bag is what initializes that chain
+	-- the whole way down -- and tears it back down in reverse.
+	self._loader = self._serviceBag:GetService(self._createLoader() :: any) :: any
+
+	-- So the export command can reach every translator's locales without a registry of
+	-- translators existing for its sake alone.
+	self._maid:GiveTask(self._translatorService:AddLocaleLoader(self._loader :: any))
 
 	if self._tieRealmService:GetTieRealm() == TieRealms.CLIENT then
 		-- On the client, load the source locale now (the fallback) and each target
@@ -148,8 +165,13 @@ function JSONTranslator.Init(self: JSONTranslator, serviceBag: ServiceBag.Servic
 			self._loader:LoadLocale(localeId)
 		end))
 	else
-		-- Off the client there is no player locale to key off, so load everything.
-		self._loader:LoadAllLocales()
+		-- Off the client there is no player locale to narrow to, but decoding every language
+		-- into a table nothing there reads is pure cost -- a server mostly registers a
+		-- translator so its locale files are hidden from join-time replication and can be
+		-- served on demand. Server-side reads still work; they load what they ask for. The
+		-- one job that does need every locale at once is the CSV export, which assembles it
+		-- on demand through [TranslatorService.PromiseLoadAllLocales].
+		self._loader:LoadSourceLocale()
 	end
 
 	self._maid:GiveTask(
@@ -493,11 +515,19 @@ function JSONTranslator.GetLocalizationTable(self: JSONTranslator): Localization
 end
 
 --[=[
-	Returns a promise that will resolve once the translator is loaded from the cloud.
+	Returns a promise that will resolve once this translator can answer: the cloud
+	translator has been acquired, and the source locale -- the fallback for every key -- has
+	been loaded.
+
+	The source locale is waited on because an instance-decoded translator fetches its locale
+	files on demand, so on a live client the fallback arrives over the network. Acquiring
+	the cloud translator takes far longer in practice, but "awaited PromiseLoaded, so
+	[JSONTranslator.FormatByKey] works" should hold by construction rather than by luck.
+
 	@return Promise
 ]=]
 function JSONTranslator.PromiseLoaded(self: JSONTranslator): Promise.Promise<()>
-	return self:PromiseTranslator()
+	return PromiseUtils.all({ self:PromiseTranslator() :: any, self._loader:PromiseSourceLocale() }) :: any
 end
 
 --[=[
@@ -510,6 +540,11 @@ end
 
 	Queues the current locale's entries if they are not loaded yet, so a first synchronous read
 	of a locale costs that decode; the observable path pays the same cost on subscribe.
+
+	A locale an instance-decoded translator has not fetched yet cannot be read this way at all --
+	nothing here can wait for the file. Await [JSONTranslator.PromiseLoaded] before reading
+	synchronously, which covers the source locale, and prefer
+	[JSONTranslator.ObserveFormatByKey] for anything else: it re-reads when the data lands.
 
 	@param translationKey string
 	@param args table?

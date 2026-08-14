@@ -1223,9 +1223,15 @@ importers:
 
   src/clienttranslator:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/enums':
         specifier: workspace:*
         version: link:../enums
@@ -1262,6 +1268,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/templateprovider':
+        specifier: workspace:*
+        version: link:../templateprovider
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie

@@ -216,7 +216,7 @@ function RagdollBallSocketUtils.ensureBallSockets(character: Model, rigType: Enu
 		local observable = (RxR15Utils.observeRigMotorBrio(character, data.motorParentName, motorName) :: any):Pipe({
 			RxBrioUtils.switchMapBrio(function(motor)
 				if motor then
-					return RxBrioUtils.flatCombineLatest({
+					return RxBrioUtils.flatCombineLatestBrio({
 						motor = Rx.of(motor),
 						part1 = RxR15Utils.observeCharacterPartBrio(character, part1Name),
 						attachment0 = RxR15Utils.observeRigAttachmentBrio(character, part0Name, attachmentName),
