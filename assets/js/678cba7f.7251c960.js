@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[71537],{57810:e=>{e.exports=JSON.parse('[{"value":"Functions","id":"functions","level":2},{"value":".decodeLocaleFromInstance","id":"decodeLocaleFromInstance","level":3},{"value":".getAvailableLocales","id":"getAvailableLocales","level":3}]')}}]);
