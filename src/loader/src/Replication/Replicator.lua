@@ -27,6 +27,7 @@
 
 local loader = script.Parent.Parent
 
+local LoaderScheduler = require(loader.Timing.LoaderScheduler)
 local LoaderValueObject = require(loader.Helpers.LoaderValueObject)
 local Maid = require(loader.Maid)
 local ReplicationType = require(loader.Replication.ReplicationType)
@@ -42,6 +43,7 @@ export type Replicator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_replicationStarted: boolean,
 		_references: ReplicatorReferences.ReplicatorReferences,
+		_scheduler: LoaderScheduler.LoaderScheduler,
 		_target: LoaderValueObject.LoaderValueObject<Instance?>,
 		_replicatedDescendantCount: LoaderValueObject.LoaderValueObject<number>,
 		_hasReplicatedDescendants: LoaderValueObject.LoaderValueObject<boolean>,
@@ -56,15 +58,21 @@ export type Replicator = typeof(setmetatable(
 	Constructs a new Replicator which will do the syncing.
 
 	@param references ReplicatorReferences
+	@param scheduler LoaderScheduler
 	@return Replicator
 ]=]
-function Replicator.new(references: ReplicatorReferences.ReplicatorReferences): Replicator
+function Replicator.new(
+	references: ReplicatorReferences.ReplicatorReferences,
+	scheduler: LoaderScheduler.LoaderScheduler
+): Replicator
 	local self = setmetatable({}, Replicator)
 
 	assert(ReplicatorReferences.isReplicatorReferences(references), "Bad references")
+	assert(LoaderScheduler.isLoaderScheduler(scheduler), "Bad scheduler")
 
 	self._maid = Maid.new()
 	self._references = references
+	self._scheduler = scheduler
 	self._replicationStarted = false
 
 	self._target = self._maid:Add(LoaderValueObject.new(nil :: Instance?))
@@ -84,22 +92,33 @@ end
 
 	@param root Instance
 ]=]
-function Replicator.ReplicateFrom(self: Replicator, root: Instance)
+function Replicator.ReplicateFromAsync(self: Replicator, root: Instance)
 	assert(typeof(root) == "Instance", "Bad root")
 	if self._replicationStarted then
 		(error :: any)("[Replicator] - Replication already started")
 	end
-
 	self._replicationStarted = true
 
+	-- Yield before doing work if we need to
+	self._scheduler:YieldIfNeededAsync()
+
+	-- We may have been superseded or destroyed while we were yielded
+	if not self.Destroy then
+		return
+	end
+
 	self._maid:GiveTask(root.ChildAdded:Connect(function(child)
-		self:_handleChildAdded(child)
+		self:_handleChildAddedAsync(child)
 	end))
 	self._maid:GiveTask(root.ChildRemoved:Connect(function(child)
 		self:_handleChildRemoved(child)
 	end))
 	for _, child in root:GetChildren() do
-		self:_handleChildAdded(child)
+		self:_handleChildAddedAsync(child)
+
+		if not self.Destroy then
+			return
+		end
 	end
 end
 
@@ -170,30 +189,33 @@ function Replicator._handleChildRemoved(self: Replicator, child: Instance)
 	self._maid[child] = nil
 end
 
-function Replicator._handleChildAdded(self: Replicator, child: Instance)
+function Replicator._handleChildAddedAsync(self: Replicator, child: Instance)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
-
-	if child.Archivable then
-		maid._current = self:_renderChild(child)
-	end
+	self._maid[child] = maid
 
 	maid:GiveTask(child:GetPropertyChangedSignal("Archivable"):Connect(function()
-		if child.Archivable then
-			maid._current = self:_renderChild(child)
-		else
-			maid._current = nil
-		end
+		self:_updateChildRenderAsync(maid, child)
 	end))
 
-	self._maid[child] = maid
+	self:_updateChildRenderAsync(maid, child)
 end
 
-function Replicator._renderChild(self: Replicator, child: Instance)
-	local maid = Maid.new()
+function Replicator._updateChildRenderAsync(self: Replicator, maid: Maid.Maid, child: Instance)
+	if not child.Archivable then
+		maid._current = nil
+		return
+	end
 
-	local replicator = Replicator.new(self._references)
+	local renderMaid = Maid.new()
+	maid._current = renderMaid
+
+	self:_renderChildAsync(renderMaid, child)
+end
+
+function Replicator._renderChildAsync(self: Replicator, maid: Maid.Maid, child: Instance)
+	local replicator = Replicator.new(self._references, self._scheduler)
 	self:_setupReplicatorDescendantCount(maid, replicator)
 	maid:GiveTask(replicator)
 
@@ -215,9 +237,7 @@ function Replicator._renderChild(self: Replicator, child: Instance)
 		)
 	end))
 
-	replicator:ReplicateFrom(child)
-
-	return maid
+	replicator:ReplicateFromAsync(child)
 end
 
 function Replicator._replicateBasedUponMode(

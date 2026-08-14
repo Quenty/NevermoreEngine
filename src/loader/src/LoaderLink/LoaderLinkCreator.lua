@@ -7,6 +7,7 @@
 
 local loader = script.Parent.Parent
 local LoaderLinkUtils = require(loader.LoaderLink.LoaderLinkUtils)
+local LoaderScheduler = require(loader.Timing.LoaderScheduler)
 local LoaderValueObject = require(loader.Helpers.LoaderValueObject)
 local Maid = require(loader.Maid)
 local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
@@ -20,6 +21,7 @@ export type LoaderLinkCreator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_root: Instance,
 		_references: ReplicatorReferences.ReplicatorReferences?,
+		_scheduler: LoaderScheduler.LoaderScheduler,
 		_hasLoaderCount: LoaderValueObject.LoaderValueObject<number>,
 		_childRequiresLoaderCount: LoaderValueObject.LoaderValueObject<number>,
 		_provideLoader: LoaderValueObject.LoaderValueObject<boolean>,
@@ -31,38 +33,67 @@ export type LoaderLinkCreator = typeof(setmetatable(
 function LoaderLinkCreator.new(
 	root: Instance,
 	references: ReplicatorReferences.ReplicatorReferences?,
-	isRoot: boolean?
+	isRoot: boolean?,
+	scheduler: LoaderScheduler.LoaderScheduler
 ): LoaderLinkCreator
 	assert(typeof(root) == "Instance", "Bad root")
 	assert(ReplicatorReferences.isReplicatorReferences(references) or references == nil, "Bad references")
+	assert(LoaderScheduler.isLoaderScheduler(scheduler), "Bad scheduler")
 
 	local self = setmetatable({}, LoaderLinkCreator)
 	self._maid = Maid.new()
 
 	self._root = root
 	self._references = references
+	self._scheduler = scheduler
 
 	self._childRequiresLoaderCount = self._maid:Add(LoaderValueObject.new(isRoot and 1 or 0))
 	self._hasLoaderCount = self._maid:Add(LoaderValueObject.new(0))
 	self._provideLoader = self._maid:Add(LoaderValueObject.new(false))
 
-	-- prevent frame delay
-	self:_setupEventTracking()
-	self:_setupRendering()
-
 	return self :: LoaderLinkCreator
 end
 
-function LoaderLinkCreator._setupEventTracking(self: LoaderLinkCreator)
+--[=[
+	Renders the loader links for this root. Split out of the constructor so
+	the caller controls when the (potentially yielding) render pass happens.
+]=]
+function LoaderLinkCreator.RenderAsync(self: LoaderLinkCreator)
+	self._scheduler:YieldIfNeededAsync()
+
+	-- Our root may have been removed while we were yielded, which destroys us
+	if not self.Destroy then
+		return
+	end
+
+	self:_setupEventTrackingAsync()
+	self:_setupRendering()
+end
+
+function LoaderLinkCreator._setupEventTrackingAsync(self: LoaderLinkCreator)
 	self._maid:GiveTask(self._root.ChildAdded:Connect(function(child)
-		self:_handleChildAdded(child)
+		local loaderLinkCreator = self:_handleChildAdded(child)
+		if loaderLinkCreator then
+			loaderLinkCreator:RenderAsync()
+		end
 	end))
 	self._maid:GiveTask(self._root.ChildRemoved:Connect(function(child)
 		self:_handleChildRemoved(child)
 	end))
 
 	for _, child in self._root:GetChildren() do
-		self:_handleChildAdded(child)
+		local loaderLinkCreator = self:_handleChildAdded(child)
+		if loaderLinkCreator then
+			loaderLinkCreator:RenderAsync()
+
+			if not self.Destroy then
+				return
+			end
+		end
+	end
+
+	if not self.Destroy then
+		return
 	end
 
 	-- Need to do this AFTER child added loop
@@ -123,7 +154,7 @@ function LoaderLinkCreator._handleChildRemoved(self: LoaderLinkCreator, child: I
 	self._maid[child] = nil
 end
 
-function LoaderLinkCreator._handleChildAdded(self: LoaderLinkCreator, child: Instance)
+function LoaderLinkCreator._handleChildAdded(self: LoaderLinkCreator, child: Instance): LoaderLinkCreator?
 	assert(typeof(child) == "Instance", "Bad child")
 
 	if child:IsA("ModuleScript") then
@@ -136,8 +167,13 @@ function LoaderLinkCreator._handleChildAdded(self: LoaderLinkCreator, child: Ins
 		end
 	elseif child:IsA("Folder") then
 		-- TODO: Maybe add to children with node_modules explicitly in its list.
-		self._maid[child] = LoaderLinkCreator.new(child, self._references)
+		local linkCreator = LoaderLinkCreator.new(child, self._references, false, self._scheduler)
+		self._maid[child] = linkCreator
+
+		return linkCreator
 	end
+
+	return nil
 end
 
 function LoaderLinkCreator._renderLoaderWithReferences(
