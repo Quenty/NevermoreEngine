@@ -27,6 +27,7 @@
 
 local loader = script.Parent.Parent
 
+local LoaderValueObject = require(loader.Helpers.LoaderValueObject)
 local Maid = require(loader.Maid)
 local ReplicationType = require(loader.Replication.ReplicationType)
 local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
@@ -41,10 +42,12 @@ export type Replicator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_replicationStarted: boolean,
 		_references: ReplicatorReferences.ReplicatorReferences,
-		_target: ObjectValue,
-		_replicatedDescendantCount: IntValue,
-		_hasReplicatedDescendants: BoolValue,
-		_replicationType: StringValue,
+		_target: LoaderValueObject.LoaderValueObject<Instance?>,
+		_replicatedDescendantCount: LoaderValueObject.LoaderValueObject<number>,
+		_hasReplicatedDescendants: LoaderValueObject.LoaderValueObject<boolean>,
+		-- Held as a plain string the same way the old StringValue was -- read sites
+		-- narrow it back to a ReplicationType.
+		_replicationType: LoaderValueObject.LoaderValueObject<string>,
 	},
 	{} :: typeof({ __index = Replicator })
 ))
@@ -64,20 +67,10 @@ function Replicator.new(references: ReplicatorReferences.ReplicatorReferences): 
 	self._references = references
 	self._replicationStarted = false
 
-	self._target = self._maid:Add(Instance.new("ObjectValue"))
-	self._target.Value = nil
-
-	self._replicatedDescendantCount = self._maid:Add(Instance.new("IntValue"))
-	self._replicatedDescendantCount.Name = "Replicator_ReplicatedDescendantCount"
-	self._replicatedDescendantCount.Value = 0
-
-	self._hasReplicatedDescendants = self._maid:Add(Instance.new("BoolValue"))
-	self._hasReplicatedDescendants.Name = "Replicator_HasReplicatedDescendants"
-	self._hasReplicatedDescendants.Value = false
-
-	self._replicationType = self._maid:Add(Instance.new("StringValue"))
-	self._replicationType.Name = "Replicator_ReplicationType"
-	self._replicationType.Value = ReplicationType.SHARED
+	self._target = self._maid:Add(LoaderValueObject.new(nil :: Instance?))
+	self._replicatedDescendantCount = self._maid:Add(LoaderValueObject.new(0))
+	self._hasReplicatedDescendants = self._maid:Add(LoaderValueObject.new(false))
+	self._replicationType = self._maid:Add(LoaderValueObject.new(ReplicationType.SHARED :: string))
 
 	self._maid:GiveTask(self._replicatedDescendantCount.Changed:Connect(function()
 		self._hasReplicatedDescendants.Value = self._replicatedDescendantCount.Value > 0
@@ -122,9 +115,9 @@ end
 
 --[=[
 	Returns the replicated descendant count value.
-	@return IntValue
+	@return LoaderValueObject<number>
 ]=]
-function Replicator.GetReplicatedDescendantCountValue(self: Replicator): IntValue
+function Replicator.GetReplicatedDescendantCountValue(self: Replicator): LoaderValueObject.LoaderValueObject<number>
 	return self._replicatedDescendantCount
 end
 
@@ -163,13 +156,13 @@ end
 	Gets a value representing if there's any replicated children. Used to
 	avoid leaking more server-side information than needed for the user.
 
-	@return BoolValue
+	@return LoaderValueObject<boolean>
 ]=]
-function Replicator.GetHasReplicatedChildrenValue(self: Replicator): BoolValue
+function Replicator.GetHasReplicatedChildrenValue(self: Replicator): LoaderValueObject.LoaderValueObject<boolean>
 	return self._hasReplicatedDescendants
 end
 
-function Replicator.GetReplicationTypeValue(self: Replicator): StringValue
+function Replicator.GetReplicationTypeValue(self: Replicator): LoaderValueObject.LoaderValueObject<string>
 	return self._replicationType
 end
 
@@ -262,6 +255,8 @@ function Replicator._doReplicationServer(self: Replicator, replicator: Replicato
 	if hasReplicatedChildren.Value then
 		maid._current = self:_doServerClone(replicator, child)
 	end
+
+	return maid
 end
 
 function Replicator._doServerClone(self: Replicator, replicator: Replicator, child: Instance): Maid.Maid
@@ -356,7 +351,9 @@ function Replicator._setupReplicatedDescendantCountAdd(self: Replicator, maid: M
 	-- have any flickering.
 	self._replicatedDescendantCount.Value += amount
 	maid:GiveTask(function()
-		self._replicatedDescendantCount.Value -= amount
+		if self._replicatedDescendantCount.Destroy then
+			self._replicatedDescendantCount.Value -= amount
+		end
 	end)
 end
 
@@ -415,7 +412,10 @@ function Replicator._setupReplicatorDescendantCount(self: Replicator, maid: Maid
 	maid:GiveTask(function()
 		local value = lastValue
 		lastValue = 0
-		self._replicatedDescendantCount.Value -= value
+
+		if self._replicatedDescendantCount.Destroy then
+			self._replicatedDescendantCount.Value -= value
+		end
 	end)
 end
 

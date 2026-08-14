@@ -7,6 +7,7 @@
 
 local loader = script.Parent.Parent
 local LoaderLinkUtils = require(loader.LoaderLink.LoaderLinkUtils)
+local LoaderValueObject = require(loader.Helpers.LoaderValueObject)
 local Maid = require(loader.Maid)
 local ReplicatorReferences = require(loader.Replication.ReplicatorReferences)
 
@@ -19,9 +20,9 @@ export type LoaderLinkCreator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_root: Instance,
 		_references: ReplicatorReferences.ReplicatorReferences?,
-		_hasLoaderCount: IntValue,
-		_childRequiresLoaderCount: IntValue,
-		_provideLoader: BoolValue,
+		_hasLoaderCount: LoaderValueObject.LoaderValueObject<number>,
+		_childRequiresLoaderCount: LoaderValueObject.LoaderValueObject<number>,
+		_provideLoader: LoaderValueObject.LoaderValueObject<boolean>,
 		_lastProvidedLoader: Instance?,
 	},
 	{} :: typeof({ __index = LoaderLinkCreator })
@@ -41,14 +42,9 @@ function LoaderLinkCreator.new(
 	self._root = root
 	self._references = references
 
-	self._childRequiresLoaderCount = self._maid:Add(Instance.new("IntValue"))
-	self._childRequiresLoaderCount.Value = isRoot and 1 or 0
-
-	self._hasLoaderCount = self._maid:Add(Instance.new("IntValue"))
-	self._hasLoaderCount.Value = 0
-
-	self._provideLoader = self._maid:Add(Instance.new("BoolValue"))
-	self._provideLoader.Value = false
+	self._childRequiresLoaderCount = self._maid:Add(LoaderValueObject.new(isRoot and 1 or 0))
+	self._hasLoaderCount = self._maid:Add(LoaderValueObject.new(0))
+	self._provideLoader = self._maid:Add(LoaderValueObject.new(false))
 
 	-- prevent frame delay
 	self:_setupEventTracking()
@@ -175,7 +171,9 @@ function LoaderLinkCreator._incrementNeededLoader(self: LoaderLinkCreator, amoun
 
 	self._childRequiresLoaderCount.Value = self._childRequiresLoaderCount.Value + amount
 	return function()
-		self._childRequiresLoaderCount.Value = self._childRequiresLoaderCount.Value - amount
+		if self._childRequiresLoaderCount.Destroy then
+			self._childRequiresLoaderCount.Value = self._childRequiresLoaderCount.Value - amount
+		end
 	end
 end
 
@@ -184,7 +182,9 @@ function LoaderLinkCreator._addToHasLoaderCount(self: LoaderLinkCreator, amount:
 
 	self._hasLoaderCount.Value = self._hasLoaderCount.Value + amount
 	return function()
-		self._hasLoaderCount.Value = self._hasLoaderCount.Value - amount
+		if self._hasLoaderCount.Destroy then
+			self._hasLoaderCount.Value = self._hasLoaderCount.Value - amount
+		end
 	end
 end
 
