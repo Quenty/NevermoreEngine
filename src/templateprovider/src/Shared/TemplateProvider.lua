@@ -171,17 +171,8 @@ function TemplateProvider._setupTemplateCache(self: TemplateProvider): ()
 				return Promise.rejected("No playerGui")
 			end
 
-			-- Just group stuff to simplify things
-			local replicationParent = playerGui:FindFirstChild("TemplateProviderReplication")
-			if not replicationParent then
-				replicationParent = Instance.new("Folder")
-				replicationParent.Name = "TemplateProviderReplication"
-				replicationParent.Archivable = false
-				replicationParent.Parent = playerGui
-			end
-
 			local copy = self._tombstoneLookup[tombstoneId]:Clone()
-			copy.Parent = replicationParent
+			copy.Parent = playerGui
 
 			task.delay(0.1, function()
 				(copy :: any):Remove()
