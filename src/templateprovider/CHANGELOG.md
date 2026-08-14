@@ -1,3 +1,17 @@
+# v11.48.2 (Fri Aug 14 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+- fix: This can break replication sometimes it looks like ([@Quenty](https://github.com/Quenty))
+- fix: Parent stuff to the right place ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

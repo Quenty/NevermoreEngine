@@ -1,3 +1,18 @@
+# v10.11.1 (Fri Aug 14 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+- fix: Load has mechanisms to delay replication/loading to stop timeout on the server on initial startup ([@Quenty](https://github.com/Quenty))
+- fix: Small fixes ([@Quenty](https://github.com/Quenty))
+- fix: Loader loads faster on launch to speedup server startup time ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
