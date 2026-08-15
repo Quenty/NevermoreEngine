@@ -4,6 +4,7 @@
 -- Component files like these should be factory functions because they have to directly apply and call stuff on the jecs world.
 local require = require(script.Parent.loader).load(script)
 
+local ImmediateCoreComponents = require("ImmediateCoreComponents")
 local ImmediateTypes = require("ImmediateTypes")
 local Jecs = require("Jecs")
 local Jecst = require("Jecst")
@@ -105,7 +106,7 @@ local function _setupComponentDictionaryWithWorld(
 end
 
 local function _setupRuntimeMaidComponentCallbacks(rt: ImmediateTypes.ImmediateRuntime)
-	local ImmediateCommonUtils = require("ImmediateCommonUtil" .. "s")
+	local ImmediateJecsUtils = require("ImmediateJecsUtils")
 	local world = rt.world
 	local maidComponent = assert(rt.comps.Maid, "no Maid component in runtime")
 
@@ -113,9 +114,9 @@ local function _setupRuntimeMaidComponentCallbacks(rt: ImmediateTypes.ImmediateR
 		assert(Maid.isMaid(m), "Maid component must be a Maid")
 		rt.maid[`{entity}_maid`] = m
 	end
-	ImmediateCommonUtils.addAddCallback(rt, maidComponent, trackEntityMaid, "trackEntityMaid")
-	ImmediateCommonUtils.addChangeCallback(rt, maidComponent, trackEntityMaid, "trackEntityMaid")
-	ImmediateCommonUtils.addRemoveCallback(rt, maidComponent, function(entity)
+	ImmediateJecsUtils.addAddCallback(rt, maidComponent, trackEntityMaid, "trackEntityMaid")
+	ImmediateJecsUtils.addChangeCallback(rt, maidComponent, trackEntityMaid, "trackEntityMaid")
+	ImmediateJecsUtils.addRemoveCallback(rt, maidComponent, function(entity)
 		rt.maid[`{entity}_maid`] = nil
 		local entityMaid = world:get(entity, maidComponent)
 		if entityMaid then
@@ -125,11 +126,13 @@ local function _setupRuntimeMaidComponentCallbacks(rt: ImmediateTypes.ImmediateR
 end
 
 function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, CustomBlackboardType>(
-	componentDictionary: ImmediateTypes.JecsComponentDictionary,
 	serviceBag: ServiceBag.ServiceBag,
 	requireCallback: (
 		path: string
 	) -> any,
+	extraComponents: {
+		[string]: Jecst.Id<any>,
+	}?,
 	debugEnabled: boolean?,
 	plugin: Plugin?
 ): ImmediateTypes.ImmediateRuntime<
@@ -141,10 +144,17 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, 
 	local world = maid:Add(Jecs.world(DEBUG))
 	local usingServiceBag = serviceBag or maid:Add(ServiceBag.new())
 
-	_setupComponentDictionaryWithWorld(world, componentDictionary)
+	-- Register initial components, exposing through rt.comps
+	local comps = ImmediateCoreComponents(world)
+	if extraComponents then
+		for name, component in extraComponents do
+			comps[name] = component
+		end
+	end
+	_setupComponentDictionaryWithWorld(world, comps)
 
+	-- Create final runtime table
 	local runtime: ImmediateTypes.ImmediateRuntime<CustomComponentDictionaries, CustomBlackboardType>
-
 	runtime = {
 		DEBUG = DEBUG,
 		require = requireCallback,
@@ -152,7 +162,7 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, 
 
 		jecs = Jecs,
 		world = world,
-		comps = componentDictionary,
+		comps = comps,
 
 		maid = maid,
 		blackboard = {},

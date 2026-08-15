@@ -28,11 +28,11 @@ function ImmediateJecsUtils.firstOfQuery(query: Jecst.Query<any>): Jecst.Entity?
 end
 
 function ImmediateJecsUtils.getMaid(r: ImmediateTypes.ImmediateRuntime, entity: Jecst.Entity): Maid.Maid?
-	return r.world:get(entity, r.Components.Maid)
+	return r.world:get(entity, r.comps.Maid)
 end
 
 function ImmediateJecsUtils.getAMaid(r: ImmediateTypes.ImmediateRuntime, entity: Jecst.Entity): Maid.Maid?
-	local directMaid = r.world:get(entity, r.Components.Maid)
+	local directMaid = r.world:get(entity, r.comps.Maid)
 	if directMaid then
 		return directMaid
 	end
@@ -42,7 +42,7 @@ function ImmediateJecsUtils.getAMaid(r: ImmediateTypes.ImmediateRuntime, entity:
 			break
 		end
 		entity = parent
-		local parentMaid = r.world:get(parent, r.Components.Maid)
+		local parentMaid = r.world:get(parent, r.comps.Maid)
 		if parentMaid then
 			return parentMaid
 		end
@@ -170,7 +170,7 @@ function ImmediateJecsUtils.addChangeCallback(
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
 )
-	local changeCallbacks = r.world:get(component, r.Components._ChangeCallbacks)
+	local changeCallbacks = r.world:get(component, r.comps._ChangeCallbacks)
 	assert(changeCallbacks, `Change callbacks not found for component: {component}`)
 	assert(changeCallbacks.callbacks, `Change callbacks not found for component: {component}`)
 	assert(changeCallbacks._counter, `Change callbacks counter not found for component: {component}`)
@@ -192,7 +192,7 @@ function ImmediateJecsUtils.addAddCallback(
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
 )
-	local addCallbacks = r.world:get(component, r.Components._AddCallbacks)
+	local addCallbacks = r.world:get(component, r.comps._AddCallbacks)
 	assert(addCallbacks, `Add callbacks not found for component: {component}`)
 	assert(addCallbacks.callbacks, `Add callbacks not found for component: {component}`)
 	assert(addCallbacks._counter ~= nil, `Add callbacks counter not found for component: {component}`)
@@ -214,7 +214,7 @@ function ImmediateJecsUtils.addRemoveCallback(
 	callback: (entity: Jecst.Entity, id: number, delete: boolean?) -> (),
 	key: any?
 )
-	local removeCallbacks = r.world:get(component, r.Components._RemoveCallbacks)
+	local removeCallbacks = r.world:get(component, r.comps._RemoveCallbacks)
 	assert(removeCallbacks, `Remove callbacks not found for component: {component}`)
 	assert(removeCallbacks.callbacks, `Remove callbacks not found for component: {component}`)
 	assert(removeCallbacks._counter ~= nil, `Remove callbacks counter not found for component: {component}`)

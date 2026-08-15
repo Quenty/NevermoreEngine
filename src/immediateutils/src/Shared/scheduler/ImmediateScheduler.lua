@@ -2,9 +2,14 @@
 --[=[
 	@class ImmediateScheduler
 
-	An opinionated way to execute systems and middleware instead of you calling
-	those cleanups and middlewares yourself (say, in unit tests, or if you run
-	systems multiple times manually in code).
+	A basic scheduler that supports:
+	
+	* pretick
+	* presystem
+	* postsystem
+	* posttick
+
+	ordering.
 
 	This doesn't handle hot reloading; some hot-reload service can interact with
 	a scheduler's APIs to add/remove systems.
@@ -267,8 +272,14 @@ end
 -- helper method to quickly grab all systems modules under one folder or something
 function ImmediateScheduler.RegisterDescendantModuleScripts(self: ImmediateScheduler, instance: Instance)
 	for _, v in instance:GetDescendants() do
-		if v:IsA("ModuleScript") then
-			self:RegisterSystem(rawrequire(v))
+		if v:IsA("ModuleScript") and v.Name ~= "loader" then
+			local loaded = rawrequire(v)
+			if type(loaded) == "table" and type(loaded.system) == "function" then
+				if loaded.name == nil then
+					loaded.name = v.Name
+				end
+				self:RegisterSystem(loaded)
+			end
 		end
 	end
 end

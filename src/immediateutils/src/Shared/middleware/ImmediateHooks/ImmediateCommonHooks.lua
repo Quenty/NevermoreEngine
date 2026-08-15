@@ -3,6 +3,7 @@
 	@class ImmediateCommonHooks
 
 	Assembles the built-in hook factories under middleware/ImmediateHooks/commonhooks.
+	You should only have to call install() on your runtime.
 ]=]
 
 local rawrequire = require
@@ -24,7 +25,7 @@ local ImmediateCommonHooks = {}
 
 ]]
 
-function ImmediateCommonHooks.createHookCallbacks(rt: ImmediateTypes.ImmediateRuntime)
+function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateRuntime)
 	local hooksFolder = script.Parent.commonhooks
 	local hooks = {
 		async = rawrequire(hooksFolder.async)(rt),
@@ -64,7 +65,7 @@ function ImmediateCommonHooks.createHookCallbacks(rt: ImmediateTypes.ImmediateRu
 	return hooks
 end
 
-export type ImmediateHookCallbacks = typeof(ImmediateCommonHooks.createHookCallbacks(
+export type ImmediateHookCallbacks = typeof(ImmediateCommonHooks._createHookCallbacks(
 	{} :: ImmediateTypes.ImmediateRuntime
 ))
 
@@ -75,7 +76,7 @@ export type ImmediateRuntimeWithHooks<C = {}, B = {}> = ImmediateHookUtils.Immed
 function ImmediateCommonHooks.install<C, B>(rt: ImmediateTypes.ImmediateRuntime<C, B>): ImmediateRuntimeWithHooks<C, B>
 	local runtime = ImmediateHookUtils.install(rt) :: ImmediateRuntimeWithHooks<C, B>
 	if runtime.hooks == nil then
-		runtime.hooks = ImmediateCommonHooks.createHookCallbacks(runtime)
+		runtime.hooks = ImmediateCommonHooks._createHookCallbacks(runtime)
 	end
 	return runtime
 end
