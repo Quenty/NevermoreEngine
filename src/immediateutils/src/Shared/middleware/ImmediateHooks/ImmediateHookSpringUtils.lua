@@ -2,8 +2,6 @@
 --[=[
 	@class ImmediateHookSpringUtils
 ]=]
-local require = require(script.Parent.loader).load(script)
-
 local ImmediateHookSpringUtils = {}
 
 function ImmediateHookSpringUtils.internalValue(value: any): any

@@ -2,8 +2,6 @@
 --[=[
 	@class ImmediateHookAverageUtils
 ]=]
-local require = require(script.Parent.loader).load(script)
-
 local ImmediateHookAverageUtils = {}
 
 export type AverageableValue = number | Vector3 | Vector2
