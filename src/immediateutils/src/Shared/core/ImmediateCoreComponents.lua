@@ -16,6 +16,16 @@ return function(world: Jecst.World)
 		ChildOf = Jecs.ChildOf,
 
 		Maid = world:component() :: Jecst.Id<Maid.Maid>,
+		MetaHookState = world:component() :: Jecst.Id<{
+			filename: string,
+			line: number,
+			discriminator: any,
+			flagForCleanup: boolean,
+			shouldCleanupCallback: ((state: any) -> boolean)?,
+			runtimePersistent: boolean?,
+		}>,
+		HookState = world:component() :: Jecst.Id<{ [any]: any }>,
+		HookRuntimeBuffer = world:component() :: Jecst.Id<nil>,
 		_ChangeCallbacks = world:component() :: Jecst.Id<{
 			_counter: number,
 			callbacks: { [string]: (entity: Jecst.Entity, id: number, data: any) -> () },

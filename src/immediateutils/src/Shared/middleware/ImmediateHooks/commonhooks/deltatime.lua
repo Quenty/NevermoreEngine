@@ -1,0 +1,32 @@
+--!nonstrict
+--[=[
+	@class deltatime
+
+	Returns the time gap between the last call and the current call.
+]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local ImmediateTypes = require("ImmediateTypes")
+local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+
+return function(rt: ImmediateTypes.ImmediateRuntime)
+	return function(dis: any?, flagToUpdate: boolean?)
+		local hookState, _hookMaid = getOrCreateHookState(rt, dis)
+
+		local now = os.clock()
+		local lastAtClock = hookState.lastAtClock
+		if lastAtClock == nil then
+			hookState.lastAtClock = now
+			return 0
+		end
+
+		local delta = now - lastAtClock
+
+		if flagToUpdate == nil or flagToUpdate == true then
+			hookState.lastAtClock = now
+		end
+
+		return delta
+	end
+end

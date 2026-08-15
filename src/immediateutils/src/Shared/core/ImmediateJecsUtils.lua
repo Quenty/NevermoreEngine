@@ -63,6 +63,7 @@ end
 
 export type RxECSObservableCollector = {
 	Drain: () -> (RxECSQueuedEmitIterator, { any }, number),
+	Last: () -> ...any,
 	Destroy: () -> (),
 }
 

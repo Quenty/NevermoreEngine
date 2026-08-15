@@ -10,7 +10,7 @@ local WARN_HOOK_CLEANUP = false
 
 local ImmediateHookUtils = {}
 
-function ImmediateHookUtils._getOrCreateHookState<T>(
+function ImmediateHookUtils.getOrCreateHookState<T>(
 	rt: ImmediateTypes.ImmediateRuntime,
 	discriminator: any,
 	cleanupIfTrue: ((state: T) -> boolean)?,
@@ -69,19 +69,19 @@ function ImmediateHookUtils._getOrCreateHookState<T>(
 			rt._hookOrderOfCalls[_firstKey] = nil
 			error(`Hook state entity for {_filename}:{_line} with discriminator {_discriminator} is not in the world`)
 		end
-		local hookMaid = rt.world:get(hookStateEntity, rt.Components.Maid)
-		local mhs = rt.world:get(hookStateEntity, rt.Components.MetaHookState)
+		local hookMaid = rt.world:get(hookStateEntity, rt.comps.Maid)
+		local mhs = rt.world:get(hookStateEntity, rt.comps.MetaHookState)
 		mhs.flagForCleanup = false
-		return rt.world:get(hookStateEntity, rt.Components.HookState) :: T, hookMaid, hookStateEntity
+		return rt.world:get(hookStateEntity, rt.comps.HookState) :: T, hookMaid, hookStateEntity
 	end
 
 	-- If not, create it.
 	local newHookEntity = rt.world:entity()
 	if entityToParentTo then
-		rt.world:add(newHookEntity, Jecs.pair(rt.Components.ChildOf, entityToParentTo))
+		rt.world:add(newHookEntity, Jecs.pair(rt.comps.ChildOf, entityToParentTo))
 	end
 	if runtimePersistent then
-		rt.world:add(newHookEntity, rt.Components.HookRuntimeBuffer)
+		rt.world:add(newHookEntity, rt.comps.HookRuntimeBuffer)
 	end
 	local newHookState = {}
 	local maid = Maid.new()
@@ -95,7 +95,7 @@ function ImmediateHookUtils._getOrCreateHookState<T>(
 			warn(`Cleaned up hook state for {_filename}:{_line} with discriminator {_discriminator}`)
 		end
 	end)
-	rt.world:set(newHookEntity, rt.Components.MetaHookState, {
+	rt.world:set(newHookEntity, rt.comps.MetaHookState, {
 		filename = _filename,
 		line = _line,
 		discriminator = discriminator,
@@ -103,11 +103,13 @@ function ImmediateHookUtils._getOrCreateHookState<T>(
 		shouldCleanupCallback = cleanupIfTrue,
 		runtimePersistent = runtimePersistent,
 	})
-	rt.world:set(newHookEntity, rt.Components.Maid, maid)
-	rt.world:set(newHookEntity, rt.Components.HookState, newHookState)
+	rt.world:set(newHookEntity, rt.comps.Maid, maid)
+	rt.world:set(newHookEntity, rt.comps.HookState, newHookState)
 	rt._hookStateEntities[_firstKey][_discriminator] = newHookEntity
 
-	return rt.world:get(newHookEntity, rt.Components.HookState) :: T, maid, newHookEntity
+	return rt.world:get(newHookEntity, rt.comps.HookState) :: T, maid, newHookEntity
 end
+
+ImmediateHookUtils._getOrCreateHookState = ImmediateHookUtils.getOrCreateHookState
 
 return ImmediateHookUtils
