@@ -179,7 +179,7 @@ local SYSTEM_OVERALL_SUPPRESS_ERRORS = 5
 
 function ImmediateScheduler._runProtectedSystem(
 	_self: ImmediateScheduler,
-	rt: any,
+	rt: ImmediateRuntime,
 	system: SchedulableSystem,
 	...
 )
@@ -236,7 +236,7 @@ function ImmediateScheduler._runProtectedSystem(
 	end
 end
 
-function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: any)
+function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateRuntime)
 	if self._sortFlag == true then
 		self:_sortSystemArrays()
 	end
