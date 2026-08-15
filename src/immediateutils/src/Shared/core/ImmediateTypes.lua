@@ -52,7 +52,9 @@ export type ImmediateRuntime<CustomComponentDictionaries = {}, CustomBlackboardT
 
 	-- The blackboard can be used to store any kind of state for all systems.
 	-- Here, you won't have to worry about key-collision with the runtime table's root level.
-	blackboard: { [any]: any } & CustomBlackboardType,
+	-- This is *only* CustomBlackboardType: `{ [any]: any } & B` makes Luau drop B's keys
+	-- (every lookup is already `any`), so `localPlayer` would not show up.
+	blackboard: CustomBlackboardType,
 
 	errorlog: {
 		lastErrorShout: number,

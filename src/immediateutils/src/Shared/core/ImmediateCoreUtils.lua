@@ -105,7 +105,7 @@ local function _setupComponentDictionaryWithWorld(
 	end
 end
 
-local function _setupRuntimeMaidComponentCallbacks(rt: ImmediateTypes.ImmediateRuntime)
+local function _setupRuntimeMaidComponentCallbacks(rt: ImmediateTypes.ImmediateRuntime<any, any>)
 	local ImmediateJecsUtils = require("ImmediateJecsUtils")
 	local world = rt.world
 	local maidComponent = assert(rt.comps.Maid, "no Maid component in runtime")
@@ -130,6 +130,7 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, 
 	requireCallback: (
 		path: string
 	) -> any,
+	initialBlackboard: CustomBlackboardType?,
 	extraComponents: {
 		[string]: Jecst.Id<any>,
 	}?,
@@ -165,7 +166,7 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, 
 		comps = comps,
 
 		maid = maid,
-		blackboard = {},
+		blackboard = (initialBlackboard :: any) or {},
 
 		errorlog = {
 			lastErrorShout = 0,

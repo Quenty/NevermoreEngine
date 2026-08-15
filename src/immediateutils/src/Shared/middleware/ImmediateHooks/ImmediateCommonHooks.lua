@@ -69,12 +69,14 @@ export type ImmediateHookCallbacks = typeof(ImmediateCommonHooks._createHookCall
 	{} :: ImmediateTypes.ImmediateRuntime
 ))
 
-export type ImmediateRuntimeWithHooks<C = {}, B = {}> = ImmediateHookUtils.ImmediateRuntimeWithHookBook<C, B> & {
+export type ImmediateHooksAddon = ImmediateHookUtils.ImmediateHookBookAddon & {
 	hooks: ImmediateHookCallbacks,
 }
 
-function ImmediateCommonHooks.install<C, B>(rt: ImmediateTypes.ImmediateRuntime<C, B>): ImmediateRuntimeWithHooks<C, B>
-	local runtime = ImmediateHookUtils.install(rt) :: ImmediateRuntimeWithHooks<C, B>
+export type ImmediateRuntimeWithHooks<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHooksAddon
+
+function ImmediateCommonHooks.install<Rt>(rt: Rt): Rt & ImmediateHooksAddon
+	local runtime = ImmediateHookUtils.install(rt) :: Rt & ImmediateHooksAddon
 	if runtime.hooks == nil then
 		runtime.hooks = ImmediateCommonHooks._createHookCallbacks(runtime)
 	end

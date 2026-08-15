@@ -28,6 +28,8 @@ local ImmediateScheduler = setmetatable({}, BaseObject)
 ImmediateScheduler.ClassName = "ImmediateScheduler"
 ImmediateScheduler.__index = ImmediateScheduler
 
+type ImmediateRuntime = ImmediateTypes.ImmediateRuntime
+
 --[[
 	https://create.roblox.com/docs/performance-optimization/microprofiler/task-scheduler
 
@@ -52,19 +54,20 @@ ImmediateScheduler.__index = ImmediateScheduler
 
 	@class ImmediateSchedulableSystem
 ]=]
-export type ImmediateSchedulableSystem = {
+export type ImmediateSchedulableSystem<Rt> = {
 	-- The actual code it'll run. The runtime always comes first.
-	system: (rt: ImmediateTypes.ImmediateRuntime, ...any) -> (),
+	system: (rt: Rt, ...any) -> (),
 
 	-- Sort order inside the tick. Lower numbers run first; ties break on `name`.
 	-- defaults to 0. so if you really want to make sure yours runs first, go negative
 	priority: number?,
 
 	-- Required for replacement/non-duplicate reasons.
-	name: string,
+	-- RegisterDescendantModuleScripts fills this from the ModuleScript name if omitted.
+	name: string?,
 
 	-- Optional opt-out of protected calls.
-	notProtected: boolean,
+	notProtected: boolean?,
 
 	-- Hard-coded slot topology: preTick -> (preSystem -> system -> postSystem)* -> postTick.
 	-- Flags select which slot(s) a system runs in; a system with no flags runs
@@ -78,6 +81,8 @@ export type ImmediateSchedulableSystem = {
 	Destroy: (() -> ())?,
 }
 
+type SchedulableSystem = ImmediateSchedulableSystem<ImmediateRuntime>
+
 --[=[
 	Constructs a new ImmediateScheduler.
 
@@ -86,13 +91,13 @@ export type ImmediateSchedulableSystem = {
 export type ImmediateScheduler =
 	typeof(setmetatable(
 		{} :: {
-			_systemDictionary: { [string]: ImmediateSchedulableSystem },
+			_systemDictionary: { [string]: SchedulableSystem },
 			_sortFlag: boolean,
-			_sorted_systems: { ImmediateSchedulableSystem },
-			_sorted_preSystem: { ImmediateSchedulableSystem },
-			_sorted_postSystem: { ImmediateSchedulableSystem },
-			_sorted_preTick: { ImmediateSchedulableSystem },
-			_sorted_postTick: { ImmediateSchedulableSystem },
+			_sorted_systems: { SchedulableSystem },
+			_sorted_preSystem: { SchedulableSystem },
+			_sorted_postSystem: { SchedulableSystem },
+			_sorted_preTick: { SchedulableSystem },
+			_sorted_postTick: { SchedulableSystem },
 		},
 		{} :: typeof({ __index = ImmediateScheduler })
 	))
@@ -116,16 +121,16 @@ function ImmediateScheduler.new(): ImmediateScheduler
 	return self
 end
 
-local function _isMiddleware(system: ImmediateSchedulableSystem): boolean
+local function _isMiddleware(system: SchedulableSystem): boolean
 	return system.preSystem == true or system.postSystem == true or system.preTick == true or system.postTick == true
 end
 
-local function _systemSortKey(system: ImmediateSchedulableSystem): number
+local function _systemSortKey(system: SchedulableSystem): number
 	local priority = if typeof(system.priority) == "number" then system.priority else 0
 	return priority
 end
 
-local function _sortSystemsInPlace(array: { ImmediateSchedulableSystem })
+local function _sortSystemsInPlace(array: { SchedulableSystem })
 	table.sort(array, function(a, b)
 		local aPriority = _systemSortKey(a)
 		local bPriority = _systemSortKey(b)
@@ -174,8 +179,8 @@ local SYSTEM_OVERALL_SUPPRESS_ERRORS = 5
 
 function ImmediateScheduler._runProtectedSystem(
 	_self: ImmediateScheduler,
-	rt: ImmediateTypes.ImmediateRuntime,
-	system: ImmediateSchedulableSystem,
+	rt: any,
+	system: SchedulableSystem,
 	...
 )
 	local errorLog = rt.errorlog
@@ -231,7 +236,7 @@ function ImmediateScheduler._runProtectedSystem(
 	end
 end
 
-function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateTypes.ImmediateRuntime)
+function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: any)
 	if self._sortFlag == true then
 		self:_sortSystemArrays()
 	end
@@ -259,9 +264,9 @@ function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateTypes.Im
 	end
 end
 
-function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable: ImmediateSchedulableSystem)
+function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable: SchedulableSystem)
 	-- TODO: upsert into the schedule by `name`, then sort by priority/name.
-	local systemName = systemTable.name
+	local systemName = assert(systemTable.name, "ImmediateSchedulableSystem requires name")
 	if self._systemDictionary[systemName] then
 		self:UnregisterSystem(systemName)
 	end

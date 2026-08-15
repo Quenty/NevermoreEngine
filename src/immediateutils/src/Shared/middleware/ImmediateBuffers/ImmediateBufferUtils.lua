@@ -16,14 +16,16 @@ export type Buffers = {
 	delete: { Jecst.Entity },
 }
 
-export type ImmediateRuntimeWithBuffers<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & {
+export type ImmediateBuffersAddon = {
 	buffers: Buffers,
 }
 
+export type ImmediateRuntimeWithBuffers<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateBuffersAddon
+
 local ImmediateBufferUtils = {}
 
-function ImmediateBufferUtils.install<C, B>(rt: ImmediateTypes.ImmediateRuntime<C, B>): ImmediateRuntimeWithBuffers<C, B>
-	local runtime = rt :: ImmediateRuntimeWithBuffers<C, B>
+function ImmediateBufferUtils.install<Rt>(rt: Rt): Rt & ImmediateBuffersAddon
+	local runtime = rt :: Rt & ImmediateBuffersAddon
 	if runtime.buffers == nil then
 		runtime.buffers = {
 			callbacks = {},

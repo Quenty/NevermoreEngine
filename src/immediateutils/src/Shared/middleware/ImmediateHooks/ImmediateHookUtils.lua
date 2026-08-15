@@ -19,14 +19,17 @@ export type HookBook = {
 	stateEntities: { [string]: { [any]: Jecst.Entity } },
 }
 
-export type ImmediateRuntimeWithHookBook<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & {
+export type ImmediateHookBookAddon = {
 	hookBook: HookBook,
 }
 
+export type ImmediateRuntimeWithHookBook<C = {}, B = {}> =
+	ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHookBookAddon
+
 local ImmediateHookUtils = {}
 
-function ImmediateHookUtils.install<C, B>(rt: ImmediateTypes.ImmediateRuntime<C, B>): ImmediateRuntimeWithHookBook<C, B>
-	local runtime = rt :: ImmediateRuntimeWithHookBook<C, B>
+function ImmediateHookUtils.install<Rt>(rt: Rt): Rt & ImmediateHookBookAddon
+	local runtime = rt :: Rt & ImmediateHookBookAddon
 	if runtime.hookBook == nil then
 		runtime.hookBook = {
 			orderOfCalls = {},

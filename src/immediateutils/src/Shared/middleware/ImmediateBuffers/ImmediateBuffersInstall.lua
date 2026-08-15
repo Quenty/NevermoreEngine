@@ -9,14 +9,13 @@ local require = require(script.Parent.loader).load(script)
 
 local ImmediateBufferUtils = require("ImmediateBufferUtils")
 local ImmediateScheduler = require("ImmediateScheduler")
-local ImmediateTypes = require("ImmediateTypes")
 
 local DEFAULT_PRIORITY = 100
 
-return function<C, B>(
-	rt: ImmediateTypes.ImmediateRuntime<C, B>,
+return function<Rt>(
+	rt: Rt,
 	scheduler: ImmediateScheduler.ImmediateScheduler?
-): ImmediateBufferUtils.ImmediateRuntimeWithBuffers<C, B>
+): Rt & ImmediateBufferUtils.ImmediateBuffersAddon
 	local runtime = ImmediateBufferUtils.install(rt)
 
 	if scheduler then
