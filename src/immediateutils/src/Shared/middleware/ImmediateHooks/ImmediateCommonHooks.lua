@@ -59,6 +59,7 @@ function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateR
 		subscribe = rawrequire(hooksFolder.subscribe)(rt),
 		throttle = rawrequire(hooksFolder.throttle)(rt),
 		tween = rawrequire(hooksFolder.tween)(rt),
+		value = rawrequire(hooksFolder.value)(rt),
 		useBinder = rawrequire(hooksFolder.useBinder)(rt),
 		useTieInterface = rawrequire(hooksFolder.useTieInterface)(rt),
 	}

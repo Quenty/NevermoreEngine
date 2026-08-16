@@ -20,6 +20,10 @@
 	reparented (nil snaps back to the host). Iris has no public setter;
 	this writes Internal.parentInstance and `_rootInstance.Parent`.
 
+	`rt.iris` is nil until Init has produced a parented root, and is
+	cleared if Iris is Disabled, shut down, or the root is destroyed.
+	Consumer systems should treat a non-nil `rt.iris` as drawable.
+
 	Client-only. Stacking this on a server scheduler is a no-op for Init/cycle.
 ]=]
 local Players = game:GetService("Players")
@@ -38,7 +42,10 @@ local HOST_NAME = "ImmediateIrisHost"
 local HOST_DISPLAY_ORDER = 2147483647 - 4096
 
 export type ImmediateIrisAddon = {
-	iris: any,
+	-- The Iris module, only while it is safe to declare widgets this tick.
+	iris: any?,
+	-- Always the Iris module once required; not for widget drawing.
+	_raw_iris: any,
 	irisParent: (BasePlayerGui | GuiBase2d)?,
 }
 
@@ -81,16 +88,32 @@ local function resolveIrisParent(r: ImmediateRuntimeWithIris): (BasePlayerGui | 
 	return ensureDefaultHost()
 end
 
-local function applyIrisParent(r: ImmediateRuntimeWithIris, parent: BasePlayerGui | GuiBase2d)
-	local iris = r.iris
+local function applyIrisParent(iris: any, parent: BasePlayerGui | GuiBase2d)
 	local internal = iris.Internal
 	if internal.parentInstance ~= parent then
 		internal.parentInstance = parent
 	end
 	local root = internal._rootInstance
-	if root and root.Parent ~= parent then
+	-- Parent nil is unparented or destroyed; setting Parent on a destroyed
+	-- instance errors. `_cycle` ForceRefresh rebuilds the root.
+	if root and root.Parent ~= nil and root.Parent ~= parent then
 		root.Parent = parent
 	end
+end
+
+-- `_started` and `Disabled` are necessary but not enough: Shutdown leaves
+-- `_started` false (covered), but a destroyed root still reports started.
+-- Drawing while Disabled desyncs VDOM because `_cycle` returns before swap.
+local function isIrisDrawable(iris: any): boolean
+	if iris == nil then
+		return false
+	end
+	local internal = iris.Internal
+	if not internal._started or internal._shutdown or iris.Disabled then
+		return false
+	end
+	local root = internal._rootInstance
+	return root ~= nil and root.Parent ~= nil
 end
 
 local function destroyDefaultHost()
@@ -106,8 +129,8 @@ end
 
 return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler?): Rt & ImmediateIrisAddon
 	local runtime = rt :: Rt & ImmediateIrisAddon
-	if runtime.iris == nil then
-		runtime.iris = require("Iris")
+	if runtime._raw_iris == nil then
+		runtime._raw_iris = require("Iris")
 	end
 
 	if scheduler and RunService:IsClient() then
@@ -117,11 +140,12 @@ return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler?): 
 			priority = BEGIN_PRIORITY,
 			notProtected = false,
 			system = function(r: ImmediateRuntimeWithIris)
-				local iris = r.iris
+				local iris = r._raw_iris
 				local customParent = r.irisParent
 				local usingDefaultHost = customParent == nil or customParent.Parent == nil
 				local parent = resolveIrisParent(r)
 				if parent == nil then
+					r.iris = nil
 					return
 				end
 
@@ -135,10 +159,11 @@ return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler?): 
 					end
 					-- false = no Heartbeat; this scheduler is the cycle.
 					iris.Init(parent, false, true)
-					return
+				else
+					applyIrisParent(iris, parent)
 				end
 
-				applyIrisParent(r, parent)
+				r.iris = if isIrisDrawable(iris) then iris else nil
 			end,
 			Destroy = function() end,
 		})
@@ -148,17 +173,17 @@ return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler?): 
 			priority = END_PRIORITY,
 			notProtected = false,
 			system = function(r: ImmediateRuntimeWithIris)
-				local iris = r.iris
-				if iris.Internal._started then
-					iris.Internal._cycle()
+				local _raw_iris = r._raw_iris
+				if _raw_iris.Internal._started then
+					_raw_iris.Internal._cycle()
 				end
 			end,
 			Destroy = function() end,
 		})
 
 		runtime.maid:GiveTask(function()
-			if runtime.iris.Internal._started then
-				runtime.iris.Disabled = true
+			if runtime._raw_iris.Internal._started then
+				runtime._raw_iris.Disabled = true
 			end
 			destroyDefaultHost()
 		end)
