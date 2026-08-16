@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.1...@quenty/bufferencoder@1.1.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/bufferencoder
+
 ## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.0...@quenty/bufferencoder@1.1.1) (2026-08-13)
 
 **Note:** Version bump only for package @quenty/bufferencoder

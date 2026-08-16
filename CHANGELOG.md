@@ -1,5 +1,18 @@
 # (Fri Aug 14 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.6`, `@quenty/ik@15.66.1`, `@quenty/loader@10.11.1`, `@quenty/ragdoll@15.65.1`, `@quenty/templateprovider@11.48.2`
+  - fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 14 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/ragdoll@15.65.0`

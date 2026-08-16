@@ -14,6 +14,7 @@ local LocalizationServiceUtils = require("LocalizationServiceUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
+local PromiseUtils = require("PromiseUtils")
 local ResolveLocaleUtils = require("ResolveLocaleUtils")
 local Rx = require("Rx")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -58,6 +59,12 @@ type PendingEntries = { [string]: PendingEntry }
 type ReadyObserver = {
 	Callback: (boolean) -> (),
 	Disconnected: boolean,
+}
+
+-- A registered locale loader. Only the "give me everything" call is used from here -- the
+-- service does not drive normal loading, which each [JSONTranslator] does for itself.
+type LocaleLoader = {
+	PromiseAllLocales: (self: any) -> Promise.Promise<()>,
 }
 
 -- An entry as the LocalizationTable stores it (the shape GetEntries returns and SetEntries
@@ -111,6 +118,7 @@ export type TranslatorService = typeof(setmetatable(
 		_loadedPlayerObservable: Observable.Observable<Player>?,
 		_loadedPlayer: Player?,
 		_pendingEntries: PendingEntries,
+		_localeLoaders: { [LocaleLoader]: true },
 		_readyObservers: { [string]: { ReadyObserver } },
 		_isDestroyed: boolean,
 		_flushScheduled: boolean,
@@ -129,6 +137,7 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._tieRealmService = serviceBag:GetService(TieRealmService) :: any
 
 	self._pendingEntries = {}
+	self._localeLoaders = {}
 	self._readyObservers = {}
 	self._isDestroyed = false
 	self._flushScheduled = false
@@ -440,6 +449,50 @@ function TranslatorService._isEntryExampleCurrent(
 	end
 
 	return entry.Source == source and entry.Context == context and entry.Example == example
+end
+
+--[=[
+	Registers a translator's locale loader, so something that needs *every* locale can reach
+	all of them ([TranslatorService.PromiseLoadAllLocales]). Returns a function that
+	unregisters it -- give it to the maid of whatever owns the loader.
+
+	@param loader LocaleLoader
+	@return () -> ()
+]=]
+function TranslatorService.AddLocaleLoader(self: TranslatorService, loader: LocaleLoader): () -> ()
+	assert(loader, "No loader")
+
+	self._localeLoaders[loader] = true
+
+	return function()
+		self._localeLoaders[loader] = nil
+	end
+end
+
+--[=[
+	Loads every locale of every registered translator into this realm's table, and resolves
+	once those writes have landed.
+
+	Nothing in normal operation wants this: a translator loads the source language plus
+	whichever one a player reads, which is the whole point of loading lazily. The CSV export
+	is the exception -- it needs every language in one table at one moment -- so it asks for
+	them here rather than every realm carrying them the whole session on the chance an export
+	happens. See [TranslatorCmdrService].
+
+	@return Promise<()>
+]=]
+function TranslatorService.PromiseLoadAllLocales(self: TranslatorService): Promise.Promise<()>
+	local promises = {}
+
+	for loader in self._localeLoaders do
+		table.insert(promises, loader:PromiseAllLocales())
+	end
+
+	-- The writes every loader just queued are still pending, and a caller asking for the full
+	-- table means to read it, so settle the batch rather than hand back a table mid-assembly.
+	return PromiseUtils.all(promises):Then(function()
+		return self:PromiseEntriesWritten()
+	end) :: any
 end
 
 --[=[

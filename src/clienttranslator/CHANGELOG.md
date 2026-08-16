@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.47.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.5...@quenty/clienttranslator@14.47.6) (2026-08-14)
+
+### Bug Fixes
+
+- Translator lazy laods data in ([9972bf7](https://github.com/Quenty/NevermoreEngine/commit/9972bf76b2ac341640a4d6c5936a34e8c6ec625b))
+
 ## [14.47.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.4...@quenty/clienttranslator@14.47.5) (2026-08-07)
 
 ### Bug Fixes

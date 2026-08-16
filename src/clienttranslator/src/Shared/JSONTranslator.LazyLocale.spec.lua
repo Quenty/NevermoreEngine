@@ -139,7 +139,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 end)
 
 describe("JSONTranslator instance loading off the client", function()
-	it("loads every locale eagerly when the realm is not client", function()
+	it("loads only the source locale, not every language", function()
 		local controller = TranslatorTestUtils.setup()
 
 		local folder = controller.newInstanceFolder({
@@ -151,7 +151,39 @@ describe("JSONTranslator instance loading off the client", function()
 
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
+		expect(entry.Values["fr"]).toBeNil()
+		controller:destroy()
+	end)
+
+	it("loads every language once the export asks for them", function()
+		local controller = TranslatorTestUtils.setup()
+
+		local folder = controller.newInstanceFolder({
+			en = { greeting = "Hello" },
+			fr = { greeting = "Bonjour" },
+		})
+		controller.newTranslatorFromInstance(folder)
+
+		local isFulfilled = controller.translatorService:PromiseLoadAllLocales():Yield()
+		expect(isFulfilled).toBe(true)
+
+		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
+		expect(entry.Values["en"]).toBe("Hello")
 		expect(entry.Values["fr"]).toBe("Bonjour")
+		controller:destroy()
+	end)
+
+	it("reaches a table-driven translator's entries too", function()
+		local controller = TranslatorTestUtils.setup()
+
+		controller.newTranslator({ greeting = "Hello" })
+
+		local isFulfilled = controller.translatorService:PromiseLoadAllLocales():Yield()
+		expect(isFulfilled).toBe(true)
+
+		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["en"]).toBe(
+			"Hello"
+		)
 		controller:destroy()
 	end)
 end)

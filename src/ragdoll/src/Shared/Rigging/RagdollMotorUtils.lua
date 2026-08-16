@@ -300,7 +300,7 @@ function RagdollMotorUtils.suppressJustRootPart(character: Model, rigType: Enum.
 		RxBrioUtils.switchMapBrio(function(motor): any
 			local ragdollMotorData = RagdollMotorData:Create(motor)
 
-			return Rx.combineLatest({
+			return RxBrioUtils.flatCombineLatestBrio({
 				motor = motor,
 				part0 = RxInstanceUtils.observeProperty(motor, "Part0"),
 				part1 = RxInstanceUtils.observeProperty(motor, "Part1"),
@@ -348,7 +348,7 @@ function RagdollMotorUtils.suppressMotors(
 			RxBrioUtils.switchMapBrio(function(motor): any
 				local ragdollMotorData = RagdollMotorData:Create(motor)
 
-				return RxBrioUtils.flatCombineLatest({
+				return RxBrioUtils.flatCombineLatestBrio({
 					motor = motor,
 					part0 = RxInstanceUtils.observeProperty(motor, "Part0"),
 					part1 = RxInstanceUtils.observeProperty(motor, "Part1"),

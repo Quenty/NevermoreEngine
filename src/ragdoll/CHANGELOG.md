@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.65.0...@quenty/ragdoll@15.65.1) (2026-08-14)
+
+### Bug Fixes
+
+- **ragdoll:** Clean up previous motor state when ragdoll inputs change ([9731cf7](https://github.com/Quenty/NevermoreEngine/commit/9731cf70a88f3924a5232c21aacc0ffc40b61826))
+
 # [15.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.2...@quenty/ragdoll@15.65.0) (2026-08-14)
 
 ### Features
