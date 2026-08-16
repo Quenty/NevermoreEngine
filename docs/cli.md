@@ -104,15 +104,18 @@ Notes:
 
 ### `nevermore install`
 
-Installs one or more Nevermore packages from npm. Names are given **without** the `@quenty/` scope — the CLI adds it and validates each name against the published `@quenty/*` packages before installing. Alias: `i`.
+Installs one or more Nevermore packages from npm. Names are given **without** the `@quenty/` scope — the CLI adds it and checks each name against the registry before installing. Alias: `i`.
 
 ```bash
 nevermore install maid
 nevermore install maid rx blend
-nevermore i servicebag            # short alias
+nevermore i servicebag                        # short alias
+nevermore i blend --package-manager pnpm      # force a package manager
 ```
 
-This is a convenience wrapper over `npm install @quenty/<name>`. Plain `npm install @quenty/maid` works identically if you prefer.
+The install runs through the package manager the project already uses, detected by walking up from the current directory: a `packageManager` field in `package.json` first, then a lockfile (`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `bun.lock`, `yarn.lock`, `package-lock.json`). A directory that declares neither gets pnpm, which is what the game and plugin templates set up. Everything except npm gets `add` rather than `install`, since a bare `install` there means "install the lockfile" and wouldn't record the new dependency. Use `--package-manager` to override the detection.
+
+Installing by hand works too — `pnpm add @quenty/maid`. Reach for `npm install` only in a project that is actually npm-managed; inside a pnpm project it can fail outright, see [gotchas/tooling.md](gotchas/tooling.md).
 
 ### `nevermore login`
 
