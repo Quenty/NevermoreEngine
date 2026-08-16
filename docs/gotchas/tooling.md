@@ -31,6 +31,8 @@ When a section grows to 10+ items, graduate it to its own doc.
 
 ## nevermore-cli
 
+- **`npm install` can't install `@quenty/*` packages in a pnpm project**: some published packages still carry a `workspace:*` range in their `devDependencies` (the release tooling rewrites `dependencies` but not `devDependencies`), and npm rejects that protocol outright with `EUNSUPPORTEDPROTOCOL — Unsupported URL Type "workspace:"`. pnpm ignores it. This is why `nevermore install` detects the project's package manager instead of always shelling out to npm, and why the game/plugin templates install with pnpm.
+- **Registry search only returns 250 packages per page**: there are 300+ published `@quenty/*` packages, so a single unpaginated `registry.npmjs.org/-/v1/search` call silently misses the tail. Anything validating a package name against that list needs to page with `from`, or query the package directly at `registry.npmjs.org/@quenty%2f<name>`.
 - **`--script-text` loses everything after the first line when invoked through `npx` on Windows**: the `npx.cmd` shim truncates a multi-line argument, so `nevermore test --cloud --script-text '<line 1>\n<line 2>'` silently runs only line 1 (and prints `(no output)` when line 1 produced none). Either write the script as a single line with `;` separators, or bypass the shim: `node tools/nevermore-cli/dist/nevermore.js test --cloud --script-text '...'`, which passes newlines through intact.
 
 ## Claude Code hooks
