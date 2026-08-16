@@ -2897,6 +2897,9 @@ importers:
 
   src/immediateutils:
     dependencies:
+      '@ekeelstudiokoikoi/iris':
+        specifier: ^2.5.2
+        version: 2.5.2
       '@ekeelstudiokoikoi/jecs':
         specifier: ^0.11.1
         version: 0.11.1
@@ -6685,6 +6688,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@ekeelstudiokoikoi/iris@2.5.2':
+    resolution: {integrity: sha512-/G8E0D/ohhJ+kgmenkZuyEyUFR024DgGB13BwkOrzmSuDUc4OBME9J5xc5rjs6ejtRwkDbA4T2PIh5jr6BrVYQ==}
 
   '@ekeelstudiokoikoi/jecs@0.11.1':
     resolution: {integrity: sha512-K+HkqOk3XZcIiq6XwpHoVX1SywxfhCqHPqR4T4fF+gYeXtiAorHuMb1tu5dT6jKAGceDpEjPu5Xzh3hsgFLYPA==}
@@ -11526,6 +11532,8 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@ekeelstudiokoikoi/iris@2.5.2': {}
 
   '@ekeelstudiokoikoi/jecs@0.11.1': {}
 
