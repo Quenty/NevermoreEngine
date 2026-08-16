@@ -8,6 +8,7 @@
     "Lua",
     "ecs",
     "jecs",
+    "iris",
     "immediate"
   ],
   "bugs": {
@@ -33,6 +34,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@ekeelstudiokoikoi/iris": "^2.5.2",
     "@ekeelstudiokoikoi/jecs": "^0.11.1",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

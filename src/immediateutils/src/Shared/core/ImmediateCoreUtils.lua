@@ -142,7 +142,12 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomComponentDictionaries, 
 >
 	local maid = Maid.new()
 	local DEBUG = debugEnabled ~= false
-	local world = maid:Add(Jecs.world(DEBUG))
+	local world = Jecs.world(DEBUG)
+	-- Jecs World has no Destroy; Maid.Add would warn and no-op on cleanup.
+	maid:GiveTask(function()
+		world:cleanup()
+		table.clear(world)
+	end)
 	local usingServiceBag = serviceBag or maid:Add(ServiceBag.new())
 
 	-- Register initial components, exposing through rt.comps

@@ -12,7 +12,7 @@
   </a>
 </div>
 
-Immediate-mode ECS loop and hooks built on jecs
+A way to introduce immediate-mode code built on jecs, with some optional additional functionality (like hooks, Iris integration, or buffers)
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/ImmediateSystem">View docs →</a></div>
 

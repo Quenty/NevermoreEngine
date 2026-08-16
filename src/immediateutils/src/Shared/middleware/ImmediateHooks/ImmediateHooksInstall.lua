@@ -17,7 +17,16 @@ return function<Rt>(
 	rt: Rt,
 	scheduler: ImmediateScheduler.ImmediateScheduler?
 ): Rt & ImmediateCommonHooks.ImmediateHooksAddon
-	local runtime = ImmediateCommonHooks.install(rt)
+	local runtime = rt :: Rt & ImmediateCommonHooks.ImmediateHooksAddon
+	if runtime.hookBook == nil then
+		runtime.hookBook = {
+			orderOfCalls = {},
+			stateEntities = {},
+		}
+	end
+	if runtime.hooks == nil then
+		runtime.hooks = ImmediateCommonHooks._createHookCallbacks(runtime)
+	end
 
 	if scheduler then
 		scheduler:RegisterSystem({

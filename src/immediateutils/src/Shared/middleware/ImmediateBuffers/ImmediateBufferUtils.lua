@@ -2,9 +2,8 @@
 --[=[
 	@class ImmediateBufferUtils
 
-	Optional runtime extension: deferred callback and entity-delete queues on
-	`rt.buffers`. Install onto a bare ImmediateRuntime; drain after every
-	gameplay system so a callback error cannot leave the live queues uncleared.
+	Deferred callback and entity-delete queues on `rt.buffers`.
+	ImmediateBuffersInstall attaches these to the runtime.
 ]=]
 local require = require(script.Parent.loader).load(script)
 
@@ -23,17 +22,6 @@ export type ImmediateBuffersAddon = {
 export type ImmediateRuntimeWithBuffers<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateBuffersAddon
 
 local ImmediateBufferUtils = {}
-
-function ImmediateBufferUtils.install<Rt>(rt: Rt): Rt & ImmediateBuffersAddon
-	local runtime = rt :: Rt & ImmediateBuffersAddon
-	if runtime.buffers == nil then
-		runtime.buffers = {
-			callbacks = {},
-			delete = {},
-		}
-	end
-	return runtime
-end
 
 function ImmediateBufferUtils.deferCallback(rt: ImmediateRuntimeWithBuffers, callback: () -> ())
 	table.insert(rt.buffers.callbacks, callback)

@@ -3,7 +3,7 @@
 	@class ImmediateCommonHooks
 
 	Assembles the built-in hook factories under middleware/ImmediateHooks/commonhooks.
-	You should only have to call install() on your runtime.
+	ImmediateHooksInstall attaches these to the runtime.
 ]=]
 
 local rawrequire = require
@@ -74,13 +74,5 @@ export type ImmediateHooksAddon = ImmediateHookUtils.ImmediateHookBookAddon & {
 }
 
 export type ImmediateRuntimeWithHooks<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHooksAddon
-
-function ImmediateCommonHooks.install<Rt>(rt: Rt): Rt & ImmediateHooksAddon
-	local runtime = ImmediateHookUtils.install(rt) :: Rt & ImmediateHooksAddon
-	if runtime.hooks == nil then
-		runtime.hooks = ImmediateCommonHooks._createHookCallbacks(runtime)
-	end
-	return runtime
-end
 
 return ImmediateCommonHooks

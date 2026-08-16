@@ -16,7 +16,13 @@ return function<Rt>(
 	rt: Rt,
 	scheduler: ImmediateScheduler.ImmediateScheduler?
 ): Rt & ImmediateBufferUtils.ImmediateBuffersAddon
-	local runtime = ImmediateBufferUtils.install(rt)
+	local runtime = rt :: Rt & ImmediateBufferUtils.ImmediateBuffersAddon
+	if runtime.buffers == nil then
+		runtime.buffers = {
+			callbacks = {},
+			delete = {},
+		}
+	end
 
 	if scheduler then
 		scheduler:RegisterSystem({
