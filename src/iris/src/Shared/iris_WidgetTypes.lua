@@ -490,6 +490,73 @@ export type PlotHistogram = Widget & {
 	},
 } & Hovered
 
+-- ImPlot (extra widgets; not PlotLines/PlotHistogram)
+
+export type ImPlotPieChart = Widget & {
+	ChunkDataContainer: Frame,
+	PieChart: any,
+
+	arguments: {
+		pieData: {
+			{
+				Name: string?,
+				Color: Color3?,
+				Value: number,
+			}
+		},
+	},
+
+	state: {
+		showPieData: State<boolean>,
+		normalize: State<boolean>,
+	},
+}
+
+export type ImPlotGraph = Widget & {
+	Graph: any,
+	XMeterTape: any,
+	YMeterTape: any,
+
+	NameLabel: TextLabel,
+	XLabel: TextLabel,
+	YLabel: TextLabel,
+
+	DataInformation: Frame,
+	Tooltip: TextLabel?,
+	TooltipConnection: RBXScriptConnection?,
+
+	arguments: {
+		GraphName: string?,
+		Axes: {
+			XScale: number?,
+			X: string?,
+			YScale: number?,
+			Y: string?,
+		}?,
+	},
+
+	state: {
+		showDataInformation: State<boolean>,
+		size: State<Vector2>,
+		plots: State<{
+			{
+				Name: string?,
+				Data: { Vector2 },
+				MarkerStyle: {
+					Shape: "Circle" | "Square",
+					Color: Color3,
+					Size: number,
+					Transparency: number,
+				}?,
+				GraphStyle: {
+					Color: Color3,
+					Thickness: number,
+				}?,
+			}
+		}>,
+	},
+}
+
 export type Table = ParentWidget & {
 	_columnIndex: number,
 	_rowIndex: number,

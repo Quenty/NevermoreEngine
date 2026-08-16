@@ -37,6 +37,8 @@ export type Combo = Types.Combo
 export type ProgressBar = Types.ProgressBar
 export type PlotLines = Types.PlotLines
 export type PlotHistogram = Types.PlotHistogram
+export type ImPlotPieChart = Types.ImPlotPieChart
+export type ImPlotGraph = Types.ImPlotGraph
 export type Table = Types.Table
 
 export type Iris = Types.Iris

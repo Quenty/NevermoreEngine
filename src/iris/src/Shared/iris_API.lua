@@ -153,6 +153,10 @@ return function(Iris: Types.Iris)
 
 	Iris.PlotHistogram = wrapper("PlotHistogram")
 
+	Iris.ImPlotGraph = wrapper("ImPlotGraph")
+
+	Iris.ImPlotPieChart = wrapper("ImPlotPieChart")
+
 	Iris.Table = wrapper("Table")
 
 	Iris.NextColumn = function()

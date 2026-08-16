@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Copyright (c) 2024 Michael_48
+Copyright (c) 2026 LinusKat
 Copyright (c) 2026 Quenty
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

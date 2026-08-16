@@ -12,7 +12,7 @@
   </a>
 </div>
 
-Immediate-mode GUI vendored from [SirMallard/Iris](https://github.com/SirMallard/Iris) (v2.5.1)
+Immediate-mode GUI vendored from [SirMallard/Iris](https://github.com/SirMallard/Iris) (v2.5.1), plus `Iris.ImPlotGraph` / `Iris.ImPlotPieChart` from [LinusKat/ImPlot](https://github.com/LinusKat/ImPlot). Those two are not upstream Iris — they are extra widgets. `PlotLines` / `PlotHistogram` remain the built-in sparkline widgets.
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Iris">View docs →</a></div>
 
@@ -29,5 +29,7 @@ local Iris = require("Iris")
 ## Source
 
 Vendored from [SirMallard/Iris](https://github.com/SirMallard/Iris) v2.5.1. MIT, copyright 2024 Michael_48.
+
+`widgets/iris_ImPlot/` is extracted from [LinusKat/ImPlot](https://github.com/LinusKat/ImPlot). MIT, copyright 2026 LinusKat. That repo is a full Iris fork with plot widgets; only the unique plot code is kept here.
 
 Files are prefixed `iris_` so they do not collide in Nevermore's global module registry. Relative requires are unchanged. Re-vendor from a tagged release next time and record the SHA here.

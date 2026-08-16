@@ -484,4 +484,6 @@ return function(Iris: Types.Internal)
 	require(script.Parent.iris_Plot)(Iris, widgets)
 
 	require(script.Parent.iris_Table)(Iris, widgets)
+
+	require(script.Parent.iris_ImPlot)(Iris, widgets)
 end

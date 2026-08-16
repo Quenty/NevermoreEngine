@@ -58,6 +58,8 @@ export type Combo = WidgetTypes.Combo
 export type ProgressBar = WidgetTypes.ProgressBar
 export type PlotLines = WidgetTypes.PlotLines
 export type PlotHistogram = WidgetTypes.PlotHistogram
+export type ImPlotPieChart = WidgetTypes.ImPlotPieChart
+export type ImPlotGraph = WidgetTypes.ImPlotGraph
 export type Table = WidgetTypes.Table
 
 export type InputDataType = number | Vector2 | Vector3 | UDim | UDim2 | Color3 | Rect | { number }
@@ -600,6 +602,8 @@ export type Iris = {
 	ProgressBar: WidgetCall<ProgressBar, WidgetArguments, WidgetStates?>,
 	PlotLines: WidgetCall<PlotLines, WidgetArguments, WidgetStates?>,
 	PlotHistogram: WidgetCall<PlotHistogram, WidgetArguments, WidgetStates?>,
+	ImPlotPieChart: WidgetCall<ImPlotPieChart, WidgetArguments, WidgetStates?>,
+	ImPlotGraph: WidgetCall<ImPlotGraph, WidgetArguments, WidgetStates?>,
 
 	Image: WidgetCall<Image, WidgetArguments, nil>,
 	ImageButton: WidgetCall<ImageButton, WidgetArguments, nil>,
