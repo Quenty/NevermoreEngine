@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.18.0...@quenty/humanoidutils@2.18.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/humanoidutils
+
+# [2.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.17.0...@quenty/humanoidutils@2.18.0) (2026-08-13)
+
+### Features
+
+- **humanoidutils:** observe whether a humanoid can jump ([d067e10](https://github.com/Quenty/NevermoreEngine/commit/d067e108ce7872cf0b763829bbf959fa59b4858c))
+
 # [2.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidutils@2.16.0...@quenty/humanoidutils@2.17.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/humanoidutils

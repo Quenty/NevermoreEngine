@@ -70,6 +70,8 @@ export function parseBatchTestLogs(
   let currentSlug: string | null = null;
   let currentLines: string[] = [];
   let summaryLineIndex = -1;
+  /** True between the summary marker and its JSON payload. */
+  let summaryPayloadPending = false;
   let beginMarkersSeen = 0;
   let endMarkersSeen = 0;
   let strayEndMarkers = 0;
@@ -130,8 +132,19 @@ export function parseBatchTestLogs(
     }
 
     if (trimmed === SUMMARY_MARKER) {
-      summaryLineIndex = i;
-      break;
+      // Keep scanning: the summary prints last but is not always delivered last,
+      // and a section's END can follow it.
+      if (summaryLineIndex < 0) {
+        summaryLineIndex = i;
+      }
+      summaryPayloadPending = true;
+      continue;
+    }
+
+    // The summary's JSON payload belongs to no section.
+    if (summaryPayloadPending && trimmed.trimStart().startsWith('[')) {
+      summaryPayloadPending = false;
+      continue;
     }
 
     // Accumulate unconditionally: output that precedes the first surviving
@@ -209,7 +222,7 @@ export function parseBatchTestLogs(
     OutputHelper.warn(
       summaryLineIndex >= lines.length - 2
         ? '[batch-log-parser] Summary sits at the end of the log — consistent with the head being dropped by a log size/retention limit.'
-        : '[batch-log-parser] Summary sits early in the log — consistent with out-of-order messages ending the scan prematurely.'
+        : '[batch-log-parser] Summary sits early in the log — consistent with messages delivered out of order.'
     );
   }
 

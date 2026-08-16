@@ -322,6 +322,9 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
@@ -337,6 +340,12 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+      '@quentystudios/t':
+        specifier: ^3.0.0
+        version: 3.0.0
 
   src/adorneedata:
     dependencies:
@@ -1214,9 +1223,15 @@ importers:
 
   src/clienttranslator:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/enums':
         specifier: workspace:*
         version: link:../enums
@@ -1253,6 +1268,9 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/templateprovider':
+        specifier: workspace:*
+        version: link:../templateprovider
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie
@@ -1337,6 +1355,9 @@ importers:
       '@quentystudios/cmdr':
         specifier: ^1.12.0-quenty.0
         version: 1.12.0-quenty.0
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/collectionserviceutils:
     dependencies:
@@ -1681,6 +1702,9 @@ importers:
       '@quenty/bindtocloseservice':
         specifier: workspace:*
         version: link:../bindtocloseservice
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -2731,15 +2755,24 @@ importers:
 
   src/humanoidutils:
     dependencies:
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/idleservice:
     dependencies:
@@ -2861,6 +2894,51 @@ importers:
       '@quenty/rigbuilderutils':
         specifier: workspace:*
         version: link:../rigbuilderutils
+
+  src/immediateutils:
+    dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
+      '@quenty/jecs':
+        specifier: workspace:*
+        version: link:../jecs
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/randomutils':
+        specifier: workspace:*
+        version: link:../randomutils
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
+      '@quenty/spring':
+        specifier: workspace:*
+        version: link:../spring
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/influxdbclient:
     dependencies:
@@ -3057,7 +3135,31 @@ importers:
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
 
+  src/iris:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/isamixin: {}
+
+  src/jecs:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/jsonutils:
     dependencies:
@@ -4087,6 +4189,9 @@ importers:
       '@quenty/characterutils':
         specifier: workspace:*
         version: link:../characterutils
+      '@quenty/cmdrservice':
+        specifier: workspace:*
+        version: link:../cmdrservice
       '@quenty/draw':
         specifier: workspace:*
         version: link:../draw
@@ -4120,6 +4225,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/playerutils':
+        specifier: workspace:*
+        version: link:../playerutils
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -6326,6 +6434,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
+      '@quenty/nevermore-deploy':
+        specifier: workspace:*
+        version: link:../nevermore-deploy
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
@@ -6347,6 +6458,9 @@ importers:
       typescript-memoize:
         specifier: ^1.1.1
         version: 1.1.1
+      ws:
+        specifier: ^8.18.0
+        version: 8.20.0
       yargs:
         specifier: ^18.0.0
         version: 18.0.0
@@ -6357,6 +6471,9 @@ importers:
       '@types/node':
         specifier: ^18.11.4
         version: 18.19.130
+      '@types/ws':
+        specifier: ^8.5.13
+        version: 8.18.1
       '@types/yargs':
         specifier: ^17.0.13
         version: 17.0.35
@@ -6400,6 +6517,21 @@ importers:
       typescript-memoize:
         specifier: ^1.1.1
         version: 1.1.1
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
+
+  tools/nevermore-deploy:
+    devDependencies:
+      '@types/node':
+        specifier: ^18.11.4
+        version: 18.19.130
+      prettier:
+        specifier: 2.7.1
+        version: 2.7.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)

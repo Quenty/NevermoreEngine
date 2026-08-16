@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.36.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.36.2...@quenty/r15utils@13.36.3) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/r15utils
+
+## [13.36.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.36.1...@quenty/r15utils@13.36.2) (2026-08-12)
+
+### Bug Fixes
+
+- A series of misc fixes + upgrade rojo ([#798](https://github.com/Quenty/NevermoreEngine/issues/798)) ([33d83e2](https://github.com/Quenty/NevermoreEngine/commit/33d83e26a384a17ee58b12f367890a63c73e8432))
+
 ## [13.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.36.0...@quenty/r15utils@13.36.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/r15utils

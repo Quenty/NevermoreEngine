@@ -1,6 +1,6 @@
 {
   "name": "@quenty/datastore",
-  "version": "13.51.1",
+  "version": "13.52.1",
   "description": "Quenty's Datastore implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/bindtocloseservice": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",

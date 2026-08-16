@@ -176,7 +176,7 @@ describe("SaveSlotCmdrUtils.registerSlotIndexType", function()
 		expect((slotIndex.Validate(slotIndex.Transform("-2", FAKE_PLAYER)))).toBe(false)
 	end)
 
-	it('exposes Default on the listable type too, so "." works for delete-save-slot', function()
+	it('exposes Default on the listable type too, so "." works for saveslot-delete', function()
 		local _slotIndex, slotIndices = registerSlotIndex({
 			lastActiveSlotId = "id-1",
 			slots = {
@@ -185,5 +185,72 @@ describe("SaveSlotCmdrUtils.registerSlotIndexType", function()
 		})
 
 		expect(slotIndices.Default(FAKE_PLAYER)).toBe("1")
+	end)
+end)
+
+describe("SaveSlotCmdrUtils.formatValue", function()
+	it("prints whole numbers without the float tail datastores round-trip them with", function()
+		expect(SaveSlotCmdrUtils.formatValue(42.0)).toBe("42")
+		expect(SaveSlotCmdrUtils.formatValue(1.5)).toBe("1.50")
+	end)
+
+	it("prints a map with sorted keys, so repeated listings read the same", function()
+		expect(SaveSlotCmdrUtils.formatValue({ world = 3, coins = 100 })).toBe("{coins = 100, world = 3}")
+	end)
+
+	it("prints an array as a list", function()
+		expect(SaveSlotCmdrUtils.formatValue({ "a", "b" })).toBe("[a, b]")
+	end)
+
+	it("collapses past the depth limit rather than unfolding forever", function()
+		expect(SaveSlotCmdrUtils.formatValue({ a = { b = { c = { d = { e = 1 } } } } })).toBe("{a = {b = {c = ...}}}")
+	end)
+end)
+
+describe("SaveSlotCmdrUtils.formatSummaryLines", function()
+	it("prints one line per provider, unwrapping the provider's own table", function()
+		expect(SaveSlotCmdrUtils.formatSummaryLines({
+			progress = { chapter = 3, percent = 42 },
+			currency = 1200,
+		})).toEqual({
+			"currency: 1200",
+			"progress: chapter = 3, percent = 42",
+		})
+	end)
+
+	it("passes a legacy plain-string summary straight through", function()
+		expect(SaveSlotCmdrUtils.formatSummaryLines("Chapters: 1")).toEqual({ "Chapters: 1" })
+	end)
+
+	it("has nothing to say about a missing summary", function()
+		expect(SaveSlotCmdrUtils.formatSummaryLines(nil)).toEqual({})
+	end)
+end)
+
+describe("SaveSlotCmdrUtils.formatSlotBlock", function()
+	local NOW = 1_754_000_000
+
+	it("prints the summary, playtime and timestamps a listing is read for", function()
+		local block = SaveSlotCmdrUtils.formatSlotBlock({
+			SlotId = "id-1",
+			SlotIndex = 1,
+			SlotName = "Alpha",
+			CreatedTime = NOW - 86400 * 3,
+			LastPlayedTime = NOW - 3600 * 2,
+			TimePlayed = 5000,
+			PlayCount = 4,
+			Summary = { progress = { chapter = 3 } },
+		}, "Active", NOW)
+
+		expect(block).toBe(table.concat({
+			'"Alpha" (1) — Active',
+			"  played 1h 23m, 4 session(s), last played 2025-07-31 20:13 UTC (2h ago)",
+			"  created 2025-07-28 22:13 UTC (3d ago)",
+			"  progress: chapter = 3",
+		}, "\n"))
+	end)
+
+	it("prints a never-played slot as its header alone, rather than empty detail lines", function()
+		expect(SaveSlotCmdrUtils.formatSlotBlock({ SlotId = "id-2", SlotIndex = 2 }, nil, NOW)).toBe('"Slot 2" (2)')
 	end)
 end)

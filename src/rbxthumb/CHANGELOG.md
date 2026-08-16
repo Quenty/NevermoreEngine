@@ -3,294 +3,158 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.13.0...@quenty/rbxthumb@5.14.0) (2026-04-23)
+## [5.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.14.0...@quenty/rbxthumb@5.14.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
+# [5.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.13.0...@quenty/rbxthumb@5.14.0) (2026-04-23)
 
-
-
+**Note:** Version bump only for package @quenty/rbxthumb
 
 # [5.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.12.0...@quenty/rbxthumb@5.13.0) (2026-02-17)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.11.2...@quenty/rbxthumb@5.12.0) (2026-01-16)
-
 
 ### Features
 
-* Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
-
-
-
-
+- Add SimpleEnum package and interface, to simplify enum usage across Nevermore ([d3040d7](https://github.com/Quenty/NevermoreEngine/commit/d3040d7a07ae7b2586bb982399b401fe19f1eb3f))
 
 ## [5.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.11.1...@quenty/rbxthumb@5.11.2) (2026-01-12)
 
-
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [5.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.11.0...@quenty/rbxthumb@5.11.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.10.1...@quenty/rbxthumb@5.11.0) (2026-01-04)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 ## [5.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.10.0...@quenty/rbxthumb@5.10.1) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.9.4...@quenty/rbxthumb@5.10.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 ## [5.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.9.3...@quenty/rbxthumb@5.9.4) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 ## [5.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.9.1...@quenty/rbxthumb@5.9.3) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [5.9.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.9.1...@quenty/rbxthumb@5.9.2) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 ## [5.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.9.0...@quenty/rbxthumb@5.9.1) (2025-03-21)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.8.0...@quenty/rbxthumb@5.9.0) (2025-02-18)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [5.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.7.1...@quenty/rbxthumb@5.8.0) (2024-11-13)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 ## [5.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.7.0...@quenty/rbxthumb@5.7.1) (2024-11-04)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [5.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.6.0...@quenty/rbxthumb@5.7.0) (2024-10-06)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.5.0...@quenty/rbxthumb@5.6.0) (2024-10-04)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [5.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.4.0...@quenty/rbxthumb@5.5.0) (2024-09-25)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.3.0...@quenty/rbxthumb@5.4.0) (2024-09-12)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.2.0...@quenty/rbxthumb@5.3.0) (2024-05-09)
-
 
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [5.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.1.0...@quenty/rbxthumb@5.2.0) (2024-04-27)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [5.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@5.0.0...@quenty/rbxthumb@5.1.0) (2024-03-09)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [5.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@4.0.0...@quenty/rbxthumb@5.0.0) (2024-02-14)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [4.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@3.0.0...@quenty/rbxthumb@4.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [3.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@2.2.0...@quenty/rbxthumb@3.0.0) (2024-02-13)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@2.1.0...@quenty/rbxthumb@2.2.0) (2024-01-08)
 
 **Note:** Version bump only for package @quenty/rbxthumb
-
-
-
-
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@2.0.0...@quenty/rbxthumb@2.1.0) (2023-12-14)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.4.0...@quenty/rbxthumb@2.0.0) (2023-10-11)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.3.1...@quenty/rbxthumb@1.4.0) (2023-08-23)
-
 
 ### Bug Fixes
 
-* Add missing dependencies ([324e3db](https://github.com/Quenty/NevermoreEngine/commit/324e3dbcd7ed260542eebe24889cbc6cd968d380))
-
-
-
-
+- Add missing dependencies ([324e3db](https://github.com/Quenty/NevermoreEngine/commit/324e3dbcd7ed260542eebe24889cbc6cd968d380))
 
 ## [1.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.3.0...@quenty/rbxthumb@1.3.1) (2023-04-07)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.2.0...@quenty/rbxthumb@1.3.0) (2023-03-05)
 
 **Note:** Version bump only for package @quenty/rbxthumb
 
-
-
-
-
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rbxthumb@1.1.0...@quenty/rbxthumb@1.2.0) (2023-02-27)
-
 
 ### Features
 
-* Add RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType) ([496f505](https://github.com/Quenty/NevermoreEngine/commit/496f5057b35e653ff5ef47e48330490644f8d6e4))
-
-
-
-
+- Add RbxThumbUtils.avatarItemTypeToThumbnailType(avatarItemType) ([496f505](https://github.com/Quenty/NevermoreEngine/commit/496f5057b35e653ff5ef47e48330490644f8d6e4))
 
 # 1.1.0 (2022-10-30)
 
-
 ### Features
 
-* Add rbxthumb package ([19d94d3](https://github.com/Quenty/NevermoreEngine/commit/19d94d36755a560ae68081138286cffc25f134b3))
-
-
-
-
+- Add rbxthumb package ([19d94d3](https://github.com/Quenty/NevermoreEngine/commit/19d94d36755a560ae68081138286cffc25f134b3))
 
 # v1.1.0 (Sun Oct 30 2022)
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.43.1...@quenty/rxbinderutils@14.43.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
 ## [14.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.43.0...@quenty/rxbinderutils@14.43.1) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/rxbinderutils

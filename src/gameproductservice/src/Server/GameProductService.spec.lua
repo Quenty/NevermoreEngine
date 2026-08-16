@@ -12,6 +12,11 @@
 	a mock, and a client-initiated accept replicates to the server over the production remoting
 	path (session purchase, ownership, and both realms' purchase signals).
 
+	Server-side verification of a client's gamepass purchase claim is gated on server-only prompting
+	(see [GameProductService.SetServerOnlyPromptingEnabled]), so it is covered from both sides: with
+	the flag off the server takes the client's word, and with it on an unconfirmed claim grants
+	nothing while a confirmed one grants the pass.
+
 	@class GameProductService.spec.lua
 ]]
 
@@ -286,7 +291,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 end)
 
 describe("client-initiated gamepass prompt", function()
-	it("resolves true on accept, replicates to the server, and fires both realms' purchase signals", function()
+	it("grants server ownership once the marketplace confirms the client's purchase", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
 
@@ -295,8 +300,18 @@ describe("client-initiated gamepass prompt", function()
 		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
 			table.insert(serverFired, { player = player, gamePassId = gamePassId })
 		end)
+		-- The pass is not owned when the prompt opens, so the client genuinely prompts. Model the
+		-- purchase going through by marking the marketplace as owning it the instant the client reports
+		-- success -- the same false-before / true-after transition a real purchase produces, and what
+		-- the server's verification then reads.
 		controller.gameProductServiceClient.GamePassPurchased:Connect(function(gamePassId)
 			table.insert(clientFired, gamePassId)
+			PlayerMock.writeLookup(
+				controller.playerMock,
+				"MarketplaceService.UserOwnsGamePassAsync",
+				GAME_PASS_ID,
+				true
+			)
 		end)
 
 		expect(
@@ -331,6 +346,46 @@ describe("client-initiated gamepass prompt", function()
 					GameConfigAssetTypes.PASS,
 					GAME_PASS_ID
 				)
+			)
+		).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("takes the client's word for a purchase the marketplace never confirms", function()
+		local controller = setup()
+		-- Server-only prompting is off (the default), so the server has not been asked to establish
+		-- purchases itself and grants on the client's report. This is a known trust gap, kept because
+		-- verifying here would read UserOwnsGamePassAsync's per-server cache, which can still answer
+		-- `false` for a purchase that just completed and would lose a pass the player paid for. Games
+		-- that want the claim checked enable server-only prompting; see the verification describe below.
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
+
+		local serverFired = {}
+		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
+			table.insert(serverFired, { player = player, gamePassId = gamePassId })
+		end)
+
+		expect(
+			controller.awaitBool(
+				controller.gameProductServiceClient:PromisePromptPurchase(
+					controller.playerMock,
+					GameConfigAssetTypes.PASS,
+					GAME_PASS_ID
+				)
+			)
+		).toEqual(true)
+
+		PromiseTestUtils.awaitValue(function()
+			return #serverFired > 0
+		end, 10)
+
+		expect(#serverFired).toEqual(1)
+		expect(
+			controller.gameProductService:HasPlayerPurchasedThisSession(
+				controller.playerMock,
+				GameConfigAssetTypes.PASS,
+				GAME_PASS_ID
 			)
 		).toEqual(true)
 
@@ -374,6 +429,109 @@ describe("client-initiated gamepass prompt", function()
 				GAME_PASS_ID
 			)
 		).toEqual(false)
+
+		controller:destroy()
+	end)
+end)
+
+describe("gamepass purchase verification under server-only prompting", function()
+	-- With server-only prompting enabled the client may no longer prompt, so these drive the client's
+	-- prompt-finished handler directly. That is the same entry point the engine's
+	-- PromptGamePassPurchaseFinished reaches, and the one an exploiter reaches by firing the remote
+	-- themselves -- which is exactly the claim under test.
+	local function claimPurchaseFromClient(controller: any, gamePassId: number)
+		local clientBinder = controller.clientBag:GetService((require :: any)("PlayerProductManagerClient"))
+
+		PromiseTestUtils.awaitValue(function()
+			return clientBinder:Get(controller.playerMock) ~= nil
+		end, 10)
+
+		local manager: any = clientBinder:Get(controller.playerMock)
+		manager:_handleGamePassPromptFinished(gamePassId, true)
+	end
+
+	it("grants nothing for a claim the marketplace does not confirm", function()
+		local controller = setup()
+		controller.gameProductService:SetServerOnlyPromptingEnabled(true)
+
+		-- UserOwnsGamePassAsync stays at its false default: the player never bought this pass. Any
+		-- client can fire this remote for any gamepass id, so on its own the claim must grant nothing.
+		local serverFired = {}
+		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
+			table.insert(serverFired, { player = player, gamePassId = gamePassId })
+		end)
+
+		claimPurchaseFromClient(controller, GAME_PASS_ID)
+
+		-- Awaiting the ownership query also lets the server's verification settle first.
+		expect(
+			controller.awaitBool(
+				controller.gameProductService:PromisePlayerOwnership(
+					controller.playerMock,
+					GameConfigAssetTypes.PASS,
+					GAME_PASS_ID
+				)
+			)
+		).toEqual(false)
+		expect(#serverFired).toEqual(0)
+		expect(
+			controller.gameProductService:HasPlayerPurchasedThisSession(
+				controller.playerMock,
+				GameConfigAssetTypes.PASS,
+				GAME_PASS_ID
+			)
+		).toEqual(false)
+
+		controller:destroy()
+	end)
+
+	it("grants the pass for a claim the marketplace confirms", function()
+		local controller = setup()
+		controller.gameProductService:SetServerOnlyPromptingEnabled(true)
+
+		-- The marketplace shows the player owning the pass, as it would after a real purchase.
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+
+		local serverFired = {}
+		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
+			table.insert(serverFired, { player = player, gamePassId = gamePassId })
+		end)
+
+		claimPurchaseFromClient(controller, GAME_PASS_ID)
+
+		PromiseTestUtils.awaitValue(function()
+			return #serverFired > 0
+		end, 10)
+
+		expect(#serverFired).toEqual(1)
+		expect(serverFired[1].player).toBe(controller.playerMock)
+		expect(serverFired[1].gamePassId).toEqual(GAME_PASS_ID)
+		expect(
+			controller.gameProductService:HasPlayerPurchasedThisSession(
+				controller.playerMock,
+				GameConfigAssetTypes.PASS,
+				GAME_PASS_ID
+			)
+		).toEqual(true)
+
+		controller:destroy()
+	end)
+
+	it("still refuses a client-initiated prompt", function()
+		local controller = setup()
+		controller.gameProductService:SetServerOnlyPromptingEnabled(true)
+
+		-- Verification and the prompting restriction ship together: a game cannot take one without
+		-- the other, so this records what enabling the flag costs the client realm.
+		local outcome = PromiseTestUtils.awaitOutcome(
+			controller.gameProductServiceClient:PromisePromptPurchase(
+				controller.playerMock,
+				GameConfigAssetTypes.PASS,
+				GAME_PASS_ID
+			),
+			10
+		)
+		expect(outcome).toEqual("rejected")
 
 		controller:destroy()
 	end)

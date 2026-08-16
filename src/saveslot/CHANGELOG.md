@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.8.0...@quenty/saveslot@2.8.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/saveslot
+
+# [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.7.1...@quenty/saveslot@2.8.0) (2026-08-13)
+
+### Bug Fixes
+
+- **datastore:** release a borrowed session even when the caller is torn down ([2537a0b](https://github.com/Quenty/NevermoreEngine/commit/2537a0b8e90a658cca96f83a515b5ffac8662518))
+- Transfers now are more secure ([cd068ce](https://github.com/Quenty/NevermoreEngine/commit/cd068ced353b388892e64e06282c505f57a4b245))
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+- **saveslot:** make every save slot command work on players who are not in this server ([795549c](https://github.com/Quenty/NevermoreEngine/commit/795549cdcb4c8584a4acd22eb7377c7aea149182))
+- **saveslot:** take playerIds on every save slot command ([8069fe5](https://github.com/Quenty/NevermoreEngine/commit/8069fe53fd564899a6c025e5371ad9a7f4e0b275))
+
+## [2.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.7.0...@quenty/saveslot@2.7.1) (2026-08-10)
+
+### Bug Fixes
+
+- Carry accrued playtime onto a copied slot ([90be930](https://github.com/Quenty/NevermoreEngine/commit/90be9301629ee967f52be7ad947f3f1568b48f29))
+
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.3...@quenty/saveslot@2.7.0) (2026-08-10)
+
+### Bug Fixes
+
+- Fix save slots ([579c587](https://github.com/Quenty/NevermoreEngine/commit/579c587ebfadaedaab91e774f8441d78a8d6fe99))
+- **nevermore-cli:** make the watch context tests independent of the host ([453f415](https://github.com/Quenty/NevermoreEngine/commit/453f415460db72eec511ecbea34434c82afb61c8))
+
+## [2.6.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.2...@quenty/saveslot@2.6.3) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/saveslot
+
 ## [2.6.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.6.1...@quenty/saveslot@2.6.2) (2026-07-30)
 
 ### Bug Fixes

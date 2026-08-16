@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.68.0...@quenty/settings@11.68.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.2...@quenty/settings@11.68.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+
+## [11.67.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.1...@quenty/settings@11.67.2) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/settings
+
 ## [11.67.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.0...@quenty/settings@11.67.1) (2026-07-30)
 
 **Note:** Version bump only for package @quenty/settings

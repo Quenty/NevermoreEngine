@@ -64,20 +64,24 @@ end
 	@param character Model
 	@param partName string
 	@param weldName string
-	@return Observable<Brio<Motor6D>>
+	@return Observable<Brio<Weld | Motor6D | AnimationConstraint>>
 ]=]
 function RxR15Utils.observeRigWeldBrio(
 	character: Model,
 	partName: string,
 	weldName: string
-): Observable.Observable<Brio.Brio<R15Utils.AnimationConstraintOrMotor6D>>
+): Observable.Observable<Brio.Brio<R15Utils.WeldOrAnimationConstraintOrMotor6D>>
 	assert(typeof(character) == "Instance", "Bad character")
 	assert(type(partName) == "string", "Bad partName")
 	assert(type(weldName) == "string", "Bad weldName")
 
 	return RxInstanceUtils.observeLastNamedChildBrio(character, "BasePart", partName):Pipe({
 		RxBrioUtils.switchMapBrio(function(part)
-			return RxInstanceUtils.observeLastNamedChildBrio(part, "Weld", weldName)
+			return RxInstanceUtils.observeLastNamedChildBrio(
+				part,
+				R15Utils.isWeldOrAnimationConstraintOrMotor6D,
+				weldName
+			)
 		end) :: any,
 		RxBrioUtils.onlyLastBrioSurvives() :: any,
 	}) :: any

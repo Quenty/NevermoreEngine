@@ -154,6 +154,58 @@ describe("HasSaveSlots.PromiseExportSlot / PromiseImportSlot", function()
 		end)
 	end)
 
+	it("carries accrued playtime through the export", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local sourceSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(2, { TimePlayed = 3600 }))
+
+			local export = awaitValueOf(hasSaveSlots:PromiseExportSlot(sourceSlotId))
+			expect(export.timePlayed).toEqual(3600)
+
+			local newSlotId = awaitValueOf(hasSaveSlots:PromiseImportSlot(export))
+			local metadata = awaitValueOf(hasSaveSlots:PromiseGetSlotMetadata(newSlotId))
+			expect(metadata.TimePlayed).toEqual(3600)
+		end)
+	end)
+
+	it("exports the live session's playtime, not just what was last saved", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+
+			-- Rewind the live session's clock so the export observes ~120s of unflushed play.
+			local tracker: any = hasSaveSlots:GetSlotsDataStore()
+			tracker._playSessionStart = os.time() - 120
+			tracker._playSessionLastFlush = os.time() - 120
+
+			local export = awaitValueOf(hasSaveSlots:PromiseExportSlot(sourceSlotId))
+			expect(export.timePlayed ~= nil and export.timePlayed >= 120).toEqual(true)
+		end)
+	end)
+
+	it("imports an export written before playtime was carried", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+
+			local newSlotId = awaitValueOf(hasSaveSlots:PromiseImportSlot({ data = { Coins = 1 }, slotName = "Hero" }))
+
+			local metadata = awaitValueOf(hasSaveSlots:PromiseGetSlotMetadata(newSlotId))
+			expect(metadata.SlotName).toEqual("Hero")
+			expect(metadata.TimePlayed).toBeNil()
+		end)
+	end)
+
+	it("refuses to import an export whose timePlayed is not a number", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			expect(awaitResolved(hasSaveSlots:PromiseImportSlot(({ data = {}, timePlayed = "600" }) :: any))).toEqual(
+				false
+			)
+		end)
+	end)
+
 	it("refuses to export the main slot", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots

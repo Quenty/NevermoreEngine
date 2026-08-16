@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.43.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.2...@quenty/nevermore-cli@4.43.3) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+## [4.43.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.43.1...@quenty/nevermore-cli@4.43.2) (2026-08-12)
+
+### Bug Fixes
+
+- A series of misc fixes + upgrade rojo ([#798](https://github.com/Quenty/Nevermore/issues/798)) ([33d83e2](https://github.com/Quenty/Nevermore/commit/33d83e26a384a17ee58b12f367890a63c73e8432))
+
+## [4.43.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.43.0...@quenty/nevermore-cli@4.43.1) (2026-08-10)
+
+### Bug Fixes
+
+- **nevermore-cli:** stop failing a batch run whose tests all passed ([#794](https://github.com/Quenty/Nevermore/issues/794)) ([0109f76](https://github.com/Quenty/Nevermore/commit/0109f7614166b086f57c0919af3e8f5f63dad436))
+
+# [4.43.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.42.0...@quenty/nevermore-cli@4.43.0) (2026-08-10)
+
+### Bug Fixes
+
+- **nevermore-cli:** close the defects a pre-merge review found ([f559265](https://github.com/Quenty/Nevermore/commit/f559265afb84205ac855eb240d899800fea08cec))
+- **nevermore-cli:** close three defects found consuming --watch ([f6b198e](https://github.com/Quenty/Nevermore/commit/f6b198e97e0142bea2c91f6190db62b477f51e3e))
+- **nevermore-cli:** make the watch context tests independent of the host ([453f415](https://github.com/Quenty/Nevermore/commit/453f415460db72eec511ecbea34434c82afb61c8))
+- **nevermore-cli:** notice an unreadable base place from the live event tail ([6ba20e8](https://github.com/Quenty/Nevermore/commit/6ba20e8373812605167ef352574d70b0701e1160))
+- **nevermore-cli:** stop naming an Open Cloud scope that does not exist ([b1d1bd6](https://github.com/Quenty/Nevermore/commit/b1d1bd638507439c71cb7726aa744d6caabff624))
+- **nevermore-deploy-config:** close lock resolution races found in review ([ea7b0a4](https://github.com/Quenty/Nevermore/commit/ea7b0a4a677d068bd7228c5b295f713986f8ae51))
+
+### Features
+
+- **nevermore-cli:** let `gh` supply the watch token, when asked ([4d53eb8](https://github.com/Quenty/Nevermore/commit/4d53eb87270020b19584b826221c3cff7ecc4e66))
+- **nevermore-cli:** let basePlace.version track "saved" or "published" ([a4f9492](https://github.com/Quenty/Nevermore/commit/a4f94927d1d9ede359e20628e65d68279a25fdfd))
+- **nevermore-cli:** rebuild a place when its base place changes ([ef82af0](https://github.com/Quenty/Nevermore/commit/ef82af0ea4c336ebc69167211fd82e1929eb5eb2))
+- **nevermore-cli:** stamp the base place version into the built place ([4e91c13](https://github.com/Quenty/Nevermore/commit/4e91c13904afd423fd39e26387087608a5da9e22))
+- **nevermore-cli:** use the shared Open Cloud key the service now spends ([d152305](https://github.com/Quenty/Nevermore/commit/d15230516bfc1cffb3e4f2cf0a5505cefee02fe4))
+- **nevermore-deploy-config:** add deploy.nevermore.lock.json ([1a76b36](https://github.com/Quenty/Nevermore/commit/1a76b36c12f79e1e0b1dd22a20170fc09e85c0e1))
+
 # [4.42.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.41.1...@quenty/nevermore-cli@4.42.0) (2026-07-29)
 
 ### Features

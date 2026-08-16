@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.47.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.5...@quenty/clienttranslator@14.47.6) (2026-08-14)
+
+### Bug Fixes
+
+- Translator lazy laods data in ([9972bf7](https://github.com/Quenty/NevermoreEngine/commit/9972bf76b2ac341640a4d6c5936a34e8c6ec625b))
+
+## [14.47.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.4...@quenty/clienttranslator@14.47.5) (2026-08-07)
+
+### Bug Fixes
+
+- Prevent more redundant table rebuilding ([33a3663](https://github.com/Quenty/NevermoreEngine/commit/33a36634ea85c8c333022c757c1a52e9acf32bbf))
+- Stale metadata ([c9b0229](https://github.com/Quenty/NevermoreEngine/commit/c9b02298164c53a8ae62c7f5b6f424c017d0f666))
+
+## [14.47.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.3...@quenty/clienttranslator@14.47.4) (2026-08-05)
+
+### Bug Fixes
+
+- Prevent redundant table rebuilding ([cbd4e62](https://github.com/Quenty/NevermoreEngine/commit/cbd4e620b1e0737a5d679412c82451ff6719a294))
+- Rebuild for metadata change ([dc160d9](https://github.com/Quenty/NevermoreEngine/commit/dc160d9aa5e09e3d35d1d486f5d1f6d2245c6ccd))
+
 ## [14.47.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.47.2...@quenty/clienttranslator@14.47.3) (2026-07-29)
 
 ### Bug Fixes

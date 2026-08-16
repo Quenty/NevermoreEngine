@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@9.40.1...@quenty/userserviceutils@9.40.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/userserviceutils
+
+## [9.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@9.40.0...@quenty/userserviceutils@9.40.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/userserviceutils
+
 # [9.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/userserviceutils@9.39.2...@quenty/userserviceutils@9.40.0) (2026-07-28)
 
 **Note:** Version bump only for package @quenty/userserviceutils

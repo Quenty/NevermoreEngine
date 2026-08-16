@@ -44,6 +44,7 @@ function SettingsServiceClient.Init(self: SettingsServiceClient, serviceBag: Ser
 
 	-- External
 	self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 
 	-- Internal
 	self._settingsDataService = self._serviceBag:GetService(require("SettingsDataService"))

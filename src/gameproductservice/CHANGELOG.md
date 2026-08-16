@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.68.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.68.1...@quenty/gameproductservice@14.68.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.68.0...@quenty/gameproductservice@14.68.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.67.0...@quenty/gameproductservice@14.68.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.10...@quenty/gameproductservice@14.67.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.10](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.9...@quenty/gameproductservice@14.66.10) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.9](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.8...@quenty/gameproductservice@14.66.9) (2026-08-08)
+
+### Bug Fixes
+
+- Server validation gate ([90ee99b](https://github.com/Quenty/NevermoreEngine/commit/90ee99be70cb20ddb01dc8cc43ed12974405d22e))
+
+## [14.66.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.7...@quenty/gameproductservice@14.66.8) (2026-08-08)
+
+### Bug Fixes
+
+- Check if alive ([b90db63](https://github.com/Quenty/NevermoreEngine/commit/b90db636b620e939929d64803e40aaa2de63616f))
+- Check if remoting is alive ([59b14cf](https://github.com/Quenty/NevermoreEngine/commit/59b14cff7b327cdab7e3510d593879a6cb0bf259))
+- Validate game pass ownership on server ([c89a788](https://github.com/Quenty/NevermoreEngine/commit/c89a788eee031ff955f1310902c5cf92bad76686))
+
+## [14.66.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.6...@quenty/gameproductservice@14.66.7) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.5...@quenty/gameproductservice@14.66.6) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
 ## [14.66.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.4...@quenty/gameproductservice@14.66.5) (2026-07-30)
 
 ### Bug Fixes

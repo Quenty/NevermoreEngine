@@ -15,6 +15,7 @@ local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 
@@ -88,6 +89,13 @@ local function awaitValueOf(promise)
 	return value
 end
 
+-- What a teleport re-save leaves behind, and the only thing the arrival path will load.
+local function writeTransfer(context: any, key: string, export)
+	return awaitValueOf(
+		context.sharedService:PromiseWrite(key, SaveSlotExportUtils.withKind(export, SaveSlotExportUtils.Kind.TRANSFER))
+	)
+end
+
 local function awaitResolved(promise): boolean
 	if not PromiseTestUtils.awaitSettled(promise, 10) then
 		error("promise hung", 0)
@@ -104,12 +112,7 @@ describe("HasSaveSlots.PromiseSelectTransferableEphemeralSlot", function()
 	it("loads a transferable ephemeral slot from a shared-store key", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(
-				context.sharedService:PromiseWrite(
-					"code-1",
-					{ data = { Coins = 5, World_2 = { Eggs = 1 } }, slotName = "Snap" }
-				)
-			)
+			writeTransfer(context, "code-1", { data = { Coins = 5, World_2 = { Eggs = 1 } }, slotName = "Snap" })
 
 			local slotId = awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-1"))
 			expect(hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
@@ -138,9 +141,86 @@ describe("HasSaveSlots.PromiseSelectTransferableEphemeralSlot", function()
 
 	it("rejects when the shared store read fails", function()
 		runWithContext(function(context)
-			awaitValueOf(context.sharedService:PromiseWrite("code-x", { data = { Coins = 1 } }))
+			writeTransfer(context, "code-x", { data = { Coins = 1 } })
 			context.sharedMock:FailNextRequests(1)
 			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-x"))).toEqual(false)
+		end)
+	end)
+
+	it("refuses a share code, which is what keeps a leaked one from being played", function()
+		runWithContext(function(context)
+			-- The key reaching this path comes from the arriving client, so a code a player was handed
+			-- must not load here. It is redeemed through PromiseImportEphemeralSaveSlotFromCode instead.
+			awaitValueOf(
+				context.sharedService:PromiseWrite(
+					"shared-code",
+					SaveSlotExportUtils.withKind({ data = { Coins = 5 } }, SaveSlotExportUtils.Kind.CODE)
+				)
+			)
+
+			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("shared-code"))).toEqual(
+				false
+			)
+		end)
+	end)
+
+	it("refuses an entry written before kinds existed, which may be a code", function()
+		runWithContext(function(context)
+			awaitValueOf(context.sharedService:PromiseWrite("legacy", { data = { Coins = 5 } }))
+
+			expect(awaitResolved(context.hasSaveSlots:PromiseSelectTransferableEphemeralSlot("legacy"))).toEqual(false)
+		end)
+	end)
+end)
+
+describe("HasSaveSlots.PromiseImportEphemeralSaveSlotFromCode", function()
+	local function writeCode(context: any, key: string, export)
+		return awaitValueOf(
+			context.sharedService:PromiseWrite(key, SaveSlotExportUtils.withKind(export, SaveSlotExportUtils.Kind.CODE))
+		)
+	end
+
+	it("redeems a share code into a transferable ephemeral slot", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			writeCode(context, "code-redeem", { data = { Coins = 5 } })
+
+			local slotId = awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode("code-redeem"))
+			expect(hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
+			expect(activeSlotData(hasSaveSlots).Coins).toEqual(5)
+		end)
+	end)
+
+	it("still redeems a code written before kinds existed", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			awaitValueOf(context.sharedService:PromiseWrite("legacy-code", { data = { Coins = 9 } }))
+
+			awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode("legacy-code"))
+			expect(activeSlotData(hasSaveSlots).Coins).toEqual(9)
+		end)
+	end)
+
+	it("transfers onward under a fresh key, so the code itself is never published", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			writeCode(context, "code-onward", { data = { Coins = 5 } })
+			awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode("code-onward"))
+
+			-- The client carries this key across a teleport and every client can read it, so it must not
+			-- be the code -- and the slice must not write a transfer over the code's entry.
+			local transferKey = assert(hasSaveSlots.ActiveTransferableEphemeralKey.Value, "No transfer key")
+			expect(transferKey).never.toEqual("code-onward")
+
+			local slice = awaitValueOf(hasSaveSlots:PromiseBuildEphemeralTransferSlice())
+			expect(slice[EPHEMERAL_KEY]).toEqual(transferKey)
+
+			local code = awaitValueOf(context.sharedService:PromiseRead("code-onward"))
+			expect(code.kind).toEqual(SaveSlotExportUtils.Kind.CODE)
+
+			-- And the fresh key holds a transfer, which is what the arrival path will accept.
+			local transfer = awaitValueOf(context.sharedService:PromiseRead(transferKey))
+			expect(transfer.kind).toEqual(SaveSlotExportUtils.Kind.TRANSFER)
 		end)
 	end)
 end)
@@ -149,7 +229,7 @@ describe("HasSaveSlots.PromiseBuildEphemeralTransferSlice", function()
 	it("re-saves the live state and carries the key", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(context.sharedService:PromiseWrite("code-2", { data = { Coins = 5 } }))
+			writeTransfer(context, "code-2", { data = { Coins = 5 } })
 			awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-2"))
 
 			-- Mutate live state after loading.
@@ -178,7 +258,7 @@ describe("HasSaveSlots.PromiseBuildEphemeralTransferSlice", function()
 	it("degrades to nil (does not block the teleport) when the re-save fails", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(context.sharedService:PromiseWrite("code-5", { data = { Coins = 5 } }))
+			writeTransfer(context, "code-5", { data = { Coins = 5 } })
 			awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-5"))
 
 			-- The re-save write fails; the slice must resolve nil rather than reject.
@@ -192,7 +272,7 @@ describe("HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport", functi
 	it("re-selects the slot from a key in the trusted band", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(context.sharedService:PromiseWrite("code-3", { data = { Coins = 7 } }))
+			writeTransfer(context, "code-3", { data = { Coins = 7 } })
 
 			context.teleportDataService:SetTrustedArrivedTeleportDataForTesting(
 				context.fakePlayer,
@@ -209,7 +289,7 @@ describe("HasSaveSlots.PromiseLoadTransferableEphemeralSlotFromTeleport", functi
 	it("re-selects the slot from a key in the client band (client-initiated teleport)", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(context.sharedService:PromiseWrite("code-4", { data = { Coins = 7 } }))
+			writeTransfer(context, "code-4", { data = { Coins = 7 } })
 
 			-- Egg-hunt's menu resume is a client-initiated teleport, so the key rides the client band; the
 			-- unified arrival read honors it (see PromiseLoadTransferableEphemeralSlotFromTeleport).
@@ -229,7 +309,7 @@ describe("HasSaveSlots.ActiveTransferableEphemeralKey (replicated for the client
 	it("reflects the active transferable-ephemeral key and clears it on deselect", function()
 		runWithContext(function(context)
 			local hasSaveSlots = context.hasSaveSlots
-			awaitValueOf(context.sharedService:PromiseWrite("code-6", { data = { Coins = 1 } }))
+			writeTransfer(context, "code-6", { data = { Coins = 1 } })
 
 			awaitValueOf(hasSaveSlots:PromiseSelectTransferableEphemeralSlot("code-6"))
 			expect(hasSaveSlots.ActiveTransferableEphemeralKey.Value).toEqual("code-6")

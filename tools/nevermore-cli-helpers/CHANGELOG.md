@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli-helpers@1.17.0...@quenty/nevermore-cli-helpers@1.17.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/nevermore-cli-helpers
+
+# [1.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.16.1...@quenty/nevermore-cli-helpers@1.17.0) (2026-08-10)
+
+### Bug Fixes
+
+- **nevermore-cli:** stop naming an Open Cloud scope that does not exist ([b1d1bd6](https://github.com/Quenty/Nevermore/commit/b1d1bd638507439c71cb7726aa744d6caabff624))
+
+### Features
+
+- **nevermore-cli:** let `gh` supply the watch token, when asked ([4d53eb8](https://github.com/Quenty/Nevermore/commit/4d53eb87270020b19584b826221c3cff7ecc4e66))
+
 ## [1.16.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli-helpers@1.16.0...@quenty/nevermore-cli-helpers@1.16.1) (2026-07-29)
 
 **Note:** Version bump only for package @quenty/nevermore-cli-helpers

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.1...@quenty/sounds@10.27.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.0...@quenty/sounds@10.27.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/sounds
+
 # [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.26.0...@quenty/sounds@10.27.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/sounds

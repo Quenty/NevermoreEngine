@@ -12,6 +12,7 @@ local CFrameUtils = require("CFrameUtils")
 local Draw = require("Draw")
 local Maid = require("Maid")
 local Motor6DTransformer = require("Motor6DTransformer")
+local R15Utils = require("R15Utils")
 local StepUtils = require("StepUtils")
 local Symbol = require("Symbol")
 
@@ -24,7 +25,7 @@ Motor6DAnimator.__index = Motor6DAnimator
 export type Motor6DAnimator =
 	typeof(setmetatable(
 		{} :: {
-			_obj: Motor6D,
+			_obj: R15Utils.AnimationConstraintOrMotor6D,
 			_debugAttachment: Attachment?,
 			_lastSetTransform: CFrame?,
 			_previousTransform: CFrame?,
@@ -35,7 +36,7 @@ export type Motor6DAnimator =
 	))
 	& BaseObject.BaseObject
 
-function Motor6DAnimator.new(motor6D: Motor6D): Motor6DAnimator
+function Motor6DAnimator.new(motor6D: R15Utils.AnimationConstraintOrMotor6D): Motor6DAnimator
 	local self = setmetatable(BaseObject.new(motor6D) :: any, Motor6DAnimator)
 
 	self._stack = {}
@@ -123,8 +124,16 @@ function Motor6DAnimator._updateStepped(self: Motor6DAnimator): ()
 		assert(self._debugAttachment, "No debug attachment")
 		self._debugAttachment.Archivable = false
 		self._debugAttachment.Name = "Motor6DAnimatorDebug"
-		self._debugAttachment.CFrame = self._obj.C0
-		self._debugAttachment.Parent = self._obj.Part0
+
+		local obj = self._obj
+		if obj:IsA("Motor6D") then
+			self._debugAttachment.CFrame = obj.C0
+			self._debugAttachment.Parent = obj.Part0
+		elseif obj:IsA("AnimationConstraint") then
+			local attachment0 = obj.Attachment0
+			self._debugAttachment.CFrame = if attachment0 then attachment0.CFrame else CFrame.identity
+			self._debugAttachment.Parent = if attachment0 then attachment0.Parent else nil
+		end
 
 		local billBoard: BillboardGui =
 			maid:Add(Draw.text(self._debugAttachment, if current then "Animating" else "Idle")) :: any

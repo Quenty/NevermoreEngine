@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.65.0...@quenty/ragdoll@15.65.1) (2026-08-14)
+
+### Bug Fixes
+
+- **ragdoll:** Clean up previous motor state when ragdoll inputs change ([9731cf7](https://github.com/Quenty/NevermoreEngine/commit/9731cf70a88f3924a5232c21aacc0ffc40b61826))
+
+# [15.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.2...@quenty/ragdoll@15.65.0) (2026-08-14)
+
+### Features
+
+- **ragdoll:** add ragdoll and unragdoll cmdr commands ([#802](https://github.com/Quenty/NevermoreEngine/issues/802)) ([dd3d887](https://github.com/Quenty/NevermoreEngine/commit/dd3d887b920fe80cc21f86bd1eceb58f43ad0e00))
+
+## [15.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.1...@quenty/ragdoll@15.64.2) (2026-08-12)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.64.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.0...@quenty/ragdoll@15.64.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
 # [15.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.63.2...@quenty/ragdoll@15.64.0) (2026-07-28)
 
 **Note:** Version bump only for package @quenty/ragdoll

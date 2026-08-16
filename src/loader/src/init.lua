@@ -11,6 +11,8 @@ local RunService = game:GetService("RunService")
 local DependencyUtils = require(script.Dependencies.DependencyUtils)
 local LoaderLinkCreator = require(script.LoaderLink.LoaderLinkCreator)
 local LoaderLinkUtils = require(script.LoaderLink.LoaderLinkUtils)
+local LoaderOptionUtils = require(script.LoaderOptionUtils)
+local LoaderScheduler = require(script.Timing.LoaderScheduler)
 local Maid = require(script.Maid)
 local ReplicationType = require(script.Replication.ReplicationType)
 local ReplicationTypeUtils = require(script.Replication.ReplicationTypeUtils)
@@ -22,6 +24,8 @@ local GLOBAL_PACKAGE_TRACKER = require(script["GlobalPackageTracker.global"])
 local Loader = {}
 Loader.__index = Loader
 Loader.ClassName = "Loader"
+
+export type LoaderOptions = LoaderOptionUtils.PartialLoaderOptions
 
 function Loader.new(packages: Instance, replicationType: ReplicationType.ReplicationType)
 	assert(typeof(packages) == "Instance", "Bad packages")
@@ -37,22 +41,41 @@ function Loader.new(packages: Instance, replicationType: ReplicationType.Replica
 	return self
 end
 
-function Loader.bootstrapGame(packages: Instance)
+function Loader.bootstrapGame(packages: Instance, options: LoaderOptions?)
 	assert(typeof(packages) == "Instance", "Bad packages")
 
 	local self = Loader.new(packages, ReplicationTypeUtils.inferReplicationType())
+	local loaderOptions = LoaderOptionUtils.createOptions(options)
 
 	if self._replicationType == ReplicationType.SERVER then
-		self:_setupLoaderPopulation(self._packages)
+		local scheduler = self:_setupLoaderPopulationAsync(self._packages, loaderOptions)
 
 		-- Trade off security for performance
-		if RunService:IsStudio() then
-			packages.Parent = ReplicatedStorage
+		local replicateAsync
+		if RunService:IsStudio() and not loaderOptions.skipStudioFastPath then
+			replicateAsync = function()
+				local replicationScheduler = self:_setupStudioFastPathAsync(loaderOptions, scheduler)
+
+				scheduler:ClearBudget()
+				replicationScheduler:ClearBudget()
+			end
 		else
-			self:_setupClientReplication()
+			replicateAsync = function()
+				local replicationScheduler = self:_setupClientReplicationAsync(loaderOptions, scheduler)
+
+				scheduler:ClearBudget()
+				replicationScheduler:ClearBudget()
+			end
+		end
+
+		if loaderOptions.backgroundClientReplication then
+			task.spawn(replicateAsync)
+		else
+			replicateAsync()
 		end
 	elseif self._replicationType == ReplicationType.PLUGIN then
-		self:_setupLoaderPopulation(self._packages)
+		local scheduler = self:_setupLoaderPopulationAsync(self._packages, loaderOptions)
+		scheduler:ClearBudget()
 	end
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
@@ -60,19 +83,21 @@ function Loader.bootstrapGame(packages: Instance)
 	return self
 end
 
-function Loader.bootstrapPlugin(packages: Instance)
+function Loader.bootstrapPlugin(packages: Instance, options: LoaderOptions?)
 	assert(typeof(packages) == "Instance", "Bad packages")
 
 	local self = Loader.new(packages, ReplicationType.PLUGIN)
+	local loaderOptions = LoaderOptionUtils.createOptions(options)
 
-	self:_setupLoaderPopulation(self._packages)
+	local scheduler = self:_setupLoaderPopulationAsync(self._packages, loaderOptions)
+	scheduler:ClearBudget()
 
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(packages)
 
 	return self
 end
 
-function Loader.bootstrapStory(storyScript: Instance)
+function Loader.bootstrapStory(storyScript: Instance, options: LoaderOptions?)
 	assert(typeof(storyScript) == "Instance", "Bad storyScript")
 
 	-- Prepopulate global package roots
@@ -82,10 +107,12 @@ function Loader.bootstrapStory(storyScript: Instance)
 	end
 
 	local self = Loader.new(storyScript, ReplicationType.PLUGIN)
+	local loaderOptions = LoaderOptionUtils.createOptions(options)
 
 	local root = topNodeModules.Parent
 
-	self:_setupLoaderPopulation(root)
+	local scheduler = self:_setupLoaderPopulationAsync(root, loaderOptions)
+	scheduler:ClearBudget()
 
 	-- Track the package root
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(root)
@@ -150,18 +177,18 @@ function Loader:_findDependency(request: string)
 		if packageTracker then
 			warn(
 				string.format(
-					"[Loader] - No package tracker for root %s (while loading %s)\n%s",
-					self._packages:GetFullName(),
+					"[Loader] - Failed to find package %q in package tracker of root %s\n%s",
 					request,
+					self._packages:GetFullName(),
 					debug.traceback()
 				)
 			)
 		else
 			warn(
 				string.format(
-					"[Loader] - Failed to find package %q in package tracker of root %s\n%s",
-					request,
+					"[Loader] - No package tracker for root %s (while loading %s)\n%s",
 					self._packages:GetFullName(),
+					request,
 					debug.traceback()
 				)
 			)
@@ -188,23 +215,75 @@ function Loader:_findDependency(request: string)
 	return nil
 end
 
-function Loader:_setupClientReplication()
+--[[
+	Replication adopts whatever frame window the loader population walk left
+	behind, so a walk that already spent the budget makes the caller's first
+	yield fire instead of the frame being held for two budgets back to back.
+]]
+function Loader:_createReplicationScheduler(
+	label: string,
+	loaderOptions: LoaderOptionUtils.LoaderOptions,
+	previousScheduler: LoaderScheduler.LoaderScheduler?
+): LoaderScheduler.LoaderScheduler
+	local scheduler = LoaderScheduler.new(label, loaderOptions.clientReplicationFrameBudget)
+	scheduler:RestartBudget(if previousScheduler then previousScheduler:GetBudgetStartTime() else nil)
+
+	return scheduler
+end
+
+function Loader:_setupStudioFastPathAsync(
+	loaderOptions: LoaderOptionUtils.LoaderOptions,
+	previousScheduler: LoaderScheduler.LoaderScheduler?
+): LoaderScheduler.LoaderScheduler
+	local scheduler = self:_createReplicationScheduler("studio fast path", loaderOptions, previousScheduler)
+	scheduler:YieldIfNeededAsync()
+
+	self._packages.Parent = ReplicatedStorage
+
+	scheduler:YieldIfNeededAsync()
+	return scheduler
+end
+
+function Loader:_setupClientReplicationAsync(
+	loaderOptions: LoaderOptionUtils.LoaderOptions,
+	previousScheduler: LoaderScheduler.LoaderScheduler?
+): LoaderScheduler.LoaderScheduler
+	local scheduler = self:_createReplicationScheduler("client replication", loaderOptions, previousScheduler)
+	scheduler:YieldIfNeededAsync()
+
 	local copy = self._maid:Add(Instance.new("Folder"))
 	copy.Name = self._packages.Name
 
 	local references = ReplicatorReferences.new()
-
-	local replicator = self._maid:Add(Replicator.new(references))
+	local replicator = self._maid:Add(Replicator.new(references, scheduler))
 	replicator:SetTarget(copy)
-	replicator:ReplicateFrom(self._packages)
+	replicator:ReplicateFromAsync(self._packages)
 
-	self._maid:Add(LoaderLinkCreator.new(copy, references, true))
+	scheduler:YieldIfNeededAsync()
+
+	local loaderLinkCreator = self._maid:Add(LoaderLinkCreator.new(copy, references, true, scheduler))
+	loaderLinkCreator:RenderAsync()
+
+	scheduler:YieldIfNeededAsync()
 
 	copy.Parent = ReplicatedStorage
+
+	scheduler:YieldIfNeededAsync()
+	return scheduler
 end
 
-function Loader:_setupLoaderPopulation(root)
-	self._maid:Add(LoaderLinkCreator.new(root, nil, true))
+function Loader:_setupLoaderPopulationAsync(
+	root: Instance,
+	loaderOptions: LoaderOptionUtils.LoaderOptions
+): LoaderScheduler.LoaderScheduler
+	local scheduler = LoaderScheduler.new("full loader", loaderOptions.bootstrapFrameBudget)
+	scheduler:RestartBudget()
+
+	local loaderLinkCreator = self._maid:Add(LoaderLinkCreator.new(root, nil, true, scheduler))
+	loaderLinkCreator:RenderAsync()
+
+	scheduler:YieldIfNeededAsync()
+	return scheduler
 end
 
 function Loader:Destroy()

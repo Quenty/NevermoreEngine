@@ -151,3 +151,30 @@ These are the types you'll use most often:
 - `Signal.new() :: any` — when the signal type would be too complex to annotate inline
 
 **Prefer fixing upstream types** over casting. If a type is wrong, fix it in the source package.
+
+## "Code is too complex to typecheck"
+
+The old solver has a per-module complexity budget, and a class that both inherits from a base class
+and names another class's type can exceed it. The error is reported at `(1,1)` with no useful
+location, and it **masks every other error in the file** — clearing it usually reveals real ones
+underneath, so never treat it as the only problem.
+
+It is cumulative, not caused by one construct, so hunt for the cheapest thing to give up rather than
+the "wrong" one. The cost is concentrated in `typeof(setmetatable(...))` class types: a single
+mention of one imported from another module can be enough to tip a file over.
+
+Two remedies, both in use:
+
+- **Inherit at runtime only.** Instead of `local MyClass = setmetatable({}, BaseClass)`, write
+  `setmetatable(MyClass :: any, BaseClass)` and supply the inherited surface structurally as a
+  `BaseClassLike` record you intersect instead. See `HasSaveSlotsDataStore` and `PlayerSettings`.
+- **Name a minimal structural type** for a collaborator rather than its real one — a `FooLike`
+  record listing only the members you call. See `PlayerSettings`' `SettingsDataServiceLike`.
+
+Where even one mention is too many, typing the field `any` at that single boundary is acceptable —
+comment it with the reason, and keep the surrounding methods' own return types precise, since those
+are what callers read. `HasSaveSlots.GetSlotsDataStore` is the worked example.
+
+Measure, don't guess: change one annotation, re-run `npm run lint:luau`, repeat. And run it through
+`npm run` — invoking `luau-lsp analyze` by hand without the script's flags produces hundreds of
+bogus "Unknown require: loader" / "Unknown type" errors that look like real breakage.

@@ -1,6 +1,6 @@
 {
   "name": "nevermore-claude",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Nevermore's Claude Code plugin (strict-typing-luau skill)",
   "keywords": [
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "tools/nevermore-claude"
+    "directory": "tools/nevermore-claude/"
   },
   "scripts": {
     "version": "node scripts/sync-plugin-version.mjs && git add .claude-plugin/plugin.json",

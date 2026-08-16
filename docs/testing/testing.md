@@ -113,6 +113,15 @@ Guidelines:
 - A plain object with no `ServiceBag` can skip the controller: create it in the test and
   `object:Destroy()` at the end (and in any early-return guard).
 
+**Read a failure list from the top.** A failing `expect` throws, so the trailing
+`controller:destroy()` never runs and that test leaks everything it built into the shared place.
+Later tests then fail for reasons of their own — timing out on an observable, seeing a slot that
+should have been filtered — and those look like independent bugs. They are usually one bug plus its
+wake. Fix the earliest failure and re-run before investigating any of the others; the count often
+drops by more than one. (This is why the guideline above matters even though it reads as
+belt-and-braces: teardown you only reach on the happy path is teardown you lose exactly when a test
+is failing.)
+
 ### Consume every rejection (or Jest passes but the run still fails)
 
 Jest only tracks assertions that run inside an `it`. Any **uncaught Luau error** raised outside that —
@@ -251,6 +260,8 @@ alive. Knowing which decides what a spec can assert:
 | `RunService.RenderStepped` | Can be read, but connecting throws `RenderStepped event can only be used from local scripts`. |
 | `RunService:BindToRenderStep` | Binds without erroring and then never invokes the callback — the silent one. |
 | `BindableEvent.Event` | A real `RBXScriptSignal` you can `:Fire()` on demand. |
+| `Humanoid:ChangeState` | Inert. The humanoid state machine never steps, so `StateChanged`, `Running`, `Jumping`, `Seated` and `Died` stay silent no matter how the rig is built. |
+| Property and flag writes | `GetPropertyChangedSignal` and signals like `Humanoid.StateEnabledChanged` run their handlers before the next line, so a spec can write and assert inline without waiting a frame. |
 
 That last row is the useful lever: anything taking a signal or an event — `StepUtils.bindToSignal`,
 `StepUtils.onceAtEvent` — is best tested by firing a `BindableEvent` rather than waiting on frames,
@@ -324,6 +335,7 @@ Each testable package needs:
 2. **A Rojo project file** (typically `test/default.project.json`) that builds the test place
 3. **A script template** (typically `test/scripts/Server/ServerMain.server.lua`) that boots the package and runs tests
 4. **A `@quentystudios/jest-lua` dependency** in the package's `package.json` (plus a `jest.config.lua`, see above) — the first `.spec.lua` in a package that has never had one must add this. Without it every spec fails to *run* with `[Loader] - "Jest" is not available` (a load error, not an assertion failure), because `require("Jest")` resolves through the package's own dependency graph. Run `pnpm install` after adding it so the workspace symlink is created.
+5. **A `@quenty/nevermore-test-runner` dependency**, for the same reason — the script template's `require("NevermoreTestRunnerUtils")` resolves through the package's own dependency graph.
 
 ### 1. deploy.nevermore.json
 
@@ -400,6 +412,11 @@ end
 ```
 
 Replace `mypackage` with the key used in your Rojo project tree.
+
+A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
+keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `false` when script
+source is unreadable, which is the case during ordinary play, so the demo still runs when you join the
+place and only the cloud/local test runs take the early return.
 
 ### NevermoreTestRunnerUtils
 

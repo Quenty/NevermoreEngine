@@ -1,6 +1,6 @@
 {
   "name": "nevermore-vscode",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Nevermore Snippets for Roblox development in VSCode",
   "displayName": "Nevermore Snippets",
   "license": "MIT",
@@ -11,8 +11,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quenty/Nevermore.git",
-    "directory": "tools/nevermore-cli/"
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "tools/nevermore-vscode/"
   },
   "publisher": "Quenty",
   "scripts": {

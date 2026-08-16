@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.68.0...@quenty/chatproviderservice@9.68.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.8...@quenty/chatproviderservice@9.68.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+
+## [9.67.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.7...@quenty/chatproviderservice@9.67.8) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.6...@quenty/chatproviderservice@9.67.7) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.5...@quenty/chatproviderservice@9.67.6) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
 ## [9.67.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.4...@quenty/chatproviderservice@9.67.5) (2026-07-30)
 
 **Note:** Version bump only for package @quenty/chatproviderservice

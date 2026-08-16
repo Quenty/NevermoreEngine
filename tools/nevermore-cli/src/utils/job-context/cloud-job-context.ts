@@ -11,6 +11,7 @@ import {
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
 
 const SKIP_RENAMING_PLACE = true;
@@ -30,8 +31,12 @@ class CloudDeployment implements Deployment {
 }
 
 export class CloudJobContext extends BaseJobContext {
-  constructor(reporter: Reporter, openCloudClient: OpenCloudClient) {
-    super(reporter, openCloudClient);
+  constructor(
+    reporter: Reporter,
+    openCloudClient: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
+    super(reporter, openCloudClient, basePlaceResolver);
   }
 
   async deployBuiltPlaceAsync(

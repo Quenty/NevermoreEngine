@@ -1,3 +1,212 @@
+# (Sun Aug 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.1.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - feat: new immediateutils package [#804](https://github.com/Quenty/NevermoreEngine/pull/804) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.6`, `@quenty/ik@15.66.1`, `@quenty/loader@10.11.1`, `@quenty/ragdoll@15.65.1`, `@quenty/templateprovider@11.48.2`
+  - fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@15.65.0`
+  - feat(ragdoll): add ragdoll and unragdoll cmdr commands [#802](https://github.com/Quenty/NevermoreEngine/pull/802) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/bufferencoder@1.1.1`, `@quenty/queue@2.4.3`, `@quenty/racketingropeconstraint@12.51.1`, `@quenty/cli-output-helpers@1.17.2`, `nevermore-claude@0.2.1`, `@quenty/nevermore-cli-helpers@1.17.1`, `@quenty/nevermore-cli@4.43.3`, `@quenty/nevermore-deploy@1.1.1`, `@quenty/nevermore-template-helpers@1.18.2`, `nevermore-vscode@0.3.2`
+  - chore(package): correct repository directory and url metadata [#801](https://github.com/Quenty/NevermoreEngine/pull/801) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/chatproviderservice@9.68.0`, `@quenty/cmdrservice@13.57.0`, `@quenty/datastore@13.52.0`, `@quenty/saveslot@2.8.0`, `@quenty/secrets@7.65.0`, `@quenty/settings@11.68.0`
+  - feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- chore(hooks): lint the worktree the push actually targets [#800](https://github.com/Quenty/NevermoreEngine/pull/800) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidutils@2.18.0`
+  - feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Aug 12 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.47.1`, `@quenty/motor6d@7.52.1`, `@quenty/r15utils@13.36.2`, `@quenty/nevermore-cli@4.43.2`
+  - fix: A series of misc fixes + upgrade rojo [#798](https://github.com/Quenty/NevermoreEngine/pull/798) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.1`
+  - fix(nevermore-cli): stop failing a batch run whose tests all passed [#794](https://github.com/Quenty/NevermoreEngine/pull/794) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.7.1`
+  - fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.9.0`, `@quenty/saveslot@2.7.0`, `@quenty/nevermore-cli-helpers@1.17.0`, `@quenty/nevermore-cli@4.43.0`, `@quenty/nevermore-deploy@1.1.0`
+  - feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@12.41.1`, `@quenty/rogue-properties@11.57.1`
+  - Users/euvinkeel/memleak2 [#789](https://github.com/Quenty/NevermoreEngine/pull/789) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.66.9`
+  - fix: Server pass purchase validation gate [#792](https://github.com/Quenty/NevermoreEngine/pull/792) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.66.8`
+  - fix: Validate game pass ownership on server [#791](https://github.com/Quenty/NevermoreEngine/pull/791) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/highlight@10.49.1`, `@quenty/performanceutils@4.12.1`, `@quenty/sounds@10.27.1`
+  - Update PerformanceUtils.lua [#787](https://github.com/Quenty/NevermoreEngine/pull/787) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.5`
+  - fix: Prevent more redundant localization table rebuilding [#788](https://github.com/Quenty/NevermoreEngine/pull/788) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Wed Aug 05 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.4`
+  - fix: Prevent redundant localization table rebuilding [#786](https://github.com/Quenty/NevermoreEngine/pull/786) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Thu Jul 30 2026)
 
 #### 🐛 Bug Fix

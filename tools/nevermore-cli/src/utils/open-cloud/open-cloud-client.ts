@@ -33,6 +33,13 @@ export interface OpenCloudClientOptions {
   rateLimiter: RateLimiter;
 }
 
+/**
+ * Which end of a place's version history to resolve. Mirrors the `versionType`
+ * the place-publishing API takes on upload, lowercased to match how it is
+ * written in deploy.nevermore.json.
+ */
+export type PlaceVersionType = 'saved' | 'published';
+
 function formatAuthError(
   action: string,
   scope: string,
@@ -335,8 +342,10 @@ export class OpenCloudClient {
 
   private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
     const apiKey = await this._resolveApiKeyAsync();
+    // Arrival order, deliberately. Do not sort by createTime: every print in a
+    // single frame shares one value, so it cannot order them anyway, and the
+    // fractional digit count varies, so comparing the strings reorders them.
     const messages: string[] = [];
-    const structured: { message: string; createTime: string }[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
     let entriesFetched = 0;
@@ -374,14 +383,7 @@ export class OpenCloudClient {
 
       for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
         if (entry.structuredMessages?.length) {
-          // Keep createTime alongside the text: the API does not guarantee
-          // chronological order, and readers downstream assume it.
-          for (const msg of entry.structuredMessages) {
-            structured.push({
-              message: msg.message,
-              createTime: msg.createTime,
-            });
-          }
+          messages.push(...entry.structuredMessages.map((msg) => msg.message));
         } else if (entry.messages?.length) {
           messages.push(...entry.messages);
         }
@@ -391,12 +393,6 @@ export class OpenCloudClient {
       pagesFetched++;
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
-
-    // Out-of-order messages silently destroy marker-delimited parsing: a
-    // trailing summary that arrives early ends the scan before any of the
-    // output it summarizes has been read.
-    structured.sort((a, b) => a.createTime.localeCompare(b.createTime));
-    messages.push(...structured.map((m) => m.message));
 
     const text = messages.join('\n');
 
@@ -494,57 +490,147 @@ export class OpenCloudClient {
   }
 
   /**
-   * Resolve the current latest published version number of a place, via the
-   * Open Cloud Assets API (`asset:read` scope; `legacy-asset:manage` also
-   * grants it). The returned number is the same value the Asset Delivery API's
-   * `/version/{n}` route expects, so it can be written straight into a
-   * `basePlace.version` pin.
+   * Resolve the newest saved or published version number of a place, via the
+   * Open Cloud Assets API (`asset:read` scope). The returned number is the same
+   * value the Asset Delivery API's `/version/{n}` route expects, so it can be
+   * written straight into a `basePlace.version` pin.
+   *
+   * This used to add that `legacy-asset:manage` grants `asset:read` too. They
+   * are separate boxes on the credentials page and nothing here ever verified
+   * the implication, so the claim is gone rather than restated — it had already
+   * been copied into the `nevermore login` instructions as fact once.
+   *
+   * `saved` is the newest version of any kind — Studio saves and publishes
+   * share one increasing version sequence. `published` is the newest version
+   * that actually went live, which is what players see and what a deploy
+   * merging against a base place normally wants.
+   *
+   * The endpoint pages newest-first, which is what makes this affordable: an
+   * actively-developed place accumulates tens of thousands of versions, and we
+   * never walk the history. `saved` is the first entry of the first page, and
+   * `published` only walks back as far as the most recent live version — one
+   * page unless the place has been saved 50+ times without publishing. The scan
+   * is capped so a never-published place fails fast instead of paging forever.
    */
-  async getLatestPlaceVersionAsync(
+  async resolveLatestPlaceVersionAsync(
     universeId: number,
-    placeId: number
+    placeId: number,
+    versionType: PlaceVersionType
   ): Promise<number> {
     const apiKey = await this._resolveApiKeyAsync();
-    const url = `https://apis.roblox.com/assets/v1/assets/${placeId}`;
+    let pageToken: string | undefined;
+    let previousVersion: number | undefined;
 
-    const response = await this._rateLimiter.fetchAsync(url, {
-      method: 'GET',
-      headers: {
-        'x-api-key': apiKey,
-      },
-    });
+    for (let page = 0; page < VERSION_SCAN_MAX_PAGES; page++) {
+      const url =
+        `https://apis.roblox.com/assets/v1/assets/${placeId}/versions` +
+        `?maxPageSize=${VERSION_SCAN_PAGE_SIZE}` +
+        (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
 
-    if (!response.ok) {
-      const text = await response.text();
-      if (response.status === 401 || response.status === 403) {
+      const response = await this._rateLimiter.fetchAsync(url, {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            formatAuthError(
+              'Read place version',
+              'asset:read',
+              universeId,
+              placeId,
+              response.status,
+              response.statusText,
+              text,
+              'GET',
+              url
+            )
+          );
+        }
         throw new Error(
-          formatAuthError(
-            'Read place version',
-            'asset:read',
-            universeId,
-            placeId,
-            response.status,
-            response.statusText,
-            text,
-            'GET',
-            url
-          )
+          `Read place version failed: ${response.status} ${response.statusText}: ${text}`
         );
       }
-      throw new Error(
-        `Read place version failed: ${response.status} ${response.statusText}: ${text}`
+
+      const data = (await response.json()) as {
+        assetVersions?: AssetVersion[];
+        nextPageToken?: string;
+      };
+
+      const page = (data.assetVersions ?? []).map((assetVersion) => ({
+        versionNumber: _parseAssetVersionNumber(placeId, assetVersion),
+        published: assetVersion.published === true,
+      }));
+
+      // Everything here rests on the API paging newest-first, and a `saved`
+      // lookup answers from the very first entry — so the whole page is checked
+      // before anything is returned. Validating only as far as the match would
+      // leave the common case unchecked and quietly pin a years-old build.
+      for (const { versionNumber } of page) {
+        if (previousVersion != null && versionNumber >= previousVersion) {
+          throw new Error(
+            `Read place version failed: place ${placeId} returned version ` +
+              `${versionNumber} after ${previousVersion}. The Assets API is no ` +
+              `longer paging newest-first, so "${versionType}" cannot be resolved ` +
+              `safely — pin an explicit version number in deploy.nevermore.json.`
+          );
+        }
+        previousVersion = versionNumber;
+      }
+
+      // `published` is omitted rather than false on save-only versions.
+      const match = page.find(
+        (entry) => versionType === 'saved' || entry.published
       );
+      if (match) {
+        return match.versionNumber;
+      }
+
+      pageToken = data.nextPageToken;
+      if (!pageToken) {
+        break;
+      }
     }
 
-    const data = (await response.json()) as { revisionId?: string };
-    const version = Number(data.revisionId);
-    if (!data.revisionId || !Number.isFinite(version)) {
-      throw new Error(
-        `Read place version failed: no revisionId for place ${placeId}`
-      );
-    }
-    return version;
+    throw new Error(
+      `Place ${placeId} has no ${versionType} version` +
+        (pageToken
+          ? ` in its most recent ${
+              VERSION_SCAN_MAX_PAGES * VERSION_SCAN_PAGE_SIZE
+            } versions`
+          : '') +
+        `. Pin an explicit version number in deploy.nevermore.json, or publish the place once.`
+    );
   }
+}
+
+/** How the Assets API reports one entry of a place's version history. */
+interface AssetVersion {
+  /** `assets/{assetId}/versions/{versionNumber}` */
+  path?: string;
+  /** Present and true only once the version has been published live. */
+  published?: boolean;
+}
+
+const VERSION_SCAN_PAGE_SIZE = 50;
+const VERSION_SCAN_MAX_PAGES = 20;
+
+function _parseAssetVersionNumber(
+  placeId: number,
+  version: AssetVersion
+): number {
+  const versionNumber = Number(version.path?.split('/').pop());
+  if (!Number.isInteger(versionNumber) || versionNumber < 1) {
+    throw new Error(
+      `Read place version failed: place ${placeId} returned an unparseable ` +
+        `version path "${version.path}"`
+    );
+  }
+  return versionNumber;
 }
 
 const CDN_MAX_ATTEMPTS = 4;

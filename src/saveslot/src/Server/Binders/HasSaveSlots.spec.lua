@@ -434,7 +434,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 	end)
 
 	it("deleting the last-active slot clears the continue pointer", function()
-		-- Repro for the `delete-save-slot *` bug: deleting the (deselected) active slot left
+		-- Repro for the `saveslot-delete *` bug: deleting the (deselected) active slot left
 		-- LastActiveSlotId dangling, so the menu kept offering "Continue" for a slot that was gone.
 		local context = setup()
 
@@ -766,7 +766,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local _, slotId = createPromise:Yield()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_getSlotStore(slotId):Store("Coins", 500)
 
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
@@ -811,7 +811,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local _, slotId = createPromise:Yield()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_getSlotStore(slotId):Store("Coins", 750)
 
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
@@ -882,7 +882,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_getSlotStore(slotId):Store("Coins", 500)
 
 		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
@@ -944,7 +944,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		selectPromise:Yield()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_getSlotStore(slotId):Store("Coins", 750)
 
 		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
@@ -1016,7 +1016,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end
 		local _, targetSlotId = targetPromise:Yield()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_getSlotStore(targetSlotId):Store("Coins", 500)
 
 		local resetPromise = context.hasSaveSlots:PromiseResetSlot(targetSlotId)
@@ -1215,7 +1215,7 @@ describe("HasSaveSlots playtime tracking", function()
 
 		-- Rewind the live session's clock so a flush observes ~120s elapsed without waiting on it. The
 		-- flush adds now - lastFlush, so the total is >= 120 (real time may nudge it a second higher).
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker._playSessionStart = os.time() - 120
 		tracker._playSessionLastFlush = os.time() - 120
 		tracker:_flushPlaytime()
@@ -1230,7 +1230,7 @@ describe("HasSaveSlots playtime tracking", function()
 	it("does not accrue time before any slot is selected", function()
 		local context = setup()
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker:_flushPlaytime()
 
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
@@ -1251,7 +1251,7 @@ describe("HasSaveSlots playtime tracking", function()
 
 		local slotId = createAndSelect(context, 1)
 
-		local tracker: any = context.hasSaveSlots
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
 		tracker._playSessionStart = os.time() - 120
 		tracker._playSessionLastFlush = os.time() - 120
 		tracker:_flushPlaytime()
@@ -1270,6 +1270,53 @@ describe("HasSaveSlots playtime tracking", function()
 		tracker._playSessionLastFlush = os.time() - 120
 		tracker:_flushPlaytime()
 		expect(getMetadata(context, slotId).TimePlayed).toEqual(afterDeselect)
+
+		context.destroy()
+	end)
+
+	it("carries the source slot's playtime onto a duplicate, live session included", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+
+		-- Rewind the live session's clock so the duplicate observes ~120s that no flush has written yet.
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+		local newSlotId = duplicatePromise:Wait()
+
+		local copied = getMetadata(context, newSlotId).TimePlayed
+		expect(copied ~= nil and copied >= 120).toEqual(true)
+
+		context.destroy()
+	end)
+
+	it("leaves a duplicate of a never-played slot without playtime", function()
+		local context = setup()
+
+		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
+		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
+			expect("create hung").toEqual("create settled")
+			context.destroy()
+			return
+		end
+		local _, slotId = createPromise:Yield()
+
+		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
+		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
+			expect("duplicate hung").toEqual("duplicate settled")
+			context.destroy()
+			return
+		end
+
+		expect(getMetadata(context, duplicatePromise:Wait()).TimePlayed).toBeNil()
 
 		context.destroy()
 	end)

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.18.0...@quenty/studio-bridge@0.18.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
+# [0.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.17.1...@quenty/studio-bridge@0.18.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/studio-bridge
+
 ## [0.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.17.0...@quenty/studio-bridge@0.17.1) (2026-07-29)
 
 **Note:** Version bump only for package @quenty/studio-bridge

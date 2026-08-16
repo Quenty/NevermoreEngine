@@ -7,6 +7,7 @@ import {
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 
@@ -24,8 +25,12 @@ class LocalDeployment implements Deployment {
 export class LocalJobContext extends BaseJobContext {
   private _deployments = new Set<LocalDeployment>();
 
-  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
-    super(reporter, openCloudClient);
+  constructor(
+    reporter: Reporter,
+    openCloudClient?: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
+    super(reporter, openCloudClient, basePlaceResolver);
   }
 
   async deployBuiltPlaceAsync(
