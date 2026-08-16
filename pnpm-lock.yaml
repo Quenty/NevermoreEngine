@@ -2895,6 +2895,51 @@ importers:
         specifier: workspace:*
         version: link:../rigbuilderutils
 
+  src/immediateutils:
+    dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
+      '@quenty/jecs':
+        specifier: workspace:*
+        version: link:../jecs
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/randomutils':
+        specifier: workspace:*
+        version: link:../randomutils
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/servicebag':
+        specifier: workspace:*
+        version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
+      '@quenty/spring':
+        specifier: workspace:*
+        version: link:../spring
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/influxdbclient:
     dependencies:
       '@quenty/baseobject':
@@ -3090,7 +3135,31 @@ importers:
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
 
+  src/iris:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/isamixin: {}
+
+  src/jecs:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/jsonutils:
     dependencies:
