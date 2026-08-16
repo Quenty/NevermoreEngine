@@ -83,14 +83,6 @@ export type ImmediateSchedulableSystem<Rt> = {
 
 type SchedulableSystem = ImmediateSchedulableSystem<ImmediateRuntime>
 
---[=[
-	@class ImmediateScheduler
-	@within ImmediateScheduler
-
-	Constructs a new ImmediateScheduler.
-
-	@return ImmediateScheduler
-]=]
 export type ImmediateScheduler =
 	typeof(setmetatable(
 		{} :: {
@@ -106,6 +98,11 @@ export type ImmediateScheduler =
 	))
 	& BaseObject.BaseObject
 
+--[=[
+	Constructs a new ImmediateScheduler.
+
+	@return ImmediateScheduler
+]=]
 function ImmediateScheduler.new(): ImmediateScheduler
 	local self = setmetatable(BaseObject.new() :: any, ImmediateScheduler)
 
