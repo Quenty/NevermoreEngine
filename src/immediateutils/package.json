@@ -33,7 +33,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
-    "@quenty/jecs": "workspace:*",
+    "@ekeelstudiokoikoi/jecs": "^0.11.1",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
