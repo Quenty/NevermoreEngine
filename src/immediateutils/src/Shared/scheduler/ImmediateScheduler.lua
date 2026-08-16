@@ -272,6 +272,9 @@ function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable
 	end
 	self._systemDictionary[systemName] = systemTable
 	self._sortFlag = true
+	return function()
+		self:UnregisterSystem(systemName)
+	end
 end
 
 -- helper method to quickly grab all systems modules under one folder or something

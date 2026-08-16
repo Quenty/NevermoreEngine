@@ -40,7 +40,7 @@ function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateR
 		draw = rawrequire(hooksFolder.draw)(rt),
 		entity = rawrequire(hooksFolder.entity)(rt),
 		filterDescendants = rawrequire(hooksFolder.filterDescendants)(rt),
-		findFirstChild = rawrequire(hooksFolder.findFirstChild)(rt),
+		findChild = rawrequire(hooksFolder.findChild)(rt),
 		gate = rawrequire(hooksFolder.gate)(rt),
 		gatecounter = rawrequire(hooksFolder.gatecounter)(rt),
 		hookEntity = rawrequire(hooksFolder.hookEntity)(rt),

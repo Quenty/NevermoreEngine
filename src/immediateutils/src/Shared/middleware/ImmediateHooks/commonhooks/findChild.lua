@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	@class findFirstChild
+	@class findChild
 ]=]
 
 local require = require(script.Parent.loader).load(script)
