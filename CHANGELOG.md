@@ -1,3 +1,16 @@
+# (Sun Aug 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.1.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - feat: new immediateutils package [#804](https://github.com/Quenty/NevermoreEngine/pull/804) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Fri Aug 14 2026)
 
 #### 🐛 Bug Fix
