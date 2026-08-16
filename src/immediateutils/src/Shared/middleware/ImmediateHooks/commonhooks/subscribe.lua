@@ -32,7 +32,8 @@ return function(rt: ImmediateTypes.ImmediateRuntime)
 		local hookState, hookMaid = getOrCreateHookState(rt, dis)
 
 		if hookState.collector == nil then
-			hookState.collector = hookMaid:Add(ImmediateJecsUtils.collectObservable(toObservable(subscribable), hookMaid))
+			hookState.collector =
+				hookMaid:Add(ImmediateJecsUtils.collectObservable(toObservable(subscribable), hookMaid))
 		end
 
 		local collector = hookState.collector

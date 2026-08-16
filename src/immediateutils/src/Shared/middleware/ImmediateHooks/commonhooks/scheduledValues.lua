@@ -124,7 +124,8 @@ return function(rt: ImmediateTypes.ImmediateRuntime)
 		end
 		_hookState.currentStageDuration = _hookState.evaluateCurrentStageDuration()
 		if _hookState.currentStageDuration then
-			_hookState.currentStageAlpha = math.clamp(_hookState.currentStageTime / _hookState.currentStageDuration, 0, 1)
+			_hookState.currentStageAlpha =
+				math.clamp(_hookState.currentStageTime / _hookState.currentStageDuration, 0, 1)
 		else
 			_hookState.currentStageAlpha = if _hookState.currentTimeKey == nil then 0 else 1
 		end

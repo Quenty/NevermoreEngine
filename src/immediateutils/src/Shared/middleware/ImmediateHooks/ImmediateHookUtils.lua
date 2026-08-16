@@ -23,8 +23,7 @@ export type ImmediateHookBookAddon = {
 	hookBook: HookBook,
 }
 
-export type ImmediateRuntimeWithHookBook<C = {}, B = {}> =
-	ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHookBookAddon
+export type ImmediateRuntimeWithHookBook<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHookBookAddon
 
 local ImmediateHookUtils = {}
 

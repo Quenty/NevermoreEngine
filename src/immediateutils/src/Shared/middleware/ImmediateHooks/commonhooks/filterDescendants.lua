@@ -13,7 +13,11 @@ local RxInstanceUtils = require("RxInstanceUtils")
 local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
-	return function(dis: any?, instanceArg: Instance | { Instance }, filterFunction: (Instance) -> boolean): { Instance }
+	return function(
+		dis: any?,
+		instanceArg: Instance | { Instance },
+		filterFunction: (Instance) -> boolean
+	): { Instance }
 		local hookState, hookMaid = getOrCreateHookState(rt, dis)
 		assert(instanceArg, "instanceArg is nil")
 		assert(

@@ -84,6 +84,9 @@ export type ImmediateSchedulableSystem<Rt> = {
 type SchedulableSystem = ImmediateSchedulableSystem<ImmediateRuntime>
 
 --[=[
+	@class ImmediateScheduler
+	@within ImmediateScheduler
+
 	Constructs a new ImmediateScheduler.
 
 	@return ImmediateScheduler
