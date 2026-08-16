@@ -1,21 +1,13 @@
-# v4.43.4 (Sun Aug 16 2026)
-
-#### 🐛 Bug Fix
-
-- fix(nevermore-cli): install with the project's package manager [#806](https://github.com/Quenty/NevermoreEngine/pull/806) ([@unrooot](https://github.com/unrooot))
-- Merge branch 'main' into users/unrooot/nevermore-cli-fix ([@unrooot](https://github.com/unrooot))
-- fix(nevermore-cli): install with the project's package manager ([@unrooot](https://github.com/unrooot))
-
-#### Authors: 1
-
-- [@unrooot](https://github.com/unrooot)
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.43.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.3...@quenty/nevermore-cli@4.43.4) (2026-08-16)
+
+### Bug Fixes
+
+- **nevermore-cli:** install with the project's package manager ([80f2a19](https://github.com/Quenty/NevermoreEngine/commit/80f2a190e0bc05191221d0a10efed50416869507))
 
 ## [4.43.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.2...@quenty/nevermore-cli@4.43.3) (2026-08-13)
 
