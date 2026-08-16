@@ -1,5 +1,18 @@
 # (Sun Aug 16 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.4`
+  - fix(nevermore-cli): install with the project's package manager [#806](https://github.com/Quenty/NevermoreEngine/pull/806) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Sun Aug 16 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/immediateutils@1.1.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
