@@ -2,8 +2,8 @@
 --[=[
 	@class ImmediateHookUtils
 
-	Optional runtime extension: hook entity lookup on `rt.hookBook`.
-	Install onto a bare ImmediateRuntime before calling getOrCreateHookState.
+	Hook entity lookup on `rt.hookBook`. ImmediateHooksInstall attaches the book
+	to the runtime.
 ]=]
 local require = require(script.Parent.loader).load(script)
 
@@ -27,19 +27,8 @@ export type ImmediateRuntimeWithHookBook<C = {}, B = {}> = ImmediateTypes.Immedi
 
 local ImmediateHookUtils = {}
 
-function ImmediateHookUtils.install<Rt>(rt: Rt): Rt & ImmediateHookBookAddon
-	local runtime = rt :: Rt & ImmediateHookBookAddon
-	if runtime.hookBook == nil then
-		runtime.hookBook = {
-			orderOfCalls = {},
-			stateEntities = {},
-		}
-	end
-	return runtime
-end
-
 local function getHookBook(rt: ImmediateRuntimeWithHookBook): HookBook
-	return assert(rt.hookBook, "ImmediateHookUtils.install(rt) was not called")
+	return assert(rt.hookBook, "ImmediateHooksInstall was not applied")
 end
 
 function ImmediateHookUtils.getOrCreateHookState<T>(
