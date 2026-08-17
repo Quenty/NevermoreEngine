@@ -1,8 +1,7 @@
 --[=[
 	@class JecsUtils
 ]=]
-
-local require = require(script.Parent.loader).load(script)
+-- local require = require(script.Parent.loader).load(script)
 
 local JecsUtils = {}
 
