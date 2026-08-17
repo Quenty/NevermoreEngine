@@ -58,6 +58,7 @@ function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateR
 		state = rawrequire(hooksFolder.state)(rt),
 		subscribe = rawrequire(hooksFolder.subscribe)(rt),
 		throttle = rawrequire(hooksFolder.throttle)(rt),
+		throttledSetQueue = rawrequire(hooksFolder.throttledSetQueue)(rt),
 		tween = rawrequire(hooksFolder.tween)(rt),
 		value = rawrequire(hooksFolder.value)(rt),
 		useBinder = rawrequire(hooksFolder.useBinder)(rt),
