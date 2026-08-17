@@ -2897,6 +2897,9 @@ importers:
 
   src/immediateutils:
     dependencies:
+      '@ekeelstudiokoikoi/jecs':
+        specifier: ^0.11.1
+        version: 0.11.1
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
@@ -2906,9 +2909,6 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
-      '@quenty/jecs':
-        specifier: workspace:*
-        version: link:../jecs
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3135,31 +3135,7 @@ importers:
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
 
-  src/iris:
-    dependencies:
-      '@quenty/loader':
-        specifier: workspace:*
-        version: link:../loader
-      '@quenty/nevermore-test-runner':
-        specifier: workspace:*
-        version: link:../nevermore-test-runner
-      '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
-
   src/isamixin: {}
-
-  src/jecs:
-    dependencies:
-      '@quenty/loader':
-        specifier: workspace:*
-        version: link:../loader
-      '@quenty/nevermore-test-runner':
-        specifier: workspace:*
-        version: link:../nevermore-test-runner
-      '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
 
   src/jsonutils:
     dependencies:
@@ -6709,6 +6685,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@ekeelstudiokoikoi/jecs@0.11.1':
+    resolution: {integrity: sha512-K+HkqOk3XZcIiq6XwpHoVX1SywxfhCqHPqR4T4fF+gYeXtiAorHuMb1tu5dT6jKAGceDpEjPu5Xzh3hsgFLYPA==}
 
   '@elttob/fusion@https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c':
     resolution: {tarball: https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c}
@@ -11547,6 +11526,8 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@ekeelstudiokoikoi/jecs@0.11.1': {}
 
   '@elttob/fusion@https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c': {}
 
