@@ -2897,9 +2897,6 @@ importers:
 
   src/immediateutils:
     dependencies:
-      '@ekeelstudiokoikoi/jecs':
-        specifier: ^0.11.1
-        version: 0.11.1
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
@@ -2936,6 +2933,15 @@ importers:
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+      '@quentystudios/iris':
+        specifier: github:QuentyStudios/Iris
+        version: https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d
+      '@quentystudios/jecs':
+        specifier: github:QuentyStudios/jecs
+        version: https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -6686,9 +6692,6 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@ekeelstudiokoikoi/jecs@0.11.1':
-    resolution: {integrity: sha512-K+HkqOk3XZcIiq6XwpHoVX1SywxfhCqHPqR4T4fF+gYeXtiAorHuMb1tu5dT6jKAGceDpEjPu5Xzh3hsgFLYPA==}
-
   '@elttob/fusion@https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c':
     resolution: {tarball: https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c}
     version: 0.1.0
@@ -7452,6 +7455,14 @@ packages:
 
   '@quentystudios/cmdr@1.12.0-quenty.0':
     resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==}
+
+  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d':
+    resolution: {tarball: https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d}
+    version: 2.5.1-quenty.2
+
+  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469':
+    resolution: {tarball: https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469}
+    version: 0.11.0-quenty.2
 
   '@quentystudios/jest-lua@3.10.0-quenty.2':
     resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==}
@@ -11527,8 +11538,6 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@ekeelstudiokoikoi/jecs@0.11.1': {}
-
   '@elttob/fusion@https://codeload.github.com/Quenty/Fusion/tar.gz/a1aec2e0813c54eb4c90830b1175cb6ba202cc9c': {}
 
   '@emnapi/core@1.10.0':
@@ -12283,6 +12292,10 @@ snapshots:
       config-chain: 1.1.13
 
   '@quentystudios/cmdr@1.12.0-quenty.0': {}
+
+  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d': {}
+
+  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469': {}
 
   '@quentystudios/jest-lua@3.10.0-quenty.2': {}
 
