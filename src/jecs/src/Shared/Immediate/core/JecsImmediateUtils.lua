@@ -3,9 +3,9 @@
 -- For specifically integrating with an ImmediateUtils Scheduler.
 local require = require(script.Parent.loader).load(script)
 
-local ImmediateCoreUtils = require("ImmediateCoreUtils")
 local Jecs = require("Jecs")
 local JecsImmediateCoreComponents = require("JecsImmediateCoreComponents")
+local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecst = require("Jecst")
 local Maid = require("Maid")
 local Observable = require("Observable")
@@ -142,7 +142,7 @@ function JecsImmediateUtils._setupComponentDictionaryWithWorld(
 	end
 end
 
-function JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(rt: ImmediateCoreUtils.ImmediateRuntime)
+function JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 	local world = rt.world
 	local maidComponent = assert(rt.comps.Maid, "no Maid component in runtime")
 
@@ -180,11 +180,11 @@ function JecsImmediateUtils.firstOfQuery(query: Jecst.Query<any>): Jecst.Entity?
 	return nil
 end
 
-function JecsImmediateUtils.getMaid(r: ImmediateCoreUtils.ImmediateRuntime, entity: Jecst.Entity): Maid.Maid?
+function JecsImmediateUtils.getMaid(r: JecsImmediateInstall.ImmediateRuntime_Jecs, entity: Jecst.Entity): Maid.Maid?
 	return r.world:get(entity, r.comps.Maid)
 end
 
-function JecsImmediateUtils.getAMaid(r: ImmediateCoreUtils.ImmediateRuntime, entity: Jecst.Entity): Maid.Maid?
+function JecsImmediateUtils.getAMaid(r: JecsImmediateInstall.ImmediateRuntime_Jecs, entity: Jecst.Entity): Maid.Maid?
 	local directMaid = r.world:get(entity, r.comps.Maid)
 	if directMaid then
 		return directMaid
@@ -263,7 +263,7 @@ end
 -- but only this component. use chrec.removed to see if it's actually removed or if the
 -- component was simply a tag without data.
 function JecsImmediateUtils.observeComponentOnChanged(
-	r: ImmediateCoreUtils.ImmediateRuntime,
+	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	component: Jecst.Id<any>
 ): Observable.Observable<
 	Jecst.Entity,
@@ -289,7 +289,7 @@ function JecsImmediateUtils.observeComponentOnChanged(
 end
 
 function JecsImmediateUtils.observeComponentData(
-	r: ImmediateCoreUtils.ImmediateRuntime,
+	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	entity: Jecst.Entity,
 	component: Jecst.Id<any>
 ): Observable.Observable<any>
@@ -318,7 +318,7 @@ function JecsImmediateUtils.observeComponentData(
 end
 
 function JecsImmediateUtils.addChangeCallback(
-	r: ImmediateCoreUtils.ImmediateRuntime,
+	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
@@ -340,7 +340,7 @@ function JecsImmediateUtils.addChangeCallback(
 end
 
 function JecsImmediateUtils.addAddCallback(
-	r: ImmediateCoreUtils.ImmediateRuntime,
+	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
@@ -362,7 +362,7 @@ function JecsImmediateUtils.addAddCallback(
 end
 
 function JecsImmediateUtils.addRemoveCallback(
-	r: ImmediateCoreUtils.ImmediateRuntime,
+	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, delete: boolean?) -> (),
 	key: any?
@@ -384,7 +384,7 @@ function JecsImmediateUtils.addRemoveCallback(
 end
 
 function JecsImmediateUtils.patch(
-	rt: ImmediateCoreUtils.ImmediateRuntime,
+	rt: JecsImmediateInstall.ImmediateRuntime_Jecs,
 	et: Jecst.Entity,
 	comp: Jecst.Id<any>,
 	partialData: { any }

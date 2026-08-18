@@ -1,18 +1,17 @@
---!nonstrict
+--!strict
 --[=[
 	@class JecsImmediateCommonHooks
 
-	Assembles the built-in hook factories under middleware/ImmediateHooks/commonhooks.
-	ImmediateHooksInstall attaches these to the runtime.
+	Assembles the built-in hook factories. ImmediateHooksInstall attaches these
+	to the runtime.
+
+	Keep the global `require` unshadowed so `require(script.X)` preserves each
+	hook factory's return type. Loader requires would type every hook as `any`.
 ]=]
 
-local rawrequire = require
-local require = require(script.Parent.loader).load(script)
+-- local nevermoreRequire = require(script.Parent.loader).load(script)
 
-local ImmediateCoreUtils = require("ImmediateCoreUtils")
-local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
-
-local JecsImmediateCommonHooks = {}
+-- local JecsImmediateInstall = nevermoreRequire("JecsImmediateInstall")
 
 --[[
 
@@ -23,59 +22,52 @@ local JecsImmediateCommonHooks = {}
 	with [hookName] = hookFunctionFactory(rt), which will give you a function that's aware of the
 	runtime state.
 
+
+
+
+
+
+	okay maybe i need to split these up into discrete modules that can be combined into one giga dictionary
+	and just return to good ol functions inside a big ahh table
+
 ]]
 
-export type ImmediateHooksAddon = JecsImmediateHookUtils.ImmediateHookBookAddon & {
-	hooks: ImmediateHookCallbacks,
-}
-
-export type ImmediateRuntime_Hooks<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & ImmediateHooksAddon
-
-function JecsImmediateCommonHooks._createHookCallbacks<Rt>(rt: Rt & ImmediateCoreUtils.ImmediateRuntime)
-	-- local hooksFolder = require("ImmediateCommonJecsHooks").script
-	local hooksFolder = script
-	local hooks = {
-		async = rawrequire(hooksFolder.async)(rt),
-		cache = rawrequire(hooksFolder.cache)(rt),
-		changed = rawrequire(hooksFolder.changed)(rt),
-		conditionSustained = rawrequire(hooksFolder.conditionSustained)(rt),
-		counter = rawrequire(hooksFolder.counter)(rt),
-		delayed = rawrequire(hooksFolder.delayed)(rt),
-		delta = rawrequire(hooksFolder.delta)(rt),
-		deltatime = rawrequire(hooksFolder.deltatime)(rt),
-		difference = rawrequire(hooksFolder.difference)(rt),
-		draw = rawrequire(hooksFolder.draw)(rt),
-		entity = rawrequire(hooksFolder.entity)(rt),
-		filterDescendants = rawrequire(hooksFolder.filterDescendants)(rt),
-		findChild = rawrequire(hooksFolder.findChild)(rt),
-		gate = rawrequire(hooksFolder.gate)(rt),
-		gatecounter = rawrequire(hooksFolder.gatecounter)(rt),
-		hookEntity = rawrequire(hooksFolder.hookEntity)(rt),
-		linearWalk = rawrequire(hooksFolder.linearWalk)(rt),
-		maid = rawrequire(hooksFolder.maid)(rt),
-		noise = rawrequire(hooksFolder.noise)(rt),
-		random = rawrequire(hooksFolder.random)(rt),
-		randomChoice = rawrequire(hooksFolder.randomChoice)(rt),
-		rtbuffer = rawrequire(hooksFolder.rtbuffer)(rt),
-		scheduledValues = rawrequire(hooksFolder.scheduledValues)(rt),
-		scheduler = rawrequire(hooksFolder.scheduler)(rt),
-		sin = rawrequire(hooksFolder.sin)(rt),
-		slidingAvg = rawrequire(hooksFolder.slidingAvg)(rt),
-		spring = rawrequire(hooksFolder.spring)(rt),
-		state = rawrequire(hooksFolder.state)(rt),
-		subscribe = rawrequire(hooksFolder.subscribe)(rt),
-		throttle = rawrequire(hooksFolder.throttle)(rt),
-		throttledSetQueue = rawrequire(hooksFolder.throttledSetQueue)(rt),
-		tween = rawrequire(hooksFolder.tween)(rt),
-		value = rawrequire(hooksFolder.value)(rt),
-		useBinder = rawrequire(hooksFolder.useBinder)(rt),
-		useTieInterface = rawrequire(hooksFolder.useTieInterface)(rt),
+return function(rt)
+	return {
+		async = require(script.async)(rt),
+		cache = require(script.cache)(rt),
+		changed = require(script.changed)(rt),
+		conditionSustained = require(script.conditionSustained)(rt),
+		counter = require(script.counter)(rt),
+		delayed = require(script.delayed)(rt),
+		delta = require(script.delta)(rt),
+		deltatime = require(script.deltatime)(rt),
+		difference = require(script.difference)(rt),
+		draw = require(script.draw)(rt),
+		entity = require(script.entity)(rt),
+		filterDescendants = require(script.filterDescendants)(rt),
+		findChild = require(script.findChild)(rt),
+		gate = require(script.gate)(rt),
+		gatecounter = require(script.gatecounter)(rt),
+		hookEntity = require(script.hookEntity)(rt),
+		linearWalk = require(script.linearWalk)(rt),
+		maid = require(script.maid)(rt),
+		noise = require(script.noise)(rt),
+		random = require(script.random)(rt),
+		randomChoice = require(script.randomChoice)(rt),
+		rtbuffer = require(script.rtbuffer)(rt),
+		scheduledValues = require(script.scheduledValues)(rt),
+		scheduler = require(script.scheduler)(rt),
+		sin = require(script.sin)(rt),
+		slidingAvg = require(script.slidingAvg)(rt),
+		spring = require(script.spring)(rt),
+		state = require(script.state)(rt),
+		subscribe = require(script.subscribe)(rt),
+		throttle = require(script.throttle)(rt),
+		throttledSetQueue = require(script.throttledSetQueue)(rt),
+		tween = require(script.tween)(rt),
+		value = require(script.value)(rt),
+		useBinder = require(script.useBinder)(rt),
+		useTieInterface = require(script.useTieInterface)(rt),
 	}
-	return hooks
 end
-
-export type ImmediateHookCallbacks = typeof(JecsImmediateCommonHooks._createHookCallbacks(
-	{} :: ImmediateCoreUtils.ImmediateRuntime
-))
-
-return JecsImmediateCommonHooks

@@ -14,15 +14,19 @@ local JecsImmediateHooksComponents = require("JecsImmediateHooksComponents")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local JecsImmediateUtils = require("JecsImmediateUtils")
 
+export type ImmediateRuntime_Jecs_Hooks<Rt = {}> =
+	JecsImmediateHookUtils.ImmediateRuntime_Jecs_Hooks<Rt>
+	& JecsImmediateHookUtils.ImmediateJecsHookBookAddon
+
 return function<Rt>(
 	rt: JecsImmediateInstall.ImmediateRuntime_Jecs<Rt>,
-	scheduler: ImmediateScheduler.ImmediateScheduler -- ): JecsImmediateHookUtils.ImmediateRuntime_Jecs_Hooks<Rt>
-): Rt & JecsImmediateInstall.ImmediateRuntime_Jecs<Rt> & JecsImmediateHookUtils.ImmediateHookBookAddon
+	scheduler: ImmediateScheduler.ImmediateScheduler
+): ImmediateRuntime_Jecs_Hooks<Rt>
 	assert(rt.world, "JecsHooks requires Jecs to be installed first. Missing world")
 	assert(rt.comps, "JecsHooks requires Jecs to be installed first. Missing comps")
 	assert(rt.jecs, "JecsHooks requires Jecs to be installed first. Missing jecs")
 
-	local runtime = rt
+	local runtime = rt :: ImmediateRuntime_Jecs_Hooks<Rt>
 	if runtime.comps.MetaHookState == nil then
 		JecsImmediateUtils._registerComponentsWithWorld(
 			runtime.world,
@@ -30,14 +34,14 @@ return function<Rt>(
 			JecsImmediateHooksComponents(runtime.world)
 		)
 	end
-	if runtime.hookBook == nil then
-		runtime.hookBook = {
+	if runtime._hookBook == nil then
+		runtime._hookBook = {
 			orderOfCalls = {},
 			stateEntities = {},
 		}
 	end
 	if runtime.hooks == nil then
-		runtime.hooks = JecsImmediateCommonHooks._createHookCallbacks(runtime)
+		runtime.hooks = JecsImmediateCommonHooks(runtime)
 	end
 
 	scheduler:RegisterSystem({

@@ -8,6 +8,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jecs = require("Jecs")
+local JecsImmediateCommonHooks = require("JecsImmediateCommonHooks")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecst = require("Jecst")
 local Maid = require("Maid")
@@ -21,17 +22,19 @@ export type HookBook = {
 	stateEntities: { [string]: { [any]: Jecst.Entity } },
 }
 
-export type ImmediateHookBookAddon = {
-	hookBook: HookBook,
+export type ImmediateJecsHookBookAddon = {
+	_hookBook: HookBook,
+	-- hooks: typeof(require("JecsImmediateCommonHooks")({} :: JecsImmediateInstall.ImmediateRuntime_Jecs)),
+	hooks: typeof(JecsImmediateCommonHooks({} :: JecsImmediateInstall.ImmediateRuntime_Jecs)),
 }
 
 export type ImmediateRuntime_Jecs_Hooks<Rt = {}> =
 	Rt
 	& JecsImmediateInstall.ImmediateRuntime_Jecs<Rt>
-	& ImmediateHookBookAddon
+	& ImmediateJecsHookBookAddon
 
 local function getHookBook(rt: ImmediateRuntime_Jecs_Hooks): HookBook
-	return assert(rt.hookBook, "ImmediateHooksInstall was not applied")
+	return assert(rt._hookBook, "ImmediateHooksInstall was not applied")
 end
 
 function JecsImmediateHookUtils.getOrCreateHookState<T>(
