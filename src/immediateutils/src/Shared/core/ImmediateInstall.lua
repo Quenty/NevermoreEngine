@@ -27,11 +27,7 @@ local ImmediateInstall = {}
 
 export type Addon<From, To> = (From, ImmediateScheduler.ImmediateScheduler) -> To
 
-function ImmediateInstall.stack1<R0, R1>(
-	rt: R0,
-	scheduler: ImmediateScheduler.ImmediateScheduler,
-	a: Addon<R0, R1>
-): R1
+function ImmediateInstall.stack1<R0, R1>(rt: R0, scheduler: ImmediateScheduler.ImmediateScheduler, a: Addon<R0, R1>): R1
 	return a(rt, scheduler)
 end
 

@@ -9,8 +9,8 @@
 
 local require = require(script.Parent.Parent.loader).load(script)
 
-local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecs = require("Jecs")
+local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecst = require("Jecst")
 local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
