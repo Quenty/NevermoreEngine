@@ -1,6 +1,6 @@
 --!nocheck
 --[[
-	Typed companion for Jecs. Not part of upstream jecs — the runtime module is
+	Typed companion for Jecs. Not part of upstream jecs; the runtime module is
 	--!nocheck, so call sites import these types instead.
 
 	@class Jecst

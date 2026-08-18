@@ -17,7 +17,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateHookSpringUtils = require("ImmediateHookSpringUtils")
 local ImmediateTypes = require("ImmediateTypes")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 local LINEAR_WALK_EPSILON = 1e-4
 

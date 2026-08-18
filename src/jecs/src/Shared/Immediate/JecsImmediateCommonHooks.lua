@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	@class ImmediateCommonHooks
+	@class JecsImmediateCommonHooks
 
 	Assembles the built-in hook factories under middleware/ImmediateHooks/commonhooks.
 	ImmediateHooksInstall attaches these to the runtime.
@@ -9,10 +9,10 @@
 local rawrequire = require
 local require = require(script.Parent.loader).load(script)
 
-local ImmediateHookUtils = require("ImmediateHookUtils")
 local ImmediateTypes = require("ImmediateTypes")
+local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 
-local ImmediateCommonHooks = {}
+local JecsImmediateCommonHooks = {}
 
 --[[
 
@@ -25,7 +25,7 @@ local ImmediateCommonHooks = {}
 
 ]]
 
-function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateRuntime)
+function JecsImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateRuntime)
 	local hooksFolder = require("CommonJecsHooks").script
 	local hooks = {
 		async = rawrequire(hooksFolder.async)(rt),
@@ -67,14 +67,14 @@ function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateR
 	return hooks
 end
 
-export type ImmediateHookCallbacks = typeof(ImmediateCommonHooks._createHookCallbacks(
+export type ImmediateHookCallbacks = typeof(JecsImmediateCommonHooks._createHookCallbacks(
 	{} :: ImmediateTypes.ImmediateRuntime
 ))
 
-export type ImmediateHooksAddon = ImmediateHookUtils.ImmediateHookBookAddon & {
+export type ImmediateHooksAddon = JecsImmediateHookUtils.ImmediateHookBookAddon & {
 	hooks: ImmediateHookCallbacks,
 }
 
 export type ImmediateRuntimeWithHooks<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHooksAddon
 
-return ImmediateCommonHooks
+return JecsImmediateCommonHooks

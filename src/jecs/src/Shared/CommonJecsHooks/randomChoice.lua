@@ -14,7 +14,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateTypes = require("ImmediateTypes")
 local RandomUtils = require("RandomUtils")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(choices: { [any]: number }, dis: any?, alwaysRandom: boolean?, noCache: boolean?, rng: Random?)

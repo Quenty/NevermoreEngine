@@ -7,7 +7,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateTypes = require("ImmediateTypes")
 local Maid = require("Maid")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(dis: any?, callback: (maid: Maid.Maid) -> any?)

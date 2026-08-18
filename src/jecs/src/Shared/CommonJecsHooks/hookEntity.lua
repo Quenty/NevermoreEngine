@@ -12,7 +12,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 local ImmediateTypes = require("ImmediateTypes")
 local Jecs = require("Jecs")
 local Jecst = require("Jecst")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(dis, initDecorator: (Jecst.Entity) -> any?)

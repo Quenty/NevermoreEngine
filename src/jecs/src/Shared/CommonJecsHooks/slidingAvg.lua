@@ -18,7 +18,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateHookAverageUtils = require("ImmediateHookAverageUtils")
 local ImmediateTypes = require("ImmediateTypes")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(

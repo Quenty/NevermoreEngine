@@ -30,7 +30,7 @@
 local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateTypes = require("ImmediateTypes")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 export type SchedulerState = {
 	lastCalledAt: number,

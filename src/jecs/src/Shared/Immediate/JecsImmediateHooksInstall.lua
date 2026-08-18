@@ -7,17 +7,17 @@
 ]=]
 local require = require(script.Parent.loader).load(script)
 
-local ImmediateCommonHooks = require("ImmediateCommonHooks")
-local ImmediateHookUtils = require("ImmediateHookUtils")
 local ImmediateScheduler = require("ImmediateScheduler")
+local JecsImmediateCommonHooks = require("JecsImmediateCommonHooks")
+local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 
 local DEFAULT_PRIORITY = 100
 
 return function<Rt>(
 	rt: Rt,
 	scheduler: ImmediateScheduler.ImmediateScheduler?
-): Rt & ImmediateCommonHooks.ImmediateHooksAddon
-	local runtime = rt :: Rt & ImmediateCommonHooks.ImmediateHooksAddon
+): Rt & JecsImmediateCommonHooks.ImmediateHooksAddon
+	local runtime = rt :: Rt & JecsImmediateCommonHooks.ImmediateHooksAddon
 	if runtime.hookBook == nil then
 		runtime.hookBook = {
 			orderOfCalls = {},
@@ -25,7 +25,7 @@ return function<Rt>(
 		}
 	end
 	if runtime.hooks == nil then
-		runtime.hooks = ImmediateCommonHooks._createHookCallbacks(runtime)
+		runtime.hooks = JecsImmediateCommonHooks._createHookCallbacks(runtime)
 	end
 
 	if scheduler then
@@ -35,7 +35,7 @@ return function<Rt>(
 			priority = DEFAULT_PRIORITY,
 			notProtected = false,
 			system = function(r)
-				ImmediateHookUtils.flushHookRuntimeBuffers(r)
+				JecsImmediateHookUtils.flushHookRuntimeBuffers(r)
 			end,
 			Destroy = function() end,
 		})
@@ -45,7 +45,7 @@ return function<Rt>(
 			priority = DEFAULT_PRIORITY,
 			notProtected = false,
 			system = function(r)
-				ImmediateHookUtils.evaluateAndCleanupHooks(r)
+				JecsImmediateHookUtils.evaluateAndCleanupHooks(r)
 			end,
 			Destroy = function() end,
 		})

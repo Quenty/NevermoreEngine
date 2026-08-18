@@ -10,7 +10,7 @@
 local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateTypes = require("ImmediateTypes")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(dis: any?, min: number?, max: number?, frequency: number?, startPhase: number?): number

@@ -18,7 +18,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 
 local ImmediateTypes = require("ImmediateTypes")
 local Jecst = require("Jecst")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 type ThrottledSetQueueInput = { any } | Jecst.Query<any> | Jecst.Cached_Query<any>
 

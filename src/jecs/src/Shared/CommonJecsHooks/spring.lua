@@ -13,7 +13,7 @@ local require = require(script.Parent.Parent.loader).load(script)
 local ImmediateHookSpringUtils = require("ImmediateHookSpringUtils")
 local ImmediateTypes = require("ImmediateTypes")
 local Spring = require("Spring")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 local function usesCFrame(goal: any?, value: any?): boolean
 	if goal ~= nil then

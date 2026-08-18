@@ -1,6 +1,6 @@
 --!nonstrict
 --[=[
-	@class ImmediateHookUtils
+	@class JecsImmediateHookUtils
 
 	Hook entity lookup on `rt.hookBook`. ImmediateHooksInstall attaches the book
 	to the runtime.
@@ -25,13 +25,13 @@ export type ImmediateHookBookAddon = {
 
 export type ImmediateRuntimeWithHookBook<C = {}, B = {}> = ImmediateTypes.ImmediateRuntime<C, B> & ImmediateHookBookAddon
 
-local ImmediateHookUtils = {}
+local JecsImmediateHookUtils = {}
 
 local function getHookBook(rt: ImmediateRuntimeWithHookBook): HookBook
 	return assert(rt.hookBook, "ImmediateHooksInstall was not applied")
 end
 
-function ImmediateHookUtils.getOrCreateHookState<T>(
+function JecsImmediateHookUtils.getOrCreateHookState<T>(
 	rt: ImmediateRuntimeWithHookBook,
 	discriminator: any,
 	cleanupIfTrue: ((state: T) -> boolean)?,
@@ -126,9 +126,9 @@ function ImmediateHookUtils.getOrCreateHookState<T>(
 	return rt.world:get(newHookEntity, rt.comps.HookState) :: T, maid, newHookEntity
 end
 
-ImmediateHookUtils._getOrCreateHookState = ImmediateHookUtils.getOrCreateHookState
+ImmediateHookUtils._getOrCreateHookState = JecsImmediateHookUtils.getOrCreateHookState
 
-function ImmediateHookUtils.forceCleanupHooks(rt: ImmediateRuntimeWithHookBook)
+function JecsImmediateHookUtils.forceCleanupHooks(rt: ImmediateRuntimeWithHookBook)
 	local toDelete = {}
 	for entity, _mhs, _hs, _maid in rt.world:query(rt.comps.MetaHookState, rt.comps.HookState, rt.comps.Maid) do
 		if _mhs.runtimePersistent then
@@ -143,7 +143,7 @@ function ImmediateHookUtils.forceCleanupHooks(rt: ImmediateRuntimeWithHookBook)
 	end
 end
 
-function ImmediateHookUtils.forceCleanupHooksOfFile(rt: ImmediateRuntimeWithHookBook, filename: string)
+function JecsImmediateHookUtils.forceCleanupHooksOfFile(rt: ImmediateRuntimeWithHookBook, filename: string)
 	local toDelete = {}
 	for entity, mhs in rt.world:query(rt.comps.MetaHookState) do
 		if mhs.runtimePersistent then
@@ -166,7 +166,7 @@ function ImmediateHookUtils.forceCleanupHooksOfFile(rt: ImmediateRuntimeWithHook
 	end
 end
 
-function ImmediateHookUtils.evaluateAndCleanupHooks(rt: ImmediateRuntimeWithHookBook)
+function JecsImmediateHookUtils.evaluateAndCleanupHooks(rt: ImmediateRuntimeWithHookBook)
 	local toDelete = {}
 	for entity, mhs, hs, _maid in rt.world:query(rt.comps.MetaHookState, rt.comps.HookState, rt.comps.Maid) do
 		if mhs.runtimePersistent then
@@ -191,7 +191,7 @@ function ImmediateHookUtils.evaluateAndCleanupHooks(rt: ImmediateRuntimeWithHook
 	end
 end
 
-function ImmediateHookUtils.flushHookRuntimeBuffers(rt: ImmediateRuntimeWithHookBook)
+function JecsImmediateHookUtils.flushHookRuntimeBuffers(rt: ImmediateRuntimeWithHookBook)
 	for _et, hookState, _ in rt.world:query(rt.comps.HookState, rt.comps.HookRuntimeBuffer) do
 		if hookState.calledThisFrame then
 			table.clear(hookState.tab)
@@ -200,4 +200,4 @@ function ImmediateHookUtils.flushHookRuntimeBuffers(rt: ImmediateRuntimeWithHook
 	end
 end
 
-return ImmediateHookUtils
+return JecsImmediateHookUtils

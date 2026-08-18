@@ -10,7 +10,7 @@ local ImmediateTypes = require("ImmediateTypes")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local Signal = require("Signal")
-local getOrCreateHookState = require("ImmediateHookUtils").getOrCreateHookState
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: ImmediateTypes.ImmediateRuntime)
 	return function(
