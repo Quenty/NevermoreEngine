@@ -1,0 +1,19 @@
+--!nonstrict
+--[=[
+	@class counter
+
+	Every time it is called it counts up.
+]=]
+
+local require = require(script.Parent.Parent.loader).load(script)
+
+local JecsImmediateInstall = require("JecsImmediateInstall")
+local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
+
+return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
+	return function(dis)
+		local hookState, _hookMaid = getOrCreateHookState(rt, dis)
+		hookState.counter = (hookState.counter or 0) + 1
+		return hookState.counter
+	end
+end

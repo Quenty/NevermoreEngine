@@ -22,13 +22,13 @@ local rawrequire = require
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ImmediateTypes = require("ImmediateTypes")
+local ImmediateCoreUtils = require("ImmediateCoreUtils")
 
 local ImmediateScheduler = setmetatable({}, BaseObject)
 ImmediateScheduler.ClassName = "ImmediateScheduler"
 ImmediateScheduler.__index = ImmediateScheduler
 
-type ImmediateRuntime = ImmediateTypes.ImmediateRuntime
+type ImmediateRuntime = ImmediateCoreUtils.ImmediateRuntime
 
 --[[
 	https://create.roblox.com/docs/performance-optimization/microprofiler/task-scheduler
@@ -302,6 +302,15 @@ function ImmediateScheduler.UnregisterSystem(self: ImmediateScheduler, systemNam
 		self._systemDictionary[systemName] = nil
 	end
 	self._sortFlag = true
+end
+
+function ImmediateScheduler.Destroy(self: ImmediateScheduler)
+	table.clear(self._systemDictionary)
+	table.clear(self._sorted_systems)
+	table.clear(self._sorted_preSystem)
+	table.clear(self._sorted_postSystem)
+	table.clear(self._sorted_preTick)
+	table.clear(self._sorted_postTick)
 end
 
 return ImmediateScheduler
