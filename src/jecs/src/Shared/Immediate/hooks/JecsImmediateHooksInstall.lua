@@ -10,7 +10,9 @@ local require = require(script.Parent.loader).load(script)
 local ImmediateScheduler = require("ImmediateScheduler")
 local JecsImmediateCommonHooks = require("JecsImmediateCommonHooks")
 local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
+local JecsImmediateHooksComponents = require("JecsImmediateHooksComponents")
 local JecsImmediateInstall = require("JecsImmediateInstall")
+local JecsImmediateUtils = require("JecsImmediateUtils")
 
 return function<Rt>(
 	rt: JecsImmediateInstall.ImmediateRuntime_Jecs<Rt>,
@@ -20,8 +22,14 @@ return function<Rt>(
 	assert(rt.comps, "JecsHooks requires Jecs to be installed first. Missing comps")
 	assert(rt.jecs, "JecsHooks requires Jecs to be installed first. Missing jecs")
 
-	-- local runtime = rt :: JecsImmediateHookUtils.ImmediateRuntime_Jecs_Hooks<Rt>
 	local runtime = rt
+	if runtime.comps.MetaHookState == nil then
+		JecsImmediateUtils._registerComponentsWithWorld(
+			runtime.world,
+			runtime.comps,
+			JecsImmediateHooksComponents(runtime.world)
+		)
+	end
 	if runtime.hookBook == nil then
 		runtime.hookBook = {
 			orderOfCalls = {},

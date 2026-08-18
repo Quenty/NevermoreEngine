@@ -16,14 +16,14 @@
 
 local require = require(script.Parent.Parent.loader).load(script)
 
-local ImmediateHookAverageUtils = require("ImmediateHookAverageUtils")
+local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
 return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 	return function(
 		dis: any?,
-		value: ImmediateHookAverageUtils.AverageableValue,
+		value: JecsImmediateHookUtils.AverageableValue,
 		windowSize: number,
 		conditionToInclude: boolean?,
 		fillBufferWithFirstValue: boolean?
@@ -37,9 +37,9 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 			hookState.buffer = table.create(windowSize)
 			hookState.head = 1
 			hookState.count = 0
-			hookState.sum = ImmediateHookAverageUtils.zeroSum(value)
+			hookState.sum = JecsImmediateHookUtils.zeroSum(value)
 			hookState.zeroSum = hookState.sum
-			hookState.push = function(pushValue: ImmediateHookAverageUtils.AverageableValue)
+			hookState.push = function(pushValue: JecsImmediateHookUtils.AverageableValue)
 				local capacity = hookState.windowSize
 				local i = hookState.head
 				local old = hookState.buffer[i]
@@ -73,6 +73,6 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 			hookState.push(value)
 		end
 
-		return ImmediateHookAverageUtils.quotient(hookState.sum, hookState.count), hookState.push, hookState.clear
+		return JecsImmediateHookUtils.quotient(hookState.sum, hookState.count), hookState.push, hookState.clear
 	end
 end

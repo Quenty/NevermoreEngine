@@ -32,7 +32,8 @@ export type ImmediateHooksAddon = JecsImmediateHookUtils.ImmediateHookBookAddon 
 export type ImmediateRuntime_Hooks<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & ImmediateHooksAddon
 
 function JecsImmediateCommonHooks._createHookCallbacks<Rt>(rt: Rt & ImmediateCoreUtils.ImmediateRuntime)
-	local hooksFolder = require("ImmediateCommonJecsHooks").script
+	-- local hooksFolder = require("ImmediateCommonJecsHooks").script
+	local hooksFolder = script
 	local hooks = {
 		async = rawrequire(hooksFolder.async)(rt),
 		cache = rawrequire(hooksFolder.cache)(rt),

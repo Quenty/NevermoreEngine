@@ -127,7 +127,7 @@ local function destroyDefaultHost()
 	end
 end
 
-return function<Rt>(rt: Rt & ImmediateCoreUtils.ImmediateRuntime, scheduler: ImmediateScheduler.ImmediateScheduler?): ImmediateRuntime_Iris<Rt>
+return function<Rt>(rt: Rt & ImmediateCoreUtils.ImmediateRuntime, scheduler: ImmediateScheduler.ImmediateScheduler): ImmediateRuntime_Iris<Rt>
 	local runtime = rt :: ImmediateRuntime_Iris<Rt>
 	if runtime._raw_iris == nil then
 		runtime._raw_iris = require("Iris")

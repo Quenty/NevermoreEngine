@@ -5,8 +5,8 @@
 
 local require = require(script.Parent.Parent.loader).load(script)
 
-local ImmediateJecsUtils = require("ImmediateJecsUtils")
 local JecsImmediateInstall = require("JecsImmediateInstall")
+local JecsImmediateUtils = require("JecsImmediateUtils")
 local Observable = require("Observable")
 local Rx = require("Rx")
 local Signal = require("Signal")
@@ -33,7 +33,7 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 
 		if hookState.collector == nil then
 			hookState.collector =
-				hookMaid:Add(ImmediateJecsUtils.collectObservable(toObservable(subscribable), hookMaid))
+				hookMaid:Add(JecsImmediateUtils.collectObservable(toObservable(subscribable), hookMaid))
 		end
 
 		local collector = hookState.collector

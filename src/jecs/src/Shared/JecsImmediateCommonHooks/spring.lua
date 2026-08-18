@@ -10,7 +10,7 @@
 
 local require = require(script.Parent.Parent.loader).load(script)
 
-local ImmediateHookSpringUtils = require("ImmediateHookSpringUtils")
+local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local Spring = require("Spring")
 local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
@@ -82,7 +82,7 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 		end
 
 		if hookState.springIsColor3 == nil then
-			hookState.springIsColor3 = ImmediateHookSpringUtils.usesColor3(goal, value)
+			hookState.springIsColor3 = JecsImmediateHookUtils.usesColor3(goal, value)
 		end
 		local isColor3 = hookState.springIsColor3
 
@@ -94,7 +94,7 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 			if initialSource == nil then
 				initialSource = if isColor3 then Vector3.zero else 0
 			end
-			local initial = ImmediateHookSpringUtils.internalValue(initialSource)
+			local initial = JecsImmediateHookUtils.internalValue(initialSource)
 			hookState.spring = Spring.new(initial)
 			hookState.spring.Speed = speed or 10
 			hookState.spring.Damper = damping or 1
@@ -109,10 +109,10 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 		end
 
 		if goal ~= nil then
-			hookState.spring.Target = ImmediateHookSpringUtils.internalValue(goal)
+			hookState.spring.Target = JecsImmediateHookUtils.internalValue(goal)
 		end
 
-		local position = ImmediateHookSpringUtils.externalValue(hookState.spring.Position, isColor3)
+		local position = JecsImmediateHookUtils.externalValue(hookState.spring.Position, isColor3)
 		return position, hookState.spring
 	end
 end

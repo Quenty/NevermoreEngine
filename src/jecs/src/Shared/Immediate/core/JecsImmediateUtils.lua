@@ -22,6 +22,75 @@ export type JecsComponentDictionary = { [string]: Jecst.Id<any> } & typeof(JecsI
 -- but here we can also expose the returned components statically.
 export type JecsComponentDictionaryInjector = (world: Jecst.World) -> JecsComponentDictionary
 
+local function attachCallbackTables(
+	world: Jecst.World,
+	fullComponentDictionary: JecsComponentDictionary,
+	component: Jecst.Id<any>
+)
+	world:set(component, fullComponentDictionary._ChangeCallbacks, {
+		_counter = 0,
+		callbacks = {},
+	})
+	world:set(component, fullComponentDictionary._AddCallbacks, {
+		_counter = 0,
+		callbacks = {},
+	})
+	world:set(component, fullComponentDictionary._RemoveCallbacks, {
+		_counter = 0,
+		callbacks = {},
+	})
+end
+
+local function bindComponentLifecycle(
+	world: Jecst.World,
+	fullComponentDictionary: JecsComponentDictionary,
+	component: Jecst.Id<any>
+)
+	world:set(component, Jecs.OnChange, function(entity, id, data)
+		local changeCallbacks = world:get(id, fullComponentDictionary._ChangeCallbacks)
+		if changeCallbacks then
+			for _key, callback in pairs(changeCallbacks.callbacks) do
+				callback(entity, id, data)
+			end
+		end
+	end)
+	world:set(component, Jecs.OnAdd, function(entity, id, data)
+		local addCallbacks = world:get(id, fullComponentDictionary._AddCallbacks)
+		if addCallbacks then
+			for _key, callback in pairs(addCallbacks.callbacks) do
+				callback(entity, id, data)
+			end
+		end
+	end)
+	world:set(component, Jecs.OnRemove, function(entity, id, delete)
+		local removeCallbacks = world:get(id, fullComponentDictionary._RemoveCallbacks)
+		if removeCallbacks then
+			for _key, callback in pairs(removeCallbacks.callbacks) do
+				callback(entity, id, delete)
+			end
+		end
+	end)
+end
+
+-- Register extra components into an already-setup dictionary. Uses the core
+-- Name / callback ids from `fullComponentDictionary`. Do not pass a fragment
+-- into `_setupComponentDictionaryWithWorld` — that function assumes a complete dict.
+function JecsImmediateUtils._registerComponentsWithWorld(
+	world: Jecst.World,
+	fullComponentDictionary: JecsComponentDictionary,
+	newComponents: { [string]: Jecst.Id<any> }
+)
+	assert(fullComponentDictionary.Name, "JecsImmediateInstall must run first (missing comps.Name)")
+	assert(fullComponentDictionary._ChangeCallbacks, "missing comps._ChangeCallbacks")
+
+	for componentName, component in pairs(newComponents) do
+		(fullComponentDictionary :: {})[componentName] = component
+		attachCallbackTables(world, fullComponentDictionary, component)
+		bindComponentLifecycle(world, fullComponentDictionary, component)
+		world:set(component, fullComponentDictionary.Name, componentName)
+	end
+end
+
 function JecsImmediateUtils._setupComponentDictionaryWithWorld(
 	world: Jecst.World,
 	fullComponentDictionary: JecsComponentDictionary
@@ -34,52 +103,12 @@ function JecsImmediateUtils._setupComponentDictionaryWithWorld(
 		then
 			continue
 		end
-		world:set(component, fullComponentDictionary._ChangeCallbacks, {
-			_counter = 0,
-			callbacks = {},
-		})
-		world:set(component, fullComponentDictionary._AddCallbacks, {
-			_counter = 0,
-			callbacks = {},
-		})
-		world:set(component, fullComponentDictionary._RemoveCallbacks, {
-			_counter = 0,
-			callbacks = {},
-		})
+		attachCallbackTables(world, fullComponentDictionary, component)
 	end
 
 	-- Every component will run callbacks assigned to them.
 	for _componentName, component in pairs(fullComponentDictionary) do
-		world:set(component, Jecs.OnChange, function(entity, id, data)
-			local changeCallbacks = world:get(id, fullComponentDictionary._ChangeCallbacks)
-			if changeCallbacks then
-				for _key, callback in pairs(changeCallbacks.callbacks) do
-					callback(entity, id, data)
-				end
-			end
-		end)
-	end
-
-	for _componentName, component in pairs(fullComponentDictionary) do
-		world:set(component, Jecs.OnAdd, function(entity, id, data)
-			local addCallbacks = world:get(id, fullComponentDictionary._AddCallbacks)
-			if addCallbacks then
-				for _key, callback in pairs(addCallbacks.callbacks) do
-					callback(entity, id, data)
-				end
-			end
-		end)
-	end
-
-	for _componentName, component in pairs(fullComponentDictionary) do
-		world:set(component, Jecs.OnRemove, function(entity, id, delete)
-			local removeCallbacks = world:get(id, fullComponentDictionary._RemoveCallbacks)
-			if removeCallbacks then
-				for _key, callback in pairs(removeCallbacks.callbacks) do
-					callback(entity, id, delete)
-				end
-			end
-		end)
+		bindComponentLifecycle(world, fullComponentDictionary, component)
 	end
 
 	-- Cleanup behavior if for some reason we remove the _Callbacks themselves

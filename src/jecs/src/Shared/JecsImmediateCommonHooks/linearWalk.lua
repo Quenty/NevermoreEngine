@@ -15,7 +15,7 @@
 
 local require = require(script.Parent.Parent.loader).load(script)
 
-local ImmediateHookSpringUtils = require("ImmediateHookSpringUtils")
+local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local getOrCreateHookState = require("JecsImmediateHookUtils").getOrCreateHookState
 
@@ -81,7 +81,7 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 		end
 
 		if hookState.linearWalkIsColor3 == nil then
-			hookState.linearWalkIsColor3 = ImmediateHookSpringUtils.usesColor3(goal, value)
+			hookState.linearWalkIsColor3 = JecsImmediateHookUtils.usesColor3(goal, value)
 		end
 		local isColor3 = hookState.linearWalkIsColor3
 
@@ -93,11 +93,11 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 			if initialSource == nil then
 				initialSource = if isColor3 then Vector3.zero else 0
 			end
-			hookState.position = ImmediateHookSpringUtils.internalValue(initialSource)
+			hookState.position = JecsImmediateHookUtils.internalValue(initialSource)
 			hookState.lastAtClock = os.clock()
 
 			if duration ~= nil and goal ~= nil then
-				local target = ImmediateHookSpringUtils.internalValue(goal)
+				local target = JecsImmediateHookUtils.internalValue(goal)
 				local delta = target - hookState.position
 				local distance = if typeof(delta) == "number" then math.abs(delta) else delta.Magnitude
 				if duration <= 0 then
@@ -121,7 +121,7 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 		hookState.lastAtClock = now
 
 		if goal ~= nil then
-			local target = ImmediateHookSpringUtils.internalValue(goal)
+			local target = JecsImmediateHookUtils.internalValue(goal)
 			local current = hookState.position
 			local delta = target - current
 			local distance = if typeof(delta) == "number" then math.abs(delta) else delta.Magnitude
@@ -138,6 +138,6 @@ return function(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
 			end
 		end
 
-		return ImmediateHookSpringUtils.externalValue(hookState.position, isColor3)
+		return JecsImmediateHookUtils.externalValue(hookState.position, isColor3)
 	end
 end

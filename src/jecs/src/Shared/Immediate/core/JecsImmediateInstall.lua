@@ -2,12 +2,16 @@
 --[=[
 	@class JecsImmediateInstall
 
+	Factory: `JecsImmediateInstall(components?, DEBUG?)` returns an
+	ImmediateInstall addon `(rt, scheduler) -> rt'`.
+
 	This adds a JECS world to an immediate runtime.
 	It's the basis for the hooks addon, and possibly some or all of your game state.
 ]=]
 local require = require(script.Parent.loader).load(script)
 
 local ImmediateCoreUtils = require("ImmediateCoreUtils")
+local ImmediateScheduler = require("ImmediateScheduler")
 local Jecs = require("Jecs")
 local JecsImmediateCoreComponents = require("JecsImmediateCoreComponents")
 local JecsImmediateUtils = require("JecsImmediateUtils")
@@ -20,10 +24,10 @@ export type JecsAddon = {
 }
 export type ImmediateRuntime_Jecs<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & JecsAddon
 
-return function<Rt>(
+local function install<Rt>(
 	rt: Rt,
-	components: JecsImmediateUtils.JecsComponentDictionary,
-	DEBUG: boolean? -- scheduler: ImmediateScheduler.ImmediateScheduler?
+	components: JecsImmediateUtils.JecsComponentDictionary?,
+	DEBUG: boolean?
 ): ImmediateRuntime_Jecs<Rt>
 	local runtime = rt :: Rt & ImmediateCoreUtils.ImmediateRuntime
 	local world = Jecs.world(DEBUG)
@@ -33,7 +37,6 @@ return function<Rt>(
 		table.clear(world)
 	end)
 
-	-- Register initial components, exposing through rt.comps
 	local comps = JecsImmediateCoreComponents(world)
 	if components then
 		for name, component in pairs(components) do
@@ -49,4 +52,11 @@ return function<Rt>(
 	JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(runtime)
 
 	return runtime
+end
+
+-- Factory: close over components/DEBUG, return an ImmediateInstall addon.
+return function(components: JecsImmediateUtils.JecsComponentDictionary?, DEBUG: boolean?)
+	return function<Rt>(rt: Rt, _scheduler: ImmediateScheduler.ImmediateScheduler): ImmediateRuntime_Jecs<Rt>
+		return install(rt, components, DEBUG)
+	end
 end
