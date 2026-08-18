@@ -2936,12 +2936,6 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
-      '@quentystudios/iris':
-        specifier: github:QuentyStudios/Iris
-        version: https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d
-      '@quentystudios/jecs':
-        specifier: github:QuentyStudios/jecs
-        version: https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -3143,12 +3137,18 @@ importers:
 
   src/iris:
     dependencies:
+      '@quenty/immediateutils':
+        specifier: workspace:*
+        version: link:../immediateutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quentystudios/iris':
+        specifier: github:QuentyStudios/Iris
+        version: https://codeload.github.com/QuentyStudios/Iris/tar.gz/bf496396d7069ee7dc146d9d9696206e4ba3ab91
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -3157,12 +3157,39 @@ importers:
 
   src/jecs:
     dependencies:
+      '@quenty/immediateutils':
+        specifier: workspace:*
+        version: link:../immediateutils
+      '@quenty/instanceutils':
+        specifier: workspace:*
+        version: link:../instanceutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/randomutils':
+        specifier: workspace:*
+        version: link:../randomutils
+      '@quenty/rx':
+        specifier: workspace:*
+        version: link:../rx
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
+      '@quenty/spring':
+        specifier: workspace:*
+        version: link:../spring
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+      '@quentystudios/jecs':
+        specifier: github:QuentyStudios/jecs
+        version: https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -7480,13 +7507,13 @@ packages:
   '@quentystudios/cmdr@1.12.0-quenty.0':
     resolution: {integrity: sha512-coxG4bEQ3wskTEiVxbh6hTsOycYoq+8jLtUABvfMURHiS3hgF/0jg3uQArZt0JeY+VvkCIXLHUCFTMMbUQOllA==}
 
-  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d':
-    resolution: {tarball: https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d}
-    version: 2.5.1-quenty.2
+  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/bf496396d7069ee7dc146d9d9696206e4ba3ab91':
+    resolution: {tarball: https://codeload.github.com/QuentyStudios/Iris/tar.gz/bf496396d7069ee7dc146d9d9696206e4ba3ab91}
+    version: 2.5.1-quenty.3
 
-  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469':
-    resolution: {tarball: https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469}
-    version: 0.11.0-quenty.2
+  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c':
+    resolution: {tarball: https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c}
+    version: 0.11.0-quenty.3
 
   '@quentystudios/jest-lua@3.10.0-quenty.2':
     resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==}
@@ -12317,9 +12344,9 @@ snapshots:
 
   '@quentystudios/cmdr@1.12.0-quenty.0': {}
 
-  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/97101b8be7e7699a06b17e8597c654d259a0b40d': {}
+  '@quentystudios/iris@https://codeload.github.com/QuentyStudios/Iris/tar.gz/bf496396d7069ee7dc146d9d9696206e4ba3ab91': {}
 
-  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/dfcc63cb5fe59cd273675a2d8e87d4f433329469': {}
+  '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c': {}
 
   '@quentystudios/jest-lua@3.10.0-quenty.2': {}
 

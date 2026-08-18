@@ -28,10 +28,11 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/immediateutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
-    "@quentystudios/iris": "github:QuentyStudios/Iris"
+    "@quentystudios/iris": "github:QuentyStudios/Iris",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"
