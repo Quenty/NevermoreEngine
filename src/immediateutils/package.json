@@ -34,8 +34,6 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
-    "@quentystudios/iris": "github:QuentyStudios/Iris",
-    "@quentystudios/jecs": "github:QuentyStudios/jecs",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

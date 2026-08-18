@@ -26,7 +26,7 @@ local ImmediateCommonHooks = {}
 ]]
 
 function ImmediateCommonHooks._createHookCallbacks(rt: ImmediateTypes.ImmediateRuntime)
-	local hooksFolder = script.Parent.commonhooks
+	local hooksFolder = require("CommonJecsHooks").script
 	local hooks = {
 		async = rawrequire(hooksFolder.async)(rt),
 		cache = rawrequire(hooksFolder.cache)(rt),
