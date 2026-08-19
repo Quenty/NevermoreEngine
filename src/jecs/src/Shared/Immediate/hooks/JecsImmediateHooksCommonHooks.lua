@@ -1100,6 +1100,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			maxCount: number?,
 			maxTime: number?
 		): () -> any?
+			debug.profilebegin("throttledSetQueue")
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
 
 			if hookState.queue == nil then
@@ -1110,6 +1111,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				end)
 			end
 
+			debug.profilebegin("throttledSetQueue.forEachIdentity")
 			local seen = {}
 			forEachIdentity(input, function(identity)
 				seen[identity] = true
@@ -1118,7 +1120,9 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					table.insert(hookState.queue, identity)
 				end
 			end)
+			debug.profileend()
 
+			debug.profilebegin("throttledSetQueue.kept")
 			local kept = {}
 			for _, identity in hookState.queue do
 				if seen[identity] then
@@ -1128,16 +1132,21 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				end
 			end
 			hookState.queue = kept
+			debug.profileend()
 
+			debug.profilebegin("throttledSetQueue.countBudget")
 			-- Default to one identity when neither bound is set.
 			local countBudget = maxCount
 			if countBudget == nil and maxTime == nil then
 				countBudget = 1
 			end
+			debug.profileend()
 
 			local emittedCount = 0
 			local startedAt: number? = nil
+			debug.profileend()
 			return function()
+				debug.profilebegin("throttledSetQueue.returnedcallback")
 				local origin = startedAt
 				if origin == nil then
 					origin = os.clock()
@@ -1153,15 +1162,20 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					return nil
 				end
 
+				debug.profilebegin("throttledSetQueue.returnedcallback.remove")
 				local identity = table.remove(hookState.queue, 1)
 				hookState.inQueue[identity] = nil
 				emittedCount += 1
+				debug.profileend()
 
+				debug.profilebegin("throttledSetQueue.returnedcallback.add")
 				if seen[identity] and not hookState.inQueue[identity] then
 					hookState.inQueue[identity] = true
 					table.insert(hookState.queue, identity)
 				end
+				debug.profileend()
 
+				debug.profileend()
 				return identity
 			end
 		end,
