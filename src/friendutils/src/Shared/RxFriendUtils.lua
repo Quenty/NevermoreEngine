@@ -17,10 +17,37 @@ local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
 
+local MAX_GET_CORE_ATTEMPTS = 10
+local GET_CORE_RETRY_INTERVAL = 1
+
 local RxFriendUtils = {}
 
 local function getUserId(player: Player): number
 	return if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+end
+
+local function awaitCore(coreName: string): any?
+	local lastError: any = nil
+
+	for attempt = 1, MAX_GET_CORE_ATTEMPTS do
+		local ok, result = pcall(function()
+			return StarterGui:GetCore(coreName)
+		end)
+
+		if ok then
+			return result
+		end
+
+		lastError = result
+
+		if attempt < MAX_GET_CORE_ATTEMPTS then
+			task.wait(GET_CORE_RETRY_INTERVAL)
+		end
+	end
+
+	warn(`[RxFriendUtils] Couldn't get core {coreName}: {tostring(lastError)}`)
+
+	return nil
 end
 
 --[=[
@@ -160,13 +187,34 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 		-- So just incase these connections throw, use a new thread so we don't error out the whole observable.
 		-- Only allow this while the game is running too
 		if observedPlayer == Players.LocalPlayer and RunService:IsRunning() then
+			-- awaitCore() yields, so the subscription may be cleaned up before it returns.
+			local cancelled = false
+			maid:GiveTask(function()
+				cancelled = true
+			end)
+
 			task.spawn(function()
-				maid:GiveTask(StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(otherPlayer: Player)
-					handleFriendState(otherPlayer, true)
-				end))
-				maid:GiveTask(StarterGui:GetCore("PlayerUnfriendedEvent").Event:Connect(function(otherPlayer: Player)
-					handleFriendState(otherPlayer, false)
-				end))
+				local friendedEvent = awaitCore("PlayerFriendedEvent")
+				if cancelled then
+					return
+				end
+
+				if friendedEvent then
+					maid:GiveTask(friendedEvent.Event:Connect(function(otherPlayer: Player)
+						handleFriendState(otherPlayer, true)
+					end))
+				end
+
+				local unfriendedEvent = awaitCore("PlayerUnfriendedEvent")
+				if cancelled then
+					return
+				end
+
+				if unfriendedEvent then
+					maid:GiveTask(unfriendedEvent.Event:Connect(function(otherPlayer: Player)
+						handleFriendState(otherPlayer, false)
+					end))
+				end
 			end)
 		end
 
