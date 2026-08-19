@@ -39,15 +39,25 @@ end
 
 type ThrottledSetQueueInput = { any } | Jecst.Query<any> | Jecst.Cached_Query<any>
 
-local function forEachIdentity(input: ThrottledSetQueueInput?, onIdentity: (any) -> ())
+local function forEachIdentity(input: ThrottledSetQueueInput?, onIdentity: (any, ...any) -> ())
 	if typeof(input) ~= "table" then
 		return
 	end
 
 	local mt = getmetatable(input :: any)
-	if typeof(mt) == "table" and mt.__iter ~= nil then
-		for identity in input :: Jecst.Query<any> do
-			if identity ~= nil then
+	if typeof(mt) == "table" and typeof(mt.__iter) == "function" then
+		-- Match Luau generic-for: __iter may return (next), or (next, state, var).
+		local iter, state, var = mt.__iter(input)
+		while true do
+			local packed = table.pack(iter(state, var))
+			local identity = packed[1]
+			if identity == nil then
+				break
+			end
+			var = identity
+			if packed.n > 1 then
+				onIdentity(identity, unpack(packed, 2, packed.n))
+			else
 				onIdentity(identity)
 			end
 		end
@@ -257,6 +267,12 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 
 		entity = function(entity: Jecst.Entity)
 			return { __hookentity = entity }
+		end,
+
+		-- Discriminator: parent the hook-state entity with ChildOf so GC
+		-- skips it while `parentEt` is still in the world.
+		preserve = function(parentEt: Jecst.Entity)
+			return { __hookentity = parentEt }
 		end,
 
 		filterDescendants = function(
@@ -1098,23 +1114,36 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			input: ThrottledSetQueueInput,
 			dis: any?,
 			maxCount: number?,
-			maxTime: number?
-		): () -> any?
+			maxTime: number?,
+			minCount: number?
+		): () -> ...any
 			debug.profilebegin("throttledSetQueue")
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
 
 			if hookState.queue == nil then
 				hookState.queue = {}
 				hookState.inQueue = {}
+				hookState.payloads = {}
 				hookMaid:GiveTask(function()
 					table.clear(hookState)
 				end)
 			end
 
+			if hookState.payloads == nil then
+				hookState.payloads = {}
+			end
+			local payloads = hookState.payloads
+
 			debug.profilebegin("throttledSetQueue.forEachIdentity")
 			local seen = {}
-			forEachIdentity(input, function(identity)
+			forEachIdentity(input, function(identity, ...)
 				seen[identity] = true
+				local extraCount = select("#", ...)
+				if extraCount > 0 then
+					payloads[identity] = table.pack(...)
+				else
+					payloads[identity] = nil
+				end
 				if not hookState.inQueue[identity] then
 					hookState.inQueue[identity] = true
 					table.insert(hookState.queue, identity)
@@ -1129,6 +1158,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					table.insert(kept, identity)
 				else
 					hookState.inQueue[identity] = nil
+					payloads[identity] = nil
 				end
 			end
 			hookState.queue = kept
@@ -1140,6 +1170,8 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			if countBudget == nil and maxTime == nil then
 				countBudget = 1
 			end
+			-- Floor: keep emitting until at least this many, even if count/time already elapsed.
+			local countFloor = minCount or 0
 			debug.profileend()
 
 			local emittedCount = 0
@@ -1152,10 +1184,11 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					origin = os.clock()
 					startedAt = origin
 				end
-				if countBudget ~= nil and emittedCount >= countBudget then
+				local metFloor = emittedCount >= countFloor
+				if countBudget ~= nil and emittedCount >= countBudget and metFloor then
 					return nil
 				end
-				if maxTime ~= nil and (os.clock() - origin) >= maxTime then
+				if maxTime ~= nil and (os.clock() - origin) >= maxTime and metFloor then
 					return nil
 				end
 				if #hookState.queue == 0 then
@@ -1176,6 +1209,10 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				debug.profileend()
 
 				debug.profileend()
+				local packed = payloads[identity]
+				if packed then
+					return identity, unpack(packed, 1, packed.n)
+				end
 				return identity
 			end
 		end,

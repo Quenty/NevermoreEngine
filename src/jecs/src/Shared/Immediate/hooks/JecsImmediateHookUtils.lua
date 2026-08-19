@@ -95,11 +95,14 @@ function JecsImmediateHookUtils.getOrCreateHookState<T>(
 
 	-- Find the hook state.
 	local hookStateEntity = hookBook.stateEntities[_firstKey][_discriminator]
-	if hookStateEntity then
+		if hookStateEntity then
 		if not rt.world:contains(hookStateEntity) then
 			hookBook.stateEntities[_firstKey][_discriminator] = nil
 			hookBook.orderOfCalls[_firstKey] = nil
 			error(`Hook state entity for {_filename}:{_line} with discriminator {_discriminator} is not in the world`)
+		end
+		if entityToParentTo then
+			rt.world:add(hookStateEntity, Jecs.pair(rt.comps.ChildOf, entityToParentTo))
 		end
 		local hookMaid = rt.world:get(hookStateEntity, rt.comps.Maid)
 		local mhs = rt.world:get(hookStateEntity, rt.comps.MetaHookState)
@@ -227,6 +230,10 @@ function JecsImmediateHookUtils.evaluateAndCleanupHooks(rt: ImmediateRuntime_Jec
 	local toDelete = {}
 	for entity, mhs, hs, _maid in rt.world:query(rt.comps.MetaHookState, rt.comps.HookState, rt.comps.Maid) do
 		if mhs.runtimePersistent then
+			continue
+		end
+		local parent = rt.world:target(entity, rt.comps.ChildOf)
+		if parent ~= nil and rt.world:contains(parent) then
 			continue
 		end
 		if not mhs.flagForCleanup then
