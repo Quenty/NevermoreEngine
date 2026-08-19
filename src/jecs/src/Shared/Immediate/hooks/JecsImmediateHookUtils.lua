@@ -8,7 +8,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jecs = require("Jecs")
-local JecsImmediateCommonHooks = require("JecsImmediateCommonHooks")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecst = require("Jecst")
 local Maid = require("Maid")
@@ -24,14 +23,16 @@ export type HookBook = {
 
 export type ImmediateJecsHookBookAddon = {
 	_hookBook: HookBook,
-	-- hooks: typeof(require("JecsImmediateCommonHooks")({} :: JecsImmediateInstall.ImmediateRuntime_Jecs)),
-	hooks: typeof(JecsImmediateCommonHooks({} :: JecsImmediateInstall.ImmediateRuntime_Jecs)),
 }
 
-export type ImmediateRuntime_Jecs_Hooks<Rt = {}> =
+-- Hook infrastructure only. `rt.hooks` is introduced later by
+-- JecsImmediateHooksCommonHooksInstall — Luau cannot overlay a nested field.
+export type ImmediateRuntime_Jecs_HookBook<Rt = {}> =
 	Rt
 	& JecsImmediateInstall.ImmediateRuntime_Jecs<Rt>
 	& ImmediateJecsHookBookAddon
+
+export type ImmediateRuntime_Jecs_Hooks<Rt = {}> = ImmediateRuntime_Jecs_HookBook<Rt>
 
 local function getHookBook(rt: ImmediateRuntime_Jecs_Hooks): HookBook
 	return assert(rt._hookBook, "ImmediateHooksInstall was not applied")

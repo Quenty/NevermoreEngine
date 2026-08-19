@@ -2,31 +2,32 @@
 --[=[
 	@class ImmediateHooksInstall
 
-	Runtime decorator: adds hookBook + common hooks, and optionally registers
+	Runtime decorator: adds hookBook + hook components, and registers
 	scheduler middleware (rtbuffer flush after each system, hook GC after the tick).
+
+	Does not attach `rt.hooks`. Stack JecsImmediateHooksCommonHooksInstall after
+	this so `hooks` is introduced as a new top-level field (Luau cannot overlay
+	a nested key for autocomplete).
 ]=]
 local require = require(script.Parent.loader).load(script)
 
 local ImmediateScheduler = require("ImmediateScheduler")
-local JecsImmediateCommonHooks = require("JecsImmediateCommonHooks")
 local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 local JecsImmediateHooksComponents = require("JecsImmediateHooksComponents")
 local JecsImmediateInstall = require("JecsImmediateInstall")
 local JecsImmediateUtils = require("JecsImmediateUtils")
 
-export type ImmediateRuntime_Jecs_Hooks<Rt = {}> =
-	JecsImmediateHookUtils.ImmediateRuntime_Jecs_Hooks<Rt>
-	& JecsImmediateHookUtils.ImmediateJecsHookBookAddon
+export type ImmediateRuntime_Jecs_HookBook<Rt = {}> = JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<Rt>
 
 return function<Rt>(
 	rt: JecsImmediateInstall.ImmediateRuntime_Jecs<Rt>,
 	scheduler: ImmediateScheduler.ImmediateScheduler
-): ImmediateRuntime_Jecs_Hooks<Rt>
+): ImmediateRuntime_Jecs_HookBook<Rt>
 	assert(rt.world, "JecsHooks requires Jecs to be installed first. Missing world")
 	assert(rt.comps, "JecsHooks requires Jecs to be installed first. Missing comps")
 	assert(rt.jecs, "JecsHooks requires Jecs to be installed first. Missing jecs")
 
-	local runtime = rt :: ImmediateRuntime_Jecs_Hooks<Rt>
+	local runtime = rt :: ImmediateRuntime_Jecs_HookBook<Rt>
 	if runtime.comps.MetaHookState == nil then
 		JecsImmediateUtils._registerComponentsWithWorld(
 			runtime.world,
@@ -39,9 +40,6 @@ return function<Rt>(
 			orderOfCalls = {},
 			stateEntities = {},
 		}
-	end
-	if runtime.hooks == nil then
-		runtime.hooks = JecsImmediateCommonHooks(runtime)
 	end
 
 	scheduler:RegisterSystem({
