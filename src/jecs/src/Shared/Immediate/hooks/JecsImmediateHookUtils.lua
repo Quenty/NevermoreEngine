@@ -38,6 +38,15 @@ local function getHookBook(rt: ImmediateRuntime_Jecs_Hooks): HookBook
 	return assert(rt._hookBook, "ImmediateHooksInstall was not applied")
 end
 
+function JecsImmediateHookUtils.bind<T, U..., V...>(arg: T, func: (T, U...) -> V...): (U...) -> V...
+	assert(type(arg) == "table", "'self' must be a table")
+	assert(type(func) == "function", "'func' must be a function")
+
+	return function(...: U...): V...
+		return (func :: any)(arg, ...)
+	end
+end
+
 function JecsImmediateHookUtils.getOrCreateHookState<T>(
 	rt: ImmediateRuntime_Jecs_Hooks,
 	discriminator: any,

@@ -5,15 +5,24 @@ local require = require(script.Parent.loader).load(script)
 
 local Jecs = require("Jecs")
 local JecsImmediateCoreComponents = require("JecsImmediateCoreComponents")
-local JecsImmediateInstall = require("JecsImmediateInstall")
 local Jecst = require("Jecst")
 local Maid = require("Maid")
 local Observable = require("Observable")
 
 local JecsImmediateUtils = {}
 
+export type JecsAddon = {
+	world: Jecst.World,
+	comps: JecsComponentDictionary,
+	jecs: typeof(Jecs),
+}
+
+-- export type ImmediateRuntime_Jecs<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & JecsAddon
+export type ImmediateRuntime_Jecs<Rt> = Rt & JecsAddon
+
 -- A component dictionary is a dictionary of component ids that also registers them to a JECS world (side effects).
-export type JecsComponentDictionary = { [string]: Jecst.Id<any> } & typeof(JecsImmediateCoreComponents({} :: Jecst.World))
+-- export type JecsComponentDictionary = { [string]: Jecst.Id<any> } & typeof(JecsImmediateCoreComponents({} :: Jecst.World))
+export type JecsComponentDictionary = typeof(JecsImmediateCoreComponents({} :: Jecst.World)) & { [string]: Jecst.Id<any> }
 
 -- A component info table is a table (commonly returned by modules) containing a common function to apply and return a component dictionary.
 -- You would make your own modules that expose this as a function, like SomeProjectHere._applyAndReturnComponentDictionary
@@ -142,7 +151,7 @@ function JecsImmediateUtils._setupComponentDictionaryWithWorld(
 	end
 end
 
-function JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(rt: JecsImmediateInstall.ImmediateRuntime_Jecs)
+function JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(rt: ImmediateRuntime_Jecs<any>)
 	local world = rt.world
 	local maidComponent = assert(rt.comps.Maid, "no Maid component in runtime")
 
@@ -180,11 +189,11 @@ function JecsImmediateUtils.firstOfQuery(query: Jecst.Query<any>): Jecst.Entity?
 	return nil
 end
 
-function JecsImmediateUtils.getMaid(r: JecsImmediateInstall.ImmediateRuntime_Jecs, entity: Jecst.Entity): Maid.Maid?
+function JecsImmediateUtils.getMaid(r: ImmediateRuntime_Jecs<any>, entity: Jecst.Entity): Maid.Maid?
 	return r.world:get(entity, r.comps.Maid)
 end
 
-function JecsImmediateUtils.getAMaid(r: JecsImmediateInstall.ImmediateRuntime_Jecs, entity: Jecst.Entity): Maid.Maid?
+function JecsImmediateUtils.getAMaid(r: ImmediateRuntime_Jecs<any>, entity: Jecst.Entity): Maid.Maid?
 	local directMaid = r.world:get(entity, r.comps.Maid)
 	if directMaid then
 		return directMaid
@@ -263,7 +272,7 @@ end
 -- but only this component. use chrec.removed to see if it's actually removed or if the
 -- component was simply a tag without data.
 function JecsImmediateUtils.observeComponentOnChanged(
-	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	r: ImmediateRuntime_Jecs<any>,
 	component: Jecst.Id<any>
 ): Observable.Observable<
 	Jecst.Entity,
@@ -289,7 +298,7 @@ function JecsImmediateUtils.observeComponentOnChanged(
 end
 
 function JecsImmediateUtils.observeComponentData(
-	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	r: ImmediateRuntime_Jecs<any>,
 	entity: Jecst.Entity,
 	component: Jecst.Id<any>
 ): Observable.Observable<any>
@@ -318,7 +327,7 @@ function JecsImmediateUtils.observeComponentData(
 end
 
 function JecsImmediateUtils.addChangeCallback(
-	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	r: ImmediateRuntime_Jecs<any>,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
@@ -340,7 +349,7 @@ function JecsImmediateUtils.addChangeCallback(
 end
 
 function JecsImmediateUtils.addAddCallback(
-	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	r: ImmediateRuntime_Jecs<any>,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, data: any) -> (),
 	key: any?
@@ -362,7 +371,7 @@ function JecsImmediateUtils.addAddCallback(
 end
 
 function JecsImmediateUtils.addRemoveCallback(
-	r: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	r: ImmediateRuntime_Jecs<any>,
 	component: Jecst.Id<any>,
 	callback: (entity: Jecst.Entity, id: number, delete: boolean?) -> (),
 	key: any?
@@ -384,7 +393,7 @@ function JecsImmediateUtils.addRemoveCallback(
 end
 
 function JecsImmediateUtils.patch(
-	rt: JecsImmediateInstall.ImmediateRuntime_Jecs,
+	rt: ImmediateRuntime_Jecs<any>,
 	et: Jecst.Entity,
 	comp: Jecst.Id<any>,
 	partialData: { any }

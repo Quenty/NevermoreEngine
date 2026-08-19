@@ -33,6 +33,7 @@ local require = require(script.Parent.loader).load(script)
 
 local ImmediateScheduler = require("ImmediateScheduler")
 local ImmediateCoreUtils = require("ImmediateCoreUtils")
+local Iris = require("Iris")
 
 local BEGIN_PRIORITY = 0
 local END_PRIORITY = 100
@@ -43,9 +44,9 @@ local HOST_DISPLAY_ORDER = 2147483647 - 4096
 
 export type IrisAddon = {
 	-- The Iris module, only while it is safe to declare widgets this tick.
-	iris: any?,
+	iris: typeof(Iris)?,
 	-- Always the Iris module once required; not for widget drawing.
-	_raw_iris: any,
+	_raw_iris: typeof(Iris),
 	irisParent: (BasePlayerGui | GuiBase2d)?,
 }
 
@@ -130,7 +131,7 @@ end
 return function<Rt>(rt: Rt & ImmediateCoreUtils.ImmediateRuntime, scheduler: ImmediateScheduler.ImmediateScheduler): ImmediateRuntime_Iris<Rt>
 	local runtime = rt :: ImmediateRuntime_Iris<Rt>
 	if runtime._raw_iris == nil then
-		runtime._raw_iris = require("Iris")
+		runtime._raw_iris = Iris
 	end
 
 	if scheduler and RunService:IsClient() then

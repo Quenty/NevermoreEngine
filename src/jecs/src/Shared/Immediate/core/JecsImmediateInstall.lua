@@ -17,18 +17,22 @@ local JecsImmediateCoreComponents = require("JecsImmediateCoreComponents")
 local JecsImmediateUtils = require("JecsImmediateUtils")
 local Jecst = require("Jecst")
 
+export type JecsComponentDictionary = typeof(JecsImmediateCoreComponents({} :: Jecst.World)) & { [string]: Jecst.Id<any> }
+
 export type JecsAddon = {
 	world: Jecst.World,
-	comps: JecsImmediateUtils.JecsComponentDictionary,
+	comps: JecsComponentDictionary,
 	jecs: typeof(Jecs),
 }
-export type ImmediateRuntime_Jecs<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & JecsAddon
+
+-- export type ImmediateRuntime_Jecs<Rt = {}> = Rt & ImmediateCoreUtils.ImmediateRuntime & JecsAddon
+export type ImmediateRuntime_Jecs<Rt> = Rt & JecsAddon
 
 local function install<Rt>(
 	rt: Rt,
 	components: JecsImmediateUtils.JecsComponentDictionary?,
-	DEBUG: boolean?
-): ImmediateRuntime_Jecs<Rt>
+	DEBUG: boolean? -- ): ImmediateRuntime_Jecs<Rt>
+)
 	local runtime = rt :: Rt & ImmediateCoreUtils.ImmediateRuntime
 	local world = Jecs.world(DEBUG)
 	-- Jecs World has no Destroy; Maid.Add would warn and no-op on cleanup.
@@ -51,12 +55,12 @@ local function install<Rt>(
 
 	JecsImmediateUtils._setupRuntimeMaidComponentCallbacks(runtime)
 
-	return runtime
+	return runtime :: ImmediateRuntime_Jecs<Rt>
 end
 
 -- Factory: close over components/DEBUG, return an ImmediateInstall addon.
 return function(components: JecsImmediateUtils.JecsComponentDictionary?, DEBUG: boolean?)
 	return function<Rt>(rt: Rt, _scheduler: ImmediateScheduler.ImmediateScheduler): ImmediateRuntime_Jecs<Rt>
-		return install(rt, components, DEBUG)
+		return install(rt, components, DEBUG) :: ImmediateRuntime_Jecs<Rt>
 	end
 end
