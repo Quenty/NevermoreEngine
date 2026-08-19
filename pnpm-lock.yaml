@@ -6122,6 +6122,9 @@ importers:
 
   src/transitionmodel:
     dependencies:
+      '@quenty/acceltween':
+        specifier: workspace:*
+        version: link:../acceltween
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
@@ -6158,6 +6161,9 @@ importers:
       '@quenty/spring':
         specifier: workspace:*
         version: link:../spring
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/timedtween':
         specifier: workspace:*
         version: link:../timedtween
