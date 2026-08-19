@@ -1019,6 +1019,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
       '@quenty/qframe':
         specifier: workspace:*
         version: link:../qframe
@@ -1034,6 +1037,9 @@ importers:
       '@quenty/steputils':
         specifier: workspace:*
         version: link:../steputils
+      '@quenty/transitionmodel':
+        specifier: workspace:*
+        version: link:../transitionmodel
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
@@ -6030,6 +6036,9 @@ importers:
       '@quenty/math':
         specifier: workspace:*
         version: link:../math
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -6048,6 +6057,9 @@ importers:
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/timesyncservice:
     dependencies:

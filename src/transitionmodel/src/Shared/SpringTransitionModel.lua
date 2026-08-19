@@ -5,16 +5,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BasicPane = require("BasicPane")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
-local Signal = require("Signal")
 local SpringObject = require("SpringObject")
 local SpringUtils = require("SpringUtils")
 local TransitionModel = require("TransitionModel")
 
-local SpringTransitionModel = setmetatable({}, BasicPane)
+local SpringTransitionModel = setmetatable({}, TransitionModel)
 SpringTransitionModel.ClassName = "SpringTransitionModel"
 SpringTransitionModel.__index = SpringTransitionModel
 
@@ -24,14 +23,10 @@ export type SpringTransitionModel<T> =
 			_showTarget: any,
 			_hideTarget: any,
 			_springObject: any,
-			_transitionModel: TransitionModel.TransitionModel,
-
-			HidingComplete: Signal.Signal<()>,
-			ShowingComplete: Signal.Signal<()>,
 		},
 		{} :: typeof({ __index = SpringTransitionModel })
 	))
-	& BasicPane.BasicPane
+	& TransitionModel.TransitionModel
 
 --[=[
 	A transition model that has a spring underlying it. Very useful
@@ -42,28 +37,32 @@ export type SpringTransitionModel<T> =
 	@return SpringTransitionModel<T>
 ]=]
 function SpringTransitionModel.new<T>(showTarget: T?, hideTarget: T?): SpringTransitionModel<T>
-	local self: SpringTransitionModel<T> = setmetatable(BasicPane.new() :: any, SpringTransitionModel)
+	local self: SpringTransitionModel<T> = setmetatable(TransitionModel.new() :: any, SpringTransitionModel)
 
 	self._showTarget = showTarget or 1
 	self._hideTarget = hideTarget
 
-	self._transitionModel = self._maid:Add(TransitionModel.new())
-	self._transitionModel:BindToPaneVisbility(self)
-
-	self.HidingComplete = self._transitionModel.HidingComplete
-	self.ShowingComplete = self._transitionModel.ShowingComplete
-
 	self._springObject = self._maid:Add(SpringObject.new(self:_computeHideTarget()))
 	self._springObject.Speed = 30
 
-	self._transitionModel:SetPromiseShow(function(maid, doNotAnimate)
+	self:SetPromiseShow(function(maid, doNotAnimate)
 		return self:_promiseShow(maid, doNotAnimate)
 	end)
-	self._transitionModel:SetPromiseHide(function(maid, doNotAnimate)
+	self:SetPromiseHide(function(maid, doNotAnimate)
 		return self:_promiseHide(maid, doNotAnimate)
 	end)
 
 	return self
+end
+
+--[=[
+	Returns true if it's a spring transition model
+
+	@param value any
+	@return boolean
+]=]
+function SpringTransitionModel.isSpringTransitionModel(value: any): boolean
+	return DuckTypeUtils.isImplementation(SpringTransitionModel, value)
 end
 
 --[=[
@@ -95,69 +94,6 @@ function SpringTransitionModel.SetHideTarget<T>(self: SpringTransitionModel<T>, 
 		self._springObject:SetTarget(self._showTarget, doNotAnimate)
 	else
 		self._springObject:SetTarget(self:_computeHideTarget(), doNotAnimate)
-	end
-end
-
---[=[
-	Returns true if showing is complete
-	@return boolean
-]=]
-function SpringTransitionModel.IsShowingComplete<T>(self: SpringTransitionModel<T>): boolean
-	return self._transitionModel:IsShowingComplete()
-end
-
---[=[
-	Returns true if hiding is complete
-	@return boolean
-]=]
-function SpringTransitionModel.IsHidingComplete<T>(self: SpringTransitionModel<T>): boolean
-	return self._transitionModel:IsHidingComplete()
-end
-
---[=[
-	Observe is showing is complete
-	@return Observable<boolean>
-]=]
-function SpringTransitionModel.ObserveIsShowingComplete<T>(self: SpringTransitionModel<T>): Observable.Observable<boolean>
-	return self._transitionModel:ObserveIsShowingComplete()
-end
-
---[=[
-	Observe is hiding is complete
-	@return Observable<boolean>
-]=]
-function SpringTransitionModel.ObserveIsHidingComplete<T>(self: SpringTransitionModel<T>): Observable.Observable<boolean>
-	return self._transitionModel:ObserveIsHidingComplete()
-end
-
---[=[
-	Binds the transition model to the actual visiblity of the pane
-
-	@param pane BasicPane
-	@return function -- Cleanup function
-]=]
-function SpringTransitionModel.BindToPaneVisbility<T>(self: SpringTransitionModel<T>, pane: BasicPane.BasicPane): () -> ()
-	local maid = Maid.new()
-
-	maid:GiveTask(pane.VisibleChanged:Connect(function(isVisible, doNotAnimate)
-		self:SetVisible(isVisible, doNotAnimate)
-	end))
-	maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
-		pane:SetVisible(isVisible, doNotAnimate)
-	end))
-
-	self:SetVisible(pane:IsVisible())
-
-	self._maid._visibleBinding = maid
-
-	return function()
-		if not self.Destroy then
-			return
-		end
-
-		if self._maid._visibleBinding == maid then
-			self._maid._visibleBinding = nil
-		end
 	end
 end
 
@@ -219,39 +155,6 @@ end
 ]=]
 function SpringTransitionModel.Observe<T>(self: SpringTransitionModel<T>): Observable.Observable<T>
 	return self._springObject:Observe()
-end
-
---[=[
-	Shows the model and promises when the showing is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function SpringTransitionModel.PromiseShow<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
-	return self._transitionModel:PromiseShow(doNotAnimate)
-end
-
---[=[
-	Hides the model and promises when the hiding is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function SpringTransitionModel.PromiseHide<T>(self: SpringTransitionModel<T>, doNotAnimate: boolean?): Promise.Promise<()>
-	return self._transitionModel:PromiseHide(doNotAnimate)
-end
-
---[=[
-	Toggles the model and promises when the transition is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function SpringTransitionModel.PromiseToggle<T>(
-	self: SpringTransitionModel<T>,
-	doNotAnimate: boolean?
-): Promise.Promise<()>
-	return self._transitionModel:PromiseToggle(doNotAnimate)
 end
 
 function SpringTransitionModel._promiseShow<T>(
