@@ -5,7 +5,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local BasicPane = require("BasicPane")
+local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
@@ -13,19 +13,18 @@ local TimedTween = require("TimedTween")
 local TransitionModel = require("TransitionModel")
 local ValueObject = require("ValueObject")
 
-local TimedTransitionModel = setmetatable({}, BasicPane)
+local TimedTransitionModel = setmetatable({}, TransitionModel)
 TimedTransitionModel.ClassName = "TimedTransitionModel"
 TimedTransitionModel.__index = TimedTransitionModel
 
 export type TimedTransitionModel =
 	typeof(setmetatable(
 		{} :: {
-			_transitionModel: TransitionModel.TransitionModel,
 			_timedTween: TimedTween.TimedTween,
 		},
 		{} :: typeof({ __index = TimedTransitionModel })
 	))
-	& BasicPane.BasicPane
+	& TransitionModel.TransitionModel
 
 --[=[
 	A transition model that has a spring underlying it. Very useful
@@ -35,22 +34,28 @@ export type TimedTransitionModel =
 	@return TimedTransitionModel
 ]=]
 function TimedTransitionModel.new(transitionTime: ValueObject.Mountable<number>?): TimedTransitionModel
-	local self: TimedTransitionModel = setmetatable(BasicPane.new() :: any, TimedTransitionModel)
-
-	self._transitionModel = self._maid:Add(TransitionModel.new())
-	self._transitionModel:BindToPaneVisbility(self)
+	local self: TimedTransitionModel = setmetatable(TransitionModel.new() :: any, TimedTransitionModel)
 
 	self._timedTween = self._maid:Add(TimedTween.new(transitionTime))
 
-	-- State
-	self._transitionModel:SetPromiseShow(function(maid, doNotAnimate)
+	self:SetPromiseShow(function(maid, doNotAnimate)
 		return self:_promiseShow(maid, doNotAnimate)
 	end)
-	self._transitionModel:SetPromiseHide(function(maid, doNotAnimate)
+	self:SetPromiseHide(function(maid, doNotAnimate)
 		return self:_promiseHide(maid, doNotAnimate)
 	end)
 
 	return self
+end
+
+--[=[
+	Returns true if it's a timed transition model
+
+	@param value any
+	@return boolean
+]=]
+function TimedTransitionModel.isTimedTransitionModel(value: any): boolean
+	return DuckTypeUtils.isImplementation(TimedTransitionModel, value)
 end
 
 --[=[
@@ -63,69 +68,6 @@ function TimedTransitionModel.SetTransitionTime(
 	transitionTime: ValueObject.Mountable<number>
 ): () -> ()
 	return self._timedTween:SetTransitionTime(transitionTime)
-end
-
---[=[
-	Returns true if showing is complete
-	@return boolean
-]=]
-function TimedTransitionModel.IsShowingComplete(self: TimedTransitionModel): boolean
-	return self._transitionModel:IsShowingComplete()
-end
-
---[=[
-	Returns true if hiding is complete
-	@return boolean
-]=]
-function TimedTransitionModel.IsHidingComplete(self: TimedTransitionModel): boolean
-	return self._transitionModel:IsHidingComplete()
-end
-
---[=[
-	Observe is showing is complete
-	@return Observable<boolean>
-]=]
-function TimedTransitionModel.ObserveIsShowingComplete(self: TimedTransitionModel): Observable.Observable<boolean>
-	return self._transitionModel:ObserveIsShowingComplete()
-end
-
---[=[
-	Observe is hiding is complete
-	@return Observable<boolean>
-]=]
-function TimedTransitionModel.ObserveIsHidingComplete(self: TimedTransitionModel): Observable.Observable<boolean>
-	return self._transitionModel:ObserveIsHidingComplete()
-end
-
---[=[
-	Binds the transition model to the actual visiblity of the pane
-
-	@param pane BasicPane
-	@return function -- Cleanup function
-]=]
-function TimedTransitionModel.BindToPaneVisbility(self: TimedTransitionModel, pane: BasicPane.BasicPane): () -> ()
-	local maid = Maid.new()
-
-	maid:GiveTask(pane.VisibleChanged:Connect(function(isVisible, doNotAnimate)
-		self:SetVisible(isVisible, doNotAnimate)
-	end))
-	maid:GiveTask(self.VisibleChanged:Connect(function(isVisible, doNotAnimate)
-		pane:SetVisible(isVisible, doNotAnimate)
-	end))
-
-	self:SetVisible(pane:IsVisible())
-
-	self._maid._visibleBinding = maid
-
-	return function()
-		if not self.Destroy then
-			return
-		end
-
-		if self._maid._visibleBinding == maid then
-			self._maid._visibleBinding = nil
-		end
-	end
 end
 
 --[=[
@@ -143,36 +85,6 @@ end
 ]=]
 function TimedTransitionModel.Observe(self: TimedTransitionModel): Observable.Observable<number>
 	return self._timedTween:Observe()
-end
-
---[=[
-	Shows the model and promises when the showing is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function TimedTransitionModel.PromiseShow(self: TimedTransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
-	return self._transitionModel:PromiseShow(doNotAnimate)
-end
-
---[=[
-	Hides the model and promises when the showing is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function TimedTransitionModel.PromiseHide(self: TimedTransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
-	return self._transitionModel:PromiseHide(doNotAnimate)
-end
-
---[=[
-	Toggles the model and promises when the transition is complete.
-
-	@param doNotAnimate boolean?
-	@return Promise
-]=]
-function TimedTransitionModel.PromiseToggle(self: TimedTransitionModel, doNotAnimate: boolean?): Promise.Promise<()>
-	return self._transitionModel:PromiseToggle(doNotAnimate)
 end
 
 function TimedTransitionModel._promiseShow(

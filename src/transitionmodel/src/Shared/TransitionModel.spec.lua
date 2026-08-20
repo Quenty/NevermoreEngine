@@ -106,6 +106,176 @@ describe("transitions without callbacks", function()
 	end)
 end)
 
+describe("TransitionModel:SetVisible", function()
+	it("snaps an in-flight transition when re-set to the same visibility with doNotAnimate", function()
+		local calls = 0
+		local lastDoNotAnimate: boolean? = nil
+		transitionModel:SetPromiseShow(function(_callbackMaid: Maid.Maid, doNotAnimate: boolean?)
+			calls += 1
+			lastDoNotAnimate = doNotAnimate
+			return if doNotAnimate then Promise.resolved() else Promise.new()
+		end)
+
+		transitionModel:Show()
+		expect(calls).toBe(1)
+		expect(transitionModel:IsShowingComplete()).toBe(false)
+
+		transitionModel:Show(true)
+
+		expect(calls).toBe(2)
+		expect(lastDoNotAnimate).toBe(true)
+		expect(transitionModel:IsShowingComplete()).toBe(true)
+	end)
+
+	it("does not restart a completed transition re-set with doNotAnimate", function()
+		local showingComplete = trackFires(transitionModel.ShowingComplete)
+
+		transitionModel:Show()
+		expect(showingComplete()).toBe(1)
+
+		transitionModel:Show(true)
+
+		expect(showingComplete()).toBe(1)
+	end)
+
+	it("rejects a visibility that is not a boolean", function()
+		expect(function()
+			transitionModel:SetVisible(5 :: any)
+		end).toThrow()
+	end)
+end)
+
+describe("TransitionModel.SkipAnimationRequested", function()
+	it("fires when asked for the visibility already held with doNotAnimate", function()
+		local fired: { boolean } = {}
+		maid:GiveTask(transitionModel.SkipAnimationRequested:Connect(function(isVisible)
+			table.insert(fired, isVisible)
+		end))
+
+		transitionModel:Hide(true)
+		transitionModel:Show()
+		transitionModel:Show(true)
+
+		expect(fired).toEqual({ false, true })
+	end)
+
+	it("does not fire when the visibility actually changes", function()
+		local fires = trackFires(transitionModel.SkipAnimationRequested :: any)
+
+		transitionModel:Show(true)
+		transitionModel:Hide(true)
+
+		expect(fires()).toBe(0)
+	end)
+
+	it("does not fire without doNotAnimate", function()
+		local fires = trackFires(transitionModel.SkipAnimationRequested :: any)
+
+		transitionModel:Show()
+		transitionModel:Show()
+
+		expect(fires()).toBe(0)
+	end)
+
+	it("lets a listener snap alongside the model's own transition", function()
+		local snapped = 0
+		maid:GiveTask(transitionModel.SkipAnimationRequested:Connect(function()
+			snapped += 1
+		end))
+
+		transitionModel:SetPromiseShow(function(_callbackMaid: Maid.Maid, doNotAnimate: boolean?)
+			return if doNotAnimate then Promise.resolved() else Promise.new()
+		end)
+
+		transitionModel:Show()
+		expect(transitionModel:IsShowingComplete()).toBe(false)
+
+		transitionModel:Show(true)
+
+		expect(snapped).toBe(1)
+		expect(transitionModel:IsShowingComplete()).toBe(true)
+	end)
+end)
+
+describe("TransitionModel:_restartTransition", function()
+	it("re-runs the show callback while visible", function()
+		local shown, hidden = 0, 0
+		transitionModel:SetPromiseShow(function()
+			shown += 1
+			return Promise.resolved()
+		end)
+		transitionModel:SetPromiseHide(function()
+			hidden += 1
+			return Promise.resolved()
+		end)
+
+		transitionModel:Show()
+		expect(shown).toBe(1)
+
+		transitionModel:_restartTransition()
+
+		expect(shown).toBe(2)
+		expect(hidden).toBe(0)
+		expect(transitionModel:IsVisible()).toBe(true)
+	end)
+
+	it("re-runs the hide callback while hidden", function()
+		local hidden = 0
+		transitionModel:SetPromiseHide(function()
+			hidden += 1
+			return Promise.resolved()
+		end)
+
+		transitionModel:_restartTransition()
+
+		expect(hidden).toBe(1)
+		expect(transitionModel:IsVisible()).toBe(false)
+	end)
+
+	it("re-fires the completion signal for the restarted transition", function()
+		local showingComplete = trackFires(transitionModel.ShowingComplete)
+
+		transitionModel:Show()
+		expect(showingComplete()).toBe(1)
+
+		transitionModel:_restartTransition()
+
+		expect(showingComplete()).toBe(2)
+	end)
+
+	it("abandons the in-flight transition it replaces", function()
+		local cleaned = false
+		transitionModel:SetPromiseShow(function(callbackMaid: Maid.Maid)
+			callbackMaid:GiveTask(function()
+				cleaned = true
+			end)
+			return Promise.new()
+		end)
+
+		transitionModel:Show()
+		expect(cleaned).toBe(false)
+
+		transitionModel:_restartTransition()
+
+		expect(cleaned).toBe(true)
+	end)
+
+	it("passes doNotAnimate through to the callback", function()
+		local lastDoNotAnimate: boolean? = nil
+		transitionModel:SetPromiseShow(function(_callbackMaid: Maid.Maid, doNotAnimate: boolean?)
+			lastDoNotAnimate = doNotAnimate
+			return Promise.resolved()
+		end)
+
+		transitionModel:Show()
+		expect(lastDoNotAnimate).toBe(nil)
+
+		transitionModel:_restartTransition(true)
+
+		expect(lastDoNotAnimate).toBe(true)
+	end)
+end)
+
 describe("TransitionModel:SetPromiseShow", function()
 	it("holds showing incomplete until the returned promise resolves", function()
 		local callbackPromise = Promise.new()

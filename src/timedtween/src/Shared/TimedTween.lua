@@ -38,6 +38,7 @@ export type TimedTween =
 		{} :: {
 			_state: ValueObject.ValueObject<TimedTweenState>,
 			_transitionTime: ValueObject.ValueObject<number>,
+			_clock: () -> number,
 
 			-- From BasicPane
 			IsVisible: (self: TimedTween) -> boolean,
@@ -58,6 +59,7 @@ export type TimedTween =
 function TimedTween.new(transitionTime: ValueObject.Mountable<number>?): TimedTween
 	local self: TimedTween = setmetatable(BasicPane.new() :: any, TimedTween)
 
+	self._clock = os.clock
 	self._transitionTime = self._maid:Add(ValueObject.new(0.15, "number"))
 	self._state = self._maid:Add(ValueObject.new({
 		p0 = 0,
@@ -83,6 +85,30 @@ function TimedTween.new(transitionTime: ValueObject.Mountable<number>?): TimedTw
 end
 
 --[=[
+	Sets the tween to be visible.
+
+	Unlike [BasicPane.SetVisible], re-setting the visibility the tween already has with
+	`doNotAnimate` is not a no-op: the boolean has not changed, but the tween may still be
+	running, and `doNotAnimate` means the caller wants it finished now.
+
+	@param isVisible boolean -- Whether or not the tween should be visible
+	@param doNotAnimate boolean? -- True if this visiblity should not animate
+]=]
+function TimedTween.SetVisible(self: TimedTween, isVisible: boolean, doNotAnimate: boolean?)
+	assert(type(isVisible) == "boolean", "Bad isVisible")
+
+	if doNotAnimate and self:IsVisible() == isVisible then
+		if self:_computeState(self._clock()).rtime > 0 then
+			self:_updateState(true)
+		end
+
+		return
+	end
+
+	BasicPane.SetVisible(self, isVisible, doNotAnimate)
+end
+
+--[=[
 	Sets the transition time
 
 	@param transitionTime ValueObject.Mountable<number>
@@ -99,6 +125,40 @@ end
 ]=]
 function TimedTween.GetTransitionTime(self: TimedTween): number
 	return self._transitionTime.Value
+end
+
+--[=[
+	Sets the clock the tween reads time from. Defaults to `os.clock`.
+
+	Safe to call mid-tween. The stored times are shifted onto the new clock's timebase, so the
+	current position, the transition duration, and the time left all carry over exactly -- the
+	animation neither jumps nor restarts.
+
+	@param clock () -> number
+]=]
+function TimedTween.SetClock(self: TimedTween, clock: () -> number): ()
+	assert(type(clock) == "function", "Bad clock")
+
+	local state = self._state.Value
+	local delta = clock() - self._clock()
+
+	self._clock = clock
+
+	self._state.Value = {
+		p0 = state.p0,
+		p1 = state.p1,
+		t0 = state.t0 + delta,
+		t1 = state.t1 + delta,
+	}
+end
+
+--[=[
+	Gets the clock the tween reads time from.
+
+	@return () -> number
+]=]
+function TimedTween.GetClock(self: TimedTween): () -> number
+	return self._clock
 end
 
 --[=[
@@ -130,7 +190,7 @@ function TimedTween.ObserveOnSignal(self: TimedTween, signal: RBXScriptSignal): 
 		local maid = Maid.new()
 
 		local startAnimate, stopAnimate = StepUtils.bindToSignal(signal, function()
-			local state = self:_computeState(os.clock())
+			local state = self:_computeState(self._clock())
 			sub:Fire(state.p)
 			return state.rtime > 0
 		end)
@@ -158,7 +218,7 @@ end
 	@return Promise
 ]=]
 function TimedTween.PromiseFinished(self: TimedTween): Promise.Promise<()>
-	local initState = self:_computeState(os.clock())
+	local initState = self:_computeState(self._clock())
 	if initState.rtime <= 0 then
 		return Promise.resolved()
 	end
@@ -168,15 +228,13 @@ function TimedTween.PromiseFinished(self: TimedTween): Promise.Promise<()>
 	maid:GiveTask(promise)
 
 	maid:GiveTask(self._state:Observe():Subscribe(function()
-		local state = self:_computeState(os.clock())
+		local state = self:_computeState(self._clock())
 		if state.rtime <= 0 then
 			promise:Resolve()
 			return
 		end
 
-		maid._scheduled = task.delay(state.rtime, function()
-			promise:Resolve()
-		end)
+		maid._scheduled = self:_scheduleFinish(state.rtime, promise)
 	end))
 
 	self._maid[promise] = maid
@@ -191,11 +249,41 @@ function TimedTween.PromiseFinished(self: TimedTween): Promise.Promise<()>
 	return promise
 end
 
+--[=[
+	Schedules resolving a finish promise, returning a task that cancels the schedule.
+
+	`task.delay` counts wall time, which only tracks the tween while the clock is the real one.
+	Under an injected clock the time left is in that clock's units and may not advance with wall
+	time at all, so poll that clock each frame instead. The default clock keeps the cheap path.
+
+	@private
+]=]
+function TimedTween._scheduleFinish(self: TimedTween, rtime: number, promise: Promise.Promise<()>): any
+	if self._clock == os.clock then
+		return task.delay(rtime, function()
+			promise:Resolve()
+		end)
+	end
+
+	local startPoll, stopPoll = StepUtils.bindToSignal(StepUtils.getAnimationStepSignal(), function()
+		if self:_computeState(self._clock()).rtime > 0 then
+			return true
+		end
+
+		promise:Resolve()
+		return false
+	end)
+
+	startPoll()
+
+	return stopPoll
+end
+
 function TimedTween._updateState(self: TimedTween, doNotAnimate: boolean?): ()
 	local transitionTime = self._transitionTime.Value
 	local target = self:IsVisible() and 1 or 0
 
-	local now = os.clock()
+	local now = self._clock()
 	local computed: ComputedState = self:_computeState(now)
 	local p0 = computed.p
 
@@ -228,7 +316,10 @@ function TimedTween._computeState(self: TimedTween, now: number): ComputedState
 		p = Math.map(math.clamp(now, state.t0, state.t1), state.t0, state.t1, state.p0, state.p1)
 	end
 
-	local rtime = math.abs(state.p1 - p) * duration
+	-- Time left, not distance left. `duration` is already scaled by the distance being covered
+	-- (see _updateState), so deriving this from the remaining distance double-counts it and
+	-- reports short for any transition that does not cover the full 0-1 range.
+	local rtime = math.clamp(state.t1 - now, 0, duration)
 
 	local v
 	if rtime > 0 and duration > 0 then
