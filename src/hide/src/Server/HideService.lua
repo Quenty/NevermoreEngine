@@ -17,6 +17,7 @@ function HideService:Init(serviceBag: ServiceBag.ServiceBag)
 	-- Binders
 	self._serviceBag:GetService(require("Hide"))
 	self._serviceBag:GetService(require("DynamicHide"))
+	self._serviceBag:GetService(require("StudioEditOnly"))
 end
 
 return HideService
