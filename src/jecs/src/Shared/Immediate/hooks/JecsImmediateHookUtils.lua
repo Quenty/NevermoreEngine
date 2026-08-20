@@ -95,7 +95,7 @@ function JecsImmediateHookUtils.getOrCreateHookState<T>(
 
 	-- Find the hook state.
 	local hookStateEntity = hookBook.stateEntities[_firstKey][_discriminator]
-		if hookStateEntity then
+	if hookStateEntity then
 		if not rt.world:contains(hookStateEntity) then
 			hookBook.stateEntities[_firstKey][_discriminator] = nil
 			hookBook.orderOfCalls[_firstKey] = nil
