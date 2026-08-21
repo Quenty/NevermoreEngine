@@ -1661,7 +1661,7 @@ function HasSaveSlotsDataStore._stagePlaytime(
 	slotId: SaveSlotData.SlotId,
 	slot: Folder
 ): ()
-	if self._metadataStore == nil or self:_isEphemeral(slotId) then
+	if self._metadataStore == nil or not self._metadataStore.Destroy or self:_isEphemeral(slotId) then
 		return
 	end
 
