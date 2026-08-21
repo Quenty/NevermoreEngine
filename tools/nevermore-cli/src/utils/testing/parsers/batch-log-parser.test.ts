@@ -151,6 +151,241 @@ describe('parseBatchTestLogs', () => {
     expect(result?.testCounts?.failed).toBe(0);
     expect(result?.tracebackCount).toBe(1);
   });
+
+  it('fails a section containing a traceback', () => {
+    const logs = buildLogs(
+      [
+        'Tests:  155 passed, 155 total',
+        'PlayerBadgeHelper: attempt to index nil',
+        'Stack Begin',
+        "Script 'PlayerBadgeHelper', Line 365",
+        'Stack End',
+      ].join('\n')
+    );
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('Luau traceback(s)');
+  });
+
+  it('takes the whole inner string as the slug when END has no PASS or FAIL', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.testCounts).toEqual({ passed: 5, failed: 0, total: 5 });
+  });
+
+  it('records no duration for an END that carries none', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.durationMs).toBeUndefined();
+  });
+
+  it('falls back to the END marker duration when the summary entry omits one', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS 4242===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.durationMs).toBe(4242);
+  });
+
+  it('lets only the first BEGIN-less END claim the output above it', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.testCounts?.total).toBe(10);
+    expect(results.get('beta')?.testCounts).toBeUndefined();
+    expect(results.get('beta')?.logs).toBe('');
+    expect(results.get('beta')?.error).toContain(
+      'no output could be attributed'
+    );
+  });
+
+  it('distinguishes a reported Luau error from an absent summary entry', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha FAIL 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":false,"error":"boom"}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.success).toBe(false);
+    expect(results.get('alpha')?.error).toBe(
+      'the batch runner reported a Luau error'
+    );
+    expect(results.get('beta')?.success).toBe(false);
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('reads every package as missing when the summary payload is not JSON', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      'not json at all',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('reads every package as missing when no summary arrived at all', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('joins several failure reasons with a semicolon', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  2 failed, 8 passed, 10 total',
+      'Test Suites:  1 failed, 3 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.error).toBe(
+      'the batch runner reported a Luau error; ' +
+        '1 test suite(s) failed; 2 test(s) failed'
+    );
+  });
+
+  it('treats a marker missing its trailing delimiter as ordinary content', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '===BATCH_TEST_BEGIN egghunt2026',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS 5===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.logs).toContain('===BATCH_TEST_BEGIN egghunt2026');
+    expect(result?.testCounts).toEqual({ passed: 5, failed: 0, total: 5 });
+  });
+
+  it('hands unattributable output to the first package only', () => {
+    const threePackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+      ['gamma', 'gamma'],
+    ]);
+    const logs = [
+      'PlayerBadgeHelper: attempt to index nil',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true},' +
+        '{"slug":"gamma","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, threePackages);
+
+    expect(results.get('alpha')?.logs).toContain('PlayerBadgeHelper');
+    expect(results.get('beta')?.logs).toBe('');
+    expect(results.get('gamma')?.logs).toBe('');
+  });
+
+  it('fails an empty section for having no jest report, with no counts', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '===BATCH_TEST_END egghunt2026 PASS 0===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.logs).toBe('');
+    expect(result?.error).toBe(
+      'no jest report in output — nothing proves any test ran'
+    );
+    // No counts were seen, so none are reported — an empty section is not zero.
+    expect(result?.testCounts).toBeUndefined();
+  });
 });
 
 describe('findSummaryEntries', () => {
