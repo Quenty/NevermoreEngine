@@ -1,13 +1,14 @@
 {
   "name": "@quenty/immediateutils",
   "version": "1.1.0",
-  "description": "Immediate-mode ECS loop and hooks built on jecs",
+  "description": "Immediate-mode ECS loop and hooks implemented via jecs+iris addons",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
     "ecs",
     "jecs",
+    "iris",
     "immediate"
   ],
   "bugs": {
@@ -33,7 +34,6 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
-    "@quenty/jecs": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
@@ -43,6 +43,7 @@
     "@quenty/signal": "workspace:*",
     "@quenty/spring": "workspace:*",
     "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {

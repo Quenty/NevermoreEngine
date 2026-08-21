@@ -22,13 +22,13 @@ local rawrequire = require
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local ImmediateTypes = require("ImmediateTypes")
+local ImmediateCoreUtils = require("ImmediateCoreUtils")
 
 local ImmediateScheduler = setmetatable({}, BaseObject)
 ImmediateScheduler.ClassName = "ImmediateScheduler"
 ImmediateScheduler.__index = ImmediateScheduler
 
-type ImmediateRuntime = ImmediateTypes.ImmediateRuntime
+type ImmediateRuntime = ImmediateCoreUtils.ImmediateRuntime
 
 --[[
 	https://create.roblox.com/docs/performance-optimization/microprofiler/task-scheduler
@@ -54,9 +54,9 @@ type ImmediateRuntime = ImmediateTypes.ImmediateRuntime
 
 	@class ImmediateSchedulableSystem
 ]=]
-export type ImmediateSchedulableSystem<Rt> = {
+export type ImmediateSchedulableSystem<CallShape = (...any) -> ()> = {
 	-- The actual code it'll run. The runtime always comes first.
-	system: (rt: Rt, ...any) -> (),
+	system: CallShape,
 
 	-- Sort order inside the tick. Lower numbers run first; ties break on `name`.
 	-- defaults to 0. so if you really want to make sure yours runs first, go negative
@@ -81,7 +81,7 @@ export type ImmediateSchedulableSystem<Rt> = {
 	Destroy: (() -> ())?,
 }
 
-type SchedulableSystem = ImmediateSchedulableSystem<ImmediateRuntime>
+type SchedulableSystem = ImmediateSchedulableSystem<(ImmediateRuntime, ...any) -> ()>
 
 export type ImmediateScheduler =
 	typeof(setmetatable(
@@ -236,30 +236,30 @@ function ImmediateScheduler._runProtectedSystem(
 	end
 end
 
-function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateRuntime)
+function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateRuntime, ...: any)
 	if self._sortFlag == true then
 		self:_sortSystemArrays()
 	end
 
 	for _, systemTable in self._sorted_preTick do
-		self:_runProtectedSystem(rt, systemTable)
+		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
 	for _, systemTable in self._sorted_systems do
 		for _, preSystemTable in self._sorted_preSystem do
-			self:_runProtectedSystem(rt, preSystemTable)
+			self:_runProtectedSystem(rt, preSystemTable, ...)
 			rt.previousRawSystem = preSystemTable
 		end
-		self:_runProtectedSystem(rt, systemTable)
+		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 		rt.previousSystem = systemTable
 		for _, postSystemTable in self._sorted_postSystem do
-			self:_runProtectedSystem(rt, postSystemTable)
+			self:_runProtectedSystem(rt, postSystemTable, ...)
 			rt.previousRawSystem = postSystemTable
 		end
 	end
 	for _, systemTable in self._sorted_postTick do
-		self:_runProtectedSystem(rt, systemTable)
+		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
 end
@@ -302,6 +302,15 @@ function ImmediateScheduler.UnregisterSystem(self: ImmediateScheduler, systemNam
 		self._systemDictionary[systemName] = nil
 	end
 	self._sortFlag = true
+end
+
+function ImmediateScheduler.Destroy(self: ImmediateScheduler)
+	table.clear(self._systemDictionary)
+	table.clear(self._sorted_systems)
+	table.clear(self._sorted_preSystem)
+	table.clear(self._sorted_postSystem)
+	table.clear(self._sorted_preTick)
+	table.clear(self._sorted_postTick)
 end
 
 return ImmediateScheduler
