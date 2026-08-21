@@ -102,6 +102,18 @@ export namespace Rx {
   function catchError<T, E, R>(
     callback: (error: E) => Observable<R>
   ): Operator<T, T | R>;
+
+  function combineLatest<
+    T extends ReadonlyArray<Observable<unknown> | unknown>,
+  >(
+    observables: T
+  ): Observable<{
+    [K in keyof T]: T[K] extends Observable<infer V>
+      ? V extends LuaTuple<infer L>
+        ? L[0]
+        : V
+      : T[K];
+  }>;
   function combineLatest<
     T extends Record<string | number | symbol, Observable<unknown> | unknown>,
   >(
@@ -113,6 +125,7 @@ export namespace Rx {
         : V
       : T[K];
   }>;
+
   const combineLatestDefer: typeof combineLatest;
   function defer<T>(observableFactory: () => Observable<T>): Observable<T>;
   function delay<T>(seconds: number): Operator<T, T>;
