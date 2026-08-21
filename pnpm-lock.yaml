@@ -2104,6 +2104,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/coreguiutils':
+        specifier: workspace:*
+        version: link:../coreguiutils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader

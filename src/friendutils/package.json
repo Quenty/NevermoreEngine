@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/brio": "workspace:*",
+    "@quenty/coreguiutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
