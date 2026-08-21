@@ -447,12 +447,12 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run tests via Open Cloud instead of locally |
-| `--logs` | Show execution logs |
+| `--logs` | Show execution logs. On by default with `--script-text`; pass `--no-logs` to suppress |
 | `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
 | `--universe-id` | Override universe ID from deploy.nevermore.json |
 | `--place-id` | Override place ID from deploy.nevermore.json |
 | `--script-template` | Override script template path |
-| `--script-text` | Luau code to execute directly instead of the configured template |
+| `--script-text` | Luau code to execute directly instead of the configured template. Implies `--logs` |
 
 ### Batch testing
 
