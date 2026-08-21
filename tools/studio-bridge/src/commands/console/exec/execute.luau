@@ -10,6 +10,12 @@
 	  - Distinct error codes: SCRIPT_LOAD_ERROR, SCRIPT_RUNTIME_ERROR.
 	  - Sequential queueing: concurrent execute requests are processed
 	    one at a time in FIFO order.
+	  - Return values: everything the script returns is marshalled onto
+	    `payload.returnValues`, so a caller can read a result as a value
+	    instead of scraping it back out of printed output.
+	  - Failure isolation: a request that throws while marshalling or
+	    reporting its result is answered with an error rather than left to
+	    latch the queue for the rest of the session.
 
 	This module has no Roblox dependencies and is testable under Lune.
 ]]
@@ -23,6 +29,149 @@ local ExecuteAction = {}
 local _queue: { { payload: { [string]: any }, requestId: string?, sessionId: string, sendMessage: ((msg: { [string]: any }) -> ())? } } =
 	{}
 local _processing = false
+
+-- ---------------------------------------------------------------------------
+-- Return value serialization
+-- ---------------------------------------------------------------------------
+
+-- Produces the SerializedReturnValue shapes declared in
+-- web-socket-protocol.ts. Action modules are loadstring'd standalone inside
+-- the plugin and cannot require anything, so this cannot be shared with the
+-- equivalent marshaller in query-data-model.luau.
+
+local MAX_DEPTH = 64
+
+-- The depth cap alone does not bound the work. `seen` is cleared as the walk
+-- leaves a table -- correct, since a value reachable by two separate paths is
+-- not a cycle -- which means a shared reference is expanded once per edge.
+-- `for i = 1, 30 do x = { a = x, b = x } end` is only 30 levels deep but 2^30
+-- nodes, so a total node budget is what actually keeps Studio alive.
+local MAX_NODES = 100_000
+
+type MarshalState = { seen: { [any]: boolean }, budget: number }
+
+local function unsupported(typeName: string, text: string): { [string]: any }
+	return { type = "Unsupported", typeName = typeName, toString = text }
+end
+
+local serializeValue: (value: any, depth: number, state: MarshalState) -> any
+
+-- An array-like table becomes a JSON array, anything else a JSON object with
+-- string keys. Mixed tables take the object branch on purpose: JSONEncode
+-- rejects them, and a rejected encode drops the whole scriptComplete message.
+--
+-- Traversal is raw (`next`, `rawlen`, `rawget`) so `__iter`, `__len` and
+-- `__index` cannot make a returned table report contents it does not have --
+-- and cannot throw from inside the walk. A metatable is not part of the value,
+-- so what gets marshalled is the table as it actually is.
+local function serializeTable(value: { [any]: any }, depth: number, state: MarshalState): any
+	local count = 0
+	for _ in next, value do
+		count += 1
+	end
+
+	if count == rawlen(value) then
+		local array = {}
+		for index = 1, count do
+			array[index] = serializeValue(rawget(value :: any, index), depth + 1, state)
+		end
+		return array
+	end
+
+	local map: { [string]: any } = {}
+	for key, item in next, value do
+		local stringKey = if type(key) == "string" then key else tostring(key)
+		if map[stringKey] ~= nil then
+			-- Two distinct Luau keys collapsed onto one JSON key (`[1]` and
+			-- `"1"`). Marking it keeps the loss visible rather than quietly
+			-- serving whichever one the traversal happened to reach last.
+			map[stringKey] = unsupported("collision", `<two keys collapsed onto "{stringKey}">`)
+		else
+			map[stringKey] = serializeValue(item, depth + 1, state)
+		end
+	end
+	return map
+end
+
+function serializeValue(value: any, depth: number, state: MarshalState): any
+	local valueType = typeof(value)
+
+	state.budget -= 1
+	if state.budget < 0 then
+		return unsupported(valueType, "<value budget exceeded>")
+	end
+
+	if valueType == "nil" then
+		-- A JSON array cannot hold a hole, and dropping the entry would shift
+		-- every later value into the wrong position.
+		return { type = "Nil" }
+	elseif valueType == "string" or valueType == "boolean" then
+		return value
+	elseif valueType == "number" then
+		-- inf and nan have no JSON spelling, and encoding one produces a
+		-- document the server cannot decode -- losing the entire message.
+		if value ~= value or value == math.huge or value == -math.huge then
+			return unsupported("number", tostring(value))
+		end
+		return value
+	elseif valueType == "table" then
+		if depth > MAX_DEPTH then
+			return unsupported("table", "<max depth exceeded>")
+		end
+		if state.seen[value] then
+			return unsupported("table", "<cycle>")
+		end
+		state.seen[value] = true
+		local serialized = serializeTable(value, depth, state)
+		state.seen[value] = nil
+		return serialized
+	elseif valueType == "Vector3" then
+		return { type = "Vector3", value = { value.X, value.Y, value.Z } }
+	elseif valueType == "Vector2" then
+		return { type = "Vector2", value = { value.X, value.Y } }
+	elseif valueType == "CFrame" then
+		return { type = "CFrame", value = { value:GetComponents() } }
+	elseif valueType == "Color3" then
+		return { type = "Color3", value = { value.R, value.G, value.B } }
+	elseif valueType == "UDim2" then
+		return { type = "UDim2", value = { value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset } }
+	elseif valueType == "UDim" then
+		return { type = "UDim", value = { value.Scale, value.Offset } }
+	elseif valueType == "BrickColor" then
+		return { type = "BrickColor", name = value.Name, value = value.Number }
+	elseif valueType == "EnumItem" then
+		return { type = "EnumItem", enum = tostring(value.EnumType), name = value.Name, value = value.Value }
+	elseif valueType == "Instance" then
+		return { type = "Instance", className = value.ClassName, path = value:GetFullName() }
+	else
+		return unsupported(valueType, tostring(value))
+	end
+end
+
+-- Marshal the values a script returned, in order. The depth cap, cycle set and
+-- node budget are shared across all of them, so one run cannot be talked into
+-- unbounded work by spreading it over several return values.
+local function serializeReturnValues(packed: { n: number, [number]: any }): { any }
+	local state: MarshalState = { seen = {}, budget = MAX_NODES }
+	local returnValues = {}
+	for index = 2, packed.n do
+		returnValues[index - 1] = serializeValue(packed[index], 1, state)
+	end
+	return returnValues
+end
+
+-- Marshalling walks values the script chose, so a hostile metatable can still
+-- throw from somewhere the raw traversal cannot avoid -- a table key whose
+-- `__tostring` errors, say. Degrading to a marker keeps one bad value from
+-- failing the run, and keeps it from throwing out of _handleExecute, which in
+-- queue mode would latch _processing and strand every later request.
+local function trySerializeReturnValues(packed: { n: number, [number]: any }): { any }
+	local ok, returnValues = pcall(serializeReturnValues, packed)
+	if ok then
+		return returnValues
+	end
+	return { unsupported("unknown", `<not serializable: {tostring(returnValues)}>`) }
+end
 
 -- ---------------------------------------------------------------------------
 -- Core execution logic
@@ -108,17 +257,27 @@ function ExecuteAction._handleExecute(
 		originalWarn(...)
 	end
 
-	local success, runtimeError = pcall(fn)
+	local returned = table.pack(pcall(fn))
+	local success = returned[1]
 
 	-- Restore originals
 	env.print = originalPrint
 	env.warn = originalWarn
 
 	if not success then
-		return sendResult({ success = false, error = tostring(runtimeError), code = "SCRIPT_RUNTIME_ERROR", output = captured })
+		return sendResult({
+			success = false,
+			error = tostring(returned[2]),
+			code = "SCRIPT_RUNTIME_ERROR",
+			output = captured,
+		})
 	end
 
-	return sendResult({ success = true, output = captured })
+	return sendResult({
+		success = true,
+		output = captured,
+		returnValues = trySerializeReturnValues(returned),
+	})
 end
 
 -- ---------------------------------------------------------------------------
@@ -133,7 +292,36 @@ local function _processQueue()
 
 	while #_queue > 0 do
 		local item = table.remove(_queue, 1)
-		ExecuteAction._handleExecute(item.payload, item.requestId, item.sessionId, item.sendMessage)
+		-- A throw here must not escape the loop. _processing would stay latched
+		-- for the rest of the Studio session, every later execute request would
+		-- pile up in _queue with nothing left to drain it, and the plugin never
+		-- re-registers this action on its own (syncActions sees an unchanged
+		-- hash), so only restarting Studio would recover. The most likely
+		-- thrower is sendMessage itself: it JSONEncodes a payload built partly
+		-- out of values the script chose.
+		local ok, err =
+			pcall(ExecuteAction._handleExecute, item.payload, item.requestId, item.sessionId, item.sendMessage)
+
+		if not ok and item.sendMessage then
+			-- Tell the requester, or the CLI waits out its whole timeout with no
+			-- idea the request was dropped. Small fixed payload, so the encode
+			-- that just failed cannot fail again for the same reason -- but it
+			-- is still guarded, since it is the last thing standing between a
+			-- bad response and the latch above.
+			local response: { [string]: any } = {
+				type = "scriptComplete",
+				sessionId = item.sessionId,
+				payload = {
+					success = false,
+					error = `Failed to report script result: {tostring(err)}`,
+					code = "INTERNAL_ERROR",
+				},
+			}
+			if item.requestId ~= nil and item.requestId ~= "" then
+				response.requestId = item.requestId
+			end
+			pcall(item.sendMessage, response)
+		end
 	end
 
 	_processing = false

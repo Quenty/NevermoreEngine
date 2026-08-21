@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
-import { OpenCloudClient } from './open-cloud-client.js';
+import {
+  OpenCloudClient,
+  getTaskReturnValues,
+  type LuauTask,
+} from './open-cloud-client.js';
 import type { RateLimiter } from './rate-limiter.js';
 
 vi.mock('@quenty/cli-output-helpers', () => ({
@@ -365,5 +369,49 @@ describe('OpenCloudClient.resolveLatestPlaceVersionAsync', () => {
     await expect(
       client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
     ).rejects.toThrowError(/unparseable version path/);
+  });
+});
+
+describe('getTaskReturnValues', () => {
+  function makeTask(overrides: Partial<LuauTask>): LuauTask {
+    return {
+      path: 'universes/1/places/2/versions/3/luau-execution-session-tasks/4',
+      createTime: '2026-01-01T00:00:00Z',
+      updateTime: '2026-01-01T00:01:00Z',
+      user: 'users/1',
+      state: 'COMPLETE',
+      script: 'return 1',
+      ...overrides,
+    };
+  }
+
+  it('returns the values natively typed, one entry per returned value', () => {
+    // Roblox serializes the return value itself, so a returned table arrives as
+    // real nested JSON — there is no JSON string to parse a second time.
+    const task = makeTask({
+      output: {
+        results: [{ slug: 'maid', counts: { passed: 1014 } }, 'str', 42, true],
+      },
+    });
+
+    expect(getTaskReturnValues(task)).toEqual([
+      { slug: 'maid', counts: { passed: 1014 } },
+      'str',
+      42,
+      true,
+    ]);
+  });
+
+  it('reports an empty result when the task returned nothing', () => {
+    expect(getTaskReturnValues(makeTask({ output: {} }))).toEqual([]);
+  });
+
+  it('reports undefined when a failed task carried no output at all', () => {
+    // An oversize return value fails the task with no output and no error
+    // message, so "nothing came back to read" has to stay distinguishable from
+    // "the script returned nothing" — only the former can fall back to logs.
+    const task = makeTask({ state: 'FAILED', output: undefined });
+
+    expect(getTaskReturnValues(task)).toBeUndefined();
   });
 });
