@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[61756],{10460:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"World","desc":"jecs `World` alias for the typed API surface in this module.","source":{"line":316,"path":"src/jecs/src/Shared/Jecst.luau"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[89229],{81863:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"Jecs","desc":"Typed view of `lib.jecs` (runtime module is `--!nocheck`; use this for call sites).","source":{"line":320,"path":"src/jecs/src/Shared/Jecst.luau"}}')}}]);
