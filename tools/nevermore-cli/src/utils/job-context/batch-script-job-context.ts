@@ -57,6 +57,7 @@ export class BatchScriptJobContext implements JobContext {
   private _batchPlaceId?: number;
   private _batchUniverseId?: number;
   private _batchTimeoutMs: number;
+  private _chunkSize: number;
   private _reporter?: Reporter;
 
   // Lazy-promise state
@@ -76,6 +77,7 @@ export class BatchScriptJobContext implements JobContext {
       batchPlaceId?: number;
       batchUniverseId?: number;
       batchTimeoutMs?: number;
+      chunkSize?: number;
       reporter?: Reporter;
     }
   ) {
@@ -85,6 +87,9 @@ export class BatchScriptJobContext implements JobContext {
     this._batchPlaceId = options?.batchPlaceId;
     this._batchUniverseId = options?.batchUniverseId;
     this._batchTimeoutMs = options?.batchTimeoutMs ?? 300_000;
+    // 16 keeps a chunk's log well inside the retained window: 8 packages came
+    // back at 65KB intact, while 73 at 272KB lost its first 14.
+    this._chunkSize = options?.chunkSize ?? 16;
     this._reporter = options?.reporter;
 
     const withBasePlace = batchTargets.filter((t) => t.target.basePlace);
@@ -282,44 +287,90 @@ export class BatchScriptJobContext implements JobContext {
     );
     const template = await fs.readFile(templatePath, 'utf-8');
 
-    const slugArray = [...slugMap.values()];
-    const batchScript = template.replaceAll(
-      '{{ PACKAGE_SLUGS_JSON }}',
-      JSON.stringify(slugArray)
-    );
+    // Run in chunks. Open Cloud keeps only the tail of a task's log, so one
+    // task covering every package loses the packages that ran first — measured
+    // at 73 packages, the first 14 came back unreadable. Chunking keeps each
+    // task's output inside the window, and gives each its own execution budget
+    // instead of sharing one 300s ceiling.
+    const chunks = chunkSlugMap(slugMap, this._chunkSize);
+    const merged = new Map<string, BatchPackageResult>();
 
-    OutputHelper.verbose(
-      `Executing batch script for ${slugMap.size} packages (timeout: ${
-        this._batchTimeoutMs / 1000
-      }s)...`
-    );
-
-    const result = await this._inner.runScriptAsync(deployment, {
-      scriptContent: batchScript,
-      packageName: '_batch_',
-      timeoutMs: this._batchTimeoutMs,
-    });
-
-    // Fetch the combined logs
-    const rawLogs = await this._inner.getLogsAsync(deployment);
-
-    if (!result.success) {
-      const stateInfo = result.taskState ? ` (state: ${result.taskState})` : '';
-      OutputHelper.warn(
-        `Batch execution task did not complete successfully${stateInfo} — parsing partial results`
+    if (chunks.length > 1) {
+      OutputHelper.verbose(
+        `Executing ${slugMap.size} packages in ${chunks.length} chunks of up to ${this._chunkSize}`
       );
-      if (result.errorMessage) {
-        OutputHelper.error(result.errorMessage);
-      }
-      if (!rawLogs || rawLogs.trim().length === 0) {
-        OutputHelper.warn(
-          'No logs were returned from the execution — the script may not have started'
-        );
-      }
-      OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
     }
 
-    // Parse into per-package results
-    return parseBatchTestLogs(rawLogs, slugMap);
+    for (const [index, chunk] of chunks.entries()) {
+      const label =
+        chunks.length > 1 ? ` (chunk ${index + 1}/${chunks.length})` : '';
+      const batchScript = template.replaceAll(
+        '{{ PACKAGE_SLUGS_JSON }}',
+        JSON.stringify([...chunk.values()])
+      );
+
+      OutputHelper.verbose(
+        `Executing batch script for ${chunk.size} packages${label} (timeout: ${
+          this._batchTimeoutMs / 1000
+        }s)...`
+      );
+
+      const result = await this._inner.runScriptAsync(deployment, {
+        scriptContent: batchScript,
+        packageName: '_batch_',
+        timeoutMs: this._batchTimeoutMs,
+      });
+
+      const rawLogs = await this._inner.getLogsAsync(deployment);
+
+      if (!result.success) {
+        const stateInfo = result.taskState
+          ? ` (state: ${result.taskState})`
+          : '';
+        OutputHelper.warn(
+          `Batch execution task${label} did not complete successfully${stateInfo} — parsing partial results`
+        );
+        if (result.errorMessage) {
+          OutputHelper.error(result.errorMessage);
+        }
+        if (!rawLogs || rawLogs.trim().length === 0) {
+          OutputHelper.warn(
+            'No logs were returned from the execution — the script may not have started'
+          );
+        }
+        OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
+      }
+
+      for (const [packageName, packageResult] of parseBatchTestLogs(
+        rawLogs,
+        chunk
+      )) {
+        merged.set(packageName, packageResult);
+      }
+    }
+
+    return merged;
   }
+}
+
+/**
+ * Split the package map into chunks small enough for one task's log to survive.
+ *
+ * Sized by package count rather than bytes because output volume is not known
+ * until the run happens, and the retained window is not a fixed size either.
+ */
+export function chunkSlugMap(
+  slugMap: Map<string, string>,
+  chunkSize: number
+): Map<string, string>[] {
+  const entries = [...slugMap.entries()];
+  if (chunkSize <= 0 || entries.length <= chunkSize) {
+    return [slugMap];
+  }
+
+  const chunks: Map<string, string>[] = [];
+  for (let i = 0; i < entries.length; i += chunkSize) {
+    chunks.push(new Map(entries.slice(i, i + chunkSize)));
+  }
+  return chunks;
 }
