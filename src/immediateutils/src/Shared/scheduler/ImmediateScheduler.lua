@@ -186,6 +186,7 @@ function ImmediateScheduler._runProtectedSystem(
 	local errorLog = rt.errorlog
 	local ok, errmsg = xpcall(function(...)
 		if rt.DEBUG then
+			debug.profilebegin(`ImmediateScheduler._runProtectedSystem.xpcall.{system.name}`)
 			local args = table.pack(...)
 			local thread = coroutine.create(function()
 				system.system(rt, unpack(args, 1, args.n))
@@ -199,8 +200,11 @@ function ImmediateScheduler._runProtectedSystem(
 				task.cancel(thread)
 				error(`RxECS system {system.name} yielded:\n{traceback}`)
 			end
+			debug.profileend()
 		else
+			debug.profilebegin(`ImmediateScheduler._runProtectedSystem.system.{system.name}`)
 			system.system(rt, ...)
+			debug.profileend()
 		end
 	end, function(err)
 		return debug.traceback(err, 2)
@@ -241,27 +245,40 @@ function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateRuntime,
 		self:_sortSystemArrays()
 	end
 
+	debug.profilebegin("ImmediateScheduler.Tick")
+	debug.profilebegin("ImmediateScheduler.Tick.sorted_preTick")
 	for _, systemTable in self._sorted_preTick do
 		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
+	debug.profileend()
+	debug.profilebegin("ImmediateScheduler.Tick.sorted_systems")
 	for _, systemTable in self._sorted_systems do
+		debug.profilebegin(`ImmediateScheduler.Tick.sorted_systems.sortedPreSystem.{systemTable.name}`)
 		for _, preSystemTable in self._sorted_preSystem do
 			self:_runProtectedSystem(rt, preSystemTable, ...)
 			rt.previousRawSystem = preSystemTable
 		end
+		debug.profileend()
+
 		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 		rt.previousSystem = systemTable
+
+		debug.profilebegin(`ImmediateScheduler.Tick.sorted_systems.sortedPostSystem.{systemTable.name}`)
 		for _, postSystemTable in self._sorted_postSystem do
 			self:_runProtectedSystem(rt, postSystemTable, ...)
 			rt.previousRawSystem = postSystemTable
 		end
+		debug.profileend()
 	end
+	debug.profileend()
+	debug.profilebegin("ImmediateScheduler.Tick.sorted_postTick")
 	for _, systemTable in self._sorted_postTick do
 		self:_runProtectedSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
+	debug.profileend()
 end
 
 function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable: SchedulableSystem)

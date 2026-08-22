@@ -1125,30 +1125,35 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			minCount: number?,
 			retainAllCandidates: boolean?
 		): () -> ...any
+			debug.profilebegin("distributeIteration.getOrCreateHookState")
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
+			debug.profileend()
 
+			debug.profilebegin("distributeIteration.setup")
 			-- One-time setup. All state persists across frames; nothing below
 			-- allocates in steady state.
 			if hookState.ring == nil then
-				hookState.ring = {}          -- identities waiting their turn
-				hookState.head = 1           -- index of the front of the ring
-				hookState.count = 0          -- identities currently in the ring
-				hookState.frameNo = 0        -- bumped once per call
-				hookState.seenStamp = {}     -- id -> last frame it appeared in input
-				hookState.queuedStamp = {}   -- id -> true while sitting in the ring
-				hookState.slots = {}         -- slots[slotIndex][id] = component value
+				hookState.ring = {} -- identities waiting their turn
+				hookState.head = 1 -- index of the front of the ring
+				hookState.count = 0 -- identities currently in the ring
+				hookState.frameNo = 0 -- bumped once per call
+				hookState.seenStamp = {} -- id -> last frame it appeared in input
+				hookState.queuedStamp = {} -- id -> true while sitting in the ring
+				hookState.slots = {} -- slots[slotIndex][id] = component value
 				for i = 1, DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS do
 					hookState.slots[i] = {}
 				end
 				hookState.packedPayloads = {} -- fallback payloads for very wide queries
-				hookState.arity = nil        -- nil = probing; -1 = permanent fallback; 0..N = fast path
-				hookState.emitted = 0        -- emissions so far this call
-				hookState.origin = nil       -- clock reading captured at first pop attempt
+				hookState.arity = nil -- nil = probing; -1 = permanent fallback; 0..N = fast path
+				hookState.emitted = 0 -- emissions so far this call
+				hookState.origin = nil -- clock reading captured at first pop attempt
 				hookMaid:GiveTask(function()
 					table.clear(hookState)
 				end)
 			end
+			debug.profileend()
 
+			debug.profilebegin("distributeIteration.reset")
 			-- Per-call reset + argument normalization. The drain closure is
 			-- built ONCE and reused, so arguments go into hookState instead
 			-- of being captured.
@@ -1164,7 +1169,9 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			hookState.maxTime = maxTime
 			hookState.retainAll = retainAllCandidates == true
 			local frameNo = hookState.frameNo
+			debug.profileend()
 
+			debug.profilebegin("distributeIteration.ringHousekeeping")
 			-- Ring housekeeping. Pops leave holes at the front; occasionally
 			-- slide the live section back down in ONE bulk move instead of
 			-- shifting on every pop.
@@ -1182,26 +1189,31 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					hookState.head = 1
 				end
 			end
+			debug.profileend()
 
 			local ring = hookState.ring
 			local seenStamp = hookState.seenStamp
 			local queuedStamp = hookState.queuedStamp
 
+			debug.profilebegin("distributeIteration.reconcile")
 			------------------------------------------------------------------
 			-- PHASE 1: reconcile. One pass over the entire input. Marks who
 			-- is alive this frame, pushes newcomers to the back of the ring,
 			-- refreshes payload data. Emits nothing itself.
 			------------------------------------------------------------------
-			local mt = getmetatable(input)
+			local mt = getmetatable(input :: any)
 			if type(mt) == "table" and type(mt.__iter) == "function" then
 				-- ECS query (or any custom iterator).
+				debug.profilebegin("distributeIteration.iterSetup")
 				local iterFn, iterState, ctrl = mt.__iter(input)
+				debug.profileend()
 
 				if hookState.arity == nil or hookState.arity == -1 then
 					-- Packing path. Runs on the first call ever (to learn the
 					-- query's shape), or forever for queries wider than
 					-- DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS. Assumes a stable
 					-- query shape, which holds for jecs queries.
+					debug.profilebegin("distributeIteration.scanPack")
 					local packed = table.pack(iterFn(iterState, ctrl))
 					while packed.n > 0 and packed[1] ~= nil do
 						local id = packed[1]
@@ -1213,6 +1225,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 							queuedStamp[id] = true
 						end
 						if hookState.arity ~= -1 then
+							debug.profilebegin("distributeIteration.scanPack.arityNotNeg1")
 							local extras = packed.n - 1
 							if extras > DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS then
 								hookState.arity = -1 -- too wide; permanent fallback
@@ -1223,12 +1236,19 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 									hookState.slots[i][id] = packed[i + 1]
 								end
 							end
+							debug.profileend()
 						else
+							debug.profilebegin("distributeIteration.scanPack.arityNeg1")
 							hookState.packedPayloads[id] = packed
+							debug.profileend()
 						end
+						debug.profilebegin("distributeIteration.scanPack.tablePack")
 						packed = table.pack(iterFn(iterState, ctrl))
+						debug.profileend()
 					end
+					debug.profileend()
 				else
+					debug.profilebegin("distributeIteration.scanFast")
 					-- Steady-state fast path: capture the iterator's returns
 					-- positionally and write straight into flat arrays.
 					local s1 = hookState.slots[1]
@@ -1256,9 +1276,11 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 						s5[i1] = i6
 						s6[i1] = i7
 					end
+					debug.profileend()
 				end
 			else
 				-- Plain table: candidates are the VALUES.
+				debug.profilebegin("distributeIteration.plainTable")
 				local k, v = next(input, nil)
 				while k ~= nil do
 					seenStamp[v] = frameNo
@@ -1269,7 +1291,12 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 					end
 					k, v = next(input, k)
 				end
+				debug.profileend()
 			end
+			debug.profileend()
+
+			-- debug
+			-- print(`[dist] frame {hookState.frameNo} inRing: {hookState.count}`)
 
 			------------------------------------------------------------------
 			-- PHASE 2: drain. The iterator your for-loop calls. Built once
@@ -1295,13 +1322,17 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 							end
 						end
 
-						-- O(1) pop from the front of the ring.
+						-- Pop + rotate. Profiled as one unit; the evict case
+						-- bails via a flag AFTER the region closes so the
+						-- profiler pair stays balanced.
+						debug.profilebegin("distributeIteration.rotate")
 						local h = st.head
 						local id = st.ring[h]
 						st.head = h + 1
 						st.count -= 1
 
 						local alive = st.seenStamp[id] == st.frameNo
+						local emitThis = true
 
 						if not alive then
 							-- Absent from the latest scan.
@@ -1309,39 +1340,69 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 							if not st.retainAll then
 								-- Default mode: evicted silently, never
 								-- emitted. A future scan can re-add it.
-								continue
+								emitThis = false
 							end
 							-- Retain mode: ONE final "goodbye" emission for
 							-- last-tick cleanup, then it leaves the rotation.
 						else
 							-- Alive: round-robin, back of the line.
+							-- Write at the tail, then restore the count the
+							-- pop took away -- net effect: moved, not lost.
 							st.ring[st.head + st.count] = id
+							st.count += 1
+						end
+						debug.profileend()
+
+						if not emitThis then
+							continue
 						end
 
+						-- Rebuild the payload tuple, profiled separately from
+						-- rotation. Values land in fixed locals so there is a
+						-- single exit point below and the region stays balanced.
+						debug.profilebegin("distributeIteration.payload")
 						st.emitted += 1
-
-						-- Rebuild the payload tuple. This branch ladder avoids
-						-- allocating anything and preserves the exact arity.
 						local arity = st.arity
+						local r2, r3, r4, r5, r6, r7, packed
 						if arity == -1 then
-							local packed = st.packedPayloads[id]
+							packed = st.packedPayloads[id]
+						elseif arity >= 1 then
+							local s = st.slots
+							r2 = s[1][id]
+							if arity >= 2 then
+								r3 = s[2][id]
+							end
+							if arity >= 3 then
+								r4 = s[3][id]
+							end
+							if arity >= 4 then
+								r5 = s[4][id]
+							end
+							if arity >= 5 then
+								r6 = s[5][id]
+							end
+							if arity >= 6 then
+								r7 = s[6][id]
+							end
+						end
+						debug.profileend()
+
+						if arity == -1 then
 							return id, unpack(packed, 2, packed.n)
 						end
 						if arity >= 1 then
-							local s = st.slots
-							if arity >= 4 then
-								if arity >= 6 then
-									return id, s[1][id], s[2][id], s[3][id], s[4][id], s[5][id], s[6][id]
-								elseif arity == 5 then
-									return id, s[1][id], s[2][id], s[3][id], s[4][id], s[5][id]
-								end
-								return id, s[1][id], s[2][id], s[3][id], s[4][id]
+							if arity >= 6 then
+								return id, r2, r3, r4, r5, r6, r7
+							elseif arity == 5 then
+								return id, r2, r3, r4, r5, r6
+							elseif arity == 4 then
+								return id, r2, r3, r4, r5
 							elseif arity == 3 then
-								return id, s[1][id], s[2][id], s[3][id]
+								return id, r2, r3, r4
 							elseif arity == 2 then
-								return id, s[1][id], s[2][id]
+								return id, r2, r3
 							end
-							return id, s[1][id]
+							return id, r2
 						end
 						return id
 					end
