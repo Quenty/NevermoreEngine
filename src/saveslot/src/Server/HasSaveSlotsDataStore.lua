@@ -1595,8 +1595,9 @@ function HasSaveSlotsDataStore._setupPlaytimeTracking(self: HasSaveSlotsDataStor
 	end))
 
 	-- Fold accrued time into TimePlayed just before every save so the written value is current. The
-	-- callback runs before the save serializes staged data (see DataStore._syncData), so the flush is
-	-- captured by that same save -- including the final save-on-leave.
+	-- callback runs before the save serializes staged data (see DataStore._syncData), and the flush
+	-- stages that data itself (see _stagePlaytime), so it is captured by that same save -- including
+	-- the final save-on-leave.
 	self._maid:GivePromise(self._loadPromise):Then(function()
 		self._maid:GiveTask(self._dataStore:AddSavingCallback(function()
 			self:_flushPlaytime()
@@ -1642,6 +1643,31 @@ function HasSaveSlotsDataStore._flushPlaytime(self: HasSaveSlotsDataStore): ()
 	end
 
 	SaveSlotData.LastSessionLength:Set(slot, now - (self._playSessionStart or now))
+
+	self:_stagePlaytime(slotId, slot)
+end
+
+--[[
+	Stages the just-written playtime attributes into the metadata store synchronously.
+
+	The usual StoreOnValueChange route is deferred, so it always lands after the save that asked for
+	the flush took its snapshot (see DataStore._syncData): each save would persist the previous
+	flush's value, and the final save-on-leave would drop the tail of the session. Storing here closes
+	that window; the deferred listener then re-stores the same value as a no-op. Ephemeral slots
+	persist nothing, so they keep the attribute-only behavior.
+]]
+function HasSaveSlotsDataStore._stagePlaytime(
+	self: HasSaveSlotsDataStore,
+	slotId: SaveSlotData.SlotId,
+	slot: Folder
+): ()
+	if self._metadataStore == nil or not self._metadataStore.Destroy or self:_isEphemeral(slotId) then
+		return
+	end
+
+	local metadataStore = self._metadataStore:GetSubStore(slotId)
+	metadataStore:Store("TimePlayed", SaveSlotData.TimePlayed:Get(slot))
+	metadataStore:Store("LastSessionLength", SaveSlotData.LastSessionLength:Get(slot))
 end
 
 function HasSaveSlotsDataStore._endPlaySession(self: HasSaveSlotsDataStore): ()
