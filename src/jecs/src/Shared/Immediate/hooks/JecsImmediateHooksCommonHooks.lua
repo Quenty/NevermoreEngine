@@ -27,6 +27,10 @@ local getOrCreateHookState = JecsImmediateHookUtils.getOrCreateHookState
 
 local LINEAR_WALK_EPSILON = 1e-4
 
+-- How many leading component values distributeIteration's fast path handles;
+-- wider queries fall back to packing values into a table per candidate.
+local DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS = 6
+
 local function usesCFrame(goal: any?, value: any?): boolean
 	if goal ~= nil then
 		return typeof(goal) == "CFrame"
@@ -37,39 +41,7 @@ local function usesCFrame(goal: any?, value: any?): boolean
 	return false
 end
 
-type ThrottledSetQueueInput = { any } | Jecst.Query<any> | Jecst.Cached_Query<any>
-
-local function forEachIdentity(input: ThrottledSetQueueInput?, onIdentity: (any, ...any) -> ())
-	if typeof(input) ~= "table" then
-		return
-	end
-
-	local mt = getmetatable(input :: any)
-	if typeof(mt) == "table" and typeof(mt.__iter) == "function" then
-		-- Match Luau generic-for: __iter may return (next), or (next, state, var).
-		local iter, state, var = mt.__iter(input)
-		while true do
-			local packed = table.pack(iter(state, var))
-			local identity = packed[1]
-			if identity == nil then
-				break
-			end
-			var = identity
-			if packed.n > 1 then
-				onIdentity(identity, unpack(packed, 2, packed.n))
-			else
-				onIdentity(identity)
-			end
-		end
-		return
-	end
-
-	for _, identity in input :: { any } do
-		if identity ~= nil then
-			onIdentity(identity)
-		end
-	end
-end
+type DistributeIterationInput = { any } | Jecst.Query<any> | Jecst.Cached_Query<any>
 
 export type SchedulerState = {
 	lastCalledAt: number,
@@ -1123,111 +1095,261 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return false
 		end,
 
-		throttledSetQueue = function(
-			input: ThrottledSetQueueInput,
+		--[=[
+			Distributed iteration: spreads a big candidate set across frames
+			under a per-frame budget, fairly (round-robin).
+
+			WHO OWNS VALIDITY?
+			- retainAllCandidates = false (default): the input is the source of
+			  truth. Each call fully scans the input; anything missing from the
+			  latest scan is evicted and NEVER emitted.
+			- retainAllCandidates = true: candidates that vanished still get ONE
+			  final emission ("goodbye") before leaving the rotation, for
+			  last-tick cleanup. Goodbye data may be stale or mid-teardown, so
+			  validate candidates inside your loop body in this mode.
+
+			BUDGETS:
+			- maxCount / maxTime are ceilings; they apply only AFTER minCount
+			  emissions have happened. Both nil -> one emission per call.
+
+			HOW IT'S FAST: ring buffer (O(1) pops), frame stamps ("alive?" and
+			"already queued?" are integer compares, nothing rebuilt per frame),
+			flat payload slots (no per-candidate pack/unpack after the first
+			frame). Steady state: zero allocations.
+		]=]
+		distributeIteration = function(
+			input: DistributeIterationInput,
 			dis: any?,
 			maxCount: number?,
 			maxTime: number?,
-			minCount: number?
+			minCount: number?,
+			retainAllCandidates: boolean?
 		): () -> ...any
-			debug.profilebegin("throttledSetQueue")
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
 
-			if hookState.queue == nil then
-				hookState.queue = {}
-				hookState.inQueue = {}
-				hookState.payloads = {}
+			-- One-time setup. All state persists across frames; nothing below
+			-- allocates in steady state.
+			if hookState.ring == nil then
+				hookState.ring = {}          -- identities waiting their turn
+				hookState.head = 1           -- index of the front of the ring
+				hookState.count = 0          -- identities currently in the ring
+				hookState.frameNo = 0        -- bumped once per call
+				hookState.seenStamp = {}     -- id -> last frame it appeared in input
+				hookState.queuedStamp = {}   -- id -> true while sitting in the ring
+				hookState.slots = {}         -- slots[slotIndex][id] = component value
+				for i = 1, DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS do
+					hookState.slots[i] = {}
+				end
+				hookState.packedPayloads = {} -- fallback payloads for very wide queries
+				hookState.arity = nil        -- nil = probing; -1 = permanent fallback; 0..N = fast path
+				hookState.emitted = 0        -- emissions so far this call
+				hookState.origin = nil       -- clock reading captured at first pop attempt
 				hookMaid:GiveTask(function()
 					table.clear(hookState)
 				end)
 			end
 
-			if hookState.payloads == nil then
-				hookState.payloads = {}
-			end
-			local payloads = hookState.payloads
-
-			debug.profilebegin("throttledSetQueue.forEachIdentity")
-			local seen = {}
-			forEachIdentity(input, function(identity, ...)
-				seen[identity] = true
-				local extraCount = select("#", ...)
-				if extraCount > 0 then
-					payloads[identity] = table.pack(...)
-				else
-					payloads[identity] = nil
-				end
-				if not hookState.inQueue[identity] then
-					hookState.inQueue[identity] = true
-					table.insert(hookState.queue, identity)
-				end
-			end)
-			debug.profileend()
-
-			debug.profilebegin("throttledSetQueue.kept")
-			local kept = {}
-			for _, identity in hookState.queue do
-				if seen[identity] then
-					table.insert(kept, identity)
-				else
-					hookState.inQueue[identity] = nil
-					payloads[identity] = nil
-				end
-			end
-			hookState.queue = kept
-			debug.profileend()
-
-			debug.profilebegin("throttledSetQueue.countBudget")
-			-- Default to one identity when neither bound is set.
+			-- Per-call reset + argument normalization. The drain closure is
+			-- built ONCE and reused, so arguments go into hookState instead
+			-- of being captured.
+			hookState.frameNo += 1
+			hookState.emitted = 0
+			hookState.origin = nil
+			hookState.floorCount = minCount or 0
 			local countBudget = maxCount
 			if countBudget == nil and maxTime == nil then
-				countBudget = 1
+				countBudget = 1 -- default: spread one candidate per call
 			end
-			-- Floor: keep emitting until at least this many, even if count/time already elapsed.
-			local countFloor = minCount or 0
-			debug.profileend()
+			hookState.countBudget = countBudget
+			hookState.maxTime = maxTime
+			hookState.retainAll = retainAllCandidates == true
+			local frameNo = hookState.frameNo
 
-			local emittedCount = 0
-			local startedAt: number? = nil
-			debug.profileend()
-			return function()
-				debug.profilebegin("throttledSetQueue.returnedcallback")
-				local origin = startedAt
-				if origin == nil then
-					origin = os.clock()
-					startedAt = origin
+			-- Ring housekeeping. Pops leave holes at the front; occasionally
+			-- slide the live section back down in ONE bulk move instead of
+			-- shifting on every pop.
+			do
+				local head, count = hookState.head, hookState.count
+				if count == 0 then
+					table.clear(hookState.ring)
+					hookState.head = 1
+				elseif head > 256 then
+					local oldEnd = head + count - 1
+					table.move(hookState.ring, head, oldEnd, 1)
+					for i = count + 1, oldEnd do
+						hookState.ring[i] = nil
+					end
+					hookState.head = 1
 				end
-				local metFloor = emittedCount >= countFloor
-				if countBudget ~= nil and emittedCount >= countBudget and metFloor then
-					return nil
-				end
-				if maxTime ~= nil and (os.clock() - origin) >= maxTime and metFloor then
-					return nil
-				end
-				if #hookState.queue == 0 then
-					return nil
-				end
-
-				debug.profilebegin("throttledSetQueue.returnedcallback.remove")
-				local identity = table.remove(hookState.queue, 1)
-				hookState.inQueue[identity] = nil
-				emittedCount += 1
-				debug.profileend()
-
-				debug.profilebegin("throttledSetQueue.returnedcallback.add")
-				if seen[identity] and not hookState.inQueue[identity] then
-					hookState.inQueue[identity] = true
-					table.insert(hookState.queue, identity)
-				end
-				debug.profileend()
-
-				debug.profileend()
-				local packed = payloads[identity]
-				if packed then
-					return identity, unpack(packed, 1, packed.n)
-				end
-				return identity
 			end
+
+			local ring = hookState.ring
+			local seenStamp = hookState.seenStamp
+			local queuedStamp = hookState.queuedStamp
+
+			------------------------------------------------------------------
+			-- PHASE 1: reconcile. One pass over the entire input. Marks who
+			-- is alive this frame, pushes newcomers to the back of the ring,
+			-- refreshes payload data. Emits nothing itself.
+			------------------------------------------------------------------
+			local mt = getmetatable(input)
+			if type(mt) == "table" and type(mt.__iter) == "function" then
+				-- ECS query (or any custom iterator).
+				local iterFn, iterState, ctrl = mt.__iter(input)
+
+				if hookState.arity == nil or hookState.arity == -1 then
+					-- Packing path. Runs on the first call ever (to learn the
+					-- query's shape), or forever for queries wider than
+					-- DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS. Assumes a stable
+					-- query shape, which holds for jecs queries.
+					local packed = table.pack(iterFn(iterState, ctrl))
+					while packed.n > 0 and packed[1] ~= nil do
+						local id = packed[1]
+						ctrl = id
+						seenStamp[id] = frameNo
+						if queuedStamp[id] == nil then
+							ring[hookState.head + hookState.count] = id
+							hookState.count += 1
+							queuedStamp[id] = true
+						end
+						if hookState.arity ~= -1 then
+							local extras = packed.n - 1
+							if extras > DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS then
+								hookState.arity = -1 -- too wide; permanent fallback
+								hookState.packedPayloads[id] = packed
+							else
+								hookState.arity = extras
+								for i = 1, extras do
+									hookState.slots[i][id] = packed[i + 1]
+								end
+							end
+						else
+							hookState.packedPayloads[id] = packed
+						end
+						packed = table.pack(iterFn(iterState, ctrl))
+					end
+				else
+					-- Steady-state fast path: capture the iterator's returns
+					-- positionally and write straight into flat arrays.
+					local s1 = hookState.slots[1]
+					local s2 = hookState.slots[2]
+					local s3 = hookState.slots[3]
+					local s4 = hookState.slots[4]
+					local s5 = hookState.slots[5]
+					local s6 = hookState.slots[6]
+					while true do
+						local i1, i2, i3, i4, i5, i6, i7 = iterFn(iterState, ctrl)
+						if i1 == nil then
+							break
+						end
+						ctrl = i1
+						seenStamp[i1] = frameNo
+						if queuedStamp[i1] == nil then
+							ring[hookState.head + hookState.count] = i1
+							hookState.count += 1
+							queuedStamp[i1] = true
+						end
+						s1[i1] = i2
+						s2[i1] = i3
+						s3[i1] = i4
+						s4[i1] = i5
+						s5[i1] = i6
+						s6[i1] = i7
+					end
+				end
+			else
+				-- Plain table: candidates are the VALUES.
+				local k, v = next(input, nil)
+				while k ~= nil do
+					seenStamp[v] = frameNo
+					if queuedStamp[v] == nil then
+						ring[hookState.head + hookState.count] = v
+						hookState.count += 1
+						queuedStamp[v] = true
+					end
+					k, v = next(input, k)
+				end
+			end
+
+			------------------------------------------------------------------
+			-- PHASE 2: drain. The iterator your for-loop calls. Built once
+			-- per call site; reads per-frame settings from hookState.
+			------------------------------------------------------------------
+			if hookState.drain == nil then
+				hookState.drain = function()
+					local st = hookState
+					while st.count > 0 do
+						-- Ceilings only apply once the min-count floor is met;
+						-- the floor always wins over budget and time.
+						if st.emitted >= st.floorCount then
+							if st.countBudget ~= nil and st.emitted >= st.countBudget then
+								return nil
+							end
+							if st.maxTime ~= nil then
+								if st.origin == nil then
+									st.origin = os.clock() -- clock starts at first pop attempt
+								end
+								if os.clock() - st.origin >= st.maxTime then
+									return nil
+								end
+							end
+						end
+
+						-- O(1) pop from the front of the ring.
+						local h = st.head
+						local id = st.ring[h]
+						st.head = h + 1
+						st.count -= 1
+
+						local alive = st.seenStamp[id] == st.frameNo
+
+						if not alive then
+							-- Absent from the latest scan.
+							st.queuedStamp[id] = nil
+							if not st.retainAll then
+								-- Default mode: evicted silently, never
+								-- emitted. A future scan can re-add it.
+								continue
+							end
+							-- Retain mode: ONE final "goodbye" emission for
+							-- last-tick cleanup, then it leaves the rotation.
+						else
+							-- Alive: round-robin, back of the line.
+							st.ring[st.head + st.count] = id
+						end
+
+						st.emitted += 1
+
+						-- Rebuild the payload tuple. This branch ladder avoids
+						-- allocating anything and preserves the exact arity.
+						local arity = st.arity
+						if arity == -1 then
+							local packed = st.packedPayloads[id]
+							return id, unpack(packed, 2, packed.n)
+						end
+						if arity >= 1 then
+							local s = st.slots
+							if arity >= 4 then
+								if arity >= 6 then
+									return id, s[1][id], s[2][id], s[3][id], s[4][id], s[5][id], s[6][id]
+								elseif arity == 5 then
+									return id, s[1][id], s[2][id], s[3][id], s[4][id], s[5][id]
+								end
+								return id, s[1][id], s[2][id], s[3][id], s[4][id]
+							elseif arity == 3 then
+								return id, s[1][id], s[2][id], s[3][id]
+							elseif arity == 2 then
+								return id, s[1][id], s[2][id]
+							end
+							return id, s[1][id]
+						end
+						return id
+					end
+					return nil
+				end
+			end
+
+			return hookState.drain
 		end,
 
 		tween = function(_start: any, _goal: any, _duration: number, _dis: any?) end,
