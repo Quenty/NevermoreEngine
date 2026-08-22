@@ -261,7 +261,12 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 
 		draw = function(drawnThing: any, dis: any?)
 			local _hookState, _hookMaid = getOrCreateHookState(runtime, dis)
-			_hookMaid._currentlyDrawnThing = drawnThing
+
+			if _hookState._drawn then
+				_hookState._drawn:Destroy()
+			end
+			_hookState._drawn = drawnThing
+
 			return drawnThing
 		end,
 
@@ -558,34 +563,42 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 		end,
 
 		randomChoice = function(
-			choices: { [any]: number },
+			choices: { any } | { [any]: number },
 			dis: any?,
 			alwaysRandom: boolean?,
 			noCache: boolean?,
 			rng: Random?
 		)
 			local hookState, _hookMaid = getOrCreateHookState(runtime, dis)
-			if not hookState.init then
-				hookState.init = true
+
+			local function fillChoiceArrays()
 				hookState.arrayOfValues = {}
 				hookState.arrayOfWeights = {}
-				for value, weight in choices do
-					table.insert(hookState.arrayOfValues, value)
-					table.insert(hookState.arrayOfWeights, weight)
+				if choices[1] ~= nil then
+					for _, value in ipairs(choices) do
+						table.insert(hookState.arrayOfValues, value)
+						table.insert(hookState.arrayOfWeights, 1)
+					end
+				else
+					for value, weight in pairs(choices) do
+						table.insert(hookState.arrayOfValues, value)
+						table.insert(hookState.arrayOfWeights, weight)
+					end
 				end
+			end
+
+			if not hookState.init then
+				hookState.init = true
+				fillChoiceArrays()
 				hookState.chosen = RandomUtils.weightedChoice(hookState.arrayOfValues, hookState.arrayOfWeights, rng)
 				_hookMaid:GiveTask(function()
 					table.clear(hookState)
 				end)
 			end
+
 			if noCache then
 				if alwaysRandom == true then
-					hookState.arrayOfValues = {}
-					hookState.arrayOfWeights = {}
-					for value, weight in choices do
-						table.insert(hookState.arrayOfValues, value)
-						table.insert(hookState.arrayOfWeights, weight)
-					end
+					fillChoiceArrays()
 					hookState.chosen =
 						RandomUtils.weightedChoice(hookState.arrayOfValues, hookState.arrayOfWeights, rng)
 				end
