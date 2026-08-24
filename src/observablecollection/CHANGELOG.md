@@ -1,3 +1,16 @@
+# v12.48.1 (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/small fixes [#814](https://github.com/Quenty/NevermoreEngine/pull/814) ([@Quenty](https://github.com/Quenty))
+- fix: ObservableSortedList handles removal immediately. ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

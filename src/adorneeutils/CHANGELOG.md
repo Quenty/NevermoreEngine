@@ -1,3 +1,16 @@
+# v3.3.6 (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- Users/quenty/small fixes [#814](https://github.com/Quenty/NevermoreEngine/pull/814) ([@Quenty](https://github.com/Quenty))
+- fix: Tools being treated as models/instances in AdorneeUtils because of inheritance change ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
