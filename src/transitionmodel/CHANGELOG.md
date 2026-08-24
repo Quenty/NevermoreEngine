@@ -1,28 +1,13 @@
-# v7.48.0 (Mon Aug 24 2026)
-
-#### 🚀 Enhancement
-
-- users/quenty/transitions [#809](https://github.com/Quenty/NevermoreEngine/pull/809) ([@Quenty](https://github.com/Quenty))
-- feat: Add AccelTween transition model ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/euvinkeel/implot ([@euvinkeel](https://github.com/euvinkeel))
-- Merge branch 'main' into users/quenty/transitions ([@Quenty](https://github.com/Quenty))
-- refactor: Move SpringTransitionModel to new folder location ([@Quenty](https://github.com/Quenty))
-- refactor: Inherit from transition model appropriately ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 2
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.47.1...@quenty/transitionmodel@7.48.0) (2026-08-24)
+
+### Features
+
+- Add AccelTween transition model ([a9032e8](https://github.com/Quenty/NevermoreEngine/commit/a9032e89925316118c5793b2b75f6185fb59e116))
 
 ## [7.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.47.0...@quenty/transitionmodel@7.47.1) (2026-08-14)
 

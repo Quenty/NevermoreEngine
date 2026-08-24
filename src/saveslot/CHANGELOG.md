@@ -1,21 +1,14 @@
-# v2.9.0 (Mon Aug 24 2026)
-
-#### 🐛 Bug Fix
-
-- fix: Store save slot playtime synchronously [#812](https://github.com/Quenty/NevermoreEngine/pull/812) ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Check if alive ([@alex-y-z](https://github.com/alex-y-z))
-- fix: Store playtime synchronously ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.8.1...@quenty/saveslot@2.9.0) (2026-08-24)
+
+### Bug Fixes
+
+- Check if alive ([2c36dff](https://github.com/Quenty/NevermoreEngine/commit/2c36dff98a87749fc9f0598355751e5e52109b37))
+- Store playtime synchronously ([502c4c9](https://github.com/Quenty/NevermoreEngine/commit/502c4c9b253980a64720780f7d7570c01fa85e77))
 
 ## [2.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/saveslot@2.8.0...@quenty/saveslot@2.8.1) (2026-08-14)
 

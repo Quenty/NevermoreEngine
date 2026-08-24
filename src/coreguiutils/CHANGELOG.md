@@ -1,20 +1,11 @@
-# v10.24.0 (Mon Aug 24 2026)
-
-#### 🐛 Bug Fix
-
-- refactor: Extract promiseRetryGetCore from RxFriendUtils [#811](https://github.com/Quenty/NevermoreEngine/pull/811) ([@alex-y-z](https://github.com/alex-y-z))
-- refactor: Extract promiseRetryGetCore ([@alex-y-z](https://github.com/alex-y-z))
-
-#### Authors: 1
-
-- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguiutils@10.23.1...@quenty/coreguiutils@10.24.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/coreguiutils
 
 ## [10.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguiutils@10.23.0...@quenty/coreguiutils@10.23.1) (2026-08-14)
 
