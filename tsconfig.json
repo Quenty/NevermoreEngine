@@ -15,7 +15,15 @@
     "removeComments": false,
     "sourceMap": true,
     "strict": true,
+    "typeRoots": [
+      "node_modules/@rbxts",
+      "node_modules/@quenty"
+    ],
     "target": "ES2022",
+    "baseUrl": ".",
+    "paths": {
+      "@quenty/*": ["src/*"]
+    },
     "skipLibCheck": true
   },
   "types": ["node"]
