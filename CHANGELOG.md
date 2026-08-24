@@ -1,3 +1,33 @@
+# (Mon Aug 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.8.0`, `@quenty/camera@14.52.0`, `@quenty/timedtween@7.46.0`, `@quenty/transitionmodel@7.48.0`
+  - users/quenty/transitions [#809](https://github.com/Quenty/NevermoreEngine/pull/809) ([@Quenty](https://github.com/Quenty))
+- `@quenty/hide@11.46.0`
+  - feat: StudioEditOnly binder [#808](https://github.com/Quenty/NevermoreEngine/pull/808) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.9.0`
+  - fix: Store save slot playtime synchronously [#812](https://github.com/Quenty/NevermoreEngine/pull/812) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/coreguiutils@10.24.0`, `@quenty/friendutils@12.39.0`
+  - refactor: Extract promiseRetryGetCore from RxFriendUtils [#811](https://github.com/Quenty/NevermoreEngine/pull/811) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/immediateutils@1.2.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - fix: jecs and iris nevermore-style integration, replace with separate forks [#805](https://github.com/Quenty/NevermoreEngine/pull/805) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/hide@11.46.0`
+  - fix: ...actually include StudioEditOnly within the service [#810](https://github.com/Quenty/NevermoreEngine/pull/810) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/friendutils@12.39.0`
+  - fix: Retry on GetCore failure [#807](https://github.com/Quenty/NevermoreEngine/pull/807) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Aug 16 2026)
 
 #### 🐛 Bug Fix
