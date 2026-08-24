@@ -153,10 +153,10 @@ nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to de
 |------|-------------|
 | `--cloud` | Run via Open Cloud instead of locally. |
 | `--api-key <key>` | Open Cloud API key (`--cloud` only). Otherwise resolved from login/env. |
-| `--logs` | Show execution logs even on success. |
+| `--logs` | Show execution logs even on success. On by default with `--script-text`; pass `--no-logs` to suppress. |
 | `--universe-id <id>` / `--place-id <id>` | Override the IDs from `deploy.nevermore.json` (`--cloud` only). |
 | `--script-template <path>` | Override the Luau script template to execute. |
-| `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging. |
+| `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging; implies `--logs`. |
 | `--output <file>` | Write JSON results to a file. |
 | `--timeout <seconds>` | Max execution time, sent to Open Cloud so Roblox cancels server-side on overrun (default: 120). |
 
