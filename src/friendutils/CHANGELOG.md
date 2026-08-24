@@ -1,3 +1,22 @@
+# v12.39.0 (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- refactor: Extract promiseRetryGetCore from RxFriendUtils [#811](https://github.com/Quenty/NevermoreEngine/pull/811) ([@alex-y-z](https://github.com/alex-y-z))
+- refactor: Extract promiseRetryGetCore ([@alex-y-z](https://github.com/alex-y-z))
+- Merge branch 'main' into users/quenty/transitions ([@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/euvinkeel/implot ([@euvinkeel](https://github.com/euvinkeel))
+- fix: Retry on GetCore failure [#807](https://github.com/Quenty/NevermoreEngine/pull/807) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Retry on GetCore failure ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

@@ -1,3 +1,24 @@
+# v11.46.0 (Mon Aug 24 2026)
+
+#### 🚀 Enhancement
+
+- feat: StudioEditOnly binder [#808](https://github.com/Quenty/NevermoreEngine/pull/808) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/euvinkeel/implot ([@euvinkeel](https://github.com/euvinkeel))
+- Merge branch 'main' into users/quenty/transitions ([@Quenty](https://github.com/Quenty))
+- fix: ...actually include StudioEditOnly within the service [#810](https://github.com/Quenty/NevermoreEngine/pull/810) ([@euvinkeel](https://github.com/euvinkeel))
+- ...actually include it within the service ([@euvinkeel](https://github.com/euvinkeel))
+- Create StudioEditOnly.lua ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 2
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

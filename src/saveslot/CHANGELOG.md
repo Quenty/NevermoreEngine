@@ -1,3 +1,17 @@
+# v2.9.0 (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Store save slot playtime synchronously [#812](https://github.com/Quenty/NevermoreEngine/pull/812) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Check if alive ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Store playtime synchronously ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
