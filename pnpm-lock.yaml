@@ -377,7 +377,20 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
 
-  src/adorneeutils: {}
+  src/adorneeutils:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/adorneevalue:
     dependencies:

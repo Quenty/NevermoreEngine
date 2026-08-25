@@ -1,5 +1,18 @@
 # (Mon Aug 24 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeutils@3.3.6`, `@quenty/observablecollection@12.48.1`
+  - Users/quenty/small fixes [#814](https://github.com/Quenty/NevermoreEngine/pull/814) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 24 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/acceltween@2.8.0`, `@quenty/camera@14.52.0`, `@quenty/timedtween@7.46.0`, `@quenty/transitionmodel@7.48.0`
