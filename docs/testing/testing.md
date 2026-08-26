@@ -122,6 +122,37 @@ drops by more than one. (This is why the guideline above matters even though it 
 belt-and-braces: teardown you only reach on the happy path is teardown you lose exactly when a test
 is failing.)
 
+**`JestUtils.afterThis` queues cleanup that survives a failed assertion.** `@quenty/jestutils` takes
+any maid task — a function, an `Instance`, a connection, a thread, anything with `Destroy` — next to
+the code that creates it, and unwinds the queue in reverse once the test finishes, pass or fail:
+
+```luau
+local JestUtils = require("JestUtils")
+
+it("does a thing", function()
+	local controller = setup()
+	JestUtils.afterThis(controller.destroy)
+
+	local thing = SomeClass.new()
+	JestUtils.afterThis(thing)
+
+	expect(thing:DoSomething()).toEqual(true)
+end)
+```
+
+The queue unwinds from a Jest `afterEach`, so a throwing `expect` no longer strands what the test
+built. Every queued task runs even when an earlier one throws, and the failures are reported together
+against the test that queued them.
+
+`afterThis` returns a function that unqueues the task again, and that function is itself a maid task.
+An object that already cleans up on its own can hand it back to its own maid, so whichever happens
+first wins and nothing is destroyed twice:
+
+```luau
+local maid = Maid.new()
+maid:GiveTask(JestUtils.afterThis(maid))
+```
+
 ### Consume every rejection (or Jest passes but the run still fails)
 
 Jest only tracks assertions that run inside an `it`. Any **uncaught Luau error** raised outside that —
