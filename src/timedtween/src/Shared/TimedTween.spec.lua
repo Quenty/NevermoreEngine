@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local TimedTween = require("TimedTween")
 
 local describe = Jest.Globals.describe
@@ -25,14 +27,15 @@ type Controller = {
 }
 
 local function setup(): Controller
-	local tween: any = TimedTween.new(TRANSITION_TIME)
+	local maid = Maid.new()
+	local tween: any = maid:Add(TimedTween.new(TRANSITION_TIME))
 
 	local now = 0
 	tween:SetClock(function()
 		return now
 	end)
 
-	return {
+	local controller: Controller = {
 		tween = tween,
 		position = function()
 			return tween:_computeState(tween:GetClock()()).p
@@ -50,9 +53,13 @@ local function setup(): Controller
 			now += seconds
 		end,
 		destroy = function()
-			tween:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("TimedTween.GetClock", function()
@@ -391,7 +398,6 @@ describe("TimedTween:PromiseFinished", function()
 		local promise = controller.tween:PromiseFinished()
 		expect(promise:IsPending()).toBe(true)
 
-		-- Wall time runs well past the transition while the injected clock stays put
 		task.wait(TRANSITION_TIME * 3)
 		expect(promise:IsPending()).toBe(true)
 

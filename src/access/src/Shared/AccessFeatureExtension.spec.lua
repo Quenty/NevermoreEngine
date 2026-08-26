@@ -15,6 +15,7 @@ local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local Rx = require("Rx")
@@ -35,7 +36,7 @@ local function setup()
 
 	local ownsGame = assert(accessDataService:GetFeature(WellKnownAccessFeatureNames.OWNS_GAME), "No owns-game feature")
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		ownsGame = ownsGame,
@@ -66,6 +67,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("the shipped owns-game feature", function()

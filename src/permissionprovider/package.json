@@ -32,6 +32,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/enums": "workspace:*",
     "@quenty/grouputils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

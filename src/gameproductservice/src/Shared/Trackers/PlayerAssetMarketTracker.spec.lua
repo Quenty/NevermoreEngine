@@ -2,8 +2,7 @@
 --[[
 	Unit coverage for PlayerAssetMarketTracker. The tracker is constructed directly with a fake
 	id-conversion table and a synchronous brio observable, so no ServiceBag, GameConfig, or real
-	MarketplaceService is involved. Each test builds a fresh tracker and destroys it so nothing
-	leaks into the shared test place.
+	MarketplaceService is involved.
 
 	@class PlayerAssetMarketTracker.spec.lua
 ]]
@@ -12,6 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local Brio = require("Brio")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -32,9 +33,6 @@ local function convertIds(idOrKey)
 	return KEY_TO_ID[idOrKey]
 end
 
--- Emits a single live brio wrapping the resolved id, synchronously on subscribe, then completes
--- for unknown keys. Synchronous emission lets ObserveAssetPurchased register the known id before
--- the test fires Purchased.
 local function observeIdsBrio(idOrKey)
 	return Observable.new(function(sub)
 		local id = convertIds(idOrKey)
@@ -53,25 +51,37 @@ local function observeIdsBrio(idOrKey)
 end
 
 local function setup()
+	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.PRODUCT, convertIds, observeIdsBrio)
+	maid:GiveTask(tracker)
 
-	return {
+	local controller = {
 		tracker = tracker,
 		destroy = function()
-			tracker:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function setupNonPromptable()
+	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.GAME, convertIds, observeIdsBrio, false)
+	maid:GiveTask(tracker)
 
-	return {
+	local controller = {
 		tracker = tracker,
 		destroy = function()
-			tracker:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function promptAndCapture(tracker, idOrKey)

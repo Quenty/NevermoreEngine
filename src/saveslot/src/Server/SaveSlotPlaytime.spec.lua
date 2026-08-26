@@ -12,6 +12,7 @@ local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local HasSaveSlotsDataStore = require("HasSaveSlotsDataStore")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -64,7 +65,7 @@ local function setup()
 	}))
 	await(slotsDataStore:PromiseSlotsLoaded(), "slots loaded")
 
-	return {
+	local controller = {
 		await = await,
 		mock = mock,
 		dataStore = dataStore,
@@ -89,6 +90,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("save slot playtime", function()

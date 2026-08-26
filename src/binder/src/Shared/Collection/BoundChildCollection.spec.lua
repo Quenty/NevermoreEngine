@@ -9,6 +9,8 @@ local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local BoundChildCollection = require("BoundChildCollection")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,8 +41,8 @@ local function setup()
 	container.Name = "BoundChildCollectionSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
-	local cleanups = {}
+	local instances: { Instance } = {}
+	local cleanups: { any } = {}
 	local booted = false
 
 	local binder = Binder.new(string.format("BoundChildCollectionSpecTag_%d", suffix), makeClass() :: any)
@@ -67,27 +71,35 @@ local function setup()
 		serviceBag:Start()
 	end
 
-	return {
+	maid:GiveTask(function()
+		for _, item in cleanups do
+			pcall(function()
+				item:Destroy()
+			end)
+		end
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		binder = binder,
 		newInstance = newInstance,
 		track = track,
 		boot = boot,
 		destroy = function()
-			for _, item in cleanups do
-				pcall(function()
-					item:Destroy()
-				end)
-			end
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("BoundChildCollection construction", function()

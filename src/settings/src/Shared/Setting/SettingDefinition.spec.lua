@@ -16,6 +16,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
@@ -72,7 +73,7 @@ local function setup()
 	end
 	implement()
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		player = player,
 		definition = SettingDefinition.new(SETTING_NAME, DEFAULT_VALUE),
@@ -83,6 +84,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("SettingDefinition.GetSettingProperty", function()

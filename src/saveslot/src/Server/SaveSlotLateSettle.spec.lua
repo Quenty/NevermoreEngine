@@ -16,13 +16,13 @@ local Workspace = game:GetService("Workspace")
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local ServiceBag = require("ServiceBag")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
@@ -33,18 +33,6 @@ local EXISTING_SLOT_ID = "e6f0c1a2-late-settle"
 -- Every datastore read yields this long, so the spec can land the unbind inside a chosen
 -- read's in-flight window.
 local READ_YIELD_SECONDS = 0.5
-
-local activeController: any = nil
-
-afterEach(function()
-	-- Safety net for a failing test: destroy is idempotent, so this is a no-op after the test's
-	-- own controller:destroy() and a full teardown when an assertion threw before reaching it.
-	if activeController then
-		local controller = activeController
-		activeController = nil
-		controller:destroy()
-	end
-end)
 
 local function setup()
 	local maid = Maid.new()
@@ -63,20 +51,11 @@ local function setup()
 	local fakePlayer = maid:Add(PlayerMock.new({ UserId = USER_ID }))
 	fakePlayer.Parent = Workspace
 
-	local destroyed = false
-	local controller: any
-	controller = {
+	local controller: any = {
 		hasSaveSlotsBinder = hasSaveSlotsBinder,
 		fakePlayer = fakePlayer,
 		mock = mock,
-		destroy = function(self: any)
-			if destroyed then
-				return
-			end
-			destroyed = true
-			if activeController == self then
-				activeController = nil
-			end
+		destroy = function()
 			-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
 			-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
 			-- this spec and fires inside a later package's window.
@@ -88,7 +67,8 @@ local function setup()
 			task.wait(READ_YIELD_SECONDS * 3)
 		end,
 	}
-	activeController = controller
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

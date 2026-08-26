@@ -35,6 +35,7 @@
     "@quenty/draw": "workspace:*",
     "@quenty/ducktype": "workspace:*",
     "@quenty/inputobjectutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",

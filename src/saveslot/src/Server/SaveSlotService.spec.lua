@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
@@ -38,7 +39,7 @@ local function setup()
 	serviceBag:Init()
 	playerDataStoreService:SetRobloxDataStore(DataStoreMock.new())
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		saveSlotService = saveSlotService,
 		teleportDataService = teleportDataService,
@@ -59,6 +60,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("SaveSlotService initialization", function()

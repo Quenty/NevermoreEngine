@@ -13,6 +13,8 @@ local CameraState = require("CameraState")
 local CameraStateTweener = require("CameraStateTweener")
 local CustomCameraEffect = require("CustomCameraEffect")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 local TransitionModel = require("TransitionModel")
@@ -36,12 +38,19 @@ local function makeEffect(): CustomCameraEffect.CustomCameraEffect
 	end)
 end
 
--- The underlying spring reads wall time analytically, so swapping its clock makes every
--- animation assertion deterministic instead of a timing race.
 local function setup(options: { speed: number? }?): Controller
+	local maid = Maid.new()
+
 	local cameraStack = CameraStack.new()
 	local cameraEffect = makeEffect()
 	local tweener = CameraStateTweener.new(cameraStack, cameraEffect, options and options.speed)
+
+	maid:GiveTask(function()
+		if tweener.Destroy then
+			tweener:Destroy()
+		end
+		cameraStack:Destroy()
+	end)
 
 	local now = 0
 	local fader: any = tweener:GetFader()
@@ -49,7 +58,7 @@ local function setup(options: { speed: number? }?): Controller
 		return now
 	end
 
-	return {
+	local controller: Controller = {
 		cameraStack = cameraStack,
 		cameraEffect = cameraEffect,
 		tweener = tweener,
@@ -61,12 +70,13 @@ local function setup(options: { speed: number? }?): Controller
 			task.wait()
 		end,
 		destroy = function()
-			if tweener.Destroy then
-				tweener:Destroy()
-			end
-			cameraStack:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("CameraStateTweener.new", function()
@@ -109,7 +119,7 @@ describe("CameraStateTweener.new", function()
 	it("accepts a service bag holding a CameraStackService", function()
 		local player = PlayerMock.new({ UserId = 66123202 })
 		player.Parent = Workspace
-		PlayerMock.setMockedLocalPlayer(player)
+		local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
 
 		local serviceBag = ServiceBag.new()
 		local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
@@ -122,7 +132,7 @@ describe("CameraStateTweener.new", function()
 
 		tweener:Destroy()
 		serviceBag:Destroy()
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		player:Destroy()
 	end)
 

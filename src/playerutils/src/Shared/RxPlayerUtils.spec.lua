@@ -4,6 +4,7 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -43,12 +44,7 @@ local function setup(): any
 			return player
 		end,
 		designateLocalPlayer = function(player: Player?)
-			PlayerMock.setMockedLocalPlayer(player)
-			maid:GiveTask(function()
-				if player ~= nil and PlayerMock.getMockedLocalPlayer() == player then
-					PlayerMock.setMockedLocalPlayer(nil)
-				end
-			end)
+			maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
 		end,
 		record = function(observable: any): { any }
 			local values = {}
@@ -66,6 +62,8 @@ local function setup(): any
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

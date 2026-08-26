@@ -37,13 +37,10 @@ local function newDummyRealmPair(name: string)
 	return server, client, instance
 end
 
--- The designation requires the mock to be in the DataModel; callers clear with
--- PlayerMock.setMockedLocalPlayer(nil) and destroy the mock on the way out.
-local function designateLocalPlayerMock(userId: number): Player
+local function designateLocalPlayerMock(userId: number): (Player, () -> ())
 	local playerMock = PlayerMock.new({ UserId = userId })
 	playerMock.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(playerMock)
-	return playerMock
+	return playerMock, PlayerMock.setMockedLocalPlayer(playerMock)
 end
 
 describe("Remoting.new", function()
@@ -379,7 +376,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("attributes a client FireServer to the designated mocked local player", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		local receivedPlayer
 		server:Connect("Ping", function(player)
@@ -393,7 +390,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(receivedPlayer).toBe(playerMock)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -402,7 +399,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("attributes a client InvokeServer to the designated mocked local player", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		local receivedPlayer
 		server:Bind("WhoAmI", function(player)
@@ -414,7 +411,7 @@ describe("Remoting dummy-mode round trip", function()
 		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
 		expect(receivedPlayer).toBe(playerMock)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -445,7 +442,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("delivers a server FireClient targeted at the mocked local player to the client Connect handler", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		-- Declare first so the client's Connect binds synchronously to the existing channel.
 		server:DeclareEvent("Pong")
@@ -462,7 +459,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(received).toEqual(42)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -471,7 +468,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("drops a server FireClient targeted at a player who is not the mocked local player", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 		local otherPlayerMock = PlayerMock.new({ UserId = 12346 })
 
 		server:DeclareEvent("Pong")
@@ -490,7 +487,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(receivedTags).toEqual({ "delivered" })
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -529,7 +526,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("FireAllClientsExcept skips the mocked local player and delivers for other or nil exclusions", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 		local otherPlayerMock = PlayerMock.new({ UserId = 12346 })
 
 		server:DeclareEvent("Pong")
@@ -549,7 +546,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(receivedTags).toEqual({ "delivered", "broadcast" })
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -571,7 +568,7 @@ describe("Remoting dummy-mode round trip", function()
 
 		-- Ordered probe: with no designated local player there is no simulated client to receive.
 		server:FireClient("Pong", playerMock, "dropped")
-		PlayerMock.setMockedLocalPlayer(playerMock)
+		local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(playerMock)
 		server:FireClient("Pong", playerMock, "delivered")
 
 		expect(PromiseTestUtils.awaitValue(function()
@@ -579,7 +576,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(receivedTags).toEqual({ "delivered" })
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -588,7 +585,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("returns a client Bind result to a server PromiseInvokeClient against a mock player", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		-- Declare first so the client's Bind attaches synchronously to the existing channel.
 		server:DeclareMethod("Compute")
@@ -603,7 +600,7 @@ describe("Remoting dummy-mode round trip", function()
 		expect(isFulfilled).toEqual(true)
 		expect(result).toEqual(10)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -612,7 +609,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("InvokeClient returns the client's bound value", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		server:DeclareMethod("Compute")
 		client:Bind("Compute", function(n)
@@ -629,7 +626,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(result).toEqual(10)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -638,7 +635,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("supports PlayerMocks through the RemotingMember API", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		server.Pong:DeclareEvent()
 
@@ -654,7 +651,7 @@ describe("Remoting dummy-mode round trip", function()
 		end)).toEqual(true)
 		expect(received).toEqual(42)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -663,7 +660,7 @@ describe("Remoting dummy-mode round trip", function()
 
 	it("supports client-side fires and invokes through the RemotingMember API", function()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		local receivedPlayer, receivedValue
 		server.Ping:Connect(function(player, value)
@@ -689,7 +686,7 @@ describe("Remoting dummy-mode round trip", function()
 		expect(receivedPlayer).toBe(playerMock)
 		expect(receivedValue).toEqual(42)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -746,7 +743,7 @@ end)
 describe("Remoting dummy-mode connection lifecycle", function()
 	it("delivers to a client Connect made before the server declares the event", function()
 		local server, client, instance = newDummyRealmPair("Lifecycle")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		local received
 		client:Connect("Pong", function(value)
@@ -763,7 +760,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		end)).toEqual(true)
 		expect(received).toEqual(42)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -772,7 +769,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 	it("attaches a client Bind made before the server declares the method", function()
 		local server, client, instance = newDummyRealmPair("Lifecycle")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		client:Bind("Compute", function(n)
 			return n * 2
@@ -787,7 +784,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		expect(isFulfilled).toEqual(true)
 		expect(result).toEqual(10)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -796,7 +793,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 	it("does not replay a fire to a Connect made after it", function()
 		local server, client, instance = newDummyRealmPair("Lifecycle")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		server:DeclareEvent("Pong")
 		server:FireClient("Pong", playerMock, "early")
@@ -813,7 +810,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		end)).toEqual(true)
 		expect(receivedTags).toEqual({ "late" })
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -852,7 +849,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 	it("stops delivering to a client Connect after its maid is cleaned", function()
 		local server, client, instance = newDummyRealmPair("Lifecycle")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		server:DeclareEvent("Pong")
 
@@ -878,7 +875,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		expect(receivedA).toEqual({ "first" })
 		expect(receivedB).toEqual({ "first", "second" })
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()
@@ -889,7 +886,7 @@ end)
 describe("Remoting dummy-mode fidelity", function()
 	it("preserves argument count and nil holes through FireServer", function()
 		local server, client, instance = newDummyRealmPair("Fidelity")
-		local playerMock = designateLocalPlayerMock(12345)
+		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		local receivedArgs
 		server:Connect("Ping", function(_player, ...)
@@ -906,7 +903,7 @@ describe("Remoting dummy-mode fidelity", function()
 		expect(receivedArgs[2]).toEqual(nil)
 		expect(receivedArgs[3]).toEqual(3)
 
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
 		playerMock:Destroy()

@@ -11,6 +11,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
@@ -29,7 +30,7 @@ local function setup()
 	local service: TeleportDataService.TeleportDataService = serviceBag:GetService(TeleportDataService) :: any
 	serviceBag:Init()
 
-	return {
+	local controller = {
 		service = service,
 		fakePlayer = function(userId: number?): Player
 			return maid:Add(PlayerMock.new(if userId ~= nil then { UserId = userId } else nil))
@@ -44,6 +45,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared builder)", function()

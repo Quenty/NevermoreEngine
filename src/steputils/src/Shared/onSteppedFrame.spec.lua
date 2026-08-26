@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local onSteppedFrame = require("onSteppedFrame")
 
 local describe = Jest.Globals.describe
@@ -18,7 +20,14 @@ type Controller = {
 }
 
 local function setup(): Controller
+	local maid = Maid.new()
 	local connections: { RBXScriptConnection } = {}
+
+	maid:GiveTask(function()
+		for _, conn in connections do
+			conn:Disconnect()
+		end
+	end)
 
 	local controller: Controller = {
 		bind = function(callback)
@@ -28,11 +37,11 @@ local function setup(): Controller
 		end,
 
 		destroy = function()
-			for _, conn in connections do
-				conn:Disconnect()
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

@@ -13,6 +13,8 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local Ragdoll = require("Ragdoll")
@@ -32,6 +34,8 @@ local specCounter = 0
 
 local function setup()
 	specCounter += 1
+
+	local maid = Maid.new()
 
 	local container = Instance.new("Folder")
 	container.Name = string.format("RagdollServiceSpecContainer_%d", specCounter)
@@ -60,13 +64,17 @@ local function setup()
 		end
 	end
 
-	local function destroy()
+	maid:GiveTask(function()
 		destroyBag()
 		mock:Destroy()
 		container:Destroy()
+	end)
+
+	local function destroy()
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		ragdollService = ragdollService,
 		mock = mock,
@@ -75,6 +83,10 @@ local function setup()
 		destroyBag = destroyBag,
 		destroy = destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("RagdollService with a mock player R6 character", function()

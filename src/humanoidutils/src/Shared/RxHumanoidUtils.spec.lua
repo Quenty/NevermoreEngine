@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local RxHumanoidUtils = require("RxHumanoidUtils")
 
@@ -40,6 +41,8 @@ local function setup(): any
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

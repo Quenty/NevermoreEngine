@@ -1756,6 +1756,17 @@ function PlayerMock.getSelectedGuiObjectChangedSignal(player: Player): RBXScript
 	return getOrCreateSelectedGuiObjectValue(player):GetPropertyChangedSignal("Value")
 end
 
+local function applyMockedLocalPlayer(player: Player?)
+	-- Only one mock can be the local player at a time.
+	for _, tagged in CollectionService:GetTagged(LOCAL_PLAYER_TAG) do
+		CollectionService:RemoveTag(tagged, LOCAL_PLAYER_TAG)
+	end
+
+	if player ~= nil then
+		CollectionService:AddTag(player :: Instance, LOCAL_PLAYER_TAG)
+	end
+end
+
 --[=[
 	Designates a mock as the local player for the client realm (or clears it with nil). Read through
 	[PlayerMock.getMockedLocalPlayer] by client code falling back from `Players.LocalPlayer`.
@@ -1770,22 +1781,49 @@ end
 	CollectionService tag, and `GetTagged` only resolves parented instances -- an unparented
 	designation would silently read back as nil.
 
+	The returned disposer undoes *this* designation, so no caller has to hand-write the inverse. It
+	is a valid maid task:
+
+	```lua
+	maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
+	```
+
+	It restores whatever was designated before this call rather than unconditionally clearing, so
+	nested designations unwind correctly (degrading to a clear in the common case where there was
+	none, or where the previous mock has since left the DataModel). It is a no-op when the
+	designation has since moved on -- a later `setMockedLocalPlayer` owns the designation from then
+	on and is never clobbered -- and calling it more than once is safe.
+
 	@param player Player? -- must be a PlayerMock in the DataModel, or nil to clear
+	@return () -> () -- Restores the previous designation. Safe to call more than once.
 ]=]
-function PlayerMock.setMockedLocalPlayer(player: Player?)
+function PlayerMock.setMockedLocalPlayer(player: Player?): () -> ()
 	assert(player == nil or PlayerMock.isMock(player), "Not a PlayerMock")
 	assert(
 		player == nil or (player :: Instance):IsDescendantOf(game),
 		"PlayerMock must be parented into the DataModel to be designated the local player"
 	)
 
-	-- Only one mock can be the local player at a time.
-	for _, tagged in CollectionService:GetTagged(LOCAL_PLAYER_TAG) do
-		CollectionService:RemoveTag(tagged, LOCAL_PLAYER_TAG)
-	end
+	local previous = PlayerMock.getMockedLocalPlayer()
 
-	if player ~= nil then
-		CollectionService:AddTag(player :: Instance, LOCAL_PLAYER_TAG)
+	applyMockedLocalPlayer(player)
+
+	local disposed = false
+	return function()
+		if disposed then
+			return
+		end
+		disposed = true
+
+		if PlayerMock.getMockedLocalPlayer() ~= player then
+			return
+		end
+
+		if previous ~= nil and not (previous :: Instance):IsDescendantOf(game) then
+			previous = nil
+		end
+
+		applyMockedLocalPlayer(previous)
 	end
 end
 

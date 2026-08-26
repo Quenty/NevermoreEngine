@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
@@ -33,7 +34,7 @@ local function setup(mock)
 	playerDataStoreService:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		playerDataStoreService = playerDataStoreService,
 		mock = mock,
 		destroy = function()
@@ -44,6 +45,10 @@ local function setup(mock)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function resolveDataStore(playerDataStoreService, userId)

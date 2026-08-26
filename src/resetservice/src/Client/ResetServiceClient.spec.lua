@@ -11,6 +11,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
@@ -32,6 +34,8 @@ local specCounter = 0
 local function setup()
 	specCounter += 1
 
+	local maid = Maid.new()
+
 	local serverBag = ServiceBag.new()
 	local resetService: any = serverBag:GetService(ResetService)
 	local playerMockService: any = serverBag:GetService(PlayerMockService)
@@ -47,7 +51,14 @@ local function setup()
 	playerMockServiceClient:SetLocalPlayer(mock)
 	clientBag:Start()
 
-	return {
+	maid:GiveTask(function()
+		-- Client bags first: the server bag owns the mock, and destroying it out from under a
+		-- live client is not something production ever does.
+		clientBag:Destroy()
+		serverBag:Destroy()
+	end)
+
+	local controller = {
 		serverBag = serverBag,
 		clientBag = clientBag,
 		resetService = resetService,
@@ -58,12 +69,13 @@ local function setup()
 			return character, assert(character:FindFirstChildOfClass("Humanoid"), "No humanoid in rig")
 		end,
 		destroy = function(_self)
-			-- Client bags first: the server bag owns the mock, and destroying it out from under a
-			-- live client is not something production ever does.
-			clientBag:Destroy()
-			serverBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("ResetServiceClient dual-realm boot", function()

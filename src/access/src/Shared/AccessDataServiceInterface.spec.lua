@@ -11,6 +11,7 @@ local AccessDataServiceInterface = require("AccessDataServiceInterface")
 local AccessFact = require("AccessFact")
 local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -27,7 +28,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
@@ -47,6 +48,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("AccessDataServiceInterface", function()

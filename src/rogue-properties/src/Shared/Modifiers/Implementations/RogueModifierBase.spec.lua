@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RogueModifierBase = require("RogueModifierBase")
 local ServiceBag = require("ServiceBag")
 
@@ -14,7 +16,8 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("TieRealmService"))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -25,12 +28,16 @@ local function setup()
 		return RogueModifierBase.new(valueObject, serviceBag), valueObject
 	end
 
-	return {
+	local controller = {
 		newModifierBase = newModifierBase,
 		destroy = function(_self: any)
-			serviceBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("RogueModifierBase", function()

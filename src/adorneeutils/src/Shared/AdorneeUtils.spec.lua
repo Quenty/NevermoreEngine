@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AdorneeUtils = require("AdorneeUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
@@ -165,6 +166,8 @@ local function setup(): Controller
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderUtils = require("PermissionProviderUtils")
@@ -32,7 +33,7 @@ local function setup()
 		userId = CREATOR_USER_ID,
 	})))
 
-	return {
+	local controller = {
 		provider = provider,
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
@@ -47,6 +48,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("CreatorPermissionProvider.new", function()

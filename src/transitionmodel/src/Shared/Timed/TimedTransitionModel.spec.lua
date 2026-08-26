@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local TimedTransitionModel = require("TimedTransitionModel")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
@@ -24,18 +26,20 @@ type Controller = {
 	destroy: () -> (),
 }
 
--- The injected clock makes position exact. Completion still runs off a real task.delay inside
--- TimedTween.PromiseFinished, so the fake clock and real time are advanced together.
+-- Completion runs off a real task.delay inside TimedTween.PromiseFinished, so the fake clock and
+-- real time have to be advanced together.
 local function setup(options: { transitionTime: number? }?): Controller
+	local maid = Maid.new()
+
 	local transitionTime = (options and options.transitionTime) or TRANSITION_TIME
-	local model: any = TimedTransitionModel.new(transitionTime)
+	local model: any = maid:Add(TimedTransitionModel.new(transitionTime))
 
 	local now = 0
 	model._timedTween:SetClock(function()
 		return now
 	end)
 
-	return {
+	local controller = {
 		model = model,
 		position = function()
 			return model._timedTween:_computeState(now).p
@@ -46,11 +50,13 @@ local function setup(options: { transitionTime: number? }?): Controller
 			task.wait()
 		end,
 		destroy = function()
-			if model.Destroy then
-				model:Destroy()
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("TimedTransitionModel.new", function()

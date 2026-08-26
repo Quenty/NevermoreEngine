@@ -10,6 +10,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -27,6 +29,8 @@ local it = Jest.Globals.it
 local FAKE_USER_ID = 424242
 
 local function setup()
+	local maid = Maid.new()
+
 	local playerMock = DataStoreMock.new()
 	local sharedMock = DataStoreMock.new()
 
@@ -48,22 +52,29 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	local function destroy()
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
+	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
+	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
+	maid:GiveTask(function()
 		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
+	end)
+
+	local function destroy()
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		hasSaveSlots = hasSaveSlots,
 		sharedService = sharedService,
 		sharedMock = sharedMock,
 		destroy = destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function runWithContext(body)

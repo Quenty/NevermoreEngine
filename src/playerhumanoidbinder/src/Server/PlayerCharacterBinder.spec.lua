@@ -14,6 +14,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerCharacterBinder = require("PlayerCharacterBinder")
 local PlayerHumanoidBinderTestUtils = require("PlayerHumanoidBinderTestUtils")
 
@@ -25,12 +27,21 @@ local makeTrackingClass = PlayerHumanoidBinderTestUtils.makeTrackingClass
 local awaitUnbound = PlayerHumanoidBinderTestUtils.awaitUnbound
 
 local function setup(constructor: any?)
-	return PlayerHumanoidBinderTestUtils.setup(PlayerCharacterBinder, "PlayerCharacterBinder", constructor)
+	local maid = Maid.new()
+	local controller = PlayerHumanoidBinderTestUtils.setup(PlayerCharacterBinder, "PlayerCharacterBinder", constructor)
+
+	maid:GiveTask(controller.destroy)
+	controller.destroy = function()
+		maid:DoCleaning()
+	end
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PlayerCharacterBinder.new()", function()
 	it("is a Binder that reports its class name and tag", function()
-		-- Never Init'd/Started, so it holds no resources and needs no teardown.
 		local binder = PlayerCharacterBinder.new("PlayerCharacterBinderMetaSpecTag", makeTrackingClass())
 		expect(Binder.isBinder(binder)).toEqual(true)
 		expect((binder :: any).ClassName).toEqual("PlayerCharacterBinder")

@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ScoredAction = require("ScoredAction")
 local TouchButtonScoredActionPicker = require("TouchButtonScoredActionPicker")
@@ -50,6 +51,8 @@ local function setup(): Controller
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

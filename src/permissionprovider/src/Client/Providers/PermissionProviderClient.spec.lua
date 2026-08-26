@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionProviderClient = require("PermissionProviderClient")
 local PermissionProviderConstants = require("PermissionProviderConstants")
@@ -32,9 +33,9 @@ local function setup()
 
 	local localPlayer = maid:Add(PlayerMock.new({ UserId = LOCAL_USER_ID }))
 	localPlayer.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(localPlayer)
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
 
-	return {
+	local controller = {
 		localPlayer = localPlayer,
 		makeProvider = function(invokeServer: (() -> any)?): any
 			local provider: any = PermissionProviderClient.new("PermissionProviderClientSpecRemote")
@@ -63,10 +64,14 @@ local function setup()
 			return tostring(err)
 		end,
 		destroy = function(_self)
-			PlayerMock.setMockedLocalPlayer(nil)
+			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PermissionProviderClient construction", function()

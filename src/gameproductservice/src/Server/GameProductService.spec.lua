@@ -25,6 +25,7 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductService = require("GameProductService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local PlayerMock = require("PlayerMock")
@@ -71,7 +72,7 @@ local function setup()
 	playerMockServiceClient:SetLocalPlayer(playerMock)
 	clientBag:Start()
 
-	return {
+	local controller = {
 		serverBag = serverBag,
 		clientBag = clientBag,
 		gameProductService = gameProductService,
@@ -90,6 +91,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("GameProductService dual-realm boot", function()

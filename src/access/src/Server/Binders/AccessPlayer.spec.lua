@@ -12,6 +12,7 @@ local AccessPlayerInterface = require("AccessPlayerInterface")
 local AccessService = require("AccessService")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMockService = require("PlayerMockService")
 local Rx = require("Rx")
@@ -24,32 +25,27 @@ local it = Jest.Globals.it
 
 local featureCounter = 0
 
-local function makeController()
+local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
-	-- Boots the entry point, the way a game does. Hand-assembling a partial bag is what broke this
-	-- first: a binder's class resolves its services during construction, which happens long after the
-	-- bag has started, so every dependency has to already be in the bag before Start.
+	-- A binder's class resolves its services during construction, long after the bag has started, so
+	-- every dependency has to already be in the bag before Start.
 	serviceBag:GetService(AccessService)
 	local binder = serviceBag:GetService(AccessPlayer) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	-- PlayerBinder declares this dependency in Init, so it is already in the bag by the time we ask.
-	-- Mocks have to come from the service: a bare PlayerMock.new() is not tracked, so nothing would
-	-- discover it and the binder would never bind.
+	-- A bare PlayerMock.new() is not tracked, so nothing would discover it and the binder would never bind.
 	local playerMockService = serviceBag:GetService(PlayerMockService) :: any
 
-	return {
+	local controller = {
 		maid = maid,
 		binder = binder,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
 			return maid:Add(playerMockService:CreatePlayer()) :: any
 		end,
-		-- A feature granted by one fact the test drives. Names are made unique because the bag is shared
-		-- across this file and a registry refuses duplicates.
 		featureOn = function(rawName: string, initial: boolean?)
 			featureCounter += 1
 			local featureName = `{rawName}{featureCounter}`
@@ -65,9 +61,7 @@ local function makeController()
 
 			return feature, valueObject
 		end,
-		-- No explicit Bind: PlayerBinder is meant to discover mocks the same way it discovers real joins,
-		-- and every test here leans on that rather than papering over it. Binding runs off deferred
-		-- CollectionService signals, so it is waited for rather than assumed synchronous.
+		-- Binding runs off deferred CollectionService signals, so it is waited for rather than assumed.
 		accessPlayerFor = function(player: Player)
 			local deadline = os.clock() + 2
 			while os.clock() < deadline do
@@ -84,19 +78,14 @@ local function makeController()
 			maid:DoCleaning()
 		end,
 	}
-end
 
--- A bag per test, torn down with it. The AccessPlayer tag is global, so a binder that outlives its test
--- goes on binding every player mock a later test creates and overwriting the facts attribute with its own
--- registry -- which is invisible here and breaks whoever is actually reading that attribute.
-local function setup()
-	return makeController()
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("AccessPlayer", function()
 	it("is bound to a mock player without anything asking it to", function()
-		-- PlayerBinder is supposed to respect mocks the same way it respects real joins. If it stops,
-		-- every spec in this file that holds an AccessPlayer is testing nothing.
 		local controller = setup()
 		local player = controller.fakePlayer()
 
@@ -106,7 +95,6 @@ describe("AccessPlayer", function()
 	end)
 
 	it("binds an implementation onto the player, findable through the tie", function()
-		-- The point: anything holding a Player can ask, without requiring the package.
 		local controller = setup()
 		local player = controller.fakePlayer()
 		controller.accessPlayerFor(player)
@@ -135,7 +123,6 @@ describe("AccessPlayer", function()
 	end)
 
 	it("fails closed on unresolved for the boolean, but says unresolved for the state", function()
-		-- A boolean has nowhere to put a third answer; the state does.
 		local controller = setup()
 		local chapters = controller.featureOn("chapters", nil)
 
@@ -203,9 +190,8 @@ end)
 
 describe("AccessPlayer and per-thing features", function()
 	it("leaves a subject-requiring feature out of the blanket tracking", function()
-		-- The tracker walks every registered feature with no subject. A per-thing gate has no answer to
-		-- that question, and running its compute against a nil it was never written for is what crashed a
-		-- purchase gate.
+		-- The tracker walks every registered feature with no subject, and a per-thing gate has no answer
+		-- to that question.
 		local controller = setup()
 		local evaluated = false
 
@@ -227,7 +213,6 @@ describe("AccessPlayer and per-thing features", function()
 	end)
 
 	it("still answers a per-thing feature when asked with its subject", function()
-		-- Skipping it in the tracker must not make it unreachable.
 		local controller = setup()
 
 		local feature = controller.maid:Add(AccessFeature.new("eggPurchase2", {

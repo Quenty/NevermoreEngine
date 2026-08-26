@@ -15,6 +15,7 @@ local AccessPolicyNames = require("AccessPolicyNames")
 local AccessPolicyRealm = require("AccessPolicyRealm")
 local AccessPolicyService = require("AccessPolicyService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -42,7 +43,7 @@ local function setup(tieRealm: string?)
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
@@ -58,6 +59,10 @@ local function setup(tieRealm: string?)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function countingPolicy(controller: any, policyName: string, applied: { n: number }, isEnabledByDefault: boolean?)

@@ -15,6 +15,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -100,7 +101,7 @@ local function setup()
 		}
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		ragdollBinder = serviceBag:GetService(Ragdoll),
 		addPlayer = addPlayer,
@@ -111,6 +112,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("RagdollCmdrService", function()

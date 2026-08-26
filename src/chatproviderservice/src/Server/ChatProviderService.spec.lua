@@ -17,12 +17,13 @@ local ChatTagConstants = require("ChatTagConstants")
 local ChatTagDataUtils = require("ChatTagDataUtils")
 local HasChatTagsConstants = require("HasChatTagsConstants")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local PermissionService = require("PermissionService")
 local PlayerMockService = require("PlayerMockService")
 local ServiceBag = require("ServiceBag")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
@@ -33,20 +34,8 @@ local DEMO_TAG = ChatTagDataUtils.createChatTagData({
 	TagColor = Color3.fromRGB(245, 163, 27),
 })
 
-local activeController: any = nil
-
-afterEach(function()
-	if activeController then
-		local controller = activeController
-		activeController = nil
-		controller.destroy()
-	end
-end)
-
 local remoteNameCounter = 0
 
--- Polls rather than observes: the tag arrives through a binder, a permission promise and an Rx chain,
--- and the point of these tests is the end state rather than which hop delivered it.
 local function waitForTagCount(player: Player, expected: number, timeout: number): number
 	local deadline = os.clock() + timeout
 
@@ -63,10 +52,9 @@ local function waitForTagCount(player: Player, expected: number, timeout: number
 	return if container then #container:GetChildren() else 0
 end
 
--- creatorUserId, when given, makes that user the creator so the built-in developer tag actually
--- applies to them. Left nil, both built-in tags are switched off: they resolve through
--- PermissionService, which is a different question than whether a mock can be tagged at all.
 local function setup(creatorUserId: number?)
+	local maid = Maid.new()
+
 	local serviceBag = ServiceBag.new()
 	local container = Instance.new("Folder")
 	container.Name = "ChatProviderServiceSpecContainer"
@@ -103,8 +91,18 @@ local function setup(creatorUserId: number?)
 		end
 	end
 
-	local controller
-	controller = {
+	maid:GiveTask(function()
+		destroyBag()
+
+		for _, mock in mocks do
+			mock:Destroy()
+		end
+		table.clear(mocks)
+
+		container:Destroy()
+	end)
+
+	local controller = {
 		chatProviderService = chatProviderService,
 		newMock = function(userId: number?): Player
 			local mock = playerMockService:CreatePlayer(if userId then { UserId = userId } else nil)
@@ -114,18 +112,12 @@ local function setup(creatorUserId: number?)
 		end,
 		destroyBag = destroyBag,
 		destroy = function()
-			destroyBag()
-
-			for _, mock in mocks do
-				mock:Destroy()
-			end
-			table.clear(mocks)
-
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
 
-	activeController = controller
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
 	return controller
 end
 

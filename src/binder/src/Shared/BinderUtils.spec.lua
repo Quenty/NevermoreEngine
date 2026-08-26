@@ -9,6 +9,8 @@ local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local BinderUtils = require("BinderUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,7 +41,7 @@ local function setup()
 	container.Name = "BinderUtilsSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
+	local instances: { Instance } = {}
 	local pendingBinders: { any } = {}
 	local tagCounter = 0
 	local booted = false
@@ -72,21 +76,29 @@ local function setup()
 		serviceBag:Start()
 	end
 
-	return {
+	maid:GiveTask(function()
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		newBinder = newBinder,
 		newInstance = newInstance,
 		boot = boot,
 		destroy = function()
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("BinderUtils.findFirstAncestor()", function()

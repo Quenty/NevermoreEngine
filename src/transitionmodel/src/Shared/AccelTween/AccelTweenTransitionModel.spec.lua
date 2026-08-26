@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local AccelTweenTransitionModel = require("AccelTweenTransitionModel")
 local BasicPane = require("BasicPane")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
 
@@ -22,18 +24,20 @@ type Controller = {
 	destroy: () -> (),
 }
 
--- AccelTween reads wall time analytically, so swapping its clock makes every animation assertion
--- deterministic. Completion is observed off the animation step, so the clock has to move and then
--- a frame has to pass before the transition notices it arrived.
+-- Completion is observed off the animation step, so the clock has to move and then a frame has to
+-- pass before the transition notices it arrived.
 local function setup(options: { showTarget: number?, hideTarget: number? }?): Controller
-	local model: any = AccelTweenTransitionModel.new(options and options.showTarget, options and options.hideTarget)
+	local maid = Maid.new()
+
+	local model: any =
+		maid:Add(AccelTweenTransitionModel.new(options and options.showTarget, options and options.hideTarget))
 
 	local now = 0
 	model._accelTween:SetClock(function()
 		return now
 	end)
 
-	return {
+	local controller = {
 		model = model,
 		value = function()
 			return model:GetPosition()
@@ -44,11 +48,13 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 			task.wait()
 		end,
 		destroy = function()
-			if model.Destroy then
-				model:Destroy()
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("AccelTweenTransitionModel.new", function()

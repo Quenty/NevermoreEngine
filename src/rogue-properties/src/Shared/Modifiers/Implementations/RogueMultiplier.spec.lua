@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RogueMultiplier = require("RogueMultiplier")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
 local ServiceBag = require("ServiceBag")
@@ -18,7 +20,8 @@ local it = Jest.Globals.it
 local RogueMultiplierClass = RogueMultiplier:GetConstructor() :: any
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("TieRealmService"))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -29,12 +32,16 @@ local function setup()
 		return RogueMultiplierClass.new(valueObject, serviceBag), valueObject
 	end
 
-	return {
+	local controller = {
 		newMultiplier = newMultiplier,
 		destroy = function(_self: any)
-			serviceBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 local function setEnabled(valueObject, enabled)

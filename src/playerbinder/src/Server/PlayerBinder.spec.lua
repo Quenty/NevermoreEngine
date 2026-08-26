@@ -20,6 +20,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerBinder = require("PlayerBinder")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -31,9 +33,6 @@ local it = Jest.Globals.it
 
 local specCounter = 0
 
--- Records its instance and whether it was destroyed. It ignores its constructor varargs: the ServiceBag
--- is injected as a constructor arg, and its Signals' strict __index makes jest's deep-equality traversal
--- throw, so the class must not retain it for toEqual to compare instances safely.
 local function makeTrackingClass()
 	local Class = {}
 	Class.__index = Class
@@ -59,6 +58,8 @@ end
 local function setup(constructor: any?)
 	specCounter += 1
 	local suffix = specCounter
+
+	local maid = Maid.new()
 
 	local serviceBag = ServiceBag.new()
 	local container = Instance.new("Folder")
@@ -108,7 +109,7 @@ local function setup(constructor: any?)
 		return mock
 	end
 
-	local function destroy()
+	maid:GiveTask(function()
 		if initialized then
 			serviceBag:Destroy()
 		end
@@ -118,9 +119,13 @@ local function setup(constructor: any?)
 			end)
 		end
 		container:Destroy()
+	end)
+
+	local function destroy()
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		binder = binder,
 		tag = tag,
 		init = init,
@@ -129,6 +134,10 @@ local function setup(constructor: any?)
 		newMock = newMock,
 		destroy = destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PlayerBinder.new()", function()

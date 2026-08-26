@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
@@ -25,8 +27,18 @@ type Controller = {
 }
 
 local function setup(): Controller
+	local maid = Maid.new()
 	local instances: { Instance } = {}
 	local cleanups: { () -> () } = {}
+
+	maid:GiveTask(function()
+		for _, cleanup in cleanups do
+			cleanup()
+		end
+		for _, inst in instances do
+			inst:Destroy()
+		end
+	end)
 
 	local function track(cleanup: () -> ()): () -> ()
 		table.insert(cleanups, cleanup)
@@ -67,14 +79,11 @@ local function setup(): Controller
 		end,
 
 		destroy = function()
-			for _, cleanup in cleanups do
-				cleanup()
-			end
-			for _, inst in instances do
-				inst:Destroy()
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

@@ -12,6 +12,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderUtils = require("PermissionProviderUtils")
@@ -38,7 +39,7 @@ local function setup()
 	remoteNameCounter += 1
 	local remoteFunctionName = string.format("PermissionServiceSpecRemote%d", remoteNameCounter)
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		permissionService = permissionService,
 		singleUserConfig = function(userId: number)
@@ -60,6 +61,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PermissionService initialization", function()

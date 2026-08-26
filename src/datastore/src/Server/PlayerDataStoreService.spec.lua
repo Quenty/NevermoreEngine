@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -40,7 +41,7 @@ local function setup(mock)
 		end)
 	end
 
-	return {
+	local controller = {
 		service = service,
 		mock = mock,
 		promiseShutdown = promiseShutdown,
@@ -51,6 +52,10 @@ local function setup(mock)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PlayerDataStoreService.PromiseDataStore", function()
@@ -227,7 +232,7 @@ describe("PlayerDataStoreService datastore configuration", function()
 		configure(service)
 		serviceBag:Start()
 
-		return {
+		local controller = {
 			service = service,
 			mock = mock,
 			destroy = function()
@@ -235,6 +240,10 @@ describe("PlayerDataStoreService datastore configuration", function()
 				maid:DoCleaning()
 			end,
 		}
+
+		maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+		return controller
 	end
 
 	it("forwards configuration through to the datastores the manager creates", function()

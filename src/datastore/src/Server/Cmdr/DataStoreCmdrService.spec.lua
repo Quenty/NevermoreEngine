@@ -16,6 +16,7 @@ local CmdrReplyUtils = require("CmdrReplyUtils")
 local DataStoreCmdrService = require("DataStoreCmdrService")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Promise = require("Promise")
 
@@ -80,7 +81,7 @@ local function setup()
 	service:SetReplyConfig(CmdrReplyUtils.createConfig({ slowReplySeconds = SLOW_REPLY_SECONDS }))
 	service:Start()
 
-	return {
+	local cmdrController = {
 		manager = controller.manager,
 		mock = controller.mock,
 		storeAndAwaitLock = controller.storeAndAwaitLock,
@@ -104,6 +105,10 @@ local function setup()
 			controller:destroy()
 		end,
 	}
+
+	serviceMaid:GiveTask(JestUtils.afterThis(cmdrController.destroy))
+
+	return cmdrController
 end
 
 describe("DataStoreCmdrService registration", function()

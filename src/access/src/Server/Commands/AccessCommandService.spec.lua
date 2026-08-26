@@ -9,6 +9,7 @@ local AccessDataService = require("AccessDataService")
 local AccessPolicy = require("AccessPolicy")
 local AccessPolicyService = require("AccessPolicyService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
@@ -44,7 +45,7 @@ local function setup()
 
 	service:_registerCommands()
 
-	return {
+	local controller = {
 		accessPolicyService = accessPolicyService,
 		command = function(name: string): any
 			return assert(commands[name], `No command registered named {name}`)
@@ -61,6 +62,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("access-policy", function()

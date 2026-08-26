@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
@@ -18,14 +20,15 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("RoguePropertyService"))
 	serviceBag:Init()
 	serviceBag:Start()
 
 	-- Adornees must live in the DataModel or CollectionService.GetInstanceAddedSignal (and
 	-- therefore the modifier binders) never fire.
-	local container = Instance.new("Folder")
+	local container = maid:Add(Instance.new("Folder"))
 	container.Name = "RoguePropertySpecContainer"
 	container.Parent = workspace
 
@@ -109,7 +112,7 @@ local function setup()
 		return value
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		container = container,
 		newCombatStats = newCombatStats,
@@ -121,10 +124,13 @@ local function setup()
 		addSetter = addSetter,
 		awaitValue = awaitValue,
 		destroy = function(_self: any)
-			serviceBag:Destroy()
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("RogueProperty scalar usage", function()

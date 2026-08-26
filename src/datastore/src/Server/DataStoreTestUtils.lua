@@ -15,6 +15,7 @@ local DataStore = require("DataStore")
 local DataStoreLockHelper = require("DataStoreLockHelper")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
 local DataStoreMock = require("DataStoreMock")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local MessagingServiceMock = require("MessagingServiceMock")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
@@ -87,7 +88,7 @@ function DataStoreTestUtils.setup()
 		return ok and loadedOk
 	end
 
-	return {
+	local controller = {
 		mock = mock,
 		serviceBag = serviceBag,
 		newDataStore = newDataStore,
@@ -100,6 +101,10 @@ function DataStoreTestUtils.setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 --[=[
@@ -207,7 +212,7 @@ function DataStoreTestUtils.setupDataStoreManager()
 		return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
 	end
 
-	return {
+	local controller = {
 		manager = manager,
 		mock = mock,
 		serviceBag = serviceBag,
@@ -218,6 +223,10 @@ function DataStoreTestUtils.setupDataStoreManager()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 --[=[

@@ -8,6 +8,7 @@ local AccessFact = require("AccessFact")
 local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
@@ -53,7 +54,7 @@ local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		maid = maid,
 		fakePlayer = function(): Player
@@ -80,6 +81,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("AccessFact.new", function()

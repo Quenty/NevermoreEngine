@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local Promise = require("Promise")
@@ -24,7 +26,8 @@ local specCounter = 0
 local function setup()
 	specCounter += 1
 
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	local resetService: any = serviceBag:GetService(ResetService)
 	local playerMockService: any = serviceBag:GetService(PlayerMockService)
 
@@ -33,14 +36,18 @@ local function setup()
 
 	local mock = playerMockService:CreatePlayer({ UserId = 77341200 + specCounter })
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		resetService = resetService,
 		mock = mock,
 		destroy = function(_self)
-			serviceBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("ResetService.PromiseResetCharacter", function()

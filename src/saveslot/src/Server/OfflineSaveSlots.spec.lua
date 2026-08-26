@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -49,7 +50,7 @@ local function setup()
 		return value
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		saveSlotService = saveSlotService,
 		mock = mock,
@@ -70,6 +71,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("SaveSlotService.PromiseOfflineSaveSlots", function()

@@ -12,6 +12,7 @@ local InputModeServiceClient = require("InputModeServiceClient")
 local InputModeType = require("InputModeType")
 local InputModeTypes = require("InputModeTypes")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ScoredAction = require("ScoredAction")
 local ScoredActionPickerProvider = require("ScoredActionPickerProvider")
@@ -78,6 +79,8 @@ local function setup(): any
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

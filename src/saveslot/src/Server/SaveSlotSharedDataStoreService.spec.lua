@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
@@ -17,9 +19,11 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
+	local maid = Maid.new()
+
 	local mock = DataStoreMock.new()
 
-	local serviceBag = ServiceBag.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	local service: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
 		serviceBag:GetService(SaveSlotSharedDataStoreService) :: any
 	serviceBag:Init()
@@ -27,17 +31,20 @@ local function setup()
 	serviceBag:Start()
 
 	local function destroy()
-		serviceBag:Destroy()
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		service = service,
 		mock = mock,
 		destroy = destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
--- Always tears the world down, even when the body throws (a leaked ServiceBag fails a later suite).
 local function runWithContext(body)
 	local context = setup()
 	local ok, err = pcall(body, context)

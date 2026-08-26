@@ -9,13 +9,13 @@ local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
 describe("PlayerMock.new", function()
 	it("is a real Instance so it satisfies typeof == Instance guards", function()
@@ -1771,38 +1771,169 @@ describe("PlayerMock selected GUI object", function()
 	end)
 end)
 
-describe("PlayerMock local player", function()
-	afterEach(function()
-		PlayerMock.setMockedLocalPlayer(nil)
-	end)
+local function setupLocalPlayer()
+	local maid = Maid.new()
 
+	local controller = {
+		newPlayer = function(userId: number): Player
+			local player = PlayerMock.new({ UserId = userId })
+			player.Parent = Workspace
+			maid:GiveTask(player)
+			return player
+		end,
+		newFolder = function(): Folder
+			local folder = Instance.new("Folder")
+			maid:GiveTask(folder)
+			return folder
+		end,
+		designate = function(player: Player?): () -> ()
+			local restore = PlayerMock.setMockedLocalPlayer(player)
+			maid:GiveTask(restore)
+			return restore
+		end,
+		destroy = function()
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
+end
+
+describe("PlayerMock local player", function()
 	it("returns the designated mock", function()
-		local player = PlayerMock.new({ UserId = 1 })
-		player.Parent = workspace -- GetTagged only resolves parented instances
-		PlayerMock.setMockedLocalPlayer(player)
+		local controller = setupLocalPlayer()
+
+		local player = controller.newPlayer(1)
+		controller.designate(player)
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(player)
 
-		player:Destroy()
+		controller.destroy()
 	end)
 
 	it("clears the designation with nil", function()
-		local player = PlayerMock.new({ UserId = 1 })
-		player.Parent = workspace
-		PlayerMock.setMockedLocalPlayer(player)
+		local controller = setupLocalPlayer()
+
+		local player = controller.newPlayer(1)
+		controller.designate(player)
 		PlayerMock.setMockedLocalPlayer(nil)
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		player:Destroy()
+		controller.destroy()
 	end)
 
 	it("asserts on a non-mock designation", function()
-		local folder = Instance.new("Folder")
+		local controller = setupLocalPlayer()
+
+		local folder = controller.newFolder()
 		expect(function()
 			PlayerMock.setMockedLocalPlayer(folder :: any)
 		end).toThrow()
-		folder:Destroy()
+
+		controller.destroy()
+	end)
+end)
+
+describe("PlayerMock.setMockedLocalPlayer disposer", function()
+	it("clears the designation when there was none before", function()
+		local controller = setupLocalPlayer()
+
+		local player = controller.newPlayer(1)
+		local restore = controller.designate(player)
+
+		restore()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
+
+		controller.destroy()
+	end)
+
+	it("restores the previous designation", function()
+		local controller = setupLocalPlayer()
+
+		local first = controller.newPlayer(1)
+		local second = controller.newPlayer(2)
+
+		controller.designate(first)
+		local restoreSecond = controller.designate(second)
+		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
+
+		restoreSecond()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBe(first)
+
+		controller.destroy()
+	end)
+
+	it("clears instead of restoring a previous mock that has left the DataModel", function()
+		local controller = setupLocalPlayer()
+
+		local first = controller.newPlayer(1)
+		local second = controller.newPlayer(2)
+
+		controller.designate(first)
+		local restoreSecond = controller.designate(second)
+		first:Destroy()
+
+		restoreSecond()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
+
+		controller.destroy()
+	end)
+
+	it("is safe to call more than once", function()
+		local controller = setupLocalPlayer()
+
+		local first = controller.newPlayer(1)
+		local second = controller.newPlayer(2)
+
+		controller.designate(first)
+		local restoreSecond = controller.designate(second)
+
+		restoreSecond()
+		restoreSecond()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBe(first)
+
+		controller.destroy()
+	end)
+
+	it("stays a no-op once spent, even when the designation returns to what it installed", function()
+		local controller = setupLocalPlayer()
+
+		local first = controller.newPlayer(1)
+		local second = controller.newPlayer(2)
+
+		controller.designate(first)
+		local restoreSecond = controller.designate(second)
+		restoreSecond()
+
+		controller.designate(second)
+		restoreSecond()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
+
+		controller.destroy()
+	end)
+
+	it("does not clobber a newer designation", function()
+		local controller = setupLocalPlayer()
+
+		local first = controller.newPlayer(1)
+		local second = controller.newPlayer(2)
+
+		local restoreFirst = controller.designate(first)
+		controller.designate(second)
+
+		restoreFirst()
+
+		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
+
+		controller.destroy()
 	end)
 end)
 

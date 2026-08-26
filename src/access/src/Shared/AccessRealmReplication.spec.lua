@@ -30,6 +30,7 @@ local AccessService = require("AccessService")
 local AccessServiceClient = require("AccessServiceClient")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -40,7 +41,6 @@ local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
-local afterEach = Jest.Globals.afterEach
 local it = Jest.Globals.it
 
 local CONVERGE_FRAMES = 120
@@ -83,7 +83,7 @@ local function setup()
 	featureCounter += 1
 	local featureName = `chapters{featureCounter}`
 
-	return {
+	local controller = {
 		maid = maid,
 		server = server,
 		client = client,
@@ -100,6 +100,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("feature composition across realms", function()
@@ -239,29 +243,17 @@ describe("per-player facts across realms", function()
 	]]
 	local playerCounter = 0
 
-	-- Torn down here rather than at the end of each test, because a failing test never reaches its last
-	-- line. The AccessPlayer tag is global: a binder that outlives its test goes on binding the next
-	-- test's player and overwriting the facts attribute from its own registry, so one failure would take
-	-- every later test with it and none of them would say why.
-	local live: any = nil
-	afterEach(function()
-		if live then
-			live:destroy()
-			live = nil
-		end
-	end)
-
 	local function setupPlayers()
 		local maid = Maid.new()
 
-		local serverBag = maid:Add(ServiceBag.new());
+		local serverBag = ServiceBag.new();
 		(serverBag:GetService(TieRealmService) :: any):SetTieRealm(TieRealms.SERVER)
 		local serverAccess: any = serverBag:GetService(AccessDataService)
 		serverBag:GetService(AccessService)
 		serverBag:Init()
 		serverBag:Start()
 
-		local clientBag = maid:Add(ServiceBag.new());
+		local clientBag = ServiceBag.new();
 		(clientBag:GetService(TieRealmService) :: any):SetTieRealm(TieRealms.CLIENT)
 		local clientAccess: any = clientBag:GetService(AccessDataService)
 		clientBag:GetService(AccessServiceClient)
@@ -308,14 +300,16 @@ describe("per-player facts across realms", function()
 				end
 			end,
 			destroy = function(_self)
-				-- Client first: the server bag owns the mock, and destroying it out from under a live client
-				-- is not something production ever does.
+				-- Client first: the server bag owns the mock, and destroying it out from under a live
+				-- client is not something production ever does.
 				clientBag:Destroy()
 				serverBag:Destroy()
+				maid:DoCleaning()
 			end,
 		}
 
-		live = controller
+		maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
 		return controller
 	end
 
@@ -461,7 +455,7 @@ local function setupPolicies()
 
 	policyCounter += 1
 
-	return {
+	local controller = {
 		maid = maid,
 		server = server,
 		client = client,
@@ -485,6 +479,10 @@ local function setupPolicies()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("policy enablement across realms", function()

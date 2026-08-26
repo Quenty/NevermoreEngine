@@ -16,6 +16,7 @@ local CmdrReplyUtils = require("CmdrReplyUtils")
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -103,7 +104,7 @@ local function setup()
 		end,
 	}
 
-	return {
+	local controller = {
 		mock = mock,
 		replies = replies,
 		run = function(commandName: string, ...)
@@ -120,6 +121,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("SaveSlotCmdrService against an absent player", function()

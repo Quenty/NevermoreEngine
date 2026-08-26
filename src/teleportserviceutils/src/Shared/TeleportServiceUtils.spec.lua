@@ -438,7 +438,7 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		local localPlayer = newMock(886011)
 		local someoneElse = newMock(886012);
 		(localPlayer :: any).Parent = Workspace
-		PlayerMock.setMockedLocalPlayer(localPlayer)
+		local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
 
 		expect(function()
 			TeleportServiceUtils.promiseTeleportClientOnce(832, someoneElse)
@@ -449,7 +449,7 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(readHop(localPlayer, 832).via).toEqual("Teleport")
 
 		promise:Destroy()
-		PlayerMock.setMockedLocalPlayer(nil)
+		restoreLocalPlayer()
 	end)
 end)
 

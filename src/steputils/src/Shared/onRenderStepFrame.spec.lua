@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local onRenderStepFrame = require("onRenderStepFrame")
 
 local describe = Jest.Globals.describe
@@ -18,7 +20,14 @@ type Controller = {
 }
 
 local function setup(): Controller
+	local maid = Maid.new()
 	local unbinds: { () -> () } = {}
+
+	maid:GiveTask(function()
+		for _, unbind in unbinds do
+			unbind()
+		end
+	end)
 
 	local controller: Controller = {
 		bind = function(priority: number, callback: () -> ())
@@ -28,11 +37,11 @@ local function setup(): Controller
 		end,
 
 		destroy = function()
-			for _, unbind in unbinds do
-				unbind()
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

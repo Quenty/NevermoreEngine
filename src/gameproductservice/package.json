@@ -39,6 +39,7 @@
     "@quenty/enumutils": "workspace:*",
     "@quenty/gameconfig": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",

@@ -4,8 +4,7 @@
 	config picker (key -> id lookup) and a fake market tracker exposing only a Purchased signal, so
 	no ServiceBag, GameConfig, or real MarketplaceService is involved. A PlayerMock stands in for
 	the player because the tracker only stores the player, never reads properties off it in the code
-	paths under test. Each test destroys everything it creates so nothing leaks into the shared test
-	place.
+	paths under test.
 
 	@class PlayerAssetOwnershipTracker.spec.lua
 ]]
@@ -15,6 +14,8 @@ local Brio = require("Brio")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigPicker = require("GameConfigPicker")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local PlayerMock = require("PlayerMock")
@@ -65,6 +66,8 @@ local function makeConfigPicker()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	local purchased = Signal.new()
 	local marketTracker = { Purchased = purchased }
 	local player = PlayerMock.new()
@@ -77,15 +80,23 @@ local function setup()
 		marketTracker
 	)
 
-	return {
+	maid:GiveTask(function()
+		tracker:Destroy()
+		purchased:Destroy()
+		player:Destroy()
+	end)
+
+	local controller = {
 		tracker = tracker,
 		marketTracker = marketTracker,
 		destroy = function()
-			tracker:Destroy()
-			purchased:Destroy()
-			player:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()

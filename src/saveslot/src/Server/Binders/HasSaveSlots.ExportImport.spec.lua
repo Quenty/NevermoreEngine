@@ -11,6 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -26,6 +28,8 @@ local it = Jest.Globals.it
 local FAKE_USER_ID = 424242
 
 local function setup()
+	local maid = Maid.new()
+
 	local mock = DataStoreMock.new()
 
 	local serviceBag = ServiceBag.new()
@@ -44,16 +48,19 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	local function destroy()
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
+	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
+	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
+	maid:GiveTask(function()
 		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
+	end)
+
+	local function destroy()
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		binder = binder,
 		fakePlayer = fakePlayer,
@@ -61,11 +68,12 @@ local function setup()
 		mock = mock,
 		destroy = destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
--- Runs the body against a fresh bound player and ALWAYS tears the world down afterwards, even when
--- the body throws (a leaked ServiceBag's background work fails a later suite). Rethrows so the test
--- still reports the original failure.
 local function runWithContext(body)
 	local context = setup()
 	local ok, err = pcall(body, context)

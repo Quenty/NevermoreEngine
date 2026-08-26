@@ -16,6 +16,7 @@ local Workspace = game:GetService("Workspace")
 local GroupPermissionProvider = require("GroupPermissionProvider")
 local GroupTestUtils = require("GroupTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderUtils = require("PermissionProviderUtils")
@@ -40,7 +41,7 @@ local function setup(options: { minAdminRequiredRank: number, minCreatorRequired
 		remoteFunctionName = string.format("GroupPermissionProviderSpecRemote%d", remoteNameCounter),
 	})))
 
-	return {
+	local controller = {
 		provider = provider,
 		fakePlayer = function(userId: number): Player
 			local player = maid:Add(PlayerMock.new({ UserId = userId }))
@@ -57,6 +58,10 @@ local function setup(options: { minAdminRequiredRank: number, minCreatorRequired
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("GroupPermissionProvider.new", function()

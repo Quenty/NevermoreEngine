@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderGroup = require("BinderGroup")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -16,6 +18,8 @@ local it = Jest.Globals.it
 local tagCounter = 0
 
 local function setup()
+	local maid = Maid.new()
+
 	local binders: { any } = {}
 
 	local function newBinder(): Binder.Binder<any>
@@ -27,16 +31,24 @@ local function setup()
 		return binder
 	end
 
-	return {
+	maid:GiveTask(function()
+		for _, binder in binders do
+			pcall(function()
+				binder:Destroy()
+			end)
+		end
+	end)
+
+	local controller = {
 		newBinder = newBinder,
 		destroy = function()
-			for _, binder in binders do
-				pcall(function()
-					binder:Destroy()
-				end)
-			end
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("BinderGroup.new()", function()

@@ -14,6 +14,8 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -26,7 +28,8 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup(tieRealm: TieRealms.TieRealm?)
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	local tieRealmService: TieRealmService.TieRealmService = serviceBag:GetService(TieRealmService) :: any
 	local gameProductDataService: GameProductDataService.GameProductDataService =
 		serviceBag:GetService(GameProductDataService) :: any
@@ -34,14 +37,18 @@ local function setup(tieRealm: TieRealms.TieRealm?)
 	tieRealmService:SetTieRealm(tieRealm or TieRealms.SERVER)
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		tieRealmService = tieRealmService,
 		gameProductDataService = gameProductDataService,
 		destroy = function()
-			serviceBag:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("GameProductDataService purchase signals", function()

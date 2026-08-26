@@ -10,6 +10,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
@@ -18,26 +20,17 @@ local ServiceBag = require("ServiceBag")
 
 local Workspace = game:GetService("Workspace")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local FAKE_USER_ID = 424243
 
-local activeContext: any = nil
-
-afterEach(function()
-	if activeContext then
-		local context = activeContext
-		activeContext = nil
-		context.destroy()
-	end
-end)
-
 type Ask = { slotId: string, previousSlotId: string? }
 
 local function setup()
+	local maid = Maid.new()
+
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
 	serviceBag:GetService(require("SaveSlotSharedDataStoreService"))
@@ -64,22 +57,16 @@ local function setup()
 		return verdict or Promise.resolved(true)
 	end
 
-	local destroyed = false
-	local function destroy()
-		if destroyed then
-			return
-		end
-		destroyed = true
-		if activeContext and activeContext.destroy == destroy then
-			activeContext = nil
-		end
-
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
+	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
+	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
+	maid:GiveTask(function()
 		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
+	end)
+
+	local function destroy()
+		maid:DoCleaning()
 	end
 
 	local context = {
@@ -92,7 +79,8 @@ local function setup()
 		end,
 		destroy = destroy,
 	}
-	activeContext = context
+
+	maid:GiveTask(JestUtils.afterThis(context.destroy))
 
 	return context
 end

@@ -11,6 +11,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -38,7 +39,7 @@ local function setup()
 		return LOCAL_USER_ID
 	end
 
-	return {
+	local controller = {
 		service = service,
 		await = function(promise: any): any
 			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
@@ -50,6 +51,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("TeleportDataServiceClient initialization", function()

@@ -18,6 +18,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionServiceClient = require("PermissionServiceClient")
 local PlayerMock = require("PlayerMock")
@@ -36,7 +37,7 @@ local function setup()
 
 	local localPlayer = maid:Add(PlayerMock.new({ UserId = LOCAL_USER_ID }))
 	localPlayer.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(localPlayer)
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
 
 	local serviceBag = maid:Add(ServiceBag.new())
 	local service: PermissionServiceClient.PermissionServiceClient =
@@ -44,7 +45,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		localPlayer = localPlayer,
 		serviceBag = serviceBag,
 		service = service,
@@ -69,10 +70,14 @@ local function setup()
 			return value
 		end,
 		destroy = function(_self)
-			PlayerMock.setMockedLocalPlayer(nil)
+			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("PermissionServiceClient initialization", function()

@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 local promiseBoundClass = require("promiseBoundClass")
 
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,7 +41,7 @@ local function setup()
 	container.Name = "PromiseBoundClassSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
+	local instances: { Instance } = {}
 	local booted = false
 
 	local binder = Binder.new(string.format("PromiseBoundClassSpecTag_%d", suffix), makeClass() :: any)
@@ -61,20 +65,28 @@ local function setup()
 		serviceBag:Start()
 	end
 
-	return {
+	maid:GiveTask(function()
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		binder = binder,
 		newInstance = newInstance,
 		boot = boot,
 		destroy = function()
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("promiseBoundClass()", function()

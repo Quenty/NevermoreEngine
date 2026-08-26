@@ -220,6 +220,9 @@ importers:
       '@quenty/gameproductservice':
         specifier: workspace:*
         version: link:../gameproductservice
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -316,6 +319,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -379,6 +385,9 @@ importers:
 
   src/adorneeutils:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -678,6 +687,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/linkutils':
         specifier: workspace:*
         version: link:../linkutils
@@ -1017,6 +1029,9 @@ importers:
       '@quenty/inputobjectutils':
         specifier: workspace:*
         version: link:../inputobjectutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1128,6 +1143,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1179,6 +1197,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1643,6 +1664,9 @@ importers:
       '@quenty/characterutils':
         specifier: workspace:*
         version: link:../characterutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1724,6 +1748,9 @@ importers:
       '@quenty/cmdrservice':
         specifier: workspace:*
         version: link:../cmdrservice
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -2311,6 +2338,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -2744,6 +2774,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -2780,6 +2813,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3797,6 +3833,9 @@ importers:
       '@quenty/grouputils':
         specifier: workspace:*
         version: link:../grouputils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3854,6 +3893,9 @@ importers:
 
   src/player-mock:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3881,9 +3923,15 @@ importers:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
@@ -3908,6 +3956,9 @@ importers:
       '@quenty/humanoidtracker':
         specifier: workspace:*
         version: link:../humanoidtracker
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4022,6 +4073,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4274,6 +4328,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4507,6 +4564,9 @@ importers:
       '@quenty/coreguiutils':
         specifier: workspace:*
         version: link:../coreguiutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4711,6 +4771,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/jsonutils':
         specifier: workspace:*
         version: link:../jsonutils
@@ -4889,6 +4952,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4955,6 +5021,9 @@ importers:
       '@quenty/inputmode':
         specifier: workspace:*
         version: link:../inputmode
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -5204,6 +5273,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/jsonutils':
         specifier: workspace:*
         version: link:../jsonutils
@@ -5715,9 +5787,15 @@ importers:
 
   src/steputils:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
@@ -5833,6 +5911,9 @@ importers:
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -6031,6 +6112,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -6091,6 +6175,9 @@ importers:
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -6204,6 +6291,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader

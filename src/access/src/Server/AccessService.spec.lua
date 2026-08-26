@@ -13,6 +13,7 @@ local AccessDataService = require("AccessDataService")
 local AccessFeature = require("AccessFeature")
 local AccessService = require("AccessService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
@@ -26,7 +27,7 @@ local function setup()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessService = serviceBag:GetService(AccessService) :: any
 
-	return {
+	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessService = accessService,
@@ -34,6 +35,10 @@ local function setup()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("AccessService", function()

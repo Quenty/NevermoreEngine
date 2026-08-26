@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local InputKeyMapService = require("InputKeyMapService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ScoredActionService = require("ScoredActionService")
 local ServiceBag = require("ServiceBag")
@@ -37,6 +38,8 @@ local function setup(): Controller
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
 
 	return controller
 end

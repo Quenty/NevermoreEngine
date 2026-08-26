@@ -16,6 +16,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local BinderTestUtils = {}
@@ -87,6 +89,8 @@ function BinderTestUtils.setup()
 	specCounter += 1
 	local suffix = specCounter
 
+	local maid = Maid.new()
+
 	local serviceBag = ServiceBag.new()
 	local serviceBagDestroyed = false
 
@@ -141,7 +145,17 @@ function BinderTestUtils.setup()
 		end
 	end
 
-	return {
+	maid:GiveTask(function()
+		destroyServiceBag()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		uniqueTag = uniqueTag,
 		addBinder = addBinder,
@@ -149,15 +163,13 @@ function BinderTestUtils.setup()
 		newInstance = newInstance,
 		destroyServiceBag = destroyServiceBag,
 		destroy = function()
-			destroyServiceBag()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 return BinderTestUtils

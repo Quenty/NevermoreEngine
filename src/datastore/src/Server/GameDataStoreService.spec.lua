@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -24,13 +25,17 @@ local function setup(mock)
 	service:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		service = service,
 		mock = mock,
 		destroy = function()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+
+	return controller
 end
 
 describe("GameDataStoreService.PromiseDataStore", function()
