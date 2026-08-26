@@ -1376,7 +1376,7 @@ end
 -- (metatable-stripped) object -- or into its destroyed stores -- throws, and because a datastore load
 -- resolves inside its UpdateAsync transform, that throw surfaces as a "Transform function error" and takes
 -- the transform's write down with it. The liveness checks cover a settle that lands mid-teardown, before
--- this promise's own maid task was reached. See SaveSlotLateSettle.spec.
+-- this promise's own maid task was reached. See SaveSlotService.LateSettle.spec.
 function HasSaveSlotsDataStore._promiseLoadSlots(
 	self: HasSaveSlotsDataStore,
 	promiseDataStore: Promise.Promise<any>

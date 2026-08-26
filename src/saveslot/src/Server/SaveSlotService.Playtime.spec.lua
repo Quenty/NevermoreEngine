@@ -1,10 +1,10 @@
---!nonstrict
+--!strict
 --[[
 	Playtime accrual persists on the save that asked for it. The flush runs from a saving callback,
 	so a value that only reached the store through the deferred attribute listener would land one
 	save late -- and the final save-on-leave would drop the tail of the session entirely.
 
-	@class SaveSlotPlaytime.spec.lua
+	@class SaveSlotService.Playtime.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -32,8 +32,10 @@ local SESSION_SECONDS = 120
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local playerDataStoreService = serviceBag:GetService(PlayerDataStoreService)
-	local sharedDataStoreService = serviceBag:GetService(SaveSlotSharedDataStoreService)
+	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	local sharedDataStoreService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
+		serviceBag:GetService(SaveSlotSharedDataStoreService) :: any
 	serviceBag:Init()
 
 	local mock = DataStoreMock.new()
@@ -75,8 +77,12 @@ local function setup()
 		beginBackdatedSession = function(): string
 			local slotId = await(slotsDataStore:PromiseCreateSlot(1), "create")
 			await(slotsDataStore:PromiseSelectSlot(slotId), "select")
-			slotsDataStore._playSessionStart -= SESSION_SECONDS
-			slotsDataStore._playSessionLastFlush -= SESSION_SECONDS
+			slotsDataStore._playSessionStart = assert(slotsDataStore._playSessionStart, "No _playSessionStart")
+				- SESSION_SECONDS
+			slotsDataStore._playSessionLastFlush = assert(
+				slotsDataStore._playSessionLastFlush,
+				"No _playSessionLastFlush"
+			) - SESSION_SECONDS
 			return slotId
 		end,
 		storedMetadata = function(slotId: string): any
@@ -118,9 +124,8 @@ describe("save slot playtime", function()
 
 		controller.await(controller.dataStore:Save(), "save")
 
-		expect(controller.slotsDataStore:GetSlotMetadata(slotId).TimePlayed).toEqual(
-			controller.storedMetadata(slotId).TimePlayed
-		)
+		local metadata = assert(controller.slotsDataStore:GetSlotMetadata(slotId), "No slot metadata")
+		expect(metadata.TimePlayed).toEqual(controller.storedMetadata(slotId).TimePlayed)
 
 		controller.destroy()
 	end)
