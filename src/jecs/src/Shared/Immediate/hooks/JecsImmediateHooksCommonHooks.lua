@@ -248,8 +248,16 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 
 		-- Discriminator: parent the hook-state entity with ChildOf so GC
 		-- skips it while `parentEt` is still in the world.
-		preserve = function(parentEt: Jecst.Entity)
-			return { __hookentity = parentEt }
+		-- If hardPreserveDiscriminator is provided, the hook will never be GC'd.
+		preserve = function(parentEt: Jecst.Entity?, hardPreserveDiscriminator: any?)
+			if hardPreserveDiscriminator ~= nil then
+				return {
+					__hookdiscriminator = hardPreserveDiscriminator,
+					__runtimePersistent = true,
+				}
+			else
+				return { __hookentity = parentEt }
+			end
 		end,
 
 		filterDescendants = function(

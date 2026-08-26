@@ -65,12 +65,12 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomBlackboardType>(
 	requireCallback: (path: string) -> any,
 	initialBlackboard: CustomBlackboardType?,
 	plugin: Plugin?
-): ImmediateRuntime
+): ImmediateRuntime<CustomBlackboardType>
 	local maid = Maid.new()
 	local usingServiceBag = serviceBag or maid:Add(ServiceBag.new())
 
 	-- Create final runtime table
-	local runtime: ImmediateRuntime
+	local runtime: ImmediateRuntime<CustomBlackboardType>
 	runtime = {
 		require = requireCallback,
 		serviceBag = usingServiceBag,
@@ -87,7 +87,7 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomBlackboardType>(
 		end,
 
 		plugin = plugin,
-	} :: ImmediateRuntime
+	} :: ImmediateRuntime<CustomBlackboardType>
 
 	return runtime
 end
