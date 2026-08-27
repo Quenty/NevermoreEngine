@@ -3175,6 +3175,18 @@ importers:
         specifier: workspace:*
         version: link:../promise
 
+  src/instance-path:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/instanceutils:
     dependencies:
       '@quenty/brio':
@@ -5582,6 +5594,9 @@ importers:
       '@quenty/counter':
         specifier: workspace:*
         version: link:../counter
+      '@quenty/instance-path':
+        specifier: workspace:*
+        version: link:../instance-path
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
