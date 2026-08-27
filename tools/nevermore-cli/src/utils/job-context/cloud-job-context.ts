@@ -14,6 +14,7 @@ import {
 } from './job-context.js';
 import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
+import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 
 const SKIP_RENAMING_PLACE = true;
 
@@ -23,6 +24,8 @@ class CloudDeployment implements Deployment {
   version: number;
   taskPath?: string;
   taskState?: LuauTask['state'];
+  /** Shape of the most recent log fetch, for whoever reads those logs next. */
+  logFetchStats?: LogFetchStats;
 
   constructor(universeId: number, placeId: number, version: number) {
     this.universeId = universeId;
@@ -146,17 +149,25 @@ export class CloudJobContext extends BaseJobContext {
       throw new Error('No task has been run yet');
     }
 
-    const logs = await this._openCloudClient!.getRawTaskLogsAsync(
+    const fetched = await this._openCloudClient!.getRawTaskLogsAsync(
       cloudDeployment.taskPath
     );
+    cloudDeployment.logFetchStats = fetched.stats;
 
     if (cloudDeployment.taskState && cloudDeployment.taskState !== 'COMPLETE') {
-      return [logs, `Task ended with state: ${cloudDeployment.taskState}`]
+      return [
+        fetched.text,
+        `Task ended with state: ${cloudDeployment.taskState}`,
+      ]
         .filter(Boolean)
         .join('\n');
     }
 
-    return logs;
+    return fetched.text;
+  }
+
+  getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
+    return (deployment as CloudDeployment).logFetchStats;
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {

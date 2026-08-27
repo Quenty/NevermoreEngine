@@ -521,3 +521,74 @@ describe('countTracebacks', () => {
     expect(countTracebacks('')).toBe(0);
   });
 });
+
+describe('parseBatchTestLogs log fetch diagnostics', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const SLUG_MAP = new Map([['egghunt2026', 'egghunt2026']]);
+
+  /** A summary with no section for the package, i.e. output that went missing. */
+  const LOST_SECTION_LOGS = [
+    'Tests:  275 passed, 275 total',
+    '===BATCH_TEST_SUMMARY===',
+    '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+  ].join('\n');
+
+  it('reports what the fetch collected on a package with no attributable output', () => {
+    // "276989 chars received" alone cannot say whether the run printed little or
+    // the engine dropped most of it. The caps that would explain it are counted
+    // in entries, pages and requests, so the failure names all of them.
+    const result = parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP, {
+      logFetchStats: {
+        requests: 3,
+        pages: 2,
+        entries: 4,
+        messages: 7627,
+        chars: 276989,
+      },
+    }).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('no output could be attributed');
+    expect(result?.error).toContain('3 API call(s)');
+    expect(result?.error).toContain('2 page(s)');
+    expect(result?.error).toContain('4 log entry(ies)');
+    expect(result?.error).toContain('7627 message(s)');
+  });
+
+  it('still reports the volume it can measure with no fetch stats', () => {
+    // A local run has no request count, which must not cost the line and char
+    // counts the parser can always take off the text it was handed.
+    const result = parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP).get(
+      'egghunt2026'
+    );
+
+    expect(result?.error).toContain('no output could be attributed');
+    expect(result?.error).toContain('3 line(s) received');
+    expect(result?.error).toContain('no fetch stats');
+  });
+
+  it('reports the fetch in the unattributed-output warning too', () => {
+    const getWarnings = captureWarnings();
+
+    parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP, {
+      logFetchStats: {
+        requests: 1,
+        pages: 1,
+        entries: 1,
+        messages: 7627,
+        chars: 276989,
+      },
+    });
+
+    expect(
+      getWarnings().some(
+        (warning) =>
+          warning.includes('could not attribute') &&
+          warning.includes('1 log entry(ies), 7627 message(s)')
+      )
+    ).toBe(true);
+  });
+});

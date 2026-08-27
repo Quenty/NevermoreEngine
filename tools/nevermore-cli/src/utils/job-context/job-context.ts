@@ -1,5 +1,6 @@
 import { type BuildPlaceOptions, type BuiltPlace } from '../build/build.js';
 import { type StructuredTestResults } from '../testing/structured-test-results.js';
+import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 
 export type { BuiltPlace } from '../build/build.js';
 
@@ -85,6 +86,17 @@ export interface JobContext {
 
   /** Retrieve raw logs from the most recent script execution on this deployment. */
   getLogsAsync(deployment: Deployment): Promise<string>;
+
+  /**
+   * What the most recent `getLogsAsync` had to do to collect those logs.
+   *
+   * For a diagnostic that has already decided output is missing: the log text
+   * alone cannot separate a run that printed little from one whose output the
+   * engine dropped or the fetch never paged through. Absent for a context whose
+   * logs do not come from an API — a local run reads them off the Studio bridge,
+   * where there is no request to count — and before any fetch has happened.
+   */
+  getLogFetchStats?(deployment: Deployment): LogFetchStats | undefined;
 
   /** Release a single deployment (stop bridge / clear task metadata). */
   releaseAsync(deployment: Deployment): Promise<void>;

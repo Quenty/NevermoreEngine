@@ -415,3 +415,109 @@ describe('getTaskReturnValues', () => {
     expect(getTaskReturnValues(task)).toBeUndefined();
   });
 });
+
+describe('OpenCloudClient.getRawTaskLogsAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /**
+   * Page the logs endpoint the way the real one does: many messages inside each
+   * `luauExecutionSessionTaskLog`, and pagination over those entries rather than
+   * over messages.
+   */
+  function makeLogsLimiter(
+    pages: Array<Array<string[]>>,
+    urls: string[] = []
+  ): RateLimiter {
+    return {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        const page = pages[urls.length - 1] ?? [];
+        return new Response(
+          JSON.stringify({
+            luauExecutionSessionTaskLogs: page.map((messages) => ({
+              structuredMessages: messages.map((message) => ({
+                message,
+                createTime: '2026-08-27T00:00:00.38Z',
+                messageType: 'OUTPUT',
+              })),
+            })),
+            ...(urls.length < pages.length
+              ? { nextPageToken: `token-${urls.length}` }
+              : {}),
+          }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+  }
+
+  it('counts pages, entries and messages separately', async () => {
+    // Entries are not lines: the endpoint's page size applies to the log
+    // objects, each of which carries many messages. Conflating the two reads a
+    // 2-entry response as a 2-line run.
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeLogsLimiter([[['a', 'b', 'c'], ['d']], [['e', 'f']]]),
+    });
+
+    const fetched = await client.getRawTaskLogsAsync('universes/1/tasks/2');
+
+    expect(fetched.text).toBe('a\nb\nc\nd\ne\nf');
+    expect(fetched.stats).toEqual({
+      requests: 2,
+      pages: 2,
+      entries: 3,
+      messages: 6,
+      chars: 11,
+    });
+  });
+
+  it('counts every attempt when empty logs were retried', async () => {
+    // The retry is invisible in the text it eventually returns, so a run whose
+    // logs only showed up on the third ask looks exactly like one that answered
+    // immediately. It is the difference between a slow API and a silent run.
+    vi.spyOn(global, 'setTimeout').mockImplementation((fn: () => void) => {
+      fn();
+      return 0 as unknown as NodeJS.Timeout;
+    });
+
+    // One unpaged response per attempt: two empty, then the logs. A limiter
+    // that pages would fold all three into a single attempt and prove nothing.
+    let attempt = 0;
+    const rateLimiter = {
+      fetchAsync: vi.fn(async () => {
+        attempt++;
+        return new Response(
+          JSON.stringify({
+            luauExecutionSessionTaskLogs:
+              attempt < 3
+                ? []
+                : [
+                    {
+                      structuredMessages: [
+                        {
+                          message: 'late',
+                          createTime: '2026-08-27T00:00:00.38Z',
+                          messageType: 'OUTPUT',
+                        },
+                      ],
+                    },
+                  ],
+          }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudClient({ apiKey: 'test-key', rateLimiter });
+
+    const fetched = await client.getRawTaskLogsAsync('universes/1/tasks/2');
+
+    expect(fetched.text).toBe('late');
+    expect(fetched.stats.requests).toBe(3);
+    expect(fetched.stats.pages).toBe(1);
+    expect(fetched.stats.messages).toBe(1);
+  });
+});

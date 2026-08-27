@@ -6,6 +6,7 @@ import {
 } from '../test-log-parser.js';
 import { formatTracebacks, parseTracebacks } from './traceback-parser.js';
 import { type StructuredTestResults } from '../structured-test-results.js';
+import { describeLogVolume, type LogFetchStats } from '../log-fetch-stats.js';
 
 export interface BatchPackageResult {
   slug: string;
@@ -42,6 +43,15 @@ export interface BatchPackageResult {
    * per-package and already in that package's log section.
    */
   testResults?: StructuredTestResults;
+}
+
+export interface ParseBatchTestLogsOptions {
+  /**
+   * What the fetch that produced `rawLogs` had to do to collect them, when the
+   * caller knows. Not used to judge a package — it only tells a failure that
+   * has already happened how much of the run's output ever arrived.
+   */
+  logFetchStats?: LogFetchStats;
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
@@ -115,10 +125,15 @@ function readSummaryCounts(entry: SummaryEntry): SummaryCounts | undefined {
  */
 export function parseBatchTestLogs(
   rawLogs: string,
-  slugMap: Map<string, string>
+  slugMap: Map<string, string>,
+  options: ParseBatchTestLogsOptions = {}
 ): Map<string, BatchPackageResult> {
   const results = new Map<string, BatchPackageResult>();
   const lines = rawLogs.split('\n');
+  // Reported by every diagnostic below. Each of them is some form of "the
+  // output is not what this run should have produced", and none can tell how
+  // much of it never arrived without knowing what the fetch collected.
+  const logVolume = describeLogVolume(rawLogs, options.logFetchStats);
 
   // Build reverse map: slug → packageName
   const slugToPackage = new Map<string, string>();
@@ -274,7 +289,7 @@ export function parseBatchTestLogs(
   const noOutputAtAll = logSections.size === 0 && summaryResults.size === 0;
   if (noOutputAtAll) {
     OutputHelper.warn(
-      `[batch-log-parser] No batch markers or summary found in logs (${lines.length} lines, ${rawLogs.length} chars). ` +
+      `[batch-log-parser] No batch markers or summary found in logs (${logVolume}). ` +
         'The batch script may not have started or produced output.'
     );
   }
@@ -286,10 +301,10 @@ export function parseBatchTestLogs(
   const lostSectionOutput = logSections.size === 0 && summaryResults.size > 0;
   if (lostSectionOutput) {
     OutputHelper.warn(
-      `[batch-log-parser] Received ${rawLogs.length} chars of output but could not ` +
-        `attribute any of it to a package section ` +
-        `(${beginMarkersSeen} BEGIN, ${endMarkersSeen} END markers; summary at line ` +
-        `${summaryLineIndex} of ${lines.length}). ` +
+      `[batch-log-parser] Received output but could not attribute any of it to ` +
+        `a package section (${logVolume}; ${beginMarkersSeen} BEGIN, ` +
+        `${endMarkersSeen} END markers; summary at line ${summaryLineIndex} of ` +
+        `${lines.length}). ` +
         'Test counts are not derived from unattributed output.'
     );
     // BEGIN is printed first and the summary last, so their positions separate
@@ -390,7 +405,7 @@ export function parseBatchTestLogs(
       success = false;
       reasons.push(
         `no output could be attributed to this package ` +
-          `(${rawLogs.length} chars received, ${beginMarkersSeen} BEGIN markers found)`
+          `(${logVolume}; ${beginMarkersSeen} BEGIN markers found)`
       );
     } else {
       // The counts say what happened even though the log does not. Tracebacks

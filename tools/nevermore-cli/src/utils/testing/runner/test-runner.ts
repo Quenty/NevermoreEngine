@@ -8,6 +8,7 @@ import {
   parseTestLogs,
   parseTestCounts,
 } from '../test-log-parser.js';
+import { describeLogVolume } from '../log-fetch-stats.js';
 import {
   type StructuredTestResults,
   describeUnexplainedVerdict,
@@ -140,6 +141,11 @@ export async function runSingleTestAsync(
     });
 
     const rawLogs = await context.getLogsAsync(deployment);
+    // Read after the fetch, since that is what it describes.
+    const logVolume = describeLogVolume(
+      rawLogs,
+      context.getLogFetchStats?.(deployment)
+    );
 
     // The runner used to announce a failing suite by throwing, which failed the
     // task. It returns its verdict now, so the verdict has to be read: without
@@ -180,6 +186,12 @@ export async function runSingleTestAsync(
         : []),
       ...(structured ? structuredFailureReasons(structured) : []),
       ...parsed.failureReasons,
+      // Said only when the log text is all there was to judge on and it did not
+      // hold up: every reason above is then a statement about what arrived, and
+      // how much arrived is the first thing to check.
+      ...(structured === undefined && parsed.failureReasons.length > 0
+        ? [`verdict read from log text alone (${logVolume})`]
+        : []),
     ]);
 
     // Returned counts outrank scraped ones: same numbers when the log
@@ -193,6 +205,7 @@ export async function runSingleTestAsync(
       packageName,
       structured,
       scrapedCounts,
+      logVolume,
       // A probe is not a test run, so it has no results to be missing. Neither
       // is one package of an aggregated batch, whose context reported the whole
       // batch's provenance in one line already.
@@ -235,9 +248,17 @@ function reportCountsProvenance(options: {
   scrapedCounts?: ParsedTestCounts;
   silent: boolean;
   hadReturnChannel: boolean;
+  /** How much log text there was to scrape, for the fallback warning. */
+  logVolume: string;
 }): void {
-  const { packageName, structured, scrapedCounts, silent, hadReturnChannel } =
-    options;
+  const {
+    packageName,
+    structured,
+    scrapedCounts,
+    silent,
+    hadReturnChannel,
+    logVolume,
+  } = options;
 
   if (silent) {
     return;
@@ -280,7 +301,7 @@ function reportCountsProvenance(options: {
   OutputHelper.warn(
     `${packageName}: the run returned no test results, so its counts were ` +
       (scrapedCounts ? 'scraped from log text' : 'unavailable') +
-      ` — the channel Open Cloud truncates on long runs. ` +
+      ` — the channel Open Cloud truncates on long runs (${logVolume}). ` +
       (hadReturnChannel
         ? 'The run delivered a return channel but nothing recognizable in it: the ' +
           'test script should end with "return results" (see docs/testing/testing.md).'

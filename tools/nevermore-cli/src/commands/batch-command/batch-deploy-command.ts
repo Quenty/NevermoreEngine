@@ -564,7 +564,7 @@ async function _runSmokeTestAsync(
   );
 
   const rawLogs = await client.getRawTaskLogsAsync(task.path);
-  const parsed = parseTestLogs(rawLogs);
+  const parsed = parseTestLogs(rawLogs.text);
 
   const infraSuccess = completedTask.state === 'COMPLETE';
   return {

@@ -24,6 +24,7 @@ import {
   type BatchPackageResult,
   parseBatchTestLogs,
 } from '../testing/parsers/batch-log-parser.js';
+import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 
 /** Per-package deployment handle. Wraps a shared inner deployment. */
 class BatchDeployment implements Deployment {
@@ -151,6 +152,17 @@ export class BatchScriptJobContext implements JobContext {
     const result = packageResults.get(batchDeployment.packageName);
 
     return result?.logs ?? '';
+  }
+
+  /**
+   * The one fetch that pulled every package's logs, reported for each of them.
+   *
+   * Per-package by way of the shared execution: a batch is one task and one
+   * fetch, so what happened to the whole window is what happened to any
+   * package whose section went missing from it.
+   */
+  getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
+    return this._inner.getLogFetchStats?.(deployment);
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {
@@ -327,6 +339,8 @@ export class BatchScriptJobContext implements JobContext {
     }
 
     // Parse into per-package results
-    return parseBatchTestLogs(rawLogs, slugMap);
+    return parseBatchTestLogs(rawLogs, slugMap, {
+      logFetchStats: this._inner.getLogFetchStats?.(deployment),
+    });
   }
 }
