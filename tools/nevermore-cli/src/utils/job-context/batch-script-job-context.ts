@@ -162,7 +162,12 @@ export class BatchScriptJobContext implements JobContext {
    * package whose section went missing from it.
    */
   getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
-    return this._inner.getLogFetchStats?.(deployment);
+    // Unwrap: the fetch happened on the shared deployment, and the inner
+    // context reads its own stats off that object. Handing it the
+    // BatchDeployment reads a field that is not there and reports "no fetch
+    // stats" for a fetch that did happen.
+    const batchDeployment = deployment as BatchDeployment;
+    return this._inner.getLogFetchStats?.(batchDeployment.inner);
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {

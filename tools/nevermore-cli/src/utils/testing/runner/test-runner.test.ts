@@ -311,3 +311,49 @@ describe('mergeFailureReasons', () => {
     expect(mergeFailureReasons(undefined, [])).toEqual([]);
   });
 });
+
+describe('runSingleTestAsync log volume reporting', () => {
+  let packagePath: string;
+
+  beforeAll(async () => {
+    packagePath = await fs.mkdtemp(path.join(os.tmpdir(), 'volume-'));
+    await fs.writeFile(
+      path.join(packagePath, 'ServerMain.server.lua'),
+      'return nil\n'
+    );
+  });
+
+  afterAll(async () => {
+    await fs.rm(packagePath, { recursive: true, force: true });
+  });
+
+  function runAsync(logs: string) {
+    return runSingleTestAsync(createContext({ success: true }, logs), {
+      packagePath,
+      packageName: 'gameconfig',
+      target: {
+        scriptTemplate: 'ServerMain.server.lua',
+      } as unknown as DeployTarget,
+    });
+  }
+
+  it('reports how much log text a verdict was read from', async () => {
+    const result = await runAsync('some output with no jest report');
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('verdict read from log text alone');
+    expect(result.error).toContain('31 chars, 1 line(s) received');
+  });
+
+  it('says nothing about log volume when there was no log text', async () => {
+    // A batch package whose section was lost has no text of its own. Reporting
+    // "0 chars received" here contradicts the fetch stats already printed for
+    // the whole batch window, and describes a judgement never made: the verdict
+    // came from the output being absent, which its own reason already says.
+    const result = await runAsync('');
+
+    expect(result.success).toBe(false);
+    expect(result.error).not.toContain('verdict read from log text alone');
+    expect(result.error).not.toContain('0 chars, 0 line(s)');
+  });
+});

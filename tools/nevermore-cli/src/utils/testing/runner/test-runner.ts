@@ -186,10 +186,15 @@ export async function runSingleTestAsync(
         : []),
       ...(structured ? structuredFailureReasons(structured) : []),
       ...parsed.failureReasons,
-      // Said only when the log text is all there was to judge on and it did not
-      // hold up: every reason above is then a statement about what arrived, and
-      // how much arrived is the first thing to check.
-      ...(structured === undefined && parsed.failureReasons.length > 0
+      // Said only when there was log text and it did not hold up: the reasons
+      // above are then statements about what arrived, and how much arrived is
+      // the first thing to check. With no text at all the verdict came from the
+      // absence of it, which the reason for that absence already explains —
+      // saying "0 chars received" beside it only contradicts the fetch that
+      // reported the whole window.
+      ...(structured === undefined &&
+      parsed.failureReasons.length > 0 &&
+      rawLogs.length > 0
         ? [`verdict read from log text alone (${logVolume})`]
         : []),
     ]);
