@@ -22,8 +22,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "test": "lune run test/results.test.luau"
+    "preinstall": "npx only-allow pnpm"
   },
   "contributors": [
     "Quenty"
