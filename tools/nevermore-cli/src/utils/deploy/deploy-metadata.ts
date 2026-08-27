@@ -25,7 +25,7 @@ export type DeployMetadataAttributes = Record<
 const INJECT_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'transform-inject-deploy-metadata.luau'
+  'transform-inject-deploy-metadata.lua'
 );
 
 function _git(args: string[]): string | undefined {

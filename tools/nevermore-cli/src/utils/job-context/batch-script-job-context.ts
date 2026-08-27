@@ -297,7 +297,7 @@ export class BatchScriptJobContext implements JobContext {
     // Build the batch Luau script from the template
     const templatePath = resolveTemplatePath(
       import.meta.url,
-      'batch-test-runner.luau'
+      'batch-test-runner.lua'
     );
     const template = await fs.readFile(templatePath, 'utf-8');
 

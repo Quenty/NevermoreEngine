@@ -57,7 +57,7 @@ import {
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'smoke-test-server.luau'
+  'smoke-test-server.lua'
 );
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {
@@ -524,7 +524,7 @@ function _annotateSmokeTestFailure(logs: string): string {
   const header =
     'Post-deploy smoke test failed. The deploy itself succeeded, but a server ' +
     "script errored on boot. ('TaskScript' in any stack trace below refers to " +
-    "Nevermore's smoke-test-server.luau, which loadstring()s each Script under " +
+    "Nevermore's smoke-test-server.lua, which loadstring()s each Script under " +
     'ServerScriptService — if you see "loadstring() is not available", set ' +
     '$properties.LoadStringEnabled = true on ServerScriptService in your ' +
     'rojo project.)';

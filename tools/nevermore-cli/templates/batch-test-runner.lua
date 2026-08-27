@@ -1,4 +1,4 @@
--- batch-test-runner.luau
+-- batch-test-runner.lua
 -- Runs all test scripts sequentially in a single execution task.
 -- PACKAGE_SLUGS_JSON placeholder is replaced with a JSON array of slug strings at runtime.
 
@@ -11,7 +11,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 -- stylua: ignore
 local packageSlugs: { string } = HttpService:JSONDecode([==[{{ PACKAGE_SLUGS_JSON }}]==])
 
--- Discover test scripts via tags (set by combine-test-places.luau)
+-- Discover test scripts via tags (set by combine-test-places.lua)
 local scriptSources = {}
 for _, slug in packageSlugs do
 	local tagged = CollectionService:GetTagged(`_BatchTest_{slug}`)

@@ -22,7 +22,7 @@ vi.mock('@quenty/nevermore-template-helpers', () => ({
       cleanupAsync: vi.fn(async () => {}),
     })),
   },
-  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.luau'),
+  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.lua'),
   resolveTemplatePath: vi.fn((..._args: any[]) => '/fake/default.project.json'),
 }));
 

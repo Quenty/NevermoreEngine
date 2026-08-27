@@ -34,7 +34,7 @@ local _processing = false
 -- Produces the SerializedReturnValue shapes declared in
 -- web-socket-protocol.ts. Action modules are loadstring'd standalone inside
 -- the plugin and cannot require anything, so this cannot be shared with the
--- equivalent marshaller in query-data-model.luau.
+-- equivalent marshaller in query-data-model.lua.
 
 local MAX_DEPTH = 64
 

@@ -24,7 +24,7 @@ import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 const MERGE_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'transform-rojo-merge-place.luau'
+  'transform-rojo-merge-place.lua'
 );
 
 interface SharedRojoBuild {

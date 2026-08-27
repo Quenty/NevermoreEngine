@@ -1,5 +1,5 @@
 /**
- * Tests for action-loader: scanning .luau files and computing content hashes.
+ * Tests for action-loader: scanning .lua files and computing content hashes.
  */
 
 import { createHash } from 'crypto';
@@ -24,21 +24,21 @@ function sha256(content: string): string {
 }
 
 describe('loadActionSourcesAsync', () => {
-  it('loads .luau files from a flat directory', async () => {
+  it('loads .lua files from a flat directory', async () => {
     const source = 'local M = {} return M';
-    await fs.writeFile(path.join(tmpDir, 'hello.luau'), source);
+    await fs.writeFile(path.join(tmpDir, 'hello.lua'), source);
 
     const results = await loadActionSourcesAsync(tmpDir);
 
     expect(results).toHaveLength(1);
     expect(results[0].name).toBe('hello');
     expect(results[0].source).toBe(source);
-    expect(results[0].relativePath).toBe('hello.luau');
+    expect(results[0].relativePath).toBe('hello.lua');
   });
 
   it('computes SHA-256 hash of source content', async () => {
     const source = 'return function() end';
-    await fs.writeFile(path.join(tmpDir, 'test.luau'), source);
+    await fs.writeFile(path.join(tmpDir, 'test.lua'), source);
 
     const results = await loadActionSourcesAsync(tmpDir);
 
@@ -47,8 +47,8 @@ describe('loadActionSourcesAsync', () => {
   });
 
   it('different content produces different hashes', async () => {
-    await fs.writeFile(path.join(tmpDir, 'a.luau'), 'version 1');
-    await fs.writeFile(path.join(tmpDir, 'b.luau'), 'version 2');
+    await fs.writeFile(path.join(tmpDir, 'a.lua'), 'version 1');
+    await fs.writeFile(path.join(tmpDir, 'b.lua'), 'version 2');
 
     const results = await loadActionSourcesAsync(tmpDir);
 
@@ -62,8 +62,8 @@ describe('loadActionSourcesAsync', () => {
     const source = 'local x = 42';
     const subDir = path.join(tmpDir, 'sub');
     await fs.mkdir(subDir);
-    await fs.writeFile(path.join(tmpDir, 'a.luau'), source);
-    await fs.writeFile(path.join(subDir, 'b.luau'), source);
+    await fs.writeFile(path.join(tmpDir, 'a.lua'), source);
+    await fs.writeFile(path.join(subDir, 'b.lua'), source);
 
     const results = await loadActionSourcesAsync(tmpDir);
 
@@ -76,21 +76,21 @@ describe('loadActionSourcesAsync', () => {
   it('recursively scans subdirectories', async () => {
     const subDir = path.join(tmpDir, 'nested', 'deep');
     await fs.mkdir(subDir, { recursive: true });
-    await fs.writeFile(path.join(subDir, 'deep.luau'), 'return nil');
+    await fs.writeFile(path.join(subDir, 'deep.lua'), 'return nil');
 
     const results = await loadActionSourcesAsync(tmpDir);
 
     expect(results).toHaveLength(1);
     expect(results[0].name).toBe('deep');
     expect(results[0].relativePath).toBe(
-      path.join('nested', 'deep', 'deep.luau')
+      path.join('nested', 'deep', 'deep.lua')
     );
   });
 
-  it('ignores non-.luau files', async () => {
-    await fs.writeFile(path.join(tmpDir, 'script.lua'), 'not included');
+  it('ignores non-.lua files', async () => {
+    await fs.writeFile(path.join(tmpDir, 'script.luau'), 'not included');
     await fs.writeFile(path.join(tmpDir, 'module.ts'), 'not included');
-    await fs.writeFile(path.join(tmpDir, 'action.luau'), 'included');
+    await fs.writeFile(path.join(tmpDir, 'action.lua'), 'included');
 
     const results = await loadActionSourcesAsync(tmpDir);
 
@@ -109,7 +109,7 @@ describe('loadActionSourcesAsync', () => {
   });
 
   it('hash is a 64-character hex string (SHA-256)', async () => {
-    await fs.writeFile(path.join(tmpDir, 'check.luau'), 'content');
+    await fs.writeFile(path.join(tmpDir, 'check.lua'), 'content');
 
     const results = await loadActionSourcesAsync(tmpDir);
 

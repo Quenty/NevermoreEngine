@@ -53,7 +53,7 @@ const defaultProjectPath = resolveTemplatePath(
 const sessionAttributeTransformScript = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'transform-add-session-attribute.luau'
+  'transform-add-session-attribute.lua'
 );
 
 function readServerVersion(): string {
@@ -448,7 +448,7 @@ export class StudioBridgeServer {
   }
 
   /**
-   * Ensure action modules (like `execute.luau`) are synced to the plugin
+   * Ensure action modules (like `execute.lua`) are synced to the plugin
    * before first use. Uses `syncActions` to check which actions the plugin
    * is missing, then registers them via `registerAction`.
    *
