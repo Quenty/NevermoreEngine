@@ -1,3 +1,16 @@
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.10.0`, `@quenty/nevermore-test-runner@1.6.0`, `@quenty/cli-output-helpers@1.18.0`, `@quenty/nevermore-cli@4.44.0`, `@quenty/nevermore-template-helpers@1.19.0`, `@quenty/studio-bridge@0.19.0`
+  - Return a test run's results instead of scraping them out of its logs [#795](https://github.com/Quenty/NevermoreEngine/pull/795) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Aug 24 2026)
 
 #### 🐛 Bug Fix
