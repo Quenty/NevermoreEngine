@@ -3,6 +3,23 @@ import { type StructuredTestResults } from '../testing/structured-test-results.j
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 import { type TaskLogMessage } from '../open-cloud/open-cloud-client.js';
 
+/** A run's output, with the severity and the fetch that produced it. */
+export interface JobLogs {
+  text: string;
+  /**
+   * The same output split into typed messages, when the transport reports
+   * severity. Empty for one that does not — a local run reads its logs off the
+   * Studio bridge, which says only what was printed.
+   */
+  messages: TaskLogMessage[];
+  /**
+   * What collecting them took, when the transport can say. Absent rather than
+   * zeroed, so "no fetch to measure" cannot read as "a fetch that found
+   * nothing".
+   */
+  stats?: LogFetchStats;
+}
+
 export type { BuiltPlace } from '../build/build.js';
 
 export interface DeployPlaceOptions {
@@ -85,29 +102,15 @@ export interface JobContext {
     options: RunScriptOptions
   ): Promise<ScriptRunResult>;
 
-  /** Retrieve raw logs from the most recent script execution on this deployment. */
-  getLogsAsync(deployment: Deployment): Promise<string>;
-
   /**
-   * What the most recent `getLogsAsync` had to do to collect those logs.
+   * Everything the most recent script execution printed.
    *
-   * For a diagnostic that has already decided output is missing: the log text
-   * alone cannot separate a run that printed little from one whose output the
-   * engine dropped or the fetch never paged through. Absent for a context whose
-   * logs do not come from an API — a local run reads them off the Studio bridge,
-   * where there is no request to count — and before any fetch has happened.
+   * One value rather than a log plus two optional side-channels for its
+   * severity and its fetch: they all come from the same fetch, so returning
+   * them together removes both the chance of asking a context that does not
+   * implement one and the chance of handing an accessor the wrong handle.
    */
-  getLogFetchStats?(deployment: Deployment): LogFetchStats | undefined;
-
-  /**
-   * The most recent `getLogsAsync` output, still split into typed messages.
-   *
-   * For rendering: severity is the API's to state, and the joined text cannot
-   * carry it — a traceback's continuation lines read as ordinary output.
-   * Absent for a context whose logs arrive without severity, which is every
-   * context but Open Cloud.
-   */
-  getLogMessages?(deployment: Deployment): TaskLogMessage[] | undefined;
+  getLogsAsync(deployment: Deployment): Promise<JobLogs>;
 
   /** Release a single deployment (stop bridge / clear task metadata). */
   releaseAsync(deployment: Deployment): Promise<void>;

@@ -22,21 +22,6 @@ export interface GroupedReporterOptions {
    * test runs: a ✓ with no numbers behind it looks identical to a real pass.
    */
   expectsTestCounts?: boolean;
-  /**
-   * When true, this reporter says nothing per package, because something else
-   * already printed the run.
-   *
-   * Set by an aggregated batch. One task runs every package, so there is no
-   * per-package moment to report: every package starts in the same tick before
-   * the task exists, which made the groups open back-to-back around no output,
-   * and the batch-wide progress lines land in whichever package's async
-   * context first triggered the shared promise — the upload and the build list
-   * were being filed under two arbitrary packages. The run's own renderer
-   * shows each section with its verdict in the title, and the summary table
-   * recaps at the end, so a header and a repeated verdict here is noise:
-   * 78 packages meant 78 such blocks.
-   */
-  logsRenderedElsewhere?: boolean;
 }
 
 /**
@@ -61,7 +46,7 @@ export class GroupedReporter extends BaseReporter {
   }
 
   override onPackageStart(name: string): void {
-    if (this._isCI && !this._options.logsRenderedElsewhere) {
+    if (this._isCI) {
       console.log(`::group::${name}`);
     }
   }
@@ -70,10 +55,6 @@ export class GroupedReporter extends BaseReporter {
     result: PackageResult,
     bufferedOutput?: string[]
   ): void {
-    if (this._options.logsRenderedElsewhere) {
-      return;
-    }
-
     this._printGroupedResult(result, bufferedOutput);
   }
 
@@ -96,9 +77,7 @@ export class GroupedReporter extends BaseReporter {
       }
     }
 
-    const showLogs =
-      (this._options.showLogs || !result.success) &&
-      !this._options.logsRenderedElsewhere;
+    const showLogs = this._options.showLogs || !result.success;
     const duration = formatDurationMs(result.durationMs);
     const successLabel = this._options.successLabel ?? 'Passed';
     const failureLabel =
@@ -161,7 +140,7 @@ export class GroupedReporter extends BaseReporter {
       }
     }
 
-    if (this._isCI && !this._options.logsRenderedElsewhere) {
+    if (this._isCI) {
       console.log('::endgroup::');
     }
 

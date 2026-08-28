@@ -3,19 +3,18 @@ import {
   getTaskReturnValues,
   type LuauTask,
   type OpenCloudClient,
-  type TaskLogMessage,
 } from '../open-cloud/open-cloud-client.js';
 import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
   type Deployment,
   type DeployPlaceOptions,
+  type JobLogs,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
 import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
-import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 
 const SKIP_RENAMING_PLACE = true;
 
@@ -25,10 +24,6 @@ class CloudDeployment implements Deployment {
   version: number;
   taskPath?: string;
   taskState?: LuauTask['state'];
-  /** Shape of the most recent log fetch, for whoever reads those logs next. */
-  logFetchStats?: LogFetchStats;
-  /** That fetch's output, still typed, for whoever renders it. */
-  logMessages?: TaskLogMessage[];
 
   constructor(universeId: number, placeId: number, version: number) {
     this.universeId = universeId;
@@ -145,7 +140,7 @@ export class CloudJobContext extends BaseJobContext {
     };
   }
 
-  async getLogsAsync(deployment: Deployment): Promise<string> {
+  async getLogsAsync(deployment: Deployment): Promise<JobLogs> {
     const cloudDeployment = deployment as CloudDeployment;
 
     if (!cloudDeployment.taskPath) {
@@ -155,27 +150,17 @@ export class CloudJobContext extends BaseJobContext {
     const fetched = await this._openCloudClient!.getRawTaskLogsAsync(
       cloudDeployment.taskPath
     );
-    cloudDeployment.logFetchStats = fetched.stats;
-    cloudDeployment.logMessages = fetched.messages;
 
     if (cloudDeployment.taskState && cloudDeployment.taskState !== 'COMPLETE') {
-      return [
-        fetched.text,
-        `Task ended with state: ${cloudDeployment.taskState}`,
-      ]
-        .filter(Boolean)
-        .join('\n');
+      const note = `Task ended with state: ${cloudDeployment.taskState}`;
+      return {
+        text: [fetched.text, note].filter(Boolean).join('\n'),
+        messages: [...fetched.messages, { message: note }],
+        stats: fetched.stats,
+      };
     }
 
-    return fetched.text;
-  }
-
-  getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
-    return (deployment as CloudDeployment).logFetchStats;
-  }
-
-  getLogMessages(deployment: Deployment): TaskLogMessage[] | undefined {
-    return (deployment as CloudDeployment).logMessages;
+    return fetched;
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {

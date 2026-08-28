@@ -1,4 +1,5 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { isCI } from '@quenty/cli-output-helpers/cli-utils';
 import {
   type ParsedTestCounts,
   evaluateTestOutcome,
@@ -102,15 +103,22 @@ function describeSlugState(
   return `${result.success ? 'Passed' : 'FAILED'}${counts}`;
 }
 
-/** Print one diagnostic, honoring the grouping levels. */
+/**
+ * Print one diagnostic, honoring the grouping levels.
+ *
+ * `useGroups` is passed in rather than looked up, so the whole run agrees about
+ * whether it is emitting workflow commands. Asking `isCI()` separately here, in
+ * the renderer and in the reporter is three answers to one question.
+ */
 export function emitDiagnostic(
   level: BatchDiagnosticLevel,
-  message: string
+  message: string,
+  useGroups: boolean
 ): void {
   if (level === 'group') {
-    OutputHelper.startGroup(message);
+    OutputHelper.startGroup(message, useGroups);
   } else if (level === 'endgroup') {
-    OutputHelper.endGroup();
+    OutputHelper.endGroup(useGroups);
   } else if (level === 'warn') {
     OutputHelper.warn(message);
   } else if (level === 'info') {
@@ -128,7 +136,7 @@ function makeReporter(
     return onDiagnostic;
   }
 
-  return (level, message) => emitDiagnostic(level, message);
+  return (level, message) => emitDiagnostic(level, message, isCI());
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';

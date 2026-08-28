@@ -146,12 +146,9 @@ export async function runSingleTestAsync(
       timeoutMs,
     });
 
-    const rawLogs = await context.getLogsAsync(deployment);
-    // Read after the fetch, since that is what it describes.
-    const logVolume = describeLogVolume(
-      rawLogs,
-      context.getLogFetchStats?.(deployment)
-    );
+    const logs = await context.getLogsAsync(deployment);
+    const rawLogs = logs.text;
+    const logVolume = describeLogVolume(rawLogs, logs.stats);
 
     // The runner used to announce a failing suite by throwing, which failed the
     // task. It returns its verdict now, so the verdict has to be read: without

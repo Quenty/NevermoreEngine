@@ -239,15 +239,15 @@ export class OutputHelper {
    * pair with {@link endGroup} — an unclosed group swallows everything printed
    * after it.
    */
-  public static startGroup(title: string): void {
+  public static startGroup(title: string, useGroups = isCI()): void {
     console.log(
-      isCI() ? `::group::${title}` : this.formatDim(`── ${title} ──`)
+      useGroups ? `::group::${title}` : this.formatDim(`── ${title} ──`)
     );
   }
 
   /** Close the section opened by {@link startGroup}. */
-  public static endGroup(): void {
-    if (isCI()) {
+  public static endGroup(useGroups = isCI()): void {
+    if (useGroups) {
       console.log('::endgroup::');
     }
   }

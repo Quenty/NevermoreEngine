@@ -1,6 +1,7 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
+  AggregatedBatchReporter,
   type Reporter,
   type JobPhase,
   type ProgressSummary,
@@ -8,6 +9,8 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import { renderBatchLog } from '../../utils/testing/parsers/batch-log-renderer.js';
+import { emitDiagnostic } from '../../utils/testing/parsers/batch-log-parser.js';
 import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type JobContext,
@@ -182,26 +185,37 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       : args.concurrency;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
+  const aggregated = args.aggregated ?? false;
+  // Decided once, here, and passed down. Three separate isCI() lookups — the
+  // renderer, OutputHelper's group markers and GroupedReporter — could each
+  // answer differently, and a half-grouped log is worse than an ungrouped one.
+  const presentation = { useGroups: isCI(), color: !process.env.NO_COLOR };
+  let aggregatedReporter: AggregatedBatchReporter | undefined;
 
   const reporter = new CompositeReporter(
     packageNames,
     (state: LiveStateTracker) => {
+      // An aggregated run is one execution, so there is no per-package progress
+      // to report and no per-package moment to report it at.
+      if (aggregated) {
+        aggregatedReporter = new AggregatedBatchReporter(packages.length, {
+          actionVerb: 'Testing',
+        });
+      }
+
       const reporters: Reporter[] = [
-        isGrouped
-          ? new GroupedReporter(state, {
-              showLogs: args.logs ?? false,
-              verbose: args.verbose,
-              actionVerb: 'Testing',
-              expectsTestCounts: true,
-              // One task runs every package, and it prints its own output in
-              // order with each section grouped. Grouping again here would wrap
-              // nothing, since every package starts before the task exists.
-              logsRenderedElsewhere: args.aggregated ?? false,
-            })
-          : new SpinnerReporter(state, {
-              showLogs: args.logs ?? false,
-              actionVerb: 'Testing',
-            }),
+        aggregatedReporter ??
+          (isGrouped
+            ? new GroupedReporter(state, {
+                showLogs: args.logs ?? false,
+                verbose: args.verbose,
+                actionVerb: 'Testing',
+                expectsTestCounts: true,
+              })
+            : new SpinnerReporter(state, {
+                showLogs: args.logs ?? false,
+                actionVerb: 'Testing',
+              })),
         new SummaryTableReporter(state),
       ];
       if (args.output) {
@@ -248,19 +262,43 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     ? new CloudJobContext(innerReporter, client, basePlaceResolver)
     : new LocalJobContext(innerReporter, client, basePlaceResolver);
 
-  const context: JobContext = args.aggregated
+  const batchContext = aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
         batchTimeoutMs: timeoutMs,
         reporter,
       })
-    : innerContext;
+    : undefined;
+  const context: JobContext = batchContext ?? innerContext;
 
   await reporter.startAsync();
 
   let exitCode = 0;
   try {
+    // Run the batch before the per-package loop asks for anything, for two
+    // reasons. The run is shown once, in order, before any per-package result
+    // could interleave with it; and the shared build, upload and execution
+    // happen outside every package's async context, so the verbose output they
+    // produce stops being captured into whichever package first reached the
+    // shared promise — which is how the upload URL and a 78-line build list
+    // came to be filed under two arbitrary packages.
+    if (batchContext && aggregatedReporter) {
+      const outcome = await batchContext.getExecutionOutcomeAsync();
+
+      aggregatedReporter.printRun(
+        renderBatchLog(outcome.lines, {
+          slugToPackage: outcome.slugToPackage,
+          results: outcome.results,
+          ...presentation,
+        })
+      );
+
+      for (const { level, message } of outcome.diagnostics) {
+        emitDiagnostic(level, message, presentation.useGroups);
+      }
+    }
+
     const results = await runBatchAsync<BatchTarget, BatchTestResult>({
       items: packages,
       concurrency,

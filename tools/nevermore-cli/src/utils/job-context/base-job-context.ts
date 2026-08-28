@@ -17,6 +17,7 @@ import {
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
+  type JobLogs,
 } from './job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
@@ -300,7 +301,7 @@ export abstract class BaseJobContext implements JobContext {
     deployment: Deployment,
     options: RunScriptOptions
   ): Promise<ScriptRunResult>;
-  abstract getLogsAsync(deployment: Deployment): Promise<string>;
+  abstract getLogsAsync(deployment: Deployment): Promise<JobLogs>;
   abstract releaseAsync(deployment: Deployment): Promise<void>;
 
   async disposeAsync(): Promise<void> {

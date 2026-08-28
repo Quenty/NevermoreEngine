@@ -12,8 +12,8 @@ import {
   type JobContext,
   type RunScriptOptions,
   type ScriptRunResult,
+  type JobLogs,
 } from './job-context.js';
-import { isCI } from '../nevermore-cli-utils.js';
 import { type BuildPlaceOptions } from '../build/build.js';
 import { type BatchTarget } from '../batch/changed-packages-utils.js';
 import {
@@ -28,8 +28,8 @@ import {
 } from '../testing/parsers/batch-log-parser.js';
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 import {
-  renderBatchLog,
   toRenderableLines,
+  type RenderableLogLine,
 } from '../testing/parsers/batch-log-renderer.js';
 
 /** Per-package deployment handle. Wraps a shared inner deployment. */
@@ -57,6 +57,28 @@ interface CombinedBuildState {
  * package configured with one — those belong in `nevermore batch test
  * --no-aggregated`, or in an integration deploy.
  */
+/**
+ * Everything one aggregated batch produced, as data.
+ *
+ * The execution used to parse, render and print from in here. Printing from a
+ * job context put presentation in the transport, bypassed whatever reporter the
+ * command had chosen — output written straight to the console is invisible to a
+ * SpinnerReporter's capture — and left the whole path untestable without spying
+ * on `console.log`. The context returns this instead, and the command layer
+ * decides what to show.
+ */
+export interface BatchExecutionOutcome {
+  results: Map<string, BatchPackageResult>;
+  /** The run's output, typed by severity and not yet rendered. */
+  lines: RenderableLogLine[];
+  /** What the fetch had to do to collect it; absent for a transport that cannot say. */
+  stats?: LogFetchStats;
+  /** What reading the log turned up, to report after the log itself. */
+  diagnostics: Array<{ level: BatchDiagnosticLevel; message: string }>;
+  /** Section slug to package name, for whoever titles the sections. */
+  slugToPackage: Map<string, string>;
+}
+
 export class BatchScriptJobContext implements JobContext {
   private _inner: JobContext;
   private _batchTargets: BatchTarget[];
@@ -69,7 +91,7 @@ export class BatchScriptJobContext implements JobContext {
   // Lazy-promise state
   private _combinedBuildPromise?: Promise<CombinedBuildState>;
   private _deployPromise?: Promise<Deployment>;
-  private _executionPromise?: Promise<Map<string, BatchPackageResult>>;
+  private _executionPromise?: Promise<BatchExecutionOutcome>;
 
   // State for cleanup
   private _combinedBuildContext?: BuildContext;
@@ -131,8 +153,8 @@ export class BatchScriptJobContext implements JobContext {
     options: RunScriptOptions
   ): Promise<ScriptRunResult> {
     const batchDeployment = deployment as BatchDeployment;
-    const packageResults = await this._getBatchExecutionAsync();
-    const result = packageResults.get(batchDeployment.packageName);
+    const { results } = await this._getBatchExecutionAsync();
+    const result = results.get(batchDeployment.packageName);
 
     if (!result) {
       return { success: false };
@@ -152,28 +174,28 @@ export class BatchScriptJobContext implements JobContext {
     };
   }
 
-  async getLogsAsync(deployment: Deployment): Promise<string> {
-    const batchDeployment = deployment as BatchDeployment;
-    const packageResults = await this._getBatchExecutionAsync();
-    const result = packageResults.get(batchDeployment.packageName);
-
-    return result?.logs ?? '';
+  /**
+   * Run the batch if it has not run, and hand back everything it produced.
+   *
+   * Public so the command layer can render the run once, before the
+   * per-package loop asks for results — which is also what keeps the shared
+   * build and upload out of any one package's async context.
+   */
+  async getExecutionOutcomeAsync(): Promise<BatchExecutionOutcome> {
+    return this._getBatchExecutionAsync();
   }
 
-  /**
-   * The one fetch that pulled every package's logs, reported for each of them.
-   *
-   * Per-package by way of the shared execution: a batch is one task and one
-   * fetch, so what happened to the whole window is what happened to any
-   * package whose section went missing from it.
-   */
-  getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
-    // Unwrap: the fetch happened on the shared deployment, and the inner
-    // context reads its own stats off that object. Handing it the
-    // BatchDeployment reads a field that is not there and reports "no fetch
-    // stats" for a fetch that did happen.
+  async getLogsAsync(deployment: Deployment): Promise<JobLogs> {
     const batchDeployment = deployment as BatchDeployment;
-    return this._inner.getLogFetchStats?.(batchDeployment.inner);
+    const { results, stats } = await this._getBatchExecutionAsync();
+    const result = results.get(batchDeployment.packageName);
+
+    // The text is this package's section; the stats describe the one fetch that
+    // pulled every section, which is what happened to any package whose own
+    // section went missing from it. Messages stay empty: severity is per
+    // message across the whole window, and slicing it per package would need
+    // the section boundaries the parser already resolved.
+    return { text: result?.logs ?? '', messages: [], stats };
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {
@@ -287,7 +309,7 @@ export class BatchScriptJobContext implements JobContext {
     return deployment;
   }
 
-  private _getBatchExecutionAsync(): Promise<Map<string, BatchPackageResult>> {
+  private _getBatchExecutionAsync(): Promise<BatchExecutionOutcome> {
     if (!this._executionPromise) {
       this._executionPromise = this._doBatchExecutionAsync();
       // On rejection, clear the promise so that a retry re-triggers the batch
@@ -298,9 +320,7 @@ export class BatchScriptJobContext implements JobContext {
     return this._executionPromise;
   }
 
-  private async _doBatchExecutionAsync(): Promise<
-    Map<string, BatchPackageResult>
-  > {
+  private async _doBatchExecutionAsync(): Promise<BatchExecutionOutcome> {
     const buildState = await this._getCombinedBuildAsync();
     const deployment = await this._getSharedDeploymentAsync();
     const { slugMap } = buildState.combinedResult;
@@ -330,8 +350,9 @@ export class BatchScriptJobContext implements JobContext {
       timeoutMs: this._batchTimeoutMs,
     });
 
-    // Fetch the combined logs
-    const rawLogs = await this._inner.getLogsAsync(deployment);
+    // Fetch the combined logs, with the severity and fetch that produced them.
+    const logs = await this._inner.getLogsAsync(deployment);
+    const rawLogs = logs.text;
 
     if (!result.success) {
       const stateInfo = result.taskState ? ` (state: ${result.taskState})` : '';
@@ -349,50 +370,15 @@ export class BatchScriptJobContext implements JobContext {
       OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
     }
 
-    // Parse into per-package results. The parser's diagnostics are held rather
-    // than printed: they describe the log window, and printing them first put
-    // them above the log they are about.
+    // Parse into per-package results. Diagnostics are collected rather than
+    // printed: they describe the log window, so they belong after it, and that
+    // is the caller's ordering to make.
     const diagnostics: Array<{ level: BatchDiagnosticLevel; message: string }> =
       [];
     const results = parseBatchTestLogs(rawLogs, slugMap, {
-      logFetchStats: this._inner.getLogFetchStats?.(deployment),
+      logFetchStats: logs.stats,
       onDiagnostic: (level, message) => diagnostics.push({ level, message }),
     });
-
-    this._renderBatchLog(deployment, rawLogs, slugMap, results);
-
-    // Now that the run has been shown, say what reading it turned up.
-    for (const { level, message } of diagnostics) {
-      if (level === 'warn') {
-        OutputHelper.warn(message);
-      } else if (level === 'info') {
-        OutputHelper.info(message);
-      } else {
-        OutputHelper.verbose(message);
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Print the run's whole output once, in arrival order, with each package's
-   * section wrapped in a group.
-   *
-   * One task produced all of this, so it is rendered from the one log window
-   * rather than re-emitted per package: the per-package path can only show
-   * output the parser managed to attribute, and everything between sections —
-   * which is where a batch-level crash lands — never reaches it.
-   */
-  private _renderBatchLog(
-    deployment: Deployment,
-    rawLogs: string,
-    slugMap: Map<string, string>,
-    results: Map<string, BatchPackageResult>
-  ): void {
-    if (!rawLogs) {
-      return;
-    }
 
     const slugToPackage = new Map<string, string>();
     for (const [packageName, slug] of slugMap) {
@@ -401,19 +387,15 @@ export class BatchScriptJobContext implements JobContext {
 
     // Typed messages when the transport carries severity; otherwise the joined
     // text, which renders uncolored rather than guessed at.
-    const messages = this._inner.getLogMessages?.(deployment) ?? [
-      { message: rawLogs },
-    ];
+    const messages =
+      logs.messages.length > 0 ? logs.messages : [{ message: rawLogs }];
 
-    const rendered = renderBatchLog(toRenderableLines(messages), {
-      slugToPackage,
+    return {
       results,
-      useGroups: isCI(),
-      color: !process.env.NO_COLOR,
-    });
-
-    for (const line of rendered) {
-      console.log(line);
-    }
+      lines: toRenderableLines(messages),
+      stats: logs.stats,
+      diagnostics,
+      slugToPackage,
+    };
   }
 }

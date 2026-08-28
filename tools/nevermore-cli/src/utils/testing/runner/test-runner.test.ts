@@ -70,7 +70,7 @@ function createContext(run: ScriptRunResult, logs: string): JobContext {
     }),
     deployBuiltPlaceAsync: async () => ({} as Deployment),
     runScriptAsync: async () => run,
-    getLogsAsync: async () => logs,
+    getLogsAsync: async () => ({ text: logs, messages: [] }),
     releaseAsync: async () => {},
     releaseBuiltPlaceAsync: async () => {},
     disposeAsync: async () => {},

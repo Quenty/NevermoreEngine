@@ -26,6 +26,7 @@ export {
   WatchResultReporter,
   type WatchResultReporterOptions,
 } from './watch-result-reporter.js';
+export { AggregatedBatchReporter } from './aggregated-batch-reporter.js';
 export { CompositeResultReporter } from './composite-result-reporter.js';
 export {
   buildResultReporter,

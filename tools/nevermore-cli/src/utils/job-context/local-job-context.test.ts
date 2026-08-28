@@ -51,7 +51,7 @@ describe('LocalJobContext.runScriptAsync', () => {
 
     expect(result.success).toBe(true);
     expect(result.returnValues).toEqual([{ counts: { passed: 7 } }]);
-    expect(await context.getLogsAsync(deployment)).toBe('ran');
+    expect((await context.getLogsAsync(deployment)).text).toBe('ran');
   });
 
   it('leaves returnValues absent when the bridge reported none', async () => {
@@ -82,7 +82,7 @@ describe('LocalJobContext.runScriptAsync', () => {
 
     expect(result.success).toBe(false);
     expect(result.returnValues).toBeUndefined();
-    expect(await context.getLogsAsync(deployment)).toContain(
+    expect((await context.getLogsAsync(deployment)).text).toContain(
       'no connected client'
     );
   });
