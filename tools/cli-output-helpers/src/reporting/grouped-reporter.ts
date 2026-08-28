@@ -22,6 +22,17 @@ export interface GroupedReporterOptions {
    * test runs: a ✓ with no numbers behind it looks identical to a real pass.
    */
   expectsTestCounts?: boolean;
+  /**
+   * When true, this reporter neither groups packages nor repeats their logs,
+   * because something else already printed the run in order.
+   *
+   * Set by an aggregated batch, where grouping here is actively wrong: one task
+   * runs every package, so every package "starts" in the same tick before the
+   * task exists, and the groups open back-to-back around no output at all. The
+   * run's own renderer wraps each section instead, and has already shown these
+   * logs — so repeating them here would print the whole batch twice.
+   */
+  logsRenderedElsewhere?: boolean;
 }
 
 /**
@@ -46,7 +57,7 @@ export class GroupedReporter extends BaseReporter {
   }
 
   override onPackageStart(name: string): void {
-    if (this._isCI) {
+    if (this._isCI && !this._options.logsRenderedElsewhere) {
       console.log(`::group::${name}`);
     }
   }
@@ -77,7 +88,9 @@ export class GroupedReporter extends BaseReporter {
       }
     }
 
-    const showLogs = this._options.showLogs || !result.success;
+    const showLogs =
+      (this._options.showLogs || !result.success) &&
+      !this._options.logsRenderedElsewhere;
     const duration = formatDurationMs(result.durationMs);
     const successLabel = this._options.successLabel ?? 'Passed';
     const failureLabel =
@@ -140,7 +153,7 @@ export class GroupedReporter extends BaseReporter {
       }
     }
 
-    if (this._isCI) {
+    if (this._isCI && !this._options.logsRenderedElsewhere) {
       console.log('::endgroup::');
     }
 

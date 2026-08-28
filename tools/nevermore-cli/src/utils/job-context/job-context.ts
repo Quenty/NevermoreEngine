@@ -1,6 +1,7 @@
 import { type BuildPlaceOptions, type BuiltPlace } from '../build/build.js';
 import { type StructuredTestResults } from '../testing/structured-test-results.js';
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
+import { type TaskLogMessage } from '../open-cloud/open-cloud-client.js';
 
 export type { BuiltPlace } from '../build/build.js';
 
@@ -97,6 +98,16 @@ export interface JobContext {
    * where there is no request to count — and before any fetch has happened.
    */
   getLogFetchStats?(deployment: Deployment): LogFetchStats | undefined;
+
+  /**
+   * The most recent `getLogsAsync` output, still split into typed messages.
+   *
+   * For rendering: severity is the API's to state, and the joined text cannot
+   * carry it — a traceback's continuation lines read as ordinary output.
+   * Absent for a context whose logs arrive without severity, which is every
+   * context but Open Cloud.
+   */
+  getLogMessages?(deployment: Deployment): TaskLogMessage[] | undefined;
 
   /** Release a single deployment (stop bridge / clear task metadata). */
   releaseAsync(deployment: Deployment): Promise<void>;

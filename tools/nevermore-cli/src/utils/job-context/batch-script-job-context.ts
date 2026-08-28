@@ -13,6 +13,7 @@ import {
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { isCI } from '../nevermore-cli-utils.js';
 import { type BuildPlaceOptions } from '../build/build.js';
 import { type BatchTarget } from '../batch/changed-packages-utils.js';
 import {
@@ -25,6 +26,10 @@ import {
   parseBatchTestLogs,
 } from '../testing/parsers/batch-log-parser.js';
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
+import {
+  renderBatchLog,
+  toRenderableLines,
+} from '../testing/parsers/batch-log-renderer.js';
 
 /** Per-package deployment handle. Wraps a shared inner deployment. */
 class BatchDeployment implements Deployment {
@@ -344,8 +349,54 @@ export class BatchScriptJobContext implements JobContext {
     }
 
     // Parse into per-package results
-    return parseBatchTestLogs(rawLogs, slugMap, {
+    const results = parseBatchTestLogs(rawLogs, slugMap, {
       logFetchStats: this._inner.getLogFetchStats?.(deployment),
     });
+
+    this._renderBatchLog(deployment, rawLogs, slugMap, results);
+
+    return results;
+  }
+
+  /**
+   * Print the run's whole output once, in arrival order, with each package's
+   * section wrapped in a group.
+   *
+   * One task produced all of this, so it is rendered from the one log window
+   * rather than re-emitted per package: the per-package path can only show
+   * output the parser managed to attribute, and everything between sections —
+   * which is where a batch-level crash lands — never reaches it.
+   */
+  private _renderBatchLog(
+    deployment: Deployment,
+    rawLogs: string,
+    slugMap: Map<string, string>,
+    results: Map<string, BatchPackageResult>
+  ): void {
+    if (!rawLogs) {
+      return;
+    }
+
+    const slugToPackage = new Map<string, string>();
+    for (const [packageName, slug] of slugMap) {
+      slugToPackage.set(slug, packageName);
+    }
+
+    // Typed messages when the transport carries severity; otherwise the joined
+    // text, which renders uncolored rather than guessed at.
+    const messages = this._inner.getLogMessages?.(deployment) ?? [
+      { message: rawLogs },
+    ];
+
+    const rendered = renderBatchLog(toRenderableLines(messages), {
+      slugToPackage,
+      results,
+      useGroups: isCI(),
+      color: !process.env.NO_COLOR,
+    });
+
+    for (const line of rendered) {
+      console.log(line);
+    }
   }
 }

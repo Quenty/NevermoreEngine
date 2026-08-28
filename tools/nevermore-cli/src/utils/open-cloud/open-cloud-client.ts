@@ -9,10 +9,27 @@ import {
 } from '../testing/test-log-parser.js';
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 
+/**
+ * One engine message, with the severity Open Cloud reported for it.
+ *
+ * A message is not a line: an error arrives with its whole traceback attached,
+ * so `message` can span several. `messageType` is OUTPUT, WARNING or ERROR.
+ */
+export interface TaskLogMessage {
+  message: string;
+  messageType?: string;
+}
+
 /** A task's log text together with what the fetch had to do to collect it. */
 export interface TaskLogFetch {
   text: string;
   stats: LogFetchStats;
+  /**
+   * The same output as `text`, still split into typed messages. Kept because
+   * severity is the API's to state and cannot be recovered from the joined
+   * text: a traceback's continuation lines look like ordinary output.
+   */
+  messages: TaskLogMessage[];
 }
 
 export interface LuauTask {
@@ -370,7 +387,11 @@ export class OpenCloudClient {
       requests += fetched.stats.requests;
 
       if (fetched.text || attempt === maxAttempts) {
-        return { text: fetched.text, stats: { ...fetched.stats, requests } };
+        return {
+          text: fetched.text,
+          stats: { ...fetched.stats, requests },
+          messages: fetched.messages,
+        };
       }
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
@@ -384,7 +405,7 @@ export class OpenCloudClient {
     // Arrival order, deliberately. Do not sort by createTime: every print in a
     // single frame shares one value, so it cannot order them anyway, and the
     // fractional digit count varies, so comparing the strings reorders them.
-    const messages: string[] = [];
+    const messages: TaskLogMessage[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
     let entriesFetched = 0;
@@ -422,9 +443,16 @@ export class OpenCloudClient {
 
       for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
         if (entry.structuredMessages?.length) {
-          messages.push(...entry.structuredMessages.map((msg) => msg.message));
+          messages.push(
+            ...entry.structuredMessages.map((msg) => ({
+              message: msg.message,
+              messageType: msg.messageType,
+            }))
+          );
         } else if (entry.messages?.length) {
-          messages.push(...entry.messages);
+          // The flat view carries no severity, which stays absent rather than
+          // being guessed at.
+          messages.push(...entry.messages.map((message) => ({ message })));
         }
       }
 
@@ -433,7 +461,7 @@ export class OpenCloudClient {
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
 
-    const text = messages.join('\n');
+    const text = messages.map((entry) => entry.message).join('\n');
 
     const stats: LogFetchStats = {
       requests: pagesFetched,
@@ -452,7 +480,7 @@ export class OpenCloudClient {
         `${stats.messages} messages, ${stats.chars} chars`
     );
 
-    return { text, stats };
+    return { text, stats, messages };
   }
 
   /**

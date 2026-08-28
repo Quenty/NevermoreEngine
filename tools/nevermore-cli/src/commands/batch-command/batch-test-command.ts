@@ -193,6 +193,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
               verbose: args.verbose,
               actionVerb: 'Testing',
               expectsTestCounts: true,
+              // One task runs every package, and it prints its own output in
+              // order with each section grouped. Grouping again here would wrap
+              // nothing, since every package starts before the task exists.
+              logsRenderedElsewhere: args.aggregated ?? false,
             })
           : new SpinnerReporter(state, {
               showLogs: args.logs ?? false,

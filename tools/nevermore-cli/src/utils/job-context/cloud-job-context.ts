@@ -3,6 +3,7 @@ import {
   getTaskReturnValues,
   type LuauTask,
   type OpenCloudClient,
+  type TaskLogMessage,
 } from '../open-cloud/open-cloud-client.js';
 import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
@@ -26,6 +27,8 @@ class CloudDeployment implements Deployment {
   taskState?: LuauTask['state'];
   /** Shape of the most recent log fetch, for whoever reads those logs next. */
   logFetchStats?: LogFetchStats;
+  /** That fetch's output, still typed, for whoever renders it. */
+  logMessages?: TaskLogMessage[];
 
   constructor(universeId: number, placeId: number, version: number) {
     this.universeId = universeId;
@@ -153,6 +156,7 @@ export class CloudJobContext extends BaseJobContext {
       cloudDeployment.taskPath
     );
     cloudDeployment.logFetchStats = fetched.stats;
+    cloudDeployment.logMessages = fetched.messages;
 
     if (cloudDeployment.taskState && cloudDeployment.taskState !== 'COMPLETE') {
       return [
@@ -168,6 +172,10 @@ export class CloudJobContext extends BaseJobContext {
 
   getLogFetchStats(deployment: Deployment): LogFetchStats | undefined {
     return (deployment as CloudDeployment).logFetchStats;
+  }
+
+  getLogMessages(deployment: Deployment): TaskLogMessage[] | undefined {
+    return (deployment as CloudDeployment).logMessages;
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {

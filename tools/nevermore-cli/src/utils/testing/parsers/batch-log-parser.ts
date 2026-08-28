@@ -141,7 +141,7 @@ interface ContentToken {
 }
 
 /** One log line, classified. Every line becomes exactly one token. */
-type BatchLogToken =
+export type BatchLogToken =
   | BeginToken
   | EndToken
   | SummaryToken
@@ -582,7 +582,7 @@ function reportCountsProvenance(
 /**
  * Classify every log line, so section splitting reads tokens instead of text.
  */
-function tokenizeBatchLog(lines: string[]): BatchLogToken[] {
+export function tokenizeBatchLog(lines: string[]): BatchLogToken[] {
   const tokens: BatchLogToken[] = [];
   /** True between the summary marker and its JSON payload. */
   let summaryPayloadPending = false;
