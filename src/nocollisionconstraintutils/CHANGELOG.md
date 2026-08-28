@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nocollisionconstraintutils@10.15.1...@quenty/nocollisionconstraintutils@10.16.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/nocollisionconstraintutils
+
 ## [10.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nocollisionconstraintutils@10.15.0...@quenty/nocollisionconstraintutils@10.15.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/nocollisionconstraintutils
