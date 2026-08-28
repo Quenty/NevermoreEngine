@@ -284,7 +284,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     // shared promise — which is how the upload URL and a 78-line build list
     // came to be filed under two arbitrary packages.
     if (batchContext && aggregatedReporter) {
-      const outcome = await batchContext.getExecutionOutcomeAsync();
+      // Retried the same way a package's run is. Running the batch up here took
+      // it out from under the per-package retry wrapper that used to cover it,
+      // and a cloud task that times out once is exactly what that retry is for.
+      const outcome = await _retryOnTransientAsync('batch execution', () =>
+        batchContext.getExecutionOutcomeAsync()
+      );
 
       aggregatedReporter.printRun(
         renderBatchLog(outcome.lines, {
@@ -360,14 +365,30 @@ async function _runWithRetryAsync(
     suppressCountsProvenance: aggregated,
   };
 
+  return _retryOnTransientAsync(pkg.name, () =>
+    runSingleTestAsync(context, opts)
+  );
+}
+
+/**
+ * Run something once more if it failed for a reason that tends not to repeat.
+ *
+ * Shared so the batch execution and a single package's run agree on what counts
+ * as transient — the batch used to inherit this by being triggered from inside
+ * a package's run, and stopped when it moved out to the command.
+ */
+async function _retryOnTransientAsync<T>(
+  label: string,
+  runAsync: () => Promise<T>
+): Promise<T> {
   try {
-    return await runSingleTestAsync(context, opts);
+    return await runAsync();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     if (message.includes('timed out') || message.includes('fetch failed')) {
-      OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
-      return await runSingleTestAsync(context, opts);
+      OutputHelper.warn(`${label}: transient failure, retrying...`);
+      return await runAsync();
     }
 
     throw err;
