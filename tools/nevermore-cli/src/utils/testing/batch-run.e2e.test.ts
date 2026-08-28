@@ -48,8 +48,14 @@ vi.mock('./runner/combined-project-generator.js', () => ({
   })),
 }));
 
-/** The summary line the Luau runner prints last, as JSON. */
-const SUMMARY_JSON = JSON.stringify([
+/**
+ * The summary the Luau runner prints last and also returns.
+ *
+ * `counts` are present for both packages: the runner reads them off what the
+ * test script returned, or off what NevermoreTestRunnerUtils left in its state
+ * module when the script returned nothing.
+ */
+const SUMMARY_ENTRIES = [
   {
     slug: 'alpha',
     success: true,
@@ -81,7 +87,9 @@ const SUMMARY_JSON = JSON.stringify([
     },
     ranJest: true,
   },
-]);
+];
+
+const SUMMARY_JSON = JSON.stringify(SUMMARY_ENTRIES);
 
 /**
  * What the task printed, in the shape Open Cloud delivers it: typed messages,
@@ -117,7 +125,10 @@ class FakeTransport implements JobContext {
   public deployCount = 0;
   public runCount = 0;
 
-  constructor(private readonly _messages: TaskLogMessage[]) {}
+  constructor(
+    private readonly _messages: TaskLogMessage[],
+    private readonly _returnValues?: unknown[]
+  ) {}
 
   async buildPlaceAsync(): Promise<BuiltPlace> {
     throw new Error('the batch context builds the combined place itself');
@@ -134,7 +145,11 @@ class FakeTransport implements JobContext {
   ): Promise<ScriptRunResult> {
     this.runCount++;
     this.scriptContent = options.scriptContent;
-    return { success: true, taskState: 'COMPLETE' };
+    return {
+      success: true,
+      taskState: 'COMPLETE',
+      returnValues: this._returnValues,
+    };
   }
 
   async getLogsAsync(): Promise<JobLogs> {
@@ -157,7 +172,10 @@ class FakeTransport implements JobContext {
   async disposeAsync(): Promise<void> {}
 }
 
-function createBatch(messages: TaskLogMessage[] = TASK_MESSAGES) {
+function createBatch(
+  messages: TaskLogMessage[] = TASK_MESSAGES,
+  returnValues?: unknown[]
+) {
   const targets = [...SLUG_MAP.keys()].map((name) => ({
     name,
     packageName: name,
@@ -166,7 +184,7 @@ function createBatch(messages: TaskLogMessage[] = TASK_MESSAGES) {
     places: [],
   })) as unknown as BatchTarget[];
 
-  const transport = new FakeTransport(messages);
+  const transport = new FakeTransport(messages, returnValues);
   const batch = new BatchScriptJobContext(transport, targets, {
     repoRoot: '/repo',
   });
@@ -273,6 +291,116 @@ describe('an aggregated batch run, end to end', () => {
     // wrong.
     expect(transport.scriptContent).toContain('["alpha","beta"]');
     expect(transport.scriptContent).not.toContain('{{ PACKAGE_SLUGS_JSON }}');
+  });
+
+  it('judges a package whose whole section the log window dropped', async () => {
+    // The case this path exists for. beta printed nothing that survived — no
+    // BEGIN, no END, no jest report — so before the summary came back as a
+    // return value it was failed for having no attributable output, and
+    // rendered nothing at all: no group, no verdict, no reason.
+    const { batch } = createBatch(
+      [
+        { message: '===BATCH_TEST_BEGIN alpha===', messageType: 'OUTPUT' },
+        {
+          message: 'PASS ServerScriptService.alpha.Thing.spec',
+          messageType: 'OUTPUT',
+        },
+        {
+          message: '===BATCH_TEST_END alpha PASS 1500===',
+          messageType: 'OUTPUT',
+        },
+      ],
+      [SUMMARY_ENTRIES]
+    );
+
+    const outcome = await batch.getExecutionOutcomeAsync();
+    const beta = outcome.results.get('@quenty/beta');
+
+    expect(beta?.testCounts).toEqual({ passed: 3, failed: 1, total: 4 });
+    expect(beta?.countsSource).toBe('returned');
+    expect(beta?.logsLost).toBe(true);
+    // Not failed for the absence of a section, which is what used to happen.
+    expect(beta?.error).not.toContain('no output could be attributed');
+
+    const rendered = renderBatchOutcome(outcome, {
+      useGroups: true,
+      color: false,
+    });
+
+    expect(rendered).toContain(
+      '::group::@quenty/beta - ⚠️ FAILED (3/4) - Logs lost (900ms)'
+    );
+    expect(rendered.join('\n')).toContain('survived the run');
+  });
+
+  it('marks a pass judged on counts alone as one, rather than an ordinary pass', async () => {
+    // Trustworthy counts, but nothing to check for tracebacks against and
+    // nothing to read if someone goes looking, so it does not get to look like
+    // every other green package in the list.
+    const { batch } = createBatch(
+      [{ message: 'nothing survived', messageType: 'OUTPUT' }],
+      [
+        [
+          {
+            slug: 'alpha',
+            success: true,
+            durationMs: 1200,
+            counts: {
+              passed: 35,
+              failed: 0,
+              skipped: 0,
+              total: 35,
+              suitesPassed: 2,
+              suitesFailed: 0,
+              suitesTotal: 2,
+            },
+            ranJest: true,
+          },
+        ],
+      ]
+    );
+
+    const outcome = await batch.getExecutionOutcomeAsync();
+
+    expect(outcome.results.get('@quenty/alpha')?.success).toBe(true);
+    expect(
+      renderBatchOutcome(outcome, { useGroups: true, color: false })
+    ).toContain(
+      '::group::@quenty/alpha - ⚠️ Passed (35/35) - Logs lost (1.2s)'
+    );
+  });
+
+  it('prefers the returned summary over the printed one', async () => {
+    // Both channels carry the same summary. The returned one is read because it
+    // is the copy the engine's log buffer cannot truncate — so when they
+    // disagree, which only happens if the printed one arrived damaged, the
+    // returned one wins.
+    const { batch } = createBatch(TASK_MESSAGES, [
+      [
+        {
+          slug: 'alpha',
+          success: true,
+          durationMs: 4200,
+          counts: {
+            passed: 99,
+            failed: 0,
+            skipped: 0,
+            total: 99,
+            suitesPassed: 1,
+            suitesFailed: 0,
+            suitesTotal: 1,
+          },
+          ranJest: true,
+        },
+      ],
+    ]);
+
+    const alpha = (await batch.getExecutionOutcomeAsync()).results.get(
+      '@quenty/alpha'
+    );
+
+    expect(alpha?.testCounts?.total).toBe(99);
+    expect(alpha?.durationMs).toBe(4200);
   });
 
   it('reports what reading the log turned up without printing it', async () => {

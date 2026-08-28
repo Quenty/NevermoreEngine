@@ -35,6 +35,15 @@ export interface BatchPackageResult {
    */
   countsSource?: 'returned' | 'scraped';
   /**
+   * True when this package's counts arrived but its log section did not.
+   *
+   * A narrower verdict than a package with a section gets: the counts say what
+   * happened, but with no text there is nothing to check for tracebacks, and
+   * nothing to read when something did go wrong. Reported so a pass that came
+   * back half-blind cannot be mistaken for an ordinary one.
+   */
+  logsLost?: boolean;
+  /**
    * What this package's own run returned, recovered from the batch summary.
    *
    * One execution covers every package, so its return value belongs to none of
@@ -60,6 +69,16 @@ export interface ParseBatchTestLogsOptions {
    * is describing.
    */
   onDiagnostic?: (level: BatchDiagnosticLevel, message: string) => void;
+  /**
+   * What the batch script returned, when the transport carries return values.
+   *
+   * The same summary the script also prints, taken from the one channel the
+   * engine's log buffer cannot truncate — an oversize return value fails the
+   * task outright rather than arriving short, so a summary that arrives here is
+   * whole. Preferred over the printed copy, which is only reached when this is
+   * absent (a local bridge run, or a task that ended without an output).
+   */
+  returnValues?: unknown[];
 }
 
 /**
@@ -310,8 +329,16 @@ export function parseBatchTestLogs(
   const summaryErrors = new Map<string, string>();
   const summaryCounts = new Map<string, SummaryCounts>();
   const summaryRanJest = new Map<string, boolean>();
-  if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
-    const entries = findSummaryEntries(lines, summaryLineIndex + 1);
+
+  // The returned copy first: it is the same summary, from the channel that
+  // cannot arrive truncated. Only when there is none is the printed one read.
+  const returnedEntries = findReturnedSummaryEntries(options.returnValues);
+  if (
+    returnedEntries ||
+    (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length)
+  ) {
+    const entries =
+      returnedEntries ?? findSummaryEntries(lines, summaryLineIndex + 1);
     if (entries === undefined) {
       report(
         'verbose',
@@ -588,6 +615,7 @@ export function parseBatchTestLogs(
       testCounts,
       tracebackCount,
       countsSource,
+      logsLost: attributedLogs === undefined && counts !== undefined,
       testResults: counts
         ? {
             success: summarySuccess === true,
@@ -685,7 +713,9 @@ function reportCountsProvenance(
     report(
       'warn',
       `Counts for these came from log text, the channel Open Cloud truncates on ` +
-        `long runs. Their test script should end with "return results" (see ` +
+        `long runs. A package that runs its tests through ` +
+        `NevermoreTestRunnerUtils reports them as a value without its script ` +
+        `changing, so these are packages doing something else (see ` +
         `docs/testing/testing.md).`
     );
     // Each with its own state: this list is read to find the packages worth
@@ -869,6 +899,35 @@ function tokensOfKind<K extends BatchLogToken['kind']>(
   return tokens.filter(
     (token): token is Extract<BatchLogToken, { kind: K }> => token.kind === kind
   );
+}
+
+/**
+ * Find the summary array among a task's return values.
+ *
+ * The batch script returns the same array it prints. Recognized by shape rather
+ * than by position: a run is free to return other things, and an array of
+ * objects that all carry a string `slug` is the summary and nothing else.
+ */
+export function findReturnedSummaryEntries(
+  returnValues: unknown[] | undefined
+): SummaryEntry[] | undefined {
+  for (const value of returnValues ?? []) {
+    if (!Array.isArray(value) || value.length === 0) {
+      continue;
+    }
+
+    const looksLikeSummary = value.every(
+      (entry) =>
+        typeof entry === 'object' &&
+        entry !== null &&
+        typeof (entry as { slug?: unknown }).slug === 'string'
+    );
+    if (looksLikeSummary) {
+      return value as SummaryEntry[];
+    }
+  }
+
+  return undefined;
 }
 
 /**

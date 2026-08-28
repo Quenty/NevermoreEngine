@@ -34,6 +34,29 @@ end
 -- it likes, so only a tagged table is read as results.
 local RESULTS_FORMAT = "nevermore-test-results@1"
 
+-- Module NevermoreTestRunnerUtils leaves a run's results in, regardless of what
+-- the script did with them. Most test scripts discard the return value
+-- (`if runTestsIfNeededAsync(root) then return end`), and without this their
+-- counts exist only in Jest's printed report — the first thing a long batch's
+-- log window drops. Read as a fallback, never in preference to what the script
+-- actually returned.
+--
+-- Named rather than required by path: this script is raw source with no loader,
+-- so it finds the module under the package it just ran and requires the
+-- instance. Requiring the same instance twice returns the same table, which is
+-- what makes this a mailbox and not a copy.
+local STATE_MODULE_NAME = "NevermoreTestRunnerState.global"
+
+--[[
+	The state module inside one package, or nil for a package that has no test
+	runner in it at all.
+]]
+local function findStateModule(package: Instance): ModuleScript?
+	local found = package:FindFirstChild(STATE_MODULE_NAME, true)
+
+	return if found and found:IsA("ModuleScript") then found else nil
+end
+
 type TestCounts = {
 	passed: number,
 	failed: number,
@@ -117,6 +140,14 @@ for _, slug in packageSlugs do
 
 	print("===BATCH_TEST_BEGIN " .. slug .. "===")
 
+	-- Cleared before the run, so a package that leaves nothing behind cannot be
+	-- credited with the previous package's counts — worse than having none.
+	local stateModule = findStateModule(allPackages[slug])
+	local state: any = if stateModule then (require :: any)(stateModule) else nil
+	if state then
+		state.results = nil
+	end
+
 	-- Measure pcall execution time only. The surrounding cleanup/yield cost
 	-- is amortized across all packages and would otherwise dominate fast tests.
 	local startClock = os.clock()
@@ -163,16 +194,23 @@ for _, slug in packageSlugs do
 		RunService.Heartbeat:Wait()
 	end
 
-	-- A test script that does not throw has still failed if the results it
-	-- returned say so, which is the whole reason it returns them: a failing suite
-	-- used to announce itself by erroring, and an error carries no counts.
-	local counts = if testOk then toCounts(returned) else nil
-	local success = testOk and not isStructuredFailure(returned)
+	-- What the script returned, or what the runner left behind when the script
+	-- returned nothing. Both are the same table whenever both exist, so
+	-- preferring the returned one costs nothing and keeps a script that does
+	-- return its results independent of the state module.
+	local published = if state then state.results else nil
+	local reported = if testOk and toCounts(returned) then returned else published
+
+	-- A test script that does not throw has still failed if the results say so,
+	-- which is the whole reason they are read at all: a failing suite used to
+	-- announce itself by erroring, and an error carries no counts.
+	local counts = if testOk then toCounts(reported) else nil
+	local success = testOk and not isStructuredFailure(reported)
 	local failureReason: string? = nil
 	if not testOk then
 		failureReason = tostring(returned)
 	elseif not success then
-		failureReason = tostring((returned :: any).error or "the test runner reported the run as failed")
+		failureReason = tostring((reported :: any).error or "the test runner reported the run as failed")
 	end
 
 	if failureReason then
@@ -185,7 +223,7 @@ for _, slug in packageSlugs do
 		durationMs = durationMs,
 		error = failureReason,
 		counts = counts,
-		ranJest = if counts then (returned :: any).ranJest == true else nil,
+		ranJest = if counts then (reported :: any).ranJest == true else nil,
 	})
 end
 
@@ -194,5 +232,11 @@ for _, package in allPackages do
 	package.Parent = ServerScriptService
 end
 
+-- Printed as well as returned. The print is what a person reads in the log and
+-- what an older CLI parses; the return value is the copy that cannot be
+-- truncated, since an oversize return fails the task outright rather than
+-- arriving short. Counts only, so it stays far inside that limit.
 print("===BATCH_TEST_SUMMARY===")
 print(HttpService:JSONEncode(results))
+
+return results

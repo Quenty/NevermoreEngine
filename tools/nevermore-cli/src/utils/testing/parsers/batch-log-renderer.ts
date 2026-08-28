@@ -88,6 +88,8 @@ export function renderBatchLog(
 ): string[] {
   const tokens = tokenizeBatchLog(lines.map((entry) => entry.line));
   const out: string[] = [];
+  /** Slugs that reached the output, so the rest can be listed after it. */
+  const rendered = new Set<string>();
   let openSlug: string | undefined;
   /**
    * Where the run of lines belonging to no open section began.
@@ -118,6 +120,7 @@ export function renderBatchLog(
       // close it here so the groups stay balanced whatever the log did.
       closeGroup();
       openSlug = token.slug;
+      rendered.add(token.slug);
       out.push(...openGroup(token.slug, options));
       continue;
     }
@@ -131,6 +134,7 @@ export function renderBatchLog(
         out.splice(orphanStart, 0, ...openGroup(token.slug, options));
         openSlug = token.slug;
       }
+      rendered.add(token.slug);
       out.push(...verdictLines(token.slug, options));
       closeGroup();
       continue;
@@ -146,8 +150,53 @@ export function renderBatchLog(
   }
 
   closeGroup();
+  out.push(...sectionlessGroups(rendered, options));
+
   return out;
 }
+
+/**
+ * Groups for packages that never appeared in the log at all.
+ *
+ * A dropped log window takes whole sections with it, markers included, and such
+ * a package used to render nothing: no group, no verdict, no reason — only a
+ * row in the summary table saying FAILED with nothing behind it. The result is
+ * known regardless, because it came back in the run's return value, so it is
+ * shown in the same shape every other package is.
+ */
+function sectionlessGroups(
+  rendered: Set<string>,
+  options: BatchLogRenderOptions
+): string[] {
+  const out: string[] = [];
+
+  for (const [slug, name] of options.slugToPackage) {
+    if (rendered.has(slug)) {
+      continue;
+    }
+    const result = options.results?.get(name);
+    if (!result) {
+      continue;
+    }
+
+    out.push(...openGroup(slug, options));
+    out.push(...verdictLines(slug, options));
+    // The group is otherwise empty, so it says why rather than leaving a reader
+    // to work out that a package showing no output is one whose output is gone.
+    out.push(
+      options.color ? OutputHelper.formatDim(NO_SECTION_NOTE) : NO_SECTION_NOTE
+    );
+    if (options.useGroups) {
+      out.push('::endgroup::');
+    }
+  }
+
+  return out;
+}
+
+const NO_SECTION_NOTE =
+  "This package printed nothing that survived the run's log window. " +
+  'Its verdict and counts came back in the batch summary instead.';
 
 /**
  * Render everything one batch execution produced, ready to print.
@@ -212,9 +261,19 @@ function describeResult(result: BatchPackageResult): string {
       ? ''
       : `(${formatDurationMs(result.durationMs)})`;
 
-  return [result.success ? 'Passed' : 'FAILED', counts, duration]
-    .filter(Boolean)
-    .join(' ');
+  // A pass judged on counts alone, its log section dropped by the window, is
+  // marked rather than shown as an ordinary pass. The counts are trustworthy —
+  // they came back as a value — but with no text there was nothing to check for
+  // tracebacks, and nothing to read if a person goes looking. Saying so in the
+  // title is the only place it can be seen, since the group is empty.
+  const verdict = result.success ? 'Passed' : 'FAILED';
+  if (result.logsLost) {
+    return [`⚠️ ${verdict}`, counts, '- Logs lost', duration]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  return [verdict, counts, duration].filter(Boolean).join(' ');
 }
 
 /**

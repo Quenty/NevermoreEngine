@@ -377,6 +377,10 @@ export class BatchScriptJobContext implements JobContext {
       [];
     const results = parseBatchTestLogs(rawLogs, slugMap, {
       logFetchStats: logs.stats,
+      // The batch script returns the same summary it prints. Handing both over
+      // lets the parser read the copy that cannot arrive truncated, and fall
+      // back to the printed one on a transport that carries no return channel.
+      returnValues: result.returnValues,
       onDiagnostic: (level, message) => diagnostics.push({ level, message }),
     });
 

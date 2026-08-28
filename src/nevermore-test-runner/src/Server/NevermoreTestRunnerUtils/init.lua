@@ -29,6 +29,12 @@ local require = require(script.Parent.loader).load(script)
 
 local NevermoreTestResults = require("NevermoreTestResults")
 
+-- By instance, not through the loader: a `.global` module is one jest leaves
+-- alone, and that only holds for the file it is spelled on. It is a child of
+-- this module for the same reason the loader's own tracker is a child of the
+-- loader — a dotted name can only be indexed off `script` itself.
+local NevermoreTestRunnerState = (require :: any)(script["NevermoreTestRunnerState.global"])
+
 local Jest = (require :: any)("Jest")
 
 local NevermoreTestRunnerUtils = {}
@@ -43,6 +49,17 @@ NevermoreTestRunnerUtils.RESULTS_FORMAT = NevermoreTestResults.FORMAT
 
 export type TestFailure = NevermoreTestResults.TestFailure
 export type TestRunResults = NevermoreTestResults.TestRunResults
+
+--[[
+	Leave `results` in [NevermoreTestRunnerState] as well as returning them, so a
+	script that discards the return value still reports its counts to the batch
+	runner. Returns them, so a caller can publish and return in one step.
+]]
+local function publish(results: TestRunResults): TestRunResults
+	NevermoreTestRunnerState.results = results
+
+	return results
+end
 
 --[=[
 	Returns true if running inside an Open Cloud Luau Execution context.
@@ -87,7 +104,7 @@ function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance): TestRun
 	end
 
 	if isOpenCloud then
-		return NevermoreTestRunnerUtils._runTestsAsync(root)
+		return publish(NevermoreTestRunnerUtils._runTestsAsync(root))
 	end
 
 	local ok, returned = pcall(function(): any
@@ -101,6 +118,8 @@ function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance): TestRun
 		results = NevermoreTestResults.failed(false, tostring(returned))
 		warn(results.error)
 	end
+
+	publish(results)
 
 	local exitCode = if results.success then 0 else 1
 	local processService = (game :: any):GetService("ProcessService")

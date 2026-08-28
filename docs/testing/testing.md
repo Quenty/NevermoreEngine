@@ -413,8 +413,14 @@ end
 
 Replace `mypackage` with the key used in your Rojo project tree.
 
-A script that returns the guard's result instead of discarding it reports its counts as a
-value rather than as log text:
+Discarding the guard's result, as above, is fine. The counts still reach the batch runner:
+every run also leaves its results in a module the runner reads, so a package reports exact
+counts without its test script changing. This matters because the engine truncates a long
+run's logs, and counts scraped back out of that text are exactly what goes missing on the
+runs where they matter most.
+
+A script can also return the table, which is the only way a *single* package run reports
+counts as a value rather than as log text:
 
 ```luau
 local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
@@ -422,10 +428,6 @@ if results then
 	return results
 end
 ```
-
-The engine truncates a long run's logs, so counts scraped back out of them are exactly what
-goes missing on the runs where they matter most. Discarding the table is still supported —
-the CLI falls back to reading the logs — so a package can move over whenever it suits.
 
 A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
 keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `nil` when script
