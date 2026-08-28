@@ -73,6 +73,35 @@ export type BatchDiagnosticLevel =
   | 'group'
   | 'endgroup';
 
+/**
+ * How one package in a listing turned out, phrased as its group title is.
+ *
+ * Kept short: this is a line in a list of dozens, not a report.
+ */
+function describeSlugState(
+  slug: string,
+  results: Map<string, BatchPackageResult>,
+  slugMap: Map<string, string>
+): string {
+  let packageName: string | undefined;
+  for (const [name, candidate] of slugMap) {
+    if (candidate === slug) {
+      packageName = name;
+      break;
+    }
+  }
+
+  const result = packageName ? results.get(packageName) : undefined;
+  if (!result) {
+    return 'no result';
+  }
+
+  const counts = result.testCounts
+    ? ` (${result.testCounts.passed}/${result.testCounts.total})`
+    : '';
+  return `${result.success ? 'Passed' : 'FAILED'}${counts}`;
+}
+
 /** Print one diagnostic, honoring the grouping levels. */
 export function emitDiagnostic(
   level: BatchDiagnosticLevel,
@@ -570,7 +599,9 @@ export function parseBatchTestLogs(
     scrapedSlugs,
     unexplainedFailures,
     sectionlessButCounted,
-    report
+    report,
+    results,
+    slugMap
   );
 
   return results;
@@ -589,7 +620,9 @@ function reportCountsProvenance(
   scrapedSlugs: string[],
   unexplainedFailures: string[],
   sectionlessButCounted: string[],
-  report: (level: BatchDiagnosticLevel, message: string) => void
+  report: (level: BatchDiagnosticLevel, message: string) => void,
+  results: Map<string, BatchPackageResult>,
+  slugMap: Map<string, string>
 ): void {
   const total = structuredSlugs.length + scrapedSlugs.length;
   if (total === 0) {
@@ -647,8 +680,13 @@ function reportCountsProvenance(
         `long runs. Their test script should end with "return results" (see ` +
         `docs/testing/testing.md).`
     );
+    // Each with its own state: this list is read to find the packages worth
+    // looking at, and a column of bare names says nothing about which those are.
     for (const slug of scrapedSlugs) {
-      report('info', `  ${slug}`);
+      report(
+        'info',
+        `  ${slug} — ${describeSlugState(slug, results, slugMap)}`
+      );
     }
     report('endgroup', '');
   }

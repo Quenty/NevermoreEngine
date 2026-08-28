@@ -106,6 +106,33 @@ describe('package-manager-utils', () => {
       expect(await detectPackageManagerAsync(root)).toBe('pnpm');
     });
 
+    it('ignores a lockfile sitting in the home directory', async () => {
+      // npm leaves a package-lock.json behind after one `npm install` run in a
+      // home directory, and walking to the filesystem root adopted it — every
+      // project below it then installed with the one tool that rejects this
+      // repo's `workspace:` ranges. This test was the symptom: the temp dir
+      // lives under the home directory on Windows, so "defaults to pnpm" here
+      // failed on a machine that had one and passed everywhere else.
+      const home = await fs.realpath(os.homedir());
+      const marker = path.join(home, 'package-lock.json');
+      const alreadyThere = await fs
+        .access(marker)
+        .then(() => true)
+        .catch(() => false);
+
+      if (!alreadyThere) {
+        await fs.writeFile(marker, '{}');
+      }
+
+      try {
+        expect(await detectPackageManagerAsync(root)).toBe('pnpm');
+      } finally {
+        if (!alreadyThere) {
+          await fs.rm(marker, { force: true });
+        }
+      }
+    });
+
     it('still honors an npm project', async () => {
       await writeFileAsync('package.json', JSON.stringify({ name: 'game' }));
       await writeFileAsync('package-lock.json', '{}');

@@ -23,14 +23,18 @@ export interface GroupedReporterOptions {
    */
   expectsTestCounts?: boolean;
   /**
-   * When true, this reporter neither groups packages nor repeats their logs,
-   * because something else already printed the run in order.
+   * When true, this reporter says nothing per package, because something else
+   * already printed the run.
    *
-   * Set by an aggregated batch, where grouping here is actively wrong: one task
-   * runs every package, so every package "starts" in the same tick before the
-   * task exists, and the groups open back-to-back around no output at all. The
-   * run's own renderer wraps each section instead, and has already shown these
-   * logs — so repeating them here would print the whole batch twice.
+   * Set by an aggregated batch. One task runs every package, so there is no
+   * per-package moment to report: every package starts in the same tick before
+   * the task exists, which made the groups open back-to-back around no output,
+   * and the batch-wide progress lines land in whichever package's async
+   * context first triggered the shared promise — the upload and the build list
+   * were being filed under two arbitrary packages. The run's own renderer
+   * shows each section with its verdict in the title, and the summary table
+   * recaps at the end, so a header and a repeated verdict here is noise:
+   * 78 packages meant 78 such blocks.
    */
   logsRenderedElsewhere?: boolean;
 }
@@ -66,6 +70,10 @@ export class GroupedReporter extends BaseReporter {
     result: PackageResult,
     bufferedOutput?: string[]
   ): void {
+    if (this._options.logsRenderedElsewhere) {
+      return;
+    }
+
     this._printGroupedResult(result, bufferedOutput);
   }
 
