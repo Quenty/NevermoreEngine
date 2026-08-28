@@ -3,7 +3,13 @@ import { formatDurationMs } from '../cli-utils.js';
 import { BaseReporter, type PackageResult } from './reporter.js';
 import { formatTable, type TableColumn } from './format-table.js';
 import { type IStateTracker } from './state/state-tracker.js';
-import { formatProgressResult, isEmptyTestRun } from './progress-format.js';
+import {
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  tallyCaveats,
+  type ResultStatus,
+} from './result-status.js';
 
 export interface SummaryTableReporterOptions {
   /** Label for successful results in the table. Default: "Passed" */
@@ -12,6 +18,11 @@ export interface SummaryTableReporterOptions {
   failureLabel?: string;
   /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
   summaryVerb?: string;
+  /**
+   * True when this kind of run should have reported test counts, so a result
+   * with none is flagged rather than shown as a plain pass.
+   */
+  expectsTestCounts?: boolean;
 }
 
 /**
@@ -23,6 +34,7 @@ export class SummaryTableReporter extends BaseReporter {
   private _successLabel: string;
   private _failureLabel: string;
   private _summaryVerb: string;
+  private _expectsTestCounts: boolean;
 
   constructor(state: IStateTracker, options?: SummaryTableReporterOptions) {
     super();
@@ -30,6 +42,7 @@ export class SummaryTableReporter extends BaseReporter {
     this._successLabel = options?.successLabel ?? 'Passed';
     this._failureLabel = options?.failureLabel ?? 'FAILED';
     this._summaryVerb = options?.summaryVerb ?? 'tested';
+    this._expectsTestCounts = options?.expectsTestCounts ?? false;
   }
 
   override async stopAsync(): Promise<void> {
@@ -43,7 +56,11 @@ export class SummaryTableReporter extends BaseReporter {
     const passed = results.length - failures.length;
     const durationMs = Date.now() - this._state.startTimeMs;
 
-    let emptyRunCount = 0;
+    // Resolved once per result and reused for the row and the footer, so the
+    // tally under the table cannot disagree with the rows in it.
+    const statuses = new Map<PackageResult, ResultStatus>(
+      results.map((result) => [result, this._resolve(result)])
+    );
 
     const columns: TableColumn<PackageResult>[] = [
       {
@@ -53,9 +70,8 @@ export class SummaryTableReporter extends BaseReporter {
       },
       {
         header: 'Status',
-        value: (r) => this._statusLabel(r),
-        format: (label, r) =>
-          this._colorStatus(label, r, () => emptyRunCount++),
+        value: (r) => formatStatusText(statuses.get(r)!),
+        format: (label, r) => colorStatus(label, statuses.get(r)!.severity),
         minWidth: 26,
       },
       {
@@ -82,39 +98,16 @@ export class SummaryTableReporter extends BaseReporter {
       `${results.length} ${unit} ${this._summaryVerb}, ${passedText}, ${failedText} ${totalTime}`
     );
 
-    if (emptyRunCount > 0) {
-      console.log(
-        OutputHelper.formatWarning(
-          `⚠ ${emptyRunCount} package(s) ran 0 tests — check test discovery`
-        )
-      );
+    for (const { message } of tallyCaveats([...statuses.values()])) {
+      console.log(OutputHelper.formatWarning(`⚠ ${message}`));
     }
   }
 
-  private _statusLabel(result: PackageResult): string {
-    if (result.success) {
-      const progressText = formatProgressResult(result.progressSummary);
-      return progressText
-        ? `${this._successLabel} ${progressText}`
-        : this._successLabel;
-    }
-    const failedPhase = result.failedPhase;
-    const failureLabel = result.failureLabel ?? this._failureLabel;
-    return failedPhase ? `${failureLabel} at ${failedPhase}` : failureLabel;
-  }
-
-  private _colorStatus(
-    label: string,
-    result: PackageResult,
-    countEmpty: () => void
-  ): string {
-    if (result.success) {
-      const empty = isEmptyTestRun(result.progressSummary);
-      if (empty) countEmpty();
-      return empty
-        ? OutputHelper.formatWarning(label)
-        : OutputHelper.formatSuccess(label);
-    }
-    return OutputHelper.formatError(label);
+  private _resolve(result: PackageResult): ResultStatus {
+    return resolveResultStatus(result, {
+      successLabel: this._successLabel,
+      failureLabel: this._failureLabel,
+      expectsTestCounts: this._expectsTestCounts,
+    });
   }
 }

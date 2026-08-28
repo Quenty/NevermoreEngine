@@ -11,10 +11,17 @@ import type {
   Capability,
   DataModelInstance,
   OutputLevel,
+  SerializedReturnValue,
 } from '../server/web-socket-protocol.js';
 
 // Re-export protocol types used in the public API
-export type { StudioState, Capability, DataModelInstance, OutputLevel };
+export type {
+  StudioState,
+  Capability,
+  DataModelInstance,
+  OutputLevel,
+  SerializedReturnValue,
+};
 
 export type SessionContext = 'edit' | 'client' | 'server';
 export type SessionOrigin = 'user' | 'managed';
@@ -47,6 +54,12 @@ export interface ExecResult {
   success: boolean;
   output: Array<{ level: OutputLevel; body: string }>;
   error?: string;
+  /**
+   * Everything the script returned, in order. Absent when the plugin reported
+   * no return channel at all (older plugin build, or a run that never reached
+   * a return) — distinct from `[]`, which means it returned nothing.
+   */
+  returnValues?: SerializedReturnValue[];
 }
 
 export interface StateResult {

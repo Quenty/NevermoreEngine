@@ -257,4 +257,4 @@ This creates or updates a PR comment with a table showing each game's deploy sta
 
 ## Luau template convention
 
-Luau scripts that run in Roblox contexts (smoke tests, transforms, templates) should be stored as `.luau` files in `build-scripts/` directories — not generated inline from TypeScript. This keeps Luau code editable, lintable, and follows the pattern established by `studio-bridge/build-scripts/`.
+Luau scripts that run in Roblox contexts (smoke tests, transforms, templates) should be stored as `.lua` files in `build-scripts/` directories — not generated inline from TypeScript. This keeps Luau code editable, lintable, and follows the pattern established by `studio-bridge/build-scripts/`.

@@ -7,6 +7,30 @@ import {
   parseTestLogs,
   type ParsedTestLogs,
 } from '../testing/test-log-parser.js';
+import { type LogFetchStats } from '../testing/log-fetch-stats.js';
+
+/**
+ * One engine message, with the severity Open Cloud reported for it.
+ *
+ * A message is not a line: an error arrives with its whole traceback attached,
+ * so `message` can span several. `messageType` is OUTPUT, WARNING or ERROR.
+ */
+export interface TaskLogMessage {
+  message: string;
+  messageType?: string;
+}
+
+/** A task's log text together with what the fetch had to do to collect it. */
+export interface TaskLogFetch {
+  text: string;
+  stats: LogFetchStats;
+  /**
+   * The same output as `text`, still split into typed messages. Kept because
+   * severity is the API's to state and cannot be recovered from the joined
+   * text: a traceback's continuation lines look like ordinary output.
+   */
+  messages: TaskLogMessage[];
+}
 
 export interface LuauTask {
   path: string;
@@ -22,10 +46,36 @@ export interface LuauTask {
     | 'FAILED';
   script: string;
   timeout?: string;
-  /** Script return value (populated on COMPLETE). */
-  output?: { results?: Array<{ value?: string }> };
+  /**
+   * What the script returned, populated on COMPLETE. `results` is a flat array
+   * of the returned values — `return t, "s", 42` arrives as three entries —
+   * natively typed: Roblox serializes them itself, so a returned Lua table is
+   * real nested JSON here, not a JSON string. (Which is also why a script must
+   * not JSONEncode its result: that lands as a double-encoded string.)
+   *
+   * Absent whenever the task produced no result. A FAILED task carries no
+   * `output` at all, with no error message explaining why — and an oversize
+   * return value (~4MB observed; ~2MB still arrives complete) fails the task
+   * exactly that way rather than truncating the value.
+   */
+  output?: { results?: unknown[] };
   /** Error details (populated on FAILED). */
   error?: { code?: string; message?: string };
+}
+
+/**
+ * The values a finished task's script returned, or `undefined` when the task
+ * reported no result at all.
+ *
+ * The distinction matters: `undefined` means nothing came back to read, so a
+ * caller can fall back to the task's logs, while `[]` means the task did report
+ * a result and the script returned nothing — no fallback will find more.
+ */
+export function getTaskReturnValues(task: LuauTask): unknown[] | undefined {
+  if (!task.output) {
+    return undefined;
+  }
+  return task.output.results ?? [];
 }
 
 export interface OpenCloudClientOptions {
@@ -316,22 +366,32 @@ export class OpenCloudClient {
 
   async getTaskLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
     const raw = await this.getRawTaskLogsAsync(taskPath);
-    return parseTestLogs(raw);
+    return parseTestLogs(raw.text);
   }
 
   /**
-   * Fetch raw log text from a completed Luau execution task.
+   * Fetch raw log text from a completed Luau execution task, along with the
+   * shape of the fetch that produced it.
+   *
    * Retries a few times if the API returns empty logs, since the test runner
-   * always produces at least some output.
+   * always produces at least some output. The reported `requests` count spans
+   * every attempt, so a fetch that only filled in on its third try says so.
    */
-  async getRawTaskLogsAsync(taskPath: string): Promise<string> {
+  async getRawTaskLogsAsync(taskPath: string): Promise<TaskLogFetch> {
     const maxAttempts = 3;
     const retryDelayMs = 1000;
+    let requests = 0;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const logs = await this._fetchRawLogsAsync(taskPath);
-      if (logs || attempt === maxAttempts) {
-        return logs;
+      const fetched = await this._fetchRawLogsAsync(taskPath);
+      requests += fetched.stats.requests;
+
+      if (fetched.text || attempt === maxAttempts) {
+        return {
+          text: fetched.text,
+          stats: { ...fetched.stats, requests },
+          messages: fetched.messages,
+        };
       }
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
@@ -340,12 +400,12 @@ export class OpenCloudClient {
     return this._fetchRawLogsAsync(taskPath);
   }
 
-  private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
+  private async _fetchRawLogsAsync(taskPath: string): Promise<TaskLogFetch> {
     const apiKey = await this._resolveApiKeyAsync();
     // Arrival order, deliberately. Do not sort by createTime: every print in a
     // single frame shares one value, so it cannot order them anyway, and the
     // fractional digit count varies, so comparing the strings reorders them.
-    const messages: string[] = [];
+    const messages: TaskLogMessage[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
     let entriesFetched = 0;
@@ -383,9 +443,16 @@ export class OpenCloudClient {
 
       for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
         if (entry.structuredMessages?.length) {
-          messages.push(...entry.structuredMessages.map((msg) => msg.message));
+          messages.push(
+            ...entry.structuredMessages.map((msg) => ({
+              message: msg.message,
+              messageType: msg.messageType,
+            }))
+          );
         } else if (entry.messages?.length) {
-          messages.push(...entry.messages);
+          // The flat view carries no severity, which stays absent rather than
+          // being guessed at.
+          messages.push(...entry.messages.map((message) => ({ message })));
         }
       }
 
@@ -394,17 +461,26 @@ export class OpenCloudClient {
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
 
-    const text = messages.join('\n');
+    const text = messages.map((entry) => entry.message).join('\n');
+
+    const stats: LogFetchStats = {
+      requests: pagesFetched,
+      pages: pagesFetched,
+      entries: entriesFetched,
+      messages: messages.length,
+      chars: text.length,
+    };
 
     // Log volume is the prime suspect when engine output goes missing between
     // the task and the parser, and the parser cannot tell a short run from a
-    // truncated fetch. Record what arrived so a real run can settle it.
+    // truncated fetch. Handed out with the text rather than only printed, so
+    // the diagnostic that finds the output missing can say what the fetch saw.
     OutputHelper.verbose(
-      `[open-cloud] Task logs: ${pagesFetched} page(s), ${entriesFetched} entries, ` +
-        `${messages.length} messages, ${text.length} chars`
+      `[open-cloud] Task logs: ${stats.pages} page(s), ${stats.entries} entries, ` +
+        `${stats.messages} messages, ${stats.chars} chars`
     );
 
-    return text;
+    return { text, stats, messages };
   }
 
   /**

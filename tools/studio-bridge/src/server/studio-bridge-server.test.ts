@@ -22,7 +22,7 @@ vi.mock('@quenty/nevermore-template-helpers', () => ({
       cleanupAsync: vi.fn(async () => {}),
     })),
   },
-  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.luau'),
+  resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.lua'),
   resolveTemplatePath: vi.fn((..._args: any[]) => '/fake/default.project.json'),
 }));
 
@@ -283,6 +283,55 @@ describe('StudioBridgeServer', () => {
       const result = await resultPromise;
       expect(result.success).toBe(false);
       expect(result.logs).toContain('Script threw: boom');
+    });
+
+    it('carries the script return values off the scriptComplete', async () => {
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const resultPromise = server.executeAsync({
+        scriptContent: 'return { counts = { passed = 7 } }',
+      });
+
+      await new Promise<void>((resolve) => {
+        client!.on('message', (raw) => {
+          const data = JSON.parse(
+            typeof raw === 'string' ? raw : raw.toString('utf-8')
+          );
+          if (data.type === 'execute') resolve();
+        });
+      });
+
+      client!.send(
+        JSON.stringify({
+          type: 'scriptComplete',
+          sessionId: ready.sessionId,
+          payload: {
+            success: true,
+            returnValues: [{ counts: { passed: 7 } }],
+          },
+        })
+      );
+
+      const result = await resultPromise;
+      expect(result.returnValues).toEqual([{ counts: { passed: 7 } }]);
+    });
+
+    it('leaves returnValues undefined when the run times out', async () => {
+      // Nothing reported a return channel, so the value is unknown rather than
+      // empty — a caller can still fall back to whatever output arrived.
+      const ready = await createReadyServer();
+      server = ready.server;
+      client = ready.client;
+
+      const result = await server.executeAsync({
+        scriptContent: 'while true do end',
+        timeoutMs: 200,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.returnValues).toBeUndefined();
     });
 
     it('returns failure when client disconnects during execution', async () => {

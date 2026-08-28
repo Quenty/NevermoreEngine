@@ -559,7 +559,7 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           reporters.push(
             new GithubCommentTableReporter(
               state,
-              createDeployCommentConfig(),
+              createDeployCommentConfig(deployLabels),
               isMultiPlace ? MULTI_PLACE_CONCURRENCY : 1
             )
           );

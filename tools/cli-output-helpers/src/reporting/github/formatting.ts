@@ -15,12 +15,14 @@ import {
   type IStateTracker,
   type PackageState,
 } from '../state/state-tracker.js';
+import { formatProgressInline } from '../progress-format.js';
 import {
-  formatProgressInline,
-  formatProgressResult,
-  isEmptyTestRun,
-  isUnreportedTestRun,
-} from '../progress-format.js';
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+  tallyCaveats,
+  type ResultStatus,
+} from '../result-status.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
 
@@ -145,26 +147,37 @@ export function formatResultStatus(
   failureLabel: string,
   expectsTestCounts = false
 ): string {
-  const duration = formatDurationMs(pkg.durationMs);
-  const progressText = formatProgressResult(pkg.progressSummary);
-  const empty = isEmptyTestRun(pkg.progressSummary);
+  const status = resolveResultStatus(pkg, {
+    successLabel,
+    failureLabel,
+    expectsTestCounts,
+  });
 
-  if (pkg.success) {
-    if (expectsTestCounts && isUnreportedTestRun(pkg.progressSummary)) {
-      return `⚠️ **Unverified** — no test counts reported (${duration})`;
-    }
-    const label = progressText
-      ? `${successLabel} ${progressText}`
-      : successLabel;
-    return empty ? `⚠️ ${label} (${duration})` : `✅ ${label} (${duration})`;
-  }
+  // Bolded verdict, plain caveats: a reader scans a column of these for the
+  // verdict, and bolding the qualifier too would flatten the difference between
+  // them. Everything else — which states exist, what they are called, what
+  // counts as a warning — is the resolver's.
+  const verdict =
+    status.severity === 'failure'
+      ? status.failedPhase
+        ? `**${status.label}** at ${status.failedPhase}`
+        : `**${status.label}**`
+      : status.label;
+  const caveats = status.caveats.length > 0 ? ` - ${caveatText(status)}` : '';
+  const head = [verdict, status.progress].filter(Boolean).join(' ');
 
-  const failedPhase = pkg.failedPhase;
-  const effectiveLabel = pkg.failureLabel ?? failureLabel;
-  const label = failedPhase
-    ? `**${effectiveLabel}** at ${failedPhase}`
-    : `**${effectiveLabel}**`;
-  return `❌ ${label} (${duration})`;
+  return `${statusIcon(
+    status.severity,
+    'emoji'
+  )} ${head}${caveats} (${formatDurationMs(pkg.durationMs)})`;
+}
+
+/** The caveat half of a status line, without the verdict in front of it. */
+function caveatText(status: ResultStatus): string {
+  return formatStatusText({ ...status, label: '', progress: '' }).replace(
+    /^ *- */,
+    ''
+  );
 }
 
 export function getActionsRunUrl(): string | undefined {
@@ -292,7 +305,7 @@ export function formatGithubTableBody(
         statusText = formatResultStatus(
           pkg.result!,
           config.successLabel ?? 'Passed',
-          config.failureLabel ?? 'Failed',
+          config.failureLabel ?? 'FAILED',
           config.expectsTestCounts ?? false
         );
         break;
@@ -314,18 +327,19 @@ export function formatGithubTableBody(
   if (allDone) {
     const passed = packages.filter((p) => p.status === 'passed').length;
     const failed = packages.filter((p) => p.status === 'failed').length;
-    // Read the final result, not the live progress — progress is cleared once a
-    // package resolves, so an end-of-run check against it never fires.
-    const emptyRuns = packages.filter((p) =>
-      isEmptyTestRun(p.result?.progressSummary ?? p.progress)
-    ).length;
-    const unreported = config.expectsTestCounts
-      ? packages.filter(
-          (p) =>
-            p.status === 'passed' &&
-            isUnreportedTestRun(p.result?.progressSummary)
-        ).length
-      : 0;
+    // Tallied off the same statuses the rows were drawn from, so a line here
+    // cannot contradict the column above it — which it could when each was
+    // counted separately. Read from the final result, not the live progress:
+    // progress is cleared once a package resolves.
+    const statuses = packages
+      .filter((p) => p.result !== undefined)
+      .map((p) =>
+        resolveResultStatus(p.result!, {
+          successLabel: config.successLabel ?? 'Passed',
+          failureLabel: config.failureLabel ?? 'FAILED',
+          expectsTestCounts: config.expectsTestCounts ?? false,
+        })
+      );
     const verb = config.summaryVerb ?? 'tested';
     const unit = packages.length === 1 ? 'package' : 'packages';
     footer = `**${
@@ -333,11 +347,8 @@ export function formatGithubTableBody(
     } ${unit} ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
       elapsedMs
     )}`;
-    if (emptyRuns > 0) {
-      footer += `\n⚠️ ${emptyRuns} package(s) ran 0 tests — check test discovery`;
-    }
-    if (unreported > 0) {
-      footer += `\n⚠️ ${unreported} package(s) reported no test counts — a pass here proves nothing about whether tests ran`;
+    for (const { message } of tallyCaveats(statuses)) {
+      footer += `\n⚠️ ${message}`;
     }
   } else {
     const done = packages.filter(

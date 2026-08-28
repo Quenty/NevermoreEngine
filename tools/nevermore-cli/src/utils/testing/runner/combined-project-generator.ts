@@ -125,7 +125,7 @@ export async function generateCombinedProjectAsync(options: {
   const luneScriptPath = resolvePackagePath(
     import.meta.url,
     'build-scripts',
-    'combine-test-places.luau'
+    'combine-test-places.lua'
   );
 
   // Build args: <outputPath> <slug1> <rbxl1> <script1> <slug2> <rbxl2> <script2> ...

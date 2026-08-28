@@ -118,6 +118,7 @@ export class BridgeSession extends EventEmitter {
         success: result.payload.success,
         output,
         error: result.payload.error,
+        returnValues: result.payload.returnValues,
       };
     }
 
