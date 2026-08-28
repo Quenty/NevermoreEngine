@@ -1,3 +1,23 @@
+# v10.49.0 (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
+- refactor: Swap to Destroy method for maid compatibility ([@Quenty](https://github.com/Quenty))
+- fix: Tie implementations on client don't implement server methods and vice versa. ([@Quenty](https://github.com/Quenty))
+- fix: Fix implementation issues ([@Quenty](https://github.com/Quenty))
+- refactor: Always cleanup controller.destroy between tests ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

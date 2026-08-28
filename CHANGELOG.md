@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/access@1.8.0`, `@quenty/adorneeboundingbox@8.50.0`, `@quenty/adorneeutils@3.5.0`, `@quenty/attributeutils@14.38.0`, `@quenty/binder@14.45.0`, `@quenty/camera@14.54.0`, `@quenty/characterutils@12.43.0`, `@quenty/chatproviderservice@9.71.0`, `@quenty/clienttranslator@14.50.0`, `@quenty/coreguienabler@12.44.0`, `@quenty/datastore@13.55.0`, `@quenty/gameproductservice@14.71.0`, `@quenty/humanoidtracker@13.41.0`, `@quenty/humanoidutils@2.20.0`, `@quenty/instance-path@1.1.0`, `@quenty/jestutils@1.1.0`, `@quenty/permissionprovider@14.51.0`, `@quenty/playermock@1.8.0`, `@quenty/playerbinder@14.48.0`, `@quenty/playerhumanoidbinder@14.49.0`, `@quenty/playerutils@8.43.0`, `@quenty/ragdoll@15.68.0`, `@quenty/remoting@12.43.0`, `@quenty/resetservice@11.49.0`, `@quenty/rogue-humanoid@10.64.0`, `@quenty/rogue-properties@11.60.0`, `@quenty/saveslot@2.11.0`, `@quenty/scoredactionservice@16.57.0`, `@quenty/settings@11.71.0`, `@quenty/soundgroup@1.55.0`, `@quenty/steputils@3.9.0`, `@quenty/teleportserviceutils@10.5.0`, `@quenty/tie@10.49.0`, `@quenty/timedtween@7.48.0`, `@quenty/transitionmodel@7.50.0`, `@quenty/nevermore-cli@4.45.0`
+  - Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/nevermoreclimanifest@1.10.0`, `@quenty/nevermore-test-runner@1.6.0`, `@quenty/cli-output-helpers@1.18.0`, `@quenty/nevermore-cli@4.44.0`, `@quenty/nevermore-template-helpers@1.19.0`, `@quenty/studio-bridge@0.19.0`
   - Return a test run's results instead of scraping them out of its logs [#795](https://github.com/Quenty/NevermoreEngine/pull/795) ([@Quenty](https://github.com/Quenty))
 
