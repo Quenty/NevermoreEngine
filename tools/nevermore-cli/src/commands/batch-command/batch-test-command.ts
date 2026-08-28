@@ -9,7 +9,7 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
-import { renderBatchLog } from '../../utils/testing/parsers/batch-log-renderer.js';
+import { renderBatchOutcome } from '../../utils/testing/parsers/batch-log-renderer.js';
 import { emitDiagnostic } from '../../utils/testing/parsers/batch-log-parser.js';
 import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
@@ -291,13 +291,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         batchContext.getExecutionOutcomeAsync()
       );
 
-      aggregatedReporter.printRun(
-        renderBatchLog(outcome.lines, {
-          slugToPackage: outcome.slugToPackage,
-          results: outcome.results,
-          ...presentation,
-        })
-      );
+      aggregatedReporter.printRun(renderBatchOutcome(outcome, presentation));
 
       for (const { level, message } of outcome.diagnostics) {
         emitDiagnostic(level, message, presentation.useGroups);

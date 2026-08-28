@@ -150,6 +150,33 @@ export function renderBatchLog(
 }
 
 /**
+ * Render everything one batch execution produced, ready to print.
+ *
+ * The binding between what a run reports and what the renderer is told about it
+ * lives here rather than at the call site, so a field the outcome carries and
+ * the render forgets — the results that put a verdict in every group title, say
+ * — is a mistake one test can catch.
+ *
+ * Structural rather than typed against `BatchExecutionOutcome`: the job context
+ * that defines it already imports this module.
+ */
+export function renderBatchOutcome(
+  outcome: {
+    lines: RenderableLogLine[];
+    results: Map<string, BatchPackageResult>;
+    slugToPackage: Map<string, string>;
+  },
+  presentation: { useGroups: boolean; color: boolean }
+): string[] {
+  return renderBatchLog(outcome.lines, {
+    slugToPackage: outcome.slugToPackage,
+    results: outcome.results,
+    useGroups: presentation.useGroups,
+    color: presentation.color,
+  });
+}
+
+/**
  * Header for one package's section, carrying its verdict.
  *
  * The status is in the title because a group is read collapsed: a reader
