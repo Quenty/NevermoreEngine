@@ -14,7 +14,17 @@ function captureWarnings(): () => string[] {
     warnings.push(message);
   });
   vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+  vi.spyOn(OutputHelper, 'startGroup').mockImplementation(() => {});
+  vi.spyOn(OutputHelper, 'endGroup').mockImplementation(() => {});
   return () => warnings;
+}
+
+/**
+ * Everything the parser reported, with its level — for findings that are a
+ * group rather than a single warning.
+ */
+function captureDiagnostics(): Array<{ level: string; message: string }> {
+  return [];
 }
 
 afterEach(() => {
@@ -278,17 +288,22 @@ describe('parseBatchTestLogs', () => {
     });
   });
 
-  it('warns out loud when a package fell back to log scraping', () => {
-    const warnings = captureWarnings();
+  it('reports a fallback to log scraping as one group naming each package', () => {
+    // Per-package lines said the same thing once per package, which in a real
+    // batch buried everything else under 78 restatements of one finding.
+    const diagnostics = captureDiagnostics();
 
-    parseBatchTestLogs(buildLogs('Tests:  275 passed, 275 total'), SLUG_MAP);
+    parseBatchTestLogs(buildLogs('Tests:  275 passed, 275 total'), SLUG_MAP, {
+      onDiagnostic: (level, message) => diagnostics.push({ level, message }),
+    });
 
-    expect(
-      warnings().some(
-        (w) =>
-          w.includes('returned no test results') && w.includes('egghunt2026')
-      )
-    ).toBe(true);
+    const group = diagnostics.find((d) => d.level === 'group');
+    expect(group?.message).toContain('fell back to log scraping');
+    expect(group?.message).toContain('1 of 1');
+    expect(diagnostics.some((d) => d.message.includes('egghunt2026'))).toBe(
+      true
+    );
+    expect(diagnostics.filter((d) => d.level === 'endgroup')).toHaveLength(1);
   });
 
   it('says nothing about a fallback when every package returned its counts', () => {

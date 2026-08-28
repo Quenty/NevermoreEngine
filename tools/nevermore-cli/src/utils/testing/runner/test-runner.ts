@@ -75,6 +75,12 @@ export interface SingleTestOptions {
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */
   scriptText?: string;
+  /**
+   * Skip this run's counts-provenance line, because the caller reports it for
+   * every package at once. Set by an aggregated batch, where one fetch serves
+   * the whole run and the per-package line says the same thing each time.
+   */
+  suppressCountsProvenance?: boolean;
 }
 
 /**
@@ -212,9 +218,13 @@ export async function runSingleTestAsync(
       scrapedCounts,
       logVolume,
       // A probe is not a test run, so it has no results to be missing. Neither
-      // is one package of an aggregated batch, whose context reported the whole
-      // batch's provenance in one line already.
-      silent: scriptText !== undefined || result.testResults !== undefined,
+      // is one package of an aggregated batch, whose context reports the whole
+      // batch's provenance once, as a group — repeating it per package printed
+      // the same fetch stats 78 times over.
+      silent:
+        scriptText !== undefined ||
+        result.testResults !== undefined ||
+        (options.suppressCountsProvenance ?? false),
       hadReturnChannel: result.returnValues !== undefined,
     });
 

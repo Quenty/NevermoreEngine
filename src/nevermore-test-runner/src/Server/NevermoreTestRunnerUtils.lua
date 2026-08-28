@@ -87,12 +87,9 @@ function NevermoreTestRunnerUtils.runTestsIfNeededAsync(root: Instance): TestRun
 	end
 
 	if isOpenCloud then
-		print("[NevermoreTestRunner] Running in Open Cloud execution context")
-
 		return NevermoreTestRunnerUtils._runTestsAsync(root)
 	end
 
-	print("[NevermoreTestRunner] Running in local execution context")
 	local ok, returned = pcall(function(): any
 		return NevermoreTestRunnerUtils._runTestsAsync(root)
 	end)
@@ -123,7 +120,6 @@ function NevermoreTestRunnerUtils._runTestsAsync(root: Instance): TestRunResults
 	end
 
 	local projectRoot = config.Parent
-	print("[NevermoreTestRunner] Running Jest tests from:", projectRoot:GetFullName())
 	local status, result = (Jest :: any)
 		.runCLI(projectRoot, {
 			verbose = true,
@@ -148,9 +144,13 @@ function NevermoreTestRunnerUtils._runTestsAsync(root: Instance): TestRunResults
 
 	local results = NevermoreTestResults.fromJest(result)
 
-	-- Printed as well as returned. It is the one line that proves the counts were
-	-- read off a result this runner understood, whatever happens to the return
-	-- channel on the way out.
+	-- Printed as well as returned, and the only status line worth its bytes. In an
+	-- aggregated batch every print competes for the engine's log buffer, so the
+	-- "running in X context" and "running jest from Y" lines were dropped: nothing
+	-- reads them, and they cost ~12 KB of the window per run. This one stays
+	-- because it prints after jest's own summary, and truncation keeps the tail —
+	-- so when the window closes over a package it is the count most likely to
+	-- survive, and the one that proves the runner understood the result it read.
 	print(
 		string.format(
 			"[NevermoreTestRunner] Results: %d passed, %d failed, %d skipped, %d total; %d of %d suite(s) failed",

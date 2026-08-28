@@ -268,7 +268,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       bufferOutput: isGrouped,
       stateTracker: reporter.state,
       executeAsync: async (pkg) => {
-        const result = await _runWithRetryAsync(pkg, context, timeoutMs);
+        const result = await _runWithRetryAsync(
+          pkg,
+          context,
+          timeoutMs,
+          args.aggregated ?? false
+        );
 
         return {
           packageName: pkg.name,
@@ -304,13 +309,17 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 async function _runWithRetryAsync(
   pkg: BatchTarget,
   context: JobContext,
-  timeoutMs: number
+  timeoutMs: number,
+  aggregated: boolean
 ): Promise<SingleTestResult> {
   const opts = {
     packagePath: pkg.path,
     packageName: pkg.name,
     timeoutMs,
     target: pkg.target,
+    // One fetch serves every package here, so its provenance is reported once
+    // for the whole batch rather than restated per package.
+    suppressCountsProvenance: aggregated,
   };
 
   try {

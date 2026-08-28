@@ -87,6 +87,15 @@ export function renderBatchLog(
   const tokens = tokenizeBatchLog(lines.map((entry) => entry.line));
   const out: string[] = [];
   let openSlug: string | undefined;
+  /**
+   * Where the run of lines belonging to no open section began.
+   *
+   * A section whose BEGIN the log window dropped only announces itself at its
+   * END, by which point its output has already been emitted. Knowing where that
+   * run started lets the header be spliced in above it, so the output lands
+   * inside its own group rather than the group holding only a verdict.
+   */
+  let orphanStart = 0;
 
   const closeGroup = (): void => {
     if (openSlug === undefined) {
@@ -96,6 +105,7 @@ export function renderBatchLog(
       out.push('::endgroup::');
     }
     openSlug = undefined;
+    orphanStart = out.length;
   };
 
   for (let i = 0; i < tokens.length; i++) {
@@ -112,10 +122,11 @@ export function renderBatchLog(
 
     if (token.kind === 'end') {
       if (openSlug === undefined) {
-        // An END whose BEGIN was dropped by the log window. Its output has been
-        // printing at the top level, so give it a header rather than silently
-        // closing a group that was never opened.
-        out.push(...openGroup(token.slug, options));
+        // An END whose BEGIN the log window dropped. Its output is already in
+        // `out`, so the header goes in above it rather than here — otherwise
+        // the group holds nothing but the verdict while the output it belongs
+        // to sits loose above it.
+        out.splice(orphanStart, 0, ...openGroup(token.slug, options));
         openSlug = token.slug;
       }
       out.push(...verdictLines(token.slug, options));

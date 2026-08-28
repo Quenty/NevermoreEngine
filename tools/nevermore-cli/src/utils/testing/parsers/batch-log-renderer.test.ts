@@ -121,13 +121,50 @@ describe('renderBatchLog', () => {
     expect(out.filter((line) => line === '::endgroup::')).toHaveLength(2);
   });
 
-  it('gives a header to a section whose BEGIN the log window dropped', () => {
+  it('puts a dropped BEGIN section inside its group, output and all', () => {
+    // Truncation eats the head of the window, so the first surviving section
+    // announces itself only at its END — after its output has been emitted.
+    // Heading it there would leave a group holding nothing but the verdict
+    // while hundreds of its lines sat loose above it.
     const out = render(
-      plain('alpha output with no begin', '===BATCH_TEST_END alpha PASS 10===')
+      plain(
+        'alpha line one',
+        'alpha line two',
+        '===BATCH_TEST_END alpha PASS 10==='
+      )
     );
 
-    expect(out).toContain('::group::@quenty/alpha');
-    expect(out).toContain('::endgroup::');
+    expect(out).toEqual([
+      '::group::@quenty/alpha',
+      'alpha line one',
+      'alpha line two',
+      '::endgroup::',
+    ]);
+  });
+
+  it('leaves earlier top-level output above a dropped BEGIN section', () => {
+    // Only the run since the last section closed belongs to the orphan; output
+    // from before that is not retroactively swept into it.
+    const out = render(
+      plain(
+        '===BATCH_TEST_BEGIN alpha===',
+        'alpha ran',
+        '===BATCH_TEST_END alpha PASS 10===',
+        'loose line between packages',
+        'beta output with no begin',
+        '===BATCH_TEST_END beta PASS 20==='
+      )
+    );
+
+    expect(out).toEqual([
+      '::group::@quenty/alpha',
+      'alpha ran',
+      '::endgroup::',
+      '::group::@quenty/beta',
+      'loose line between packages',
+      'beta output with no begin',
+      '::endgroup::',
+    ]);
   });
 
   it('prints a package verdict where its output ends', () => {

@@ -52,6 +52,54 @@ export interface ParseBatchTestLogsOptions {
    * has already happened how much of the run's output ever arrived.
    */
   logFetchStats?: LogFetchStats;
+  /**
+   * Where diagnostics go. When set, the parser reports through this instead of
+   * printing, so a caller that renders the run's output can hold them until
+   * after it: a remark about a log window reads as nonsense above the log it
+   * is describing.
+   */
+  onDiagnostic?: (level: BatchDiagnosticLevel, message: string) => void;
+}
+
+/**
+ * `group` and `endgroup` bracket a run of diagnostics that belong together, so
+ * a finding repeated across many packages can be collapsed into one block
+ * instead of one line each.
+ */
+export type BatchDiagnosticLevel =
+  | 'info'
+  | 'warn'
+  | 'verbose'
+  | 'group'
+  | 'endgroup';
+
+/** Print one diagnostic, honoring the grouping levels. */
+export function emitDiagnostic(
+  level: BatchDiagnosticLevel,
+  message: string
+): void {
+  if (level === 'group') {
+    OutputHelper.startGroup(message);
+  } else if (level === 'endgroup') {
+    OutputHelper.endGroup();
+  } else if (level === 'warn') {
+    OutputHelper.warn(message);
+  } else if (level === 'info') {
+    OutputHelper.info(message);
+  } else {
+    OutputHelper.verbose(message);
+  }
+}
+
+/** Report through the caller's sink, or straight out when there is none. */
+function makeReporter(
+  onDiagnostic?: (level: BatchDiagnosticLevel, message: string) => void
+): (level: BatchDiagnosticLevel, message: string) => void {
+  if (onDiagnostic) {
+    return onDiagnostic;
+  }
+
+  return (level, message) => emitDiagnostic(level, message);
 }
 
 const BEGIN_MARKER = '===BATCH_TEST_BEGIN ';
@@ -186,6 +234,7 @@ export function parseBatchTestLogs(
   // output is not what this run should have produced", and none can tell how
   // much of it never arrived without knowing what the fetch collected.
   const logVolume = describeLogVolume(rawLogs, options.logFetchStats);
+  const report = makeReporter(options.onDiagnostic);
 
   // Build reverse map: slug → packageName
   const slugToPackage = new Map<string, string>();
@@ -227,7 +276,8 @@ export function parseBatchTestLogs(
   if (summaryLineIndex >= 0 && summaryLineIndex + 1 < lines.length) {
     const entries = findSummaryEntries(lines, summaryLineIndex + 1);
     if (entries === undefined) {
-      OutputHelper.verbose(
+      report(
+        'verbose',
         `[batch-log-parser] Failed to parse JSON summary after line ${summaryLineIndex}: ` +
           lines
             .slice(summaryLineIndex + 1, summaryLineIndex + 3)
@@ -265,7 +315,8 @@ export function parseBatchTestLogs(
   // ── Warn when the batch produced no recognizable output ──
 
   if (strayEndSlugs.length > 0) {
-    OutputHelper.verbose(
+    report(
+      'verbose',
       `[batch-log-parser] Ignored ${strayEndSlugs.length} out-of-order END marker(s); ` +
         'their sections closed on their own boundaries.'
     );
@@ -274,14 +325,16 @@ export function parseBatchTestLogs(
   // Reported, not acted on: a slug the batch never asked for means the markers
   // and the package list disagree, which no per-package verdict can express.
   if (unknownEndSlugs.length > 0) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] END marker(s) for slug(s) not in this batch: ` +
         `${unknownEndSlugs.join(', ')}.`
     );
   }
 
   if (orphanedBeginSlugs.length > 0) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] ${orphanedBeginSlugs.length} section(s) reopened by a ` +
         `second BEGIN before their own END arrived (${orphanedBeginSlugs.join(
           ', '
@@ -292,7 +345,8 @@ export function parseBatchTestLogs(
 
   const noOutputAtAll = logSections.size === 0 && summaryResults.size === 0;
   if (noOutputAtAll) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] No batch markers or summary found in logs (${logVolume}). ` +
         'The batch script may not have started or produced output.'
     );
@@ -304,7 +358,8 @@ export function parseBatchTestLogs(
   // from pcall exit status alone, knowing nothing about what actually ran.
   const lostSectionOutput = logSections.size === 0 && summaryResults.size > 0;
   if (lostSectionOutput) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] Received output but could not attribute any of it to ` +
         `a package section (${logVolume}; ${beginMarkersSeen} BEGIN, ` +
         `${endMarkersSeen} END markers; summary at line ${summaryLineIndex} of ` +
@@ -314,7 +369,8 @@ export function parseBatchTestLogs(
     // BEGIN is printed first and the summary last, so their positions separate
     // the two ways this happens: a log window that dropped the head keeps the
     // summary at the end, while reordered messages put it early.
-    OutputHelper.warn(
+    report(
+      'warn',
       summaryLineIndex >= lines.length - 2
         ? '[batch-log-parser] Summary sits at the end of the log — consistent with the head being dropped by a log size/retention limit.'
         : '[batch-log-parser] Summary sits early in the log — consistent with messages delivered out of order.'
@@ -419,7 +475,8 @@ export function parseBatchTestLogs(
     }
 
     if (partialSections.has(slug)) {
-      OutputHelper.warn(
+      report(
+        'warn',
         `[batch-log-parser] ${slug}: section closed by its END marker with no BEGIN — ` +
           'the start of this output was dropped by the log window, so the section is partial.'
       );
@@ -431,14 +488,16 @@ export function parseBatchTestLogs(
     const tracebackCount = tracebacks.reduce((sum, t) => sum + t.count, 0);
     const owned = tracebacks.filter((t) => !t.owner || t.owner === slug);
     if (tracebacks.length > owned.length) {
-      OutputHelper.verbose(
+      report(
+        'verbose',
         `[batch-log-parser] ${slug}: ignored ${
           tracebacks.length - owned.length
         } traceback(s) belonging to other packages`
       );
     }
     if (owned.length > 0) {
-      OutputHelper.warn(
+      report(
+        'warn',
         `[batch-log-parser] ${slug}: ${owned.length} distinct traceback(s):\n` +
           formatTracebacks(owned)
       );
@@ -471,7 +530,8 @@ export function parseBatchTestLogs(
     // own — said out loud because a returned count that is quietly wrong reads
     // like a clean run, which is how a broken structured read stays invisible.
     if (counts && scrapedCounts && counts.total !== scrapedCounts.total) {
-      OutputHelper.warn(
+      report(
+        'warn',
         `[batch-log-parser] ${slug}: returned counts disagree with the log — ` +
           `the run returned ${counts.passed} passed / ${counts.failed} failed / ` +
           `${counts.total} total, its jest report says ${scrapedCounts.passed} / ` +
@@ -509,7 +569,8 @@ export function parseBatchTestLogs(
     structuredSlugs,
     scrapedSlugs,
     unexplainedFailures,
-    sectionlessButCounted
+    sectionlessButCounted,
+    report
   );
 
   return results;
@@ -527,7 +588,8 @@ function reportCountsProvenance(
   structuredSlugs: string[],
   scrapedSlugs: string[],
   unexplainedFailures: string[],
-  sectionlessButCounted: string[]
+  sectionlessButCounted: string[],
+  report: (level: BatchDiagnosticLevel, message: string) => void
 ): void {
   const total = structuredSlugs.length + scrapedSlugs.length;
   if (total === 0) {
@@ -538,7 +600,8 @@ function reportCountsProvenance(
   // these packages were judged without their log text, so nothing checked them
   // for tracebacks, which jest cannot count and only the log shows.
   if (sectionlessButCounted.length > 0) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] ${sectionlessButCounted.length} package(s) were judged on ` +
         `their returned counts alone, with no log section to read: ` +
         `${sectionlessButCounted.join(
@@ -548,7 +611,8 @@ function reportCountsProvenance(
     );
   }
 
-  OutputHelper.info(
+  report(
+    'info',
     `[batch-log-parser] Counts returned by the run for ${structuredSlugs.length} ` +
       `of ${total} package(s); ${scrapedSlugs.length} scraped from logs.`
   );
@@ -556,7 +620,8 @@ function reportCountsProvenance(
   // Failing every package while every package's counts are clean is a signature,
   // not a coincidence: it means the runner's verdict, not the tests, is wrong.
   if (unexplainedFailures.length > 0) {
-    OutputHelper.warn(
+    report(
+      'warn',
       `[batch-log-parser] ${unexplainedFailures.length} of ${total} package(s) were ` +
         `failed by a run whose own counts show nothing failed: ` +
         `${unexplainedFailures.join(
@@ -568,14 +633,24 @@ function reportCountsProvenance(
   }
 
   if (scrapedSlugs.length > 0) {
-    OutputHelper.warn(
-      `[batch-log-parser] ${scrapedSlugs.length} package(s) returned no test ` +
-        `results, so their counts were scraped from log text — the channel Open ` +
-        `Cloud truncates on long runs: ${scrapedSlugs.join(
-          ', '
-        )}. Their test ` +
-        `script should end with "return results" (see docs/testing/testing.md).`
+    // One group rather than a line per package: the packages differ but the
+    // finding does not, and 78 restatements of it buried everything else. The
+    // state goes in the title so the group can be left collapsed.
+    report(
+      'group',
+      `${scrapedSlugs.length} of ${total} package(s) fell back to log scraping ` +
+        `(no test results returned)`
     );
+    report(
+      'warn',
+      `Counts for these came from log text, the channel Open Cloud truncates on ` +
+        `long runs. Their test script should end with "return results" (see ` +
+        `docs/testing/testing.md).`
+    );
+    for (const slug of scrapedSlugs) {
+      report('info', `  ${slug}`);
+    }
+    report('endgroup', '');
   }
 }
 

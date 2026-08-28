@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { AsyncLocalStorage } from 'async_hooks';
+import { isCI } from './cli-utils.js';
 
 export type BoxOptions = {
   centered?: boolean;
@@ -228,6 +229,27 @@ export class OutputHelper {
    */
   public static warn(message: string): void {
     console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
+  }
+
+  /**
+   * Open a collapsible section, so a run of related output can be folded away.
+   *
+   * In CI this is a workflow command; elsewhere it is a plain header, since a
+   * `::group::` line is only noise in a terminal that cannot fold it. Always
+   * pair with {@link endGroup} — an unclosed group swallows everything printed
+   * after it.
+   */
+  public static startGroup(title: string): void {
+    console.log(
+      isCI() ? `::group::${title}` : this.formatDim(`── ${title} ──`)
+    );
+  }
+
+  /** Close the section opened by {@link startGroup}. */
+  public static endGroup(): void {
+    if (isCI()) {
+      console.log('::endgroup::');
+    }
   }
 
   /**

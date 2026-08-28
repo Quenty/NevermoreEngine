@@ -22,6 +22,7 @@ import {
   generateCombinedProjectAsync,
 } from '../testing/runner/combined-project-generator.js';
 import {
+  type BatchDiagnosticLevel,
   type BatchPackageResult,
   parseBatchTestLogs,
 } from '../testing/parsers/batch-log-parser.js';
@@ -348,12 +349,28 @@ export class BatchScriptJobContext implements JobContext {
       OutputHelper.verbose(`Raw batch logs:\n${rawLogs || '(empty)'}`);
     }
 
-    // Parse into per-package results
+    // Parse into per-package results. The parser's diagnostics are held rather
+    // than printed: they describe the log window, and printing them first put
+    // them above the log they are about.
+    const diagnostics: Array<{ level: BatchDiagnosticLevel; message: string }> =
+      [];
     const results = parseBatchTestLogs(rawLogs, slugMap, {
       logFetchStats: this._inner.getLogFetchStats?.(deployment),
+      onDiagnostic: (level, message) => diagnostics.push({ level, message }),
     });
 
     this._renderBatchLog(deployment, rawLogs, slugMap, results);
+
+    // Now that the run has been shown, say what reading it turned up.
+    for (const { level, message } of diagnostics) {
+      if (level === 'warn') {
+        OutputHelper.warn(message);
+      } else if (level === 'info') {
+        OutputHelper.info(message);
+      } else {
+        OutputHelper.verbose(message);
+      }
+    }
 
     return results;
   }
