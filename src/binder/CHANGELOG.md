@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.43.2...@quenty/binder@14.44.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/binder
+
 ## [14.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.43.1...@quenty/binder@14.43.2) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/binder

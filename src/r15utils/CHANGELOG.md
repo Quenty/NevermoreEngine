@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.36.3...@quenty/r15utils@13.37.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/r15utils
+
 ## [13.36.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/r15utils@13.36.2...@quenty/r15utils@13.36.3) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/r15utils

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.7.2...@quenty/steputils@3.8.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/steputils
+
 ## [3.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.7.1...@quenty/steputils@3.7.2) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/steputils
