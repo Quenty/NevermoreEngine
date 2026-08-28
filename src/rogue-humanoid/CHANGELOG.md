@@ -1,24 +1,13 @@
-# v10.64.0 (Fri Aug 28 2026)
-
-#### 🚀 Enhancement
-
-- Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-- fix: Fix bugs ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.63.0...@quenty/rogue-humanoid@10.64.0) (2026-08-28)
+
+### Bug Fixes
+
+- Fix bugs ([d4c36f5](https://github.com/Quenty/NevermoreEngine/commit/d4c36f54312c24081417e72c842efc18a185b38b))
 
 # [10.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.62.1...@quenty/rogue-humanoid@10.63.0) (2026-08-28)
 

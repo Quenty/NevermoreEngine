@@ -1,24 +1,13 @@
-# v4.45.0 (Fri Aug 28 2026)
-
-#### 🚀 Enhancement
-
-- Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-- fix: Dryrun does not create place ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.44.0...@quenty/nevermore-cli@4.45.0) (2026-08-28)
+
+### Bug Fixes
+
+- Dryrun does not create place ([2c7f39d](https://github.com/Quenty/NevermoreEngine/commit/2c7f39d0374c423fae572fa36ccf7f9fd794a27b))
 
 # [4.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.4...@quenty/nevermore-cli@4.44.0) (2026-08-28)
 

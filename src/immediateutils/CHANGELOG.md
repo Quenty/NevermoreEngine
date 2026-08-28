@@ -1,19 +1,11 @@
-# v1.4.0 (Fri Aug 28 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.3.0...@quenty/immediateutils@1.4.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/immediateutils
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.2.0...@quenty/immediateutils@1.3.0) (2026-08-28)
 

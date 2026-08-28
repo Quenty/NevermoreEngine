@@ -1,19 +1,11 @@
-# v14.48.0 (Fri Aug 28 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.47.0...@quenty/lipsum@14.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/lipsum
 
 # [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/lipsum@14.46.0...@quenty/lipsum@14.47.0) (2026-08-28)
 

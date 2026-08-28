@@ -1,19 +1,11 @@
-# v9.51.0 (Fri Aug 28 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [9.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.50.0...@quenty/playerinputmode@9.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerinputmode
 
 # [9.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.49.2...@quenty/playerinputmode@9.50.0) (2026-08-28)
 

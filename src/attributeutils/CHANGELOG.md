@@ -1,25 +1,13 @@
-# v14.38.0 (Fri Aug 28 2026)
-
-#### 🚀 Enhancement
-
-- Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-- refactor: Swap to Destroy method for maid compatibility ([@Quenty](https://github.com/Quenty))
-- fix: Strict type AttributeUtils and add tests to all of them ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.37.0...@quenty/attributeutils@14.38.0) (2026-08-28)
+
+### Bug Fixes
+
+- Strict type AttributeUtils and add tests to all of them ([cbc351a](https://github.com/Quenty/NevermoreEngine/commit/cbc351a608794f2d2114b25ed5e3ef6c433dafea))
 
 # [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.36.1...@quenty/attributeutils@14.37.0) (2026-08-28)
 

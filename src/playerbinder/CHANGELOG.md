@@ -1,25 +1,11 @@
-# v14.48.0 (Fri Aug 28 2026)
-
-#### 🚀 Enhancement
-
-- Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/jest-utils ([@Quenty](https://github.com/Quenty))
-- refactor: Swap to Destroy method for maid compatibility ([@Quenty](https://github.com/Quenty))
-- refactor: Always cleanup controller.destroy between tests ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.47.0...@quenty/playerbinder@14.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerbinder
 
 # [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.46.1...@quenty/playerbinder@14.47.0) (2026-08-28)
 
