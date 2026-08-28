@@ -80,6 +80,16 @@ export interface ScriptRunResult {
    * not report it a second time.
    */
   testResults?: StructuredTestResults;
+  /**
+   * True when this run's verdict rests on returned results alone, its log
+   * output having been dropped before it reached us.
+   *
+   * A narrower verdict than an ordinary one: the counts are exact, but with no
+   * text there is nothing to check for tracebacks and nothing to read when
+   * something did go wrong. Reported so it can be shown as such rather than as
+   * an ordinary pass.
+   */
+  logsLost?: boolean;
 }
 
 /**

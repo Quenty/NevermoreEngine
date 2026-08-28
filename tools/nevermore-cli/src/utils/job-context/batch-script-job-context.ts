@@ -171,6 +171,7 @@ export class BatchScriptJobContext implements JobContext {
       // rather than left for the caller to find in a return value that is not
       // this package's.
       testResults: result.testResults,
+      logsLost: result.logsLost,
     };
   }
 

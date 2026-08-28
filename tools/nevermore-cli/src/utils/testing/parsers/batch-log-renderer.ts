@@ -1,6 +1,11 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { formatDurationMs } from '@quenty/cli-output-helpers/cli-utils';
-import { formatProgressResult } from '@quenty/cli-output-helpers/reporting';
+import {
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+  type ResultStatusInput,
+} from '@quenty/cli-output-helpers/reporting';
 import {
   type BatchPackageResult,
   tokenizeBatchLog,
@@ -246,34 +251,50 @@ function openGroup(slug: string, options: BatchLogRenderOptions): string[] {
   return [OutputHelper.formatDim(`──────── ${title} ────────`)];
 }
 
-/** "Passed (68/68) (1.5s)", the same shape the comment report gives a row. */
+/**
+ * "⚠️ Passed (35/35) - Logs lost (1.2s)", the shape every other reporter uses.
+ *
+ * Resolved by the shared status resolver rather than worked out here, so a
+ * group title, a summary-table row and a PR comment row describing the same run
+ * cannot disagree about what state it is in or what that state is called. This
+ * only picks the icon style and puts the duration on the end.
+ */
 function describeResult(result: BatchPackageResult): string {
-  const counts = result.testCounts
-    ? formatProgressResult({
-        kind: 'test-counts',
-        passed: result.testCounts.passed,
-        failed: result.testCounts.failed,
-        total: result.testCounts.total,
-      })
-    : '';
+  const status = resolveResultStatus(toStatusInput(result));
   const duration =
     result.durationMs === undefined
       ? ''
       : `(${formatDurationMs(result.durationMs)})`;
 
-  // A pass judged on counts alone, its log section dropped by the window, is
-  // marked rather than shown as an ordinary pass. The counts are trustworthy —
-  // they came back as a value — but with no text there was nothing to check for
-  // tracebacks, and nothing to read if a person goes looking. Saying so in the
-  // title is the only place it can be seen, since the group is empty.
-  const verdict = result.success ? 'Passed' : 'FAILED';
-  if (result.logsLost) {
-    return [`⚠️ ${verdict}`, counts, '- Logs lost', duration]
-      .filter(Boolean)
-      .join(' ');
-  }
+  return [
+    statusIcon(status.severity, 'emoji'),
+    formatStatusText(status),
+    duration,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
 
-  return [verdict, counts, duration].filter(Boolean).join(' ');
+/**
+ * A batch result in the shape the status resolver reads.
+ *
+ * The parser's result is not a `PackageResult` — it is per-section, and one
+ * section is not a package's whole run — so the two fields the resolver needs
+ * are handed over rather than the type being widened to fit.
+ */
+function toStatusInput(result: BatchPackageResult): ResultStatusInput {
+  return {
+    success: result.success,
+    progressSummary: result.testCounts
+      ? {
+          kind: 'test-counts',
+          passed: result.testCounts.passed,
+          failed: result.testCounts.failed,
+          total: result.testCounts.total,
+        }
+      : undefined,
+    caveats: result.logsLost ? ['logs-lost'] : undefined,
+  };
 }
 
 /**

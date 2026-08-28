@@ -216,7 +216,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
                 showLogs: args.logs ?? false,
                 actionVerb: 'Testing',
               })),
-        new SummaryTableReporter(state),
+        // Told to expect counts for the same reason the grouped reporter and
+        // the PR comment are: a green row with nothing behind it reads exactly
+        // like a package that tested something.
+        new SummaryTableReporter(state, { expectsTestCounts: true }),
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
@@ -323,6 +326,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           durationMs: result.durationMs,
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
+            : undefined,
+          // Every reporter downstream reads state through resolveResultStatus,
+          // so a run judged without its logs is marked once here rather than
+          // being re-derived by each of them.
+          caveats: result.logsLost
+            ? (['logs-lost'] as const).slice()
             : undefined,
           error: result.error,
         };

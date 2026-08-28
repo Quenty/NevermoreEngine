@@ -222,7 +222,7 @@ describe('an aggregated batch run, end to end', () => {
     expect(rendered).toEqual([
       // Before any package began, so it belongs to none of them.
       '[BatchTest] running 2 packages',
-      '::group::@quenty/alpha - Passed (68/68) (1.5s)',
+      '::group::@quenty/alpha - ✅ Passed (68/68) (1.5s)',
       'PASS ServerScriptService.alpha.Thing.spec',
       '::endgroup::',
       // Between two packages. This is the output the parser used to discard,
@@ -231,7 +231,7 @@ describe('an aggregated batch run, end to end', () => {
       'Stack Begin',
       "Script 'Foo', Line 3",
       'Stack End',
-      '::group::@quenty/beta - FAILED (3/4) (900ms)',
+      '::group::@quenty/beta - ❌ FAILED (3/4) (900ms)',
       '[BatchTest] beta: beta had a failing suite',
       'beta had a failing suite',
       '::endgroup::',
@@ -328,7 +328,7 @@ describe('an aggregated batch run, end to end', () => {
     });
 
     expect(rendered).toContain(
-      '::group::@quenty/beta - ⚠️ FAILED (3/4) - Logs lost (900ms)'
+      '::group::@quenty/beta - ❌ FAILED (3/4) - Logs lost (900ms)'
     );
     expect(rendered.join('\n')).toContain('survived the run');
   });

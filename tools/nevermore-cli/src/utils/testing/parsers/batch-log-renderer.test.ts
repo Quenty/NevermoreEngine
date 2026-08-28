@@ -192,7 +192,7 @@ describe('renderBatchLog', () => {
     );
 
     expect(out).toEqual([
-      '::group::@quenty/alpha - FAILED (3/4) (1.5s)',
+      '::group::@quenty/alpha - ❌ FAILED (3/4) (1.5s)',
       'alpha ran',
       'no jest report in output',
       '::endgroup::',
@@ -219,7 +219,7 @@ describe('renderBatchLog', () => {
       results
     );
 
-    expect(out[0]).toBe('::group::@quenty/alpha - Passed (68/68) (1.5s)');
+    expect(out[0]).toBe('::group::@quenty/alpha - ✅ Passed (68/68) (1.5s)');
   });
 
   it('titles a package with only its name when nothing is known about it', () => {

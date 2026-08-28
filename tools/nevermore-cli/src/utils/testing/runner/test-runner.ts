@@ -43,6 +43,8 @@ export interface SingleTestResult {
    * truncation destroys. Absent when there are no counts at all.
    */
   countsSource?: 'returned' | 'scraped';
+  /** True when the verdict rests on returned results with no log to read. */
+  logsLost?: boolean;
 }
 
 /**
@@ -240,6 +242,7 @@ export async function runSingleTestAsync(
         : undefined,
       durationMs: result.durationMs,
       error: reasons.length > 0 ? reasons.join('; ') : undefined,
+      logsLost: result.logsLost,
     };
   } finally {
     await context.releaseAsync(deployment);

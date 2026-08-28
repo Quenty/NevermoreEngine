@@ -53,6 +53,18 @@ export {
   isEmptyTestRun,
   summarizeFailure,
 } from './progress-format.js';
+export {
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+  tallyCaveats,
+  type ResolveResultStatusOptions,
+  type ResultCaveat,
+  type ResultSeverity,
+  type ResultStatus,
+  type ResultStatusInput,
+} from './result-status.js';
 
 // State tracking
 export {
