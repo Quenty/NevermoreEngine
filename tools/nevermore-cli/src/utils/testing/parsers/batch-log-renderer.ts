@@ -252,7 +252,7 @@ function openGroup(slug: string, options: BatchLogRenderOptions): string[] {
 }
 
 /**
- * "⚠️ Passed (35/35) - Logs lost (1.2s)", the shape every other reporter uses.
+ * "⚠️ Passed (35/35) - logs lost (1.2s)", the shape every other reporter uses.
  *
  * Resolved by the shared status resolver rather than worked out here, so a
  * group title, a summary-table row and a PR comment row describing the same run

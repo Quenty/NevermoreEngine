@@ -43,7 +43,7 @@ const CAVEAT_COPY: Record<ResultCaveat, CaveatCopy> = {
       `${count} package(s) reported no test counts — a pass here proves nothing about whether tests ran`,
   },
   'logs-lost': {
-    label: 'Logs lost',
+    label: 'logs lost',
     tally: (count) =>
       `${count} package(s) lost their log output — their counts came back in the run's summary, but nothing could be checked for tracebacks`,
   },
@@ -151,7 +151,7 @@ export function resolveResultStatus(
 }
 
 /**
- * The status as one line of plain text: "Passed (35/35) - Logs lost".
+ * The status as one line of plain text: "Passed (35/35) - logs lost".
  *
  * No icon, no duration and no color — those differ between a markdown table, a
  * terminal line and a collapsible group header, and are the renderer's to add.

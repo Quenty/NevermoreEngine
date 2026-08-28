@@ -285,7 +285,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         reporters.push(
           new GithubCommentTableReporter(
             state,
-            createDeployCommentConfig(),
+            createDeployCommentConfig(deployLabels),
             concurrency
           )
         );

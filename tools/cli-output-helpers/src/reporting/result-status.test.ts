@@ -37,7 +37,7 @@ describe('resolveResultStatus', () => {
     });
 
     expect(status.severity).toBe('failure');
-    expect(formatStatusText(status)).toBe('FAILED (3/4) - Logs lost');
+    expect(formatStatusText(status)).toBe('FAILED (3/4) - logs lost');
   });
 
   it('demotes a pass that carries a caveat to a warning', () => {
@@ -47,7 +47,7 @@ describe('resolveResultStatus', () => {
     });
 
     expect(status.severity).toBe('warning');
-    expect(formatStatusText(status)).toBe('Passed (35/35) - Logs lost');
+    expect(formatStatusText(status)).toBe('Passed (35/35) - logs lost');
   });
 
   it('flags a pass that ran no tests', () => {
@@ -87,7 +87,7 @@ describe('resolveResultStatus', () => {
 
     expect(status.caveats).toEqual(['logs-lost', 'empty-run']);
     expect(formatStatusText(status)).toBe(
-      'Passed (0/0) - Logs lost, ran 0 tests'
+      'Passed (0/0) - logs lost, ran 0 tests'
     );
   });
 

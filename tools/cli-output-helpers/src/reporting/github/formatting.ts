@@ -305,7 +305,7 @@ export function formatGithubTableBody(
         statusText = formatResultStatus(
           pkg.result!,
           config.successLabel ?? 'Passed',
-          config.failureLabel ?? 'Failed',
+          config.failureLabel ?? 'FAILED',
           config.expectsTestCounts ?? false
         );
         break;
@@ -336,7 +336,7 @@ export function formatGithubTableBody(
       .map((p) =>
         resolveResultStatus(p.result!, {
           successLabel: config.successLabel ?? 'Passed',
-          failureLabel: config.failureLabel ?? 'Failed',
+          failureLabel: config.failureLabel ?? 'FAILED',
           expectsTestCounts: config.expectsTestCounts ?? false,
         })
       );

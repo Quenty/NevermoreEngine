@@ -328,7 +328,7 @@ describe('an aggregated batch run, end to end', () => {
     });
 
     expect(rendered).toContain(
-      '::group::@quenty/beta - ❌ FAILED (3/4) - Logs lost (900ms)'
+      '::group::@quenty/beta - ❌ FAILED (3/4) - logs lost (900ms)'
     );
     expect(rendered.join('\n')).toContain('survived the run');
   });
@@ -366,7 +366,7 @@ describe('an aggregated batch run, end to end', () => {
     expect(
       renderBatchOutcome(outcome, { useGroups: true, color: false })
     ).toContain(
-      '::group::@quenty/alpha - ⚠️ Passed (35/35) - Logs lost (1.2s)'
+      '::group::@quenty/alpha - ⚠️ Passed (35/35) - logs lost (1.2s)'
     );
   });
 
