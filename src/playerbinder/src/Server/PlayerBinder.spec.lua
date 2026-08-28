@@ -121,7 +121,7 @@ local function setup(constructor: any?)
 		container:Destroy()
 	end)
 
-	local function destroy()
+	local function Destroy(_self)
 		maid:DoCleaning()
 	end
 
@@ -132,10 +132,10 @@ local function setup(constructor: any?)
 		start = start,
 		boot = boot,
 		newMock = newMock,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -156,7 +156,7 @@ describe("PlayerBinder mock discovery", function()
 
 		expect(controller.binder:GetAll()).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a player mock that exists before start", function()
@@ -170,7 +170,7 @@ describe("PlayerBinder mock discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(mock)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a player mock created after start", function()
@@ -183,7 +183,7 @@ describe("PlayerBinder mock discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(mock)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("applies the binder's tag to the discovered mock", function()
@@ -195,7 +195,7 @@ describe("PlayerBinder mock discovery", function()
 
 		expect(controller.binder:HasTag(mock)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds each of several mocks to its own class", function()
@@ -214,7 +214,7 @@ describe("PlayerBinder mock discovery", function()
 		expect(classA).never.toEqual(classB)
 		expect(#controller.binder:GetAll()).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discovers a hand-built mock it did not create", function()
@@ -229,7 +229,7 @@ describe("PlayerBinder mock discovery", function()
 		expect(class.instance).toEqual(foreignMock)
 
 		foreignMock:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("unbinds and destroys the class when the mock is destroyed", function()
@@ -246,6 +246,6 @@ describe("PlayerBinder mock discovery", function()
 		expect(controller.binder:Get(mock)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

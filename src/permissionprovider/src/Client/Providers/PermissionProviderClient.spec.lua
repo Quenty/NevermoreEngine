@@ -63,13 +63,13 @@ local function setup()
 			expect(ok).toEqual(false)
 			return tostring(err)
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -97,7 +97,7 @@ describe("PermissionProviderClient.PromiseIsAdmin argument validation", function
 			provider:PromiseIsAdmin(5 :: any)
 		end).toThrow("Bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a player other than the designated local player", function()
@@ -109,7 +109,7 @@ describe("PermissionProviderClient.PromiseIsAdmin argument validation", function
 			provider:PromiseIsAdmin(otherPlayer)
 		end).toThrow("We only support local player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -122,7 +122,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the server's answer for a nil player", function()
@@ -133,7 +133,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(nil))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("denies when the server answers false", function()
@@ -144,7 +144,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a non-boolean server answer", function()
@@ -156,7 +156,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
 		expect(message).toContain("Got non-boolean from server")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects when the server invoke throws", function()
@@ -168,7 +168,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
 		expect(message).toContain("Server invoke failed")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("caches the admin answer across calls", function()
@@ -186,6 +186,6 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		expect(controller.awaitBool(first)).toEqual(true)
 		expect(invokeCount).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

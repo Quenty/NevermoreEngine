@@ -19,7 +19,7 @@ type Controller = {
 	newAction: () -> ScoredAction.ScoredAction,
 	connect: (ScoredAction.ScoredAction, (Maid.Maid) -> ()) -> Maid.Maid,
 	connectLoose: (ScoredAction.ScoredAction, (Maid.Maid) -> ()) -> Maid.Maid,
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -38,12 +38,12 @@ local function setup(): Controller
 			return ScoredActionUtils.connectToPreferred(action, callback)
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -60,7 +60,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(calls).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("invokes the callback immediately for an already preferred action", function()
@@ -75,7 +75,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("invokes the callback when the action becomes preferred", function()
@@ -91,7 +91,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not re-invoke the callback for a second push", function()
@@ -108,7 +108,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("invokes the callback again on a later push", function()
@@ -125,7 +125,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(calls).toBe(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cleans up the callback maid when the action stops being preferred", function()
@@ -146,7 +146,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cleans up the callback maid when the returned maid is destroyed", function()
@@ -165,7 +165,7 @@ describe("ScoredActionUtils.connectToPreferred", function()
 
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cleans up a callback maid abandoned by a pop during the callback", function()
@@ -185,6 +185,6 @@ describe("ScoredActionUtils.connectToPreferred", function()
 		expect(action:IsPreferred()).toBe(false)
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

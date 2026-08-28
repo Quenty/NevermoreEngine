@@ -56,7 +56,7 @@ local function setup()
 	local fakePlayer = maid:Add(PlayerMock.new({ UserId = USER_ID }))
 	fakePlayer.Parent = Workspace
 
-	local function destroy()
+	local function Destroy(_self)
 		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
 		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
 		-- this spec and fires inside a later package's window.
@@ -92,10 +92,10 @@ local function setup()
 		leave = function()
 			hasSaveSlotsBinder:Unbind(fakePlayer)
 		end,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -111,7 +111,7 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		expect(PromiseTestUtils.awaitSettled(slotsLoaded, 0)).toEqual(false)
 		controller.leave()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	-- Pins that seedExistingSlot really lands where the load reads it. Without this, drift in the raw
@@ -134,7 +134,7 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 			return hasSaveSlots.ActiveSlotId.Value == EXISTING_SLOT_ID
 		end, 10)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("consumes a returning player's slots-load that settles after the binder died", function()
@@ -151,7 +151,7 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		expect(PromiseTestUtils.awaitSettled(slotsLoaded, 0)).toEqual(false)
 		controller.leave()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("consumes a default-slot read that settles after the binder died", function()
@@ -169,6 +169,6 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		-- stray "attempt to call missing method" error fails the run.
 		controller.leave()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

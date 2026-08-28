@@ -100,13 +100,13 @@ local function setup()
 			table.sort(names)
 			return names
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			serviceMaid:DoCleaning()
-			controller:destroy()
+			controller:Destroy()
 		end,
 	}
 
-	serviceMaid:GiveTask(JestUtils.afterThis(cmdrController.destroy))
+	serviceMaid:GiveTask(JestUtils.afterThis(cmdrController))
 
 	return cmdrController
 end
@@ -125,7 +125,7 @@ describe("DataStoreCmdrService registration", function()
 			"datastore-write-json",
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("registers the sub-store type", function()
@@ -133,7 +133,7 @@ describe("DataStoreCmdrService registration", function()
 
 		expect(controller.subStoreType()).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes players in bulk", function()
@@ -141,7 +141,7 @@ describe("DataStoreCmdrService registration", function()
 
 		expect(controller.run("datastore-lock-info", {})).toEqual("No players to act on.")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stays quiet while a command is quick", function()
@@ -152,7 +152,7 @@ describe("DataStoreCmdrService registration", function()
 
 		expect(#controller.replies).toEqual(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports a target that is taking a while", function()
@@ -165,7 +165,7 @@ describe("DataStoreCmdrService registration", function()
 		expect(#controller.replies).toEqual(1)
 		expect(string.find(controller.replies[1], "1: ", 1, true) ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -175,7 +175,7 @@ describe("datastore-lock-info", function()
 
 		expect(string.find(controller.run("datastore-lock-info", { 1 }), "unlocked") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names the session holding the lock", function()
@@ -185,7 +185,7 @@ describe("datastore-lock-info", function()
 
 		expect(string.find(controller.run("datastore-lock-info", { 1 }), "foreign%-job") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports every target on its own line", function()
@@ -198,7 +198,7 @@ describe("datastore-lock-info", function()
 		expect(string.find(output, "1: ") ~= nil).toEqual(true)
 		expect(string.find(output, "2: ") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -213,7 +213,7 @@ describe("datastore-unlock", function()
 		expect(controller.mock:GetRaw("user_1").lock).toBeNil()
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("says so when there was nothing to clear", function()
@@ -223,7 +223,7 @@ describe("datastore-unlock", function()
 
 		expect(string.find(controller.run("datastore-unlock", { 1 }), "already unlocked") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	-- These are stress-test tools, so a live local session is a target rather than a refusal.
@@ -232,14 +232,14 @@ describe("datastore-unlock", function()
 
 		if not controller.storeAndAwaitLock() then
 			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(string.find(controller.run("datastore-unlock", { 1 }), "Unlocked") ~= nil).toEqual(true)
 		expect(controller.mock:GetRaw("user_1").lock).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("clears every target in a batch", function()
@@ -254,7 +254,7 @@ describe("datastore-unlock", function()
 		expect(controller.mock:GetRaw("user_1").lock).toBeNil()
 		expect(controller.mock:GetRaw("user_2").lock).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -267,7 +267,7 @@ describe("datastore-lock", function()
 		expect(string.find(controller.run("datastore-lock", { 1 }), "Locked") ~= nil).toEqual(true)
 		expect(controller.mock:GetRaw("user_1").lock).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the lock it replaced", function()
@@ -277,7 +277,7 @@ describe("datastore-lock", function()
 
 		expect(string.find(controller.run("datastore-lock", { 1 }), "foreign%-job") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -293,7 +293,7 @@ describe("datastore-read-json", function()
 		expect(string.find(output, '"level"') ~= nil).toEqual(true)
 		expect(string.find(output, "7") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -307,7 +307,7 @@ describe("datastore-write-json", function()
 		expect(controller.mock:GetRaw("user_1").profile.level).toEqual(7)
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports undecodable JSON as a failure", function()
@@ -317,7 +317,7 @@ describe("datastore-write-json", function()
 			true
 		)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -331,7 +331,7 @@ describe("datastore-delete", function()
 		expect(controller.mock:GetRaw("user_1").profile).toBeNil()
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -345,7 +345,7 @@ describe("datastore-copy", function()
 		controller.run("datastore-copy", 1, { 2 }, { "profile" })
 		expect(controller.mock:GetRaw("user_2").profile.level).toEqual(7)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("copies onto an absent player through a store that yields", function()
@@ -359,7 +359,7 @@ describe("datastore-copy", function()
 
 		expect(controller.mock:GetRaw("user_2").profile.level).toEqual(7)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("skips the source when it is also a target", function()
@@ -370,6 +370,6 @@ describe("datastore-copy", function()
 		local output = controller.run("datastore-copy", 1, { 1 }, { "profile" })
 		expect(string.find(output, "Skipped") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

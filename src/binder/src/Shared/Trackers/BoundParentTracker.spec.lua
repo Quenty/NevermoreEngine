@@ -100,12 +100,12 @@ local function setup()
 		track = track,
 		boot = boot,
 		awaitChange = awaitChange,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -130,7 +130,7 @@ describe("BoundParentTracker tracking", function()
 		local tracker = controller.track(BoundParentTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toEqual(controller.binder:Get(parent))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the child is reparented off the bound parent", function()
@@ -148,7 +148,7 @@ describe("BoundParentTracker tracking", function()
 		child.Parent = controller.container
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the parent's class is unbound", function()
@@ -166,6 +166,6 @@ describe("BoundParentTracker tracking", function()
 		controller.binder:Untag(parent)
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

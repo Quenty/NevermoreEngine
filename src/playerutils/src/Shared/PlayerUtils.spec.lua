@@ -24,12 +24,12 @@ local function setup(): any
 			maid:GiveTask(player)
 			return player
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -89,7 +89,7 @@ describe("PlayerUtils.formatName", function()
 		local player = controller.newPlayer({ UserId = 8675309 })
 		expect(PlayerUtils.formatName(player)).toBe(player.Name)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("qualifies the mock's display name stand-in with its name", function()
@@ -98,7 +98,7 @@ describe("PlayerUtils.formatName", function()
 		local player = controller.newPlayer({ UserId = 8675309, DisplayName = "oot" })
 		expect(PlayerUtils.formatName(player)).toBe(string.format("oot (@%s)", player.Name))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows a display name written mid-test", function()
@@ -108,7 +108,7 @@ describe("PlayerUtils.formatName", function()
 		PlayerMock.write(player, "DisplayName", "oot")
 		expect(PlayerUtils.formatName(player)).toBe(string.format("oot (@%s)", player.Name))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects an instance that is neither a Player nor a mock", function()
@@ -129,7 +129,7 @@ describe("PlayerUtils.promiseLoadCharacter", function()
 		expect(character).toBe(PlayerMock.read(player, "Character"))
 		expect(character.Parent).toBe(workspace)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects an instance that is neither a Player nor a mock", function()
@@ -156,7 +156,7 @@ describe("PlayerUtils.promiseLoadCharacterWithHumanoidDescription", function()
 		expect(character:FindFirstChildOfClass("Humanoid")).never.toBeNil()
 
 		description:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a bad humanoidDescription", function()
@@ -167,6 +167,6 @@ describe("PlayerUtils.promiseLoadCharacterWithHumanoidDescription", function()
 			PlayerUtils.promiseLoadCharacterWithHumanoidDescription(player, Instance.new("Folder") :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

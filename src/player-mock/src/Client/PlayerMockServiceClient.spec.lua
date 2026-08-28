@@ -46,12 +46,12 @@ local function setup(): any
 			player.Parent = workspace
 			return player
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -66,7 +66,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(service:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("observes mocks parented before and after the observation started", function()
@@ -86,7 +86,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(seen).toEqual({ before, after })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops observing after unsubscribe", function()
@@ -105,7 +105,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(seen).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates concurrent client services sharing the place's mocks", function()
@@ -119,7 +119,7 @@ describe("PlayerMockServiceClient", function()
 		expect(service:GetPlayerMocks()).toEqual({ player })
 		expect(otherService:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("designates the mocked local player and records it per service", function()
@@ -133,7 +133,7 @@ describe("PlayerMockServiceClient", function()
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(player)
 		expect(service:GetLocalPlayer()).toBe(player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps its own local player when another client designates a different mock", function()
@@ -151,7 +151,7 @@ describe("PlayerMockServiceClient", function()
 		expect(otherService:GetLocalPlayer()).toBe(second)
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("adopts a designation made before the bag booted", function()
@@ -164,7 +164,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(service:GetLocalPlayer()).toBe(player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the designation when the service is destroyed", function()
@@ -178,7 +178,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears an adopted pre-boot designation when the service is destroyed", function()
@@ -193,7 +193,7 @@ describe("PlayerMockServiceClient", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fails when a mock outlived the service that consumed it", function()
@@ -210,6 +210,6 @@ describe("PlayerMockServiceClient", function()
 			uninitialized:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("leaked")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

@@ -49,7 +49,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 		handle:Destroy()
 		settleSaves(controller)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	-- Whether the session is still open is read through store identity rather than the stored lock:
@@ -71,7 +71,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 		second:Destroy()
 		settleSaves(controller)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("holds the session while another handle is still open", function()
@@ -102,7 +102,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 		fourth:Destroy()
 		settleSaves(controller)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("survives being destroyed twice", function()
@@ -115,7 +115,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 		handle:Destroy()
 		settleSaves(controller)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses to hand back a store once destroyed", function()
@@ -131,6 +131,6 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 			handle:GetDataStore()
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

@@ -53,7 +53,7 @@ end)
 Spec files should be comment-free apart from lint directives (`--!strict`, `-- selene:`) and the
 `@class` docstring — the code and test names carry the intent. Do **not** write prose headers above
 `setup()` or other helpers describing what they build, comments narrating test flow, or comments
-restating what an assertion checks — `setup()`/`destroy()` is an established pattern and needs no
+restating what an assertion checks — `setup()`/`Destroy()` is an established pattern and needs no
 explanation. The only comment worth keeping is one documenting something impossible to infer from
 the code (e.g. an engine-bug workaround, with a link). When in doubt, omit it.
 
@@ -65,12 +65,12 @@ leaves running keeps executing after the test ends and can throw during a *later
 which the runner reports as that innocent later package failing. A leaked `DataStore` auto-save loop
 throwing during the `secrets` suite is a real example we hit.
 
-So every object a test constructs must be torn down. Use the **`setup()` / `destroy()` controller
+So every object a test constructs must be torn down. Use the **`setup()` / `Destroy()` controller
 pattern** — the standard across the codebase (see the `rogue-properties` specs and
 `saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` creates a `Maid`, `maid:Add`s the
 `ServiceBag` and every object it builds, and returns a controller: named fields plus factory
-functions, and a `destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
-`controller:destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
+functions, and a `Destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
+`controller:Destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
 
 ```luau
 local function setup()
@@ -85,7 +85,7 @@ local function setup()
 
 	return {
 		thing = thing,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -94,7 +94,7 @@ end
 it("does a thing", function()
 	local controller = setup()
 	expect(controller.thing:DoSomething()).toEqual(true)
-	controller:destroy()
+	controller:Destroy()
 end)
 ```
 
@@ -105,7 +105,7 @@ Guidelines:
   loop, a subscription) running otherwise. This is the exact bug that leaked into the `secrets` suite.
 - For objects a test builds on demand (multiple stores, per-test config), expose a factory that
   returns `maid:Add(X.new(...))` — e.g. a `newDataStore()` on the controller.
-- In a hung-promise guard that returns early, call `controller:destroy()` before the `return` so the
+- In a hung-promise guard that returns early, call `controller:Destroy()` before the `return` so the
   early exit still cleans up.
 - A test may still `:Destroy()` an object mid-test when that teardown *is* the behavior under test —
   the maid safely skips an already-destroyed object at `DoCleaning` (a destroyed `BaseObject` has its
@@ -114,7 +114,7 @@ Guidelines:
   `object:Destroy()` at the end (and in any early-return guard).
 
 **Read a failure list from the top.** A failing `expect` throws, so the trailing
-`controller:destroy()` never runs and that test leaks everything it built into the shared place.
+`controller:Destroy()` never runs and that test leaks everything it built into the shared place.
 Later tests then fail for reasons of their own — timing out on an observable, seeing a slot that
 should have been filtered — and those look like independent bugs. They are usually one bug plus its
 wake. Fix the earliest failure and re-run before investigating any of the others; the count often
@@ -131,7 +131,7 @@ local JestUtils = require("JestUtils")
 
 it("does a thing", function()
 	local controller = setup()
-	JestUtils.afterThis(controller.destroy)
+	JestUtils.afterThis(controller)
 
 	local thing = SomeClass.new()
 	JestUtils.afterThis(thing)

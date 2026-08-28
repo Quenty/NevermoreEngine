@@ -40,12 +40,12 @@ local function setup()
 			end))
 			return seen
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -59,7 +59,7 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 
 		expect(controller.subscribeSeen()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits nil on subscribe when nothing is designated", function()
@@ -67,7 +67,7 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 
 		expect(controller.subscribeSeen()).toEqual({ NONE })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows the designation changing after subscribe", function()
@@ -82,6 +82,6 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 		PlayerMock.setMockedLocalPlayer(nil)
 		expect(seen[#seen]).toBe(NONE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

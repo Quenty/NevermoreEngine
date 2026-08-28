@@ -21,7 +21,7 @@ type Controller = {
 	model: AccelTweenTransitionModel.AccelTweenTransitionModel,
 	value: () -> number,
 	advance: (seconds: number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 -- Completion is observed off the animation step, so the clock has to move and then a frame has to
@@ -37,7 +37,7 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 		return now
 	end)
 
-	local controller = {
+	local controller: Controller = {
 		model = model,
 		value = function()
 			return model:GetPosition()
@@ -47,12 +47,12 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 			task.wait()
 			task.wait()
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -66,7 +66,7 @@ describe("AccelTweenTransitionModel.new", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("defaults to a show target of 1 and a hide target of 0", function()
@@ -78,7 +78,7 @@ describe("AccelTweenTransitionModel.new", function()
 		controller.model:Hide(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("honors explicit show and hide targets", function()
@@ -89,7 +89,7 @@ describe("AccelTweenTransitionModel.new", function()
 		controller.model:Show(true)
 		expect(controller.value()).toBe(8)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a show target that is not a number", function()
@@ -103,7 +103,7 @@ describe("AccelTweenTransitionModel.new", function()
 
 		expect(BasicPane.isBasicPane(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -118,7 +118,7 @@ describe("AccelTweenTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(false)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes showing once the tween arrives", function()
@@ -130,7 +130,7 @@ describe("AccelTweenTransitionModel visibility", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.value()).toBeCloseTo(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes hiding once the tween arrives", function()
@@ -143,7 +143,7 @@ describe("AccelTweenTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBeCloseTo(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("never overshoots the show target", function()
@@ -156,7 +156,7 @@ describe("AccelTweenTransitionModel visibility", function()
 			expect(controller.value() <= 1).toBe(true)
 		end
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes immediately when told not to animate", function()
@@ -168,7 +168,7 @@ describe("AccelTweenTransitionModel visibility", function()
 		expect(controller.model:GetVelocity()).toBe(0)
 		expect(controller.model:GetRemainingTime()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("toggles visibility", function()
@@ -180,7 +180,7 @@ describe("AccelTweenTransitionModel visibility", function()
 		controller.model:Toggle(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -193,7 +193,7 @@ describe("AccelTweenTransitionModel:SetShowTarget", function()
 
 		expect(controller.value()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a hidden model at the hide target", function()
@@ -206,7 +206,7 @@ describe("AccelTweenTransitionModel:SetShowTarget", function()
 		controller.model:Show(true)
 		expect(controller.value()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -218,7 +218,7 @@ describe("AccelTweenTransitionModel:SetHideTarget", function()
 
 		expect(controller.value()).toBe(0.25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -238,8 +238,8 @@ describe("AccelTweenTransitionModel:SetAcceleration", function()
 		expect(fast.model:IsShowingComplete()).toBe(true)
 		expect(slow.model:IsShowingComplete()).toBe(false)
 
-		slow.destroy()
-		fast.destroy()
+		slow:Destroy()
+		fast:Destroy()
 	end)
 
 	it("reports the acceleration it was given", function()
@@ -249,7 +249,7 @@ describe("AccelTweenTransitionModel:SetAcceleration", function()
 
 		expect(controller.model:GetAcceleration()).toBe(50)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects an acceleration that is not a number", function()
@@ -259,7 +259,7 @@ describe("AccelTweenTransitionModel:SetAcceleration", function()
 			controller.model:SetAcceleration("fast" :: any)
 		end).toThrow("Bad acceleration")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -274,7 +274,7 @@ describe("AccelTweenTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the hide until the tween arrives", function()
@@ -289,7 +289,7 @@ describe("AccelTweenTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves without waiting when told not to animate", function()
@@ -297,7 +297,7 @@ describe("AccelTweenTransitionModel promises", function()
 
 		expect(controller.model:PromiseShow(true):IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the toggle in whichever direction it goes", function()
@@ -309,7 +309,7 @@ describe("AccelTweenTransitionModel promises", function()
 		expect(controller.model:PromiseToggle(true):IsFulfilled()).toBe(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires ShowingComplete once the tween arrives", function()
@@ -325,7 +325,7 @@ describe("AccelTweenTransitionModel promises", function()
 		controller.advance(5)
 		expect(fires).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -345,7 +345,7 @@ describe("AccelTweenTransitionModel:Observe", function()
 		expect(values[#values]).toBeCloseTo(1)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -363,7 +363,7 @@ describe("AccelTweenTransitionModel:BindToPaneVisbility", function()
 		expect(pane:IsVisible()).toBe(false)
 
 		pane:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not throw when unbinding after the model is destroyed", function()
@@ -371,7 +371,7 @@ describe("AccelTweenTransitionModel:BindToPaneVisbility", function()
 		local pane = BasicPane.new()
 
 		local unbind = controller.model:BindToPaneVisbility(pane)
-		controller.destroy()
+		controller:Destroy()
 
 		expect(function()
 			unbind()
@@ -387,7 +387,7 @@ describe("AccelTweenTransitionModel duck typing", function()
 
 		expect(TransitionUtils.isTransition(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is recognized as a transition model", function()
@@ -395,7 +395,7 @@ describe("AccelTweenTransitionModel duck typing", function()
 
 		expect(TransitionModel.isTransitionModel(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is recognized as an accel tween transition model", function()
@@ -403,7 +403,7 @@ describe("AccelTweenTransitionModel duck typing", function()
 
 		expect(AccelTweenTransitionModel.isAccelTweenTransitionModel(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -419,7 +419,7 @@ describe("AccelTweenTransitionModel in-flight snap", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.value()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps an already-running hide", function()
@@ -434,6 +434,6 @@ describe("AccelTweenTransitionModel in-flight snap", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

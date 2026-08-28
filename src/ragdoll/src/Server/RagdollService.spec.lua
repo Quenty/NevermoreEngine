@@ -70,7 +70,7 @@ local function setup()
 		container:Destroy()
 	end)
 
-	local function destroy()
+	local function Destroy(_self)
 		maid:DoCleaning()
 	end
 
@@ -81,10 +81,10 @@ local function setup()
 		character = character,
 		humanoid = humanoid,
 		destroyBag = destroyBag,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -105,7 +105,7 @@ describe("RagdollService with a mock player R6 character", function()
 		expect(torso:FindFirstChild("NeckAttachment")).toBeDefined()
 		expect(torso:FindFirstChild("LeftShoulderRagdollAttachment")).toBeDefined()
 
-		state.destroy()
+		state:Destroy()
 	end)
 
 	it("suppresses motors while Ragdoll is bound and restores them on unbind", function()
@@ -130,7 +130,7 @@ describe("RagdollService with a mock player R6 character", function()
 		end)).toBe(true)
 		expect(ragdollBinder:Get(state.humanoid)).toBeNil()
 
-		state.destroy()
+		state:Destroy()
 	end)
 
 	it("tears down while ragdolled, despawning the mock character", function()
@@ -152,7 +152,7 @@ describe("RagdollService with a mock player R6 character", function()
 			return state.character.Parent == nil
 		end)).toBe(true)
 
-		state.destroy()
+		state:Destroy()
 	end)
 
 	it("SetRagdollOnFall toggles automatic tagging and the fall remote event", function()
@@ -173,6 +173,6 @@ describe("RagdollService with a mock player R6 character", function()
 		expect(onFallBinder:Get(state.humanoid)).toBeNil()
 		expect(state.humanoid:FindFirstChild(RagdollHumanoidOnFallConstants.REMOTE_EVENT_NAME)).toBeNil()
 
-		state.destroy()
+		state:Destroy()
 	end)
 end)

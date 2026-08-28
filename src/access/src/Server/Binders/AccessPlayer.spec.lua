@@ -74,12 +74,12 @@ local function setup()
 
 			error("PlayerBinder did not bind the mock player")
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -91,7 +91,7 @@ describe("AccessPlayer", function()
 
 		expect(controller.accessPlayerFor(player)).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("binds an implementation onto the player, findable through the tie", function()
@@ -101,7 +101,7 @@ describe("AccessPlayer", function()
 
 		expect(AccessPlayerInterface:HasImplementation(player)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("answers the same question three ways, consistently", function()
@@ -119,7 +119,7 @@ describe("AccessPlayer", function()
 		end))
 		expect(observed).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("fails closed on unresolved for the boolean, but says unresolved for the state", function()
@@ -132,7 +132,7 @@ describe("AccessPlayer", function()
 		expect(accessPlayer:GetFeatureAllowedState(chapters).type).toEqual("disallowed")
 		expect((accessPlayer:GetFeatureAllowedState(chapters) :: any).reason).toEqual("unresolved")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("fires FeatureAllowedChanged as a verdict changes", function()
@@ -156,7 +156,7 @@ describe("AccessPlayer", function()
 		end
 		expect(sawChapters).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("overrides a fact from the player object, server-side", function()
@@ -172,7 +172,7 @@ describe("AccessPlayer", function()
 
 		expect(accessPlayer:IsFeatureAllowed(chapters)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports every feature verdict in its debug state", function()
@@ -184,7 +184,7 @@ describe("AccessPlayer", function()
 
 		expect(state.featureStates[chapters:GetFeatureName()].allowed).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -209,7 +209,7 @@ describe("AccessPlayer and per-thing features", function()
 
 		expect(evaluated).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still answers a per-thing feature when asked with its subject", function()
@@ -230,6 +230,6 @@ describe("AccessPlayer and per-thing features", function()
 
 		expect(accessPlayer:IsFeatureAllowed(feature, "blueEgg")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

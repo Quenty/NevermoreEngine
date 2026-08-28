@@ -100,12 +100,12 @@ local function setup()
 		track = track,
 		boot = boot,
 		awaitChange = awaitChange,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -123,7 +123,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toEqual(controller.binder:Get(grandparent))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("has no value when no ancestor is bound", function()
@@ -136,7 +136,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("updates when an ancestor becomes bound", function()
@@ -155,7 +155,7 @@ describe("BoundAncestorTracker tracking", function()
 		local value = controller.awaitChange(tracker, nil)
 		expect(value).toEqual(controller.binder:Get(ancestor))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the child leaves the bound ancestry", function()
@@ -174,6 +174,6 @@ describe("BoundAncestorTracker tracking", function()
 		child.Parent = controller.container
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

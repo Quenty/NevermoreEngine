@@ -1791,12 +1791,12 @@ local function setupLocalPlayer()
 			maid:GiveTask(restore)
 			return restore
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -1810,7 +1810,7 @@ describe("PlayerMock local player", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the designation with nil", function()
@@ -1822,7 +1822,7 @@ describe("PlayerMock local player", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("asserts on a non-mock designation", function()
@@ -1833,7 +1833,7 @@ describe("PlayerMock local player", function()
 			PlayerMock.setMockedLocalPlayer(folder :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -1848,7 +1848,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("restores the previous designation", function()
@@ -1865,7 +1865,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears instead of restoring a previous mock that has left the DataModel", function()
@@ -1882,7 +1882,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is safe to call more than once", function()
@@ -1899,7 +1899,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stays a no-op once spent, even when the designation returns to what it installed", function()
@@ -1917,7 +1917,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not clobber a newer designation", function()
@@ -1933,7 +1933,7 @@ describe("PlayerMock.setMockedLocalPlayer disposer", function()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 

@@ -98,12 +98,12 @@ local function setup(): any
 			service:Destroy()
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -118,7 +118,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 		expect(action:IsEnabled()).toBe(true)
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on something that is not an inputKeyMapList", function()
@@ -128,7 +128,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 			(controller.service :: any):GetScoredAction({})
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("prefers the highest scoring action bound to the same key", function()
@@ -144,7 +144,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 		expect(high:IsPreferred()).toBe(true)
 		expect(low:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("hands the preference over when the winner is disabled", function()
@@ -162,7 +162,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 		expect(high:IsPreferred()).toBe(false)
 		expect(low:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not make actions on different keys compete", function()
@@ -177,7 +177,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 		expect(first:IsPreferred()).toBe(true)
 		expect(second:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the preference when the action is destroyed", function()
@@ -192,7 +192,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 
 		expect((action :: any).Destroy).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("lets a later action win the key a destroyed action held", function()
@@ -208,7 +208,7 @@ describe("ScoredActionServiceClient.GetScoredAction", function()
 
 		expect(second:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -220,7 +220,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 			(controller.service :: any):ObserveNewFromInputKeyMapList({})
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits an action carrying the current score", function()
@@ -232,7 +232,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 		expect(#actions).toBe(1)
 		expect(actions[1]:GetScore()).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows later changes to the score value", function()
@@ -245,7 +245,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 
 		expect(actions[1]:GetScore()).toBe(9)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits once for a repeated inputKeyMapList", function()
@@ -256,7 +256,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 
 		expect(#actions).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits again for a different inputKeyMapList", function()
@@ -269,7 +269,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 		expect(#actions).toBe(2)
 		expect(actions[2]).never.toBe(actions[1])
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("destroys the previous action when a new one is emitted", function()
@@ -282,7 +282,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 		expect(actions[1].Destroy).toBeNil()
 		expect(actions[2].Destroy).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("destroys the emitted action when the subscription ends", function()
@@ -294,7 +294,7 @@ describe("ScoredActionServiceClient.ObserveNewFromInputKeyMapList", function()
 
 		expect(actions[1].Destroy).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -310,7 +310,7 @@ describe("ScoredActionServiceClient.Start", function()
 
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops re-ranking once the service is destroyed", function()
@@ -324,7 +324,7 @@ describe("ScoredActionServiceClient.Start", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -341,6 +341,6 @@ describe("ScoredActionServiceClient.Destroy", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

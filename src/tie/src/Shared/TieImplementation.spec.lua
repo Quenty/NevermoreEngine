@@ -55,12 +55,12 @@ local function setup(): any
 			end
 			return names
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -102,7 +102,7 @@ describe("TieImplementation member realms", function()
 		expect(children.ServerSignal).toBe(nil)
 		expect(container:GetAttribute("ServerProperty")).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not create members for the other realm on a server implementation", function()
@@ -117,7 +117,7 @@ describe("TieImplementation member realms", function()
 		expect(children.ServerMethod).toBe(true)
 		expect(children.ClientMethod).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates members for both realms on a shared implementation", function()
@@ -134,7 +134,7 @@ describe("TieImplementation member realms", function()
 		expect(children.ServerMethod).toBe(true)
 		expect(children.SharedMethod).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("still creates shared properties on a client implementation", function()
@@ -146,7 +146,7 @@ describe("TieImplementation member realms", function()
 
 		expect(container:GetAttribute("SharedProperty")).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when a client implementation supplies a server member", function()
@@ -160,7 +160,7 @@ describe("TieImplementation member realms", function()
 			controller.implement(adornee, implementer, TieRealms.CLIENT)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when assigning a member from the other realm after construction", function()
@@ -173,7 +173,7 @@ describe("TieImplementation member realms", function()
 			implementation.ServerMethod = noop
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when reading a member from the other realm", function()
@@ -186,7 +186,7 @@ describe("TieImplementation member realms", function()
 			return implementation.ServerMethod
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is still a valid implementation in its own realm", function()
@@ -199,6 +199,6 @@ describe("TieImplementation member realms", function()
 		expect(controller.definition:IsImplementation(container, TieRealms.CLIENT)).toBe(true)
 		expect(controller.definition:HasImplementation(adornee, TieRealms.CLIENT)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

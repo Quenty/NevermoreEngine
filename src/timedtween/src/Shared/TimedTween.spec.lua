@@ -23,7 +23,7 @@ type Controller = {
 	remainingTime: () -> number,
 	setClock: (clock: () -> number) -> (),
 	advance: (seconds: number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -52,12 +52,12 @@ local function setup(): Controller
 		advance = function(seconds: number)
 			now += seconds
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -81,7 +81,7 @@ describe("TimedTween.GetClock", function()
 
 		expect(controller.tween:GetClock()).toBe(clock)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -93,7 +93,7 @@ describe("TimedTween:SetClock", function()
 			controller.tween:SetClock(5 :: any)
 		end).toThrow("Bad clock")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("holds position when swapped while settled", function()
@@ -108,7 +108,7 @@ describe("TimedTween:SetClock", function()
 
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("holds position when swapped mid-tween", function()
@@ -124,7 +124,7 @@ describe("TimedTween:SetClock", function()
 
 		expect(controller.position()).toBeCloseTo(0.25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("holds the time left when swapped mid-tween", function()
@@ -141,7 +141,7 @@ describe("TimedTween:SetClock", function()
 		expect(controller.remainingTime()).toBeCloseTo(before)
 		expect(controller.remainingTime()).toBeCloseTo(TRANSITION_TIME * 0.75)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps animating on the new clock from where it left off", function()
@@ -162,7 +162,7 @@ describe("TimedTween:SetClock", function()
 		now += TRANSITION_TIME
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not restart a tween that was swapped mid-flight", function()
@@ -179,7 +179,7 @@ describe("TimedTween:SetClock", function()
 		expect(controller.position()).never.toBe(0)
 		expect(controller.remainingTime()).never.toBeCloseTo(TRANSITION_TIME)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("survives being swapped backwards onto an earlier timebase", function()
@@ -196,7 +196,7 @@ describe("TimedTween:SetClock", function()
 
 		expect(controller.position()).toBeCloseTo(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -207,7 +207,7 @@ describe("TimedTween position", function()
 		expect(controller.tween:IsVisible()).toBe(false)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("moves linearly across the transition time", function()
@@ -224,7 +224,7 @@ describe("TimedTween position", function()
 		controller.advance(TRANSITION_TIME)
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps when told not to animate", function()
@@ -236,7 +236,7 @@ describe("TimedTween position", function()
 		controller.tween:Hide(true)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reverses from wherever it currently is", function()
@@ -251,7 +251,7 @@ describe("TimedTween position", function()
 
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -263,7 +263,7 @@ describe("TimedTween remaining time", function()
 
 		expect(controller.rtime()).toBeCloseTo(TRANSITION_TIME)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("counts down with the clock", function()
@@ -274,7 +274,7 @@ describe("TimedTween remaining time", function()
 
 		expect(controller.rtime()).toBeCloseTo(TRANSITION_TIME * 0.75)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the time left, not the distance left, when reversing mid-tween", function()
@@ -290,7 +290,7 @@ describe("TimedTween remaining time", function()
 		expect(controller.rtime()).toBeCloseTo(TRANSITION_TIME / 2)
 		expect(controller.rtime()).toBeCloseTo(controller.remainingTime())
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stays consistent partway through a reversed tween", function()
@@ -303,7 +303,7 @@ describe("TimedTween remaining time", function()
 
 		expect(controller.rtime()).toBeCloseTo(TRANSITION_TIME / 4)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports zero once settled", function()
@@ -314,7 +314,7 @@ describe("TimedTween remaining time", function()
 
 		expect(controller.rtime()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports zero when told not to animate", function()
@@ -324,7 +324,7 @@ describe("TimedTween remaining time", function()
 
 		expect(controller.rtime()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -341,7 +341,7 @@ describe("TimedTween:SetVisible", function()
 		expect(controller.position()).toBe(1)
 		expect(controller.rtime()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps an already-running hide when told not to animate", function()
@@ -356,7 +356,7 @@ describe("TimedTween:SetVisible", function()
 		expect(controller.position()).toBe(0)
 		expect(controller.rtime()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a settled tween alone", function()
@@ -368,7 +368,7 @@ describe("TimedTween:SetVisible", function()
 		expect(controller.position()).toBe(1)
 		expect(controller.tween:IsVisible()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a visibility that is not a boolean", function()
@@ -378,7 +378,7 @@ describe("TimedTween:SetVisible", function()
 			controller.tween:SetVisible(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -388,7 +388,7 @@ describe("TimedTween:PromiseFinished", function()
 
 		expect(controller.tween:PromiseFinished():IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("waits on the injected clock rather than wall time", function()
@@ -407,7 +407,7 @@ describe("TimedTween:PromiseFinished", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("waits on wall time under the default clock", function()
@@ -433,7 +433,7 @@ describe("TimedTween:SetTransitionTime", function()
 
 		expect(controller.tween:GetTransitionTime()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("defaults to 0.15 seconds", function()

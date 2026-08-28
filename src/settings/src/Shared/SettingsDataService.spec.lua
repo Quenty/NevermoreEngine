@@ -68,12 +68,12 @@ local function setup()
 			return getPlayerCalls
 		end,
 		maid = maid,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -88,7 +88,7 @@ describe("SettingsDataService hydration", function()
 		expect(first).never.toBeNil()
 		expect(second).toBe(first)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("hydrates without invoking the implementation's GetPlayer", function()
@@ -98,7 +98,7 @@ describe("SettingsDataService hydration", function()
 
 		expect(controller.getPlayerCalls()).toBe(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not re-hydrate when an observer reads settings during a re-hydration", function()
@@ -128,7 +128,7 @@ describe("SettingsDataService hydration", function()
 		-- read rebuilds from inside that emission.
 		expect(sequence).toBe("impl,nil,impl,")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not hydrate a player who has left", function()
@@ -155,7 +155,7 @@ describe("SettingsDataService hydration", function()
 		expect(settingsDataService:GetPlayerSettings(player)).toBeNil()
 		expect(sequence).toBe("impl,nil,")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stops holding a player once they are out of the DataModel", function()
@@ -181,6 +181,6 @@ describe("SettingsDataService hydration", function()
 		expect(settingsDataService:GetPlayerSettings(player)).toBeNil()
 		expect(internal._hydratedPlayersMaid[player]).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

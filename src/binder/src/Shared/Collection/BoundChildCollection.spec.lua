@@ -92,12 +92,12 @@ local function setup()
 		newInstance = newInstance,
 		track = track,
 		boot = boot,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -126,7 +126,7 @@ describe("BoundChildCollection construction", function()
 		expect(#collection:GetClasses()).toEqual(2)
 		expect(collection:HasClass(controller.binder:Get(childA))).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -158,7 +158,7 @@ describe("BoundChildCollection dynamic updates", function()
 		expect(addedClass).toEqual(class)
 		expect(collection:GetSize()).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires ClassRemoved when a tracked child is reparented out", function()
@@ -187,7 +187,7 @@ describe("BoundChildCollection dynamic updates", function()
 		expect(removedClass).toEqual(class)
 		expect(collection:GetSize()).toEqual(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires ClassRemoved when a tracked child is unbound", function()
@@ -210,6 +210,6 @@ describe("BoundChildCollection dynamic updates", function()
 
 		expect(collection:GetSize()).toEqual(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

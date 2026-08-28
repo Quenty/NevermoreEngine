@@ -28,12 +28,12 @@ local function setup(): any
 			maid:GiveTask(adornee)
 			return adornee
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -64,7 +64,7 @@ describe("TiePropertyInterface.Value get", function()
 
 		expect(getScore(definition, adornee).Value).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads a value-object-backed value", function()
@@ -80,7 +80,7 @@ describe("TiePropertyInterface.Value get", function()
 
 		expect(getScore(definition, adornee).Value).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("prefers the attribute over a colliding child member", function()
@@ -103,7 +103,7 @@ describe("TiePropertyInterface.Value get", function()
 
 		expect(getScore(definition, adornee).Value).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors with a clean message when the member is unimplemented", function()
@@ -119,7 +119,7 @@ describe("TiePropertyInterface.Value get", function()
 		expect(ok).toBe(false)
 		expect((string.find(tostring(err), "is not implemented", 1, true))).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when there is no implementation container at all", function()
@@ -132,7 +132,7 @@ describe("TiePropertyInterface.Value get", function()
 			return getScore(definition, adornee).Value
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -151,7 +151,7 @@ describe("TiePropertyInterface.Value set", function()
 		expect(getScore(definition, adornee).Value).toBe(10)
 		expect(getContainer(definition, adornee):GetAttribute("Score")).toBe(10)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("writes through to the underlying value object", function()
@@ -170,7 +170,7 @@ describe("TiePropertyInterface.Value set", function()
 		expect(scoreValue.Value).toBe(10)
 		expect(getScore(definition, adornee).Value).toBe(10)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a value base child for a non-attribute value", function()
@@ -192,7 +192,7 @@ describe("TiePropertyInterface.Value set", function()
 		expect(container:GetAttribute("Score")).toBeNil()
 		expect(getScore(definition, adornee).Value).toBe(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("replaces a value base child with an attribute when set to an attribute value", function()
@@ -214,7 +214,7 @@ describe("TiePropertyInterface.Value set", function()
 		expect(container:GetAttribute("Score")).toBe(42)
 		expect(getScore(definition, adornee).Value).toBe(42)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when set to an unsupported value type", function()
@@ -230,7 +230,7 @@ describe("TiePropertyInterface.Value set", function()
 			getScore(definition, adornee).Value = function() end
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stores nil as an empty ObjectValue member", function()
@@ -250,7 +250,7 @@ describe("TiePropertyInterface.Value set", function()
 		expect(container:GetAttribute("Score")).toBeNil()
 		expect(getScore(definition, adornee).Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when setting a non-attribute value without an implementation container", function()
@@ -266,7 +266,7 @@ describe("TiePropertyInterface.Value set", function()
 			getScore(definition, adornee).Value = part
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when setting an attribute value without an implementation container", function()
@@ -279,7 +279,7 @@ describe("TiePropertyInterface.Value set", function()
 			getScore(definition, adornee).Value = 5
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -304,7 +304,7 @@ describe("TiePropertyInterface.Changed", function()
 
 		expect(seen).toEqual({ 10 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires when a value-object-backed value changes", function()
@@ -327,7 +327,7 @@ describe("TiePropertyInterface.Changed", function()
 
 		expect(seen).toEqual({ 7 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not fire for the initial value", function()
@@ -346,7 +346,7 @@ describe("TiePropertyInterface.Changed", function()
 
 		expect(#seen).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cannot be assigned", function()
@@ -362,7 +362,7 @@ describe("TiePropertyInterface.Changed", function()
 			getScore(definition, adornee).Changed = 5
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -387,7 +387,7 @@ describe("TiePropertyInterface.Observe", function()
 
 		expect(seen).toEqual({ 5 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits updates as the value changes", function()
@@ -407,7 +407,7 @@ describe("TiePropertyInterface.Observe", function()
 
 		expect(seen).toEqual({ 5, 10, 15 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("dedupes consecutive identical values", function()
@@ -427,7 +427,7 @@ describe("TiePropertyInterface.Observe", function()
 
 		expect(seen).toEqual({ 5, 10 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits nil when the implementation is removed", function()
@@ -446,7 +446,7 @@ describe("TiePropertyInterface.Observe", function()
 
 		expect(seen).toEqual({ 5, NIL })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -473,7 +473,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 5 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the current value-object-backed value", function()
@@ -492,7 +492,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 5 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("applies the predicate filter", function()
@@ -517,7 +517,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 15 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits nothing, instead of erroring, while the container exists but the property is unimplemented", function()
@@ -536,7 +536,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(#seen).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps the subscription alive when the implementation member is removed mid-observation", function()
@@ -568,7 +568,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 5 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops emitting when an attribute-backed value is cleared, without erroring", function()
@@ -589,7 +589,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 5 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("re-emits when the property is implemented again after removal", function()
@@ -610,7 +610,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 
 		expect(seen).toEqual({ 5, 9 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -628,7 +628,7 @@ describe("TiePropertyInterface indexing", function()
 			return (getScore(definition, adornee) :: any).NotAMember
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors when assigning an unknown member", function()
@@ -644,6 +644,6 @@ describe("TiePropertyInterface indexing", function()
 			(getScore(definition, adornee) :: any).NotAMember = 5
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

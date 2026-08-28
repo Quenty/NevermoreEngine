@@ -7,7 +7,7 @@
 
 	Tags are global and the test place is shared across a batch run, so every binder gets a distinct
 	tag from a single module-level counter -- shared across every spec file that requires this module,
-	so tags never collide between files -- and each controller cleans up after itself via `destroy()`.
+	so tags never collide between files -- and each controller cleans up after itself via `Destroy()`.
 
 	@class BinderTestUtils
 ]=]
@@ -76,11 +76,11 @@ end
 --[=[
 	Builds the controller the Binder specs share. Register binders with `addBinder`, boot them all at
 	once through a ServiceBag with `boot`, create adornees with `newInstance`, and tear everything down
-	with `destroy` (or just the service bag with `destroyServiceBag`).
+	with `Destroy` (or just the service bag with `destroyServiceBag`).
 
 	Fields: `container`.
 	Builders: `addBinder(constructor, ...)` -> Binder, `newInstance(parent?, className?)` -> Instance.
-	Lifecycle: `boot()`, `destroyServiceBag()`, `destroy()`.
+	Lifecycle: `boot()`, `destroyServiceBag()`, `Destroy()`.
 	Helpers: `uniqueTag()` -> string.
 
 	@return { ... }
@@ -162,12 +162,12 @@ function BinderTestUtils.setup()
 		boot = boot,
 		newInstance = newInstance,
 		destroyServiceBag = destroyServiceBag,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end

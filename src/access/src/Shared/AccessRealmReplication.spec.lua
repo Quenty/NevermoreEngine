@@ -96,12 +96,12 @@ local function setup()
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 			return feature
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -113,7 +113,7 @@ describe("feature composition across realms", function()
 		expect(controller.server).never.toBeNil()
 		expect(controller.client).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a server-only push to the client", function()
@@ -130,7 +130,7 @@ describe("feature composition across realms", function()
 			controller.factName,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes the push back when the server drops it", function()
@@ -148,7 +148,7 @@ describe("feature composition across realms", function()
 
 		expect(waitForFactNames(clientFeature, { "ownsGame" })).toEqual({ "ownsGame" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reaches a client feature registered after the server pushed", function()
@@ -164,7 +164,7 @@ describe("feature composition across realms", function()
 			controller.factName,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("changes what the client's verdict actually reads", function()
@@ -198,7 +198,7 @@ describe("feature composition across realms", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a fact the client pushed itself alone", function()
@@ -225,7 +225,7 @@ describe("feature composition across realms", function()
 
 		expect(clientFeature:GetFactNames()).toEqual({ "ownsGame", "sharedAllowlist" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -299,7 +299,7 @@ describe("per-player facts across realms", function()
 					return last
 				end
 			end,
-			destroy = function(_self)
+			Destroy = function(_self)
 				-- Client first: the server bag owns the mock, and destroying it out from under a live
 				-- client is not something production ever does.
 				clientBag:Destroy()
@@ -308,7 +308,7 @@ describe("per-player facts across realms", function()
 			end,
 		}
 
-		maid:GiveTask(JestUtils.afterThis(controller.destroy))
+		maid:GiveTask(JestUtils.afterThis(controller))
 
 		return controller
 	end
@@ -399,7 +399,7 @@ describe("the published composition and the service that wrote it", function()
 		local other = { someoneElse = { "theirFact" } }
 		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", HttpService:JSONEncode(other))
 
-		controller:destroy()
+		controller:Destroy()
 
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(HttpService:JSONEncode(other))
 		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", nil)
@@ -416,7 +416,7 @@ describe("the published composition and the service that wrote it", function()
 		end
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(nil)
 	end)
@@ -475,12 +475,12 @@ local function setupPolicies()
 
 			return policy
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -496,7 +496,7 @@ describe("policy enablement across realms", function()
 
 		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, false)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a policy switched on on the server to the client", function()
@@ -508,7 +508,7 @@ describe("policy enablement across realms", function()
 
 		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, true)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a policy the server never registered alone", function()
@@ -522,6 +522,6 @@ describe("policy enablement across realms", function()
 
 		expect(controller.client.accessPolicyService:IsPolicyEnabled(controller.policyName)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

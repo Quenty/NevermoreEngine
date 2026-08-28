@@ -21,7 +21,7 @@ type Controller = {
 	newLooseProvider: () -> ScoredActionPickerProvider.ScoredActionPickerProvider,
 	newAction: (number) -> ScoredAction.ScoredAction,
 	slot: (string) -> any,
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -46,12 +46,12 @@ local function setup(): Controller
 			return SlottedTouchButtonUtils.createSlottedTouchButton(slotId)
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -66,7 +66,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect(second).toBe(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a separate picker per input type", function()
@@ -78,7 +78,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect(gamepad).never.toBe(keyboard)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a competing picker for a key code", function()
@@ -89,7 +89,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect((picker :: any).ClassName).toBe("ScoredActionPicker")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a non-competing picker for a Roblox touch button", function()
@@ -100,7 +100,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect((picker :: any).ClassName).toBe("TouchButtonScoredActionPicker")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reuses the picker for slotted touch buttons sharing a slot", function()
@@ -112,7 +112,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect(second).toBe(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a separate picker per slot", function()
@@ -124,7 +124,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 
 		expect(second).never.toBe(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a nil input type", function()
@@ -135,7 +135,7 @@ describe("ScoredActionPickerProvider.GetOrCreatePicker", function()
 			(provider :: any):GetOrCreatePicker(nil)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -146,7 +146,7 @@ describe("ScoredActionPickerProvider.FindPicker", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("finds a created picker", function()
@@ -157,7 +157,7 @@ describe("ScoredActionPickerProvider.FindPicker", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBe(picker)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("finds a slotted touch button picker by an equivalent slot", function()
@@ -168,7 +168,7 @@ describe("ScoredActionPickerProvider.FindPicker", function()
 
 		expect(provider:FindPicker(controller.slot("inner1"))).toBe(picker)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -182,7 +182,7 @@ describe("ScoredActionPickerProvider.Update", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps a picker that still has actions", function()
@@ -195,7 +195,7 @@ describe("ScoredActionPickerProvider.Update", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBe(picker)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("updates the pickers it keeps", function()
@@ -211,7 +211,7 @@ describe("ScoredActionPickerProvider.Update", function()
 
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discards a picker once its last action is removed", function()
@@ -228,7 +228,7 @@ describe("ScoredActionPickerProvider.Update", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discards a touch button picker that has no actions", function()
@@ -240,7 +240,7 @@ describe("ScoredActionPickerProvider.Update", function()
 
 		expect(provider:FindPicker("TouchButton")).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does nothing when there are no pickers", function()
@@ -251,7 +251,7 @@ describe("ScoredActionPickerProvider.Update", function()
 			provider:Update()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -269,6 +269,6 @@ describe("ScoredActionPickerProvider.Destroy", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

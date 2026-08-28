@@ -47,12 +47,12 @@ local function setup(): any
 			serviceBag:Start()
 			return serviceBag, service
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -70,7 +70,7 @@ describe("PlayerMockService", function()
 		expect((player :: Instance):IsDescendantOf(game)).toBe(true)
 		expect(service:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discovers its mock from a client-realm service in another bag", function()
@@ -83,7 +83,7 @@ describe("PlayerMockService", function()
 
 		expect(clientService:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discovers a mock created before the service booted", function()
@@ -96,7 +96,7 @@ describe("PlayerMockService", function()
 
 		expect(service:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discovers a hand-built mock once parented", function()
@@ -111,7 +111,7 @@ describe("PlayerMockService", function()
 
 		expect(service:GetPlayerMocks()).toEqual({ player })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("observes mocks created before and after the observation started, across realms", function()
@@ -132,7 +132,7 @@ describe("PlayerMockService", function()
 
 		expect(seen).toEqual({ before, after })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops observing after unsubscribe", function()
@@ -151,7 +151,7 @@ describe("PlayerMockService", function()
 
 		expect(seen).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("drops a kicked mock from discovery", function()
@@ -164,7 +164,7 @@ describe("PlayerMockService", function()
 
 		expect(service:GetPlayerMocks()).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("destroys its created mocks on teardown", function()
@@ -180,7 +180,7 @@ describe("PlayerMockService", function()
 		expect((player :: Instance).Parent).toBeNil()
 		expect(clientService:GetPlayerMocks()).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fails when a mock outlived the service that consumed it", function()
@@ -198,7 +198,7 @@ describe("PlayerMockService", function()
 			uninitialized:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("leaked")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fails when a second server-realm service boots alongside a live one", function()
@@ -212,6 +212,6 @@ describe("PlayerMockService", function()
 			second:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("alive at once")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

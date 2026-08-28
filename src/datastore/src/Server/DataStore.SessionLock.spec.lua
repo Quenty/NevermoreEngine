@@ -41,7 +41,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local result = helper:AcquireLock(nil, false)
 		expect(result.isValid).toEqual(true)
 		expect(result.stolenLockFromSession).toEqual(nil)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("acquires a profile that has no lock, preserving its data", function()
@@ -51,7 +51,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		expect(result.isValid).toEqual(true)
 		expect(result.unlockedProfile.coins).toEqual(5)
 		expect(type(result.lockedProfile.lock)).toEqual("table")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("re-acquires a profile locked by our own session", function()
@@ -62,7 +62,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		expect(result.isValid).toEqual(true)
 		expect(result.stolenLockFromSession).toEqual(nil)
 		expect(result.lockedProfile.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is blocked by a fresh lock held by another session", function()
@@ -71,7 +71,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time()), false)
 		expect(result.isValid).toEqual(false)
 		expect(result.blockingSession.SessionId).toEqual("foreign-session-id")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("steals a foreign lock when canStealLock is true", function()
@@ -80,7 +80,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time()), true)
 		expect(result.isValid).toEqual(true)
 		expect(result.stolenLockFromSession.SessionId).toEqual("foreign-session-id")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("steals a stale foreign lock (crashed session) without stealing explicitly", function()
@@ -91,7 +91,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		expect(result.isValid).toEqual(true)
 		expect(result.stolenLockFromSession.SessionId).toEqual("foreign-session-id")
 		expect(result.unlockedProfile.coins).toEqual(9)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does NOT steal a foreign lock that is only slightly old", function()
@@ -99,7 +99,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), os.time() - 100, {}), false)
 		expect(result.isValid).toEqual(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is blocked by a foreign lock that has no LastUpdateTime (cannot judge staleness)", function()
@@ -107,7 +107,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock(lockedBy(foreignSession(), nil, {}), false)
 		expect(result.isValid).toEqual(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("acquires when the lock envelope has no ActiveSession", function()
@@ -115,7 +115,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock({ coins = 1, lock = { LastUpdateTime = os.time() } }, false)
 		expect(result.isValid).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("acquires when the lock field is malformed (not a table)", function()
@@ -123,7 +123,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local helper = controller.newLockHelper()
 		local result = helper:AcquireLock({ coins = 1, lock = "not a table" }, false)
 		expect(result.isValid).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("passes through non-table data (locking not applicable)", function()
@@ -132,7 +132,7 @@ describe("DataStoreLockHelper.AcquireLock", function()
 		local result = helper:AcquireLock("a raw string", false)
 		expect(result.isValid).toEqual(true)
 		expect(result.unlockedProfile).toEqual("a raw string")
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -143,7 +143,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		local result = helper:ToUnlockedProfile(nil)
 		expect(result.isValid).toEqual(true)
 		expect(result.unlockedProfile).toEqual({})
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("validates a profile locked by our own session and strips the lock", function()
@@ -154,7 +154,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		expect(result.isValid).toEqual(true)
 		expect(result.unlockedProfile.coins).toEqual(5)
 		expect(result.unlockedProfile.lock).toEqual(nil)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("invalidates a profile whose lock was stolen by another session", function()
@@ -163,7 +163,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		local result = helper:ToUnlockedProfile(lockedBy(foreignSession(), os.time(), { coins = 5 }))
 		expect(result.isValid).toEqual(false)
 		expect(result.thiefSession.SessionId).toEqual("foreign-session-id")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("validates a profile that has no lock", function()
@@ -171,7 +171,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		local helper = controller.newLockHelper()
 		local result = helper:ToUnlockedProfile({ coins = 5 })
 		expect(result.isValid).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("passes through non-table data", function()
@@ -180,7 +180,7 @@ describe("DataStoreLockHelper.ToUnlockedProfile (save-side thief detection)", fu
 		local result = helper:ToUnlockedProfile("raw")
 		expect(result.isValid).toEqual(true)
 		expect(result.unlockedProfile).toEqual("raw")
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -192,7 +192,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		expect(locked.coins).toEqual(5)
 		expect(locked.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
 		expect(type(locked.lock.LastUpdateTime)).toEqual("number")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the lock (doCloseSession) and preserves user data", function()
@@ -201,7 +201,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		local released = helper:ToLockedProfile({ coins = 5 }, true)
 		expect(released.coins).toEqual(5)
 		expect(released.lock).toEqual(nil)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not mutate the original profile", function()
@@ -210,7 +210,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		local original: { coins: number, lock: any? } = { coins = 5 }
 		helper:ToLockedProfile(original)
 		expect(original.lock).toEqual(nil)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("strips the lock via ToRawUnlockedProfile without mutating the original", function()
@@ -221,7 +221,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		expect(raw.lock).toEqual(nil)
 		expect(raw.coins).toEqual(5)
 		expect(type(original.lock)).toEqual("table")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("locks nil to an envelope, and closes nil to an empty profile", function()
@@ -229,7 +229,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		local helper = controller.newLockHelper()
 		expect(type(helper:ToLockedProfile(nil).lock)).toEqual("table")
 		expect(helper:ToLockedProfile(nil, true)).toEqual({})
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("round-trips user data through lock then unlock with no corruption", function()
@@ -238,7 +238,7 @@ describe("DataStoreLockHelper.ToLockedProfile / ToRawUnlockedProfile", function(
 		local data = { coins = 5, nested = { a = 1, b = { 2, 3 } } }
 		local roundTripped = helper:ToRawUnlockedProfile(helper:ToLockedProfile(data))
 		expect(roundTripped).toEqual(data)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -247,7 +247,7 @@ describe("DataStoreLockHelper.PromiseCloseSession", function()
 		local controller = DataStoreTestUtils.setup()
 		local helper = controller.newLockHelper()
 		expect(helper:PromiseCloseSession():IsPending()).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves once ToLockedProfile closes the session", function()
@@ -257,7 +257,7 @@ describe("DataStoreLockHelper.PromiseCloseSession", function()
 		helper:ToLockedProfile({ coins = 5 }, true)
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		expect((promise:Yield())).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -274,7 +274,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local promise = dataStore:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(promise, 3)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("acquires the lock once the holding session releases it (retry resolves genuine contention)", function()
@@ -286,7 +286,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local loadA = sessionA:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadA, 10) then
 			expect("A load hung").toEqual("A load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadA:Yield())).toEqual(true)
@@ -301,18 +301,18 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local closeA = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closeA, 10) then
 			expect("A close hung").toEqual("A close settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		if not PromiseTestUtils.awaitSettled(loadB, 20) then
 			expect("B never acquired the released lock").toEqual("B acquired the released lock")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadB:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("prevents data duplication: a stolen session's save is cancelled and the owner's data wins", function()
@@ -325,7 +325,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local loadA = sessionA:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadA, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadA:Yield())).toEqual(true)
@@ -336,7 +336,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local saveA = sessionA:Save()
 		if not PromiseTestUtils.awaitSettled(saveA, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -344,7 +344,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		expect(raw.coins).toEqual(20)
 		expect(raw.lock.ActiveSession.SessionId).toEqual("winner-session")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -360,14 +360,14 @@ describe("session lock edge cases and failure modes", function()
 		local second = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(first, 10) or not PromiseTestUtils.awaitSettled(second, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((first:Yield())).toEqual(true)
 
 		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps stored data consistent under two concurrent saves", function()
@@ -380,7 +380,7 @@ describe("session lock edge cases and failure modes", function()
 		local load = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(load, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -391,7 +391,7 @@ describe("session lock edge cases and failure modes", function()
 
 		if not PromiseTestUtils.awaitSettled(saveOne, 10) or not PromiseTestUtils.awaitSettled(saveTwo, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -400,7 +400,7 @@ describe("session lock edge cases and failure modes", function()
 		expect(raw.coins).toEqual(2)
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -416,7 +416,7 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		local bLoad = serverB:Load("items")
 		if not PromiseTestUtils.awaitSettled(aLoad, 5) or not PromiseTestUtils.awaitSettled(bLoad, 5) then
 			expect("load hung").toEqual("load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((aLoad:Wait())).toEqual({ "rare_sword" })
@@ -425,7 +425,7 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		serverA:Store("items", {})
 		if not PromiseTestUtils.awaitSettled(serverA:Save(), 5) then
 			expect("A save hung").toEqual("A save settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect(controller.mock:GetRaw("player_1").items).toEqual({})
@@ -433,12 +433,12 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 		serverB:Store("items", { "rare_sword" })
 		if not PromiseTestUtils.awaitSettled(serverB:Save(), 5) then
 			expect("B save hung").toEqual("B save settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(controller.mock:GetRaw("player_1").items).toEqual({ "rare_sword" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

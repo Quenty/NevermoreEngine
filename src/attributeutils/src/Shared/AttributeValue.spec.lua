@@ -31,7 +31,7 @@ local function setup(): any
 
 			return values
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -40,7 +40,7 @@ end
 describe("AttributeValue.new()", function()
 	it("writes the default value to the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.newAttributeValue("Version", "1.0.0")
 
@@ -49,7 +49,7 @@ describe("AttributeValue.new()", function()
 
 	it("leaves an attribute that is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "2.0.0")
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
@@ -60,7 +60,7 @@ describe("AttributeValue.new()", function()
 
 	it("writes nothing when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", nil)
 
@@ -76,7 +76,7 @@ describe("AttributeValue.new()", function()
 
 	it("rejects an attribute name that is not a string", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(function()
 			AttributeValue.new(controller.folder, nil :: any, "1.0.0")
@@ -87,7 +87,7 @@ end)
 describe("AttributeValue.Value", function()
 	it("reads the attribute back", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		controller.folder:SetAttribute("Version", "2.0.0")
@@ -97,7 +97,7 @@ describe("AttributeValue.Value", function()
 
 	it("writes the attribute", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		attributeValue.Value = "2.0.0"
@@ -108,7 +108,7 @@ describe("AttributeValue.Value", function()
 
 	it("falls back to the default once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		attributeValue.Value = nil
@@ -121,14 +121,14 @@ end)
 describe("AttributeValue.AttributeName", function()
 	it("reports the attribute it is bound to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(controller.newAttributeValue("Version", "1.0.0").AttributeName).toBe("Version")
 	end)
 
 	it("cannot be assigned to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 
@@ -141,7 +141,7 @@ end)
 describe("AttributeValue.Changed", function()
 	it("fires when the attribute changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 
@@ -160,7 +160,7 @@ end)
 describe("AttributeValue members", function()
 	it("throws when reading a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue: any = controller.newAttributeValue("Version", "1.0.0")
 
@@ -171,7 +171,7 @@ describe("AttributeValue members", function()
 
 	it("throws when writing a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue: any = controller.newAttributeValue("Version", "1.0.0")
 
@@ -184,7 +184,7 @@ end)
 describe("AttributeValue:Observe()", function()
 	it("fires the current value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		local values = controller.observeInto(attributeValue:Observe())
@@ -197,7 +197,7 @@ describe("AttributeValue:Observe()", function()
 
 	it("fires the default value once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		local values = controller.observeInto(attributeValue:Observe())
@@ -210,7 +210,7 @@ describe("AttributeValue:Observe()", function()
 
 	it("fires nil when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", nil)
 
@@ -229,7 +229,7 @@ end)
 describe("AttributeValue:ObserveBrio()", function()
 	it("emits a brio for the current value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		local brios = controller.observeInto(attributeValue:ObserveBrio())
@@ -240,7 +240,7 @@ describe("AttributeValue:ObserveBrio()", function()
 
 	it("kills the last brio when the value changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		local brios = controller.observeInto(attributeValue:ObserveBrio())
@@ -255,7 +255,7 @@ describe("AttributeValue:ObserveBrio()", function()
 
 	it("skips values the condition rejects", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Count", 1)
 		local brios = controller.observeInto(attributeValue:ObserveBrio(function(value)

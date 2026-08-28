@@ -14,8 +14,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
-local JestUtils = require("JestUtils")
-local Maid = require("Maid")
 local PlayerCharacterBinder = require("PlayerCharacterBinder")
 local PlayerHumanoidBinderTestUtils = require("PlayerHumanoidBinderTestUtils")
 
@@ -27,17 +25,7 @@ local makeTrackingClass = PlayerHumanoidBinderTestUtils.makeTrackingClass
 local awaitUnbound = PlayerHumanoidBinderTestUtils.awaitUnbound
 
 local function setup(constructor: any?)
-	local maid = Maid.new()
-	local controller = PlayerHumanoidBinderTestUtils.setup(PlayerCharacterBinder, "PlayerCharacterBinder", constructor)
-
-	maid:GiveTask(controller.destroy)
-	controller.destroy = function()
-		maid:DoCleaning()
-	end
-
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
-
-	return controller
+	return PlayerHumanoidBinderTestUtils.setup(PlayerCharacterBinder, "PlayerCharacterBinder", constructor)
 end
 
 describe("PlayerCharacterBinder.new()", function()
@@ -65,7 +53,7 @@ describe("PlayerCharacterBinder automatic tagging API", function()
 		expect(emissions[2]).toEqual(false)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-boolean", function()
@@ -76,7 +64,7 @@ describe("PlayerCharacterBinder automatic tagging API", function()
 			controller.binder:SetAutomaticTagging(nil :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ObserveAutomaticTaggingBrio kills the brio when the value changes", function()
@@ -98,7 +86,7 @@ describe("PlayerCharacterBinder automatic tagging API", function()
 		expect(brios[2]:GetValue()).toEqual(false)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -118,7 +106,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		expect(class.instance).toEqual(character)
 		expect(controller.binder:HasTag(character)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a character spawned after start", function()
@@ -133,7 +121,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(character)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not bind a bare Character write", function()
@@ -149,7 +137,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		task.wait(0.1)
 		expect(controller.binder:Get(character)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("spawning a replacement despawns and unbinds the old character", function()
@@ -173,7 +161,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		expect(firstClass.destroyed).toEqual(true)
 		expect(controller.binder:Get(second)).toEqual(class)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("unbinds and destroys the class when the character is destroyed", function()
@@ -193,7 +181,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("despawns and unbinds the character when the mock is destroyed", function()
@@ -215,7 +203,7 @@ describe("PlayerCharacterBinder character discovery", function()
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -237,7 +225,7 @@ describe("PlayerCharacterBinder:SetAutomaticTagging(false)", function()
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops discovering while disabled and rediscovers on re-enable", function()
@@ -258,7 +246,7 @@ describe("PlayerCharacterBinder:SetAutomaticTagging(false)", function()
 		local ok = controller.binder:Promise(character):Yield()
 		expect(ok).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -274,7 +262,7 @@ describe("PlayerCharacterBinder teardown", function()
 		local ok, class = controller.binder:Promise(character):Yield()
 		assert(ok, "Never bound")
 
-		controller.destroy()
+		controller:Destroy()
 
 		expect(class.destroyed).toEqual(true)
 	end)

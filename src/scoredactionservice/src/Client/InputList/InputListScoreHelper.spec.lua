@@ -75,12 +75,12 @@ local function setup(): any
 			return picker:HasActions()
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -103,7 +103,7 @@ describe("InputListScoreHelper.new", function()
 		expect(provider:FindPicker(Enum.KeyCode.ButtonX)).toBeNil()
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("registers every key in the active input mode", function()
@@ -120,7 +120,7 @@ describe("InputListScoreHelper.new", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.E)).toBe(true)
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.Q)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("registers nothing for an empty key list", function()
@@ -136,7 +136,7 @@ describe("InputListScoreHelper.new", function()
 
 		expect(provider:FindPicker(Enum.KeyCode.E)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws without a serviceBag", function()
@@ -147,7 +147,7 @@ describe("InputListScoreHelper.new", function()
 			(InputListScoreHelper :: any).new(nil, controller.newProvider(), controller.newAction(), list)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws without a provider", function()
@@ -158,7 +158,7 @@ describe("InputListScoreHelper.new", function()
 			(InputListScoreHelper :: any).new(controller.serviceBag, nil, controller.newAction(), list)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws without a scoredAction", function()
@@ -169,7 +169,7 @@ describe("InputListScoreHelper.new", function()
 			(InputListScoreHelper :: any).new(controller.serviceBag, controller.newProvider(), nil, list)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on something that is not an inputKeyMapList", function()
@@ -184,7 +184,7 @@ describe("InputListScoreHelper.new", function()
 			)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -206,7 +206,7 @@ describe("InputListScoreHelper input mode changes", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.E)).toBe(false)
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.ButtonX)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps a key that both input modes share", function()
@@ -226,7 +226,7 @@ describe("InputListScoreHelper input mode changes", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.E)).toBe(true)
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows a rebind of the active input mode", function()
@@ -244,7 +244,7 @@ describe("InputListScoreHelper input mode changes", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.E)).toBe(false)
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.Q)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("unregisters the action when the list loses its only input mode", function()
@@ -263,7 +263,7 @@ describe("InputListScoreHelper input mode changes", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.E)).toBe(false)
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -285,7 +285,7 @@ describe("InputListScoreHelper.Destroy", function()
 		expect(controller.pickerHasActions(provider, Enum.KeyCode.Q)).toBe(false)
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates a provider destroyed first", function()
@@ -304,6 +304,6 @@ describe("InputListScoreHelper.Destroy", function()
 			helper:Destroy()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

@@ -28,7 +28,7 @@ type Controller = {
 	newBoundingBox: (adornee: Instance?) -> AdorneeBoundingBox.AdorneeBoundingBox,
 	collect: (observable: any) -> Record,
 	step: (count: number?) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -103,12 +103,12 @@ local function setup(): Controller
 			end
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -122,7 +122,7 @@ describe("AdorneeBoundingBox.new", function()
 		expect(boundingBox:GetCFrame()).toBeNil()
 		expect(boundingBox:GetBoundingBox()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not emit a bounding box with no adornee", function()
@@ -135,7 +135,7 @@ describe("AdorneeBoundingBox.new", function()
 
 		expect(record.count).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -148,7 +148,7 @@ describe("AdorneeBoundingBox with a part adornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(4, 1, 2))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the cframe immediately", function()
@@ -159,7 +159,7 @@ describe("AdorneeBoundingBox with a part adornee", function()
 
 		expect(boundingBox:GetCFrame()).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns both halves from GetBoundingBox", function()
@@ -174,7 +174,7 @@ describe("AdorneeBoundingBox with a part adornee", function()
 		expect((data :: any).Size).toEqual(Vector3.new(4, 1, 2))
 		expect((data :: any).CFrame).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a bounding box", function()
@@ -188,7 +188,7 @@ describe("AdorneeBoundingBox with a part adornee", function()
 		expect(record.values[1].Size).toEqual(Vector3.new(4, 1, 2))
 		expect(record.values[1].CFrame).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tracks changes to the part", function()
@@ -204,7 +204,7 @@ describe("AdorneeBoundingBox with a part adornee", function()
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(9, 9, 9))
 		expect(boundingBox:GetCFrame()).toEqual(CFrame.new(0, 100, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -218,7 +218,7 @@ describe("AdorneeBoundingBox with a model adornee", function()
 			controller.newBoundingBox(model)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("matches the engine bounding box after a step", function()
@@ -234,7 +234,7 @@ describe("AdorneeBoundingBox with a model adornee", function()
 		expect(boundingBox:GetSize()).toEqual(expectedSize)
 		expect(boundingBox:GetCFrame()).toEqual(expectedCFrame)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a bounding box once measured", function()
@@ -252,7 +252,7 @@ describe("AdorneeBoundingBox with a model adornee", function()
 		expect(record.values[record.count].Size).toEqual(expectedSize)
 		expect(record.values[record.count].CFrame).toEqual(expectedCFrame)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -266,7 +266,7 @@ describe("AdorneeBoundingBox with a humanoid adornee", function()
 			controller.newBoundingBox(humanoid)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("uses the bounding box of the parent model", function()
@@ -281,7 +281,7 @@ describe("AdorneeBoundingBox with a humanoid adornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(expectedSize)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -296,7 +296,7 @@ describe("AdorneeBoundingBox with a tool adornee", function()
 
 		expect(boundingBox:GetCFrame()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("uses the handle once it exists", function()
@@ -313,7 +313,7 @@ describe("AdorneeBoundingBox with a tool adornee", function()
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(1, 2, 3))
 		expect(boundingBox:GetCFrame()).toEqual(CFrame.new(5, 0, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -329,7 +329,7 @@ describe("AdorneeBoundingBox with an attachment adornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.zero)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the world cframe of the attachment", function()
@@ -346,7 +346,7 @@ describe("AdorneeBoundingBox with an attachment adornee", function()
 		expect(cframe).never.toBeNil()
 		expect((cframe :: CFrame).Position).toEqual(Vector3.new(10, 5, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -362,7 +362,7 @@ describe("AdorneeBoundingBox with an unsupported adornee", function()
 		expect(boundingBox:GetCFrame()).toBeNil()
 
 		folder:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("never emits a bounding box", function()
@@ -377,7 +377,7 @@ describe("AdorneeBoundingBox with an unsupported adornee", function()
 		expect(record.count).toBe(0)
 
 		folder:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -391,7 +391,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 			boundingBox:SetAdornee("not an instance" :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("accepts nil", function()
@@ -403,7 +403,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 			boundingBox:SetAdornee(nil)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("starts tracking the new adornee", function()
@@ -416,7 +416,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(7, 7, 7))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("swaps between adornees", function()
@@ -430,7 +430,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(8, 8, 8))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a cleanup that stops tracking", function()
@@ -447,7 +447,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 
 		expect(boundingBox:GetSize()).never.toEqual(Vector3.new(20, 20, 20))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a cleanup that leaves a newer adornee alone", function()
@@ -463,7 +463,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(8, 8, 8))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -482,7 +482,7 @@ describe("AdorneeBoundingBox:Destroy", function()
 
 		expect(record.count).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not throw while tracking a model", function()
@@ -497,6 +497,6 @@ describe("AdorneeBoundingBox:Destroy", function()
 			boundingBox:Destroy()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

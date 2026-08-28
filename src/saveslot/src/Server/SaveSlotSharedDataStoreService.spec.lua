@@ -30,17 +30,17 @@ local function setup()
 	service:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	local function destroy()
+	local function Destroy(_self)
 		maid:DoCleaning()
 	end
 
 	local controller = {
 		service = service,
 		mock = mock,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -48,7 +48,7 @@ end
 local function runWithContext(body)
 	local context = setup()
 	local ok, err = pcall(body, context)
-	context.destroy()
+	context:Destroy()
 	if not ok then
 		error(err, 0)
 	end

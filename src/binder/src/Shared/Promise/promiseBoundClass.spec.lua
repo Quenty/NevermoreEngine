@@ -79,12 +79,12 @@ local function setup()
 		binder = binder,
 		newInstance = newInstance,
 		boot = boot,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -101,7 +101,7 @@ describe("promiseBoundClass()", function()
 		assert(ok, "Never bound")
 		expect(class).toEqual(controller.binder:Get(inst))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves once an instance is bound after start", function()
@@ -114,7 +114,7 @@ describe("promiseBoundClass()", function()
 		local ok = promiseBoundClass(controller.binder, inst):Yield()
 		expect(ok).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when the binder is not a binder", function()
@@ -125,7 +125,7 @@ describe("promiseBoundClass()", function()
 			promiseBoundClass({} :: any, controller.newInstance())
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when the instance is not an Instance", function()
@@ -136,6 +136,6 @@ describe("promiseBoundClass()", function()
 			promiseBoundClass(controller.binder, 5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

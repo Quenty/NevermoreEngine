@@ -50,7 +50,7 @@ local function setup()
 		:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY)
 		:GetSubStore("slot-abc")
 
-	local function destroy()
+	local function Destroy(_self)
 		-- Lift the limit before teardown so the session lock's final unlock-save can flush and release
 		-- cleanly, rather than throwing during cleanup and leaking a retry into a later spec (these all
 		-- share one test place).
@@ -77,10 +77,10 @@ local function setup()
 			slotStore:Store("blob", string.rep("A", OVERSIZED_LENGTH))
 			return (PromiseTestUtils.awaitOutcome(dataStore:Save(), 10))
 		end,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -92,7 +92,7 @@ describe("save slot overflow save", function()
 		expect(controller.saveSlotValue("coins", 25)).toEqual("resolved")
 		expect(controller.saveOversizedSlot()).toEqual("rejected")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("preserves the already-saved slot data when an oversized save fails", function()
@@ -107,6 +107,6 @@ describe("save slot overflow save", function()
 		expect(loadStatus).toEqual("resolved")
 		expect(coins).toEqual(25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

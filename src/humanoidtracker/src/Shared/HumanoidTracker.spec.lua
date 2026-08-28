@@ -24,12 +24,12 @@ local function setup(): any
 		newLooseTracker = function(player: Player): any
 			return HumanoidTracker.new(player)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -58,7 +58,7 @@ describe("HumanoidTracker.new", function()
 		expect(tracker.Humanoid.Value).toBeNil()
 		expect(tracker.AliveHumanoid.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("picks up a humanoid that spawned before the tracker existed", function()
@@ -72,7 +72,7 @@ describe("HumanoidTracker.new", function()
 		expect(tracker.Humanoid.Value).toBe(humanoid)
 		expect(tracker.AliveHumanoid.Value).toBe(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -97,7 +97,7 @@ describe("HumanoidTracker spawn lifecycle", function()
 		expect(tracker.Humanoid.Value).toBeNil()
 		expect(tracker.AliveHumanoid.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("waits for a humanoid when the character spawns without one", function()
@@ -113,7 +113,7 @@ describe("HumanoidTracker spawn lifecycle", function()
 		humanoid.Parent = character
 		expect(tracker.Humanoid.Value).toBe(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	-- Cloud runs never step the humanoid state machine (Died does not fire even at Health=0), so
@@ -131,7 +131,7 @@ describe("HumanoidTracker spawn lifecycle", function()
 		expect(tracker.Humanoid.Value).toBe(humanoid)
 		expect(tracker.AliveHumanoid.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the alive humanoid when a respawn brings a dead one", function()
@@ -147,7 +147,7 @@ describe("HumanoidTracker spawn lifecycle", function()
 		PlayerMock.loadCharacterAsync(player, rig)
 		expect(tracker.AliveHumanoid.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -166,7 +166,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 		expect(isFulfilled).toBe(true)
 		expect(humanoid).toBe(character:FindFirstChildOfClass("Humanoid"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves when the next humanoid appears", function()
@@ -184,7 +184,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 		expect(isFulfilled).toBe(true)
 		expect(humanoid).toBe(character:FindFirstChildOfClass("Humanoid"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reuses the pending promise across calls", function()
@@ -195,7 +195,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 
 		expect(tracker:PromiseNextHumanoid()).toBe(tracker:PromiseNextHumanoid())
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects the pending promise when the tracker is destroyed", function()
@@ -209,7 +209,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 
 		expect(promise:IsRejected()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -225,6 +225,6 @@ describe("HumanoidTracker.Destroy", function()
 			PlayerMock.loadMinimalCharacterAsync(player)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

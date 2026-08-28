@@ -58,12 +58,12 @@ local function setup(): any
 				return #values >= count
 			end)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -78,7 +78,7 @@ describe("RxPlayerUtils.observePlayers", function()
 		expect(controller.awaitCount(players, 1)).toBe(true)
 		expect(contains(players, player)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a mock that joins after subscribing", function()
@@ -90,7 +90,7 @@ describe("RxPlayerUtils.observePlayers", function()
 		expect(controller.awaitCount(players, 1)).toBe(true)
 		expect(contains(players, player)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("skips mocks the predicate rejects", function()
@@ -104,7 +104,7 @@ describe("RxPlayerUtils.observePlayers", function()
 		expect(contains(players, accepted)).toBe(true)
 		expect(contains(players, rejected)).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -118,7 +118,7 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, player)).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a living brio for a mock that joins after subscribing", function()
@@ -130,7 +130,7 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, player)).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the brio when the mock is destroyed", function()
@@ -147,7 +147,7 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 			return brio:IsDead()
 		end)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the brio when the mock is kicked", function()
@@ -165,7 +165,7 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 			return brio:IsDead()
 		end)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("skips mocks the predicate rejects", function()
@@ -178,7 +178,7 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, rejected)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -193,7 +193,7 @@ describe("RxPlayerUtils.observeCharactersBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, character)).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the brio when the character despawns", function()
@@ -211,7 +211,7 @@ describe("RxPlayerUtils.observeCharactersBrio", function()
 			return brio:IsDead()
 		end)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -226,7 +226,7 @@ describe("RxPlayerUtils.observeHumanoidsBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, character:FindFirstChildOfClass("Humanoid"))).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -239,7 +239,7 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 
 		expect(#brios).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a living brio for a mock designated before subscribing", function()
@@ -252,7 +252,7 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(brios[1]:GetValue()).toBe(player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a living brio for a mock designated after subscribing", function()
@@ -265,7 +265,7 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(brios[1]:GetValue()).toBe(player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the brio when the designation is cleared", function()
@@ -282,7 +282,7 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 			return brios[1]:IsDead()
 		end)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -298,7 +298,7 @@ describe("RxPlayerUtils.observeLocalPlayerHumanoidBrio", function()
 		expect(controller.awaitCount(brios, 1)).toBe(true)
 		expect(findLivingBrio(brios, character:FindFirstChildOfClass("Humanoid"))).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -311,7 +311,7 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 
 		expect(#fires).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires once the mock spawns", function()
@@ -338,7 +338,7 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 		end)).toBe(true)
 
 		maid:DoCleaning()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires immediately when the mock has already spawned", function()
@@ -364,7 +364,7 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 		expect(completed).toBe(true)
 
 		maid:DoCleaning()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fails when the mock leaves before spawning", function()
@@ -384,6 +384,6 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 		end)).toBe(true)
 
 		maid:DoCleaning()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

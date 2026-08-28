@@ -20,7 +20,7 @@ type Controller = {
 	newLoosePicker: () -> TouchButtonScoredActionPicker.TouchButtonScoredActionPicker,
 	newAction: (number) -> ScoredAction.ScoredAction,
 	newLooseAction: (number) -> ScoredAction.ScoredAction,
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -47,12 +47,12 @@ local function setup(): Controller
 
 		newLooseAction = makeAction,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -72,7 +72,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 		expect(first:IsPreferred()).toBe(true)
 		expect(second:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("never prefers an action scored at -math.huge", function()
@@ -85,7 +85,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not prefer an action that is already disabled", function()
@@ -98,7 +98,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("drops the preference when the action is disabled", function()
@@ -114,7 +114,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("gives the preference back when the action is re-enabled", function()
@@ -132,7 +132,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 		picker:Update()
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves the other actions alone when one is disabled", function()
@@ -150,7 +150,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 		expect(disabled:IsPreferred()).toBe(false)
 		expect(enabled:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("drops the preference when the action is removed", function()
@@ -166,7 +166,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 		expect(action:IsPreferred()).toBe(false)
 		expect(picker:HasActions()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("prefers an action that gained a score", function()
@@ -181,7 +181,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("holds a single preference across repeated updates", function()
@@ -197,7 +197,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates an action destroyed without being removed", function()
@@ -212,7 +212,7 @@ describe("TouchButtonScoredActionPicker.Update", function()
 			picker:Update()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -229,7 +229,7 @@ describe("TouchButtonScoredActionPicker.AddAction", function()
 		expect(action:IsPreferred()).toBe(false)
 		expect(picker:HasActions()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -248,7 +248,7 @@ describe("TouchButtonScoredActionPicker.RemoveAction", function()
 		expect(removed:IsPreferred()).toBe(false)
 		expect(remaining:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -259,7 +259,7 @@ describe("TouchButtonScoredActionPicker.HasActions", function()
 
 		expect(picker:HasActions()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -276,6 +276,6 @@ describe("TouchButtonScoredActionPicker.Destroy", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

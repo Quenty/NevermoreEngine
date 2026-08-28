@@ -28,7 +28,7 @@ type Controller = {
 	cameraEffect: CustomCameraEffect.CustomCameraEffect,
 	tweener: CameraStateTweener.CameraStateTweener,
 	advance: (seconds: number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function makeEffect(): CustomCameraEffect.CustomCameraEffect
@@ -69,12 +69,12 @@ local function setup(options: { speed: number? }?): Controller
 			task.wait()
 			task.wait()
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -87,7 +87,7 @@ describe("CameraStateTweener.new", function()
 		expect(controller.tweener:GetCameraEffect()).toBe(controller.cameraEffect)
 		expect(controller.tweener:GetCameraBelow()).never.toBe(controller.cameraEffect)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("starts fully hidden", function()
@@ -97,7 +97,7 @@ describe("CameraStateTweener.new", function()
 		expect(controller.tweener:IsFinishedHiding()).toBe(true)
 		expect(controller.tweener:IsFinishedShowing()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("defaults to a speed of 20", function()
@@ -105,7 +105,7 @@ describe("CameraStateTweener.new", function()
 
 		expect((controller.tweener:GetFader() :: any).Speed).toBe(20)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("honors an explicit speed", function()
@@ -113,7 +113,7 @@ describe("CameraStateTweener.new", function()
 
 		expect((controller.tweener:GetFader() :: any).Speed).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("accepts a service bag holding a CameraStackService", function()
@@ -164,7 +164,7 @@ describe("CameraStateTweener:Show", function()
 		expect(controller.tweener:IsFinishedShowing()).toBe(false)
 		expect(controller.tweener:IsFinishedHiding()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("arrives once enough time passes", function()
@@ -177,7 +177,7 @@ describe("CameraStateTweener:Show", function()
 		expect(controller.tweener:IsFinishedShowing()).toBe(true)
 		expect(controller.tweener:IsFinishedHiding()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps when told not to animate", function()
@@ -188,7 +188,7 @@ describe("CameraStateTweener:Show", function()
 		expect(controller.tweener:GetPercentVisible()).toBe(1)
 		expect(controller.tweener:IsFinishedShowing()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps an already-running show when told not to animate", function()
@@ -202,7 +202,7 @@ describe("CameraStateTweener:Show", function()
 		expect(controller.tweener:GetPercentVisible()).toBe(1)
 		expect(controller.tweener:IsFinishedShowing()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -217,7 +217,7 @@ describe("CameraStateTweener:Hide", function()
 		expect(controller.tweener:GetPercentVisible()).toBe(1)
 		expect(controller.tweener:IsFinishedHiding()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("arrives once enough time passes", function()
@@ -230,7 +230,7 @@ describe("CameraStateTweener:Hide", function()
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 		expect(controller.tweener:IsFinishedHiding()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps when told not to animate", function()
@@ -242,7 +242,7 @@ describe("CameraStateTweener:Hide", function()
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 		expect(controller.tweener:IsFinishedHiding()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -254,7 +254,7 @@ describe("CameraStateTweener:SetVisible", function()
 
 		expect(controller.tweener:GetPercentVisible()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("hides when not visible", function()
@@ -265,7 +265,7 @@ describe("CameraStateTweener:SetVisible", function()
 
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -278,7 +278,7 @@ describe("CameraStateTweener:SetTarget", function()
 
 		expect(controller.tweener:GetPercentVisible()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps to a partial value when told not to animate", function()
@@ -288,7 +288,7 @@ describe("CameraStateTweener:SetTarget", function()
 
 		expect(controller.tweener:GetPercentVisible()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns itself so calls can chain", function()
@@ -296,7 +296,7 @@ describe("CameraStateTweener:SetTarget", function()
 
 		expect(controller.tweener:SetTarget(1)).toBe(controller.tweener)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("hides on a target of zero without discarding the shown target", function()
@@ -312,7 +312,7 @@ describe("CameraStateTweener:SetTarget", function()
 
 		expect(controller.tweener:GetPercentVisible()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a target that is not a number", function()
@@ -322,7 +322,7 @@ describe("CameraStateTweener:SetTarget", function()
 			controller.tweener:SetTarget(nil :: any)
 		end).toThrow("Bad target")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -336,7 +336,7 @@ describe("CameraStateTweener:SetShownTarget", function()
 		expect(controller.tweener:GetShownTarget()).toBe(0.25)
 		expect(controller.tweener:GetPercentVisible()).toBe(0.25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("retargets and runs the show transition again when changed while shown", function()
@@ -359,7 +359,7 @@ describe("CameraStateTweener:SetShownTarget", function()
 		expect(showingComplete).toBe(2)
 		expect(controller.tweener:GetPercentVisible()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not start a transition when changed while hidden", function()
@@ -370,7 +370,7 @@ describe("CameraStateTweener:SetShownTarget", function()
 		expect((controller.tweener:GetFader() :: any).Target).toBe(0)
 		expect(controller.tweener:IsHidingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -380,7 +380,7 @@ describe("CameraStateTweener as a transition model", function()
 
 		expect(TransitionModel.isTransitionModel(controller.tweener)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the show until the fade arrives", function()
@@ -394,7 +394,7 @@ describe("CameraStateTweener as a transition model", function()
 		expect(promise:IsFulfilled()).toBe(true)
 		expect(controller.tweener:GetPercentVisible()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the show promise without waiting when told not to animate", function()
@@ -402,7 +402,7 @@ describe("CameraStateTweener as a transition model", function()
 
 		expect(controller.tweener:PromiseShow(true):IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the hide until the fade arrives", function()
@@ -418,7 +418,7 @@ describe("CameraStateTweener as a transition model", function()
 		expect(promise:IsFulfilled()).toBe(true)
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires ShowingComplete only once the fade arrives", function()
@@ -435,7 +435,7 @@ describe("CameraStateTweener as a transition model", function()
 
 		expect(showingComplete).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("toggles visibility", function()
@@ -449,7 +449,7 @@ describe("CameraStateTweener as a transition model", function()
 		expect(controller.tweener:IsVisible()).toBe(false)
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -466,7 +466,7 @@ describe("CameraStateTweener:Finish", function()
 		expect(calls).toBe(1)
 		expect(controller.tweener:GetPercentVisible()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("waits for the hide to complete before invoking the callback", function()
@@ -481,7 +481,7 @@ describe("CameraStateTweener:Finish", function()
 		expect(calls).toBe(0)
 		expect((controller.tweener:GetFader() :: any).Target).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a callback that is not a function", function()
@@ -491,7 +491,7 @@ describe("CameraStateTweener:Finish", function()
 			controller.tweener:Finish(true, nil :: any)
 		end).toThrow("Bad callback")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -502,7 +502,7 @@ describe("CameraStateTweener:SetSpeed", function()
 		expect(controller.tweener:SetSpeed(40)).toBe(controller.tweener)
 		expect((controller.tweener:GetFader() :: any).Speed).toBe(40)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a speed that is not a number", function()
@@ -512,7 +512,7 @@ describe("CameraStateTweener:SetSpeed", function()
 			controller.tweener:SetSpeed("fast" :: any)
 		end).toThrow("Bad speed")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -524,7 +524,7 @@ describe("CameraStateTweener:SetEpsilon", function()
 
 		expect((controller.tweener:GetFader() :: any).Epsilon).toBe(0.1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("counts the tween as arrived sooner than the default epsilon would", function()
@@ -541,8 +541,8 @@ describe("CameraStateTweener:SetEpsilon", function()
 		expect(loose.tweener:IsFinishedShowing()).toBe(true)
 		expect(strict.tweener:IsFinishedShowing()).toBe(false)
 
-		strict.destroy()
-		loose.destroy()
+		strict:Destroy()
+		loose:Destroy()
 	end)
 end)
 
@@ -557,6 +557,6 @@ describe("CameraStateTweener:Destroy", function()
 
 		expect(controller.cameraStack:GetIndex(fader)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

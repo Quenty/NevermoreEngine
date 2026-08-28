@@ -40,12 +40,12 @@ local function setup()
 		serviceBag = serviceBag,
 		resetService = resetService,
 		mock = mock,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -64,7 +64,7 @@ describe("ResetService.PromiseResetCharacter", function()
 		expect(character).never.toBeNil()
 		expect(character:FindFirstChildOfClass("Humanoid")).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a player that is not in the DataModel", function()
@@ -77,7 +77,7 @@ describe("ResetService.PromiseResetCharacter", function()
 		expect(promise:IsRejected()).toBe(true)
 
 		orphan:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a bad player", function()
@@ -87,7 +87,7 @@ describe("ResetService.PromiseResetCharacter", function()
 			controller.resetService:PromiseResetCharacter(nil)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -112,7 +112,7 @@ describe("ResetService.PushResetProvider", function()
 		-- The default provider never ran, so no character was spawned.
 		expect(PlayerMock.read(controller.mock, "Character")).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("restores the previous provider once the pushed one is popped", function()
@@ -142,7 +142,7 @@ describe("ResetService.PushResetProvider", function()
 		expect(afterValue).toBe("first")
 		expect(firstCount).toBe(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a bad provider", function()
@@ -152,6 +152,6 @@ describe("ResetService.PushResetProvider", function()
 			controller.resetService:PushResetProvider("not a function")
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

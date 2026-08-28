@@ -30,12 +30,12 @@ local function setup()
 
 	local controller = {
 		newModifierBase = newModifierBase,
-		destroy = function(_self: any)
+		Destroy = function(_self: any)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -50,7 +50,7 @@ describe("RogueModifierBase", function()
 		local modifier = controller.newModifierBase(1)
 		expect(modifier.Order).never.toBeNil()
 		expect(modifier.Source).never.toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should error from the unimplemented GetModifiedVersion", function()
@@ -59,7 +59,7 @@ describe("RogueModifierBase", function()
 		expect(function()
 			modifier:GetModifiedVersion(1)
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should error from the unimplemented ObserveModifiedVersion", function()
@@ -68,6 +68,6 @@ describe("RogueModifierBase", function()
 		expect(function()
 			modifier:ObserveModifiedVersion(1)
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

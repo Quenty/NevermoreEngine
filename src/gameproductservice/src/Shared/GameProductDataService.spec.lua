@@ -41,12 +41,12 @@ local function setup(tieRealm: TieRealms.TieRealm?)
 		serviceBag = serviceBag,
 		tieRealmService = tieRealmService,
 		gameProductDataService = gameProductDataService,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -69,7 +69,7 @@ describe("GameProductDataService purchase signals", function()
 			expect(Signal.isSignal((service :: any)[signalName])).toEqual(true)
 		end
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -77,7 +77,7 @@ describe("GameProductDataService server-only prompting", function()
 	it("should default to disabled", function()
 		local context = setup()
 		expect(context.gameProductDataService:GetServerOnlyPromptingValue().Value).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should enable and disable via SetServerOnlyPrompting on the server", function()
@@ -89,7 +89,7 @@ describe("GameProductDataService server-only prompting", function()
 
 		service:SetServerOnlyPrompting(false)
 		expect(service:GetServerOnlyPromptingValue().Value).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should replicate the change through the ValueObject observable", function()
@@ -106,7 +106,7 @@ describe("GameProductDataService server-only prompting", function()
 
 		expect(values[1]).toEqual(false)
 		expect(values[#values]).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject a non-boolean argument", function()
@@ -116,7 +116,7 @@ describe("GameProductDataService server-only prompting", function()
 		expect(function()
 			service:SetServerOnlyPrompting("nope" :: any)
 		end).toThrow()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should refuse to configure server-only prompting from the client realm", function()
@@ -126,7 +126,7 @@ describe("GameProductDataService server-only prompting", function()
 		expect(function()
 			service:SetServerOnlyPrompting(true)
 		end).toThrow()
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -141,7 +141,7 @@ describe("GameProductDataService ownership overrides", function()
 		end).toThrow()
 
 		fakePlayer:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should refuse to clear an ownership override from the client realm", function()
@@ -154,7 +154,7 @@ describe("GameProductDataService ownership overrides", function()
 		end).toThrow()
 
 		fakePlayer:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -168,6 +168,6 @@ describe("GameProductDataService prompt guard", function()
 		expect(outcome).toEqual("resolved")
 
 		fakePlayer:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 end)

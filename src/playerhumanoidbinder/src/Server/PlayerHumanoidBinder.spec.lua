@@ -13,8 +13,6 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
-local JestUtils = require("JestUtils")
-local Maid = require("Maid")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local PlayerHumanoidBinderTestUtils = require("PlayerHumanoidBinderTestUtils")
 
@@ -26,17 +24,7 @@ local makeTrackingClass = PlayerHumanoidBinderTestUtils.makeTrackingClass
 local awaitUnbound = PlayerHumanoidBinderTestUtils.awaitUnbound
 
 local function setup(constructor: any?)
-	local maid = Maid.new()
-	local controller = PlayerHumanoidBinderTestUtils.setup(PlayerHumanoidBinder, "PlayerHumanoidBinder", constructor)
-
-	maid:GiveTask(controller.destroy)
-	controller.destroy = function()
-		maid:DoCleaning()
-	end
-
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
-
-	return controller
+	return PlayerHumanoidBinderTestUtils.setup(PlayerHumanoidBinder, "PlayerHumanoidBinder", constructor)
 end
 
 describe("PlayerHumanoidBinder.new()", function()
@@ -71,7 +59,7 @@ describe("PlayerHumanoidBinder automatic tagging API", function()
 		expect(emissions[2]).toEqual(false)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-boolean", function()
@@ -82,7 +70,7 @@ describe("PlayerHumanoidBinder automatic tagging API", function()
 			controller.binder:SetAutomaticTagging(nil :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ObserveAutomaticTaggingBrio kills the brio when the value changes", function()
@@ -104,7 +92,7 @@ describe("PlayerHumanoidBinder automatic tagging API", function()
 		expect(brios[2]:GetValue()).toEqual(false)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -124,7 +112,7 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 		expect(class.instance).toEqual(humanoid)
 		expect(controller.binder:HasTag(humanoid)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds the humanoid when a character is assigned after start", function()
@@ -139,7 +127,7 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a humanoid added to the character later", function()
@@ -161,7 +149,7 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("unbinds and destroys the class when the character is destroyed", function()
@@ -181,7 +169,7 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 		expect(controller.binder:Get(humanoid)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -208,7 +196,7 @@ describe("PlayerHumanoidBinder:SetAutomaticTagging(false)", function()
 		local rebound = controller.binder:Promise(humanoid):Yield()
 		expect(rebound).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops discovering while disabled", function()
@@ -224,7 +212,7 @@ describe("PlayerHumanoidBinder:SetAutomaticTagging(false)", function()
 		task.wait(0.1)
 		expect(controller.binder:Get(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -240,7 +228,7 @@ describe("PlayerHumanoidBinder teardown", function()
 		local ok, class = controller.binder:Promise(humanoid):Yield()
 		assert(ok, "Never bound")
 
-		controller.destroy()
+		controller:Destroy()
 
 		expect(class.destroyed).toEqual(true)
 	end)

@@ -21,12 +21,12 @@ local function setup(): any
 
 	local controller = {
 		player = player,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -41,7 +41,7 @@ describe("CharacterUtils.getPlayerHumanoid", function()
 
 		expect(CharacterUtils.getPlayerHumanoid(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the spawned character's humanoid", function()
@@ -50,7 +50,7 @@ describe("CharacterUtils.getPlayerHumanoid", function()
 		local character = PlayerMock.loadMinimalCharacterAsync(controller.player)
 		expect(CharacterUtils.getPlayerHumanoid(controller.player)).toBe(getHumanoid(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil after the character despawns", function()
@@ -60,7 +60,7 @@ describe("CharacterUtils.getPlayerHumanoid", function()
 		PlayerMock.removeCharacter(controller.player)
 		expect(CharacterUtils.getPlayerHumanoid(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -71,7 +71,7 @@ describe("CharacterUtils.getAlivePlayerHumanoid", function()
 		local character = PlayerMock.loadMinimalCharacterAsync(controller.player)
 		expect(CharacterUtils.getAlivePlayerHumanoid(controller.player)).toBe(getHumanoid(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil once the humanoid's health reaches zero", function()
@@ -81,7 +81,7 @@ describe("CharacterUtils.getAlivePlayerHumanoid", function()
 		getHumanoid(character).Health = 0
 		expect(CharacterUtils.getAlivePlayerHumanoid(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil with no character", function()
@@ -89,7 +89,7 @@ describe("CharacterUtils.getAlivePlayerHumanoid", function()
 
 		expect(CharacterUtils.getAlivePlayerHumanoid(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -100,7 +100,7 @@ describe("CharacterUtils.getPlayerRootPart", function()
 		local character = PlayerMock.loadMinimalCharacterAsync(controller.player)
 		expect(CharacterUtils.getPlayerRootPart(controller.player)).toBe(character:FindFirstChild("HumanoidRootPart"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("still returns the root part at zero health", function()
@@ -110,7 +110,7 @@ describe("CharacterUtils.getPlayerRootPart", function()
 		getHumanoid(character).Health = 0
 		expect(CharacterUtils.getPlayerRootPart(controller.player)).toBe(character:FindFirstChild("HumanoidRootPart"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil with no character", function()
@@ -118,7 +118,7 @@ describe("CharacterUtils.getPlayerRootPart", function()
 
 		expect(CharacterUtils.getPlayerRootPart(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -131,7 +131,7 @@ describe("CharacterUtils.getAlivePlayerRootPart", function()
 			character:FindFirstChild("HumanoidRootPart")
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil once the humanoid's health reaches zero", function()
@@ -141,7 +141,7 @@ describe("CharacterUtils.getAlivePlayerRootPart", function()
 		getHumanoid(character).Health = 0
 		expect(CharacterUtils.getAlivePlayerRootPart(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil with no character", function()
@@ -149,7 +149,7 @@ describe("CharacterUtils.getAlivePlayerRootPart", function()
 
 		expect(CharacterUtils.getAlivePlayerRootPart(controller.player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -170,7 +170,7 @@ describe("CharacterUtils.unequipTools", function()
 		expect(tool.Parent).never.toBe(character)
 		tool:Destroy()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is a no-op with no character", function()
@@ -180,7 +180,7 @@ describe("CharacterUtils.unequipTools", function()
 			CharacterUtils.unequipTools(controller.player)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -191,7 +191,7 @@ describe("CharacterUtils.getPlayerFromCharacter", function()
 		local character = PlayerMock.loadMinimalCharacterAsync(controller.player)
 		expect(CharacterUtils.getPlayerFromCharacter(character)).toBe(controller.player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the mock from a part of the character", function()
@@ -201,7 +201,7 @@ describe("CharacterUtils.getPlayerFromCharacter", function()
 		local rootPart = character:FindFirstChild("HumanoidRootPart") :: BasePart
 		expect(CharacterUtils.getPlayerFromCharacter(rootPart)).toBe(controller.player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the mock from a nested descendant", function()
@@ -212,7 +212,7 @@ describe("CharacterUtils.getPlayerFromCharacter", function()
 		attachment.Parent = character:FindFirstChild("HumanoidRootPart") :: BasePart
 		expect(CharacterUtils.getPlayerFromCharacter(attachment)).toBe(controller.player)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an instance outside any character", function()
@@ -223,6 +223,6 @@ describe("CharacterUtils.getPlayerFromCharacter", function()
 		expect(CharacterUtils.getPlayerFromCharacter(part)).toBeNil()
 		part:Destroy()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

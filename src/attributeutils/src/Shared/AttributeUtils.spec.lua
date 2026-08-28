@@ -29,7 +29,7 @@ local function setup(): any
 
 			return token, assert(cancel, "No cancel")
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -53,7 +53,7 @@ end)
 describe("AttributeUtils.initAttribute()", function()
 	it("writes the default when the attribute is unset", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(AttributeUtils.initAttribute(controller.folder, "Version", "1.0.0")).toBe("1.0.0")
 		expect(controller.folder:GetAttribute("Version")).toBe("1.0.0")
@@ -61,7 +61,7 @@ describe("AttributeUtils.initAttribute()", function()
 
 	it("keeps a value that is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "2.0.0")
 
@@ -71,7 +71,7 @@ describe("AttributeUtils.initAttribute()", function()
 
 	it("keeps a value of false", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Enabled", false)
 
@@ -82,7 +82,7 @@ end)
 describe("AttributeUtils.getAttribute()", function()
 	it("returns the default when the attribute is unset", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(AttributeUtils.getAttribute(controller.folder, "Version", "1.0.0")).toBe("1.0.0")
 		expect(controller.folder:GetAttribute("Version")).toBe(nil)
@@ -90,7 +90,7 @@ describe("AttributeUtils.getAttribute()", function()
 
 	it("returns the attribute when it is set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "2.0.0")
 
@@ -99,7 +99,7 @@ describe("AttributeUtils.getAttribute()", function()
 
 	it("returns a value of false instead of the default", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Enabled", false)
 
@@ -110,7 +110,7 @@ end)
 describe("AttributeUtils.removeAllAttributes()", function()
 	it("removes every attribute", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 		controller.folder:SetAttribute("Enabled", false)
@@ -122,7 +122,7 @@ describe("AttributeUtils.removeAllAttributes()", function()
 
 	it("leaves an instance without attributes alone", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		AttributeUtils.removeAllAttributes(controller.folder)
 
@@ -133,7 +133,7 @@ end)
 describe("AttributeUtils.promiseAttribute()", function()
 	it("resolves immediately when the attribute is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -147,7 +147,7 @@ describe("AttributeUtils.promiseAttribute()", function()
 
 	it("resolves once the attribute is set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local promise = AttributeUtils.promiseAttribute(controller.folder, "Version")
 		JestUtils.afterThis(promise)
@@ -163,7 +163,7 @@ describe("AttributeUtils.promiseAttribute()", function()
 
 	it("waits for a value the predicate accepts", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local promise = AttributeUtils.promiseAttribute(controller.folder, "Count", function(value)
 			return type(value) == "number" and value >= 3
@@ -184,7 +184,7 @@ describe("AttributeUtils.promiseAttribute()", function()
 
 	it("rejects when the cancel token cancels", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local token, cancel = controller.newCancelSource()
 
@@ -199,7 +199,7 @@ describe("AttributeUtils.promiseAttribute()", function()
 
 	it("rejects a predicate that is not a function", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(function()
 			AttributeUtils.promiseAttribute(controller.folder, "Version", 5 :: any)

@@ -34,12 +34,12 @@ local function setup()
 
 	local controller = {
 		newMultiplier = newMultiplier,
-		destroy = function(_self: any)
+		Destroy = function(_self: any)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -68,7 +68,7 @@ describe("RogueMultiplier:GetModifiedVersion()", function()
 		local modifier = controller.newMultiplier(2)
 		expect(modifier:GetModifiedVersion(10)).toEqual(20)
 		expect(modifier:GetModifiedVersion(2.5)).toEqual(5)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reflect a later change to its value", function()
@@ -77,7 +77,7 @@ describe("RogueMultiplier:GetModifiedVersion()", function()
 		expect(modifier:GetModifiedVersion(10)).toEqual(20)
 		valueObject.Value = 5
 		expect(modifier:GetModifiedVersion(10)).toEqual(50)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -85,14 +85,14 @@ describe("RogueMultiplier:GetModifiedVersion()", function()
 		local modifier, valueObject = controller.newMultiplier(2)
 		setEnabled(valueObject, false)
 		expect(modifier:GetModifiedVersion(10)).toEqual(10)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should scale a Color3 input by its value", function()
 		local controller = setup()
 		local modifier = controller.newMultiplier(2)
 		expect(modifier:GetModifiedVersion(Color3.new(0.25, 0.25, 0.25))).toEqual(Color3.new(0.5, 0.5, 0.5))
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -101,7 +101,7 @@ describe("RogueMultiplier:GetInvertedVersion()", function()
 		local controller = setup()
 		local modifier = controller.newMultiplier(2)
 		expect(modifier:GetInvertedVersion(20)).toEqual(10)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -109,6 +109,6 @@ describe("RogueMultiplier:GetInvertedVersion()", function()
 		local modifier, valueObject = controller.newMultiplier(2)
 		setEnabled(valueObject, false)
 		expect(modifier:GetInvertedVersion(20)).toEqual(20)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

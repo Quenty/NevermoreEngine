@@ -41,12 +41,12 @@ local function setup()
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
 		accessPolicyService = accessPolicyService,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -114,7 +114,7 @@ describe("AccessPolicy.GetDebugState", function()
 			isEnabledByDefault = false,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -126,7 +126,7 @@ describe("AccessDataService.GetDebugState", function()
 		expect(#state.facts[AccessFactNames.PLAYER_IS_ADMIN]).toEqual(1)
 		expect(state.facts[AccessFactNames.PLAYER_IS_ADMIN][1].source).toEqual("permission")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("shows a second layer once one is added", function()
@@ -146,7 +146,7 @@ describe("AccessDataService.GetDebugState", function()
 		local state = controller.accessDataService:GetDebugState()
 		expect(#state.facts[AccessFactNames.PLAYER_IS_ADMIN]).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("includes the shipped feature and what it reads", function()
@@ -155,7 +155,7 @@ describe("AccessDataService.GetDebugState", function()
 		local state = controller.accessDataService:GetDebugState()
 		expect(state.features[WellKnownAccessFeatureNames.OWNS_GAME].facts).toEqual({ AccessFactNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -168,7 +168,7 @@ describe("AccessPolicyService.GetDebugState", function()
 		expect(state[AccessPolicyNames.KICK_ON_NON_ADMIN].realm).toEqual(AccessPolicyRealm.SERVER)
 		expect(state[AccessPolicyNames.KICK_ON_NON_ADMIN].facts).toEqual({ AccessFactNames.PLAYER_IS_ADMIN })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("tracks a policy being switched on", function()
@@ -179,6 +179,6 @@ describe("AccessPolicyService.GetDebugState", function()
 			true
 		)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

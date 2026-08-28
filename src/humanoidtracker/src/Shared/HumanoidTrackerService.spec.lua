@@ -35,12 +35,12 @@ local function setup(): any
 			serviceBag:Start()
 			return serviceBag, service
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -58,7 +58,7 @@ describe("HumanoidTrackerService.GetHumanoidTracker", function()
 		expect(service:GetHumanoidTracker(player)).toBe(tracker)
 		expect(service:GetHumanoidTracker(otherPlayer)).never.toBe(tracker)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a non-player value", function()
@@ -70,7 +70,7 @@ describe("HumanoidTrackerService.GetHumanoidTracker", function()
 			service:GetHumanoidTracker(5)
 		end).toThrow("Bad player")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -86,7 +86,7 @@ describe("HumanoidTrackerService.GetHumanoid", function()
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
 		expect(service:GetHumanoid(player)).toBe(character:FindFirstChildOfClass("Humanoid"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -103,7 +103,7 @@ describe("HumanoidTrackerService.GetAliveHumanoid", function()
 		PlayerMock.removeCharacter(player)
 		expect(service:GetAliveHumanoid(player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not report a dead humanoid as alive", function()
@@ -121,7 +121,7 @@ describe("HumanoidTrackerService.GetAliveHumanoid", function()
 		expect(service:GetHumanoid(player)).toBe(humanoid)
 		expect(service:GetAliveHumanoid(player)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -150,7 +150,7 @@ describe("HumanoidTrackerService.ObserveHumanoid", function()
 		expect(emissions).toBe(3)
 		expect(lastValue).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -178,7 +178,7 @@ describe("HumanoidTrackerService.ObserveHumanoidBrio", function()
 		expect(brios[1]:IsDead()).toBe(true)
 		expect(#brios).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -203,7 +203,7 @@ describe("HumanoidTrackerService.ObserveAliveHumanoid", function()
 		expect(emissions).toBe(2)
 		expect(lastValue).toBe(character:FindFirstChildOfClass("Humanoid"))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -226,7 +226,7 @@ describe("HumanoidTrackerService.ObserveAliveHumanoidBrio", function()
 		PlayerMock.removeCharacter(player)
 		expect(brios[1]:IsDead()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -243,6 +243,6 @@ describe("HumanoidTrackerService.Destroy", function()
 
 		expect((tracker :: any).Destroy).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

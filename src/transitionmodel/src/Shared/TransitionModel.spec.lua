@@ -42,12 +42,12 @@ local function setup(): any
 
 			return values
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -60,7 +60,7 @@ describe("TransitionModel.new", function()
 		expect(controller.transitionModel:IsShowingComplete()).toBe(false)
 		expect(controller.transitionModel:IsHidingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -70,7 +70,7 @@ describe("TransitionModel.isTransitionModel", function()
 
 		expect(TransitionModel.isTransitionModel(controller.transitionModel)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a plain basic pane", function()
@@ -78,7 +78,7 @@ describe("TransitionModel.isTransitionModel", function()
 
 		expect(TransitionModel.isTransitionModel(controller.maid:Add(BasicPane.new()))).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects values that are not transition models", function()
@@ -88,7 +88,7 @@ describe("TransitionModel.isTransitionModel", function()
 		expect(TransitionModel.isTransitionModel({})).toBe(false)
 		expect(TransitionModel.isTransitionModel(5)).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -104,7 +104,7 @@ describe("transitions without callbacks", function()
 		expect(controller.transitionModel:IsHidingComplete()).toBe(false)
 		expect(showingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes hiding immediately", function()
@@ -120,7 +120,7 @@ describe("transitions without callbacks", function()
 		expect(controller.transitionModel:IsShowingComplete()).toBe(false)
 		expect(hidingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not re-run a transition set to the visibility it already has", function()
@@ -133,7 +133,7 @@ describe("transitions without callbacks", function()
 
 		expect(showingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -159,7 +159,7 @@ describe("TransitionModel:SetVisible", function()
 		expect(lastDoNotAnimate).toBe(true)
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not restart a completed transition re-set with doNotAnimate", function()
@@ -174,7 +174,7 @@ describe("TransitionModel:SetVisible", function()
 
 		expect(showingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a visibility that is not a boolean", function()
@@ -184,7 +184,7 @@ describe("TransitionModel:SetVisible", function()
 			controller.transitionModel:SetVisible(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -203,7 +203,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 
 		expect(fired).toEqual({ false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not fire when the visibility actually changes", function()
@@ -216,7 +216,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 
 		expect(fires()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not fire without doNotAnimate", function()
@@ -229,7 +229,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 
 		expect(fires()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("lets a listener snap alongside the model's own transition", function()
@@ -252,7 +252,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 		expect(snapped).toBe(1)
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -279,7 +279,7 @@ describe("TransitionModel:_restartTransition", function()
 		expect(hidden).toBe(0)
 		expect(controller.transitionModel:IsVisible()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("re-runs the hide callback while hidden", function()
@@ -296,7 +296,7 @@ describe("TransitionModel:_restartTransition", function()
 		expect(hidden).toBe(1)
 		expect(controller.transitionModel:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("re-fires the completion signal for the restarted transition", function()
@@ -311,7 +311,7 @@ describe("TransitionModel:_restartTransition", function()
 
 		expect(showingComplete()).toBe(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("abandons the in-flight transition it replaces", function()
@@ -332,7 +332,7 @@ describe("TransitionModel:_restartTransition", function()
 
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("passes doNotAnimate through to the callback", function()
@@ -351,7 +351,7 @@ describe("TransitionModel:_restartTransition", function()
 
 		expect(lastDoNotAnimate).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -374,7 +374,7 @@ describe("TransitionModel:SetPromiseShow", function()
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 		expect(showingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("passes doNotAnimate through to the callback", function()
@@ -393,7 +393,7 @@ describe("TransitionModel:SetPromiseShow", function()
 		expect(observed[1]).toBe(true)
 		expect(observed[2]).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cleans up the callback maid when the next transition starts", function()
@@ -413,7 +413,7 @@ describe("TransitionModel:SetPromiseShow", function()
 		controller.transitionModel:Hide()
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("cleans up the callback maid on destroy", function()
@@ -433,7 +433,7 @@ describe("TransitionModel:SetPromiseShow", function()
 		controller.maid:DoCleaning()
 		expect(cleaned).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the callback when set to nil", function()
@@ -448,7 +448,7 @@ describe("TransitionModel:SetPromiseShow", function()
 
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a callback that is not a function", function()
@@ -458,7 +458,7 @@ describe("TransitionModel:SetPromiseShow", function()
 			controller.transitionModel:SetPromiseShow(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -482,7 +482,7 @@ describe("TransitionModel:SetPromiseHide", function()
 		expect(controller.transitionModel:IsHidingComplete()).toBe(true)
 		expect(hidingComplete()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("abandons an in-flight hide when shown again", function()
@@ -507,7 +507,7 @@ describe("TransitionModel:SetPromiseHide", function()
 		callbackPromise:Resolve()
 		expect(controller.transitionModel:IsHidingComplete()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a callback that is not a function", function()
@@ -517,7 +517,7 @@ describe("TransitionModel:SetPromiseHide", function()
 			controller.transitionModel:SetPromiseHide(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -537,7 +537,7 @@ describe("TransitionModel:PromiseShow", function()
 		callbackPromise:Resolve()
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves immediately when showing is already complete", function()
@@ -547,7 +547,7 @@ describe("TransitionModel:PromiseShow", function()
 
 		expect(controller.transitionModel:PromiseShow():IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects when hidden before showing completes", function()
@@ -563,7 +563,7 @@ describe("TransitionModel:PromiseShow", function()
 		controller.transitionModel:Hide()
 		expect(promise:IsRejected()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -585,7 +585,7 @@ describe("TransitionModel:PromiseHide", function()
 		callbackPromise:Resolve()
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves immediately when hiding is already complete", function()
@@ -593,7 +593,7 @@ describe("TransitionModel:PromiseHide", function()
 
 		expect(controller.transitionModel:PromiseHide():IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects when shown before hiding completes", function()
@@ -611,7 +611,7 @@ describe("TransitionModel:PromiseHide", function()
 		controller.transitionModel:Show()
 		expect(promise:IsRejected()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -640,7 +640,7 @@ describe("TransitionModel:PromiseToggle", function()
 		expect(controller.transitionModel:IsHidingComplete()).toBe(true)
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("runs the show transition when hidden", function()
@@ -664,7 +664,7 @@ describe("TransitionModel:PromiseToggle", function()
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -679,7 +679,7 @@ describe("TransitionModel:ObserveIsShowingComplete", function()
 
 		expect(values).toEqual({ false, true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -694,7 +694,7 @@ describe("TransitionModel:ObserveIsHidingComplete", function()
 
 		expect(values).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -710,7 +710,7 @@ describe("TransitionModel:BindToPaneVisbility", function()
 		expect(controller.transitionModel:IsVisible()).toBe(true)
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("mirrors visibility in both directions", function()
@@ -725,7 +725,7 @@ describe("TransitionModel:BindToPaneVisbility", function()
 		controller.transitionModel:Hide()
 		expect(pane:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops mirroring once the cleanup function runs", function()
@@ -739,7 +739,7 @@ describe("TransitionModel:BindToPaneVisbility", function()
 		pane:Show()
 		expect(controller.transitionModel:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not tear down a newer binding", function()
@@ -759,6 +759,6 @@ describe("TransitionModel:BindToPaneVisbility", function()
 		secondPane:Show()
 		expect(controller.transitionModel:IsVisible()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

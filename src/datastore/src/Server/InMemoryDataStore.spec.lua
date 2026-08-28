@@ -27,7 +27,7 @@ local function newInMemoryController()
 		makeStore = function()
 			return maid:Add(InMemoryDataStore.new())
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -39,7 +39,9 @@ local function newDataStoreController()
 		makeStore = function()
 			return controller.newDataStore()
 		end,
-		destroy = controller.destroy,
+		Destroy = function(_self)
+			controller:Destroy()
+		end,
 	}
 end
 
@@ -48,7 +50,7 @@ local function describeSharedBehavior(caseName: string, newController)
 		it("loads the default value when the key is empty", function()
 			local c = newController()
 			expect(resolve(c.makeStore():Load("coins", 99))).toEqual(99)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("round-trips a stored value", function()
@@ -56,7 +58,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local store = c.makeStore()
 			store:Store("coins", 5)
 			expect(resolve(store:Load("coins"))).toEqual(5)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("round-trips multiple keys and loads defaults for missing ones", function()
@@ -69,7 +71,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			expect(all.coins).toEqual(5)
 			expect(all.gems).toEqual(10)
 			expect(resolve(store:Load("missing", "default"))).toEqual("default")
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("deletes a key so it no longer loads", function()
@@ -82,7 +84,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local all = resolve(store:LoadAll())
 			expect(all.a).toEqual(nil)
 			expect(all.b).toEqual(2)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("overwrites the whole view", function()
@@ -96,7 +98,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			expect(all.a).toEqual(nil)
 			expect(all.b).toEqual(nil)
 			expect(all.c).toEqual(3)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("wipes to empty", function()
@@ -105,7 +107,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("a", 1)
 			store:Wipe()
 			expect(resolve(store:LoadAll({}))).toEqual({})
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("round-trips substore values and nests them under the parent", function()
@@ -117,7 +119,7 @@ local function describeSharedBehavior(caseName: string, newController)
 
 			local all = resolve(store:LoadAll())
 			expect(all.inventory.sword).toEqual(true)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("lists the top-level keys", function()
@@ -129,7 +131,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local keys = resolve(store:PromiseKeyList())
 			table.sort(keys)
 			expect(keys).toEqual({ "a", "b" })
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("stores table values by deep copy, immune to later mutation of the source", function()
@@ -140,7 +142,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			source.count = 999
 
 			expect(resolve(store:Load("data")).count).toEqual(1)
-			c.destroy()
+			c:Destroy()
 		end)
 
 		it("observes a key: emits the initial value then updates on store", function()
@@ -164,7 +166,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			end, 5)).toEqual(true)
 
 			maid:DoCleaning()
-			c.destroy()
+			c:Destroy()
 		end)
 	end)
 end
@@ -190,8 +192,8 @@ describe("matrix: cross-implementation consistency", function()
 
 		expect(inMemoryView).toEqual(persistedView)
 
-		dataStoreController.destroy()
-		inMemoryController.destroy()
+		dataStoreController:Destroy()
+		inMemoryController:Destroy()
 	end)
 end)
 

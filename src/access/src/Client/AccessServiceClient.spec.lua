@@ -84,12 +84,12 @@ local function setup(options: SetupOptions?)
 		localPlayer = localPlayer,
 		otherPlayer = otherPlayer,
 		appliedFor = appliedFor,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end

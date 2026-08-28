@@ -25,7 +25,7 @@ type Controller = {
 	newBoundingBox: (model: Model) -> AdorneeModelBoundingBox.AdorneeModelBoundingBox,
 	collect: (observable: any) -> Record,
 	step: (count: number?) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -71,12 +71,12 @@ local function setup(): Controller
 			end
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -94,7 +94,7 @@ describe("AdorneeModelBoundingBox.new", function()
 		expect(record.count).toBe(1)
 		expect(record.values[1]).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("has no cframe until the first update runs", function()
@@ -109,7 +109,7 @@ describe("AdorneeModelBoundingBox.new", function()
 		expect(record.count).toBe(1)
 		expect(record.values[1]).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("matches the engine bounding box after a step", function()
@@ -129,7 +129,7 @@ describe("AdorneeModelBoundingBox.new", function()
 		expect(sizeRecord.values[sizeRecord.count]).toEqual(expectedSize)
 		expect(cframeRecord.values[cframeRecord.count]).toEqual(expectedCFrame)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("collapses several changes in one frame into a single update", function()
@@ -151,7 +151,7 @@ describe("AdorneeModelBoundingBox.new", function()
 
 		expect(record.count).toBe(settledCount + 1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -177,7 +177,7 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 		expect(after).toEqual(expectedSize)
 		expect(after).never.toEqual(before)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("updates when a part is resized", function()
@@ -198,7 +198,7 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 
 		expect(record.values[record.count]).toEqual(expectedSize)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("updates when a part is removed", function()
@@ -219,7 +219,7 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 
 		expect(record.values[record.count]).never.toEqual(before)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -244,7 +244,7 @@ describe("AdorneeModelBoundingBox:ObserveCFrame", function()
 		expect(after).never.toEqual(before)
 		expect(after.Position.Y).toBeCloseTo(50, 3)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows an unanchored part", function()
@@ -264,7 +264,7 @@ describe("AdorneeModelBoundingBox:ObserveCFrame", function()
 
 		expect(record.values[record.count].Position.Z).toBeCloseTo(30, 3)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -288,7 +288,7 @@ describe("AdorneeModelBoundingBox:Destroy", function()
 
 		expect(record.count).toBe(settledCount)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops the unanchored update loop", function()
@@ -307,6 +307,6 @@ describe("AdorneeModelBoundingBox:Destroy", function()
 
 		controller.step(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

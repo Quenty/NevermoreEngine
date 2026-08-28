@@ -6,7 +6,7 @@
 	TranslatorService, translator factories initialized against it, and await
 	helpers for the (async) Roblox translator. Writes land in the real (shared,
 	role-named) LocalizationService table, which is cleared before and after every
-	test for isolation. `controller:destroy()` tears the world down.
+	test for isolation. `controller:Destroy()` tears the world down.
 
 	@class TranslatorTestUtils
 ]]
@@ -49,7 +49,7 @@ function TranslatorTestUtils.clearGeneratedTables()
 end
 
 --[[
-	Builds an isolated test world. Call once per test and pair with controller:destroy().
+	Builds an isolated test world. Call once per test and pair with controller:Destroy().
 
 	`options.tieRealm` (a TieRealms value) injects the realm on the service bag, exactly
 	like the Raven stories do, so client-only behavior can be exercised on the server test
@@ -186,7 +186,7 @@ function TranslatorTestUtils.setup(options)
 		track = function(item)
 			return giveTask(item)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 			TranslatorTestUtils.clearGeneratedTables()
 		end,

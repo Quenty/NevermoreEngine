@@ -111,12 +111,12 @@ local function setup(creatorUserId: number?)
 			return mock
 		end,
 		destroyBag = destroyBag,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end

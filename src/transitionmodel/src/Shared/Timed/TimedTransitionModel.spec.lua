@@ -23,7 +23,7 @@ type Controller = {
 	model: TimedTransitionModel.TimedTransitionModel,
 	position: () -> number,
 	advance: (seconds: number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 -- Completion runs off a real task.delay inside TimedTween.PromiseFinished, so the fake clock and
@@ -39,7 +39,7 @@ local function setup(options: { transitionTime: number? }?): Controller
 		return now
 	end)
 
-	local controller = {
+	local controller: Controller = {
 		model = model,
 		position = function()
 			return model._timedTween:_computeState(now).p
@@ -49,12 +49,12 @@ local function setup(options: { transitionTime: number? }?): Controller
 			task.wait(seconds)
 			task.wait()
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -68,7 +68,7 @@ describe("TimedTransitionModel.new", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("honors an explicit transition time", function()
@@ -76,7 +76,7 @@ describe("TimedTransitionModel.new", function()
 
 		expect(controller.model._timedTween:GetTransitionTime()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is a basic pane", function()
@@ -84,7 +84,7 @@ describe("TimedTransitionModel.new", function()
 
 		expect(BasicPane.isBasicPane(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -99,7 +99,7 @@ describe("TimedTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(false)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("moves halfway through the transition time", function()
@@ -110,7 +110,7 @@ describe("TimedTransitionModel visibility", function()
 
 		expect(controller.position()).toBeCloseTo(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes showing once the transition time elapses", function()
@@ -122,7 +122,7 @@ describe("TimedTransitionModel visibility", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes hiding once the transition time elapses", function()
@@ -135,7 +135,7 @@ describe("TimedTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes immediately when told not to animate", function()
@@ -146,7 +146,7 @@ describe("TimedTransitionModel visibility", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("toggles visibility", function()
@@ -158,7 +158,7 @@ describe("TimedTransitionModel visibility", function()
 		controller.model:Toggle(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -170,7 +170,7 @@ describe("TimedTransitionModel:SetTransitionTime", function()
 
 		expect(controller.model._timedTween:GetTransitionTime()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -185,7 +185,7 @@ describe("TimedTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the hide until the transition finishes", function()
@@ -200,7 +200,7 @@ describe("TimedTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves without waiting when told not to animate", function()
@@ -208,7 +208,7 @@ describe("TimedTransitionModel promises", function()
 
 		expect(controller.model:PromiseShow(true):IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the toggle in whichever direction it goes", function()
@@ -220,7 +220,7 @@ describe("TimedTransitionModel promises", function()
 		expect(controller.model:PromiseToggle(true):IsFulfilled()).toBe(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports completion through ObserveIsShowingComplete", function()
@@ -236,7 +236,7 @@ describe("TimedTransitionModel promises", function()
 		expect(values).toEqual({ false, true })
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -254,7 +254,7 @@ describe("TimedTransitionModel completion signals", function()
 		controller.advance(TRANSITION_TIME * 2)
 		expect(fires).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires HidingComplete once the transition finishes", function()
@@ -271,7 +271,7 @@ describe("TimedTransitionModel completion signals", function()
 		controller.advance(TRANSITION_TIME * 2)
 		expect(fires).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -289,7 +289,7 @@ describe("TimedTransitionModel:BindToPaneVisbility", function()
 		expect(pane:IsVisible()).toBe(false)
 
 		pane:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not throw when unbinding after the model is destroyed", function()
@@ -297,7 +297,7 @@ describe("TimedTransitionModel:BindToPaneVisbility", function()
 		local pane = BasicPane.new()
 
 		local unbind = controller.model:BindToPaneVisbility(pane)
-		controller.destroy()
+		controller:Destroy()
 
 		expect(function()
 			unbind()
@@ -313,7 +313,7 @@ describe("TimedTransitionModel duck typing", function()
 
 		expect(TransitionUtils.isTransition(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is recognized as a transition model", function()
@@ -321,7 +321,7 @@ describe("TimedTransitionModel duck typing", function()
 
 		expect(TransitionModel.isTransitionModel(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -337,7 +337,7 @@ describe("TimedTransitionModel in-flight snap", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.position()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps an already-running hide", function()
@@ -352,6 +352,6 @@ describe("TimedTransitionModel in-flight snap", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.position()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

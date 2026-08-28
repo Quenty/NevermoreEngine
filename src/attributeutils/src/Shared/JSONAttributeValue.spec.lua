@@ -31,7 +31,7 @@ local function setup(): any
 
 			return values
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -40,7 +40,7 @@ end
 describe("JSONAttributeValue.new()", function()
 	it("encodes the default value onto the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.newJSONValue("Facts", { "a", "b" })
 
@@ -49,7 +49,7 @@ describe("JSONAttributeValue.new()", function()
 
 	it("writes nothing when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", nil)
 
@@ -61,7 +61,7 @@ end)
 describe("JSONAttributeValue.Value", function()
 	it("round trips a dictionary", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		jsonValue.Value = { enabled = true, count = 3 }
@@ -71,7 +71,7 @@ describe("JSONAttributeValue.Value", function()
 
 	it("round trips a list", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		jsonValue.Value = { "a", "b" }
@@ -81,7 +81,7 @@ describe("JSONAttributeValue.Value", function()
 
 	it("decodes what another writer stored", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		controller.folder:SetAttribute("Facts", '{"enabled":true}')
@@ -91,7 +91,7 @@ describe("JSONAttributeValue.Value", function()
 
 	it("falls back to the default once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		controller.folder:SetAttribute("Facts", nil)
@@ -101,7 +101,7 @@ describe("JSONAttributeValue.Value", function()
 
 	it("clears the attribute when written a value it cannot encode", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		jsonValue.Value = 5
@@ -111,7 +111,7 @@ describe("JSONAttributeValue.Value", function()
 
 	it("reads nil when the attribute is not a string", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", nil)
 		controller.folder:SetAttribute("Facts", 5)
@@ -123,7 +123,7 @@ end)
 describe("JSONAttributeValue:Observe()", function()
 	it("fires the decoded value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		local values = controller.observeInto(jsonValue:Observe())
@@ -136,7 +136,7 @@ describe("JSONAttributeValue:Observe()", function()
 
 	it("fires the default value once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		local values = controller.observeInto(jsonValue:Observe())

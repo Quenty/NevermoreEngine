@@ -19,7 +19,7 @@ local it = Jest.Globals.it
 type Controller = {
 	serviceBag: ServiceBag.ServiceBag,
 	service: any,
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -34,12 +34,12 @@ local function setup(): Controller
 		serviceBag = serviceBag,
 		service = service,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -51,7 +51,7 @@ describe("ScoredActionService.Init", function()
 		expect(controller.service).never.toBeNil()
 		expect(ScoredActionService.ServiceName).toBe("ScoredActionService")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("registers the input key map service", function()
@@ -59,7 +59,7 @@ describe("ScoredActionService.Init", function()
 
 		expect(controller.serviceBag:HasService(InputKeyMapService)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when initialized twice", function()
@@ -69,7 +69,7 @@ describe("ScoredActionService.Init", function()
 			controller.service:Init(controller.serviceBag)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws without a serviceBag", function()
@@ -79,6 +79,6 @@ describe("ScoredActionService.Init", function()
 			(ScoredActionService :: any):Init(nil)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

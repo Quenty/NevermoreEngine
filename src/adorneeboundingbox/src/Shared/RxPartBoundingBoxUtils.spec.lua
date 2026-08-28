@@ -23,7 +23,7 @@ type Controller = {
 	newPart: (cframe: CFrame?) -> BasePart,
 	collect: (observable: any) -> Record,
 	step: (count: number?) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -58,12 +58,12 @@ local function setup(): Controller
 			end
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -76,7 +76,7 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 			RxPartBoundingBoxUtils.observePartCFrame(Instance.new("Folder") :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the current cframe on subscribe", function()
@@ -88,7 +88,7 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 		expect(record.count).toBe(1)
 		expect(record.values[1]).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits when the part moves", function()
@@ -103,7 +103,7 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 		expect(record.count).toBe(2)
 		expect(record.values[2]).toEqual(CFrame.new(0, 40, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops emitting once unsubscribed", function()
@@ -122,6 +122,6 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 
 		expect(count).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

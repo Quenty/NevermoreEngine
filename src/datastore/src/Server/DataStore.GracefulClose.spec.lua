@@ -83,7 +83,7 @@ describe("crash-safety semantics preserved", function()
 		local serverA = controller.newServer({ messaging = true })
 		if not controller.awaitOwn(serverA) then
 			expect("A load hung").toEqual("A load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -96,7 +96,7 @@ describe("crash-safety semantics preserved", function()
 		expect(PromiseTestUtils.awaitSettled(loadB, 2)).toEqual(false)
 		expect(controller.mock:GetRaw("player_1").lock.ActiveSession.SessionId).toEqual(serverA:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("steals a dead holder's fresh lock only through the retry ladder, leaking no rejections", function()
@@ -121,7 +121,7 @@ describe("crash-safety semantics preserved", function()
 		local loadB = serverB:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadB, 20) then
 			expect("B never stole the dead session's lock").toEqual("B stole the dead session's lock")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadB:Wait())).toEqual(true)
@@ -130,6 +130,6 @@ describe("crash-safety semantics preserved", function()
 		expect(raw.coins).toEqual(9)
 		expect(raw.lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end, 30000) -- Two full 5s graceful-close timeouts plus backoff, beyond jest's 5s default
 end)

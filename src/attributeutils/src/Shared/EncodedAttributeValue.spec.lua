@@ -39,7 +39,7 @@ local function setup(): any
 
 			return values
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -48,7 +48,7 @@ end
 describe("EncodedAttributeValue.new()", function()
 	it("encodes the default value onto the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.newEncodedValue("Count", 5)
 
@@ -57,7 +57,7 @@ describe("EncodedAttributeValue.new()", function()
 
 	it("leaves an attribute that is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Count", "7")
 		local encodedValue = controller.newEncodedValue("Count", 5)
@@ -68,7 +68,7 @@ describe("EncodedAttributeValue.new()", function()
 
 	it("writes nothing when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", nil)
 
@@ -78,7 +78,7 @@ describe("EncodedAttributeValue.new()", function()
 
 	it("rejects an encode that is not a function", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(function()
 			EncodedAttributeValue.new(controller.folder, "Count", nil :: any, decode, 5)
@@ -87,7 +87,7 @@ describe("EncodedAttributeValue.new()", function()
 
 	it("rejects a decode that is not a function", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(function()
 			EncodedAttributeValue.new(controller.folder, "Count", encode, nil :: any, 5)
@@ -98,7 +98,7 @@ end)
 describe("EncodedAttributeValue.Value", function()
 	it("decodes what is stored on the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		controller.folder:SetAttribute("Count", "7")
@@ -108,7 +108,7 @@ describe("EncodedAttributeValue.Value", function()
 
 	it("encodes what is written to it", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		encodedValue.Value = 7
@@ -119,7 +119,7 @@ describe("EncodedAttributeValue.Value", function()
 
 	it("falls back to the default once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		encodedValue.Value = nil
@@ -132,14 +132,14 @@ end)
 describe("EncodedAttributeValue.AttributeName", function()
 	it("reports the attribute it is bound to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		expect(controller.newEncodedValue("Count", 5).AttributeName).toBe("Count")
 	end)
 
 	it("cannot be assigned to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 
@@ -152,7 +152,7 @@ end)
 describe("EncodedAttributeValue.Changed", function()
 	it("fires when the attribute changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 
@@ -171,7 +171,7 @@ end)
 describe("EncodedAttributeValue members", function()
 	it("throws when reading a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue: any = controller.newEncodedValue("Count", 5)
 
@@ -182,7 +182,7 @@ describe("EncodedAttributeValue members", function()
 
 	it("throws when writing a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue: any = controller.newEncodedValue("Count", 5)
 
@@ -195,7 +195,7 @@ end)
 describe("EncodedAttributeValue:Observe()", function()
 	it("fires the decoded value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		local values = controller.observeInto(encodedValue:Observe())
@@ -208,7 +208,7 @@ describe("EncodedAttributeValue:Observe()", function()
 
 	it("fires the default value once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		local values = controller.observeInto(encodedValue:Observe())
@@ -221,7 +221,7 @@ describe("EncodedAttributeValue:Observe()", function()
 
 	it("fires nil when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", nil)
 
@@ -240,7 +240,7 @@ end)
 describe("EncodedAttributeValue:ObserveBrio()", function()
 	it("emits a brio with the decoded value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		local brios = controller.observeInto(encodedValue:ObserveBrio())
@@ -251,7 +251,7 @@ describe("EncodedAttributeValue:ObserveBrio()", function()
 
 	it("kills the last brio when the value changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		local brios = controller.observeInto(encodedValue:ObserveBrio())
@@ -266,7 +266,7 @@ describe("EncodedAttributeValue:ObserveBrio()", function()
 
 	it("skips encoded values the condition rejects", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local encodedValue = controller.newEncodedValue("Count", 5)
 		local brios = controller.observeInto(encodedValue:ObserveBrio(function(value)

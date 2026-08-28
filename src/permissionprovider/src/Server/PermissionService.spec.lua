@@ -57,12 +57,12 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -76,7 +76,7 @@ describe("PermissionService initialization", function()
 			controller.serviceBag:Start()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should start with a provider derived from the game when none is configured", function()
@@ -86,7 +86,7 @@ describe("PermissionService initialization", function()
 			controller.serviceBag:Start()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should resolve the permission provider after start", function()
@@ -103,7 +103,7 @@ describe("PermissionService initialization", function()
 		expect(ok).toEqual(true)
 		expect((provider :: any).ClassName).toEqual("CreatorPermissionProvider")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -116,7 +116,7 @@ describe("PermissionService.SetProviderFromConfig", function()
 			controller.permissionService:SetProviderFromConfig(controller.singleUserConfig(CREATOR_USER_ID))
 		end).toThrow("Already have provider set")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject an unknown config type", function()
@@ -126,7 +126,7 @@ describe("PermissionService.SetProviderFromConfig", function()
 			controller.permissionService:SetProviderFromConfig({ type = "UnknownConfigType" } :: any)
 		end).toThrow("Bad provider")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -139,7 +139,7 @@ describe("PermissionService permission queries", function()
 		local player = controller.fakePlayer(CREATOR_USER_ID)
 		expect(controller.awaitBool(controller.permissionService:PromiseIsAdmin(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should treat the configured user as a creator", function()
@@ -150,7 +150,7 @@ describe("PermissionService permission queries", function()
 		local player = controller.fakePlayer(CREATOR_USER_ID)
 		expect(controller.awaitBool(controller.permissionService:PromiseIsCreator(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should deny another user admin permission", function()
@@ -161,7 +161,7 @@ describe("PermissionService permission queries", function()
 		local player = controller.fakePlayer(CREATOR_USER_ID + 1)
 		expect(controller.awaitBool(controller.permissionService:PromiseIsAdmin(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a non-player value", function()
@@ -173,7 +173,7 @@ describe("PermissionService permission queries", function()
 			controller.permissionService:PromiseIsAdmin(nil :: any)
 		end).toThrow("bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject an invalid permission level", function()
@@ -186,7 +186,7 @@ describe("PermissionService permission queries", function()
 			controller.permissionService:PromiseIsPermissionLevel(player, "not-a-level" :: any)
 		end).toThrow("Bad permissionLevel")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -203,6 +203,6 @@ describe("PermissionService.ObservePermissionedPlayersBrio", function()
 			subscription:Destroy()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

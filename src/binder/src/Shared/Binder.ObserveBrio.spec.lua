@@ -43,7 +43,7 @@ describe("Binder:ObserveBrio()", function()
 		expect(brios[1]:GetValue()).toEqual(class)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits immediately when the instance is already bound", function()
@@ -67,7 +67,7 @@ describe("Binder:ObserveBrio()", function()
 		expect(brios[1]:GetValue()).toEqual(class)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the emitted brio when the instance unbinds", function()
@@ -93,7 +93,7 @@ describe("Binder:ObserveBrio()", function()
 		expect(brios[1]:IsDead()).toEqual(true)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a fresh live brio when the instance rebinds", function()
@@ -125,7 +125,7 @@ describe("Binder:ObserveBrio()", function()
 		expect(brios[2]:GetValue()).toEqual(class)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -153,7 +153,7 @@ describe("Binder:ObserveAllBrio()", function()
 		expect(values[binder:Get(instB)]).toEqual(true)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits a brio when a new class is added", function()
@@ -178,7 +178,7 @@ describe("Binder:ObserveAllBrio()", function()
 		expect(brios[1]:GetValue()).toEqual(binder:Get(inst))
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("kills the brio when the class is removed", function()
@@ -204,6 +204,6 @@ describe("Binder:ObserveAllBrio()", function()
 		expect(brios[1]:IsDead()).toEqual(true)
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

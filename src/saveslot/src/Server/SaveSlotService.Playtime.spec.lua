@@ -91,13 +91,13 @@ local function setup()
 			local metadata = system and system[SaveSlotConstants.METADATA_STORE_KEY]
 			return metadata and metadata[slotId]
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -115,7 +115,7 @@ describe("save slot playtime", function()
 		expect(stored.TimePlayed).toBeGreaterThanOrEqual(SESSION_SECONDS)
 		expect(stored.LastSessionLength).toBeGreaterThanOrEqual(SESSION_SECONDS)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps the replicated attribute and the stored value in step", function()
@@ -127,6 +127,6 @@ describe("save slot playtime", function()
 		local metadata = assert(controller.slotsDataStore:GetSlotMetadata(slotId), "No slot metadata")
 		expect(metadata.TimePlayed).toEqual(controller.storedMetadata(slotId).TimePlayed)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

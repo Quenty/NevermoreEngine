@@ -80,12 +80,12 @@ local function setup()
 		-- Swaps in an equivalent implementation -- the container churn that mints the new interface
 		-- identity downstream sees.
 		reimplement = implement,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -99,7 +99,7 @@ describe("SettingDefinition.GetSettingProperty", function()
 
 		expect(second).toBe(first)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps a separate property per player", function()
@@ -113,7 +113,7 @@ describe("SettingDefinition.GetSettingProperty", function()
 		expect(otherProperty).never.toBe(property)
 
 		otherPlayer:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -124,7 +124,7 @@ describe("SettingProperty.Observe", function()
 
 		expect(property:Observe()).toBe(property:Observe())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not re-emit when the tie churns but the value does not", function()
@@ -145,6 +145,6 @@ describe("SettingProperty.Observe", function()
 		expect(emissions).toBe(1)
 
 		maid:DoCleaning()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

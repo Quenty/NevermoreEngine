@@ -37,12 +37,12 @@ local function setup(): any
 				subscription:Destroy()
 			end
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -55,7 +55,7 @@ describe("RxHumanoidUtils.observeRunningSpeed", function()
 			(RxHumanoidUtils :: any).observeRunningSpeed(nil)
 		end).toThrow("No humanoid")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	-- Cloud runs never step the humanoid state machine, so Running/Jumping/Seated never fire and only
@@ -68,7 +68,7 @@ describe("RxHumanoidUtils.observeRunningSpeed", function()
 
 		expect(speeds).toEqual({ 0 })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -81,7 +81,7 @@ describe("RxHumanoidUtils.observeHumanoidStateType", function()
 
 		expect(stateTypes).toEqual({ humanoid:GetState() })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -93,7 +93,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 			(RxHumanoidUtils :: any).observeHumanoidStateEnabled(nil, Enum.HumanoidStateType.Jumping)
 		end).toThrow("No humanoid")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors without a state type", function()
@@ -104,7 +104,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 			(RxHumanoidUtils :: any).observeHumanoidStateEnabled(humanoid, nil)
 		end).toThrow("No stateType")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the current enabled state on subscribe", function()
@@ -116,7 +116,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits when the state is disabled and re-enabled", function()
@@ -131,7 +131,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 
 		expect(enabled).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("only emits distinct values", function()
@@ -147,7 +147,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 
 		expect(enabled).toEqual({ true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores other state types", function()
@@ -162,7 +162,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops emitting once unsubscribed", function()
@@ -178,7 +178,7 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -190,7 +190,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 			(RxHumanoidUtils :: any).observeJumpEnabled(nil)
 		end).toThrow("No humanoid")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is enabled for a default humanoid", function()
@@ -201,7 +201,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is disabled while the jumping state is disabled", function()
@@ -215,7 +215,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads jump power while UseJumpPower is true", function()
@@ -231,7 +231,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads jump height while UseJumpPower is false", function()
@@ -247,7 +247,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("switches which jump strength it reads with UseJumpPower", function()
@@ -264,7 +264,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores the unused jump strength", function()
@@ -280,7 +280,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stays disabled while both the state and the jump power are disabled", function()
@@ -296,7 +296,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops emitting once unsubscribed", function()
@@ -310,6 +310,6 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 
 		expect(enabled).toEqual({ true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

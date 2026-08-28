@@ -56,12 +56,12 @@ local function setup()
 				return last
 			end
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -84,7 +84,7 @@ describe("FeatureAccessFact", function()
 		ownsChapters.Value = false
 		expect(AccessStateUtils.isAllowed(getState() :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps unresolved unresolved rather than collapsing it to a refusal", function()
@@ -102,7 +102,7 @@ describe("FeatureAccessFact", function()
 		local state = controller.observeState(controller.fakePlayer(), shop)()
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names the source after the feature it came from, so a readout says where it came from", function()
@@ -113,7 +113,7 @@ describe("FeatureAccessFact", function()
 
 		expect(asFact:GetSource()).toEqual("feature:chapters")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles a cycle as unresolved instead of recursing", function()
@@ -131,6 +131,6 @@ describe("FeatureAccessFact", function()
 
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

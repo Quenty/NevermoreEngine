@@ -65,7 +65,7 @@ local function setup()
 		serviceBag:Destroy()
 	end)
 
-	local function destroy()
+	local function Destroy(_self)
 		maid:DoCleaning()
 	end
 
@@ -77,10 +77,10 @@ local function setup()
 		answerWith = function(promise: any)
 			verdict = promise
 		end,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(context.destroy))
+	maid:GiveTask(JestUtils.afterThis(context))
 
 	return context
 end
@@ -104,7 +104,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[1].previousSlotId).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("reports the selection being replaced when switching slots", function()
@@ -119,7 +119,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[2].slotId).toEqual(secondId)
 		expect(context.asks[2].previousSlotId).toEqual(firstId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("asks for a new slot and for an ephemeral slot alike", function()
@@ -132,7 +132,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[1].slotId).toEqual(newId)
 		expect(context.asks[2].slotId).toEqual(ephemeralId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("does not ask when the slot is already active", function()
@@ -144,7 +144,7 @@ describe("HasSaveSlots pre-select", function()
 
 		expect(#context.asks).toEqual(1)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("holds the selection until the answer settles", function()
@@ -164,7 +164,7 @@ describe("HasSaveSlots pre-select", function()
 		await(selection)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("rejects the selection and leaves the active slot alone when refused", function()
@@ -179,7 +179,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(selection:IsRejected()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("leaves the previous selection standing when a switch is refused", function()
@@ -196,6 +196,6 @@ describe("HasSaveSlots pre-select", function()
 		expect(selection:IsRejected()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(firstId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)

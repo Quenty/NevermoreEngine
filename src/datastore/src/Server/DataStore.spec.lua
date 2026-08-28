@@ -29,7 +29,7 @@ describe("DataStore without session locking", function()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(99)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should round-trip a stored value through the datastore", function()
@@ -50,7 +50,7 @@ describe("DataStore without session locking", function()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should round-trip multiple keys and load defaults for missing ones", function()
@@ -74,7 +74,7 @@ describe("DataStore without session locking", function()
 		expectSettled(missingPromise)
 		expect((missingPromise:Wait())).toEqual("default")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should round-trip substore values", function()
@@ -92,7 +92,7 @@ describe("DataStore without session locking", function()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should delete a key so it no longer loads", function()
@@ -115,7 +115,7 @@ describe("DataStore without session locking", function()
 		expect(all.a).toEqual(nil)
 		expect(all.b).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should resolve a save when nothing is staged", function()
@@ -128,7 +128,7 @@ describe("DataStore without session locking", function()
 		expectSettled(savePromise)
 		expect((savePromise:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should report load failure (not hang) when the datastore is unavailable", function()
@@ -143,7 +143,7 @@ describe("DataStore without session locking", function()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a save when the datastore goes down after loading", function()
@@ -159,7 +159,7 @@ describe("DataStore without session locking", function()
 		expectSettled(savePromise, 5)
 		expect((savePromise:Yield())).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should mark DidLoadFail after a failed load", function()
@@ -172,7 +172,7 @@ describe("DataStore without session locking", function()
 
 		expect(dataStore:DidLoadFail()).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -191,7 +191,7 @@ describe("DataStore with session locking", function()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("surfaces a persistent datastore failure fast instead of hanging", function()
@@ -209,7 +209,7 @@ describe("DataStore with session locking", function()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a failed session-locked load with the preserved datastore error", function()
@@ -225,6 +225,6 @@ describe("DataStore with session locking", function()
 		expect(outcome).toEqual("rejected")
 		expect(string.find(tostring(err), "509", 1, true) ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

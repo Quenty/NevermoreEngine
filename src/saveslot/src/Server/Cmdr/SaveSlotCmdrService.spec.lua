@@ -116,13 +116,13 @@ local function setup()
 		readRaw = function(userId: number?)
 			return mock:GetRaw(tostring(userId or ABSENT_USER_ID))
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -143,7 +143,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(string.find(output, "Alpha", 1, true) ~= nil).toEqual(true)
 		expect(string.find(output, tostring(ABSENT_USER_ID), 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("lists a slot's summary and playtime, which is what the listing is read for", function()
@@ -169,7 +169,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		-- The bug this replaced: a structured summary printed as "table: 0x...".
 		expect(string.find(output, "table: 0x", 1, true)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("creates a slot that lands in their datastore", function()
@@ -187,7 +187,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("deletes a stored slot", function()
@@ -202,7 +202,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(string.find(listed, "(1)", 1, true)).toBeNil()
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("copies a slot into the lowest free index when no destination is given", function()
@@ -223,7 +223,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "Alpha (Copy)", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("copies one player's slot onto another player's, in their own datastore", function()
@@ -251,7 +251,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local listed = controller.run("saveslot-list", { OTHER_USER_ID })
 		expect(string.find(listed, '"Alpha" (2)', 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("copies onto the named destination, overwriting the slot already there", function()
@@ -275,7 +275,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(string.find(listed, "(4)", 1, true)).toBeNil()
 		expect(string.find(listed, 'Alpha (Copy)" (3)', 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses a copy whose source and destination are the same slot", function()
@@ -286,7 +286,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 2)
 		expect(string.find(output, "both the source and the destination", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses the main slot as a destination, whose store is the player's root data", function()
@@ -297,7 +297,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local output = controller.run("saveslot-copy", ABSENT_USER_ID, 2, { ABSENT_USER_ID }, 1)
 		expect(string.find(output, "main slot (1) cannot be copied onto", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("round-trips a slot through export and import, the console's own share-code loop", function()
@@ -325,7 +325,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local listed = controller.run("saveslot-list", { OTHER_USER_ID })
 		expect(string.find(listed, '"Alpha"', 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("round-trips a slot through read-json and write-json", function()
@@ -353,7 +353,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local listed = controller.run("saveslot-list", { ABSENT_USER_ID })
 		expect(string.find(listed, "(3)", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports malformed write-json input without touching anyone's data", function()
@@ -363,7 +363,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(string.find(output, "could not decode JSON", 1, true) ~= nil).toEqual(true)
 		expect(controller.readRaw()).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the slot they would resume on, since nothing is selected offline", function()
@@ -381,7 +381,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		local output = controller.run("saveslot-get-active", { ABSENT_USER_ID })
 		expect(string.find(output, "would resume on slot 3", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the session, so back-to-back commands both work", function()
@@ -399,7 +399,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(string.find(listed, "(1)", 1, true) ~= nil).toEqual(true)
 		expect(string.find(listed, "(2)", 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports an empty target list rather than doing nothing quietly", function()
@@ -407,7 +407,7 @@ describe("SaveSlotCmdrService against an absent player", function()
 
 		expect(controller.run("saveslot-list", {})).toEqual("No players to act on.")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports a target that is taking a while", function()
@@ -420,6 +420,6 @@ describe("SaveSlotCmdrService against an absent player", function()
 		expect(#controller.replies).toEqual(1)
 		expect(string.find(controller.replies[1], tostring(ABSENT_USER_ID), 1, true) ~= nil).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

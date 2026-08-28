@@ -61,7 +61,7 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 		serviceBag:Destroy()
 	end)
 
-	local function destroy()
+	local function Destroy(_self)
 		maid:DoCleaning()
 	end
 
@@ -71,10 +71,10 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 		fakePlayer = fakePlayer,
 		hasSaveSlots = hasSaveSlots,
 		mock = mock,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -87,12 +87,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local promise = context.hasSaveSlots:PromiseSlotsLoaded()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("slots load hung").toEqual("slots load settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should create a slot and find it", function()
@@ -101,7 +101,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local ok, slotId = createPromise:Yield()
@@ -111,7 +111,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local hasPromise = context.hasSaveSlots:PromiseHasSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(hasPromise, 10) then
 			expect("hasSlot hung").toEqual("hasSlot settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((hasPromise:Wait())).toEqual(true)
@@ -119,12 +119,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local indexPromise = context.hasSaveSlots:PromiseSlotIdFromIndex(1)
 		if not PromiseTestUtils.awaitSettled(indexPromise, 10) then
 			expect("slotIdFromIndex hung").toEqual("slotIdFromIndex settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((indexPromise:Wait())).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should select a slot and report it active", function()
@@ -133,7 +133,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -141,7 +141,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((selectPromise:Yield())).toEqual(true)
@@ -151,12 +151,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
 		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
 			expect("lastActive hung").toEqual("lastActive settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((lastPromise:Wait())).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should observe the active slot store after selection", function()
@@ -165,7 +165,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -173,7 +173,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -192,7 +192,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 
 		expect(emitted).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("ObserveActiveSlotStoreBrio tears its brio down once the active slot is deselected", function()
@@ -201,7 +201,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -209,7 +209,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -231,7 +231,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
 			subscription:Destroy()
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -239,7 +239,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(activeBrio:IsDead()).toEqual(true)
 
 		subscription:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("ObserveActiveSlotStoreBrio swaps its brio when switching to another slot", function()
@@ -248,7 +248,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local firstCreate = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(firstCreate, 10) then
 			expect("first create hung").toEqual("first create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, firstSlotId = firstCreate:Yield()
@@ -256,7 +256,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local secondCreate = context.hasSaveSlots:PromiseCreateSlot(2)
 		if not PromiseTestUtils.awaitSettled(secondCreate, 10) then
 			expect("second create hung").toEqual("second create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, secondSlotId = secondCreate:Yield()
@@ -264,7 +264,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectFirst = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(selectFirst, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectFirst:Yield()
@@ -281,7 +281,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end, 10) then
 			expect("first brio hung").toEqual("first brio emitted")
 			subscription:Destroy()
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local firstBrio = currentBrio
@@ -290,7 +290,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		if not PromiseTestUtils.awaitSettled(selectSecond, 10) then
 			expect("switch hung").toEqual("switch settled")
 			subscription:Destroy()
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectSecond:Yield()
@@ -300,7 +300,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		end, 10) then
 			expect("second brio hung").toEqual("second brio emitted")
 			subscription:Destroy()
-			context.destroy()
+			context:Destroy()
 			return
 		end
 
@@ -308,7 +308,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		expect(currentBrio:IsDead()).toEqual(false)
 
 		subscription:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject creating a slot beyond the max slot count", function()
@@ -318,12 +318,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local promise = context.hasSaveSlots:PromiseCreateSlot(2)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject creating a duplicate slot index", function()
@@ -332,7 +332,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local firstPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(firstPromise, 10) then
 			expect("first create hung").toEqual("first create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		firstPromise:Yield()
@@ -340,12 +340,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local secondPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("second create hung").toEqual("second create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((secondPromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject deleting the active slot", function()
@@ -354,7 +354,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -362,7 +362,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -370,12 +370,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
 			expect("delete hung").toEqual("delete settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((deletePromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should replicate the last active slot after selection", function()
@@ -384,7 +384,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -392,14 +392,14 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
 
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDeselectSlot clears the active slot but remembers the last active", function()
@@ -408,7 +408,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -416,7 +416,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -424,7 +424,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((deselectPromise:Yield())).toEqual(true)
@@ -435,12 +435,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
 		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
 			expect("lastActive hung").toEqual("lastActive settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((lastPromise:Wait())).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("deleting the last-active slot clears the continue pointer", function()
@@ -451,7 +451,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -459,7 +459,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -467,7 +467,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -477,7 +477,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
 			expect("delete hung").toEqual("delete settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deletePromise:Yield()
@@ -487,12 +487,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
 		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
 			expect("lastActive hung").toEqual("lastActive settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((lastPromise:Wait())).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("deleting a non-last-active slot leaves the continue pointer intact", function()
@@ -501,7 +501,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local firstPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(firstPromise, 10) then
 			expect("first create hung").toEqual("first create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, firstSlotId = firstPromise:Yield()
@@ -509,7 +509,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local secondPromise = context.hasSaveSlots:PromiseCreateSlot(2)
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("second create hung").toEqual("second create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, secondSlotId = secondPromise:Yield()
@@ -517,7 +517,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -525,7 +525,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -533,14 +533,14 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(secondSlotId)
 		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
 			expect("delete hung").toEqual("delete settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deletePromise:Yield()
 
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(firstSlotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDeselectSlot is a no-op when no slot is active", function()
@@ -549,13 +549,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((deselectPromise:Yield())).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDeselectSlot then PromiseSelectLastSaveSlot round-trips back into the slot", function()
@@ -564,7 +564,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -572,7 +572,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -580,7 +580,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -589,13 +589,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local continuePromise = context.hasSaveSlots:PromiseSelectLastSaveSlot()
 		if not PromiseTestUtils.awaitSettled(continuePromise, 10) then
 			expect("continue hung").toEqual("continue settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((continuePromise:Wait())).toEqual(slotId)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseSelectLastSaveSlot re-selects the last active slot after the active slot is cleared", function()
@@ -604,7 +604,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -612,7 +612,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -623,13 +623,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local continuePromise = context.hasSaveSlots:PromiseSelectLastSaveSlot()
 		if not PromiseTestUtils.awaitSettled(continuePromise, 10) then
 			expect("continue hung").toEqual("continue settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((continuePromise:Wait())).toEqual(slotId)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseSelectLastSaveSlot resolves nil when there is nothing to continue", function()
@@ -638,13 +638,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local continuePromise = context.hasSaveSlots:PromiseSelectLastSaveSlot()
 		if not PromiseTestUtils.awaitSettled(continuePromise, 10) then
 			expect("continue hung").toEqual("continue settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((continuePromise:Wait())).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseSelectNewSaveSlot creates and selects a fresh slot each time", function()
@@ -653,7 +653,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local firstPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 		if not PromiseTestUtils.awaitSettled(firstPromise, 10) then
 			expect("new game hung").toEqual("new game settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local firstSlotId = firstPromise:Wait()
@@ -663,14 +663,14 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local secondPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("second new game hung").toEqual("second new game settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local secondSlotId = secondPromise:Wait()
 		expect(type(secondSlotId)).toEqual("string")
 		expect(secondSlotId ~= firstSlotId).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDeleteAllSlots wipes every slot and clears the selection", function()
@@ -679,7 +679,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local firstPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(firstPromise, 10) then
 			expect("first create hung").toEqual("first create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, firstSlotId = firstPromise:Yield()
@@ -687,7 +687,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local secondPromise = context.hasSaveSlots:PromiseCreateSlot(2)
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("second create hung").toEqual("second create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		secondPromise:Yield()
@@ -695,7 +695,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -703,7 +703,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local wipePromise = context.hasSaveSlots:PromiseDeleteAllSlots()
 		if not PromiseTestUtils.awaitSettled(wipePromise, 10) then
 			expect("wipe hung").toEqual("wipe settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		wipePromise:Yield()
@@ -714,12 +714,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local hasPromise = context.hasSaveSlots:PromiseHasSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(hasPromise, 10) then
 			expect("hasSlot hung").toEqual("hasSlot settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((hasPromise:Wait())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseSelectNewSaveSlot reuses the lowest free index after a deletion", function()
@@ -730,7 +730,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			local createPromise = context.hasSaveSlots:PromiseCreateSlot(index)
 			if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 				expect("create hung").toEqual("create settled")
-				context.destroy()
+				context:Destroy()
 				return
 			end
 			local _, slotId = createPromise:Yield()
@@ -740,7 +740,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deletePromise = context.hasSaveSlots:PromiseDeleteSlot(slotIdsByIndex[2])
 		if not PromiseTestUtils.awaitSettled(deletePromise, 10) then
 			expect("delete hung").toEqual("delete settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deletePromise:Yield()
@@ -748,7 +748,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 		if not PromiseTestUtils.awaitSettled(newPromise, 10) then
 			expect("new game hung").toEqual("new game settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = newPromise:Wait()
@@ -757,12 +757,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((metadataPromise:Wait()).SlotIndex).toEqual(2)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDuplicateSlot copies saved data into a fresh slot and marks the name", function()
@@ -771,7 +771,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1, { SlotName = "Adventure" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -782,7 +782,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
 			expect("duplicate hung").toEqual("duplicate settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = duplicatePromise:Wait()
@@ -792,7 +792,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local metadata = metadataPromise:Wait()
@@ -802,12 +802,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((dataPromise:Wait())).toEqual(500)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDuplicateSlot into the default slot preserves the system store", function()
@@ -816,7 +816,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Save" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -827,7 +827,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
 			expect("duplicate hung").toEqual("duplicate settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = duplicatePromise:Wait()
@@ -835,7 +835,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((metadataPromise:Wait()).SlotIndex).toEqual(1)
@@ -843,7 +843,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local sourceStillThere = context.hasSaveSlots:PromiseSlotIdFromIndex(2)
 		if not PromiseTestUtils.awaitSettled(sourceStillThere, 10) then
 			expect("lookup hung").toEqual("lookup settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((sourceStillThere:Wait())).toEqual(slotId)
@@ -851,12 +851,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((dataPromise:Wait())).toEqual(750)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseDuplicateSlot rejects when the source slot is missing", function()
@@ -865,12 +865,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot("does-not-exist")
 		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
 			expect("duplicate hung").toEqual("duplicate settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((duplicatePromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetActiveSlot wipes saved data but keeps the slot's index and name", function()
@@ -879,7 +879,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Adventure" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -887,7 +887,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -898,7 +898,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = resetPromise:Wait()
@@ -909,7 +909,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local hasOldPromise = context.hasSaveSlots:PromiseHasSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(hasOldPromise, 10) then
 			expect("hasSlot hung").toEqual("hasSlot settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((hasOldPromise:Wait())).toEqual(false)
@@ -917,7 +917,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local metadata = metadataPromise:Wait()
@@ -927,12 +927,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((dataPromise:Wait())).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetActiveSlot resets the default slot in place, preserving the system store", function()
@@ -941,7 +941,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1, { SlotName = "Save" })
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -949,7 +949,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -960,7 +960,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = resetPromise:Wait()
@@ -968,7 +968,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local lookupPromise = context.hasSaveSlots:PromiseSlotIdFromIndex(1)
 		if not PromiseTestUtils.awaitSettled(lookupPromise, 10) then
 			expect("lookup hung").toEqual("lookup settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((lookupPromise:Wait())).toEqual(newSlotId)
@@ -976,12 +976,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((dataPromise:Wait())).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetActiveSlot is a no-op resolving nil when no slot is active", function()
@@ -990,13 +990,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetActiveSlot()
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((resetPromise:Wait())).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetSlot wipes a non-active slot without touching the active selection", function()
@@ -1005,7 +1005,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local activePromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(activePromise, 10) then
 			expect("active create hung").toEqual("active create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, activeSlotId = activePromise:Yield()
@@ -1013,7 +1013,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(activeSlotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -1021,7 +1021,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local targetPromise = context.hasSaveSlots:PromiseCreateSlot(2, { SlotName = "Adventure" })
 		if not PromiseTestUtils.awaitSettled(targetPromise, 10) then
 			expect("target create hung").toEqual("target create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, targetSlotId = targetPromise:Yield()
@@ -1032,7 +1032,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetSlot(targetSlotId)
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = resetPromise:Wait()
@@ -1044,7 +1044,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local metadataPromise = context.hasSaveSlots:PromiseGetSlotMetadata(newSlotId)
 		if not PromiseTestUtils.awaitSettled(metadataPromise, 10) then
 			expect("metadata hung").toEqual("metadata settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local metadata = metadataPromise:Wait()
@@ -1054,12 +1054,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local dataPromise = tracker:_getSlotStore(newSlotId):Load("Coins")
 		if not PromiseTestUtils.awaitSettled(dataPromise, 10) then
 			expect("data hung").toEqual("data settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((dataPromise:Wait())).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetSlot keeps the continue pointer on the reset slot when it was last-active", function()
@@ -1068,7 +1068,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -1076,7 +1076,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local selectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(selectPromise, 10) then
 			expect("select hung").toEqual("select settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		selectPromise:Yield()
@@ -1084,7 +1084,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -1093,7 +1093,7 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = resetPromise:Wait()
@@ -1104,12 +1104,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local lastPromise = context.hasSaveSlots:PromiseLastActiveSlotId()
 		if not PromiseTestUtils.awaitSettled(lastPromise, 10) then
 			expect("lastActive hung").toEqual("lastActive settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((lastPromise:Wait())).toEqual(newSlotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseResetSlot rejects when the slot is missing", function()
@@ -1118,12 +1118,12 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local resetPromise = context.hasSaveSlots:PromiseResetSlot("does-not-exist")
 		if not PromiseTestUtils.awaitSettled(resetPromise, 10) then
 			expect("reset hung").toEqual("reset settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		expect((resetPromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("allows creating a slot past a finite cap when the count is unbounded", function()
@@ -1133,14 +1133,14 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(6)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local ok, slotId = createPromise:Yield()
 		expect(ok).toEqual(true)
 		expect(type(slotId)).toEqual("string")
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("PromiseSelectNewSaveSlot never runs out of slots when unbounded", function()
@@ -1151,13 +1151,13 @@ describe("HasSaveSlots against a fake player (healthy datastore)", function()
 			local newPromise = context.hasSaveSlots:PromiseSelectNewSaveSlot()
 			if not PromiseTestUtils.awaitSettled(newPromise, 10) then
 				expect("new game hung").toEqual("new game settled")
-				context.destroy()
+				context:Destroy()
 				return
 			end
 			expect(type(newPromise:Wait())).toEqual("string")
 		end
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -1195,7 +1195,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local slotId = createAndSelect(context, 1)
 		expect(getMetadata(context, slotId).PlayCount).toEqual(1)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("counts a fresh session each time a slot is re-selected", function()
@@ -1207,7 +1207,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local reselectPromise = context.hasSaveSlots:PromiseSelectSlot(firstSlotId)
 		if not PromiseTestUtils.awaitSettled(reselectPromise, 10) then
 			expect("reselect hung").toEqual("reselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		reselectPromise:Yield()
@@ -1215,7 +1215,7 @@ describe("HasSaveSlots playtime tracking", function()
 		expect(getMetadata(context, firstSlotId).PlayCount).toEqual(2)
 		expect(getMetadata(context, secondSlotId).PlayCount).toEqual(1)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("accrues elapsed wall time into TimePlayed and LastSessionLength for the active slot", function()
@@ -1234,7 +1234,7 @@ describe("HasSaveSlots playtime tracking", function()
 		expect(metadata.TimePlayed ~= nil and metadata.TimePlayed >= 120).toEqual(true)
 		expect(metadata.LastSessionLength ~= nil and metadata.LastSessionLength >= 120).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("does not accrue time before any slot is selected", function()
@@ -1246,14 +1246,14 @@ describe("HasSaveSlots playtime tracking", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
 
 		expect(getMetadata(context, slotId).TimePlayed).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("stops accruing into a slot once it is deselected", function()
@@ -1269,7 +1269,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local deselectPromise = context.hasSaveSlots:PromiseDeselectSlot()
 		if not PromiseTestUtils.awaitSettled(deselectPromise, 10) then
 			expect("deselect hung").toEqual("deselect settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		deselectPromise:Yield()
@@ -1281,7 +1281,7 @@ describe("HasSaveSlots playtime tracking", function()
 		tracker:_flushPlaytime()
 		expect(getMetadata(context, slotId).TimePlayed).toEqual(afterDeselect)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("carries the source slot's playtime onto a duplicate, live session included", function()
@@ -1297,7 +1297,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
 			expect("duplicate hung").toEqual("duplicate settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local newSlotId = duplicatePromise:Wait()
@@ -1305,7 +1305,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local copied = getMetadata(context, newSlotId).TimePlayed
 		expect(copied ~= nil and copied >= 120).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("leaves a duplicate of a never-played slot without playtime", function()
@@ -1314,7 +1314,7 @@ describe("HasSaveSlots playtime tracking", function()
 		local createPromise = context.hasSaveSlots:PromiseCreateSlot(1)
 		if not PromiseTestUtils.awaitSettled(createPromise, 10) then
 			expect("create hung").toEqual("create settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 		local _, slotId = createPromise:Yield()
@@ -1322,13 +1322,13 @@ describe("HasSaveSlots playtime tracking", function()
 		local duplicatePromise = context.hasSaveSlots:PromiseDuplicateSlot(slotId)
 		if not PromiseTestUtils.awaitSettled(duplicatePromise, 10) then
 			expect("duplicate hung").toEqual("duplicate settled")
-			context.destroy()
+			context:Destroy()
 			return
 		end
 
 		expect(getMetadata(context, duplicatePromise:Wait()).TimePlayed).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -1386,7 +1386,7 @@ describe("HasSaveSlots summary providers", function()
 		expect(summary.coins).toEqual(100)
 		expect(summary.world).toEqual(3)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("drops a provider's key from the Summary once it is unregistered", function()
@@ -1412,7 +1412,7 @@ describe("HasSaveSlots summary providers", function()
 		expect(matched).toEqual(true)
 		expect(summary.world).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("isolates a provider that errors when called so the others still contribute", function()
@@ -1433,7 +1433,7 @@ describe("HasSaveSlots summary providers", function()
 		expect(matched).toEqual(true)
 		expect(summary.bad).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("isolates a provider whose stream fails so the others still contribute", function()
@@ -1457,7 +1457,7 @@ describe("HasSaveSlots summary providers", function()
 		expect(matched).toEqual(true)
 		expect(summary.bad).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("clears the Summary when every provider is unregistered", function()
@@ -1479,7 +1479,7 @@ describe("HasSaveSlots summary providers", function()
 		end, 10)
 		expect(cleared).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -1499,7 +1499,7 @@ describe("HasSaveSlots against a fake player (datastore down)", function()
 			expect(ok).toEqual(false)
 		end
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -1534,7 +1534,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotId))).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("marks the slot with the IsEphemeral property, and real slots without it", function()
@@ -1549,7 +1549,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(ephemeralMetadata.IsEphemeral).toEqual(true)
 		expect(realMetadata.IsEphemeral).never.toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("keeps the ephemeral slot out of the slot list while still replicating it", function()
@@ -1568,7 +1568,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(slotContainerHasChild(context, realId)).toEqual(true)
 		expect(slotContainerHasChild(context, ephemeralId)).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("replicates the ephemeral slot's metadata so it is readable off the instance tree", function()
@@ -1582,7 +1582,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(metadata.SlotName).toEqual("Lobby run")
 		expect(metadata.IsEphemeral).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("replicates the ephemeral slot's summary as its providers update it", function()
@@ -1610,7 +1610,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		end, 10)).toEqual(true)
 
 		coins:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("emits the ephemeral slot through ObserveSlotMetadata, and nil once it is retired", function()
@@ -1639,7 +1639,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		end, 10)).toEqual(true)
 
 		maid:DoCleaning()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("excludes the ephemeral slot from ObserveSlotList without dropping the real slots", function()
@@ -1673,7 +1673,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(observedIds[realId]).toEqual(true)
 
 		maid:DoCleaning()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("persists a real slot's data but never an ephemeral slot's", function()
@@ -1699,7 +1699,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(ephemeralIdFound).toEqual(false)
 		expect(ephemeralValueFound).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("destroys the ephemeral slot's in-memory store when it is retired", function()
@@ -1715,7 +1715,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		-- now GC-eligible) when the slot was retired, rather than lingering.
 		expect(getmetatable(store)).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("does not disturb the Continue pointer when an ephemeral slot is selected", function()
@@ -1726,7 +1726,7 @@ describe("HasSaveSlots ephemeral slots", function()
 
 		expect(context.hasSaveSlots.LastActiveSlotId.Value).toEqual(realId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("tears the ephemeral slot down once it stops being active", function()
@@ -1741,7 +1741,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
 		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("retires the ephemeral slot when switching to a real slot, keeping the real slots", function()
@@ -1758,7 +1758,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotA))).toEqual(true)
 		expect(resolve(context.hasSaveSlots:PromiseHasSlot(slotB))).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("drives summaries through the ephemeral slot's in-memory store", function()
@@ -1776,7 +1776,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		end, 10)
 		expect(matched).toEqual(true)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("refuses to reset an ephemeral slot", function()
@@ -1788,7 +1788,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(PromiseTestUtils.awaitSettled(resetPromise, 10)).toEqual(true)
 		expect((resetPromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("duplicates an ephemeral slot into a real slot carrying its live data", function()
@@ -1810,7 +1810,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		-- Duplicating leaves the session running on the ephemeral slot, like any other duplicate.
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(ephemeralId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("persists the ephemeral slot and continues play on the new real slot", function()
@@ -1836,7 +1836,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(data.Coins).toEqual(12)
 		expect(data.SaveSlots).never.toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("refuses to persist when the active slot is a real one", function()
@@ -1848,7 +1848,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(PromiseTestUtils.awaitSettled(persistPromise, 10)).toEqual(true)
 		expect((persistPromise:Yield())).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("ends the session when the ephemeral slot is deleted", function()
@@ -1861,7 +1861,7 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(resolve(context.hasSaveSlots:PromiseHasSlot(ephemeralId))).toEqual(false)
 		expect(slotContainerHasChild(context, ephemeralId)).toEqual(false)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("still resumes the real slot with Continue after an ephemeral session", function()
@@ -1877,6 +1877,6 @@ describe("HasSaveSlots ephemeral slots", function()
 		expect(continuedId).toEqual(realId)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(realId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)

@@ -36,7 +36,7 @@ local function setup(): any
 
 			return set
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -45,7 +45,7 @@ end
 describe("RxAttributeUtils.observeAttribute()", function()
 	it("fires the current value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 		local values = controller.observeInto(RxAttributeUtils.observeAttribute(controller.folder, "Version"))
@@ -58,7 +58,7 @@ describe("RxAttributeUtils.observeAttribute()", function()
 
 	it("fires the default value while the attribute is unset", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local values = controller.observeInto(RxAttributeUtils.observeAttribute(controller.folder, "Version", "1.0.0"))
 
@@ -81,7 +81,7 @@ end)
 describe("RxAttributeUtils.observeAttributeKeys()", function()
 	it("fires every key that is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 		controller.folder:SetAttribute("Enabled", true)
@@ -93,7 +93,7 @@ describe("RxAttributeUtils.observeAttributeKeys()", function()
 
 	it("fires keys as they are added", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		local keys = controller.observeIntoSet(RxAttributeUtils.observeAttributeKeys(controller.folder))
 
@@ -109,7 +109,7 @@ end)
 describe("RxAttributeUtils.observeAttributeKeysBrio()", function()
 	it("emits a live brio for every key that is set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -122,7 +122,7 @@ describe("RxAttributeUtils.observeAttributeKeysBrio()", function()
 
 	it("kills the brio once the attribute is removed", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -137,7 +137,7 @@ describe("RxAttributeUtils.observeAttributeKeysBrio()", function()
 
 	it("keeps the same brio while the key only changes value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -154,7 +154,7 @@ end)
 describe("RxAttributeUtils.observeAttributeBrio()", function()
 	it("emits a brio for the current value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -166,7 +166,7 @@ describe("RxAttributeUtils.observeAttributeBrio()", function()
 
 	it("replaces the brio when the value changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -182,7 +182,7 @@ describe("RxAttributeUtils.observeAttributeBrio()", function()
 
 	it("does not emit again for the same value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "1.0.0")
 
@@ -197,7 +197,7 @@ describe("RxAttributeUtils.observeAttributeBrio()", function()
 
 	it("skips values the condition rejects", function()
 		local controller = setup()
-		JestUtils.afterThis(controller.destroy)
+		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Count", 1)
 

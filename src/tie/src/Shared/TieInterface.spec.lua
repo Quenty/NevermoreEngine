@@ -49,12 +49,12 @@ local function setup(): any
 		newInterface = function(implParent: Instance?, adornee: Instance?): any
 			return (TieInterface :: any).new(controller.definition, implParent, adornee, TieRealms.SERVER)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -78,7 +78,7 @@ describe("TieInterface.IsImplemented with an implParent only", function()
 
 		expect(controller.newInterface(container, nil):IsImplemented()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false when a required member is missing", function()
@@ -90,7 +90,7 @@ describe("TieInterface.IsImplemented with an implParent only", function()
 
 		expect(controller.newInterface(container, nil):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores the container name when no adornee is given", function()
@@ -101,7 +101,7 @@ describe("TieInterface.IsImplemented with an implParent only", function()
 
 		expect(controller.newInterface(container, nil):IsImplemented()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -114,7 +114,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 
 		expect(controller.newInterface(container, adornee):IsImplemented()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns true for every container name valid in the realm", function()
@@ -127,7 +127,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 			expect(controller.newInterface(container, adornee):IsImplemented()).toBe(true)
 		end
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false for a container name that is not valid in the realm", function()
@@ -138,7 +138,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 
 		expect(controller.newInterface(container, adornee):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false for an unrelated container name", function()
@@ -149,7 +149,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 
 		expect(controller.newInterface(container, adornee):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false when the container is parented elsewhere", function()
@@ -161,7 +161,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 
 		expect(controller.newInterface(container, adornee):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false when a valid container is missing a required member", function()
@@ -173,7 +173,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 
 		expect(controller.newInterface(container, adornee):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("follows the container as it is renamed and reparented", function()
@@ -194,7 +194,7 @@ describe("TieInterface.IsImplemented with an implParent and an adornee", functio
 		container.Parent = controller.newAdornee()
 		expect(interface:IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -207,7 +207,7 @@ describe("TieInterface.IsImplemented with an adornee only", function()
 
 		expect(controller.definition:Get(adornee, TieRealms.SERVER):IsImplemented()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false when the adornee has no implementation", function()
@@ -217,7 +217,7 @@ describe("TieInterface.IsImplemented with an adornee only", function()
 
 		expect(controller.definition:Get(adornee, TieRealms.SERVER):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false when the only container is not valid in the realm", function()
@@ -228,7 +228,7 @@ describe("TieInterface.IsImplemented with an adornee only", function()
 
 		expect(controller.definition:Get(adornee, TieRealms.SERVER):IsImplemented()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -255,7 +255,7 @@ describe("TieInterface.ObserveIsImplemented", function()
 
 		expect(seen).toEqual({ true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits for an implParent alone", function()
@@ -272,7 +272,7 @@ describe("TieInterface.ObserveIsImplemented", function()
 
 		expect(seen).toEqual({ true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("emits for an adornee alone", function()
@@ -288,6 +288,6 @@ describe("TieInterface.ObserveIsImplemented", function()
 
 		expect(seen).toEqual({ false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

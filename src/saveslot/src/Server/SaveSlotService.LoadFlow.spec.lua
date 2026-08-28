@@ -45,7 +45,7 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 	local dataStore: DataStore.DataStore = resolved
 	local systemStore = dataStore:GetSubStore(SaveSlotConstants.SYSTEM_STORE_KEY)
 
-	local function destroy()
+	local function Destroy(_self)
 		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
 		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
 		-- this spec and fires inside a later package's window.
@@ -61,10 +61,10 @@ local function setup(mock: DataStoreMock.DataStoreMock?)
 		getSlotStore = function(slotId: string)
 			return systemStore:GetSubStore(SaveSlotConstants.SLOT_STORE_KEY):GetSubStore(slotId)
 		end,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -82,7 +82,7 @@ describe("save slot load flow (healthy datastore)", function()
 		expect(activeStatus).toEqual("resolved")
 		expect(activeSlotId).toEqual(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("round-trips a slot's data through the slot substore", function()
@@ -98,7 +98,7 @@ describe("save slot load flow (healthy datastore)", function()
 		expect(loadStatus).toEqual("resolved")
 		expect(coins).toEqual(25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -112,6 +112,6 @@ describe("save slot load flow (datastore down)", function()
 		local status = PromiseTestUtils.awaitOutcome(controller.metadataStore:LoadAll({}), 5)
 		expect(status).toEqual("rejected")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

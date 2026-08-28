@@ -60,19 +60,23 @@ local function setup()
 		serviceBag:Destroy()
 	end)
 
-	local function destroy()
-		maid:DoCleaning()
-	end
+	local controller = {
+		hasSaveSlots = hasSaveSlots,
+		sharedMock = sharedMock,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
 
-	maid:GiveTask(JestUtils.afterThis(destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
-	return { hasSaveSlots = hasSaveSlots, sharedMock = sharedMock, destroy = destroy }
+	return controller
 end
 
 local function runWithContext(body)
 	local context = setup()
 	local ok, err = pcall(body, context)
-	context.destroy()
+	context:Destroy()
 	if not ok then
 		error(err, 0)
 	end

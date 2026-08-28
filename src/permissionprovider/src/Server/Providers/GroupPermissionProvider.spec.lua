@@ -54,12 +54,12 @@ local function setup(options: { minAdminRequiredRank: number, minCreatorRequired
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -82,7 +82,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should deny both levels when the rank thresholds are not met", function()
@@ -92,7 +92,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should grant admin but deny creator for a tiered config", function()
@@ -102,7 +102,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should grant admin but deny creator from an injected group rank", function()
@@ -113,7 +113,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should grant both levels from an injected group rank meeting both thresholds", function()
@@ -124,7 +124,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should ignore a rank injected for a different group", function()
@@ -134,7 +134,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a player outside the game hierarchy", function()
@@ -147,7 +147,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		end).toThrow("Bad player")
 
 		maid:DoCleaning()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a non-player value", function()
@@ -157,7 +157,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 			controller.provider:PromiseIsPermissionLevel(nil :: any, PermissionLevel.ADMIN)
 		end).toThrow("Bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject an invalid permission level", function()
@@ -168,7 +168,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 			controller.provider:PromiseIsPermissionLevel(player, "not-a-level" :: any)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -180,6 +180,6 @@ describe("GroupPermissionProvider.Start", function()
 			controller.provider:Start()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

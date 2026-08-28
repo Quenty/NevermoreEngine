@@ -52,7 +52,7 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
 			-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
 			-- this spec and fires inside a later package's window.
@@ -61,7 +61,7 @@ local function setup()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -75,7 +75,7 @@ describe("SaveSlotService initialization", function()
 		end).never.toThrow()
 		expect(controller.saveSlotService).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -85,7 +85,7 @@ describe("SaveSlotService.GetExplicitSelectionRequired", function()
 
 		expect(controller.saveSlotService:GetExplicitSelectionRequired()).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should be true after RequireExplicitSelection", function()
@@ -94,7 +94,7 @@ describe("SaveSlotService.GetExplicitSelectionRequired", function()
 		controller.saveSlotService:RequireExplicitSelection()
 		expect(controller.saveSlotService:GetExplicitSelectionRequired()).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -106,7 +106,7 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 			controller.saveSlotService:RegisterPreSelectCallback(nil :: any)
 		end).toThrow("Bad callback")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("accepts registrations after Start", function()
@@ -123,7 +123,7 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
 		expect(ran).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops running a callback once removed", function()
@@ -144,7 +144,7 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
 		expect(ran).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -156,7 +156,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			true
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("hands each callback the player and the selection it is replacing", function()
@@ -176,7 +176,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 		expect(calls[1].slotId).toEqual("slot-2")
 		expect(calls[1].previousSlotId).toEqual("slot-1")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses when a callback returns false", function()
@@ -190,7 +190,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			false
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses when a returned promise resolves false", function()
@@ -204,7 +204,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			false
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("waits on every returned promise before answering", function()
@@ -227,7 +227,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 		second:Resolve()
 		expect(controller.awaitBool(verdict)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("runs every callback even once one has refused", function()
@@ -246,7 +246,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 
 		expect(ranAfter).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("allows the selection when a callback errors rather than treating it as a refusal", function()
@@ -266,7 +266,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 		)
 		expect(ranAfter).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("allows the selection when a returned promise rejects", function()
@@ -280,7 +280,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			true
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -293,7 +293,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:RequireExplicitSelection()
 		end).toThrow("RequireExplicitSelection must be called before Start")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject SetMaxSlotCount after Start", function()
@@ -304,7 +304,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:SetMaxSlotCount(3)
 		end).toThrow("SetMaxSlotCount must be called before Start")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should accept a valid SetMaxSlotCount before Start", function()
@@ -314,7 +314,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:SetMaxSlotCount(3)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a SetMaxSlotCount below 1", function()
@@ -324,7 +324,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:SetMaxSlotCount(0)
 		end).toThrow("Bad maxSlotCount")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should accept SetUnlimitedSlots before Start", function()
@@ -334,7 +334,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:SetUnlimitedSlots()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject SetUnlimitedSlots after Start", function()
@@ -345,7 +345,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:SetUnlimitedSlots()
 		end).toThrow("SetMaxSlotCount must be called before Start")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a non-function default summary provider", function()
@@ -355,7 +355,7 @@ describe("SaveSlotService configuration guards", function()
 			controller.saveSlotService:RegisterDefaultSummaryProvider("progress", "not a function" :: any)
 		end).toThrow("Bad provider")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a non-string default summary provider name", function()
@@ -367,7 +367,7 @@ describe("SaveSlotService configuration guards", function()
 			end)
 		end).toThrow("Bad name")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("registers a default summary provider and returns an unregister function", function()
@@ -385,7 +385,7 @@ describe("SaveSlotService configuration guards", function()
 			unregister()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -401,7 +401,7 @@ describe("SaveSlotService internal teleport", function()
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should not carry a slot id when the single player has no active slot", function()
@@ -414,7 +414,7 @@ describe("SaveSlotService internal teleport", function()
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should carry each player's own active slot id for a multi-player teleport", function()
@@ -432,7 +432,7 @@ describe("SaveSlotService internal teleport", function()
 		expect(sliceA and sliceA[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-a")
 		expect(sliceB and sliceB[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-b")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should report a client-initiated teleport (non-trusted band) as internal", function()
@@ -446,7 +446,7 @@ describe("SaveSlotService internal teleport", function()
 
 		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should report a server-initiated teleport (trusted band) as internal", function()
@@ -461,7 +461,7 @@ describe("SaveSlotService internal teleport", function()
 
 		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("should report a fresh join (no arrived data) as not internal", function()
@@ -473,6 +473,6 @@ describe("SaveSlotService internal teleport", function()
 
 		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(fresh))).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

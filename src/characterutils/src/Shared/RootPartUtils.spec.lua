@@ -22,7 +22,7 @@ local function setup(): any
 	local controller = {
 		maid = maid,
 		player = player,
-		destroy = function()
+		Destroy = function(_self)
 			-- Destroying the player first fires the leave path, rejecting a pending
 			-- promisePlayerHumanoidRootPart with nobody to consume it.
 			maid:DoCleaning()
@@ -30,7 +30,7 @@ local function setup(): any
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -52,7 +52,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(ok).toBe(true)
 		expect(rootPart).toBe(getRootPart(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stays pending until a character spawns", function()
@@ -67,7 +67,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(ok).toBe(true)
 		expect(rootPart).toBe(getRootPart(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves with the root part of the character present when it spawns, not a despawned one", function()
@@ -87,7 +87,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(rootPart).toBe(getRootPart(secondCharacter))
 		expect(rootPart).never.toBe(firstRootPart)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves for a dead humanoid, which still has a root part", function()
@@ -103,7 +103,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(ok).toBe(true)
 		expect(rootPart).toBe(getRootPart(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves once a humanoid is added to a character that spawned without one", function()
@@ -129,7 +129,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(ok).toBe(true)
 		expect(resolved).toBe(rootPart)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects when the player leaves the game", function()
@@ -144,7 +144,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		expect(ok).toBe(false)
 		expect(err).toBe("Player removed from game")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a value that is neither a Player nor a PlayerMock", function()
@@ -158,7 +158,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 
 		folder:Destroy()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -170,7 +170,7 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		expect(RootPartUtils.getPlayerRootPart(controller.player)).toBe(getRootPart(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil when the player has no character", function()
@@ -178,7 +178,7 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		expect(RootPartUtils.getPlayerRootPart(controller.player)).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil once the character is removed", function()
@@ -189,7 +189,7 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		expect(RootPartUtils.getPlayerRootPart(controller.player)).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a character without a humanoid", function()
@@ -207,7 +207,7 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		expect(RootPartUtils.getPlayerRootPart(controller.player)).toBe(nil)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part for a dead humanoid", function()
@@ -219,7 +219,7 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		expect(RootPartUtils.getPlayerRootPart(controller.player)).toBe(getRootPart(character))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a value that is neither a Player nor a PlayerMock", function()
@@ -233,6 +233,6 @@ describe("RootPartUtils.getPlayerRootPart", function()
 
 		folder:Destroy()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

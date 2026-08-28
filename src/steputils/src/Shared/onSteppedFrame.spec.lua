@@ -16,7 +16,7 @@ local it = Jest.Globals.it
 
 type Controller = {
 	bind: (() -> ()) -> RBXScriptConnection,
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -36,12 +36,12 @@ local function setup(): Controller
 			return conn
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -55,7 +55,7 @@ describe("onSteppedFrame", function()
 		expect(typeof(conn)).toBe("RBXScriptConnection")
 		expect(conn.Connected).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("goes dead once disconnected", function()
@@ -66,7 +66,7 @@ describe("onSteppedFrame", function()
 
 		expect(conn.Connected).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates a repeated disconnect", function()
@@ -79,7 +79,7 @@ describe("onSteppedFrame", function()
 			conn:Disconnect()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function", function()
@@ -89,6 +89,6 @@ describe("onSteppedFrame", function()
 			(onSteppedFrame :: any)("func")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

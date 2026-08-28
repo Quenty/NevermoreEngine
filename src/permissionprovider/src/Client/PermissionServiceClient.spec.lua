@@ -69,13 +69,13 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -91,7 +91,7 @@ describe("PermissionServiceClient initialization", function()
 		expect(ok).toEqual(true)
 		expect((provider :: any).ClassName).toEqual("PermissionProviderClient")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects double initialization", function()
@@ -105,7 +105,7 @@ describe("PermissionServiceClient initialization", function()
 		end).toThrow("Already initialized")
 
 		bare:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -117,7 +117,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			controller.service:PromiseIsAdmin(5 :: any)
 		end).toThrow("Bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the server's answer for the designated local player", function()
@@ -128,7 +128,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the server's answer for a nil player", function()
@@ -139,7 +139,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(controller.service:PromiseIsAdmin(nil))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("denies the designated local player when the server answers false", function()
@@ -150,7 +150,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a mock that is not the designated local player", function()
@@ -161,7 +161,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			controller.service:PromiseIsAdmin(otherPlayer)
 		end).toThrow("We only support local player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("caches the server answer across calls", function()
@@ -176,6 +176,6 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 		expect(invokeCount).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

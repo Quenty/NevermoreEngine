@@ -20,7 +20,7 @@ type Controller = {
 	newLooseAction: () -> ScoredAction.ScoredAction,
 	newValue: (boolean) -> ValueObject.ValueObject<boolean>,
 	collect: (any) -> { any },
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -47,12 +47,12 @@ local function setup(): Controller
 			return results
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -66,7 +66,7 @@ describe("ScoredAction.new", function()
 		expect(action:IsEnabled()).toBe(true)
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -79,7 +79,7 @@ describe("ScoredAction.SetScore", function()
 
 		expect(action:GetScore()).toBe(5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-number score", function()
@@ -90,7 +90,7 @@ describe("ScoredAction.SetScore", function()
 			(action :: any):SetScore("5")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -103,7 +103,7 @@ describe("ScoredAction.SetIsEnabled", function()
 
 		expect(action:IsEnabled()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tracks an observable source", function()
@@ -116,7 +116,7 @@ describe("ScoredAction.SetIsEnabled", function()
 
 		expect(action:IsEnabled()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops tracking the observable source once unmounted", function()
@@ -130,7 +130,7 @@ describe("ScoredAction.SetIsEnabled", function()
 
 		expect(action:IsEnabled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires EnabledChanged with the new state", function()
@@ -143,7 +143,7 @@ describe("ScoredAction.SetIsEnabled", function()
 
 		expect(states).toEqual({ true, false, true })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -157,7 +157,7 @@ describe("ScoredAction.ObserveIsEnabled", function()
 
 		expect(states).toEqual({ true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -172,7 +172,7 @@ describe("ScoredAction.PushPreferred", function()
 		pop()
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stays preferred until every push is popped", function()
@@ -188,7 +188,7 @@ describe("ScoredAction.PushPreferred", function()
 		popSecond()
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires PreferredChanged with the new state", function()
@@ -204,7 +204,7 @@ describe("ScoredAction.PushPreferred", function()
 
 		expect(states).toEqual({ true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not require a score", function()
@@ -216,7 +216,7 @@ describe("ScoredAction.PushPreferred", function()
 		expect(action:GetScore()).toBe(-math.huge)
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -230,7 +230,7 @@ describe("ScoredAction.ObservePreferred", function()
 
 		expect(states).toEqual({ false, true, false })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -248,7 +248,7 @@ describe("ScoredAction.Destroy", function()
 
 		expect(fired).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the metatable so pickers can detect a stale action", function()
@@ -260,6 +260,6 @@ describe("ScoredAction.Destroy", function()
 
 		expect((action :: any).Destroy).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

@@ -16,7 +16,7 @@ local it = Jest.Globals.it
 
 type Controller = {
 	bind: (number, () -> ()) -> () -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -36,12 +36,12 @@ local function setup(): Controller
 			return unbind
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	maid:GiveTask(JestUtils.afterThis(controller.destroy))
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -54,7 +54,7 @@ describe("onRenderStepFrame", function()
 
 		expect(type(unbind)).toBe("function")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates a repeated unbind", function()
@@ -67,7 +67,7 @@ describe("onRenderStepFrame", function()
 			unbind()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds each call under its own key", function()
@@ -82,7 +82,7 @@ describe("onRenderStepFrame", function()
 			second()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-number priority", function()
@@ -92,7 +92,7 @@ describe("onRenderStepFrame", function()
 			(onRenderStepFrame :: any)("high", function() end)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function callback", function()
@@ -102,6 +102,6 @@ describe("onRenderStepFrame", function()
 			(onRenderStepFrame :: any)(100, "callback")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
