@@ -11,6 +11,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
@@ -32,6 +34,8 @@ local specCounter = 0
 local function setup()
 	specCounter += 1
 
+	local maid = Maid.new()
+
 	local serverBag = ServiceBag.new()
 	local resetService: any = serverBag:GetService(ResetService)
 	local playerMockService: any = serverBag:GetService(PlayerMockService)
@@ -47,7 +51,14 @@ local function setup()
 	playerMockServiceClient:SetLocalPlayer(mock)
 	clientBag:Start()
 
-	return {
+	maid:GiveTask(function()
+		-- Client bags first: the server bag owns the mock, and destroying it out from under a
+		-- live client is not something production ever does.
+		clientBag:Destroy()
+		serverBag:Destroy()
+	end)
+
+	local controller = {
 		serverBag = serverBag,
 		clientBag = clientBag,
 		resetService = resetService,
@@ -57,13 +68,14 @@ local function setup()
 			local character = PlayerMock.loadCharacterAsync(mock, RigBuilderUtils.createR6BaseRig())
 			return character, assert(character:FindFirstChildOfClass("Humanoid"), "No humanoid in rig")
 		end,
-		destroy = function(_self)
-			-- Client bags first: the server bag owns the mock, and destroying it out from under a
-			-- live client is not something production ever does.
-			clientBag:Destroy()
-			serverBag:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("ResetServiceClient dual-realm boot", function()
@@ -73,7 +85,7 @@ describe("ResetServiceClient dual-realm boot", function()
 		expect(controller.resetService).never.toBeNil()
 		expect(controller.resetServiceClient).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -98,7 +110,7 @@ describe("ResetServiceClient.PromiseResetCharacter", function()
 		expect(humanoid.Health).toBe(0)
 		expect(resetPlayers).toEqual({ controller.mock })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("respawns the character through the default reset provider", function()
@@ -115,7 +127,7 @@ describe("ResetServiceClient.PromiseResetCharacter", function()
 		expect(newCharacter).never.toBe(character)
 		expect(character.Parent).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resets without a character", function()
@@ -129,7 +141,7 @@ describe("ResetServiceClient.PromiseResetCharacter", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 10)).toBe(true)
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -151,7 +163,7 @@ describe("ResetServiceClient.RequestResetCharacter", function()
 		expect(humanoid.Health).toBe(0)
 		expect(resetPlayers).toEqual({ controller.mock })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -161,7 +173,7 @@ describe("ResetServiceClient.PushDisable", function()
 
 		expect(controller.resetServiceClient:IsDisabled()).toBe(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("disables while a state is held and re-enables once it is popped", function()
@@ -173,7 +185,7 @@ describe("ResetServiceClient.PushDisable", function()
 		cancel()
 		expect(controller.resetServiceClient:IsDisabled()).toBe(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stays disabled until every pushed state is popped", function()
@@ -188,7 +200,7 @@ describe("ResetServiceClient.PushDisable", function()
 		cancelSecond()
 		expect(controller.resetServiceClient:IsDisabled()).toBe(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits each disabled state to observers", function()
@@ -205,7 +217,7 @@ describe("ResetServiceClient.PushDisable", function()
 		expect(states).toEqual({ false, true, false })
 
 		sub:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still resets programmatically while disabled", function()
@@ -224,7 +236,7 @@ describe("ResetServiceClient.PushDisable", function()
 		expect(promise:IsFulfilled()).toBe(true)
 		expect(resetPlayers).toEqual({ controller.mock })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -248,6 +260,6 @@ describe("ResetServiceClient reset button callback", function()
 		expect(humanoid.Health).toBe(0)
 		expect(resetPlayers).toEqual({ controller.mock })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

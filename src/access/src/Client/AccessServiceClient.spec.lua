@@ -16,6 +16,7 @@ local AccessPolicyRealm = require("AccessPolicyRealm")
 local AccessPolicyService = require("AccessPolicyService")
 local AccessServiceClient = require("AccessServiceClient")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -24,20 +25,9 @@ local TieRealms = require("TieRealms")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
-local afterEach = Jest.Globals.afterEach
 local it = Jest.Globals.it
 
 local policyCounter = 0
-
--- Torn down here rather than at the end of each test: a failing test never reaches its last line, and the
--- local-player designation is ambient, so one leaked mock would be the local player for every test after it.
-local live: any = nil
-afterEach(function()
-	if live then
-		live:destroy()
-		live = nil
-	end
-end)
 
 type SetupOptions = {
 	designateLocalPlayer: boolean?,
@@ -54,12 +44,7 @@ local function setup(options: SetupOptions?)
 	localPlayer.Parent = Workspace
 
 	if opts.designateLocalPlayer ~= false then
-		PlayerMock.setMockedLocalPlayer(localPlayer)
-		maid:GiveTask(function()
-			if PlayerMock.getMockedLocalPlayer() == localPlayer then
-				PlayerMock.setMockedLocalPlayer(nil)
-			end
-		end)
+		maid:GiveTask(PlayerMock.setMockedLocalPlayer(localPlayer))
 	end
 
 	local otherPlayer = maid:Add(PlayerMock.new()) :: any
@@ -92,20 +77,20 @@ local function setup(options: SetupOptions?)
 
 	serviceBag:Start()
 
-	local controller
-	controller = {
+	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessPolicyService = accessPolicyService,
 		localPlayer = localPlayer,
 		otherPlayer = otherPlayer,
 		appliedFor = appliedFor,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
 
-	live = controller
+	maid:GiveTask(JestUtils.afterThis(controller))
+
 	return controller
 end
 

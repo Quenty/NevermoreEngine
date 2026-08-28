@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local BasicPane = require("BasicPane")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local SpringTransitionModel = require("SpringTransitionModel")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
@@ -19,21 +21,23 @@ type Controller = {
 	model: SpringTransitionModel.SpringTransitionModel<number>,
 	value: () -> number,
 	advance: (seconds: number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
--- SpringObject reads wall time analytically, so swapping its clock makes every animation
--- assertion deterministic. Completion is observed off the animation step, so the clock has to
--- move and then a frame has to pass before the transition notices it arrived.
+-- Completion is observed off the animation step, so the clock has to move and then a frame has to
+-- pass before the transition notices it arrived.
 local function setup(options: { showTarget: number?, hideTarget: number? }?): Controller
-	local model: any = SpringTransitionModel.new(options and options.showTarget, options and options.hideTarget)
+	local maid = Maid.new()
+
+	local model: any =
+		maid:Add(SpringTransitionModel.new(options and options.showTarget, options and options.hideTarget))
 
 	local now = 0
 	model._springObject:SetClock(function()
 		return now
 	end)
 
-	return {
+	local controller: Controller = {
 		model = model,
 		value = function()
 			return model._springObject.Value
@@ -43,12 +47,14 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 			task.wait()
 			task.wait()
 		end,
-		destroy = function()
-			if model.Destroy then
-				model:Destroy()
-			end
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("SpringTransitionModel.new", function()
@@ -60,7 +66,7 @@ describe("SpringTransitionModel.new", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("defaults to a show target of 1 and a hide target of 0", function()
@@ -72,7 +78,7 @@ describe("SpringTransitionModel.new", function()
 		controller.model:Hide(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("honors explicit show and hide targets", function()
@@ -83,7 +89,7 @@ describe("SpringTransitionModel.new", function()
 		controller.model:Show(true)
 		expect(controller.value()).toBe(8)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is a basic pane", function()
@@ -91,7 +97,7 @@ describe("SpringTransitionModel.new", function()
 
 		expect(BasicPane.isBasicPane(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -106,7 +112,7 @@ describe("SpringTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(false)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes showing once the spring settles", function()
@@ -118,7 +124,7 @@ describe("SpringTransitionModel visibility", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.value()).toBeCloseTo(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes hiding once the spring settles", function()
@@ -131,7 +137,7 @@ describe("SpringTransitionModel visibility", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBeCloseTo(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("completes immediately when told not to animate", function()
@@ -142,7 +148,7 @@ describe("SpringTransitionModel visibility", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.model:GetVelocity()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("toggles visibility", function()
@@ -154,7 +160,7 @@ describe("SpringTransitionModel visibility", function()
 		controller.model:Toggle(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -167,7 +173,7 @@ describe("SpringTransitionModel:SetShowTarget", function()
 
 		expect(controller.value()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a hidden model at the hide target", function()
@@ -180,7 +186,7 @@ describe("SpringTransitionModel:SetShowTarget", function()
 		controller.model:Show(true)
 		expect(controller.value()).toBe(0.5)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -192,7 +198,7 @@ describe("SpringTransitionModel:SetHideTarget", function()
 
 		expect(controller.value()).toBe(0.25)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -212,8 +218,8 @@ describe("SpringTransitionModel:SetSpeed", function()
 		expect(fast.model:IsShowingComplete()).toBe(true)
 		expect(slow.model:IsShowingComplete()).toBe(false)
 
-		slow.destroy()
-		fast.destroy()
+		slow:Destroy()
+		fast:Destroy()
 	end)
 
 	it("rejects a speed that is not a number", function()
@@ -223,7 +229,7 @@ describe("SpringTransitionModel:SetSpeed", function()
 			controller.model:SetSpeed("fast" :: any)
 		end).toThrow("Bad speed")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -235,7 +241,7 @@ describe("SpringTransitionModel:SetEpsilon", function()
 			controller.model:SetEpsilon("wide" :: any)
 		end).toThrow("Bad epsilon")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -250,7 +256,7 @@ describe("SpringTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the hide until the spring settles", function()
@@ -265,7 +271,7 @@ describe("SpringTransitionModel promises", function()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves without waiting when told not to animate", function()
@@ -273,7 +279,7 @@ describe("SpringTransitionModel promises", function()
 
 		expect(controller.model:PromiseShow(true):IsFulfilled()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("promises the toggle in whichever direction it goes", function()
@@ -285,7 +291,7 @@ describe("SpringTransitionModel promises", function()
 		expect(controller.model:PromiseToggle(true):IsFulfilled()).toBe(true)
 		expect(controller.model:IsVisible()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires ShowingComplete once the spring settles", function()
@@ -301,7 +307,7 @@ describe("SpringTransitionModel promises", function()
 		controller.advance(5)
 		expect(fires).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -319,7 +325,7 @@ describe("SpringTransitionModel:BindToPaneVisbility", function()
 		expect(pane:IsVisible()).toBe(false)
 
 		pane:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not throw when unbinding after the model is destroyed", function()
@@ -327,7 +333,7 @@ describe("SpringTransitionModel:BindToPaneVisbility", function()
 		local pane = BasicPane.new()
 
 		local unbind = controller.model:BindToPaneVisbility(pane)
-		controller.destroy()
+		controller:Destroy()
 
 		expect(function()
 			unbind()
@@ -343,7 +349,7 @@ describe("SpringTransitionModel duck typing", function()
 
 		expect(TransitionUtils.isTransition(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is recognized as a transition model", function()
@@ -351,7 +357,7 @@ describe("SpringTransitionModel duck typing", function()
 
 		expect(TransitionModel.isTransitionModel(controller.model)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -367,7 +373,7 @@ describe("SpringTransitionModel in-flight snap", function()
 		expect(controller.model:IsShowingComplete()).toBe(true)
 		expect(controller.value()).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("snaps an already-running hide", function()
@@ -382,6 +388,6 @@ describe("SpringTransitionModel in-flight snap", function()
 		expect(controller.model:IsHidingComplete()).toBe(true)
 		expect(controller.value()).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

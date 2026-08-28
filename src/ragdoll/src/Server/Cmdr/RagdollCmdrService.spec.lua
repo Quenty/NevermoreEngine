@@ -15,6 +15,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -100,17 +101,21 @@ local function setup()
 		}
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		ragdollBinder = serviceBag:GetService(Ragdoll),
 		addPlayer = addPlayer,
 		run = function(commandName: string, ...)
 			return registered[commandName]({}, ...)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("RagdollCmdrService", function()
@@ -132,7 +137,7 @@ describe("RagdollCmdrService", function()
 			return RagdollTestUtils.areMotorsEnabled(player.character, true)
 		end)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("acts on every player in the list", function()
@@ -148,7 +153,7 @@ describe("RagdollCmdrService", function()
 		expect(controller.ragdollBinder:Get(first.humanoid)).toBeNil()
 		expect(controller.ragdollBinder:Get(second.humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the players it could not act on without skipping the rest", function()
@@ -175,7 +180,7 @@ describe("RagdollCmdrService", function()
 			true
 		)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reports an empty player list", function()
@@ -184,6 +189,6 @@ describe("RagdollCmdrService", function()
 		expect(controller.run("ragdoll", {})).toEqual("No players to act on.")
 		expect(controller.run("unragdoll", {})).toEqual("No players to act on.")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

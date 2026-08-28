@@ -15,6 +15,7 @@ local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local Rx = require("Rx")
@@ -35,7 +36,7 @@ local function setup()
 
 	local ownsGame = assert(accessDataService:GetFeature(WellKnownAccessFeatureNames.OWNS_GAME), "No owns-game feature")
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		ownsGame = ownsGame,
@@ -62,10 +63,14 @@ local function setup()
 				return last
 			end
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("the shipped owns-game feature", function()
@@ -75,7 +80,7 @@ describe("the shipped owns-game feature", function()
 		expect(controller.accessDataService:HasFeature(WellKnownAccessFeatureNames.OWNS_GAME)).toEqual(true)
 		expect(controller.accessDataService:HasFact(AccessFactNames.OWNS_GAME)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reads only the purchase before anything is pushed onto it", function()
@@ -83,7 +88,7 @@ describe("the shipped owns-game feature", function()
 
 		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -98,7 +103,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 		expect(table.find(names, "ownsGamePass") ~= nil).toEqual(true)
 		expect(table.find(names, "isStaff") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("grants the feature when a pushed fact says yes", function()
@@ -115,7 +120,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 
 		expect(AccessStateUtils.isAllowed(getState() :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reaches consumers that subscribed before the push", function()
@@ -130,7 +135,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 
 		expect(AccessStateUtils.isAllowed(getState() :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names every fact that granted, not just the first", function()
@@ -142,7 +147,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 
 		expect(#state.grantedBy).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("only widens -- a pushed fact reading false cannot deny what another granted", function()
@@ -154,7 +159,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("narrows again when the push is disposed", function()
@@ -179,7 +184,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 		expect(AccessStateUtils.isAllowed(getState() :: any)).toEqual(false)
 		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores a push of a fact the feature already reads", function()
@@ -193,7 +198,7 @@ describe("AccessFeature.PushFactAllowsFeature", function()
 
 		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -243,7 +248,7 @@ describe("declared context in a report", function()
 			true
 		)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -296,7 +301,7 @@ describe("a feature reading another feature", function()
 
 		expect((last :: any).reason).toEqual("boughtAccessDisabled")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries an allowed verdict through with what granted it", function()
@@ -313,7 +318,7 @@ describe("a feature reading another feature", function()
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 		expect((last :: any).grantedBy).toEqual({ "ownsGame" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names the inherited verdict in the report, so the readout can explain it", function()
@@ -338,7 +343,7 @@ describe("a feature reading another feature", function()
 		expect(string.find(text, "chapterEntitlement") ~= nil).toEqual(true)
 		expect(string.find(text, "boughtAccessDisabled") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("hands a feature that declared none an empty map rather than nothing", function()
@@ -364,7 +369,7 @@ describe("a feature reading another feature", function()
 
 		expect(seen).toEqual({})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("gives the compute the player it is deciding for", function()
@@ -386,7 +391,7 @@ describe("a feature reading another feature", function()
 
 		expect(seen).toEqual(player)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -406,7 +411,7 @@ describe("push ownership", function()
 
 		expect(controller.ownsGame:GetFactNames()).toEqual({ AccessFactNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -429,7 +434,7 @@ describe("a feature that requires a subject", function()
 			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature)
 		end).toThrow("requires a subject")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is fine once it is given one", function()
@@ -448,7 +453,7 @@ describe("a feature that requires a subject", function()
 			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature, "blueEgg")
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -475,7 +480,7 @@ describe("the registered fact-name list", function()
 
 		expect(emissions).toEqual(before)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does emit when a genuinely new fact arrives", function()
@@ -496,7 +501,7 @@ describe("the registered fact-name list", function()
 
 		expect(emissions > before).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -520,7 +525,7 @@ describe("a registered object that gets destroyed", function()
 
 		expect(controller.accessDataService:HasFact("selfDestructing")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a live report readable rather than calling into the wreckage", function()
@@ -547,7 +552,7 @@ describe("a registered object that gets destroyed", function()
 			fact:Destroy()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes its feature out of the registry", function()
@@ -560,7 +565,7 @@ describe("a registered object that gets destroyed", function()
 
 		expect(controller.accessDataService:GetFeature("selfDestructingFeature")).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not mind the disposer being called as well", function()
@@ -580,7 +585,7 @@ describe("a registered object that gets destroyed", function()
 			unregister()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 

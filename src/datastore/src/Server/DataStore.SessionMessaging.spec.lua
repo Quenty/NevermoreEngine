@@ -42,7 +42,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 
 		if not PromiseTestUtils.awaitSettled(sendPromise, 10) then
 			expect("message send hung").toEqual("message send settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -51,7 +51,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 		end, 15)
 		expect(received).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects sending a message to our own session", function()
@@ -66,6 +66,6 @@ describe("cross-server session messaging (close-session kick-out)", function()
 			})
 		end).toThrow("Cannot message self")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

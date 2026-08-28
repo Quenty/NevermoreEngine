@@ -7,7 +7,7 @@
 	writes land in the real (shared, role-named) LocalizationService table, which is
 	cleared before and after every test for isolation, so tests assert on what actually
 	reached the TranslatorService rather than on a stand-in recording writer.
-	`controller:destroy()` tears the world down.
+	`controller:Destroy()` tears the world down.
 
 	@class LocaleLoaderTestUtils
 ]]
@@ -37,7 +37,7 @@ function LocaleLoaderTestUtils.clearGeneratedTables()
 end
 
 --[[
-	Builds an isolated test world. Call once per test and pair with controller:destroy().
+	Builds an isolated test world. Call once per test and pair with controller:Destroy().
 
 	`options.tieRealm` (a TieRealms value) injects the realm on the service bag, matching
 	how the client-only paths are exercised on the server test runner.
@@ -149,7 +149,7 @@ function LocaleLoaderTestUtils.setup(options)
 		track = function(item)
 			return giveTask(item)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 			LocaleLoaderTestUtils.clearGeneratedTables()
 		end,

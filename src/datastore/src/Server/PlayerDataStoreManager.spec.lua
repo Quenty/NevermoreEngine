@@ -27,7 +27,7 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect(dataStore).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should cache the datastore per user", function()
@@ -40,7 +40,7 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 		local other = controller.manager:GetDataStore(2)
 		expect((first == other)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should apply the key generator", function()
@@ -49,7 +49,7 @@ describe("PlayerDataStoreManager.GetDataStore", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetKey())).toEqual("user_1")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -63,7 +63,7 @@ describe("PlayerDataStoreManager PlayerMock support", function()
 		expect((dataStore:GetKey())).toEqual("user_42")
 
 		player:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("shares the same datastore between the mock and its numeric userId (unified state)", function()
@@ -75,7 +75,7 @@ describe("PlayerDataStoreManager PlayerMock support", function()
 		expect(viaMock).toEqual(viaUserId)
 
 		player:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a plain Folder that is not a PlayerMock", function()
@@ -87,7 +87,7 @@ describe("PlayerDataStoreManager PlayerMock support", function()
 		end).toThrow()
 
 		folder:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -97,7 +97,7 @@ describe("PlayerDataStoreManager.PromiseDataStore", function()
 
 		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -107,12 +107,12 @@ describe("PlayerDataStoreManager.PromiseDataStore", function()
 
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not expectSettled(loadPromise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadPromise:Wait())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -127,7 +127,7 @@ describe("PlayerDataStoreManager persistence", function()
 
 		local promise = controller.manager:PromiseDataStore(1)
 		if not expectSettled(promise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -136,7 +136,7 @@ describe("PlayerDataStoreManager persistence", function()
 
 		local loadPromise = reloaded:Load("coins")
 		if not expectSettled(loadPromise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -144,7 +144,7 @@ describe("PlayerDataStoreManager persistence", function()
 		expect(loadOk).toEqual(true)
 		expect(value).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -161,14 +161,14 @@ describe("PlayerDataStoreManager.AddRemovingCallback", function()
 
 		local promise = controller.manager:PromiseAllSaves()
 		if not expectSettled(promise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
 		expect(ran).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -181,12 +181,12 @@ describe("PlayerDataStoreManager.PromiseAllSaves", function()
 
 		local promise = controller.manager:PromiseAllSaves()
 		if not expectSettled(promise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -198,12 +198,12 @@ describe("PlayerDataStoreManager server shutdown", function()
 
 		if not controller.storeAndAwaitLock() then
 			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -211,7 +211,7 @@ describe("PlayerDataStoreManager server shutdown", function()
 		expect(raw.coins).toEqual(5)
 		expect(raw.lock).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the lock for every player still in the server", function()
@@ -227,12 +227,12 @@ describe("PlayerDataStoreManager server shutdown", function()
 		end, 10)
 		if not locked then
 			expect("both locks were never acquired").toEqual("both locks were acquired")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		if not expectSettled(controller.promiseShutdown({ 1, 2 }), 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -241,7 +241,7 @@ describe("PlayerDataStoreManager server shutdown", function()
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(1)
 		expect(controller.mock:GetRaw("user_2").coins).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("destroys each store once its removal has flushed", function()
@@ -249,18 +249,18 @@ describe("PlayerDataStoreManager server shutdown", function()
 
 		local dataStore = controller.manager:GetDataStore(1)
 		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(getmetatable(dataStore)).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not resolve the close while a PlayerRemoving save is still in flight", function()
@@ -274,7 +274,7 @@ describe("PlayerDataStoreManager server shutdown", function()
 
 		if not controller.storeAndAwaitLock() then
 			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -285,7 +285,7 @@ describe("PlayerDataStoreManager server shutdown", function()
 		expect(closePromise:IsPending()).toEqual(true)
 
 		if not expectSettled(closePromise, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -295,7 +295,7 @@ describe("PlayerDataStoreManager server shutdown", function()
 		expect(raw.coins).toEqual(5)
 		expect(raw.lock).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("closes cleanly when a store's load failed, leaking no rejection and writing no lock", function()
@@ -307,19 +307,19 @@ describe("PlayerDataStoreManager server shutdown", function()
 
 		local loaded = dataStore:PromiseLoadSuccessful()
 		if not expectSettled(loaded, 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loaded:Wait())).toEqual(false)
 
 		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(controller.mock:GetRaw("user_1")).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -332,7 +332,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetAutoSaveTimeSeconds())).toEqual(14)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves the datastore default alone when unconfigured", function()
@@ -341,7 +341,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetAutoSaveTimeSeconds())).toEqual(60 * 5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("applies nil autosave (syncing disabled) rather than treating it as unconfigured", function()
@@ -352,7 +352,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect(dataStore:GetAutoSaveTimeSeconds()).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("configures every datastore it creates, not just the first", function()
@@ -364,7 +364,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local second = controller.manager:GetDataStore(2)
 		expect((second:GetAutoSaveTimeSeconds())).toEqual(14)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects configuration once a datastore has been created", function()
@@ -382,7 +382,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 			controller.manager:SetSessionMessagingCloseDelaySeconds(0.5)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("forwards load retry options to created datastores", function()
@@ -394,7 +394,7 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetLoadRetryOptions())).toEqual(retryOptions)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("forwards the session messaging close delay to created datastores", function()
@@ -405,6 +405,6 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		local dataStore = controller.manager:GetDataStore(1)
 		expect((dataStore:GetSessionMessagingCloseDelaySeconds())).toEqual(0.5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

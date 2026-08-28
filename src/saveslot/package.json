@@ -36,6 +36,7 @@
     "@quenty/cmdrservice": "workspace:*",
     "@quenty/datastore": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

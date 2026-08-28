@@ -13,6 +13,8 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local RagdollClient = require("RagdollClient")
 local RagdollServiceClient = require("RagdollServiceClient")
@@ -21,22 +23,21 @@ local RagdollableClient = require("RagdollableClient")
 local RigBuilderUtils = require("RigBuilderUtils")
 local ServiceBag = require("ServiceBag")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local specCounter = 0
-local currentMock: Player? = nil
-local currentServiceBag: ServiceBag.ServiceBag? = nil
 
 local function setup()
 	specCounter += 1
 
+	local maid = Maid.new()
+	JestUtils.afterThis(maid)
+
 	local mock = PlayerMock.new({ UserId = 66123100 + specCounter })
 	mock.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(mock)
-	currentMock = mock
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(mock)
 
 	local serviceBag = ServiceBag.new()
 	local ragdollServiceClient = (
@@ -45,7 +46,12 @@ local function setup()
 
 	serviceBag:Init()
 	serviceBag:Start()
-	currentServiceBag = serviceBag
+
+	maid:GiveTask(function()
+		serviceBag:Destroy()
+		restoreLocalPlayer()
+		mock:Destroy()
+	end)
 
 	return {
 		mock = mock,
@@ -53,20 +59,6 @@ local function setup()
 		ragdollServiceClient = ragdollServiceClient,
 	}
 end
-
-afterEach(function()
-	if currentServiceBag ~= nil then
-		currentServiceBag:Destroy()
-		currentServiceBag = nil
-	end
-
-	PlayerMock.setMockedLocalPlayer(nil)
-
-	if currentMock ~= nil then
-		currentMock:Destroy()
-		currentMock = nil
-	end
-end)
 
 describe("RagdollServiceClient with a mocked local player", function()
 	it("initializes, starts, and defaults screen shake to enabled", function()

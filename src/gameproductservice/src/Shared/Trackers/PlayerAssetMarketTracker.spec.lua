@@ -2,8 +2,7 @@
 --[[
 	Unit coverage for PlayerAssetMarketTracker. The tracker is constructed directly with a fake
 	id-conversion table and a synchronous brio observable, so no ServiceBag, GameConfig, or real
-	MarketplaceService is involved. Each test builds a fresh tracker and destroys it so nothing
-	leaks into the shared test place.
+	MarketplaceService is involved.
 
 	@class PlayerAssetMarketTracker.spec.lua
 ]]
@@ -12,6 +11,8 @@ local require = require(script.Parent.loader).load(script)
 local Brio = require("Brio")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -32,9 +33,6 @@ local function convertIds(idOrKey)
 	return KEY_TO_ID[idOrKey]
 end
 
--- Emits a single live brio wrapping the resolved id, synchronously on subscribe, then completes
--- for unknown keys. Synchronous emission lets ObserveAssetPurchased register the known id before
--- the test fires Purchased.
 local function observeIdsBrio(idOrKey)
 	return Observable.new(function(sub)
 		local id = convertIds(idOrKey)
@@ -53,25 +51,37 @@ local function observeIdsBrio(idOrKey)
 end
 
 local function setup()
+	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.PRODUCT, convertIds, observeIdsBrio)
+	maid:GiveTask(tracker)
 
-	return {
+	local controller = {
 		tracker = tracker,
-		destroy = function()
-			tracker:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function setupNonPromptable()
+	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.GAME, convertIds, observeIdsBrio, false)
+	maid:GiveTask(tracker)
 
-	return {
+	local controller = {
 		tracker = tracker,
-		destroy = function()
-			tracker:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function promptAndCapture(tracker, idOrKey)
@@ -93,13 +103,13 @@ describe("PlayerAssetMarketTracker basics", function()
 	it("should report its asset type", function()
 		local context = setup()
 		expect(context.tracker:GetAssetType()).toEqual(GameConfigAssetTypes.PRODUCT)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should start with no prompt open", function()
 		local context = setup()
 		expect(context.tracker:IsPromptOpen()).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should hold and return an ownership tracker", function()
@@ -112,13 +122,13 @@ describe("PlayerAssetMarketTracker basics", function()
 
 		context.tracker:SetOwnershipTracker(nil)
 		expect(context.tracker:GetOwnershipTracker()).toBeNil()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should be promptable by default", function()
 		local context = setup()
 		expect(context.tracker:IsPromptable()).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -126,7 +136,7 @@ describe("PlayerAssetMarketTracker non-promptable asset types", function()
 	it("should report IsPromptable() as false", function()
 		local context = setupNonPromptable()
 		expect(context.tracker:IsPromptable()).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject PromisePromptPurchase for a known id without opening a prompt", function()
@@ -143,7 +153,7 @@ describe("PlayerAssetMarketTracker non-promptable asset types", function()
 		expect(outcome).toEqual("rejected")
 		expect(promptRequested).toEqual(false)
 		expect(context.tracker:IsPromptOpen()).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject PromisePromptPurchase for an unknown key too", function()
@@ -151,7 +161,7 @@ describe("PlayerAssetMarketTracker non-promptable asset types", function()
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("doesNotExist"), 5)
 		expect(outcome).toEqual("rejected")
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -159,34 +169,34 @@ describe("PlayerAssetMarketTracker:HasPurchasedThisSession()", function()
 	it("should return false before anything is purchased", function()
 		local context = setup()
 		expect(context.tracker:HasPurchasedThisSession("swordKey")).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should return true after a purchase event for that id", function()
 		local context = setup()
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, true)
 		expect(context.tracker:HasPurchasedThisSession("swordKey")).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should stay false for a different id than the one purchased", function()
 		local context = setup()
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, true)
 		expect(context.tracker:HasPurchasedThisSession("shieldKey")).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should return false for an unknown key", function()
 		local context = setup()
 		expect(context.tracker:HasPurchasedThisSession("doesNotExist")).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not mark a failed purchase as purchased", function()
 		local context = setup()
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, false)
 		expect(context.tracker:HasPurchasedThisSession("swordKey")).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -204,7 +214,7 @@ describe("PlayerAssetMarketTracker:HandlePurchaseEvent()", function()
 
 		expect(#fired).toEqual(1)
 		expect(fired[1]).toEqual(KEY_TO_ID.swordKey)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not fire Purchased on a failed purchase", function()
@@ -219,7 +229,7 @@ describe("PlayerAssetMarketTracker:HandlePurchaseEvent()", function()
 		conn:Disconnect()
 
 		expect(firedCount).toEqual(0)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -229,7 +239,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("doesNotExist"), 5)
 		expect(outcome).toEqual("rejected")
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should request a prompt and resolve true once the purchase succeeds", function()
@@ -246,7 +256,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 		local ok, purchased = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(purchased).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should resolve false when the purchase is declined", function()
@@ -260,7 +270,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 		local ok, purchased = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(purchased).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject a second prompt while one is already open", function()
@@ -275,7 +285,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 		context.tracker:HandlePurchaseEvent(firstId, true)
 		context.tracker:HandlePromptClosedEvent(firstId)
 		PromiseTestUtils.awaitSettled(firstPromise, 5)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -293,7 +303,7 @@ describe("PlayerAssetMarketTracker prompt open counting", function()
 		expect(PromiseTestUtils.awaitValue(function()
 			return not context.tracker:IsPromptOpen()
 		end, 5)).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should surface the open count through ObservePromptOpenCount", function()
@@ -318,7 +328,7 @@ describe("PlayerAssetMarketTracker prompt open counting", function()
 			end
 		end
 		expect(sawOpen).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -337,7 +347,7 @@ describe("PlayerAssetMarketTracker:ObserveAssetPurchased()", function()
 			return fireCount > 0
 		end, 5)).toEqual(true)
 		sub:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not fire when a different id is purchased", function()
@@ -353,6 +363,6 @@ describe("PlayerAssetMarketTracker:ObserveAssetPurchased()", function()
 		sub:Destroy()
 
 		expect(fireCount).toEqual(0)
-		context.destroy()
+		context:Destroy()
 	end)
 end)

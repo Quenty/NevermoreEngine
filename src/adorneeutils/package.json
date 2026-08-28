@@ -25,6 +25,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

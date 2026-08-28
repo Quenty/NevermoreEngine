@@ -3,7 +3,7 @@
 	Shared setup helpers for the DataStore server specs. The two controller builders --
 	[DataStoreTestUtils.setup] (raw DataStores) and [DataStoreTestUtils.setupDataStoreManager]
 	(a [PlayerDataStoreManager]) -- each own a [Maid] and register everything they create on it, so a
-	single `controller:destroy()` tears it all down: the stores, the auto-save loop each starts once
+	single `controller:Destroy()` tears it all down: the stores, the auto-save loop each starts once
 	loaded, the helpers, the manager, and the service bag.
 
 	@class DataStoreTestUtils
@@ -15,6 +15,7 @@ local DataStore = require("DataStore")
 local DataStoreLockHelper = require("DataStoreLockHelper")
 local DataStoreMessageHelper = require("DataStoreMessageHelper")
 local DataStoreMock = require("DataStoreMock")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local MessagingServiceMock = require("MessagingServiceMock")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
@@ -26,7 +27,7 @@ local DataStoreTestUtils = {}
 --[=[
 	Builds the controller the DataStore specs share: a fresh [DataStoreMock], a [ServiceBag] with an
 	in-process [MessagingServiceMock] injected (so messaging-enabled stores never touch the real
-	MessagingService), and builder methods that own everything they create on one Maid. `destroy()`
+	MessagingService), and builder methods that own everything they create on one Maid. `Destroy()`
 	tears it all down. Every builder defaults its key to `"player_1"`; pass a key to override.
 
 	Fields: `mock`, `serviceBag`.
@@ -87,7 +88,7 @@ function DataStoreTestUtils.setup()
 		return ok and loadedOk
 	end
 
-	return {
+	local controller = {
 		mock = mock,
 		serviceBag = serviceBag,
 		newDataStore = newDataStore,
@@ -96,10 +97,14 @@ function DataStoreTestUtils.setup()
 		newMessageHelper = newMessageHelper,
 		newServer = newServer,
 		awaitOwn = awaitOwn,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 --[=[
@@ -125,7 +130,7 @@ end
 --[=[
 	Shuts down the manager a [PlayerDataStoreService] owns, the way Roblox would, and waits for it.
 
-	Call this from the `destroy()` of any spec that injects a datastore into the service and tears down
+	Call this from the `Destroy()` of any spec that injects a datastore into the service and tears down
 	by destroying its ServiceBag. `manager:Destroy()` destroys no stores -- they are only ever destroyed
 	by a removal -- and a [PlayerMock] never fires the real `Players.PlayerRemoving`, so without this
 	every store the spec loaded outlives it with its `task.spawn` auto-save loop running. In the shared
@@ -170,7 +175,7 @@ end
 	Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to
 	a fresh [DataStoreMock] (keyed `user_<userId>`), all owned by a Maid.
 
-	`destroy()` shuts the server down the way Roblox would (see
+	`Destroy()` shuts the server down the way Roblox would (see
 	[DataStoreTestUtils.promiseSimulatedShutdown]) and then tears the objects down. The shutdown is not
 	optional bookkeeping: a store the spec loaded keeps its auto-save loop running until something
 	removes it, and in the shared test place that loop outlives the spec and fires inside a later
@@ -207,17 +212,21 @@ function DataStoreTestUtils.setupDataStoreManager()
 		return DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)
 	end
 
-	return {
+	local controller = {
 		manager = manager,
 		mock = mock,
 		serviceBag = serviceBag,
 		storeAndAwaitLock = storeAndAwaitLock,
 		promiseShutdown = promiseShutdown,
-		destroy = function()
+		Destroy = function(_self)
 			PromiseTestUtils.awaitSettled(promiseShutdown(), 5)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 --[=[

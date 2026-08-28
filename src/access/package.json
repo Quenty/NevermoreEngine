@@ -35,6 +35,7 @@
     "@quenty/enums": "workspace:*",
     "@quenty/gameconfig": "workspace:*",
     "@quenty/gameproductservice": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

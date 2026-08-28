@@ -49,6 +49,6 @@ describe("Binder load abandonment", function()
 		expect(binder:Get(inst)).toBeNil()
 		expect(constructed).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

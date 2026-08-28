@@ -37,6 +37,7 @@
     "@quenty/collectionserviceutils": "workspace:*",
     "@quenty/enums": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

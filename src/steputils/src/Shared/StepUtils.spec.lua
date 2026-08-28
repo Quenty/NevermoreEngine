@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
@@ -21,12 +23,22 @@ type Controller = {
 	bindStepped: ((...any) -> boolean) -> ((...any) -> (), () -> ()),
 	track: (() -> ()) -> () -> (),
 	stepFrames: (number) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
+	local maid = Maid.new()
 	local instances: { Instance } = {}
 	local cleanups: { () -> () } = {}
+
+	maid:GiveTask(function()
+		for _, cleanup in cleanups do
+			cleanup()
+		end
+		for _, inst in instances do
+			inst:Destroy()
+		end
+	end)
 
 	local function track(cleanup: () -> ()): () -> ()
 		table.insert(cleanups, cleanup)
@@ -66,15 +78,12 @@ local function setup(): Controller
 			end
 		end,
 
-		destroy = function()
-			for _, cleanup in cleanups do
-				cleanup()
-			end
-			for _, inst in instances do
-				inst:Destroy()
-			end
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -85,7 +94,7 @@ describe("StepUtils.getAnimationStepSignal", function()
 
 		expect(typeof(StepUtils.getAnimationStepSignal())).toBe("RBXScriptSignal")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("falls back to Heartbeat off a running client", function()
@@ -93,7 +102,7 @@ describe("StepUtils.getAnimationStepSignal", function()
 
 		expect(StepUtils.getAnimationStepSignal()).toBe(RunService.Heartbeat)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a signal that actually fires here", function()
@@ -111,7 +120,7 @@ describe("StepUtils.getAnimationStepSignal", function()
 
 		expect(fired).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -121,7 +130,7 @@ describe("StepUtils.getSteppedSignal", function()
 
 		expect(typeof(StepUtils.getSteppedSignal())).toBe("RBXScriptSignal")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("falls back to Heartbeat on a non-running DataModel", function()
@@ -130,7 +139,7 @@ describe("StepUtils.getSteppedSignal", function()
 		expect(StepUtils.getSteppedSignal()).toBe(RunService.Heartbeat)
 		expect(StepUtils.getSteppedSignal()).never.toBe(RunService.Stepped)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a signal that actually fires here", function()
@@ -148,7 +157,7 @@ describe("StepUtils.getSteppedSignal", function()
 
 		expect(fired).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -167,7 +176,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not connect when the first update returns false", function()
@@ -186,7 +195,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps invoking the update while it returns true", function()
@@ -205,7 +214,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(3)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops invoking the update once it returns false", function()
@@ -225,7 +234,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("forwards the connect arguments to every later update", function()
@@ -244,7 +253,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(seen).toEqual({ "self", "self", "self" })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores the signal's own arguments", function()
@@ -262,7 +271,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(seen).toEqual({ { value = nil }, { value = nil } })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores a repeated connect while already connected", function()
@@ -280,7 +289,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reconnects after an explicit disconnect", function()
@@ -303,7 +312,7 @@ describe("StepUtils.bindToSignal", function()
 
 		expect(calls).toBe(3)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates disconnect before connect and repeated disconnects", function()
@@ -319,7 +328,7 @@ describe("StepUtils.bindToSignal", function()
 			disconnect()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on something that is not a signal", function()
@@ -331,7 +340,7 @@ describe("StepUtils.bindToSignal", function()
 			end)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function update", function()
@@ -342,7 +351,7 @@ describe("StepUtils.bindToSignal", function()
 			(StepUtils :: any).bindToSignal(bindable.Event, "update")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -361,7 +370,7 @@ describe("StepUtils.bindToRenderStep", function()
 
 		expect(calls).toBe(3)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not bind when the first update returns false", function()
@@ -378,7 +387,7 @@ describe("StepUtils.bindToRenderStep", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops driving the update after disconnect", function()
@@ -399,7 +408,7 @@ describe("StepUtils.bindToRenderStep", function()
 
 		expect(calls).toBe(afterDisconnect)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -417,7 +426,7 @@ describe("StepUtils.bindToStepped", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates disconnect before connect", function()
@@ -431,7 +440,7 @@ describe("StepUtils.bindToStepped", function()
 			disconnect()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -449,7 +458,7 @@ describe("StepUtils.deferWait", function()
 
 		expect(order).toEqual({ "deferred", "resumed" })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -467,7 +476,7 @@ describe("StepUtils.onceAtEvent", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("passes the event arguments through", function()
@@ -483,7 +492,7 @@ describe("StepUtils.onceAtEvent", function()
 
 		expect(seen).toBe("payload")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("only invokes the function once", function()
@@ -500,7 +509,7 @@ describe("StepUtils.onceAtEvent", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not invoke the function once cancelled", function()
@@ -517,7 +526,7 @@ describe("StepUtils.onceAtEvent", function()
 
 		expect(calls).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates cancelling after the function ran", function()
@@ -532,7 +541,7 @@ describe("StepUtils.onceAtEvent", function()
 			cancel()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function", function()
@@ -543,7 +552,7 @@ describe("StepUtils.onceAtEvent", function()
 			(StepUtils :: any).onceAtEvent(bindable.Event, "func")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -560,7 +569,7 @@ describe("StepUtils.onceAtRenderStepped", function()
 
 		expect(calls).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not invoke the function once cancelled", function()
@@ -576,7 +585,7 @@ describe("StepUtils.onceAtRenderStepped", function()
 
 		expect(calls).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -595,7 +604,7 @@ describe("StepUtils.onceAtStepped", function()
 		end).never.toThrow()
 		expect(calls).toBe(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -610,7 +619,7 @@ describe("StepUtils.onceAtRenderPriority", function()
 			cancel()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-number priority", function()
@@ -620,7 +629,7 @@ describe("StepUtils.onceAtRenderPriority", function()
 			(StepUtils :: any).onceAtRenderPriority("high", function() end)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function", function()
@@ -630,6 +639,6 @@ describe("StepUtils.onceAtRenderPriority", function()
 			(StepUtils :: any).onceAtRenderPriority(100, "func")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

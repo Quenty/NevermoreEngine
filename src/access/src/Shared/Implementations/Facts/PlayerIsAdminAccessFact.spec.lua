@@ -10,6 +10,7 @@ local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerIsAdminAccessFact = require("PlayerIsAdminAccessFact")
 local PlayerMock = require("PlayerMock")
@@ -26,17 +27,21 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
 		maid = maid,
 		fakePlayer = function(): Player
 			return maid:Add(PlayerMock.new()) :: any
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PlayerIsAdminAccessFact", function()
@@ -45,7 +50,7 @@ describe("PlayerIsAdminAccessFact", function()
 
 		expect(controller.accessDataService:HasFact(AccessFactNames.PLAYER_IS_ADMIN)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("sits at the built-in priority so anything a game registers outranks it", function()
@@ -55,7 +60,7 @@ describe("PlayerIsAdminAccessFact", function()
 		expect(#layers).toEqual(1)
 		expect(layers[1]:GetPriority()).toEqual(AccessFactPriority.BUILT_IN)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is named in the readout by the mechanism behind it", function()
@@ -64,7 +69,7 @@ describe("PlayerIsAdminAccessFact", function()
 		local layers = controller.accessDataService:GetFactLayers(AccessFactNames.PLAYER_IS_ADMIN)
 		expect(layers[1]:GetSource()).toEqual("permission")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets a game layer its own answer over the built-in one", function()
@@ -89,7 +94,7 @@ describe("PlayerIsAdminAccessFact", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses to build without a service bag", function()

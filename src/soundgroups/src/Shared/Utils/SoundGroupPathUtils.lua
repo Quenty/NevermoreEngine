@@ -1,100 +1,79 @@
 --!strict
 --[=[
+	@deprecated 1.54.0 -- Use [InstancePathUtils] from `@quenty/instance-path` instead.
 	@class SoundGroupPathUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local SoundService = game:GetService("SoundService")
 
+local InstancePathUtils = require("InstancePathUtils")
+
 local SoundGroupPathUtils = {}
+
+export type InstancePath = InstancePathUtils.InstancePath
+export type InstancePathTable = InstancePathUtils.InstancePathTable
+
+local function onCreateSoundGroup(instance: Instance)
+	(instance :: SoundGroup).Volume = 1
+end
 
 --[=[
 	Checks if the given string is a valid sound group path.
 
+	@deprecated 1.54.0 -- Use [InstancePathUtils.isInstancePath] instead.
 	@param soundGroupPath string
 	@return boolean
 ]=]
 function SoundGroupPathUtils.isSoundGroupPath(soundGroupPath: string): boolean
-	return type(soundGroupPath) == "string"
+	return InstancePathUtils.isInstancePath(soundGroupPath)
 end
 
 --[=[
 	Converts a sound group path into a table of strings.
 
-	@param soundGroupPath string
-	@return { string }
+	@deprecated 1.54.0 -- Use [InstancePathUtils.toPathTable] instead.
+	@param soundGroupPath InstancePath
+	@return InstancePathTable
 ]=]
-function SoundGroupPathUtils.toPathTable(soundGroupPath: string): { string }
-	assert(type(soundGroupPath) == "string", "Bad soundGroupPath")
-
-	return string.split(soundGroupPath, ".")
+function SoundGroupPathUtils.toPathTable(soundGroupPath: InstancePath): InstancePathTable
+	return InstancePathUtils.toPathTable(soundGroupPath)
 end
 
 --[=[
-	Converts a table of strings into a sound group path.
+	Finds the sound group at the given path, searching from [SoundService] if no root is given.
 
-	@param soundGroupPath string
+	@deprecated 1.54.0 -- Use [InstancePathUtils.findInstance] instead.
+	@param soundGroupPath InstancePath
+	@param root Instance?
+	@return SoundGroup?
+]=]
+function SoundGroupPathUtils.findSoundGroup(soundGroupPath: InstancePath, root: Instance?): SoundGroup?
+	assert(typeof(root) == "Instance" or root == nil, "Bad root")
+
+	return InstancePathUtils.findInstance(root or SoundService, soundGroupPath, "SoundGroup") :: SoundGroup?
+end
+
+--[=[
+	Finds the sound group at the given path, constructing any missing sound groups along the
+	way. Searches from [SoundService] if no root is given.
+
+	@deprecated 1.54.0 -- Use [InstancePathUtils.findOrCreateInstance] instead.
+	@param soundGroupPath InstancePath
 	@param root Instance?
 	@return SoundGroup
 ]=]
-function SoundGroupPathUtils.findSoundGroup(soundGroupPath: string, root: Instance?): SoundGroup?
-	assert(type(soundGroupPath) == "string", "Bad soundGroupPath")
+function SoundGroupPathUtils.findOrCreateSoundGroup(soundGroupPath: InstancePath, root: Instance?): SoundGroup
 	assert(typeof(root) == "Instance" or root == nil, "Bad root")
 
-	local current: Instance = root or SoundService
-	for _, soundGroupName in SoundGroupPathUtils.toPathTable(soundGroupPath) do
-		local found = SoundGroupPathUtils._findSoundGroup(current, soundGroupName)
-		if not found then
-			return nil
-		end
-		current = found
-	end
-
-	if current ~= root and current:IsA("SoundGroup") then
-		return current
-	else
-		return nil
-	end
-end
-
---[=[
-	Converts a table of strings into a sound group path.
-
-	@param soundGroupPath string
-	@return SoundGroup
-]=]
-function SoundGroupPathUtils.findOrCreateSoundGroup(soundGroupPath: string, root: Instance?): SoundGroup
-	assert(type(soundGroupPath) == "string", "Bad soundGroupPath")
-	assert(typeof(root) == "Instance" or root == nil, "Bad root")
-
-	local current: Instance = root or SoundService
-
-	for _, soundGroupName in SoundGroupPathUtils.toPathTable(soundGroupPath) do
-		local parent = current
-		local found = SoundGroupPathUtils._findSoundGroup(parent, soundGroupName)
-
-		if found then
-			current = found
-		else
-			local constructed = Instance.new("SoundGroup")
-			constructed.Name = soundGroupName
-			constructed.Volume = 1
-			constructed.Parent = parent
-			current = constructed
-		end
-	end
-
-	assert(current:IsA("SoundGroup"), "Current is not a SoundGroup")
-	return current
-end
-
-function SoundGroupPathUtils._findSoundGroup(parent: Instance, soundGroupName: string): SoundGroup?
-	for _, item in parent:GetChildren() do
-		if item:IsA("SoundGroup") and item.Name == soundGroupName then
-			return item
-		end
-	end
-
-	return nil
+	local parent = root or SoundService
+	return InstancePathUtils.findOrCreateInstance(
+			parent,
+			soundGroupPath,
+			"SoundGroup",
+			onCreateSoundGroup
+		) :: SoundGroup
 end
 
 return SoundGroupPathUtils

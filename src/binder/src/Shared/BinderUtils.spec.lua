@@ -9,6 +9,8 @@ local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local BinderUtils = require("BinderUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,7 +41,7 @@ local function setup()
 	container.Name = "BinderUtilsSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
+	local instances: { Instance } = {}
 	local pendingBinders: { any } = {}
 	local tagCounter = 0
 	local booted = false
@@ -72,21 +76,29 @@ local function setup()
 		serviceBag:Start()
 	end
 
-	return {
+	maid:GiveTask(function()
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		newBinder = newBinder,
 		newInstance = newInstance,
 		boot = boot,
-		destroy = function()
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("BinderUtils.findFirstAncestor()", function()
@@ -104,7 +116,7 @@ describe("BinderUtils.findFirstAncestor()", function()
 
 		expect(BinderUtils.findFirstAncestor(binder, child)).toEqual(binder:Get(grandparent))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil when no ancestor is bound", function()
@@ -117,7 +129,7 @@ describe("BinderUtils.findFirstAncestor()", function()
 
 		expect(BinderUtils.findFirstAncestor(binder, child)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance child", function()
@@ -129,7 +141,7 @@ describe("BinderUtils.findFirstAncestor()", function()
 			BinderUtils.findFirstAncestor(binder, 5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -148,7 +160,7 @@ describe("BinderUtils.findFirstChild()", function()
 		expect(BinderUtils.findFirstChild(binder, parent)).toEqual(binder:Get(boundChild))
 		expect(binder:Get(unboundChild)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil when no child is bound", function()
@@ -161,7 +173,7 @@ describe("BinderUtils.findFirstChild()", function()
 
 		expect(BinderUtils.findFirstChild(binder, parent)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -181,7 +193,7 @@ describe("BinderUtils.getChildren()", function()
 
 		expect(#BinderUtils.getChildren(binder, parent)).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not include bound descendants deeper than one level", function()
@@ -197,7 +209,7 @@ describe("BinderUtils.getChildren()", function()
 
 		expect(#BinderUtils.getChildren(binder, parent)).toEqual(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -216,7 +228,7 @@ describe("BinderUtils.getDescendants()", function()
 
 		expect(#BinderUtils.getDescendants(binder, parent)).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -232,7 +244,7 @@ describe("BinderUtils.mapBinderListToTable()", function()
 		expect(map[binderA:GetTag()]).toEqual(binderA)
 		expect(map[binderB:GetTag()]).toEqual(binderB)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -253,7 +265,7 @@ describe("BinderUtils.getMappedFromList()", function()
 
 		expect(#objects).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -273,7 +285,7 @@ describe("BinderUtils.getChildrenOfBinders()", function()
 
 		expect(#BinderUtils.getChildrenOfBinders({ binderA, binderB }, parent)).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -295,7 +307,7 @@ describe("BinderUtils.getLinkedChildren()", function()
 		expect(#objects).toEqual(1)
 		expect(objects[1]).toEqual(binder:Get(target))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores links whose name does not match", function()
@@ -313,7 +325,7 @@ describe("BinderUtils.getLinkedChildren()", function()
 
 		expect(#BinderUtils.getLinkedChildren(binder, "Link", parent)).toEqual(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("deduplicates when two links point to the same bound target", function()
@@ -333,6 +345,6 @@ describe("BinderUtils.getLinkedChildren()", function()
 
 		expect(#BinderUtils.getLinkedChildren(binder, "Link", parent)).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

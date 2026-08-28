@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -49,7 +50,7 @@ local function setup()
 		return value
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		saveSlotService = saveSlotService,
 		mock = mock,
@@ -63,13 +64,17 @@ local function setup()
 			end
 			return offline
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			-- A PlayerMock never fires the real Players.PlayerRemoving, and an offline store is only
 			-- released by its handle, so shut down the way Roblox does before tearing the bag down.
 			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("SaveSlotService.PromiseOfflineSaveSlots", function()
@@ -101,7 +106,7 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		expect(slots:GetLastActiveSlotId()).toEqual("slot-a")
 
 		offline:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("writes a slot created offline into the player's datastore", function()
@@ -120,7 +125,7 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		expect(slotList[1].SlotIndex).toEqual(1)
 
 		reopened:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the borrowed session, so the next open builds a fresh one", function()
@@ -135,7 +140,7 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		expect(second:GetSlotsDataStore() == firstStore).toEqual(false)
 
 		second:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	-- The refusal for a player who *is* in this server is not covered: the guard reads
@@ -156,7 +161,7 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		expect(metadata.TimePlayed).toBeNil()
 
 		offline:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("survives being destroyed twice", function()
@@ -169,6 +174,6 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 			offline:Destroy()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

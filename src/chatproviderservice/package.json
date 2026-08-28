@@ -37,6 +37,7 @@
     "@quenty/color3utils": "workspace:*",
     "@quenty/datastore": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/localizedtextutils": "workspace:*",
     "@quenty/maid": "workspace:*",

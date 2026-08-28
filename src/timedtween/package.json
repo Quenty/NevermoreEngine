@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/basicpane": "workspace:*",
     "@quenty/blend": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",

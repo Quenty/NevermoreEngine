@@ -32,6 +32,7 @@
     "@quenty/baseobject": "workspace:*",
     "@quenty/bindtocloseservice": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",
