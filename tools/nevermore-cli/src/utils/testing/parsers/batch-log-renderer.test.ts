@@ -167,7 +167,9 @@ describe('renderBatchLog', () => {
     ]);
   });
 
-  it('prints a package verdict where its output ends', () => {
+  it('carries the verdict in the group title, and the reason in its body', () => {
+    // A group is read collapsed first, so the title has to say which ones are
+    // worth opening. The reason is a sentence and stays in the body.
     const results = new Map([
       [
         '@quenty/alpha',
@@ -175,6 +177,7 @@ describe('renderBatchLog', () => {
           success: false,
           error: 'no jest report in output',
           testCounts: { passed: 3, failed: 1, total: 4 },
+          durationMs: 1500,
         }),
       ],
     ]);
@@ -189,12 +192,42 @@ describe('renderBatchLog', () => {
     );
 
     expect(out).toEqual([
-      '::group::@quenty/alpha',
+      '::group::@quenty/alpha - FAILED (3/4) (1.5s)',
       'alpha ran',
-      '✗ FAILED (3 passed, 1 failed, 4 total)',
       'no jest report in output',
       '::endgroup::',
     ]);
+  });
+
+  it('titles a passing package with its counts and duration', () => {
+    const results = new Map([
+      [
+        '@quenty/alpha',
+        result({
+          success: true,
+          testCounts: { passed: 68, failed: 0, total: 68 },
+          durationMs: 1500,
+        }),
+      ],
+    ]);
+
+    const out = render(
+      plain(
+        '===BATCH_TEST_BEGIN alpha===',
+        '===BATCH_TEST_END alpha PASS 1==='
+      ),
+      results
+    );
+
+    expect(out[0]).toBe('::group::@quenty/alpha - Passed (68/68) (1.5s)');
+  });
+
+  it('titles a package with only its name when nothing is known about it', () => {
+    const out = render(
+      plain('===BATCH_TEST_BEGIN alpha===', '===BATCH_TEST_END alpha PASS 1===')
+    );
+
+    expect(out[0]).toBe('::group::@quenty/alpha');
   });
 
   it('drops the summary marker and its payload', () => {

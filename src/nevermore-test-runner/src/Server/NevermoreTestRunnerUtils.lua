@@ -144,25 +144,6 @@ function NevermoreTestRunnerUtils._runTestsAsync(root: Instance): TestRunResults
 
 	local results = NevermoreTestResults.fromJest(result)
 
-	-- Printed as well as returned, and the only status line worth its bytes. In an
-	-- aggregated batch every print competes for the engine's log buffer, so the
-	-- "running in X context" and "running jest from Y" lines were dropped: nothing
-	-- reads them, and they cost ~12 KB of the window per run. This one stays
-	-- because it prints after jest's own summary, and truncation keeps the tail —
-	-- so when the window closes over a package it is the count most likely to
-	-- survive, and the one that proves the runner understood the result it read.
-	print(
-		string.format(
-			"[NevermoreTestRunner] Results: %d passed, %d failed, %d skipped, %d total; %d of %d suite(s) failed",
-			results.passed,
-			results.failed,
-			results.skipped,
-			results.total,
-			results.suitesFailed,
-			results.suitesTotal
-		)
-	)
-
 	if results.error then
 		warn(results.error)
 	end

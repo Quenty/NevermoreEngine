@@ -1,4 +1,6 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { formatDurationMs } from '@quenty/cli-output-helpers/cli-utils';
+import { formatProgressResult } from '@quenty/cli-output-helpers/reporting';
 import {
   type BatchPackageResult,
   tokenizeBatchLog,
@@ -147,47 +149,64 @@ export function renderBatchLog(
   return out;
 }
 
-/** Header for one package's section. */
+/**
+ * Header for one package's section, carrying its verdict.
+ *
+ * The status is in the title because a group is read collapsed: a reader
+ * scanning 78 of them wants to know which to open, and a title that is only a
+ * package name makes them all look alike. The counts and duration are formatted
+ * with the same helpers the PR comment table uses, so the two cannot drift into
+ * describing the same run differently.
+ */
 function openGroup(slug: string, options: BatchLogRenderOptions): string[] {
   const name = options.slugToPackage.get(slug) ?? slug;
+  const result = options.results?.get(name);
+  const title = result ? `${name} - ${describeResult(result)}` : name;
 
   if (options.useGroups) {
-    return [`::group::${name}`];
+    return [`::group::${title}`];
   }
 
-  return [OutputHelper.formatDim(`──────── ${name} ────────`)];
+  return [OutputHelper.formatDim(`──────── ${title} ────────`)];
 }
 
-/** The package's verdict, printed where its output ends. */
+/** "Passed (68/68) (1.5s)", the same shape the comment report gives a row. */
+function describeResult(result: BatchPackageResult): string {
+  const counts = result.testCounts
+    ? formatProgressResult({
+        kind: 'test-counts',
+        passed: result.testCounts.passed,
+        failed: result.testCounts.failed,
+        total: result.testCounts.total,
+      })
+    : '';
+  const duration =
+    result.durationMs === undefined
+      ? ''
+      : `(${formatDurationMs(result.durationMs)})`;
+
+  return [result.success ? 'Passed' : 'FAILED', counts, duration]
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Why a package failed, printed where its output ends.
+ *
+ * Only the reason: the verdict itself is in the group's title now, and saying
+ * it twice in six lines of output reads as two separate findings. A reason is
+ * a sentence and belongs in the body.
+ */
 function verdictLines(slug: string, options: BatchLogRenderOptions): string[] {
   const name = options.slugToPackage.get(slug);
   const result = name ? options.results?.get(name) : undefined;
-  if (!result) {
+  if (!result?.error) {
     return [];
   }
 
-  const icon = result.success ? '✓' : '✗';
-  const label = result.success ? 'Passed' : 'FAILED';
-  const counts = result.testCounts
-    ? ` (${result.testCounts.passed} passed, ${result.testCounts.failed} failed, ${result.testCounts.total} total)`
-    : '';
-  const headline = `${icon} ${label}${counts}`;
-
-  const lines = [
-    options.color
-      ? result.success
-        ? OutputHelper.formatSuccess(headline)
-        : OutputHelper.formatError(headline)
-      : headline,
+  return [
+    options.color ? OutputHelper.formatError(result.error) : result.error,
   ];
-
-  if (result.error) {
-    lines.push(
-      options.color ? OutputHelper.formatError(result.error) : result.error
-    );
-  }
-
-  return lines;
 }
 
 function colorize(entry: RenderableLogLine, color: boolean): string {
