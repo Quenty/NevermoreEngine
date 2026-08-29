@@ -9,6 +9,7 @@ local require = require(loader).bootstrapPlugin(modules)
 
 local ConverterPane = require("ConverterPane")
 local Maid = require("Maid")
+local UIConverterHeadlessApi = require("UIConverterHeadlessApi")
 
 local function renderPane(plugin, target)
 	local maid = Maid.new()
@@ -34,6 +35,9 @@ end
 
 local function initialize(plugin)
 	local maid = Maid.new()
+
+	maid:GiveTask(UIConverterHeadlessApi.new())
+
 	local toolbar = plugin:CreateToolbar("Object")
 	local toggleButton = toolbar:CreateButton(
 		"convertButton",
