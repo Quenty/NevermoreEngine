@@ -1,0 +1,47 @@
+{
+  "name": "@quenty/jecs",
+  "version": "1.3.0",
+  "description": "Nevermore-integrated Jecs",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "jecs"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "src/jecs/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/immediateutils": "workspace:*",
+    "@quenty/instanceutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/randomutils": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quenty/spring": "workspace:*",
+    "@quenty/tie": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jecs": "github:QuentyStudios/jecs",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -53,7 +53,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 
 		controller.awaitEntriesWritten()
 		expect(received).toEqual({ "<nil>", "en-us" })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the locale immediately for a key whose writes already landed", function()
@@ -63,7 +63,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		controller.awaitEntriesWritten()
 
 		expect(collect(controller, translator:_observeTranslationReady("greeting"))).toEqual({ "en-us" })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits immediately for a key nothing ever registered", function()
@@ -73,7 +73,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		controller.awaitEntriesWritten()
 
 		expect(collect(controller, translator:_observeTranslationReady("never.registered"))).toEqual({ "en-us" })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("re-emits for the new locale when the locale swaps", function()
@@ -90,7 +90,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		task.wait()
 
 		expect(received).toEqual({ "en", "<nil>", "fr" })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits without waiting when swapping back to an already loaded locale", function()
@@ -106,7 +106,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 
 		controller.setForcedLocaleId("en")
 		expect(received).toEqual({ "fr", "en" })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not write to the localization table while observing a queued key", function()
@@ -119,7 +119,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 
 		expect(controller.translatorService:GetLocalizationWriteCount()).toBe(writesBefore)
 		expect(controller.translatorService:IsTranslationReady("greeting")).toBe(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("requires a string translation key", function()
@@ -129,7 +129,7 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		expect(function()
 			translator:_observeTranslationReady(5 :: any)
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -143,14 +143,14 @@ describe("TranslatorService:IsTranslationReady", function()
 
 		controller.awaitEntriesWritten()
 		expect(service:IsTranslationReady("k.one")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is true for a key nothing ever queued", function()
 		local controller = TranslatorTestUtils.setup()
 
 		expect(controller.translatorService:IsTranslationReady("never.registered")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stays false until the flush, even after a single-key read landed its locales", function()
@@ -163,7 +163,7 @@ describe("TranslatorService:IsTranslationReady", function()
 
 		controller.awaitEntriesWritten()
 		expect(service:IsTranslationReady("k.one")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -175,7 +175,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
 
 		expect(collect(controller, service:ObserveIsTranslationReady("k.one"))).toEqual({ false })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits false when a key is queued after subscribing, then true on the flush", function()
@@ -190,7 +190,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		controller.awaitEntriesWritten()
 		expect(received).toEqual({ true, false, true })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	-- A write the table already holds never gets queued at all (TranslatorService.spec.lua,
@@ -213,7 +213,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		expect(received).toEqual({ false, true })
 		expect(service:GetLocalizationWriteCount()).toBe(writesAfterRead)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("serves multiple observers of the same key independently", function()
@@ -235,7 +235,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		expect(first).toEqual({ true, false })
 		expect(second).toEqual({ true, false, true })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stops emitting to an observer that left before the flush", function()
@@ -254,7 +254,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		expect(received).toEqual({ true, false })
 		expect(service:IsTranslationReady("k.one")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports not-ready only once the queued value is stored and the flush is scheduled", function()
@@ -276,7 +276,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		expect(#seen).toBe(1)
 		expect(seen[1].pendingFlush).toBe(true)
 		expect(seen[1].isReady).toBe(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -301,7 +301,7 @@ describe("TranslatorService readiness re-entrancy", function()
 
 		controller.awaitEntriesWritten()
 		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.two"].Values["en"]).toBe("Two")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("never reports a key ready while it is pending again, whatever order the batch fires in", function()
@@ -352,7 +352,7 @@ describe("TranslatorService readiness re-entrancy", function()
 			end
 		end
 		expect(rewritten).toBe(#keys - 1)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("tells every surviving observer when a handler unsubscribes itself and a later one", function()
@@ -387,7 +387,7 @@ describe("TranslatorService readiness re-entrancy", function()
 		expect(told[2]).toBeNil()
 		expect(told[3]).toBe(true)
 		expect(told[4]).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("tells a later observer the truth when an earlier one re-queued the key", function()
@@ -421,7 +421,7 @@ describe("TranslatorService readiness re-entrancy", function()
 		expect(disagreements).toBe(0)
 		expect(received[#received]).toBe(true)
 		expect(TranslatorTestUtils.getEntryMap(service:GetLocalizationTable())["k.one"].Values["en-us"]).toBe("second")
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -440,14 +440,14 @@ describe("TranslatorService:IsTranslationReadyForLocale", function()
 		expect(service:IsTranslationReadyForLocale("k.one", "en")).toBe(true)
 		expect(service:IsTranslationReadyForLocale("k.one", "fr")).toBe(false)
 		expect(service:IsTranslationReady("k.one")).toBe(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is true for a key nothing ever queued", function()
 		local controller = TranslatorTestUtils.setup()
 
 		expect(controller.translatorService:IsTranslationReadyForLocale("never.registered", "en")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is false for a regional locale while the language value it falls back to is queued", function()
@@ -461,7 +461,7 @@ describe("TranslatorService:IsTranslationReadyForLocale", function()
 		controller.awaitEntriesWritten()
 
 		expect(service:IsTranslationReadyForLocale("k.one", "en-us")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is true while only a locale the read cannot consult is queued", function()
@@ -472,7 +472,7 @@ describe("TranslatorService:IsTranslationReadyForLocale", function()
 		service:SetEntryValue("k.one", "One", "ctx", "fr", "Un")
 
 		expect(service:IsTranslationReadyForLocale("k.one", "en-us")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -486,7 +486,7 @@ describe("TranslatorService teardown", function()
 
 		expect(service:IsTranslationReady("k.late")).toBe(true)
 		expect(collect(controller, service:ObserveIsTranslationReady("k.late"))).toEqual({ true })
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles a readiness observer for a key still queued at destroy", function()
@@ -500,7 +500,7 @@ describe("TranslatorService teardown", function()
 		service:Destroy()
 
 		expect(received[#received]).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not write a queued entry that arrives after destroy", function()
@@ -514,7 +514,7 @@ describe("TranslatorService teardown", function()
 		task.wait()
 
 		expect(TranslatorTestUtils.getEntryMap(localizationTable)["k.late"]).toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles a pending flush promise instead of stranding its awaiters", function()
@@ -528,7 +528,7 @@ describe("TranslatorService teardown", function()
 		service:Destroy()
 
 		expect(promise:IsPending()).toBe(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stops feeding a translator that was destroyed before its service", function()
@@ -548,7 +548,7 @@ describe("TranslatorService teardown", function()
 		controller.awaitEntriesWritten()
 
 		expect(#received).toBe(emittedBeforeDestroy)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("delivers the ready state for a key re-registered inside a readiness handler", function()
@@ -570,7 +570,7 @@ describe("TranslatorService teardown", function()
 		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Howdy")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("survives a translation key that collides with a Maid member name", function()
@@ -583,7 +583,7 @@ describe("TranslatorService teardown", function()
 
 		expect(received[#received]).toBe("Bye")
 		expect(controller.translatorService:IsTranslationReady("GiveTask")).toBe(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -598,7 +598,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Hello")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("translates a locale swap without any explicit flush", function()
@@ -615,7 +615,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		task.wait()
 
 		expect(received[#received]).toBe("Bonjour")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("never falls back to the source while a swapped-to locale is still queued", function()
@@ -635,7 +635,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 			expect(received[index]).toBe("Ciao")
 		end
 		expect(received[#received]).toBe("Ciao")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("translates a swap back to an already loaded locale", function()
@@ -663,7 +663,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 
 		task.wait()
 		expect(received[#received]).toBe("Bonjour")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps translating for the locale asked for, not the one a translator was built for", function()
@@ -682,7 +682,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local enTranslator = controller.getLocalizationTable():GetTranslator("en")
 		expect(translator:_doTranslation(enTranslator, "greeting", nil, "fr")).toBe("Bonjour")
 		expect(translator:_doTranslation(enTranslator, "greeting", nil, "en")).toBe("Hello")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("picks up a value registered after subscribing", function()
@@ -698,7 +698,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Later")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the key itself for a key nothing registered", function()
@@ -709,7 +709,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local received = collect(controller, translator:ObserveFormatByKey("does.not.exist"))
 
 		expect(received[#received]).toBe("does.not.exist")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not flicker to the source language when an arg emits during a locale swap", function()
@@ -736,7 +736,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 
 		task.wait()
 		expect(received[#received]).toBe("Ciao James")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not force the batch to flush early", function()
@@ -748,6 +748,6 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 
 		expect(controller.translatorService:GetLocalizationWriteCount()).toBe(writesBefore)
 		expect(controller.translatorService:IsTranslationReady("farewell")).toBe(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

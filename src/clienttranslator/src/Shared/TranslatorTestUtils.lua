@@ -6,7 +6,7 @@
 	TranslatorService, translator factories initialized against it, and await
 	helpers for the (async) Roblox translator. Writes land in the real (shared,
 	role-named) LocalizationService table, which is cleared before and after every
-	test for isolation. `controller:destroy()` tears the world down.
+	test for isolation. `controller:Destroy()` tears the world down.
 
 	@class TranslatorTestUtils
 ]]
@@ -49,7 +49,7 @@ function TranslatorTestUtils.clearGeneratedTables()
 end
 
 --[[
-	Builds an isolated test world. Call once per test and pair with controller:destroy().
+	Builds an isolated test world. Call once per test and pair with controller:Destroy().
 
 	`options.tieRealm` (a TieRealms value) injects the realm on the service bag, exactly
 	like the Raven stories do, so client-only behavior can be exercised on the server test
@@ -73,8 +73,12 @@ function TranslatorTestUtils.setup(options)
 			serviceBag:GetService(TieRealmService):SetTieRealm(tieRealm)
 		end
 		serviceBag:GetService(TranslatorService)
+
+		-- Init but deliberately not Start: the translator factories below initialize their
+		-- translators against this bag, and a translator registers its loader (which
+		-- registers a TemplateProvider) as it initializes. A bag rejects service types added
+		-- after it has started. Nothing in this stack defines Start, so nothing is skipped.
 		serviceBag:Init()
-		serviceBag:Start()
 		return serviceBag:GetService(TranslatorService), serviceBag
 	end
 
@@ -109,9 +113,9 @@ function TranslatorTestUtils.setup(options)
 		return folder
 	end
 
-	-- Creates a JSONTranslator initialized against the real service bag. The translator
-	-- is initialized directly (like a service consuming it during its own Init) rather
-	-- than registered on the bag, which is already started.
+	-- Creates a JSONTranslator initialized against the real service bag. The translator is
+	-- initialized directly, like a service consuming it during its own Init, rather than
+	-- registered on the bag.
 	local function newTranslator(dataTable, localeId)
 		local translator = JSONTranslator.new("TestTranslator", localeId or "en", dataTable)
 		translator:Init(serviceBag)
@@ -182,7 +186,7 @@ function TranslatorTestUtils.setup(options)
 		track = function(item)
 			return giveTask(item)
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 			TranslatorTestUtils.clearGeneratedTables()
 		end,

@@ -9,30 +9,29 @@ local Workspace = game:GetService("Workspace")
 
 local CoreGuiEnabler = require("CoreGuiEnabler")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local currentMock: Player? = nil
-
 local function setupLocalPlayer(): Player
+	local maid = Maid.new()
+	JestUtils.afterThis(maid)
+
 	local player = PlayerMock.new({ UserId = 66123001 })
 	player.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(player)
-	currentMock = player
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
+
+	maid:GiveTask(function()
+		restoreLocalPlayer()
+		player:Destroy()
+	end)
+
 	return player
 end
-
-afterEach(function()
-	PlayerMock.setMockedLocalPlayer(nil)
-	if currentMock ~= nil then
-		currentMock:Destroy()
-		currentMock = nil
-	end
-end)
 
 describe("CoreGuiEnabler.Disable", function()
 	it("records the disable on the mocked local player and restores on enable", function()

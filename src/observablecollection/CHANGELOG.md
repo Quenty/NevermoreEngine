@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.49.0...@quenty/observablecollection@12.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+# [12.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.48.1...@quenty/observablecollection@12.49.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+## [12.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.48.0...@quenty/observablecollection@12.48.1) (2026-08-24)
+
+### Bug Fixes
+
+- ObservableSortedList handles removal immediately. ([9f115e8](https://github.com/Quenty/NevermoreEngine/commit/9f115e8b32c5450f63904a1a39845e98f423712e))
+
+# [12.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.47.1...@quenty/observablecollection@12.48.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
+## [12.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.47.0...@quenty/observablecollection@12.47.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/observablecollection
+
 # [12.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.46.2...@quenty/observablecollection@12.47.0) (2026-07-28)
 
 **Note:** Version bump only for package @quenty/observablecollection

@@ -32,13 +32,13 @@ describe("DataStore saving callbacks that misbehave", function()
 		local promise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 		expect(ran).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("isolates a throwing saving callback into a clean save rejection, preserving the stack trace", function()
@@ -57,7 +57,7 @@ describe("DataStore saving callbacks that misbehave", function()
 		expect(string.find(tostring(err), "saving callback boom", 1, true) ~= nil).toEqual(true)
 		expect(string.find(tostring(err), "PromiseInvokeSavingCallbacks", 1, true) ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects the save when a saving callback returns a rejected promise (and does not persist)", function()
@@ -72,7 +72,7 @@ describe("DataStore saving callbacks that misbehave", function()
 		expect((PromiseTestUtils.awaitOutcome(dataStore:Save(), 5))).toEqual("rejected")
 		expect(controller.mock:GetRaw("key")).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("blocks the save while a saving callback yields (never resolves)", function()
@@ -87,6 +87,6 @@ describe("DataStore saving callbacks that misbehave", function()
 		local promise = dataStore:Save()
 		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

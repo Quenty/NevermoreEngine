@@ -33,6 +33,7 @@ function SaveSlotServiceClient.Init(self: SaveSlotServiceClient, serviceBag: Ser
 	self._maid = Maid.new()
 
 	-- External
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 	self._teleportDataServiceClient = self._serviceBag:GetService(TeleportDataServiceClient)
 
 	-- Internal

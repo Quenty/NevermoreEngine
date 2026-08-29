@@ -248,7 +248,7 @@ function ArmIKBase._observeStateBrio(self: ArmIKBase): any
 				Rx.shareReplay(1),
 			})
 
-			return RxBrioUtils.flatCombineLatest({
+			return RxBrioUtils.flatCombineLatestBrio({
 				UpperTorso = observeUpperTorsoBrio,
 				UpperArm = observeUpperArmBrio,
 				LowerArm = observeLowerArmBrio,

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "14.36.0",
+  "version": "14.38.0",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -28,15 +28,17 @@
     "Quenty"
   ],
   "dependencies": {
-    "@quenty/baseobject": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/canceltoken": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxsignal": "workspace:*",
-    "@quenty/symbol": "workspace:*"
+    "@quenty/symbol": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

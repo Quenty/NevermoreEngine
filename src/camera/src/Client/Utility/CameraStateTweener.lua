@@ -4,19 +4,27 @@
 	out a new camera state. Call `:Show()` and `:Hide()` to do so, and make sure to
 	call `:Destroy()` after usage.
 
+	Inherits from [TransitionModel]. See for more API.
+
 	@class CameraStateTweener
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
-local BaseObject = require("BaseObject")
 local CameraEffectUtils = require("CameraEffectUtils")
 local CameraStack = require("CameraStack")
 local CameraStackService = require("CameraStackService")
+local DuckTypeUtils = require("DuckTypeUtils")
 local FadeBetweenCamera3 = require("FadeBetweenCamera3")
+local Maid = require("Maid")
+local Observable = require("Observable")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
+local StepUtils = require("StepUtils")
+local TransitionModel = require("TransitionModel")
+local ValueObject = require("ValueObject")
 
-local CameraStateTweener = setmetatable({}, BaseObject)
+local CameraStateTweener = setmetatable({}, TransitionModel)
 CameraStateTweener.ClassName = "CameraStateTweener"
 CameraStateTweener.__index = CameraStateTweener
 
@@ -27,10 +35,11 @@ export type CameraStateTweener =
 			_cameraEffect: any,
 			_cameraBelow: any,
 			_fadeBetween: FadeBetweenCamera3.FadeBetweenCamera3,
+			_shownTarget: ValueObject.ValueObject<number>,
 		},
 		{} :: typeof({ __index = CameraStateTweener })
 	))
-	& BaseObject.BaseObject
+	& TransitionModel.TransitionModel
 
 --[=[
 	Constructs a new camera state tweener
@@ -45,19 +54,22 @@ function CameraStateTweener.new(
 	cameraEffect,
 	speed: number?
 ): CameraStateTweener
-	local self: CameraStateTweener = setmetatable(BaseObject.new() :: any, CameraStateTweener)
-
 	assert(cameraEffect, "No cameraEffect")
 
+	local cameraStack: CameraStack.CameraStack
 	if ServiceBag.isServiceBag(serviceBagOrCameraStack) then
-		self._cameraStack = (serviceBagOrCameraStack :: any):GetService(CameraStackService):GetCameraStack()
+		cameraStack = (serviceBagOrCameraStack :: any):GetService(CameraStackService):GetCameraStack()
 	elseif CameraStack.isCameraStack(serviceBagOrCameraStack) then
-		self._cameraStack = serviceBagOrCameraStack :: any
+		cameraStack = serviceBagOrCameraStack :: any
 	else
 		error("Bad serviceBagOrCameraStack")
 	end
 
-	assert(self._cameraStack, "No CameraStack")
+	assert(cameraStack, "No CameraStack")
+
+	local self: CameraStateTweener = setmetatable(TransitionModel.new() :: any, CameraStateTweener)
+
+	self._cameraStack = cameraStack
 
 	local cameraBelow, assign = self._cameraStack:GetNewStateBelow()
 
@@ -72,11 +84,38 @@ function CameraStateTweener.new(
 	self._fadeBetween.Target = 0
 	self._fadeBetween.Value = 0
 
+	self._shownTarget = self._maid:Add(ValueObject.new(1, "number"))
+
+	self:SetPromiseShow(function(maid, doNotAnimate)
+		return self:_promiseFadeTo(maid, self._shownTarget.Value, doNotAnimate)
+	end)
+	self:SetPromiseHide(function(maid, doNotAnimate)
+		return self:_promiseFadeTo(maid, 0, doNotAnimate)
+	end)
+
+	-- Retarget while shown. Visibility has not changed, so nothing would restart the fade
+	-- on its own, and the completion signals would report the transition that no longer applies.
+	self._maid:GiveTask(self._shownTarget.Changed:Connect(function()
+		if self:IsVisible() then
+			self:_restartTransition()
+		end
+	end))
+
 	self._maid:GiveTask(function()
 		self._cameraStack:Remove(self._fadeBetween)
 	end)
 
 	return self
+end
+
+--[=[
+	Returns true if it's a camera state tweener
+
+	@param value any
+	@return boolean
+]=]
+function CameraStateTweener.isCameraStateTweener(value: any): boolean
+	return DuckTypeUtils.isImplementation(CameraStateTweener, value)
 end
 
 --[=[
@@ -88,58 +127,37 @@ function CameraStateTweener.GetPercentVisible(self: CameraStateTweener): number
 end
 
 --[=[
-	Shows the camera to fade in.
-	@param doNotAnimate boolean? -- Optional, defaults to animating
-]=]
-function CameraStateTweener.Show(self: CameraStateTweener, doNotAnimate: boolean?)
-	self:SetTarget(1, doNotAnimate)
-end
-
---[=[
-	Hides the camera to fade in.
-	@param doNotAnimate boolean? -- Optional, defaults to animating
-]=]
-function CameraStateTweener.Hide(self: CameraStateTweener, doNotAnimate: boolean?)
-	self:SetTarget(0, doNotAnimate)
-end
-
---[=[
 	Returns true if we're done hiding
+
+	@deprecated 14.52.0 -- Use TransitionModel.IsHidingComplete
 	@return boolean
 ]=]
 function CameraStateTweener.IsFinishedHiding(self: CameraStateTweener): boolean
-	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 0
+	return self:IsHidingComplete()
 end
 
 --[=[
 	Returns true if we're done showing
+
+	@deprecated 14.52.0 -- Use TransitionModel.IsShowingComplete
 	@return boolean
 ]=]
 function CameraStateTweener.IsFinishedShowing(self: CameraStateTweener): boolean
-	return self._fadeBetween.HasReachedTarget and self._fadeBetween.Target == 1
+	return self:IsShowingComplete()
 end
 
 --[=[
 	Hides the tweener, and invokes the callback once the tweener
 	is finished hiding.
+
+	@deprecated 14.52.0 -- Use TransitionModel.PromiseHide, which also surfaces the tween being interrupted
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@param callback function
 ]=]
 function CameraStateTweener.Finish(self: CameraStateTweener, doNotAnimate: boolean?, callback: () -> ())
 	assert(type(callback) == "function", "Bad callback")
 
-	self:Hide(doNotAnimate)
-
-	if self._fadeBetween.HasReachedTarget then
-		callback()
-	else
-		task.spawn(function()
-			while not self._fadeBetween.HasReachedTarget do
-				task.wait(0.05)
-			end
-			callback()
-		end)
-	end
+	self._maid:GivePromise(self:PromiseHide(doNotAnimate)):Then(callback)
 end
 
 --[=[
@@ -162,12 +180,49 @@ end
 	Sets the epsilon to stop animating
 	@param epsilon number?
 ]=]
-function CameraStateTweener:SetEpsilon(epsilon: number?)
+function CameraStateTweener.SetEpsilon(self: CameraStateTweener, epsilon: number?)
 	self._fadeBetween.Epsilon = epsilon
 end
 
 --[=[
-	Sets the percent visible target
+	Sets how far the camera effect fades in when shown. Defaults to 1, fully faded in.
+
+	Changing this while shown retargets the fade and runs the show transition again, so
+	[TransitionModel.ShowingComplete] fires for the transition that actually happened.
+
+	@param shownTarget number | Observable<number> | ValueObject<number>
+	@return function -- Cleanup function
+]=]
+function CameraStateTweener.SetShownTarget(
+	self: CameraStateTweener,
+	shownTarget: ValueObject.Mountable<number>
+): () -> ()
+	return self._shownTarget:Mount(shownTarget)
+end
+
+--[=[
+	Gets how far the camera effect fades in when shown.
+	@return number
+]=]
+function CameraStateTweener.GetShownTarget(self: CameraStateTweener): number
+	return self._shownTarget.Value
+end
+
+--[=[
+	Observes how far the camera effect fades in when shown.
+	@return Observable<number>
+]=]
+function CameraStateTweener.ObserveShownTarget(self: CameraStateTweener): Observable.Observable<number>
+	return self._shownTarget:Observe()
+end
+
+--[=[
+	Sets the percent visible target.
+
+	A target of 0 hides the tweener and leaves the shown target alone, so a later
+	[BasicPane.Show] returns to where it was. Any other target becomes the new shown
+	target and shows the tweener.
+
 	@param target number
 	@param doNotAnimate boolean? -- Optional, defaults to animating
 	@return CameraStateTweener -- self
@@ -177,11 +232,15 @@ function CameraStateTweener.SetTarget(
 	target: number,
 	doNotAnimate: boolean?
 ): CameraStateTweener
-	self._fadeBetween.Target = target or error("No target")
-	if doNotAnimate then
-		self._fadeBetween.Value = self._fadeBetween.Target
-		self._fadeBetween.Velocity = 0
+	assert(type(target) == "number", "Bad target")
+
+	if target == 0 then
+		self:Hide(doNotAnimate)
+	else
+		self._shownTarget.Value = target
+		self:Show(doNotAnimate)
 	end
+
 	return self
 end
 
@@ -199,24 +258,46 @@ function CameraStateTweener.SetSpeed(self: CameraStateTweener, speed: number): C
 end
 
 --[=[
-	Sets whether the tweener is visible
-	@param isVisible boolean
-	@param doNotAnimate boolean? -- Optional, defaults to animating
-]=]
-function CameraStateTweener.SetVisible(self: CameraStateTweener, isVisible: number, doNotAnimate: boolean?): ()
-	if isVisible then
-		self:Show(doNotAnimate)
-	else
-		self:Hide(doNotAnimate)
-	end
-end
-
---[=[
 	Retrieves the fading camera being used to interpolate.
 	@return CameraEffect
 ]=]
 function CameraStateTweener.GetFader(self: CameraStateTweener): CameraEffectUtils.CameraEffect
 	return self._fadeBetween
+end
+
+function CameraStateTweener._promiseFadeTo(
+	self: CameraStateTweener,
+	maid: Maid.Maid,
+	target: number,
+	doNotAnimate: boolean?
+): Promise.Promise<()>
+	self._fadeBetween.Target = target
+
+	if doNotAnimate then
+		self._fadeBetween.Value = target
+		self._fadeBetween.Velocity = 0
+	end
+
+	if self._fadeBetween.HasReachedTarget then
+		return Promise.resolved()
+	end
+
+	local promise = maid:Add(Promise.new())
+
+	-- TODO: Mathematical solution? The spring has no completion event to hook.
+	local startAnimate, stopAnimate = StepUtils.bindToRenderStep(function()
+		if self._fadeBetween.HasReachedTarget then
+			promise:Resolve()
+			return false
+		end
+
+		return true
+	end)
+
+	maid:GiveTask(stopAnimate)
+	startAnimate()
+
+	return promise
 end
 
 return CameraStateTweener

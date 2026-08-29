@@ -50,6 +50,7 @@ function ChatProviderService.Init(self: ChatProviderService, serviceBag: Service
 	-- External
 	self._serviceBag:GetService(require("CmdrService"))
 	self._serviceBag:GetService(require("PermissionService"))
+	self._serviceBag:GetService(require("DataStoreService"))
 	self._serviceBag:GetService(require("PlayerDataStoreService"))
 
 	-- Internal

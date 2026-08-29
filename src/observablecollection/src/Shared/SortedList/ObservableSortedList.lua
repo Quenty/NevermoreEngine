@@ -50,6 +50,7 @@ export type ObservableSortedList<T> = typeof(setmetatable(
 
 		_unifiedTracker: UnifiedChangedSpanTracker.UnifiedChangedSpanTracker,
 
+		_nodeRemovedImmediate: Signal.Signal<SortedNode.SortedNode<T>>,
 		_indexObservers: any,
 		_nodeIndexObservables: any,
 		_mainObservables: any,
@@ -115,6 +116,10 @@ function ObservableSortedList.new<T>(isReversed: boolean?, compare: CompareFunct
 	@within ObservableSortedList
 ]=]
 	self.OrderChanged = self._maid:Add(Signal.new())
+
+	-- Internal: fires the moment a node leaves the tree, ahead of the batched ItemRemoved, for
+	-- observers holding the node itself.
+	self._nodeRemovedImmediate = self._maid:Add(Signal.new()) :: any
 
 	--[=[
 	Fires when the count changes
@@ -286,6 +291,13 @@ function ObservableSortedList.ObserveItemsBrio<T>(
 		-- to so many events
 
 		local function handleItem(data: T, _index, node)
+			-- Nodes added before this subscription are announced from the tree below, and their
+			-- ItemAdded still fires on the next flush. Announcing twice would replace the brio the
+			-- subscriber is already holding.
+			if maid[node] then
+				return
+			end
+
 			local brio = Brio.new(data, node)
 			maid[node] = brio
 			sub:Fire(brio)
@@ -297,7 +309,7 @@ function ObservableSortedList.ObserveItemsBrio<T>(
 		end
 
 		maid:GiveTask(self.ItemAdded:Connect(handleItem))
-		maid:GiveTask(self.ItemRemoved:Connect(function(_item, node)
+		maid:GiveTask(self._nodeRemovedImmediate:Connect(function(node)
 			maid[node] = nil
 		end))
 
@@ -494,6 +506,11 @@ function ObservableSortedList._assignSortValue<T>(
 			self:_removeNode(node)
 			node.value = nil
 			self:_queueFireEvents()
+
+			-- Holders of the node itself have to let go now, not on the next flush. A node added and
+			-- removed before that flush cancels both batched events, so ItemRemoved alone would
+			-- leave them holding a node that is no longer in the list.
+			self._nodeRemovedImmediate:Fire(node)
 		else
 			node.value = nil
 		end

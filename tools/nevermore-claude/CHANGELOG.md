@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/Quenty/NevermoreEngine/compare/nevermore-claude@0.2.0...nevermore-claude@0.2.1) (2026-08-13)
+
+**Note:** Version bump only for package nevermore-claude
+
 # 0.2.0 (2026-07-16)
 
 ### Features

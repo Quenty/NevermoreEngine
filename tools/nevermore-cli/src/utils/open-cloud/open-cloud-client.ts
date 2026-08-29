@@ -7,6 +7,30 @@ import {
   parseTestLogs,
   type ParsedTestLogs,
 } from '../testing/test-log-parser.js';
+import { type LogFetchStats } from '../testing/log-fetch-stats.js';
+
+/**
+ * One engine message, with the severity Open Cloud reported for it.
+ *
+ * A message is not a line: an error arrives with its whole traceback attached,
+ * so `message` can span several. `messageType` is OUTPUT, WARNING or ERROR.
+ */
+export interface TaskLogMessage {
+  message: string;
+  messageType?: string;
+}
+
+/** A task's log text together with what the fetch had to do to collect it. */
+export interface TaskLogFetch {
+  text: string;
+  stats: LogFetchStats;
+  /**
+   * The same output as `text`, still split into typed messages. Kept because
+   * severity is the API's to state and cannot be recovered from the joined
+   * text: a traceback's continuation lines look like ordinary output.
+   */
+  messages: TaskLogMessage[];
+}
 
 export interface LuauTask {
   path: string;
@@ -22,16 +46,49 @@ export interface LuauTask {
     | 'FAILED';
   script: string;
   timeout?: string;
-  /** Script return value (populated on COMPLETE). */
-  output?: { results?: Array<{ value?: string }> };
+  /**
+   * What the script returned, populated on COMPLETE. `results` is a flat array
+   * of the returned values — `return t, "s", 42` arrives as three entries —
+   * natively typed: Roblox serializes them itself, so a returned Lua table is
+   * real nested JSON here, not a JSON string. (Which is also why a script must
+   * not JSONEncode its result: that lands as a double-encoded string.)
+   *
+   * Absent whenever the task produced no result. A FAILED task carries no
+   * `output` at all, with no error message explaining why — and an oversize
+   * return value (~4MB observed; ~2MB still arrives complete) fails the task
+   * exactly that way rather than truncating the value.
+   */
+  output?: { results?: unknown[] };
   /** Error details (populated on FAILED). */
   error?: { code?: string; message?: string };
+}
+
+/**
+ * The values a finished task's script returned, or `undefined` when the task
+ * reported no result at all.
+ *
+ * The distinction matters: `undefined` means nothing came back to read, so a
+ * caller can fall back to the task's logs, while `[]` means the task did report
+ * a result and the script returned nothing — no fallback will find more.
+ */
+export function getTaskReturnValues(task: LuauTask): unknown[] | undefined {
+  if (!task.output) {
+    return undefined;
+  }
+  return task.output.results ?? [];
 }
 
 export interface OpenCloudClientOptions {
   apiKey: string | (() => Promise<string>);
   rateLimiter: RateLimiter;
 }
+
+/**
+ * Which end of a place's version history to resolve. Mirrors the `versionType`
+ * the place-publishing API takes on upload, lowercased to match how it is
+ * written in deploy.nevermore.json.
+ */
+export type PlaceVersionType = 'saved' | 'published';
 
 function formatAuthError(
   action: string,
@@ -309,22 +366,32 @@ export class OpenCloudClient {
 
   async getTaskLogsAsync(taskPath: string): Promise<ParsedTestLogs> {
     const raw = await this.getRawTaskLogsAsync(taskPath);
-    return parseTestLogs(raw);
+    return parseTestLogs(raw.text);
   }
 
   /**
-   * Fetch raw log text from a completed Luau execution task.
+   * Fetch raw log text from a completed Luau execution task, along with the
+   * shape of the fetch that produced it.
+   *
    * Retries a few times if the API returns empty logs, since the test runner
-   * always produces at least some output.
+   * always produces at least some output. The reported `requests` count spans
+   * every attempt, so a fetch that only filled in on its third try says so.
    */
-  async getRawTaskLogsAsync(taskPath: string): Promise<string> {
+  async getRawTaskLogsAsync(taskPath: string): Promise<TaskLogFetch> {
     const maxAttempts = 3;
     const retryDelayMs = 1000;
+    let requests = 0;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const logs = await this._fetchRawLogsAsync(taskPath);
-      if (logs || attempt === maxAttempts) {
-        return logs;
+      const fetched = await this._fetchRawLogsAsync(taskPath);
+      requests += fetched.stats.requests;
+
+      if (fetched.text || attempt === maxAttempts) {
+        return {
+          text: fetched.text,
+          stats: { ...fetched.stats, requests },
+          messages: fetched.messages,
+        };
       }
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
@@ -333,10 +400,12 @@ export class OpenCloudClient {
     return this._fetchRawLogsAsync(taskPath);
   }
 
-  private async _fetchRawLogsAsync(taskPath: string): Promise<string> {
+  private async _fetchRawLogsAsync(taskPath: string): Promise<TaskLogFetch> {
     const apiKey = await this._resolveApiKeyAsync();
-    const messages: string[] = [];
-    const structured: { message: string; createTime: string }[] = [];
+    // Arrival order, deliberately. Do not sort by createTime: every print in a
+    // single frame shares one value, so it cannot order them anyway, and the
+    // fractional digit count varies, so comparing the strings reorders them.
+    const messages: TaskLogMessage[] = [];
     let pageToken: string | undefined;
     let pagesFetched = 0;
     let entriesFetched = 0;
@@ -374,16 +443,16 @@ export class OpenCloudClient {
 
       for (const entry of data.luauExecutionSessionTaskLogs ?? []) {
         if (entry.structuredMessages?.length) {
-          // Keep createTime alongside the text: the API does not guarantee
-          // chronological order, and readers downstream assume it.
-          for (const msg of entry.structuredMessages) {
-            structured.push({
+          messages.push(
+            ...entry.structuredMessages.map((msg) => ({
               message: msg.message,
-              createTime: msg.createTime,
-            });
-          }
+              messageType: msg.messageType,
+            }))
+          );
         } else if (entry.messages?.length) {
-          messages.push(...entry.messages);
+          // The flat view carries no severity, which stays absent rather than
+          // being guessed at.
+          messages.push(...entry.messages.map((message) => ({ message })));
         }
       }
 
@@ -392,23 +461,26 @@ export class OpenCloudClient {
       pageToken = data.nextPageToken || undefined;
     } while (pageToken);
 
-    // Out-of-order messages silently destroy marker-delimited parsing: a
-    // trailing summary that arrives early ends the scan before any of the
-    // output it summarizes has been read.
-    structured.sort((a, b) => a.createTime.localeCompare(b.createTime));
-    messages.push(...structured.map((m) => m.message));
+    const text = messages.map((entry) => entry.message).join('\n');
 
-    const text = messages.join('\n');
+    const stats: LogFetchStats = {
+      requests: pagesFetched,
+      pages: pagesFetched,
+      entries: entriesFetched,
+      messages: messages.length,
+      chars: text.length,
+    };
 
     // Log volume is the prime suspect when engine output goes missing between
     // the task and the parser, and the parser cannot tell a short run from a
-    // truncated fetch. Record what arrived so a real run can settle it.
+    // truncated fetch. Handed out with the text rather than only printed, so
+    // the diagnostic that finds the output missing can say what the fetch saw.
     OutputHelper.verbose(
-      `[open-cloud] Task logs: ${pagesFetched} page(s), ${entriesFetched} entries, ` +
-        `${messages.length} messages, ${text.length} chars`
+      `[open-cloud] Task logs: ${stats.pages} page(s), ${stats.entries} entries, ` +
+        `${stats.messages} messages, ${stats.chars} chars`
     );
 
-    return text;
+    return { text, stats, messages };
   }
 
   /**
@@ -494,57 +566,147 @@ export class OpenCloudClient {
   }
 
   /**
-   * Resolve the current latest published version number of a place, via the
-   * Open Cloud Assets API (`asset:read` scope; `legacy-asset:manage` also
-   * grants it). The returned number is the same value the Asset Delivery API's
-   * `/version/{n}` route expects, so it can be written straight into a
-   * `basePlace.version` pin.
+   * Resolve the newest saved or published version number of a place, via the
+   * Open Cloud Assets API (`asset:read` scope). The returned number is the same
+   * value the Asset Delivery API's `/version/{n}` route expects, so it can be
+   * written straight into a `basePlace.version` pin.
+   *
+   * This used to add that `legacy-asset:manage` grants `asset:read` too. They
+   * are separate boxes on the credentials page and nothing here ever verified
+   * the implication, so the claim is gone rather than restated — it had already
+   * been copied into the `nevermore login` instructions as fact once.
+   *
+   * `saved` is the newest version of any kind — Studio saves and publishes
+   * share one increasing version sequence. `published` is the newest version
+   * that actually went live, which is what players see and what a deploy
+   * merging against a base place normally wants.
+   *
+   * The endpoint pages newest-first, which is what makes this affordable: an
+   * actively-developed place accumulates tens of thousands of versions, and we
+   * never walk the history. `saved` is the first entry of the first page, and
+   * `published` only walks back as far as the most recent live version — one
+   * page unless the place has been saved 50+ times without publishing. The scan
+   * is capped so a never-published place fails fast instead of paging forever.
    */
-  async getLatestPlaceVersionAsync(
+  async resolveLatestPlaceVersionAsync(
     universeId: number,
-    placeId: number
+    placeId: number,
+    versionType: PlaceVersionType
   ): Promise<number> {
     const apiKey = await this._resolveApiKeyAsync();
-    const url = `https://apis.roblox.com/assets/v1/assets/${placeId}`;
+    let pageToken: string | undefined;
+    let previousVersion: number | undefined;
 
-    const response = await this._rateLimiter.fetchAsync(url, {
-      method: 'GET',
-      headers: {
-        'x-api-key': apiKey,
-      },
-    });
+    for (let page = 0; page < VERSION_SCAN_MAX_PAGES; page++) {
+      const url =
+        `https://apis.roblox.com/assets/v1/assets/${placeId}/versions` +
+        `?maxPageSize=${VERSION_SCAN_PAGE_SIZE}` +
+        (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
 
-    if (!response.ok) {
-      const text = await response.text();
-      if (response.status === 401 || response.status === 403) {
+      const response = await this._rateLimiter.fetchAsync(url, {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            formatAuthError(
+              'Read place version',
+              'asset:read',
+              universeId,
+              placeId,
+              response.status,
+              response.statusText,
+              text,
+              'GET',
+              url
+            )
+          );
+        }
         throw new Error(
-          formatAuthError(
-            'Read place version',
-            'asset:read',
-            universeId,
-            placeId,
-            response.status,
-            response.statusText,
-            text,
-            'GET',
-            url
-          )
+          `Read place version failed: ${response.status} ${response.statusText}: ${text}`
         );
       }
-      throw new Error(
-        `Read place version failed: ${response.status} ${response.statusText}: ${text}`
+
+      const data = (await response.json()) as {
+        assetVersions?: AssetVersion[];
+        nextPageToken?: string;
+      };
+
+      const page = (data.assetVersions ?? []).map((assetVersion) => ({
+        versionNumber: _parseAssetVersionNumber(placeId, assetVersion),
+        published: assetVersion.published === true,
+      }));
+
+      // Everything here rests on the API paging newest-first, and a `saved`
+      // lookup answers from the very first entry — so the whole page is checked
+      // before anything is returned. Validating only as far as the match would
+      // leave the common case unchecked and quietly pin a years-old build.
+      for (const { versionNumber } of page) {
+        if (previousVersion != null && versionNumber >= previousVersion) {
+          throw new Error(
+            `Read place version failed: place ${placeId} returned version ` +
+              `${versionNumber} after ${previousVersion}. The Assets API is no ` +
+              `longer paging newest-first, so "${versionType}" cannot be resolved ` +
+              `safely — pin an explicit version number in deploy.nevermore.json.`
+          );
+        }
+        previousVersion = versionNumber;
+      }
+
+      // `published` is omitted rather than false on save-only versions.
+      const match = page.find(
+        (entry) => versionType === 'saved' || entry.published
       );
+      if (match) {
+        return match.versionNumber;
+      }
+
+      pageToken = data.nextPageToken;
+      if (!pageToken) {
+        break;
+      }
     }
 
-    const data = (await response.json()) as { revisionId?: string };
-    const version = Number(data.revisionId);
-    if (!data.revisionId || !Number.isFinite(version)) {
-      throw new Error(
-        `Read place version failed: no revisionId for place ${placeId}`
-      );
-    }
-    return version;
+    throw new Error(
+      `Place ${placeId} has no ${versionType} version` +
+        (pageToken
+          ? ` in its most recent ${
+              VERSION_SCAN_MAX_PAGES * VERSION_SCAN_PAGE_SIZE
+            } versions`
+          : '') +
+        `. Pin an explicit version number in deploy.nevermore.json, or publish the place once.`
+    );
   }
+}
+
+/** How the Assets API reports one entry of a place's version history. */
+interface AssetVersion {
+  /** `assets/{assetId}/versions/{versionNumber}` */
+  path?: string;
+  /** Present and true only once the version has been published live. */
+  published?: boolean;
+}
+
+const VERSION_SCAN_PAGE_SIZE = 50;
+const VERSION_SCAN_MAX_PAGES = 20;
+
+function _parseAssetVersionNumber(
+  placeId: number,
+  version: AssetVersion
+): number {
+  const versionNumber = Number(version.path?.split('/').pop());
+  if (!Number.isInteger(versionNumber) || versionNumber < 1) {
+    throw new Error(
+      `Read place version failed: place ${placeId} returned an unparseable ` +
+        `version path "${version.path}"`
+    );
+  }
+  return versionNumber;
 }
 
 const CDN_MAX_ATTEMPTS = 4;

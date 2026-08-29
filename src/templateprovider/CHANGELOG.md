@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.50.0...@quenty/templateprovider@11.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+# [11.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.49.1...@quenty/templateprovider@11.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+## [11.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.49.0...@quenty/templateprovider@11.49.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+# [11.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.48.2...@quenty/templateprovider@11.49.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/templateprovider
+
+## [11.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.48.1...@quenty/templateprovider@11.48.2) (2026-08-14)
+
+### Bug Fixes
+
+- Parent stuff to the right place ([bb33329](https://github.com/Quenty/NevermoreEngine/commit/bb3332922e6048b9467d8cb6e11a23806080e8b7))
+- This can break replication sometimes it looks like ([69dd09a](https://github.com/Quenty/NevermoreEngine/commit/69dd09a614de40b6e5240b1dc228364b2f56b396))
+
 ## [11.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.48.0...@quenty/templateprovider@11.48.1) (2026-08-10)
 
 **Note:** Version bump only for package @quenty/templateprovider

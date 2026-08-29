@@ -56,6 +56,7 @@ export type AccelTween = typeof(setmetatable(
 		pt: number,
 
 		-- Internal
+		_clock: () -> number,
 		_accel: number,
 		_t0: number,
 		_y0: number,
@@ -87,6 +88,7 @@ export type AccelTween = typeof(setmetatable(
 ]=]
 function AccelTween.new(maxaccel: number?): AccelTween
 	local self = setmetatable({
+		_clock = os.clock,
 		_accel = maxaccel or 1,
 		_t0 = 0,
 		_y0 = 0,
@@ -108,21 +110,49 @@ function AccelTween.SetTarget(self: AccelTween, target: number, doNotAnimate: bo
 	end
 end
 
+--[=[
+	Sets the clock the tween reads time from. Defaults to `os.clock`.
+
+	Safe to call mid-tween. The stored times are shifted onto the new clock's timebase, so the
+	current position, velocity, and the time left all carry over exactly -- the tween neither
+	jumps nor restarts.
+
+	@param clock () -> number
+]=]
+function AccelTween.SetClock(self: AccelTween, clock: () -> number): ()
+	assert(type(clock) == "function", "Bad clock")
+
+	local delta = clock() - self._clock()
+
+	self._clock = clock
+	self._t0 += delta
+	self._t1 += delta
+end
+
+--[=[
+	Gets the clock the tween reads time from.
+
+	@return () -> number
+]=]
+function AccelTween.GetClock(self: AccelTween): () -> number
+	return self._clock
+end
+
 function AccelTween:__index(index)
 	if AccelTween[index] then
 		return AccelTween[index]
 	elseif index == "p" then
-		local pos, _ = self:_getState(os.clock())
+		local pos, _ = self:_getState(self._clock())
 		return pos
 	elseif index == "v" then
-		local _, vel = self:_getState(os.clock())
+		local _, vel = self:_getState(self._clock())
 		return vel
 	elseif index == "a" then
 		return self._accel
 	elseif index == "t" then
 		return self._y1
 	elseif index == "rtime" then
-		local time = os.clock()
+		local time = self._clock()
 		return time < self._t1 and self._t1 - time or 0
 	else
 		error(string.format("Bad index %q", tostring(index)))
@@ -158,7 +188,7 @@ function AccelTween:_getState(time)
 end
 
 function AccelTween:_setState(newpos, newvel, newaccel, newtarg)
-	local time = os.clock()
+	local time = self._clock()
 	local pos, vel = self:_getState(time)
 	pos = newpos or pos
 	vel = newvel or vel

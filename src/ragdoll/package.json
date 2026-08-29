@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "15.64.1",
+  "version": "15.68.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -36,10 +36,12 @@
     "@quenty/camera": "workspace:*",
     "@quenty/cancellabledelay": "workspace:*",
     "@quenty/characterutils": "workspace:*",
+    "@quenty/cmdrservice": "workspace:*",
     "@quenty/draw": "workspace:*",
     "@quenty/enumutils": "workspace:*",
     "@quenty/hapticfeedbackutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/motor6d": "workspace:*",
@@ -47,6 +49,7 @@
     "@quenty/physicsutils": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
+    "@quenty/playerutils": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/qframe": "workspace:*",
     "@quenty/r15utils": "workspace:*",

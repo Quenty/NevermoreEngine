@@ -11,6 +11,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
@@ -20,60 +21,78 @@ local StepUtils = require("StepUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
-local beforeEach = Jest.Globals.beforeEach
+
+local function setup(): any
+	local maid = Maid.new()
+
+	local controller = {
+		maid = maid,
+		newService = function(): any
+			local serviceBag = maid:Add(ServiceBag.new())
+			local service = serviceBag:GetService(PlayerMockServiceClient)
+			serviceBag:Init()
+			serviceBag:Start()
+			return service
+		end,
+		newLooseService = function(): (any, any)
+			local serviceBag = ServiceBag.new()
+			local service = serviceBag:GetService(PlayerMockServiceClient)
+			serviceBag:Init()
+			serviceBag:Start()
+			return serviceBag, service
+		end,
+		newMock = function(userId: number): Player
+			local player = maid:Add(PlayerMock.new({ UserId = userId }))
+			player.Parent = workspace
+			return player
+		end,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
 
 describe("PlayerMockServiceClient", function()
-	local maid
-
-	beforeEach(function()
-		maid = Maid.new()
-	end)
-
-	afterEach(function()
-		maid:DoCleaning()
-	end)
-
-	local function makeService(): any
-		local serviceBag = maid:Add(ServiceBag.new())
-		local service = serviceBag:GetService(PlayerMockServiceClient)
-		serviceBag:Init()
-		serviceBag:Start()
-		return service
-	end
-
-	local function newMock(userId: number): Player
-		local player = maid:Add(PlayerMock.new({ UserId = userId }))
-		player.Parent = workspace
-		return player
-	end
-
 	it("sees a parented mock in GetPlayerMocks", function()
-		local service = makeService()
+		local controller = setup()
 
-		local player = newMock(1)
+		local service = controller.newService()
+
+		local player = controller.newMock(1)
 
 		expect(service:GetPlayerMocks()).toEqual({ player })
+
+		controller:Destroy()
 	end)
 
 	it("observes mocks parented before and after the observation started", function()
-		local service = makeService()
+		local controller = setup()
 
-		local before = newMock(1)
+		local service = controller.newService()
+
+		local before = controller.newMock(1)
 
 		local seen = {}
-		maid:GiveTask(service:ObservePlayerMocks():Subscribe(function(observed)
+		controller.maid:GiveTask(service:ObservePlayerMocks():Subscribe(function(observed)
 			table.insert(seen, observed)
 		end))
 
-		local after = newMock(2)
+		local after = controller.newMock(2)
 		StepUtils.deferWait()
 
 		expect(seen).toEqual({ before, after })
+
+		controller:Destroy()
 	end)
 
 	it("stops observing after unsubscribe", function()
-		local service = makeService()
+		local controller = setup()
+
+		local service = controller.newService()
 
 		local seen = {}
 		local subscription = service:ObservePlayerMocks():Subscribe(function(observed)
@@ -81,98 +100,116 @@ describe("PlayerMockServiceClient", function()
 		end)
 		subscription:Destroy()
 
-		newMock(1)
+		controller.newMock(1)
 		StepUtils.deferWait()
 
 		expect(seen).toEqual({})
+
+		controller:Destroy()
 	end)
 
 	it("tolerates concurrent client services sharing the place's mocks", function()
-		local service = makeService()
-		local otherService = makeService()
+		local controller = setup()
 
-		local player = newMock(1)
+		local service = controller.newService()
+		local otherService = controller.newService()
+
+		local player = controller.newMock(1)
 
 		expect(service:GetPlayerMocks()).toEqual({ player })
 		expect(otherService:GetPlayerMocks()).toEqual({ player })
+
+		controller:Destroy()
 	end)
 
 	it("designates the mocked local player and records it per service", function()
-		local service = makeService()
+		local controller = setup()
 
-		local player = newMock(1)
+		local service = controller.newService()
+
+		local player = controller.newMock(1)
 		service:SetLocalPlayer(player)
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(player)
 		expect(service:GetLocalPlayer()).toBe(player)
+
+		controller:Destroy()
 	end)
 
 	it("keeps its own local player when another client designates a different mock", function()
-		local service = makeService()
-		local otherService = makeService()
+		local controller = setup()
 
-		local first = newMock(1)
-		local second = newMock(2)
+		local service = controller.newService()
+		local otherService = controller.newService()
+
+		local first = controller.newMock(1)
+		local second = controller.newMock(2)
 		service:SetLocalPlayer(first)
 		otherService:SetLocalPlayer(second)
 
 		expect(service:GetLocalPlayer()).toBe(first)
 		expect(otherService:GetLocalPlayer()).toBe(second)
 		expect(PlayerMock.getMockedLocalPlayer()).toBe(second)
+
+		controller:Destroy()
 	end)
 
 	it("adopts a designation made before the bag booted", function()
-		local player = newMock(1)
+		local controller = setup()
+
+		local player = controller.newMock(1)
 		PlayerMock.setMockedLocalPlayer(player)
 
-		local service = makeService()
+		local service = controller.newService()
 
 		expect(service:GetLocalPlayer()).toBe(player)
+
+		controller:Destroy()
 	end)
 
 	it("clears the designation when the service is destroyed", function()
-		local serviceMaid = Maid.new()
-		local serviceBag = serviceMaid:Add(ServiceBag.new())
-		local service: any = serviceBag:GetService(PlayerMockServiceClient)
-		serviceBag:Init()
-		serviceBag:Start()
+		local controller = setup()
 
-		local player = newMock(1)
+		local serviceBag, service = controller.newLooseService()
+
+		local player = controller.newMock(1)
 		service:SetLocalPlayer(player)
-		serviceMaid:DoCleaning()
+		serviceBag:Destroy()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
+
+		controller:Destroy()
 	end)
 
 	it("clears an adopted pre-boot designation when the service is destroyed", function()
-		local player = newMock(1)
+		local controller = setup()
+
+		local player = controller.newMock(1)
 		PlayerMock.setMockedLocalPlayer(player)
 
-		local serviceMaid = Maid.new()
-		local serviceBag = serviceMaid:Add(ServiceBag.new())
-		serviceBag:GetService(PlayerMockServiceClient)
-		serviceBag:Init()
-		serviceBag:Start()
+		local serviceBag = controller.newLooseService()
 
-		serviceMaid:DoCleaning()
+		serviceBag:Destroy()
 
 		expect(PlayerMock.getMockedLocalPlayer()).toBeNil()
+
+		controller:Destroy()
 	end)
 
 	it("fails when a mock outlived the service that consumed it", function()
-		local firstMaid = Maid.new()
-		local firstBag = firstMaid:Add(ServiceBag.new())
-		firstBag:GetService(PlayerMockServiceClient)
-		firstBag:Init()
-		firstBag:Start()
+		local controller = setup()
 
-		local _leaked = newMock(1)
+		local firstBag = controller.newLooseService()
 
-		firstMaid:DoCleaning()
+		local _leaked = controller.newMock(1)
+
+		firstBag:Destroy()
 
 		local uninitialized = setmetatable({}, { __index = PlayerMockServiceClient })
 		expect(function()
-			uninitialized:Init(maid:Add(ServiceBag.new()) :: any)
+			uninitialized:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("leaked")
+
+		controller:Destroy()
 	end)
 end)

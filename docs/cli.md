@@ -67,8 +67,10 @@ These apply to every command:
 | Flag | Description |
 |------|-------------|
 | `--yes` | Never prompt; fail instead of asking. Use in CI and scripts. |
-| `--dryrun` | Describe what would happen without touching the file system or Roblox. |
+| `--dryrun` | Describe what would happen without touching the file system or Roblox. Exception: `--watch` registration still runs for real, since it has no deploy side effects and that is how you test it. |
 | `--verbose` | Show intermediate output (building, uploading, credential loading). Also disables the live spinner in favor of plain, scrollable logs. |
+| `--frozen-lockfile` | Fail instead of resolving a base place version that `deploy.nevermore.lock.json` doesn't already pin. Off by default, including in CI. See [The lock file](deploy.md#the-lock-file). |
+| `--refresh-base-place` | Re-resolve `"saved"`/`"published"` base place pins instead of reusing the locked version, and write the result back. Required in watch-triggered builds, which would otherwise rebuild the version they already shipped. Rejected alongside `--frozen-lockfile`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
 | `--help` | Show help for the current command. |
 | `--version` | Print the installed CLI version. |
 
@@ -102,15 +104,18 @@ Notes:
 
 ### `nevermore install`
 
-Installs one or more Nevermore packages from npm. Names are given **without** the `@quenty/` scope — the CLI adds it and validates each name against the published `@quenty/*` packages before installing. Alias: `i`.
+Installs one or more Nevermore packages from npm. Names are given **without** the `@quenty/` scope — the CLI adds it and checks each name against the registry before installing. Alias: `i`.
 
 ```bash
 nevermore install maid
 nevermore install maid rx blend
-nevermore i servicebag            # short alias
+nevermore i servicebag                        # short alias
+nevermore i blend --package-manager pnpm      # force a package manager
 ```
 
-This is a convenience wrapper over `npm install @quenty/<name>`. Plain `npm install @quenty/maid` works identically if you prefer.
+The install runs through the package manager the project already uses, detected by walking up from the current directory: a `packageManager` field in `package.json` first, then a lockfile (`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `bun.lock`, `yarn.lock`, `package-lock.json`). A directory that declares neither gets pnpm, which is what the game and plugin templates set up. Everything except npm gets `add` rather than `install`, since a bare `install` there means "install the lockfile" and wouldn't record the new dependency. Use `--package-manager` to override the detection.
+
+Installing by hand works too — `pnpm add @quenty/maid`. Reach for `npm install` only in a project that is actually npm-managed; inside a pnpm project it can fail outright, see [gotchas/tooling.md](gotchas/tooling.md).
 
 ### `nevermore login`
 
@@ -148,10 +153,10 @@ nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to de
 |------|-------------|
 | `--cloud` | Run via Open Cloud instead of locally. |
 | `--api-key <key>` | Open Cloud API key (`--cloud` only). Otherwise resolved from login/env. |
-| `--logs` | Show execution logs even on success. |
+| `--logs` | Show execution logs even on success. On by default with `--script-text`; pass `--no-logs` to suppress. |
 | `--universe-id <id>` / `--place-id <id>` | Override the IDs from `deploy.nevermore.json` (`--cloud` only). |
 | `--script-template <path>` | Override the Luau script template to execute. |
-| `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging. |
+| `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging; implies `--logs`. |
 | `--output <file>` | Write JSON results to a file. |
 | `--timeout <seconds>` | Max execution time, sent to Open Cloud so Roblox cancels server-side on overrun (default: 120). |
 
@@ -181,7 +186,7 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--create-place` | Auto-create a new place in the universe (uses cookie auth). |
 | `--force` | Overwrite an existing `deploy.nevermore.json`. |
 
-**`nevermore deploy run [target]`** — builds and uploads a target. Defaults to the only target if there's one, otherwise `test`.
+**`nevermore deploy run [target]`** — builds and uploads a target. Defaults to the only target if there's one, otherwise `test`. `target` may narrow to one place of a multi-place target with the `<target>.places.<place>` form (e.g. `integration.places.hub`).
 
 | Flag | Description |
 |------|-------------|
@@ -191,8 +196,12 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--place-file <path>` | Upload a pre-built `.rbxl` instead of building via rojo (single-place targets only). |
 | `--output <file>` | Write JSON results to a file. |
 | `--logs` | Show build/upload logs even on success. |
+| `--watch <url>` | After a successful deploy: on GitHub Actions, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-mode <auto\|dispatch\|notify>` | Which of those two `--watch` does. Defaults to `auto`, which detects GitHub Actions. Pass `dispatch` in any other automated context — detection reads it as local, and notifying there holds a stream forever. |
+| `--watch-use-gh-auth` | Let the GitHub CLI supply the watch token when no environment variable does. Off by default — registering sends the token to the watch service. |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll a private base place. Off by default. |
 
-**`nevermore deploy version upgrade [target]`** — re-pins every `basePlace` in `deploy.nevermore.json` to its current latest published version, so deploys pull a fixed, git-tracked base place instead of whatever is live. Without a target it walks every target. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
+**`nevermore deploy version upgrade [target]`** — rolls every `basePlace` forward, so deploys pull a fixed, git-tracked base place instead of whatever is live. Numeric (and unpinned) base places are re-pinned in `deploy.nevermore.json`; base places tracking `"saved"` or `"published"` have their resolved version rewritten in `deploy.nevermore.lock.json` instead. Without a target it walks every target and prunes unreferenced lock entries. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
 
 | Flag | Description |
 |------|-------------|
@@ -243,6 +252,8 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--logs` | Show build/upload logs for every package. |
 | `--output <file>` | Write JSON results to a file. |
 | `--api-key <key>` | Open Cloud API key. |
+| `--watch <url>` | After deploying, register one monitor per package — `<package>/<target>/<ref>`, the same name `deploy run --watch` uses — covering **every** package with that target, not just the changed ones, since a re-apply replaces a monitor's whole list. Registers even when nothing changed, so the lease doesn't lapse. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll private base places. Off by default. |
 
 ### `nevermore tools`
 

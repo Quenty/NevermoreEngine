@@ -1,6 +1,7 @@
 import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
+  AggregatedBatchReporter,
   type Reporter,
   type JobPhase,
   type ProgressSummary,
@@ -8,6 +9,9 @@ import {
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
+import { renderBatchOutcome } from '../../utils/testing/parsers/batch-log-renderer.js';
+import { emitDiagnostic } from '../../utils/testing/parsers/batch-log-parser.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type JobContext,
   BatchScriptJobContext,
@@ -181,23 +185,41 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       : args.concurrency;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
+  const aggregated = args.aggregated ?? false;
+  // Decided once, here, and passed down. Three separate isCI() lookups — the
+  // renderer, OutputHelper's group markers and GroupedReporter — could each
+  // answer differently, and a half-grouped log is worse than an ungrouped one.
+  const presentation = { useGroups: isCI(), color: !process.env.NO_COLOR };
+  let aggregatedReporter: AggregatedBatchReporter | undefined;
 
   const reporter = new CompositeReporter(
     packageNames,
     (state: LiveStateTracker) => {
+      // An aggregated run is one execution, so there is no per-package progress
+      // to report and no per-package moment to report it at.
+      if (aggregated) {
+        aggregatedReporter = new AggregatedBatchReporter(packages.length, {
+          actionVerb: 'Testing',
+        });
+      }
+
       const reporters: Reporter[] = [
-        isGrouped
-          ? new GroupedReporter(state, {
-              showLogs: args.logs ?? false,
-              verbose: args.verbose,
-              actionVerb: 'Testing',
-              expectsTestCounts: true,
-            })
-          : new SpinnerReporter(state, {
-              showLogs: args.logs ?? false,
-              actionVerb: 'Testing',
-            }),
-        new SummaryTableReporter(state),
+        aggregatedReporter ??
+          (isGrouped
+            ? new GroupedReporter(state, {
+                showLogs: args.logs ?? false,
+                verbose: args.verbose,
+                actionVerb: 'Testing',
+                expectsTestCounts: true,
+              })
+            : new SpinnerReporter(state, {
+                showLogs: args.logs ?? false,
+                actionVerb: 'Testing',
+              })),
+        // Told to expect counts for the same reason the grouped reporter and
+        // the PR comment are: a green row with nothing behind it reads exactly
+        // like a package that tested something.
+        new SummaryTableReporter(state, { expectsTestCounts: true }),
       ];
       if (args.output) {
         reporters.push(new JsonFileReporter(state, args.output));
@@ -234,23 +256,51 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     ? _createBroadcastReporter(reporter, packageNames)
     : reporter;
 
-  const innerContext: JobContext = cloud
-    ? new CloudJobContext(innerReporter, client)
-    : new LocalJobContext(innerReporter, client);
+  // Local runs get a resolver too — a package with a basePlace still has to
+  // merge it, and the client resolves its API key lazily so a run that never
+  // touches one is not prompted for credentials.
+  const basePlaceResolver = createBasePlaceResolver(client, args);
 
-  const context: JobContext = args.aggregated
+  const innerContext: JobContext = cloud
+    ? new CloudJobContext(innerReporter, client, basePlaceResolver)
+    : new LocalJobContext(innerReporter, client, basePlaceResolver);
+
+  const batchContext = aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
         batchTimeoutMs: timeoutMs,
         reporter,
       })
-    : innerContext;
+    : undefined;
+  const context: JobContext = batchContext ?? innerContext;
 
   await reporter.startAsync();
 
   let exitCode = 0;
   try {
+    // Run the batch before the per-package loop asks for anything, for two
+    // reasons. The run is shown once, in order, before any per-package result
+    // could interleave with it; and the shared build, upload and execution
+    // happen outside every package's async context, so the verbose output they
+    // produce stops being captured into whichever package first reached the
+    // shared promise — which is how the upload URL and a 78-line build list
+    // came to be filed under two arbitrary packages.
+    if (batchContext && aggregatedReporter) {
+      // Retried the same way a package's run is. Running the batch up here took
+      // it out from under the per-package retry wrapper that used to cover it,
+      // and a cloud task that times out once is exactly what that retry is for.
+      const outcome = await _retryOnTransientAsync('batch execution', () =>
+        batchContext.getExecutionOutcomeAsync()
+      );
+
+      aggregatedReporter.printRun(renderBatchOutcome(outcome, presentation));
+
+      for (const { level, message } of outcome.diagnostics) {
+        emitDiagnostic(level, message, presentation.useGroups);
+      }
+    }
+
     const results = await runBatchAsync<BatchTarget, BatchTestResult>({
       items: packages,
       concurrency,
@@ -258,7 +308,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       bufferOutput: isGrouped,
       stateTracker: reporter.state,
       executeAsync: async (pkg) => {
-        const result = await _runWithRetryAsync(pkg, context, timeoutMs);
+        const result = await _runWithRetryAsync(
+          pkg,
+          context,
+          timeoutMs,
+          args.aggregated ?? false
+        );
 
         return {
           packageName: pkg.name,
@@ -271,6 +326,12 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           durationMs: result.durationMs,
           progressSummary: result.testCounts
             ? { kind: 'test-counts' as const, ...result.testCounts }
+            : undefined,
+          // Every reporter downstream reads state through resolveResultStatus,
+          // so a run judged without its logs is marked once here rather than
+          // being re-derived by each of them.
+          caveats: result.logsLost
+            ? (['logs-lost'] as const).slice()
             : undefined,
           error: result.error,
         };
@@ -294,23 +355,43 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 async function _runWithRetryAsync(
   pkg: BatchTarget,
   context: JobContext,
-  timeoutMs: number
+  timeoutMs: number,
+  aggregated: boolean
 ): Promise<SingleTestResult> {
   const opts = {
     packagePath: pkg.path,
     packageName: pkg.name,
     timeoutMs,
     target: pkg.target,
+    // One fetch serves every package here, so its provenance is reported once
+    // for the whole batch rather than restated per package.
+    suppressCountsProvenance: aggregated,
   };
 
+  return _retryOnTransientAsync(pkg.name, () =>
+    runSingleTestAsync(context, opts)
+  );
+}
+
+/**
+ * Run something once more if it failed for a reason that tends not to repeat.
+ *
+ * Shared so the batch execution and a single package's run agree on what counts
+ * as transient — the batch used to inherit this by being triggered from inside
+ * a package's run, and stopped when it moved out to the command.
+ */
+async function _retryOnTransientAsync<T>(
+  label: string,
+  runAsync: () => Promise<T>
+): Promise<T> {
   try {
-    return await runSingleTestAsync(context, opts);
+    return await runAsync();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     if (message.includes('timed out') || message.includes('fetch failed')) {
-      OutputHelper.warn(`${pkg.name}: transient failure, retrying...`);
-      return await runSingleTestAsync(context, opts);
+      OutputHelper.warn(`${label}: transient failure, retrying...`);
+      return await runAsync();
     }
 
     throw err;

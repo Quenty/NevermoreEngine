@@ -47,6 +47,70 @@ describe('decodePluginMessage', () => {
       });
       expect(msg).not.toHaveProperty('requestId');
     });
+
+    it('carries returnValues through unchanged, nesting included', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: {
+          success: true,
+          returnValues: [
+            { slug: 'maid', counts: { passed: 1014, failed: 0 } },
+            'str',
+            42,
+            true,
+            { type: 'Vector3', value: [1, 2, 3] },
+            [1, 2],
+          ],
+        },
+      });
+      expect(msg?.type).toBe('scriptComplete');
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toEqual([
+        { slug: 'maid', counts: { passed: 1014, failed: 0 } },
+        'str',
+        42,
+        true,
+        { type: 'Vector3', value: [1, 2, 3] },
+        [1, 2],
+      ]);
+    });
+
+    it('leaves returnValues undefined when the plugin sent none', () => {
+      // Distinguishable from an empty array: nothing reported a return channel,
+      // so a caller can still fall back to the run's printed output.
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toBeUndefined();
+    });
+
+    it('preserves an empty returnValues array', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true, returnValues: [] },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toEqual([]);
+    });
+
+    it('ignores a returnValues field that is not an array', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true, returnValues: 'nope' },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toBeUndefined();
+    });
   });
 
   describe('register', () => {

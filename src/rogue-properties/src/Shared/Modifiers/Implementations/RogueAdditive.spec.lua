@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RogueAdditive = require("RogueAdditive")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
 local ServiceBag = require("ServiceBag")
@@ -18,7 +20,8 @@ local it = Jest.Globals.it
 local RogueAdditiveClass = RogueAdditive:GetConstructor() :: any
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("TieRealmService"))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -29,12 +32,16 @@ local function setup()
 		return RogueAdditiveClass.new(valueObject, serviceBag), valueObject
 	end
 
-	return {
+	local controller = {
 		newAdditive = newAdditive,
-		destroy = function(_self: any)
-			serviceBag:Destroy()
+		Destroy = function(_self: any)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function setEnabled(valueObject, enabled)
@@ -60,21 +67,21 @@ describe("RogueAdditive:GetModifiedVersion()", function()
 		local controller = setup()
 		local modifier = controller.newAdditive("NumberValue", 15)
 		expect(modifier:GetModifiedVersion(100)).toEqual(115)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should add component-wise for a Vector3 value", function()
 		local controller = setup()
 		local modifier = controller.newAdditive("Vector3Value", Vector3.new(1, 1, 1))
 		expect(modifier:GetModifiedVersion(Vector3.new(2, 2, 2))).toEqual(Vector3.new(3, 3, 3))
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should add component-wise for a Color3 value", function()
 		local controller = setup()
 		local modifier = controller.newAdditive("Color3Value", Color3.new(0.25, 0.25, 0.25))
 		expect(modifier:GetModifiedVersion(Color3.new(0.5, 0.5, 0.5))).toEqual(Color3.new(0.75, 0.75, 0.75))
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reflect a later change to its value", function()
@@ -83,7 +90,7 @@ describe("RogueAdditive:GetModifiedVersion()", function()
 		expect(modifier:GetModifiedVersion(100)).toEqual(115)
 		valueObject.Value = 5
 		expect(modifier:GetModifiedVersion(100)).toEqual(105)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -91,7 +98,7 @@ describe("RogueAdditive:GetModifiedVersion()", function()
 		local modifier, valueObject = controller.newAdditive("NumberValue", 15)
 		setEnabled(valueObject, false)
 		expect(modifier:GetModifiedVersion(100)).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -100,7 +107,7 @@ describe("RogueAdditive:GetInvertedVersion()", function()
 		local controller = setup()
 		local modifier = controller.newAdditive("NumberValue", 15)
 		expect(modifier:GetInvertedVersion(115)).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -108,6 +115,6 @@ describe("RogueAdditive:GetInvertedVersion()", function()
 		local modifier, valueObject = controller.newAdditive("NumberValue", 15)
 		setEnabled(valueObject, false)
 		expect(modifier:GetInvertedVersion(115)).toEqual(115)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

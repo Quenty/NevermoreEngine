@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.23.1...@quenty/voicechat@5.24.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/voicechat
+
+## [5.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.23.0...@quenty/voicechat@5.23.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/voicechat
+
 # [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/voicechat@5.22.0...@quenty/voicechat@5.23.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/voicechat

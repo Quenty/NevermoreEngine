@@ -51,6 +51,8 @@ local NevermoreCLIManifestUtils = {}
 	.published boolean? -- true if published live (`--publish`), false if only Saved
 	.placeId number? -- Roblox place ID the build was deployed to
 	.universeId number? -- Roblox universe ID the build was deployed to
+	.basePlaceId number? -- Roblox place ID of the base place this build merged from
+	.basePlaceVersion number? -- version of that base place the build was made from
 	@within NevermoreCLIManifestUtils
 ]=]
 export type GameMetadata = {
@@ -64,6 +66,8 @@ export type GameMetadata = {
 	published: boolean?,
 	placeId: number?,
 	universeId: number?,
+	basePlaceId: number?,
+	basePlaceVersion: number?,
 }
 
 --[=[
@@ -88,7 +92,7 @@ export type ManifestPlace = {
 }
 
 -- Attribute names written by the nevermore CLI. These MUST stay in sync with
--- tools/nevermore-cli/build-scripts/transform-inject-deploy-metadata.luau
+-- tools/nevermore-cli/build-scripts/transform-inject-deploy-metadata.lua
 local ATTRIBUTE = {
 	deployed = "Deployed",
 	commit = "Commit",
@@ -100,6 +104,8 @@ local ATTRIBUTE = {
 	published = "Published",
 	placeId = "PlaceId",
 	universeId = "UniverseId",
+	basePlaceId = "BasePlaceId",
+	basePlaceVersion = "BasePlaceVersion",
 	-- JSON-encoded array of the whole target's places (see getPlaces).
 	places = "Places",
 }
@@ -129,6 +135,8 @@ local function readMetadata(instance: Instance): GameMetadata
 		published = instance:GetAttribute(ATTRIBUTE.published) :: boolean?,
 		placeId = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.placeId)),
 		universeId = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.universeId)),
+		basePlaceId = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.basePlaceId)),
+		basePlaceVersion = toOptionalNumber(instance:GetAttribute(ATTRIBUTE.basePlaceVersion)),
 	}
 end
 

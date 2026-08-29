@@ -9,7 +9,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local InstanceLocaleLoader = require("InstanceLocaleLoader")
 local Jest = require("Jest")
 local LocaleLoaderTestUtils = require("LocaleLoaderTestUtils")
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
@@ -35,7 +34,7 @@ describe("InstanceLocaleLoader.LoadSourceLocale", function()
 		-- The source locale carries the example.
 		expect(entry.Example).toBe("Hello")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("writes every value the source decode produced, including the Studio pseudo locale", function()
@@ -52,7 +51,7 @@ describe("InstanceLocaleLoader.LoadSourceLocale", function()
 		local decoded = LocalizationEntryParserUtils.decodeLocaleFromInstance("T", "en", "en", folder, {})[1]
 		expect(controller.getEntryMap()["greeting"].Values).toEqual(decoded.Values)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -73,7 +72,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		-- A non-source locale contributes no example, so the source's example stands.
 		expect(entry.Example).toBe("Hello")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("loads the universal and regional files that share the target language", function()
@@ -92,7 +91,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		expect(controller.valueFor("greeting", "es")).toBe("Hola")
 		expect(controller.valueFor("greeting", "es-mx")).toBe("Que onda")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("loads sibling regional locales so they can serve as fallbacks", function()
@@ -111,7 +110,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		expect(controller.valueFor("onlyFr", "fr-fr")).toBe("Seulement FR")
 		expect(controller.valueFor("onlyCa", "fr-ca")).toBe("Seulement CA")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("uses the source Source/Context even if a regional file is decoded first", function()
@@ -127,7 +126,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		expect(entry.Source).toBe("Hello")
 		expect(entry.Context).toBe("Generated from T with key greeting")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not load a locale twice", function()
@@ -146,7 +145,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		controller.flush()
 		expect(controller.getWriteCount()).toBe(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("writes nothing extra for a language with no files", function()
@@ -162,7 +161,7 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		controller.flush()
 		expect(controller.getWriteCount()).toBe(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not decode the other locales' JSON", function()
@@ -174,13 +173,76 @@ describe("InstanceLocaleLoader.LoadLocale", function()
 		frBad.Value = "{ not valid json"
 		frBad.Parent = folder
 
-		local loader = InstanceLocaleLoader.new(controller.serviceBag, "T", "en", folder)
+		local loader = controller.newLoaderFromFolder(folder, "en")
 		loader:LoadSourceLocale()
 		controller.flush()
 
 		expect(controller.valueFor("greeting", "en")).toBe("Hello")
 
-		controller:destroy()
+		controller:Destroy()
+	end)
+end)
+
+describe("InstanceLocaleLoader.PromiseSourceLocale", function()
+	it("resolves once the source locale's entries are queued", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" } })
+
+		local ok = loader:PromiseSourceLocale():Yield()
+		expect(ok).toBe(true)
+
+		controller.flush()
+		expect(controller.valueFor("greeting", "en")).toBe("Hello")
+
+		controller:Destroy()
+	end)
+
+	it("returns the same promise rather than reloading", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" } })
+
+		expect(loader:PromiseSourceLocale()).toBe(loader:PromiseSourceLocale())
+
+		controller.flush()
+		expect(controller.getWriteCount()).toBe(1)
+
+		controller:Destroy()
+	end)
+end)
+
+describe("InstanceLocaleLoader file availability", function()
+	it("loads a locale file that appears after the locale was asked for", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local folder = controller.newInstanceFolder({ en = { greeting = "Hello" } })
+		local loader = controller.newLoaderFromFolder(folder)
+
+		loader:LoadLocale("fr")
+		controller.flush()
+		expect(controller.valueFor("greeting", "fr")).toBeNil()
+
+		controller.addLocaleFile(folder, "fr", { greeting = "Bonjour" })
+		controller.flush()
+
+		expect(controller.valueFor("greeting", "fr")).toBe("Bonjour")
+
+		controller:Destroy()
+	end)
+
+	it("does not load a late file for a language nothing asked for", function()
+		local controller = LocaleLoaderTestUtils.setup()
+		local folder = controller.newInstanceFolder({ en = { greeting = "Hello" } })
+		local loader = controller.newLoaderFromFolder(folder)
+
+		loader:LoadSourceLocale()
+		controller.flush()
+
+		controller.addLocaleFile(folder, "fr", { greeting = "Bonjour" })
+		expect(controller.isIdle()).toBe(true)
+		controller.flush()
+
+		expect(controller.valueFor("greeting", "fr")).toBeNil()
+
+		controller:Destroy()
 	end)
 end)
 
@@ -198,6 +260,6 @@ describe("InstanceLocaleLoader.LoadAllLocales", function()
 		-- Only the source contributes an example.
 		expect(entry.Example).toBe("Hello")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

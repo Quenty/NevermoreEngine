@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.8.0...@quenty/gameversionutils@3.9.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameversionutils
+
+# [3.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.7.1...@quenty/gameversionutils@3.8.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameversionutils
+
+## [3.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.7.0...@quenty/gameversionutils@3.7.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/gameversionutils
+
+# [3.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.6.1...@quenty/gameversionutils@3.7.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameversionutils
+
 ## [3.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameversionutils@3.6.0...@quenty/gameversionutils@3.6.1) (2026-07-25)
 
 ### Bug Fixes

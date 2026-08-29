@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli-helpers",
-  "version": "1.16.1",
+  "version": "1.18.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Quenty/Nevermore.git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
     "directory": "tools/nevermore-cli-helpers/"
   },
   "license": "UNLICENSED",

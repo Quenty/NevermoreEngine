@@ -6,6 +6,7 @@ import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   CloudJobContext,
   LocalJobContext,
@@ -15,7 +16,7 @@ import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveSingleDeployTarget,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy';
 import {
   type Reporter,
   type LiveStateTracker,
@@ -132,27 +133,32 @@ export class TestProjectCommand<T>
 
     let exitCode = 0;
     try {
+      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+      const target = resolveSingleDeployTarget(
+        config,
+        'test',
+        'nevermore batch test'
+      );
+
+      // A local run needs Open Cloud only to fetch a base place. The key is
+      // resolved lazily so a package without one is never asked for credentials.
+      const client = args.cloud
+        ? new OpenCloudClient({
+            apiKey: await getApiKeyAsync(args),
+            rateLimiter: new RateLimiter(),
+          })
+        : new OpenCloudClient({
+            apiKey: () => getApiKeyAsync(args),
+            rateLimiter: new RateLimiter(),
+          });
+      const basePlaceResolver = createBasePlaceResolver(client, args);
+
       const context = args.cloud
-        ? new CloudJobContext(
-            reporter,
-            new OpenCloudClient({
-              apiKey: await getApiKeyAsync(args),
-              rateLimiter: new RateLimiter(),
-            })
-          )
-        : new LocalJobContext(reporter);
+        ? new CloudJobContext(reporter, client, basePlaceResolver)
+        : new LocalJobContext(reporter, client, basePlaceResolver);
 
       let result;
       try {
-        const config = await loadDeployConfigAsync(
-          resolveDeployConfigPath(cwd)
-        );
-        const target = resolveSingleDeployTarget(
-          config,
-          'test',
-          'nevermore batch test'
-        );
-
         result = await runSingleTestAsync(context, {
           packagePath: cwd,
           packageName,

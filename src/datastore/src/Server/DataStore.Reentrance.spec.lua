@@ -30,7 +30,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 		end, 2)
 		expect(everWrote).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("cancels a yielding save thread when the DataStore is destroyed", function()
@@ -40,7 +40,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("load hung").toEqual("load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -58,7 +58,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 		end, 2)
 		expect(extraWrites).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -75,12 +75,12 @@ describe("lock command that does not settle", function()
 		controller.mock:UnblockRequests()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung after unblock").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Wait())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("re-loads cleanly on a fresh session after a cancelled in-flight lock command", function()
@@ -97,11 +97,11 @@ describe("lock command that does not settle", function()
 		local secondPromise = second:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((secondPromise:Wait())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

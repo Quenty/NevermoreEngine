@@ -30,6 +30,7 @@ local AccessService = require("AccessService")
 local AccessServiceClient = require("AccessServiceClient")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -40,7 +41,6 @@ local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
-local afterEach = Jest.Globals.afterEach
 local it = Jest.Globals.it
 
 local CONVERGE_FRAMES = 120
@@ -83,7 +83,7 @@ local function setup()
 	featureCounter += 1
 	local featureName = `chapters{featureCounter}`
 
-	return {
+	local controller = {
 		maid = maid,
 		server = server,
 		client = client,
@@ -96,10 +96,14 @@ local function setup()
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 			return feature
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("feature composition across realms", function()
@@ -109,7 +113,7 @@ describe("feature composition across realms", function()
 		expect(controller.server).never.toBeNil()
 		expect(controller.client).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a server-only push to the client", function()
@@ -126,7 +130,7 @@ describe("feature composition across realms", function()
 			controller.factName,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes the push back when the server drops it", function()
@@ -144,7 +148,7 @@ describe("feature composition across realms", function()
 
 		expect(waitForFactNames(clientFeature, { "ownsGame" })).toEqual({ "ownsGame" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reaches a client feature registered after the server pushed", function()
@@ -160,7 +164,7 @@ describe("feature composition across realms", function()
 			controller.factName,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("changes what the client's verdict actually reads", function()
@@ -194,7 +198,7 @@ describe("feature composition across realms", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a fact the client pushed itself alone", function()
@@ -221,7 +225,7 @@ describe("feature composition across realms", function()
 
 		expect(clientFeature:GetFactNames()).toEqual({ "ownsGame", "sharedAllowlist" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -239,29 +243,17 @@ describe("per-player facts across realms", function()
 	]]
 	local playerCounter = 0
 
-	-- Torn down here rather than at the end of each test, because a failing test never reaches its last
-	-- line. The AccessPlayer tag is global: a binder that outlives its test goes on binding the next
-	-- test's player and overwriting the facts attribute from its own registry, so one failure would take
-	-- every later test with it and none of them would say why.
-	local live: any = nil
-	afterEach(function()
-		if live then
-			live:destroy()
-			live = nil
-		end
-	end)
-
 	local function setupPlayers()
 		local maid = Maid.new()
 
-		local serverBag = maid:Add(ServiceBag.new());
+		local serverBag = ServiceBag.new();
 		(serverBag:GetService(TieRealmService) :: any):SetTieRealm(TieRealms.SERVER)
 		local serverAccess: any = serverBag:GetService(AccessDataService)
 		serverBag:GetService(AccessService)
 		serverBag:Init()
 		serverBag:Start()
 
-		local clientBag = maid:Add(ServiceBag.new());
+		local clientBag = ServiceBag.new();
 		(clientBag:GetService(TieRealmService) :: any):SetTieRealm(TieRealms.CLIENT)
 		local clientAccess: any = clientBag:GetService(AccessDataService)
 		clientBag:GetService(AccessServiceClient)
@@ -307,15 +299,17 @@ describe("per-player facts across realms", function()
 					return last
 				end
 			end,
-			destroy = function(_self)
-				-- Client first: the server bag owns the mock, and destroying it out from under a live client
-				-- is not something production ever does.
+			Destroy = function(_self)
+				-- Client first: the server bag owns the mock, and destroying it out from under a live
+				-- client is not something production ever does.
 				clientBag:Destroy()
 				serverBag:Destroy()
+				maid:DoCleaning()
 			end,
 		}
 
-		live = controller
+		maid:GiveTask(JestUtils.afterThis(controller))
+
 		return controller
 	end
 
@@ -405,7 +399,7 @@ describe("the published composition and the service that wrote it", function()
 		local other = { someoneElse = { "theirFact" } }
 		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", HttpService:JSONEncode(other))
 
-		controller:destroy()
+		controller:Destroy()
 
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(HttpService:JSONEncode(other))
 		ReplicatedStorage:SetAttribute("AccessFeatureFactNames", nil)
@@ -422,7 +416,7 @@ describe("the published composition and the service that wrote it", function()
 		end
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 
 		expect(ReplicatedStorage:GetAttribute("AccessFeatureFactNames")).toEqual(nil)
 	end)
@@ -461,7 +455,7 @@ local function setupPolicies()
 
 	policyCounter += 1
 
-	return {
+	local controller = {
 		maid = maid,
 		server = server,
 		client = client,
@@ -481,10 +475,14 @@ local function setupPolicies()
 
 			return policy
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("policy enablement across realms", function()
@@ -498,7 +496,7 @@ describe("policy enablement across realms", function()
 
 		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, false)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a policy switched on on the server to the client", function()
@@ -510,7 +508,7 @@ describe("policy enablement across realms", function()
 
 		expect(waitForPolicyEnabled(controller.client.accessPolicyService, controller.policyName, true)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a policy the server never registered alone", function()
@@ -524,6 +522,6 @@ describe("policy enablement across realms", function()
 
 		expect(controller.client.accessPolicyService:IsPolicyEnabled(controller.policyName)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

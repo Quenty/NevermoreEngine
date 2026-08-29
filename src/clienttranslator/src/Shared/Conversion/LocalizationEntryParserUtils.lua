@@ -36,7 +36,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(
 
 	for _, descendant in folder:GetDescendants() do
 		if descendant:IsA("StringValue") then
-			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
+			local localeId = LocalizationEntryParserUtils.parseLocaleFromName(descendant.Name)
 			local decodedTable = HttpService:JSONDecode(descendant.Value)
 
 			LocalizationEntryParserUtils._parseTableToResultsList(
@@ -48,7 +48,7 @@ function LocalizationEntryParserUtils.decodeFromInstance(
 				tableName
 			)
 		elseif descendant:IsA("ModuleScript") then
-			local localeId = LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)
+			local localeId = LocalizationEntryParserUtils.parseLocaleFromName(descendant.Name)
 			local decodedTable = (require :: any)(descendant)
 
 			LocalizationEntryParserUtils._parseTableToResultsList(
@@ -82,10 +82,27 @@ function LocalizationEntryParserUtils.getAvailableLocales(folder: Instance): { [
 	local locales: { [string]: true } = {}
 	for _, descendant in folder:GetDescendants() do
 		if descendant:IsA("StringValue") or descendant:IsA("ModuleScript") then
-			locales[LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name)] = true
+			locales[LocalizationEntryParserUtils.parseLocaleFromName(descendant.Name)] = true
 		end
 	end
 	return locales
+end
+
+--[=[
+	The locale a locale file's name denotes, dropping a `.json` extension if there is one
+	(`en.json` -> `en`, `en` -> `en`).
+
+	@param name string
+	@return string
+]=]
+function LocalizationEntryParserUtils.parseLocaleFromName(name: string): string
+	assert(type(name) == "string", "Bad name")
+
+	if string.sub(name, -5) == ".json" then
+		return string.sub(name, 1, #name - 5)
+	else
+		return name
+	end
 end
 
 --[=[
@@ -116,7 +133,7 @@ function LocalizationEntryParserUtils.decodeLocaleFromInstance(
 
 	local baseKey = ""
 	for _, descendant in folder:GetDescendants() do
-		if LocalizationEntryParserUtils._parseLocaleFromName(descendant.Name) ~= localeId then
+		if LocalizationEntryParserUtils.parseLocaleFromName(descendant.Name) ~= localeId then
 			continue
 		end
 
@@ -174,14 +191,6 @@ function LocalizationEntryParserUtils.decodeFromTable(
 		table.insert(results, item)
 	end
 	return results
-end
-
-function LocalizationEntryParserUtils._parseLocaleFromName(name: string): string
-	if string.sub(name, -5) == ".json" then
-		return string.sub(name, 1, #name - 5)
-	else
-		return name
-	end
 end
 
 function LocalizationEntryParserUtils._parseTableToResultsList(

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/racketingropeconstraint",
-  "version": "12.51.0",
+  "version": "12.53.0",
   "description": "Tries to racket a rope constraint back down to a reasonable length",
   "keywords": [
     "Roblox",
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "ssrc/racketingropeconstraint/"
+    "directory": "src/racketingropeconstraint/"
   },
   "funding": {
     "type": "patreon",

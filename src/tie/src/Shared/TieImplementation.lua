@@ -137,6 +137,8 @@ end
 		rawset(self :: any, index, value)
 	elseif self._memberImplementations[index] then
 		self._memberImplementations[index]:SetImplementation(value, self._actualSelf)
+	elseif self._memberMap[index] then
+		error(self:_getErrorMessageForNotAllowedMember(self._memberMap[index]))
 	elseif TieImplementation[index] then
 		error(string.format("Cannot set %q in TieImplementation", tostring(index)))
 	else
@@ -153,22 +155,24 @@ function TieImplementation._buildMemberImplementations<T>(self: TieImplementatio
 			found = implementer[memberName]
 		end
 
+		if not memberDefinition:IsAllowedForImplementation(self._implementationTieRealm) then
+			if found then
+				error(self:_getErrorMessageForNotAllowedMember(memberDefinition))
+			end
+
+			continue
+		end
+
 		if memberDefinition:IsRequiredForImplementation(self._implementationTieRealm) then
 			if not found then
 				error(self:_getErrorMessageRequiredMember(memberDefinition))
 			end
 		end
 
-		if found then
-			if not memberDefinition:IsAllowedForImplementation(self._implementationTieRealm) then
-				error(self:_getErrorMessageForNotAllowedMember(memberDefinition))
-			end
-		end
-
 		local memberImplementation = self._maid:Add(
 			memberDefinition:Implement(self._implParent, found, self._actualSelf, self._implementationTieRealm)
 		)
-		self._memberImplementations[memberDefinition:GetMemberName()] = memberImplementation
+		self._memberImplementations[memberName] = memberImplementation
 	end
 end
 

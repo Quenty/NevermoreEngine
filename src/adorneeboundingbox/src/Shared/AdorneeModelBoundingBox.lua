@@ -122,6 +122,11 @@ function AdorneeModelBoundingBox._handlePart(self: AdorneeModelBoundingBox, topM
 	topMaid:GiveTask(part:GetPropertyChangedSignal("CFrame"):Connect(function()
 		self._isDirty.Value = true
 	end))
+	topMaid:GiveTask(function()
+		if self._isDirty.Destroy then
+			self._isDirty.Value = true
+		end
+	end)
 	self._isDirty.Value = true
 end
 

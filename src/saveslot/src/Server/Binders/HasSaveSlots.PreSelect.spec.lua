@@ -10,6 +10,8 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
@@ -18,26 +20,17 @@ local ServiceBag = require("ServiceBag")
 
 local Workspace = game:GetService("Workspace")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local FAKE_USER_ID = 424243
 
-local activeContext: any = nil
-
-afterEach(function()
-	if activeContext then
-		local context = activeContext
-		activeContext = nil
-		context.destroy()
-	end
-end)
-
 type Ask = { slotId: string, previousSlotId: string? }
 
 local function setup()
+	local maid = Maid.new()
+
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
 	serviceBag:GetService(require("SaveSlotSharedDataStoreService"))
@@ -64,22 +57,16 @@ local function setup()
 		return verdict or Promise.resolved(true)
 	end
 
-	local destroyed = false
-	local function destroy()
-		if destroyed then
-			return
-		end
-		destroyed = true
-		if activeContext and activeContext.destroy == destroy then
-			activeContext = nil
-		end
-
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
+	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
+	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
+	maid:GiveTask(function()
 		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
+	end)
+
+	local function Destroy(_self)
+		maid:DoCleaning()
 	end
 
 	local context = {
@@ -90,9 +77,10 @@ local function setup()
 		answerWith = function(promise: any)
 			verdict = promise
 		end,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
-	activeContext = context
+
+	maid:GiveTask(JestUtils.afterThis(context))
 
 	return context
 end
@@ -116,7 +104,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[1].previousSlotId).toBeNil()
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("reports the selection being replaced when switching slots", function()
@@ -131,7 +119,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[2].slotId).toEqual(secondId)
 		expect(context.asks[2].previousSlotId).toEqual(firstId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("asks for a new slot and for an ephemeral slot alike", function()
@@ -144,7 +132,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(context.asks[1].slotId).toEqual(newId)
 		expect(context.asks[2].slotId).toEqual(ephemeralId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("does not ask when the slot is already active", function()
@@ -156,7 +144,7 @@ describe("HasSaveSlots pre-select", function()
 
 		expect(#context.asks).toEqual(1)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("holds the selection until the answer settles", function()
@@ -176,7 +164,7 @@ describe("HasSaveSlots pre-select", function()
 		await(selection)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("rejects the selection and leaves the active slot alone when refused", function()
@@ -191,7 +179,7 @@ describe("HasSaveSlots pre-select", function()
 		expect(selection:IsRejected()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("leaves the previous selection standing when a switch is refused", function()
@@ -208,6 +196,6 @@ describe("HasSaveSlots pre-select", function()
 		expect(selection:IsRejected()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(firstId)
 
-		context.destroy()
+		context:Destroy()
 	end)
 end)

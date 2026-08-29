@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerhumanoidbinder",
-  "version": "14.47.0",
+  "version": "14.49.0",
   "description": "Binder that will automatically bind to each player's humanoid",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/humanoidtracker": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

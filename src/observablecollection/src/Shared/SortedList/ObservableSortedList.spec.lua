@@ -1013,6 +1013,111 @@ describe("ObservableSortedList", function()
 			maid:Destroy()
 		end)
 
+		it("should kill the brio of an item added and removed in the same frame", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
+
+			local remove = list:Add("a", 1)
+
+			local brios: { any } = {}
+			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
+				table.insert(brios, brio)
+			end))
+
+			expect(#brios).toEqual(1)
+			expect(brios[1]:IsDead()).toEqual(false)
+
+			remove()
+
+			expect(brios[1]:IsDead()).toEqual(true)
+			expect(list:GetList()).toEqual({})
+
+			list:_testForceFireEvents()
+
+			expect(brios[1]:IsDead()).toEqual(true)
+
+			maid:Destroy()
+		end)
+
+		it("should kill the brio of an item removed after its add has fired", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
+
+			local remove = list:Add("a", 1)
+			list:_testForceFireEvents()
+
+			local brios: { any } = {}
+			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
+				table.insert(brios, brio)
+			end))
+
+			expect(#brios).toEqual(1)
+
+			remove()
+
+			expect(brios[1]:IsDead()).toEqual(true)
+
+			maid:Destroy()
+		end)
+
+		it("should not announce an item added and removed before anyone subscribed", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
+
+			local remove = list:Add("a", 1)
+			remove()
+
+			local brios: { any } = {}
+			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
+				table.insert(brios, brio)
+			end))
+
+			list:_testForceFireEvents()
+
+			expect(#brios).toEqual(0)
+
+			maid:Destroy()
+		end)
+
+		it("should announce an item once when subscribing before its add fires", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
+
+			list:Add("a", 1)
+
+			local brios: { any } = {}
+			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
+				table.insert(brios, brio)
+			end))
+
+			expect(#brios).toEqual(1)
+
+			list:_testForceFireEvents()
+
+			expect(#brios).toEqual(1)
+			expect(brios[1]:IsDead()).toEqual(false)
+
+			maid:Destroy()
+		end)
+
+		it("should keep announcing items added after the subscription", function()
+			local maid = Maid.new()
+			local list = maid:Add(ObservableSortedList.new())
+
+			local brios: { any } = {}
+			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
+				table.insert(brios, brio)
+			end))
+
+			list:Add("a", 1)
+			list:_testForceFireEvents()
+
+			expect(#brios).toEqual(1)
+			expect((brios[1]:GetValue())).toEqual("a")
+
+			maid:Destroy()
+		end)
+
 		it("should handle removing during a sort value change", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())

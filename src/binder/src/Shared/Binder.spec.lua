@@ -58,7 +58,7 @@ describe("Binder.new()", function()
 		expect(class.a).toEqual("a")
 		expect(class.b).toEqual("b")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -109,7 +109,7 @@ describe("Binder constructor variants", function()
 		expect(class.kind).toEqual("function")
 		expect(class.instance).toEqual(inst)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("supports a class table with .new", function()
@@ -126,7 +126,7 @@ describe("Binder constructor variants", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(inst)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("supports a provider table with :Create", function()
@@ -147,7 +147,7 @@ describe("Binder constructor variants", function()
 		assert(ok, "Never bound")
 		expect(class.kind).toEqual("provider")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -192,7 +192,7 @@ describe("Binder binding via ServiceBag", function()
 
 		expect(binder:Get(inst)).never.toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds instances tagged after start", function()
@@ -207,7 +207,7 @@ describe("Binder binding via ServiceBag", function()
 		local ok = binder:Promise(inst):Yield()
 		expect(ok).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -220,7 +220,7 @@ describe("Binder:Get()", function()
 
 		expect(binder:Get(controller.newInstance())).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when passed a non-instance", function()
@@ -233,7 +233,7 @@ describe("Binder:Get()", function()
 			binder:Get(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -251,7 +251,7 @@ describe("Binder tagging", function()
 		binder:Untag(inst)
 		expect(binder:HasTag(inst)).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("Bind tags and Unbind untags on the server", function()
@@ -270,7 +270,7 @@ describe("Binder tagging", function()
 		binder:Unbind(inst)
 		expect(binder:HasTag(inst)).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -325,7 +325,7 @@ describe("Binder:GetAll() / GetAllSet()", function()
 		expect(set[binder:Get(instA)]).toEqual(true)
 		expect(set[binder:Get(instB)]).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -340,7 +340,7 @@ describe("Binder signals", function()
 		expect(binder:GetClassRemovingSignal()).toEqual(binder:GetClassRemovingSignal())
 		expect(binder:GetClassRemovedSignal()).toEqual(binder:GetClassRemovedSignal())
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires the added signal with the class and instance", function()
@@ -362,7 +362,7 @@ describe("Binder signals", function()
 		expect(firedInst).toEqual(inst)
 		expect(firedClass).toEqual(binder:Get(inst))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires removing then removed on unbind", function()
@@ -389,7 +389,7 @@ describe("Binder signals", function()
 		expect(order[1]).toEqual("removing")
 		expect(order[2]).toEqual("removed")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("destroys the bound class when it is removed", function()
@@ -408,7 +408,7 @@ describe("Binder signals", function()
 
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -440,7 +440,7 @@ describe("Binder:ObserveInstance()", function()
 
 		cleanup()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a cleanup that stops future callbacks", function()
@@ -462,7 +462,7 @@ describe("Binder:ObserveInstance()", function()
 
 		expect(count).toEqual(0)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance or non-function", function()
@@ -478,7 +478,7 @@ describe("Binder:ObserveInstance()", function()
 			binder:ObserveInstance(controller.newInstance(), 5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -507,7 +507,7 @@ describe("Binder:Observe()", function()
 		expect(emissions[2].value).toEqual(binder:Get(inst))
 
 		sub:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -524,7 +524,7 @@ describe("Binder:Promise()", function()
 		local promise = binder:Promise(inst)
 		expect(promise:IsFulfilled()).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when passed a non-instance", function()
@@ -537,7 +537,7 @@ describe("Binder:Promise()", function()
 			binder:Promise(5 :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -561,7 +561,7 @@ describe("Binder:_add() dedupe", function()
 
 		expect(constructed).toEqual(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -581,6 +581,6 @@ describe("Binder teardown", function()
 
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

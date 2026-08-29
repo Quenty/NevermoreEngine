@@ -53,7 +53,7 @@ end)
 Spec files should be comment-free apart from lint directives (`--!strict`, `-- selene:`) and the
 `@class` docstring — the code and test names carry the intent. Do **not** write prose headers above
 `setup()` or other helpers describing what they build, comments narrating test flow, or comments
-restating what an assertion checks — `setup()`/`destroy()` is an established pattern and needs no
+restating what an assertion checks — `setup()`/`Destroy()` is an established pattern and needs no
 explanation. The only comment worth keeping is one documenting something impossible to infer from
 the code (e.g. an engine-bug workaround, with a link). When in doubt, omit it.
 
@@ -65,12 +65,12 @@ leaves running keeps executing after the test ends and can throw during a *later
 which the runner reports as that innocent later package failing. A leaked `DataStore` auto-save loop
 throwing during the `secrets` suite is a real example we hit.
 
-So every object a test constructs must be torn down. Use the **`setup()` / `destroy()` controller
+So every object a test constructs must be torn down. Use the **`setup()` / `Destroy()` controller
 pattern** — the standard across the codebase (see the `rogue-properties` specs and
 `saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` creates a `Maid`, `maid:Add`s the
 `ServiceBag` and every object it builds, and returns a controller: named fields plus factory
-functions, and a `destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
-`controller:destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
+functions, and a `Destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
+`controller:Destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
 
 ```luau
 local function setup()
@@ -85,7 +85,7 @@ local function setup()
 
 	return {
 		thing = thing,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
@@ -94,7 +94,7 @@ end
 it("does a thing", function()
 	local controller = setup()
 	expect(controller.thing:DoSomething()).toEqual(true)
-	controller:destroy()
+	controller:Destroy()
 end)
 ```
 
@@ -105,13 +105,53 @@ Guidelines:
   loop, a subscription) running otherwise. This is the exact bug that leaked into the `secrets` suite.
 - For objects a test builds on demand (multiple stores, per-test config), expose a factory that
   returns `maid:Add(X.new(...))` — e.g. a `newDataStore()` on the controller.
-- In a hung-promise guard that returns early, call `controller:destroy()` before the `return` so the
+- In a hung-promise guard that returns early, call `controller:Destroy()` before the `return` so the
   early exit still cleans up.
 - A test may still `:Destroy()` an object mid-test when that teardown *is* the behavior under test —
   the maid safely skips an already-destroyed object at `DoCleaning` (a destroyed `BaseObject` has its
   metatable nil'd), so there is no double-destroy.
 - A plain object with no `ServiceBag` can skip the controller: create it in the test and
   `object:Destroy()` at the end (and in any early-return guard).
+
+**Read a failure list from the top.** A failing `expect` throws, so the trailing
+`controller:Destroy()` never runs and that test leaks everything it built into the shared place.
+Later tests then fail for reasons of their own — timing out on an observable, seeing a slot that
+should have been filtered — and those look like independent bugs. They are usually one bug plus its
+wake. Fix the earliest failure and re-run before investigating any of the others; the count often
+drops by more than one. (This is why the guideline above matters even though it reads as
+belt-and-braces: teardown you only reach on the happy path is teardown you lose exactly when a test
+is failing.)
+
+**`JestUtils.afterThis` queues cleanup that survives a failed assertion.** `@quenty/jestutils` takes
+any maid task — a function, an `Instance`, a connection, a thread, anything with `Destroy` — next to
+the code that creates it, and unwinds the queue in reverse once the test finishes, pass or fail:
+
+```luau
+local JestUtils = require("JestUtils")
+
+it("does a thing", function()
+	local controller = setup()
+	JestUtils.afterThis(controller)
+
+	local thing = SomeClass.new()
+	JestUtils.afterThis(thing)
+
+	expect(thing:DoSomething()).toEqual(true)
+end)
+```
+
+The queue unwinds from a Jest `afterEach`, so a throwing `expect` no longer strands what the test
+built. Every queued task runs even when an earlier one throws, and the failures are reported together
+against the test that queued them.
+
+`afterThis` returns a function that unqueues the task again, and that function is itself a maid task.
+An object that already cleans up on its own can hand it back to its own maid, so whichever happens
+first wins and nothing is destroyed twice:
+
+```luau
+local maid = Maid.new()
+maid:GiveTask(JestUtils.afterThis(maid))
+```
 
 ### Consume every rejection (or Jest passes but the run still fails)
 
@@ -251,6 +291,8 @@ alive. Knowing which decides what a spec can assert:
 | `RunService.RenderStepped` | Can be read, but connecting throws `RenderStepped event can only be used from local scripts`. |
 | `RunService:BindToRenderStep` | Binds without erroring and then never invokes the callback — the silent one. |
 | `BindableEvent.Event` | A real `RBXScriptSignal` you can `:Fire()` on demand. |
+| `Humanoid:ChangeState` | Inert. The humanoid state machine never steps, so `StateChanged`, `Running`, `Jumping`, `Seated` and `Died` stay silent no matter how the rig is built. |
+| Property and flag writes | `GetPropertyChangedSignal` and signals like `Humanoid.StateEnabledChanged` run their handlers before the next line, so a spec can write and assert inline without waiting a frame. |
 
 That last row is the useful lever: anything taking a signal or an event — `StepUtils.bindToSignal`,
 `StepUtils.onceAtEvent` — is best tested by firing a `BindableEvent` rather than waiting on frames,
@@ -324,6 +366,7 @@ Each testable package needs:
 2. **A Rojo project file** (typically `test/default.project.json`) that builds the test place
 3. **A script template** (typically `test/scripts/Server/ServerMain.server.lua`) that boots the package and runs tests
 4. **A `@quentystudios/jest-lua` dependency** in the package's `package.json` (plus a `jest.config.lua`, see above) — the first `.spec.lua` in a package that has never had one must add this. Without it every spec fails to *run* with `[Loader] - "Jest" is not available` (a load error, not an assertion failure), because `require("Jest")` resolves through the package's own dependency graph. Run `pnpm install` after adding it so the workspace symlink is created.
+5. **A `@quenty/nevermore-test-runner` dependency**, for the same reason — the script template's `require("NevermoreTestRunnerUtils")` resolves through the package's own dependency graph.
 
 ### 1. deploy.nevermore.json
 
@@ -401,6 +444,27 @@ end
 
 Replace `mypackage` with the key used in your Rojo project tree.
 
+Discarding the guard's result, as above, is fine. The counts still reach the batch runner:
+every run also leaves its results in a module the runner reads, so a package reports exact
+counts without its test script changing. This matters because the engine truncates a long
+run's logs, and counts scraped back out of that text are exactly what goes missing on the
+runs where they matter most.
+
+A script can also return the table, which is the only way a *single* package run reports
+counts as a value rather than as log text:
+
+```luau
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+if results then
+	return results
+end
+```
+
+A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
+keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `nil` when script
+source is unreadable, which is the case during ordinary play, so the demo still runs when you join the
+place and only the cloud/local test runs take the early return.
+
 ### NevermoreTestRunnerUtils
 
 The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`, which handles the test execution lifecycle:
@@ -408,6 +472,9 @@ The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`,
 - If a `jest.config` is found under the given root, it runs Jest tests
 - If no `jest.config` is found, boot success is the test (smoke test)
 - Detects Open Cloud vs local execution context and exits appropriately
+- Returns a [TestRunResults](/api/NevermoreTestRunnerUtils) table — counts, a capped failure
+  list, and the run's verdict — or `nil` when no test run was attempted, which is how a real
+  game server tells itself apart from a test place and falls through to its normal boot
 
 ## Running tests
 
@@ -430,12 +497,12 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run tests via Open Cloud instead of locally |
-| `--logs` | Show execution logs |
+| `--logs` | Show execution logs. On by default with `--script-text`; pass `--no-logs` to suppress |
 | `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
 | `--universe-id` | Override universe ID from deploy.nevermore.json |
 | `--place-id` | Override place ID from deploy.nevermore.json |
 | `--script-template` | Override script template path |
-| `--script-text` | Luau code to execute directly instead of the configured template |
+| `--script-text` | Luau code to execute directly instead of the configured template. Implies `--logs` |
 
 ### Batch testing
 

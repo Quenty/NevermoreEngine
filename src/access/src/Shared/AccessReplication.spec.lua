@@ -18,6 +18,7 @@ local AccessFeature = require("AccessFeature")
 local AccessReplicationState = require("AccessReplicationState")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -41,7 +42,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
@@ -64,10 +65,14 @@ local function setup()
 			end))
 			return last
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessFactServerOverrideBehavior.combine", function()
@@ -145,7 +150,7 @@ describe("AccessDataService.SetServerFactValue", function()
 
 		expect(controller.report(player, "serverOnly").value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps the local answer visible alongside the server one", function()
@@ -170,7 +175,7 @@ describe("AccessDataService.SetServerFactValue", function()
 		end
 		expect((localLayer :: any).value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not override under SERVER_OVERRIDE_NONE, but still reports what the server said", function()
@@ -186,7 +191,7 @@ describe("AccessDataService.SetServerFactValue", function()
 		expect(report.serverValue).toEqual(true)
 		expect(report.serverOverrode).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("cannot take access away under the default behavior", function()
@@ -198,7 +203,7 @@ describe("AccessDataService.SetServerFactValue", function()
 
 		expect(controller.report(player, "ownsGame").value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes access away when the fact asks for it", function()
@@ -210,7 +215,7 @@ describe("AccessDataService.SetServerFactValue", function()
 
 		expect(controller.report(player, "notBanned").value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reaches the feature that reads the fact", function()
@@ -232,7 +237,7 @@ describe("AccessDataService.SetServerFactValue", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps one player's replicated answer off another", function()
@@ -246,7 +251,7 @@ describe("AccessDataService.SetServerFactValue", function()
 		expect(controller.report(told, "serverOnly").value).toEqual(true)
 		expect(controller.report(other, "serverOnly").value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -274,7 +279,7 @@ describe("facts the client cannot compute at all", function()
 		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(false)
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves a fact that is not registered on this realm at all", function()
@@ -297,7 +302,7 @@ describe("facts the client cannot compute at all", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still lets a local answer stand where there is one", function()
@@ -311,7 +316,7 @@ describe("facts the client cannot compute at all", function()
 
 		expect(controller.report(player, "ownsGame").value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -337,7 +342,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 		expect(feature:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a verdict through the fact it was told about", function()
@@ -361,7 +366,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("applies to a feature registered after the payload arrived", function()
@@ -373,7 +378,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 		expect(feature:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes back a fact the server stops naming", function()
@@ -385,7 +390,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 		expect(feature:GetFactNames()).toEqual({ "ownsGame" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("never takes back a fact this realm pushed itself", function()
@@ -399,7 +404,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 		expect(feature:GetFactNames()).toEqual({ "ownsGame", "staffAllowlist" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores a feature this realm does not have", function()
@@ -409,7 +414,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 			controller.accessDataService:SetReplicatedFeatureFactNames({ neverRegistered = { "gamePass" } })
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -431,7 +436,7 @@ describe("replicated feature facts across a feature's lifetime", function()
 
 		expect(second:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -454,7 +459,7 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 
 		expect(controller.report(player, "ownsGame").value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("shows up as an override rather than as an unexplained replicated value", function()
@@ -477,7 +482,7 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 		-- Named as the server's, so "I cleared that override and it is still set" is a short conversation.
 		expect((overrideLayer :: any).metadata.replicated).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries a forced-unresolved override, which is a thing people deliberately do", function()
@@ -491,7 +496,7 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 
 		expect(controller.report(player, "ownsGame").value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets a local override shadow the server's", function()
@@ -507,7 +512,7 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 		expect(report.value).toEqual(true)
 		expect(report.layers[1].metadata).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lifts again when the server clears it", function()
@@ -520,7 +525,7 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 
 		expect(controller.report(player, "ownsGame").value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps one player's override off another", function()
@@ -534,6 +539,6 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 		expect(controller.report(told, "ownsGame").value).toEqual(false)
 		expect(controller.report(other, "ownsGame").value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

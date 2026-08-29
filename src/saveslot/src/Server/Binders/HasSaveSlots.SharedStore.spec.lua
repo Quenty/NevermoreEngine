@@ -10,10 +10,13 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
+local SaveSlotExportUtils = require("SaveSlotExportUtils")
 local SaveSlotSharedDataStoreService = require("SaveSlotSharedDataStoreService")
 local ServiceBag = require("ServiceBag")
 
@@ -26,6 +29,8 @@ local it = Jest.Globals.it
 local FAKE_USER_ID = 424242
 
 local function setup()
+	local maid = Maid.new()
+
 	local playerMock = DataStoreMock.new()
 	local sharedMock = DataStoreMock.new()
 
@@ -47,28 +52,35 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	local function destroy()
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
+	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
+	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
+	maid:GiveTask(function()
 		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
+	end)
+
+	local function Destroy(_self)
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		hasSaveSlots = hasSaveSlots,
 		sharedService = sharedService,
 		sharedMock = sharedMock,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function runWithContext(body)
 	local context = setup()
 	local ok, err = pcall(body, context)
-	context.destroy()
+	context:Destroy()
 	if not ok then
 		error(err, 0)
 	end
@@ -121,6 +133,42 @@ describe("HasSaveSlots shared-store save/import", function()
 	it("rejects import from a missing key", function()
 		runWithContext(function(context)
 			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("nope"))).toEqual(false)
+		end)
+	end)
+
+	it("tags what it writes as a share code, keeping it out of the teleport arrival path", function()
+		runWithContext(function(context)
+			local hasSaveSlots = context.hasSaveSlots
+			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-kind"))
+
+			local stored = awaitValueOf(context.sharedService:PromiseRead("code-kind"))
+			expect(stored.kind).toEqual(SaveSlotExportUtils.Kind.CODE)
+		end)
+	end)
+
+	it("refuses to import a transfer snapshot, whose key every client can read", function()
+		runWithContext(function(context)
+			awaitValueOf(
+				context.sharedService:PromiseWrite(
+					"transfer-key",
+					SaveSlotExportUtils.withKind({ data = { Coins = 5 } }, SaveSlotExportUtils.Kind.TRANSFER)
+				)
+			)
+
+			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("transfer-key"))).toEqual(
+				false
+			)
+		end)
+	end)
+
+	it("still imports an entry written before kinds existed", function()
+		runWithContext(function(context)
+			awaitValueOf(context.sharedService:PromiseWrite("legacy-code", { data = { Coins = 5 } }))
+
+			local newSlotId = awaitValueOf(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("legacy-code"))
+			local reexport = awaitValueOf(context.hasSaveSlots:PromiseExportSlot(newSlotId))
+			expect(reexport.data.Coins).toEqual(5)
 		end)
 	end)
 

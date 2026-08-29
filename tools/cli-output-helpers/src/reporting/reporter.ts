@@ -5,6 +5,16 @@
  * and end in a terminal state (passed / failed).
  */
 
+/**
+ * Something that makes a result less than it appears.
+ *
+ * All three are compatible with a pass, which is the point: a run that passed
+ * without proving anything must not render as one that did. Declared here
+ * rather than beside the resolver that reads them, so a result type can carry
+ * one without depending on how it is drawn.
+ */
+export type ResultCaveat = 'no-counts' | 'logs-lost' | 'empty-run';
+
 /** Execution phases a package can move through. */
 export type JobPhase =
   | 'waiting'
@@ -71,6 +81,14 @@ export interface PackageResult {
   failedPhase?: JobPhase;
   /** Per-result override of the reporter's default failure label. */
   failureLabel?: string;
+  /**
+   * What qualifies this result, for facts the reporters cannot derive.
+   *
+   * `empty-run` and `no-counts` come from the counts themselves and are worked
+   * out by `resolveResultStatus`; anything here is something only the producer
+   * knows, such as a run whose log output the engine dropped.
+   */
+  caveats?: ResultCaveat[];
 }
 
 /** Summary of a complete batch run. */

@@ -9,6 +9,8 @@ local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local BoundAncestorTracker = require("BoundAncestorTracker")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,8 +41,8 @@ local function setup()
 	container.Name = "BoundAncestorTrackerSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
-	local cleanups = {}
+	local instances: { Instance } = {}
+	local cleanups: { any } = {}
 	local booted = false
 
 	local binder = Binder.new(string.format("BoundAncestorTrackerSpecTag_%d", suffix), makeClass() :: any)
@@ -74,28 +78,36 @@ local function setup()
 		return tracker.Class.Value
 	end
 
-	return {
+	maid:GiveTask(function()
+		for _, item in cleanups do
+			pcall(function()
+				item:Destroy()
+			end)
+		end
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		binder = binder,
 		newInstance = newInstance,
 		track = track,
 		boot = boot,
 		awaitChange = awaitChange,
-		destroy = function()
-			for _, item in cleanups do
-				pcall(function()
-					item:Destroy()
-				end)
-			end
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("BoundAncestorTracker tracking", function()
@@ -111,7 +123,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toEqual(controller.binder:Get(grandparent))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("has no value when no ancestor is bound", function()
@@ -124,7 +136,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = controller.track(BoundAncestorTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("updates when an ancestor becomes bound", function()
@@ -143,7 +155,7 @@ describe("BoundAncestorTracker tracking", function()
 		local value = controller.awaitChange(tracker, nil)
 		expect(value).toEqual(controller.binder:Get(ancestor))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the child leaves the bound ancestry", function()
@@ -162,6 +174,6 @@ describe("BoundAncestorTracker tracking", function()
 		child.Parent = controller.container
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

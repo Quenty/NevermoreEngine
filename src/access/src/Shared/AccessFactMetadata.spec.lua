@@ -15,6 +15,7 @@ local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -31,7 +32,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
@@ -55,10 +56,14 @@ local function setup()
 			end))
 			return last
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessFact.contribution", function()
@@ -71,7 +76,7 @@ describe("AccessFact.contribution", function()
 		expect(report.value).toEqual(true)
 		expect(report.metadata.gamePassId).toEqual(12345)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves metadata nil for a plain answer, so the common case stays plain", function()
@@ -80,7 +85,7 @@ describe("AccessFact.contribution", function()
 
 		expect(controller.report(controller.fakePlayer(), "ownsGamePass").metadata).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports the deciding layer's attribution, not an outranked one's", function()
@@ -99,7 +104,7 @@ describe("AccessFact.contribution", function()
 		expect(report.decidedBy).toEqual("allowlist")
 		expect(report.metadata.via).toEqual("allowlist")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps every layer's attribution visible underneath", function()
@@ -117,7 +122,7 @@ describe("AccessFact.contribution", function()
 		expect(report.layers[2].metadata.via).toEqual("allowlist")
 		expect(report.layers[3].metadata.via).toEqual("groupRank")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("follows attribution as it changes, which is what a UI subscribes to", function()
@@ -132,7 +137,7 @@ describe("AccessFact.contribution", function()
 
 		expect(controller.report(player, "friendAccess").metadata.userId).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still grants the feature it is attached to", function()
@@ -144,7 +149,7 @@ describe("AccessFact.contribution", function()
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "shop")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -201,7 +206,7 @@ describe("attribution across replication", function()
 		expect(report.decidedBy).toEqual("replicated")
 		expect(report.metadata.grantedByUserId).toEqual(42)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("shows the replicated attribution on its own layer", function()
@@ -221,6 +226,6 @@ describe("attribution across replication", function()
 
 		expect((replicated :: any).metadata.grantedByUserId).toEqual(42)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

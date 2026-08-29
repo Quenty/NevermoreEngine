@@ -1,6 +1,6 @@
 {
   "name": "@quenty/characterutils",
-  "version": "12.41.0",
+  "version": "12.43.0",
   "description": "CharacterUtils",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/deferred": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

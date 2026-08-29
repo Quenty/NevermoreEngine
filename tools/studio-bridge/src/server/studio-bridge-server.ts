@@ -26,6 +26,7 @@ import {
   type Capability,
   type PluginMessage,
   type ServerMessage,
+  type SerializedReturnValue,
   encodeMessage,
   decodePluginMessage,
 } from './web-socket-protocol.js';
@@ -52,7 +53,7 @@ const defaultProjectPath = resolveTemplatePath(
 const sessionAttributeTransformScript = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'transform-add-session-attribute.luau'
+  'transform-add-session-attribute.lua'
 );
 
 function readServerVersion(): string {
@@ -106,6 +107,14 @@ export interface ExecuteOptions {
 export interface StudioBridgeResult {
   success: boolean;
   logs: string;
+  /**
+   * Everything the script returned, in order, marshalled by the plugin.
+   * Absent whenever no `scriptComplete` carrying a return channel arrived —
+   * a timeout, a disconnect, a plugin error, or an older plugin build — which
+   * is what separates "we never learned what it returned" from `[]`, "it
+   * returned nothing".
+   */
+  returnValues?: SerializedReturnValue[];
 }
 
 type BridgeState =
@@ -439,7 +448,7 @@ export class StudioBridgeServer {
   }
 
   /**
-   * Ensure action modules (like `execute.luau`) are synced to the plugin
+   * Ensure action modules (like `execute.lua`) are synced to the plugin
    * before first use. Uses `syncActions` to check which actions the plugin
    * is missing, then registers them via `registerAction`.
    *
@@ -797,6 +806,7 @@ export class StudioBridgeServer {
             finish({
               success: msg.payload.success,
               logs: logLines.join('\n'),
+              returnValues: msg.payload.returnValues,
             });
             break;
           }

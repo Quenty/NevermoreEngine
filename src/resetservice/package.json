@@ -1,6 +1,6 @@
 {
   "name": "@quenty/resetservice",
-  "version": "11.46.1",
+  "version": "11.49.0",
   "description": "Handles reset requests since Roblox's reset system doesn't handle ragdolls correctly",
   "keywords": [
     "Roblox",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@quenty/characterutils": "workspace:*",
     "@quenty/coreguiutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

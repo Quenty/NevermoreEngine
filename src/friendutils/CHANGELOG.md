@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.40.0...@quenty/friendutils@12.41.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.39.0...@quenty/friendutils@12.40.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.38.1...@quenty/friendutils@12.39.0) (2026-08-24)
+
+### Bug Fixes
+
+- Retry on GetCore failure ([c8a595a](https://github.com/Quenty/NevermoreEngine/commit/c8a595a01876ff9324f81a4790ea478086740d2a))
+
+## [12.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.38.0...@quenty/friendutils@12.38.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/friendutils
+
 # [12.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.37.2...@quenty/friendutils@12.38.0) (2026-07-28)
 
 **Note:** Version bump only for package @quenty/friendutils

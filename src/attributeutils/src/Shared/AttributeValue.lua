@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Allows access to an attribute like a ValueObject.
 
@@ -27,18 +27,36 @@ local RxAttributeUtils = require("RxAttributeUtils")
 
 local AttributeValue = {}
 AttributeValue.ClassName = "AttributeValue"
-AttributeValue.__index = AttributeValue
 
 export type AttributeValue<T> = typeof(setmetatable(
 	{} :: {
+		--[=[
+			The current value of the attribute. Can be assigned to to write
+			the attribute.
+			@prop Value T
+			@within AttributeValue
+		]=]
+		Value: T,
+
+		--[=[
+			Name of the attribute being read and written.
+			@readonly
+			@prop AttributeName string
+			@within AttributeValue
+		]=]
+		AttributeName: string,
+
+		--[=[
+			Signal that fires when the attribute changes
+			@readonly
+			@prop Changed RBXScriptSignal
+			@within AttributeValue
+		]=]
+		Changed: RBXScriptSignal<>,
+
 		_object: Instance,
 		_attributeName: string,
-		_defaultValue: T,
-
-		-- Public
-		Value: T,
-		AttributeName: string,
-		Changed: RBXScriptSignal<(T)>,
+		_defaultValue: T?,
 	},
 	{} :: typeof({ __index = AttributeValue })
 ))
@@ -49,73 +67,69 @@ export type AttributeValue<T> = typeof(setmetatable(
 
 	@param object Instance
 	@param attributeName string
-	@param defaultValue T
+	@param defaultValue T?
 	@return AttributeValue<T>
 ]=]
-function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: T): AttributeValue<T>
+function AttributeValue.new<T>(object: Instance, attributeName: string, defaultValue: T?): AttributeValue<T>
 	assert(typeof(object) == "Instance", "Bad object")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
-	local self = {
-		_object = object,
-		_attributeName = attributeName,
-		_defaultValue = defaultValue,
-	}
+	local self: AttributeValue<T> = setmetatable(
+		{
+			_object = object,
+			_attributeName = attributeName,
+			_defaultValue = defaultValue,
+		} :: any,
+		AttributeValue
+	)
 
-	if defaultValue ~= nil and self._object:GetAttribute(self._attributeName) == nil then
-		self._object:SetAttribute(rawget(self, "_attributeName") :: string, defaultValue)
+	if defaultValue ~= nil and object:GetAttribute(attributeName) == nil then
+		object:SetAttribute(attributeName, defaultValue :: any)
 	end
 
-	return setmetatable(self, AttributeValue) :: any
+	return self
 end
 
 --[=[
 	Handles observing the value conditionally
 
-	@param condition function | nil
-	@return Observable<Brio<any>>
+	@param condition ((T) -> boolean)?
+	@return Observable<Brio<T>>
 ]=]
 function AttributeValue.ObserveBrio<T>(
 	self: AttributeValue<T>,
 	condition: Rx.Predicate<T>?
-): Observable.Observable<Brio.Brio<any>>
+): Observable.Observable<Brio.Brio<T>>
 	return RxAttributeUtils.observeAttributeBrio(self._object, self._attributeName, condition)
 end
 
 --[=[
-	Observes an attribute on an instance.
-	@return Observable<any>
+	Observes an attribute on an instance, falling back to the default value
+	whenever the attribute is not set.
+
+	@return Observable<T>
 ]=]
 function AttributeValue.Observe<T>(self: AttributeValue<T>): Observable.Observable<T>
-	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, rawget(self :: any, "_defaultValue"))
+	-- rawget since the key is absent whenever the default is nil, and __index errors on unknown members
+	local defaultValue = rawget(self :: any, "_defaultValue") :: T?
+
+	return RxAttributeUtils.observeAttribute(self._object, self._attributeName, defaultValue) :: any
 end
 
---[=[
-	The current property of the Attribute. Can be assigned to write
-	the attribute.
-	@prop Value T
-	@within AttributeValue
-]=]
-
---[=[
-	Signal that fires when the attribute changes
-	@readonly
-	@prop Changed Signal<()>
-	@within AttributeValue
-]=]
-function AttributeValue.__index<T>(self: AttributeValue<T>, index)
+function AttributeValue:__index(index)
 	if AttributeValue[index] then
 		return AttributeValue[index]
 	elseif index == "Value" then
-		local result = self._object:GetAttribute(rawget(self :: any, "_attributeName") :: string)
-		local default = rawget(self :: any, "_defaultValue")
+		local object = rawget(self :: any, "_object") :: Instance
+		local result = object:GetAttribute(rawget(self :: any, "_attributeName") :: string)
 		if result == nil then
-			return default
+			return rawget(self :: any, "_defaultValue")
 		else
 			return result
 		end
 	elseif index == "Changed" then
-		return self._object:GetAttributeChangedSignal(self._attributeName)
+		local object = rawget(self :: any, "_object") :: Instance
+		return object:GetAttributeChangedSignal(rawget(self :: any, "_attributeName") :: string)
 	elseif index == "AttributeName" then
 		return rawget(self :: any, "_attributeName")
 	else
@@ -123,9 +137,10 @@ function AttributeValue.__index<T>(self: AttributeValue<T>, index)
 	end
 end
 
-function AttributeValue.__newindex<T>(self: AttributeValue<T>, index, value)
+function AttributeValue:__newindex(index, value)
 	if index == "Value" then
-		self._object:SetAttribute(rawget(self :: any, "_attributeName") :: string, value)
+		local object = rawget(self :: any, "_object") :: Instance
+		object:SetAttribute(rawget(self :: any, "_attributeName") :: string, value)
 	elseif index == "AttributeName" then
 		error("Cannot set AttributeName")
 	else

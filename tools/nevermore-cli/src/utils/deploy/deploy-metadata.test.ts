@@ -90,6 +90,46 @@ describe('buildDeployMetadataAttributes', () => {
     expect('PackageVersion' in attributes).toBe(false);
   });
 
+  // The one fact nothing downstream can recover: a "published" pin resolves at
+  // deploy time and the base place moves on afterwards, so without this a
+  // running build cannot say which upstream content it is made of.
+  it('records the base place it was merged from', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        basePlaceId: 71403466083947,
+        basePlaceVersion: 158,
+      }
+    );
+
+    expect(attributes.BasePlaceId).toBe('71403466083947');
+    expect(attributes.BasePlaceVersion).toBe('158');
+  });
+
+  // Stringified for the same reason as the place ids: Lune round-trips number
+  // attributes as float32, which silently corrupts anything above 2^24.
+  it('keeps a large base place id exact', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        basePlaceId: 140328750749206,
+        basePlaceVersion: 1,
+      }
+    );
+
+    expect(attributes.BasePlaceId).toBe('140328750749206');
+    expect(Number(attributes.BasePlaceId)).toBe(140328750749206);
+  });
+
+  it('omits the base place fields when nothing was merged', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+
+    expect('BasePlaceId' in attributes).toBe(false);
+    expect('BasePlaceVersion' in attributes).toBe(false);
+  });
+
   it('reflects a Saved (unpublished) deploy', () => {
     const attributes = buildDeployMetadataAttributes(
       {},

@@ -4,24 +4,31 @@
 	single locale already in memory, so there is no per-locale laziness -- every entry
 	point queues the full set once.
 
-	Writes land on the [TranslatorService] resolved from the [ServiceBag] passed to the
-	constructor. Shares the loader surface (LoadSourceLocale / LoadLocale / LoadAllLocales)
-	with [InstanceLocaleLoader] so [JSONTranslator] can drive either the same way.
+	Registered as a service by the [JSONTranslator] that owns it, and writes land on the
+	[TranslatorService] resolved from the same bag. Shares the loader surface
+	(LoadSourceLocale / LoadLocale / LoadAllLocales) with [InstanceLocaleLoader] so
+	[JSONTranslator] can drive either the same way.
 
 	@class TableLocaleLoader
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local BaseObject = require("BaseObject")
+local Maid = require("Maid")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local TranslatorService = require("TranslatorService")
 
-local TableLocaleLoader = {}
+local TableLocaleLoader = setmetatable({}, BaseObject)
 TableLocaleLoader.ClassName = "TableLocaleLoader"
 TableLocaleLoader.__index = TableLocaleLoader
 
 export type TableLocaleLoader = typeof(setmetatable(
 	{} :: {
+		ServiceName: string,
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
 		_translatorService: TranslatorService.TranslatorService,
 		_entries: { any },
 		_loaded: boolean,
@@ -30,21 +37,37 @@ export type TableLocaleLoader = typeof(setmetatable(
 ))
 
 --[=[
-	@param serviceBag ServiceBag -- provides the [TranslatorService] writes land on
+	Constructs a new [TableLocaleLoader]. Register it on the [ServiceBag] that provides the
+	[TranslatorService] its writes land on.
+
+	@param translatorName string
 	@param entries { any } -- already-decoded localization entries
 	@return TableLocaleLoader
 ]=]
-function TableLocaleLoader.new(serviceBag: ServiceBag.ServiceBag, entries: { any }): TableLocaleLoader
-	assert(serviceBag, "Bad serviceBag")
+function TableLocaleLoader.new(translatorName: string, entries: { any }): TableLocaleLoader
+	assert(type(translatorName) == "string", "Bad translatorName")
 	assert(type(entries) == "table", "Bad entries")
 
-	local self = setmetatable({}, TableLocaleLoader)
+	local self: TableLocaleLoader = setmetatable({} :: any, TableLocaleLoader)
 
-	self._translatorService = serviceBag:GetService(TranslatorService) :: any
+	self.ServiceName = translatorName .. "LocaleLoader"
 	self._entries = entries
 	self._loaded = false
 
-	return self :: any
+	return self
+end
+
+--[=[
+	Initializes the loader. Should be done via [ServiceBag].
+
+	@param serviceBag ServiceBag
+]=]
+function TableLocaleLoader.Init(self: TableLocaleLoader, serviceBag: ServiceBag.ServiceBag)
+	assert(not self._serviceBag, "Already initialized")
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._maid = Maid.new()
+
+	self._translatorService = serviceBag:GetService(TranslatorService) :: any
 end
 
 --[=[
@@ -55,10 +78,35 @@ function TableLocaleLoader.LoadSourceLocale(self: TableLocaleLoader)
 end
 
 --[=[
+	Queues the entries and resolves. In-memory data has nothing to fetch, so the source
+	locale is available the moment it is asked for. Mirrors
+	[InstanceLocaleLoader.PromiseSourceLocale] so [JSONTranslator] can await either.
+
+	@return Promise<()>
+]=]
+function TableLocaleLoader.PromiseSourceLocale(self: TableLocaleLoader): Promise.Promise<()>
+	self:_load()
+
+	return Promise.resolved()
+end
+
+--[=[
 	Queues the entries. See [TableLocaleLoader].
 ]=]
 function TableLocaleLoader.LoadAllLocales(self: TableLocaleLoader)
 	self:_load()
+end
+
+--[=[
+	Queues the entries and resolves. Mirrors [InstanceLocaleLoader.PromiseAllLocales] so
+	[TranslatorService.PromiseLoadAllLocales] can drive either.
+
+	@return Promise<()>
+]=]
+function TableLocaleLoader.PromiseAllLocales(self: TableLocaleLoader): Promise.Promise<()>
+	self:_load()
+
+	return Promise.resolved()
 end
 
 --[=[

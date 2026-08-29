@@ -23,9 +23,11 @@ function RagdollService:Init(serviceBag: ServiceBag.ServiceBag)
 
 	-- External
 	self._serviceBag:GetService(require("Motor6DService"))
+	self._serviceBag:GetService(require("CmdrService"))
 
 	-- Internal
 	self._serviceBag:GetService(require("RagdollBindersServer"))
+	self._serviceBag:GetService((require :: any)("RagdollCmdrService"))
 
 	-- Binders
 	self._serviceBag:GetService((require :: any)("Ragdoll"))

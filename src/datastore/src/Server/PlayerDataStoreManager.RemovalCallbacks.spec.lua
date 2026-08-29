@@ -29,7 +29,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 		end, 10)).toEqual(true)
 		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	describe("failure modes", function()
@@ -48,7 +48,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			end, 3)).toEqual(false)
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
-			controller:destroy()
+			controller:Destroy()
 		end)
 
 		it("throwing callback: the synchronous throw escapes removal (lock held, stuck)", function()
@@ -69,7 +69,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			-- reach it and nothing else destroys it. Kill its auto-save loop by hand, or it outlives this
 			-- spec and fires inside a later package's window.
 			dataStore:Destroy()
-			controller:destroy()
+			controller:Destroy()
 		end)
 
 		it("yielding callback: removal blocks forever (no save, lock held)", function()
@@ -87,7 +87,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			end, 2)).toEqual(false)
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
-			controller:destroy()
+			controller:Destroy()
 		end)
 	end)
 end)

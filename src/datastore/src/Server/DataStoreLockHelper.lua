@@ -8,6 +8,7 @@ local RunService = game:GetService("RunService")
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
+local DataStoreLockUtils = require("DataStoreLockUtils")
 local Promise = require("Promise")
 
 local DataStoreLockHelper = setmetatable({}, BaseObject)
@@ -27,16 +28,8 @@ export type DataStoreLockHelper =
 	))
 	& BaseObject.BaseObject
 
-export type LockedSessionData = {
-	SessionId: string,
-	PlaceId: number,
-	JobId: string,
-}
-
-export type LockData = {
-	LastUpdateTime: number?,
-	ActiveSession: LockedSessionData?,
-}
+export type LockedSessionData = DataStoreLockUtils.LockedSessionData
+export type LockData = DataStoreLockUtils.LockData
 
 export type AcquiredValidLockResult = {
 	isValid: true,
@@ -88,7 +81,7 @@ function DataStoreLockHelper.ToUnlockedProfile(self: DataStoreLockHelper, origin
 			unlockedProfile = original,
 		}
 	else
-		local parsedLockData = self:_deserializeLockData(original.lock)
+		local parsedLockData = DataStoreLockUtils.deserializeLockData(original.lock)
 		if parsedLockData == nil or parsedLockData.ActiveSession == nil then
 			return {
 				isValid = true,
@@ -113,50 +106,16 @@ function DataStoreLockHelper.ToUnlockedProfile(self: DataStoreLockHelper, origin
 end
 
 function DataStoreLockHelper.ToRawUnlockedProfile(_self: DataStoreLockHelper, original: any): any
-	if original == nil then
-		return {}
-	elseif type(original) ~= "table" then
-		warn("[DataStoreLockHelper] - Data session locking is not available for non-table entries")
-		return original
-	else
-		local copy = table.clone(original)
-		copy.lock = nil
-		return copy
-	end
+	return DataStoreLockUtils.withLock(original, nil)
 end
 
 function DataStoreLockHelper.ToLockedProfile(self: DataStoreLockHelper, original: any, doCloseSession: boolean?): any
 	if doCloseSession then
 		self._sessionClosedPromise:Resolve()
+		return DataStoreLockUtils.withLock(original, nil)
 	end
 
-	if original == nil then
-		if doCloseSession then
-			return {}
-		else
-			return {
-				lock = {
-					LastUpdateTime = os.time(),
-					ActiveSession = self:_ourCurrentSessionData(),
-				} :: LockData,
-			}
-		end
-	elseif type(original) ~= "table" then
-		warn("[DataStoreLockHelper] - Data session locking is not available for non-table entries")
-		return original
-	else
-		local copy = table.clone(original)
-		if doCloseSession then
-			copy.lock = nil :: LockData?
-		else
-			copy.lock = {
-				LastUpdateTime = os.time(),
-				ActiveSession = self:_ourCurrentSessionData(),
-			} :: LockData
-		end
-
-		return copy
-	end
+	return DataStoreLockUtils.withLock(original, DataStoreLockUtils.createLockData(self:_ourCurrentSessionData()))
 end
 
 function DataStoreLockHelper._isInSession(self: DataStoreLockHelper, sessionData: LockedSessionData): boolean
@@ -179,43 +138,6 @@ function DataStoreLockHelper._ourCurrentSessionData(self: DataStoreLockHelper): 
 		SessionId = self._dataStore:GetSessionId(),
 		PlaceId = game.PlaceId,
 		JobId = game.JobId,
-	}
-end
-
-function DataStoreLockHelper._deserializeSessionData(_self: DataStoreLockHelper, sessionData: any): LockedSessionData?
-	if type(sessionData) ~= "table" then
-		return nil
-	end
-
-	if type(sessionData.SessionId) ~= "string" then
-		return nil
-	end
-
-	if type(sessionData.PlaceId) ~= "number" then
-		return nil
-	end
-
-	if type(sessionData.JobId) ~= "string" then
-		return nil
-	end
-
-	return {
-		SessionId = sessionData.SessionId,
-		PlaceId = sessionData.PlaceId,
-		JobId = sessionData.JobId,
-	}
-end
-
-function DataStoreLockHelper._deserializeLockData(self: DataStoreLockHelper, lockData: any): LockData?
-	if type(lockData) ~= "table" then
-		return nil
-	end
-
-	local activeSession: LockedSessionData? = self:_deserializeSessionData(lockData.ActiveSession)
-
-	return {
-		LastUpdateTime = if type(lockData.LastUpdateTime) == "number" then lockData.LastUpdateTime else nil,
-		ActiveSession = activeSession,
 	}
 end
 
@@ -245,7 +167,7 @@ function DataStoreLockHelper.AcquireLock(self: DataStoreLockHelper, data: any, c
 		}
 	end
 
-	local parsedLockData = self:_deserializeLockData(data.lock)
+	local parsedLockData = DataStoreLockUtils.deserializeLockData(data.lock)
 	if parsedLockData == nil or parsedLockData.ActiveSession == nil then
 		return {
 			isValid = true,

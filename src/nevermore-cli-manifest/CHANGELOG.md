@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.9.1...@quenty/nevermoreclimanifest@1.10.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/nevermoreclimanifest
+
+## [1.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.9.0...@quenty/nevermoreclimanifest@1.9.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/nevermoreclimanifest
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.8.0...@quenty/nevermoreclimanifest@1.9.0) (2026-08-10)
+
+### Features
+
+- **nevermore-cli:** stamp the base place version into the built place ([4e91c13](https://github.com/Quenty/NevermoreEngine/commit/4e91c13904afd423fd39e26387087608a5da9e22))
+
 # [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermoreclimanifest@1.7.0...@quenty/nevermoreclimanifest@1.8.0) (2026-07-25)
 
 **Note:** Version bump only for package @quenty/nevermoreclimanifest

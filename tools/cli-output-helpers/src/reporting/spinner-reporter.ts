@@ -2,11 +2,13 @@ import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs } from '../cli-utils.js';
 import { type JobPhase, type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
+import { formatProgressInline } from './progress-format.js';
 import {
-  formatProgressInline,
-  formatProgressResult,
-  isEmptyTestRun,
-} from './progress-format.js';
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+} from './result-status.js';
 
 export interface SpinnerReporterOptions {
   showLogs: boolean;
@@ -176,20 +178,19 @@ export class SpinnerReporter extends BaseReporter {
   }
 
   private _printResultLogs(result: PackageResult): void {
-    const icon = result.success
-      ? OutputHelper.formatSuccess('✓')
-      : OutputHelper.formatError('✗');
-    const status = result.success
-      ? this._options.successLabel ?? 'Passed'
-      : result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
-    const formatted = result.success
-      ? OutputHelper.formatSuccess(status)
-      : OutputHelper.formatError(status);
+    const status = this._resolve(result);
+    const icon = colorStatus(
+      statusIcon(status.severity, 'ascii'),
+      status.severity
+    );
 
     console.log(
       `${icon} ${OutputHelper.formatDim('──')} ${
         result.packageName
-      } ${OutputHelper.formatDim('──')} ${formatted}`
+      } ${OutputHelper.formatDim('──')} ${colorStatus(
+        formatStatusText(status),
+        status.severity
+      )}`
     );
 
     if (result.logs) {
@@ -201,6 +202,15 @@ export class SpinnerReporter extends BaseReporter {
       console.log(`  ${OutputHelper.formatError(result.error)}`);
     }
     console.log('');
+  }
+
+  private _resolve(
+    result: Parameters<typeof resolveResultStatus>[0]
+  ): ReturnType<typeof resolveResultStatus> {
+    return resolveResultStatus(result, {
+      successLabel: this._options.successLabel,
+      failureLabel: this._options.failureLabel,
+    });
   }
 
   private _render(): void {
@@ -221,32 +231,23 @@ export class SpinnerReporter extends BaseReporter {
         line = `  ${icon} ${OutputHelper.formatDim(
           state.name.padEnd(30)
         )} ${statusText}`;
-      } else if (state.status === 'passed') {
-        const icon = OutputHelper.formatSuccess('✓');
-        const progressText = formatProgressResult(
-          state.result?.progressSummary
+      } else if (state.status === 'passed' || state.status === 'failed') {
+        // Both terminal states through one resolver: a pass that ran no tests
+        // and a pass whose logs went missing are warnings, and deciding that
+        // here is how the spinner and the table came to disagree about them.
+        const status = this._resolve(
+          state.result ?? { success: state.status === 'passed' }
         );
-        const label = this._options.successLabel ?? 'Passed';
-        const empty = isEmptyTestRun(state.result?.progressSummary);
-        let plain = progressText ? `${label} ${progressText}` : label;
-        if (empty) plain += ' ⚠';
-        const padded = OutputHelper.padVisible(plain, STATUS_COLUMN_WIDTH);
-        const statusText = empty
-          ? OutputHelper.formatWarning(padded)
-          : OutputHelper.formatSuccess(padded);
-        line = `  ${icon} ${state.name.padEnd(
-          30
-        )} ${statusText} ${OutputHelper.formatDim(time)}`;
-      } else if (state.status === 'failed') {
-        const icon = OutputHelper.formatError('✗');
-        const failedPhase = state.result?.failedPhase;
-        const failureLabel =
-          state.result?.failureLabel ?? this._options.failureLabel ?? 'FAILED';
-        const plain = failedPhase
-          ? `${failureLabel} at ${failedPhase}`
-          : failureLabel;
-        const statusText = OutputHelper.formatError(
-          plain.padEnd(STATUS_COLUMN_WIDTH)
+        const icon = colorStatus(
+          statusIcon(status.severity, 'ascii'),
+          status.severity
+        );
+        const statusText = colorStatus(
+          OutputHelper.padVisible(
+            formatStatusText(status),
+            STATUS_COLUMN_WIDTH
+          ),
+          status.severity
         );
         line = `  ${icon} ${state.name.padEnd(
           30

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/chatproviderservice",
-  "version": "9.67.8",
+  "version": "9.71.0",
   "description": "Provide wrapper around chat system to allow tags to be set",
   "keywords": [
     "Roblox",
@@ -37,6 +37,7 @@
     "@quenty/color3utils": "workspace:*",
     "@quenty/datastore": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/localizedtextutils": "workspace:*",
     "@quenty/maid": "workspace:*",

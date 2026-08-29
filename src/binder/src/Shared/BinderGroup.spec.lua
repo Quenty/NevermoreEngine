@@ -8,6 +8,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderGroup = require("BinderGroup")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -16,6 +18,8 @@ local it = Jest.Globals.it
 local tagCounter = 0
 
 local function setup()
+	local maid = Maid.new()
+
 	local binders: { any } = {}
 
 	local function newBinder(): Binder.Binder<any>
@@ -27,16 +31,24 @@ local function setup()
 		return binder
 	end
 
-	return {
+	maid:GiveTask(function()
+		for _, binder in binders do
+			pcall(function()
+				binder:Destroy()
+			end)
+		end
+	end)
+
+	local controller = {
 		newBinder = newBinder,
-		destroy = function()
-			for _, binder in binders do
-				pcall(function()
-					binder:Destroy()
-				end)
-			end
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("BinderGroup.new()", function()
@@ -49,7 +61,7 @@ describe("BinderGroup.new()", function()
 
 		expect(#group:GetBinders()).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("constructs empty", function()
@@ -68,7 +80,7 @@ describe("BinderGroup:Add()", function()
 
 		expect(group:GetBinders()[1]).toEqual(binder)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("fires BinderAdded with the added binder", function()
@@ -85,7 +97,7 @@ describe("BinderGroup:Add()", function()
 
 		expect(fired).toEqual(binder)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when the value is not a binder", function()
@@ -111,7 +123,7 @@ describe("BinderGroup constructor validation", function()
 
 		expect(validated[1]).toEqual(binder:GetConstructor())
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws when the constructor fails validation", function()
@@ -126,7 +138,7 @@ describe("BinderGroup constructor validation", function()
 			group:Add(binder)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -139,7 +151,7 @@ describe("BinderGroup:AddList()", function()
 
 		expect(#group:GetBinders()).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-table argument", function()

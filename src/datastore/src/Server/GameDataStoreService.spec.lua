@@ -6,6 +6,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -24,13 +25,17 @@ local function setup(mock)
 	service:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		service = service,
 		mock = mock,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("GameDataStoreService.PromiseDataStore", function()
@@ -40,7 +45,7 @@ describe("GameDataStoreService.PromiseDataStore", function()
 		local promise = controller.service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -51,12 +56,12 @@ describe("GameDataStoreService.PromiseDataStore", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadPromise:Wait())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should return the same cached promise on repeated calls", function()
@@ -66,7 +71,7 @@ describe("GameDataStoreService.PromiseDataStore", function()
 		local second = controller.service:PromiseDataStore()
 		expect((first == second)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -77,7 +82,7 @@ describe("GameDataStoreService persistence", function()
 		local promise = controller.service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -89,7 +94,7 @@ describe("GameDataStoreService persistence", function()
 		local savePromise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(savePromise) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((savePromise:Yield())).toEqual(true)
@@ -98,7 +103,7 @@ describe("GameDataStoreService persistence", function()
 		expect(raw).never.toBeNil()
 		expect(raw.motd).toEqual("hello")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -110,7 +115,7 @@ describe("GameDataStoreService.SetRobloxDataStore", function()
 			controller.service:SetRobloxDataStore(DataStoreMock.new())
 		end).toThrow("Already resolved robloxDataStore")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw on a non-datastore argument", function()
@@ -124,7 +129,7 @@ describe("GameDataStoreService.SetRobloxDataStore", function()
 			controller.service:SetRobloxDataStore(nil)
 		end).toThrow("Bad robloxDataStore")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -138,7 +143,7 @@ describe("GameDataStoreService failure handling", function()
 		local promise = controller.service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -148,7 +153,7 @@ describe("GameDataStoreService failure handling", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -156,7 +161,7 @@ describe("GameDataStoreService failure handling", function()
 		expect(loadOk).toEqual(true)
 		expect(loadedOk).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -167,12 +172,12 @@ describe("GameDataStoreService teardown", function()
 		local promise = controller.service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		local _ok, dataStore = promise:Yield()
 
-		controller:destroy()
+		controller:Destroy()
 
 		-- BaseObject.Destroy clears the metatable, so a torn-down store reads a nil metatable.
 		expect(getmetatable(dataStore)).toBeNil()
@@ -184,20 +189,20 @@ describe("GameDataStoreService teardown", function()
 		local promise = controller.service:PromiseDataStore()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		local _ok, dataStore = promise:Yield()
 
 		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5) then
 			expect("load hung").toEqual("load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		dataStore:Store("motd", "goodbye")
 
-		controller:destroy()
+		controller:Destroy()
 
 		local raw = controller.mock:GetRaw("version1")
 		expect(raw).never.toBeNil()

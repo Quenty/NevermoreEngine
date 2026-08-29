@@ -14,6 +14,9 @@ JSONTranslator          per-translator: owns a loader, resolves text for a key
   |
   +-- InstanceLocaleLoader / TableLocaleLoader
   |     decode JSON -> queue entries (never writes the table itself)
+  |     |
+  |     +-- TemplateProvider (instance loader only, one per translator)
+  |           fetches a locale file on demand instead of replicating all of them
   |
   +-- TranslatorService (shared, one per realm)
         owns the LocalizationTable, batches writes, tracks per-key readiness,
@@ -22,6 +25,85 @@ JSONTranslator          per-translator: owns a loader, resolves text for a key
 
 Loaders only ever *queue*. Everything that touches the `LocalizationTable` goes through
 `TranslatorService`.
+
+Every box is a service. A `JSONTranslator` registers its loader on the bag during its own `Init`,
+and an `InstanceLocaleLoader` registers its `TemplateProvider` during *its* `Init`, so the standard
+initialization chain builds the whole stack and tears it down in reverse. Nothing in it owns
+anything below it.
+
+## Locale files are fetched, not replicated
+
+An instance-decoded translator is a folder of per-locale JSON under `ReplicatedStorage`. Left
+alone, all of it replicates to every client at join — a game with a dozen languages ships twelve to
+a player who reads one. So `InstanceLocaleLoader` reaches its files through a `TemplateProvider`
+named for the translator, which on a live server parks them under a `PreventReplication` camera and
+replicates name-only tombstones. The client learns which locales exist without their contents, and
+fetches the one it needs.
+
+**Why the provider rather than a remote returning the JSON.** A locale file may be a `ModuleScript`
+(`decodeLocaleFromInstance` requires it), and a server-only instance returned from a remote arrives
+as `nil` — the client has no reference to something it never received. `TemplateProvider`'s
+parent-into-`PlayerGui`-then-return is not incidental machinery for meshes; it is the only way to
+hand a client an instance it does not have. For the `StringValue` case a remote would move the same
+bytes, and would mean rebuilding the request dedup, the pending-promise map, and the locale
+manifest the provider already has.
+
+Four consequences worth knowing before changing any of this:
+
+**Loading is asynchronous, but only on a live client.** `TemplateReplicationModesUtils.inferReplicationMode`
+returns `SHARED` when `RunService:IsRunning()` is false, and the server path registers its templates
+during `Init`, so `PromiseTemplate` resolves synchronously in Studio edit, on the server, and under
+the test runner. Loading there behaves exactly as it did before any of this — which is also why
+the specs do not exercise the replicated path at all.
+
+**Decode order has to be forced.** The source locale establishes the `Source`/`Context` that every
+other locale's values merge onto, and once files are fetched the order they arrive in has nothing
+to do with the order they were asked for. Non-source files therefore chain behind
+`PromiseSourceLocale` before decoding; the fetches still overlap, only the decode is serialized.
+
+**"No file for this locale" and "not yet" are the same observation.** A client learns the locale set
+as tombstones replicate, so concluding absence from an empty set would silently skip a file that
+was merely late. `_promiseFileName` waits instead, and a file appearing later re-triggers loading
+for any language already requested. A locale that genuinely has no file warns after five seconds
+rather than hanging quietly.
+
+**`PromiseLoaded` waits for the source locale**, not just the cloud translator. Acquiring the
+translator takes 20–30 seconds and dominates a fetch in practice, so this changes nothing
+observable — but it makes "awaited `PromiseLoaded`, so `FormatByKey` works" true by construction
+instead of true by luck.
+
+## Nobody loads every locale, so the export asks
+
+Both realms are lazy: the client loads the source plus whichever language the player reads, and a
+server loads only the source — it registers a translator mostly so the files are hidden and
+servable, and decoding a dozen languages into a table nothing there reads is pure cost. Off-client
+used to be eager (`LoadAllLocales`), which made `GeneratedJSONTable_Server` the one place the full
+set existed.
+
+That was the CSV export's only supply, so removing it needs a replacement rather than nothing:
+`TranslatorService.PromiseLoadAllLocales` walks every registered loader, and
+`TranslatorCmdrService` exposes it as `prepare-localization-export`. Every `JSONTranslator`
+registers its loader on the service during `Init` for this and nothing else — there is no registry
+of translators otherwise, and one exists here only because "give me all of it" has no other way to
+reach them.
+
+The command yields until the batch has flushed before reporting, because the next thing the
+operator does is read the table by hand.
+
+## The server has to register the translator too
+
+A `TemplateProvider` only hides and tombstones on the realm where it is *initialized*. A translator
+registered on the client bag alone means no server provider, so nothing is hidden, the whole
+language set replicates at join, and the client's provider quietly finds the real files and works.
+Everything behaves correctly and the entire saving is gone.
+
+Since nothing looks wrong when this happens, `InstanceLocaleLoader` warns once when it is running
+on a live `CLIENT` realm and sees a locale file it never saw a tombstone for. That is always this
+misconfiguration.
+
+One file per locale. The provider keys templates by name, so a second file resolving to the same
+locale can never be fetched; the loader warns and ignores it rather than losing half a language
+silently.
 
 ## One table per realm, and what that costs
 
@@ -333,6 +415,14 @@ in the output either way. Anything that needs the strict answer should ask a tra
 
 - Specs use the `setup()` / `controller:destroy()` pattern; `destroy` is the last line of each
   test. The shared place makes leaks somebody else's failure.
+- The harnesses `Init()` their service bag but deliberately never `Start()` it. A bag refuses new
+  service types once started, and building a translator or a loader registers services (a loader,
+  and under it a `TemplateProvider`) — so tests build them in the same window production does,
+  during `Init`. Nothing in this stack defines `Start`, so nothing is skipped.
+- Locale-file replication is **not** covered. Under the test runner `RunService:IsRunning()` is
+  false, so the provider resolves everything locally and synchronously; the tombstone path only
+  runs on a live server/client pair. What the specs do cover is the reactive half — a file
+  appearing after its locale was requested.
 - Readiness bugs are ordering bugs, so tests that depend on hash iteration order are worthless.
   Where order matters, drive enough keys that whichever one fires first triggers the case (see
   "never reports a key ready while it is pending again").

@@ -20,6 +20,8 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerBinder = require("PlayerBinder")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
@@ -31,9 +33,6 @@ local it = Jest.Globals.it
 
 local specCounter = 0
 
--- Records its instance and whether it was destroyed. It ignores its constructor varargs: the ServiceBag
--- is injected as a constructor arg, and its Signals' strict __index makes jest's deep-equality traversal
--- throw, so the class must not retain it for toEqual to compare instances safely.
 local function makeTrackingClass()
 	local Class = {}
 	Class.__index = Class
@@ -59,6 +58,8 @@ end
 local function setup(constructor: any?)
 	specCounter += 1
 	local suffix = specCounter
+
+	local maid = Maid.new()
 
 	local serviceBag = ServiceBag.new()
 	local container = Instance.new("Folder")
@@ -108,7 +109,7 @@ local function setup(constructor: any?)
 		return mock
 	end
 
-	local function destroy()
+	maid:GiveTask(function()
 		if initialized then
 			serviceBag:Destroy()
 		end
@@ -118,17 +119,25 @@ local function setup(constructor: any?)
 			end)
 		end
 		container:Destroy()
+	end)
+
+	local function Destroy(_self)
+		maid:DoCleaning()
 	end
 
-	return {
+	local controller = {
 		binder = binder,
 		tag = tag,
 		init = init,
 		start = start,
 		boot = boot,
 		newMock = newMock,
-		destroy = destroy,
+		Destroy = Destroy,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PlayerBinder.new()", function()
@@ -147,7 +156,7 @@ describe("PlayerBinder mock discovery", function()
 
 		expect(controller.binder:GetAll()).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a player mock that exists before start", function()
@@ -161,7 +170,7 @@ describe("PlayerBinder mock discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(mock)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds a player mock created after start", function()
@@ -174,7 +183,7 @@ describe("PlayerBinder mock discovery", function()
 		assert(ok, "Never bound")
 		expect(class.instance).toEqual(mock)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("applies the binder's tag to the discovered mock", function()
@@ -186,7 +195,7 @@ describe("PlayerBinder mock discovery", function()
 
 		expect(controller.binder:HasTag(mock)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds each of several mocks to its own class", function()
@@ -205,7 +214,7 @@ describe("PlayerBinder mock discovery", function()
 		expect(classA).never.toEqual(classB)
 		expect(#controller.binder:GetAll()).toEqual(2)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("discovers a hand-built mock it did not create", function()
@@ -220,7 +229,7 @@ describe("PlayerBinder mock discovery", function()
 		expect(class.instance).toEqual(foreignMock)
 
 		foreignMock:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("unbinds and destroys the class when the mock is destroyed", function()
@@ -237,6 +246,6 @@ describe("PlayerBinder mock discovery", function()
 		expect(controller.binder:Get(mock)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

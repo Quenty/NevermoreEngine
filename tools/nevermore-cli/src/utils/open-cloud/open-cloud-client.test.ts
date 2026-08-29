@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
-import { OpenCloudClient } from './open-cloud-client.js';
+import {
+  OpenCloudClient,
+  getTaskReturnValues,
+  type LuauTask,
+} from './open-cloud-client.js';
 import type { RateLimiter } from './rate-limiter.js';
 
 vi.mock('@quenty/cli-output-helpers', () => ({
@@ -203,38 +207,157 @@ describe('OpenCloudClient.downloadPlaceAsync', () => {
   });
 });
 
-describe('OpenCloudClient.getLatestPlaceVersionAsync', () => {
+describe('OpenCloudClient.resolveLatestPlaceVersionAsync', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('returns the numeric revisionId from the Assets API', async () => {
-    const urls: string[] = [];
-    const fakeLimiter = {
+  /** Page the Assets API newest-first, as the real endpoint does. */
+  function makeVersionsLimiter(
+    pages: Array<Array<{ version: number; published?: boolean }>>,
+    urls: string[] = []
+  ): RateLimiter {
+    return {
       fetchAsync: vi.fn(async (url: string | URL) => {
         urls.push(String(url));
+        const page = pages[urls.length - 1] ?? [];
         return new Response(
-          JSON.stringify({ assetId: '22', revisionId: '5781' }),
+          JSON.stringify({
+            assetVersions: page.map((entry) => ({
+              path: `assets/22/versions/${entry.version}`,
+              // The real API omits `published` entirely on save-only versions.
+              ...(entry.published ? { published: true } : {}),
+            })),
+            ...(urls.length < pages.length
+              ? { nextPageToken: `token-${urls.length}` }
+              : {}),
+          }),
           { status: 200 }
         );
       }),
     } as unknown as RateLimiter;
+  }
 
+  it('resolves "saved" to the newest version of any kind', async () => {
+    const urls: string[] = [];
     const client = new OpenCloudClient({
       apiKey: 'test-key',
-      rateLimiter: fakeLimiter,
+      rateLimiter: makeVersionsLimiter(
+        [[{ version: 5781 }, { version: 5780, published: true }]],
+        urls
+      ),
     });
-    const version = await client.getLatestPlaceVersionAsync(1, 22);
 
-    expect(version).toBe(5781);
-    expect(urls[0]).toBe('https://apis.roblox.com/assets/v1/assets/22');
+    expect(await client.resolveLatestPlaceVersionAsync(1, 22, 'saved')).toBe(
+      5781
+    );
+    expect(urls).toHaveLength(1);
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/assets/v1/assets/22/versions?maxPageSize=50'
+    );
   });
 
-  it('throws when the Assets API omits a revisionId', async () => {
+  it('resolves "published" past unpublished saves at the head', async () => {
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [
+          { version: 5781 },
+          { version: 5780 },
+          { version: 5779, published: true },
+        ],
+      ]),
+    });
+
+    expect(
+      await client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).toBe(5779);
+  });
+
+  it('pages only until the newest published version is found', async () => {
+    const urls: string[] = [];
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(
+        [
+          [{ version: 300 }, { version: 299 }],
+          [{ version: 298, published: true }, { version: 297 }],
+          [{ version: 296, published: true }],
+        ],
+        urls
+      ),
+    });
+
+    expect(
+      await client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).toBe(298);
+    expect(urls).toHaveLength(2);
+    expect(urls[1]).toContain('pageToken=token-1');
+  });
+
+  it('throws when the place has never been published', async () => {
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([[{ version: 2 }, { version: 1 }]]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/no published version/);
+  });
+
+  it('refuses to guess when the API stops paging newest-first', async () => {
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [{ version: 1 }, { version: 2, published: true }],
+      ]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/no longer paging newest-first/);
+  });
+
+  it('refuses a "saved" lookup when the page is not newest-first', async () => {
+    // "saved" answers from the first entry, so the ordering guard has to check
+    // the whole page before returning or this silently pins the oldest build.
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [{ version: 1 }, { version: 2 }, { version: 3 }],
+      ]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
+    ).rejects.toThrowError(/no longer paging newest-first/);
+  });
+
+  it('reports the scan limit when every page is unpublished', async () => {
+    const pages = Array.from({ length: 25 }, (_, page) =>
+      Array.from({ length: 2 }, (_, i) => ({ version: 1000 - page * 2 - i }))
+    );
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(pages),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/in its most recent 1000 versions/);
+  });
+
+  it('throws on an unparseable version path', async () => {
     const fakeLimiter = {
       fetchAsync: vi.fn(
         async () =>
-          new Response(JSON.stringify({ assetId: '22' }), { status: 200 })
+          new Response(
+            JSON.stringify({
+              assetVersions: [{ path: 'assets/22/versions/' }],
+            }),
+            { status: 200 }
+          )
       ),
     } as unknown as RateLimiter;
 
@@ -243,8 +366,158 @@ describe('OpenCloudClient.getLatestPlaceVersionAsync', () => {
       rateLimiter: fakeLimiter,
     });
 
-    await expect(client.getLatestPlaceVersionAsync(1, 22)).rejects.toThrowError(
-      /no revisionId/
-    );
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
+    ).rejects.toThrowError(/unparseable version path/);
+  });
+});
+
+describe('getTaskReturnValues', () => {
+  function makeTask(overrides: Partial<LuauTask>): LuauTask {
+    return {
+      path: 'universes/1/places/2/versions/3/luau-execution-session-tasks/4',
+      createTime: '2026-01-01T00:00:00Z',
+      updateTime: '2026-01-01T00:01:00Z',
+      user: 'users/1',
+      state: 'COMPLETE',
+      script: 'return 1',
+      ...overrides,
+    };
+  }
+
+  it('returns the values natively typed, one entry per returned value', () => {
+    // Roblox serializes the return value itself, so a returned table arrives as
+    // real nested JSON — there is no JSON string to parse a second time.
+    const task = makeTask({
+      output: {
+        results: [{ slug: 'maid', counts: { passed: 1014 } }, 'str', 42, true],
+      },
+    });
+
+    expect(getTaskReturnValues(task)).toEqual([
+      { slug: 'maid', counts: { passed: 1014 } },
+      'str',
+      42,
+      true,
+    ]);
+  });
+
+  it('reports an empty result when the task returned nothing', () => {
+    expect(getTaskReturnValues(makeTask({ output: {} }))).toEqual([]);
+  });
+
+  it('reports undefined when a failed task carried no output at all', () => {
+    // An oversize return value fails the task with no output and no error
+    // message, so "nothing came back to read" has to stay distinguishable from
+    // "the script returned nothing" — only the former can fall back to logs.
+    const task = makeTask({ state: 'FAILED', output: undefined });
+
+    expect(getTaskReturnValues(task)).toBeUndefined();
+  });
+});
+
+describe('OpenCloudClient.getRawTaskLogsAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /**
+   * Page the logs endpoint the way the real one does: many messages inside each
+   * `luauExecutionSessionTaskLog`, and pagination over those entries rather than
+   * over messages.
+   */
+  function makeLogsLimiter(
+    pages: Array<Array<string[]>>,
+    urls: string[] = []
+  ): RateLimiter {
+    return {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        const page = pages[urls.length - 1] ?? [];
+        return new Response(
+          JSON.stringify({
+            luauExecutionSessionTaskLogs: page.map((messages) => ({
+              structuredMessages: messages.map((message) => ({
+                message,
+                createTime: '2026-08-27T00:00:00.38Z',
+                messageType: 'OUTPUT',
+              })),
+            })),
+            ...(urls.length < pages.length
+              ? { nextPageToken: `token-${urls.length}` }
+              : {}),
+          }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+  }
+
+  it('counts pages, entries and messages separately', async () => {
+    // Entries are not lines: the endpoint's page size applies to the log
+    // objects, each of which carries many messages. Conflating the two reads a
+    // 2-entry response as a 2-line run.
+    const client = new OpenCloudClient({
+      apiKey: 'test-key',
+      rateLimiter: makeLogsLimiter([[['a', 'b', 'c'], ['d']], [['e', 'f']]]),
+    });
+
+    const fetched = await client.getRawTaskLogsAsync('universes/1/tasks/2');
+
+    expect(fetched.text).toBe('a\nb\nc\nd\ne\nf');
+    expect(fetched.stats).toEqual({
+      requests: 2,
+      pages: 2,
+      entries: 3,
+      messages: 6,
+      chars: 11,
+    });
+  });
+
+  it('counts every attempt when empty logs were retried', async () => {
+    // The retry is invisible in the text it eventually returns, so a run whose
+    // logs only showed up on the third ask looks exactly like one that answered
+    // immediately. It is the difference between a slow API and a silent run.
+    vi.spyOn(global, 'setTimeout').mockImplementation((fn: () => void) => {
+      fn();
+      return 0 as unknown as NodeJS.Timeout;
+    });
+
+    // One unpaged response per attempt: two empty, then the logs. A limiter
+    // that pages would fold all three into a single attempt and prove nothing.
+    let attempt = 0;
+    const rateLimiter = {
+      fetchAsync: vi.fn(async () => {
+        attempt++;
+        return new Response(
+          JSON.stringify({
+            luauExecutionSessionTaskLogs:
+              attempt < 3
+                ? []
+                : [
+                    {
+                      structuredMessages: [
+                        {
+                          message: 'late',
+                          createTime: '2026-08-27T00:00:00.38Z',
+                          messageType: 'OUTPUT',
+                        },
+                      ],
+                    },
+                  ],
+          }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudClient({ apiKey: 'test-key', rateLimiter });
+
+    const fetched = await client.getRawTaskLogsAsync('universes/1/tasks/2');
+
+    expect(fetched.text).toBe('late');
+    expect(fetched.stats.requests).toBe(3);
+    expect(fetched.stats.pages).toBe(1);
+    expect(fetched.stats.messages).toBe(1);
   });
 });

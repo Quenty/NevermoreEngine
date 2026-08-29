@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ScoredAction = require("ScoredAction")
 local ScoredActionPicker = require("ScoredActionPicker")
@@ -38,10 +39,12 @@ local function setup(): any
 
 		newLooseAction = makeAction,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -60,7 +63,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(high:IsPreferred()).toBe(true)
 		expect(low:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("never prefers an action scored at -math.huge", function()
@@ -73,7 +76,7 @@ describe("ScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("drops the preference when the only action is disabled", function()
@@ -91,7 +94,7 @@ describe("ScoredActionPicker.Update", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("hands the preference to the best still-enabled action", function()
@@ -110,7 +113,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(high:IsPreferred()).toBe(false)
 		expect(low:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("gives the preference back when the action is re-enabled", function()
@@ -128,7 +131,7 @@ describe("ScoredActionPicker.Update", function()
 		picker:Update()
 		expect(action:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("drops the preference when the preferred action is removed", function()
@@ -144,7 +147,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(action:IsPreferred()).toBe(false)
 		expect(picker:HasActions()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("breaks score ties in favor of the older action", function()
@@ -160,7 +163,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(older:IsPreferred()).toBe(true)
 		expect(newer:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("skips past unscored actions to reach a scored one", function()
@@ -176,7 +179,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(scored:IsPreferred()).toBe(true)
 		expect(unscored:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("moves the preference when a score change reorders the actions", function()
@@ -196,7 +199,7 @@ describe("ScoredActionPicker.Update", function()
 		expect(first:IsPreferred()).toBe(false)
 		expect(second:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates an action destroyed without being removed", function()
@@ -211,7 +214,7 @@ describe("ScoredActionPicker.Update", function()
 			picker:Update()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -226,7 +229,7 @@ describe("ScoredActionPicker.AddAction", function()
 		expect(action:IsPreferred()).toBe(true)
 		expect(picker:HasActions()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("re-evaluates when an action's enabled state changes", function()
@@ -243,7 +246,7 @@ describe("ScoredActionPicker.AddAction", function()
 		expect(high:IsPreferred()).toBe(false)
 		expect(low:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores a repeated add of the same action", function()
@@ -257,7 +260,7 @@ describe("ScoredActionPicker.AddAction", function()
 
 		expect(picker:HasActions()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-table action", function()
@@ -268,7 +271,7 @@ describe("ScoredActionPicker.AddAction", function()
 			(picker :: any):AddAction("action")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -286,7 +289,7 @@ describe("ScoredActionPicker.RemoveAction", function()
 
 		expect(low:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("stops tracking the enabled state of a removed action", function()
@@ -303,7 +306,7 @@ describe("ScoredActionPicker.RemoveAction", function()
 
 		expect(remaining:IsPreferred()).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("ignores an action that was never added", function()
@@ -315,7 +318,7 @@ describe("ScoredActionPicker.RemoveAction", function()
 			picker:RemoveAction(action)
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-table action", function()
@@ -326,7 +329,7 @@ describe("ScoredActionPicker.RemoveAction", function()
 			(picker :: any):RemoveAction("action")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -343,6 +346,6 @@ describe("ScoredActionPicker.Destroy", function()
 
 		expect(action:IsPreferred()).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

@@ -1,3 +1,216 @@
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.8.0`, `@quenty/adorneeboundingbox@8.50.0`, `@quenty/adorneeutils@3.5.0`, `@quenty/attributeutils@14.38.0`, `@quenty/binder@14.45.0`, `@quenty/camera@14.54.0`, `@quenty/characterutils@12.43.0`, `@quenty/chatproviderservice@9.71.0`, `@quenty/clienttranslator@14.50.0`, `@quenty/coreguienabler@12.44.0`, `@quenty/datastore@13.55.0`, `@quenty/gameproductservice@14.71.0`, `@quenty/humanoidtracker@13.41.0`, `@quenty/humanoidutils@2.20.0`, `@quenty/instance-path@1.1.0`, `@quenty/jestutils@1.1.0`, `@quenty/permissionprovider@14.51.0`, `@quenty/playermock@1.8.0`, `@quenty/playerbinder@14.48.0`, `@quenty/playerhumanoidbinder@14.49.0`, `@quenty/playerutils@8.43.0`, `@quenty/ragdoll@15.68.0`, `@quenty/remoting@12.43.0`, `@quenty/resetservice@11.49.0`, `@quenty/rogue-humanoid@10.64.0`, `@quenty/rogue-properties@11.60.0`, `@quenty/saveslot@2.11.0`, `@quenty/scoredactionservice@16.57.0`, `@quenty/settings@11.71.0`, `@quenty/soundgroup@1.55.0`, `@quenty/steputils@3.9.0`, `@quenty/teleportserviceutils@10.5.0`, `@quenty/tie@10.49.0`, `@quenty/timedtween@7.48.0`, `@quenty/transitionmodel@7.50.0`, `@quenty/nevermore-cli@4.45.0`
+  - Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.10.0`, `@quenty/nevermore-test-runner@1.6.0`, `@quenty/cli-output-helpers@1.18.0`, `@quenty/nevermore-cli@4.44.0`, `@quenty/nevermore-template-helpers@1.19.0`, `@quenty/studio-bridge@0.19.0`
+  - Return a test run's results instead of scraping them out of its logs [#795](https://github.com/Quenty/NevermoreEngine/pull/795) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeutils@3.3.6`, `@quenty/observablecollection@12.48.1`
+  - Users/quenty/small fixes [#814](https://github.com/Quenty/NevermoreEngine/pull/814) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.8.0`, `@quenty/camera@14.52.0`, `@quenty/timedtween@7.46.0`, `@quenty/transitionmodel@7.48.0`
+  - users/quenty/transitions [#809](https://github.com/Quenty/NevermoreEngine/pull/809) ([@Quenty](https://github.com/Quenty))
+- `@quenty/hide@11.46.0`
+  - feat: StudioEditOnly binder [#808](https://github.com/Quenty/NevermoreEngine/pull/808) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.9.0`
+  - fix: Store save slot playtime synchronously [#812](https://github.com/Quenty/NevermoreEngine/pull/812) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/coreguiutils@10.24.0`, `@quenty/friendutils@12.39.0`
+  - refactor: Extract promiseRetryGetCore from RxFriendUtils [#811](https://github.com/Quenty/NevermoreEngine/pull/811) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/immediateutils@1.2.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - fix: jecs and iris nevermore-style integration, replace with separate forks [#805](https://github.com/Quenty/NevermoreEngine/pull/805) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/hide@11.46.0`
+  - fix: ...actually include StudioEditOnly within the service [#810](https://github.com/Quenty/NevermoreEngine/pull/810) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/friendutils@12.39.0`
+  - fix: Retry on GetCore failure [#807](https://github.com/Quenty/NevermoreEngine/pull/807) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Aug 16 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.4`
+  - fix(nevermore-cli): install with the project's package manager [#806](https://github.com/Quenty/NevermoreEngine/pull/806) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Sun Aug 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.1.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - feat: new immediateutils package [#804](https://github.com/Quenty/NevermoreEngine/pull/804) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.6`, `@quenty/ik@15.66.1`, `@quenty/loader@10.11.1`, `@quenty/ragdoll@15.65.1`, `@quenty/templateprovider@11.48.2`
+  - fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@15.65.0`
+  - feat(ragdoll): add ragdoll and unragdoll cmdr commands [#802](https://github.com/Quenty/NevermoreEngine/pull/802) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/bufferencoder@1.1.1`, `@quenty/queue@2.4.3`, `@quenty/racketingropeconstraint@12.51.1`, `@quenty/cli-output-helpers@1.17.2`, `nevermore-claude@0.2.1`, `@quenty/nevermore-cli-helpers@1.17.1`, `@quenty/nevermore-cli@4.43.3`, `@quenty/nevermore-deploy@1.1.1`, `@quenty/nevermore-template-helpers@1.18.2`, `nevermore-vscode@0.3.2`
+  - chore(package): correct repository directory and url metadata [#801](https://github.com/Quenty/NevermoreEngine/pull/801) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/chatproviderservice@9.68.0`, `@quenty/cmdrservice@13.57.0`, `@quenty/datastore@13.52.0`, `@quenty/saveslot@2.8.0`, `@quenty/secrets@7.65.0`, `@quenty/settings@11.68.0`
+  - feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- chore(hooks): lint the worktree the push actually targets [#800](https://github.com/Quenty/NevermoreEngine/pull/800) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidutils@2.18.0`
+  - feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Aug 12 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.47.1`, `@quenty/motor6d@7.52.1`, `@quenty/r15utils@13.36.2`, `@quenty/nevermore-cli@4.43.2`
+  - fix: A series of misc fixes + upgrade rojo [#798](https://github.com/Quenty/NevermoreEngine/pull/798) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.1`
+  - fix(nevermore-cli): stop failing a batch run whose tests all passed [#794](https://github.com/Quenty/NevermoreEngine/pull/794) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.7.1`
+  - fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.9.0`, `@quenty/saveslot@2.7.0`, `@quenty/nevermore-cli-helpers@1.17.0`, `@quenty/nevermore-cli@4.43.0`, `@quenty/nevermore-deploy@1.1.0`
+  - feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Aug 10 2026)
 
 #### 🐛 Bug Fix
