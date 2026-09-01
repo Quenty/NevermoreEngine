@@ -1,3 +1,16 @@
+# (Tue Sep 01 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.5.0`, `@quenty/jecs@1.4.0`
+  - feat: distributed iteration helper [#813](https://github.com/Quenty/NevermoreEngine/pull/813) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Fri Aug 28 2026)
 
 #### 🚀 Enhancement

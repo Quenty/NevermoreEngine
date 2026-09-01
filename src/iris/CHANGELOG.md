@@ -1,3 +1,16 @@
+# v1.4.0 (Tue Sep 01 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'users/euvinkeel/immediate-tweaks' of https://github.com/Quenty/NevermoreEngine into users/euvinkeel/immediate-tweaks ([@euvinkeel](https://github.com/euvinkeel))
+- Merge branch 'main' into users/euvinkeel/immediate-tweaks ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
