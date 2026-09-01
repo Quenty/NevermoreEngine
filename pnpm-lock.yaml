@@ -679,6 +679,21 @@ importers:
 
   src/binarysearch: {}
 
+  src/bindable-utils:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/symbol':
+        specifier: workspace:*
+        version: link:../symbol
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/binder:
     dependencies:
       '@quenty/baseobject':
@@ -3911,6 +3926,9 @@ importers:
 
   src/player-mock:
     dependencies:
+      '@quenty/bindable-utils':
+        specifier: workspace:*
+        version: link:../bindable-utils
       '@quenty/jestutils':
         specifier: workspace:*
         version: link:../jest-utils
@@ -3929,9 +3947,15 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/steputils':
         specifier: workspace:*
         version: link:../steputils
+      '@quenty/table':
+        specifier: workspace:*
+        version: link:../table
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -6121,6 +6145,9 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/bindable-utils':
+        specifier: workspace:*
+        version: link:../bindable-utils
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio
