@@ -645,6 +645,15 @@ local LOOKUPS: { [string]: LookupSpec } = {
 	-- performs the set on the mock local player, there being no CoreGui to affect) and read by tests
 	-- to assert the effect. Default true: CoreGui starts enabled on a real client.
 	["StarterGui.SetCoreGuiEnabled"] = { default = true, valueType = "boolean", keyKind = "EnumItem" },
+	-- UserInputService:IsKeyDown(keyCode) / :IsMouseButtonPressed(userInputType) -- the engine's
+	-- answer for what is physically held right now, which for a mock is whatever the test says. Keyed
+	-- by the EnumItem the call takes. Production reads these when it has to learn about a press that
+	-- began before it was listening (KeymapControls picking up a key already down at bind time, or
+	-- after the window regains focus); a test drives that path by writing the key down here and
+	-- releasing it through the "UserInputService.InputEnded" service signal. Default false: a fake
+	-- player holds nothing.
+	["UserInputService.IsKeyDown"] = { default = false, valueType = "boolean", keyKind = "EnumItem" },
+	["UserInputService.IsMouseButtonPressed"] = { default = false, valueType = "boolean", keyKind = "EnumItem" },
 	-- TeleportService teleports (Teleport / TeleportAsync / TeleportToPlaceInstance) -- client engine
 	-- effects recorded like SetCoreGuiEnabled: production (TeleportServiceUtils) writes a record keyed by
 	-- destination placeId on the mock, there being no real place to send it to, and a test reads it back
@@ -1419,6 +1428,125 @@ function PlayerMock.fireSignal(player: Player, eventName: string, ...: any)
 	-- one here also keeps this safe while the mock is being destroyed (see removeCharacter), when
 	-- parenting a new child would fail.
 	local existing = (player :: Instance):FindFirstChild(SIGNAL_NAME_PREFIX .. eventName)
+	if existing ~= nil then
+		(existing :: BindableEvent):Fire(...)
+	end
+end
+
+-- Prefix for the BindableEvent children backing client service events on a mock (see
+-- [PlayerMock.getServiceSignal]). The domain's "." flattens to "_" the way the lookup attribute
+-- names flatten theirs, an instance name being no more able to carry it than an attribute name.
+local SERVICE_SIGNAL_NAME_PREFIX = "PlayerMockServiceSignal_"
+
+local function getServiceSignalName(domain: string): string
+	return SERVICE_SIGNAL_NAME_PREFIX .. (string.gsub(domain, "%.", "_"))
+end
+
+-- Lazily-built set of the events reflection reports on a class, cached per class the way the
+-- `Player` set above is. Reflection is far too expensive to walk on every signal read, and these
+-- sit on the path production takes to connect an input event.
+local serviceEventNames: { [string]: { [string]: boolean } } = {}
+
+local function getServiceEventNames(className: string): { [string]: boolean }?
+	local names = serviceEventNames[className]
+	if names ~= nil then
+		return names
+	end
+
+	local ok, events = pcall(function()
+		return ReflectionService:GetEventsOfClass(className) :: { any }
+	end)
+	if not ok then
+		return nil
+	end
+
+	local built: { [string]: boolean } = {}
+	for _, reflectedEvent in events do
+		built[reflectedEvent.Name] = true
+	end
+	serviceEventNames[className] = built
+	return built
+end
+
+-- Typo protection for a `Service.Event` domain, checked against the engine's own reflection rather
+-- than an allowlist this module would have to keep in step: the class must exist and must really
+-- have that event.
+local function assertServiceEvent(domain: string): ()
+	local rawClassName, rawEventName = string.match(domain, "^(%a[%w_]*)%.(%a[%w_]*)$")
+	assert(rawClassName ~= nil, string.format("%q is not a Service.Event domain", domain))
+	assert(rawEventName ~= nil, string.format("%q is not a Service.Event domain", domain))
+
+	local className: string = rawClassName
+	local eventName: string = rawEventName
+
+	local names = getServiceEventNames(className)
+	assert(names ~= nil, string.format("%q is not a known class", className))
+	assert(names[eventName] == true, string.format("%q is not an event of %s", eventName, className))
+end
+
+--[=[
+	Reads a stand-in for a client service's event off a mock -- `UserInputService.WindowFocused`,
+	`UserInputService.InputEnded`, and the like -- as a `BindableEvent`-backed signal a test fires
+	through [PlayerMock.fireServiceSignal]. The engine fires the real ones off a window and a
+	keyboard a headless run has neither of, so production takes this branch the same way it takes
+	the [PlayerMock.bindInput] one:
+
+	```lua
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		return PlayerMock.getServiceSignal(localPlayer, "UserInputService.WindowFocused")
+	end
+	return UserInputService.WindowFocused
+	```
+
+	The domain is the canonical `Service.Event`, validated against the engine's reflection, so a
+	typo errors instead of returning a signal that can never fire. Unlike [PlayerMock.getSignal]
+	this is not restricted to `Player` -- any class's event can be stood in for, because nothing
+	here is read off the mock; the mock is only where the backing lives.
+
+	Arguments cross a `BindableEvent`, so they are marshalled: EnumItems, numbers and strings arrive
+	intact, but a table's methods and metatable do not survive. Hand a [PlayerMock.makeInputObject]
+	stand-in to [PlayerMock.fireInput] instead when the handler calls methods on it.
+
+	@param player Player -- must be a PlayerMock
+	@param domain string -- a canonical Service.Event, e.g. "UserInputService.WindowFocused"
+	@return RBXScriptSignal
+]=]
+function PlayerMock.getServiceSignal(player: Player, domain: string): RBXScriptSignal
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+	assert(type(domain) == "string", "Bad domain")
+	assertServiceEvent(domain)
+
+	local instance = player :: Instance
+	local name = getServiceSignalName(domain)
+
+	local existing = instance:FindFirstChild(name)
+	if existing ~= nil then
+		return (existing :: BindableEvent).Event
+	end
+
+	local bindableEvent = Instance.new("BindableEvent")
+	bindableEvent.Name = name
+	bindableEvent.Parent = instance
+	return bindableEvent.Event
+end
+
+--[=[
+	Fires the backing signal for a client service's event on a mock, so code connected through
+	[PlayerMock.getServiceSignal] observes the event as if the engine had fired it.
+
+	@param player Player -- must be a PlayerMock
+	@param domain string -- a canonical Service.Event, e.g. "UserInputService.WindowFocused"
+	@param ... any -- Event arguments delivered to connected handlers.
+]=]
+function PlayerMock.fireServiceSignal(player: Player, domain: string, ...: any)
+	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+	assert(type(domain) == "string", "Bad domain")
+	assertServiceEvent(domain)
+
+	-- No backing means no listeners ever connected -- firing would be unobservable, and creating one
+	-- here would be unsafe mid-teardown, exactly as in fireSignal.
+	local existing = (player :: Instance):FindFirstChild(getServiceSignalName(domain))
 	if existing ~= nil then
 		(existing :: BindableEvent):Fire(...)
 	end

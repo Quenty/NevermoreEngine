@@ -919,6 +919,26 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
+	it("answers the input-state domains false until a test says otherwise", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.E)).toBe(false)
+		expect(PlayerMock.readLookup(player, "UserInputService.IsMouseButtonPressed", Enum.UserInputType.MouseButton1)).toBe(
+			false
+		)
+
+		PlayerMock.writeLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.E, true)
+
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.E)).toBe(true)
+		-- Held keys are per key, and a key going down is not a mouse button going down.
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.Q)).toBe(false)
+		expect(PlayerMock.readLookup(player, "UserInputService.IsMouseButtonPressed", Enum.UserInputType.MouseButton1)).toBe(
+			false
+		)
+
+		player:Destroy()
+	end)
+
 	it("keys results independently per ID within a domain", function()
 		local player = PlayerMock.new({ UserId = 12345 })
 		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
@@ -1476,6 +1496,136 @@ describe("PlayerMock.getSignal", function()
 			PlayerMock.getSignal(folder :: any, "Chatted")
 		end).toThrow()
 		folder:Destroy()
+	end)
+end)
+
+describe("PlayerMock.getServiceSignal", function()
+	it("delivers fireServiceSignal arguments to a connected handler", function()
+		local player = PlayerMock.new()
+		local focused = {}
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
+			table.insert(focused, true)
+		end)
+
+		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+
+		expect(#focused).toBe(1)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("returns the same backing signal across calls", function()
+		local player = PlayerMock.new()
+		local count = 0
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function()
+			count += 1
+		end)
+
+		-- A second lookup must not create a second backing signal the fire misses.
+		PlayerMock.getServiceSignal(player, "UserInputService.InputEnded")
+		PlayerMock.fireServiceSignal(player, "UserInputService.InputEnded")
+
+		expect(count).toBe(1)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("keeps domains apart", function()
+		local player = PlayerMock.new()
+		local focusedCount = 0
+		local releasedCount = 0
+		local maid = Maid.new()
+
+		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
+			focusedCount += 1
+		end))
+		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusReleased"):Connect(function()
+			releasedCount += 1
+		end))
+
+		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocusReleased")
+
+		expect(focusedCount).toBe(0)
+		expect(releasedCount).toBe(1)
+
+		maid:DoCleaning()
+		player:Destroy()
+	end)
+
+	it("carries EnumItem arguments through intact", function()
+		local player = PlayerMock.new()
+		local seen: any = nil
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function(inputObject)
+			seen = inputObject
+		end)
+
+		PlayerMock.fireServiceSignal(
+			player,
+			"UserInputService.InputEnded",
+			PlayerMock.makeInputObject({
+				UserInputType = Enum.UserInputType.Keyboard,
+				KeyCode = Enum.KeyCode.E,
+			})
+		)
+
+		expect(seen).never.toBeNil()
+		expect(seen.KeyCode).toBe(Enum.KeyCode.E)
+		expect(seen.UserInputType).toBe(Enum.UserInputType.Keyboard)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("errors on a misspelled event name", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusd")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on an unknown class", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "UserInputServic.WindowFocused")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on a domain that is not Service.Event shaped", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "WindowFocused")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("throws when passed something that is not a PlayerMock", function()
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getServiceSignal(folder :: any, "UserInputService.WindowFocused")
+		end).toThrow()
+		folder:Destroy()
+	end)
+end)
+
+describe("PlayerMock.fireServiceSignal", function()
+	it("is a no-op when nothing ever connected", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+		end).never.toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on a misspelled event name", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocusd")
+		end).toThrow()
+		player:Destroy()
 	end)
 end)
 
