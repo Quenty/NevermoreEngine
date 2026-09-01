@@ -1,6 +1,6 @@
 {
   "name": "@quenty/ragdoll",
-  "version": "15.66.1",
+  "version": "15.68.0",
   "description": "Quenty's Ragdoll system for Roblox - Floppy fun ragdolls",
   "keywords": [
     "Roblox",
@@ -41,6 +41,7 @@
     "@quenty/enumutils": "workspace:*",
     "@quenty/hapticfeedbackutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/motor6d": "workspace:*",

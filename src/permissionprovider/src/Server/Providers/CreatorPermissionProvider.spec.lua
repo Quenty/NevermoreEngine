@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderUtils = require("PermissionProviderUtils")
@@ -32,7 +33,7 @@ local function setup()
 		userId = CREATOR_USER_ID,
 	})))
 
-	return {
+	local controller = {
 		provider = provider,
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
@@ -43,10 +44,14 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("CreatorPermissionProvider.new", function()
@@ -68,7 +73,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should treat the configured user as a creator", function()
@@ -77,7 +82,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should deny another user admin permission", function()
@@ -86,7 +91,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should deny another user creator permission", function()
@@ -95,7 +100,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should resolve synchronously for the IsAdmin wrapper", function()
@@ -104,7 +109,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 
 		expect(controller.provider:IsAdmin(player)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a non-player value", function()
@@ -114,7 +119,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 			controller.provider:PromiseIsPermissionLevel(nil :: any, PermissionLevel.ADMIN)
 		end).toThrow("Bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject an invalid permission level", function()
@@ -125,6 +130,6 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 			controller.provider:PromiseIsPermissionLevel(player, "not-a-level" :: any)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

@@ -11,6 +11,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
@@ -29,7 +30,7 @@ local function setup()
 	local service: TeleportDataService.TeleportDataService = serviceBag:GetService(TeleportDataService) :: any
 	serviceBag:Init()
 
-	return {
+	local controller = {
 		service = service,
 		fakePlayer = function(userId: number?): Player
 			return maid:Add(PlayerMock.new(if userId ~= nil then { UserId = userId } else nil))
@@ -40,10 +41,14 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared builder)", function()
@@ -58,7 +63,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared 
 		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "slot-111" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("carries base data under a shared provider key", function()
@@ -71,7 +76,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared 
 		local built = controller.await(controller.service:PromiseBuildTeleportData({}, { shared = "caller" }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ shared = "caller" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -89,7 +94,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (async build)", function(
 		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "async" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still carries a synchronous provider slice", function()
@@ -103,7 +108,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (async build)", function(
 		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "sync" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -117,7 +122,7 @@ describe("TeleportDataService unified arrived data", function()
 
 		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ region = "us" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reads the non-trusted band alone when there is no trusted band", function()
@@ -129,7 +134,7 @@ describe("TeleportDataService unified arrived data", function()
 
 		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ slot = "client" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("unions disjoint keys across both bands", function()
@@ -145,7 +150,7 @@ describe("TeleportDataService unified arrived data", function()
 			slot = "client",
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets the trusted band win on a key conflict (client cannot override the server)", function()
@@ -158,7 +163,7 @@ describe("TeleportDataService unified arrived data", function()
 
 		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("server-slot")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -176,7 +181,7 @@ describe("TeleportDataService band separation", function()
 		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "region"))).toEqual(true)
 		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "slot"))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("exposes only the non-trusted band through the non-trusted accessor", function()
@@ -189,7 +194,7 @@ describe("TeleportDataService band separation", function()
 
 		expect(controller.await(controller.service:PromiseNonTrustedArrivedData(player))).toEqual({ slot = "client" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports provenance: a trusted key is trusted, a client-only key is not", function()
@@ -203,7 +208,7 @@ describe("TeleportDataService band separation", function()
 		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "region"))).toEqual(true)
 		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports a conflicting key as trusted (the trusted value is the one that wins)", function()
@@ -216,7 +221,7 @@ describe("TeleportDataService band separation", function()
 
 		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -235,7 +240,7 @@ describe("TeleportDataService value accessors", function()
 		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "slot"))).toEqual(true)
 		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "missing"))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -255,7 +260,7 @@ describe("TeleportDataService per-player replication", function()
 		expect(controller.await(controller.service:PromiseArrivedValue(playerA, "slot"))).toEqual("a")
 		expect(controller.await(controller.service:PromiseArrivedValue(playerB, "slot"))).toEqual("b")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -276,7 +281,7 @@ describe("TeleportDataService arrival lifecycle", function()
 
 		expect(controller.await(promise)).toEqual({ region = "us", slot = "client" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("falls back to the trusted band alone when replication never arrives (timeout)", function()
@@ -292,7 +297,7 @@ describe("TeleportDataService arrival lifecycle", function()
 
 		expect(controller.await(promise)).toEqual({ region = "us" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves promptly for a mock with nothing injected -- there is no client to wait for", function()
@@ -301,7 +306,7 @@ describe("TeleportDataService arrival lifecycle", function()
 
 		expect(controller.await(controller.service:PromiseArrivedData(player))).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("seals on the first replication -- a later one is ignored (first wins)", function()
@@ -319,7 +324,7 @@ describe("TeleportDataService arrival lifecycle", function()
 
 		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("first")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("gives every reader the same sealed answer", function()
@@ -336,7 +341,7 @@ describe("TeleportDataService arrival lifecycle", function()
 		expect(controller.await(pendingRead)).toEqual("a")
 		expect(controller.await(laterRead)).toEqual("a")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -351,7 +356,7 @@ describe("TeleportDataService inject-before-read invariant", function()
 			controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects injecting a trusted override after the arrival has sealed", function()
@@ -364,6 +369,6 @@ describe("TeleportDataService inject-before-read invariant", function()
 			controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

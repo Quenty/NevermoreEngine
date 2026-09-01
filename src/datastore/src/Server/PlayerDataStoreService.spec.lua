@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -40,17 +41,21 @@ local function setup(mock)
 		end)
 	end
 
-	return {
+	local controller = {
 		service = service,
 		mock = mock,
 		promiseShutdown = promiseShutdown,
-		destroy = function()
+		Destroy = function(_self)
 			-- Otherwise a store the spec loaded outlives it with its auto-save loop running, and fires
 			-- inside a later package's window in the shared test place.
 			PromiseTestUtils.awaitSettled(promiseShutdown(), 5)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PlayerDataStoreService.PromiseDataStore", function()
@@ -60,7 +65,7 @@ describe("PlayerDataStoreService.PromiseDataStore", function()
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -71,12 +76,12 @@ describe("PlayerDataStoreService.PromiseDataStore", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadPromise:Wait())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -88,7 +93,7 @@ describe("PlayerDataStoreService configuration guards", function()
 			controller.service:SetDataStoreName("X")
 		end).toThrow("Already started, cannot configure")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when SetDataStoreScope is called after start", function()
@@ -98,7 +103,7 @@ describe("PlayerDataStoreService configuration guards", function()
 			controller.service:SetDataStoreScope("X")
 		end).toThrow("Already started, cannot configure")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when SetRobloxDataStore is called after the manager is built", function()
@@ -107,7 +112,7 @@ describe("PlayerDataStoreService configuration guards", function()
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -115,7 +120,7 @@ describe("PlayerDataStoreService configuration guards", function()
 			controller.service:SetRobloxDataStore(controller.mock)
 		end).toThrow("Already built manager")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when SetRobloxDataStore is given a bad datastore", function()
@@ -129,7 +134,7 @@ describe("PlayerDataStoreService configuration guards", function()
 			controller.service:SetRobloxDataStore({})
 		end).toThrow("Bad robloxDataStore")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -140,12 +145,12 @@ describe("PlayerDataStoreService.PromiseAddRemovingCallback", function()
 		local promise = controller.service:PromiseAddRemovingCallback(function() end)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -159,7 +164,7 @@ describe("PlayerDataStoreService failure handling", function()
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -171,7 +176,7 @@ describe("PlayerDataStoreService failure handling", function()
 		expect(PromiseTestUtils.awaitSettled(loadPromise, 5)).toEqual(true)
 		expect((loadPromise:Wait())).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -184,14 +189,14 @@ describe("PlayerDataStoreService server shutdown", function()
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		local _ok, dataStore = promise:Yield()
 
 		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10) then
 			expect("load hung").toEqual("load settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -199,7 +204,7 @@ describe("PlayerDataStoreService server shutdown", function()
 
 		if not PromiseTestUtils.awaitSettled(controller.promiseShutdown({ 1 }), 10) then
 			expect("shutdown never flushed").toEqual("shutdown flushed")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -208,7 +213,7 @@ describe("PlayerDataStoreService server shutdown", function()
 		expect(raw.coins).toEqual(7)
 		expect(getmetatable(dataStore)).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -227,14 +232,18 @@ describe("PlayerDataStoreService datastore configuration", function()
 		configure(service)
 		serviceBag:Start()
 
-		return {
+		local controller = {
 			service = service,
 			mock = mock,
-			destroy = function()
+			Destroy = function(_self)
 				DataStoreTestUtils.awaitServiceShutdown(service)
 				maid:DoCleaning()
 			end,
 		}
+
+		maid:GiveTask(JestUtils.afterThis(controller))
+
+		return controller
 	end
 
 	it("forwards configuration through to the datastores the manager creates", function()
@@ -248,7 +257,7 @@ describe("PlayerDataStoreService datastore configuration", function()
 		local promise = controller.service:PromiseDataStore(1)
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		local _ok, dataStore = promise:Yield()
@@ -257,7 +266,7 @@ describe("PlayerDataStoreService datastore configuration", function()
 		expect((dataStore:GetLoadRetryOptions())).toEqual(retryOptions)
 		expect((dataStore:GetSessionMessagingCloseDelaySeconds())).toEqual(0.5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects configuration after start", function()
@@ -273,6 +282,6 @@ describe("PlayerDataStoreService datastore configuration", function()
 			controller.service:SetSessionMessagingCloseDelaySeconds(0.5)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

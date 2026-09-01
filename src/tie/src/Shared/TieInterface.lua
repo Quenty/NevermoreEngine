@@ -66,7 +66,7 @@ function TieInterface.IsImplemented<T>(self: TieInterface<T>): boolean
 				return false
 			end
 
-			if definition:GetValidContainerNameSet(interfaceTieRealm)[implParent.Name] then
+			if not definition:GetValidContainerNameSet(interfaceTieRealm)[implParent.Name] then
 				return false
 			end
 		end
@@ -109,7 +109,7 @@ function TieInterface.ObserveIsImplemented<T>(self: TieInterface<T>): Observable
 
 	if implParent then
 		if adornee then
-			return definition:ObserveIsImplementationOn(implParent, adornee, interfaceTieRealm)
+			return definition:ObserveIsImplementedOn(implParent, adornee, interfaceTieRealm)
 		else
 			return definition:ObserveIsImplementation(implParent, interfaceTieRealm)
 		end

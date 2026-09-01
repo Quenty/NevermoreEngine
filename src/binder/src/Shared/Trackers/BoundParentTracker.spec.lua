@@ -9,6 +9,8 @@ local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
 local BoundParentTracker = require("BoundParentTracker")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -29,6 +31,8 @@ local function makeClass()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	specCounter += 1
 	local suffix = specCounter
 
@@ -37,8 +41,8 @@ local function setup()
 	container.Name = "BoundParentTrackerSpecContainer"
 	container.Parent = workspace
 
-	local instances = {}
-	local cleanups = {}
+	local instances: { Instance } = {}
+	local cleanups: { any } = {}
 	local booted = false
 
 	local binder = Binder.new(string.format("BoundParentTrackerSpecTag_%d", suffix), makeClass() :: any)
@@ -74,28 +78,36 @@ local function setup()
 		return tracker.Class.Value
 	end
 
-	return {
+	maid:GiveTask(function()
+		for _, item in cleanups do
+			pcall(function()
+				item:Destroy()
+			end)
+		end
+		serviceBag:Destroy()
+		for _, inst in instances do
+			pcall(function()
+				inst:Destroy()
+			end)
+		end
+		container:Destroy()
+	end)
+
+	local controller = {
 		container = container,
 		binder = binder,
 		newInstance = newInstance,
 		track = track,
 		boot = boot,
 		awaitChange = awaitChange,
-		destroy = function()
-			for _, item in cleanups do
-				pcall(function()
-					item:Destroy()
-				end)
-			end
-			serviceBag:Destroy()
-			for _, inst in instances do
-				pcall(function()
-					inst:Destroy()
-				end)
-			end
-			container:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("BoundParentTracker.new()", function()
@@ -118,7 +130,7 @@ describe("BoundParentTracker tracking", function()
 		local tracker = controller.track(BoundParentTracker.new(controller.binder, child))
 		expect(tracker.Class.Value).toEqual(controller.binder:Get(parent))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the child is reparented off the bound parent", function()
@@ -136,7 +148,7 @@ describe("BoundParentTracker tracking", function()
 		child.Parent = controller.container
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("clears the value when the parent's class is unbound", function()
@@ -154,6 +166,6 @@ describe("BoundParentTracker tracking", function()
 		controller.binder:Untag(parent)
 		expect(controller.awaitChange(tracker, class)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

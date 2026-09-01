@@ -16,6 +16,9 @@
       },
       "nevermore-test-runner": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

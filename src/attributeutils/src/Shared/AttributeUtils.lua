@@ -12,11 +12,34 @@ local CancelToken = require("CancelToken")
 local Maid = require("Maid")
 local Promise = require("Promise")
 
-local DEFAULT_PREDICATE = function(value)
+local AttributeUtils = {}
+
+--[=[
+	Predicate run against the current value of an attribute.
+	@type AttributePredicate (value: any) -> boolean
+	@within AttributeUtils
+]=]
+export type AttributePredicate = (value: any) -> boolean
+
+--[=[
+	Subset of the [Binder] API that [AttributeUtils.bindToBinder] needs. Declared
+	structurally since this package cannot depend upon the binder package.
+
+	@type BinderLike { Bind: (self: any, inst: Instance) -> any, ... }
+	@within AttributeUtils
+]=]
+export type BinderLike = {
+	Bind: (self: any, inst: Instance) -> any,
+	BindClient: (self: any, inst: Instance) -> (),
+	Unbind: (self: any, inst: Instance) -> (),
+	UnbindClient: (self: any, inst: Instance) -> (),
+	Get: (self: any, inst: Instance) -> any,
+	ObserveInstance: (self: any, inst: Instance, callback: (any) -> ()) -> () -> (),
+}
+
+local DEFAULT_PREDICATE: AttributePredicate = function(value)
 	return value ~= nil
 end
-
-local AttributeUtils = {}
 
 type ValidAttributeMap = { [string]: true }
 
@@ -60,25 +83,26 @@ end
 
 	@param instance Instance
 	@param attributeName string
-	@param predicate function | nil
-	@param cancelToken CancelToken
+	@param predicate AttributePredicate?
+	@param cancelToken CancelToken?
 	@return Promise<unknown>
 ]=]
 function AttributeUtils.promiseAttribute(
 	instance: Instance,
 	attributeName: string,
-	predicate,
+	predicate: AttributePredicate?,
 	cancelToken: CancelToken.CancelToken?
 ): Promise.Promise<unknown>
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
+	assert(type(predicate) == "function" or predicate == nil, "Bad predicate")
 	assert(CancelToken.isCancelToken(cancelToken) or cancelToken == nil, "Bad cancelToken")
 
-	predicate = predicate or DEFAULT_PREDICATE
+	local checkValue: AttributePredicate = predicate or DEFAULT_PREDICATE
 
 	do
 		local attributeValue = instance:GetAttribute(attributeName)
-		if predicate(attributeValue) then
+		if checkValue(attributeValue) then
 			return Promise.resolved(attributeValue)
 		end
 	end
@@ -95,7 +119,7 @@ function AttributeUtils.promiseAttribute(
 
 	maid:GiveTask(instance:GetAttributeChangedSignal(attributeName):Connect(function()
 		local attributeValue = instance:GetAttribute(attributeName)
-		if predicate(attributeValue) then
+		if checkValue(attributeValue) then
 			promise:Resolve(attributeValue)
 		end
 	end))
@@ -116,7 +140,7 @@ end
 	@param binder Binder<T>
 	@return Maid
 ]=]
-function AttributeUtils.bindToBinder(instance: Instance, attributeName: string, binder): Maid.Maid
+function AttributeUtils.bindToBinder(instance: Instance, attributeName: string, binder: BinderLike): Maid.Maid
 	assert(binder, "Bad binder")
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(type(attributeName) == "string", "Bad attributeName")
@@ -178,19 +202,20 @@ end
 
 	@param instance Instance
 	@param attributeName string
-	@param default any
-	@return any? -- The value of the attribute
+	@param default T
+	@return T -- The value of the attribute
 ]=]
-function AttributeUtils.initAttribute(instance: Instance, attributeName: string, default: any): any
+function AttributeUtils.initAttribute<T>(instance: Instance, attributeName: string, default: T): T
 	assert(typeof(instance) == "Instance", "Bad instance")
 	assert(typeof(attributeName) == "string", "Bad attributeName")
 
 	local value = instance:GetAttribute(attributeName)
 	if value == nil then
-		instance:SetAttribute(attributeName, default)
-		value = default
+		instance:SetAttribute(attributeName, default :: any)
+		return default
 	end
-	return value
+
+	return value :: any
 end
 
 --[=[
@@ -198,16 +223,19 @@ end
 	instead.
 	@param instance Instance
 	@param attributeName string
-	@param default T?
-	@return T?
+	@param default T
+	@return T
 ]=]
-function AttributeUtils.getAttribute(instance: Instance, attributeName: string, default: any): any
+function AttributeUtils.getAttribute<T>(instance: Instance, attributeName: string, default: T): T
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(type(attributeName) == "string", "Bad attributeName")
+
 	local value = instance:GetAttribute(attributeName)
 	if value == nil then
 		return default
 	end
 
-	return value
+	return value :: any
 end
 
 --[=[
@@ -215,7 +243,7 @@ end
 
 	@param instance Instance
 ]=]
-function AttributeUtils.removeAllAttributes(instance: Instance)
+function AttributeUtils.removeAllAttributes(instance: Instance): ()
 	assert(typeof(instance) == "Instance", "Bad instance")
 
 	for key, _ in instance:GetAttributes() do

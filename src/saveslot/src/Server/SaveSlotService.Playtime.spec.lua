@@ -1,10 +1,10 @@
---!nonstrict
+--!strict
 --[[
 	Playtime accrual persists on the save that asked for it. The flush runs from a saving callback,
 	so a value that only reached the store through the deferred attribute listener would land one
 	save late -- and the final save-on-leave would drop the tail of the session entirely.
 
-	@class SaveSlotPlaytime.spec.lua
+	@class SaveSlotService.Playtime.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -12,6 +12,7 @@ local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local HasSaveSlotsDataStore = require("HasSaveSlotsDataStore")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local Promise = require("Promise")
@@ -31,8 +32,10 @@ local SESSION_SECONDS = 120
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local playerDataStoreService = serviceBag:GetService(PlayerDataStoreService)
-	local sharedDataStoreService = serviceBag:GetService(SaveSlotSharedDataStoreService)
+	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
+		serviceBag:GetService(PlayerDataStoreService) :: any
+	local sharedDataStoreService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
+		serviceBag:GetService(SaveSlotSharedDataStoreService) :: any
 	serviceBag:Init()
 
 	local mock = DataStoreMock.new()
@@ -64,7 +67,7 @@ local function setup()
 	}))
 	await(slotsDataStore:PromiseSlotsLoaded(), "slots loaded")
 
-	return {
+	local controller = {
 		await = await,
 		mock = mock,
 		dataStore = dataStore,
@@ -74,8 +77,12 @@ local function setup()
 		beginBackdatedSession = function(): string
 			local slotId = await(slotsDataStore:PromiseCreateSlot(1), "create")
 			await(slotsDataStore:PromiseSelectSlot(slotId), "select")
-			slotsDataStore._playSessionStart -= SESSION_SECONDS
-			slotsDataStore._playSessionLastFlush -= SESSION_SECONDS
+			slotsDataStore._playSessionStart = assert(slotsDataStore._playSessionStart, "No _playSessionStart")
+				- SESSION_SECONDS
+			slotsDataStore._playSessionLastFlush = assert(
+				slotsDataStore._playSessionLastFlush,
+				"No _playSessionLastFlush"
+			) - SESSION_SECONDS
 			return slotId
 		end,
 		storedMetadata = function(slotId: string): any
@@ -84,11 +91,15 @@ local function setup()
 			local metadata = system and system[SaveSlotConstants.METADATA_STORE_KEY]
 			return metadata and metadata[slotId]
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("save slot playtime", function()
@@ -104,7 +115,7 @@ describe("save slot playtime", function()
 		expect(stored.TimePlayed).toBeGreaterThanOrEqual(SESSION_SECONDS)
 		expect(stored.LastSessionLength).toBeGreaterThanOrEqual(SESSION_SECONDS)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps the replicated attribute and the stored value in step", function()
@@ -113,10 +124,9 @@ describe("save slot playtime", function()
 
 		controller.await(controller.dataStore:Save(), "save")
 
-		expect(controller.slotsDataStore:GetSlotMetadata(slotId).TimePlayed).toEqual(
-			controller.storedMetadata(slotId).TimePlayed
-		)
+		local metadata = assert(controller.slotsDataStore:GetSlotMetadata(slotId), "No slot metadata")
+		expect(metadata.TimePlayed).toEqual(controller.storedMetadata(slotId).TimePlayed)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

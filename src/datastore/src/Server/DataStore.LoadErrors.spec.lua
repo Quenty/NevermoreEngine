@@ -36,7 +36,7 @@ describe("shared load promise fan-out", function()
 		expect(valueB).toEqual(2)
 		expect(all).toEqual({ a = 1, b = 2 })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves all consumers of a slow (yielding) load attached during the yield", function()
@@ -59,7 +59,7 @@ describe("shared load promise fan-out", function()
 		expect(results[2]).toEqual(1)
 		expect(results[3]).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("delivers the rejection to every consumer when the shared load fails", function()
@@ -79,7 +79,7 @@ describe("shared load promise fan-out", function()
 			return aRejected and bRejected
 		end, 5)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -97,7 +97,7 @@ describe("auto-save loop", function()
 		end, 6)
 		expect(saved).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("stops auto-saving after the datastore is destroyed", function()
@@ -120,6 +120,6 @@ describe("auto-save loop", function()
 		expect(settled).toEqual(false)
 		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(before)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

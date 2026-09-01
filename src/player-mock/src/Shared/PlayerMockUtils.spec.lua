@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockUtils = require("PlayerMockUtils")
@@ -15,61 +16,72 @@ local PlayerMockUtils = require("PlayerMockUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-local afterEach = Jest.Globals.afterEach
 
 -- Sentinel standing in for a nil emission, so emissions can live in an array
 local NONE = "none"
 
-local function subscribeSeen(maid: Maid.Maid): { any }
-	local seen: { any } = {}
-	maid:GiveTask(PlayerMockUtils.observeMockedLocalPlayer():Subscribe(function(localPlayer: Player?)
-		table.insert(seen, if localPlayer ~= nil then localPlayer else NONE)
-	end))
-	return seen
+local function setup()
+	local maid = Maid.new()
+
+	local controller = {
+		newPlayer = function(): Player
+			local player = PlayerMock.new({ UserId = 1 })
+			player.Parent = Workspace
+			maid:GiveTask(player)
+			return player
+		end,
+		designate = function(player: Player?)
+			maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
+		end,
+		subscribeSeen = function(): { any }
+			local seen: { any } = {}
+			maid:GiveTask(PlayerMockUtils.observeMockedLocalPlayer():Subscribe(function(localPlayer: Player?)
+				table.insert(seen, if localPlayer ~= nil then localPlayer else NONE)
+			end))
+			return seen
+		end,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PlayerMockUtils.observeMockedLocalPlayer", function()
-	afterEach(function()
-		PlayerMock.setMockedLocalPlayer(nil)
-	end)
-
 	it("emits the current designation on subscribe", function()
-		local player = PlayerMock.new({ UserId = 1 })
-		player.Parent = Workspace
-		PlayerMock.setMockedLocalPlayer(player)
+		local controller = setup()
 
-		local maid = Maid.new()
-		local seen = subscribeSeen(maid)
+		local player = controller.newPlayer()
+		controller.designate(player)
 
-		expect(seen).toEqual({ player })
+		expect(controller.subscribeSeen()).toEqual({ player })
 
-		maid:DoCleaning()
-		player:Destroy()
+		controller:Destroy()
 	end)
 
 	it("emits nil on subscribe when nothing is designated", function()
-		local maid = Maid.new()
-		local seen = subscribeSeen(maid)
+		local controller = setup()
 
-		expect(seen).toEqual({ NONE })
+		expect(controller.subscribeSeen()).toEqual({ NONE })
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("follows the designation changing after subscribe", function()
-		local player = PlayerMock.new({ UserId = 1 })
-		player.Parent = Workspace
+		local controller = setup()
 
-		local maid = Maid.new()
-		local seen = subscribeSeen(maid)
+		local player = controller.newPlayer()
+		local seen = controller.subscribeSeen()
 
-		PlayerMock.setMockedLocalPlayer(player)
+		controller.designate(player)
 		expect(seen[#seen]).toBe(player)
 
 		PlayerMock.setMockedLocalPlayer(nil)
 		expect(seen[#seen]).toBe(NONE)
 
-		maid:DoCleaning()
-		player:Destroy()
+		controller:Destroy()
 	end)
 end)

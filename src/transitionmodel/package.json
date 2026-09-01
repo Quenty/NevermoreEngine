@@ -1,6 +1,6 @@
 {
   "name": "@quenty/transitionmodel",
-  "version": "7.48.0",
+  "version": "7.50.0",
   "description": "Helps with Gui visiblity showing and hiding",
   "keywords": [
     "Roblox",
@@ -34,6 +34,7 @@
     "@quenty/blend": "workspace:*",
     "@quenty/ducktype": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

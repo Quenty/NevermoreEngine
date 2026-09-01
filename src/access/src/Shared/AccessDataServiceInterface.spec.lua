@@ -11,6 +11,7 @@ local AccessDataServiceInterface = require("AccessDataServiceInterface")
 local AccessFact = require("AccessFact")
 local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -27,7 +28,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
@@ -43,10 +44,14 @@ local function setup()
 				accessDataService:RegisterFeature(maid:Add(AccessFeature.anyOf(featureName, { `{featureName}Fact` })))
 			)
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessDataServiceInterface", function()
@@ -56,7 +61,7 @@ describe("AccessDataServiceInterface", function()
 
 		expect(AccessDataServiceInterface:HasImplementation(ReplicatedStorage)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("answers by name through the tie", function()
@@ -70,7 +75,7 @@ describe("AccessDataServiceInterface", function()
 			"boolean"
 		)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lists what is registered through the tie", function()
@@ -80,7 +85,7 @@ describe("AccessDataServiceInterface", function()
 		expect(tie:HasFeature(WellKnownAccessFeatureNames.OWNS_GAME)).toEqual(true)
 		expect(tie:HasFeature("nosuch")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -94,7 +99,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reads a denial as not allowed", function()
@@ -103,7 +108,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("fails closed on unresolved, since a boolean cannot carry a third answer", function()
@@ -123,7 +128,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses a feature nobody registered, so a typo is loud", function()
@@ -133,7 +138,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 			controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chpaters")
 		end).toThrow("No feature registered")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -155,6 +160,6 @@ describe("AccessDataService.ObserveIsFeatureAllowedByName", function()
 		controller.accessDataService:SetFactOverride(player, "chaptersFact", true)
 		expect(last).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

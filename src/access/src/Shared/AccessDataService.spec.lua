@@ -12,6 +12,7 @@ local AccessFactPriority = require("AccessFactPriority")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -30,7 +31,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
 		maid = maid,
@@ -74,10 +75,14 @@ local function setup()
 			end))
 			return last
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessDataService registration", function()
@@ -91,7 +96,7 @@ describe("AccessDataService registration", function()
 			controller.fact("ownsChapterPass", false, { source = "other" })
 		end).toThrow("already has a layer at priority")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses two layers of one fact sourced the same", function()
@@ -102,7 +107,7 @@ describe("AccessDataService registration", function()
 			controller.fact("ownsChapterPass", false, { priority = AccessFactPriority.ELEVATED })
 		end).toThrow("already has a layer sourced")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses a layer registering above the override priority", function()
@@ -112,7 +117,7 @@ describe("AccessDataService registration", function()
 			controller.fact("ownsChapterPass", true, { priority = AccessFactPriority.OVERRIDE })
 		end).toThrow("cannot register at or above the override priority")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses two features under one name", function()
@@ -123,7 +128,7 @@ describe("AccessDataService registration", function()
 			controller.feature("chapters", {})
 		end).toThrow("already registered")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("unregisters a fact when the registration is disposed", function()
@@ -139,7 +144,7 @@ describe("AccessDataService registration", function()
 		dispose()
 		expect(controller.accessDataService:HasFact("temporary")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lists what is registered, for console commands working from strings", function()
@@ -157,7 +162,7 @@ describe("AccessDataService registration", function()
 			WellKnownAccessFeatureNames.OWNS_GAME,
 		})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -177,7 +182,7 @@ describe("AccessDataService.AddAccessFact", function()
 		expect(AccessStateUtils.isAllowed(first :: any)).toEqual(true)
 		expect(AccessStateUtils.isAllowed(second :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -193,7 +198,7 @@ describe("AccessDataService.ObserveFeature", function()
 
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("follows the facts as they resolve", function()
@@ -216,7 +221,7 @@ describe("AccessDataService.ObserveFeature", function()
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
 		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not stall on a fact the feature never declared", function()
@@ -231,7 +236,7 @@ describe("AccessDataService.ObserveFeature", function()
 
 		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reads a fact this realm never registered as unresolved, without taking the subscriber down", function()
@@ -251,7 +256,7 @@ describe("AccessDataService.ObserveFeature", function()
 
 		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reads a fact nothing here has heard of as unresolved rather than throwing", function()
@@ -274,7 +279,7 @@ describe("AccessDataService.ObserveFeature", function()
 		expect((report :: any).state).toEqual(AccessFactContributionState.UNRESOLVED)
 		expect((report :: any).value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps each player's verdict to themselves", function()
@@ -303,7 +308,7 @@ describe("AccessDataService.ObserveFeature", function()
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -319,7 +324,7 @@ describe("AccessDataService.PromiseFeature", function()
 
 		expect(promise:IsPending()).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles once a real verdict arrives", function()
@@ -335,7 +340,7 @@ describe("AccessDataService.PromiseFeature", function()
 		local _ok, state = promise:Yield()
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -356,7 +361,7 @@ describe("AccessDataService.SetFactOverride", function()
 		controller.accessDataService:SetFactOverride(player, "ownsChapterPass", true)
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("forces unresolved, which is the state hardest to reproduce by hand", function()
@@ -374,7 +379,7 @@ describe("AccessDataService.SetFactOverride", function()
 
 		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("restores the real value when the override is disposed", function()
@@ -394,7 +399,7 @@ describe("AccessDataService.SetFactOverride", function()
 		clear()
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not leak one player's override onto another", function()
@@ -412,7 +417,7 @@ describe("AccessDataService.SetFactOverride", function()
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses a fact nobody registered, so a typo is loud", function()
@@ -422,7 +427,7 @@ describe("AccessDataService.SetFactOverride", function()
 			controller.accessDataService:SetFactOverride(controller.fakePlayer(), "onwsGame", true)
 		end).toThrow("No fact registered")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("clears every override for a player at once", function()
@@ -441,7 +446,7 @@ describe("AccessDataService.SetFactOverride", function()
 
 		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -457,7 +462,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("purchase")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets the highest-priority layer win", function()
@@ -472,7 +477,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("allowlist")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("falls through a layer that abstains", function()
@@ -487,7 +492,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("groupRank")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("falls through a layer that answers unresolved to one that knows", function()
@@ -504,7 +509,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("groupRank")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lists every layer, highest priority first, with the losers still visible", function()
@@ -530,7 +535,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.layers[4].source).toEqual("replicated")
 		expect(report.layers[4].contributes).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("shows an override as its own layer with the real answer still underneath", function()
@@ -549,7 +554,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.layers[2].source).toEqual("purchase")
 		expect(report.layers[2].value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is unresolved with no decider when every layer abstains", function()
@@ -563,7 +568,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		expect(report.value).toEqual(nil)
 		expect(report.decidedBy).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -582,7 +587,7 @@ describe("AccessDataService.ObserveFeatureReport", function()
 		expect(report.facts.ownsChapterPass.decidedBy).toEqual("purchase")
 		expect(report.facts.ownsChapterPass.value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -601,7 +606,7 @@ describe("AccessDataService.TeardownPlayer", function()
 
 		expect(promise:IsRejected()).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves a promise that already settled alone", function()
@@ -617,7 +622,7 @@ describe("AccessDataService.TeardownPlayer", function()
 
 		expect(promise:IsFulfilled()).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("completes a live feature subscription", function()
@@ -637,7 +642,7 @@ describe("AccessDataService.TeardownPlayer", function()
 		controller.accessDataService:TeardownPlayer(player)
 		expect(completed).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("completes rather than hanging for a player who already left", function()
@@ -657,7 +662,7 @@ describe("AccessDataService.TeardownPlayer", function()
 
 		expect(completed).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("drops the player's overrides", function()
@@ -670,7 +675,7 @@ describe("AccessDataService.TeardownPlayer", function()
 
 		expect(controller.accessDataService:ObserveIsPlayerPresent(player)).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("drops every fact layer's cached resolution for that player", function()
@@ -688,7 +693,7 @@ describe("AccessDataService.TeardownPlayer", function()
 			expect((layer :: any)._observableByPlayer[player]).toEqual(nil)
 		end
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -706,6 +711,6 @@ describe("AccessDataService.ObserveIsPlayerPresent", function()
 		controller.accessDataService:TeardownPlayer(player)
 		expect(present).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

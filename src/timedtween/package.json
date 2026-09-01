@@ -1,6 +1,6 @@
 {
   "name": "@quenty/timedtween",
-  "version": "7.46.0",
+  "version": "7.48.0",
   "description": "Linear timed tweening model",
   "keywords": [
     "Roblox",
@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/basicpane": "workspace:*",
     "@quenty/blend": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/math": "workspace:*",

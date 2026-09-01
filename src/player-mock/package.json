@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playermock",
-  "version": "1.6.1",
+  "version": "1.8.0",
   "description": "Mock Player instance standing in for a Player in tests",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

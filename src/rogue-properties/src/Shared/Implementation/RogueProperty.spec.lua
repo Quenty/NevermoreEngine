@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
@@ -18,14 +20,15 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("RoguePropertyService"))
 	serviceBag:Init()
 	serviceBag:Start()
 
 	-- Adornees must live in the DataModel or CollectionService.GetInstanceAddedSignal (and
 	-- therefore the modifier binders) never fire.
-	local container = Instance.new("Folder")
+	local container = maid:Add(Instance.new("Folder"))
 	container.Name = "RoguePropertySpecContainer"
 	container.Parent = workspace
 
@@ -109,7 +112,7 @@ local function setup()
 		return value
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		container = container,
 		newCombatStats = newCombatStats,
@@ -120,11 +123,14 @@ local function setup()
 		addAdditive = addAdditive,
 		addSetter = addSetter,
 		awaitValue = awaitValue,
-		destroy = function(_self: any)
-			serviceBag:Destroy()
-			container:Destroy()
+		Destroy = function(_self: any)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("RogueProperty scalar usage", function()
@@ -132,14 +138,14 @@ describe("RogueProperty scalar usage", function()
 		local controller = setup()
 		local properties = controller.newCombatStats()
 		expect(properties.Health:GetBaseValue()).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose the value through the .Value getter", function()
 		local controller = setup()
 		local properties = controller.newCombatStats()
 		expect(properties.Health.Value).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should update the base value through SetBaseValue", function()
@@ -148,7 +154,7 @@ describe("RogueProperty scalar usage", function()
 		properties.Health:SetBaseValue(42)
 		expect(properties.Health:GetBaseValue()).toEqual(42)
 		expect(properties.Health.Value).toEqual(42)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should update the value through the .Value setter", function()
@@ -156,7 +162,7 @@ describe("RogueProperty scalar usage", function()
 		local properties = controller.newCombatStats()
 		properties.Health.Value = 25
 		expect(properties.Health.Value).toEqual(25)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when assigning a value of the wrong type", function()
@@ -165,7 +171,7 @@ describe("RogueProperty scalar usage", function()
 		expect(function()
 			properties.Health.Value = "not a number"
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should return the same cached observable on repeated Observe calls", function()
@@ -175,14 +181,14 @@ describe("RogueProperty scalar usage", function()
 		local properties = controller.newCombatStats()
 		local health = properties.Health
 		expect(health:Observe()).toEqual(health:Observe())
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose a Changed event", function()
 		local controller = setup()
 		local properties = controller.newCombatStats()
 		expect(properties.Health.Changed).never.toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should return the same value across repeated reads", function()
@@ -191,7 +197,7 @@ describe("RogueProperty scalar usage", function()
 		local properties = controller.newCombatStats()
 		expect(properties.Health.Value).toEqual(100)
 		expect(properties.Health.Value).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -203,7 +209,7 @@ describe("RoguePropertyTable usage", function()
 		expect(base.Health).toEqual(100)
 		expect(base.Ultimate.AttackDamage).toEqual(30)
 		expect(base.Ultimate.AbilityPower).toEqual(30)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should compute the current value table", function()
@@ -212,7 +218,7 @@ describe("RoguePropertyTable usage", function()
 		local value = properties.Value
 		expect(value.Health).toEqual(100)
 		expect(value.Ultimate.AttackDamage).toEqual(30)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should apply a partial SetBaseValue without touching other members", function()
@@ -221,7 +227,7 @@ describe("RoguePropertyTable usage", function()
 		properties:SetBaseValue({ Health = 5 })
 		expect(properties.Health.Value).toEqual(5)
 		expect(properties.Ultimate.AttackDamage.Value).toEqual(30)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should apply a whole-table assignment through the .Value setter", function()
@@ -229,7 +235,7 @@ describe("RoguePropertyTable usage", function()
 		local properties = controller.newCombatStats()
 		properties.Value = { Health = 25000 }
 		expect(properties.Health.Value).toEqual(25000)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should read and write nested properties", function()
@@ -238,7 +244,7 @@ describe("RoguePropertyTable usage", function()
 		expect(properties.Ultimate.AttackDamage.Value).toEqual(30)
 		properties.Ultimate.AttackDamage.Value = 99
 		expect(properties.Ultimate.AttackDamage.Value).toEqual(99)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -249,7 +255,7 @@ describe("RogueProperty Color3 and boolean values", function()
 		expect(properties.Color.Value).toEqual(Color3.new(1, 0, 0))
 		properties.Color.Value = Color3.new(0, 0.5, 0.25)
 		expect(properties.Color.Value).toEqual(Color3.new(0, 0.5, 0.25))
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should round-trip a boolean base value", function()
@@ -258,7 +264,7 @@ describe("RogueProperty Color3 and boolean values", function()
 		expect(properties.Flag.Value).toEqual(true)
 		properties.Flag.Value = false
 		expect(properties.Flag.Value).toEqual(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should override a Color3 with a setter modifier", function()
@@ -266,7 +272,7 @@ describe("RogueProperty Color3 and boolean values", function()
 		local properties, adornee = controller.newTypedStats()
 		controller.addSetter(properties.Color, Color3.new(0, 0, 1), adornee)
 		expect(properties.Color.Value).toEqual(Color3.new(0, 0, 1))
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should override a boolean with a setter modifier", function()
@@ -275,7 +281,7 @@ describe("RogueProperty Color3 and boolean values", function()
 		expect(properties.Flag.Value).toEqual(true)
 		controller.addSetter(properties.Flag, false, adornee)
 		expect(properties.Flag.Value).toEqual(false)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -288,7 +294,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(value[1]).toEqual(0)
 		expect(value[2]).toEqual(120)
 		expect(value[3]).toEqual(240)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose the default array through GetBaseValue", function()
@@ -298,7 +304,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(#value).toEqual(3)
 		expect(value[1]).toEqual(0)
 		expect(value[3]).toEqual(240)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should include the array in the parent table's base value", function()
@@ -307,7 +313,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		local base = properties:GetBaseValue()
 		expect(#base.Numbers).toEqual(3)
 		expect(base.Numbers[2]).toEqual(120)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose each element as a RogueProperty by numeric index", function()
@@ -316,7 +322,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(properties.Numbers[1].Value).toEqual(0)
 		expect(properties.Numbers[2].Value).toEqual(120)
 		expect(properties.Numbers[3].Value).toEqual(240)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when indexing an element out of range", function()
@@ -325,7 +331,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(function()
 			return properties.Numbers[99]
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should report the array elements through GetRogueProperties", function()
@@ -337,7 +343,7 @@ describe("RoguePropertyTable scalar arrays", function()
 			count += 1
 		end
 		expect(count).toEqual(3)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should grow the array through the parent table's base value", function()
@@ -348,7 +354,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(#value).toEqual(5)
 		expect(value[1]).toEqual(5)
 		expect(value[5]).toEqual(25)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should shrink the array through the .Value setter", function()
@@ -359,7 +365,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		expect(#value).toEqual(2)
 		expect(value[1]).toEqual(2)
 		expect(value[2]).toEqual(5)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should replace the array with a single element", function()
@@ -369,7 +375,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		local value = properties.Numbers.Value
 		expect(#value).toEqual(1)
 		expect(value[1]).toEqual(9)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should update a single element through its .Value setter", function()
@@ -378,7 +384,7 @@ describe("RoguePropertyTable scalar arrays", function()
 		properties.Numbers[1].Value = 42
 		expect(properties.Numbers[1].Value).toEqual(42)
 		expect(properties.Numbers.Value[1]).toEqual(42)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -391,7 +397,7 @@ describe("RoguePropertyTable table arrays", function()
 		expect(value[1].Name).toEqual("One")
 		expect(value[1].Power).toEqual(1)
 		expect(value[2].Name).toEqual("Two")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose each table element and its fields by index", function()
@@ -400,7 +406,7 @@ describe("RoguePropertyTable table arrays", function()
 		expect(properties.Sequence[1].Name.Value).toEqual("One")
 		expect(properties.Sequence[1].Power.Value).toEqual(1)
 		expect(properties.Sequence[2].Name.Value).toEqual("Two")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should replace the table array through the .Value setter", function()
@@ -413,7 +419,7 @@ describe("RoguePropertyTable table arrays", function()
 		expect(#value).toEqual(1)
 		expect(value[1].Name).toEqual("Solo")
 		expect(value[1].Power).toEqual(9)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should update a field on a table element", function()
@@ -421,7 +427,7 @@ describe("RoguePropertyTable table arrays", function()
 		local properties = controller.newArrayStats()
 		properties.Sequence[1].Power.Value = 100
 		expect(properties.Sequence[1].Power.Value).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -433,7 +439,7 @@ describe("RoguePropertyTable nested arrays", function()
 		expect(#value).toEqual(3)
 		expect(value[1]).toEqual(1)
 		expect(value[3]).toEqual(3)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should set an array nested inside a table member", function()
@@ -443,7 +449,7 @@ describe("RoguePropertyTable nested arrays", function()
 		local value = properties.Nested.Inner.Value
 		expect(#value).toEqual(2)
 		expect(value[1]).toEqual(7)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -456,7 +462,7 @@ describe("RoguePropertyTable array reactiveness", function()
 		end)
 		expect(value[1]).toEqual(0)
 		expect(value[3]).toEqual(240)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should re-emit array values after a replacement", function()
@@ -472,7 +478,7 @@ describe("RoguePropertyTable array reactiveness", function()
 		end)
 		expect(value[1]).toEqual(11)
 		expect(value[2]).toEqual(22)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -492,7 +498,7 @@ describe("RoguePropertyTable scalar array serialization forms", function()
 		expect(value[1]).toEqual(11)
 		expect(value[2]).toEqual(22)
 		expect(value[3]).toEqual(240)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should read scalar elements serialized as instances", function()
@@ -513,7 +519,7 @@ describe("RoguePropertyTable scalar array serialization forms", function()
 		expect(value[1]).toEqual(77)
 		expect(value[2]).toEqual(88)
 		expect(value[3]).toEqual(99)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -524,7 +530,7 @@ describe("RoguePropertyTable edge cases", function()
 		expect(function()
 			return properties.Nonexistent
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when assigning to a reserved method name", function()
@@ -533,7 +539,7 @@ describe("RoguePropertyTable edge cases", function()
 		expect(function()
 			properties.GetValue = 1
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when assigning to the Changed event", function()
@@ -542,7 +548,7 @@ describe("RoguePropertyTable edge cases", function()
 		expect(function()
 			properties.Changed = 1
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should throw when SetBaseValue includes an unexpected member", function()
@@ -551,7 +557,7 @@ describe("RoguePropertyTable edge cases", function()
 		expect(function()
 			properties:SetBaseValue({ Bogus = 1 })
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -561,7 +567,7 @@ describe("RogueProperty modifiers (individual)", function()
 		local properties, adornee = controller.newCombatStats()
 		controller.addMultiplier(properties.Health, 2, adornee)
 		expect(properties.Health.Value).toEqual(200)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should apply an additive to the computed value", function()
@@ -569,7 +575,7 @@ describe("RogueProperty modifiers (individual)", function()
 		local properties, adornee = controller.newCombatStats()
 		controller.addAdditive(properties.Health, 15, adornee)
 		expect(properties.Health.Value).toEqual(115)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should override the computed value with a setter", function()
@@ -577,7 +583,7 @@ describe("RogueProperty modifiers (individual)", function()
 		local properties, adornee = controller.newCombatStats()
 		controller.addSetter(properties.Health, 777, adornee)
 		expect(properties.Health.Value).toEqual(777)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should leave the base value unchanged when a modifier is applied", function()
@@ -585,7 +591,7 @@ describe("RogueProperty modifiers (individual)", function()
 		local properties, adornee = controller.newCombatStats()
 		controller.addMultiplier(properties.Health, 2, adornee)
 		expect(properties.Health:GetBaseValue()).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -599,7 +605,7 @@ describe("RogueProperty modifier ordering", function()
 		controller.addMultiplier(health, 2, adornee) -- Order 2
 
 		expect(health.Value).toEqual(220)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should respect a reordered additive: base * mult + add", function()
@@ -613,7 +619,7 @@ describe("RogueProperty modifier ordering", function()
 		controller.modifierData(additive).Order.Value = 5
 
 		expect(health.Value).toEqual(210)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should stack setter, additive, and multiplier in order", function()
@@ -626,7 +632,7 @@ describe("RogueProperty modifier ordering", function()
 		controller.addMultiplier(health, 2, adornee) -- Order 2
 
 		expect(health.Value).toEqual(120)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should stack two additives", function()
@@ -638,7 +644,7 @@ describe("RogueProperty modifier ordering", function()
 		controller.addAdditive(health, 5, adornee)
 
 		expect(health.Value).toEqual(115)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -657,7 +663,7 @@ describe("RogueProperty modifier enable/disable", function()
 		controller.modifierData(multiplier).Enabled.Value = true
 		expect(health.Value).toEqual(200)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -669,7 +675,7 @@ describe("RogueProperty reactiveness", function()
 			return v == 100
 		end)
 		expect(value).toEqual(100)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should re-emit when a modifier is added", function()
@@ -683,7 +689,7 @@ describe("RogueProperty reactiveness", function()
 			return v == 200
 		end)
 		expect(value).toEqual(200)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should re-emit when a modifier's value changes", function()
@@ -701,7 +707,7 @@ describe("RogueProperty reactiveness", function()
 			return v == 300
 		end)).toEqual(300)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should re-emit when a modifier is removed", function()
@@ -719,7 +725,7 @@ describe("RogueProperty reactiveness", function()
 			return v == 100
 		end)).toEqual(100)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should re-emit when the base value changes underneath a modifier", function()
@@ -737,6 +743,6 @@ describe("RogueProperty reactiveness", function()
 			return v == 100
 		end)).toEqual(100)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

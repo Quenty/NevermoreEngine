@@ -7,6 +7,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
 local RogueSetter = require("RogueSetter")
 local ServiceBag = require("ServiceBag")
@@ -18,7 +20,8 @@ local it = Jest.Globals.it
 local RogueSetterClass = RogueSetter:GetConstructor() :: any
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("TieRealmService"))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -29,12 +32,16 @@ local function setup()
 		return RogueSetterClass.new(valueObject, serviceBag), valueObject
 	end
 
-	return {
+	local controller = {
 		newSetter = newSetter,
-		destroy = function(_self: any)
-			serviceBag:Destroy()
+		Destroy = function(_self: any)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function setEnabled(valueObject, enabled)
@@ -61,7 +68,7 @@ describe("RogueSetter:GetModifiedVersion()", function()
 		local modifier = controller.newSetter("NumberValue", 999)
 		expect(modifier:GetModifiedVersion(10)).toEqual(999)
 		expect(modifier:GetModifiedVersion(500)).toEqual(999)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reflect a later change to its value", function()
@@ -70,7 +77,7 @@ describe("RogueSetter:GetModifiedVersion()", function()
 		expect(modifier:GetModifiedVersion(10)).toEqual(999)
 		valueObject.Value = 5
 		expect(modifier:GetModifiedVersion(10)).toEqual(5)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -78,7 +85,7 @@ describe("RogueSetter:GetModifiedVersion()", function()
 		local modifier, valueObject = controller.newSetter("NumberValue", 999)
 		setEnabled(valueObject, false)
 		expect(modifier:GetModifiedVersion(10)).toEqual(10)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -87,14 +94,14 @@ describe("RogueSetter value types", function()
 		local controller = setup()
 		local modifier = controller.newSetter("Color3Value", Color3.new(1, 0, 0))
 		expect(modifier:GetModifiedVersion(Color3.new(0, 0, 0))).toEqual(Color3.new(1, 0, 0))
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should return a boolean value", function()
 		local controller = setup()
 		local modifier = controller.newSetter("BoolValue", true)
 		expect(modifier:GetModifiedVersion(false)).toEqual(true)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -103,7 +110,7 @@ describe("RogueSetter:GetInvertedVersion()", function()
 		local controller = setup()
 		local modifier = controller.newSetter("NumberValue", 999)
 		expect(modifier:GetInvertedVersion(50, 7)).toEqual(7)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should pass the input through unchanged when disabled", function()
@@ -111,6 +118,6 @@ describe("RogueSetter:GetInvertedVersion()", function()
 		local modifier, valueObject = controller.newSetter("NumberValue", 999)
 		setEnabled(valueObject, false)
 		expect(modifier:GetInvertedVersion(50, 7)).toEqual(50)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

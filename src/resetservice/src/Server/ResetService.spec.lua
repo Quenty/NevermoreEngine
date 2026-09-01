@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local Promise = require("Promise")
@@ -24,7 +26,8 @@ local specCounter = 0
 local function setup()
 	specCounter += 1
 
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	local resetService: any = serviceBag:GetService(ResetService)
 	local playerMockService: any = serviceBag:GetService(PlayerMockService)
 
@@ -33,14 +36,18 @@ local function setup()
 
 	local mock = playerMockService:CreatePlayer({ UserId = 77341200 + specCounter })
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		resetService = resetService,
 		mock = mock,
-		destroy = function(_self)
-			serviceBag:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("ResetService.PromiseResetCharacter", function()
@@ -57,7 +64,7 @@ describe("ResetService.PromiseResetCharacter", function()
 		expect(character).never.toBeNil()
 		expect(character:FindFirstChildOfClass("Humanoid")).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a player that is not in the DataModel", function()
@@ -70,7 +77,7 @@ describe("ResetService.PromiseResetCharacter", function()
 		expect(promise:IsRejected()).toBe(true)
 
 		orphan:Destroy()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a bad player", function()
@@ -80,7 +87,7 @@ describe("ResetService.PromiseResetCharacter", function()
 			controller.resetService:PromiseResetCharacter(nil)
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -105,7 +112,7 @@ describe("ResetService.PushResetProvider", function()
 		-- The default provider never ran, so no character was spawned.
 		expect(PlayerMock.read(controller.mock, "Character")).toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("restores the previous provider once the pushed one is popped", function()
@@ -135,7 +142,7 @@ describe("ResetService.PushResetProvider", function()
 		expect(afterValue).toBe("first")
 		expect(firstCount).toBe(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a bad provider", function()
@@ -145,6 +152,6 @@ describe("ResetService.PushResetProvider", function()
 			controller.resetService:PushResetProvider("not a function")
 		end).toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

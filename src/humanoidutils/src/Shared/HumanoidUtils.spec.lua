@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local HumanoidUtils = require("HumanoidUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
@@ -26,10 +27,12 @@ local function setup(): any
 			humanoid.Parent = rig
 			return rig, humanoid
 		end,
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -44,7 +47,7 @@ describe("HumanoidUtils.getHumanoid", function()
 
 		expect(HumanoidUtils.getHumanoid(limb)).toBe(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("finds the humanoid from a nested descendant", function()
@@ -59,7 +62,7 @@ describe("HumanoidUtils.getHumanoid", function()
 
 		expect(HumanoidUtils.getHumanoid(handle)).toBe(humanoid)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil outside of a humanoid model", function()
@@ -69,7 +72,7 @@ describe("HumanoidUtils.getHumanoid", function()
 
 		expect(HumanoidUtils.getHumanoid(part)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -81,7 +84,7 @@ describe("HumanoidUtils.isHumanoidStateEnabled", function()
 			(HumanoidUtils :: any).isHumanoidStateEnabled(nil, Enum.HumanoidStateType.Jumping)
 		end).toThrow("No humanoid")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("errors without a state type", function()
@@ -92,7 +95,7 @@ describe("HumanoidUtils.isHumanoidStateEnabled", function()
 			(HumanoidUtils :: any).isHumanoidStateEnabled(humanoid, nil)
 		end).toThrow("No stateType")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads the enabled state per state type", function()
@@ -104,7 +107,7 @@ describe("HumanoidUtils.isHumanoidStateEnabled", function()
 		expect(HumanoidUtils.isHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)).toBe(false)
 		expect(HumanoidUtils.isHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Climbing)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -116,7 +119,7 @@ describe("HumanoidUtils.isJumpEnabled", function()
 			(HumanoidUtils :: any).isJumpEnabled(nil)
 		end).toThrow("No humanoid")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is enabled for a default humanoid", function()
@@ -125,7 +128,7 @@ describe("HumanoidUtils.isJumpEnabled", function()
 
 		expect(HumanoidUtils.isJumpEnabled(humanoid)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("is disabled while the jumping state is disabled", function()
@@ -136,7 +139,7 @@ describe("HumanoidUtils.isJumpEnabled", function()
 
 		expect(HumanoidUtils.isJumpEnabled(humanoid)).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads jump power while UseJumpPower is true", function()
@@ -152,7 +155,7 @@ describe("HumanoidUtils.isJumpEnabled", function()
 		humanoid.JumpPower = 50
 		expect(HumanoidUtils.isJumpEnabled(humanoid)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("reads jump height while UseJumpPower is false", function()
@@ -168,7 +171,7 @@ describe("HumanoidUtils.isJumpEnabled", function()
 		humanoid.JumpHeight = 7
 		expect(HumanoidUtils.isJumpEnabled(humanoid)).toBe(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -181,6 +184,6 @@ describe("HumanoidUtils.forceUnseatHumanoid", function()
 
 		expect(humanoid.Sit).toBe(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

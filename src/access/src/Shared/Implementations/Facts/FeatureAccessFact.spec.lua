@@ -10,6 +10,7 @@ local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local FeatureAccessFact = require("FeatureAccessFact")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -26,7 +27,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		accessDataService = accessDataService,
 		fakePlayer = function(): Player
@@ -55,10 +56,14 @@ local function setup()
 				return last
 			end
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("FeatureAccessFact", function()
@@ -79,7 +84,7 @@ describe("FeatureAccessFact", function()
 		ownsChapters.Value = false
 		expect(AccessStateUtils.isAllowed(getState() :: any)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps unresolved unresolved rather than collapsing it to a refusal", function()
@@ -97,7 +102,7 @@ describe("FeatureAccessFact", function()
 		local state = controller.observeState(controller.fakePlayer(), shop)()
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names the source after the feature it came from, so a readout says where it came from", function()
@@ -108,7 +113,7 @@ describe("FeatureAccessFact", function()
 
 		expect(asFact:GetSource()).toEqual("feature:chapters")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles a cycle as unresolved instead of recursing", function()
@@ -126,6 +131,6 @@ describe("FeatureAccessFact", function()
 
 		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

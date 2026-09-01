@@ -11,16 +11,26 @@ export interface BatchDeployResult extends PackageResult {
   placeId: number;
 }
 
-/** Shared config for the deploy results GitHub comment reporter. */
-export function createDeployCommentConfig(): GithubCommentTableConfig {
+/**
+ * Shared config for the deploy results GitHub comment reporter.
+ *
+ * Takes the labels rather than fixing them, because a publish and a deploy are
+ * different words and the command already knows which it is doing. Without
+ * this the comment said "Failed" for a run whose terminal output said "DEPLOY
+ * FAILED" — the same run, described two ways.
+ */
+export function createDeployCommentConfig(labels?: {
+  successLabel?: string;
+  failureLabel?: string;
+}): GithubCommentTableConfig {
   return {
     heading: 'Deploy Results',
     commentMarker: '<!-- nevermore-deploy-results -->',
     sectionId: 'deploy',
     extraColumns: [createErrorColumn(), createTryItColumn()],
     errorHeading: 'Deploy Results',
-    successLabel: 'Deployed',
-    failureLabel: 'Failed',
+    successLabel: labels?.successLabel ?? 'Deployed',
+    failureLabel: labels?.failureLabel ?? 'DEPLOY FAILED',
     summaryVerb: 'deployed',
   };
 }

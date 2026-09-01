@@ -11,35 +11,36 @@ local CameraStackService = require("CameraStackService")
 local CameraState = require("CameraState")
 local CustomCameraEffect = require("CustomCameraEffect")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local currentServiceBag: ServiceBag.ServiceBag? = nil
-local currentMock: Player? = nil
-
--- Boots the service the way production does (Init then Start). The mocked local player is designated
--- before boot so CameraStackService.Start skips BindToRenderStep, which is client-only and would
--- error in the server context these specs run in.
 local function setup(options: { start: boolean? }?): CameraStackService.CameraStackService
+	local maid = Maid.new()
+	JestUtils.afterThis(maid)
+
 	local player = PlayerMock.new({ UserId = 66123201 })
 	player.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(player)
-	currentMock = player
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
 
 	local serviceBag = ServiceBag.new()
-	currentServiceBag = serviceBag
-
 	local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
 	serviceBag:Init()
 
 	if not (options and options.start == false) then
 		serviceBag:Start()
 	end
+
+	maid:GiveTask(function()
+		serviceBag:Destroy()
+		restoreLocalPlayer()
+		player:Destroy()
+	end)
 
 	return service
 end
@@ -51,19 +52,6 @@ local function makeEffect(): (CustomCameraEffect.CustomCameraEffect, CameraState
 	end)
 	return effect, state
 end
-
-afterEach(function()
-	if currentServiceBag then
-		currentServiceBag:Destroy()
-		currentServiceBag = nil
-	end
-
-	PlayerMock.setMockedLocalPlayer(nil)
-	if currentMock then
-		currentMock:Destroy()
-		currentMock = nil
-	end
-end)
 
 describe("CameraStackService.Init", function()
 	it("initializes with the default camera at the bottom of the stack", function()
@@ -85,7 +73,7 @@ describe("CameraStackService.Init", function()
 
 	it("errors when used before the service bag runs Init", function()
 		local serviceBag = ServiceBag.new()
-		currentServiceBag = serviceBag
+		JestUtils.afterThis(serviceBag)
 		local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
 
 		expect(function()
@@ -93,7 +81,7 @@ describe("CameraStackService.Init", function()
 		end).toThrow("Not initialized")
 
 		-- Destroying a never-initialized CameraStackService errors on its nil maid, so finish
-		-- initialization for the afterEach teardown.
+		-- initialization for teardown.
 		serviceBag:Init()
 	end)
 end)

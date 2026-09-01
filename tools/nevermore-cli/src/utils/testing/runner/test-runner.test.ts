@@ -1,6 +1,290 @@
-import { describe, expect, it } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
+import { type DeployTarget } from '@quenty/nevermore-deploy';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
-import { mergeFailureReasons } from './test-runner.js';
+import { mergeFailureReasons, runSingleTestAsync } from './test-runner.js';
+import { TEST_RESULTS_FORMAT } from '../structured-test-results.js';
+import {
+  type Deployment,
+  type JobContext,
+  type ScriptRunResult,
+} from '../../job-context/job-context.js';
+
+const PASSING_LOGS = [
+  'Test Suites: 3 passed, 3 total',
+  'Tests:       25 passed, 25 total',
+].join('\n');
+
+function structuredResults(overrides: Record<string, unknown> = {}) {
+  return {
+    format: TEST_RESULTS_FORMAT,
+    success: true,
+    ranJest: true,
+    passed: 25,
+    failed: 0,
+    skipped: 0,
+    total: 25,
+    suitesPassed: 3,
+    suitesFailed: 0,
+    suitesTotal: 3,
+    failures: [],
+    omittedFailures: 0,
+    ...overrides,
+  };
+}
+
+/** Collect what the runner said out loud, so silence can be asserted on. */
+function captureWarnings(): () => string[] {
+  const warnings: string[] = [];
+  vi.spyOn(OutputHelper, 'warn').mockImplementation((message: string) => {
+    warnings.push(message);
+  });
+  vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+  return () => warnings;
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+/**
+ * A context that runs nothing: it hands back the run result and logs the test
+ * wants to reason about. Everything else is the minimum the runner touches.
+ */
+function createContext(run: ScriptRunResult, logs: string): JobContext {
+  return {
+    buildPlaceAsync: async (options) => ({
+      rbxlPath: 'unused.rbxl',
+      target: options.target,
+    }),
+    deployBuiltPlaceAsync: async () => ({} as Deployment),
+    runScriptAsync: async () => run,
+    getLogsAsync: async () => ({ text: logs, messages: [] }),
+    releaseAsync: async () => {},
+    releaseBuiltPlaceAsync: async () => {},
+    disposeAsync: async () => {},
+  };
+}
+
+describe('runSingleTestAsync', () => {
+  let packagePath: string;
+
+  beforeAll(async () => {
+    packagePath = await fs.mkdtemp(path.join(os.tmpdir(), 'nevermore-test-'));
+    await fs.writeFile(
+      path.join(packagePath, 'ServerMain.server.lua'),
+      'return nil\n'
+    );
+  });
+
+  afterAll(async () => {
+    await fs.rm(packagePath, { recursive: true, force: true });
+  });
+
+  async function runAsync(run: ScriptRunResult, logs: string) {
+    return runSingleTestAsync(createContext(run, logs), {
+      packagePath,
+      packageName: 'maid',
+      target: {
+        scriptTemplate: 'ServerMain.server.lua',
+      } as unknown as DeployTarget,
+    });
+  }
+
+  it('fails a run whose returned results say it failed', async () => {
+    // The runner used to announce this by throwing, which failed the task. Now
+    // it returns the verdict, and these logs are what a truncated window leaves
+    // behind: a jest report from a suite that passed and no sign of the one
+    // that did not.
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [structuredResults({ success: false, failed: 2 })],
+      },
+      PASSING_LOGS
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('2 test(s) failed');
+  });
+
+  it('reports the counts the run returned, not the ones in the log', async () => {
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [structuredResults({ passed: 400, total: 400 })],
+      },
+      PASSING_LOGS
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.testCounts).toEqual({ passed: 400, failed: 0, total: 400 });
+  });
+
+  it('accepts returned results as proof the runner ran', async () => {
+    // Demanding a jest report in the logs is a stand-in for that proof, and it
+    // is the first thing a truncated log window costs.
+    const result = await runAsync(
+      { success: true, returnValues: [structuredResults()] },
+      '(logs truncated)'
+    );
+
+    expect(result.success).toBe(true);
+  });
+
+  it('still fails a run with a traceback in its logs', async () => {
+    // Jest cannot count a deferred-callback crash, so passing results are no
+    // reason to stop reading the logs.
+    const result = await runAsync(
+      { success: true, returnValues: [structuredResults()] },
+      `${PASSING_LOGS}\nStack Begin\nScript 'maid.spec', Line 4\nStack End`
+    );
+
+    expect(result.success).toBe(false);
+  });
+
+  it('falls back to the logs for a script that returned nothing', async () => {
+    // A test script written before results were returned. It must keep working,
+    // and it must not start passing when its logs say otherwise.
+    const failing = await runAsync(
+      { success: true, returnValues: [] },
+      'Tests:       2 failed, 23 passed, 25 total'
+    );
+    expect(failing.success).toBe(false);
+    expect(failing.error).toContain('2 test(s) failed');
+
+    const passing = await runAsync(
+      { success: true, returnValues: [] },
+      PASSING_LOGS
+    );
+    expect(passing.success).toBe(true);
+    expect(passing.testCounts).toEqual({ passed: 25, failed: 0, total: 25 });
+  });
+
+  it('fails a script that returned nothing and logged nothing', async () => {
+    const result = await runAsync(
+      { success: true, returnValues: undefined },
+      ''
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('nothing proves any test ran');
+  });
+
+  it('records where the counts came from', async () => {
+    const returned = await runAsync(
+      { success: true, returnValues: [structuredResults()] },
+      PASSING_LOGS
+    );
+    expect(returned.countsSource).toBe('returned');
+
+    const scraped = await runAsync(
+      { success: true, returnValues: [] },
+      PASSING_LOGS
+    );
+    expect(scraped.countsSource).toBe('scraped');
+  });
+
+  it('warns out loud when the run returned no results', async () => {
+    // Silence here is what let the structured channel ship inert: a run that
+    // fell back to scraping produced output identical to one that did not.
+    const warnings = captureWarnings();
+
+    await runAsync({ success: true, returnValues: [] }, PASSING_LOGS);
+
+    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
+      true
+    );
+  });
+
+  it('fails a package with specs whose run never reached jest', async () => {
+    // A Rojo regression that stops shipping jest.config turns a real suite into
+    // a smoke test. Before results were returned, the required jest report caught
+    // that; a smoke-test result retires the report and would otherwise pass with
+    // zero tests.
+    await fs.mkdir(path.join(packagePath, 'src'), { recursive: true });
+    await fs.writeFile(
+      path.join(packagePath, 'src', 'jest.config.lua'),
+      'return {}\n'
+    );
+
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [
+          structuredResults({ ranJest: false, passed: 0, total: 0 }),
+        ],
+      },
+      '[NevermoreTestRunner] No jest.config found — smoke test passed (boot success)'
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('none of its specs ran');
+
+    await fs.rm(path.join(packagePath, 'src'), {
+      recursive: true,
+      force: true,
+    });
+  });
+
+  it('passes a package with no specs that smoke tested', async () => {
+    // No jest.config on disk, so a smoke test is the whole contract.
+    const result = await runAsync(
+      {
+        success: true,
+        returnValues: [
+          structuredResults({ ranJest: false, passed: 0, total: 0 }),
+        ],
+      },
+      '[NevermoreTestRunner] No jest.config found — smoke test passed (boot success)'
+    );
+
+    expect(result.success).toBe(true);
+  });
+
+  it('takes results a context resolved for it, without re-reporting', async () => {
+    // Aggregated batch mode: one execution covers every package, so the batch
+    // log parser splits the per-package results out and has already reported
+    // provenance for the whole batch.
+    const warnings = captureWarnings();
+
+    const result = await runAsync(
+      {
+        success: true,
+        testResults: {
+          success: false,
+          ranJest: true,
+          passed: 273,
+          failed: 2,
+          skipped: 0,
+          total: 275,
+          suitesPassed: 8,
+          suitesFailed: 1,
+          suitesTotal: 9,
+          failures: [],
+          omittedFailures: 0,
+        },
+      },
+      '(this package’s section was truncated away)'
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.countsSource).toBe('returned');
+    expect(result.testCounts).toEqual({ passed: 273, failed: 2, total: 275 });
+    expect(warnings()).toHaveLength(0);
+  });
+});
 
 describe('mergeFailureReasons', () => {
   it('does not repeat reasons the context already reported', () => {
@@ -25,5 +309,51 @@ describe('mergeFailureReasons', () => {
 
   it('is empty when nothing failed', () => {
     expect(mergeFailureReasons(undefined, [])).toEqual([]);
+  });
+});
+
+describe('runSingleTestAsync log volume reporting', () => {
+  let packagePath: string;
+
+  beforeAll(async () => {
+    packagePath = await fs.mkdtemp(path.join(os.tmpdir(), 'volume-'));
+    await fs.writeFile(
+      path.join(packagePath, 'ServerMain.server.lua'),
+      'return nil\n'
+    );
+  });
+
+  afterAll(async () => {
+    await fs.rm(packagePath, { recursive: true, force: true });
+  });
+
+  function runAsync(logs: string) {
+    return runSingleTestAsync(createContext({ success: true }, logs), {
+      packagePath,
+      packageName: 'gameconfig',
+      target: {
+        scriptTemplate: 'ServerMain.server.lua',
+      } as unknown as DeployTarget,
+    });
+  }
+
+  it('reports how much log text a verdict was read from', async () => {
+    const result = await runAsync('some output with no jest report');
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('verdict read from log text alone');
+    expect(result.error).toContain('31 chars, 1 line(s) received');
+  });
+
+  it('says nothing about log volume when there was no log text', async () => {
+    // A batch package whose section was lost has no text of its own. Reporting
+    // "0 chars received" here contradicts the fetch stats already printed for
+    // the whole batch window, and describes a judgement never made: the verdict
+    // came from the output being absent, which its own reason already says.
+    const result = await runAsync('');
+
+    expect(result.success).toBe(false);
+    expect(result.error).not.toContain('verdict read from log text alone');
+    expect(result.error).not.toContain('0 chars, 0 line(s)');
   });
 });

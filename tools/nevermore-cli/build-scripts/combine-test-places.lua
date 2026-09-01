@@ -1,7 +1,7 @@
--- combine-test-places.luau
+-- combine-test-places.lua
 -- Merges individually-built test .rbxl files into a single combined place.
 --
--- Usage: lune run combine-test-places.luau <outputPath> <slug1> <rbxl1> <scriptPath1> [<slug2> <rbxl2> <scriptPath2> ...]
+-- Usage: lune run combine-test-places.lua <outputPath> <slug1> <rbxl1> <scriptPath1> [<slug2> <rbxl2> <scriptPath2> ...]
 --
 -- For each triple (slug, rbxl, scriptPath):
 --   1. Deserializes the .rbxl
@@ -14,7 +14,7 @@ local roblox = require("@lune/roblox")
 
 local outputPath = process.args[1]
 if not outputPath then
-	print("Usage: lune run combine-test-places.luau <outputPath> <slug> <rbxl> <scriptPath> ...")
+	print("Usage: lune run combine-test-places.lua <outputPath> <slug> <rbxl> <scriptPath> ...")
 	process.exit(1)
 end
 

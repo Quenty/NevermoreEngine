@@ -92,7 +92,7 @@ export type ManifestPlace = {
 }
 
 -- Attribute names written by the nevermore CLI. These MUST stay in sync with
--- tools/nevermore-cli/build-scripts/transform-inject-deploy-metadata.luau
+-- tools/nevermore-cli/build-scripts/transform-inject-deploy-metadata.lua
 local ATTRIBUTE = {
 	deployed = "Deployed",
 	commit = "Commit",

@@ -15,6 +15,7 @@ local AccessPolicyNames = require("AccessPolicyNames")
 local AccessPolicyRealm = require("AccessPolicyRealm")
 local AccessPolicyService = require("AccessPolicyService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -42,7 +43,7 @@ local function setup(tieRealm: string?)
 	serviceBag:Init()
 	serviceBag:Start()
 
-	return {
+	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
@@ -54,10 +55,14 @@ local function setup(tieRealm: string?)
 		setAdmin = function(player: Player, value: boolean?)
 			accessDataService:SetFactOverride(player, AccessFactNames.PLAYER_IS_ADMIN, value)
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 local function countingPolicy(controller: any, policyName: string, applied: { n: number }, isEnabledByDefault: boolean?)
@@ -87,7 +92,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(false)
 		expect(applied.n).toEqual(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("registers a policy that asked to be on already running", function()
@@ -104,7 +109,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(true)
 		expect(applied.n).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("applies a default-enabled policy to players already here", function()
@@ -120,7 +125,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 
 		expect(applied.n).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets the console turn a default-enabled policy back off", function()
@@ -137,7 +142,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 		expect(controller.accessPolicyService:IsPolicyEnabled("noop")).toEqual(false)
 		expect(applied.n).toEqual(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("ships the built-in kick policy off, whatever this option allows", function()
@@ -145,7 +150,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 
 		expect(controller.accessPolicyService:IsPolicyEnabled(AccessPolicyNames.KICK_ON_NON_ADMIN)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lists a disabled policy anyway, so it can be discovered", function()
@@ -156,7 +161,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 
 		expect(controller.accessPolicyService:GetPolicyNames()).toEqual({ AccessPolicyNames.KICK_ON_NON_ADMIN, "noop" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses two policies under one name", function()
@@ -169,7 +174,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 			controller.accessPolicyService:RegisterPolicy(countingPolicy(controller, "noop", { n = 0 }))
 		end).toThrow("already registered")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses to enable a policy nobody registered", function()
@@ -179,7 +184,7 @@ describe("AccessPolicyService.RegisterPolicy", function()
 			controller.accessPolicyService:SetPolicyEnabled("nosuch", true)
 		end).toThrow("No policy registered")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -198,7 +203,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 
 		expect(applied.n).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("applies to a player who arrives while it is on", function()
@@ -213,7 +218,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 
 		expect(applied.n).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("tears down when switched off", function()
@@ -230,7 +235,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		controller.accessPolicyService:SetPolicyEnabled("noop", false)
 		expect(applied.n).toEqual(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("tears down when the player leaves", function()
@@ -248,7 +253,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 
 		expect(applied.n).toEqual(0)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves the other policies alone when one is switched off", function()
@@ -266,7 +271,7 @@ describe("AccessPolicyService.SetPolicyEnabled", function()
 		expect(a.n).toEqual(0)
 		expect(b.n).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -289,7 +294,7 @@ describe("AccessPolicy declarations", function()
 			controller.accessPolicyService:SetPolicyEnabled("sneaky", true)
 		end).toThrow("without declaring it")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -324,7 +329,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not kick when the fact reads the other way", function()
@@ -337,7 +342,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("kicks when the fact reads the bound value", function()
@@ -350,7 +355,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("kicks when someone is demoted mid-session", function()
@@ -367,7 +372,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not kick while it is disabled, however the fact reads", function()
@@ -391,7 +396,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("uses the message it was bound with", function()
@@ -419,7 +424,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual("staff only")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is outranked by a game's own layer of the same fact", function()
@@ -442,7 +447,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("declares the fact it was bound to, so a readout can name it", function()
@@ -452,7 +457,7 @@ describe("AccessKickPolicy.whenFactIs", function()
 		local policy = controller.accessPolicyService:GetPolicy(POLICY_NAME)
 		expect((policy :: any):GetFactNames()).toEqual({ AccessFactNames.PLAYER_IS_ADMIN })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -487,7 +492,7 @@ describe("AccessKickPolicy.whenFeatureDisallowed", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not kick an allowed player", function()
@@ -501,7 +506,7 @@ describe("AccessKickPolicy.whenFeatureDisallowed", function()
 
 		expect(PlayerMock.getKickMessage(player)).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("kicks a player the feature refuses for a real reason", function()
@@ -515,7 +520,7 @@ describe("AccessKickPolicy.whenFeatureDisallowed", function()
 
 		expect(PlayerMock.getKickMessage(player)).never.toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("declares the feature it was bound to", function()
@@ -526,7 +531,7 @@ describe("AccessKickPolicy.whenFeatureDisallowed", function()
 		local policy = controller.accessPolicyService:GetPolicy(POLICY_NAME)
 		expect(#(policy :: any):GetFeatures()).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -550,7 +555,7 @@ describe("AccessPolicyService query API", function()
 		controller.accessPolicyService:SetPolicyEnabled("noop", false)
 		expect(last).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports false for a policy nobody registered rather than erroring", function()
@@ -565,7 +570,7 @@ describe("AccessPolicyService query API", function()
 
 		expect(last).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("observes the registry as policies are added", function()
@@ -583,7 +588,7 @@ describe("AccessPolicyService query API", function()
 
 		expect(#(last :: any)).toEqual(before + 1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("answers which policies read a fact", function()
@@ -595,7 +600,7 @@ describe("AccessPolicyService query API", function()
 		})
 		expect(controller.accessPolicyService:GetPolicyNamesReadingFact("somethingElse")).toEqual({})
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("answers which policies read a feature", function()
@@ -614,7 +619,7 @@ describe("AccessPolicyService query API", function()
 
 		expect(controller.accessPolicyService:GetPolicyNamesReadingFeature(feature)).toEqual({ "watchShop" })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -635,7 +640,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		controller.accessPolicyService:AddPlayer(player)
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "noop")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is false for a policy that belongs to the other realm", function()
@@ -656,7 +661,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "clientOnly")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	-- Read from RunService, this policy is registered, listed, enabled -- and silently does nothing.
@@ -684,7 +689,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		expect(applied.n).toEqual(1)
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "clientOnly")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still refuses a server-realm policy in a bag that was told it is a client", function()
@@ -709,7 +714,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 		expect(applied.n).toEqual(0)
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "serverOnly")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("is false for a policy nobody registered", function()
@@ -719,7 +724,7 @@ describe("AccessPolicyService.IsPolicyActiveForPlayer", function()
 
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "nosuch")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -744,7 +749,7 @@ describe("AccessPolicyService per-player policy queries", function()
 		controller.accessPolicyService:AddPlayer(player)
 		expect(controller.accessPolicyService:IsPolicyActiveForPlayer(player, "noop")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("settles only once the policy is actually running for the player", function()
@@ -765,7 +770,7 @@ describe("AccessPolicyService per-player policy queries", function()
 
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -783,7 +788,7 @@ describe("AccessPolicy self-query through the tie", function()
 
 		expect(policy:IsPolicyActiveForPlayer(untracked)).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("says no for a policy no service has ever heard of", function()
@@ -794,6 +799,6 @@ describe("AccessPolicy self-query through the tie", function()
 
 		expect(policy:IsPolicyActiveForPlayer(controller.fakePlayer())).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

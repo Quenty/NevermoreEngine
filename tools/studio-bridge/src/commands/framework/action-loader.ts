@@ -1,9 +1,9 @@
 /**
- * Scans co-located `.luau` action files from the command directory tree
+ * Scans co-located `.lua` action files from the command directory tree
  * and returns their source contents for pushing to plugin sessions.
  *
- * Each command directory may contain a `.luau` file with the same stem
- * as its `.ts` file (e.g. `exec.luau` next to `exec.ts`). These files
+ * Each command directory may contain a `.lua` file with the same stem
+ * as its `.ts` file (e.g. `exec.lua` next to `exec.ts`). These files
  * are Luau modules that register action handlers in the plugin's
  * ActionRouter at runtime.
  */
@@ -25,8 +25,8 @@ export interface ActionSource {
 }
 
 /**
- * Recursively scan `baseDir` for `.luau` files and return their contents
- * as `ActionSource` entries. Only files that end in `.luau` are included.
+ * Recursively scan `baseDir` for `.lua` files and return their contents
+ * as `ActionSource` entries. Only files that end in `.lua` are included.
  */
 export async function loadActionSourcesAsync(
   baseDir?: string
@@ -54,9 +54,9 @@ async function scanDirAsync(
     const fullPath = path.join(currentDir, entry.name);
     if (entry.isDirectory()) {
       await scanDirAsync(baseDir, fullPath, results);
-    } else if (entry.name.endsWith('.luau')) {
+    } else if (entry.name.endsWith('.lua')) {
       const source = await fs.readFile(fullPath, 'utf-8');
-      const name = path.basename(entry.name, '.luau');
+      const name = path.basename(entry.name, '.lua');
       const relativePath = path.relative(baseDir, fullPath);
       const hash = createHash('sha256').update(source).digest('hex');
       results.push({ name, source, relativePath, hash });

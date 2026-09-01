@@ -9,6 +9,7 @@ local Workspace = game:GetService("Workspace")
 local HasSaveSlotsClient = require("HasSaveSlotsClient")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
@@ -18,27 +19,16 @@ local TeleportDataServiceClient = require("TeleportDataServiceClient")
 local TieRealmService = require("TieRealmService")
 local TieRealms = require("TieRealms")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local FAKE_USER_ID = 424242
 
-local activeMaid: Maid.Maid? = nil
-
-afterEach(function()
-	if activeMaid then
-		local maid = activeMaid
-		activeMaid = nil
-		maid:DoCleaning()
-	end
-	PlayerMock.setMockedLocalPlayer(nil)
-end)
-
 local function setup(): (Maid.Maid, any, any)
 	local maid = Maid.new()
-	activeMaid = maid
+
+	maid:GiveTask(JestUtils.afterThis(maid))
 
 	local serviceBag = maid:Add(ServiceBag.new())
 	local tieRealmService = serviceBag:GetService(TieRealmService) :: any
@@ -59,7 +49,7 @@ local function newPlayerMock(maid: Maid.Maid, isLocalPlayer: boolean): Player
 		playerMock:Destroy()
 	end)
 	if isLocalPlayer then
-		PlayerMock.setMockedLocalPlayer(playerMock)
+		maid:GiveTask(PlayerMock.setMockedLocalPlayer(playerMock))
 	end
 	return playerMock
 end

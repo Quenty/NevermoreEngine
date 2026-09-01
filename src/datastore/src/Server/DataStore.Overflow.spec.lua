@@ -31,7 +31,7 @@ describe("DataStore overflow save", function()
 		expectSettled(savePromise, 5)
 		expect((savePromise:Yield())).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should leave the previously saved value intact when an oversized save fails", function()
@@ -57,7 +57,7 @@ describe("DataStore overflow save", function()
 		expect(ok).toEqual(true)
 		expect(value).toEqual("known-good")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should still save values that fit within the real 4 MB ceiling", function()
@@ -76,7 +76,7 @@ describe("DataStore overflow save", function()
 		expectSettled(loadPromise)
 		expect((loadPromise:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should fail the save when data accumulated across substores overflows the key", function()
@@ -92,6 +92,6 @@ describe("DataStore overflow save", function()
 		expectSettled(savePromise, 5)
 		expect((savePromise:Yield())).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

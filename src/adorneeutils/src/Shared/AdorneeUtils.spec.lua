@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AdorneeUtils = require("AdorneeUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
@@ -44,7 +45,7 @@ type Controller = {
 	newHandlelessTool: () -> (Tool, BasePart),
 	newAccessory: () -> (Accessory, BasePart),
 	newClothing: () -> (Clothing, BasePart),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -161,10 +162,12 @@ local function setup(): Controller
 			return clothing, part
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -176,7 +179,7 @@ describe("Tool inheriting from Model", function()
 
 		expect(tool:IsA("Model")).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("adorns to the handle rather than the model bounding box", function()
@@ -189,7 +192,7 @@ describe("Tool inheriting from Model", function()
 		expect(AdorneeUtils.getAlignedSize(tool)).toEqual(handle.Size)
 		expect(AdorneeUtils.getRenderAdornee(tool)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not fall back to another part when the tool has no handle", function()
@@ -202,7 +205,7 @@ describe("Tool inheriting from Model", function()
 		expect(AdorneeUtils.getAlignedSize(tool)).toBeNil()
 		expect(AdorneeUtils.getRenderAdornee(tool)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("adorns to the handle even when the tool has a primary part", function()
@@ -212,7 +215,7 @@ describe("Tool inheriting from Model", function()
 
 		expect(AdorneeUtils.getPart(tool)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("leaves plain models on the model path", function()
@@ -223,7 +226,7 @@ describe("Tool inheriting from Model", function()
 		expect(AdorneeUtils.getAlignedSize(model)).toEqual(MODEL_BOUNDING_BOX_SIZE)
 		expect(AdorneeUtils.getRenderAdornee(model)).toEqual(model)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -234,7 +237,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(part)).toEqual(Vector3.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the bounding box center of a model", function()
@@ -243,7 +246,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(model)).toEqual(MODEL_BOUNDING_BOX_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the world position of an attachment", function()
@@ -253,7 +256,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(attachment)).toEqual(Vector3.new(10, 1, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part position of a humanoid", function()
@@ -262,7 +265,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(humanoid)).toEqual(ROOT_PART_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a humanoid with no root part", function()
@@ -271,7 +274,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle position of an accessory", function()
@@ -280,7 +283,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(accessory)).toEqual(ACCESSORY_HANDLE_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an accessory with no part", function()
@@ -290,7 +293,7 @@ describe("AdorneeUtils.getCenter", function()
 		expect(AdorneeUtils.getCenter(accessory)).toBeNil()
 
 		accessory:Destroy()
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the part position of clothing", function()
@@ -299,7 +302,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(clothing)).toEqual(CLOTHING_PART_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle position of a tool", function()
@@ -308,7 +311,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(tool)).toEqual(HANDLE_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil when a tool's handle is not a base part", function()
@@ -321,7 +324,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(tool)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an unsupported adornee", function()
@@ -330,7 +333,7 @@ describe("AdorneeUtils.getCenter", function()
 
 		expect(AdorneeUtils.getCenter(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()
@@ -354,7 +357,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toEqual(MODEL_BOUNDING_BOX_CFRAME)
 		expect(size).toEqual(MODEL_BOUNDING_BOX_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a zero sized box at an attachment's world cframe", function()
@@ -367,7 +370,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toEqual(CFrame.new(10, 1, 0))
 		expect(size).toEqual(Vector3.zero)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the cframe and size of a base part", function()
@@ -379,7 +382,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toEqual(CFrame.new(1, 2, 3))
 		expect(size).toEqual(Vector3.new(4, 1, 2))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle box of a tool rather than its model bounding box", function()
@@ -396,7 +399,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toEqual(HANDLE_CFRAME)
 		expect(size).toEqual(HANDLE_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a tool with no handle", function()
@@ -408,7 +411,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toBeNil()
 		expect(size).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part cframe and the character size for a humanoid", function()
@@ -420,7 +423,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toEqual(ROOT_PART_CFRAME)
 		expect(size).toEqual(CHARACTER_BOUNDING_BOX_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an unsupported adornee", function()
@@ -432,7 +435,7 @@ describe("AdorneeUtils.getBoundingBox", function()
 		expect(cframe).toBeNil()
 		expect(size).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -443,7 +446,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(part, part)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns true for a descendant part", function()
@@ -452,7 +455,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(model, first)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns true for a deeply nested part", function()
@@ -467,7 +470,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(model, nested)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false for an unrelated part", function()
@@ -477,7 +480,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(model, other)).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns true for a part of the humanoid's character", function()
@@ -486,7 +489,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(humanoid, rootPart)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false for a part outside the humanoid's character", function()
@@ -496,7 +499,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(humanoid, other)).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns false for a humanoid with no parent", function()
@@ -506,7 +509,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 
 		expect(AdorneeUtils.isPartOfAdornee(humanoid, part)).toEqual(false)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns true for the parts of a tool", function()
@@ -516,7 +519,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 		expect(AdorneeUtils.isPartOfAdornee(tool, handle)).toEqual(true)
 		expect(AdorneeUtils.isPartOfAdornee(tool, blade)).toEqual(true)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a bad part", function()
@@ -532,7 +535,7 @@ describe("AdorneeUtils.isPartOfAdornee", function()
 			AdorneeUtils.isPartOfAdornee(part, folder :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -543,7 +546,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(part)).toEqual({ part })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("includes the descendants of a base part", function()
@@ -554,7 +557,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(part)).toEqual({ part, child })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns every part of a model", function()
@@ -563,7 +566,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(model)).toEqual({ first, second })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the nested parts of a model", function()
@@ -578,7 +581,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(model)).toEqual({ nested })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the character's parts for a humanoid", function()
@@ -590,7 +593,7 @@ describe("AdorneeUtils.getParts", function()
 		expect(#parts).toEqual(2)
 		expect(parts[1]).toEqual(rootPart)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns an empty list for a humanoid with no parent", function()
@@ -599,7 +602,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(humanoid)).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns every part of a tool", function()
@@ -608,7 +611,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(tool)).toEqual({ blade, handle })
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns an empty list for an adornee with no parts", function()
@@ -617,7 +620,7 @@ describe("AdorneeUtils.getParts", function()
 
 		expect(AdorneeUtils.getParts(folder)).toEqual({})
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()
@@ -634,7 +637,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(model)).toEqual(MODEL_BOUNDING_BOX_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the character bounding box size for a humanoid", function()
@@ -643,7 +646,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(humanoid)).toEqual(CHARACTER_BOUNDING_BOX_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a humanoid whose parent is not a model", function()
@@ -653,7 +656,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a humanoid with no parent", function()
@@ -662,7 +665,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the size of a base part", function()
@@ -671,7 +674,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(part)).toEqual(Vector3.new(4, 1, 2))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the ancestor part size for an attachment", function()
@@ -681,7 +684,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(attachment)).toEqual(Vector3.new(4, 1, 2))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle size of a tool", function()
@@ -690,7 +693,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(tool)).toEqual(HANDLE_SIZE)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a tool with no handle", function()
@@ -699,7 +702,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(tool)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an unsupported adornee", function()
@@ -708,7 +711,7 @@ describe("AdorneeUtils.getAlignedSize", function()
 
 		expect(AdorneeUtils.getAlignedSize(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -719,7 +722,7 @@ describe("AdorneeUtils.getPartCFrame", function()
 
 		expect(AdorneeUtils.getPartCFrame(part)).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle cframe of a tool", function()
@@ -728,7 +731,7 @@ describe("AdorneeUtils.getPartCFrame", function()
 
 		expect(AdorneeUtils.getPartCFrame(tool)).toEqual(HANDLE_CFRAME)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part cframe of a humanoid", function()
@@ -737,7 +740,7 @@ describe("AdorneeUtils.getPartCFrame", function()
 
 		expect(AdorneeUtils.getPartCFrame(humanoid)).toEqual(ROOT_PART_CFRAME)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an adornee with no part", function()
@@ -746,7 +749,7 @@ describe("AdorneeUtils.getPartCFrame", function()
 
 		expect(AdorneeUtils.getPartCFrame(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()
@@ -763,7 +766,7 @@ describe("AdorneeUtils.getPartPosition", function()
 
 		expect(AdorneeUtils.getPartPosition(part)).toEqual(Vector3.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the primary part position of a model", function()
@@ -773,7 +776,7 @@ describe("AdorneeUtils.getPartPosition", function()
 
 		expect(AdorneeUtils.getPartPosition(model)).toEqual(second.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part position of a humanoid", function()
@@ -782,7 +785,7 @@ describe("AdorneeUtils.getPartPosition", function()
 
 		expect(AdorneeUtils.getPartPosition(humanoid)).toEqual(ROOT_PART_CFRAME.Position)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an adornee with no part", function()
@@ -791,7 +794,7 @@ describe("AdorneeUtils.getPartPosition", function()
 
 		expect(AdorneeUtils.getPartPosition(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()
@@ -810,7 +813,7 @@ describe("AdorneeUtils.getPartVelocity", function()
 
 		expect(AdorneeUtils.getPartVelocity(part)).toEqual(Vector3.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns zero for an anchored part", function()
@@ -819,7 +822,7 @@ describe("AdorneeUtils.getPartVelocity", function()
 
 		expect(AdorneeUtils.getPartVelocity(part)).toEqual(Vector3.zero)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle velocity of a tool", function()
@@ -830,7 +833,7 @@ describe("AdorneeUtils.getPartVelocity", function()
 
 		expect(AdorneeUtils.getPartVelocity(tool)).toEqual(Vector3.new(0, 5, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an adornee with no part", function()
@@ -839,7 +842,7 @@ describe("AdorneeUtils.getPartVelocity", function()
 
 		expect(AdorneeUtils.getPartVelocity(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -850,7 +853,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(part)).toEqual(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a model's primary part", function()
@@ -860,7 +863,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(model)).toEqual(second)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a model's first base part when there is no primary part", function()
@@ -869,7 +872,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(model)).toEqual(first)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a model with no parts", function()
@@ -878,7 +881,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(model)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a model whose parts are not direct children", function()
@@ -893,7 +896,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(model)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the ancestor part of an attachment", function()
@@ -903,7 +906,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(attachment)).toEqual(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an attachment with no ancestor part", function()
@@ -913,7 +916,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(attachment)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the root part of a humanoid", function()
@@ -922,7 +925,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(humanoid)).toEqual(rootPart)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a humanoid with no root part", function()
@@ -931,7 +934,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle of an accessory", function()
@@ -940,7 +943,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(accessory)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the part of clothing", function()
@@ -949,7 +952,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(clothing)).toEqual(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle of a tool ahead of any other part", function()
@@ -958,7 +961,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(tool)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a tool with no handle", function()
@@ -967,7 +970,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(tool)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an unsupported adornee", function()
@@ -976,7 +979,7 @@ describe("AdorneeUtils.getPart", function()
 
 		expect(AdorneeUtils.getPart(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()
@@ -993,7 +996,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(part)).toEqual(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns a model itself", function()
@@ -1002,7 +1005,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(model)).toEqual(model)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns an attachment itself", function()
@@ -1012,7 +1015,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(attachment)).toEqual(attachment)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the character of a humanoid", function()
@@ -1021,7 +1024,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(humanoid)).toEqual(character)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a humanoid with no parent", function()
@@ -1030,7 +1033,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(humanoid)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle of an accessory", function()
@@ -1039,7 +1042,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(accessory)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the part of clothing", function()
@@ -1048,7 +1051,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(clothing)).toEqual(part)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the handle of a tool rather than the tool", function()
@@ -1057,7 +1060,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(tool)).toEqual(handle)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for a tool with no handle", function()
@@ -1066,7 +1069,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(tool)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("returns nil for an unsupported adornee", function()
@@ -1075,7 +1078,7 @@ describe("AdorneeUtils.getRenderAdornee", function()
 
 		expect(AdorneeUtils.getRenderAdornee(folder)).toBeNil()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws for a non-instance", function()

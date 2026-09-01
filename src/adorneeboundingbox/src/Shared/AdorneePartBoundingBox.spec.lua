@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AdorneePartBoundingBox = require("AdorneePartBoundingBox")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 
 local describe = Jest.Globals.describe
@@ -23,7 +24,7 @@ type Controller = {
 	newBoundingBox: (part: BasePart) -> AdorneePartBoundingBox.AdorneePartBoundingBox,
 	collect: (observable: any) -> Record,
 	step: (count: number?) -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
@@ -63,10 +64,12 @@ local function setup(): Controller
 			end
 		end,
 
-		destroy = function()
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -79,7 +82,7 @@ describe("AdorneePartBoundingBox.new", function()
 			AdorneePartBoundingBox.new(Instance.new("Folder") :: any)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("seeds the size from the part", function()
@@ -92,7 +95,7 @@ describe("AdorneePartBoundingBox.new", function()
 		expect(record.count).toBe(1)
 		expect(record.values[1]).toEqual(Vector3.new(4, 1, 2))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("seeds the cframe from the part", function()
@@ -105,7 +108,7 @@ describe("AdorneePartBoundingBox.new", function()
 		expect(record.count).toBe(1)
 		expect(record.values[1]).toEqual(CFrame.new(1, 2, 3))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -123,7 +126,7 @@ describe("AdorneePartBoundingBox:ObserveSize", function()
 		expect(record.count).toBe(2)
 		expect(record.values[2]).toEqual(Vector3.new(8, 3, 5))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("does not emit when the size is unchanged", function()
@@ -138,7 +141,7 @@ describe("AdorneePartBoundingBox:ObserveSize", function()
 
 		expect(record.count).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -156,7 +159,7 @@ describe("AdorneePartBoundingBox:ObserveCFrame", function()
 		expect(record.count).toBe(2)
 		expect(record.values[2]).toEqual(CFrame.new(10, 0, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("keeps tracking an unanchored part", function()
@@ -174,7 +177,7 @@ describe("AdorneePartBoundingBox:ObserveCFrame", function()
 
 		expect(record.values[record.count]).toEqual(CFrame.new(0, 25, 0))
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -193,6 +196,6 @@ describe("AdorneePartBoundingBox:Destroy", function()
 
 		expect(record.count).toBe(1)
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

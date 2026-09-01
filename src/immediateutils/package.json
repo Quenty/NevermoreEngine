@@ -1,6 +1,6 @@
 {
   "name": "@quenty/immediateutils",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "Immediate-mode ECS loop and hooks implemented via jecs+iris addons",
   "keywords": [
     "Roblox",
