@@ -1,20 +1,11 @@
-# v1.4.0 (Tue Sep 01 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'users/euvinkeel/immediate-tweaks' of https://github.com/Quenty/NevermoreEngine into users/euvinkeel/immediate-tweaks ([@euvinkeel](https://github.com/euvinkeel))
-- Merge branch 'main' into users/euvinkeel/immediate-tweaks ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.3.0...@quenty/iris@1.4.0) (2026-09-01)
+
+**Note:** Version bump only for package @quenty/iris
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.2.0...@quenty/iris@1.3.0) (2026-08-28)
 
