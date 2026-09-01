@@ -70,6 +70,38 @@ function AdorneeUtils.getBoundingBox(adornee: Instance): (CFrame?, Vector3?)
 end
 
 --[=[
+	Moves the adornee so its bounding box sits at the given cframe, keeping every part where it
+	sits relative to the others.
+
+	This is the counterpart to [AdorneeUtils.getBoundingBox], and is not the same as `PivotTo`,
+	which moves the adornee by its pivot rather than by the center of its bounds.
+
+	@param adornee Instance
+	@param cframe CFrame -- New bounding box cframe
+	@return boolean -- False when the adornee has no bounding box to move
+]=]
+function AdorneeUtils.setBoundingBoxCFrame(adornee: Instance, cframe: CFrame): boolean
+	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
+	assert(typeof(cframe) == "CFrame", "Bad cframe")
+
+	local bbCFrame = AdorneeUtils.getBoundingBox(adornee)
+	if not bbCFrame then
+		return false
+	end
+
+	local relativeCFrames: { [BasePart]: CFrame } = {}
+	for _, part in AdorneeUtils.getParts(adornee) do
+		relativeCFrames[part] = bbCFrame:ToObjectSpace(part.CFrame)
+	end
+
+	for part, relativeCFrame in relativeCFrames do
+		part.CFrame = cframe:ToWorldSpace(relativeCFrame)
+	end
+
+	return true
+end
+
+--[=[
 	Returns whether a part is a part of an adornee
 	@param adornee Instance
 	@param part BasePart
