@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local onRenderStepFrame = require("onRenderStepFrame")
 
 local describe = Jest.Globals.describe
@@ -14,11 +16,18 @@ local it = Jest.Globals.it
 
 type Controller = {
 	bind: (number, () -> ()) -> () -> (),
-	destroy: () -> (),
+	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
+	local maid = Maid.new()
 	local unbinds: { () -> () } = {}
+
+	maid:GiveTask(function()
+		for _, unbind in unbinds do
+			unbind()
+		end
+	end)
 
 	local controller: Controller = {
 		bind = function(priority: number, callback: () -> ())
@@ -27,12 +36,12 @@ local function setup(): Controller
 			return unbind
 		end,
 
-		destroy = function()
-			for _, unbind in unbinds do
-				unbind()
-			end
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
 
 	return controller
 end
@@ -45,7 +54,7 @@ describe("onRenderStepFrame", function()
 
 		expect(type(unbind)).toBe("function")
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("tolerates a repeated unbind", function()
@@ -58,7 +67,7 @@ describe("onRenderStepFrame", function()
 			unbind()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("binds each call under its own key", function()
@@ -73,7 +82,7 @@ describe("onRenderStepFrame", function()
 			second()
 		end).never.toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-number priority", function()
@@ -83,7 +92,7 @@ describe("onRenderStepFrame", function()
 			(onRenderStepFrame :: any)("high", function() end)
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 
 	it("throws on a non-function callback", function()
@@ -93,6 +102,6 @@ describe("onRenderStepFrame", function()
 			(onRenderStepFrame :: any)(100, "callback")
 		end).toThrow()
 
-		controller.destroy()
+		controller:Destroy()
 	end)
 end)

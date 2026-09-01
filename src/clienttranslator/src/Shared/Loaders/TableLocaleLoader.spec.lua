@@ -28,7 +28,7 @@ describe("TableLocaleLoader", function()
 		expect(entry.Values["en"]).toBe("Hello")
 		expect(entry.Example).toBe("Hello")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("loads only once across the load entry points", function()
@@ -46,6 +46,6 @@ describe("TableLocaleLoader", function()
 		controller.flush()
 		expect(controller.getWriteCount()).toBe(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

@@ -2,7 +2,7 @@
 	Simple Lune test runner for studio-bridge plugin modules.
 
 	Usage:
-	  lune run test/test-runner                      -- discover all *.test.luau in test/
+	  lune run test/test-runner                      -- discover all *.test.lua in test/
 	  lune run test/test-runner test/protocol.test   -- run specific test file(s)
 
 	Each test file must return a list of { name: string, fn: () -> () } entries.
@@ -27,25 +27,25 @@ local testRequirePaths: { string } = {}
 
 if #process.args > 0 then
 	for _, arg in process.args do
-		-- Allow both "test/foo.test" and "test/foo.test.luau"
+		-- Allow both "test/foo.test" and "test/foo.test.lua"
 		local path = arg
-		if not string.match(path, "%.luau$") then
-			path = path .. ".luau"
+		if not string.match(path, "%.lua$") then
+			path = path .. ".lua"
 		end
 		table.insert(testFiles, path)
 
-		-- Build a require path relative to this runner (./ prefix, no .luau)
-		local name = string.match(path, "([^/]+)%.luau$") or path
-		table.insert(testRequirePaths, "./" .. string.gsub(name, "%.luau$", ""))
+		-- Build a require path relative to this runner (./ prefix, no .lua)
+		local name = string.match(path, "([^/]+)%.lua$") or path
+		table.insert(testRequirePaths, "./" .. string.gsub(name, "%.lua$", ""))
 	end
 else
-	-- Discover all *.test.luau files in the test/ directory (non-recursive).
+	-- Discover all *.test.lua files in the test/ directory (non-recursive).
 	local entries = fs.readDir(scriptDir)
 	for _, entry in entries do
-		if string.match(entry, "%.test%.luau$") then
+		if string.match(entry, "%.test%.lua$") then
 			table.insert(testFiles, scriptDir .. entry)
 			-- require path relative to this script: ./filename (no extension)
-			local name = string.gsub(entry, "%.luau$", "")
+			local name = string.gsub(entry, "%.lua$", "")
 			table.insert(testRequirePaths, "./" .. name)
 		end
 	end

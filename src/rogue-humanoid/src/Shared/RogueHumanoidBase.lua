@@ -209,7 +209,7 @@ function RogueHumanoidBase._updateScaleValue(_self: RogueHumanoidBase, numberVal
 	local multiplier = min + (math.exp(r * t) * (-min + max)) / (math.exp(r * t) + (-i + max) / (i - min))
 	-- TODO: Ask trey what's up with this
 	if state.scale == 1 then
-		numberValue = initialValue
+		numberValue.Value = initialValue
 	else
 		numberValue.Value = initialValue * multiplier
 	end

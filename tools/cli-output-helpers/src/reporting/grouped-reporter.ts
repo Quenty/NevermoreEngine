@@ -3,10 +3,11 @@ import { formatDurationMs, isCI } from '../cli-utils.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
 import {
-  formatProgressResult,
-  isEmptyTestRun,
-  isUnreportedTestRun,
-} from './progress-format.js';
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+} from './result-status.js';
 
 export interface GroupedReporterOptions {
   showLogs: boolean;
@@ -79,45 +80,22 @@ export class GroupedReporter extends BaseReporter {
 
     const showLogs = this._options.showLogs || !result.success;
     const duration = formatDurationMs(result.durationMs);
-    const successLabel = this._options.successLabel ?? 'Passed';
-    const failureLabel =
-      result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
 
-    const progressText = formatProgressResult(result.progressSummary);
-    const empty = isEmptyTestRun(result.progressSummary);
+    const status = resolveResultStatus(result, {
+      successLabel: this._options.successLabel,
+      failureLabel: this._options.failureLabel,
+      expectsTestCounts: this._options.expectsTestCounts,
+    });
 
-    const unverified =
-      (this._options.expectsTestCounts ?? false) &&
-      isUnreportedTestRun(result.progressSummary);
-
-    if (result.success) {
-      const label = unverified
-        ? 'Unverified — no test counts reported'
-        : progressText
-        ? `${successLabel} ${progressText}`
-        : successLabel;
-      const formatted =
-        empty || unverified
-          ? OutputHelper.formatWarning(`${label} ⚠`)
-          : OutputHelper.formatSuccess(label);
-      const icon =
-        empty || unverified
-          ? OutputHelper.formatWarning('⚠')
-          : OutputHelper.formatSuccess('✓');
-      console.log(
-        `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
-      );
-    } else {
-      const failedPhase = result.failedPhase;
-      const label = failedPhase
-        ? `${failureLabel} at ${failedPhase}`
-        : failureLabel;
-      console.log(
-        `  ${OutputHelper.formatError('✗')} ${OutputHelper.formatError(
-          label
-        )} ${OutputHelper.formatDim(`(${duration})`)}`
-      );
-    }
+    console.log(
+      `  ${colorStatus(
+        statusIcon(status.severity, 'ascii'),
+        status.severity
+      )} ${colorStatus(
+        formatStatusText(status),
+        status.severity
+      )} ${OutputHelper.formatDim(`(${duration})`)}`
+    );
 
     if (showLogs) {
       if (result.logs) {

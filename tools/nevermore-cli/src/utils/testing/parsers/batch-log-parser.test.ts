@@ -1,10 +1,39 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 
 import {
   countTracebacks,
   findSummaryEntries,
   parseBatchTestLogs,
 } from './batch-log-parser.js';
+
+/** Collect what the parser said out loud, so silence can be asserted on. */
+function captureWarnings(): () => string[] {
+  const warnings: string[] = [];
+  vi.spyOn(OutputHelper, 'warn').mockImplementation((message: string) => {
+    warnings.push(message);
+  });
+  vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+  vi.spyOn(OutputHelper, 'startGroup').mockImplementation(() => {});
+  vi.spyOn(OutputHelper, 'endGroup').mockImplementation(() => {});
+  return () => warnings;
+}
+
+/**
+ * Everything the parser reported, with its level — for findings that are a
+ * group rather than a single warning.
+ */
+function captureDiagnostics(): Array<{ level: string; message: string }> {
+  return [];
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+const RETURNED_COUNTS =
+  '"counts":{"passed":273,"failed":2,"skipped":1,"total":276,' +
+  '"suitesPassed":8,"suitesFailed":1,"suitesTotal":9},"ranJest":true';
 
 const SLUG_MAP = new Map([['egghunt2026', 'egghunt2026']]);
 
@@ -151,6 +180,565 @@ describe('parseBatchTestLogs', () => {
     expect(result?.testCounts?.failed).toBe(0);
     expect(result?.tracebackCount).toBe(1);
   });
+
+  it('prefers the counts the runner returned over the ones in the section', () => {
+    // The whole point of returning them: these are the numbers a truncated log
+    // window cannot take away.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '(the section this run printed is gone)',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"counts":' +
+        '{"passed":275,"failed":0,"skipped":2,"total":277,' +
+        '"suitesPassed":9,"suitesFailed":0,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 277 });
+  });
+
+  it('ignores malformed counts instead of reporting zeroes', () => {
+    const logs = buildLogs('Tests:  275 passed, 275 total').replace(
+      '"durationMs":1000',
+      '"durationMs":1000,"counts":{"passed":"lots"}'
+    );
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('reports why the runner failed a package rather than guessing', () => {
+    // A failing suite used to reach here as a Luau error. It arrives as a
+    // verdict now, and saying "Luau error" about it sends you hunting for one.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  2 failed, 273 passed, 275 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false,"durationMs":1000,' +
+        '"error":"[NevermoreTestRunner] 2 test(s) and 0 test suite(s) failed",' +
+        '"counts":{"passed":273,"failed":2,"skipped":0,"total":275,' +
+        '"suitesPassed":8,"suitesFailed":0,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('[NevermoreTestRunner] 2 test(s)');
+    expect(result?.error).not.toContain('Luau error');
+    expect(result?.testCounts).toEqual({ passed: 273, failed: 2, total: 275 });
+  });
+
+  it('does not believe a pass reported alongside failed tests', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  275 passed, 275 total',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"counts":' +
+        '{"passed":273,"failed":2,"skipped":0,"total":275,' +
+        '"suitesPassed":8,"suitesFailed":1,"suitesTotal":9}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('2 failed test(s)');
+  });
+
+  it('still reads a summary from a package that returned no counts', () => {
+    // A test script written before results were returned.
+    const result = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total'),
+      SLUG_MAP
+    ).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.testCounts).toEqual({ passed: 275, failed: 0, total: 275 });
+  });
+
+  it('records where each package’s counts came from', () => {
+    // The structured channel and log scraping produce identical-looking output,
+    // so a channel that quietly stopped flowing is invisible without this.
+    const scraped = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total'),
+      SLUG_MAP
+    ).get('egghunt2026');
+    expect(scraped?.countsSource).toBe('scraped');
+    expect(scraped?.testResults).toBeUndefined();
+
+    const returned = parseBatchTestLogs(
+      buildLogs('Tests:  2 failed, 273 passed, 276 total').replace(
+        '"durationMs":1000',
+        `"durationMs":1000,${RETURNED_COUNTS}`
+      ),
+      SLUG_MAP
+    ).get('egghunt2026');
+    expect(returned?.countsSource).toBe('returned');
+    expect(returned?.testResults).toMatchObject({
+      ranJest: true,
+      passed: 273,
+      failed: 2,
+      skipped: 1,
+      total: 276,
+      suitesFailed: 1,
+    });
+  });
+
+  it('reports a fallback to log scraping as one group naming each package', () => {
+    // Per-package lines said the same thing once per package, which in a real
+    // batch buried everything else under 78 restatements of one finding.
+    const diagnostics = captureDiagnostics();
+
+    parseBatchTestLogs(buildLogs('Tests:  275 passed, 275 total'), SLUG_MAP, {
+      onDiagnostic: (level, message) => diagnostics.push({ level, message }),
+    });
+
+    const group = diagnostics.find((d) => d.level === 'group');
+    expect(group?.message).toContain('fell back to log scraping');
+    expect(group?.message).toContain('1 of 1');
+    expect(diagnostics.some((d) => d.message.includes('egghunt2026'))).toBe(
+      true
+    );
+    expect(diagnostics.filter((d) => d.level === 'endgroup')).toHaveLength(1);
+  });
+
+  it('says nothing about a fallback when every package returned its counts', () => {
+    const warnings = captureWarnings();
+
+    parseBatchTestLogs(
+      buildLogs('Tests:  2 failed, 273 passed, 276 total').replace(
+        '"durationMs":1000',
+        `"durationMs":1000,${RETURNED_COUNTS}`
+      ),
+      SLUG_MAP
+    );
+
+    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
+      false
+    );
+  });
+
+  it('passes every package whose returned counts are clean', () => {
+    // The regression this guards: a runner consulted jest-lua's inverted
+    // AggregatedResult.success and failed all four packages in a batch, three of
+    // which had every test passing.
+    const warnings = captureWarnings();
+    const fourPackages = new Map([
+      ['access', 'access'],
+      ['animations', 'animations'],
+      ['binder', 'binder'],
+      ['blend', 'blend'],
+    ]);
+
+    const clean = (slug: string, passed: number) =>
+      [
+        `===BATCH_TEST_BEGIN ${slug}===`,
+        `Tests:  ${passed} passed, ${passed} total`,
+        `===BATCH_TEST_END ${slug} PASS 100===`,
+      ].join('\n');
+
+    const entry = (slug: string, passed: number) =>
+      `{"slug":"${slug}","success":true,"durationMs":100,"ranJest":true,` +
+      `"counts":{"passed":${passed},"failed":0,"skipped":0,"total":${passed},` +
+      `"suitesPassed":1,"suitesFailed":0,"suitesTotal":1}}`;
+
+    const logs = [
+      clean('access', 311),
+      clean('animations', 8),
+      clean('binder', 99),
+      clean('blend', 3),
+      '===BATCH_TEST_SUMMARY===',
+      `[${entry('access', 311)},${entry('animations', 8)},` +
+        `${entry('binder', 99)},${entry('blend', 3)}]`,
+    ].join('\n');
+
+    const parsed = parseBatchTestLogs(logs, fourPackages);
+
+    expect([...parsed.values()].filter((r) => r.success)).toHaveLength(4);
+    expect(parsed.get('access')?.testCounts).toEqual({
+      passed: 311,
+      failed: 0,
+      total: 311,
+    });
+    expect(warnings()).toHaveLength(0);
+  });
+
+  it('warns when a failure’s own counts show nothing failed', () => {
+    const warnings = captureWarnings();
+
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  311 passed, 311 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 100===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false,"durationMs":100,"ranJest":true,' +
+        '"error":"[NevermoreTestRunner] something","counts":{"passed":311,' +
+        '"failed":0,"skipped":0,"total":311,"suitesPassed":19,"suitesFailed":0,' +
+        '"suitesTotal":19}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    // The verdict stands — it is not the parser's to overturn — but it is loud.
+    expect(result?.success).toBe(false);
+    expect(
+      warnings().some((w) => w.includes('own counts show nothing failed'))
+    ).toBe(true);
+  });
+
+  it('accepts returned counts in place of a jest report the log lost', () => {
+    // The CI case this whole channel exists for: dozens of packages share one log
+    // window, so a section keeps its END marker long after its jest summary was
+    // dropped. Requiring the report there failed the package anyway.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '  ✓ one line of output that survived',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000,"ranJest":true,' +
+        '"counts":{"passed":311,"failed":0,"skipped":0,"total":311,' +
+        '"suitesPassed":19,"suitesFailed":0,"suitesTotal":19}}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.error).toBeUndefined();
+    expect(result?.testCounts).toEqual({ passed: 311, failed: 0, total: 311 });
+  });
+
+  it('still demands a jest report from a package that returned no counts', () => {
+    // Nothing structural to stand in for it, so the stand-in stays.
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '  ✓ one line of output that survived',
+      '===BATCH_TEST_END egghunt2026 PASS 1000===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('nothing proves any test ran');
+  });
+
+  it('judges a package whose section was lost entirely on its counts', () => {
+    const warnings = captureWarnings();
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true,"durationMs":10,"ranJest":true,' +
+        '"counts":{"passed":10,"failed":0,"skipped":0,"total":10,"suitesPassed":1,' +
+        '"suitesFailed":0,"suitesTotal":1}},' +
+        '{"slug":"beta","success":true,"durationMs":20,"ranJest":true,' +
+        '"counts":{"passed":7,"failed":0,"skipped":0,"total":7,"suitesPassed":1,' +
+        '"suitesFailed":0,"suitesTotal":1}}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    // beta's section never arrived; its counts did.
+    expect(results.get('beta')?.success).toBe(true);
+    expect(results.get('beta')?.testCounts).toEqual({
+      passed: 7,
+      failed: 0,
+      total: 7,
+    });
+    // Narrower than a verdict with a section: nothing checked it for tracebacks.
+    expect(
+      warnings().some((w) => w.includes('not checked for Luau tracebacks'))
+    ).toBe(true);
+  });
+
+  it('still fails a lost section when no counts came back either', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('beta')?.success).toBe(false);
+    expect(results.get('beta')?.error).toContain(
+      'no output could be attributed'
+    );
+  });
+
+  it('warns when the returned counts and the log disagree', () => {
+    // The exact failure that shipped once: the runner read the wrong level of
+    // jest's result, so every count came back zero and read as a clean run.
+    const warnings = captureWarnings();
+
+    const result = parseBatchTestLogs(
+      buildLogs('Tests:  275 passed, 275 total').replace(
+        '"durationMs":1000',
+        '"durationMs":1000,"counts":{"passed":0,"failed":0,"skipped":0,' +
+          '"total":0,"suitesPassed":0,"suitesFailed":0,"suitesTotal":0},"ranJest":true'
+      ),
+      SLUG_MAP
+    );
+
+    expect(
+      warnings().some((w) =>
+        w.includes('returned counts disagree with the log')
+      )
+    ).toBe(true);
+    expect(result.get('egghunt2026')?.countsSource).toBe('returned');
+  });
+
+  it('fails a section containing a traceback', () => {
+    const logs = buildLogs(
+      [
+        'Tests:  155 passed, 155 total',
+        'PlayerBadgeHelper: attempt to index nil',
+        'Stack Begin',
+        "Script 'PlayerBadgeHelper', Line 365",
+        'Stack End',
+      ].join('\n')
+    );
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('Luau traceback(s)');
+  });
+
+  it('takes the whole inner string as the slug when END has no PASS or FAIL', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(true);
+    expect(result?.testCounts).toEqual({ passed: 5, failed: 0, total: 5 });
+  });
+
+  it('records no duration for an END that carries none', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.durationMs).toBeUndefined();
+  });
+
+  it('falls back to the END marker duration when the summary entry omits one', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS 4242===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.durationMs).toBe(4242);
+  });
+
+  it('lets only the first BEGIN-less END claim the output above it', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.testCounts?.total).toBe(10);
+    expect(results.get('beta')?.testCounts).toBeUndefined();
+    expect(results.get('beta')?.logs).toBe('');
+    expect(results.get('beta')?.error).toContain(
+      'no output could be attributed'
+    );
+  });
+
+  it('distinguishes a reported Luau error from an absent summary entry', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha FAIL 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":false,"error":"boom"}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.success).toBe(false);
+    // The reason the runner gave, not a guess at one: a failing suite reaches
+    // the summary as a verdict now, and calling it a Luau error sends whoever
+    // reads it hunting for a traceback that was never thrown.
+    expect(results.get('alpha')?.error).toBe('boom');
+    expect(results.get('beta')?.success).toBe(false);
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('reads every package as missing when the summary payload is not JSON', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+      '===BATCH_TEST_SUMMARY===',
+      'not json at all',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('reads every package as missing when no summary arrived at all', () => {
+    const twoPackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+    ]);
+    const logs = [
+      '===BATCH_TEST_BEGIN alpha===',
+      'Tests:  10 passed, 10 total',
+      '===BATCH_TEST_END alpha PASS 10===',
+      '===BATCH_TEST_BEGIN beta===',
+      'Tests:  20 passed, 20 total',
+      '===BATCH_TEST_END beta PASS 20===',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, twoPackages);
+
+    expect(results.get('alpha')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+    expect(results.get('beta')?.error).toBe(
+      'this package is missing from the batch summary'
+    );
+  });
+
+  it('joins several failure reasons with a semicolon', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      'Tests:  2 failed, 8 passed, 10 total',
+      'Test Suites:  1 failed, 3 total',
+      '===BATCH_TEST_END egghunt2026 FAIL 10===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":false}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.error).toBe(
+      'the batch runner reported this as failed; ' +
+        '1 test suite(s) failed; 2 test(s) failed'
+    );
+  });
+
+  it('treats a marker missing its trailing delimiter as ordinary content', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '===BATCH_TEST_BEGIN egghunt2026',
+      'Tests:  5 passed, 5 total',
+      '===BATCH_TEST_END egghunt2026 PASS 5===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.logs).toContain('===BATCH_TEST_BEGIN egghunt2026');
+    expect(result?.testCounts).toEqual({ passed: 5, failed: 0, total: 5 });
+  });
+
+  it('hands unattributable output to the first package only', () => {
+    const threePackages = new Map([
+      ['alpha', 'alpha'],
+      ['beta', 'beta'],
+      ['gamma', 'gamma'],
+    ]);
+    const logs = [
+      'PlayerBadgeHelper: attempt to index nil',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"alpha","success":true},{"slug":"beta","success":true},' +
+        '{"slug":"gamma","success":true}]',
+    ].join('\n');
+
+    const results = parseBatchTestLogs(logs, threePackages);
+
+    expect(results.get('alpha')?.logs).toContain('PlayerBadgeHelper');
+    expect(results.get('beta')?.logs).toBe('');
+    expect(results.get('gamma')?.logs).toBe('');
+  });
+
+  it('fails an empty section for having no jest report, with no counts', () => {
+    const logs = [
+      '===BATCH_TEST_BEGIN egghunt2026===',
+      '===BATCH_TEST_END egghunt2026 PASS 0===',
+      '===BATCH_TEST_SUMMARY===',
+      '[{"slug":"egghunt2026","success":true}]',
+    ].join('\n');
+
+    const result = parseBatchTestLogs(logs, SLUG_MAP).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.logs).toBe('');
+    expect(result?.error).toBe(
+      'no jest report in output — nothing proves any test ran'
+    );
+    // No counts were seen, so none are reported — an empty section is not zero.
+    expect(result?.testCounts).toBeUndefined();
+  });
 });
 
 describe('findSummaryEntries', () => {
@@ -182,5 +770,76 @@ describe('countTracebacks', () => {
 
   it('is zero for empty output', () => {
     expect(countTracebacks('')).toBe(0);
+  });
+});
+
+describe('parseBatchTestLogs log fetch diagnostics', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const SLUG_MAP = new Map([['egghunt2026', 'egghunt2026']]);
+
+  /** A summary with no section for the package, i.e. output that went missing. */
+  const LOST_SECTION_LOGS = [
+    'Tests:  275 passed, 275 total',
+    '===BATCH_TEST_SUMMARY===',
+    '[{"slug":"egghunt2026","success":true,"durationMs":1000}]',
+  ].join('\n');
+
+  it('reports what the fetch collected on a package with no attributable output', () => {
+    // "276989 chars received" alone cannot say whether the run printed little or
+    // the engine dropped most of it. The caps that would explain it are counted
+    // in entries, pages and requests, so the failure names all of them.
+    const result = parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP, {
+      logFetchStats: {
+        requests: 3,
+        pages: 2,
+        entries: 4,
+        messages: 7627,
+        chars: 276989,
+      },
+    }).get('egghunt2026');
+
+    expect(result?.success).toBe(false);
+    expect(result?.error).toContain('no output could be attributed');
+    expect(result?.error).toContain('3 API call(s)');
+    expect(result?.error).toContain('2 page(s)');
+    expect(result?.error).toContain('4 log entry(ies)');
+    expect(result?.error).toContain('7627 message(s)');
+  });
+
+  it('still reports the volume it can measure with no fetch stats', () => {
+    // A local run has no request count, which must not cost the line and char
+    // counts the parser can always take off the text it was handed.
+    const result = parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP).get(
+      'egghunt2026'
+    );
+
+    expect(result?.error).toContain('no output could be attributed');
+    expect(result?.error).toContain('3 line(s) received');
+    expect(result?.error).toContain('no fetch stats');
+  });
+
+  it('reports the fetch in the unattributed-output warning too', () => {
+    const getWarnings = captureWarnings();
+
+    parseBatchTestLogs(LOST_SECTION_LOGS, SLUG_MAP, {
+      logFetchStats: {
+        requests: 1,
+        pages: 1,
+        entries: 1,
+        messages: 7627,
+        chars: 276989,
+      },
+    });
+
+    expect(
+      getWarnings().some(
+        (warning) =>
+          warning.includes('could not attribute') &&
+          warning.includes('1 log entry(ies), 7627 message(s)')
+      )
+    ).toBe(true);
   });
 });

@@ -52,11 +52,17 @@ export async function detectProjectFileAsync(
 export async function detectScriptFileAsync(
   packagePath: string
 ): Promise<string | undefined> {
+  // Both extensions for each, since a package may use either. The client
+  // entry read `ClientMain.server.luau` and so matched nothing: every client
+  // script in this repo is `ClientMain.client.lua`, and a `.server` client
+  // script does not exist.
   const candidates = [
     'test/scripts/Server/ServerMain.server.lua',
     'test/scripts/Server/ServerMain.server.luau',
     'scripts/Server/ServerMain.server.lua',
-    'scripts/Client/ClientMain.server.luau',
+    'scripts/Server/ServerMain.server.luau',
+    'scripts/Client/ClientMain.client.lua',
+    'scripts/Client/ClientMain.client.luau',
   ];
   for (const candidate of candidates) {
     if (await fileExistsAsync(path.join(packagePath, candidate))) {

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/binder",
-  "version": "14.43.2",
+  "version": "14.45.0",
   "description": "Utility object to Bind a class to Roblox object, and associated helper methods",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/canceltoken": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/linkutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

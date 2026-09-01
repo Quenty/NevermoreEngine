@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.48.0...@quenty/tie@10.49.0) (2026-08-28)
+
+### Bug Fixes
+
+- Fix implementation issues ([e66b446](https://github.com/Quenty/NevermoreEngine/commit/e66b44639e249e0531d842e7ccb0208f357dc351))
+- Tie implementations on client don't implement server methods and vice versa. ([29ca57a](https://github.com/Quenty/NevermoreEngine/commit/29ca57aab206911b06512d44f8a5834a6287dcb8))
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.47.1...@quenty/tie@10.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/tie
+
 ## [10.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.47.0...@quenty/tie@10.47.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/tie

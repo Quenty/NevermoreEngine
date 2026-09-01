@@ -1,7 +1,7 @@
--- transform-inject-deploy-metadata.luau
+-- transform-inject-deploy-metadata.lua
 -- Injects nevermore deploy metadata into a built place.
 --
--- Usage: lune run transform-inject-deploy-metadata.luau <inputPath> <outputPath> <metadataJson>
+-- Usage: lune run transform-inject-deploy-metadata.lua <inputPath> <outputPath> <metadataJson>
 --
 -- The nevermore-cli-manifest package ships a `NevermoreCLIManifestUtils`
 -- ModuleScript. This transform finds that module in the built place and writes
@@ -22,7 +22,7 @@ local outputPath = process.args[2]
 local metadataJson = process.args[3]
 
 if not inputPath or not outputPath or not metadataJson then
-	print("Usage: lune run transform-inject-deploy-metadata.luau <inputPath> <outputPath> <metadataJson>")
+	print("Usage: lune run transform-inject-deploy-metadata.lua <inputPath> <outputPath> <metadataJson>")
 	process.exit(1)
 end
 

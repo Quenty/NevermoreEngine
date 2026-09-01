@@ -13,6 +13,7 @@ local AccessDataService = require("AccessDataService")
 local AccessFeature = require("AccessFeature")
 local AccessService = require("AccessService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
@@ -26,14 +27,18 @@ local function setup()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessService = serviceBag:GetService(AccessService) :: any
 
-	return {
+	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessService = accessService,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessService", function()
@@ -45,7 +50,7 @@ describe("AccessService", function()
 			controller.serviceBag:Start()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("hands back the same registry the shared service exposes", function()
@@ -57,7 +62,7 @@ describe("AccessService", function()
 
 		expect(controller.accessService:GetAccessDataService()).toBe(direct)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("registers features that are then readable through the entry point", function()
@@ -69,6 +74,6 @@ describe("AccessService", function()
 
 		expect(accessDataService:GetFeatureNames()).toEqual({ "hub", WellKnownAccessFeatureNames.OWNS_GAME })
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

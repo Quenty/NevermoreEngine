@@ -8,6 +8,7 @@ local AccessFact = require("AccessFact")
 local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
@@ -53,7 +54,7 @@ local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		maid = maid,
 		fakePlayer = function(): Player
@@ -76,10 +77,14 @@ local function setup()
 			end))
 			return emitted
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessFact.new", function()
@@ -116,7 +121,7 @@ describe("AccessFact.ObserveForPlayer", function()
 		expect(#emitted).toEqual(1)
 		expect(emitted[1].value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("emits the resolved value after the resolver answers", function()
@@ -133,7 +138,7 @@ describe("AccessFact.ObserveForPlayer", function()
 		expect(#emitted).toEqual(2)
 		expect(emitted[2].value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("falls back to unresolved when a resolved fact later fails", function()
@@ -153,7 +158,7 @@ describe("AccessFact.ObserveForPlayer", function()
 		drive.fail()
 		expect(emitted[#emitted].value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves a bare boolean, so a test needs no observable", function()
@@ -167,7 +172,7 @@ describe("AccessFact.ObserveForPlayer", function()
 
 		expect(emitted[#emitted].value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves a ValueObject and follows it", function()
@@ -183,7 +188,7 @@ describe("AccessFact.ObserveForPlayer", function()
 
 		expect(emitted[#emitted].value).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves each player separately", function()
@@ -200,7 +205,7 @@ describe("AccessFact.ObserveForPlayer", function()
 
 		expect(#seen).toEqual(2)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("runs one resolver for concurrent readers of the same player", function()
@@ -220,7 +225,7 @@ describe("AccessFact.ObserveForPlayer", function()
 
 		expect(resolveCount).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("refuses to resolve before it has been initialized", function()
@@ -236,7 +241,7 @@ describe("AccessFact.ObserveForPlayer", function()
 			fact:ObserveForPlayer(controller.fakePlayer())
 		end).toThrow("not initialized")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -259,7 +264,7 @@ describe("AccessFact.new with a value", function()
 		expect(first[#first].value).toEqual(false)
 		expect(second[#second].value).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -308,7 +313,7 @@ describe("AccessFact layering", function()
 		expect(emitted[#emitted].abstained).toEqual(false)
 		expect(emitted[#emitted].value).toEqual(nil)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("abstains when the resolver returns ABSTAIN", function()
@@ -322,6 +327,6 @@ describe("AccessFact layering", function()
 
 		expect(emitted[#emitted].abstained).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

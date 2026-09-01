@@ -9,7 +9,7 @@
 
 	Tags are global and the test place is shared across a batch run, so every controller derives a
 	distinct tag from a single module-level counter, parents everything under its own container, and
-	tears it all down via destroy().
+	tears it all down via Destroy().
 
 	@class PlayerHumanoidBinderTestUtils
 ]=]
@@ -17,6 +17,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local BinderProvider = require("BinderProvider")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local ServiceBag = require("ServiceBag")
@@ -79,6 +81,7 @@ function PlayerHumanoidBinderTestUtils.setup(binderClass, tagPrefix, constructor
 	specCounter += 1
 	local suffix = specCounter
 
+	local maid = Maid.new()
 	local serviceBag = ServiceBag.new()
 	local container = Instance.new("Folder")
 	container.Name = string.format("%sSpecContainer_%d", tagPrefix, suffix)
@@ -151,7 +154,7 @@ function PlayerHumanoidBinderTestUtils.setup(binderClass, tagPrefix, constructor
 		return PlayerMock.loadCharacterAsync(mock, character)
 	end
 
-	local function destroy()
+	maid:GiveTask(function()
 		if initialized then
 			serviceBag:Destroy()
 		end
@@ -161,9 +164,11 @@ function PlayerHumanoidBinderTestUtils.setup(binderClass, tagPrefix, constructor
 			end)
 		end
 		container:Destroy()
-	end
+	end)
 
-	return {
+	maid:GiveTask(JestUtils.afterThis(maid))
+
+	return maid:Add({
 		binder = binder,
 		tag = tag,
 		init = init,
@@ -173,8 +178,10 @@ function PlayerHumanoidBinderTestUtils.setup(binderClass, tagPrefix, constructor
 		newCharacter = newCharacter,
 		setCharacter = setCharacter,
 		loadCharacter = loadCharacter,
-		destroy = destroy,
-	}
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	})
 end
 
 return PlayerHumanoidBinderTestUtils

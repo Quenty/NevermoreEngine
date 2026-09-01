@@ -57,7 +57,7 @@ import {
 const SMOKE_TEST_SCRIPT_PATH = resolvePackagePath(
   import.meta.url,
   'build-scripts',
-  'smoke-test-server.luau'
+  'smoke-test-server.lua'
 );
 
 interface BatchDeployArgs extends NevermoreGlobalArgs {
@@ -285,7 +285,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         reporters.push(
           new GithubCommentTableReporter(
             state,
-            createDeployCommentConfig(),
+            createDeployCommentConfig(deployLabels),
             concurrency
           )
         );
@@ -524,7 +524,7 @@ function _annotateSmokeTestFailure(logs: string): string {
   const header =
     'Post-deploy smoke test failed. The deploy itself succeeded, but a server ' +
     "script errored on boot. ('TaskScript' in any stack trace below refers to " +
-    "Nevermore's smoke-test-server.luau, which loadstring()s each Script under " +
+    "Nevermore's smoke-test-server.lua, which loadstring()s each Script under " +
     'ServerScriptService — if you see "loadstring() is not available", set ' +
     '$properties.LoadStringEnabled = true on ServerScriptService in your ' +
     'rojo project.)';
@@ -564,7 +564,7 @@ async function _runSmokeTestAsync(
   );
 
   const rawLogs = await client.getRawTaskLogsAsync(task.path);
-  const parsed = parseTestLogs(rawLogs);
+  const parsed = parseTestLogs(rawLogs.text);
 
   const infraSuccess = completedTask.state === 'COMPLETE';
   return {

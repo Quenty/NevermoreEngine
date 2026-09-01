@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local RogueModifierBase = require("RogueModifierBase")
 local ServiceBag = require("ServiceBag")
 
@@ -14,7 +16,8 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
-	local serviceBag = ServiceBag.new()
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(require("TieRealmService"))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -25,12 +28,16 @@ local function setup()
 		return RogueModifierBase.new(valueObject, serviceBag), valueObject
 	end
 
-	return {
+	local controller = {
 		newModifierBase = newModifierBase,
-		destroy = function(_self: any)
-			serviceBag:Destroy()
+		Destroy = function(_self: any)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("RogueModifierBase", function()
@@ -43,7 +50,7 @@ describe("RogueModifierBase", function()
 		local modifier = controller.newModifierBase(1)
 		expect(modifier.Order).never.toBeNil()
 		expect(modifier.Source).never.toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should error from the unimplemented GetModifiedVersion", function()
@@ -52,7 +59,7 @@ describe("RogueModifierBase", function()
 		expect(function()
 			modifier:GetModifiedVersion(1)
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should error from the unimplemented ObserveModifiedVersion", function()
@@ -61,6 +68,6 @@ describe("RogueModifierBase", function()
 		expect(function()
 			modifier:ObserveModifiedVersion(1)
 		end).toThrow()
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

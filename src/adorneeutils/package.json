@@ -1,6 +1,6 @@
 {
   "name": "@quenty/adorneeutils",
-  "version": "3.3.6",
+  "version": "3.5.0",
   "description": "AdorneeUtils - Generic adornee functions to make attaching to objects in Roblox easier.",
   "keywords": [
     "Roblox",
@@ -25,6 +25,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

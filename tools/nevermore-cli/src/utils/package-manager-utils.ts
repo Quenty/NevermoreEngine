@@ -4,6 +4,7 @@
  */
 
 import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 
 export const PACKAGE_MANAGERS = ['pnpm', 'npm', 'yarn', 'bun'] as const;
@@ -80,9 +81,20 @@ async function detectInDirectoryAsync(
 export async function detectPackageManagerAsync(
   startDirectory: string
 ): Promise<PackageManager> {
-  let directory = path.resolve(startDirectory);
+  let directory = await resolveRealPathAsync(path.resolve(startDirectory));
+  // Walking to the filesystem root adopts lockfiles that belong to nobody. A
+  // stray package-lock.json in a home directory — npm leaves one behind after a
+  // single `npm install` run there — made every project below it detect as npm,
+  // and in this monorepo that means installing with the one tool that rejects
+  // `workspace:` ranges outright. Nothing above the home directory can be part
+  // of the project, so the search stops there.
+  const boundary = await resolveRealPathAsync(os.homedir());
 
   for (;;) {
+    if (boundary !== undefined && isSamePath(directory, boundary)) {
+      break;
+    }
+
     const detected = await detectInDirectoryAsync(directory);
     if (detected) {
       return detected;
@@ -96,6 +108,27 @@ export async function detectPackageManagerAsync(
   }
 
   return DEFAULT_PACKAGE_MANAGER;
+}
+
+/**
+ * Resolve symlinks and, on Windows, 8.3 short names — `C:\Users\JAMESO~1` and
+ * `C:\Users\James Onnen` are the same directory and must compare equal.
+ * Returns the input unchanged when the path does not exist.
+ */
+async function resolveRealPathAsync(target: string): Promise<string> {
+  try {
+    return await fs.realpath(target);
+  } catch {
+    return target;
+  }
+}
+
+/** Windows paths are case-insensitive; POSIX ones are not. */
+function isSamePath(left: string, right: string): boolean {
+  if (process.platform === 'win32') {
+    return left.toLowerCase() === right.toLowerCase();
+  }
+  return left === right;
 }
 
 /**

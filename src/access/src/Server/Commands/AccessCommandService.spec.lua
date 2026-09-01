@@ -9,6 +9,7 @@ local AccessDataService = require("AccessDataService")
 local AccessPolicy = require("AccessPolicy")
 local AccessPolicyService = require("AccessPolicyService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
@@ -44,7 +45,7 @@ local function setup()
 
 	service:_registerCommands()
 
-	return {
+	local controller = {
 		accessPolicyService = accessPolicyService,
 		command = function(name: string): any
 			return assert(commands[name], `No command registered named {name}`)
@@ -57,10 +58,14 @@ local function setup()
 				end,
 			}))))
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("access-policy", function()
@@ -69,7 +74,7 @@ describe("access-policy", function()
 
 		expect(controller.command("access-policy").definition.Args[1].Type).toEqual("accessPolicyNames")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("switches every policy it was given, not just the first", function()
@@ -82,7 +87,7 @@ describe("access-policy", function()
 		expect(controller.accessPolicyService:IsPolicyEnabled("kickOnNonAdmin")).toEqual(true)
 		expect(controller.accessPolicyService:IsPolicyEnabled("watchShop")).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("switches them back off again", function()
@@ -94,7 +99,7 @@ describe("access-policy", function()
 
 		expect(controller.accessPolicyService:IsPolicyEnabled("kickOnNonAdmin")).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("switches nothing at all when one name in the list is not registered", function()
@@ -108,7 +113,7 @@ describe("access-policy", function()
 		expect(controller.accessPolicyService:IsPolicyEnabled("kickOnNonAdmin")).toEqual(false)
 		expect(string.find(result, "nosuch") ~= nil).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names every unknown one, in the same checkable order as the rest", function()
@@ -119,7 +124,7 @@ describe("access-policy", function()
 
 		expect(result).toEqual("No policy registered named: aaa, zzz")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("names what it switched, in an order somebody can check against", function()
@@ -131,7 +136,7 @@ describe("access-policy", function()
 
 		expect(result).toEqual("Disabled kickOnNonAdmin, watchShop.")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("counts them once naming them would be a wall, which is what * produces", function()
@@ -147,6 +152,6 @@ describe("access-policy", function()
 
 		expect(result).toEqual("Enabled 5 policies.")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionProviderClient = require("PermissionProviderClient")
 local PermissionProviderConstants = require("PermissionProviderConstants")
@@ -32,9 +33,9 @@ local function setup()
 
 	local localPlayer = maid:Add(PlayerMock.new({ UserId = LOCAL_USER_ID }))
 	localPlayer.Parent = Workspace
-	PlayerMock.setMockedLocalPlayer(localPlayer)
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
 
-	return {
+	local controller = {
 		localPlayer = localPlayer,
 		makeProvider = function(invokeServer: (() -> any)?): any
 			local provider: any = PermissionProviderClient.new("PermissionProviderClientSpecRemote")
@@ -62,11 +63,15 @@ local function setup()
 			expect(ok).toEqual(false)
 			return tostring(err)
 		end,
-		destroy = function(_self)
-			PlayerMock.setMockedLocalPlayer(nil)
+		Destroy = function(_self)
+			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PermissionProviderClient construction", function()
@@ -92,7 +97,7 @@ describe("PermissionProviderClient.PromiseIsAdmin argument validation", function
 			provider:PromiseIsAdmin(5 :: any)
 		end).toThrow("Bad player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a player other than the designated local player", function()
@@ -104,7 +109,7 @@ describe("PermissionProviderClient.PromiseIsAdmin argument validation", function
 			provider:PromiseIsAdmin(otherPlayer)
 		end).toThrow("We only support local player")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -117,7 +122,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves the server's answer for a nil player", function()
@@ -128,7 +133,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(nil))).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("denies when the server answers false", function()
@@ -139,7 +144,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 
 		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects a non-boolean server answer", function()
@@ -151,7 +156,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
 		expect(message).toContain("Got non-boolean from server")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects when the server invoke throws", function()
@@ -163,7 +168,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
 		expect(message).toContain("Server invoke failed")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("caches the admin answer across calls", function()
@@ -181,6 +186,6 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		expect(controller.awaitBool(first)).toEqual(true)
 		expect(invokeCount).toEqual(1)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

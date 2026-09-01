@@ -1,6 +1,6 @@
 {
   "name": "@quenty/humanoidutils",
-  "version": "2.18.1",
+  "version": "2.20.0",
   "description": "General humanoid utility code.",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

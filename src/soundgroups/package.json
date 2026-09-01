@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundgroup",
-  "version": "1.53.1",
+  "version": "1.55.0",
   "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/counter": "workspace:*",
+    "@quenty/instance-path": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

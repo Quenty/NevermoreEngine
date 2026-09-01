@@ -26,6 +26,7 @@ export {
   WatchResultReporter,
   type WatchResultReporterOptions,
 } from './watch-result-reporter.js';
+export { AggregatedBatchReporter } from './aggregated-batch-reporter.js';
 export { CompositeResultReporter } from './composite-result-reporter.js';
 export {
   buildResultReporter,
@@ -52,6 +53,18 @@ export {
   isEmptyTestRun,
   summarizeFailure,
 } from './progress-format.js';
+export {
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+  tallyCaveats,
+  type ResolveResultStatusOptions,
+  type ResultCaveat,
+  type ResultSeverity,
+  type ResultStatus,
+  type ResultStatusInput,
+} from './result-status.js';
 
 // State tracking
 export {

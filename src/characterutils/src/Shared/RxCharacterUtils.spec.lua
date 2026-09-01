@@ -26,12 +26,10 @@ end
 local function setup()
 	local player = PlayerMock.new()
 	player.Parent = workspace -- setMockedLocalPlayer requires a parented mock
-	PlayerMock.setMockedLocalPlayer(player)
+	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
 
 	local function cleanup()
-		if PlayerMock.getMockedLocalPlayer() == player then
-			PlayerMock.setMockedLocalPlayer(nil)
-		end
+		restoreLocalPlayer()
 		player:Destroy() -- also removes any loaded character, like a player leaving
 	end
 

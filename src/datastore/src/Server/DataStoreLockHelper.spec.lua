@@ -23,7 +23,7 @@ describe("DataStore session locking", function()
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -37,7 +37,7 @@ describe("DataStore session locking", function()
 		expect(raw.lock.ActiveSession).never.toBeNil()
 		expect(raw.lock.ActiveSession.SessionId).toEqual(dataStore:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("releases the lock on SaveAndCloseSession so a new session can load", function()
@@ -50,7 +50,7 @@ describe("DataStore session locking", function()
 		local loadA = sessionA:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadA, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadA:Yield())).toEqual(true)
@@ -58,7 +58,7 @@ describe("DataStore session locking", function()
 		local closePromise = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closePromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((closePromise:Yield())).toEqual(true)
@@ -74,12 +74,12 @@ describe("DataStore session locking", function()
 		local loadB = sessionB:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadB, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadB:Yield())).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("preserves user data across a lock/unlock round-trip", function()
@@ -93,7 +93,7 @@ describe("DataStore session locking", function()
 		local closePromise = sessionA:SaveAndCloseSession()
 		if not PromiseTestUtils.awaitSettled(closePromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((closePromise:Yield())).toEqual(true)
@@ -105,7 +105,7 @@ describe("DataStore session locking", function()
 		local loadPromise = sessionB:Load("coins")
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -113,7 +113,7 @@ describe("DataStore session locking", function()
 		expect(ok).toEqual(true)
 		expect(value).toEqual(5)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("steals a stale lock left by a dead session", function()
@@ -138,7 +138,7 @@ describe("DataStore session locking", function()
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((promise:Yield())).toEqual(true)
@@ -149,12 +149,12 @@ describe("DataStore session locking", function()
 		local loadPromise = dataStore:Load("coins")
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadPromise:Wait())).toEqual(7)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("fires SessionStolen when saving over a lock held by another session", function()
@@ -167,7 +167,7 @@ describe("DataStore session locking", function()
 		local loadPromise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadPromise:Yield())).toEqual(true)
@@ -193,14 +193,14 @@ describe("DataStore session locking", function()
 		local savePromise = dataStore:Save()
 		if not PromiseTestUtils.awaitSettled(savePromise, 10) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(stolenBy).never.toBeNil()
 		expect(stolenBy.SessionId).toEqual("thief-session-id")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("surfaces a locked-load datastore failure fast instead of hanging", function()
@@ -214,7 +214,7 @@ describe("DataStore session locking", function()
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 5) then
 			expect("hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -222,6 +222,6 @@ describe("DataStore session locking", function()
 		expect(ok).toEqual(true)
 		expect(loadedOk).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

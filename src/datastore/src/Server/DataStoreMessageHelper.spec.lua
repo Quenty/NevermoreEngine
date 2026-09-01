@@ -20,7 +20,7 @@ describe("DataStoreMessageHelper.new", function()
 
 		expect(helper).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should expose the ServiceBag it was built with", function()
@@ -29,7 +29,7 @@ describe("DataStoreMessageHelper.new", function()
 
 		expect((helper:GetServiceBag() == controller.serviceBag)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should reject a nil serviceBag", function()
@@ -40,7 +40,7 @@ describe("DataStoreMessageHelper.new", function()
 			DataStoreMessageHelper.new(nil, dataStore)
 		end).toThrow("No serviceBag")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("should not error on construct then Destroy", function()
@@ -51,7 +51,7 @@ describe("DataStoreMessageHelper.new", function()
 			helper:Destroy()
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -68,7 +68,7 @@ describe("DataStoreMessageHelper.PromiseSendSessionMessage", function()
 			})
 		end).toThrow("Cannot message self")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -80,7 +80,7 @@ describe("DataStoreMessageHelper.PromiseCloseSessionGraceful", function()
 		local promise = helper:PromiseCloseSessionGraceful(1, "some-other-job", "some-other-session")
 		expect(promise).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -99,7 +99,7 @@ describe("DataStore.SetSessionMessagingEnabled wiring", function()
 			dataStore:SetSessionMessagingEnabled(false)
 		end).never.toThrow()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 

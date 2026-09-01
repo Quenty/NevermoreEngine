@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.44.0...@quenty/nevermore-cli@4.45.0) (2026-08-28)
+
+### Bug Fixes
+
+- Dryrun does not create place ([2c7f39d](https://github.com/Quenty/NevermoreEngine/commit/2c7f39d0374c423fae572fa36ccf7f9fd794a27b))
+
+# [4.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.4...@quenty/nevermore-cli@4.44.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
 ## [4.43.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.3...@quenty/nevermore-cli@4.43.4) (2026-08-16)
 
 ### Bug Fixes

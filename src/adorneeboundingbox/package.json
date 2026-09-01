@@ -1,6 +1,6 @@
 {
   "name": "@quenty/adorneeboundingbox",
-  "version": "8.48.1",
+  "version": "8.50.0",
   "description": "Handles logic for reactive bounding box monitoring",
   "keywords": [
     "Roblox",
@@ -32,6 +32,7 @@
     "@quenty/brio": "workspace:*",
     "@quenty/draw": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

@@ -36,7 +36,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
 		expect(entry.Values["fr"]).toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("writes a locale's data when the locale is swapped to", function()
@@ -51,7 +51,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["fr"]).toBe("Bonjour")
 		expect(entry.Values["en"]).toBe("Hello")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("loads the universal and regional files sharing the target language on swap", function()
@@ -73,7 +73,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		expect(entry.Values["es"]).toBe("Hola")
 		expect(entry.Values["es-mx"]).toBe("Que onda")
 		expect(entry.Values["en"]).toBe("Hello")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves a regional locale to the closest available file", function()
@@ -88,7 +88,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["fr"]).toBe(
 			"Bonjour"
 		)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not decode a locale's JSON until it is needed", function()
@@ -111,7 +111,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["en"]).toBe(
 			"Hello"
 		)
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("does not decode or write a locale again once it has been loaded", function()
@@ -134,7 +134,7 @@ describe("JSONTranslator lazy locale loading (client)", function()
 			"Bonjour"
 		)
 		expect(controller.translatorService:GetLocalizationWriteCount()).toBe(writesAfterFirstLoad)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -152,7 +152,7 @@ describe("JSONTranslator instance loading off the client", function()
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
 		expect(entry.Values["fr"]).toBeNil()
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("loads every language once the export asks for them", function()
@@ -170,7 +170,7 @@ describe("JSONTranslator instance loading off the client", function()
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
 		expect(entry.Values["fr"]).toBe("Bonjour")
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reaches a table-driven translator's entries too", function()
@@ -184,6 +184,6 @@ describe("JSONTranslator instance loading off the client", function()
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["en"]).toBe(
 			"Hello"
 		)
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

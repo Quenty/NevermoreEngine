@@ -25,6 +25,7 @@ local require = require(script.Parent.loader).load(script)
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductService = require("GameProductService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local PlayerMock = require("PlayerMock")
@@ -71,7 +72,7 @@ local function setup()
 	playerMockServiceClient:SetLocalPlayer(playerMock)
 	clientBag:Start()
 
-	return {
+	local controller = {
 		serverBag = serverBag,
 		clientBag = clientBag,
 		gameProductService = gameProductService,
@@ -84,12 +85,16 @@ local function setup()
 			expect(ok).toEqual(true)
 			return value
 		end,
-		destroy = function(_self)
+		Destroy = function(_self)
 			clientBag:Destroy()
 			serverBag:Destroy()
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("GameProductService dual-realm boot", function()
@@ -99,7 +104,7 @@ describe("GameProductService dual-realm boot", function()
 		expect(controller.gameProductService).never.toBeNil()
 		expect(controller.gameProductServiceClient).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -114,7 +119,7 @@ describe("PlayerProductManager discovers a PlayerMock", function()
 
 		expect(binder:Get(controller.playerMock)).never.toBeNil()
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -142,7 +147,7 @@ describe("GameProductService server ownership from an injected lookup", function
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves ownership queried by a configured asset key", function()
@@ -160,7 +165,7 @@ describe("GameProductService server ownership from an injected lookup", function
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("rejects an unconfigured asset key", function()
@@ -176,7 +181,7 @@ describe("GameProductService server ownership from an injected lookup", function
 		)
 		expect(outcome).toEqual("rejected")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -204,7 +209,7 @@ describe("GameProductService ownership override", function()
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("clears back to the injected cloud answer", function()
@@ -237,7 +242,7 @@ describe("GameProductService ownership override", function()
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -265,7 +270,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("reports no session purchases for the mock on either realm", function()
@@ -286,7 +291,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -349,7 +354,7 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("takes the client's word for a purchase the marketplace never confirms", function()
@@ -389,7 +394,7 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves false on reject and marks nothing purchased on either realm", function()
@@ -430,7 +435,7 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -482,7 +487,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("grants the pass for a claim the marketplace confirms", function()
@@ -514,7 +519,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("still refuses a client-initiated prompt", function()
@@ -533,7 +538,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 		)
 		expect(outcome).toEqual("rejected")
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -580,7 +585,7 @@ describe("server-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("resolves false on reject and leaves ownership untouched", function()
@@ -613,6 +618,6 @@ describe("server-initiated gamepass prompt", function()
 			)
 		).toEqual(false)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

@@ -23,7 +23,7 @@ describe("two servers: clean handoff and crash recovery", function()
 		serverA:Store("coins", 42)
 		if not PromiseTestUtils.awaitSettled(serverA:SaveAndCloseSession(), 10) then
 			expect("A close hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -31,13 +31,13 @@ describe("two servers: clean handoff and crash recovery", function()
 		local coins = serverB:Load("coins")
 		if not PromiseTestUtils.awaitSettled(coins, 10) then
 			expect("B load hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((coins:Wait())).toEqual(42)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("recovers a crashed server's saved data by stealing its stale lock", function()
@@ -48,7 +48,7 @@ describe("two servers: clean handoff and crash recovery", function()
 		serverA:Store("coins", 7)
 		if not PromiseTestUtils.awaitSettled(serverA:Save(), 10) then
 			expect("A save hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
@@ -60,13 +60,13 @@ describe("two servers: clean handoff and crash recovery", function()
 		local coins = serverB:Load("coins")
 		if not PromiseTestUtils.awaitSettled(coins, 10) then
 			expect("B load hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((coins:Wait())).toEqual(7)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("lets exactly one of two concurrent loads acquire the lock; the other stays blocked", function()
@@ -89,7 +89,7 @@ describe("two servers: clean handoff and crash recovery", function()
 		local owner = controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId
 		expect(owner == serverA:GetSessionId() or owner == serverB:GetSessionId()).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 
 	it("cancels the loser's write when a session is stolen (no duplication)", function()
@@ -113,14 +113,14 @@ describe("two servers: clean handoff and crash recovery", function()
 		serverA:Store("coins", 5)
 		if not PromiseTestUtils.awaitSettled(serverA:Save(), 10) then
 			expect("A save hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 
 		expect(stolen).never.toBeNil()
 		expect(controller.mock:GetRaw(KEY).coins).toEqual(100)
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -136,7 +136,7 @@ describe("two servers: MessagingService graceful close", function()
 		local graceful = helperB:PromiseCloseSessionGraceful(game.PlaceId, game.JobId, serverA:GetSessionId())
 		if not PromiseTestUtils.awaitSettled(graceful, 15) then
 			expect("graceful close hung").toEqual("resolved")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((graceful:Yield())).toEqual(true)
@@ -146,7 +146,7 @@ describe("two servers: MessagingService graceful close", function()
 			return raw ~= nil and raw.lock == nil
 		end, 5)).toEqual(true)
 
-		controller:destroy()
+		controller:Destroy()
 	end, 30000) -- MessagingService round-trip, beyond jest's 5s default
 
 	it("evicts the holder during a messaging-enabled load and then acquires (production flow)", function()
@@ -161,12 +161,12 @@ describe("two servers: MessagingService graceful close", function()
 
 		if not PromiseTestUtils.awaitSettled(loadB, 8) then
 			expect("B messaging load hung").toEqual("settled")
-			controller:destroy()
+			controller:Destroy()
 			return
 		end
 		expect((loadB:Wait())).toEqual(true)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
-		controller:destroy()
+		controller:Destroy()
 	end)
 end)

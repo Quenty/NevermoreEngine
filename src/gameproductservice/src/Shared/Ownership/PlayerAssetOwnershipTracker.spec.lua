@@ -4,8 +4,7 @@
 	config picker (key -> id lookup) and a fake market tracker exposing only a Purchased signal, so
 	no ServiceBag, GameConfig, or real MarketplaceService is involved. A PlayerMock stands in for
 	the player because the tracker only stores the player, never reads properties off it in the code
-	paths under test. Each test destroys everything it creates so nothing leaks into the shared test
-	place.
+	paths under test.
 
 	@class PlayerAssetOwnershipTracker.spec.lua
 ]]
@@ -15,6 +14,8 @@ local Brio = require("Brio")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigPicker = require("GameConfigPicker")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local PlayerMock = require("PlayerMock")
@@ -65,6 +66,8 @@ local function makeConfigPicker()
 end
 
 local function setup()
+	local maid = Maid.new()
+
 	local purchased = Signal.new()
 	local marketTracker = { Purchased = purchased }
 	local player = PlayerMock.new()
@@ -77,15 +80,23 @@ local function setup()
 		marketTracker
 	)
 
-	return {
+	maid:GiveTask(function()
+		tracker:Destroy()
+		purchased:Destroy()
+		player:Destroy()
+	end)
+
+	local controller = {
 		tracker = tracker,
 		marketTracker = marketTracker,
-		destroy = function()
-			tracker:Destroy()
-			purchased:Destroy()
-			player:Destroy()
+		Destroy = function(_self)
+			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
@@ -94,7 +105,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("doesNotExist"), 5)
 		expect(outcome).toEqual("rejected")
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should reject when no ownership callback is set and the asset is not already owned", function()
@@ -102,7 +113,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(outcome).toEqual("rejected")
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should resolve true when the callback reports ownership", function()
@@ -116,7 +127,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 		local ok, owns = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should resolve false when the callback reports no ownership", function()
@@ -130,7 +141,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 		local ok, owns = promise:Yield()
 		expect(ok).toEqual(true)
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should cache the callback result and not query twice", function()
@@ -150,7 +161,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 		expect(callCount).toEqual(1)
 		local _, owns = second:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -164,13 +175,13 @@ describe("PlayerAssetOwnershipTracker:SetOwnership()", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should ignore an unknown key without erroring", function()
 		local context = setup()
 		context.tracker:SetOwnership("doesNotExist", true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -184,7 +195,7 @@ describe("PlayerAssetOwnershipTracker market tracker integration", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -211,7 +222,7 @@ describe("PlayerAssetOwnershipTracker:SetQueryOwnershipCallback()", function()
 		expect(secondCallbackCalls).toEqual(1)
 		local _, secondOwns = second:Yield()
 		expect(secondOwns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -238,7 +249,7 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset()", function()
 			return values[#values] == true
 		end, 5)).toEqual(true)
 		sub:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -255,7 +266,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should resolve false for a false override even when the callback reports ownership", function()
@@ -270,7 +281,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should resolve true for a true override even with no callback set", function()
@@ -282,7 +293,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should let a false override revoke an asset already in the owned set", function()
@@ -295,7 +306,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should let a false override revoke an asset after a purchase fires", function()
@@ -308,7 +319,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not invoke the cloud callback while an override is set", function()
@@ -325,7 +336,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		PromiseTestUtils.awaitSettled(promise, 5)
 
 		expect(callCount).toEqual(0)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -347,7 +358,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		expect(PromiseTestUtils.awaitSettled(afterClear, 5)).toEqual(true)
 		local _, ownsAfterClear = afterClear:Yield()
 		expect(ownsAfterClear).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should treat SetOwnershipOverride(nil) as clearing the override", function()
@@ -363,7 +374,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should flip when the override is re-set", function()
@@ -380,7 +391,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		PromiseTestUtils.awaitSettled(second, 5)
 		local _, secondOwns = second:Yield()
 		expect(secondOwns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -394,7 +405,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(true)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should honor an override set by id when queried by key", function()
@@ -409,7 +420,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not affect a different asset", function()
@@ -424,7 +435,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
 		local _, owns = promise:Yield()
 		expect(owns).toEqual(false)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should ignore an override for an unknown key without erroring", function()
@@ -433,7 +444,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromiseOwnsAsset("doesNotExist"), 5)
 		expect(outcome).toEqual("rejected")
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
@@ -524,7 +535,7 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 		for _, sub in subs do
 			sub:Destroy()
 		end
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not report an asset it was never given a callback to query", function()
@@ -537,7 +548,7 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 		expect(outcome).toEqual("rejected")
 
 		expect(#reports).toEqual(0)
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should not report a query cancelled by teardown as a failure", function()
@@ -553,7 +564,7 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 
 		-- Destroying the tracker rejects the query with nothing, which is teardown rather than a refusal.
 		-- The real _warnQueryFailed drops it on the nil check; here we see it arrive and assert the shape.
-		context.destroy()
+		context:Destroy()
 		expect(PromiseTestUtils.awaitSettled(asked, 5)).toEqual(true)
 		local askedOk = asked:Yield()
 		expect(askedOk).toEqual(false)
@@ -593,7 +604,7 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 		end, 5)).toEqual(true)
 
 		sub:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 
 	it("should emit false for a false override even when the cloud query reports ownership", function()
@@ -614,7 +625,7 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 		end, 5)).toEqual(true)
 
 		sub:Destroy()
-		context.destroy()
+		context:Destroy()
 	end)
 end)
 
