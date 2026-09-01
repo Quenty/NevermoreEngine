@@ -3929,6 +3929,12 @@ importers:
       '@quenty/bindable-utils':
         specifier: workspace:*
         version: link:../bindable-utils
+      '@quenty/enumutils':
+        specifier: workspace:*
+        version: link:../enumutils
+      '@quenty/instance-path':
+        specifier: workspace:*
+        version: link:../instance-path
       '@quenty/jestutils':
         specifier: workspace:*
         version: link:../jest-utils

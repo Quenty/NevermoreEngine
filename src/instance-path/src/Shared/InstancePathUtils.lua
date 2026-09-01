@@ -25,6 +25,14 @@ export type InstancePath = string
 export type InstancePathTable = { string }
 
 --[=[
+	Either form of an instance path, so a caller can pass whichever it already holds.
+
+	@type InstancePathTableLike InstancePath | InstancePathTable
+	@within InstancePathUtils
+]=]
+export type InstancePathTableLike = InstancePath | InstancePathTable
+
+--[=[
 	Checks if the given value is a valid instance path.
 
 	@param instancePath any
@@ -35,12 +43,27 @@ function InstancePathUtils.isInstancePath(instancePath: any): boolean
 end
 
 --[=[
-	Converts an instance path into a table of instance names.
+	Checks if the given value is either form of an instance path.
 
-	@param instancePath InstancePath
+	@param instancePath any
+	@return boolean
+]=]
+function InstancePathUtils.isInstancePathTableLike(instancePath: any): boolean
+	return type(instancePath) == "string" or type(instancePath) == "table"
+end
+
+--[=[
+	Converts an instance path into a table of instance names. A path table is copied, so callers
+	that go on to mutate the result cannot reach back into what they were given.
+
+	@param instancePath InstancePathTableLike
 	@return InstancePathTable
 ]=]
-function InstancePathUtils.toPathTable(instancePath: InstancePath): InstancePathTable
+function InstancePathUtils.toPathTable(instancePath: InstancePathTableLike): InstancePathTable
+	if type(instancePath) == "table" then
+		return table.clone(instancePath)
+	end
+
 	assert(type(instancePath) == "string", "Bad instancePath")
 
 	return string.split(instancePath, ".")
@@ -49,10 +72,14 @@ end
 --[=[
 	Converts a table of instance names into an instance path.
 
-	@param pathTable InstancePathTable
+	@param pathTable InstancePathTableLike
 	@return InstancePath
 ]=]
-function InstancePathUtils.fromPathTable(pathTable: InstancePathTable): InstancePath
+function InstancePathUtils.fromPathTable(pathTable: InstancePathTableLike): InstancePath
+	if type(pathTable) == "string" then
+		return pathTable
+	end
+
 	assert(type(pathTable) == "table", "Bad pathTable")
 
 	return table.concat(pathTable, ".")
