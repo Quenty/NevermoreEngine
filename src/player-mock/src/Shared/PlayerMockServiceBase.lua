@@ -34,21 +34,33 @@ local CONSUMER_TOKEN_TAG = "PlayerMockConsumerToken"
 
 local PlayerMockServiceBase = {}
 
+export type PlayerMockServiceBase = typeof(setmetatable(
+	{} :: {
+		ServiceName: string,
+		_consumedAttributeName: string,
+		_allowConcurrentConsumers: boolean,
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_consumerId: string,
+	},
+	{} :: typeof({ __index = PlayerMockServiceBase })
+))
+
 --[=[
 	Initializes the service and begins consuming every mock in the place. Deriving services must
 	define `ServiceName`, `_consumedAttributeName`, and `_allowConcurrentConsumers` as static fields.
 
 	@param serviceBag ServiceBag
 ]=]
-function PlayerMockServiceBase:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function PlayerMockServiceBase.Init(self: PlayerMockServiceBase, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	self:_startConsumingMocks()
 end
 
-function PlayerMockServiceBase:Start() end
+function PlayerMockServiceBase.Start(_self: PlayerMockServiceBase): () end
 
 --[=[
 	Returns the mocks currently in the place. Mirrors `Players:GetPlayers()` -- the same answer from
@@ -57,7 +69,7 @@ function PlayerMockServiceBase:Start() end
 
 	@return { Player }
 ]=]
-function PlayerMockServiceBase:GetPlayerMocks(): { Player }
+function PlayerMockServiceBase.GetPlayerMocks(_self: PlayerMockServiceBase): { Player }
 	local players = {}
 	for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
 		if PlayerMock.isMock(tagged) then
@@ -74,7 +86,7 @@ end
 
 	@return Observable<Player>
 ]=]
-function PlayerMockServiceBase:ObservePlayerMocks(): Observable.Observable<Player>
+function PlayerMockServiceBase.ObservePlayerMocks(_self: PlayerMockServiceBase): Observable.Observable<Player>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 
@@ -98,7 +110,7 @@ function PlayerMockServiceBase:ObservePlayerMocks(): Observable.Observable<Playe
 	end) :: any
 end
 
-function PlayerMockServiceBase:_startConsumingMocks()
+function PlayerMockServiceBase._startConsumingMocks(self: PlayerMockServiceBase): ()
 	self._consumerId = HttpService:GenerateGUID(false)
 
 	-- A leak detected in this sweep throws out of Init; unwind any tokens already parented into
@@ -122,7 +134,7 @@ function PlayerMockServiceBase:_startConsumingMocks()
 	end))
 end
 
-function PlayerMockServiceBase:_consumeMock(mock: Instance)
+function PlayerMockServiceBase._consumeMock(self: PlayerMockServiceBase, mock: Instance): ()
 	local existing = mock:GetAttribute(self._consumedAttributeName)
 	if existing == nil then
 		mock:SetAttribute(self._consumedAttributeName, self._consumerId)
@@ -133,7 +145,7 @@ function PlayerMockServiceBase:_consumeMock(mock: Instance)
 		local token = Instance.new("Configuration")
 		token.Name = "PlayerMockConsumer"
 		token:SetAttribute("ConsumerId", self._consumerId)
-		CollectionService:AddTag(token, CONSUMER_TOKEN_TAG)
+		token:AddTag(CONSUMER_TOKEN_TAG)
 		token.Parent = mock
 		self._maid:GiveTask(token)
 		return
@@ -178,7 +190,7 @@ function PlayerMockServiceBase._isConsumerAlive(consumerId: string): boolean
 	return false
 end
 
-function PlayerMockServiceBase:Destroy()
+function PlayerMockServiceBase.Destroy(self: PlayerMockServiceBase): ()
 	self._maid:DoCleaning()
 end
 

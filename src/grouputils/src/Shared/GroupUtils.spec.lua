@@ -46,14 +46,14 @@ describe("GroupUtils.promiseRankInGroup", function()
 
 	it("should resolve the highest rank when the result carries multiple roles", function()
 		local player = PlayerMock.new({ UserId = 111 })
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", GROUP_ID, {
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 			IsMember = true,
 			Roles = {
 				{ Name = "Member", Rank = 1 },
 				{ Name = "Admin", Rank = 230 },
 				{ Name = "Moderator", Rank = 150 },
 			},
-		})
+		}, GROUP_ID)
 
 		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, GROUP_ID))
 		expect(outcome).toBe("resolved")
@@ -64,9 +64,9 @@ describe("GroupUtils.promiseRankInGroup", function()
 
 	it("should resolve from the GetGroupsAsync fallback when the primary result reports non-member", function()
 		local player = PlayerMock.new({ UserId = 111 })
-		PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", 0, {
+		PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", {
 			{ Id = GROUP_ID, Rank = 42, Role = "Member" },
-		})
+		}, 0)
 
 		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, GROUP_ID))
 		expect(outcome).toBe("resolved")
@@ -117,14 +117,14 @@ describe("GroupUtils.promiseRoleInGroup", function()
 
 	it("should resolve the highest role's name when the result carries multiple roles", function()
 		local player = PlayerMock.new({ UserId = 111 })
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", GROUP_ID, {
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 			IsMember = true,
 			Roles = {
 				{ Name = "Member", Rank = 1 },
 				{ Name = "Admin", Rank = 230 },
 				{ Name = "Moderator", Rank = 150 },
 			},
-		})
+		}, GROUP_ID)
 
 		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleInGroup(player, GROUP_ID))
 		expect(outcome).toBe("resolved")
@@ -135,9 +135,9 @@ describe("GroupUtils.promiseRoleInGroup", function()
 
 	it("should resolve from the GetGroupsAsync fallback when the primary result reports non-member", function()
 		local player = PlayerMock.new({ UserId = 111 })
-		PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", 0, {
+		PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", {
 			{ Id = GROUP_ID, Rank = 42, Role = "Member" },
-		})
+		}, 0)
 
 		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleInGroup(player, GROUP_ID))
 		expect(outcome).toBe("resolved")
@@ -177,7 +177,7 @@ describe("GroupTestUtils.assignGroupInfo", function()
 
 		-- Clearing one group's primary result forces its answer through the shared GetGroupsAsync
 		-- fallback list, proving the second assignment appended rather than replaced it.
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", GROUP_ID, nil)
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", nil, GROUP_ID)
 
 		local _, rank = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, GROUP_ID))
 		local _, otherRank = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, 99999))
@@ -195,7 +195,7 @@ describe("GroupTestUtils.assignGroupInfo", function()
 		local _, rank = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, GROUP_ID))
 		expect(rank).toBe(20)
 
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", GROUP_ID, nil)
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", nil, GROUP_ID)
 		local _, fallbackRank = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRankInGroup(player, GROUP_ID))
 		expect(fallbackRank).toBe(20)
 

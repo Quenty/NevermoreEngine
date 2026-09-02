@@ -55,7 +55,7 @@ type GetGroupsAsyncResult = { GetGroupDictionary }
 -- result avoids the (flaky, fake-UserId) group lookup.
 local function _getRolesInGroupAsync(player: Player, groupId: number): GetRolesInGroupAsyncResult
 	if PlayerMock.isMock(player) then
-		return PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", groupId)
+		return PlayerMock.callMethod(player, "GroupService.GetRolesInGroupAsync", groupId)
 	end
 
 	return GroupService:GetRolesInGroupAsync(player.UserId, groupId) :: GetRolesInGroupAsyncResult
@@ -69,7 +69,7 @@ local function _getRankAndRoleFallbackAsync(player: Player, groupId: number): (n
 	--? https://devforum.roblox.com/t/excessive-rate-limits-when-checking-gamepasses-group-ranks/3549665
 	local groups: GetGroupsAsyncResult
 	if PlayerMock.isMock(player) then
-		groups = PlayerMock.readLookup(player, "GroupService.GetGroupsAsync", 0)
+		groups = PlayerMock.callMethod(player, "GroupService.GetGroupsAsync", 0)
 	else
 		groups = GroupService:GetGroupsAsync(player.UserId) :: GetGroupsAsyncResult
 	end

@@ -28,14 +28,21 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/bindable-utils": "workspace:*",
+    "@quenty/enumutils": "workspace:*",
+    "@quenty/instance-path": "workspace:*",
     "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
     "@quenty/steputils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quenty/table": "workspace:*",
+    "@quenty/tuple": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"
