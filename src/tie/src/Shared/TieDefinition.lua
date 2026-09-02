@@ -384,6 +384,79 @@ function TieDefinition.ObserveAllTaggedBrio<T>(
 end
 
 --[=[
+	Observes the first ancestor of the instance that implements this interface, starting at the
+	instance's parent. The instance itself never counts as an ancestor.
+
+	@param instance Instance
+	@param tieRealm TieRealm?
+	@return Observable<Brio<TieInterface<T>>>
+]=]
+function TieDefinition.ObserveFirstAncestorImplementationBrio<T>(
+	self: TieDefinition<T>,
+	instance: Instance,
+	tieRealm: TieRealm?
+): Observable.Observable<
+	Brio.Brio<TieInterface.TieInterface<T>>
+>
+	assert(typeof(instance) == "Instance", "Bad instance")
+	assert(TieRealmUtils.isTieRealm(tieRealm) or tieRealm == nil, "Bad tieRealm")
+
+	local realm: TieRealm = tieRealm or self._defaultTieRealm
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastFound: Instance? = nil
+
+		local function rebuild()
+			local watchMaid = Maid.new()
+
+			maid._watchMaid = watchMaid
+
+			local found: Instance? = nil
+			local current: Instance? = instance.Parent
+			while current do
+				local ancestor: Instance = current
+
+				watchMaid:GiveTask(self:ObserveIsImplemented(ancestor, realm)
+					:Pipe({
+						Rx.skip(1) :: any,
+					})
+					:Subscribe(function()
+						rebuild()
+					end))
+
+				if self:HasImplementation(ancestor, realm) then
+					found = ancestor
+					break
+				end
+
+				current = ancestor.Parent
+			end
+
+			if found ~= lastFound then
+				lastFound = found
+
+				local interface = found and self:Find(found, realm) or nil
+				if interface then
+					local brio = Brio.new(interface)
+					maid._current = brio
+					sub:Fire(brio)
+				else
+					maid._current = nil
+				end
+			end
+		end
+
+		maid:GiveTask(instance.AncestryChanged:Connect(rebuild))
+
+		rebuild()
+
+		return maid
+	end) :: any
+end
+
+--[=[
 	Finds the first valid interfaces for this adornee
 	@param adornee Instance
 	@param tieRealm TieRealm?
