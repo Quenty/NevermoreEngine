@@ -30,7 +30,11 @@ local Players = game:GetService("Players")
 local PlayerMock = require("PlayerMock")
 local PlayerMockServiceBase = require("PlayerMockServiceBase")
 
-local PlayerMockService = setmetatable({}, { __index = PlayerMockServiceBase })
+export type PlayerMockService = PlayerMockServiceBase.PlayerMockServiceBase & {
+	CreatePlayer: (self: PlayerMockService, overrides: { [string]: any }?) -> Player,
+}
+
+local PlayerMockService = (setmetatable({}, { __index = PlayerMockServiceBase }) :: any) :: PlayerMockService
 PlayerMockService.ServiceName = "PlayerMockService"
 PlayerMockService._consumedAttributeName = "PlayerMockConsumedServer"
 PlayerMockService._allowConcurrentConsumers = false
@@ -44,10 +48,7 @@ PlayerMockService._allowConcurrentConsumers = false
 	@param overrides { [string]: any }? -- Per-property seed values, e.g. `{ UserId = 12345 }` (see [PlayerMock.new]).
 	@return Player
 ]=]
-function PlayerMockService.CreatePlayer(
-	self: PlayerMockServiceBase.PlayerMockServiceBase,
-	overrides: { [string]: any }?
-): Player
+function PlayerMockService.CreatePlayer(self: PlayerMockService, overrides: { [string]: any }?): Player
 	local player = PlayerMock.new(overrides)
 	player.Parent = Players
 
