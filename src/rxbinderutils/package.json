@@ -29,13 +29,18 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/linkutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
-    "@quenty/rx": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/symbol": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

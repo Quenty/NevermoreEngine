@@ -738,9 +738,6 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
-      '@quenty/valueobject':
-        specifier: workspace:*
-        version: link:../valueobject
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -868,12 +865,18 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/brine:
     dependencies:
@@ -4950,6 +4953,9 @@ importers:
 
   src/rxbinderutils:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
@@ -4968,9 +4974,21 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quenty/symbol':
+        specifier: workspace:*
+        version: link:../symbol
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/rxsignal:
     dependencies:
