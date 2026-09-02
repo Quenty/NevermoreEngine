@@ -1,3 +1,16 @@
+# (Wed Sep 02 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeutils@3.6.0`, `@quenty/bindable-utils@1.1.0`, `@quenty/binder@14.46.0`, `@quenty/boundlinkutils@14.47.0`, `@quenty/coreguienabler@12.45.0`, `@quenty/coreguiutils@10.26.0`, `@quenty/friendutils@12.42.0`, `@quenty/gameproductservice@14.72.0`, `@quenty/grouputils@10.31.0`, `@quenty/instance-path@1.2.0`, `@quenty/marketplaceutils@11.33.0`, `@quenty/playermock@1.9.0`, `@quenty/playersservicepromises@10.29.0`, `@quenty/playerthumbnailutils@10.29.0`, `@quenty/ragdoll@15.69.0`, `@quenty/rxbinderutils@14.46.0`, `@quenty/teleportserviceutils@10.6.0`, `@quenty/tie@10.50.0`, `@quenty/userserviceutils@9.43.0`
+  - feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Sep 01 2026)
 
 #### 🚀 Enhancement
