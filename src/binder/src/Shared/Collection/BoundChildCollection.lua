@@ -21,6 +21,7 @@ export type BoundChildCollection<T> =
 			_binder: Binder.Binder<T>,
 			_parent: Instance,
 			_classes: Set.Set<T>,
+			_childToClass: { [Instance]: T },
 			ClassAdded: Signal.Signal<T>,
 			ClassRemoved: Signal.Signal<T>,
 			_size: number,
@@ -56,14 +57,8 @@ function BoundChildCollection.new<T>(binder: Binder.Binder<T>, parent: Instance)
 	self.ClassRemoved = self._maid:Add(Signal.new() :: any) -- :Fire(class)
 
 	self._classes = {} -- [class] = true
+	self._childToClass = {}
 	self._size = 0
-
-	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(...)
-		self:_handleNewClassBound(...)
-	end))
-	self._maid:GiveTask(self._binder:GetClassRemovingSignal():Connect(function(class)
-		self:_removeClass(class)
-	end))
 
 	self:_startTracking()
 
@@ -128,29 +123,39 @@ function BoundChildCollection._startTracking<T>(self: BoundChildCollection<T>)
 end
 
 function BoundChildCollection._addChild<T>(self: BoundChildCollection<T>, inst: Instance, doNotFire: boolean?): ()
-	local class = self._binder:Get(inst)
-	if not class then
-		return
-	end
+	self._maid[inst] = self._binder:ObserveInstance(inst, function(class)
+		self:_setChildClass(inst, class)
+	end)
 
-	self:_addClass(class, doNotFire)
-end
-
-function BoundChildCollection._handleNewClassBound<T>(self: BoundChildCollection<T>, class: T, inst: Instance): ()
-	if inst.Parent ~= self._parent then
-		return
-	end
-
-	self:_addClass(class)
+	self:_setChildClass(inst, self._binder:Get(inst), doNotFire)
 end
 
 function BoundChildCollection._removeChild<T>(self: BoundChildCollection<T>, inst: Instance): ()
-	local class = self._binder:Get(inst)
-	if not class then
+	self._maid[inst] = nil
+
+	self:_setChildClass(inst, nil)
+end
+
+function BoundChildCollection._setChildClass<T>(
+	self: BoundChildCollection<T>,
+	inst: Instance,
+	class: T?,
+	doNotFire: boolean?
+): ()
+	local existing = self._childToClass[inst]
+	if existing == class then
 		return
 	end
 
-	self:_removeClass(class)
+	if existing ~= nil then
+		self._childToClass[inst] = nil
+		self:_removeClass(existing)
+	end
+
+	if class ~= nil then
+		self._childToClass[inst] = class
+		self:_addClass(class, doNotFire)
+	end
 end
 
 function BoundChildCollection._addClass<T>(self: BoundChildCollection<T>, class: T, doNotFire: boolean?): ()

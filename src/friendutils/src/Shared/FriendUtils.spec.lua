@@ -31,10 +31,10 @@ describe("FriendUtils.promiseAllFriends against a mock", function()
 	it("resolves the injected friends list", function()
 		local player = PlayerMock.new({ UserId = 90041001 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", 0, {
+		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", {
 			makeFriendData(90041002, true),
 			makeFriendData(90041003, false),
-		})
+		}, 0)
 
 		local outcome, friends = PromiseTestUtils.awaitOutcome(FriendUtils.promiseAllFriends(90041001))
 
@@ -62,11 +62,11 @@ describe("FriendUtils.promiseAllFriends against a mock", function()
 	it("stops at limitMaxFriends", function()
 		local player = PlayerMock.new({ UserId = 90041005 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", 0, {
+		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", {
 			makeFriendData(90041006, true),
 			makeFriendData(90041007, true),
 			makeFriendData(90041008, true),
-		})
+		}, 0)
 
 		local outcome, friends = PromiseTestUtils.awaitOutcome(FriendUtils.promiseAllFriends(90041005, 2))
 

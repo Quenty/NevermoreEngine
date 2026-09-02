@@ -1,177 +1,90 @@
 --!strict
 --[=[
-	In-memory stand-in for a Roblox `Player` used by tests. A real `Player` cannot be
-	`Instance.new`'d and no client joins a headless Open Cloud test place, so this builds a
-	`Folder` that carries the marker and identity attributes production code reads -- letting a
-	"player" flow through guards and providers without a real join.
+	In-memory stand-in for a Roblox `Player`. A real `Player` cannot be `Instance.new`'d and no
+	client joins a headless test place, so a mock is a tagged `Folder` typed as a `Player`.
 
-	It is the shared replacement for the ad-hoc `Instance.new("Folder") :: Player` stand-ins that
-	had accreted across the test suites. Guards keep their hard `Player` assert and add an explicit
-	OR clause so support for the mock is greppable rather than a silent weakening:
+	Guards keep their real-`Player` assert and add an explicit OR clause:
 
 	```lua
 	assert(player:IsA("Player") or PlayerMock.isMock(player), "Bad player")
 	```
 
-	Native `Player` members a Folder cannot expose are read through [PlayerMock.read], which is
-	mock-only and errors on anything else (including a real `Player`). Consumers branch explicitly --
-	`if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId` -- so the
-	real-Player path stays plain member access that luau-lsp can type-check. Each property is backed by
-	a same-named attribute (Instance-valued members like `Character` by an ObjectValue child), so a test
-	can mock a value and observe changes via [PlayerMock.getPropertyChangedSignal]:
+	Native members a Folder cannot expose are read through mock-only accessors, so call sites branch
+	explicitly and the real-`Player` path stays plain member access:
 
 	```lua
 	local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
-	player.Parent = game:GetService("Players") -- where real players live; see PlayerMockService.CreatePlayer
+	player.Parent = game:GetService("Players")
 
-	assert(PlayerMock.isMock(player))
-	assert(PlayerMock.read(player, "UserId") == 12345)
-	assert(PlayerMock.read(player, "MembershipType") == Enum.MembershipType.None)
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 
-	PlayerMock.write(player, "AccountAge", 31) -- fires GetAttributeChangedSignal("AccountAge")
+	PlayerMock.write(player, "AccountAge", 31)
 	```
 
-	Native `Player` events follow the same shape through [PlayerMock.getSignal] -- mock-only, with
-	the name validated against the engine's reflected `Player` events so a typo errors instead of
-	returning a signal that can never fire -- and [PlayerMock.fireSignal] as the test-side trigger:
+	Events follow the same shape through [PlayerMock.getSignal], with [PlayerMock.fireSignal] as the
+	test-side trigger:
 
 	```lua
 	local chatted = if PlayerMock.isMock(player) then PlayerMock.getSignal(player, "Chatted") else player.Chatted
 	maid:GiveTask(chatted:Connect(onChatted))
 
-	PlayerMock.fireSignal(player, "Chatted", "hello") -- test-side
+	PlayerMock.fireSignal(player, "Chatted", "hello")
 	```
 
-	Results of ID-keyed engine calls (group rank, gamepass/asset ownership, ...) that production
-	code fetches from a Roblox web API by (player, id) follow the same shape through
-	[PlayerMock.writeLookup] / [PlayerMock.readLookup], with the domain named after the canonical
-	`Service.Method` being intercepted. The injected result lives on the mock -- one attribute per
-	(domain, key) -- so it is centralized per player: every consumer whose answer derives from the
-	same engine call resolves the same value, instead of each call site stubbing its own copy that
-	can drift.
+	Results of argument-keyed engine calls (group rank, gamepass/asset ownership, ...) go through
+	[PlayerMock.writeLookup] / [PlayerMock.readLookup], named by the canonical `Service.Method` and
+	keyed by the arguments the call turns on:
 
 	```lua
-	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
+	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 		IsMember = true,
 		Roles = { { Name = "Admin", Rank = 230 } },
-	})
-	-- GroupUtils.promiseRankInGroup(player, 372) now resolves 230 everywhere it is asked,
-	-- and promiseRoleInGroup(player, 372) resolves the matching "Admin". Values are the raw
-	-- engine result shape (see GroupTestUtils.assignGroupInfo for a friendlier writer).
+	}, 372)
 	```
 
 	@class PlayerMock
 ]=]
 
-local CollectionService = game:GetService("CollectionService")
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local ReflectionService = game:GetService("ReflectionService")
-local Workspace = game:GetService("Workspace")
+local require = require(script.Parent.loader).load(script)
+
+local InstancePathUtils = require("InstancePathUtils")
+local MockInputObject = require("MockInputObject")
+local PlayerMockCharacterUtils = require("PlayerMockCharacterUtils")
+local PlayerMockChildrenUtils = require("PlayerMockChildrenUtils")
+local PlayerMockConstants = require("PlayerMockConstants")
+local PlayerMockInputUtils = require("PlayerMockInputUtils")
+local PlayerMockMethodUtils = require("PlayerMockMethodUtils")
+local PlayerMockPlayerServiceUtils = require("PlayerMockPlayerServiceUtils")
+local PlayerMockPropertyUtils = require("PlayerMockPropertyUtils")
+local PlayerMockReplicationFocusUtils = require("PlayerMockReplicationFocusUtils")
+local PlayerMockSignalUtils = require("PlayerMockSignalUtils")
+local PlayerMockUtils = require("PlayerMockUtils")
 
 local PlayerMock = {}
 
--- CollectionService tag stamped on every mock: the single marker answering both "is this value
--- a mock?" ([PlayerMock.isMock]) and the reverse question "which mocks exist?" -- needed by
--- enumerating consumers like [PlayerMock.getMockByUserId] and [PlayerMockService.GetPlayerMocks].
--- Real Players never carry it, so the recognition can never false-positive on a real join.
--- `GetTagged` only resolves instances in the DataModel, which matches the engine calls being
--- mirrored (`Players:GetPlayerByUserId`, `Players:GetPlayers`): they only resolve players that
--- are in the game.
-local MOCK_TAG = "PlayerMock"
+export type InputObjectProps = MockInputObject.InputObjectProps
 
 --[=[
-	The CollectionService tag every mock carries from construction: the place-wide discovery channel
-	[PlayerMockService] and [PlayerMockServiceClient] observe. Replication is the default -- a real
-	`Player` exists for every peer, so a mock is discoverable from any ServiceBag in either realm the
-	moment it is parented into the DataModel (tag resolution is DataModel-scoped), and a destroyed
-	(or kicked) mock drops out automatically.
+	The CollectionService tag every mock carries, and the channel [PlayerMockService] /
+	[PlayerMockServiceClient] discover mocks through. Tag resolution is DataModel-scoped, so a mock
+	becomes discoverable when it is parented in and drops out when it is destroyed or kicked.
 
 	@prop TAG string
 	@readonly
 	@within PlayerMock
 ]=]
-PlayerMock.TAG = MOCK_TAG
-
--- CollectionService tag marking the mock a test designated as the local player for the client realm
--- (via PlayerMockServiceClient). Carrying the designation on the mock itself -- rather than in Lua module
--- state -- keeps it inspectable and self-cleaning (a destroyed mock takes the designation with it), while
--- still letting DI-less code like dummy-mode Remoting resolve it.
-local LOCAL_PLAYER_TAG = "PlayerMockLocalPlayer"
-
--- Shared with PlayerMockUtils (same package) so [PlayerMockUtils.observeMockedLocalPlayer] can watch
--- the designation change via the tag signals. Not public API -- consumers observe the designation
--- through that observable rather than the raw tag.
-PlayerMock._LOCAL_PLAYER_TAG = LOCAL_PLAYER_TAG
-
-type PropertySpec = {
-	default: any,
-	-- Instance-valued member: backed by a prefixed ObjectValue child instead of an attribute
-	-- (attributes cannot hold Instances). Observed through [PlayerMock.getPropertyChangedSignal].
-	instanceValued: boolean?,
-	-- Bridges a value shape that a Roblox attribute cannot hold (e.g. an EnumItem) to/from a storable one.
-	encode: ((any) -> any)?,
-	decode: ((any) -> any)?,
-}
-
--- Native `Player` properties a mock stands in for, each backed by a same-named attribute (so a test can
--- seed/mock the value and observe changes). Values are pre-authored with the real member's type/shape --
--- a `Player` cannot be `Instance.new`'d, so the defaults cannot be reflected off a live instance.
--- EnumItem-typed members (which attributes cannot store) round-trip through their `.Name`;
--- Instance-typed members (which attributes cannot store at all) are backed by an ObjectValue child.
-local PLAYER_PROPERTIES: { [string]: PropertySpec } = {
-	UserId = { default = 0 },
-	DisplayName = { default = "" },
-	MembershipType = {
-		default = Enum.MembershipType.None,
-		encode = function(value: any): string
-			return (value :: EnumItem).Name
-		end,
-		decode = function(value: any): EnumItem
-			return (Enum.MembershipType :: any)[value]
-		end,
-	},
-	AccountAge = { default = 0 },
-	HasVerifiedBadge = { default = false },
-	FollowUserId = { default = 0 },
-	-- Method-shaped rather than a property on a real Player (`Player:HasAppearanceLoaded()`), but a
-	-- zero-arg boolean getter reads the same way, so it stands in through the same backing.
-	-- [PlayerMock.loadCharacterAsync] sets it, the way the engine sets it when a spawn finishes
-	-- loading an appearance.
-	HasAppearanceLoaded = { default = false },
-	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
-	RespawnLocation = { instanceValued = true }, -- default nil; checkpoint spawn stand-in
-}
-
--- Prefix for the ObjectValue children backing Instance-valued stand-in properties. Like the
--- attribute backings, the value lives on the mock itself: inspectable and self-cleaning.
-local PROPERTY_OBJECT_NAME_PREFIX = "PlayerMockProperty_"
-
-local function findPropertyObjectValue(player: Player, propertyName: string): ObjectValue?
-	return (player :: Instance):FindFirstChild(PROPERTY_OBJECT_NAME_PREFIX .. propertyName) :: ObjectValue?
-end
-
-local function getOrCreatePropertyObjectValue(player: Player, propertyName: string): ObjectValue
-	local existing = findPropertyObjectValue(player, propertyName)
-	if existing ~= nil then
-		return existing
-	end
-
-	local objectValue = Instance.new("ObjectValue")
-	objectValue.Name = PROPERTY_OBJECT_NAME_PREFIX .. propertyName
-	objectValue.Parent = player :: Instance
-	return objectValue
-end
+PlayerMock.TAG = PlayerMockConstants.MOCK_TAG
 
 --[=[
-	Constructs a mock player. The returned value is typed as `Player` for drop-in use, but is really
-	a marked `Folder`; it is unparented -- the caller parents and/or `maid:Add`s it as needed. Once
-	parented into the DataModel it is replicated: discoverable place-wide through [PlayerMockService] /
-	[PlayerMockServiceClient] in any ServiceBag, either realm (see [PlayerMock.TAG]).
+	Constructs a mock player, unparented -- the caller parents and/or maids it. Once parented into
+	the DataModel it is discoverable place-wide in either realm (see [PlayerMock.TAG]).
 
-	Every stand-in property (see [PlayerMock.read]) is seeded as an attribute from `overrides` (keyed by
-	native property name, e.g. `UserId`), or the pre-authored default, so reads resolve without a real
-	Player.
+	Every stand-in property (see [PlayerMock.read]) is seeded from `overrides` or its default.
+
+	```lua
+	local player = PlayerMock.new({ UserId = 12345, DisplayName = "Quenty" })
+	player.Parent = game:GetService("Players")
+	```
 
 	@param overrides { [string]: any }? -- Per-property seed values, keyed by native property name.
 	@return Player
@@ -184,66 +97,39 @@ function PlayerMock.new(overrides: { [string]: any }?): Player
 
 	local player = Instance.new("Folder")
 	player.Name = if userId ~= nil then string.format("PlayerMock_%d", userId) else "PlayerMock"
-	CollectionService:AddTag(player, MOCK_TAG)
+	player:AddTag(PlayerMockConstants.MOCK_TAG)
 
 	local castPlayer = (player :: any) :: Player
 
-	-- Seed each stand-in property as an attribute (mockable + observable via GetAttributeChangedSignal).
-	for propertyName, spec in PLAYER_PROPERTIES do
-		local value: any
-		if overrides and overrides[propertyName] ~= nil then
-			value = overrides[propertyName]
-		elseif propertyName == "DisplayName" then
-			value = player.Name
-		else
-			value = spec.default
-		end
+	PlayerMockPropertyUtils.seedProperties(castPlayer, overrides)
+	PlayerMockChildrenUtils.seedContainers(castPlayer)
 
-		if value ~= nil then
-			PlayerMock.write(castPlayer, propertyName, value)
-		end
-	end
-
-	-- The engine inserts a player's PlayerGui at join; mirror that with a stand-in. PlayerGui is
-	-- not Instance.new-able (unlike Backpack), so like the mock itself this is a Folder cast to
-	-- the native type, resolved through the explicit isMock branch (see PlayerMock.getPlayerGui).
-	local playerGui = Instance.new("Folder")
-	playerGui.Name = "PlayerGui"
-	playerGui.Parent = player
-
-	-- The engine likewise inserts a player's PlayerScripts at join; mirror that with a stand-in.
-	-- PlayerScripts is not Instance.new-able either, so this too is a Folder resolved through the
-	-- explicit isMock branch (see PlayerMock.getPlayerScripts).
-	local playerScripts = Instance.new("Folder")
-	playerScripts.Name = "PlayerScripts"
-	playerScripts.Parent = player
-
-	-- The engine removes a player's character when the player leaves or is kicked; mirror that so
-	-- a destroyed mock cannot leak its character into the Workspace.
+	-- The engine removes a player's character when they leave or are kicked.
 	player.Destroying:Connect(function()
-		PlayerMock.removeCharacter(castPlayer)
+		PlayerMockCharacterUtils.removeCharacter(castPlayer)
 	end)
 
 	return castPlayer
 end
 
 --[=[
-	Returns whether the given value is a [PlayerMock]. Intended for use alongside a real-Player check
-	in a guard, e.g. `player:IsA("Player") or PlayerMock.isMock(player)`.
+	Returns whether the given value is a [PlayerMock]. A foreign instance merely carrying
+	[PlayerMock.TAG] is rejected.
+
+	```lua
+	assert(player:IsA("Player") or PlayerMock.isMock(player), "Bad player")
+	```
 
 	@param value any
 	@return boolean
 ]=]
 function PlayerMock.isMock(value: any): boolean
-	-- A mock's backing instance is always a Folder (see [PlayerMock.new]); requiring it rejects
-	-- foreign instances that merely carry the tag.
-	return typeof(value) == "Instance" and value:IsA("Folder") and CollectionService:HasTag(value, MOCK_TAG)
+	return PlayerMockUtils.isMock(value)
 end
 
 --[=[
 	Returns the nearest ancestor of `instance` that is a [PlayerMock], or nil. The mock counterpart
-	of `FindFirstAncestorWhichIsA("Player")` -- a mock's backing Folder is invisible to an `IsA`
-	walk, so code resolving the owning player from a descendant adds the explicit OR clause:
+	of `FindFirstAncestorWhichIsA("Player")`, which a mock's backing Folder is invisible to:
 
 	```lua
 	local player = instance:FindFirstAncestorWhichIsA("Player") or PlayerMock.findFirstAncestorMock(instance)
@@ -255,24 +141,13 @@ end
 	@return Player?
 ]=]
 function PlayerMock.findFirstAncestorMock(instance: Instance): Player?
-	assert(typeof(instance) == "Instance", "Bad instance")
-
-	local ancestor = instance.Parent
-	while ancestor ~= nil do
-		if PlayerMock.isMock(ancestor) then
-			return (ancestor :: any) :: Player
-		end
-		ancestor = ancestor.Parent
-	end
-
-	return nil
+	return PlayerMockUtils.findFirstAncestorMock(instance)
 end
 
 --[=[
-	Returns the mock currently in the DataModel whose `UserId` stand-in matches, or nil. The mock
-	counterpart of `Players:GetPlayerByUserId` -- the resolver for code paths keyed by userId alone
-	(e.g. [MarketplaceUtils.promiseUserOwnsGamePass]), where no player value is in hand to
-	`isMock`-branch on:
+	Returns the mock in the DataModel whose `UserId` stand-in matches, or nil. The mock counterpart
+	of `Players:GetPlayerByUserId`, for code paths keyed by userId alone with no player value in hand
+	to `isMock`-branch on:
 
 	```lua
 	local mockPlayer = PlayerMock.getMockByUserId(userId)
@@ -283,28 +158,17 @@ end
 	end
 	```
 
-	Like the engine call, only mocks in the game resolve -- discovery runs over [PlayerMock.TAG],
-	and tag resolution is DataModel-scoped, so an unparented (or destroyed) mock reads back as nil.
-	Real UserIds are unique; seed mocks the same way, since the first match wins.
+	Like the engine call, only mocks in the game resolve. Seed UserIds uniquely -- the first match wins.
 
 	@param userId number
 	@return Player?
 ]=]
 function PlayerMock.getMockByUserId(userId: number): Player?
-	assert(type(userId) == "number", "Bad userId")
-
-	for _, tagged in CollectionService:GetTagged(MOCK_TAG) do
-		if PlayerMock.isMock(tagged) and PlayerMock.read((tagged :: any) :: Player, "UserId") == userId then
-			return (tagged :: any) :: Player
-		end
-	end
-
-	return nil
+	return PlayerMockPlayerServiceUtils.getPlayerByUserId(userId)
 end
 
 --[=[
-	Returns the mocks currently in the DataModel. The mock counterpart of `Players:GetPlayers()`,
-	for code that enumerates the players present rather than resolving one:
+	Returns the mocks in the DataModel. The mock counterpart of `Players:GetPlayers()`:
 
 	```lua
 	for _, player in Players:GetPlayers() do
@@ -315,60 +179,28 @@ end
 	end
 	```
 
-	Like the engine call, only mocks in the game resolve -- discovery runs over [PlayerMock.TAG],
-	and tag resolution is DataModel-scoped, so an unparented (or destroyed) mock is not returned.
-
 	@return { Player }
 ]=]
 function PlayerMock.getMocks(): { Player }
-	local mocks: { Player } = {}
-	for _, tagged in CollectionService:GetTagged(MOCK_TAG) do
-		if PlayerMock.isMock(tagged) then
-			table.insert(mocks, (tagged :: any) :: Player)
-		end
-	end
-
-	return mocks
+	return PlayerMockUtils.getMocks()
 end
-
--- BindableEvents mirroring the mock tag's CollectionService signals with the [PlayerMock.isMock]
--- guard already applied, so the exposed signals only ever hand back a genuine mock -- the way
--- `Players.PlayerAdded` only ever hands back a real `Player`, and a foreign instance merely carrying
--- the tag can never reach a consumer. Module-level and never torn down, because they mirror the
--- place-wide tag channel rather than any one consumer's subscription.
-local mockAddedBindable: BindableEvent? = nil
-local mockRemovingBindable: BindableEvent? = nil
 
 --[=[
 	Returns the signal that fires when a mock enters the DataModel. The mock counterpart of
-	`Players.PlayerAdded` -- mocks are invisible to the `Players` service, so code observing joins
-	connects both:
+	`Players.PlayerAdded`, which mocks are invisible to:
 
 	```lua
 	maid:GiveTask(Players.PlayerAdded:Connect(handlePlayer))
 	maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(handlePlayer))
 	```
 
-	Membership is carried by [PlayerMock.TAG], whose resolution is DataModel-scoped, so this fires
-	when a mock is parented in -- which is when [PlayerMock.getMocks] starts returning it -- not when
-	it is constructed.
+	Fires when a mock is parented in -- which is when [PlayerMock.getMocks] starts returning it --
+	not when it is constructed.
 
 	@return RBXScriptSignal
 ]=]
 function PlayerMock.getMockAddedSignal(): RBXScriptSignal
-	local bindable = mockAddedBindable
-	if bindable == nil then
-		bindable = Instance.new("BindableEvent")
-		mockAddedBindable = bindable
-
-		CollectionService:GetInstanceAddedSignal(MOCK_TAG):Connect(function(instance)
-			if PlayerMock.isMock(instance) then
-				(bindable :: BindableEvent):Fire((instance :: any) :: Player)
-			end
-		end)
-	end
-
-	return (bindable :: BindableEvent).Event
+	return PlayerMockUtils.getMockAddedSignal()
 end
 
 --[=[
@@ -379,615 +211,272 @@ end
 	@return RBXScriptSignal
 ]=]
 function PlayerMock.getMockRemovingSignal(): RBXScriptSignal
-	local bindable = mockRemovingBindable
-	if bindable == nil then
-		bindable = Instance.new("BindableEvent")
-		mockRemovingBindable = bindable
-
-		CollectionService:GetInstanceRemovedSignal(MOCK_TAG):Connect(function(instance)
-			if PlayerMock.isMock(instance) then
-				(bindable :: BindableEvent):Fire((instance :: any) :: Player)
-			end
-		end)
-	end
-
-	return (bindable :: BindableEvent).Event
+	return PlayerMockUtils.getMockRemovingSignal()
 end
 
 --[=[
-	Returns the mock currently in the DataModel whose username stand-in matches, or nil. The mock
-	counterpart of `Players:GetUserIdFromNameAsync` -- the resolver for code paths keyed by username
-	alone (e.g. [PlayersServicePromises.promiseUserIdFromName]). A mock's username is its
-	"UserService.GetUserInfosByUserIdsAsync" lookup's `Username`, which defaults to the mock's
-	`Name` -- the same member that holds a real Player's username.
-
-	Like [PlayerMock.getMockByUserId], only mocks in the game resolve, and the first match wins.
-
-	@param username string
-	@return Player?
-]=]
-function PlayerMock.getMockByUsername(username: string): Player?
-	assert(type(username) == "string", "Bad username")
-
-	for _, tagged in CollectionService:GetTagged(MOCK_TAG) do
-		if PlayerMock.isMock(tagged) then
-			local mock = (tagged :: any) :: Player
-			local userInfo = PlayerMock.readLookup(mock, "UserService.GetUserInfosByUserIdsAsync", 0)
-			if userInfo.Username == username then
-				return mock
-			end
-		end
-	end
-
-	return nil
-end
-
---[=[
-	Returns the mock currently in the DataModel whose `Character` stand-in is the given model, or
-	nil. The mock counterpart of `Players:GetPlayerFromCharacter` -- the resolver for code paths
-	that start from a character (or a part of one) with no player value in hand to `isMock`-branch
-	on (e.g. [CharacterUtils.getPlayerFromCharacter]):
+	Returns the mock in the DataModel whose `Character` stand-in is the given model, or nil. The
+	mock counterpart of `Players:GetPlayerFromCharacter`:
 
 	```lua
 	local player = Players:GetPlayerFromCharacter(model) or PlayerMock.getMockFromCharacter(model)
 	```
 
-	Like the engine call, only the exact character model matches -- a descendant part resolves nil,
-	so callers walking up from a descendant keep their own ancestor walk -- and only mocks in the
-	game resolve (discovery runs over [PlayerMock.TAG], and tag resolution is DataModel-scoped).
+	Like the engine call, only the exact character model matches -- a descendant part resolves nil.
 
 	@param character Instance
 	@return Player?
 ]=]
 function PlayerMock.getMockFromCharacter(character: Instance): Player?
-	assert(typeof(character) == "Instance", "Bad character")
-
-	for _, tagged in CollectionService:GetTagged(MOCK_TAG) do
-		if PlayerMock.isMock(tagged) and PlayerMock.read((tagged :: any) :: Player, "Character") == character then
-			return (tagged :: any) :: Player
-		end
-	end
-
-	return nil
+	return PlayerMockCharacterUtils.getMockFromCharacter(character)
 end
 
 --[=[
-	Reads a stand-in native `Player` property off a mock: the seeded backing attribute, or the
-	pre-authored typed default when unset. Errors on anything that is not a [PlayerMock] -- including a
-	real `Player` -- so call sites must branch explicitly:
+	Reads a stand-in native property off a mock. Errors on anything that is not a [PlayerMock],
+	including a real `Player`, so call sites branch explicitly:
 
 	```lua
 	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 	```
 
-	Keeping the real-Player read as plain member access preserves luau-lsp's native property typing on
-	the hot path instead of funneling every read through this `any`-returning helper.
+	A bare name reads a `Player` property. A `Service.Property` path reads the mock's own copy of a
+	client-global service member, which a headless server has only one of:
+
+	```lua
+	local selected = PlayerMock.read(player, "GuiService.SelectedObject")
+	```
 
 	@param player Player -- must be a PlayerMock
-	@param propertyName string
+	@param propertyPath InstancePathTableLike -- `"UserId"` or `"GuiService.SelectedObject"`
 	@return any
 ]=]
-function PlayerMock.read(player: Player, propertyName: string): any
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(propertyName) == "string", "Bad propertyName")
-
-	local spec = PLAYER_PROPERTIES[propertyName]
-	if spec and spec.instanceValued then
-		local backing = findPropertyObjectValue(player, propertyName)
-		return if backing ~= nil then backing.Value else spec.default
-	end
-
-	local raw = (player :: Instance):GetAttribute(propertyName)
-	if raw == nil then
-		return if spec then spec.default else nil
-	end
-	if spec and spec.decode then
-		return spec.decode(raw)
-	end
-	return raw
+function PlayerMock.read(player: Player, propertyPath: InstancePathUtils.InstancePathTableLike): any
+	return PlayerMockPropertyUtils.read(player, propertyPath)
 end
 
 --[=[
-	Mocks a native `Player` property on a mock by writing its backing attribute, which also fires the
-	instance's `GetAttributeChangedSignal(propertyName)` so observers see the change.
+	Mocks a native property on a mock, firing [PlayerMock.getPropertyChangedSignal] so observers see
+	the change. Takes the same paths [PlayerMock.read] does.
 
-	Writing `Character = nil` carries the engine's despawn semantics (the model is destroyed) --
-	see [PlayerMock.removeCharacter].
+	```lua
+	PlayerMock.write(player, "AccountAge", 31)
+	PlayerMock.write(player, "GuiService.SelectedObject", button)
+	```
+
+	Writing `Character = nil` carries the engine's despawn semantics -- see [PlayerMock.removeCharacter].
 
 	@param player Player -- must be a PlayerMock
-	@param propertyName string
+	@param propertyPath InstancePathTableLike -- `"UserId"` or `"GuiService.SelectedObject"`
 	@param value any
 ]=]
-function PlayerMock.write(player: Player, propertyName: string, value: any)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(propertyName) == "string", "Bad propertyName")
-
-	local spec = PLAYER_PROPERTIES[propertyName]
-	if spec and spec.instanceValued then
-		assert(
-			value == nil or typeof(value) == "Instance",
-			string.format("Bad value for Instance-valued %s", propertyName)
-		)
-
-		local objectValue = getOrCreatePropertyObjectValue(player, propertyName)
-		local oldValue = objectValue.Value
-
-		-- The engine's Character setter despawns on nil: CharacterRemoving fires, the property
-		-- nils (so observers tear down while the model is still alive), then the model is
-		-- destroyed. Assigning a *different model* does not remove the old one -- the classic
-		-- morph pattern destroys it manually.
-		if propertyName == "Character" and value == nil and oldValue ~= nil then
-			PlayerMock.fireSignal(player, "CharacterRemoving", oldValue)
-			objectValue.Value = nil
-			oldValue:Destroy()
-			return
-		end
-
-		objectValue.Value = value
-		return
-	end
-
-	local encoded = if spec and spec.encode then spec.encode(value) else value
-
-	local instance = player :: Instance
-	instance:SetAttribute(propertyName, encoded)
+function PlayerMock.write(player: Player, propertyPath: InstancePathUtils.InstancePathTableLike, value: any): ()
+	PlayerMockPropertyUtils.write(player, propertyPath, value)
 end
 
 --[=[
-	Returns the signal that fires when the given stand-in property changes on a mock: the backing
-	attribute's changed signal, or the backing ObjectValue's Value-changed signal for Instance-valued
-	members like `Character`. Mock-only, like [PlayerMock.read] -- the real-Player path stays
-	`player:GetPropertyChangedSignal(propertyName)`.
+	Returns the signal that fires when the given stand-in property changes on a mock. Mock-only,
+	like [PlayerMock.read] -- the real-Player path stays `player:GetPropertyChangedSignal(propertyName)`.
 
 	@param player Player -- must be a PlayerMock
-	@param propertyName string
+	@param propertyPath InstancePathTableLike -- `"UserId"` or `"GuiService.SelectedObject"`
 	@return RBXScriptSignal
 ]=]
-function PlayerMock.getPropertyChangedSignal(player: Player, propertyName: string): RBXScriptSignal
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(propertyName) == "string", "Bad propertyName")
-
-	local spec = PLAYER_PROPERTIES[propertyName]
-	if spec and spec.instanceValued then
-		return getOrCreatePropertyObjectValue(player, propertyName):GetPropertyChangedSignal("Value")
-	end
-
-	return (player :: Instance):GetAttributeChangedSignal(propertyName)
-end
-
--- Prefix for the attributes backing ID-keyed service lookups on a mock (see [PlayerMock.readLookup]).
--- Like the property attributes, the backing lives on the mock itself: inspectable, self-cleaning,
--- and observable via `GetAttributeChangedSignal`.
-local LOOKUP_ATTRIBUTE_PREFIX = "PlayerMockLookup_"
-
-type LookupSpec = {
-	default: any,
-	-- Computes the default from the mock itself instead of `default`, for domains whose truthful
-	-- unset answer is the mock's own identity (e.g. user info) rather than a constant.
-	getDefault: ((player: Player) -> any)?,
-	-- typeof() an injected value must satisfy, so a bad writeLookup fails at the write instead of as
-	-- a confusing consumer failure at read time.
-	valueType: string,
-	-- What the domain is keyed by: an integer ID (the default), an EnumItem (e.g. CoreGuiType),
-	-- or a string (e.g. a subscriptionId).
-	keyKind: ("EnumItem" | "string")?,
-	-- Deeper shape check for table-valued domains, run at write time.
-	validate: ((any) -> ())?,
-	-- Bridges a value shape a Roblox attribute cannot hold (e.g. a table) to/from a storable one.
-	encode: ((any) -> any)?,
-	decode: ((any) -> any)?,
-}
-
--- ID-keyed engine calls a mock can stand in for, keyed by the canonical `Service.Method` the
--- production code path bottoms out in -- the interception point is the engine API, not the Nevermore
--- util wrapping it. That keeps the domain greppable against Roblox docs, and it centralizes the
--- injected result per (player, id): every consumer that derives an answer from the same engine call
--- -- a permission provider, an ownership tracker, a direct util call, rank AND role from the same
--- group query -- resolves from the same injected value, so answers can never tear. Defaults are the
--- truthful answer for a fake UserId: not in the group, owns nothing.
-local LOOKUPS: { [string]: LookupSpec } = {
-	-- GroupService:GetRolesInGroupAsync(userId, groupId) -> { IsMember, Roles = { { Name, Rank } } },
-	-- stored as the raw engine result so consumers (GroupUtils.promiseRankInGroup /
-	-- promiseRoleInGroup) run their real parsing over it. One entry backs both rank and role so an
-	-- injected pair can never disagree.
-	["GroupService.GetRolesInGroupAsync"] = {
-		default = { IsMember = false, Roles = {} } :: any, -- Roblox's non-member answer
-		valueType = "table",
-		validate = function(value: any)
-			assert(type(value.IsMember) == "boolean", "Bad value.IsMember")
-			assert(type(value.Roles) == "table", "Bad value.Roles")
-			for _, roleTable in value.Roles do
-				assert(type(roleTable.Name) == "string", "Bad role.Name")
-				assert(type(roleTable.Rank) == "number", "Bad role.Rank")
-			end
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-	-- GroupService:GetGroupsAsync(userId) -> { { Id, Rank, Role, ... } }. The engine call is keyed
-	-- by userId alone and the injected result already lives on the mock, so the lookup key is
-	-- fixed at 0.
-	["GroupService.GetGroupsAsync"] = {
-		default = {} :: any, -- a fake UserId is in no groups
-		valueType = "table",
-		validate = function(value: any)
-			for _, groupInfo in value do
-				assert(type(groupInfo.Id) == "number", "Bad group.Id")
-				assert(type(groupInfo.Rank) == "number", "Bad group.Rank")
-				assert(type(groupInfo.Role) == "string", "Bad group.Role")
-			end
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-	-- MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId) -> owned
-	["MarketplaceService.UserOwnsGamePassAsync"] = { default = false, valueType = "boolean" },
-	-- MarketplaceService:PlayerOwnsAsset(player, assetId) -> owned (inventory items: hats, gear, ...)
-	["MarketplaceService.PlayerOwnsAsset"] = { default = false, valueType = "boolean" },
-	-- MarketplaceService:PlayerOwnsAssetAsync(player, assetId) -> owned (paid access to a game)
-	["MarketplaceService.PlayerOwnsAssetAsync"] = { default = false, valueType = "boolean" },
-	-- MarketplaceService:PlayerOwnsBundle(player, bundleId) -> owned
-	["MarketplaceService.PlayerOwnsBundle"] = { default = false, valueType = "boolean" },
-	-- MarketplaceService:PromptGamePassPurchase(player, gamePassId) -> whether the mock "user" accepts
-	-- the prompt. The engine cannot prompt a mock, so consumers answer with this decision as if the
-	-- engine had fired PromptGamePassPurchaseFinished; a fake user buys nothing by default.
-	["MarketplaceService.PromptGamePassPurchase"] = { default = false, valueType = "boolean" },
-	-- StarterGui:SetCoreGuiEnabled(coreGuiType, enabled) -- a client-only engine effect. Unlike the
-	-- injected web-API lookups above, this domain is written by PRODUCTION code (CoreGuiEnabler
-	-- performs the set on the mock local player, there being no CoreGui to affect) and read by tests
-	-- to assert the effect. Default true: CoreGui starts enabled on a real client.
-	["StarterGui.SetCoreGuiEnabled"] = { default = true, valueType = "boolean", keyKind = "EnumItem" },
-	-- TeleportService teleports (Teleport / TeleportAsync / TeleportToPlaceInstance) -- client engine
-	-- effects recorded like SetCoreGuiEnabled: production (TeleportServiceUtils) writes a record keyed by
-	-- destination placeId on the mock, there being no real place to send it to, and a test reads it back
-	-- to assert the hop and its data. Value is a { via, teleportData?, instanceId?, spawnName? } record
-	-- (`via` names the API used). Default nil: no teleport requested until one is.
-	["TeleportService.Teleport"] = {
-		default = nil :: any,
-		valueType = "table",
-		validate = function(value: any)
-			assert(type(value.via) == "string", "Bad teleport.via")
-			assert(value.teleportData == nil or type(value.teleportData) == "table", "Bad teleport.teleportData")
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-	-- TeleportService.TeleportInitFailed(player, teleportResult, message) -- what the engine says about
-	-- a teleport, which it can never say to a mock, whose teleport never reaches the engine (see the
-	-- domain above). A test injects a report keyed by the destination placeId and the backing
-	-- attribute's changed signal stands in for the event, the way "Player.IsFriendsWithAsync" stands in
-	-- for the friendship events. Despite the name the event reports outcomes, not only failures: it
-	-- also carries Success and IsTeleporting, so `result` is required, and injecting one of those is
-	-- how a test says the hop is underway. Attributes only fire on change, so consecutive reports about
-	-- the same teleport must differ (an attempt number in the message, say) for a retrying consumer to
-	-- see each one. Default nil: the engine has said nothing.
-	["TeleportService.TeleportInitFailed"] = {
-		default = nil :: any,
-		valueType = "table",
-		validate = function(value: any)
-			assert(
-				typeof(value.result) == "EnumItem" and value.result.EnumType == Enum.TeleportResult,
-				"Bad teleportInitFailed.result"
-			)
-			assert(type(value.message) == "string", "Bad teleportInitFailed.message")
-		end,
-		-- Stored by name, an EnumItem being the one part of this record JSON cannot carry. Production
-		-- reads back the EnumItem the engine would have handed it.
-		encode = function(value: any): string
-			return HttpService:JSONEncode({ result = value.result.Name, message = value.message })
-		end,
-		decode = function(value: any): any
-			local decoded = HttpService:JSONDecode(value)
-			return {
-				result = (Enum.TeleportResult :: any)[decoded.result],
-				message = decoded.message,
-			}
-		end,
-	},
-	-- Players:GetFriendsAsync(userId) -> FriendPages, stored as the flat FriendData array the pages
-	-- iterate ({ Id, Username, DisplayName, IsOnline }). The engine call is keyed by userId alone
-	-- and the injected result already lives on the mock, so the lookup key is fixed at 0. Consumers
-	-- (FriendUtils.promiseFriendPages) wrap the array back into a pages shape via PagesProxy so
-	-- their real page iteration runs unchanged.
-	["Players.GetFriendsAsync"] = {
-		default = {} :: any, -- a fake UserId has no friends
-		valueType = "table",
-		validate = function(value: any)
-			for _, friendData in value do
-				assert(type(friendData.Id) == "number", "Bad friendData.Id")
-				assert(type(friendData.Username) == "string", "Bad friendData.Username")
-				assert(type(friendData.DisplayName) == "string", "Bad friendData.DisplayName")
-				assert(type(friendData.IsOnline) == "boolean", "Bad friendData.IsOnline")
-			end
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-	-- Player:IsFriendsWithAsync(userId) -> isFriends, keyed by the other player's UserId. The
-	-- backing attribute's changed signal (see [PlayerMock.getLookupChangedSignal]) doubles as the
-	-- friendship-changed event for observers like RxFriendUtils, so a writeLookup mid-test stands
-	-- in for the CoreGui friended/unfriended events.
-	["Player.IsFriendsWithAsync"] = { default = false, valueType = "boolean" },
-	-- UserService:GetUserInfosByUserIdsAsync({ userId })[1] -> { Id, Username, DisplayName,
-	-- HasVerifiedBadge }. Keyed by userId alone like GetGroupsAsync, so the key is fixed at 0. The
-	-- default derives from the mock's own identity (`Name` standing in for the username, like a real
-	-- Player's) so identity consumers agree with the mock's properties without an injection; the one
-	-- entry backs both username and display-name consumers (UserServiceUtils, Players.GetNameFromUserIdAsync
-	-- wrappers like PlayerThumbnailUtils.promiseUserName) so an injected pair can never disagree.
-	["UserService.GetUserInfosByUserIdsAsync"] = {
-		getDefault = function(player: Player)
-			return {
-				Id = PlayerMock.read(player, "UserId"),
-				Username = player.Name,
-				DisplayName = PlayerMock.read(player, "DisplayName"),
-				HasVerifiedBadge = PlayerMock.read(player, "HasVerifiedBadge"),
-			}
-		end,
-		valueType = "table",
-		validate = function(value: any)
-			assert(type(value.Id) == "number", "Bad value.Id")
-			assert(type(value.Username) == "string", "Bad value.Username")
-			assert(type(value.DisplayName) == "string", "Bad value.DisplayName")
-			assert(type(value.HasVerifiedBadge) == "boolean", "Bad value.HasVerifiedBadge")
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-	-- MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId) -> { IsSubscribed, IsRenewing },
-	-- keyed by the subscriptionId string (e.g. "EXP-...").
-	["MarketplaceService.GetUserSubscriptionStatusAsync"] = {
-		default = { IsSubscribed = false, IsRenewing = false } :: any, -- a fake user subscribes to nothing
-		valueType = "table",
-		keyKind = "string",
-		validate = function(value: any)
-			assert(type(value.IsSubscribed) == "boolean", "Bad value.IsSubscribed")
-			assert(type(value.IsRenewing) == "boolean", "Bad value.IsRenewing")
-		end,
-		encode = function(value: any): string
-			return HttpService:JSONEncode(value)
-		end,
-		decode = function(value: any): any
-			return HttpService:JSONDecode(value)
-		end,
-	},
-}
-
-local function assertLookupKey(domain: string, spec: LookupSpec, key: any)
-	if spec.keyKind == "EnumItem" then
-		assert(typeof(key) == "EnumItem", string.format("Bad key for %s lookup (expected EnumItem)", domain))
-	elseif spec.keyKind == "string" then
-		assert(type(key) == "string" and key ~= "", string.format("Bad key for %s lookup (expected string)", domain))
-	else
-		assert(type(key) == "number" and key % 1 == 0, "Bad key")
-	end
-end
-
-local function getLookupAttributeName(domain: string, key: number | EnumItem | string): string
-	-- Attribute names cannot contain "." (or any non-word character, e.g. the "-" in a
-	-- subscriptionId), so the canonical Service.Method and the key both flatten to word characters.
-	local keyName = if typeof(key) == "EnumItem" then (key :: EnumItem).Name else tostring(key)
-	keyName = string.gsub(keyName, "[^%w_]", "_")
-	return string.format("%s%s_%s", LOOKUP_ATTRIBUTE_PREFIX, (string.gsub(domain, "%.", "_")), keyName)
+function PlayerMock.getPropertyChangedSignal(
+	player: Player,
+	propertyPath: InstancePathUtils.InstancePathTableLike
+): RBXScriptSignal
+	return PlayerMockPropertyUtils.getPropertyChangedSignal(player, propertyPath)
 end
 
 --[=[
-	Reads the injected result for an ID-keyed engine call off a mock: the value a test injected
-	through [PlayerMock.writeLookup], or the domain's pre-authored default when unset. The domain is
-	the canonical `Service.Method` the production code path bottoms out in, validated against the
-	pre-authored set so a typo errors instead of silently reading a default.
-
-	Like [PlayerMock.read], this is mock-only and errors on anything else (including a real
-	`Player`), so consumers branch explicitly and the real-Player path keeps calling the real
-	service:
+	Calls a native method on a mock, running whichever stand-in it has: a callback bound over the
+	whole method through [PlayerMock.bindMethod], otherwise an answer injected for these arguments
+	through [PlayerMock.writeLookup], otherwise what the domain models.
 
 	```lua
 	if PlayerMock.isMock(player) then
-		-- same raw result shape the engine call returns, so parsing below runs unchanged
+		PlayerMock.callMethod(player, "Player.AddReplicationFocus", part)
+	else
+		player:AddReplicationFocus(part)
+	end
+	```
+
+	The path is validated against the engine's reflection, so a typo errors instead of silently
+	standing in for a method production could never have called.
+
+	@param player Player -- must be a PlayerMock
+	@param methodPath InstancePathTableLike -- `"Player.Kick"` or `"MarketplaceService.UserOwnsGamePassAsync"`
+	@param ... any -- the engine call's own arguments; for a lookup, what its answer turns on
+	@return ...any
+]=]
+function PlayerMock.callMethod(player: Player, methodPath: InstancePathUtils.InstancePathTableLike, ...: any): ...any
+	return PlayerMockMethodUtils.call(player, methodPath, ...)
+end
+
+--[=[
+	Binds a callback to stand in for a native method on one mock, displacing whatever
+	[PlayerMock.callMethod] would otherwise run. Use it where a value is not enough and the stand-in
+	has to compute -- an answer that varies per call, or a method the mock models no default for.
+
+	```lua
+	PlayerMock.bindMethod(player, "Players.GetFriendsAsync", function(_player, _userId)
+		return if attempts > 1 then friends else error("Rate limited")
+	end)
+	```
+
+	The callback receives the mock followed by the call's own arguments. Binding again replaces the
+	previous callback, and binding nil removes it; [PlayerMock.unbindMethod] is that same removal
+	under a name that says so.
+
+	Passing the call's arguments narrows the binding to that one argument tuple, the way
+	[PlayerMock.writeLookup] injects a value for one; passing none binds the whole method.
+
+	Returns a function that removes this binding, so a maid can hold it:
+
+	```lua
+	maid:GiveTask(PlayerMock.bindMethod(player, "Players.GetFriendsAsync", stubFriends))
+	```
+
+	It removes only the binding it came from -- after a rebind it is a no-op -- so a maid unwinding
+	late cannot tear down a stand-in that replaced its own.
+
+	@param player Player -- must be a PlayerMock
+	@param methodPath InstancePathTableLike -- `"Player.Kick"` or `"Players.GetFriendsAsync"`
+	@param callback ((player: Player, ...any) -> ...any)? -- nil removes the binding
+	@param ... any -- the arguments to bind over, or none for the whole method
+	@return () -> ()
+]=]
+function PlayerMock.bindMethod(
+	player: Player,
+	methodPath: InstancePathUtils.InstancePathTableLike,
+	callback: ((player: Player, ...any) -> ...any)?,
+	...: any
+): () -> ()
+	return PlayerMockMethodUtils.bindMethod(player, methodPath, callback, ...)
+end
+
+--[=[
+	Removes a callback bound through [PlayerMock.bindMethod], so the method falls back to its
+	modelled stand-in. The arguments are the ones the binding was made over; unbinding a method that
+	was never bound is a no-op.
+
+	@param player Player -- must be a PlayerMock
+	@param methodPath InstancePathTableLike -- `"Player.Kick"` or `"Players.GetFriendsAsync"`
+	@param ... any -- the arguments the binding was made over, or none for the whole method
+]=]
+function PlayerMock.unbindMethod(player: Player, methodPath: InstancePathUtils.InstancePathTableLike, ...: any): ()
+	PlayerMockMethodUtils.unbindMethod(player, methodPath, ...)
+end
+
+--[=[
+	Returns whether a callback is currently bound for the method on this mock, over the arguments
+	given or over the whole method when none are.
+
+	@param player Player -- must be a PlayerMock
+	@param methodPath InstancePathTableLike -- `"Player.Kick"` or `"Players.GetFriendsAsync"`
+	@param ... any -- the arguments the binding was made over, or none for the whole method
+	@return boolean
+]=]
+function PlayerMock.isMethodBound(
+	player: Player,
+	methodPath: InstancePathUtils.InstancePathTableLike,
+	...: any
+): boolean
+	return PlayerMockMethodUtils.isMethodBound(player, methodPath, ...)
+end
+
+--[=[
+	Reads back what a mock answers for an argument-keyed engine call, the test-side name for
+	[PlayerMock.callMethod]. The value is the raw engine result shape, so production parsing runs
+	over it unchanged:
+
+	```lua
+	if PlayerMock.isMock(player) then
 		return PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", groupId)
 	end
 	return GroupService:GetRolesInGroupAsync(player.UserId, groupId)
 	```
 
 	Effect-recording domains (e.g. `StarterGui.SetCoreGuiEnabled`) run the same machinery in the
-	other direction: production wrote the value through [PlayerMock.writeLookup], and the test reads
-	it here to assert the engine effect.
+	other direction: production writes through [PlayerMock.writeLookup] and the test reads here.
 
 	@param player Player -- must be a PlayerMock
-	@param domain string -- a known lookup domain, e.g. "GroupService.GetRolesInGroupAsync"
-	@param key number | EnumItem | string -- what the call is keyed by (groupId, gamePassId, CoreGuiType, subscriptionId, ...)
+	@param domain InstancePathTableLike -- a known lookup domain, e.g. "GroupService.GetRolesInGroupAsync"
+	@param ... any -- the engine call's own arguments, the ones the answer turns on
 	@return any
 ]=]
-function PlayerMock.readLookup(player: Player, domain: string, key: number | EnumItem | string): any
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	local spec = LOOKUPS[domain]
-	assert(spec ~= nil, string.format("%q is not a known lookup domain", tostring(domain)))
-	assertLookupKey(domain, spec, key)
-
-	local raw = (player :: Instance):GetAttribute(getLookupAttributeName(domain, key))
-	if raw == nil then
-		if spec.getDefault then
-			return spec.getDefault(player)
-		end
-		return spec.default
-	end
-	if spec.decode then
-		return spec.decode(raw)
-	end
-	return raw
+function PlayerMock.readLookup(player: Player, domain: InstancePathUtils.InstancePathTableLike, ...: any): any
+	return PlayerMockMethodUtils.readLookup(player, domain, ...)
 end
 
 --[=[
-	Injects the result a mock answers for an ID-keyed engine call, or clears it back to the
-	domain default with nil. Because the value is stored on the mock -- one attribute per
-	(domain, key) -- every consumer whose answer derives from the same engine call resolves the
-	same value, and the write fires the backing attribute's `GetAttributeChangedSignal` so
-	observers see the change.
+	Injects the result a mock answers for an argument-keyed engine call -- [PlayerMock.bindMethod]
+	over those arguments, with a constant in place of a callback. Passing nil removes the injection,
+	leaving the domain to answer what it models again.
 
 	```lua
-	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
+	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 		IsMember = true,
 		Roles = { { Name = "Admin", Rank = 230 } },
-	})
-	PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 12345, true)
+	}, 372)
+	PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, 12345)
 	```
 
-	For effect-recording domains (e.g. `StarterGui.SetCoreGuiEnabled`) the writer is production
-	code instead: it performs the engine effect on the mock, and the test observes it through
-	[PlayerMock.readLookup] or the backing attribute's changed signal.
-
 	@param player Player -- must be a PlayerMock
-	@param domain string -- a known lookup domain, e.g. "MarketplaceService.UserOwnsGamePassAsync"
-	@param key number | EnumItem | string -- what the call is keyed by (groupId, gamePassId, CoreGuiType, subscriptionId, ...)
-	@param value any -- must match the domain's value shape; nil clears back to the default
+	@param domain InstancePathTableLike -- a known lookup domain, e.g. "MarketplaceService.UserOwnsGamePassAsync"
+	@param value any -- must match the domain's result shape; nil removes the injection
+	@param ... any -- the engine call's own arguments, the ones the answer turns on
 ]=]
-function PlayerMock.writeLookup(player: Player, domain: string, key: number | EnumItem | string, value: any)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	local spec = LOOKUPS[domain]
-	assert(spec ~= nil, string.format("%q is not a known lookup domain", tostring(domain)))
-	assertLookupKey(domain, spec, key)
-	assert(
-		value == nil or typeof(value) == spec.valueType,
-		string.format("Bad value for %s lookup (expected %s)", domain, spec.valueType)
-	)
-	if value ~= nil and spec.validate then
-		spec.validate(value)
-	end
-
-	local encoded = if value ~= nil and spec.encode then spec.encode(value) else value
-
-	local instance = player :: Instance
-	instance:SetAttribute(getLookupAttributeName(domain, key), encoded)
-end
-
---[=[
-	Returns the signal that fires when the injected result for an ID-keyed engine call changes on a
-	mock: the backing attribute's changed signal. This lets a production observer treat a mid-test
-	[PlayerMock.writeLookup] as the engine's own change event -- e.g. [RxFriendUtils] re-reading
-	friendship when the "Player.IsFriendsWithAsync" domain changes, standing in for the CoreGui
-	friended/unfriended events a mock can never receive. Mock-only, like [PlayerMock.readLookup].
-
-	@param player Player -- must be a PlayerMock
-	@param domain string -- a known lookup domain, e.g. "Player.IsFriendsWithAsync"
-	@param key number | EnumItem | string -- what the call is keyed by
-	@return RBXScriptSignal
-]=]
-function PlayerMock.getLookupChangedSignal(
+function PlayerMock.writeLookup(
 	player: Player,
-	domain: string,
-	key: number | EnumItem | string
-): RBXScriptSignal
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	local spec = LOOKUPS[domain]
-	assert(spec ~= nil, string.format("%q is not a known lookup domain", tostring(domain)))
-	assertLookupKey(domain, spec, key)
-
-	return (player :: Instance):GetAttributeChangedSignal(getLookupAttributeName(domain, key))
+	domain: InstancePathUtils.InstancePathTableLike,
+	value: any,
+	...: any
+): ()
+	PlayerMockMethodUtils.writeLookup(player, domain, value, ...)
 end
 
 --[=[
 	Emulates `Player:LoadCharacterAsync()` on a mock. The caller supplies the character model -- e.g.
 	`Players:CreateHumanoidModelFromUserId`/`FromDescription` (both work in cloud test runs) or a
 	hand-built rig -- or omits it to get a default R15 built from an empty `HumanoidDescription`
-	(may yield while the engine builds it).
+	(which may yield).
 
-	The observable sequence encodes the engine's avatar loading event ordering
-	(https://devforum.roblox.com/t/avatar-loading-event-ordering-improvements/269607), and
-	PlayerMock.spec asserts each step -- correct both together if that understanding is ever
-	corrected:
+	```lua
+	local character = PlayerMock.loadCharacterAsync(player, rig)
+	```
 
-	1. `CharacterRemoving(old)` fires while `Character` still points at the old model and it is
-	   still parented -- the event's "just before removal" contract (not part of the announcement)
-	2. `Character` nils and the old character is destroyed (see [RxCharacterUtils.observeLastCharacterBrio]'s
-	   assumption); nil-before-destroy lets observers tear down while the instance is still alive
-	3. the new rig is fully built before any signal fires -- the announcement's "appearance
-	   initialized / rig built and scaled" steps; the caller's rig (or the built default) stands in
-	4. `Character` is set to the new model (the property `Changed` fires)
+	The sequence encodes the engine's [avatar loading event ordering](https://devforum.roblox.com/t/avatar-loading-event-ordering-improvements/269607),
+	which PlayerMock.spec asserts step by step:
+
+	1. `CharacterRemoving(old)` fires while `Character` still points at the old, parented model
+	2. `Character` nils, then the old character is destroyed
+	3. the new rig is fully built before any signal fires
+	4. `Character` is set to the new model
 	5. the new character is parented to the Workspace
-	6. `CharacterAdded(new)` fires -- after both the assignment and the Workspace parenting, per
-	   the announcement above (the pre-2019 "not in Workspace yet" gotcha is gone)
-	7. the `HasAppearanceLoaded` stand-in flips true and `CharacterAppearanceLoaded(new)` fires --
-	   after `CharacterAdded`, with the rig finalized
-	8. only then does the call return, mirroring "LoadCharacter returns" ending the announced order
+	6. `CharacterAdded(new)` fires
+	7. `HasAppearanceLoaded` flips true and `CharacterAppearanceLoaded(new)` fires
+	8. the call returns
 
-	Per the same announcement, `CharacterAdded` fires only during avatar loading -- which is why a
-	plain `PlayerMock.write(player, "Character", model)` deliberately does not fire it.
+	`CharacterAdded` fires only during avatar loading, which is why a plain
+	`PlayerMock.write(player, "Character", model)` deliberately does not fire it.
 
-	Each call also replaces the mock's `Backpack` stand-in with a fresh empty one before any spawn
-	signal fires, like the engine does on respawn (minus the StarterPack copy) -- see
-	[PlayerMock.getBackpack]. The first call additionally inserts the `StarterGear` stand-in,
-	which later spawns keep -- see [PlayerMock.getStarterGear].
+	Each call also replaces the [PlayerMock.getBackpack] stand-in with a fresh empty one, like the
+	engine does on respawn (minus the StarterPack copy). The first call additionally inserts the
+	[PlayerMock.getStarterGear] stand-in, which later spawns keep.
 
 	@param player Player -- must be a PlayerMock
 	@param character Model? -- the new character; nil builds a default R15 rig
 	@return Model
 ]=]
 function PlayerMock.loadCharacterAsync(player: Player, character: Model?): Model
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(character == nil or (typeof(character) == "Instance" and character:IsA("Model")), "Bad character")
-
-	local newCharacter: Model = character
-		or Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
-	newCharacter.Name = player.Name
-
-	-- The Character-nil setter carries the removal semantics: CharacterRemoving -> nil -> destroy
-	if PlayerMock.read(player, "Character") ~= nil then
-		PlayerMock.write(player, "Character", nil)
-	end
-
-	-- Each spawn gets a fresh empty Backpack, like the engine replacing player.Backpack on
-	-- respawn (minus the StarterPack copy). Replaced before any spawn signal fires so
-	-- CharacterAdded handlers can already reach the new backpack.
-	local oldBackpack = PlayerMock.getBackpack(player)
-	if oldBackpack ~= nil then
-		oldBackpack:Destroy()
-	end
-
-	local backpack = Instance.new("Backpack")
-	backpack.Parent = player :: Instance
-
-	-- The StarterGear appears alongside the first spawn and then persists -- the engine never
-	-- replaces it on respawn (unlike the Backpack), so granted gear survives here too.
-	if PlayerMock.getStarterGear(player) == nil then
-		local starterGear = Instance.new("StarterGear")
-		starterGear.Parent = player :: Instance
-	end
-
-	PlayerMock.write(player, "Character", newCharacter)
-	newCharacter.Parent = Workspace
-	PlayerMock.fireSignal(player, "CharacterAdded", newCharacter)
-
-	-- Written before the event fires so a handler that reads the stand-in agrees with the event
-	PlayerMock.write(player, "HasAppearanceLoaded", true)
-	PlayerMock.fireSignal(player, "CharacterAppearanceLoaded", newCharacter)
-
-	return newCharacter
+	return PlayerMockCharacterUtils.loadCharacterAsync(player, character)
 end
 
 --[=[
 	[PlayerMock.loadCharacterAsync] with a minimal hand-built rig -- an anchored `HumanoidRootPart`
-	(the `PrimaryPart`) and a `Humanoid` -- instead of a full R15 built from a `HumanoidDescription`.
-	That is the smallest shape character-driven code paths (equip flows, humanoid observers) accept,
-	and building it never yields, so specs that only need *a* character spawn instantly:
+	(the `PrimaryPart`) and a `Humanoid`. Building it never yields, so specs that only need *a*
+	character spawn instantly:
 
 	```lua
 	local character = PlayerMock.loadMinimalCharacterAsync(playerMock)
@@ -997,49 +486,26 @@ end
 	@return Model
 ]=]
 function PlayerMock.loadMinimalCharacterAsync(player: Player): Model
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local character = Instance.new("Model")
-
-	local rootPart = Instance.new("Part")
-	rootPart.Name = "HumanoidRootPart"
-	rootPart.Anchored = true
-	rootPart.Parent = character
-	character.PrimaryPart = rootPart
-
-	local humanoid = Instance.new("Humanoid")
-	humanoid.Parent = character
-
-	return PlayerMock.loadCharacterAsync(player, character)
+	return PlayerMockCharacterUtils.loadMinimalCharacterAsync(player)
 end
 
 --[=[
 	Emulates the character being removed with no replacement, i.e. `player.Character = nil`:
-	`CharacterRemoving` fires while `Character` still points at the model, `Character` is set to
-	nil, and the model is destroyed. No-op when no character is loaded.
+	`CharacterRemoving` fires while `Character` still points at the model, `Character` is set to nil,
+	and the model is destroyed. No-op when no character is loaded.
 
-	Runs automatically when the mock itself is destroyed, mirroring the engine cleaning up the
-	character when its player leaves or is kicked.
+	Runs automatically when the mock is destroyed or kicked.
 
 	@param player Player -- must be a PlayerMock
 ]=]
-function PlayerMock.removeCharacter(player: Player)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	if PlayerMock.read(player, "Character") ~= nil then
-		PlayerMock.write(player, "Character", nil)
-	end
+function PlayerMock.removeCharacter(player: Player): ()
+	PlayerMockCharacterUtils.removeCharacter(player)
 end
 
 --[=[
-	Returns the mock's current `Backpack` stand-in, or nil before the first spawn -- the engine only
-	inserts a player's Backpack when their character spawns. The stand-in is a genuine `Backpack`
-	instance parented to the mock (so it is the child named "Backpack", like a real Player's), which
-	means production code that observes the backpack's children -- e.g.
-	`RxInstanceUtils.observeLastNamedChildBrio(player, "Backpack", "Backpack")` -- works unchanged.
-
-	[PlayerMock.loadCharacterAsync] replaces it with a fresh empty one on every spawn, like the
-	engine does on respawn; the test parents `Tool`s into it directly:
+	Returns the mock's current `Backpack` stand-in, or nil before the first spawn. It is a genuine
+	`Backpack` parented to the mock, so production code observing its children works unchanged.
+	[PlayerMock.loadCharacterAsync] replaces it with a fresh empty one on every spawn:
 
 	```lua
 	local character = PlayerMock.loadCharacterAsync(player, rig)
@@ -1051,19 +517,13 @@ end
 	@return Backpack?
 ]=]
 function PlayerMock.getBackpack(player: Player): Backpack?
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	return (player :: Instance):FindFirstChildOfClass("Backpack")
+	return PlayerMockChildrenUtils.getBackpack(player)
 end
 
 --[=[
-	Returns the mock's current `StarterGear` stand-in, or nil before the first spawn -- the engine
-	only inserts a player's StarterGear alongside their first character spawn. Like the Backpack
-	stand-in it is a genuine `StarterGear` instance parented to the mock, so class-based lookups
-	(`player:FindFirstChildOfClass("StarterGear")`) work unchanged; unlike the Backpack,
-	[PlayerMock.loadCharacterAsync] never replaces it -- the engine keeps a player's StarterGear
-	across respawns. Consumers that dot-index `player.StarterGear` resolve it through the usual
-	explicit branch:
+	Returns the mock's current `StarterGear` stand-in, or nil before the first spawn. It is a genuine
+	`StarterGear` parented to the mock, and unlike the Backpack it survives respawns. Consumers that
+	dot-index `player.StarterGear` branch:
 
 	```lua
 	local starterGear = if PlayerMock.isMock(player)
@@ -1075,17 +535,12 @@ end
 	@return StarterGear?
 ]=]
 function PlayerMock.getStarterGear(player: Player): StarterGear?
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	return (player :: Instance):FindFirstChildOfClass("StarterGear")
+	return PlayerMockChildrenUtils.getStarterGear(player)
 end
 
 --[=[
-	Returns the mock's `PlayerGui` stand-in, parented at construction -- mirroring the engine
-	inserting a player's PlayerGui at join (unlike the Backpack, which only appears at first
-	spawn). `PlayerGui` cannot be `Instance.new`'d, so like the mock itself the stand-in is really
-	a `Folder` (named "PlayerGui") typed as the native class; consumers resolve it through the
-	usual explicit branch instead of `FindFirstChildOfClass`:
+	Returns the mock's `PlayerGui` stand-in, parented at construction. It is really a `Folder` named
+	"PlayerGui", so consumers branch instead of using `FindFirstChildOfClass`:
 
 	```lua
 	local playerGui = if PlayerMock.isMock(player)
@@ -1093,65 +548,40 @@ end
 		else player:FindFirstChildOfClass("PlayerGui")
 	```
 
-	[PlayerGuiUtils] branches this way internally, so consumers of it work against a mock without
-	changes. Tests parent ScreenGui/Frame surfaces into the stand-in directly.
+	[PlayerGuiUtils] branches this way internally, so its consumers work against a mock unchanged.
 
 	@param player Player -- must be a PlayerMock
 	@return PlayerGui
 ]=]
 function PlayerMock.getPlayerGui(player: Player): PlayerGui
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local playerGui: any = assert((player :: Instance):FindFirstChild("PlayerGui"), "No PlayerGui")
-	return playerGui :: PlayerGui
+	return PlayerMockChildrenUtils.getPlayerGui(player)
 end
 
 --[=[
-	Returns the mock's `PlayerScripts` stand-in, parented at construction -- mirroring the engine
-	inserting a player's PlayerScripts at join, like the PlayerGui stand-in. `PlayerScripts` cannot
-	be `Instance.new`'d, so the stand-in is really a `Folder` (named "PlayerScripts") typed as the
-	native class. A Folder can never satisfy an `IsA("PlayerScripts")` class filter, so consumers
-	observing the child by class resolve it through the usual explicit branch:
+	Returns the mock's `PlayerScripts` stand-in, parented at construction. Like the PlayerGui stand-in
+	it is really a `Folder`, which can never satisfy an `IsA("PlayerScripts")` filter, so consumers
+	observing the child by class branch on the class name:
 
 	```lua
 	local playerScriptsClassName = if PlayerMock.isMock(localPlayer) then "Folder" else "PlayerScripts"
 	RxInstanceUtils.observeLastNamedChildBrio(localPlayer, playerScriptsClassName, "PlayerScripts")
 	```
 
-	Tests parent script stand-ins (e.g. an `RbxCharacterSounds` `LocalScript`) into it directly.
-
 	@param player Player -- must be a PlayerMock
 	@return PlayerScripts
 ]=]
 function PlayerMock.getPlayerScripts(player: Player): PlayerScripts
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local playerScripts: any = assert((player :: Instance):FindFirstChild("PlayerScripts"), "No PlayerScripts")
-	return playerScripts :: PlayerScripts
+	return PlayerMockChildrenUtils.getPlayerScripts(player)
 end
 
--- Attribute recording the message a mock was kicked with (see [PlayerMock.kick]). Stored on the
--- mock so the record survives the destroy that ends the kick -- a held reference can still read it.
-local KICK_MESSAGE_ATTRIBUTE = "PlayerMockKickMessage"
-
 --[=[
-	Emulates `Player:Kick(message)` on a mock. Kick is the special case among the stand-ins: a
-	*method* whose observable effect is the engine removing the player from the game, not a property
-	or event a test seeds -- so the mock really performs the removal sequence instead of merely
+	Emulates `Player:Kick(message)` on a mock, performing the removal sequence rather than merely
 	recording the call:
 
-	1. the kick message is recorded (see [PlayerMock.getKickMessage] -- no client exists to show it to)
-	2. the character is removed (`CharacterRemoving` fires while `Character` still points at it,
-	   `Character` nils, the model is destroyed), mirroring the engine cleaning up a kicked player's
-	   character
+	1. the message is recorded for [PlayerMock.getKickMessage]
+	2. the character is removed (see [PlayerMock.removeCharacter])
 	3. the mock leaves the DataModel (`Parent = nil`, not a destroy -- a held reference stays
-	   readable), so the native `AncestryChanged` signal genuinely fires -- the same way a kicked
-	   player's instance leaves `Players`
-
-	`Players.PlayerRemoving` is a `Players`-service event only the engine fires, so consumers of that
-	event cannot observe a mock kick; observe `AncestryChanged` instead.
-
-	Production code branches explicitly, like every other mock seam:
+	   readable), so `AncestryChanged` genuinely fires
 
 	```lua
 	if PlayerMock.isMock(player) then
@@ -1161,78 +591,31 @@ local KICK_MESSAGE_ATTRIBUTE = "PlayerMockKickMessage"
 	end
 	```
 
+	`Players.PlayerRemoving` is a `Players`-service event only the engine fires, so consumers of it
+	cannot observe a mock kick -- observe `AncestryChanged` instead.
+
 	@param player Player -- must be a PlayerMock
 	@param message string? -- recorded for [PlayerMock.getKickMessage]; nil records ""
 ]=]
-function PlayerMock.kick(player: Player, message: string?)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(message == nil or type(message) == "string", "Bad message")
-
-	local instance = player :: Instance
-	instance:SetAttribute(KICK_MESSAGE_ATTRIBUTE, message or "")
-
-	-- Explicitly, rather than via the Destroying hook, so CharacterRemoving observers still see a
-	-- live (parented) mock -- the engine removes the character before the player instance goes away.
-	PlayerMock.removeCharacter(player)
-	instance.Parent = nil
+function PlayerMock.kick(player: Player, message: string?): ()
+	PlayerMockMethodUtils.call(player, "Player.Kick", message)
 end
 
 --[=[
-	Returns the message a mock was kicked with (via [PlayerMock.kick]), or nil when it was never
-	kicked. A kick with no message reads back as `""`. Stays readable after the kick destroys the
-	mock, as long as the caller holds a reference.
+	Returns the message a mock was kicked with via [PlayerMock.kick], or nil when it was never kicked.
+	A kick with no message reads back as `""`. Stays readable after the kick, as long as the caller
+	holds a reference.
 
 	@param player Player -- must be a PlayerMock
 	@return string?
 ]=]
 function PlayerMock.getKickMessage(player: Player): string?
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local message = (player :: Instance):GetAttribute(KICK_MESSAGE_ATTRIBUTE)
-	return if type(message) == "string" then message else nil
-end
-
--- Folder holding one ObjectValue per part added through [PlayerMock.addReplicationFocus]. Streaming
--- focuses are a *set* the engine only lets you add to and remove from -- it exposes no getter -- so the
--- set lives on the mock, inspectable and self-cleaning like the other backings, and a test reads it
--- back through [PlayerMock.getReplicationFocuses].
-local REPLICATION_FOCUS_FOLDER_NAME = "PlayerMockReplicationFocuses"
-
-local function findReplicationFocusFolder(player: Player): Folder?
-	return (player :: Instance):FindFirstChild(REPLICATION_FOCUS_FOLDER_NAME) :: Folder?
-end
-
-local function getOrCreateReplicationFocusFolder(player: Player): Folder
-	local existing = findReplicationFocusFolder(player)
-	if existing ~= nil then
-		return existing
-	end
-
-	local folder = Instance.new("Folder")
-	folder.Name = REPLICATION_FOCUS_FOLDER_NAME
-	folder.Parent = player :: Instance
-	return folder
-end
-
-local function findReplicationFocusValue(player: Player, part: BasePart): ObjectValue?
-	local folder = findReplicationFocusFolder(player)
-	if folder == nil then
-		return nil
-	end
-
-	for _, child in folder:GetChildren() do
-		if (child :: ObjectValue).Value == part then
-			return child :: ObjectValue
-		end
-	end
-
-	return nil
+	return PlayerMockMethodUtils.getKickMessage(player)
 end
 
 --[=[
-	Emulates `Player:AddReplicationFocus(part)` on a mock, adding the part to the mock's set of
-	streaming focuses. A mock's backing Folder has no such method, so production code branches
-	explicitly, like every other mock seam:
+	Emulates `Player:AddReplicationFocus(part)` on a mock. The backing is a set, so adding a part
+	already focused does nothing.
 
 	```lua
 	if PlayerMock.isMock(player) then
@@ -1242,260 +625,126 @@ end
 	end
 	```
 
-	The backing is a set, so adding a part already focused does nothing.
-
 	@param player Player -- must be a PlayerMock
 	@param part BasePart
 ]=]
-function PlayerMock.addReplicationFocus(player: Player, part: BasePart)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
-
-	if findReplicationFocusValue(player, part) ~= nil then
-		return
-	end
-
-	local objectValue = Instance.new("ObjectValue")
-	objectValue.Name = part.Name
-	objectValue.Value = part
-	objectValue.Parent = getOrCreateReplicationFocusFolder(player)
+function PlayerMock.addReplicationFocus(player: Player, part: BasePart): ()
+	PlayerMockMethodUtils.call(player, "Player.AddReplicationFocus", part)
 end
 
 --[=[
-	Emulates `Player:RemoveReplicationFocus(part)` on a mock, dropping the part from its set of
-	streaming focuses. The removal half of the branch in [PlayerMock.addReplicationFocus]; removing a
-	part that is not focused is a no-op.
+	Emulates `Player:RemoveReplicationFocus(part)` on a mock. The removal half of the branch in
+	[PlayerMock.addReplicationFocus]; removing a part that is not focused is a no-op.
 
 	@param player Player -- must be a PlayerMock
 	@param part BasePart
 ]=]
-function PlayerMock.removeReplicationFocus(player: Player, part: BasePart)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
-
-	local objectValue = findReplicationFocusValue(player, part)
-	if objectValue ~= nil then
-		objectValue:Destroy()
-	end
+function PlayerMock.removeReplicationFocus(player: Player, part: BasePart): ()
+	PlayerMockMethodUtils.call(player, "Player.RemoveReplicationFocus", part)
 end
 
 --[=[
 	Returns the parts currently focused on a mock, in the order they were added. The engine has no
 	counterpart -- a real `Player`'s focuses can only be added and removed -- so this is the test-side
-	reader for the effect of [PlayerMock.addReplicationFocus] / [PlayerMock.removeReplicationFocus],
-	the way [PlayerMock.getKickMessage] reads the effect of [PlayerMock.kick].
+	reader for [PlayerMock.addReplicationFocus] / [PlayerMock.removeReplicationFocus].
 
 	@param player Player -- must be a PlayerMock
 	@return { BasePart }
 ]=]
 function PlayerMock.getReplicationFocuses(player: Player): { BasePart }
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local folder = findReplicationFocusFolder(player)
-	if folder == nil then
-		return {}
-	end
-
-	local focuses: { BasePart } = {}
-	for _, child in folder:GetChildren() do
-		local value = (child :: ObjectValue).Value
-		if value ~= nil then
-			table.insert(focuses, value :: BasePart)
-		end
-	end
-	return focuses
-end
-
--- Prefix for the BindableEvent children backing `Player`-class events on a mock (see
--- [PlayerMock.getSignal]). Stored on the mock itself so the backing stays inspectable and
--- self-cleaning, like the attribute-backed properties.
-local SIGNAL_NAME_PREFIX = "PlayerMockSignal_"
-
--- Lazily-built set of the events reflection reports on `Player`, own and inherited alike. Used
--- purely as typo protection; which of the two backings serves a name is decided by
--- findNativeSignal below.
-local playerEventNames: { [string]: boolean }? = nil
-
-local function getPlayerEventNames(): { [string]: boolean }
-	local names = playerEventNames
-	if names ~= nil then
-		return names
-	end
-
-	local built: { [string]: boolean } = {}
-	for _, reflectedEvent in ReflectionService:GetEventsOfClass("Player") :: { any } do
-		built[reflectedEvent.Name] = true
-	end
-	playerEventNames = built
-	return built
-end
-
-local function isPlayerEvent(eventName: string): boolean
-	return getPlayerEventNames()[eventName] == true
-end
-
--- Events the mock's backing Folder inherits from Instance (`AncestryChanged`, `Destroying`, ...)
--- exist natively and genuinely fire; only the rest need a BindableEvent stand-in.
-local function findNativeSignal(player: Player, eventName: string): RBXScriptSignal?
-	local ok, member = pcall(function()
-		return (player :: any)[eventName]
-	end)
-	if ok and typeof(member) == "RBXScriptSignal" then
-		return member
-	end
-
-	return nil
-end
-
-local function getOrCreateSignalBindable(player: Player, eventName: string): BindableEvent
-	local instance = player :: Instance
-	local name = SIGNAL_NAME_PREFIX .. eventName
-
-	local existing = instance:FindFirstChild(name)
-	if existing ~= nil then
-		return existing :: BindableEvent
-	end
-
-	local bindableEvent = Instance.new("BindableEvent")
-	bindableEvent.Name = name
-	bindableEvent.Parent = instance
-	return bindableEvent
+	return PlayerMockReplicationFocusUtils.getReplicationFocuses(player)
 end
 
 --[=[
-	Reads a stand-in native `Player` event off a mock: the genuine native signal when the backing
-	Folder inherits it from `Instance` (`AncestryChanged`, `Destroying`, ...), otherwise a
-	`BindableEvent`-backed signal a test fires through [PlayerMock.fireSignal]. The name is
-	validated against the engine's reflected `Player` events, so a typo errors instead of
-	returning a signal that can never fire.
-
-	Like [PlayerMock.read], this is mock-only and errors on anything else (including a real
-	`Player`), so call sites branch explicitly and the real-Player path stays plain member access:
+	Reads a stand-in native event off a mock: the genuine native signal for events the backing Folder
+	inherits from `Instance`, otherwise a signal a test fires through [PlayerMock.fireSignal]. The
+	path is validated against the engine's reflection, so a typo errors instead of returning a signal
+	that can never fire.
 
 	```lua
 	local chatted = if PlayerMock.isMock(player) then PlayerMock.getSignal(player, "Chatted") else player.Chatted
 	```
 
+	A bare name reads a `Player` event. A `Service.Event` path reads the mock's own copy of a
+	client-global service event, which a headless server has only one of -- see
+	[PlayerMock.getServiceSignal].
+
 	@param player Player -- must be a PlayerMock
-	@param eventName string
+	@param eventPath InstancePathTableLike -- `"Chatted"` or `"UserInputService.WindowFocused"`
 	@return RBXScriptSignal
 ]=]
-function PlayerMock.getSignal(player: Player, eventName: string): RBXScriptSignal
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(eventName) == "string", "Bad eventName")
-
-	-- Events the backing Folder inherits from Instance are genuine -- surface those, not a stand-in.
-	local nativeSignal = findNativeSignal(player, eventName)
-	if nativeSignal ~= nil then
-		return nativeSignal
-	end
-
-	assert(isPlayerEvent(eventName), string.format("%q is not an event of Player", eventName))
-
-	return getOrCreateSignalBindable(player, eventName).Event
+function PlayerMock.getSignal(player: Player, eventPath: InstancePathUtils.InstancePathTableLike): RBXScriptSignal
+	return PlayerMockSignalUtils.getSignal(player, eventPath)
 end
 
 --[=[
-	Fires the backing signal for a `Player`-class event on a mock, so code connected through
-	[PlayerMock.getSignal] observes the event as if the engine had fired it.
+	Fires the backing signal for an event on a mock, so code connected through [PlayerMock.getSignal]
+	observes the event as if the engine had fired it. Takes the same paths [PlayerMock.getSignal] does.
 
-	Only `Player`-class events can be fired; events the backing Folder inherits from `Instance`
-	resolve to genuine native signals, which only the engine fires.
+	```lua
+	PlayerMock.fireSignal(player, "Chatted", "hello")
+	PlayerMock.fireSignal(player, "UserInputService.WindowFocused")
+	```
+
+	Events the backing Folder inherits from `Instance` resolve to genuine native signals, which only
+	the engine fires, so they cannot be fired here.
 
 	@param player Player -- must be a PlayerMock
-	@param eventName string
+	@param eventPath InstancePathTableLike -- `"Chatted"` or `"UserInputService.WindowFocused"`
 	@param ... any -- Event arguments delivered to connected handlers.
 ]=]
-function PlayerMock.fireSignal(player: Player, eventName: string, ...: any)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(eventName) == "string", "Bad eventName")
-	assert(isPlayerEvent(eventName), string.format("%q is not an event of Player", eventName))
-	assert(
-		findNativeSignal(player, eventName) == nil,
-		string.format("%q is a native signal only the engine fires", eventName)
-	)
-
-	-- No backing means no listeners ever connected -- firing would be unobservable. Not creating
-	-- one here also keeps this safe while the mock is being destroyed (see removeCharacter), when
-	-- parenting a new child would fail.
-	local existing = (player :: Instance):FindFirstChild(SIGNAL_NAME_PREFIX .. eventName)
-	if existing ~= nil then
-		(existing :: BindableEvent):Fire(...)
-	end
+function PlayerMock.fireSignal(player: Player, eventPath: InstancePathUtils.InstancePathTableLike, ...: any): ()
+	PlayerMockSignalUtils.fireSignal(player, eventPath, ...)
 end
-
--- Prefix for the BindableFunction children backing ContextActionService action binds on a mock
--- (see [PlayerMock.bindInput]). The bound callback lives on the mock as the backing's OnInvoke
--- handler, so like the other backings it is inspectable and self-cleaning.
-local ACTION_NAME_PREFIX = "PlayerMockAction_"
-
--- The raw Lua callback for each bind, keyed by its marker BindableFunction so [PlayerMock.fireInput]
--- can invoke it *directly*. Firing through the BindableFunction itself (as this once did) crosses the
--- bindable boundary, which strips a stand-in InputObject's methods/signals -- and real handlers read
--- `inputObject:GetPropertyChangedSignal(...)` (e.g. KeymapControls tracking the input's end). Weak keys
--- so an entry drops with its child; also cleared explicitly on unbind/rebind.
-local boundActionCallbacks: { [BindableFunction]: (...any) -> ...any } = setmetatable({}, { __mode = "k" }) :: any
-
-local function findActionBindable(player: Player, actionName: string): BindableFunction?
-	return (player :: Instance):FindFirstChild(ACTION_NAME_PREFIX .. actionName) :: BindableFunction?
-end
-
-local function bindActionCallback(player: Player, actionName: string, functionToBind: any)
-	assert(type(functionToBind) == "function", "Bad functionToBind")
-
-	local bindableFunction = findActionBindable(player, actionName)
-	if bindableFunction == nil then
-		local created = Instance.new("BindableFunction")
-		created.Name = ACTION_NAME_PREFIX .. actionName
-		created.Parent = player :: Instance
-		bindableFunction = created
-	end
-
-	boundActionCallbacks[bindableFunction :: BindableFunction] = functionToBind
-end
-
--- Context-restricted input-binding engine calls a mock stands in for, keyed by the canonical
--- `Service.Method` like the LOOKUPS domains. The args after (player, domain, actionName) mirror
--- the engine call's own remaining args, so a production mock branch is the identical call aimed
--- at the mock; each handler validates the args the emulation depends on and discards the rest
--- (touch buttons, priority routing, and input-type routing are not modeled). All bind domains
--- share one action registry per mock -- like the engine's -- so rebinding a name replaces the
--- callback and "ContextActionService.UnbindAction" tears down either bind variant.
-local INPUT_DOMAINS: { [string]: (player: Player, actionName: string, ...any) -> () } = {
-	-- ContextActionService:BindAction(actionName, functionToBind, createTouchButton, ...inputTypes)
-	["ContextActionService.BindAction"] = function(player, actionName, functionToBind)
-		bindActionCallback(player, actionName, functionToBind)
-	end,
-	-- ContextActionService:BindActionAtPriority(actionName, functionToBind, createTouchButton,
-	-- priorityLevel, ...inputTypes) -- the priority is required for signature parity, though
-	-- with no engine bind stack there is nothing to prioritize against.
-	["ContextActionService.BindActionAtPriority"] = function(
-		player,
-		actionName,
-		functionToBind,
-		_createTouchButton,
-		priorityLevel
-	)
-		assert(type(priorityLevel) == "number", "Bad priorityLevel")
-		bindActionCallback(player, actionName, functionToBind)
-	end,
-	-- ContextActionService:UnbindAction(actionName) -- like the engine call, unbinding an action
-	-- that is not bound is a no-op.
-	["ContextActionService.UnbindAction"] = function(player, actionName)
-		local bindableFunction = findActionBindable(player, actionName)
-		if bindableFunction ~= nil then
-			boundActionCallbacks[bindableFunction] = nil
-			bindableFunction:Destroy()
-		end
-	end,
-}
 
 --[=[
-	Emulates a context-restricted `ContextActionService` call on a mock. The domain is the canonical
-	`Service.Method` -- validated against the pre-authored set so a typo errors, like
-	[PlayerMock.readLookup] -- and the args after it mirror the engine call's own args, so a
-	production mock branch is the identical call aimed at the mock local player (there is no input
-	to receive):
+	Reads a stand-in for a client service's event off a mock -- `UserInputService.WindowFocused`,
+	`UserInputService.InputEnded`, and the like -- which a test fires through
+	[PlayerMock.fireServiceSignal]:
+
+	```lua
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		return PlayerMock.getServiceSignal(localPlayer, "UserInputService.WindowFocused")
+	end
+	return UserInputService.WindowFocused
+	```
+
+	Named sugar over [PlayerMock.getSignal], which takes the same `Service.Event` path -- the mock is
+	only where the backing lives.
+
+	Arguments cross a `BindableEvent`, so they are marshalled: EnumItems, numbers and strings arrive
+	intact, but a table's methods and metatable do not survive. Hand a [PlayerMock.makeInputObject]
+	stand-in to [PlayerMock.fireInput] instead when the handler calls methods on it.
+
+	@param player Player -- must be a PlayerMock
+	@param domain InstancePathTableLike -- a canonical Service.Event, e.g. "UserInputService.WindowFocused"
+	@return RBXScriptSignal
+]=]
+function PlayerMock.getServiceSignal(player: Player, domain: InstancePathUtils.InstancePathTableLike): RBXScriptSignal
+	return PlayerMockSignalUtils.getSignal(player, domain)
+end
+
+--[=[
+	Fires the backing signal for a client service's event on a mock, so code connected through
+	[PlayerMock.getServiceSignal] observes the event as if the engine had fired it. Named sugar over
+	[PlayerMock.fireSignal].
+
+	```lua
+	PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+	```
+
+	@param player Player -- must be a PlayerMock
+	@param domain InstancePathTableLike -- a canonical Service.Event, e.g. "UserInputService.WindowFocused"
+	@param ... any -- Event arguments delivered to connected handlers.
+]=]
+function PlayerMock.fireServiceSignal(player: Player, domain: InstancePathUtils.InstancePathTableLike, ...: any): ()
+	PlayerMockSignalUtils.fireSignal(player, domain, ...)
+end
+
+--[=[
+	Emulates a context-restricted `ContextActionService` call on a mock. The args after the domain are
+	the engine call's own, so a production mock branch is the identical call aimed at the mock:
 
 	```lua
 	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
@@ -1512,53 +761,47 @@ local INPUT_DOMAINS: { [string]: (player: Player, actionName: string, ...any) ->
 	PlayerMock.bindInput(localPlayer, "ContextActionService.UnbindAction", "Drag")
 	```
 
-	A test dispatches a bound action through [PlayerMock.fireInput] as if the engine had routed
-	input to it. What the emulation deliberately does not model: touch buttons, priority routing,
-	input-type routing, and the engine's bind stack -- all bind domains share one action registry
-	per mock (like the engine's), and rebinding a name simply replaces the callback.
+	A test dispatches a bound action through [PlayerMock.fireInput]. Deliberately not modelled: touch
+	buttons, priority routing, input-type routing, and the engine's bind stack. All bind domains
+	share one action registry per mock, like the engine's, so rebinding a name replaces the callback.
 
 	@param player Player -- must be a PlayerMock
-	@param domain string -- a known input domain, e.g. "ContextActionService.BindAction"
+	@param domain InstancePathTableLike -- a known input domain, e.g. "ContextActionService.BindAction"
 	@param actionName string
 	@param ... any -- the engine call's remaining args, e.g. `functionToBind, createTouchButton, ...inputTypes`
 ]=]
-function PlayerMock.bindInput(player: Player, domain: string, actionName: string, ...: any)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	local handler = INPUT_DOMAINS[domain]
-	assert(handler ~= nil, string.format("%q is not a known input domain", tostring(domain)))
-	assert(type(actionName) == "string", "Bad actionName")
-
-	handler(player, actionName, ...)
+function PlayerMock.bindInput(
+	player: Player,
+	domain: InstancePathUtils.InstancePathTableLike,
+	actionName: string,
+	...: any
+): ()
+	PlayerMockMethodUtils.call(player, domain, actionName, ...)
 end
 
 --[=[
-	Returns whether the given action is currently bound on a mock (via [PlayerMock.bindInput]).
-	Keyed by the action name alone -- both bind domains share one action registry, like the engine.
+	Returns whether the given action is currently bound on a mock via [PlayerMock.bindInput].
 
 	@param player Player -- must be a PlayerMock
 	@param actionName string
 	@return boolean
 ]=]
 function PlayerMock.isInputBound(player: Player, actionName: string): boolean
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(actionName) == "string", "Bad actionName")
-
-	return findActionBindable(player, actionName) ~= nil
+	return PlayerMockInputUtils.isInputBound(player, actionName)
 end
 
 --[=[
 	Dispatches a bound action on a mock, invoking the bound callback with
-	`(actionName, userInputState, inputObject)` -- the argument order the engine uses -- and
-	returning its result. Test-side counterpart of [PlayerMock.bindInput], like
-	[PlayerMock.fireSignal] is for [PlayerMock.getSignal].
+	`(actionName, userInputState, inputObject)` -- the engine's argument order -- and returning its
+	result. Errors when the action is not bound.
 
-	Errors when the action is not bound: with no engine sink logic modeled, firing an unbound
-	action can only be a test mistake (typo'd name, or firing after the production unbind).
+	```lua
+	PlayerMock.fireInput(player, "Drag", Enum.UserInputState.Begin, input)
+	```
 
-	The bound callback is invoked directly (not through the marker BindableFunction), so `inputObject`
-	is passed by reference: hand it a real `InputObject`, a plain table of the fields the callback reads
-	(`UserInputType`, `Position`, `Delta`, ...), or a [PlayerMock.makeInputObject] stand-in when the
-	callback also needs `:GetPropertyChangedSignal(...)` (e.g. a KeymapControls handler).
+	`inputObject` is passed by reference, so hand it a real `InputObject`, a plain table of the fields
+	the callback reads, or a [PlayerMock.makeInputObject] stand-in when the callback also needs
+	`:GetPropertyChangedSignal(...)`.
 
 	@param player Player -- must be a PlayerMock
 	@param actionName string
@@ -1572,142 +815,32 @@ function PlayerMock.fireInput(
 	userInputState: Enum.UserInputState,
 	inputObject: any?
 ): Enum.ContextActionResult?
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(type(actionName) == "string", "Bad actionName")
-	assert(
-		typeof(userInputState) == "EnumItem" and userInputState.EnumType == Enum.UserInputState,
-		"Bad userInputState"
-	)
-
-	local bindableFunction =
-		assert(findActionBindable(player, actionName), string.format("%q is not a bound action", actionName))
-
-	local callback = boundActionCallbacks[bindableFunction]
-	if callback == nil then
-		-- Bound before this mock carried a raw callback (or by foreign code): fall back to the bindable.
-		return bindableFunction:Invoke(actionName, userInputState, inputObject)
-	end
-
-	return callback(actionName, userInputState, inputObject)
+	return PlayerMockInputUtils.fireInput(player, actionName, userInputState, inputObject)
 end
 
-export type InputObjectProps = {
-	UserInputType: Enum.UserInputType?,
-	KeyCode: Enum.KeyCode?,
-	UserInputState: Enum.UserInputState?,
-	Position: Vector3?,
-	Delta: Vector3?,
-}
-
 --[=[
-	Builds a stand-in `InputObject` for [PlayerMock.fireInput] to hand a bound action -- for handlers
-	that read more than the raw fields, in particular `:GetPropertyChangedSignal("UserInputState")`
-	(KeymapControls connects it to learn when the press ends). A real `InputObject` cannot be
-	`Instance.new`'d, so this is a plain table exposing the fields and that one method; drive the press
-	lifecycle with `:SetUserInputState(...)`, which updates the field and fires the signal.
+	Builds a stand-in `InputObject` for [PlayerMock.fireInput] to hand a bound action, for handlers
+	that read more than the raw fields -- in particular `:GetPropertyChangedSignal("UserInputState")`.
+	A real `InputObject` is not `Instance.new`-able, so this is a plain table exposing the fields and
+	that one method; drive the press lifecycle with `:SetUserInputState(...)`:
 
 	```lua
 	local input = PlayerMock.makeInputObject({ UserInputType = Enum.UserInputType.Gamepad1, KeyCode = Enum.KeyCode.ButtonA })
 	PlayerMock.fireInput(mock, actionName, Enum.UserInputState.Begin, input)
-	input:SetUserInputState(Enum.UserInputState.End) -- releases the press
+	input:SetUserInputState(Enum.UserInputState.End)
 	```
 
 	@param props InputObjectProps?
 	@return table -- an InputObject stand-in
 ]=]
 function PlayerMock.makeInputObject(props: InputObjectProps?): any
-	local resolved: InputObjectProps = props or {}
-	assert(
-		resolved.UserInputType == nil
-			or (typeof(resolved.UserInputType) == "EnumItem" and resolved.UserInputType.EnumType == Enum.UserInputType),
-		"Bad UserInputType"
-	)
-
-	-- One lightweight signal per observed property (only UserInputState is driven today). A local
-	-- implementation keeps player-mock free of a Signal dependency. The connection carries Destroy
-	-- alongside Disconnect: a Maid only cleans a table task through Destroy, so without it a handler
-	-- that maids the connection (e.g. KeymapControls) leaks it and warns about a task with no Destroy.
-	local signals: { [string]: any } = {}
-	local function signalFor(propertyName: string)
-		local signal = signals[propertyName]
-		if signal then
-			return signal
-		end
-
-		local connections: { [(...any) -> ()]: boolean } = {}
-		signal = {
-			Connect = function(_self, callback)
-				connections[callback] = true
-
-				local connection = {
-					Connected = true,
-					Disconnect = function(self)
-						self.Connected = false
-						connections[callback] = nil
-					end,
-				}
-				connection.Destroy = connection.Disconnect
-
-				return connection
-			end,
-			Fire = function(_self, ...)
-				for callback in connections do
-					callback(...)
-				end
-			end,
-		}
-		signals[propertyName] = signal
-		return signal
-	end
-
-	local inputObject: any = {
-		UserInputType = resolved.UserInputType or Enum.UserInputType.Keyboard,
-		KeyCode = resolved.KeyCode or Enum.KeyCode.None,
-		UserInputState = resolved.UserInputState or Enum.UserInputState.Begin,
-		Position = resolved.Position or Vector3.zero,
-		Delta = resolved.Delta or Vector3.zero,
-	}
-
-	function inputObject.GetPropertyChangedSignal(_self, propertyName: string)
-		assert(type(propertyName) == "string", "Bad propertyName")
-		return signalFor(propertyName)
-	end
-
-	function inputObject.SetUserInputState(self, userInputState: Enum.UserInputState)
-		assert(
-			typeof(userInputState) == "EnumItem" and userInputState.EnumType == Enum.UserInputState,
-			"Bad userInputState"
-		)
-		self.UserInputState = userInputState
-		signalFor("UserInputState"):Fire()
-	end
-
-	return inputObject
-end
-
--- ObjectValue child standing in for the client-global `GuiService.SelectedObject` (gamepad/keyboard
--- focus). A headless server has no PlayerGui, so the engine refuses `GuiService.SelectedObject = obj`
--- ("not a descendant of a PlayerGui"); selection code branches to store/read it on the mock local
--- player instead, which is inspectable and self-cleaning like the other backings. Global focus maps to
--- the single mocked local player.
-local SELECTED_GUI_OBJECT_NAME = "PlayerMockSelectedGuiObject"
-
-local function getOrCreateSelectedGuiObjectValue(player: Player): ObjectValue
-	local existing = (player :: Instance):FindFirstChild(SELECTED_GUI_OBJECT_NAME)
-	if existing ~= nil then
-		return existing :: ObjectValue
-	end
-
-	local objectValue = Instance.new("ObjectValue")
-	objectValue.Name = SELECTED_GUI_OBJECT_NAME
-	objectValue.Parent = player :: Instance
-	return objectValue
+	return MockInputObject.new(props)
 end
 
 --[=[
-	Sets the mock's stand-in for `GuiService.SelectedObject` (or clears it with nil). Selection code
-	branches to this when the local player is a mock, since the engine's `GuiService.SelectedObject`
-	rejects any object not under a real PlayerGui (which a headless run has none of):
+	Sets the mock's stand-in for `GuiService.SelectedObject`, or clears it with nil. A headless server
+	has no PlayerGui, so the engine rejects `GuiService.SelectedObject = obj` outright and selection
+	code branches:
 
 	```lua
 	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
@@ -1718,14 +851,16 @@ end
 	end
 	```
 
+	Named sugar over `PlayerMock.write(player, "GuiService.SelectedObject", guiObject)`, which reads
+	and writes the same per-mock store.
+
 	@param player Player -- must be a PlayerMock
 	@param guiObject GuiObject? -- the focused object, or nil to clear
 ]=]
-function PlayerMock.setSelectedGuiObject(player: Player, guiObject: GuiObject?)
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
+function PlayerMock.setSelectedGuiObject(player: Player, guiObject: GuiObject?): ()
 	assert(guiObject == nil or (typeof(guiObject) == "Instance" and guiObject:IsA("GuiObject")), "Bad guiObject")
 
-	getOrCreateSelectedGuiObjectValue(player).Value = guiObject
+	PlayerMockPropertyUtils.write(player, "GuiService.SelectedObject", guiObject)
 end
 
 --[=[
@@ -1736,101 +871,51 @@ end
 	@return GuiObject?
 ]=]
 function PlayerMock.getSelectedGuiObject(player: Player): GuiObject?
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	local objectValue = (player :: Instance):FindFirstChild(SELECTED_GUI_OBJECT_NAME)
-	return if objectValue ~= nil then (objectValue :: ObjectValue).Value :: GuiObject? else nil
+	return PlayerMockPropertyUtils.read(player, "GuiService.SelectedObject")
 end
 
 --[=[
-	Returns the signal that fires when the mock's stand-in for `GuiService.SelectedObject` changes --
-	the backing ObjectValue's Value-changed signal. Lets a test (or a production observer that mirrors
-	`GuiService:GetPropertyChangedSignal("SelectedObject")`) react to selection moving.
+	Returns the signal that fires when the mock's stand-in for `GuiService.SelectedObject` changes,
+	standing in for `GuiService:GetPropertyChangedSignal("SelectedObject")`.
 
 	@param player Player -- must be a PlayerMock
 	@return RBXScriptSignal
 ]=]
 function PlayerMock.getSelectedGuiObjectChangedSignal(player: Player): RBXScriptSignal
-	assert(PlayerMock.isMock(player), "Not a PlayerMock")
-
-	return getOrCreateSelectedGuiObjectValue(player):GetPropertyChangedSignal("Value")
-end
-
-local function applyMockedLocalPlayer(player: Player?)
-	-- Only one mock can be the local player at a time.
-	for _, tagged in CollectionService:GetTagged(LOCAL_PLAYER_TAG) do
-		CollectionService:RemoveTag(tagged, LOCAL_PLAYER_TAG)
-	end
-
-	if player ~= nil then
-		CollectionService:AddTag(player :: Instance, LOCAL_PLAYER_TAG)
-	end
+	return PlayerMockPropertyUtils.getPropertyChangedSignal(player, "GuiService.SelectedObject")
 end
 
 --[=[
-	Designates a mock as the local player for the client realm (or clears it with nil). Read through
-	[PlayerMock.getMockedLocalPlayer] by client code falling back from `Players.LocalPlayer`.
-
-	Call this directly *before* booting bags to pre-designate -- matching production, where
-	`Players.LocalPlayer` exists before any service runs -- and a booting [PlayerMockServiceClient]
-	adopts the designation as its local player and owns its cleanup. After boot, designate through
-	[PlayerMockServiceClient.SetLocalPlayer] instead, which records the designation per simulated
-	client.
-
-	The mock must be parented into the DataModel first: the designation is carried as a
-	CollectionService tag, and `GetTagged` only resolves parented instances -- an unparented
-	designation would silently read back as nil.
-
-	The returned disposer undoes *this* designation, so no caller has to hand-write the inverse. It
-	is a valid maid task:
+	Designates a mock as the local player for the client realm, or clears it with nil. Read back
+	through [PlayerMock.getMockedLocalPlayer].
 
 	```lua
 	maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
 	```
 
-	It restores whatever was designated before this call rather than unconditionally clearing, so
-	nested designations unwind correctly (degrading to a clear in the common case where there was
-	none, or where the previous mock has since left the DataModel). It is a no-op when the
-	designation has since moved on -- a later `setMockedLocalPlayer` owns the designation from then
-	on and is never clobbered -- and calling it more than once is safe.
+	Call this directly *before* booting bags to pre-designate -- matching production, where
+	`Players.LocalPlayer` exists before any service runs -- and a booting [PlayerMockServiceClient]
+	adopts the designation and owns its cleanup. After boot, designate through
+	[PlayerMockServiceClient.SetLocalPlayer] instead.
+
+	The mock must already be parented into the DataModel, the designation being a tag that
+	`GetTagged` only resolves for parented instances.
+
+	The returned disposer restores whatever was designated before this call, so nested designations
+	unwind correctly. It is a no-op when the designation has since moved on, and calling it more than
+	once is safe.
 
 	@param player Player? -- must be a PlayerMock in the DataModel, or nil to clear
 	@return () -> () -- Restores the previous designation. Safe to call more than once.
 ]=]
 function PlayerMock.setMockedLocalPlayer(player: Player?): () -> ()
-	assert(player == nil or PlayerMock.isMock(player), "Not a PlayerMock")
-	assert(
-		player == nil or (player :: Instance):IsDescendantOf(game),
-		"PlayerMock must be parented into the DataModel to be designated the local player"
-	)
-
-	local previous = PlayerMock.getMockedLocalPlayer()
-
-	applyMockedLocalPlayer(player)
-
-	local disposed = false
-	return function()
-		if disposed then
-			return
-		end
-		disposed = true
-
-		if PlayerMock.getMockedLocalPlayer() ~= player then
-			return
-		end
-
-		if previous ~= nil and not (previous :: Instance):IsDescendantOf(game) then
-			previous = nil
-		end
-
-		applyMockedLocalPlayer(previous)
-	end
+	return PlayerMockPlayerServiceUtils.setMockedLocalPlayer(player)
 end
 
 --[=[
-	Returns the mock designated as the local player (via [PlayerMockServiceClient]), or nil. This is
-	only ever the mock -- there is deliberately no helper that resolves the real `Players.LocalPlayer`,
-	so call sites fall back explicitly and the real read stays visible to luau-lsp:
+	Returns the mock designated as the local player, or nil. This is only ever the mock -- there is
+	deliberately no helper resolving the real `Players.LocalPlayer`, so call sites fall back
+	explicitly and the real read stays visible to luau-lsp:
 
 	```lua
 	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
@@ -1839,12 +924,7 @@ end
 	@return Player?
 ]=]
 function PlayerMock.getMockedLocalPlayer(): Player?
-	local tagged = CollectionService:GetTagged(LOCAL_PLAYER_TAG)[1]
-	if tagged ~= nil and PlayerMock.isMock(tagged) then
-		return (tagged :: any) :: Player
-	end
-
-	return nil
+	return PlayerMockUtils.getMockedLocalPlayer()
 end
 
 return PlayerMock

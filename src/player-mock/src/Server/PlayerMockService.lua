@@ -44,7 +44,10 @@ PlayerMockService._allowConcurrentConsumers = false
 	@param overrides { [string]: any }? -- Per-property seed values, e.g. `{ UserId = 12345 }` (see [PlayerMock.new]).
 	@return Player
 ]=]
-function PlayerMockService:CreatePlayer(overrides: { [string]: any }?): Player
+function PlayerMockService.CreatePlayer(
+	self: PlayerMockServiceBase.PlayerMockServiceBase,
+	overrides: { [string]: any }?
+): Player
 	local player = PlayerMock.new(overrides)
 	player.Parent = Players
 

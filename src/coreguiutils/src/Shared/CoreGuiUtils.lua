@@ -6,8 +6,10 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local CoreGuiUtils = {}
@@ -118,6 +120,11 @@ end
 ]=]
 function CoreGuiUtils.tryToGetCore(coreName: string): (boolean, any)
 	assert(type(coreName) == "string", "Bad coreName")
+
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		return true, PlayerMock.callMethod(localPlayer, "StarterGui.GetCore", coreName)
+	end
 
 	local ok, result = pcall(function()
 		return StarterGui:GetCore(coreName)

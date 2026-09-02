@@ -679,6 +679,21 @@ importers:
 
   src/binarysearch: {}
 
+  src/bindable-utils:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/symbol':
+        specifier: workspace:*
+        version: link:../symbol
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
+
   src/binder:
     dependencies:
       '@quenty/baseobject':
@@ -723,9 +738,6 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
-      '@quenty/valueobject':
-        specifier: workspace:*
-        version: link:../valueobject
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -853,12 +865,18 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/brine:
     dependencies:
@@ -1700,6 +1718,9 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/promise':
         specifier: workspace:*
         version: link:../promise
@@ -3911,6 +3932,15 @@ importers:
 
   src/player-mock:
     dependencies:
+      '@quenty/bindable-utils':
+        specifier: workspace:*
+        version: link:../bindable-utils
+      '@quenty/enumutils':
+        specifier: workspace:*
+        version: link:../enumutils
+      '@quenty/instance-path':
+        specifier: workspace:*
+        version: link:../instance-path
       '@quenty/jestutils':
         specifier: workspace:*
         version: link:../jest-utils
@@ -3929,12 +3959,24 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/steputils':
         specifier: workspace:*
         version: link:../steputils
+      '@quenty/table':
+        specifier: workspace:*
+        version: link:../table
+      '@quenty/tuple':
+        specifier: workspace:*
+        version: link:../tuple
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
+      '@quentystudios/t':
+        specifier: ^3.0.0
+        version: 3.0.0
 
   src/playerbinder:
     dependencies:
@@ -4911,6 +4953,9 @@ importers:
 
   src/rxbinderutils:
     dependencies:
+      '@quenty/baseobject':
+        specifier: workspace:*
+        version: link:../baseobject
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
@@ -4929,9 +4974,21 @@ importers:
       '@quenty/maid':
         specifier: workspace:*
         version: link:../maid
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
+      '@quenty/symbol':
+        specifier: workspace:*
+        version: link:../symbol
+      '@quenty/valueobject':
+        specifier: workspace:*
+        version: link:../valueobject
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/rxsignal:
     dependencies:
@@ -6121,6 +6178,9 @@ importers:
       '@quenty/baseobject':
         specifier: workspace:*
         version: link:../baseobject
+      '@quenty/bindable-utils':
+        specifier: workspace:*
+        version: link:../bindable-utils
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio

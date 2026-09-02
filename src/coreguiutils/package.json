@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*"
   },
   "publishConfig": {
