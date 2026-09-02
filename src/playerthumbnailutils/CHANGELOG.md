@@ -1,23 +1,11 @@
-# v10.29.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: PlayerMock code cleanup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.28.0...@quenty/playerthumbnailutils@10.29.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
 
 # [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.27.0...@quenty/playerthumbnailutils@10.28.0) (2026-08-28)
 

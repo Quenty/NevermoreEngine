@@ -1,21 +1,14 @@
-# v10.50.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-- feat: Add TieDefinition.ObserveFirstAncestorImplementationBrio ([@Quenty](https://github.com/Quenty))
-- feat: Add BindableUtils package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.49.0...@quenty/tie@10.50.0) (2026-09-02)
+
+### Features
+
+- Add BindableUtils package ([1fc7b61](https://github.com/Quenty/NevermoreEngine/commit/1fc7b61851e84dac9a2f728d964c5f1c10884b5c))
+- Add TieDefinition.ObserveFirstAncestorImplementationBrio ([ea3e228](https://github.com/Quenty/NevermoreEngine/commit/ea3e228cd51627ccd51d774c21c0b00a6e10a77c))
 
 # [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.48.0...@quenty/tie@10.49.0) (2026-08-28)
 

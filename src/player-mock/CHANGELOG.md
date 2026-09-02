@@ -1,24 +1,13 @@
-# v1.9.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: PlayerMock code cleanup ([@Quenty](https://github.com/Quenty))
-- fix: PlayerMock add more user input service events ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.8.0...@quenty/playermock@1.9.0) (2026-09-02)
+
+### Bug Fixes
+
+- PlayerMock add more user input service events ([d963570](https://github.com/Quenty/NevermoreEngine/commit/d96357095a4aa4be014fced25a45fc7b0bc2bb37))
 
 # [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.7.0...@quenty/playermock@1.8.0) (2026-08-28)
 

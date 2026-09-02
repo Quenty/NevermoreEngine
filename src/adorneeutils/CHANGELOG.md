@@ -1,20 +1,13 @@
-# v3.6.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-- feat(adorneeutils): Add AdorneeUtils.setBoundingBoxCFrame ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@3.5.0...@quenty/adorneeutils@3.6.0) (2026-09-02)
+
+### Features
+
+- **adorneeutils:** Add AdorneeUtils.setBoundingBoxCFrame ([d4b0fe8](https://github.com/Quenty/NevermoreEngine/commit/d4b0fe8f04b9e5ce26de76c47e387e6031ad87ec))
 
 # [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeutils@3.4.0...@quenty/adorneeutils@3.5.0) (2026-08-28)
 

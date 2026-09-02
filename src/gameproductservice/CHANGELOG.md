@@ -1,23 +1,11 @@
-# v14.72.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- refactor: PlayerMock code cleanup ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.71.0...@quenty/gameproductservice@14.72.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/gameproductservice
 
 # [14.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.70.0...@quenty/gameproductservice@14.71.0) (2026-08-28)
 

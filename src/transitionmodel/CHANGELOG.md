@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.50.0...@quenty/transitionmodel@7.51.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/transitionmodel
+
 # [7.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transitionmodel@7.49.0...@quenty/transitionmodel@7.50.0) (2026-08-28)
 
 **Note:** Version bump only for package @quenty/transitionmodel

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/bindable-utils",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Encoding utilities for transferring values over BindableEvents and BindableFunctions",
   "keywords": [
     "Roblox",

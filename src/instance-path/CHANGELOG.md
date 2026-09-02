@@ -1,20 +1,13 @@
-# v1.2.0 (Wed Sep 02 2026)
-
-#### 🚀 Enhancement
-
-- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
-- feat: Add InstancePathTableLike ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/instance-path@1.1.0...@quenty/instance-path@1.2.0) (2026-09-02)
+
+### Features
+
+- Add InstancePathTableLike ([1335db4](https://github.com/Quenty/NevermoreEngine/commit/1335db4c561d564e44e233bef514eb97d526709c))
 
 # 1.1.0 (2026-08-28)
 
