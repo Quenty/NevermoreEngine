@@ -1,3 +1,16 @@
+# v1.9.1 (Thu Sep 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix(player-mock): Give PlayerMockService its own type so callers do not need a cast [#819](https://github.com/Quenty/NevermoreEngine/pull/819) ([@Quenty](https://github.com/Quenty))
+- fix(player-mock): Give PlayerMockService its own type so callers do not need a cast ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
