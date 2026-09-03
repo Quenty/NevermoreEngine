@@ -3,7 +3,7 @@
 ]]
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local root = ServerScriptService.{{packageName}}
+local root = ServerScriptService{{{packageNameIndex}}}
 local loader = root:FindFirstChild("LoaderUtils", true).Parent
 local require = require(loader).bootstrapGame(root)
 

@@ -10,20 +10,64 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 
 const existsAsync = util.promisify(fs.exists);
 
+const LUAU_KEYWORDS = new Set([
+  'and',
+  'break',
+  'do',
+  'else',
+  'elseif',
+  'end',
+  'false',
+  'for',
+  'function',
+  'if',
+  'in',
+  'local',
+  'nil',
+  'not',
+  'or',
+  'repeat',
+  'return',
+  'then',
+  'true',
+  'until',
+  'while',
+]);
+
 /**
  * Helper class for handling folder templates
  */
 export class TemplateHelper {
   /**
-   * Makes the string upper camel case
+   * Makes the string upper camel case. Separators are dropped, so a hyphenated
+   * name still yields a valid Luau identifier for module and type names.
    */
   public static camelize(str: string): string {
     return str
-      .replace(/-./g, (x) => x[1].toUpperCase())
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word: string, index: number) {
-        return word.toUpperCase();
-      })
-      .replace(/\s+/g, '');
+      .split(/[\s\-_]+/)
+      .filter((part) => part.length > 0)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
+  }
+
+  /**
+   * Makes the name a package is known by on disk, in npm and in the Rojo tree.
+   * Separators are kept, so `adornee-editor-welding` stays hyphenated.
+   */
+  public static toPackageName(str: string): string {
+    return str.replace(/\s+/g, '').toLowerCase();
+  }
+
+  /**
+   * Makes the Luau expression that indexes a name out of its parent instance.
+   * A name that is a valid identifier reads as a dot access, anything else
+   * needs brackets.
+   */
+  public static toIndexExpression(str: string): string {
+    const isIdentifier =
+      /^[A-Za-z_][A-Za-z0-9_]*$/.test(str) && !LUAU_KEYWORDS.has(str);
+
+    return isIdentifier ? `.${str}` : `[${JSON.stringify(str)}]`;
   }
 
   /**

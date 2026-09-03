@@ -85,7 +85,7 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
   public async handler(args: InitGameArgs) {
     const rawGameName = await InitGameCommand._ensureGameName(args);
 
-    const gameName = TemplateHelper.camelize(rawGameName).toLowerCase();
+    const gameName = TemplateHelper.toPackageName(rawGameName);
     const gameNameProper = TemplateHelper.camelize(rawGameName);
 
     const srcRoot = process.cwd();
