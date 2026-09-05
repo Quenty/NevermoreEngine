@@ -1037,7 +1037,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return position, hookState.spring
 		end,
 
-		state = function(dis: any?, initFunction: ({ any? }, Maid.Maid) -> ...any?)
+		state = function(dis: any?, initFunction: (({ any? }, Maid.Maid) -> ...any?)?): ({ any? }, Maid.Maid)
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
 			if hookState._init == nil then
 				hookState._init = true
