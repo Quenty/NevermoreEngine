@@ -362,7 +362,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return hookState.counter
 		end,
 
-		hookEntity = function(dis: any?, initDecorator: ((Jecst.Entity) -> any?)?)
+		hookEntity = function(dis: any?, initDecorator: ((Jecst.Entity) -> any? | nil)?)
 			local hookState, _hookMaid, hookStateEntity = getOrCreateHookState(runtime, dis)
 			if not hookState.childEntity then
 				hookState.childEntity = runtime.world:entity()
