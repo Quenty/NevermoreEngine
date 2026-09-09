@@ -135,4 +135,19 @@ function Vector3Utils.areClose(a: Vector3, b: Vector3, epsilon: number): boolean
 	return math.abs(a.X - b.X) <= epsilon and math.abs(a.Y - b.Y) <= epsilon and math.abs(a.Z - b.Z) <= epsilon
 end
 
+--[=[
+	Computes the volume of the box the vector spans. Always non-negative, so a negated size
+	still reports the same volume.
+
+	```lua
+	local volume = Vector3Utils.volume(part.Size)
+	```
+
+	@param vector3 Vector3
+	@return number
+]=]
+function Vector3Utils.volume(vector3: Vector3): number
+	return math.abs(vector3.X * vector3.Y * vector3.Z)
+end
+
 return Vector3Utils
