@@ -161,6 +161,96 @@ describe("BoundChildCollection dynamic updates", function()
 		controller:Destroy()
 	end)
 
+	it("fires ClassAdded when an existing child binds after construction", function()
+		local controller = setup()
+
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.boot()
+
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
+		expect(collection:GetSize()).toEqual(0)
+
+		local added = {}
+		collection.ClassAdded:Connect(function(class)
+			table.insert(added, class)
+		end)
+
+		controller.binder:Tag(child)
+
+		expect(collection:GetSize()).toEqual(1)
+		expect(#added).toEqual(1)
+		expect(added[1]).toEqual(controller.binder:Get(child))
+
+		controller:Destroy()
+	end)
+
+	it("ignores a bind on an instance that is not a child of the parent", function()
+		local controller = setup()
+
+		local parent = controller.newInstance()
+		local outsider = controller.newInstance()
+		local grandchild = controller.newInstance(controller.newInstance(parent))
+		controller.boot()
+
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
+
+		controller.binder:Tag(outsider)
+		controller.binder:Tag(grandchild)
+
+		expect(collection:GetSize()).toEqual(0)
+
+		controller:Destroy()
+	end)
+
+	it("stops following a child that was reparented out", function()
+		local controller = setup()
+
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(child)
+		controller.boot()
+
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
+		expect(collection:GetSize()).toEqual(1)
+
+		child.Parent = controller.container
+		expect(collection:GetSize()).toEqual(0)
+
+		local removed = 0
+		collection.ClassRemoved:Connect(function()
+			removed += 1
+		end)
+
+		controller.binder:Untag(child)
+
+		expect(collection:GetSize()).toEqual(0)
+		expect(removed).toEqual(0)
+
+		controller:Destroy()
+	end)
+
+	it("re-adds a child that leaves and comes back", function()
+		local controller = setup()
+
+		local parent = controller.newInstance()
+		local child = controller.newInstance(parent)
+		controller.binder:Tag(child)
+		controller.boot()
+
+		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
+		expect(collection:GetSize()).toEqual(1)
+
+		child.Parent = controller.container
+		expect(collection:GetSize()).toEqual(0)
+
+		child.Parent = parent
+		expect(collection:GetSize()).toEqual(1)
+		expect(collection:HasClass(controller.binder:Get(child))).toEqual(true)
+
+		controller:Destroy()
+	end)
+
 	it("fires ClassRemoved when a tracked child is reparented out", function()
 		local controller = setup()
 

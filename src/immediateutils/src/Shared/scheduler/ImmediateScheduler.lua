@@ -66,7 +66,7 @@ export type ImmediateSchedulableSystem<CallShape = (...any) -> ()> = {
 	-- RegisterDescendantModuleScripts fills this from the ModuleScript name if omitted.
 	name: string?,
 
-	-- Optional opt-out of protected calls.
+	-- Opt out of xpcall and DEBUG yield-detection. Errors propagate to the caller.
 	notProtected: boolean?,
 
 	-- Hard-coded slot topology: preTick -> (preSystem -> system -> postSystem)* -> postTick.
@@ -87,6 +87,7 @@ export type ImmediateScheduler =
 	typeof(setmetatable(
 		{} :: {
 			_systemDictionary: { [string]: SchedulableSystem },
+			_profileLabels: { [string]: string },
 			_sortFlag: boolean,
 			_sorted_systems: { SchedulableSystem },
 			_sorted_preSystem: { SchedulableSystem },
@@ -107,6 +108,7 @@ function ImmediateScheduler.new(): ImmediateScheduler
 	local self = setmetatable(BaseObject.new() :: any, ImmediateScheduler)
 
 	self._systemDictionary = {}
+	self._profileLabels = {}
 
 	-- If set to true, will re-order systems for next tick
 	self._sortFlag = false
@@ -134,7 +136,10 @@ local function _sortSystemsInPlace(array: { SchedulableSystem })
 	table.sort(array, function(a, b)
 		local aPriority = _systemSortKey(a)
 		local bPriority = _systemSortKey(b)
-		return aPriority < bPriority
+		if aPriority ~= bPriority then
+			return aPriority < bPriority
+		end
+		return (a.name or "") < (b.name or "")
 	end)
 end
 
@@ -177,30 +182,42 @@ end
 local SYSTEM_ERROR_SUPPRESS_SECONDS = 10
 local SYSTEM_OVERALL_SUPPRESS_ERRORS = 5
 
-function ImmediateScheduler._runProtectedSystem(
-	_self: ImmediateScheduler,
-	rt: ImmediateRuntime,
-	system: SchedulableSystem,
-	...
-)
+local function _invokeSystem(rt: ImmediateRuntime, system: SchedulableSystem, label: string, ...: any)
+	debug.profilebegin(label)
+	system.system(rt, ...)
+	debug.profileend()
+end
+
+function ImmediateScheduler._runSystem(self: ImmediateScheduler, rt: ImmediateRuntime, system: SchedulableSystem, ...)
+	local label = self._profileLabels[system.name :: string] or (system.name :: string)
+
+	if system.notProtected == true then
+		_invokeSystem(rt, system, label, ...)
+		return
+	end
+
 	local errorLog = rt.errorlog
 	local ok, errmsg = xpcall(function(...)
 		if rt.DEBUG then
+			debug.profilebegin(label)
 			local args = table.pack(...)
 			local thread = coroutine.create(function()
 				system.system(rt, unpack(args, 1, args.n))
 			end)
 			local resumed, err = coroutine.resume(thread)
 			if not resumed then
+				debug.profileend()
 				error(err)
 			end
 			if coroutine.status(thread) ~= "dead" then
 				local traceback = debug.traceback(thread)
 				task.cancel(thread)
-				error(`RxECS system {system.name} yielded:\n{traceback}`)
+				debug.profileend()
+				error(`ImmediateScheduler system {system.name} yielded:\n{traceback}`)
 			end
+			debug.profileend()
 		else
-			system.system(rt, ...)
+			_invokeSystem(rt, system, label, ...)
 		end
 	end, function(err)
 		return debug.traceback(err, 2)
@@ -229,7 +246,7 @@ function ImmediateScheduler._runProtectedSystem(
 			>= SYSTEM_OVERALL_SUPPRESS_ERRORS
 
 		if weErroredAfterCooldown and weErroredAfterOverallCooldown then
-			task.spawn(error, `[RxECS] {key}, traceback: {foundEntry.traceback}`)
+			task.spawn(error, `[ImmediateScheduler] {key}, traceback: {foundEntry.traceback}`)
 			foundEntry.lastShoutedAt = os.clock()
 			errorLog.lastErrorShout = os.clock()
 		end
@@ -241,36 +258,53 @@ function ImmediateScheduler.Tick(self: ImmediateScheduler, rt: ImmediateRuntime,
 		self:_sortSystemArrays()
 	end
 
+	debug.profilebegin("ImmediateScheduler.Tick")
+
+	debug.profilebegin("sorted_preTick")
 	for _, systemTable in self._sorted_preTick do
-		self:_runProtectedSystem(rt, systemTable, ...)
+		self:_runSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
+	debug.profileend()
+
+	debug.profilebegin("sorted_systems")
 	for _, systemTable in self._sorted_systems do
+		-- Run all pre-system middleware before this one system.
 		for _, preSystemTable in self._sorted_preSystem do
-			self:_runProtectedSystem(rt, preSystemTable, ...)
+			self:_runSystem(rt, preSystemTable, ...)
 			rt.previousRawSystem = preSystemTable
 		end
-		self:_runProtectedSystem(rt, systemTable, ...)
+
+		-- The main system.
+		self:_runSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 		rt.previousSystem = systemTable
+
+		-- Run all post-system middleware after this one system.
 		for _, postSystemTable in self._sorted_postSystem do
-			self:_runProtectedSystem(rt, postSystemTable, ...)
+			self:_runSystem(rt, postSystemTable, ...)
 			rt.previousRawSystem = postSystemTable
 		end
 	end
+	debug.profileend()
+
+	debug.profilebegin("sorted_postTick")
 	for _, systemTable in self._sorted_postTick do
-		self:_runProtectedSystem(rt, systemTable, ...)
+		self:_runSystem(rt, systemTable, ...)
 		rt.previousRawSystem = systemTable
 	end
+	debug.profileend()
+
+	debug.profileend()
 end
 
 function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable: SchedulableSystem)
-	-- TODO: upsert into the schedule by `name`, then sort by priority/name.
 	local systemName = assert(systemTable.name, "ImmediateSchedulableSystem requires name")
 	if self._systemDictionary[systemName] then
 		self:UnregisterSystem(systemName)
 	end
 	self._systemDictionary[systemName] = systemTable
+	self._profileLabels[systemName] = `sys.{systemName}`
 	self._sortFlag = true
 	return function()
 		self:UnregisterSystem(systemName)
@@ -300,17 +334,25 @@ function ImmediateScheduler.UnregisterSystem(self: ImmediateScheduler, systemNam
 			targetSystem.Destroy()
 		end
 		self._systemDictionary[systemName] = nil
+		self._profileLabels[systemName] = nil
 	end
 	self._sortFlag = true
 end
 
 function ImmediateScheduler.Destroy(self: ImmediateScheduler)
-	table.clear(self._systemDictionary)
+	local pendingNames = {}
+	for systemName in self._systemDictionary do
+		table.insert(pendingNames, systemName)
+	end
+	for _, systemName in pendingNames do
+		self:UnregisterSystem(systemName)
+	end
 	table.clear(self._sorted_systems)
 	table.clear(self._sorted_preSystem)
 	table.clear(self._sorted_postSystem)
 	table.clear(self._sorted_preTick)
 	table.clear(self._sorted_postTick)
+	self:Destroy()
 end
 
 return ImmediateScheduler

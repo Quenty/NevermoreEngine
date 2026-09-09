@@ -38,12 +38,16 @@ PlayerMockServiceClient.ServiceName = "PlayerMockServiceClient"
 PlayerMockServiceClient._consumedAttributeName = "PlayerMockConsumedClient"
 PlayerMockServiceClient._allowConcurrentConsumers = true
 
-function PlayerMockServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
+export type PlayerMockServiceClient = PlayerMockServiceBase.PlayerMockServiceBase & {
+	_localPlayer: Player?,
+}
+
+function PlayerMockServiceClient.Init(self: PlayerMockServiceClient, serviceBag: ServiceBag.ServiceBag): ()
 	PlayerMockServiceBase.Init(self :: any, serviceBag)
 
 	local designated = PlayerMock.getMockedLocalPlayer()
 	if designated ~= nil then
-		self:_adoptLocalPlayer(designated)
+		PlayerMockServiceClient._adoptLocalPlayer(self, designated)
 	end
 end
 
@@ -54,11 +58,11 @@ end
 
 	@param player Player -- must be a PlayerMock
 ]=]
-function PlayerMockServiceClient:SetLocalPlayer(player: Player)
+function PlayerMockServiceClient.SetLocalPlayer(self: PlayerMockServiceClient, player: Player): ()
 	assert(PlayerMock.isMock(player), "Not a PlayerMock")
 
 	PlayerMock.setMockedLocalPlayer(player)
-	self:_adoptLocalPlayer(player)
+	PlayerMockServiceClient._adoptLocalPlayer(self, player)
 end
 
 --[=[
@@ -68,12 +72,12 @@ end
 
 	@return Player?
 ]=]
-function PlayerMockServiceClient:GetLocalPlayer(): Player?
+function PlayerMockServiceClient.GetLocalPlayer(self: PlayerMockServiceClient): Player?
 	return self._localPlayer
 end
 
-function PlayerMockServiceClient:_adoptLocalPlayer(player: Player)
-	self._localPlayer = player :: Player?
+function PlayerMockServiceClient._adoptLocalPlayer(self: PlayerMockServiceClient, player: Player): ()
+	self._localPlayer = player
 	self._maid:GiveTask(function()
 		if self._localPlayer == player then
 			self._localPlayer = nil

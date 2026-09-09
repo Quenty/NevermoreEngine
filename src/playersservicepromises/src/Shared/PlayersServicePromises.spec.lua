@@ -32,12 +32,12 @@ describe("PlayersServicePromises.promiseUserIdFromName against a mock", function
 	it("resolves the mock's UserId by an injected username", function()
 		local player = PlayerMock.new({ UserId = 90071002 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90071002,
 			Username = "injected_lookup_name",
 			DisplayName = "Injected",
 			HasVerifiedBadge = false,
-		})
+		}, 0)
 
 		local outcome, userId =
 			PromiseTestUtils.awaitOutcome(PlayersServicePromises.promiseUserIdFromName("injected_lookup_name"))

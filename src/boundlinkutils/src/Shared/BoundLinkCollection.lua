@@ -24,6 +24,8 @@ export type BoundLinkCollection = typeof(setmetatable(
 		ClassAdded: Signal.Signal<any>,
 		ClassRemoved: Signal.Signal<any>,
 		_classes: { [any]: boolean },
+		_canidateMaid: Maid.Maid,
+		_canidateToClass: { [Instance]: any },
 		_canidates: { [Instance]: { [Instance]: boolean } },
 		_linkCanidate: { [Instance]: Instance },
 		_linkValues: { [Instance]: boolean },
@@ -44,15 +46,10 @@ function BoundLinkCollection.new(binder: Binder.Binder<any>, linkName: string, p
 
 	self._classes = {} -- [class] = true
 	self._canidates = {} -- [inst] = { [objValue] = true }
+	self._canidateToClass = {}
 	self._linkCanidate = {} -- [objValue] = [inst]
 	self._linkValues = {} -- [objValue] = true
-
-	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(...)
-		self:_handleNewClassBound(...)
-	end))
-	self._maid:GiveTask(self._binder:GetClassRemovingSignal():Connect(function(class)
-		self:_removeClass(class)
-	end))
+	self._canidateMaid = self._maid:Add(Maid.new())
 
 	self:TrackParent(parent)
 
@@ -141,13 +138,9 @@ end
 
 function BoundLinkCollection._removeCanidate(self: BoundLinkCollection, canidate: Instance): ()
 	self._canidates[canidate] = nil
+	self._canidateMaid[canidate] = nil
 
-	local class = self._binder:Get(canidate)
-	if not class then
-		return
-	end
-
-	self:_removeClass(class)
+	self:_setCanidateClass(canidate, nil)
 end
 
 function BoundLinkCollection._addCanidate(self: BoundLinkCollection, objValue: Instance, canidate: Instance): ()
@@ -157,14 +150,30 @@ function BoundLinkCollection._addCanidate(self: BoundLinkCollection, objValue: I
 
 	if not self._canidates[canidate] then
 		self._canidates[canidate] = {}
+		self._canidateMaid[canidate] = self._binder:ObserveInstance(canidate, function(class)
+			self:_setCanidateClass(canidate, class)
+		end)
 	end
 	self._canidates[canidate][objValue] = true
 
-	local class = self._binder:Get(canidate)
-	if not class then
+	self:_setCanidateClass(canidate, self._binder:Get(canidate))
+end
+
+function BoundLinkCollection._setCanidateClass(self: BoundLinkCollection, canidate: Instance, class: any): ()
+	local existing = self._canidateToClass[canidate]
+	if existing == class then
 		return
 	end
-	self:_addClass(class)
+
+	if existing ~= nil then
+		self._canidateToClass[canidate] = nil
+		self:_removeClass(existing)
+	end
+
+	if class ~= nil then
+		self._canidateToClass[canidate] = class
+		self:_addClass(class)
+	end
 end
 
 function BoundLinkCollection._removeClass(self: BoundLinkCollection, class: any): ()
@@ -183,14 +192,6 @@ function BoundLinkCollection._addClass(self: BoundLinkCollection, class: any): (
 
 	self._classes[class] = true
 	self.ClassAdded:Fire(class)
-end
-
-function BoundLinkCollection._handleNewClassBound(self: BoundLinkCollection, class: any, inst: Instance): ()
-	if not self._canidates[inst] then
-		return
-	end
-
-	self:_addClass(class)
 end
 
 function BoundLinkCollection.Destroy(self: BoundLinkCollection): ()

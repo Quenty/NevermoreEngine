@@ -205,8 +205,8 @@ test creates a mock and drives production APIs unchanged. You should not need to
 implemented to test against it; the API reference lives in the [moonwave docs](/api/PlayerMock).
 
 If production code does **not** work against a mock, that is the package failing its contract — the fix is a
-seam in the package (an `isMock` branch at the engine call, or a new domain in the `LOOKUPS` or
-`INPUT_DOMAINS` tables in `PlayerMock.lua`), never a stub in your test or at a call site. If the package isn't yours to change, file
+seam in the package (an `isMock` branch at the engine call, or a new domain in the `METHODS` table in
+`PlayerMockMethodUtils.lua`), never a stub in your test or at a call site. If the package isn't yours to change, file
 the gap upstream instead of working around it.
 
 Add `@quenty/playermock` to the package's `package.json` (then `pnpm install`) before requiring it.
@@ -220,14 +220,14 @@ local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
 player.Parent = game:GetService("Players") -- where real players live; CreatePlayer does this for you
 
 PlayerMock.write(player, "AccountAge", 31) -- mock a property
-PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", gamePassId, true)
+PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, gamePassId)
 ```
 
-`PlayerMock.writeLookup` injects the result of an ID-keyed engine call. Domains are named after the
-canonical engine `Service.Method` the production code path bottoms out in, and injected values are the raw
-engine result shape — the consuming util's real parsing, fallback ordering, and reject paths all execute;
-only the engine call is stubbed. (For coherent group rank/role pairs, see `GroupTestUtils.assignGroupInfo`
-in `@quenty/grouputils`.)
+`PlayerMock.writeLookup` injects the result of an engine call, keyed by the arguments that call turns on
+(here the gamePassId). Domains are named after the canonical engine `Service.Method` the production code
+path bottoms out in, and injected values are the raw engine result shape — the consuming util's real
+parsing, fallback ordering, and reject paths all execute; only the engine call is stubbed. (For coherent
+group rank/role pairs, see `GroupTestUtils.assignGroupInfo` in `@quenty/grouputils`.)
 
 **Full-flow tests** use the services:
 

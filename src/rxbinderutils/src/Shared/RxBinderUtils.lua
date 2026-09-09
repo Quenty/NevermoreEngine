@@ -21,6 +21,9 @@ local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
 local RxLinkUtils = require("RxLinkUtils")
+local Symbol = require("Symbol")
+
+local UNSET_VALUE = Symbol.named("unsetValue")
 
 local RxBinderUtils = {}
 
@@ -107,6 +110,81 @@ function RxBinderUtils.observeBoundParentClassBrio<T>(
 		end) :: any,
 		RxBrioUtils.onlyLastBrioSurvives() :: any,
 	}) :: any
+end
+
+--[=[
+	Observes the bound class on the instance's parent.
+
+	@param binder Binder<T>
+	@param instance Instance
+	@return Observable<T?>
+]=]
+function RxBinderUtils.observeBoundParent<T>(binder: Binder.Binder<T>, instance: Instance): Observable.Observable<T?>
+	assert(Binder.isBinder(binder), "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return RxInstanceUtils.observeProperty(instance, "Parent"):Pipe({
+		Rx.switchMap(function(parent: Instance?)
+			if parent then
+				return RxBinderUtils.observeBoundClass(binder, parent) :: any
+			else
+				return Rx.of(nil) :: any
+			end
+		end) :: any,
+		Rx.distinct() :: any,
+	}) :: any
+end
+
+--[=[
+	Observes the closest ancestor of the instance bound to the given binder, starting at the
+	instance's parent. Emits nil whenever no ancestor is bound. The instance itself never counts.
+
+	@param binder Binder<T>
+	@param instance Instance
+	@return Observable<T?>
+]=]
+function RxBinderUtils.observeBoundAncestor<T>(binder: Binder.Binder<T>, instance: Instance): Observable.Observable<T?>
+	assert(Binder.isBinder(binder), "Bad binder")
+	assert(typeof(instance) == "Instance", "Bad instance")
+
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+
+		local lastFound: any = UNSET_VALUE
+
+		local function rebuild()
+			local watchMaid = Maid.new()
+			maid._watchMaid = watchMaid
+
+			local found: any = nil
+			local current: Instance? = instance.Parent
+			while current do
+				local ancestor: Instance = current
+				watchMaid:GiveTask(binder:ObserveInstance(ancestor, function()
+					rebuild()
+				end))
+
+				local class = binder:Get(ancestor)
+				if class then
+					found = class
+					break
+				end
+
+				current = ancestor.Parent
+			end
+
+			if found ~= lastFound then
+				lastFound = found
+				sub:Fire(found)
+			end
+		end
+
+		maid:GiveTask(instance.AncestryChanged:Connect(rebuild))
+
+		rebuild()
+
+		return maid
+	end)
 end
 
 --[=[

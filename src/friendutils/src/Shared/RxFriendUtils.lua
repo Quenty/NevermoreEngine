@@ -26,15 +26,29 @@ local function getUserId(player: Player): number
 	return if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 end
 
+local function readFriendship(observedPlayer: Player, otherPlayer: Player): boolean
+	if PlayerMock.isMock(observedPlayer) then
+		return PlayerMock.callMethod(observedPlayer, "Player.IsFriendsWithAsync", getUserId(otherPlayer))
+	elseif PlayerMock.isMock(otherPlayer) then
+		return PlayerMock.callMethod(otherPlayer, "Player.IsFriendsWithAsync", getUserId(observedPlayer))
+	end
+
+	return observedPlayer:IsFriendsWithAsync(getUserId(otherPlayer))
+end
+
 --[=[
 	Observe friends in the current server (not including the LocalPlayer!), useful for social GUIs.
 	The lifetimes exist for the whole duration another player is a friend and in your server.
 	This means if a player is unfriended + friended multiple times per session, they will have emitted multiple friend lifetimes.
 
-	Works against [PlayerMock] players on either side: mocks in the DataModel are enumerated
-	alongside real players, friendship resolves from the mock's "Player.IsFriendsWithAsync" lookup
-	domain, and a mid-test [PlayerMock.writeLookup] to that domain stands in for the CoreGui
-	friended/unfriended events -- the observable re-reads and emits/kills lifetimes accordingly.
+	Works against [PlayerMock] players on either side: mocks in the DataModel are enumerated alongside
+	real players, and friendship resolves through the mock's `"Player.IsFriendsWithAsync"` domain. A
+	mock local player answers `StarterGui:GetCore` with its own stand-in for the CoreGui events below,
+	so a test fires a friending the way the CoreGui does:
+
+	```lua
+	PlayerMock.callMethod(player, "StarterGui.GetCore", "PlayerFriendedEvent"):Fire(otherPlayer)
+	```
 
 	@param player Player?
 	@return Observable<Brio<Player>>
@@ -53,11 +67,6 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 	-- Therefore, we must also use Player:IsFriendsWith() initially, and then use the below events just for when the state changes.
 	return Observable.new(function(sub)
 		local maid = Maid.new()
-
-		-- Per-otherPlayer wiring (mock friendship-changed connections). Separate from the brio keyed
-		-- under maid[otherPlayer]: an unfriend kills the brio but the wiring must survive so a
-		-- re-friend emits a new lifetime. Both die together when the other player leaves.
-		local listenMaid = maid:Add(Maid.new())
 
 		local function handleFriendState(otherPlayer: Player, isFriendsWith: boolean)
 			if otherPlayer == Players.LocalPlayer then
@@ -82,37 +91,9 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 				return
 			end
 
-			-- Friendship is symmetric, so with only one side mocked the injected state lives on
-			-- whichever player is the mock; with both mocked, on the observed player.
-			local lookupMock: Player? = nil
-			local lookupKey: number? = nil
-			if PlayerMock.isMock(observedPlayer) then
-				lookupMock = observedPlayer
-				lookupKey = getUserId(otherPlayer)
-			elseif PlayerMock.isMock(otherPlayer) then
-				lookupMock = otherPlayer
-				lookupKey = getUserId(observedPlayer)
-			end
-
-			if lookupMock ~= nil and lookupKey ~= nil then
-				local mock: Player, key: number = lookupMock, lookupKey
-
-				local function readFriendState()
-					handleFriendState(otherPlayer, PlayerMock.readLookup(mock, "Player.IsFriendsWithAsync", key))
-				end
-
-				-- The lookup attribute's changed signal stands in for the CoreGui friended /
-				-- unfriended events below, which only the engine can fire.
-				listenMaid[otherPlayer] = PlayerMock.getLookupChangedSignal(mock, "Player.IsFriendsWithAsync", key)
-					:Connect(readFriendState)
-
-				readFriendState()
-				return
-			end
-
 			local isFriendsWith = false
 			local ok = pcall(function()
-				isFriendsWith = observedPlayer:IsFriendsWithAsync(getUserId(otherPlayer))
+				isFriendsWith = readFriendship(observedPlayer, otherPlayer)
 			end)
 			if not ok then
 				warn(
@@ -132,7 +113,6 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 		end
 
 		local function handlePlayerRemoving(otherPlayer: Player)
-			listenMaid[otherPlayer] = nil
 			maid[otherPlayer] = nil
 		end
 
@@ -162,7 +142,8 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 		-- https://devforum.roblox.com/t/playerfriendedevent-was-deleted-from-corescripts/696683
 		-- So just incase these connections throw, retrieve them off-thread so we don't error out the whole observable.
 		-- Only allow this while the game is running too
-		if observedPlayer == Players.LocalPlayer and RunService:IsRunning() then
+		local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+		if observedPlayer == localPlayer and (RunService:IsRunning() or PlayerMock.isMock(observedPlayer)) then
 			-- Getting the core yields, so the subscription may be cleaned up before it resolves.
 			local cancelled = false
 			maid:GiveTask(function()

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/coreguiutils",
-  "version": "10.25.0",
+  "version": "10.26.1",
   "description": "Utility functions to work with the CoreGui",
   "keywords": [
     "Roblox",
@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*"
   },
   "publishConfig": {

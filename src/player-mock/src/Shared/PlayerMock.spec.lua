@@ -5,7 +5,6 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local CollectionService = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
@@ -78,7 +77,7 @@ describe("PlayerMock.isMock", function()
 
 	it("returns false for a tagged non-Folder", function()
 		local part = Instance.new("Part")
-		CollectionService:AddTag(part, PlayerMock.TAG)
+		part:AddTag(PlayerMock.TAG)
 		expect(PlayerMock.isMock(part)).toBe(false)
 		part:Destroy()
 	end)
@@ -246,6 +245,42 @@ describe("PlayerMock.read", function()
 			PlayerMock.read(folder :: any, "AccountAge")
 		end).toThrow()
 		folder:Destroy()
+	end)
+end)
+
+describe("PlayerMock property names", function()
+	it("rejects a misspelled property name everywhere a name is taken", function()
+		local player = PlayerMock.new()
+
+		expect(function()
+			PlayerMock.read(player, "UserID")
+		end).toThrow()
+		expect(function()
+			PlayerMock.write(player, "AccountAg", 5)
+		end).toThrow()
+		expect(function()
+			PlayerMock.getPropertyChangedSignal(player, "AccountAg")
+		end).toThrow()
+
+		player:Destroy()
+	end)
+
+	it("accepts a real Player property it does not pre-author a default for", function()
+		local player = PlayerMock.new()
+
+		expect(function()
+			PlayerMock.write(player, "Team", nil)
+		end).never.toThrow()
+
+		player:Destroy()
+	end)
+
+	it("accepts the modelled members reflection reports as methods rather than properties", function()
+		local player = PlayerMock.new()
+
+		expect(PlayerMock.read(player, "HasAppearanceLoaded")).toBe(false)
+
+		player:Destroy()
 	end)
 end)
 
@@ -908,6 +943,47 @@ describe("PlayerMock replication focuses", function()
 	end)
 end)
 
+describe("PlayerMock domains", function()
+	it("accepts a lookup domain split into its path table", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+
+		PlayerMock.writeLookup(player, { "MarketplaceService", "UserOwnsGamePassAsync" }, true, 111)
+		expect(PlayerMock.readLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111)).toBe(true)
+		expect(PlayerMock.readLookup(player, { "MarketplaceService", "UserOwnsGamePassAsync" }, 111)).toBe(true)
+
+		player:Destroy()
+	end)
+
+	it("backs a service signal with the same instance either way the domain is written", function()
+		local player = PlayerMock.new()
+		local fired = 0
+
+		local connection = PlayerMock.getServiceSignal(player, { "UserInputService", "WindowFocused" })
+			:Connect(function()
+				fired += 1
+			end)
+		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+		task.wait()
+
+		expect(fired).toBe(1)
+
+		connection:Disconnect()
+		player:Destroy()
+	end)
+
+	it("accepts an input domain split into its path table", function()
+		local player = PlayerMock.new()
+
+		PlayerMock.bindInput(player, { "ContextActionService", "BindAction" }, "Drag", function() end, false)
+		expect(PlayerMock.isInputBound(player, "Drag")).toBe(true)
+
+		PlayerMock.bindInput(player, { "ContextActionService", "UnbindAction" }, "Drag")
+		expect(PlayerMock.isInputBound(player, "Drag")).toBe(false)
+
+		player:Destroy()
+	end)
+end)
+
 describe("PlayerMock.readLookup", function()
 	it("returns the pre-authored default for an uninjected lookup", function()
 		local player = PlayerMock.new({ UserId = 12345 })
@@ -919,12 +995,32 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
+	it("answers the input-state domains false until a test says otherwise", function()
+		local player = PlayerMock.new({ UserId = 12345 })
+
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.E)).toBe(false)
+		expect(PlayerMock.readLookup(player, "UserInputService.IsMouseButtonPressed", Enum.UserInputType.MouseButton1)).toBe(
+			false
+		)
+
+		PlayerMock.writeLookup(player, "UserInputService.IsKeyDown", true, Enum.KeyCode.E)
+
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.E)).toBe(true)
+		-- Held keys are per key, and a key going down is not a mouse button going down.
+		expect(PlayerMock.readLookup(player, "UserInputService.IsKeyDown", Enum.KeyCode.Q)).toBe(false)
+		expect(PlayerMock.readLookup(player, "UserInputService.IsMouseButtonPressed", Enum.UserInputType.MouseButton1)).toBe(
+			false
+		)
+
+		player:Destroy()
+	end)
+
 	it("keys results independently per ID within a domain", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 			IsMember = true,
 			Roles = { { Name = "Admin", Rank = 230 } },
-		})
+		}, 372)
 
 		expect(PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", 372).IsMember).toBe(true)
 		expect(PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", 999).IsMember).toBe(false)
@@ -935,7 +1031,7 @@ describe("PlayerMock.readLookup", function()
 	it("keys results independently across domains sharing an ID space", function()
 		local player = PlayerMock.new({ UserId = 12345 })
 		-- PlayerOwnsAsset (inventory) and PlayerOwnsAssetAsync (paid access) are distinct engine calls.
-		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", 555, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", true, 555)
 
 		expect(PlayerMock.readLookup(player, "MarketplaceService.PlayerOwnsAsset", 555)).toBe(true)
 		expect(PlayerMock.readLookup(player, "MarketplaceService.PlayerOwnsAssetAsync", 555)).toBe(false)
@@ -949,7 +1045,7 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
-	it("errors on a number key for an EnumItem-keyed domain", function()
+	it("errors on a number argument for an EnumItem-keyed domain", function()
 		local player = PlayerMock.new()
 		expect(function()
 			PlayerMock.readLookup(player, "StarterGui.SetCoreGuiEnabled", 1)
@@ -957,7 +1053,7 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
-	it("errors on an EnumItem key for a number-keyed domain", function()
+	it("errors on an EnumItem argument for a number-keyed domain", function()
 		local player = PlayerMock.new()
 		expect(function()
 			PlayerMock.readLookup(player, "MarketplaceService.UserOwnsGamePassAsync", Enum.CoreGuiType.Backpack :: any)
@@ -973,7 +1069,7 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
-	it("errors on a number key for a string-keyed domain", function()
+	it("errors on a number argument for a string-keyed domain", function()
 		local player = PlayerMock.new()
 		expect(function()
 			PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", 123)
@@ -981,7 +1077,7 @@ describe("PlayerMock.readLookup", function()
 		player:Destroy()
 	end)
 
-	it("errors on an empty-string key for a string-keyed domain", function()
+	it("errors on an empty-string argument for a string-keyed domain", function()
 		local player = PlayerMock.new()
 		expect(function()
 			PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "")
@@ -1015,10 +1111,10 @@ describe("PlayerMock TeleportService.Teleport lookup", function()
 
 	it("records and reads back a teleport record with its data", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, {
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", {
 			via = "Teleport",
 			teleportData = { SlotId = "abc", Flag = true },
-		})
+		}, 4567)
 
 		local recorded = PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)
 		expect(recorded.via).toEqual("Teleport")
@@ -1029,10 +1125,10 @@ describe("PlayerMock TeleportService.Teleport lookup", function()
 
 	it("keys recorded teleports independently per placeId", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, {
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", {
 			via = "Teleport",
 			teleportData = { SlotId = "abc" },
-		})
+		}, 4567)
 
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 4567).teleportData.SlotId).toEqual("abc")
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 9999)).toEqual(nil)
@@ -1041,11 +1137,11 @@ describe("PlayerMock TeleportService.Teleport lookup", function()
 
 	it("round-trips a nested instance-teleport record through encode/decode", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "TeleportService.Teleport", 1, {
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", {
 			via = "TeleportToPlaceInstance",
 			instanceId = "job-1",
 			teleportData = { nested = { a = 1, list = { "x", "y" } } },
-		})
+		}, 1)
 
 		local recorded = PlayerMock.readLookup(player, "TeleportService.Teleport", 1)
 		expect(recorded.instanceId).toEqual("job-1")
@@ -1059,32 +1155,36 @@ describe("PlayerMock TeleportService.Teleport lookup", function()
 		PlayerMock.writeLookup(
 			player,
 			"TeleportService.Teleport",
-			4567,
-			{ via = "Teleport", teleportData = { SlotId = "abc" } }
+			{ via = "Teleport", teleportData = { SlotId = "abc" } },
+			4567
 		)
-		PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, nil)
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", nil, 4567)
 
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)).toEqual(nil)
 		player:Destroy()
 	end)
 
-	it("validates the record shape: a missing `via` is rejected", function()
+	it("validates the record shape on read: a missing `via` is rejected", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", { teleportData = {} } :: any, 4567)
+
 		expect(function()
-			PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, { teleportData = {} } :: any)
+			PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)
 		end).toThrow()
 		player:Destroy()
 	end)
 
-	it("errors when written a non-table value", function()
+	it("errors on read when written a non-table value", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "TeleportService.Teleport", "nope" :: any, 4567)
+
 		expect(function()
-			PlayerMock.writeLookup(player, "TeleportService.Teleport", 4567, "nope" :: any)
+			PlayerMock.readLookup(player, "TeleportService.Teleport", 4567)
 		end).toThrow()
 		player:Destroy()
 	end)
 
-	it("errors on a non-number key (the domain is placeId-keyed)", function()
+	it("errors on a non-number argument (the domain is placeId-keyed)", function()
 		local player = PlayerMock.new()
 		expect(function()
 			PlayerMock.readLookup(player, "TeleportService.Teleport", Enum.CoreGuiType.Backpack :: any)
@@ -1096,7 +1196,7 @@ end)
 describe("PlayerMock.writeLookup", function()
 	it("injects a value every subsequent read resolves", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, 111)
 
 		expect(PlayerMock.readLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111)).toBe(true)
 		expect(PlayerMock.readLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111)).toBe(true)
@@ -1106,10 +1206,10 @@ describe("PlayerMock.writeLookup", function()
 
 	it("round-trips a table-valued result through its backing attribute", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 			IsMember = true,
 			Roles = { { Name = "Moderator", Rank = 150 } },
-		})
+		}, 372)
 
 		local result = PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", 372)
 		expect(result.IsMember).toBe(true)
@@ -1120,41 +1220,25 @@ describe("PlayerMock.writeLookup", function()
 
 	it("clears back to the default with nil", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 			IsMember = true,
 			Roles = { { Name = "Admin", Rank = 230 } },
-		})
-		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, nil)
+		}, 372)
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", nil, 372)
 
 		expect(PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", 372).IsMember).toBe(false)
 
 		player:Destroy()
 	end)
 
-	it("fires GetAttributeChangedSignal on the backing attribute", function()
-		local player = PlayerMock.new()
-		local fired = false
-		local conn = player
-			:GetAttributeChangedSignal("PlayerMockLookup_MarketplaceService_UserOwnsGamePassAsync_111")
-			:Connect(function()
-				fired = true
-			end)
-
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111, true)
-		expect(fired).toBe(true)
-
-		conn:Disconnect()
-		player:Destroy()
-	end)
-
 	it("round-trips an EnumItem-keyed effect write, keyed per enum value", function()
 		local player = PlayerMock.new()
-		PlayerMock.writeLookup(player, "StarterGui.SetCoreGuiEnabled", Enum.CoreGuiType.Backpack, false)
+		PlayerMock.writeLookup(player, "StarterGui.SetCoreGuiEnabled", false, Enum.CoreGuiType.Backpack)
 
 		expect(PlayerMock.readLookup(player, "StarterGui.SetCoreGuiEnabled", Enum.CoreGuiType.Backpack)).toBe(false)
 		expect(PlayerMock.readLookup(player, "StarterGui.SetCoreGuiEnabled", Enum.CoreGuiType.Chat)).toBe(true)
 
-		PlayerMock.writeLookup(player, "StarterGui.SetCoreGuiEnabled", Enum.CoreGuiType.Backpack, nil)
+		PlayerMock.writeLookup(player, "StarterGui.SetCoreGuiEnabled", nil, Enum.CoreGuiType.Backpack)
 		expect(PlayerMock.readLookup(player, "StarterGui.SetCoreGuiEnabled", Enum.CoreGuiType.Backpack)).toBe(true)
 
 		player:Destroy()
@@ -1162,10 +1246,10 @@ describe("PlayerMock.writeLookup", function()
 
 	it("round-trips a string-keyed result, keyed per subscriptionId", function()
 		local player = PlayerMock.new({ UserId = 12345 })
-		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-123", {
+		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", {
 			IsSubscribed = true,
 			IsRenewing = false,
-		})
+		}, "EXP-123")
 
 		local status = PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-123")
 		expect(status.IsSubscribed).toBe(true)
@@ -1174,7 +1258,7 @@ describe("PlayerMock.writeLookup", function()
 			PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-999").IsSubscribed
 		).toBe(false)
 
-		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-123", nil)
+		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", nil, "EXP-123")
 		expect(
 			PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-123").IsSubscribed
 		).toBe(false)
@@ -1182,52 +1266,66 @@ describe("PlayerMock.writeLookup", function()
 		player:Destroy()
 	end)
 
-	it("errors when a string-keyed table value fails the domain's shape validation", function()
+	it("errors on read when a string-keyed table value fails the domain's shape validation", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(
+			player,
+			"MarketplaceService.GetUserSubscriptionStatusAsync",
+			{
+				IsSubscribed = "yes",
+			} :: any,
+			"EXP-123"
+		)
+
 		expect(function()
-			PlayerMock.writeLookup(
-				player,
-				"MarketplaceService.GetUserSubscriptionStatusAsync",
-				"EXP-123",
-				{
-					IsSubscribed = "yes",
-				} :: any
-			)
+			PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", "EXP-123")
 		end).toThrow()
 		player:Destroy()
 	end)
 
-	it("errors when the value does not match the domain's value type", function()
+	it("errors on read when the value does not match the domain's value type", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", "yes" :: any, 111)
+
 		expect(function()
-			PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111, "yes" :: any)
+			PlayerMock.readLookup(player, "MarketplaceService.UserOwnsGamePassAsync", 111)
 		end).toThrow()
 		player:Destroy()
 	end)
 
-	it("errors when a table-valued result fails the domain's shape check", function()
+	it("errors on read when a table-valued result fails the domain's shape check", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
+			IsMember = true,
+			Roles = { { Name = "Admin", Rank = "admin" } },
+		}, 372)
+
 		expect(function()
-			PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", 372, {
-				IsMember = true,
-				Roles = { { Name = "Admin", Rank = "admin" } },
-			})
+			PlayerMock.readLookup(player, "GroupService.GetRolesInGroupAsync", 372)
 		end).toThrow()
 		player:Destroy()
 	end)
 
-	it("errors on an unknown lookup domain", function()
+	it("errors on an argument the domain is not keyed by", function()
 		local player = PlayerMock.new()
 		expect(function()
-			PlayerMock.writeLookup(player, "GroupService.GetRankInGroup", 372, 230)
+			PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, "111" :: any)
 		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("reaches a method the mock models no default for", function()
+		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "Player.RequestStreamAroundAsync", "streamed")
+
+		expect(PlayerMock.readLookup(player, "Player.RequestStreamAroundAsync")).toBe("streamed")
 		player:Destroy()
 	end)
 
 	it("throws when passed something that is not a PlayerMock", function()
 		local folder = Instance.new("Folder")
 		expect(function()
-			PlayerMock.writeLookup(folder :: any, "MarketplaceService.UserOwnsGamePassAsync", 111, true)
+			PlayerMock.writeLookup(folder :: any, "MarketplaceService.UserOwnsGamePassAsync", true, 111)
 		end).toThrow()
 		folder:Destroy()
 	end)
@@ -1242,10 +1340,10 @@ describe("PlayerMock friends domains", function()
 
 	it("round-trips an injected friends list", function()
 		local player = PlayerMock.new({ UserId = 90031002 })
-		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", 0, {
+		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", {
 			{ Id = 90031003, Username = "friend_one", DisplayName = "Friend One", IsOnline = true },
 			{ Id = 90031004, Username = "friend_two", DisplayName = "Friend Two", IsOnline = false },
-		})
+		}, 0)
 
 		local friends = PlayerMock.readLookup(player, "Players.GetFriendsAsync", 0)
 		expect(#friends).toBe(2)
@@ -1255,12 +1353,14 @@ describe("PlayerMock friends domains", function()
 		player:Destroy()
 	end)
 
-	it("errors when a friends entry fails the FriendData shape check", function()
+	it("errors on read when a friends entry fails the FriendData shape check", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(player, "Players.GetFriendsAsync", {
+			{ Id = 90031005, Username = "no_online_flag", DisplayName = "Nope" },
+		}, 0)
+
 		expect(function()
-			PlayerMock.writeLookup(player, "Players.GetFriendsAsync", 0, {
-				{ Id = 90031005, Username = "no_online_flag", DisplayName = "Nope" },
-			})
+			PlayerMock.readLookup(player, "Players.GetFriendsAsync", 0)
 		end).toThrow()
 		player:Destroy()
 	end)
@@ -1269,7 +1369,7 @@ describe("PlayerMock friends domains", function()
 		local player = PlayerMock.new({ UserId = 90031006 })
 		expect(PlayerMock.readLookup(player, "Player.IsFriendsWithAsync", 90031007)).toBe(false)
 
-		PlayerMock.writeLookup(player, "Player.IsFriendsWithAsync", 90031007, true)
+		PlayerMock.writeLookup(player, "Player.IsFriendsWithAsync", true, 90031007)
 		expect(PlayerMock.readLookup(player, "Player.IsFriendsWithAsync", 90031007)).toBe(true)
 		expect(PlayerMock.readLookup(player, "Player.IsFriendsWithAsync", 90031008)).toBe(false)
 
@@ -1301,116 +1401,99 @@ describe("PlayerMock user info domain", function()
 
 	it("resolves an injected user info over the derived default", function()
 		local player = PlayerMock.new({ UserId = 90032003 })
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90032003,
 			Username = "injected_name",
 			DisplayName = "Injected",
 			HasVerifiedBadge = false,
-		})
+		}, 0)
 
 		local userInfo = PlayerMock.readLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0)
 		expect(userInfo.Username).toBe("injected_name")
 
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, nil)
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", nil, 0)
 		expect(PlayerMock.readLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0).Username).toBe(player.Name)
 
 		player:Destroy()
 	end)
 
-	it("errors when the injected value fails the UserInfo shape check", function()
+	it("errors on read when the injected value fails the UserInfo shape check", function()
 		local player = PlayerMock.new()
+		PlayerMock.writeLookup(
+			player,
+			"UserService.GetUserInfosByUserIdsAsync",
+			{
+				Id = 1,
+				Username = "missing_fields",
+			} :: any,
+			0
+		)
+
 		expect(function()
-			PlayerMock.writeLookup(
-				player,
-				"UserService.GetUserInfosByUserIdsAsync",
-				0,
-				{
-					Id = 1,
-					Username = "missing_fields",
-				} :: any
-			)
+			PlayerMock.readLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0)
 		end).toThrow()
 		player:Destroy()
 	end)
 end)
 
-describe("PlayerMock.getMockByUsername", function()
+describe("PlayerMock.callMethod Players.GetUserIdFromNameAsync", function()
 	it("resolves a parented mock by its default Name-derived username", function()
 		local player = PlayerMock.new({ UserId = 90033001 })
 		player.Parent = Workspace
 
-		expect(PlayerMock.getMockByUsername(player.Name)).toBe(player)
+		expect(PlayerMock.callMethod(player, "Players.GetUserIdFromNameAsync", player.Name)).toBe(90033001)
 		player:Destroy()
 	end)
 
 	it("resolves a parented mock by an injected username", function()
 		local player = PlayerMock.new({ UserId = 90033002 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90033002,
 			Username = "injected_username",
 			DisplayName = "Injected",
 			HasVerifiedBadge = false,
-		})
+		}, 0)
 
-		expect(PlayerMock.getMockByUsername("injected_username")).toBe(player)
+		expect(PlayerMock.callMethod(player, "Players.GetUserIdFromNameAsync", "injected_username")).toBe(90033002)
 		player:Destroy()
 	end)
 
-	it("returns nil when no mock matches", function()
+	it("answers for any mock, the Players service being DataModel-wide", function()
+		local named = PlayerMock.new({ UserId = 90033005 })
+		named.Parent = Workspace
+		local other = PlayerMock.new({ UserId = 90033006 })
+		other.Parent = Workspace
+
+		expect(PlayerMock.callMethod(other, "Players.GetUserIdFromNameAsync", named.Name)).toBe(90033005)
+
+		named:Destroy()
+		other:Destroy()
+	end)
+
+	it("is nil when no mock matches, so production falls through to the engine", function()
 		local player = PlayerMock.new({ UserId = 90033003 })
 		player.Parent = Workspace
 
-		expect(PlayerMock.getMockByUsername("no_such_username")).toBeNil()
+		expect(PlayerMock.callMethod(player, "Players.GetUserIdFromNameAsync", "no_such_username")).toBeNil()
 		player:Destroy()
 	end)
 
-	it("returns nil for an unparented mock, like the engine's DataModel-scoped resolve", function()
+	it("is nil for an unparented mock, like the engine's DataModel-scoped resolve", function()
 		local player = PlayerMock.new({ UserId = 90033004 })
 
-		expect(PlayerMock.getMockByUsername(player.Name)).toBeNil()
+		expect(PlayerMock.callMethod(player, "Players.GetUserIdFromNameAsync", player.Name)).toBeNil()
 		player:Destroy()
 	end)
 
 	it("throws on a non-string username", function()
-		expect(function()
-			PlayerMock.getMockByUsername(12345 :: any)
-		end).toThrow()
-	end)
-end)
-
-describe("PlayerMock.getLookupChangedSignal", function()
-	it("fires when the lookup is written, keyed per ID", function()
-		local player = PlayerMock.new({ UserId = 90034001 })
-		local fired = 0
-		local conn = PlayerMock.getLookupChangedSignal(player, "Player.IsFriendsWithAsync", 90034002):Connect(function()
-			fired += 1
-		end)
-
-		PlayerMock.writeLookup(player, "Player.IsFriendsWithAsync", 90034003, true)
-		expect(fired).toBe(0)
-
-		PlayerMock.writeLookup(player, "Player.IsFriendsWithAsync", 90034002, true)
-		expect(fired).toBe(1)
-
-		conn:Disconnect()
-		player:Destroy()
-	end)
-
-	it("errors on an unknown lookup domain", function()
 		local player = PlayerMock.new()
-		expect(function()
-			PlayerMock.getLookupChangedSignal(player, "Players.GetFriends", 0)
-		end).toThrow()
-		player:Destroy()
-	end)
 
-	it("throws when passed something that is not a PlayerMock", function()
-		local folder = Instance.new("Folder")
 		expect(function()
-			PlayerMock.getLookupChangedSignal(folder :: any, "Player.IsFriendsWithAsync", 1)
+			PlayerMock.callMethod(player, "Players.GetUserIdFromNameAsync", 12345 :: any)
 		end).toThrow()
-		folder:Destroy()
+
+		player:Destroy()
 	end)
 end)
 
@@ -1476,6 +1559,136 @@ describe("PlayerMock.getSignal", function()
 			PlayerMock.getSignal(folder :: any, "Chatted")
 		end).toThrow()
 		folder:Destroy()
+	end)
+end)
+
+describe("PlayerMock.getServiceSignal", function()
+	it("delivers fireServiceSignal arguments to a connected handler", function()
+		local player = PlayerMock.new()
+		local focused = {}
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
+			table.insert(focused, true)
+		end)
+
+		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+
+		expect(#focused).toBe(1)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("returns the same backing signal across calls", function()
+		local player = PlayerMock.new()
+		local count = 0
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function()
+			count += 1
+		end)
+
+		-- A second lookup must not create a second backing signal the fire misses.
+		PlayerMock.getServiceSignal(player, "UserInputService.InputEnded")
+		PlayerMock.fireServiceSignal(player, "UserInputService.InputEnded")
+
+		expect(count).toBe(1)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("keeps domains apart", function()
+		local player = PlayerMock.new()
+		local focusedCount = 0
+		local releasedCount = 0
+		local maid = Maid.new()
+
+		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
+			focusedCount += 1
+		end))
+		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusReleased"):Connect(function()
+			releasedCount += 1
+		end))
+
+		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocusReleased")
+
+		expect(focusedCount).toBe(0)
+		expect(releasedCount).toBe(1)
+
+		maid:DoCleaning()
+		player:Destroy()
+	end)
+
+	it("carries EnumItem arguments through intact", function()
+		local player = PlayerMock.new()
+		local seen: any = nil
+		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function(inputObject)
+			seen = inputObject
+		end)
+
+		PlayerMock.fireServiceSignal(
+			player,
+			"UserInputService.InputEnded",
+			PlayerMock.makeInputObject({
+				UserInputType = Enum.UserInputType.Keyboard,
+				KeyCode = Enum.KeyCode.E,
+			})
+		)
+
+		expect(seen).never.toBeNil()
+		expect(seen.KeyCode).toBe(Enum.KeyCode.E)
+		expect(seen.UserInputType).toBe(Enum.UserInputType.Keyboard)
+
+		conn:Disconnect()
+		player:Destroy()
+	end)
+
+	it("errors on a misspelled event name", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusd")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on an unknown class", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "UserInputServic.WindowFocused")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on a domain that is not Service.Event shaped", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.getServiceSignal(player, "WindowFocused")
+		end).toThrow()
+		player:Destroy()
+	end)
+
+	it("throws when passed something that is not a PlayerMock", function()
+		local folder = Instance.new("Folder")
+		expect(function()
+			PlayerMock.getServiceSignal(folder :: any, "UserInputService.WindowFocused")
+		end).toThrow()
+		folder:Destroy()
+	end)
+end)
+
+describe("PlayerMock.fireServiceSignal", function()
+	it("is a no-op when nothing ever connected", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
+		end).never.toThrow()
+		player:Destroy()
+	end)
+
+	it("errors on a misspelled event name", function()
+		local player = PlayerMock.new()
+		expect(function()
+			PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocusd")
+		end).toThrow()
+		player:Destroy()
 	end)
 end)
 
@@ -2071,7 +2284,7 @@ describe("PlayerMock.getMockAddedSignal", function()
 		end))
 
 		local imposter = Instance.new("Configuration")
-		CollectionService:AddTag(imposter, PlayerMock.TAG)
+		imposter:AddTag(PlayerMock.TAG)
 		imposter.Parent = workspace
 		task.wait()
 

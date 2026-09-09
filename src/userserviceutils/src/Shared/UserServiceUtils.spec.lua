@@ -37,12 +37,12 @@ describe("UserServiceUtils.promiseUserInfosByUserIds against mocks", function()
 	it("resolves an injected user info over the derived default", function()
 		local player = PlayerMock.new({ UserId = 90061002 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90061002,
 			Username = "injected_username",
 			DisplayName = "Injected Display",
 			HasVerifiedBadge = true,
-		})
+		}, 0)
 
 		local outcome, userInfos =
 			PromiseTestUtils.awaitOutcome(UserServiceUtils.promiseUserInfosByUserIds({ 90061002 }))
@@ -96,12 +96,12 @@ describe("UserServiceUtils wrappers against a mock", function()
 	it("promiseDisplayName and promiseUserName agree with the injected info", function()
 		local player = PlayerMock.new({ UserId = 90061006 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90061006,
 			Username = "the_username",
 			DisplayName = "The Display",
 			HasVerifiedBadge = false,
-		})
+		}, 0)
 
 		local displayOutcome, displayName = PromiseTestUtils.awaitOutcome(UserServiceUtils.promiseDisplayName(90061006))
 		local nameOutcome, userName = PromiseTestUtils.awaitOutcome(UserServiceUtils.promiseUserName(90061006))

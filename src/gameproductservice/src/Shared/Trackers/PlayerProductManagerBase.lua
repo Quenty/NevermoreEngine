@@ -106,7 +106,7 @@ function PlayerProductManagerBase.new(player: Player, serviceBag: ServiceBag.Ser
 			-- through [PlayerMock.writeLookup] (default: declined), routed through the same
 			-- handler the engine's PromptGamePassPurchaseFinished would reach.
 			local isPurchased =
-				PlayerMock.readLookup(self._player, "MarketplaceService.PromptGamePassPurchase", gamePassId)
+				PlayerMock.callMethod(self._player, "MarketplaceService.PromptGamePassPurchase", gamePassId)
 			self._maid:GiveTask(task.defer(function()
 				(self :: any):_handleGamePassPromptFinished(gamePassId, isPurchased)
 			end))

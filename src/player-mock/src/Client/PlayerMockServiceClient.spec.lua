@@ -205,7 +205,7 @@ describe("PlayerMockServiceClient", function()
 
 		firstBag:Destroy()
 
-		local uninitialized = setmetatable({}, { __index = PlayerMockServiceClient })
+		local uninitialized: any = setmetatable({}, { __index = PlayerMockServiceClient })
 		expect(function()
 			uninitialized:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("leaked")

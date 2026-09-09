@@ -1,23 +1,8 @@
 --!strict
 --[=[
 	Utilities for teleporting players, including mock-aware wrappers of the TeleportService teleport
-	APIs. A [PlayerMock] records its teleports in the `"TeleportService.Teleport"` lookup domain, keyed
-	by destination placeId, instead of reaching the engine:
-
-	```lua
-	TeleportServiceUtils.teleport(placeId, mock, { SlotId = "abc" })
-	local hop = PlayerMock.readLookup(mock, "TeleportService.Teleport", placeId)
-	```
-
-	What the engine would have said back goes in through the `"TeleportService.TeleportInitFailed"`
-	lookup the same way, `result` and all:
-
-	```lua
-	PlayerMock.writeLookup(mock, "TeleportService.TeleportInitFailed", placeId, {
-		result = Enum.TeleportResult.GameFull,
-		message = "server full",
-	})
-	```
+	APIs. A [PlayerMock] records its teleports instead of reaching the engine, so a caller teleports
+	one the same way it teleports a real player.
 
 	@class TeleportServiceUtils
 ]=]
@@ -644,7 +629,7 @@ end
 	A teleport the engine never saw, written where a test reads it back.
 ]]
 function TeleportServiceUtils._recordMockTeleport(player: Player, placeId: number, record: MockTeleport): ()
-	PlayerMock.writeLookup(player, "TeleportService.Teleport", placeId, record)
+	PlayerMock.writeLookup(player, "TeleportService.Teleport", record, placeId)
 end
 
 --[[
@@ -658,29 +643,19 @@ function TeleportServiceUtils._connectTeleportReported(
 	player: Player,
 	onReport: (report: TeleportFailedReportUtils.TeleportReport) -> ()
 ): ()
-	if PlayerMock.isMock(player) then
-		maid:GiveTask(
-			PlayerMock.getLookupChangedSignal(player, "TeleportService.TeleportInitFailed", placeId):Connect(function()
-				local injected = PlayerMock.readLookup(player, "TeleportService.TeleportInitFailed", placeId)
-				if injected == nil then
-					return
-				end
-
-				onReport(TeleportFailedReportUtils.new(placeId, injected.result, injected.message))
-			end)
-		)
-		return
-	end
+	local reported: RBXScriptSignal = if PlayerMock.isMock(player)
+		then PlayerMock.getServiceSignal(player, "TeleportService.TeleportInitFailed")
+		else TeleportService.TeleportInitFailed
 
 	maid:GiveTask(
-		TeleportService.TeleportInitFailed:Connect(
+		reported:Connect(
 			function(failedPlayer: Player, result: Enum.TeleportResult, message: string, reportedPlaceId: number?)
 				if failedPlayer ~= player then
 					return
 				end
 
-				-- Keyed by destination like the mock is, so a hop to somewhere else failing never speaks for
-				-- this one. Tolerates the engine omitting the place rather than dropping every report.
+				-- Filtered by destination, so a hop to somewhere else failing never speaks for this one.
+				-- Tolerates the engine omitting the place rather than dropping every report.
 				if reportedPlaceId ~= nil and reportedPlaceId ~= placeId then
 					return
 				end
