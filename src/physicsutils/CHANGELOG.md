@@ -1,19 +1,13 @@
-# v8.35.0 (Wed Sep 09 2026)
-
-#### 🚀 Enhancement
-
-- feat(vector3utils): Add Vector3Utils.volume and unit tests for vector3utils and physicsutils [#821](https://github.com/Quenty/NevermoreEngine/pull/821) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.34.0...@quenty/physicsutils@8.35.0) (2026-09-09)
+
+### Features
+
+- **vector3utils:** Add Vector3Utils.volume and unit tests for vector3utils and physicsutils ([#821](https://github.com/Quenty/NevermoreEngine/issues/821)) ([69630c0](https://github.com/Quenty/NevermoreEngine/commit/69630c0552e18a4cc1ecf44d65aef750327e20ec))
 
 # [8.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.33.1...@quenty/physicsutils@8.34.0) (2026-08-28)
 
