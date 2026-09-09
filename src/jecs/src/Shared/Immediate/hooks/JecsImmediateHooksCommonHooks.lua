@@ -362,7 +362,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return hookState.counter
 		end,
 
-		hookEntity = function(dis: any?, initDecorator: ((Jecst.Entity) -> any?)?)
+		hookEntity = function(dis: any?, initDecorator: ((Jecst.Entity) -> any? | nil)?)
 			local hookState, _hookMaid, hookStateEntity = getOrCreateHookState(runtime, dis)
 			if not hookState.childEntity then
 				hookState.childEntity = runtime.world:entity()
@@ -1037,7 +1037,7 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return position, hookState.spring
 		end,
 
-		state = function(dis: any?, initFunction: ({ any? }, Maid.Maid) -> ...any?)
+		state = function(dis: any?, initFunction: (({ any? }, Maid.Maid) -> ...any?)?): ({ any? }, Maid.Maid)
 			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
 			if hookState._init == nil then
 				hookState._init = true
