@@ -51,6 +51,8 @@ local PROPERTIES: { [string]: PropertySpec } = {
 	FollowUserId = { default = 0 },
 	-- `Player:HasAppearanceLoaded()` on a real Player, but a zero-arg boolean getter reads the same.
 	HasAppearanceLoaded = { default = false },
+	Neutral = { default = true },
+	Team = { instanceValued = true }, -- default nil, like a real Player before assignment
 	Character = { instanceValued = true }, -- default nil, like a real Player before spawn
 	RespawnLocation = { instanceValued = true }, -- default nil; checkpoint spawn stand-in
 
