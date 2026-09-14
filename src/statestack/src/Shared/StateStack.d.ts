@@ -23,7 +23,7 @@ interface StateStack<T> extends BaseObject {
 
 interface StateStackConstructor {
   readonly ClassName: 'StateStack';
-  new <T>(): StateStack<T>;
+  new <T>(): StateStack<T | undefined>;
   new <T>(defaultValue: T, checkType?: string): StateStack<T>;
 }
 

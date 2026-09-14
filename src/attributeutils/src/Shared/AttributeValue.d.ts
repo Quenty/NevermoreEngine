@@ -8,10 +8,14 @@ interface AttributeValue<T> extends ValueObjectLike<T> {
 
 interface AttributeValueConstructor {
   readonly ClassName: 'AttributeValue';
-  new <T = unknown>(
+  new <T = never>(
+    object: Instance,
+    attributeName: string
+  ): AttributeValue<T | undefined>;
+  new <T>(
     object: Instance,
     attributeName: string,
-    defaultValue?: T
+    defaultValue: T
   ): AttributeValue<T>;
 }
 
