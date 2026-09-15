@@ -16,6 +16,7 @@ export type TieRealmService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_tieRealm: TieRealms.TieRealm,
+		_hasExplicitTieRealm: boolean?,
 	},
 	{} :: typeof({ __index = TieRealmService })
 ))
@@ -36,6 +37,20 @@ function TieRealmService.SetTieRealm(self: TieRealmService, tieRealm: TieRealms.
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
 	self._tieRealm = tieRealm
+	self._hasExplicitTieRealm = true
+end
+
+--[=[
+	Returns whether the realm was set with [TieRealmService.SetTieRealm] rather than inferred.
+
+	[RunService] reports the server even when the game is not running, such as in Studio edit mode
+	or a headless test. A service whose server behavior is unsafe there can keep its own inference
+	unless the bag was told a realm.
+
+	@return boolean
+]=]
+function TieRealmService.HasExplicitTieRealm(self: TieRealmService): boolean
+	return self._hasExplicitTieRealm == true
 end
 
 --[=[
