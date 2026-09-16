@@ -104,9 +104,9 @@ end
 	http://reactivex.io/documentation/operators/just.html
 
 	```lua
-	Rx.of(1, 2, 3):Subscribe(print, function()
+	Rx.of(1, 2, 3):Subscribe(print, nil, function()
 		print("Complete")
-	end)) --> 1, 2, 3, "Complete"
+	end) --> 1, 2, 3, "Complete"
 	```
 
 	@param ... any -- Arguments to emit
