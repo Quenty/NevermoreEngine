@@ -17,9 +17,9 @@ Converts UI between Roblox instances and Blend.
 
 ## Headless API
 
-The plugin also converts without the widget being open, so external tooling (command bar scripts, MCP agents) can drive it. Create a `Folder` whose name starts with `UIConverterRequest`, add `ObjectValue` children pointing at the instances to convert (or none to convert the current selection), optionally set a `Library` attribute (`Blend`, `BlendUnpacked`, `Fusion`, `FusionUnpacked`), then parent the folder to `ServerStorage`. Build the folder fully before parenting it.
+The plugin also converts without the widget being open, so external tooling (command bar scripts, MCP agents) can drive it. Create a `Folder` whose name starts with `UIConverterRequest`, add `ObjectValue` children pointing at the instances to convert (or set a `UseSelection` attribute to true to convert the current selection), optionally set a `Library` attribute (`Blend`, `BlendUnpacked`, `Fusion`, `FusionUnpacked`), then parent the folder to `ServerStorage`. Build the folder fully before parenting it — only folders parented after the plugin loads are served.
 
-The plugin sets the folder's `Status` attribute to `working`, then `done` with the generated code in a `ModuleScript` named `Output` inside the folder, or `error` with the message in an `Error` attribute. The requester owns cleanup: destroy the folder when finished.
+The plugin sets the folder's `Status` attribute to `working`, then `done` with the generated code in a `ModuleScript` named `Output` inside the folder (prefixed with `return` so it is a valid module), or `error` with the message in an `Error` attribute. The requester owns cleanup: destroy the folder when finished.
 
 ### Using it from an AI agent
 
@@ -34,8 +34,9 @@ Blend/Fusion source. To convert:
    child per root instance to convert (descendants are included). Optionally
    set a "Library" attribute: "Blend" (default), "BlendUnpacked", "Fusion",
    or "FusionUnpacked". Only after the folder is fully built, parent it to
-   ServerStorage. With no ObjectValue children, the current Studio selection
-   is converted instead.
+   ServerStorage. To convert the user's current Studio selection instead,
+   set a "UseSelection" attribute to true (prefer explicit ObjectValue
+   targets when working autonomously).
 2. Poll the folder's "Status" attribute (task.wait loop is fine): it goes
    nil -> "working" -> "done" or "error". The first conversion per session
    downloads the Roblox API dump, so allow ~15 seconds. If Status never

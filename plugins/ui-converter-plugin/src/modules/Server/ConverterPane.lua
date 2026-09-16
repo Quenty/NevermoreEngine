@@ -5,8 +5,6 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
-local ScriptEditorService = game:GetService("ScriptEditorService")
-local ServerStorage = game:GetService("ServerStorage")
 
 local BasicPane = require("BasicPane")
 local Blend = require("Blend")
@@ -28,14 +26,13 @@ local ConverterPane = setmetatable({}, BasicPane)
 ConverterPane.ClassName = "ConverterPane"
 ConverterPane.__index = ConverterPane
 
-local OUTPUT_SCRIPT_NAME = "UIConverterOutput"
-
-function ConverterPane.new()
+function ConverterPane.new(converter)
 	local self = setmetatable(BasicPane.new(), ConverterPane)
 
 	self._previewTextName = "ClassConverterPreviewText" .. HttpService:GenerateGUID(false)
 
-	self._converter = self._maid:Add(UIConverter.new())
+	self._converter = converter or self._maid:Add(UIConverter.new())
+	self._codeValid = false
 	self._vDividerPosition = self._maid:Add(ValueObject.new(0.3))
 	self._hDividerPosition = self._maid:Add(ValueObject.new(0.5))
 	self._draggingState = self._maid:Add(ValueObject.new(false))
@@ -59,8 +56,8 @@ function ConverterPane.new()
 	return self
 end
 
-function ConverterPane:SetPlugin(plugin: Plugin)
-	self._plugin = plugin
+function ConverterPane:SetOutputScriptManager(outputScriptManager)
+	self._outputScriptManager = outputScriptManager
 end
 
 function ConverterPane:SetupSettings(plugin: Plugin)
@@ -247,6 +244,8 @@ function ConverterPane:_renderFromInstance(state)
 	local maid = Maid.new()
 
 	if #state.selectedList > 0 and state.library then
+		self._codeValid = false
+		self._code.Value = ""
 		self._copyPreview.Value = self:_showPreviewText("Generating...")
 		self._renderPreview.Value = self:_showPreviewText("Generating...")
 
@@ -264,55 +263,17 @@ function ConverterPane:_renderFromInstance(state)
 			maid._genMaid = nil
 			local genMaid = Maid.new()
 
-			local codePromises = {}
 			genMaid
-				:GivePromise(
-					UIConverterUtils.promiseCreateLookupMap(state.library, self._converter, state.selectedList)
-				)
-				:Then(function(refLookupMap)
-					for _, item in state.selectedList do
-						table.insert(
-							codePromises,
-							genMaid:GivePromise(
-								UIConverterUtils.promiseToLibraryInstance(
-									state.library,
-									self._converter,
-									item,
-									refLookupMap
-								)
-							)
-						)
-					end
+				:GivePromise(UIConverterUtils.promiseCode(state.library, self._converter, state.selectedList))
+				:Then(function(code)
+					self._codeValid = true
+					self._code.Value = code
 
-					genMaid
-						:GivePromise(PromiseUtils.all(codePromises))
-						:Then(function(...)
-							local results = {}
-							for _, item in { ... } do
-								if item then
-									table.insert(results, item)
-								end
-							end
-
-							local prefix = UIConverterUtils.getEntryListCode(state.library, refLookupMap)
-
-							if #results == 0 then
-								return UIConverterUtils.toLuaComment("error while making code, no results")
-							elseif #results == 1 then
-								return prefix .. results[1]
-							else
-								return prefix .. UIConverterUtils.convertListOfItemsToTable(results)
-							end
-						end)
-						:Then(function(code)
-							self._code.Value = code
-
-							ensureRenderPreview()
-						end)
-						:Catch(function(err)
-							self._code.Value =
-								UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
-						end)
+					ensureRenderPreview()
+				end)
+				:Catch(function(err)
+					self._codeValid = false
+					self._code.Value = UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
 				end)
 
 			local clonePromises = {}
@@ -385,6 +346,7 @@ function ConverterPane:_renderFromInstance(state)
 
 		generate()
 	else
+		self._codeValid = false
 		self._copyPreview.Value = self:_showPreviewText()
 		self._renderPreview.Value = self:_showPreviewText()
 		self._code.Value = UIConverterUtils.toLuaComment("select an object")
@@ -651,117 +613,25 @@ function ConverterPane:_setOpenScriptStatus(text: string?)
 		return
 	end
 
-	local maid = Maid.new()
-
-	local alive = true
-	maid:GiveTask(function()
-		alive = false
+	self._maid._openScriptStatusMaid = task.delay(2, function()
+		self._openScriptStatus.Value = nil
 	end)
-
-	task.delay(2, function()
-		if alive then
-			self._openScriptStatus.Value = nil
-		end
-	end)
-
-	self._maid._openScriptStatusMaid = maid
-end
-
-function ConverterPane:_getOrCreateOutputScript(): (ModuleScript, boolean)
-	local existing = self._outputScript
-	if existing and existing.Parent then
-		return existing, false
-	end
-
-	local outputScript = Instance.new("ModuleScript")
-	outputScript.Name = OUTPUT_SCRIPT_NAME
-	outputScript.Parent = ServerStorage
-
-	return outputScript, true
-end
-
-function ConverterPane:_writeOutputSource(outputScript: ModuleScript, code: string): boolean
-	local ok, err = pcall(function()
-		if ScriptEditorService:FindScriptDocument(outputScript) then
-			ScriptEditorService:UpdateSourceAsync(outputScript, function()
-				return code
-			end)
-		else
-			outputScript.Source = code
-		end
-	end)
-
-	if not ok then
-		warn(string.format("[ConverterPane] - Failed to write script source - %s", tostring(err)))
-	end
-
-	return ok
-end
-
-function ConverterPane:_watchOutputScript(outputScript: ModuleScript)
-	if self._outputScript == outputScript then
-		return
-	end
-
-	self._outputScript = outputScript
-
-	local maid = Maid.new()
-
-	local alive = true
-	maid:GiveTask(function()
-		alive = false
-		self._outputScript = nil
-
-		if outputScript.Parent then
-			outputScript:Destroy()
-		end
-	end)
-
-	maid:GiveTask(ScriptEditorService.TextDocumentDidClose:Connect(function()
-		task.defer(function()
-			if not alive or outputScript.Parent == nil then
-				return
-			end
-
-			if ScriptEditorService:FindScriptDocument(outputScript) then
-				return
-			end
-
-			outputScript:Destroy()
-			self._maid._outputScriptMaid = nil
-		end)
-	end))
-
-	self._maid._outputScriptMaid = maid
 end
 
 function ConverterPane:OpenInScript()
-	if not self._plugin then
-		self:_setOpenScriptStatus("No plugin")
+	if not self._outputScriptManager then
+		self:_setOpenScriptStatus("No output target")
 		return
 	end
 
 	local code = self._code.Value
-	if type(code) ~= "string" or #code == 0 then
+	if not self._codeValid or type(code) ~= "string" or #code == 0 then
 		self:_setOpenScriptStatus("Nothing to open")
 		return
 	end
 
-	local outputScript, created = self:_getOrCreateOutputScript()
-
-	if not self:_writeOutputSource(outputScript, code) then
-		if created then
-			outputScript:Destroy()
-		end
-
-		self:_setOpenScriptStatus("Needs script injection")
-		return
-	end
-
-	self._plugin:OpenScript(outputScript)
-	self:_watchOutputScript(outputScript)
-
-	self:_setOpenScriptStatus("Opened!")
+	local _, message = self._outputScriptManager:Open(UIConverterUtils.toModuleSource(code))
+	self:_setOpenScriptStatus(message)
 end
 
 function ConverterPane:_renderOpenInScriptButton()

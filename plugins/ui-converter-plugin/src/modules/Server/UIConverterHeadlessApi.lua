@@ -7,13 +7,15 @@
 	"UIConverterRequest", add ObjectValue children pointing at the instances
 	to convert, then parent the folder to ServerStorage. Optionally set a
 	"Library" attribute ("Blend", "BlendUnpacked", "Fusion", "FusionUnpacked").
-	If the folder has no ObjectValue children, the current selection is
-	converted instead.
+	Setting a "UseSelection" attribute to true converts the current Studio
+	selection instead of ObjectValue targets.
 
 	The plugin sets the folder's "Status" attribute to "working", then either
 	"done" with the generated code in a ModuleScript named "Output" inside the
-	folder, or "error" with the message in an "Error" attribute. The requester
-	owns cleanup and should destroy the folder when finished.
+	folder, or "error" with the message in an "Error" attribute. Only folders
+	parented after the plugin loads are served; requests saved into the place
+	file are ignored. The requester owns cleanup and should destroy the folder
+	when finished.
 
 	@class UIConverterHeadlessApi
 ]=]
@@ -25,9 +27,6 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
-local Promise = require("Promise")
-local PromiseUtils = require("PromiseUtils")
-local UIConverter = require("UIConverter")
 local UIConverterUtils = require("UIConverterUtils")
 
 local REQUEST_NAME_PREFIX = "UIConverterRequest"
@@ -44,8 +43,10 @@ local UIConverterHeadlessApi = setmetatable({}, BaseObject)
 UIConverterHeadlessApi.ClassName = "UIConverterHeadlessApi"
 UIConverterHeadlessApi.__index = UIConverterHeadlessApi
 
-function UIConverterHeadlessApi.new()
+function UIConverterHeadlessApi.new(converter)
 	local self = setmetatable(BaseObject.new(), UIConverterHeadlessApi)
+
+	self._converter = assert(converter, "No converter")
 
 	self._maid:GiveTask(ServerStorage.ChildAdded:Connect(function(child)
 		task.defer(function()
@@ -57,19 +58,7 @@ function UIConverterHeadlessApi.new()
 		self._maid[child] = nil
 	end))
 
-	for _, child in ServerStorage:GetChildren() do
-		self:_handleChild(child)
-	end
-
 	return self
-end
-
-function UIConverterHeadlessApi:_getConverter()
-	if not self._converter then
-		self._converter = self._maid:Add(UIConverter.new())
-	end
-
-	return self._converter
 end
 
 function UIConverterHeadlessApi:_handleChild(child: Instance)
@@ -85,7 +74,7 @@ function UIConverterHeadlessApi:_handleChild(child: Instance)
 		return
 	end
 
-	-- Only pick up fresh requests, not ones from a previous session
+	-- Don't reprocess folders re-added after being serviced (e.g. via undo)
 	if child:GetAttribute("Status") ~= nil then
 		return
 	end
@@ -114,62 +103,47 @@ function UIConverterHeadlessApi:_processRequest(request: Folder)
 	end
 
 	local targets = {}
-	for _, child in request:GetChildren() do
-		if child:IsA("ObjectValue") then
-			if typeof(child.Value) == "Instance" then
-				table.insert(targets, child.Value)
-			else
-				return fail(string.format("ObjectValue %q has no target instance", child.Name))
+	if request:GetAttribute("UseSelection") == true then
+		targets = Selection:Get()
+
+		if #targets == 0 then
+			return fail("UseSelection is set but nothing is selected")
+		end
+	else
+		for _, child in request:GetChildren() do
+			if child:IsA("ObjectValue") then
+				if typeof(child.Value) == "Instance" then
+					table.insert(targets, child.Value)
+				else
+					return fail(string.format("ObjectValue %q has no target instance", child.Name))
+				end
 			end
+		end
+
+		if #targets == 0 then
+			return fail("No targets - add ObjectValue children pointing at instances, or set UseSelection")
 		end
 	end
 
-	if #targets == 0 then
-		targets = Selection:Get()
-	end
+	maid:GivePromise(UIConverterUtils.promiseCode(library, self._converter, targets))
+		:Then(function(code)
+			local ok, err = pcall(function()
+				local outputScript = Instance.new("ModuleScript")
+				outputScript.Name = OUTPUT_SCRIPT_NAME
+				outputScript.Source = UIConverterUtils.toModuleSource(code)
+				outputScript.Parent = request
+			end)
 
-	if #targets == 0 then
-		return fail("No targets - add ObjectValue children pointing at instances, or select instances")
-	end
-
-	local converter = self:_getConverter()
-
-	maid:GivePromise(UIConverterUtils.promiseCreateLookupMap(library, converter, targets))
-		:Then(function(refLookupMap)
-			local codePromises = {}
-			for _, item in targets do
-				table.insert(
-					codePromises,
-					maid:GivePromise(UIConverterUtils.promiseToLibraryInstance(library, converter, item, refLookupMap))
+			if ok then
+				request:SetAttribute("Status", "done")
+			else
+				fail(
+					string.format(
+						"Failed to write output script (is script injection permission granted?) - %s",
+						tostring(err)
+					)
 				)
 			end
-
-			return PromiseUtils.all(codePromises):Then(function(...)
-				local results = {}
-				for _, item in { ... } do
-					if item then
-						table.insert(results, item)
-					end
-				end
-
-				local prefix = UIConverterUtils.getEntryListCode(library, refLookupMap)
-
-				if #results == 0 then
-					return Promise.rejected("No convertible instances in request")
-				elseif #results == 1 then
-					return prefix .. results[1]
-				else
-					return prefix .. UIConverterUtils.convertListOfItemsToTable(results)
-				end
-			end)
-		end)
-		:Then(function(code)
-			local outputScript = Instance.new("ModuleScript")
-			outputScript.Name = OUTPUT_SCRIPT_NAME
-			outputScript.Source = code
-			outputScript.Parent = request
-
-			request:SetAttribute("Status", "done")
 		end)
 		:Catch(function(err)
 			fail(err)
