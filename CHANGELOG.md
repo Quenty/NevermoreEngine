@@ -1,3 +1,16 @@
+# (Wed Sep 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ultrawidecontainerutils@2.6.0`
+  - feat: add headless UI converter API and script output management [#822](https://github.com/Quenty/NevermoreEngine/pull/822) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Wed Sep 09 2026)
 
 #### 🚀 Enhancement

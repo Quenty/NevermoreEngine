@@ -1,3 +1,20 @@
+# v2.6.0 (Wed Sep 16 2026)
+
+#### 🚀 Enhancement
+
+- feat: add headless UI converter API and script output management [#822](https://github.com/Quenty/NevermoreEngine/pull/822) ([@unrooot](https://github.com/unrooot))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/unrooot/ui-converter-improvements ([@unrooot](https://github.com/unrooot))
+- fix(ultrawidecontainerutils): use Frame BackgroundTransparency ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
