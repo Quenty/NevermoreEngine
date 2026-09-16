@@ -44,7 +44,20 @@ describe("InstancePathUtils.toPathTable(instancePath)", function()
 		expect(InstancePathUtils.toPathTable("master")).toEqual({ "master" })
 	end)
 
-	it("should throw for a non-string", function()
+	it("should pass a path table through", function()
+		expect(InstancePathUtils.toPathTable({ "a", "b", "c" })).toEqual({ "a", "b", "c" })
+	end)
+
+	it("should copy a path table so the caller's own table is never mutated", function()
+		local pathTable = { "a", "b", "c" }
+		local result = InstancePathUtils.toPathTable(pathTable)
+		table.remove(result)
+
+		expect(result).never.toBe(pathTable)
+		expect(pathTable).toEqual({ "a", "b", "c" })
+	end)
+
+	it("should throw for neither form of a path", function()
 		expect(function()
 			InstancePathUtils.toPathTable(5 :: any)
 		end).toThrow()
@@ -63,10 +76,29 @@ describe("InstancePathUtils.fromPathTable(pathTable)", function()
 		expect(InstancePathUtils.fromPathTable(pathTable)).toEqual(instancePath)
 	end)
 
-	it("should throw for a non-table", function()
+	it("should pass a dotted path through", function()
+		expect(InstancePathUtils.fromPathTable("a.b.c")).toEqual("a.b.c")
+	end)
+
+	it("should throw for neither form of a path", function()
 		expect(function()
-			InstancePathUtils.fromPathTable("a.b" :: any)
+			InstancePathUtils.fromPathTable(5 :: any)
 		end).toThrow()
+	end)
+end)
+
+describe("InstancePathUtils.isInstancePathTableLike(instancePath)", function()
+	it("should be true for a dotted path", function()
+		expect(InstancePathUtils.isInstancePathTableLike("a.b")).toBe(true)
+	end)
+
+	it("should be true for a path table", function()
+		expect(InstancePathUtils.isInstancePathTableLike({ "a", "b" })).toBe(true)
+	end)
+
+	it("should be false for neither form of a path", function()
+		expect(InstancePathUtils.isInstancePathTableLike(5)).toBe(false)
+		expect(InstancePathUtils.isInstancePathTableLike(nil)).toBe(false)
 	end)
 end)
 

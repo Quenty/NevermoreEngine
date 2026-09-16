@@ -439,6 +439,57 @@ describe("AdorneeUtils.getBoundingBox", function()
 	end)
 end)
 
+describe("AdorneeUtils.setBoundingBoxCFrame", function()
+	it("puts the bounding box where it was asked to go", function()
+		local controller = setup()
+		local model = controller.newModel()
+
+		local target = CFrame.new(20, 8, -4)
+		local moved = AdorneeUtils.setBoundingBoxCFrame(model, target)
+
+		local cframe = AdorneeUtils.getBoundingBox(model)
+
+		expect(moved).toBe(true)
+		expect(cframe).toEqual(target)
+
+		controller:Destroy()
+	end)
+
+	it("keeps parts where they sit relative to each other", function()
+		local controller = setup()
+		local model, first, second = controller.newModel()
+
+		local offset = first.CFrame:ToObjectSpace(second.CFrame)
+
+		AdorneeUtils.setBoundingBoxCFrame(model, CFrame.Angles(0, math.pi / 2, 0) + Vector3.new(20, 8, -4))
+
+		expect(first.CFrame:ToObjectSpace(second.CFrame)).toEqual(offset)
+
+		controller:Destroy()
+	end)
+
+	it("moves a lone part", function()
+		local controller = setup()
+		local part = controller.newPart(Vector3.new(4, 1, 2), CFrame.new(1, 2, 3))
+
+		local moved = AdorneeUtils.setBoundingBoxCFrame(part, CFrame.new(7, 7, 7))
+
+		expect(moved).toBe(true)
+		expect(part.CFrame).toEqual(CFrame.new(7, 7, 7))
+
+		controller:Destroy()
+	end)
+
+	it("reports nothing moved when the adornee has no parts", function()
+		local controller = setup()
+		local folder = controller.newFolder()
+
+		expect(AdorneeUtils.setBoundingBoxCFrame(folder, CFrame.new(1, 2, 3))).toBe(false)
+
+		controller:Destroy()
+	end)
+end)
+
 describe("AdorneeUtils.isPartOfAdornee", function()
 	it("returns true when the part is the adornee", function()
 		local controller = setup()

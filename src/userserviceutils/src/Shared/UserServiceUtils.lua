@@ -48,7 +48,7 @@ function UserServiceUtils.promiseUserInfosByUserIds(userIds: { number }): Promis
 		for _, userId in userIds do
 			local mockPlayer = PlayerMock.getMockByUserId(userId)
 			if mockPlayer ~= nil then
-				table.insert(userInfos, PlayerMock.readLookup(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0))
+				table.insert(userInfos, PlayerMock.callMethod(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0))
 			else
 				table.insert(remainingUserIds, userId)
 			end

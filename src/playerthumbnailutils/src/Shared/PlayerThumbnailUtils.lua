@@ -111,7 +111,7 @@ function PlayerThumbnailUtils.promiseUserName(userId: number): Promise.Promise<s
 		if mockPlayer ~= nil then
 			-- Resolved from the same user-info domain UserServiceUtils reads, so the two
 			-- packages' usernames can never disagree for a mock.
-			return resolve(PlayerMock.readLookup(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0).Username)
+			return resolve(PlayerMock.callMethod(mockPlayer, "UserService.GetUserInfosByUserIdsAsync", 0).Username)
 		end
 
 		local tries = 0

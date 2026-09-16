@@ -43,10 +43,10 @@ function GroupTestUtils.assignGroupInfo(player: Player, groupId: number, groupIn
 	assert(type(groupInfo.rank) == "number", "Bad groupInfo.rank")
 	assert(type(groupInfo.role) == "string", "Bad groupInfo.role")
 
-	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", groupId, {
+	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 		IsMember = true,
 		Roles = { { Name = groupInfo.role, Rank = groupInfo.rank } },
-	})
+	}, groupId)
 
 	local groups = PlayerMock.readLookup(player, "GroupService.GetGroupsAsync", 0)
 	local updated = {}
@@ -60,7 +60,7 @@ function GroupTestUtils.assignGroupInfo(player: Player, groupId: number, groupIn
 		Rank = groupInfo.rank,
 		Role = groupInfo.role,
 	})
-	PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", 0, updated)
+	PlayerMock.writeLookup(player, "GroupService.GetGroupsAsync", updated, 0)
 end
 
 return GroupTestUtils

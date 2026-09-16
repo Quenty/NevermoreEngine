@@ -46,7 +46,7 @@ local function setup()
 
 	local serviceBag = maid:Add(ServiceBag.new())
 	serviceBag:GetService(RagdollService)
-	local playerMockService = serviceBag:GetService(PlayerMockService)
+	local playerMockService: any = serviceBag:GetService(PlayerMockService)
 
 	serviceBag:Init()
 	serviceBag:Start()

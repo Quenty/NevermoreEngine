@@ -38,7 +38,7 @@ local ALL_TOKEN = Symbol.named("allToken")
 local function setCoreGuiEnabled(coreGuiType: Enum.CoreGuiType, isEnabled: boolean)
 	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
-		PlayerMock.writeLookup(localPlayer, "StarterGui.SetCoreGuiEnabled", coreGuiType, isEnabled)
+		PlayerMock.writeLookup(localPlayer, "StarterGui.SetCoreGuiEnabled", isEnabled, coreGuiType)
 	else
 		StarterGui:SetCoreGuiEnabled(coreGuiType, isEnabled)
 	end

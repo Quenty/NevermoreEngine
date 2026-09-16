@@ -1,9 +1,9 @@
 --!nonstrict
 --[=[
-	@class ImmediateBuffersInstall
+	@class ImmediateDeferInstall
 
-	Runtime decorator: adds rt.buffers, and optionally registers scheduler
-	middleware to drain those queues after each gameplay system.
+	Runtime decorator: adds `rt.defer` / `rt.defer_buffer`, and registers
+	postSystem middleware to drain that queue after each gameplay system.
 ]=]
 local require = require(script.Parent.loader).load(script)
 
@@ -29,20 +29,19 @@ return function<Rt>(
 	end
 
 	scheduler:RegisterSystem({
-		name = "mw_immediate_buffers_flush",
+		name = "mw_immediate_defer_flush",
 		postSystem = true,
 		priority = DEFAULT_PRIORITY,
-		notProtected = false,
 		system = function()
 			-- Snapshot-and-clear first so a callback error cannot leave the live
-			-- buffers uncleared and double-fire next postSystem.
+			-- buffer uncleared and double-fire next postSystem.
 			assert(rt.defer_buffer, "rt.defer_buffer is not defined")
-			for _, callback in ipairs(rt.defer_buffer) do
+			local snapshot = table.clone(rt.defer_buffer)
+			table.clear(rt.defer_buffer)
+			for _, callback in ipairs(snapshot) do
 				callback()
 			end
-			table.clear(rt.defer_buffer)
 		end,
-		Destroy = function() end,
 	})
 
 	return rt

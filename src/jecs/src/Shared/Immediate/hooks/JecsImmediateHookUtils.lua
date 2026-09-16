@@ -68,21 +68,37 @@ function JecsImmediateHookUtils.getOrCreateHookState<T>(
 	hookBook.orderOfCalls[_firstKey] = hookBook.orderOfCalls[_firstKey] + 1
 
 	local entityToParentTo = nil
-
-	if
-		discriminator
-		and typeof(discriminator) == "number"
-		and rt.world:contains(discriminator :: any)
-		and discriminator > 50
-	then
-		warn(`Hook discriminator {discriminator} is an entity, did you mean to wrap it in hooks.entity()?`)
-		warn(debug.traceback())
-	end
+	local persistent = runtimePersistent == true
 
 	local _discriminator = discriminator
-	if _discriminator and typeof(_discriminator) == "table" and _discriminator.__hookentity then
-		entityToParentTo = _discriminator.__hookentity
-		_discriminator = _discriminator.__hookentity
+	if _discriminator and typeof(_discriminator) == "table" then
+		if _discriminator.__runtimePersistent then
+			persistent = true
+		end
+		if _discriminator.__hookentity then
+			entityToParentTo = _discriminator.__hookentity
+			_discriminator = _discriminator.__hookentity
+		elseif _discriminator.__hookdiscriminator ~= nil then
+			_discriminator = _discriminator.__hookdiscriminator
+			if typeof(_discriminator) == "number" and rt.world:contains(_discriminator :: any) then
+				entityToParentTo = _discriminator
+			end
+		end
+	end
+
+	if
+		_discriminator
+		and typeof(_discriminator) == "number"
+		and entityToParentTo == nil
+		and rt.world:contains(_discriminator :: any)
+		and _discriminator > 50
+	then
+		if false then
+			warn(
+				`Hook discriminator {_discriminator} is an entity, did you mean to wrap it in hooks.entity() or hooks.preserve()?`
+			)
+			warn(debug.traceback())
+		end
 	end
 
 	if _discriminator == nil then
@@ -107,6 +123,9 @@ function JecsImmediateHookUtils.getOrCreateHookState<T>(
 		local hookMaid = rt.world:get(hookStateEntity, rt.comps.Maid)
 		local mhs = rt.world:get(hookStateEntity, rt.comps.MetaHookState)
 		mhs.flagForCleanup = false
+		if persistent then
+			mhs.runtimePersistent = true
+		end
 		return rt.world:get(hookStateEntity, rt.comps.HookState) :: T, hookMaid, hookStateEntity
 	end
 
@@ -136,7 +155,7 @@ function JecsImmediateHookUtils.getOrCreateHookState<T>(
 		discriminator = discriminator,
 		flagForCleanup = false,
 		shouldCleanupCallback = cleanupIfTrue,
-		runtimePersistent = runtimePersistent,
+		runtimePersistent = persistent,
 	})
 	rt.world:set(newHookEntity, rt.comps.Maid, maid)
 	rt.world:set(newHookEntity, rt.comps.HookState, newHookState)

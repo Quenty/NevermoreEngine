@@ -56,22 +56,22 @@ describe("MarketplaceUtils.promiseUserOwnsGamePass", function()
 
 	it("resolves the ownership injected on the mock", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(true)
 	end)
 
 	it("keys the injected ownership by gamePassId", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID + 1))).toBe(false)
 	end)
 
 	it("clears back to false when the injection is cleared", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
-		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, nil)
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
+		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", nil, GAME_PASS_ID)
 
 		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(false)
 	end)
@@ -92,7 +92,7 @@ describe("MarketplaceUtils.promisePlayerOwnsAsset", function()
 
 	it("resolves the ownership injected on the mock", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", ASSET_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", true, ASSET_ID)
 
 		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAsset(player, ASSET_ID))).toBe(true)
 	end)
@@ -107,14 +107,14 @@ describe("MarketplaceUtils.promisePlayerOwnsAssetAsync", function()
 
 	it("resolves the ownership injected on the mock", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAssetAsync", ASSET_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAssetAsync", true, ASSET_ID)
 
 		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(true)
 	end)
 
 	it("reads a distinct domain from promisePlayerOwnsAsset", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", ASSET_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", true, ASSET_ID)
 
 		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(false)
 	end)
@@ -129,7 +129,7 @@ describe("MarketplaceUtils.promisePlayerOwnsBundle", function()
 
 	it("resolves the ownership injected on the mock", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsBundle", BUNDLE_ID, true)
+		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsBundle", true, BUNDLE_ID)
 
 		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsBundle(player, BUNDLE_ID))).toBe(true)
 	end)
@@ -148,10 +148,10 @@ describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 
 	it("resolves the status injected on the mock", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", SUBSCRIPTION_ID, {
+		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", {
 			IsSubscribed = true,
 			IsRenewing = true,
-		})
+		}, SUBSCRIPTION_ID)
 
 		local outcome, status =
 			PromiseTestUtils.awaitOutcome(MarketplaceUtils.promiseUserSubscriptionStatus(player, SUBSCRIPTION_ID))
@@ -162,10 +162,10 @@ describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 
 	it("keys the injected status by subscriptionId", function()
 		local player = makeMock({ UserId = MOCK_USER_ID })
-		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", SUBSCRIPTION_ID, {
+		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", {
 			IsSubscribed = true,
 			IsRenewing = false,
-		})
+		}, SUBSCRIPTION_ID)
 
 		local outcome, status =
 			PromiseTestUtils.awaitOutcome(MarketplaceUtils.promiseUserSubscriptionStatus(player, "EXP-other"))

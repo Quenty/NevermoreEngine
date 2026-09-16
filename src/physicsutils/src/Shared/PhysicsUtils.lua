@@ -4,19 +4,26 @@
 	@class PhysicsUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local Workspace = game:GetService("Workspace")
+
+local Vector3Utils = require("Vector3Utils")
 
 local PhysicsUtils = {}
 PhysicsUtils.WATER_DENSITY = 1 -- (mass/volume)
 
 --[=[
-	Retrieves all connected parts of a part, plus the connected part.
+	Retrieves all connected parts of a part, plus the part itself. The part appears
+	exactly once even though the engine already includes it in the assembly list.
 	@param part BasePart
 	@return { BasePart }
 ]=]
 function PhysicsUtils.getConnectedParts(part: BasePart): { BasePart }
 	local parts: { BasePart } = part:GetConnectedParts(true) :: any
-	table.insert(parts, part)
+	if not table.find(parts, part) then
+		table.insert(parts, part)
+	end
 	return parts
 end
 
@@ -51,7 +58,7 @@ function PhysicsUtils.estimateBuoyancyContribution(parts: { BasePart }): (number
 		totalFloat = totalFloat - mass * Workspace.Gravity
 
 		if part.CanCollide then
-			local volume = part.Size.X * part.Size.Y * part.Size.Z
+			local volume = Vector3Utils.volume(part.Size)
 			totalFloat = totalFloat + volume * PhysicsUtils.WATER_DENSITY * Workspace.Gravity
 			totalVolumeApplicable = totalVolumeApplicable + volume
 		end
@@ -139,7 +146,7 @@ end
 	@param force Vector3 -- the force vector to apply
 	@param forcePosition Vector3 -- The position that the force is to be applied from (World vector).
 ]=]
-function PhysicsUtils.applyForce(part: BasePart, force: Vector3, forcePosition: Vector3)
+function PhysicsUtils.applyForce(part: BasePart, force: Vector3, forcePosition: Vector3): ()
 	local parts = PhysicsUtils.getConnectedParts(part)
 
 	forcePosition = forcePosition or part.Position
@@ -170,7 +177,7 @@ end
 	@param emittingPart BasePart
 	@param acceleration Vector3
 ]=]
-function PhysicsUtils.acceleratePart(part: BasePart, emittingPart: BasePart, acceleration: Vector3)
+function PhysicsUtils.acceleratePart(part: BasePart, emittingPart: BasePart, acceleration: Vector3): ()
 	local force = acceleration * part:GetMass()
 	local position = part.Position
 

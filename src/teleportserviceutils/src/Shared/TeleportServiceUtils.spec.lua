@@ -62,18 +62,11 @@ local function readHop(player: Player, placeId: number): any
 end
 
 local function clearHop(player: Player, placeId: number): ()
-	PlayerMock.writeLookup(player, "TeleportService.Teleport", placeId, nil)
+	PlayerMock.writeLookup(player, "TeleportService.Teleport", nil, placeId)
 end
 
--- The engine reporting on a teleport. The message must differ from the previous report about the same
--- teleport: the backing attribute only reports a change, so a repeat goes unnoticed.
 local function report(player: Player, placeId: number, result: Enum.TeleportResult, message: string): ()
-	PlayerMock.writeLookup(
-		player,
-		"TeleportService.TeleportInitFailed",
-		placeId,
-		{ result = result, message = message }
-	)
+	PlayerMock.fireServiceSignal(player, "TeleportService.TeleportInitFailed", player, result, message, placeId)
 end
 
 -- The everyday transient refusal, for tests about retrying rather than about classification.
@@ -555,8 +548,7 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 				initFailedGraceSeconds = 5,
 			})
 
-			-- Each attempt writes its own hop record; clearing it is how the next one becomes visible,
-			-- and the message has to differ or the backing attribute reports no change.
+			-- Each attempt writes its own hop record; clearing it is how the next one becomes visible.
 			for _ = 1, 2 do
 				awaitHop(player, 847)
 				attempts += 1

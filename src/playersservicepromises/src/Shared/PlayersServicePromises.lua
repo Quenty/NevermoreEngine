@@ -22,9 +22,14 @@ function PlayersServicePromises.promiseUserIdFromName(name: string): Promise.Pro
 	assert(type(name) == "string", "Bad name")
 
 	return Promise.spawn(function(resolve, reject)
-		local mockPlayer = PlayerMock.getMockByUsername(name)
-		if mockPlayer ~= nil then
-			return resolve(PlayerMock.read(mockPlayer, "UserId"))
+		-- The mocked `Players` service is DataModel-wide, so any mock is an equally good handle onto
+		-- it, and it answers nil for a name no mock carries.
+		local mocks = PlayerMock.getMocks()
+		if #mocks > 0 then
+			local mockedUserId = PlayerMock.callMethod(mocks[1], "Players.GetUserIdFromNameAsync", name)
+			if mockedUserId ~= nil then
+				return resolve(mockedUserId)
+			end
 		end
 
 		local userId

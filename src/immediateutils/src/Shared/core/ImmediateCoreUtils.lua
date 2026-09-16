@@ -19,7 +19,7 @@ local ImmediateCoreUtils = {}
 -- Additional functionality can be installed if a package has an installer function
 -- that takes in a runtime table and returns a modified runtime table.
 export type ImmediateRuntime<CustomBlackboardType = {}> = {
-	-- A flag to enable debug mode, where you can run slower but correct checks.
+	-- Scheduler debug: yield-detection around systems. Independent of Jecs.world(DEBUG).
 	DEBUG: boolean,
 
 	-- A single maid that cleans up the entire runtime.
@@ -64,18 +64,20 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomBlackboardType>(
 	serviceBag: ServiceBag.ServiceBag,
 	requireCallback: (path: string) -> any,
 	initialBlackboard: CustomBlackboardType?,
-	plugin: Plugin?
-): ImmediateRuntime
+	plugin: Plugin?,
+	DEBUG: boolean?
+): ImmediateRuntime<CustomBlackboardType>
 	local maid = Maid.new()
 	local usingServiceBag = serviceBag or maid:Add(ServiceBag.new())
 
 	-- Create final runtime table
-	local runtime: ImmediateRuntime
+	local runtime: ImmediateRuntime<CustomBlackboardType>
 	runtime = {
 		require = requireCallback,
 		serviceBag = usingServiceBag,
 		maid = maid,
 		blackboard = (initialBlackboard :: any) or {},
+		DEBUG = DEBUG or false,
 
 		errorlog = {
 			lastErrorShout = 0,
@@ -87,7 +89,7 @@ function ImmediateCoreUtils.createImmediateRuntime<CustomBlackboardType>(
 		end,
 
 		plugin = plugin,
-	} :: ImmediateRuntime
+	} :: ImmediateRuntime<CustomBlackboardType>
 
 	return runtime
 end

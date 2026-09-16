@@ -1,0 +1,17 @@
+{
+  "name": "Vector3UtilsTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "vector3utils": {
+        "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}

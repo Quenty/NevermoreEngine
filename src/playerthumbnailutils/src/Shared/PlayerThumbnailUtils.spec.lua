@@ -64,12 +64,12 @@ describe("PlayerThumbnailUtils.promiseUserName against a mock", function()
 	it("resolves an injected username from the shared user-info domain", function()
 		local player = PlayerMock.new({ UserId = 90081004 })
 		player.Parent = Workspace
-		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", 0, {
+		PlayerMock.writeLookup(player, "UserService.GetUserInfosByUserIdsAsync", {
 			Id = 90081004,
 			Username = "shared_domain_name",
 			DisplayName = "Shared",
 			HasVerifiedBadge = false,
-		})
+		}, 0)
 
 		local outcome, name = PromiseTestUtils.awaitOutcome(PlayerThumbnailUtils.promiseUserName(90081004))
 

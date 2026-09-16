@@ -118,7 +118,7 @@ function FriendUtils.promiseFriendPages(userId: number): Promise.Promise<FriendP
 	return Promise.spawn(function(resolve, reject)
 		local mockPlayer = PlayerMock.getMockByUserId(userId)
 		if mockPlayer ~= nil then
-			local friends = PlayerMock.readLookup(mockPlayer, "Players.GetFriendsAsync", 0)
+			local friends = PlayerMock.callMethod(mockPlayer, "Players.GetFriendsAsync", 0)
 			return resolve(PagesProxy.new(PagesDatabase.fromPageData({ friends })) :: any)
 		end
 

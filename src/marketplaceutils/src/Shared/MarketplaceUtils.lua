@@ -162,7 +162,7 @@ function MarketplaceUtils.promiseUserSubscriptionStatus(
 		local ok, err = pcall(function()
 			if PlayerMock.isMock(player) then
 				subStatus =
-					PlayerMock.readLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", subscriptionId)
+					PlayerMock.callMethod(player, "MarketplaceService.GetUserSubscriptionStatusAsync", subscriptionId)
 			else
 				subStatus = MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)
 			end
@@ -192,7 +192,7 @@ function MarketplaceUtils.promiseUserOwnsGamePass(userId: number, gamePassId: nu
 		local ok, err = pcall(function()
 			local mockPlayer = PlayerMock.getMockByUserId(userId)
 			if mockPlayer ~= nil then
-				result = PlayerMock.readLookup(mockPlayer, "MarketplaceService.UserOwnsGamePassAsync", gamePassId)
+				result = PlayerMock.callMethod(mockPlayer, "MarketplaceService.UserOwnsGamePassAsync", gamePassId)
 			else
 				result = MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId)
 			end
@@ -221,7 +221,7 @@ function MarketplaceUtils.promisePlayerOwnsAsset(player: Player, assetId: number
 		local result
 		local ok, err = pcall(function()
 			if PlayerMock.isMock(player) then
-				result = PlayerMock.readLookup(player, "MarketplaceService.PlayerOwnsAsset", assetId)
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsAsset", assetId)
 			else
 				result = MarketplaceService:PlayerOwnsAsset(player, assetId)
 			end
@@ -254,7 +254,7 @@ function MarketplaceUtils.promisePlayerOwnsAssetAsync(player: Player, assetId: n
 		local result
 		local ok, err = pcall(function()
 			if PlayerMock.isMock(player) then
-				result = PlayerMock.readLookup(player, "MarketplaceService.PlayerOwnsAssetAsync", assetId)
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsAssetAsync", assetId)
 			else
 				result = MarketplaceService:PlayerOwnsAssetAsync(player, assetId)
 			end
@@ -283,7 +283,7 @@ function MarketplaceUtils.promisePlayerOwnsBundle(player: Player, bundleId: numb
 		local result
 		local ok, err = pcall(function()
 			if PlayerMock.isMock(player) then
-				result = PlayerMock.readLookup(player, "MarketplaceService.PlayerOwnsBundle", bundleId)
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsBundle", bundleId)
 			else
 				result = MarketplaceService:PlayerOwnsBundle(player, bundleId)
 			end

@@ -193,7 +193,7 @@ describe("PlayerMockService", function()
 
 		firstBag:Destroy()
 
-		local uninitialized = setmetatable({}, { __index = PlayerMockService })
+		local uninitialized: any = setmetatable({}, { __index = PlayerMockService })
 		expect(function()
 			uninitialized:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("leaked")
@@ -207,7 +207,7 @@ describe("PlayerMockService", function()
 		local service = controller.newService()
 		service:CreatePlayer()
 
-		local second = setmetatable({}, { __index = PlayerMockService })
+		local second: any = setmetatable({}, { __index = PlayerMockService })
 		expect(function()
 			second:Init(controller.maid:Add(ServiceBag.new()) :: any)
 		end).toThrow("alive at once")

@@ -126,7 +126,7 @@ end)
 describe("GameProductService server ownership from an injected lookup", function()
 	it("resolves false for an uninjected gamepass and true for an injected one", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
 			controller.awaitBool(
@@ -153,7 +153,7 @@ describe("GameProductService server ownership from an injected lookup", function
 	it("resolves ownership queried by a configured asset key", function()
 		local controller = setup()
 		controller.gameConfigService:AddPass("test_pass", GAME_PASS_ID)
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
 			controller.awaitBool(
@@ -188,7 +188,7 @@ end)
 describe("GameProductService ownership override", function()
 	it("wins over the injected cloud answer", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		controller.awaitBool(
 			controller.gameProductService:SetPlayerOwnershipOverride(
@@ -214,7 +214,7 @@ describe("GameProductService ownership override", function()
 
 	it("clears back to the injected cloud answer", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		controller.awaitBool(
 			controller.gameProductService:SetPlayerOwnershipOverride(
@@ -249,7 +249,7 @@ end)
 describe("GameProductServiceClient ownership for the designated mock", function()
 	it("resolves the same injected ownership as the server realm", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
 			controller.awaitBool(
@@ -298,7 +298,7 @@ end)
 describe("client-initiated gamepass prompt", function()
 	it("grants server ownership once the marketplace confirms the client's purchase", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
 		local serverFired = {}
 		local clientFired = {}
@@ -314,8 +314,8 @@ describe("client-initiated gamepass prompt", function()
 			PlayerMock.writeLookup(
 				controller.playerMock,
 				"MarketplaceService.UserOwnsGamePassAsync",
-				GAME_PASS_ID,
-				true
+				true,
+				GAME_PASS_ID
 			)
 		end)
 
@@ -364,7 +364,7 @@ describe("client-initiated gamepass prompt", function()
 		-- verifying here would read UserOwnsGamePassAsync's per-server cache, which can still answer
 		-- `false` for a purchase that just completed and would lose a pass the player paid for. Games
 		-- that want the claim checked enable server-only prompting; see the verification describe below.
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
 		local serverFired = {}
 		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
@@ -495,7 +495,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 		controller.gameProductService:SetServerOnlyPromptingEnabled(true)
 
 		-- The marketplace shows the player owning the pass, as it would after a real purchase.
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		local serverFired = {}
 		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
@@ -545,7 +545,7 @@ end)
 describe("server-initiated gamepass prompt", function()
 	it("resolves true on accept and marks the session purchase", function()
 		local controller = setup()
-		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", GAME_PASS_ID, true)
+		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
 		local serverFired = {}
 		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
