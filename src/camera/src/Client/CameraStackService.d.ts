@@ -12,7 +12,7 @@ export interface CameraStackService {
   SetDoNotUseDefaultCamera(doNotUseDefaultCamera: boolean): void;
   PushDisable(): () => void;
   PrintCameraStack(): void;
-  GetDefaultCamera(): CameraEffect;
+  GetDefaultCamera(): DefaultCamera;
   GetImpulseCamera(): ImpulseCamera;
   GetRawDefaultCamera(): DefaultCamera;
   GetTopCamera(): CameraLike;
