@@ -9,13 +9,17 @@ local require = require(loader).bootstrapPlugin(modules)
 
 local ConverterPane = require("ConverterPane")
 local Maid = require("Maid")
+local OutputScriptManager = require("OutputScriptManager")
+local UIConverter = require("UIConverter")
+local UIConverterHeadlessApi = require("UIConverterHeadlessApi")
 
-local function renderPane(plugin, target)
+local function renderPane(plugin, target, converter, outputScriptManager)
 	local maid = Maid.new()
 
-	local pane = ConverterPane.new()
+	local pane = ConverterPane.new(converter)
 	maid:GiveTask(pane)
 
+	pane:SetOutputScriptManager(outputScriptManager)
 	pane:SetSelected(game.Selection:Get())
 
 	maid:GiveTask(game.Selection.SelectionChanged:Connect(function()
@@ -33,6 +37,12 @@ end
 
 local function initialize(plugin)
 	local maid = Maid.new()
+
+	local converter = maid:Add(UIConverter.new())
+	local outputScriptManager = maid:Add(OutputScriptManager.new(plugin))
+
+	maid:GiveTask(UIConverterHeadlessApi.new(converter))
+
 	local toolbar = plugin:CreateToolbar("Object")
 	local toggleButton = toolbar:CreateButton(
 		"convertButton",
@@ -52,7 +62,7 @@ local function initialize(plugin)
 		toggleButton:SetActive(enabled)
 
 		if enabled then
-			maid._current = renderPane(plugin, target)
+			maid._current = renderPane(plugin, target, converter, outputScriptManager)
 		else
 			maid._current = nil
 		end

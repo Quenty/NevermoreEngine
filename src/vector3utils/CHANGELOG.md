@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.11.1...@quenty/vector3utils@10.12.0) (2026-09-09)
+
+### Features
+
+- **vector3utils:** Add Vector3Utils.volume and unit tests for vector3utils and physicsutils ([#821](https://github.com/Quenty/NevermoreEngine/issues/821)) ([69630c0](https://github.com/Quenty/NevermoreEngine/commit/69630c0552e18a4cc1ecf44d65aef750327e20ec))
+
 ## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.11.0...@quenty/vector3utils@10.11.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/vector3utils
