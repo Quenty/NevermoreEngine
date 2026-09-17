@@ -1,3 +1,16 @@
+# (Thu Sep 17 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/jecs@1.5.1`
+  - fix: imm hook type fix [#820](https://github.com/Quenty/NevermoreEngine/pull/820) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Wed Sep 16 2026)
 
 #### 🚀 Enhancement

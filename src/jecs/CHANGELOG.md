@@ -1,3 +1,18 @@
+# v1.5.1 (Thu Sep 17 2026)
+
+#### 🐛 Bug Fix
+
+- fix: imm hook type fix [#820](https://github.com/Quenty/NevermoreEngine/pull/820) ([@euvinkeel](https://github.com/euvinkeel))
+- Merge branch 'main' into users/euvinkeel/hooktweak ([@euvinkeel](https://github.com/euvinkeel))
+- type fix ([@euvinkeel](https://github.com/euvinkeel))
+- Update JecsImmediateHooksCommonHooks.lua ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
