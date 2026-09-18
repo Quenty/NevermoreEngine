@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[[
 	@class ImmediateHotReloadInstall.spec.lua
 ]]
@@ -62,7 +62,7 @@ end
 
 local function installLive(systems: Instance, playContext)
 	local rt, scheduler = makeRuntime()
-	local installer = ImmediateHotReloadInstall(systems, playContext)
+	local installer = ImmediateHotReloadInstall.install(systems, playContext :: any)
 	installer(rt, scheduler)
 	settle()
 	return rt, scheduler
@@ -90,7 +90,7 @@ describe("ImmediateHotReloadInstall outside Studio play", function()
 		cloneFixture("sys_ok", "sys_ok", systems)
 
 		local rt, scheduler = makeRuntime()
-		local installer = ImmediateHotReloadInstall(systems, {
+		local installer = ImmediateHotReloadInstall.install(systems, {
 			isStudioPlay = false,
 			isServer = true,
 		})
@@ -244,7 +244,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 		local first = cloneFixture("sys_yield", "sys_ok", systems)
 
 		local rt, scheduler = makeRuntime()
-		local installer = ImmediateHotReloadInstall(systems, PLAY_CLIENT)
+		local installer = ImmediateHotReloadInstall.install(systems, PLAY_CLIENT)
 		installer(rt, scheduler)
 
 		first:Destroy()

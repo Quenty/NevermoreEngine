@@ -1,4 +1,4 @@
---!strict
+--!nonstrict
 --[=[
 	@class ImmediateHotReloadInstall
 
@@ -12,7 +12,7 @@
 	(https://github.com/sayhisam1/Rewire/blob/main/src/HotReloader.lua, MIT).
 
 	```
-	ImmediateHotReloadInstall(systemsFolder) -- (rt, scheduler) -> rt
+	ImmediateInstall.stackN(..., ImmediateHotReloadInstall.install(systemsFolder))
 	ImmediateHotReloadInstall.mirrorShadow(liveSystemsFolder)
 	```
 ]=]
@@ -25,9 +25,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Brio = require("Brio")
 local ImmediateCoreUtils = require("ImmediateCoreUtils")
 local ImmediateScheduler = require("ImmediateScheduler")
 local Maid = require("Maid")
+local Observable = require("Observable")
+local Rx = require("Rx")
+local RxBrioUtils = require("RxBrioUtils")
+local RxInstanceUtils = require("RxInstanceUtils")
+local Signal = require("Signal")
 
 local HR_PREFIX = "_HR_"
 local LOG_PREFIX = "[ImmediateHotReloadInstall]"
@@ -35,6 +41,16 @@ local LOG_PREFIX = "[ImmediateHotReloadInstall]"
 export type PlayContext = {
 	isStudioPlay: boolean?,
 	isServer: boolean?,
+}
+
+-- Luau infers `local X = {}` as a sealed empty table, so later
+-- `function X.install` is invisible to require() consumers.
+export type ImmediateHotReloadInstall = {
+	install: (
+		systemsFolder: Instance,
+		playContext: PlayContext?
+	) -> <Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler) -> Rt,
+	mirrorShadow: (liveSystemsFolder: Instance, playContext: PlayContext?) -> () -> (),
 }
 
 type PackageLocation = {
@@ -60,10 +76,9 @@ type LiveController = {
 	liveFolder: Instance,
 	records: { [string]: PathRecord },
 	namesToPath: { [string]: string },
-	flushScheduled: boolean,
 }
 
-local ImmediateHotReloadInstall = {}
+local ImmediateHotReloadInstall: ImmediateHotReloadInstall = {} :: any
 
 local function warnPath(path: string, message: string)
 	warn(`{LOG_PREFIX} {path}: {message}`)
@@ -240,64 +255,124 @@ local function emptyCleanup(): () -> ()
 	return function() end
 end
 
-local function observeNamedChild(parent: Instance, name: string, onChild: (Instance?) -> (), maid: Maid.Maid)
-	local current: Instance? = nil
+local function bindDeferredFlush(maid: Maid.Maid, flush: () -> ()): () -> ()
+	local requested = Signal.new()
+	maid:GiveTask(requested)
+	maid:GiveTask(Rx.fromSignal(requested)
+		:Pipe({
+			Rx.throttleDefer(),
+		})
+		:Subscribe(flush))
 
-	local function pick()
-		local found, ambiguous = findUniqueChild(parent, name)
-		if ambiguous then
-			warnPath(name, `ambiguous child under {parent:GetFullName()}`)
-			found = nil
-		end
-		if current == found then
-			return
-		end
-		current = found
-		onChild(found)
+	return function()
+		requested:Fire()
 	end
-
-	maid:GiveTask(parent.ChildAdded:Connect(function(child)
-		if child.Name == name then
-			pick()
-		end
-		maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(pick))
-	end))
-	maid:GiveTask(parent.ChildRemoved:Connect(function()
-		pick()
-	end))
-	for _, child in parent:GetChildren() do
-		maid:GiveTask(child:GetPropertyChangedSignal("Name"):Connect(pick))
-	end
-	pick()
 end
 
-local function observePath(
+local function isTreeInstance(descendant: Instance): boolean
+	if isExecutionCloneName(descendant.Name) then
+		return false
+	end
+	return descendant:IsA("Folder") or descendant:IsA("ModuleScript")
+end
+
+local function watchFolderTree(
+	maid: Maid.Maid,
+	folder: Instance,
+	scheduleFlush: () -> (),
+	onModuleSourceChanged: ((ModuleScript) -> ())?
+)
+	maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(folder, isTreeInstance):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local descendant = brio:GetValue()
+		local inner = brio:ToMaid()
+		inner:GiveTask(function()
+			scheduleFlush()
+		end)
+		inner:GiveTask(RxInstanceUtils.observeProperty(descendant, "Name")
+			:Pipe({
+				Rx.skip(1),
+			})
+			:Subscribe(scheduleFlush))
+
+		if onModuleSourceChanged and descendant:IsA("ModuleScript") and descendant.Name ~= "loader" then
+			-- Play scripts cannot touch ModuleScript.Source (read or GetPropertyChangedSignal).
+			-- Instance.Changed still reports the property name when Rojo writes it.
+			inner:GiveTask(Rx.fromSignal(descendant.Changed):Subscribe(function(propertyName: string)
+				if propertyName == "Source" then
+					onModuleSourceChanged(descendant :: ModuleScript)
+				end
+			end))
+		end
+
+		scheduleFlush()
+	end))
+end
+
+local function observeUniqueNamedChildBrio(parent: Instance, name: string): Observable.Observable<Brio.Brio<Instance>>
+	return Observable.new(function(sub)
+		local maid = Maid.new()
+		local current: Instance? = nil
+
+		local function pick()
+			local found, ambiguous = findUniqueChild(parent, name)
+			if ambiguous then
+				warnPath(name, `ambiguous child under {parent:GetFullName()}`)
+				found = nil
+			end
+			if current == found then
+				return
+			end
+			current = found
+			if found then
+				local brio = Brio.new(found)
+				maid._current = brio
+				sub:Fire(brio)
+			else
+				maid._current = nil
+			end
+		end
+
+		maid:GiveTask(RxInstanceUtils.observeChildrenBrio(parent):Subscribe(function(childBrio)
+			if childBrio:IsDead() then
+				return
+			end
+
+			local inner = childBrio:ToMaid()
+			inner:GiveTask(function()
+				pick()
+			end)
+			inner:GiveTask(RxInstanceUtils.observeProperty(childBrio:GetValue(), "Name"):Subscribe(function()
+				pick()
+			end))
+		end))
+
+		return maid
+	end) :: any
+end
+
+local function observePathBrio(
 	service: Instance,
 	rootName: string,
-	segments: { string },
-	onResolved: (Instance?) -> (),
-	maid: Maid.Maid
-)
-	local function bindAt(parent: Instance, index: number, levelMaid: Maid.Maid)
+	segments: { string }
+): Observable.Observable<Brio.Brio<Instance>>
+	local function step(parent: Instance, index: number): Observable.Observable<Brio.Brio<Instance>>
 		local name = if index == 0 then rootName else segments[index]
-		local nestedMaid = Maid.new()
-		levelMaid:GiveTask(nestedMaid)
+		if index >= #segments then
+			return observeUniqueNamedChildBrio(parent, name)
+		end
 
-		observeNamedChild(parent, name, function(child)
-			nestedMaid:DoCleaning()
-			if not child then
-				onResolved(nil)
-				return
-			end
-			if index >= #segments then
-				onResolved(child)
-				return
-			end
-			bindAt(child, index + 1, nestedMaid)
-		end, levelMaid)
+		return observeUniqueNamedChildBrio(parent, name):Pipe({
+			RxBrioUtils.switchMapBrio(function(child: Instance)
+				return step(child, index + 1)
+			end),
+		}) :: any
 	end
 
-	bindAt(service, 0, maid)
+	return step(service, 0)
 end
 
 local function cloneModule(source: ModuleScript, relativePath: string): ModuleScript?
@@ -317,7 +392,6 @@ type PublisherState = {
 	liveFolder: Instance,
 	published: { [string]: ModuleScript },
 	fromShadow: { [string]: ModuleScript },
-	flushScheduled: boolean,
 	shadowSeen: boolean,
 	shadowFolder: Instance?,
 	shadowMaid: Maid.Maid,
@@ -368,18 +442,7 @@ local function publisherFlush(state: PublisherState)
 	end
 end
 
-local function publisherScheduleFlush(state: PublisherState)
-	if state.flushScheduled or state.disposed then
-		return
-	end
-	state.flushScheduled = true
-	task.defer(function()
-		state.flushScheduled = false
-		publisherFlush(state)
-	end)
-end
-
-local function bindShadowFolder(state: PublisherState, shadowFolder: Instance?)
+local function bindShadowFolder(state: PublisherState, shadowFolder: Instance?, scheduleFlush: () -> ())
 	state.shadowMaid:DoCleaning()
 	state.shadowFolder = shadowFolder
 
@@ -390,47 +453,14 @@ local function bindShadowFolder(state: PublisherState, shadowFolder: Instance?)
 
 	state.shadowSeen = true
 
-	local function forgetShadowModule(descendant: ModuleScript)
+	watchFolderTree(state.shadowMaid, shadowFolder, scheduleFlush, function(descendant)
 		for path, module in state.fromShadow do
 			if module == descendant then
 				state.fromShadow[path] = nil :: any
 			end
 		end
-	end
-
-	local function watchDescendant(descendant: Instance)
-		if
-			descendant:IsA("ModuleScript")
-			and descendant.Name ~= "loader"
-			and not isExecutionCloneName(descendant.Name)
-		then
-			state.shadowMaid:GiveTask(descendant:GetPropertyChangedSignal("Source"):Connect(function()
-				forgetShadowModule(descendant)
-				publisherScheduleFlush(state)
-			end))
-			state.shadowMaid:GiveTask(descendant:GetPropertyChangedSignal("Name"):Connect(function()
-				publisherScheduleFlush(state)
-			end))
-		elseif descendant:IsA("Folder") then
-			state.shadowMaid:GiveTask(descendant:GetPropertyChangedSignal("Name"):Connect(function()
-				publisherScheduleFlush(state)
-			end))
-		end
-	end
-
-	state.shadowMaid:GiveTask(shadowFolder.DescendantAdded:Connect(function(descendant)
-		watchDescendant(descendant)
-		publisherScheduleFlush(state)
-	end))
-	state.shadowMaid:GiveTask(shadowFolder.DescendantRemoving:Connect(function()
-		publisherScheduleFlush(state)
-	end))
-
-	for _, descendant in shadowFolder:GetDescendants() do
-		watchDescendant(descendant)
-	end
-
-	publisherScheduleFlush(state)
+		scheduleFlush()
+	end)
 end
 
 local function startMirrorShadow(liveFolder: Instance, playContext: PlayContext?): () -> ()
@@ -452,11 +482,14 @@ local function startMirrorShadow(liveFolder: Instance, playContext: PlayContext?
 		liveFolder = liveFolder,
 		published = {},
 		fromShadow = {},
-		flushScheduled = false,
 		shadowSeen = false,
 		shadowFolder = nil,
 		shadowMaid = shadowMaid,
 	}
+
+	local scheduleFlush = bindDeferredFlush(maid, function()
+		publisherFlush(state)
+	end)
 
 	maid:GiveTask(function()
 		state.disposed = true
@@ -469,12 +502,16 @@ local function startMirrorShadow(liveFolder: Instance, playContext: PlayContext?
 		table.clear(state.fromShadow)
 	end)
 
-	observePath(ServerScriptService, location.rootName, location.segments, function(resolved)
-		if state.disposed then
-			return
-		end
-		bindShadowFolder(state, resolved)
-	end, maid)
+	maid:GiveTask(observePathBrio(ServerScriptService, location.rootName, location.segments)
+		:Pipe({
+			RxBrioUtils.flattenToValueAndNil :: any,
+		})
+		:Subscribe(function(resolved: Instance?)
+			if state.disposed then
+				return
+			end
+			bindShadowFolder(state, resolved, scheduleFlush)
+		end))
 
 	return function()
 		maid:DoCleaning()
@@ -629,17 +666,6 @@ local function liveFlush(controller: LiveController)
 	end
 end
 
-local function liveScheduleFlush(controller: LiveController)
-	if controller.flushScheduled or controller.disposed then
-		return
-	end
-	controller.flushScheduled = true
-	task.defer(function()
-		controller.flushScheduled = false
-		liveFlush(controller)
-	end)
-end
-
 local function watchLiveFolder(
 	liveFolder: Instance,
 	rt: ImmediateCoreUtils.ImmediateRuntime,
@@ -654,55 +680,25 @@ local function watchLiveFolder(
 		liveFolder = liveFolder,
 		records = {},
 		namesToPath = {},
-		flushScheduled = false,
 	}
 
-	local function connectInstance(descendant: Instance)
-		if isExecutionCloneName(descendant.Name) then
-			return
-		end
-		if descendant:IsA("ModuleScript") and descendant.Name ~= "loader" then
-			if observeSource then
-				maid:GiveTask(descendant:GetPropertyChangedSignal("Source"):Connect(function()
-					local record: PathRecord? = nil
-					for _, candidate in controller.records do
-						if candidate.source == descendant then
-							record = candidate
-							break
-						end
-					end
-					if record then
-						record.source = nil
-					end
-					liveScheduleFlush(controller)
-				end))
+	local scheduleFlush = bindDeferredFlush(maid, function()
+		liveFlush(controller)
+	end)
+
+	local onModuleSourceChanged = if observeSource
+		then function(descendant: ModuleScript)
+			for _, candidate in controller.records do
+				if candidate.source == descendant then
+					candidate.source = nil
+					break
+				end
 			end
-			maid:GiveTask(descendant:GetPropertyChangedSignal("Name"):Connect(function()
-				liveScheduleFlush(controller)
-			end))
-		elseif descendant:IsA("Folder") then
-			maid:GiveTask(descendant:GetPropertyChangedSignal("Name"):Connect(function()
-				liveScheduleFlush(controller)
-			end))
+			scheduleFlush()
 		end
-	end
+		else nil
 
-	maid:GiveTask(liveFolder.DescendantAdded:Connect(function(descendant)
-		connectInstance(descendant)
-		liveScheduleFlush(controller)
-	end))
-	maid:GiveTask(liveFolder.DescendantRemoving:Connect(function()
-		liveScheduleFlush(controller)
-	end))
-	maid:GiveTask(liveFolder.ChildAdded:Connect(function(child)
-		if child.Name == "loader" then
-			liveScheduleFlush(controller)
-		end
-	end))
-
-	for _, descendant in liveFolder:GetDescendants() do
-		connectInstance(descendant)
-	end
+	watchFolderTree(maid, liveFolder, scheduleFlush, onModuleSourceChanged)
 
 	maid:GiveTask(function()
 		controller.disposed = true
@@ -712,14 +708,14 @@ local function watchLiveFolder(
 		end
 	end)
 
-	liveScheduleFlush(controller)
+	scheduleFlush()
 
 	return function()
 		maid:DoCleaning()
 	end
 end
 
-local function install(
+local function installInto(
 	systemsFolder: Instance,
 	rt: ImmediateCoreUtils.ImmediateRuntime,
 	scheduler: ImmediateScheduler.ImmediateScheduler,
@@ -740,23 +736,18 @@ local function install(
 	end
 end
 
+function ImmediateHotReloadInstall.install(systemsFolder: Instance, playContext: PlayContext?)
+	assert(typeof(systemsFolder) == "Instance", "Bad systemsFolder")
+
+	return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler): Rt
+		installInto(systemsFolder, rt :: any, scheduler, playContext)
+		return rt
+	end
+end
+
 function ImmediateHotReloadInstall.mirrorShadow(liveSystemsFolder: Instance, playContext: PlayContext?): () -> ()
 	assert(typeof(liveSystemsFolder) == "Instance", "Bad liveSystemsFolder")
 	return startMirrorShadow(liveSystemsFolder, playContext)
 end
 
-setmetatable(ImmediateHotReloadInstall :: any, {
-	__call = function(_self, systemsFolder: Instance, playContext: PlayContext?)
-		return function<Rt>(rt: Rt, scheduler: ImmediateScheduler.ImmediateScheduler): Rt
-			install(systemsFolder, rt :: any, scheduler, playContext)
-			return rt
-		end
-	end,
-})
-
-export type ImmediateInstallAddon = (
-	ImmediateCoreUtils.ImmediateRuntime,
-	ImmediateScheduler.ImmediateScheduler
-) -> ImmediateCoreUtils.ImmediateRuntime
-
-return ImmediateHotReloadInstall
+return ImmediateHotReloadInstall :: ImmediateHotReloadInstall
