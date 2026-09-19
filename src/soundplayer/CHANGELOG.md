@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.57.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.57.1...@quenty/soundplayer@7.57.2) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
 ## [7.57.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.57.0...@quenty/soundplayer@7.57.1) (2026-09-03)
 
 **Note:** Version bump only for package @quenty/soundplayer

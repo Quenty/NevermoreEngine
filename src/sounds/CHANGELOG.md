@@ -1,21 +1,11 @@
-# v10.28.1 (Sat Sep 19 2026)
-
-#### 🐛 Bug Fix
-
-- fix: soundutil methods shouldn't return anything other than the sound [#824](https://github.com/Quenty/NevermoreEngine/pull/824) ([@euvinkeel](https://github.com/euvinkeel))
-- don't return anything other than the sound ([@euvinkeel](https://github.com/euvinkeel))
-- add play at position as a utility method ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.28.0...@quenty/sounds@10.28.1) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/sounds
 
 # [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.2...@quenty/sounds@10.28.0) (2026-08-28)
 
