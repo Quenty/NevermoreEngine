@@ -1,3 +1,16 @@
+# (Sat Sep 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.7.0`
+  - feat: immediate system hot reloads [#823](https://github.com/Quenty/NevermoreEngine/pull/823) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Thu Sep 17 2026)
 
 #### 🐛 Bug Fix
