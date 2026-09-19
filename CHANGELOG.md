@@ -1,5 +1,18 @@
 # (Sat Sep 19 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/sounds@10.28.1`
+  - fix: soundutil methods shouldn't return anything other than the sound [#824](https://github.com/Quenty/NevermoreEngine/pull/824) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Sep 19 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/immediateutils@1.7.0`
