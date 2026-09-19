@@ -178,7 +178,7 @@ function SoundUtils.playAtPosition(id: SoundId, position: Vector3): Sound
 		maid:DoCleaning()
 	end))
 
-	return sound, maid
+	return sound
 end
 
 --[=[
