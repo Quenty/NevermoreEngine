@@ -14,6 +14,7 @@ local require = require(script.Parent.loader).load(script)
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 
+local Maid = require("Maid")
 local RbxAssetUtils = require("RbxAssetUtils")
 local SoundPromiseUtils = require("SoundPromiseUtils")
 
@@ -137,6 +138,47 @@ function SoundUtils.playFromIdInParent(id: SoundId, parent: Instance): Sound
 	SoundUtils.removeAfterTimeLength(sound)
 
 	return sound
+end
+
+--[=[
+	Plays a sound at a world position by parenting it to a temporary Terrain attachment.
+
+	The attachment is destroyed when the sound is cleaned up.
+
+	```lua
+	SoundUtils.playAtPosition("rbxassetid://4255432837", position)
+	SoundUtils.playAtPosition({
+		SoundId = "rbxassetid://4255432837",
+		Volume = 0.8,
+		RollOffMinDistance = 20,
+		RollOffMaxDistance = 150,
+	}, position)
+	```
+
+	:::tip
+	The sound will be automatically cleaned up after the sound is played.
+	:::
+
+	@param id SoundId
+	@param position Vector3
+	@return Sound
+]=]
+function SoundUtils.playAtPosition(id: SoundId, position: Vector3): Sound
+	assert(typeof(position) == "Vector3", "Bad position")
+	local maid = Maid.new()
+
+	local attachment = maid:Add(Instance.new("Attachment"))
+	attachment.Name = "SoundAtPosition"
+	attachment.Archivable = false
+	attachment.Parent = workspace.Terrain
+	attachment.WorldPosition = position
+
+	local sound = maid:Add(SoundUtils.playFromIdInParent(id, attachment))
+	maid:GiveTask(sound.Destroying:Connect(function()
+		maid:DoCleaning()
+	end))
+
+	return sound, maid
 end
 
 --[=[
