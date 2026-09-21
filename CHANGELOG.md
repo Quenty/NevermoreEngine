@@ -1,3 +1,68 @@
+# (Sat Sep 19 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/sounds@10.28.1`
+  - fix: soundutil methods shouldn't return anything other than the sound [#824](https://github.com/Quenty/NevermoreEngine/pull/824) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Sep 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.7.0`
+  - feat: immediate system hot reloads [#823](https://github.com/Quenty/NevermoreEngine/pull/823) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Thu Sep 17 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/jecs@1.5.1`
+  - fix: imm hook type fix [#820](https://github.com/Quenty/NevermoreEngine/pull/820) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Wed Sep 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ultrawidecontainerutils@2.6.0`
+  - feat: add headless UI converter API and script output management [#822](https://github.com/Quenty/NevermoreEngine/pull/822) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 09 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/physicsutils@8.35.0`, `@quenty/vector3utils@10.12.0`
+  - feat(vector3utils): Add Vector3Utils.volume and unit tests for vector3utils and physicsutils [#821](https://github.com/Quenty/NevermoreEngine/pull/821) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Sep 03 2026)
 
 #### 🐛 Bug Fix

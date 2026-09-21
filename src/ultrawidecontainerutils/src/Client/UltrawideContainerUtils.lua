@@ -21,7 +21,7 @@ function UltrawideContainerUtils.createContainer(parent: Instance?): (Frame, UIS
 	frame.AnchorPoint = Vector2.new(0.5, 0.5)
 	frame.Position = UDim2.fromScale(0.5, 0.5)
 	frame.BorderSizePixel = 0
-	frame.Transparency = 1
+	frame.BackgroundTransparency = 1
 	frame.Size = UDim2.fromScale(1, 1)
 
 	local uiSizeConstraint = Instance.new("UISizeConstraint")

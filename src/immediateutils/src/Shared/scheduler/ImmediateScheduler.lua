@@ -11,8 +11,8 @@
 
 	ordering.
 
-	This doesn't handle hot reloading; some hot-reload service can interact with
-	a scheduler's APIs to add/remove systems.
+	This doesn't handle hot reloading. [ImmediateHotReloadInstall] watches
+	system ModuleScripts and calls RegisterSystem / UnregisterSystem.
 
 	You determine when entire "ticks" happen (usually by hooking it up to
 	PreRender, or you can just manually call tick() a bunch in one go for unit
@@ -307,7 +307,12 @@ function ImmediateScheduler.RegisterSystem(self: ImmediateScheduler, systemTable
 	self._profileLabels[systemName] = `sys.{systemName}`
 	self._sortFlag = true
 	return function()
-		self:UnregisterSystem(systemName)
+		if getmetatable(self) == nil then
+			return
+		end
+		if self._systemDictionary and self._systemDictionary[systemName] == systemTable then
+			self:UnregisterSystem(systemName)
+		end
 	end
 end
 
@@ -352,7 +357,7 @@ function ImmediateScheduler.Destroy(self: ImmediateScheduler)
 	table.clear(self._sorted_postSystem)
 	table.clear(self._sorted_preTick)
 	table.clear(self._sorted_postTick)
-	self:Destroy()
+	BaseObject.Destroy(self)
 end
 
 return ImmediateScheduler

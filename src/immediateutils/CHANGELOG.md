@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.6.0...@quenty/immediateutils@1.7.0) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
 # [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.5.0...@quenty/immediateutils@1.6.0) (2026-09-02)
 
 **Note:** Version bump only for package @quenty/immediateutils
