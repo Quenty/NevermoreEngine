@@ -1,23 +1,11 @@
-# v10.39.0 (Mon Sep 21 2026)
-
-#### 🚀 Enhancement
-
-- fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test: TeamUtils has unit tests and support mocks (for some) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.38.0...@quenty/teamutils@10.39.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/teamutils
 
 # [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teamutils@10.37.0...@quenty/teamutils@10.38.0) (2026-08-28)
 

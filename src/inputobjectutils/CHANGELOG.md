@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.41.1...@quenty/inputobjectutils@4.42.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
 ## [4.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.41.0...@quenty/inputobjectutils@4.41.1) (2026-09-03)
 
 **Note:** Version bump only for package @quenty/inputobjectutils

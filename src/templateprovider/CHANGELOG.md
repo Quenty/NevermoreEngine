@@ -1,24 +1,13 @@
-# v11.53.0 (Mon Sep 21 2026)
-
-#### 🚀 Enhancement
-
-- fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix: Fix unit testing template provider ([@Quenty](https://github.com/Quenty))
-- test: Add tests to TemplateProvider and new methods to observe/query child templates without loading them. ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.52.1...@quenty/templateprovider@11.53.0) (2026-09-21)
+
+### Bug Fixes
+
+- Fix unit testing template provider ([08dd007](https://github.com/Quenty/NevermoreEngine/commit/08dd007171bd348dcd1a966ff67b8d597a202cb5))
 
 ## [11.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.52.0...@quenty/templateprovider@11.52.1) (2026-09-03)
 

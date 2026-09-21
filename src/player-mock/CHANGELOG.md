@@ -1,20 +1,13 @@
-# v1.10.0 (Mon Sep 21 2026)
-
-#### 🚀 Enhancement
-
-- fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
-- feat: Support HumanoidKillerUtils supporting PlayerMock package ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.9.1...@quenty/playermock@1.10.0) (2026-09-21)
+
+### Features
+
+- Support HumanoidKillerUtils supporting PlayerMock package ([93e40ea](https://github.com/Quenty/NevermoreEngine/commit/93e40ea35729944e8dd0f4464249e18a9f4355e8))
 
 ## [1.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.9.0...@quenty/playermock@1.9.1) (2026-09-03)
 
