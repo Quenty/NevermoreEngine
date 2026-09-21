@@ -27,6 +27,7 @@ local it = Jest.Globals.it
 type Realms = {
 	server: TemplateProvider.TemplateProvider,
 	client: TemplateProvider.TemplateProvider,
+	Destroy: (self: Realms) -> (),
 }
 
 type Controller = {
@@ -78,15 +79,23 @@ local function setup(): Controller
 			playerMockServiceClient:SetLocalPlayer(playerMockService:CreatePlayer())
 			clientBag:Start()
 
-			maid:GiveTask(function()
-				clientBag:Destroy()
-				serverBag:Destroy()
-			end)
-
-			return {
+			local destroyed = false
+			local realms: Realms = {
 				server = server,
 				client = client,
+				Destroy = function(_self)
+					if destroyed then
+						return
+					end
+					destroyed = true
+
+					clientBag:Destroy()
+					serverBag:Destroy()
+				end,
 			}
+			maid:GiveTask(realms)
+
+			return realms
 		end,
 
 		newInstance = function(className, name, parent)
@@ -737,6 +746,25 @@ describe("TemplateProvider across a server and a client", function()
 		expect(sword:FindFirstAncestorWhichIsA("Camera")).never.toBeNil()
 		expect(realms.client:GetTemplate("Sword")).toBeNil()
 		expect(realms.client:IsTemplateAvailable("Sword")).toBe(false)
+
+		controller:Destroy()
+	end)
+
+	it("hands the container its templates back when the server provider is destroyed", function()
+		local controller = setup()
+		local root = controller.newInstance("Folder", "Templates")
+		local sword = controller.newInstance("Model", "Sword", root)
+		local realms = controller.newRealms(root)
+
+		realms:Destroy()
+
+		expect(sword.Parent).toBe(root)
+		expect(root:GetChildren()).toEqual({ sword })
+
+		local rebooted = controller.newRealms(root)
+
+		expect(rebooted.server:GetTemplate("Sword")).toBe(sword)
+		expect(controller.newMaid():Add(rebooted.server:CloneTemplate("Sword") :: Instance).Name).toBe("Sword")
 
 		controller:Destroy()
 	end)

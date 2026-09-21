@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
@@ -37,6 +38,7 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/templateprovider": "workspace:*",
+    "@quenty/tie": "workspace:*",
     "@quentystudios/cmdr": "^1.12.0-quenty.0",
     "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },

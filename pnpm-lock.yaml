@@ -1389,6 +1389,9 @@ importers:
 
   src/cmdrservice:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1416,6 +1419,9 @@ importers:
       '@quenty/templateprovider':
         specifier: workspace:*
         version: link:../templateprovider
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
       '@quentystudios/cmdr':
         specifier: ^1.12.0-quenty.0
         version: 1.12.0-quenty.0

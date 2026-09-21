@@ -224,7 +224,7 @@ function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid
 	then
 		-- Prevent replication to client immediately
 
-		local camera = containerMaid:Add(Instance.new("Camera"))
+		local camera = Instance.new("Camera")
 		camera.Name = PREVENT_REPLICATION_CAMERA_NAME
 		camera.Parent = container
 
@@ -239,13 +239,23 @@ function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid
 			child.Parent = camera
 		end
 
-		containerMaid:GiveTask(container.ChildAdded:Connect(handleChild))
+		local childAddedConnection = container.ChildAdded:Connect(handleChild)
 
 		for _, child in container:GetChildren() do
 			handleChild(child)
 		end
 
 		self:_replicateTombstones(containerMaid, camera, container)
+
+		containerMaid:GiveTask(function()
+			childAddedConnection:Disconnect()
+
+			for _, child in camera:GetChildren() do
+				child.Parent = container
+			end
+
+			camera:Destroy()
+		end)
 
 		return
 	end
