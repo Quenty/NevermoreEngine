@@ -153,11 +153,13 @@ brio:Kill() --> "Resource is no longer valid"
 
 **When to use:** When emitting objects from Observables that have a limited lifetime. Binder's `:ObserveBrio()` returns `Observable<Brio<T>>` — this is the canonical use case. Essential for safely passing resources through reactive pipelines.
 
-### Three ways a Brio pipeline silently gives the wrong answer
+### Four ways a Brio pipeline silently gives the wrong answer
 
 These bite when a stream models "the current state of some replicated instances", where the consumer needs an answer at every moment — not just when things exist.
 
 **Never emitting is not the same as emitting nil.** `RxInstanceUtils.observeLastNamedChildBrio` (and anything built on it) fires only once a matching child exists. Subscribe before the instance replicates and you get *nothing* — the subscriber can't tell "not there" from "not loaded yet" and renders whatever it had. End such a pipeline with `Rx.defaultsToNil`, which fires nil only when the source didn't already fire synchronously, so a present value never flickers through nil first.
+
+**`emitOnDeath` cannot rescue a source that never emits.** It is reached for precisely when a pipeline must always produce a value, but it is itself a `switchMap` over the source's emissions — a silent source makes it silent too, and the default never appears. `ObservableMap:ObserveAtKeyBrio(key)` is where this bites: it ends in `RxBrioUtils.switchToBrio(value ~= nil)`, and that operator fires *nothing* for an absent key rather than a dead brio, so following it with `RxBrioUtils.emitOnDeath({})` yields no emission at all instead of the empty table you asked for. When you need a guaranteed first value, observe the plain `ObserveAtKey`, which does fire the current value — nil included — on subscribe, and branch on nil with `Rx.of(default)`.
 
 **`Rx.EMPTY` as a switchMap fallback swallows the disappearance.** `Rx.switchMap(function(inst) return inst and Data:Observe(inst) or Rx.EMPTY end)` looks right, but `Rx.EMPTY` emits nothing at all — so when the instance goes away, the nil that `RxBrioUtils.emitOnDeath(nil)` worked to produce is dropped and the subscriber keeps stale data forever. Return `Rx.of(nil)`.
 
