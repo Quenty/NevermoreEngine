@@ -1,7 +1,7 @@
 {
   "name": "@quenty/weldconstraintutils",
   "version": "3.1.5",
-  "description": "Utility functions to create WeldConstraint objects in Roblox",
+  "description": "Utility functions to create WeldConstraint and fabric BallSocketConstraint objects in Roblox",
   "keywords": [
     "Roblox",
     "Nevermore",
@@ -24,6 +24,16 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm"
+  },
+  "dependencies": {
+    "@quenty/adorneeutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/nocollisionconstraintutils": "workspace:*",
+    "@quenty/vector3utils": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "contributors": [
     "Quenty"
