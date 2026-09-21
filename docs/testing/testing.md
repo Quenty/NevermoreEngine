@@ -240,6 +240,11 @@ group rank/role pairs, see `GroupTestUtils.assignGroupInfo` in `@quenty/grouputi
   `playerMockServiceClient:SetLocalPlayer(player)`. Client code resolves it as
   `Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()`, and dummy-mode `Remoting` routes fires the
   same way — client↔server round-trips run headless against production remoting, with no loopback stubs.
+- To run a server and a client bag in one DataModel, tell each bag its realm before `Init` with
+  `serviceBag:GetService(TieRealmService):SetTieRealm(TieRealms.CLIENT)`. A headless test reports
+  `RunService:IsServer()` even though nothing is running, so an untold bag infers the server. A service
+  whose server behavior is unsafe outside a running game (`TemplateProvider` hides templates under a
+  Camera) checks `TieRealmService:HasExplicitTieRealm()` and keeps its own inference otherwise.
 - A mock carries Folder stand-ins for the engine-inserted containers `PlayerGui` and `PlayerScripts`
   (`PlayerMock.getPlayerGui` / `PlayerMock.getPlayerScripts`) — both classes are NotCreatable, so a Folder
   is the best a mock can do. That means an `IsA`-class-filtered observe (e.g.

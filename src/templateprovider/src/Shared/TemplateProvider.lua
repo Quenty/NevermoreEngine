@@ -52,7 +52,9 @@ local DuckTypeUtils = require("DuckTypeUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableCountingMap = require("ObservableCountingMap")
+local ObservableMap = require("ObservableMap")
 local ObservableMapList = require("ObservableMapList")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseMaidUtils = require("PromiseMaidUtils")
 local Remoting = require("Remoting")
@@ -62,10 +64,12 @@ local ServiceBag = require("ServiceBag")
 local String = require("String")
 local TemplateReplicationModes = require("TemplateReplicationModes")
 local TemplateReplicationModesUtils = require("TemplateReplicationModesUtils")
+local TieRealmService = require("TieRealmService")
 
 local TOMBSTONE_ID_ATTRIBUTE = "UnreplicatedTemplateId"
 local TOMBSTONE_NAME_POSTFIX_UNLOADED = "_Unloaded"
 local TOMBSTONE_NAME_POSTFIX_LOADED = "_Loaded"
+local PREVENT_REPLICATION_CAMERA_NAME = "PreventReplication"
 
 local TemplateProvider = {}
 TemplateProvider.ClassName = "TemplateProvider"
@@ -87,6 +91,7 @@ export type TemplateProvider = typeof(setmetatable(
 		_templateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
 		_unreplicatedTemplateMapList: any, -- ObservableMapList.ObservableMapList<Instance>,
 		_containerRootCountingMap: any, -- ObservableCountingMap.ObservableCountingMap<Instance>,
+		_childTemplateNameCountingMaps: any, -- ObservableMap.ObservableMap<Instance, ObservableCountingMap.ObservableCountingMap<string>>,
 		_remoting: Remoting.Remoting,
 		_tombstoneLookup: { [string]: Instance },
 		_pendingTemplatePromises: { [string]: Promise.Promise<Instance> },
@@ -136,6 +141,9 @@ end
 --[=[
 	Initializes the container provider. Should be done via [ServiceBag].
 
+	The replication mode follows the bag's [TieRealmService] realm when one was set, and is otherwise
+	inferred from [RunService].
+
 	@param serviceBag ServiceBag
 ]=]
 function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.ServiceBag): ()
@@ -143,7 +151,12 @@ function TemplateProvider.Init(self: TemplateProvider, serviceBag: ServiceBag.Se
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	self._replicationMode = TemplateReplicationModesUtils.inferReplicationMode()
+	local tieRealmService: TieRealmService.TieRealmService = serviceBag:GetService(TieRealmService) :: any
+	if tieRealmService:HasExplicitTieRealm() then
+		self._replicationMode = TemplateReplicationModesUtils.fromTieRealm(tieRealmService:GetTieRealm())
+	else
+		self._replicationMode = TemplateReplicationModesUtils.inferReplicationMode()
+	end
 
 	-- There can be multiple templates for a given name
 	self._templateMapList = self._maid:Add(ObservableMapList.new())
@@ -166,7 +179,9 @@ function TemplateProvider._setupTemplateCache(self: TemplateProvider): ()
 			assert(self._tombstoneLookup[tombstoneId], "Not a valid tombstone")
 
 			-- Stuff doesn't replicate in the PlayerGui
-			local playerGui = player:FindFirstChildWhichIsA("PlayerGui")
+			local playerGui = if PlayerMock.isMock(player)
+				then PlayerMock.getPlayerGui(player)
+				else player:FindFirstChildWhichIsA("PlayerGui")
 			if not playerGui then
 				return Promise.rejected("No playerGui")
 			end
@@ -209,8 +224,8 @@ function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid
 	then
 		-- Prevent replication to client immediately
 
-		local camera = containerMaid:Add(Instance.new("Camera"))
-		camera.Name = "PreventReplication"
+		local camera = Instance.new("Camera")
+		camera.Name = PREVENT_REPLICATION_CAMERA_NAME
 		camera.Parent = container
 
 		local function handleChild(child: Instance)
@@ -224,13 +239,23 @@ function TemplateProvider._handleContainer(self: TemplateProvider, containerMaid
 			child.Parent = camera
 		end
 
-		containerMaid:GiveTask(container.ChildAdded:Connect(handleChild))
+		local childAddedConnection = container.ChildAdded:Connect(handleChild)
 
 		for _, child in container:GetChildren() do
 			handleChild(child)
 		end
 
 		self:_replicateTombstones(containerMaid, camera, container)
+
+		containerMaid:GiveTask(function()
+			childAddedConnection:Disconnect()
+
+			for _, child in camera:GetChildren() do
+				child.Parent = container
+			end
+
+			camera:Destroy()
+		end)
 
 		return
 	end
@@ -317,6 +342,185 @@ function TemplateProvider.ObserveUnreplicatedTemplateNamesBrio(
 	self: TemplateProvider
 ): Observable.Observable<Brio.Brio<string>>
 	return self._unreplicatedTemplateMapList:ObserveKeysBrio()
+end
+
+--[=[
+	Lists the names of the templates directly inside a folder template without
+	replicating the folder or any of its contents. On the client this reads the
+	tombstones the server left behind, so it works before anything is loaded.
+	Use this to pick one template by name and then [TemplateProvider.PromiseTemplate]
+	just that one.
+
+	Returns an empty list if the folder template is not known yet, or if it does not
+	hold child templates. Only folders and roots passed to [TemplateProvider.AddTemplates]
+	hold child templates.
+
+	:::info
+	The order of the names is not stable. Sort them if you need a deterministic order.
+	:::
+
+	@param folderTemplateName string
+	@return { string }
+]=]
+function TemplateProvider.GetChildTemplateNameList(self: TemplateProvider, folderTemplateName: string): { string }
+	assert(type(folderTemplateName) == "string", "Bad folderTemplateName")
+
+	local container = self:_findTemplateOrTombstone(folderTemplateName)
+	if not container then
+		return {}
+	end
+
+	local countingMap = self:_ensureChildTemplateNameCache():Get(container)
+	if not countingMap then
+		return {}
+	end
+
+	return countingMap:GetKeyList()
+end
+
+--[=[
+	Observes [TemplateProvider.GetChildTemplateNameList]. Emits a new list whenever
+	the set of child template names changes, starting with an empty list until the
+	folder template is known.
+
+	Adding or removing a template that leaves the set of names unchanged does not emit,
+	and neither does anything deeper than a direct child.
+
+	@param folderTemplateName string
+	@return Observable<{ string }>
+]=]
+function TemplateProvider.ObserveChildTemplateNameList(
+	self: TemplateProvider,
+	folderTemplateName: string
+): Observable.Observable<{ string }>
+	assert(type(folderTemplateName) == "string", "Bad folderTemplateName")
+
+	local countingMaps = self:_ensureChildTemplateNameCache()
+
+	return self:_observeTemplateOrTombstone(folderTemplateName):Pipe({
+		Rx.switchMap(function(container: Instance?)
+			if not container then
+				return Rx.of({}) :: any
+			end
+
+			return countingMaps:ObserveAtKey(container):Pipe({
+				Rx.switchMap(function(countingMap)
+					if not countingMap then
+						return Rx.of({})
+					end
+
+					return countingMap:ObserveKeysList()
+				end :: any),
+			} :: any) :: any
+		end) :: any,
+	} :: any) :: any
+end
+
+function TemplateProvider._findTemplateOrTombstone(self: TemplateProvider, templateName: string): Instance?
+	return self._templateMapList:GetItemForKeyAtIndex(templateName, -1)
+		or self._unreplicatedTemplateMapList:GetItemForKeyAtIndex(templateName, -1)
+end
+
+function TemplateProvider._observeTemplateOrTombstone(
+	self: TemplateProvider,
+	templateName: string
+): Observable.Observable<Instance?>
+	local function observeLast(mapList)
+		return mapList:ObserveList(templateName):Pipe({
+			Rx.switchMap(function(list)
+				if not list then
+					return Rx.of(nil)
+				end
+
+				return list:ObserveAtIndex(-1)
+			end :: any),
+		} :: any)
+	end
+
+	return Rx.combineLatest({
+		template = observeLast(self._templateMapList),
+		tombstone = observeLast(self._unreplicatedTemplateMapList),
+	}):Pipe({
+		Rx.map(function(state)
+			return state.template or state.tombstone
+		end) :: any,
+		Rx.distinct() :: any,
+	} :: any) :: any
+end
+
+function TemplateProvider._ensureChildTemplateNameCache(self: TemplateProvider)
+	if self._childTemplateNameCountingMaps then
+		return self._childTemplateNameCountingMaps
+	end
+
+	local countingMaps = self._maid:Add(ObservableMap.new())
+	self._childTemplateNameCountingMaps = countingMaps
+
+	self._maid:GiveTask(self._containerRootCountingMap:ObserveKeysBrio():Subscribe(function(containerBrio)
+		if containerBrio:IsDead() then
+			return
+		end
+
+		local containerMaid: Maid.Maid, container = containerBrio:ToMaidAndValue()
+
+		local countingMap: ObservableCountingMap.ObservableCountingMap<string> =
+			containerMaid:Add(ObservableCountingMap.new()) :: any
+
+		self:_addChildTemplateNames(containerMaid, container, countingMap)
+		containerMaid:GiveTask(countingMaps:Set(container, countingMap))
+	end))
+
+	return countingMaps
+end
+
+function TemplateProvider._addChildTemplateNames(
+	self: TemplateProvider,
+	topMaid: Maid.Maid,
+	container: Instance,
+	countingMap: ObservableCountingMap.ObservableCountingMap<string>
+): ()
+	topMaid:GiveTask(RxInstanceUtils.observeChildrenBrio(container):Subscribe(function(brio)
+		if brio:IsDead() then
+			return
+		end
+
+		local maid, child = brio:ToMaidAndValue()
+
+		if child:IsA("PackageLink") then
+			return
+		end
+
+		-- The server moves a container's templates in here, but they are still its children
+		if child:IsA("Camera") and child.Name == PREVENT_REPLICATION_CAMERA_NAME then
+			self:_addChildTemplateNames(maid, child, countingMap)
+			return
+		end
+
+		maid:GiveTask(RxInstanceUtils.observeProperty(child, "Name")
+			:Pipe({
+				Rx.map(function()
+					return self:_getTemplateNameFromInstance(child)
+				end),
+				Rx.distinct() :: any,
+			} :: any)
+			:Subscribe(function(templateName)
+				maid._currentTemplateName = countingMap:Add(templateName)
+			end))
+	end))
+end
+
+function TemplateProvider._getTemplateNameFromInstance(_self: TemplateProvider, instance: Instance): string
+	local name = instance.Name
+
+	if instance:GetAttribute(TOMBSTONE_ID_ATTRIBUTE) then
+		if String.endsWith(name, TOMBSTONE_NAME_POSTFIX_UNLOADED) then
+			return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_UNLOADED)
+		elseif String.endsWith(name, TOMBSTONE_NAME_POSTFIX_LOADED) then
+			return String.removePostfix(name, TOMBSTONE_NAME_POSTFIX_LOADED)
+		end
+	end
+
+	return name
 end
 
 --[=[
