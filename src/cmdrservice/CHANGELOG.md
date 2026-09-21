@@ -1,3 +1,19 @@
+# v13.62.0 (Mon Sep 21 2026)
+
+#### 🚀 Enhancement
+
+- fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Fix unit testing template provider ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
