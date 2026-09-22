@@ -1,3 +1,16 @@
+# (Tue Sep 22 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.40.1`
+  - fix: Compare animation weights [#826](https://github.com/Quenty/NevermoreEngine/pull/826) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Mon Sep 21 2026)
 
 #### 🚀 Enhancement

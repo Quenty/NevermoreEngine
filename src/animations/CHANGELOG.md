@@ -1,3 +1,16 @@
+# v8.40.1 (Tue Sep 22 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Compare animation weights [#826](https://github.com/Quenty/NevermoreEngine/pull/826) ([@alex-y-z](https://github.com/alex-y-z))
+- fix: Compare animation weights ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
