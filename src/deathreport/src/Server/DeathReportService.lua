@@ -9,12 +9,15 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local DeathReportProcessor = require("DeathReportProcessor")
 local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local DeathReportUtils = require("DeathReportUtils")
-local GetRemoteEvent = require("GetRemoteEvent")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
+local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
 
@@ -26,7 +29,7 @@ export type DeathReportService = typeof(setmetatable(
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
 		NewDeathReport: Signal.Signal<DeathReportUtils.DeathReport>,
-		_remoteEvent: RemoteEvent,
+		_remoting: Remoting.Remoting,
 		_reportProcessor: DeathReportProcessor.DeathReportProcessor,
 		_weaponDataRetrievers: { GetWeaponData },
 	},
@@ -45,23 +48,38 @@ function DeathReportService.Init(self: DeathReportService, serviceBag: ServiceBa
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
-	-- Internal
-	self._serviceBag:GetService((require :: any)("DeathReportBindersServer"))
-
-	-- Binders
+	-- Binders. Required lazily: each one requires this service at load time.
 	self._serviceBag:GetService((require :: any)("DeathTrackedHumanoid"))
+	self._serviceBag:GetService((require :: any)("TeamKillTracker"))
+	self._serviceBag:GetService((require :: any)("PlayerKillTracker"))
+	self._serviceBag:GetService((require :: any)("PlayerDeathTracker"))
 
-	-- Export
+	--[=[
+	Fires with every [DeathReport] the server records
+	@prop NewDeathReport Signal<DeathReport>
+	@within DeathReportService
+]=]
 	self.NewDeathReport = self._maid:Add(Signal.new()) :: any
 
 	-- State
-	self._remoteEvent = GetRemoteEvent(DeathReportServiceConstants.REMOTE_EVENT_NAME)
+	self._remoting = self._maid:Add(Remoting.Server.new(ReplicatedStorage, DeathReportServiceConstants.REMOTING_NAME))
+	self._remoting:DeclareEvent(DeathReportServiceConstants.DEATH_REPORTED_EVENT_NAME)
+
 	self._reportProcessor = self._maid:Add(DeathReportProcessor.new())
 
 	self._weaponDataRetrievers = {}
 end
 
-function DeathReportService.AddWeaponDataRetriever(self: DeathReportService, getWeaponData: GetWeaponData)
+--[=[
+	Registers a callback that resolves the weapon a humanoid died to. Retrievers are asked in
+	registration order; the first non-nil answer wins.
+
+	@param getWeaponData (humanoid: Humanoid) -> WeaponData?
+	@return () -> () -- Removes the retriever
+]=]
+function DeathReportService.AddWeaponDataRetriever(self: DeathReportService, getWeaponData: GetWeaponData): () -> ()
+	assert(type(getWeaponData) == "function", "Bad getWeaponData")
+
 	table.insert(self._weaponDataRetrievers, getWeaponData)
 
 	return function()
@@ -72,6 +90,12 @@ function DeathReportService.AddWeaponDataRetriever(self: DeathReportService, get
 	end
 end
 
+--[=[
+	Asks the registered retrievers for the weapon the humanoid died to
+
+	@param humanoid Humanoid
+	@return WeaponData?
+]=]
 function DeathReportService.FindWeaponData(self: DeathReportService, humanoid: Humanoid): DeathReportUtils.WeaponData?
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 
@@ -97,7 +121,7 @@ function DeathReportService.ObservePlayerKillerReports(
 	self: DeathReportService,
 	player: Player
 ): Observable.Observable<DeathReportUtils.DeathReport>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._reportProcessor:ObservePlayerKillerReports(player)
 end
@@ -112,7 +136,7 @@ function DeathReportService.ObservePlayerDeathReports(
 	self: DeathReportService,
 	player: Player
 ): Observable.Observable<DeathReportUtils.DeathReport>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._reportProcessor:ObservePlayerDeathReports(player)
 end
@@ -163,7 +187,7 @@ function DeathReportService.ObserveCharacterKillerReports(
 end
 
 --[=[
-	Observes killer reports for the given character
+	Observes death reports for the given character
 
 	@param character Model
 	@return Observable<DeathReport>
@@ -196,6 +220,12 @@ function DeathReportService.ReportHumanoidDeath(
 	self:ReportDeathReport(report)
 end
 
+--[=[
+	Records a death report: fires [DeathReportService.NewDeathReport], routes it to the observers,
+	and replicates it to every client.
+
+	@param deathReport DeathReport
+]=]
 function DeathReportService.ReportDeathReport(self: DeathReportService, deathReport: DeathReportUtils.DeathReport)
 	assert(DeathReportUtils.isDeathReport(deathReport), "Bad deathReport")
 
@@ -205,7 +235,7 @@ function DeathReportService.ReportDeathReport(self: DeathReportService, deathRep
 	self._reportProcessor:HandleDeathReport(deathReport)
 
 	-- Send to all clients
-	self._remoteEvent:FireAllClients(deathReport)
+	self._remoting:FireAllClients(DeathReportServiceConstants.DEATH_REPORTED_EVENT_NAME, deathReport)
 end
 
 function DeathReportService.Destroy(self: DeathReportService)

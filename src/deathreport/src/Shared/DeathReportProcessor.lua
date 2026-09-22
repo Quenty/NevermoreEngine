@@ -13,6 +13,7 @@ local BaseObject = require("BaseObject")
 local DeathReportUtils = require("DeathReportUtils")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local PlayerMock = require("PlayerMock")
 
 local DeathReportProcessor = setmetatable({}, BaseObject)
 DeathReportProcessor.ClassName = "DeathReportProcessor"
@@ -52,10 +53,16 @@ function DeathReportProcessor.new(): DeathReportProcessor
 	self._characterKillerSubTable = self._maid:Add(ObservableSubscriptionTable.new())
 	self._characterDeathSubTable = self._maid:Add(ObservableSubscriptionTable.new())
 
-	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player)
+	local function handlePlayerRemoving(player: Player)
 		self._playerKillerSubTable:Complete(player)
 		self._playerDeathSubTable:Complete(player)
-	end))
+	end
+
+	self._maid:GiveTask(Players.PlayerRemoving:Connect(handlePlayerRemoving))
+
+	-- Mocks are invisible to the Players service, so their removal is the counterpart of
+	-- PlayerRemoving, feeding the same handler.
+	self._maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(handlePlayerRemoving))
 
 	return self
 end
@@ -70,7 +77,7 @@ function DeathReportProcessor.ObservePlayerKillerReports(
 	self: DeathReportProcessor,
 	player: Player
 ): Observable.Observable<DeathReportUtils.DeathReport>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._playerKillerSubTable:Observe(player)
 end
@@ -85,7 +92,7 @@ function DeathReportProcessor.ObservePlayerDeathReports(
 	self: DeathReportProcessor,
 	player: Player
 ): Observable.Observable<DeathReportUtils.DeathReport>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._playerDeathSubTable:Observe(player)
 end
@@ -136,7 +143,7 @@ function DeathReportProcessor.ObserveCharacterKillerReports(
 end
 
 --[=[
-	Observes killer reports for the given character
+	Observes death reports for the given character
 
 	@param character Model
 	@return Observable<DeathReport>
