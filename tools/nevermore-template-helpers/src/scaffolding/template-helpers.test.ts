@@ -32,12 +32,8 @@ describe('TemplateHelper.camelize', () => {
   });
 
   it('keeps casing inside a part, so an acronym survives', () => {
-    expect(TemplateHelper.camelize('influxdb-service')).toBe(
-      'InfluxdbService'
-    );
-    expect(TemplateHelper.camelize('InfluxDB-service')).toBe(
-      'InfluxDBService'
-    );
+    expect(TemplateHelper.camelize('influxdb-service')).toBe('InfluxdbService');
+    expect(TemplateHelper.camelize('InfluxDB-service')).toBe('InfluxDBService');
   });
 
   it('ignores repeated, leading and trailing separators', () => {

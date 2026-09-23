@@ -78,7 +78,10 @@ function HttpPromise.request(request: HTTPRequest): Promise.Promise<HTTPResponse
 		end)
 
 		if DEBUG_RESPONSE then
-			print(string.format("Response: %d %s %s", response.StatusCode, request.Method, request.Url), response.Body)
+			print(
+				string.format("Response: %d %s %s", response.StatusCode, request.Method or "GET", request.Url),
+				response.Body
+			)
 		end
 
 		if not ok then

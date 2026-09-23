@@ -541,7 +541,7 @@ function TimeDurationUtils._applyLimits(
 			return
 		end
 
-		local nextField = FORMAT_TOKENS[next.rank :: number].field
+		local nextField: Time.TimeUnit? = FORMAT_TOKENS[next.rank :: number].field
 		local limit = if nextField then limits[Time._normalizeUnit(nextField)] else nil
 		if limit == nil then
 			return
@@ -658,7 +658,7 @@ function TimeDurationUtils._formatTokenValue(
 		else tostring(math.floor(value + 0.5))
 
 	if part.label then
-		local field = FORMAT_TOKENS[part.rank :: number].field
+		local field: Time.TimeUnit? = FORMAT_TOKENS[part.rank :: number].field
 		assert(field, string.format("No duration phrase for %q", FORMAT_TOKENS[part.rank :: number].letter))
 		return TimeDurationUtils.formatUnit(field, tonumber(text) :: number, options)
 	end
