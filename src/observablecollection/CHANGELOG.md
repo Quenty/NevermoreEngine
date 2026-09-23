@@ -1,3 +1,20 @@
+# v12.53.0 (Wed Sep 23 2026)
+
+#### 🚀 Enhancement
+
+- fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
+- fix: Observe negative indexes properly ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

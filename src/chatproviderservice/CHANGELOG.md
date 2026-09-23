@@ -1,3 +1,15 @@
+# v9.74.0 (Wed Sep 23 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

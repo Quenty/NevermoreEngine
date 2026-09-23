@@ -1,3 +1,22 @@
+# v2.6.0 (Wed Sep 23 2026)
+
+#### 🚀 Enhancement
+
+- fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
+- feat: Refactor time package to support localized text + relative time formatting ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
+- fix: Resolve luau-lsp and prettier lint failures ([@Quenty](https://github.com/Quenty))
+- fix: TIme duration allows for centiseconds ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
