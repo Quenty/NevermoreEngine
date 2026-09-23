@@ -6,7 +6,7 @@
 	seconds.
 
 	```lua
-	TimeDurationUtils.format({ hours = 1, minutes = 30 }, "HH:mm") --> 01:30
+	TimeDurationUtils.format({ hours = 1, minutes = 30 }, "hh:mm") --> 01:30
 	TimeDurationUtils.humanize(TimeDurationUtils.toSeconds(2, "days")) --> 2 days
 	TimeDurationUtils.toIsoString("PT90M") --> PT1H30M
 	```
@@ -173,11 +173,11 @@ local ISO_TIME_UNITS: { [string]: number } = {
 
 type FormatToken = {
 	letter: string,
-	field: Time.TimeUnit,
+	field: Time.TimeUnit?,
 	milliseconds: number,
 }
 
-function TimeDurationUtils._formatToken(letter: string, field: Time.TimeUnit, milliseconds: number): FormatToken
+function TimeDurationUtils._formatToken(letter: string, field: Time.TimeUnit?, milliseconds: number): FormatToken
 	return { letter = letter, field = field, milliseconds = milliseconds }
 end
 
@@ -190,6 +190,8 @@ local FORMAT_TOKENS: { FormatToken } = {
 	TimeDurationUtils._formatToken("h", "hours", SECONDS_AN_HOUR * 1000),
 	TimeDurationUtils._formatToken("m", "minutes", SECONDS_A_MINUTE * 1000),
 	TimeDurationUtils._formatToken("s", "seconds", 1000),
+	-- Centiseconds have no TimeUnit, so they take no limit and no `__` phrase
+	TimeDurationUtils._formatToken("C", nil, 10),
 	TimeDurationUtils._formatToken("S", "milliseconds", 1),
 }
 
@@ -539,7 +541,8 @@ function TimeDurationUtils._applyLimits(
 			return
 		end
 
-		local limit = limits[Time._normalizeUnit(FORMAT_TOKENS[next.rank :: number].field)]
+		local nextField = FORMAT_TOKENS[next.rank :: number].field
+		local limit = if nextField then limits[Time._normalizeUnit(nextField)] else nil
 		if limit == nil then
 			return
 		end
@@ -655,7 +658,8 @@ function TimeDurationUtils._formatTokenValue(
 		else tostring(math.floor(value + 0.5))
 
 	if part.label then
-		local field: Time.TimeUnit = FORMAT_TOKENS[part.rank :: number].field
+		local field = FORMAT_TOKENS[part.rank :: number].field
+		assert(field, string.format("No duration phrase for %q", FORMAT_TOKENS[part.rank :: number].letter))
 		return TimeDurationUtils.formatUnit(field, tonumber(text) :: number, options)
 	end
 
@@ -771,8 +775,8 @@ end
 
 --[=[
 	Formats the duration with a template in the style of moment-duration-format. Tokens are `y`
-	years, `M` months, `w` weeks, `d` days, `h` hours, `m` minutes, `s` seconds and `S`
-	milliseconds; repeating a letter zero pads it to that width. The largest token in the
+	years, `M` months, `w` weeks, `d` days, `h` hours, `m` minutes, `s` seconds, `C`
+	centiseconds and `S` milliseconds; repeating a letter zero pads it to that width. The largest token in the
 	template absorbs everything above it, so `h:mm` on 47 hours is `47:00`, and the smallest
 	token is rounded unless `trunc` is set. `__` after a token prints it as a localized phrase
 	such as `2 days`, and text in square brackets is literal.
@@ -785,6 +789,7 @@ end
 
 	```lua
 	TimeDurationUtils.format(47 * 3600, "h:mm:ss") --> 47:00:00
+	TimeDurationUtils.format(65.432, "mm:ss:CC", { trunc = true }) --> 01:05:43
 	TimeDurationUtils.format({ days = 45 }, "d __") --> 45 days
 	TimeDurationUtils.format(123 * 60, "d __ h:mm:ss") --> 2:03:00
 	TimeDurationUtils.format({ days = 1, minutes = 5 }, "d __, h __, m __", { largest = 2 }) --> 1 day, 5 minutes

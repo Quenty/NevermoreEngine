@@ -1736,6 +1736,15 @@ importers:
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quenty/time':
+        specifier: workspace:*
+        version: link:../time
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/counter:
     dependencies:
@@ -1841,12 +1850,18 @@ importers:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
       '@quenty/characterutils':
         specifier: workspace:*
         version: link:../characterutils
       '@quenty/humanoidkillerutils':
         specifier: workspace:*
         version: link:../humanoidkillerutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1856,9 +1871,15 @@ importers:
       '@quenty/nevermore-test-runner':
         specifier: workspace:*
         version: link:../nevermore-test-runner
+      '@quenty/playerbinder':
+        specifier: workspace:*
+        version: link:../playerbinder
       '@quenty/playerhumanoidbinder':
         specifier: workspace:*
         version: link:../playerhumanoidbinder
+      '@quenty/playermock':
+        specifier: workspace:*
+        version: link:../player-mock
       '@quenty/remoting':
         specifier: workspace:*
         version: link:../remoting
@@ -1877,6 +1898,12 @@ importers:
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
+      '@quenty/tie':
+        specifier: workspace:*
+        version: link:../tie
+      '@quenty/valuebaseutils':
+        specifier: workspace:*
+        version: link:../valuebaseutils
       '@quentystudios/jest-lua':
         specifier: 3.10.0-quenty.2
         version: 3.10.0-quenty.2
@@ -5109,6 +5136,9 @@ importers:
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie
+      '@quenty/time':
+        specifier: workspace:*
+        version: link:../time
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject
@@ -6307,7 +6337,20 @@ importers:
         specifier: workspace:*
         version: link:../signal
 
-  src/time: {}
+  src/time:
+    dependencies:
+      '@quenty/clienttranslator':
+        specifier: workspace:*
+        version: link:../clienttranslator
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/timedtween:
     dependencies:
