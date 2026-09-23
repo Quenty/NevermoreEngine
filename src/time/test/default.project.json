@@ -1,12 +1,12 @@
 {
-  "name": "CountdownTextTest",
+  "name": "TimeTest",
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
       "$properties": {
         "LoadStringEnabled": true
       },
-      "countdowntext": {
+      "time": {
         "$path": ".."
       },
       "Script": {
