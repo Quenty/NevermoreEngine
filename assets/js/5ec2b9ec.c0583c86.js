@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[55249],{69607:e=>{e.exports=JSON.parse('[{"value":"Types","id":"types","level":2},{"value":"CalendarFormat","id":"CalendarFormat","level":3},{"value":"CalendarFormats","id":"CalendarFormats","level":3},{"value":"Functions","id":"functions","level":2},{"value":".calendar","id":"calendar","level":3}]')}}]);
