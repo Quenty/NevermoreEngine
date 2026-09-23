@@ -41,6 +41,7 @@ local SaveSlotCodeUtils = require("SaveSlotCodeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local SaveSlotExportUtils = require("SaveSlotExportUtils")
+local SaveSlotUtils = require("SaveSlotUtils")
 local ValueObject = require("ValueObject")
 
 -- The caller-supplied fields for a new slot. SlotId and SlotIndex are assigned by PromiseCreateSlot
@@ -485,7 +486,7 @@ function HasSaveSlotsDataStore.PromiseCreateSlot(
 		local data = {
 			SlotId = slotId,
 			SlotIndex = slotIndex,
-			SlotName = (metadata and metadata.SlotName) or `Slot {slotIndex}`,
+			SlotName = (metadata and metadata.SlotName) or SaveSlotUtils.getDefaultSlotName(slotIndex),
 			CreatedTime = os.time(),
 			Summary = metadata and metadata.Summary,
 			TimePlayed = metadata and metadata.TimePlayed,
@@ -1573,7 +1574,8 @@ end
 	selecting a slot begins one (bumping PlayCount), and deselecting, switching, or unbinding ends
 	it. Elapsed wall time is folded into the slot's TimePlayed from a datastore saving callback, so
 	it persists on exactly the cadence the data is written -- always fresh at save time, with no
-	separate timer -- and again at each session boundary.
+	separate timer -- and again at each session boundary. Between flushes the active slot's total is
+	stale on purpose; [SaveSlotUtils.getTimePlayed] re-derives it from the clock for display.
 
 	Skipped entirely when the owner opts out (`TrackPlaytime = false`), which is what offline admin
 	tooling wants: editing a slot from a console is not someone playing it, and no session is ever
@@ -1619,6 +1621,9 @@ function HasSaveSlotsDataStore._beginPlaySession(self: HasSaveSlotsDataStore, sl
 	local slot = self._slotMap[slotId]
 	if slot then
 		SaveSlotData.PlayCount:Set(slot, (SaveSlotData.PlayCount:Get(slot) or 0) + 1)
+		-- Zeroed at the boundary so TimePlayed - LastSessionLength is the pre-session total for the
+		-- whole session, whatever the flush cadence; see SaveSlotUtils.getTimePlayed.
+		SaveSlotData.LastSessionLength:Set(slot, 0)
 	end
 end
 

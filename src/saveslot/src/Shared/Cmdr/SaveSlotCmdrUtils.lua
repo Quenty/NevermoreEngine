@@ -5,14 +5,25 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local RelativeTimeUtils = require("RelativeTimeUtils")
 local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
+local SaveSlotUtils = require("SaveSlotUtils")
+local Time = require("Time")
+local TimeDurationUtils = require("TimeDurationUtils")
 
 local SaveSlotCmdrUtils = {}
 
 -- How deep a summary value is expanded before it collapses to "...". Summaries come out of a
 -- JSON-encoded attribute, so they are shallow in practice; this only guards a pathological one.
 local MAX_VALUE_DEPTH = 3
+
+-- Unit suffixes for the compact "1h 23m" playtime a listing shows
+local COMPACT_DURATION_STRINGS: TimeDurationUtils.DurationStringOverrides = {
+	hours = { one = "%dh", other = "%dh" },
+	minutes = { one = "%dm", other = "%dm" },
+	seconds = { one = "%ds", other = "%ds" },
+}
 
 function SaveSlotCmdrUtils.registerSlotIndexType(cmdr, saveSlotDataService)
 	local slotIndex = {
@@ -153,52 +164,29 @@ function SaveSlotCmdrUtils.formatValue(value: any, depth: number?): string
 end
 
 --[=[
-	Renders a duration in seconds as "1h 23m", "23m", or "45s".
-
-	@param seconds number
-	@return string
+	Renders a duration in seconds as its two largest units, e.g. "1h 23m", "23m 4s", or "45s".
 ]=]
 function SaveSlotCmdrUtils.formatDuration(seconds: number): string
-	local total = math.max(0, math.floor(seconds))
-	local hours = math.floor(total / 3600)
-	local minutes = math.floor((total % 3600) / 60)
-
-	if hours > 0 then
-		return `{hours}h {minutes}m`
-	elseif minutes > 0 then
-		return `{minutes}m`
-	end
-
-	return `{total}s`
+	return TimeDurationUtils.format(math.max(0, seconds), "h __ m __ s __", {
+		largest = 2,
+		trunc = true,
+		strings = COMPACT_DURATION_STRINGS,
+	})
 end
 
 --[=[
-	Renders a unix timestamp as UTC plus how long ago it was, e.g. "2026-08-12 14:03 UTC (3h ago)".
-	The relative part is what an admin actually reads; the absolute one is what they quote back.
-
-	@param unixTime number
-	@param now number? -- defaults to os.time()
-	@return string
+	Renders a unix timestamp as UTC plus how long ago it was, e.g. "2026-08-12 14:03 UTC (3 hours ago)".
+	The relative part is what an admin actually reads; the absolute one is what they quote back. A
+	timestamp ahead of `now` (clock skew) prints the absolute part alone. `now` defaults to os.time().
 ]=]
 function SaveSlotCmdrUtils.formatTimestamp(unixTime: number, now: number?): string
-	local absolute = os.date("!%Y-%m-%d %H:%M UTC", math.floor(unixTime))
-	local elapsed = (now or os.time()) - unixTime
-	if elapsed < 0 then
+	local absolute = Time.format("YYYY-MM-DD HH:mm [UTC]", unixTime)
+	local resolvedNow = now or os.time()
+	if unixTime > resolvedNow then
 		return absolute
 	end
 
-	local relative
-	if elapsed < 60 then
-		relative = "just now"
-	elseif elapsed < 3600 then
-		relative = `{math.floor(elapsed / 60)}m ago`
-	elseif elapsed < 86400 then
-		relative = `{math.floor(elapsed / 3600)}h ago`
-	else
-		relative = `{math.floor(elapsed / 86400)}d ago`
-	end
-
-	return `{absolute} ({relative})`
+	return `{absolute} ({RelativeTimeUtils.from(unixTime, resolvedNow)})`
 end
 
 --[=[
@@ -251,7 +239,7 @@ function SaveSlotCmdrUtils.formatSlotBlock(
 	status: string?,
 	now: number?
 ): string
-	local name = metadata.SlotName or `Slot {metadata.SlotIndex}`
+	local name = metadata.SlotName or SaveSlotUtils.getDefaultSlotName(metadata.SlotIndex)
 	local lines = { `"{name}" ({metadata.SlotIndex}){if status then ` — {status}` else ""}` }
 
 	local played = {}

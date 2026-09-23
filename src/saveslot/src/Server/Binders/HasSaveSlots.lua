@@ -725,6 +725,14 @@ function HasSaveSlots._setupRemotes(self: HasSaveSlots): ()
 			return (Promise :: any).rejected("Bad player")
 		end
 	end))
+
+	self._maid:GiveTask(self._remoting.PromiseDeselectSlot:Bind(function(remotePlayer: Player)
+		if remotePlayer == self._obj then
+			return self:PromiseDeselectSlot()
+		else
+			return (Promise :: any).rejected("Bad player")
+		end
+	end))
 end
 
 return PlayerBinder.new("HasSaveSlots", HasSaveSlots :: any) :: Binder.Binder<HasSaveSlots>

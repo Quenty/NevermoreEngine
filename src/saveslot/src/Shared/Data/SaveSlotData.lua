@@ -27,7 +27,7 @@ export type SaveSlotMetadata = {
 	-- Accrued automatically by HasSaveSlots while the slot is the active slot; see _setupPlaytimeTracking.
 	TimePlayed: number?, -- total seconds the slot has been actively played, across every session
 	PlayCount: number?, -- number of sessions (incremented each time the slot is selected)
-	LastSessionLength: number?, -- seconds of the current/most-recent session
+	LastSessionLength: number?, -- seconds of the current/most-recent session, zeroed when a session begins
 	-- A session-only slot that is never persisted and is filtered out of the save-slot list. Set at
 	-- creation and never mutated; see HasSaveSlots.PromiseSelectEphemeralSlot.
 	IsEphemeral: boolean?,

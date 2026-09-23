@@ -1237,6 +1237,28 @@ describe("HasSaveSlots playtime tracking", function()
 		context:Destroy()
 	end)
 
+	it("zeroes LastSessionLength when a session begins, keeping the total minus it as the pre-session time", function()
+		local context = setup()
+
+		local slotId = createAndSelect(context, 1)
+		local tracker: any = context.hasSaveSlots:GetSlotsDataStore()
+		tracker._playSessionStart = os.time() - 120
+		tracker._playSessionLastFlush = os.time() - 120
+		tracker:_flushPlaytime()
+
+		-- Switching away ends the session with its length recorded; coming back must not carry it over
+		createAndSelect(context, 2)
+		local reselectPromise = context.hasSaveSlots:PromiseSelectSlot(slotId)
+		expect(PromiseTestUtils.awaitSettled(reselectPromise, 10)).toEqual(true)
+		reselectPromise:Yield()
+
+		local metadata = getMetadata(context, slotId)
+		expect(metadata.TimePlayed ~= nil and metadata.TimePlayed >= 120).toEqual(true)
+		expect(metadata.LastSessionLength).toEqual(0)
+
+		context:Destroy()
+	end)
+
 	it("does not accrue time before any slot is selected", function()
 		local context = setup()
 

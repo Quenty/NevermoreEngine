@@ -121,6 +121,13 @@ function HasSaveSlotsClient.PromiseLastActiveSlotId(self: HasSaveSlotsClient): P
 end
 
 --[=[
+	Clears the active slot selection, returning the player to a no-slot state
+]=]
+function HasSaveSlotsClient.PromiseDeselectSlot(self: HasSaveSlotsClient): Promise.Promise<()>
+	return self._remoting.PromiseDeselectSlot:PromiseInvokeServer()
+end
+
+--[=[
 	Returns the slot ID from the given index
 ]=]
 function HasSaveSlotsClient.PromiseSlotIdFromIndex(
