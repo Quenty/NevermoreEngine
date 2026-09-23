@@ -5,29 +5,33 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DeathReportServiceConstants = require("DeathReportServiceConstants")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local Jest = require("Jest")
 local PlayerDeathTracker = require("PlayerDeathTracker")
-local PlayerKillTrackerUtils = require("PlayerKillTrackerUtils")
+local PlayerDeathTrackerInterface = require("PlayerDeathTrackerInterface")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function newTracker(controller: any, mock: Player): (PlayerDeathTracker.PlayerDeathTracker, IntValue)
-	local score = PlayerKillTrackerUtils.create(controller.playerDeathTrackerBinder, mock)
-	return DeathReportTestUtils.awaitBound(controller.playerDeathTrackerBinder, score), score
+local function awaitTracker(controller: any, mock: Player): PlayerDeathTracker.PlayerDeathTracker
+	return DeathReportTestUtils.awaitBound(controller.playerDeathTrackerBinder, mock)
 end
 
 describe("PlayerDeathTracker", function()
-	it("binds under the player and starts at zero", function()
+	it("binds to every player and starts at zero", function()
 		local controller = DeathReportTestUtils.setup()
 		local mock = controller.newMock()
-		local tracker, score = newTracker(controller, mock)
+		local tracker = awaitTracker(controller, mock)
 
 		expect(tracker:GetPlayer()).toBe(mock)
-		expect(tracker:GetDeathValue()).toBe(score)
 		expect(tracker:GetDeaths()).toEqual(0)
+
+		local deathValue = tracker:GetDeathValue()
+		expect(deathValue.Parent).toBe(mock)
+		expect(deathValue.Name).toEqual(DeathReportServiceConstants.PLAYER_DEATH_VALUE_NAME)
+		expect(deathValue.Value).toEqual(0)
 
 		controller:Destroy()
 	end)
@@ -36,7 +40,7 @@ describe("PlayerDeathTracker", function()
 		local controller = DeathReportTestUtils.setup()
 		local victim = controller.newMock()
 		local _victimCharacter, victimHumanoid = controller.newCharacter(victim)
-		local tracker = newTracker(controller, victim)
+		local tracker = awaitTracker(controller, victim)
 
 		controller.kill(victimHumanoid)
 
@@ -52,7 +56,7 @@ describe("PlayerDeathTracker", function()
 
 		local victim = controller.newMock()
 		local _victimCharacter, victimHumanoid = controller.newCharacter(victim)
-		local tracker = newTracker(controller, victim)
+		local tracker = awaitTracker(controller, victim)
 
 		controller.kill(victimHumanoid, killer)
 
@@ -65,7 +69,7 @@ describe("PlayerDeathTracker", function()
 		local controller = DeathReportTestUtils.setup()
 		local killer = controller.newMock()
 		controller.newCharacter(killer)
-		local killerTracker = newTracker(controller, killer)
+		local killerTracker = awaitTracker(controller, killer)
 
 		local victim = controller.newMock()
 		local _victimCharacter, victimHumanoid = controller.newCharacter(victim)
@@ -77,18 +81,31 @@ describe("PlayerDeathTracker", function()
 		controller:Destroy()
 	end)
 
-	it("stops counting once unbound", function()
+	it("removes its value once unbound", function()
 		local controller = DeathReportTestUtils.setup()
 		local victim = controller.newMock()
-		local _victimCharacter, victimHumanoid = controller.newCharacter(victim)
-		local _tracker, score = newTracker(controller, victim)
+		local deathValue = awaitTracker(controller, victim):GetDeathValue()
 
-		controller.playerDeathTrackerBinder:Unbind(score)
-		DeathReportTestUtils.awaitUnbound(controller.playerDeathTrackerBinder, score)
+		controller.playerDeathTrackerBinder:Unbind(victim)
+		DeathReportTestUtils.awaitUnbound(controller.playerDeathTrackerBinder, victim)
 
-		controller.kill(victimHumanoid)
+		expect(deathValue.Parent).toBeNil()
+		expect(victim:FindFirstChild(DeathReportServiceConstants.PLAYER_DEATH_VALUE_NAME)).toBeNil()
 
-		expect(score.Value).toEqual(0)
+		controller:Destroy()
+	end)
+
+	it("implements PlayerDeathTrackerInterface on the player", function()
+		local controller = DeathReportTestUtils.setup()
+		local mock = controller.newMock()
+		local tracker = awaitTracker(controller, mock)
+
+		local implementation = PlayerDeathTrackerInterface.Server:Find(mock)
+		assert(implementation, "No implementation")
+
+		expect(implementation:GetPlayer()).toBe(mock)
+		expect(implementation:GetDeathValue()).toBe(tracker:GetDeathValue())
+		expect(implementation:GetDeaths()).toEqual(0)
 
 		controller:Destroy()
 	end)

@@ -1,7 +1,7 @@
 --!strict
 --[[
-	Client binder coverage with both realms booted: the server binds the tracker it created, and the
-	client binder binds the same replicated IntValue.
+	Client binder coverage with both realms booted: the server binder tags every player and keeps the
+	replicated value, and the client binder binds the same tagged player.
 
 	@class PlayerKillTrackerClient.spec.lua
 ]]
@@ -10,7 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local Jest = require("Jest")
-local PlayerKillTrackerUtils = require("PlayerKillTrackerUtils")
+local PlayerKillTrackerInterface = require("PlayerKillTrackerInterface")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -21,17 +21,16 @@ local function setup(): any
 
 	local mock = controller.newMock()
 	controller.setLocalPlayer(mock)
-	local score = PlayerKillTrackerUtils.create(controller.playerKillTrackerBinder, mock)
 
 	controller.mock = mock
-	controller.score = score
-	controller.tracker = DeathReportTestUtils.awaitBound(controller.playerKillTrackerClientBinder, score)
+	controller.score = DeathReportTestUtils.awaitBound(controller.playerKillTrackerBinder, mock):GetKillValue()
+	controller.tracker = DeathReportTestUtils.awaitBound(controller.playerKillTrackerClientBinder, mock)
 
 	return controller
 end
 
 describe("PlayerKillTrackerClient", function()
-	it("binds the replicated tracker and reads its player and kills", function()
+	it("binds the tagged player and reads its replicated kills", function()
 		local controller = setup()
 
 		expect(controller.tracker:GetPlayer()).toBe(controller.mock)
@@ -72,6 +71,19 @@ describe("PlayerKillTrackerClient", function()
 		expect(DeathReportTestUtils.waitFor(function()
 			return controller.tracker:GetKills() == 1
 		end)).toBe(true)
+
+		controller:Destroy()
+	end)
+
+	it("implements PlayerKillTrackerInterface for the client realm", function()
+		local controller = setup()
+
+		local implementation = PlayerKillTrackerInterface.Client:Find(controller.mock)
+		assert(implementation, "No implementation")
+
+		expect(implementation:GetPlayer()).toBe(controller.mock)
+		expect(implementation:GetKillValue()).toBe(controller.score)
+		expect(implementation:GetKills()).toEqual(0)
 
 		controller:Destroy()
 	end)

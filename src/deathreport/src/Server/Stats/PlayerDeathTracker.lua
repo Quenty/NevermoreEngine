@@ -1,11 +1,10 @@
 --!strict
 --[=[
-	Counts the deaths of one player. Bound to an [IntValue] parented under a [Player]; every death
-	report for that player increments the value.
+	Counts the deaths of one player. Bound to every [Player] automatically through a
+	[PlayerBinder]; every death report for that player increments a replicated [IntValue] kept
+	under the player.
 
-	Retrieve the binder from a [ServiceBag] with `serviceBag:GetService(require("PlayerDeathTracker"))`
-	and create tracked values with [PlayerKillTrackerUtils.create], or let
-	[PlayerKillTrackerAssigner] do it for every player.
+	Retrieve the binder from a [ServiceBag] with `serviceBag:GetService(require("PlayerDeathTracker"))`.
 
 	@server
 	@class PlayerDeathTracker
@@ -14,9 +13,13 @@
 local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
-local Binder = require("Binder")
 local DeathReportService = require("DeathReportService")
+local DeathReportServiceConstants = require("DeathReportServiceConstants")
+local Observable = require("Observable")
+local PlayerBinder = require("PlayerBinder")
+local PlayerDeathTrackerInterface = require("PlayerDeathTrackerInterface")
 local PlayerMock = require("PlayerMock")
+local RxValueBaseUtils = require("RxValueBaseUtils")
 local ServiceBag = require("ServiceBag")
 
 local PlayerDeathTracker = setmetatable({}, BaseObject)
@@ -26,10 +29,10 @@ PlayerDeathTracker.__index = PlayerDeathTracker
 export type PlayerDeathTracker =
 	typeof(setmetatable(
 		{} :: {
-			_obj: IntValue,
+			_obj: Player,
 			_serviceBag: ServiceBag.ServiceBag,
 			_deathReportService: DeathReportService.DeathReportService,
-			_player: Player,
+			_deathValue: IntValue,
 		},
 		{} :: typeof({ __index = PlayerDeathTracker })
 	))
@@ -38,34 +41,39 @@ export type PlayerDeathTracker =
 --[=[
 	Constructs a new PlayerDeathTracker. Should be done via the binder.
 
-	@param scoreObject IntValue -- Parented under the [Player] to track
+	@param player Player
 	@param serviceBag ServiceBag
 	@return PlayerDeathTracker
 ]=]
-function PlayerDeathTracker.new(scoreObject: IntValue, serviceBag: ServiceBag.ServiceBag): PlayerDeathTracker
-	local self: PlayerDeathTracker = setmetatable(BaseObject.new(scoreObject) :: any, PlayerDeathTracker)
+function PlayerDeathTracker.new(player: Player, serviceBag: ServiceBag.ServiceBag): PlayerDeathTracker
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
+
+	local self: PlayerDeathTracker = setmetatable(BaseObject.new(player) :: any, PlayerDeathTracker)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._deathReportService = self._serviceBag:GetService(DeathReportService) :: any
 
-	local player = self._obj.Parent
-	assert(player and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
-	self._player = player :: Player
+	self._deathValue = self._maid:Add(Instance.new("IntValue"))
+	self._deathValue.Name = DeathReportServiceConstants.PLAYER_DEATH_VALUE_NAME
+	self._deathValue.Value = 0
+	self._deathValue.Parent = self._obj
 
-	self._maid:GiveTask(self._deathReportService:ObservePlayerDeathReports(self._player):Subscribe(function(deathReport)
-		assert(deathReport.player == self._player, "Bad player")
-		self._obj.Value = self._obj.Value + 1
+	self._maid:GiveTask(self._deathReportService:ObservePlayerDeathReports(self._obj):Subscribe(function(deathReport)
+		assert(deathReport.player == self._obj, "Bad player")
+		self._deathValue.Value = self._deathValue.Value + 1
 	end))
+
+	self._maid:GiveTask(PlayerDeathTrackerInterface.Server:Implement(self._obj, self))
 
 	return self
 end
 
 --[=[
-	Returns the value holding the death count
+	Returns the replicated value holding the death count
 	@return IntValue
 ]=]
 function PlayerDeathTracker.GetDeathValue(self: PlayerDeathTracker): IntValue
-	return self._obj
+	return self._deathValue
 end
 
 --[=[
@@ -73,7 +81,7 @@ end
 	@return Player
 ]=]
 function PlayerDeathTracker.GetPlayer(self: PlayerDeathTracker): Player
-	return self._player
+	return self._obj
 end
 
 --[=[
@@ -81,7 +89,17 @@ end
 	@return number
 ]=]
 function PlayerDeathTracker.GetDeaths(self: PlayerDeathTracker): number
-	return self._obj.Value
+	return self._deathValue.Value
 end
 
-return Binder.new("PlayerDeathTracker", PlayerDeathTracker :: any) :: Binder.Binder<PlayerDeathTracker>
+--[=[
+	Observes the number of deaths of the player
+]=]
+function PlayerDeathTracker.ObserveDeaths(self: PlayerDeathTracker): Observable.Observable<number>
+	return RxValueBaseUtils.observeValue(self._deathValue)
+end
+
+return PlayerBinder.new(
+		"PlayerDeathTracker",
+		PlayerDeathTracker :: any
+	) :: PlayerBinder.PlayerBinder<PlayerDeathTracker>

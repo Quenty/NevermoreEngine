@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local Jest = require("Jest")
 local TeamKillTracker = require("TeamKillTracker")
+local TeamKillTrackerInterface = require("TeamKillTrackerInterface")
 local TeamKillTrackerUtils = require("TeamKillTrackerUtils")
 
 local describe = Jest.Globals.describe
@@ -119,6 +120,20 @@ describe("TeamKillTracker", function()
 		controller.kill(victimHumanoid, killer)
 
 		expect(score.Value).toEqual(0)
+
+		controller:Destroy()
+	end)
+
+	it("implements TeamKillTrackerInterface on the tracked value", function()
+		local controller = DeathReportTestUtils.setup()
+		local team, _tracker, score = newTrackedTeam(controller)
+
+		local implementation = TeamKillTrackerInterface.Server:Find(score)
+		assert(implementation, "No implementation")
+
+		expect(implementation:GetTeam()).toBe(team)
+		expect(implementation:GetKillValue()).toBe(score)
+		expect(implementation:GetKills()).toEqual(0)
 
 		controller:Destroy()
 	end)

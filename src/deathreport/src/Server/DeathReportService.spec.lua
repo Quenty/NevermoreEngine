@@ -9,6 +9,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DeathReportDataService = require("DeathReportDataService")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local DeathReportUtils = require("DeathReportUtils")
 local Jest = require("Jest")
@@ -236,6 +237,23 @@ describe("DeathReportService.ReportDeathReport(deathReport)", function()
 		controller.deathReportService:ReportDeathReport(report)
 
 		expect(reports).toEqual({ report })
+		expect(controller.deathReportService:GetLastDeathReports()).toEqual({ report })
+
+		controller:Destroy()
+	end)
+
+	it("records the report in the bag's DeathReportDataService", function()
+		local controller = DeathReportTestUtils.setup()
+		local service = controller.deathReportService
+		local dataService = controller.serverBag:GetService(DeathReportDataService)
+		local npc = controller.newNpc()
+
+		expect(service.NewDeathReport).toBe(dataService.NewDeathReport)
+
+		local report = DeathReportUtils.create(npc)
+		service:ReportDeathReport(report)
+
+		expect(dataService:GetLastDeathReports()).toEqual({ report })
 
 		controller:Destroy()
 	end)

@@ -39,6 +39,8 @@ local PlayerMockServiceClient = require("PlayerMockServiceClient")
 local ServiceBag = require("ServiceBag")
 local TeamKillTracker = require("TeamKillTracker")
 local TeamKillTrackerClient = require("TeamKillTrackerClient")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
 
 local DeathReportTestUtils = {}
 
@@ -124,6 +126,7 @@ function DeathReportTestUtils.setup(options)
 	local serverBag = ServiceBag.new()
 	local deathReportService = serverBag:GetService(DeathReportService)
 	local playerMockService = serverBag:GetService(PlayerMockService)
+	serverBag:GetService(TieRealmService):SetTieRealm(TieRealms.SERVER)
 	serverBag:Init()
 	serverBag:Start()
 
@@ -134,6 +137,7 @@ function DeathReportTestUtils.setup(options)
 		clientBag = ServiceBag.new()
 		deathReportServiceClient = clientBag:GetService(DeathReportServiceClient)
 		playerMockServiceClient = clientBag:GetService(PlayerMockServiceClient)
+		clientBag:GetService(TieRealmService):SetTieRealm(TieRealms.CLIENT)
 		clientBag:Init()
 		clientBag:Start()
 	end

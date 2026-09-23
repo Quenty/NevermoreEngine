@@ -9,6 +9,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local DeathReportDataService = require("DeathReportDataService")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local DeathReportUtils = require("DeathReportUtils")
 local Jest = require("Jest")
@@ -49,6 +50,18 @@ describe("DeathReportServiceClient", function()
 
 		expect(controller.deathReportServiceClient).toBeDefined()
 		expect(controller.deathReportServiceClient:GetLastDeathReports()).toEqual({})
+
+		controller:Destroy()
+	end)
+
+	it("aliases the client bag's DeathReportDataService, separate from the server's", function()
+		local controller = setup()
+		local client = controller.deathReportServiceClient
+		local clientDataService = controller.clientBag:GetService(DeathReportDataService)
+		local serverDataService = controller.serverBag:GetService(DeathReportDataService)
+
+		expect(client.NewDeathReport).toBe(clientDataService.NewDeathReport)
+		expect(clientDataService).never.toBe(serverDataService)
 
 		controller:Destroy()
 	end)

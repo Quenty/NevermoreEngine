@@ -16,8 +16,11 @@ local BaseObject = require("BaseObject")
 local Binder = require("Binder")
 local DeathReportService = require("DeathReportService")
 local DeathReportUtils = require("DeathReportUtils")
+local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
+local RxValueBaseUtils = require("RxValueBaseUtils")
 local ServiceBag = require("ServiceBag")
+local TeamKillTrackerInterface = require("TeamKillTrackerInterface")
 
 local TeamKillTracker = setmetatable({}, BaseObject)
 TeamKillTracker.ClassName = "TeamKillTracker"
@@ -56,6 +59,8 @@ function TeamKillTracker.new(scoreObject: IntValue, serviceBag: ServiceBag.Servi
 		self:_handleDeathReport(deathReport)
 	end))
 
+	self._maid:GiveTask(TeamKillTrackerInterface.Server:Implement(self._obj, self))
+
 	return self
 end
 
@@ -68,11 +73,26 @@ function TeamKillTracker.GetTeam(self: TeamKillTracker): Instance?
 end
 
 --[=[
+	Returns the value holding the kill count
+	@return IntValue
+]=]
+function TeamKillTracker.GetKillValue(self: TeamKillTracker): IntValue
+	return self._obj
+end
+
+--[=[
 	Returns the number of kills scored by the team
 	@return number
 ]=]
 function TeamKillTracker.GetKills(self: TeamKillTracker): number
 	return self._obj.Value
+end
+
+--[=[
+	Observes the number of kills scored by the team
+]=]
+function TeamKillTracker.ObserveKills(self: TeamKillTracker): Observable.Observable<number>
+	return RxValueBaseUtils.observeValue(self._obj)
 end
 
 function TeamKillTracker._handleDeathReport(self: TeamKillTracker, deathReport: DeathReportUtils.DeathReport)

@@ -12,6 +12,9 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Binder = require("Binder")
+local Observable = require("Observable")
+local RxValueBaseUtils = require("RxValueBaseUtils")
+local TeamKillTrackerInterface = require("TeamKillTrackerInterface")
 
 local TeamKillTrackerClient = setmetatable({}, BaseObject)
 TeamKillTrackerClient.ClassName = "TeamKillTrackerClient"
@@ -43,6 +46,8 @@ function TeamKillTrackerClient.new(tracker: IntValue): TeamKillTrackerClient
 ]=]
 	self.KillsChanged = self._obj.Changed
 
+	self._maid:GiveTask(TeamKillTrackerInterface.Client:Implement(self._obj, self))
+
 	return self
 end
 
@@ -68,6 +73,13 @@ end
 ]=]
 function TeamKillTrackerClient.GetKills(self: TeamKillTrackerClient): number
 	return self._obj.Value
+end
+
+--[=[
+	Observes the number of kills scored by the team
+]=]
+function TeamKillTrackerClient.ObserveKills(self: TeamKillTrackerClient): Observable.Observable<number>
+	return RxValueBaseUtils.observeValue(self._obj)
 end
 
 return Binder.new("TeamKillTracker", TeamKillTrackerClient :: any) :: Binder.Binder<TeamKillTrackerClient>
