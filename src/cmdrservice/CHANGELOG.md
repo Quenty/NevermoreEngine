@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.61.1...@quenty/cmdrservice@13.62.0) (2026-09-21)
+
+### Bug Fixes
+
+- Fix unit testing template provider ([08dd007](https://github.com/Quenty/NevermoreEngine/commit/08dd007171bd348dcd1a966ff67b8d597a202cb5))
+
 ## [13.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cmdrservice@13.61.0...@quenty/cmdrservice@13.61.1) (2026-09-03)
 
 **Note:** Version bump only for package @quenty/cmdrservice

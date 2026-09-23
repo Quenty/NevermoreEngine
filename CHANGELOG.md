@@ -1,3 +1,29 @@
+# (Tue Sep 22 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.40.1`
+  - fix: Compare animation weights [#826](https://github.com/Quenty/NevermoreEngine/pull/826) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Sep 21 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cmdrservice@13.62.0`, `@quenty/humanoidkillerutils@2.4.0`, `@quenty/playermock@1.10.0`, `@quenty/raycaster@3.6.0`, `@quenty/teamutils@10.39.0`, `@quenty/templateprovider@11.53.0`, `@quenty/tie@10.51.0`, `@quenty/weldconstraintutils@3.2.0`
+  - fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sat Sep 19 2026)
 
 #### 🐛 Bug Fix
