@@ -31,13 +31,16 @@
   "devDependencies": {
     "@types/node": "^18.11.4",
     "prettier": "2.7.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "build": "tsc --build",
     "build:watch": "tsc --build --watch",
     "build:clean": "tsc --build --clean",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "publishConfig": {
     "access": "public"

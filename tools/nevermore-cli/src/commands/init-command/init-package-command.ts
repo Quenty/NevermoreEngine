@@ -51,7 +51,7 @@ export class InitPackageCommand<T>
   public handler = async (args: InitPackageArgs) => {
     let rawPackageName = await InitPackageCommand._ensurePackageName(args);
 
-    const packageName = TemplateHelper.camelize(rawPackageName).toLowerCase();
+    const packageName = TemplateHelper.toPackageName(rawPackageName);
     const packageNameProper = TemplateHelper.camelize(rawPackageName);
     const description = await InitPackageCommand._ensureDescription(args);
 
@@ -71,6 +71,7 @@ export class InitPackageCommand<T>
       {
         packageName: packageName,
         packageNameProper: packageNameProper,
+        packageNameIndex: TemplateHelper.toIndexExpression(packageName),
         description: description,
       },
       args.dryrun

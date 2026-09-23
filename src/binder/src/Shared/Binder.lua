@@ -698,6 +698,12 @@ function Binder._add<T>(self: Binder<T>, inst: Instance)
 				tostring(type(constructor) == "table" and constructor.ClassName or constructor)
 			)
 		)
+		if MaidTaskUtils.isValidTask(class) then
+			task.spawn(function()
+				MaidTaskUtils.doTask(class)
+			end)
+		end
+
 		return
 	end
 

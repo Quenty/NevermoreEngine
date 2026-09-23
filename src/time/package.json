@@ -1,7 +1,7 @@
 {
   "name": "@quenty/time",
   "version": "2.5.0",
-  "description": "Library handles time based parsing / operations. Untested. Based off of PHP's time system. Note: This library is out of date, and does not necessarily work. I recommend using os.time()",
+  "description": "Time based parsing and formatting built on Roblox's DateTime, with PHP-style format codes. All calculations are in UTC.",
   "keywords": [
     "Roblox",
     "Nevermore",
@@ -27,6 +27,15 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
+  "devDependencies": {
+    "@quenty/loader": "workspace:*"
+  },
   "publishConfig": {
     "access": "public"
   }
