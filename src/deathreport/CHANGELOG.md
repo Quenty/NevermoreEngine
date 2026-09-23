@@ -1,25 +1,13 @@
-# v10.61.0 (Wed Sep 23 2026)
-
-#### 🚀 Enhancement
-
-- fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-- refactor: Change how death/kill tracking works so it's on the player ([@Quenty](https://github.com/Quenty))
-- fix: DeathReport supports player mocks and is strict typed ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.60.0...@quenty/deathreport@10.61.0) (2026-09-23)
+
+### Bug Fixes
+
+- DeathReport supports player mocks and is strict typed ([1d1b21a](https://github.com/Quenty/NevermoreEngine/commit/1d1b21a01945ddd946cf25333a8591daddc5a939))
 
 # [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.59.1...@quenty/deathreport@10.60.0) (2026-09-21)
 

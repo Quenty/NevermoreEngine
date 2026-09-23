@@ -1,19 +1,11 @@
-# v1.58.0 (Wed Sep 23 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.57.0...@quenty/soundgroup@1.58.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/soundgroup
 
 # [1.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.56.1...@quenty/soundgroup@1.57.0) (2026-09-21)
 

@@ -1,19 +1,11 @@
-# v15.73.0 (Wed Sep 23 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [15.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.72.0...@quenty/ik@15.73.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/ik
 
 # [15.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.71.0...@quenty/ik@15.72.0) (2026-09-21)
 

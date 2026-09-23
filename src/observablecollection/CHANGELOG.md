@@ -1,24 +1,13 @@
-# v12.53.0 (Wed Sep 23 2026)
-
-#### 🚀 Enhancement
-
-- fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-- fix: Observe negative indexes properly ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.52.0...@quenty/observablecollection@12.53.0) (2026-09-23)
+
+### Bug Fixes
+
+- Observe negative indexes properly ([4c02458](https://github.com/Quenty/NevermoreEngine/commit/4c02458ffe4d771169e1f47ab790fdfd52710564))
 
 # [12.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.51.1...@quenty/observablecollection@12.52.0) (2026-09-21)
 

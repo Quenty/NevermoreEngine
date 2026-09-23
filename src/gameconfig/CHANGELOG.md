@@ -1,19 +1,11 @@
-# v12.70.0 (Wed Sep 23 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.69.0...@quenty/gameconfig@12.70.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/gameconfig
 
 # [12.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.68.1...@quenty/gameconfig@12.69.0) (2026-09-21)
 

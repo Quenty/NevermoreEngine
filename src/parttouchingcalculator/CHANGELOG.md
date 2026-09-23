@@ -1,19 +1,11 @@
-# v14.56.0 (Wed Sep 23 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.55.0...@quenty/parttouchingcalculator@14.56.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/parttouchingcalculator
 
 # [14.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/parttouchingcalculator@14.54.1...@quenty/parttouchingcalculator@14.55.0) (2026-09-21)
 

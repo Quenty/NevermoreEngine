@@ -1,26 +1,18 @@
-# v2.6.0 (Wed Sep 23 2026)
-
-#### 🚀 Enhancement
-
-- fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
-- feat: Refactor time package to support localized text + relative time formatting ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-- fix: Resolve luau-lsp and prettier lint failures ([@Quenty](https://github.com/Quenty))
-- fix: TIme duration allows for centiseconds ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/time@2.5.0...@quenty/time@2.6.0) (2026-09-23)
+
+### Bug Fixes
+
+- Resolve luau-lsp and prettier lint failures ([c6face3](https://github.com/Quenty/NevermoreEngine/commit/c6face3b716827345bf7f82406723a1b0388d59b))
+- TIme duration allows for centiseconds ([d9d5408](https://github.com/Quenty/NevermoreEngine/commit/d9d54088b122f8f80df0165b9bd2db05df224827))
+
+### Features
+
+- Refactor time package to support localized text + relative time formatting ([fab96a0](https://github.com/Quenty/NevermoreEngine/commit/fab96a01f941baf5e051f85ba7e0dc82bc04d1c5))
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/time@2.4.6...@quenty/time@2.5.0) (2026-07-14)
 

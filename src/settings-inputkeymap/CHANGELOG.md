@@ -1,19 +1,11 @@
-# v10.77.0 (Wed Sep 23 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/updates ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.77.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.76.0...@quenty/settings-inputkeymap@10.77.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
 
 # [10.76.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.75.1...@quenty/settings-inputkeymap@10.76.0) (2026-09-21)
 
