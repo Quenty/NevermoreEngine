@@ -624,24 +624,25 @@ function ObservableSortedList._fireEvents<T>(self: ObservableSortedList<T>)
 		return
 	end
 
-	local effectiveSpans = self._unifiedTracker:ComputeEffectiveSpans(previousCount, descendantCount)
+	local effectiveSpans, originalIndexes = self._unifiedTracker:ComputeEffectiveSpans(previousCount, descendantCount)
 
 	-- We assume there's not that many index observers at once (since you're usually looking for the ordinal first/last)
 	for rawIndex, _ in self._indexObservers:GetRawSubscriptionMap() do
 		local index = ListIndexUtils.toPositiveIndex(descendantCount, rawIndex)
-		local shouldFire = UnifiedChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
 
-		-- For negative indices, also fire if the position mapping changed due to count change
-		if not shouldFire and rawIndex < 0 and previousCount ~= descendantCount then
-			local oldIndex = ListIndexUtils.toPositiveIndex(previousCount, rawIndex)
-			shouldFire = oldIndex ~= index
+		local shouldFire
+		if rawIndex > 0 then
+			shouldFire = UnifiedChangedSpanTracker.isIndexInSpan(effectiveSpans, index)
+		else
+			shouldFire = UnifiedChangedSpanTracker.isNegativeIndexChanged(originalIndexes, previousCount, rawIndex)
 		end
 
 		if not shouldFire then
 			continue
 		end
 
-		local node = self:_findNodeAtIndex(index) -- O(log n)
+		-- A negative slot that fell off the front maps to index <= 0, which the tree cannot look up
+		local node = if index >= 1 then self:_findNodeAtIndex(index) else nil -- O(log n)
 		if node then
 			self._indexObservers:Fire(rawIndex, node.data, node)
 		else
