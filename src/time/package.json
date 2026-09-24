@@ -1,6 +1,6 @@
 {
   "name": "@quenty/time",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Time based parsing and formatting built on Roblox's DateTime, with PHP-style format codes. All calculations are in UTC.",
   "keywords": [
     "Roblox",
