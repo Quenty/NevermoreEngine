@@ -1,24 +1,11 @@
-# v1.8.0 (Thu Sep 24 2026)
-
-#### 🚀 Enhancement
-
-- feat: guid hook [#827](https://github.com/Quenty/NevermoreEngine/pull/827) ([@euvinkeel](https://github.com/euvinkeel))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/euvinkeel/hooks-guid ([@euvinkeel](https://github.com/euvinkeel))
-- Update JecsImmediateHooksCommonHooks.lua ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jecs@1.7.1...@quenty/jecs@1.8.0) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/jecs
 
 ## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jecs@1.7.0...@quenty/jecs@1.7.1) (2026-09-24)
 
