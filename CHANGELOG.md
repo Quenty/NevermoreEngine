@@ -1,3 +1,16 @@
+# (Thu Sep 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@10.11.2`
+  - fix: Detect plugin replication type during play solo [#829](https://github.com/Quenty/NevermoreEngine/pull/829) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # (Wed Sep 23 2026)
 
 #### 🚀 Enhancement

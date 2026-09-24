@@ -1,3 +1,16 @@
+# v10.11.2 (Thu Sep 24 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Detect plugin replication type during play solo [#829](https://github.com/Quenty/NevermoreEngine/pull/829) ([@unrooot](https://github.com/unrooot))
+- fix: Detect plugin replication type during play solo ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
