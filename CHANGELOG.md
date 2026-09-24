@@ -1,5 +1,18 @@
 # (Thu Sep 24 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/jecs@1.8.0`
+  - feat: guid hook [#827](https://github.com/Quenty/NevermoreEngine/pull/827) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Thu Sep 24 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/loader@10.11.2`
