@@ -1,4 +1,5 @@
 --!nonstrict
+local HttpService = game:GetService("HttpService")
 --[=[
 	@class JecsImmediateHooksCommonHooks
 
@@ -72,6 +73,14 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				end))
 			end
 			return hookState._ret
+		end,
+
+		guid = function(dis: any?)
+			local hookState, _hookMaid = getOrCreateHookState(runtime, dis)
+			if hookState.guid == nil then
+				hookState.guid = HttpService:GenerateGUID()
+			end
+			return hookState.guid
 		end,
 
 		cache = function(
