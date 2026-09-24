@@ -416,3 +416,86 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 	end)
 end)
+
+describe("UnifiedChangedSpanTracker.isNegativeIndexChanged", function()
+	local function changed(originalIndexes: { number }?, previousCount: number, negativeIndex: number): boolean
+		return UnifiedChangedSpanTracker.isNegativeIndexChanged(originalIndexes, previousCount, negativeIndex)
+	end
+
+	it("returns original indexes alongside the spans", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(2)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 4)
+
+		expect(originalIndexes).toEqual({ 1, 0, 2, 3 })
+	end)
+
+	it("returns nil original indexes when nothing happened", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 3)
+
+		expect(originalIndexes).toEqual(nil)
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+	end)
+
+	it("shifts every negative slot when adding at the end", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(2, 3)
+
+		expect(changed(originalIndexes, 2, -1)).toEqual(true)
+		expect(changed(originalIndexes, 2, -2)).toEqual(true)
+		expect(changed(originalIndexes, 2, -3)).toEqual(true)
+		expect(changed(originalIndexes, 2, -4)).toEqual(false)
+	end)
+
+	it("only changes the slot that fell off when removing from the front", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogRemove(1)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 2)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+		expect(changed(originalIndexes, 3, -2)).toEqual(false)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+		expect(changed(originalIndexes, 3, -4)).toEqual(false)
+	end)
+
+	it("shifts every negative slot when removing from the end", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogRemove(3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 2)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(true)
+		expect(changed(originalIndexes, 3, -2)).toEqual(true)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+	end)
+
+	it("only changes earlier slots when inserting in the middle", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(2)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 4)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+		expect(changed(originalIndexes, 3, -2)).toEqual(false)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+		expect(changed(originalIndexes, 3, -4)).toEqual(true)
+	end)
+
+	it("treats a move across the whole list as changing every slot", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogMove(1, 3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 3)
+
+		expect(originalIndexes).toEqual({ 2, 3, 1 })
+		expect(changed(originalIndexes, 3, -1)).toEqual(true)
+		expect(changed(originalIndexes, 3, -2)).toEqual(true)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+	end)
+end)

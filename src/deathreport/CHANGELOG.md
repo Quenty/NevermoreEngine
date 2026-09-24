@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.61.0...@quenty/deathreport@10.61.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.60.0...@quenty/deathreport@10.61.0) (2026-09-23)
+
+### Bug Fixes
+
+- DeathReport supports player mocks and is strict typed ([1d1b21a](https://github.com/Quenty/NevermoreEngine/commit/1d1b21a01945ddd946cf25333a8591daddc5a939))
+
 # [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.59.1...@quenty/deathreport@10.60.0) (2026-09-21)
 
 **Note:** Version bump only for package @quenty/deathreport

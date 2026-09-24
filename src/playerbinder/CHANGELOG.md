@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.51.0...@quenty/playerbinder@14.51.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
+# [14.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.50.0...@quenty/playerbinder@14.51.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/playerbinder
+
 # [14.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerbinder@14.49.1...@quenty/playerbinder@14.50.0) (2026-09-21)
 
 **Note:** Version bump only for package @quenty/playerbinder

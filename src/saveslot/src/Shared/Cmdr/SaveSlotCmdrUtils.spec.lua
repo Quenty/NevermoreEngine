@@ -244,8 +244,8 @@ describe("SaveSlotCmdrUtils.formatSlotBlock", function()
 
 		expect(block).toBe(table.concat({
 			'"Alpha" (1) — Active',
-			"  played 1h 23m, 4 session(s), last played 2025-07-31 20:13 UTC (2h ago)",
-			"  created 2025-07-28 22:13 UTC (3d ago)",
+			"  played 1h 23m, 4 session(s), last played 2025-07-31 20:13 UTC (2 hours ago)",
+			"  created 2025-07-28 22:13 UTC (3 days ago)",
 			"  progress: chapter = 3",
 		}, "\n"))
 	end)

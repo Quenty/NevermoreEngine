@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.53.0...@quenty/clienttranslator@14.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
+# [14.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.52.0...@quenty/clienttranslator@14.53.0) (2026-09-23)
+
+### Features
+
+- Refactor time package to support localized text + relative time formatting ([fab96a0](https://github.com/Quenty/NevermoreEngine/commit/fab96a01f941baf5e051f85ba7e0dc82bc04d1c5))
+
 # [14.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.51.1...@quenty/clienttranslator@14.52.0) (2026-09-21)
 
 **Note:** Version bump only for package @quenty/clienttranslator

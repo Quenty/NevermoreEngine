@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.11.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/setmechanismcframe@10.11.1...@quenty/setmechanismcframe@10.11.2) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/setmechanismcframe
+
 ## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/setmechanismcframe@10.11.0...@quenty/setmechanismcframe@10.11.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/setmechanismcframe

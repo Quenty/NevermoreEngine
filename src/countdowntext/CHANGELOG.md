@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.12.0...@quenty/countdowntext@4.12.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/countdowntext
+
+# [4.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.11.1...@quenty/countdowntext@4.12.0) (2026-09-23)
+
+### Features
+
+- Refactor time package to support localized text + relative time formatting ([fab96a0](https://github.com/Quenty/NevermoreEngine/commit/fab96a01f941baf5e051f85ba7e0dc82bc04d1c5))
+
 ## [4.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.11.0...@quenty/countdowntext@4.11.1) (2026-08-14)
 
 **Note:** Version bump only for package @quenty/countdowntext

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.45.0...@quenty/nevermore-cli@4.46.0) (2026-09-23)
+
+### Bug Fixes
+
+- **nevermore-template-helpers:** Scaffold hyphenated package names correctly ([b978855](https://github.com/Quenty/NevermoreEngine/commit/b9788553c4759f430ec4a3b61d02d8881881b867))
+
+### Features
+
+- Upgrade rojo + aftman to latest higher performance rojo ([c0356e6](https://github.com/Quenty/NevermoreEngine/commit/c0356e643d5c571da86642e69709b77e3f1d13cf))
+
 # [4.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.44.0...@quenty/nevermore-cli@4.45.0) (2026-08-28)
 
 ### Bug Fixes

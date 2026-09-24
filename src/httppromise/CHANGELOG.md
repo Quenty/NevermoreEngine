@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@10.25.0...@quenty/httppromise@10.25.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/httppromise
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@10.24.0...@quenty/httppromise@10.25.0) (2026-09-23)
+
+### Bug Fixes
+
+- Fix HttpPromise types ([59327a4](https://github.com/Quenty/NevermoreEngine/commit/59327a4a15859ac6d88fc44666b400732bf545a3))
+- Resolve luau-lsp and prettier lint failures ([c6face3](https://github.com/Quenty/NevermoreEngine/commit/c6face3b716827345bf7f82406723a1b0388d59b))
+
 # [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/httppromise@10.23.1...@quenty/httppromise@10.24.0) (2026-08-28)
 
 **Note:** Version bump only for package @quenty/httppromise

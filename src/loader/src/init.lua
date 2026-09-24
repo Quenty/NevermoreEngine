@@ -123,9 +123,12 @@ end
 function Loader.load(packagesOrModuleScript: Instance)
 	assert(typeof(packagesOrModuleScript) == "Instance", "Bad packagesOrModuleScript")
 
-	local self = Loader.new(packagesOrModuleScript, ReplicationTypeUtils.inferReplicationType())
+	-- Plugins keep running during play solo, where RunService would otherwise report server/client
+	local replicationType = if packagesOrModuleScript:FindFirstAncestorWhichIsA("Plugin")
+		then ReplicationType.PLUGIN
+		else ReplicationTypeUtils.inferReplicationType()
 
-	return self
+	return Loader.new(packagesOrModuleScript, replicationType)
 end
 
 function Loader:__index(request)

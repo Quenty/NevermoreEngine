@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.29.0...@quenty/modeltransparencyeffect@11.29.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.28.0...@quenty/modeltransparencyeffect@11.29.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/modeltransparencyeffect
+
 # [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/modeltransparencyeffect@11.27.0...@quenty/modeltransparencyeffect@11.28.0) (2026-09-02)
 
 **Note:** Version bump only for package @quenty/modeltransparencyeffect

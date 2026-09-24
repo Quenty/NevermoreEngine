@@ -9,6 +9,7 @@ local Brio = require("Brio")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
+local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
 local Symbol = require("Symbol")
 local ValueObject = require("ValueObject")
@@ -2329,5 +2330,261 @@ describe("ObservableSortedList", function()
 			subE:Destroy()
 			maid:Destroy()
 		end)
+	end)
+end)
+
+local function observe(list, index: number)
+	return ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(index))
+end
+
+describe("ObservableSortedList negative index observation (mirrors ObservableList)", function()
+	it("moves the last item back when a later item is added", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		list:Add("a", 1)
+		list:_testForceFireEvents()
+
+		local seenLast, subLast = observe(list, -1)
+		local seenSecondLast, subSecondLast = observe(list, -2)
+
+		list:Add("b", 2)
+		list:_testForceFireEvents()
+
+		expect(seenLast).toEqual({ "a", "b" })
+		expect(seenSecondLast).toEqual({ NIL_VALUE, "a" })
+
+		subLast:Destroy()
+		subSecondLast:Destroy()
+		maid:Destroy()
+	end)
+
+	it("reveals the previous item when the last item is removed", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		list:Add("a", 1)
+		local removeB = list:Add("b", 2)
+		list:_testForceFireEvents()
+
+		local seen, sub = observe(list, -1)
+
+		removeB()
+		list:_testForceFireEvents()
+
+		expect(seen).toEqual({ "b", "a" })
+
+		sub:Destroy()
+		maid:Destroy()
+	end)
+
+	it("emits nil for the most negative index once it falls off the end", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local removeA = list:Add("a", 1)
+		list:Add("b", 2)
+		list:_testForceFireEvents()
+
+		local seen, sub = observe(list, -2)
+
+		removeA()
+		list:_testForceFireEvents()
+
+		expect(seen).toEqual({ "a", NIL_VALUE })
+
+		sub:Destroy()
+		maid:Destroy()
+	end)
+
+	it("leaves the last item alone when an earlier item is removed", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local removeA = list:Add("a", 1)
+		list:Add("b", 2)
+		list:_testForceFireEvents()
+
+		local seen, sub = observe(list, -1)
+
+		removeA()
+		list:_testForceFireEvents()
+
+		expect(seen).toEqual({ "b" })
+
+		sub:Destroy()
+		maid:Destroy()
+	end)
+
+	it("emits nil for the vacated positive index when the last item is removed", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		list:Add("a", 1)
+		local removeB = list:Add("b", 2)
+		list:_testForceFireEvents()
+
+		local seenFirst, subFirst = observe(list, 1)
+		local seenSecond, subSecond = observe(list, 2)
+
+		removeB()
+		list:_testForceFireEvents()
+
+		expect(seenFirst).toEqual({ "a" })
+		expect(seenSecond).toEqual({ "b", NIL_VALUE })
+
+		subFirst:Destroy()
+		subSecond:Destroy()
+		maid:Destroy()
+	end)
+
+	it("shifts earlier items when an item is inserted in the middle", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		list:Add("a", 1)
+		list:Add("b", 2)
+		list:Add("c", 3)
+		list:_testForceFireEvents()
+
+		local seen4, sub4 = observe(list, -4)
+		local seen3, sub3 = observe(list, -3)
+		local seen2, sub2 = observe(list, -2)
+		local seen1, sub1 = observe(list, -1)
+
+		list:Add("x", 1.5)
+		list:_testForceFireEvents()
+
+		expect(list:GetList()).toEqual({ "a", "x", "b", "c" })
+		expect(seen4).toEqual({ NIL_VALUE, "a" })
+		expect(seen3).toEqual({ "a", "x" })
+		expect(seen2).toEqual({ "b" })
+		expect(seen1).toEqual({ "c" })
+
+		sub4:Destroy()
+		sub3:Destroy()
+		sub2:Destroy()
+		sub1:Destroy()
+		maid:Destroy()
+	end)
+
+	it("shifts earlier items when a middle item is removed", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		list:Add("a", 1)
+		local removeB = list:Add("b", 2)
+		list:Add("c", 3)
+		list:_testForceFireEvents()
+
+		local seen3, sub3 = observe(list, -3)
+		local seen2, sub2 = observe(list, -2)
+		local seen1, sub1 = observe(list, -1)
+
+		removeB()
+		list:_testForceFireEvents()
+
+		expect(list:GetList()).toEqual({ "a", "c" })
+		expect(seen3).toEqual({ "a", NIL_VALUE })
+		expect(seen2).toEqual({ "b", "a" })
+		expect(seen1).toEqual({ "c" })
+
+		sub3:Destroy()
+		sub2:Destroy()
+		sub1:Destroy()
+		maid:Destroy()
+	end)
+
+	it("emits only the shifted value for a positive slot when an earlier item is removed", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local removeA = list:Add("a", 1)
+		list:Add("b", 2)
+		list:Add("c", 3)
+		list:_testForceFireEvents()
+
+		local seen, sub = observe(list, 2)
+
+		removeA()
+		list:_testForceFireEvents()
+
+		expect(seen).toEqual({ "b", "c" })
+
+		sub:Destroy()
+		maid:Destroy()
+	end)
+
+	it("survives Destroy from an ItemRemoved handler", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local removeA = list:Add("a", 1)
+		list:_testForceFireEvents()
+
+		maid:Add(list.ItemRemoved:Connect(function()
+			maid:Destroy()
+		end))
+
+		expect(function()
+			removeA()
+			list:_testForceFireEvents()
+		end).never.toThrow()
+
+		maid:Destroy()
+	end)
+end)
+
+describe("ObservableSortedList emission cost (mirrors ObservableList)", function()
+	local function countFires(callback: () -> ()): number
+		local originalFire = ObservableSubscriptionTable.Fire
+		local count = 0
+		ObservableSubscriptionTable.Fire = function(...)
+			count += 1
+			return originalFire(...)
+		end
+
+		local ok, err = pcall(callback :: () -> any)
+		ObservableSubscriptionTable.Fire = originalFire
+
+		if not ok then
+			error(err)
+		end
+
+		return count
+	end
+
+	local ITEMS = 100
+
+	it("fires a bounded number of observers per Add with a last-item observer", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local _, sub = observe(list, -1)
+
+		local fires = countFires(function()
+			for i = 1, ITEMS do
+				list:Add(i, i)
+				list:_testForceFireEvents()
+			end
+		end)
+
+		expect(fires).toBeLessThanOrEqual(4 * ITEMS)
+
+		sub:Destroy()
+		maid:Destroy()
+	end)
+
+	it("fires a bounded number of observers per pop from the back with a last-item observer", function()
+		local maid = Maid.new()
+		local list = maid:Add(ObservableSortedList.new())
+		local removers = {}
+		for i = 1, ITEMS do
+			removers[i] = list:Add(i, i)
+		end
+		list:_testForceFireEvents()
+		local _, sub = observe(list, -1)
+
+		local fires = countFires(function()
+			for i = ITEMS, 1, -1 do
+				removers[i]()
+				list:_testForceFireEvents()
+			end
+		end)
+
+		expect(fires).toBeLessThanOrEqual(4 * ITEMS)
+
+		sub:Destroy()
+		maid:Destroy()
 	end)
 end)

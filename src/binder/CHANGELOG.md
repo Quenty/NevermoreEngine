@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.47.0...@quenty/binder@14.47.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.46.0...@quenty/binder@14.47.0) (2026-09-23)
+
+### Bug Fixes
+
+- Binder cleans up during construct/deconstruct moment ([404160e](https://github.com/Quenty/NevermoreEngine/commit/404160efddacbdf95eba0ede5e15066c5d71ed64))
+
 # [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.45.0...@quenty/binder@14.46.0) (2026-09-02)
 
 ### Features

@@ -1,3 +1,29 @@
+# (Thu Sep 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@10.11.2`
+  - fix: Detect plugin replication type during play solo [#829](https://github.com/Quenty/NevermoreEngine/pull/829) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.47.0`, `@quenty/clienttranslator@14.53.0`, `@quenty/countdowntext@4.12.0`, `@quenty/deathreport@10.61.0`, `@quenty/httppromise@10.25.0`, `@quenty/observablecollection@12.53.0`, `@quenty/saveslot@2.14.0`, `@quenty/time@2.6.0`, `@quenty/nevermore-cli@4.46.0`, `@quenty/nevermore-template-helpers@1.20.0`
+  - fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Sep 22 2026)
 
 #### 🐛 Bug Fix
