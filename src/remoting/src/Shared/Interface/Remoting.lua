@@ -70,7 +70,7 @@ export type Remoting = typeof(setmetatable(
 		DeclareEvent: (self: Remoting, memberName: string) -> (),
 		DeclareMethod: (self: Remoting, memberName: string) -> (),
 		Connect: (self: Remoting, memberName: string, callback: (...any) -> ()) -> Maid.Maid,
-		Bind: (self: Remoting, memberName: string, callback: (...any) -> ()) -> Maid.Maid,
+		Bind: (self: Remoting, memberName: string, callback: (...any) -> ...any) -> Maid.Maid,
 		FireClient: (self: Remoting, memberName: string, player: Player, ...any) -> (),
 		FireAllClients: (self: Remoting, memberName: string, ...any) -> (),
 		FireAllClientsExcept: (self: Remoting, memberName: string, excludePlayer: Player, ...any) -> (),
