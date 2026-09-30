@@ -57,7 +57,7 @@ function TieMethodInterfaceUtils.get(
 
 			error(
 				string.format(
-					"No implemented for %s on %q",
+					"Not implemented for %s on %q",
 					tieMethodDefinition:GetFriendlyName(),
 					implParent and implParent:GetFullName() or "nil"
 				)
@@ -68,7 +68,7 @@ function TieMethodInterfaceUtils.get(
 		if not bindableFunction then
 			error(
 				string.format(
-					"No implemented for %s on %q",
+					"Not implemented for %s on %q",
 					tieMethodDefinition:GetFriendlyName(),
 					implParent and implParent:GetFullName() or "nil"
 				)
