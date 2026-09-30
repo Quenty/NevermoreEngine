@@ -1,3 +1,16 @@
+# (Wed Sep 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.63.2`, `@quenty/tie@10.51.2`
+  - fix: Check if rogue modifier is alive [#831](https://github.com/Quenty/NevermoreEngine/pull/831) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Thu Sep 24 2026)
 
 #### 🚀 Enhancement

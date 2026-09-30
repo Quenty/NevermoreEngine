@@ -1,3 +1,16 @@
+# v10.51.2 (Wed Sep 30 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Check if rogue modifier is alive [#831](https://github.com/Quenty/NevermoreEngine/pull/831) ([@alex-y-z](https://github.com/alex-y-z))
+- chore: Typo ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
