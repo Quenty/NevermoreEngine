@@ -8,12 +8,18 @@ interface EncodedAttributeValue<T> extends ValueObjectLike<T> {
 
 interface EncodedAttributeValueConstructor {
   readonly ClassName: 'EncodedAttributeValue';
-  new <T = unknown>(
+  new <T = never>(
+    object: Instance,
+    attributeName: string,
+    encode: (value: T | undefined) => string | undefined,
+    decode: (value: string) => T | undefined
+  ): EncodedAttributeValue<T | undefined>;
+  new <T>(
     object: Instance,
     attributeName: string,
     encode: (value: T) => string,
     decode: (value: string) => T,
-    defaultValue?: T
+    defaultValue: T
   ): EncodedAttributeValue<T>;
 }
 
