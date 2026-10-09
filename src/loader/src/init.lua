@@ -111,8 +111,6 @@ function Loader.bootstrapStory(storyScript: Instance, options: LoaderOptions?)
 
 	local root = topNodeModules.Parent
 
-	-- Nothing tears a story's loader down, so a story that reloads would otherwise stack another full set of
-	-- link creators onto the root each time. Links are only missing when nobody is maintaining them.
 	if not LoaderLinkUtils.isPopulated(root, script.Name) then
 		local scheduler = self:_setupLoaderPopulationAsync(root, loaderOptions)
 		scheduler:ClearBudget()
