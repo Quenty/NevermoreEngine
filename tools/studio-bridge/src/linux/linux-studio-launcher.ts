@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import type { Socket } from 'net';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { resolveLinuxConfig } from './linux-config.js';
 import { buildWineEnv } from './linux-wine-env.js';
@@ -69,6 +70,20 @@ export async function launchStudioLinuxAsync(
     }
   });
   tailProc.unref();
+  // `unref()` detaches the child handle only. A 'pipe' stdio is a separate,
+  // still-ref'd net.Socket, and `tail -f` never closes it, so the event loop
+  // stayed alive and the CLI could never exit. Unref the pipe as well.
+  // (@types/node types stdout as Readable, which does not declare unref.)
+  (tailProc.stdout as Socket | null)?.unref();
+
+  // Unreffing alone would leave `tail` behind as an orphan, so reap it.
+  process.once('exit', () => {
+    try {
+      tailProc.kill('SIGTERM');
+    } catch {
+      // Best effort
+    }
+  });
 
   let killed = false;
   const killAsync = async () => {
