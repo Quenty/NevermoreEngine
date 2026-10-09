@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.67.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.67.2...@quenty/rogue-humanoid@10.67.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/rogue-humanoid
+
 ## [10.67.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-humanoid@10.67.1...@quenty/rogue-humanoid@10.67.2) (2026-09-30)
 
 **Note:** Version bump only for package @quenty/rogue-humanoid

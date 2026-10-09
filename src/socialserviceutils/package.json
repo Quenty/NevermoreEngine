@@ -1,6 +1,6 @@
 {
   "name": "@quenty/socialserviceutils",
-  "version": "10.24.1",
+  "version": "10.24.2",
   "description": "Utility functions wrapping SocialService with promises",
   "keywords": [
     "Roblox",

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.50.1...@quenty/buttonhighlightmodel@14.50.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/buttonhighlightmodel
+
 ## [14.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/buttonhighlightmodel@14.50.0...@quenty/buttonhighlightmodel@14.50.1) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/buttonhighlightmodel
