@@ -1,3 +1,15 @@
+# v10.11.3 (Fri Oct 09 2026)
+
+#### 🐛 Bug Fix
+
+- fix: Skip story loader population when the root already has its links [#832](https://github.com/Quenty/NevermoreEngine/pull/832) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
