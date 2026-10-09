@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@quenty/contentproviderutils": "workspace:*",
-    "@quenty/playerthumbnailutils": "workspace:*"
+    "@quenty/playerthumbnailutils": "workspace:*",
+    "@quenty/buttondragmodel": "workspace:*"
   }
 }
