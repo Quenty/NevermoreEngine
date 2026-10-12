@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { Readable, Transform } from 'node:stream';
 import nodeFetch from 'node-fetch';
 import { OutputHelper } from '@quenty/cli-output-helpers';
@@ -90,6 +91,109 @@ export interface OpenCloudClientOptions {
  */
 export type PlaceVersionType = 'saved' | 'published';
 
+/** Who owns a newly created asset. */
+export type AssetCreator = { userId: number } | { groupId: number };
+
+export interface AssetFile {
+  filePath: string;
+  /** MIME type of the file. The Assets API picks its importer from it. */
+  contentType: string;
+}
+
+export interface CreateAssetOptions extends AssetFile {
+  /** `Model`, `Image`, `Audio`, ... as the Assets API spells them. */
+  assetType: string;
+  displayName: string;
+  description: string;
+  creator: AssetCreator;
+}
+
+/**
+ * The long-running operation every asset upload returns. Creating an asset is
+ * not synchronous — the file is imported and moderated first — so the id only
+ * exists once the operation reports `done`.
+ */
+export interface AssetOperation {
+  /** `operations/{operationId}` */
+  path: string;
+  done?: boolean;
+  response?: {
+    /** A string in practice, though the API's own schema calls it an integer. */
+    assetId?: string | number;
+    revisionId?: string;
+    moderationResult?: { moderationState?: string };
+  };
+  error?: { code?: number | string; message?: string };
+}
+
+export interface UploadedAsset {
+  assetId: number;
+  revisionId?: string;
+  /**
+   * `Approved`, `Reviewing`, ... exactly as the API reports it — which is not
+   * the `MODERATION_STATE_APPROVED` spelling its documentation shows. Audio
+   * routinely finishes uploading while still `Reviewing`.
+   */
+  moderationState?: string;
+}
+
+const ASSETS_API_URL = 'https://apis.roblox.com/assets/v1';
+const ASSET_OPERATION_POLL_MS = 2000;
+const ASSET_OPERATION_TIMEOUT_MS = 5 * 60 * 1000;
+
+/** Pull the human-readable message out of an Open Cloud error body. */
+function _extractApiMessage(body: string): string {
+  try {
+    const parsed = JSON.parse(body);
+    if (Array.isArray(parsed.errors) && parsed.errors[0]?.message) {
+      return parsed.errors[0].message;
+    }
+    if (typeof parsed.message === 'string') {
+      return parsed.message;
+    }
+  } catch {
+    // Not JSON
+  }
+  return '';
+}
+
+function formatAssetApiError(
+  action: string,
+  status: number,
+  statusText: string,
+  body: string,
+  method: string,
+  url: string
+): string {
+  if (status !== 401 && status !== 403) {
+    return `${action} failed: ${status} ${statusText}: ${body}`;
+  }
+
+  const apiMessage = _extractApiMessage(body);
+  const headline = apiMessage
+    ? `${action} failed: ${apiMessage} (${status})`
+    : `${action} failed: ${status} ${statusText}`;
+
+  const dim = OutputHelper.formatDim;
+  const info = OutputHelper.formatInfo;
+
+  return [
+    OutputHelper.formatError(headline),
+    '',
+    `  ${dim('Scope:')}       asset:read, asset:write`,
+    '',
+    OutputHelper.formatWarning(
+      'Ensure the API key has the Assets API with both Read and Write, and ' +
+        'that its owner may create assets for the user or group named as creator.'
+    ),
+    '',
+    `  ${dim('Credentials:')} ${info(
+      'https://create.roblox.com/dashboard/credentials'
+    )}`,
+    `  ${dim('Route:')}       ${dim(`${method} ${url}`)}`,
+  ].join('\n');
+}
+
 function formatAuthError(
   action: string,
   scope: string,
@@ -101,18 +205,7 @@ function formatAuthError(
   method: string,
   url: string
 ): string {
-  // Extract human-readable message from JSON body if possible
-  let apiMessage = '';
-  try {
-    const parsed = JSON.parse(body);
-    if (Array.isArray(parsed.errors) && parsed.errors[0]?.message) {
-      apiMessage = parsed.errors[0].message;
-    } else if (typeof parsed.message === 'string') {
-      apiMessage = parsed.message;
-    }
-  } catch {
-    // Not JSON
-  }
+  const apiMessage = _extractApiMessage(body);
 
   const headline = apiMessage
     ? `${action} failed: ${apiMessage} (${status})`
@@ -681,6 +774,217 @@ export class OpenCloudClient {
           : '') +
         `. Pin an explicit version number in deploy.nevermore.json, or publish the place once.`
     );
+  }
+
+  /**
+   * Start uploading a file as a new asset via the Open Cloud Assets API
+   * (`asset:read` and `asset:write`). Returns the operation to hand to
+   * {@link pollAssetOperationAsync}; the asset has no id until that finishes.
+   */
+  async createAssetAsync(options: CreateAssetOptions): Promise<AssetOperation> {
+    const { creator } = options;
+    return this._sendAssetAsync(
+      'POST',
+      `${ASSETS_API_URL}/assets`,
+      {
+        assetType: options.assetType,
+        displayName: options.displayName,
+        description: options.description,
+        creationContext: {
+          creator:
+            'userId' in creator
+              ? { userId: String(creator.userId) }
+              : { groupId: String(creator.groupId) },
+        },
+      },
+      options
+    );
+  }
+
+  /**
+   * Start replacing an existing asset's file, keeping its id — the upload
+   * becomes a new version of the same asset. The API only does this for models.
+   */
+  async updateAssetContentAsync(
+    assetId: number,
+    file: AssetFile
+  ): Promise<AssetOperation> {
+    return this._sendAssetAsync(
+      'PATCH',
+      `${ASSETS_API_URL}/assets/${assetId}`,
+      { assetId },
+      file
+    );
+  }
+
+  /**
+   * Wait for an asset upload to finish and return the asset it produced.
+   *
+   * Throws if the operation reports an error or outlives `timeoutMs`. A timeout
+   * is not a failed upload: Roblox may still finish creating the asset, which
+   * is why the message says to look before uploading again.
+   */
+  async pollAssetOperationAsync(
+    operation: AssetOperation,
+    timeoutMs: number = ASSET_OPERATION_TIMEOUT_MS
+  ): Promise<UploadedAsset> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url = `${ASSETS_API_URL}/${operation.path}`;
+    const maxPolls = Math.ceil(timeoutMs / ASSET_OPERATION_POLL_MS);
+
+    let current = operation;
+    for (let poll = 0; !current.done && poll < maxPolls; poll++) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, ASSET_OPERATION_POLL_MS)
+      );
+
+      const response = await this._rateLimiter.fetchAsync(url, {
+        method: 'GET',
+        headers: { 'x-api-key': apiKey },
+      });
+      if (!response.ok) {
+        throw new Error(
+          formatAssetApiError(
+            'Read asset upload status',
+            response.status,
+            response.statusText,
+            await response.text(),
+            'GET',
+            url
+          )
+        );
+      }
+      current = (await response.json()) as AssetOperation;
+    }
+
+    if (!current.done) {
+      throw new Error(
+        `Asset upload ${operation.path} did not finish within ` +
+          `${Math.round(timeoutMs / 1000)}s. Roblox may still create the ` +
+          `asset — check https://create.roblox.com/dashboard/creations ` +
+          `before uploading it again.`
+      );
+    }
+    if (current.error) {
+      throw new Error(
+        `Asset upload failed: ${
+          current.error.message ?? JSON.stringify(current.error)
+        }`
+      );
+    }
+
+    const assetId = Number(current.response?.assetId);
+    if (!Number.isSafeInteger(assetId) || assetId < 1) {
+      throw new Error(
+        `Asset upload ${operation.path} finished without an asset id: ` +
+          JSON.stringify(current)
+      );
+    }
+
+    return {
+      assetId,
+      revisionId: current.response?.revisionId,
+      moderationState: current.response?.moderationResult?.moderationState,
+    };
+  }
+
+  /**
+   * Who owns a universe: the user or group its assets should belong to if the
+   * experience is to use them. Needs no scope beyond a valid key.
+   */
+  async getUniverseOwnerAsync(universeId: number): Promise<AssetCreator> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}`;
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'GET',
+      headers: { 'x-api-key': apiKey },
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Read universe ${universeId} failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    // Exactly one of the two is present: `users/123` or `groups/456`.
+    const universe = (await response.json()) as {
+      user?: string;
+      group?: string;
+    };
+    const userId = Number(universe.user?.match(/^users\/(\d+)$/)?.[1]);
+    if (Number.isSafeInteger(userId)) {
+      return { userId };
+    }
+    const groupId = Number(universe.group?.match(/^groups\/(\d+)$/)?.[1]);
+    if (Number.isSafeInteger(groupId)) {
+      return { groupId };
+    }
+    throw new Error(`Universe ${universeId} did not report an owner`);
+  }
+
+  /** The user the API key acts as — whoever created it. */
+  async getApiKeyUserIdAsync(): Promise<number> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url = 'https://apis.roblox.com/api-keys/v1/introspect';
+
+    // The key travels in the body here, not the usual header.
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey }),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Read API key owner failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const key = (await response.json()) as { authorizedUserId?: number };
+    if (!Number.isSafeInteger(key.authorizedUserId)) {
+      throw new Error('The API key did not report which user it belongs to');
+    }
+    return key.authorizedUserId!;
+  }
+
+  private async _sendAssetAsync(
+    method: 'POST' | 'PATCH',
+    url: string,
+    request: Record<string, unknown>,
+    file: AssetFile
+  ): Promise<AssetOperation> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const fileBuffer = await fs.readFile(file.filePath);
+
+    const form = new FormData();
+    form.append('request', JSON.stringify(request));
+    form.append(
+      'fileContent',
+      new Blob([new Uint8Array(fileBuffer)], { type: file.contentType }),
+      path.basename(file.filePath)
+    );
+
+    // No Content-Type header: fetch writes the multipart boundary itself, and
+    // setting one by hand sends a body the API cannot split into parts.
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method,
+      headers: { 'x-api-key': apiKey },
+      body: form,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        formatAssetApiError(
+          method === 'POST' ? 'Create asset' : 'Update asset',
+          response.status,
+          response.statusText,
+          await response.text(),
+          method,
+          url
+        )
+      );
+    }
+
+    return (await response.json()) as AssetOperation;
   }
 }
 

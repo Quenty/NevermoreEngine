@@ -25,14 +25,14 @@
     "@quenty/cli-output-helpers": "workspace:*",
     "inquirer": "^13.2.0",
     "latest-version": "^9.0.0",
-    "semver": "^7.6.0"
+    "semver": "^7.6.0",
+    "typescript-memoize": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.4",
     "@types/semver": "^7.5.0",
     "prettier": "2.7.1",
     "typescript": "^5.9.3",
-    "typescript-memoize": "^1.1.1",
     "vitest": "^3.0.0"
   },
   "scripts": {

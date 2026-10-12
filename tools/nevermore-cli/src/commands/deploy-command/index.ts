@@ -75,6 +75,11 @@ import {
   type VersionPromoteArgs,
 } from './version-command.js';
 import { selectTargetAsync } from './select-target.js';
+import {
+  handleAssetUploadAsync,
+  type AssetUploadArgs,
+} from './asset-command.js';
+import { ASSET_TYPES } from '../../utils/assets/asset-formats.js';
 
 const MULTI_PLACE_CONCURRENCY = 10;
 
@@ -249,6 +254,86 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
             }
           )
           .demandCommand(1, 'Specify a version action, e.g. "upgrade".');
+      },
+      () => {}
+    );
+
+    args.command(
+      'asset',
+      'Upload files as Roblox assets (images, models, audio, ...)',
+      (yargs) => {
+        return yargs
+          .command(
+            'upload <files..>',
+            'Upload files as assets and print the id each one was given',
+            (uploadYargs) => {
+              return uploadYargs
+                .positional('files', {
+                  describe:
+                    'Files to upload. The asset type comes from each extension.',
+                  type: 'string',
+                  array: true,
+                })
+                .option('user-id', {
+                  describe:
+                    'Roblox user who will own the new assets. Without this or --group-id, ' +
+                    'the owner of the universe in the nearest deploy.nevermore.json, else the owner of the API key',
+                  type: 'number',
+                })
+                .option('group-id', {
+                  describe: 'Roblox group who will own the new assets',
+                  type: 'number',
+                })
+                .option('type', {
+                  describe:
+                    'Asset type, where the extension allows more than one: ' +
+                    'an image is an Image unless told Decal, an .rbxm a Model unless told Animation',
+                  type: 'string',
+                  choices: ASSET_TYPES,
+                })
+                .option('name', {
+                  describe:
+                    'Display name (single file only; defaults to the file name)',
+                  type: 'string',
+                })
+                .option('description', {
+                  describe: 'Description (defaults to the display name)',
+                  type: 'string',
+                })
+                .option('asset-id', {
+                  describe:
+                    'Replace this existing asset instead of creating one, keeping its id (single Model file only)',
+                  type: 'number',
+                })
+                .option('output', {
+                  describe: 'Write JSON results to this file',
+                  type: 'string',
+                })
+                .option('timeout', {
+                  describe:
+                    'Seconds to wait for Roblox to finish importing each file',
+                  type: 'number',
+                  default: 300,
+                })
+                .option('api-key', {
+                  describe: 'Roblox Open Cloud API key',
+                  type: 'string',
+                });
+            },
+            async (uploadArgs) => {
+              try {
+                await handleAssetUploadAsync(
+                  uploadArgs as unknown as AssetUploadArgs
+                );
+              } catch (err) {
+                OutputHelper.error(
+                  err instanceof Error ? err.message : String(err)
+                );
+                process.exitCode = 1;
+              }
+            }
+          )
+          .demandCommand(1, 'Specify an asset action, e.g. "upload".');
       },
       () => {}
     );

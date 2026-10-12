@@ -6889,6 +6889,9 @@ importers:
       semver:
         specifier: ^7.6.0
         version: 7.7.4
+      typescript-memoize:
+        specifier: ^1.1.1
+        version: 1.1.1
     devDependencies:
       '@types/node':
         specifier: ^18.11.4
@@ -6902,9 +6905,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-      typescript-memoize:
-        specifier: ^1.1.1
-        version: 1.1.1
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)

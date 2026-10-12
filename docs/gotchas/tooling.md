@@ -46,6 +46,8 @@ When a section grows to 10+ items, graduate it to its own doc.
 
 - **`--script-text` loses everything after the first line when invoked through `npx` on Windows**: the `npx.cmd` shim truncates a multi-line argument, so `nevermore test --cloud --script-text '<line 1>\n<line 2>'` silently runs only line 1 (and prints `(no output)` when line 1 produced none). Either write the script as a single line with `;` separators, or bypass the shim: `node tools/nevermore-cli/dist/nevermore.js test --cloud --script-text '...'`, which passes newlines through intact.
 
+- **`process.exit()` straight after a `fetch` aborts Node on Windows**: on Node 24, exiting while fetch's sockets are still closing trips a libuv assertion — `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c` — and the process dies with exit code 127 instead of the one you asked for. Still non-zero, so CI reads it as a failure either way, but a script checking for exactly `1` does not, and the assertion is the last line the user sees. Set `process.exitCode = 1` and return instead, which lets the loop drain and exits with the right code (`deploy asset upload` does this). Most other handlers still call `process.exit(1)` after network calls and have the same flaw.
+
 ## Claude Code hooks
 
 Committed Claude Code hooks live in `.claude/settings.json`, backed by scripts in `.claude/hooks/`. They run only for contributors using Claude Code — not for manual `git` usage or CI.
