@@ -5,6 +5,7 @@ import * as path from 'path';
 import {
   type DeployConfig,
   type DeployTarget,
+  DeployTargetNotFoundError,
   loadDeployConfigAsync,
   resolveDefaultTargetName,
   resolveDeployTargetPlaces,
@@ -272,6 +273,9 @@ describe('resolveDeployTargetPlaces', () => {
   it('lists the available places when the selector names none of them', () => {
     expect(() =>
       resolveDeployTargetPlaces(config, 'integration.places.nope')
+    ).toThrowError(DeployTargetNotFoundError);
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'integration.places.nope')
     ).toThrowError(/no place named "nope"[\s\S]*hub, lobby/);
   });
 
@@ -284,7 +288,19 @@ describe('resolveDeployTargetPlaces', () => {
   it('still reports an unknown target by its name alone', () => {
     expect(() =>
       resolveDeployTargetPlaces(config, 'missing.places.hub')
+    ).toThrowError(DeployTargetNotFoundError);
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'missing.places.hub')
     ).toThrowError(/Target "missing" not found/);
+  });
+
+  it('does not classify invalid selectors as missing targets', () => {
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'integration.places.')
+    ).toThrowError(/Invalid target selector/);
+    expect(() =>
+      resolveDeployTargetPlaces(config, 'integration.places.')
+    ).not.toThrowError(DeployTargetNotFoundError);
   });
 });
 

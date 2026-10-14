@@ -533,6 +533,8 @@ nevermore batch test --cloud --concurrency 3
 nevermore batch test --output results.json
 ```
 
+Batch discovery skips packages without `deploy.nevermore.json` or without the requested target or named place. An unreadable config, malformed JSON, or invalid config stops discovery with the package name, config path, and original diagnostic; the batch does not run with a silently incomplete package list. This applies to changed-package and `--all` discovery, including batch deploys. Invalid target selectors fail even when no packages are found.
+
 Options:
 | Flag | Description |
 |------|-------------|
