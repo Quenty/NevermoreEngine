@@ -29,7 +29,9 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
     "@quenty/memoize": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playermock": "workspace:*",

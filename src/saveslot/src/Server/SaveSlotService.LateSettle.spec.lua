@@ -13,8 +13,8 @@ local require = require(script.Parent.loader).load(script)
 
 local Workspace = game:GetService("Workspace")
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -45,6 +45,7 @@ local function setup()
 	mock:SetYieldTime(READ_YIELD_SECONDS)
 
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local hasSaveSlotsBinder = serviceBag:GetService(require("HasSaveSlots"))
@@ -57,10 +58,7 @@ local function setup()
 	fakePlayer.Parent = Workspace
 
 	local function Destroy(_self)
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
-		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		serviceBag:Destroy()
 		maid:DoCleaning()
 		-- Any straggler continuation blows up here, inside the test that owns it, rather

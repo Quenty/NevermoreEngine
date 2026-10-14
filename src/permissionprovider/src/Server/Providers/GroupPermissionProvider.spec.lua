@@ -48,12 +48,6 @@ local function setup(options: { minAdminRequiredRank: number, minCreatorRequired
 			player.Parent = Workspace
 			return player
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -79,8 +73,8 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup({ minAdminRequiredRank = 0, minCreatorRequiredRank = 0 })
 		local player = controller.fakePlayer(111)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -89,8 +83,8 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup({ minAdminRequiredRank = 100, minCreatorRequiredRank = 200 })
 		local player = controller.fakePlayer(111)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -99,8 +93,8 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup({ minAdminRequiredRank = 0, minCreatorRequiredRank = 1 })
 		local player = controller.fakePlayer(111)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -110,8 +104,8 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local player = controller.fakePlayer(111)
 		GroupTestUtils.assignGroupInfo(player, 12345, { rank = 150, role = "Admin" })
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -121,8 +115,8 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local player = controller.fakePlayer(111)
 		GroupTestUtils.assignGroupInfo(player, 12345, { rank = 255, role = "Owner" })
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -132,7 +126,7 @@ describe("GroupPermissionProvider.PromiseIsPermissionLevel", function()
 		local player = controller.fakePlayer(111)
 		GroupTestUtils.assignGroupInfo(player, 99999, { rank = 255, role = "Owner" })
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(false)
 
 		controller:Destroy()
 	end)

@@ -37,7 +37,7 @@ local function setup()
 
 	local localPlayer = maid:Add(PlayerMock.new({ UserId = LOCAL_USER_ID }))
 	localPlayer.Parent = Workspace
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
+	maid:Add(PlayerMock.setMockedLocalPlayer(localPlayer))
 
 	local serviceBag = maid:Add(ServiceBag.new())
 	local service: PermissionServiceClient.PermissionServiceClient =
@@ -63,14 +63,7 @@ local function setup()
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
-			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
@@ -126,7 +119,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			return true
 		end)
 
-		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -137,7 +130,7 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			return true
 		end)
 
-		expect(controller.awaitBool(controller.service:PromiseIsAdmin(nil))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseIsAdmin(nil))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -148,7 +141,9 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			return false
 		end)
 
-		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(
+			false
+		)
 
 		controller:Destroy()
 	end)
@@ -172,8 +167,8 @@ describe("PermissionServiceClient.PromiseIsAdmin", function()
 			return true
 		end)
 
-		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
-		expect(controller.awaitBool(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 		expect(invokeCount).toEqual(1)
 
 		controller:Destroy()

@@ -8,54 +8,59 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local TeleportDataEnvelopeUtils = require("TeleportDataEnvelopeUtils")
 local TeleportServiceUtils = require("TeleportServiceUtils")
 
-local afterEach = Jest.Globals.afterEach
-local beforeEach = Jest.Globals.beforeEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 local jest = Jest.Globals.jest
 
-local mocks: { Player } = {}
-
-local function newMock(userId: number): Player
-	local player = PlayerMock.new({ UserId = userId })
-	table.insert(mocks, player)
-	return player
-end
-
--- A player the mock layer will not claim, so the call reaches the engine, which refuses it.
-local function newUnmockedPlayer(): Player
-	local player = Instance.new("Folder")
-	player.Name = "NotAPlayerMock"
-	table.insert(mocks, (player :: any) :: Player)
-	return (player :: any) :: Player
-end
-
--- A cloud run is a server, so the realm seam is what lets the client path be exercised at all.
---
--- Spied once and re-implemented between tests rather than restored and re-spied: jest.restoreAllMocks
--- clears the spy state but not the per-object mock registry, so a second jest.spyOn of the same method
--- hands back the cached mock WITHOUT reinstalling it, and the spy quietly stops applying.
 local realIsServer = TeleportServiceUtils._isServer
 local isServerSpy = jest.spyOn(TeleportServiceUtils, "_isServer")
 
-local function pretendClient(): ()
-	isServerSpy.mockReturnValue(false)
-end
+local function setup()
+	local maid = Maid.new()
 
-afterEach(function()
-	isServerSpy.mockImplementation(realIsServer)
+	maid:GiveTask(function()
+		isServerSpy.mockImplementation(realIsServer)
+	end)
 
-	for _, player in mocks do
-		player:Destroy()
+	local function newMock(userId: number): Player
+		local player = PlayerMock.new({ UserId = userId })
+		maid:GiveTask(player)
+		return player
 	end
-	table.clear(mocks)
-end)
+
+	-- A player the mock layer will not claim, so the call reaches the engine, which refuses it.
+	local function newUnmockedPlayer(): Player
+		local player = Instance.new("Folder")
+		player.Name = "NotAPlayerMock"
+		maid:GiveTask(player)
+		return (player :: any) :: Player
+	end
+
+	local function pretendClient(): ()
+		isServerSpy.mockReturnValue(false)
+	end
+
+	local controller = {
+		newMock = newMock,
+		newUnmockedPlayer = newUnmockedPlayer,
+		pretendClient = pretendClient,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
 
 local function readHop(player: Player, placeId: number): any
 	return PlayerMock.readLookup(player, "TeleportService.Teleport", placeId)
@@ -96,10 +101,6 @@ local function awaitHop(player: Player, placeId: number): any
 end
 
 describe("TeleportServiceUtils.teleport", function()
-	beforeEach(function()
-		pretendClient()
-	end)
-
 	-- It yields until the teleport is settled, and a teleport that works never settles -- the player
 	-- leaves instead -- so the request is made off-thread and read back through the mock's record.
 	local function requestTeleport(
@@ -119,54 +120,82 @@ describe("TeleportServiceUtils.teleport", function()
 	end
 
 	it("records the teleport with via=Teleport and its data on a mock", function()
-		local player = newMock(880001)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880001)
 		requestTeleport(4567, player, { SlotId = "abc", Flag = true })
 
 		local hop = awaitHop(player, 4567)
 		expect(hop.via).toEqual("Teleport")
 		expect(hop.teleportData.SlotId).toEqual("abc")
 		expect(hop.teleportData.Flag).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("records an empty data table when none is passed, so a read still reports the hop", function()
-		local player = newMock(880002)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880002)
 		requestTeleport(9999, player, nil)
 
 		local hop = awaitHop(player, 9999)
 		expect(hop).never.toEqual(nil)
 		expect(hop.via).toEqual("Teleport")
+
+		controller:Destroy()
 	end)
 
 	it("does not record a hop to a place that was never teleported to", function()
-		local player = newMock(880003)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880003)
 		requestTeleport(1111, player, {})
 
 		awaitHop(player, 1111)
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 2222)).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("overwrites a prior hop to the same place with the latest data", function()
-		local player = newMock(880004)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880004)
 		requestTeleport(333, player, { SlotId = "first" })
 		awaitHop(player, 333)
 		clearHop(player, 333)
 		requestTeleport(333, player, { SlotId = "second" })
 
 		expect(awaitHop(player, 333).teleportData.SlotId).toEqual("second")
+
+		controller:Destroy()
 	end)
 
 	it("does not come back while the hop is still in flight", function()
-		local player = newMock(880006)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880006)
 
 		local read = requestTeleport(444, player, {})
 		awaitHop(player, 444)
 
 		task.wait(0.1)
 		expect(read()).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("comes back false with the reason once the teleport has failed", function()
-		local player = newMock(880007)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880007)
 
 		local read = requestTeleport(555, player, {})
 		awaitHop(player, 555)
@@ -179,25 +208,39 @@ describe("TeleportServiceUtils.teleport", function()
 		local ok, err = read()
 		expect(ok).toEqual(false)
 		expect(err).toContain("Unauthorized")
+
+		controller:Destroy()
 	end)
 
 	it("errors on a non-number placeId", function()
-		local player = newMock(880005)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(880005)
 		expect(function()
 			TeleportServiceUtils.teleport("nope" :: any, player, {})
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 
 	it("errors when given no player", function()
+		local controller = setup()
+		controller.pretendClient()
+
 		expect(function()
 			TeleportServiceUtils.teleport(123, nil :: any, {})
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("TeleportServiceUtils.teleportToPlaceInstance", function()
 	it("records via, instanceId, spawnName and data on a mock", function()
-		local player = newMock(881001)
+		local controller = setup()
+
+		local player = controller.newMock(881001)
 		TeleportServiceUtils.teleportToPlaceInstance(500, "job-9", player, "SpawnA", { SlotId = "x" })
 
 		local hop = PlayerMock.readLookup(player, "TeleportService.Teleport", 500)
@@ -205,20 +248,28 @@ describe("TeleportServiceUtils.teleportToPlaceInstance", function()
 		expect(hop.instanceId).toEqual("job-9")
 		expect(hop.spawnName).toEqual("SpawnA")
 		expect(hop.teleportData.SlotId).toEqual("x")
+
+		controller:Destroy()
 	end)
 
 	it("errors on a non-string instanceId", function()
-		local player = newMock(881002)
+		local controller = setup()
+
+		local player = controller.newMock(881002)
 		expect(function()
 			TeleportServiceUtils.teleportToPlaceInstance(500, 123 :: any, player)
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("TeleportServiceUtils.teleportAsync", function()
 	it("records each mock in the batch with the options' teleport data, skipping the engine", function()
-		local a = newMock(882001)
-		local b = newMock(882002)
+		local controller = setup()
+
+		local a = controller.newMock(882001)
+		local b = controller.newMock(882002)
 		local options = Instance.new("TeleportOptions")
 		options:SetTeleportData({ SlotId = "shared" })
 
@@ -228,13 +279,19 @@ describe("TeleportServiceUtils.teleportAsync", function()
 		expect(PlayerMock.readLookup(a, "TeleportService.Teleport", 600).via).toEqual("TeleportAsync")
 		expect(PlayerMock.readLookup(a, "TeleportService.Teleport", 600).teleportData.SlotId).toEqual("shared")
 		expect(PlayerMock.readLookup(b, "TeleportService.Teleport", 600).teleportData.SlotId).toEqual("shared")
+
+		controller:Destroy()
 	end)
 
 	it("records a mock even when no options are passed", function()
-		local player = newMock(882003)
+		local controller = setup()
+
+		local player = controller.newMock(882003)
 		TeleportServiceUtils.teleportAsync(601, { player }, nil)
 
 		expect(PlayerMock.readLookup(player, "TeleportService.Teleport", 601).via).toEqual("TeleportAsync")
+
+		controller:Destroy()
 	end)
 
 	it("errors on non-table players", function()
@@ -244,16 +301,22 @@ describe("TeleportServiceUtils.teleportAsync", function()
 	end)
 
 	it("errors on options that are not a TeleportOptions", function()
-		local player = newMock(882004)
+		local controller = setup()
+
+		local player = controller.newMock(882004)
 		expect(function()
 			TeleportServiceUtils.teleportAsync(600, { player }, Instance.new("Folder") :: any)
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("TeleportServiceUtils.promiseTeleportServerOnce", function()
 	it("is mock-aware: records mocks and resolves nil for an all-mock batch", function()
-		local player = newMock(883001)
+		local controller = setup()
+
+		local player = controller.newMock(883001)
 		local options = Instance.new("TeleportOptions")
 		options:SetTeleportData({ SlotId = "z" })
 
@@ -263,32 +326,44 @@ describe("TeleportServiceUtils.promiseTeleportServerOnce", function()
 		local hop = PlayerMock.readLookup(player, "TeleportService.Teleport", 700)
 		expect(hop.via).toEqual("TeleportAsync")
 		expect(hop.teleportData.SlotId).toEqual("z")
+
+		controller:Destroy()
 	end)
 end)
 
 describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 	it("teleports on the spot, carrying the teleport data", function()
-		local player = newMock(886001)
+		local controller = setup()
+
+		local player = controller.newMock(886001)
 
 		TeleportServiceUtils.promiseTeleportClientOnce(820, player, { SlotId = "abc" })
 
 		local hop = readHop(player, 820)
 		expect(hop.via).toEqual("Teleport")
 		expect(hop.teleportData.SlotId).toEqual("abc")
+
+		controller:Destroy()
 	end)
 
 	it("stays pending, because a teleport that works ends with the player gone", function()
-		local player = newMock(886002)
+		local controller = setup()
+
+		local player = controller.newMock(886002)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(821, player)
 
 		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("rejects with the whole report, so a caller decides on the result", function()
-		local player = newMock(886003)
+		local controller = setup()
+
+		local player = controller.newMock(886003)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(822, player)
 		report(player, 822, Enum.TeleportResult.Unauthorized, "not allowed")
@@ -298,10 +373,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(rejected.result).toEqual(Enum.TeleportResult.Unauthorized)
 		expect(rejected.message).toEqual("not allowed")
 		expect(rejected.placeId).toEqual(822)
+
+		controller:Destroy()
 	end)
 
 	it("renders its report as text, for a consumer that only wants a message", function()
-		local player = newMock(886004)
+		local controller = setup()
+
+		local player = controller.newMock(886004)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(823, player)
 		report(player, 823, Enum.TeleportResult.GameFull, "server full")
@@ -310,11 +389,15 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(tostring(rejected)).toContain("823")
 		expect(tostring(rejected)).toContain("GameFull")
 		expect(tostring(rejected)).toContain("server full")
+
+		controller:Destroy()
 	end)
 
 	it("asks exactly once, whatever the engine reports back", function()
+		local controller = setup()
+
 		for _, result in ALL_RESULTS do
-			local player = newMock(886100 + result.Value)
+			local player = controller.newMock(886100 + result.Value)
 
 			local promise = TeleportServiceUtils.promiseTeleportClientOnce(824, player)
 			expect(readHop(player, 824)).never.toEqual(nil)
@@ -332,11 +415,15 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 
 			promise:Destroy()
 		end
+
+		controller:Destroy()
 	end)
 
 	it("stays pending while the engine says the hop is underway", function()
+		local controller = setup()
+
 		for _, result in IN_FLIGHT do
-			local player = newMock(886200 + result.Value)
+			local player = controller.newMock(886200 + result.Value)
 
 			local promise = TeleportServiceUtils.promiseTeleportClientOnce(825, player)
 			report(player, 825, result, "still going")
@@ -348,10 +435,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 
 			promise:Destroy()
 		end
+
+		controller:Destroy()
 	end)
 
 	it("reports a raised call as a Failure, so every rejection is a report", function()
-		local player = newUnmockedPlayer()
+		local controller = setup()
+
+		local player = controller.newUnmockedPlayer()
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(826, player)
 
@@ -359,11 +450,15 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(outcome).toEqual("rejected")
 		expect(rejected.result).toEqual(Enum.TeleportResult.Failure)
 		expect(rejected.placeId).toEqual(826)
+
+		controller:Destroy()
 	end)
 
 	it("ignores a report aimed at another player's teleport", function()
-		local player = newMock(886005)
-		local other = newMock(886006)
+		local controller = setup()
+
+		local player = controller.newMock(886005)
+		local other = controller.newMock(886006)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(827, player)
 		report(other, 827, Enum.TeleportResult.GameFull, "someone else's problem")
@@ -371,10 +466,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("ignores a report about a hop to a different place", function()
-		local player = newMock(886007)
+		local controller = setup()
+
+		local player = controller.newMock(886007)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(828, player)
 		report(player, 999, Enum.TeleportResult.GameFull, "a different destination")
@@ -382,10 +481,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("rejects with nothing when cancelled, so a caller can tell teardown from a refusal", function()
-		local player = newMock(886008)
+		local controller = setup()
+
+		local player = controller.newMock(886008)
 
 		local outcome, err = "pending", nil :: any
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(829, player)
@@ -399,10 +502,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 
 		expect(outcome).toEqual("rejected")
 		expect(err).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("stops listening once cancelled, so a later report cannot settle it", function()
-		local player = newMock(886009)
+		local controller = setup()
+
+		local player = controller.newMock(886009)
 
 		local promise = TeleportServiceUtils.promiseTeleportClientOnce(830, player)
 		promise:Destroy()
@@ -411,10 +518,14 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 			report(player, 830, Enum.TeleportResult.GameFull, "too late")
 			task.wait(0.1)
 		end).never.toThrow()
+
+		controller:Destroy()
 	end)
 
 	it("errors on a bad placeId, player, or teleport data", function()
-		local player = newMock(886010)
+		local controller = setup()
+
+		local player = controller.newMock(886010)
 
 		expect(function()
 			TeleportServiceUtils.promiseTeleportClientOnce("nope" :: any, player)
@@ -425,11 +536,15 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 		expect(function()
 			TeleportServiceUtils.promiseTeleportClientOnce(831, player, "nope" :: any)
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 
 	it("refuses to teleport anyone but the local player", function()
-		local localPlayer = newMock(886011)
-		local someoneElse = newMock(886012);
+		local controller = setup()
+
+		local localPlayer = controller.newMock(886011)
+		local someoneElse = controller.newMock(886012);
 		(localPlayer :: any).Parent = Workspace
 		local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
 
@@ -443,12 +558,16 @@ describe("TeleportServiceUtils.promiseTeleportClientOnce", function()
 
 		promise:Destroy()
 		restoreLocalPlayer()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("TeleportServiceUtils.promiseTeleport (server)", function()
 	it("sends the batch through TeleportAsync, resolving with the engine's result", function()
-		local player = newMock(887001)
+		local controller = setup()
+
+		local player = controller.newMock(887001)
 		local options = Instance.new("TeleportOptions")
 		options:SetTeleportData({ SlotId = "batched" })
 
@@ -457,19 +576,27 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 		expect(result).toEqual(nil)
 		expect(readHop(player, 840).via).toEqual("TeleportAsync")
 		expect(readHop(player, 840).teleportData.SlotId).toEqual("batched")
+
+		controller:Destroy()
 	end)
 
 	it("takes a config instead of options, building the options the batch needs", function()
-		local player = newMock(887002)
+		local controller = setup()
+
+		local player = controller.newMock(887002)
 
 		TeleportServiceUtils.promiseTeleport(841, { player }, { teleportData = { SlotId = "from-config" } }):Wait()
 
 		expect(readHop(player, 841).via).toEqual("TeleportAsync")
 		expect(readHop(player, 841).teleportData.SlotId).toEqual("from-config")
+
+		controller:Destroy()
 	end)
 
 	it("retries a throwing request, then rejects once the attempts are spent", function()
-		local player = newUnmockedPlayer()
+		local controller = setup()
+
+		local player = controller.newUnmockedPlayer()
 
 		local promise = TeleportServiceUtils.promiseTeleport(842, { player }, {
 			maxAttempts = 3,
@@ -480,6 +607,8 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 		local outcome, err = PromiseTestUtils.awaitOutcome(promise)
 		expect(outcome).toEqual("rejected")
 		expect(err).toContain("3 times")
+
+		controller:Destroy()
 	end)
 
 	-- The engine accepts the request and refuses it a moment later, which is what a paid-access
@@ -487,7 +616,9 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 	-- resolved, so whatever was waiting on the hop waits forever.
 	describe("initFailedGraceSeconds", function()
 		it("rejects with a refusal raised after the request was accepted", function()
-			local player = newMock(887010)
+			local controller = setup()
+
+			local player = controller.newMock(887010)
 
 			local promise = TeleportServiceUtils.promiseTeleport(844, { player }, {
 				maxAttempts = 1,
@@ -503,10 +634,14 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 			expect(outcome).toEqual("rejected")
 			expect(err.result).toEqual(Enum.TeleportResult.Unauthorized)
 			expect(tostring(err)).toContain("buy the game")
+
+			controller:Destroy()
 		end)
 
 		it("resolves once the window passes quietly, the hop being underway", function()
-			local player = newMock(887011)
+			local controller = setup()
+
+			local player = controller.newMock(887011)
 
 			local promise = TeleportServiceUtils.promiseTeleport(845, { player }, {
 				maxAttempts = 1,
@@ -514,15 +649,17 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 				initFailedGraceSeconds = 0.2,
 			})
 
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, result = promise:Yield()
-			expect(ok).toEqual(true)
+			local result = PromiseTestUtils.awaitFulfilled(promise, 5)
 			-- Nil is what an all-mock batch resolves with: no engine call was made to return a result.
 			expect(result).toEqual(nil)
+
+			controller:Destroy()
 		end)
 
 		it("ignores a report that means the hop is still running", function()
-			local player = newMock(887012)
+			local controller = setup()
+
+			local player = controller.newMock(887012)
 
 			local promise = TeleportServiceUtils.promiseTeleport(846, { player }, {
 				maxAttempts = 1,
@@ -535,10 +672,14 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 
 			local ok = promise:Yield()
 			expect(ok).toEqual(true)
+
+			controller:Destroy()
 		end)
 
 		it("spends an attempt on a refusal worth retrying", function()
-			local player = newMock(887013)
+			local controller = setup()
+
+			local player = controller.newMock(887013)
 			local attempts = 0
 
 			local promise = TeleportServiceUtils.promiseTeleport(847, { player }, {
@@ -559,10 +700,14 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 			local outcome = PromiseTestUtils.awaitOutcome(promise)
 			expect(outcome).toEqual("rejected")
 			expect(attempts).toEqual(2)
+
+			controller:Destroy()
 		end)
 
 		it("resolves on acceptance without a window, as every server call did before", function()
-			local player = newMock(887014)
+			local controller = setup()
+
+			local player = controller.newMock(887014)
 
 			local promise = TeleportServiceUtils.promiseTeleport(848, { player }, { maxAttempts = 1, retryWait = 0 })
 
@@ -574,17 +719,18 @@ describe("TeleportServiceUtils.promiseTeleport (server)", function()
 
 			local ok = promise:Yield()
 			expect(ok).toEqual(true)
+
+			controller:Destroy()
 		end)
 	end)
 end)
 
 describe("TeleportServiceUtils.promiseTeleportClient", function()
-	beforeEach(function()
-		pretendClient()
-	end)
-
 	it("is a transparent shell: promiseTeleport reaches the same client request", function()
-		local player = newMock(887101)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(887101)
 
 		local promise = TeleportServiceUtils.promiseTeleport(843, player, { teleportData = { SlotId = "direct" } })
 
@@ -593,28 +739,43 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(hop.teleportData.SlotId).toEqual("direct")
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("teleports on the spot, carrying the config's teleport data", function()
-		local player = newMock(885001)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885001)
 
 		TeleportServiceUtils.promiseTeleportClient(800, player, { teleportData = { SlotId = "abc" } })
 
 		local hop = readHop(player, 800)
 		expect(hop.via).toEqual("Teleport")
 		expect(hop.teleportData.SlotId).toEqual("abc")
+
+		controller:Destroy()
 	end)
 
 	it("teleports with no data at all when no config is given", function()
-		local player = newMock(885002)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885002)
 
 		TeleportServiceUtils.promiseTeleportClient(801, player)
 
 		expect(readHop(player, 801).via).toEqual("Teleport")
+
+		controller:Destroy()
 	end)
 
 	it("stays pending, because a teleport that works ends with the player gone", function()
-		local player = newMock(885003)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885003)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(802, player)
 
@@ -622,10 +783,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(promise:IsPending()).toEqual(true)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("teleports again after the engine refuses, carrying the same data", function()
-		local player = newMock(885004)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885004)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(803, player, {
 			teleportData = { SlotId = "retry-me" },
@@ -639,10 +805,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(promise:IsPending()).toEqual(true)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("keeps retrying until the attempts are spent, then rejects naming the last refusal", function()
-		local player = newMock(885005)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885005)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(804, player, { maxAttempts = 3, retryWait = 0 })
 
@@ -659,10 +830,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(err).toContain("refusal 3")
 		expect(err).toContain("3 times")
 		expect(err).toContain("804")
+
+		controller:Destroy()
 	end)
 
 	it("gives up on the first refusal when the config allows a single attempt", function()
-		local player = newMock(885006)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885006)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(805, player, { maxAttempts = 1, retryWait = 0 })
 
@@ -672,10 +848,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		local outcome = PromiseTestUtils.awaitOutcome(promise)
 		expect(outcome).toEqual("rejected")
 		expect(readHop(player, 805)).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("waits the configured backoff before trying again", function()
-		local player = newMock(885007)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885007)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(806, player, { retryWait = 0.5 })
 
@@ -688,11 +869,16 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(awaitHop(player, 806).via).toEqual("Teleport")
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("ignores a refusal aimed at another player's teleport", function()
-		local player = newMock(885008)
-		local other = newMock(885009)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885008)
+		local other = controller.newMock(885009)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(807, player, { maxAttempts = 1, retryWait = 0 })
 
@@ -703,10 +889,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(readHop(player, 807)).toEqual(nil)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("ignores a refusal of a hop to a different place", function()
-		local player = newMock(885010)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885010)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(808, player, { maxAttempts = 1, retryWait = 0 })
 
@@ -715,10 +906,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 0.2)).toEqual(false)
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("rejects with nothing when cancelled, so a caller can tell teardown from a failure", function()
-		local player = newMock(885011)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885011)
 
 		local outcome, err = "pending", nil :: any
 		local promise = TeleportServiceUtils.promiseTeleportClient(809, player)
@@ -732,10 +928,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 		expect(outcome).toEqual("rejected")
 		expect(err).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("stops retrying once cancelled, including a backoff already counting down", function()
-		local player = newMock(885012)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885012)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(810, player, { retryWait = 0.1 })
 
@@ -746,10 +947,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		-- Well past the backoff.
 		task.wait(0.3)
 		expect(readHop(player, 810)).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("ignores a refusal that lands after it has already given up", function()
-		local player = newMock(885013)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885013)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(811, player, { maxAttempts = 1, retryWait = 0 })
 
@@ -762,10 +968,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 		task.wait(0.1)
 		expect(readHop(player, 811)).toEqual(nil)
+
+		controller:Destroy()
 	end)
 
 	it("rejects when the engine raises instead of refusing through the event", function()
-		local player = newUnmockedPlayer()
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newUnmockedPlayer()
 
 		local promise
 		expect(function()
@@ -776,21 +987,31 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(outcome).toEqual("rejected")
 		expect(err).toContain("813")
 		expect(err).toContain("1 times")
+
+		controller:Destroy()
 	end)
 
 	it("retries a raised refusal like any other, then rejects once the attempts are spent", function()
-		local player = newUnmockedPlayer()
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newUnmockedPlayer()
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(814, player, { maxAttempts = 3, retryWait = 0 })
 
 		local outcome, err = PromiseTestUtils.awaitOutcome(promise)
 		expect(outcome).toEqual("rejected")
 		expect(err).toContain("3 times")
+
+		controller:Destroy()
 	end)
 
 	it("gives up the moment a refusal will only repeat, without spending the budget", function()
+		local controller = setup()
+		controller.pretendClient()
+
 		for _, result in TERMINAL do
-			local player = newMock(886300 + result.Value)
+			local player = controller.newMock(886300 + result.Value)
 
 			local promise = TeleportServiceUtils.promiseTeleportClient(815, player, {
 				maxAttempts = 5,
@@ -817,11 +1038,16 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 				secondHop = nil,
 			})
 		end
+
+		controller:Destroy()
 	end)
 
 	it("never asks again while the engine says the hop is underway", function()
+		local controller = setup()
+		controller.pretendClient()
+
 		for _, result in IN_FLIGHT do
-			local player = newMock(886400 + result.Value)
+			local player = controller.newMock(886400 + result.Value)
 
 			local promise = TeleportServiceUtils.promiseTeleportClient(816, player, { retryWait = 0 })
 
@@ -841,10 +1067,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 
 			promise:Destroy()
 		end
+
+		controller:Destroy()
 	end)
 
 	it("holds one request at a time: the next only goes out after the last has rejected", function()
-		local player = newMock(886500)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(886500)
 
 		local promise = TeleportServiceUtils.promiseTeleportClient(817, player, {
 			maxAttempts = 3,
@@ -862,10 +1093,15 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(awaitHop(player, 817).via).toEqual("Teleport")
 
 		promise:Destroy()
+
+		controller:Destroy()
 	end)
 
 	it("errors on a bad placeId, player, or config", function()
-		local player = newMock(885014)
+		local controller = setup()
+		controller.pretendClient()
+
+		local player = controller.newMock(885014)
 
 		expect(function()
 			TeleportServiceUtils.promiseTeleportClient("nope" :: any, player)
@@ -885,6 +1121,8 @@ describe("TeleportServiceUtils.promiseTeleportClient", function()
 		expect(function()
 			TeleportServiceUtils.promiseTeleportClient(812, player, { teleportData = "nope" :: any })
 		end).toThrow()
+
+		controller:Destroy()
 	end)
 end)
 
@@ -892,8 +1130,10 @@ end)
 -- fragile part is the per-player map's numeric-string keys.
 describe("TeleportServiceUtils teleport data (consumer envelope round-trip)", function()
 	it("recovers the arriving player's merged slice from a recorded envelope", function()
+		local controller = setup()
+
 		local userId = 884001
-		local player = newMock(userId)
+		local player = controller.newMock(userId)
 
 		local envelope = TeleportDataEnvelopeUtils.build(
 			{ WorldIndex = 3, Reason = "journey" },
@@ -912,11 +1152,15 @@ describe("TeleportServiceUtils teleport data (consumer envelope round-trip)", fu
 			Ephemeral = true,
 			Trace = { Origin = "hub", Depth = 2 },
 		})
+
+		controller:Destroy()
 	end)
 
 	it("keeps per-player slices distinct after the record's JSON round-trip", function()
-		local a = newMock(884101)
-		local b = newMock(884102)
+		local controller = setup()
+
+		local a = controller.newMock(884101)
+		local b = controller.newMock(884102)
 
 		local envelope = TeleportDataEnvelopeUtils.build(nil, {
 			["884101"] = { SlotId = "for-a" },
@@ -931,5 +1175,7 @@ describe("TeleportServiceUtils teleport data (consumer envelope round-trip)", fu
 		local dataB = PlayerMock.readLookup(b, "TeleportService.Teleport", 4243).teleportData
 		expect(TeleportDataEnvelopeUtils.readSlice(dataA, 884101)).toEqual({ SlotId = "for-a" })
 		expect(TeleportDataEnvelopeUtils.readSlice(dataB, 884102)).toEqual({ SlotId = "for-b" })
+
+		controller:Destroy()
 	end)
 end)

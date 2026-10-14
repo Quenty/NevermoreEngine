@@ -24,21 +24,19 @@ local function makeRig(): (Model, Part)
 end
 
 local function setup()
-	local player = PlayerMock.new()
+	local maid = Maid.new()
+
+	-- Destroying the mock also removes any loaded character, like a player leaving
+	local player = maid:Add(PlayerMock.new())
 	player.Parent = workspace -- setMockedLocalPlayer requires a parented mock
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
+	maid:Add(PlayerMock.setMockedLocalPlayer(player))
 
-	local function cleanup()
-		restoreLocalPlayer()
-		player:Destroy() -- also removes any loaded character, like a player leaving
-	end
-
-	return player, cleanup
+	return player, maid
 end
 
 describe("RxCharacterUtils.observeIsOfLocalCharacter", function()
 	local maid = Maid.new()
-	local player, cleanupMock = setup()
+	local player, mockMaid = setup()
 
 	local firstRig, firstChildPart = makeRig()
 	local secondRig, secondChildPart = makeRig()
@@ -66,7 +64,7 @@ describe("RxCharacterUtils.observeIsOfLocalCharacter", function()
 
 	afterAll(function()
 		maid:Destroy()
-		cleanupMock()
+		mockMaid:Destroy()
 		unrelatedPart:Destroy()
 	end)
 
@@ -104,7 +102,7 @@ end)
 
 describe("RxCharacterUtils.observeIsOfLocalCharacterBrio", function()
 	local maid = Maid.new()
-	local player, cleanupMock = setup()
+	local player, mockMaid = setup()
 
 	local firstRig, firstChildPart = makeRig()
 	local secondRig, secondChildPart = makeRig()
@@ -133,7 +131,7 @@ describe("RxCharacterUtils.observeIsOfLocalCharacterBrio", function()
 	afterAll(function()
 		maid:Destroy()
 		cleanupSub:Destroy()
-		cleanupMock()
+		mockMaid:Destroy()
 		unrelatedPart:Destroy()
 	end)
 

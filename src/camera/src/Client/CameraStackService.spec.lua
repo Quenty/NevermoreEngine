@@ -26,7 +26,7 @@ local function setup(options: { start: boolean? }?): CameraStackService.CameraSt
 
 	local player = PlayerMock.new({ UserId = 66123201 })
 	player.Parent = Workspace
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
+	maid:Add(PlayerMock.setMockedLocalPlayer(player))
 
 	local serviceBag = ServiceBag.new()
 	local service: CameraStackService.CameraStackService = serviceBag:GetService(CameraStackService) :: any
@@ -38,7 +38,6 @@ local function setup(options: { start: boolean? }?): CameraStackService.CameraSt
 
 	maid:GiveTask(function()
 		serviceBag:Destroy()
-		restoreLocalPlayer()
 		player:Destroy()
 	end)
 

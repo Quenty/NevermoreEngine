@@ -33,7 +33,7 @@ local function setup()
 
 	local localPlayer = maid:Add(PlayerMock.new({ UserId = LOCAL_USER_ID }))
 	localPlayer.Parent = Workspace
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(localPlayer)
+	maid:Add(PlayerMock.setMockedLocalPlayer(localPlayer))
 
 	local controller = {
 		localPlayer = localPlayer,
@@ -51,20 +51,7 @@ local function setup()
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
-		awaitError = function(promise: any): string
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, err = promise:Yield()
-			expect(ok).toEqual(false)
-			return tostring(err)
-		end,
 		Destroy = function(_self)
-			restoreLocalPlayer()
 			maid:DoCleaning()
 		end,
 	}
@@ -120,7 +107,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 			return true
 		end)
 
-		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -131,7 +118,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 			return true
 		end)
 
-		expect(controller.awaitBool(provider:PromiseIsAdmin(nil))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(provider:PromiseIsAdmin(nil))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -142,7 +129,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 			return false
 		end)
 
-		expect(controller.awaitBool(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(provider:PromiseIsAdmin(controller.localPlayer))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -153,7 +140,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 			return "yes"
 		end)
 
-		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
+		local message = tostring(PromiseTestUtils.awaitRejected(provider:PromiseIsAdmin(controller.localPlayer)))
 		expect(message).toContain("Got non-boolean from server")
 
 		controller:Destroy()
@@ -165,7 +152,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 			error("Server invoke failed")
 		end)
 
-		local message = controller.awaitError(provider:PromiseIsAdmin(controller.localPlayer))
+		local message = tostring(PromiseTestUtils.awaitRejected(provider:PromiseIsAdmin(controller.localPlayer)))
 		expect(message).toContain("Server invoke failed")
 
 		controller:Destroy()
@@ -183,7 +170,7 @@ describe("PermissionProviderClient.PromiseIsAdmin", function()
 		local second = provider:PromiseIsAdmin(controller.localPlayer)
 
 		expect(second).toBe(first)
-		expect(controller.awaitBool(first)).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(first)).toEqual(true)
 		expect(invokeCount).toEqual(1)
 
 		controller:Destroy()

@@ -10,9 +10,11 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local MessagingServiceMock = require("MessagingServiceMock")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
@@ -28,31 +30,25 @@ describe("clean session end releases the lock (server-shutdown path)", function(
 
 		-- Server A: a player in the server with a live session, about to be shut down.
 		local maidA = Maid.new()
+		JestUtils.afterThis(maidA)
 		local serviceBagA = DataStoreTestUtils.newServiceBag(maidA, MessagingServiceMock.new())
+		local bindToCloseServiceA: BindToCloseService.BindToCloseService =
+			serviceBagA:GetService(BindToCloseService) :: any
 		local managerA = maidA:Add(PlayerDataStoreManager.new(serviceBagA, mock :: any, function(userId)
 			return "user_" .. tostring(userId)
-		end, true))
+		end))
 
 		local storeA = assert(managerA:GetDataStore(1), "No storeA")
 		storeA:Store("coins", 42)
-		if
-			not PromiseTestUtils.awaitValue(function()
-				local raw = mock:GetRaw("user_1")
-				return raw ~= nil and raw.lock ~= nil
-			end, 10)
-		then
-			expect("A never acquired the lock").toEqual("A acquired the lock")
-			maidA:DoCleaning()
-			return
-		end
+		expect(PromiseTestUtils.awaitValue(function()
+			local raw = mock:GetRaw("user_1")
+			return raw ~= nil and raw.lock ~= nil
+		end, 10)).toEqual(true)
 
 		-- Clean shutdown: Roblox fires PlayerRemoving for the player still in the server, and holds the
 		-- close open until that removal has flushed.
-		if not PromiseTestUtils.awaitSettled(DataStoreTestUtils.promiseSimulatedShutdown(managerA, { 1 }), 10) then
-			expect("A's shutdown never flushed").toEqual("A's shutdown flushed")
-			maidA:DoCleaning()
-			return
-		end
+		managerA:RemovePlayerDataStore(1)
+		PromiseTestUtils.awaitFulfilled(bindToCloseServiceA:PromiseClose(), 10)
 		maidA:DoCleaning()
 
 		-- The close must have written the graceful release: data saved, lock gone.
@@ -62,14 +58,9 @@ describe("clean session end releases the lock (server-shutdown path)", function(
 		-- Server B: an immediate clean takeover -- bounded well under the 5s graceful-close
 		-- wait (and nowhere near the ~49s retry ladder).
 		local maidB = Maid.new()
+		JestUtils.afterThis(maidB)
 		local storeB = DataStoreTestUtils.newSessionLockedStore(maidB, mock, "user_1")
-		local loadB = storeB:Load("coins")
-		if not PromiseTestUtils.awaitSettled(loadB, 1) then
-			expect("B load was not immediate").toEqual("B load was immediate")
-			maidB:DoCleaning()
-			return
-		end
-		expect((loadB:Wait())).toEqual(42)
+		expect(PromiseTestUtils.awaitFulfilled(storeB:Load("coins"), 1)).toEqual(42)
 		expect(mock:GetRaw("user_1").lock.ActiveSession.SessionId).toEqual(storeB:GetSessionId())
 
 		maidB:DoCleaning()
@@ -81,11 +72,7 @@ describe("crash-safety semantics preserved", function()
 		local controller = DataStoreTestUtils.setup()
 
 		local serverA = controller.newServer({ messaging = true })
-		if not controller.awaitOwn(serverA) then
-			expect("A load hung").toEqual("A load settled")
-			controller:Destroy()
-			return
-		end
+		expect(controller.awaitOwn(serverA)).toEqual(true)
 
 		local serverB = controller.newServer({ messaging = true })
 		serverB:SetSessionMessagingCloseDelaySeconds(0.1)
@@ -118,13 +105,7 @@ describe("crash-safety semantics preserved", function()
 		serverB:SetLoadRetryOptions({ exponential = 1, initialWaitTime = 0.2, maxAttempts = 2, printWarning = false })
 		serverB:SetSessionMessagingCloseDelaySeconds(0.05)
 
-		local loadB = serverB:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadB, 20) then
-			expect("B never stole the dead session's lock").toEqual("B stole the dead session's lock")
-			controller:Destroy()
-			return
-		end
-		expect((loadB:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(serverB:PromiseLoadSuccessful(), 20)).toEqual(true)
 
 		local raw = controller.mock:GetRaw("player_1")
 		expect(raw.coins).toEqual(9)

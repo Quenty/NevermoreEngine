@@ -14,12 +14,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function expectSettled(promise, timeout: number?): boolean
-	local settled = PromiseTestUtils.awaitSettled(promise, timeout)
-	expect(settled).toEqual(true)
-	return settled
-end
-
 describe("PlayerDataStoreManager.GetDataStore", function()
 	it("should return a datastore for a fresh user", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
@@ -95,22 +89,10 @@ describe("PlayerDataStoreManager.PromiseDataStore", function()
 	it("should resolve the datastore and load successfully against a healthy mock", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		local promise = controller.manager:PromiseDataStore(1)
-		if not expectSettled(promise, 10) then
-			controller:Destroy()
-			return
-		end
-
-		local ok, dataStore = promise:Yield()
-		expect(ok).toEqual(true)
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStore(1), 10)
 		expect(dataStore).never.toBeNil()
 
-		local loadPromise = dataStore:PromiseLoadSuccessful()
-		if not expectSettled(loadPromise, 10) then
-			controller:Destroy()
-			return
-		end
-		expect((loadPromise:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -125,23 +107,9 @@ describe("PlayerDataStoreManager persistence", function()
 
 		controller.manager:RemovePlayerDataStore(1)
 
-		local promise = controller.manager:PromiseDataStore(1)
-		if not expectSettled(promise, 10) then
-			controller:Destroy()
-			return
-		end
+		local reloaded = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStore(1), 10)
 
-		local ok, reloaded = promise:Yield()
-		expect(ok).toEqual(true)
-
-		local loadPromise = reloaded:Load("coins")
-		if not expectSettled(loadPromise, 10) then
-			controller:Destroy()
-			return
-		end
-
-		local loadOk, value = loadPromise:Yield()
-		expect(loadOk).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(reloaded:Load("coins"), 10)
 		expect(value).toEqual(5)
 
 		controller:Destroy()
@@ -159,12 +127,7 @@ describe("PlayerDataStoreManager.AddRemovingCallback", function()
 
 		controller.manager:GetDataStore(1)
 
-		local promise = controller.manager:PromiseAllSaves()
-		if not expectSettled(promise, 10) then
-			controller:Destroy()
-			return
-		end
-		expect((promise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseAllSaves(), 10)
 
 		expect(ran).toEqual(true)
 
@@ -179,12 +142,7 @@ describe("PlayerDataStoreManager.PromiseAllSaves", function()
 		controller.manager:GetDataStore(1):Store("coins", 1)
 		controller.manager:GetDataStore(2):Store("coins", 2)
 
-		local promise = controller.manager:PromiseAllSaves()
-		if not expectSettled(promise, 10) then
-			controller:Destroy()
-			return
-		end
-		expect((promise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseAllSaves(), 10)
 
 		controller:Destroy()
 	end)
@@ -196,16 +154,10 @@ describe("PlayerDataStoreManager server shutdown", function()
 	it("saves the staged data and releases the lock for the leaving player", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
-		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:Destroy()
-			return
-		end
+		controller.manager:RemovePlayerDataStore(1)
+		PromiseTestUtils.awaitFulfilled(controller.bindToCloseService:PromiseClose(), 10)
 
 		local raw = controller.mock:GetRaw("user_1")
 		expect(raw.coins).toEqual(5)
@@ -225,16 +177,11 @@ describe("PlayerDataStoreManager server shutdown", function()
 			local rawTwo = controller.mock:GetRaw("user_2")
 			return rawOne ~= nil and rawOne.lock ~= nil and rawTwo ~= nil and rawTwo.lock ~= nil
 		end, 10)
-		if not locked then
-			expect("both locks were never acquired").toEqual("both locks were acquired")
-			controller:Destroy()
-			return
-		end
+		expect(locked).toEqual(true)
 
-		if not expectSettled(controller.promiseShutdown({ 1, 2 }), 10) then
-			controller:Destroy()
-			return
-		end
+		controller.manager:RemovePlayerDataStore(1)
+		controller.manager:RemovePlayerDataStore(2)
+		PromiseTestUtils.awaitFulfilled(controller.bindToCloseService:PromiseClose(), 10)
 
 		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
 		expect(controller.mock:GetRaw("user_2").lock).toEqual(nil)
@@ -248,15 +195,10 @@ describe("PlayerDataStoreManager server shutdown", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
 		local dataStore = controller.manager:GetDataStore(1)
-		if not expectSettled(dataStore:PromiseLoadSuccessful(), 10) then
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
 
-		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:Destroy()
-			return
-		end
+		controller.manager:RemovePlayerDataStore(1)
+		PromiseTestUtils.awaitFulfilled(controller.bindToCloseService:PromiseClose(), 10)
 
 		expect(getmetatable(dataStore)).toBeNil()
 
@@ -272,22 +214,15 @@ describe("PlayerDataStoreManager server shutdown", function()
 			return PromiseUtils.delayed(0.5)
 		end)
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
 		-- PlayerRemoving lands first, then the server begins closing.
 		controller.manager:RemovePlayerDataStore(1)
 
-		local closePromise = controller.manager:PromiseAllSaves()
+		local closePromise = controller.bindToCloseService:PromiseClose()
 		expect(closePromise:IsPending()).toEqual(true)
 
-		if not expectSettled(closePromise, 10) then
-			controller:Destroy()
-			return
-		end
+		PromiseTestUtils.awaitFulfilled(closePromise, 10)
 
 		-- The close resolving has to mean the write landed. If it can resolve first, the real server
 		-- dies here with the session still locked and no other server able to release it.
@@ -305,17 +240,10 @@ describe("PlayerDataStoreManager server shutdown", function()
 
 		local dataStore = controller.manager:GetDataStore(1)
 
-		local loaded = dataStore:PromiseLoadSuccessful()
-		if not expectSettled(loaded, 10) then
-			controller:Destroy()
-			return
-		end
-		expect((loaded:Wait())).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(false)
 
-		if not expectSettled(controller.promiseShutdown({ 1 }), 10) then
-			controller:Destroy()
-			return
-		end
+		controller.manager:RemovePlayerDataStore(1)
+		PromiseTestUtils.awaitFulfilled(controller.bindToCloseService:PromiseClose(), 10)
 
 		expect(controller.mock:GetRaw("user_1")).toBeNil()
 

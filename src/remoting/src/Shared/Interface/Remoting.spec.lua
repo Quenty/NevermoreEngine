@@ -407,8 +407,7 @@ describe("Remoting dummy-mode round trip", function()
 			return true
 		end)
 
-		local promise = client:PromiseInvokeServer("WhoAmI")
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect(PromiseTestUtils.awaitSettled(client:PromiseInvokeServer("WhoAmI"))).toEqual(true)
 		expect(receivedPlayer).toBe(playerMock)
 
 		restoreLocalPlayer()
@@ -426,9 +425,7 @@ describe("Remoting dummy-mode round trip", function()
 			received = value
 		end)
 
-		local promise = client:PromiseFireServer("Ping", 42)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-		expect((promise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(client:PromiseFireServer("Ping", 42))
 
 		expect(PromiseTestUtils.awaitValue(function()
 			return received ~= nil
@@ -593,11 +590,7 @@ describe("Remoting dummy-mode round trip", function()
 			return n * 2
 		end)
 
-		local promise = server:PromiseInvokeClient("Compute", playerMock, 5)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-		local isFulfilled, result = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local result = PromiseTestUtils.awaitFulfilled(server:PromiseInvokeClient("Compute", playerMock, 5))
 		expect(result).toEqual(10)
 
 		restoreLocalPlayer()
@@ -673,11 +666,7 @@ describe("Remoting dummy-mode round trip", function()
 
 		client.Ping:FireServer(42)
 
-		local promise = client.Double:PromiseInvokeServer(5)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-		local isFulfilled, result = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local result = PromiseTestUtils.awaitFulfilled(client.Double:PromiseInvokeServer(5))
 		expect(result).toEqual(10)
 
 		expect(PromiseTestUtils.awaitValue(function()
@@ -727,11 +716,7 @@ describe("Remoting dummy-mode round trip", function()
 			return n * 2
 		end)
 
-		local promise = client:PromiseInvokeServer("Double", 5)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-		local isFulfilled, result = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local result = PromiseTestUtils.awaitFulfilled(client:PromiseInvokeServer("Double", 5))
 		expect(result).toEqual(10)
 
 		server:Destroy()
@@ -777,11 +762,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 		server:DeclareMethod("Compute")
 
-		local promise = server:PromiseInvokeClient("Compute", playerMock, 5)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-		local isFulfilled, result = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local result = PromiseTestUtils.awaitFulfilled(server:PromiseInvokeClient("Compute", playerMock, 5))
 		expect(result).toEqual(10)
 
 		restoreLocalPlayer()
@@ -938,11 +919,7 @@ describe("Remoting dummy-mode fidelity", function()
 			return Promise.resolved(n + 1)
 		end)
 
-		local promise = client:PromiseInvokeServer("Fetch", 41)
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-		local isFulfilled, result = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local result = PromiseTestUtils.awaitFulfilled(client:PromiseInvokeServer("Fetch", 41))
 		expect(result).toEqual(42)
 
 		server:Destroy()
@@ -1077,11 +1054,7 @@ describe("Remoting dummy-mode multiple simulated clients", function()
 
 		local function invokeAs(client)
 			client.activate()
-			local promise = client.remoting:PromiseInvokeServer("Increment")
-			expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
-
-			local isFulfilled, count = promise:Yield()
-			expect(isFulfilled).toEqual(true)
+			local count = PromiseTestUtils.awaitFulfilled(client.remoting:PromiseInvokeServer("Increment"))
 			return count
 		end
 

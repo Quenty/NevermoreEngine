@@ -8,8 +8,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local HasSaveSlotsDataStore = require("HasSaveSlotsDataStore")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
@@ -32,6 +32,7 @@ local SESSION_SECONDS = 120
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local sharedDataStoreService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
@@ -42,20 +43,7 @@ local function setup()
 	playerDataStoreService:SetRobloxDataStore(mock)
 	serviceBag:Start()
 
-	local function await(promise, label: string): any
-		if not PromiseTestUtils.awaitSettled(promise, 10) then
-			expect(`{label} hung`).toEqual(`{label} settled`)
-			return nil
-		end
-		local ok, value = promise:Yield()
-		if not ok then
-			expect(`{label} rejected: {tostring(value)}`).toEqual(`{label} fulfilled`)
-			return nil
-		end
-		return value
-	end
-
-	local dataStore = await(playerDataStoreService:PromiseDataStore(USER_ID), "data store")
+	local dataStore = PromiseTestUtils.awaitFulfilled(playerDataStoreService:PromiseDataStore(USER_ID))
 
 	local slotsDataStore = maid:Add(HasSaveSlotsDataStore.new(Promise.resolved(dataStore), {
 		ActiveSlotId = maid:Add(ValueObject.new(nil)),
@@ -65,18 +53,17 @@ local function setup()
 		SharedDataStoreService = sharedDataStoreService,
 		UserId = USER_ID,
 	}))
-	await(slotsDataStore:PromiseSlotsLoaded(), "slots loaded")
+	PromiseTestUtils.awaitFulfilled(slotsDataStore:PromiseSlotsLoaded())
 
 	local controller = {
-		await = await,
 		mock = mock,
 		dataStore = dataStore,
 		slotsDataStore = slotsDataStore,
 		-- Selects a fresh slot and backdates the session so the next flush accrues real time without
 		-- the spec waiting it out.
 		beginBackdatedSession = function(): string
-			local slotId = await(slotsDataStore:PromiseCreateSlot(1), "create")
-			await(slotsDataStore:PromiseSelectSlot(slotId), "select")
+			local slotId = PromiseTestUtils.awaitFulfilled(slotsDataStore:PromiseCreateSlot(1))
+			PromiseTestUtils.awaitFulfilled(slotsDataStore:PromiseSelectSlot(slotId))
 			slotsDataStore._playSessionStart = assert(slotsDataStore._playSessionStart, "No _playSessionStart")
 				- SESSION_SECONDS
 			slotsDataStore._playSessionLastFlush = assert(
@@ -92,7 +79,7 @@ local function setup()
 			return metadata and metadata[slotId]
 		end,
 		Destroy = function(_self)
-			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+			PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 			maid:DoCleaning()
 		end,
 	}
@@ -107,7 +94,7 @@ describe("save slot playtime", function()
 		local controller = setup()
 		local slotId = controller.beginBackdatedSession()
 
-		controller.await(controller.dataStore:Save(), "save")
+		PromiseTestUtils.awaitFulfilled(controller.dataStore:Save())
 
 		local stored = controller.storedMetadata(slotId)
 		expect(stored).never.toBeNil()
@@ -122,7 +109,7 @@ describe("save slot playtime", function()
 		local controller = setup()
 		local slotId = controller.beginBackdatedSession()
 
-		controller.await(controller.dataStore:Save(), "save")
+		PromiseTestUtils.awaitFulfilled(controller.dataStore:Save())
 
 		local metadata = assert(controller.slotsDataStore:GetSlotMetadata(slotId), "No slot metadata")
 		expect(metadata.TimePlayed).toEqual(controller.storedMetadata(slotId).TimePlayed)

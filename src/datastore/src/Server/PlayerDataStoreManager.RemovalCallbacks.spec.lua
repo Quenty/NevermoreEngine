@@ -74,8 +74,9 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 
 		it("yielding callback: removal blocks forever (no save, lock held)", function()
 			local controller = DataStoreTestUtils.setupDataStoreManager()
+			local blocked = Promise.new()
 			controller.manager:AddRemovingCallback(function()
-				return Promise.new()
+				return blocked
 			end)
 
 			expect(controller.storeAndAwaitLock()).toEqual(true)
@@ -87,6 +88,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			end, 2)).toEqual(false)
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
+			blocked:Resolve()
 			controller:Destroy()
 		end)
 	end)

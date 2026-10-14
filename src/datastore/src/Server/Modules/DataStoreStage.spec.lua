@@ -22,14 +22,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 			dataStore:Store("coins", 25)
 
-			local promise = dataStore:Load("coins")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
+			local value = PromiseTestUtils.awaitFulfilled(dataStore:Load("coins"))
 			expect(value).toEqual(25)
 
 			dataStore:Destroy()
@@ -39,14 +32,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 			dataStore:Store("profile", { level = 3, name = "Egg" })
 
-			local promise = dataStore:Load("profile")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
+			local value = PromiseTestUtils.awaitFulfilled(dataStore:Load("profile"))
 			expect(value).toEqual({ level = 3, name = "Egg" })
 
 			dataStore:Destroy()
@@ -55,13 +41,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should return the default value for a missing key", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			local promise = dataStore:Load("missing", "fallback")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			expect((promise:Wait())).toEqual("fallback")
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:Load("missing", "fallback"))).toEqual("fallback")
 
 			dataStore:Destroy()
 		end)
@@ -73,14 +53,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			dataStore:Store("coins", 5)
 			dataStore:Store("gems", 10)
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ coins = 5, gems = 10 })
 
 			dataStore:Destroy()
@@ -89,13 +62,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should return the default when the stage is empty", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			local promise = dataStore:LoadAll("empty")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			expect((promise:Wait())).toEqual("empty")
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:LoadAll("empty"))).toEqual("empty")
 
 			dataStore:Destroy()
 		end)
@@ -116,14 +83,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 			dataStore:GetSubStore("inv"):Store("sword", true)
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ inv = { sword = true } })
 
 			dataStore:Destroy()
@@ -133,14 +93,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 			dataStore:GetSubStore("a"):GetSubStore("b"):Store("c", 1)
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ a = { b = { c = 1 } } })
 
 			dataStore:Destroy()
@@ -154,23 +107,11 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			local dataStore = DataStore.new(mock, "player_1")
 
-			local basePromise = dataStore:Load("coins")
-			if not PromiseTestUtils.awaitSettled(basePromise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-			expect((basePromise:Wait())).toEqual(1)
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:Load("coins"))).toEqual(1)
 
 			dataStore:Store("coins", 999)
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ coins = 999, gems = 2 })
 
 			dataStore:Destroy()
@@ -185,14 +126,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			dataStore:Overwrite({ c = 3 })
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ c = 3 })
 
 			dataStore:Destroy()
@@ -204,13 +138,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			dataStore:Overwrite(nil)
 
-			local promise = dataStore:LoadAll("cleared")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			expect((promise:Wait())).toEqual("cleared")
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:LoadAll("cleared"))).toEqual("cleared")
 
 			dataStore:Destroy()
 		end)
@@ -221,22 +149,11 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			local dataStore = DataStore.new(mock, "player_1")
 
-			local basePromise = dataStore:Load("coins")
-			if not PromiseTestUtils.awaitSettled(basePromise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-			expect((basePromise:Wait())).toEqual(5)
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:Load("coins"))).toEqual(5)
 
 			dataStore:Wipe()
 
-			local promise = dataStore:LoadAll("wiped")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			expect((promise:Wait())).toEqual("wiped")
+			expect(PromiseTestUtils.awaitFulfilled(dataStore:LoadAll("wiped"))).toEqual("wiped")
 
 			dataStore:Destroy()
 		end)
@@ -248,14 +165,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			dataStore:OverwriteMerge({ b = 3, c = 4 })
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ a = 1, b = 3, c = 4 })
 
 			dataStore:Destroy()
@@ -270,14 +180,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			dataStore:Delete("a")
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all).toEqual({ b = 2 })
 
 			dataStore:Destroy()
@@ -291,14 +194,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			local dataStore = DataStore.new(mock, "player_1")
 
-			local promise = Rx.toPromise(dataStore:Observe("coins", 0))
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
+			local value = PromiseTestUtils.awaitFulfilled(Rx.toPromise(dataStore:Observe("coins", 0)))
 			expect(value).toEqual(7)
 
 			dataStore:Destroy()
@@ -307,13 +203,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should emit the default for a missing key", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			local promise = Rx.toPromise(dataStore:Observe("coins", 0))
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			expect((promise:Wait())).toEqual(0)
+			expect(PromiseTestUtils.awaitFulfilled(Rx.toPromise(dataStore:Observe("coins", 0)))).toEqual(0)
 
 			dataStore:Destroy()
 		end)
@@ -367,14 +257,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			dataStore:Store("a", 1)
 			dataStore:Store("b", 2)
 
-			local promise = dataStore:PromiseKeySet()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, keys = promise:Yield()
-			expect(ok).toEqual(true)
+			local keys = PromiseTestUtils.awaitFulfilled(dataStore:PromiseKeySet())
 			expect(keys).toEqual({ a = true, b = true })
 
 			dataStore:Destroy()
@@ -385,14 +268,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			dataStore:Store("a", 1)
 			dataStore:Store("b", 2)
 
-			local promise = dataStore:PromiseKeyList()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, list = promise:Yield()
-			expect(ok).toEqual(true)
+			local list = PromiseTestUtils.awaitFulfilled(dataStore:PromiseKeyList())
 
 			local asSet = {}
 			for _, key in list do
@@ -408,24 +284,14 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should stage the value whenever the ValueObject changes", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			if not PromiseTestUtils.awaitSettled(dataStore:Load("level")) then
-				expect("hung").toEqual("settled")
-				return
-			end
+			expect(PromiseTestUtils.awaitSettled(dataStore:Load("level"))).toEqual(true)
 
 			local valueObject = ValueObject.new(0)
 			dataStore:StoreOnValueChange("level", valueObject)
 
 			valueObject.Value = 7
 
-			local promise = dataStore:LoadAll()
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, all = promise:Yield()
-			expect(ok).toEqual(true)
+			local all = PromiseTestUtils.awaitFulfilled(dataStore:LoadAll())
 			expect(all.level).toEqual(7)
 
 			dataStore:Destroy()
@@ -439,22 +305,10 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 			local writer = DataStore.new(mock, "player_1")
 			writer:Store("coins", 5)
 
-			local savePromise = writer:Save()
-			if not PromiseTestUtils.awaitSettled(savePromise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-			expect((savePromise:Yield())).toEqual(true)
+			PromiseTestUtils.awaitFulfilled(writer:Save())
 
 			local reader = DataStore.new(mock, "player_1")
-			local loadPromise = reader:Load("coins")
-			if not PromiseTestUtils.awaitSettled(loadPromise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, value = loadPromise:Yield()
-			expect(ok).toEqual(true)
+			local value = PromiseTestUtils.awaitFulfilled(reader:Load("coins"))
 			expect(value).toEqual(5)
 
 			writer:Destroy()
@@ -471,14 +325,7 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 
 			input.count = 999
 
-			local promise = dataStore:Load("data")
-			if not PromiseTestUtils.awaitSettled(promise) then
-				expect("hung").toEqual("settled")
-				return
-			end
-
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
+			local value = PromiseTestUtils.awaitFulfilled(dataStore:Load("data"))
 			expect(value).toEqual({ count = 1 })
 
 			dataStore:Destroy()

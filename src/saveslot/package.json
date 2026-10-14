@@ -32,6 +32,7 @@
     "@quenty/attributeutils": "workspace:*",
     "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
+    "@quenty/bindtocloseservice": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
     "@quenty/datastore": "workspace:*",

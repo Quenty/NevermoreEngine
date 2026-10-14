@@ -37,7 +37,7 @@ local function setup()
 
 	local mock = PlayerMock.new({ UserId = 66123100 + specCounter })
 	mock.Parent = Workspace
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(mock)
+	maid:Add(PlayerMock.setMockedLocalPlayer(mock))
 
 	local serviceBag = ServiceBag.new()
 	local ragdollServiceClient = (
@@ -49,7 +49,6 @@ local function setup()
 
 	maid:GiveTask(function()
 		serviceBag:Destroy()
-		restoreLocalPlayer()
 		mock:Destroy()
 	end)
 

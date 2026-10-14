@@ -7,8 +7,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -36,6 +36,7 @@ local function setup()
 
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local sharedService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
@@ -52,10 +53,8 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
-	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
 	maid:GiveTask(function()
-		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end)
@@ -77,37 +76,10 @@ local function setup()
 	return controller
 end
 
-local function runWithContext(body)
-	local context = setup()
-	local ok, err = pcall(body, context)
-	context:Destroy()
-	if not ok then
-		error(err, 0)
-	end
-end
-
-local function awaitValueOf(promise)
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	local ok, value = promise:Yield()
-	if not ok then
-		error(`promise rejected: {tostring(value)}`, 0)
-	end
-	return value
-end
-
-local function awaitResolved(promise): boolean
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	return (promise:Yield())
-end
-
 local function createSelectAndWrite(hasSaveSlots, slotIndex: number): string
-	local slotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(slotIndex))
-	awaitValueOf(hasSaveSlots:PromiseSelectSlot(slotId))
-	local store = awaitValueOf(hasSaveSlots:PromiseActiveSlotStore())
+	local slotId = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseCreateSlot(slotIndex))
+	PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSelectSlot(slotId))
+	local store = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseActiveSlotStore())
 	store:Store("Coins", 7)
 	store:GetSubStore("World_2"):Store("Eggs", 3)
 	return slotId
@@ -115,92 +87,98 @@ end
 
 describe("HasSaveSlots shared-store save/import", function()
 	it("saves a non-main slot to the shared store and imports it into a fresh non-main slot", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
 
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
-			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-abc"))
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-abc"))
 
-			local newSlotId = awaitValueOf(hasSaveSlots:PromiseImportSlotFromSharedDataStore("code-abc"))
-			expect(newSlotId).never.toEqual(sourceSlotId)
+		local newSlotId = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseImportSlotFromSharedDataStore("code-abc"))
+		expect(newSlotId).never.toEqual(sourceSlotId)
 
-			local reexport = awaitValueOf(hasSaveSlots:PromiseExportSlot(newSlotId))
-			expect(reexport.data.Coins).toEqual(7)
-			expect(reexport.data.World_2.Eggs).toEqual(3)
-		end)
+		local reexport = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSlot(newSlotId))
+		expect(reexport.data.Coins).toEqual(7)
+		expect(reexport.data.World_2.Eggs).toEqual(3)
+
+		context:Destroy()
 	end)
 
 	it("rejects import from a missing key", function()
-		runWithContext(function(context)
-			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("nope"))).toEqual(false)
-		end)
+		local context = setup()
+		PromiseTestUtils.awaitRejected(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("nope"))
+
+		context:Destroy()
 	end)
 
 	it("tags what it writes as a share code, keeping it out of the teleport arrival path", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
-			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-kind"))
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-kind"))
 
-			local stored = awaitValueOf(context.sharedService:PromiseRead("code-kind"))
-			expect(stored.kind).toEqual(SaveSlotExportUtils.Kind.CODE)
-		end)
+		local stored = PromiseTestUtils.awaitFulfilled(context.sharedService:PromiseRead("code-kind"))
+		expect(stored.kind).toEqual(SaveSlotExportUtils.Kind.CODE)
+
+		context:Destroy()
 	end)
 
 	it("refuses to import a transfer snapshot, whose key every client can read", function()
-		runWithContext(function(context)
-			awaitValueOf(
-				context.sharedService:PromiseWrite(
-					"transfer-key",
-					SaveSlotExportUtils.withKind({ data = { Coins = 5 } }, SaveSlotExportUtils.Kind.TRANSFER)
-				)
+		local context = setup()
+		PromiseTestUtils.awaitFulfilled(
+			context.sharedService:PromiseWrite(
+				"transfer-key",
+				SaveSlotExportUtils.withKind({ data = { Coins = 5 } }, SaveSlotExportUtils.Kind.TRANSFER)
 			)
+		)
 
-			expect(awaitResolved(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("transfer-key"))).toEqual(
-				false
-			)
-		end)
+		PromiseTestUtils.awaitRejected(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("transfer-key"))
+
+		context:Destroy()
 	end)
 
 	it("still imports an entry written before kinds existed", function()
-		runWithContext(function(context)
-			awaitValueOf(context.sharedService:PromiseWrite("legacy-code", { data = { Coins = 5 } }))
+		local context = setup()
+		PromiseTestUtils.awaitFulfilled(context.sharedService:PromiseWrite("legacy-code", { data = { Coins = 5 } }))
 
-			local newSlotId = awaitValueOf(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("legacy-code"))
-			local reexport = awaitValueOf(context.hasSaveSlots:PromiseExportSlot(newSlotId))
-			expect(reexport.data.Coins).toEqual(5)
-		end)
+		local newSlotId =
+			PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseImportSlotFromSharedDataStore("legacy-code"))
+		local reexport = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseExportSlot(newSlotId))
+		expect(reexport.data.Coins).toEqual(5)
+
+		context:Destroy()
 	end)
 
 	it("propagates the main-slot guard through a shared-store save", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
 
-			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
-			expect(awaitResolved(hasSaveSlots:PromiseSaveSlotToSharedDataStore(mainSlotId, "k"))).toEqual(false)
-		end)
+		local mainSlotId =
+			PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseSaveSlotToSharedDataStore(mainSlotId, "k"))
+
+		context:Destroy()
 	end)
 
 	it("rejects a save when the shared store write fails", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
 
-			context.sharedMock:FailNextRequests(1)
-			expect(awaitResolved(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-fail"))).toEqual(
-				false
-			)
-		end)
+		context.sharedMock:FailNextRequests(1)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-fail"))
+
+		context:Destroy()
 	end)
 
 	it("rejects an import when the shared store read fails", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
-			awaitValueOf(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-read"))
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSaveSlotToSharedDataStore(sourceSlotId, "code-read"))
 
-			context.sharedMock:FailNextRequests(1)
-			expect(awaitResolved(hasSaveSlots:PromiseImportSlotFromSharedDataStore("code-read"))).toEqual(false)
-		end)
+		context.sharedMock:FailNextRequests(1)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseImportSlotFromSharedDataStore("code-read"))
+
+		context:Destroy()
 	end)
 end)

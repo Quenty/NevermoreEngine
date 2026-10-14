@@ -2207,6 +2207,9 @@ importers:
       '@quenty/coreguiutils':
         specifier: workspace:*
         version: link:../coreguiutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3461,9 +3464,15 @@ importers:
 
   src/marketplaceutils:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
+      '@quenty/maid':
+        specifier: workspace:*
+        version: link:../maid
       '@quenty/memoize':
         specifier: workspace:*
         version: link:../memoize
@@ -5076,6 +5085,9 @@ importers:
       '@quenty/binder':
         specifier: workspace:*
         version: link:../binder
+      '@quenty/bindtocloseservice':
+        specifier: workspace:*
+        version: link:../bindtocloseservice
       '@quenty/brio':
         specifier: workspace:*
         version: link:../brio

@@ -40,14 +40,7 @@ end)
 
 describe("DataStorePromises.promiseDataStore", function()
 	it("should resolve an Instance in the cloud test place", function()
-		local promise = DataStorePromises.promiseDataStore("SpecStore", "SpecScope")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, dataStore = promise:Yield()
-		expect(ok).toEqual(true)
+		local dataStore = PromiseTestUtils.awaitFulfilled(DataStorePromises.promiseDataStore("SpecStore", "SpecScope"))
 		expect(typeof(dataStore)).toEqual("Instance")
 	end)
 
@@ -69,28 +62,14 @@ describe("DataStorePromises.getAsync", function()
 		local mock = DataStoreMock.new()
 		mock:SetRaw("key", { coins = 5 })
 
-		local promise = DataStorePromises.getAsync(mock, "key")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(DataStorePromises.getAsync(mock, "key"))
 		expect(value.coins).toEqual(5)
 	end)
 
 	it("should resolve with nil for an unset key", function()
 		local mock = DataStoreMock.new()
 
-		local promise = DataStorePromises.getAsync(mock, "missing")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(DataStorePromises.getAsync(mock, "missing"))
 		expect(value).toEqual(nil)
 	end)
 
@@ -98,14 +77,7 @@ describe("DataStorePromises.getAsync", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local promise = DataStorePromises.getAsync(mock, "key")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(false)
+		PromiseTestUtils.awaitRejected(DataStorePromises.getAsync(mock, "key"))
 	end)
 
 	it("should throw synchronously for a bad robloxDataStore", function()
@@ -130,13 +102,7 @@ describe("DataStorePromises.updateAsync", function()
 		local promise = DataStorePromises.updateAsync(mock, "key", function(current)
 			return (current or 0) + 1
 		end)
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(promise)
 		expect(value).toEqual(2)
 	end)
 
@@ -149,13 +115,7 @@ describe("DataStorePromises.updateAsync", function()
 			seen = current
 			return current + 5
 		end)
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(promise)
 		expect(seen).toEqual(10)
 		expect(mock:GetRaw("key")).toEqual(15)
 	end)
@@ -167,13 +127,7 @@ describe("DataStorePromises.updateAsync", function()
 		local promise = DataStorePromises.updateAsync(mock, "key", function()
 			return 1
 		end)
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(false)
+		PromiseTestUtils.awaitRejected(promise)
 	end)
 
 	it("should throw synchronously for a bad robloxDataStore", function()
@@ -205,14 +159,7 @@ describe("DataStorePromises.setAsync", function()
 	it("should resolve true and write the value", function()
 		local mock = DataStoreMock.new()
 
-		local promise = DataStorePromises.setAsync(mock, "key", "value")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(DataStorePromises.setAsync(mock, "key", "value"))
 		expect(value).toEqual(true)
 		expect(mock:GetRaw("key")).toEqual("value")
 	end)
@@ -220,28 +167,14 @@ describe("DataStorePromises.setAsync", function()
 	it("should accept userIds", function()
 		local mock = DataStoreMock.new()
 
-		local promise = DataStorePromises.setAsync(mock, "key", "value", { 111, 222 })
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(DataStorePromises.setAsync(mock, "key", "value", { 111, 222 }))
 	end)
 
 	it("should reject when the store fails all requests", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local promise = DataStorePromises.setAsync(mock, "key", "value")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(false)
+		PromiseTestUtils.awaitRejected(DataStorePromises.setAsync(mock, "key", "value"))
 	end)
 
 	it("should throw synchronously for a bad robloxDataStore", function()
@@ -270,14 +203,7 @@ describe("DataStorePromises.promiseIncrementAsync", function()
 		local mock = DataStoreMock.new()
 		mock:SetRaw("key", 5)
 
-		local promise = DataStorePromises.promiseIncrementAsync(mock, "key", 3)
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(DataStorePromises.promiseIncrementAsync(mock, "key", 3))
 		expect(value).toEqual(true)
 		expect(mock:GetRaw("key")).toEqual(8)
 	end)
@@ -286,14 +212,7 @@ describe("DataStorePromises.promiseIncrementAsync", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local promise = DataStorePromises.promiseIncrementAsync(mock, "key", 1)
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(false)
+		PromiseTestUtils.awaitRejected(DataStorePromises.promiseIncrementAsync(mock, "key", 1))
 	end)
 
 	it("should throw synchronously for a bad robloxDataStore", function()
@@ -322,14 +241,7 @@ describe("DataStorePromises.removeAsync", function()
 		local mock = DataStoreMock.new()
 		mock:SetRaw("key", "value")
 
-		local promise = DataStorePromises.removeAsync(mock, "key")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(DataStorePromises.removeAsync(mock, "key"))
 		expect(value).toEqual(true)
 		expect(mock:GetRaw("key")).toEqual(nil)
 	end)
@@ -338,14 +250,7 @@ describe("DataStorePromises.removeAsync", function()
 		local mock = DataStoreMock.new()
 		mock:FailAllRequests()
 
-		local promise = DataStorePromises.removeAsync(mock, "key")
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("promise hung").toEqual("promise settled")
-			return
-		end
-
-		local ok = promise:Yield()
-		expect(ok).toEqual(false)
+		PromiseTestUtils.awaitRejected(DataStorePromises.removeAsync(mock, "key"))
 	end)
 
 	it("should throw synchronously for a bad robloxDataStore", function()

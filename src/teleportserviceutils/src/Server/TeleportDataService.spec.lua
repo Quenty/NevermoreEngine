@@ -35,12 +35,6 @@ local function setup()
 		fakePlayer = function(userId: number?): Player
 			return maid:Add(PlayerMock.new(if userId ~= nil then { UserId = userId } else nil))
 		end,
-		await = function(promise: any): any
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -60,7 +54,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared 
 			return { slot = "slot-" .. tostring(givenPlayer:GetAttribute("UserId")) }
 		end)
 
-		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
+		local built = PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "slot-111" })
 
 		controller:Destroy()
@@ -73,7 +67,8 @@ describe("TeleportDataService.PromiseBuildTeleportData (delegates to the shared 
 			return { shared = "provider" }
 		end)
 
-		local built = controller.await(controller.service:PromiseBuildTeleportData({}, { shared = "caller" }))
+		local built =
+			PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({}, { shared = "caller" }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ shared = "caller" })
 
 		controller:Destroy()
@@ -91,7 +86,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (async build)", function(
 			end)
 		end)
 
-		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
+		local built = PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "async" })
 
 		controller:Destroy()
@@ -105,7 +100,7 @@ describe("TeleportDataService.PromiseBuildTeleportData (async build)", function(
 			return { slot = "sync" }
 		end)
 
-		local built = controller.await(controller.service:PromiseBuildTeleportData({ player }))
+		local built = PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({ player }))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, 111)).toEqual({ slot = "sync" })
 
 		controller:Destroy()
@@ -120,7 +115,7 @@ describe("TeleportDataService unified arrived data", function()
 		controller.service:SetTrustedArrivedTeleportDataForTesting(player, { region = "us" })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, nil)
 
-		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ region = "us" })
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData(player))).toEqual({ region = "us" })
 
 		controller:Destroy()
 	end)
@@ -132,7 +127,9 @@ describe("TeleportDataService unified arrived data", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({ slot = "client" })
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData(player))).toEqual({
+			slot = "client",
+		})
 
 		controller:Destroy()
 	end)
@@ -145,7 +142,7 @@ describe("TeleportDataService unified arrived data", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedData(player))).toEqual({
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData(player))).toEqual({
 			region = "us",
 			slot = "client",
 		})
@@ -161,7 +158,9 @@ describe("TeleportDataService unified arrived data", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client-slot" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("server-slot")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(player, "slot"))).toEqual(
+			"server-slot"
+		)
 
 		controller:Destroy()
 	end)
@@ -176,10 +175,16 @@ describe("TeleportDataService band separation", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseTrustedArrivedData(player))).toEqual({ region = "us" })
-		expect(controller.await(controller.service:PromiseTrustedArrivedValue(player, "slot"))).toBeNil()
-		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "region"))).toEqual(true)
-		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue(player, "slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseTrustedArrivedData(player))).toEqual({
+			region = "us",
+		})
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseTrustedArrivedValue(player, "slot"))).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasTrustedArrivedValue(player, "region"))).toEqual(
+			true
+		)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasTrustedArrivedValue(player, "slot"))).toEqual(
+			false
+		)
 
 		controller:Destroy()
 	end)
@@ -192,7 +197,9 @@ describe("TeleportDataService band separation", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseNonTrustedArrivedData(player))).toEqual({ slot = "client" })
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseNonTrustedArrivedData(player))).toEqual({
+			slot = "client",
+		})
 
 		controller:Destroy()
 	end)
@@ -205,8 +212,12 @@ describe("TeleportDataService band separation", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "region"))).toEqual(true)
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted(player, "region"))).toEqual(
+			true
+		)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(
+			false
+		)
 
 		controller:Destroy()
 	end)
@@ -219,7 +230,9 @@ describe("TeleportDataService band separation", function()
 		local envelope = TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(player, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted(player, "slot"))).toEqual(
+			true
+		)
 
 		controller:Destroy()
 	end)
@@ -235,10 +248,12 @@ describe("TeleportDataService value accessors", function()
 			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "a" } })
 		)
 
-		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("a")
-		expect(controller.await(controller.service:PromiseArrivedValue(player, "missing"))).toBeNil()
-		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "slot"))).toEqual(true)
-		expect(controller.await(controller.service:PromiseHasArrivedValue(player, "missing"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("a")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(player, "missing"))).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue(player, "slot"))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue(player, "missing"))).toEqual(
+			false
+		)
 
 		controller:Destroy()
 	end)
@@ -257,8 +272,8 @@ describe("TeleportDataService per-player replication", function()
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(playerA, envelope)
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(playerB, envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedValue(playerA, "slot"))).toEqual("a")
-		expect(controller.await(controller.service:PromiseArrivedValue(playerB, "slot"))).toEqual("b")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(playerA, "slot"))).toEqual("a")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(playerB, "slot"))).toEqual("b")
 
 		controller:Destroy()
 	end)
@@ -279,7 +294,7 @@ describe("TeleportDataService arrival lifecycle", function()
 			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "client" } })
 		)
 
-		expect(controller.await(promise)).toEqual({ region = "us", slot = "client" })
+		expect(PromiseTestUtils.awaitFulfilled(promise)).toEqual({ region = "us", slot = "client" })
 
 		controller:Destroy()
 	end)
@@ -295,7 +310,7 @@ describe("TeleportDataService arrival lifecycle", function()
 		local promise = controller.service:PromiseArrivedData(player)
 		expect(promise:IsPending()).toEqual(true)
 
-		expect(controller.await(promise)).toEqual({ region = "us" })
+		expect(PromiseTestUtils.awaitFulfilled(promise)).toEqual({ region = "us" })
 
 		controller:Destroy()
 	end)
@@ -304,7 +319,7 @@ describe("TeleportDataService arrival lifecycle", function()
 		local controller = setup()
 		local player = controller.fakePlayer(111)
 
-		expect(controller.await(controller.service:PromiseArrivedData(player))).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData(player))).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -322,7 +337,7 @@ describe("TeleportDataService arrival lifecycle", function()
 			TeleportDataEnvelopeUtils.build(nil, { ["111"] = { slot = "second" } })
 		)
 
-		expect(controller.await(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("first")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue(player, "slot"))).toEqual("first")
 
 		controller:Destroy()
 	end)
@@ -338,8 +353,8 @@ describe("TeleportDataService arrival lifecycle", function()
 		)
 		local laterRead = controller.service:PromiseArrivedValue(player, "slot")
 
-		expect(controller.await(pendingRead)).toEqual("a")
-		expect(controller.await(laterRead)).toEqual("a")
+		expect(PromiseTestUtils.awaitFulfilled(pendingRead)).toEqual("a")
+		expect(PromiseTestUtils.awaitFulfilled(laterRead)).toEqual("a")
 
 		controller:Destroy()
 	end)

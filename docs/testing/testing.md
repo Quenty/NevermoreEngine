@@ -103,10 +103,15 @@ Guidelines:
 - `maid:Add` **every** object `setup()` creates, not just the `ServiceBag`. A standalone object the
   bag does not own — a manager, a `DataStore`, a bound class — keeps its background work (an auto-save
   loop, a subscription) running otherwise. This is the exact bug that leaked into the `secrets` suite.
+- Destroying a server `ServiceBag` does not close the game, so work that only stops on game close
+  outlives the bag — a `PlayerDataStoreService` store and its auto-save loop, for one. Close first:
+  `PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())`, then clean the maid.
 - For objects a test builds on demand (multiple stores, per-test config), expose a factory that
   returns `maid:Add(X.new(...))` — e.g. a `newDataStore()` on the controller.
-- In a hung-promise guard that returns early, call `controller:Destroy()` before the `return` so the
-  early exit still cleans up.
+- Await a promise's value with `PromiseTestUtils.awaitFulfilled(promise)`, or its error with
+  `awaitRejected`. Both error when the promise hangs or settles the other way, so the test fails at
+  the await with nothing else to write. Do not hand-roll an `if not awaitSettled(...) then expect(...)
+  controller:Destroy() return end` guard: the `expect` throws, so the lines after it never run.
 - A test may still `:Destroy()` an object mid-test when that teardown *is* the behavior under test —
   the maid safely skips an already-destroyed object at `DoCleaning` (a destroyed `BaseObject` has its
   metatable nil'd), so there is no double-destroy.
@@ -174,8 +179,9 @@ store:Save()
 store:Save():Catch(function() end)
 ```
 
-When you need to wait for a settled result, `PromiseTestUtils.awaitOutcome` / `awaitSettled` attach handlers
-synchronously — prefer them over hand-rolled awaits.
+When you need to wait for a promise, `PromiseTestUtils.awaitFulfilled` / `awaitRejected` / `awaitOutcome` /
+`awaitSettled` attach handlers synchronously — prefer them over hand-rolled awaits, and over a spec-local
+`await` helper that re-implements one of them.
 
 A rejection is only reported if it carries information. Rejecting with no values at all (what `Destroy()`
 and cancellation produce), with values that are all nil (`Promise.rejected(nil)`), or with a single empty
