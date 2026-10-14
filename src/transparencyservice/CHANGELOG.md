@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.11.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@11.11.3...@quenty/transparencyservice@11.11.4) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/transparencyservice
+
 ## [11.11.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/transparencyservice@11.11.2...@quenty/transparencyservice@11.11.3) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/transparencyservice

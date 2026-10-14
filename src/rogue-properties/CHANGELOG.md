@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.63.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.63.2...@quenty/rogue-properties@11.63.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/rogue-properties
+
+## [11.63.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.63.1...@quenty/rogue-properties@11.63.2) (2026-09-30)
+
+### Bug Fixes
+
+- Check if modifier is alive ([655b333](https://github.com/Quenty/NevermoreEngine/commit/655b333d8a55fb0d550641e660924739ece7a88c))
+
 ## [11.63.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rogue-properties@11.63.0...@quenty/rogue-properties@11.63.1) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/rogue-properties

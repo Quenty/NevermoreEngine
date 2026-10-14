@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@7.38.1...@quenty/undostack@7.38.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/undostack
+
 ## [7.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/undostack@7.38.0...@quenty/undostack@7.38.1) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/undostack

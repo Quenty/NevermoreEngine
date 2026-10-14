@@ -526,6 +526,10 @@ function RogueProperty.Observe(self: RogueProperty): Observable.Observable<any>
 		Rx.switchMap(function(rogueModifierList): any
 			local current = observeInitialValue
 			for _, rogueModifier in rogueModifierList do
+				if not rogueModifier:IsImplemented() then
+					continue
+				end
+
 				current = rogueModifier:ObserveModifiedVersion(current)
 			end
 			return current
