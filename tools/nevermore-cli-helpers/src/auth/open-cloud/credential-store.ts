@@ -33,6 +33,11 @@ export function printApiKeySetupHelp(): void {
     '  - asset:read                      (let the watch service read base place versions)'
   );
   console.log('');
+  console.log('Only needed for `deploy asset upload`:');
+  console.log(
+    '  - asset:read, asset:write         (upload images, models, audio)'
+  );
+  console.log('');
 }
 
 interface StoredCredentials {

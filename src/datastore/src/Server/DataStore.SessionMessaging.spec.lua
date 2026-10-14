@@ -40,11 +40,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 			requesterSessionId = sessionB:GetSessionId(),
 		})
 
-		if not PromiseTestUtils.awaitSettled(sendPromise, 10) then
-			expect("message send hung").toEqual("message send settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(sendPromise, 10)).toEqual(true)
 
 		local received = PromiseTestUtils.awaitValue(function()
 			return closeRequested

@@ -42,24 +42,10 @@ describe("GameDataStoreService.PromiseDataStore", function()
 	it("should resolve a datastore that loads successfully against a healthy mock", function()
 		local controller = setup()
 
-		local promise = controller.service:PromiseDataStore()
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-
-		local ok, dataStore = promise:Yield()
-		expect(ok).toEqual(true)
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore())
 		expect(dataStore).never.toBeNil()
 
-		local loadPromise = dataStore:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadPromise) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((loadPromise:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -79,25 +65,11 @@ describe("GameDataStoreService persistence", function()
 	it("should round-trip a stored value into the mock under the version1 key", function()
 		local controller = setup()
 
-		local promise = controller.service:PromiseDataStore()
-		if not PromiseTestUtils.awaitSettled(promise) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-
-		local ok, dataStore = promise:Yield()
-		expect(ok).toEqual(true)
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore())
 
 		dataStore:Store("motd", "hello")
 
-		local savePromise = dataStore:Save()
-		if not PromiseTestUtils.awaitSettled(savePromise) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((savePromise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore:Save())
 
 		local raw = controller.mock:GetRaw("version1")
 		expect(raw).never.toBeNil()
@@ -140,25 +112,9 @@ describe("GameDataStoreService failure handling", function()
 
 		local controller = setup(mock)
 
-		local promise = controller.service:PromiseDataStore()
-		if not PromiseTestUtils.awaitSettled(promise, 5) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
 
-		local ok, dataStore = promise:Yield()
-		expect(ok).toEqual(true)
-
-		local loadPromise = dataStore:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadPromise, 5) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-
-		local loadOk, loadedOk = loadPromise:Yield()
-		expect(loadOk).toEqual(true)
+		local loadedOk = PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 5)
 		expect(loadedOk).toEqual(false)
 
 		controller:Destroy()
@@ -169,13 +125,7 @@ describe("GameDataStoreService teardown", function()
 	it("destroys its inner datastore when the service is destroyed", function()
 		local controller = setup()
 
-		local promise = controller.service:PromiseDataStore()
-		if not PromiseTestUtils.awaitSettled(promise, 5) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		local _ok, dataStore = promise:Yield()
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
 
 		controller:Destroy()
 
@@ -186,19 +136,9 @@ describe("GameDataStoreService teardown", function()
 	it("flushes staged data synchronously to the underlying store when destroyed", function()
 		local controller = setup()
 
-		local promise = controller.service:PromiseDataStore()
-		if not PromiseTestUtils.awaitSettled(promise, 5) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		local _ok, dataStore = promise:Yield()
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
 
-		if not PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5) then
-			expect("load hung").toEqual("load settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5)).toEqual(true)
 
 		dataStore:Store("motd", "goodbye")
 

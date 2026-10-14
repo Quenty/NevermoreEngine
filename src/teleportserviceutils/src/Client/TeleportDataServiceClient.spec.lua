@@ -41,12 +41,6 @@ local function setup()
 
 	local controller = {
 		service = service,
-		await = function(promise: any): any
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -61,8 +55,8 @@ describe("TeleportDataServiceClient initialization", function()
 	it("resolves to no arrived data outside a real teleport", function()
 		local controller = setup()
 
-		expect(controller.await(controller.service:PromiseArrivedData())).toBeNil()
-		expect(controller.await(controller.service:PromiseHasArrivedValue("anything"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData())).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue("anything"))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -78,7 +72,7 @@ describe("TeleportDataServiceClient.PromiseBuildTeleportData (async build)", fun
 			end)
 		end)
 
-		local built = controller.await(controller.service:PromiseBuildTeleportData({}))
+		local built = PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({}))
 		expect(TeleportDataEnvelopeUtils.readSlice(built, LOCAL_USER_ID)).toEqual({ region = "async" })
 
 		controller:Destroy()
@@ -91,9 +85,9 @@ describe("TeleportDataServiceClient unified arrived data", function()
 
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ slot = "a" })
 
-		expect(controller.await(controller.service:PromiseArrivedData())).toEqual({ slot = "a" })
-		expect(controller.await(controller.service:PromiseArrivedValue("slot"))).toEqual("a")
-		expect(controller.await(controller.service:PromiseHasArrivedValue("slot"))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData())).toEqual({ slot = "a" })
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue("slot"))).toEqual("a")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue("slot"))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -103,8 +97,8 @@ describe("TeleportDataServiceClient unified arrived data", function()
 
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ slot = "a" })
 
-		expect(controller.await(controller.service:PromiseArrivedValue("missing"))).toBeNil()
-		expect(controller.await(controller.service:PromiseHasArrivedValue("missing"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue("missing"))).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue("missing"))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -118,7 +112,7 @@ describe("TeleportDataServiceClient unified arrived data", function()
 		})
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedData())).toEqual({
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData())).toEqual({
 			region = "shared",
 			slot = "mine",
 		})
@@ -134,8 +128,8 @@ describe("TeleportDataServiceClient unified arrived data", function()
 		})
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting(envelope)
 
-		expect(controller.await(controller.service:PromiseArrivedData())).toBeNil()
-		expect(controller.await(controller.service:PromiseHasArrivedValue("slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedData())).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasArrivedValue("slot"))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -148,10 +142,14 @@ describe("TeleportDataServiceClient band separation", function()
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ region = "us", slot = "client" })
 		controller.service:SetTrustedArrivedTeleportDataForTesting({ region = "us" })
 
-		expect(controller.await(controller.service:PromiseTrustedArrivedData())).toEqual({ region = "us" })
-		expect(controller.await(controller.service:PromiseTrustedArrivedValue("region"))).toEqual("us")
-		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue("region"))).toEqual(true)
-		expect(controller.await(controller.service:PromiseHasTrustedArrivedValue("slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseTrustedArrivedData())).toEqual({
+			region = "us",
+		})
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseTrustedArrivedValue("region"))).toEqual("us")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasTrustedArrivedValue("region"))).toEqual(
+			true
+		)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseHasTrustedArrivedValue("slot"))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -162,7 +160,7 @@ describe("TeleportDataServiceClient band separation", function()
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ region = "us", slot = "client" })
 		controller.service:SetTrustedArrivedTeleportDataForTesting({ region = "us" })
 
-		expect(controller.await(controller.service:PromiseNonTrustedArrivedData())).toEqual({
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseNonTrustedArrivedData())).toEqual({
 			region = "us",
 			slot = "client",
 		})
@@ -176,8 +174,8 @@ describe("TeleportDataServiceClient band separation", function()
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ region = "us", slot = "client" })
 		controller.service:SetTrustedArrivedTeleportDataForTesting({ region = "us" })
 
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted("region"))).toEqual(true)
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted("slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted("region"))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted("slot"))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -188,9 +186,9 @@ describe("TeleportDataServiceClient band separation", function()
 		controller.service:SetNonTrustedArrivedTeleportDataForTesting({ slot = "client" })
 		controller.service:SetTrustedArrivedTeleportDataForTesting(nil)
 
-		expect(controller.await(controller.service:PromiseTrustedArrivedData())).toBeNil()
-		expect(controller.await(controller.service:PromiseArrivedValueIsTrusted("slot"))).toEqual(false)
-		expect(controller.await(controller.service:PromiseArrivedValue("slot"))).toEqual("client")
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseTrustedArrivedData())).toBeNil()
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValueIsTrusted("slot"))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.service:PromiseArrivedValue("slot"))).toEqual("client")
 
 		controller:Destroy()
 	end)
@@ -205,7 +203,7 @@ describe("TeleportDataServiceClient build API (symmetric with the server)", func
 		end)
 
 		local fakeLocalPlayer = ({ UserId = LOCAL_USER_ID } :: any) :: Player
-		local built = controller.await(controller.service:PromiseBuildTeleportData({ fakeLocalPlayer }))
+		local built = PromiseTestUtils.awaitFulfilled(controller.service:PromiseBuildTeleportData({ fakeLocalPlayer }))
 
 		expect(TeleportDataEnvelopeUtils.readSlice(built, LOCAL_USER_ID)).toEqual({ slot = "built" })
 

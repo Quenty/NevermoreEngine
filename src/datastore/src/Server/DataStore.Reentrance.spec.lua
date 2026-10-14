@@ -37,12 +37,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 		local controller = DataStoreTestUtils.setup()
 
 		local dataStore = controller.newSessionLockedStore()
-		local loadPromise = dataStore:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadPromise, 10) then
-			expect("load hung").toEqual("load settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
 
 		controller.mock:BlockRequests()
 		dataStore:Store("coins", 5)
@@ -73,12 +68,7 @@ describe("lock command that does not settle", function()
 		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
 
 		controller.mock:UnblockRequests()
-		if not PromiseTestUtils.awaitSettled(promise, 10) then
-			expect("hung after unblock").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((promise:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(promise, 10)).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -94,13 +84,7 @@ describe("lock command that does not settle", function()
 		controller.mock:UnblockRequests()
 
 		local second = controller.newSessionLockedStore()
-		local secondPromise = second:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(secondPromise, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((secondPromise:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(second:PromiseLoadSuccessful(), 10)).toEqual(true)
 
 		controller:Destroy()
 	end)

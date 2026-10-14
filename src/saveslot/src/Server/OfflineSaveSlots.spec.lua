@@ -8,8 +8,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -27,6 +27,7 @@ local ABSENT_USER_ID = 90210
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
@@ -37,37 +38,22 @@ local function setup()
 	saveSlotService:SetMaxSlotCount(5)
 	serviceBag:Start()
 
-	local function await(promise, label: string): any
-		if not PromiseTestUtils.awaitSettled(promise, 10) then
-			expect(`{label} hung`).toEqual(`{label} settled`)
-			return nil
-		end
-		local ok, value = promise:Yield()
-		if not ok then
-			expect(`{label} rejected: {tostring(value)}`).toEqual(`{label} fulfilled`)
-			return nil
-		end
-		return value
-	end
-
 	local controller = {
 		serviceBag = serviceBag,
 		saveSlotService = saveSlotService,
 		mock = mock,
-		await = await,
 		-- Opens the offline slots and waits for the roster to load, which is what every caller wants;
 		-- the sync read accessors see an empty roster until it has.
 		openSlots = function(userId: number?): any
-			local offline = await(saveSlotService:PromiseOfflineSaveSlots(userId or ABSENT_USER_ID), "open")
+			local offline =
+				PromiseTestUtils.awaitFulfilled(saveSlotService:PromiseOfflineSaveSlots(userId or ABSENT_USER_ID))
 			if offline then
-				await(offline:PromiseSlotsLoaded(), "load")
+				PromiseTestUtils.awaitFulfilled(offline:PromiseSlotsLoaded())
 			end
 			return offline
 		end,
 		Destroy = function(_self)
-			-- A PlayerMock never fires the real Players.PlayerRemoving, and an offline store is only
-			-- released by its handle, so shut down the way Roblox does before tearing the bag down.
-			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+			PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 			maid:DoCleaning()
 		end,
 	}
@@ -113,7 +99,7 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		local controller = setup()
 
 		local offline = controller.openSlots()
-		local slotId = controller.await(offline:GetSlotsDataStore():PromiseCreateSlot(1), "create")
+		local slotId = PromiseTestUtils.awaitFulfilled(offline:GetSlotsDataStore():PromiseCreateSlot(1))
 		expect(type(slotId)).toEqual("string")
 
 		-- Releasing the session is what flushes it, so read the store only after the destroy settles.
@@ -153,8 +139,8 @@ describe("SaveSlotService.PromiseOfflineSaveSlots", function()
 		local offline = controller.openSlots()
 		local slots = offline:GetSlotsDataStore()
 
-		local slotId = controller.await(slots:PromiseCreateSlot(1), "create")
-		controller.await(slots:PromiseSelectSlot(slotId), "select")
+		local slotId = PromiseTestUtils.awaitFulfilled(slots:PromiseCreateSlot(1))
+		PromiseTestUtils.awaitFulfilled(slots:PromiseSelectSlot(slotId))
 
 		local metadata = slots:GetSlotMetadata(slotId)
 		expect(metadata.PlayCount).toBeNil()

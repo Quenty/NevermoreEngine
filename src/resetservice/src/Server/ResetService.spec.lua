@@ -101,11 +101,7 @@ describe("ResetService.PushResetProvider", function()
 			return Promise.resolved("custom")
 		end)
 
-		local promise = controller.resetService:PromiseResetCharacter(controller.mock)
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toBe(true)
-
-		local ok, value = promise:Yield()
-		expect(ok).toBe(true)
+		local value = PromiseTestUtils.awaitFulfilled(controller.resetService:PromiseResetCharacter(controller.mock), 5)
 		expect(value).toBe("custom")
 		expect(resetPlayers).toEqual({ controller.mock })
 
@@ -128,17 +124,14 @@ describe("ResetService.PushResetProvider", function()
 			return Promise.resolved("second")
 		end)
 
-		local promise = controller.resetService:PromiseResetCharacter(controller.mock)
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toBe(true)
-		local _, value = promise:Yield()
+		local value = PromiseTestUtils.awaitFulfilled(controller.resetService:PromiseResetCharacter(controller.mock), 5)
 		expect(value).toBe("second")
 		expect(firstCount).toBe(0)
 
 		popSecond()
 
-		local afterPop = controller.resetService:PromiseResetCharacter(controller.mock)
-		expect(PromiseTestUtils.awaitSettled(afterPop, 5)).toBe(true)
-		local _, afterValue = afterPop:Yield()
+		local afterValue =
+			PromiseTestUtils.awaitFulfilled(controller.resetService:PromiseResetCharacter(controller.mock), 5)
 		expect(afterValue).toBe("first")
 		expect(firstCount).toBe(1)
 

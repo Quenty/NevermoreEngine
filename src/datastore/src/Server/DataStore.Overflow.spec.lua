@@ -13,23 +13,17 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function expectSettled(promise, timeout: number?)
-	expect(PromiseTestUtils.awaitSettled(promise, timeout)).toEqual(true)
-end
-
 describe("DataStore overflow save", function()
 	it("should reject a save whose serialized value exceeds the datastore size limit", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
-		expectSettled(dataStore:Load("data"))
+		expect(PromiseTestUtils.awaitSettled(dataStore:Load("data"))).toEqual(true)
 
 		controller.mock:SetMaxValueLength(1024)
 		dataStore:Store("data", string.rep("A", 8192))
 
-		local savePromise = dataStore:Save()
-		expectSettled(savePromise, 5)
-		expect((savePromise:Yield())).toEqual(false)
+		PromiseTestUtils.awaitRejected(dataStore:Save(), 5)
 
 		controller:Destroy()
 	end)
@@ -39,22 +33,16 @@ describe("DataStore overflow save", function()
 		local writer = controller.newDataStore()
 
 		writer:Store("data", "known-good")
-		expectSettled(writer:Save())
+		expect(PromiseTestUtils.awaitSettled(writer:Save())).toEqual(true)
 
 		controller.mock:SetMaxValueLength(1024)
 		writer:Store("data", string.rep("A", 8192))
 
-		local savePromise = writer:Save()
-		expectSettled(savePromise, 5)
-		expect((savePromise:Yield())).toEqual(false)
+		PromiseTestUtils.awaitRejected(writer:Save(), 5)
 
 		controller.mock:SetMaxValueLength(nil)
 		local reader = controller.newDataStore()
-		local loadPromise = reader:Load("data")
-		expectSettled(loadPromise)
-
-		local ok, value = loadPromise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(reader:Load("data"))
 		expect(value).toEqual("known-good")
 
 		controller:Destroy()
@@ -67,14 +55,10 @@ describe("DataStore overflow save", function()
 		controller.mock:SetMaxValueLength(DataStoreMock.MAX_VALUE_LENGTH)
 		dataStore:Store("coins", 5)
 
-		local savePromise = dataStore:Save()
-		expectSettled(savePromise)
-		expect((savePromise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore:Save())
 
 		local reader = controller.newDataStore()
-		local loadPromise = reader:Load("coins")
-		expectSettled(loadPromise)
-		expect((loadPromise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(reader:Load("coins"))
 
 		controller:Destroy()
 	end)
@@ -83,14 +67,12 @@ describe("DataStore overflow save", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
-		expectSettled(dataStore:Load("data"))
+		expect(PromiseTestUtils.awaitSettled(dataStore:Load("data"))).toEqual(true)
 
 		controller.mock:SetMaxValueLength(1024)
 		dataStore:GetSubStore("inventory"):Store("blob", string.rep("A", 8192))
 
-		local savePromise = dataStore:Save()
-		expectSettled(savePromise, 5)
-		expect((savePromise:Yield())).toEqual(false)
+		PromiseTestUtils.awaitRejected(dataStore:Save(), 5)
 
 		controller:Destroy()
 	end)

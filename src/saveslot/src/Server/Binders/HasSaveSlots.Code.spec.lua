@@ -7,8 +7,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -36,6 +36,7 @@ local function setup()
 
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local sharedService: SaveSlotSharedDataStoreService.SaveSlotSharedDataStoreService =
@@ -52,10 +53,8 @@ local function setup()
 	local hasSaveSlots = assert(binder:Bind(fakePlayer), "Failed to bind HasSaveSlots")
 	hasSaveSlots.MaxSlotCount.Value = 5
 
-	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
-	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
 	maid:GiveTask(function()
-		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end)
@@ -73,167 +72,153 @@ local function setup()
 	return controller
 end
 
-local function runWithContext(body)
-	local context = setup()
-	local ok, err = pcall(body, context)
-	context:Destroy()
-	if not ok then
-		error(err, 0)
-	end
-end
-
-local function awaitValueOf(promise)
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	local ok, value = promise:Yield()
-	if not ok then
-		error(`promise rejected: {tostring(value)}`, 0)
-	end
-	return value
-end
-
-local function awaitResolved(promise): boolean
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	return (promise:Yield())
-end
-
 local function createSelectAndWrite(hasSaveSlots, slotIndex: number): string
-	local slotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(slotIndex))
-	awaitValueOf(hasSaveSlots:PromiseSelectSlot(slotId))
-	local store = awaitValueOf(hasSaveSlots:PromiseActiveSlotStore())
+	local slotId = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseCreateSlot(slotIndex))
+	PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSelectSlot(slotId))
+	local store = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseActiveSlotStore())
 	store:Store("Coins", 7)
 	store:GetSubStore("World_2"):Store("Eggs", 3)
 	return slotId
 end
 
 local function activeSlotData(hasSaveSlots)
-	local store = awaitValueOf(hasSaveSlots:PromiseActiveSlotStore())
-	return awaitValueOf(store:LoadAll({}))
+	local store = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseActiveSlotStore())
+	return PromiseTestUtils.awaitFulfilled(store:LoadAll({}))
 end
 
 describe("HasSaveSlots export-to-code / load-from-code", function()
 	it("round-trips a slot through a code into a fresh ephemeral slot", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
 
-			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode(sourceSlotId))
-			expect(type(code)).toEqual("string")
+		local code = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToCode(sourceSlotId))
+		expect(type(code)).toEqual("string")
 
-			local ephemeralSlotId = awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
-			expect(hasSaveSlots.ActiveSlotId.Value).toEqual(ephemeralSlotId)
+		local ephemeralSlotId =
+			PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
+		expect(hasSaveSlots.ActiveSlotId.Value).toEqual(ephemeralSlotId)
 
-			local data = activeSlotData(hasSaveSlots)
-			expect(data.Coins).toEqual(7)
-			expect(data.World_2.Eggs).toEqual(3)
+		local data = activeSlotData(hasSaveSlots)
+		expect(data.Coins).toEqual(7)
+		expect(data.World_2.Eggs).toEqual(3)
 
-			local metadata = awaitValueOf(hasSaveSlots:PromiseGetSlotMetadata(ephemeralSlotId))
-			expect(metadata.IsEphemeral).toEqual(true)
-		end)
+		local metadata = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseGetSlotMetadata(ephemeralSlotId))
+		expect(metadata.IsEphemeral).toEqual(true)
+
+		context:Destroy()
 	end)
 
 	it("defaults the exported slot to the active slot", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		createSelectAndWrite(hasSaveSlots, 2)
 
-			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode())
-			awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
-			expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
-		end)
+		local code = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToCode())
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
+		expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
+
+		context:Destroy()
 	end)
 
 	it("refuses to export the main slot to a code", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
-			awaitValueOf(hasSaveSlots:PromiseSelectSlot(mainSlotId))
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local mainSlotId =
+			PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSelectSlot(mainSlotId))
 
-			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToCode())).toEqual(false)
-		end)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseExportSaveSlotToCode())
+
+		context:Destroy()
 	end)
 
 	it("rejects loading an unknown code", function()
-		runWithContext(function(context)
-			expect(awaitResolved(context.hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode("nope"))).toEqual(false)
-		end)
+		local context = setup()
+		PromiseTestUtils.awaitRejected(context.hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode("nope"))
+
+		context:Destroy()
 	end)
 
 	it("exports a slot as JSON that decodes back to its data", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		createSelectAndWrite(hasSaveSlots, 2)
 
-			local json = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToJson())
-			expect(type(json)).toEqual("string")
+		local json = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToJson())
+		expect(type(json)).toEqual("string")
 
-			local decoded = HttpService:JSONDecode(json)
-			expect(decoded.data.Coins).toEqual(7)
-			expect(decoded.data.World_2.Eggs).toEqual(3)
-		end)
+		local decoded = HttpService:JSONDecode(json)
+		expect(decoded.data.Coins).toEqual(7)
+		expect(decoded.data.World_2.Eggs).toEqual(3)
+
+		context:Destroy()
 	end)
 
 	it("refuses to export the main slot as JSON", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			local mainSlotId = awaitValueOf(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
-			awaitValueOf(hasSaveSlots:PromiseSelectSlot(mainSlotId))
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		local mainSlotId =
+			PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseCreateSlot(SaveSlotConstants.DEFAULT_SLOT_INDEX))
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseSelectSlot(mainSlotId))
 
-			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToJson())).toEqual(false)
-		end)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseExportSaveSlotToJson())
+
+		context:Destroy()
 	end)
 
 	it("generates a sanity-checkable default code (date-state-user-token)", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		createSelectAndWrite(hasSaveSlots, 2)
 
-			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode())
-			-- Date-prefixed, lowercase alphanumeric + hyphens, safe as a datastore key.
-			expect(string.match(code, "^%d%d%d%d%d%d%d%d%-") ~= nil).toEqual(true)
-			expect(string.match(code, "^[a-z0-9%-]+$") ~= nil).toEqual(true)
-			expect(#code <= 50).toEqual(true)
-		end)
+		local code = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToCode())
+		-- Date-prefixed, lowercase alphanumeric + hyphens, safe as a datastore key.
+		expect(string.match(code, "^%d%d%d%d%d%d%d%d%-") ~= nil).toEqual(true)
+		expect(string.match(code, "^[a-z0-9%-]+$") ~= nil).toEqual(true)
+		expect(#code <= 50).toEqual(true)
+
+		context:Destroy()
 	end)
 
 	it("honors an injected code generator", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			hasSaveSlots:SetCodeGenerator(function(generatorContext)
-				return `custom-{generatorContext.slotIndex}`
-			end)
-			local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
-
-			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode(sourceSlotId))
-			expect(code).toEqual("custom-2")
-
-			-- The custom code still round-trips through the shared store.
-			awaitValueOf(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
-			expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		hasSaveSlots:SetCodeGenerator(function(generatorContext)
+			return `custom-{generatorContext.slotIndex}`
 		end)
+		local sourceSlotId = createSelectAndWrite(hasSaveSlots, 2)
+
+		local code = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToCode(sourceSlotId))
+		expect(code).toEqual("custom-2")
+
+		-- The custom code still round-trips through the shared store.
+		PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
+		expect(activeSlotData(hasSaveSlots).Coins).toEqual(7)
+
+		context:Destroy()
 	end)
 
 	it("rejects export-to-code when the shared store write fails", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			createSelectAndWrite(hasSaveSlots, 2)
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		createSelectAndWrite(hasSaveSlots, 2)
 
-			context.sharedMock:FailNextRequests(1)
-			expect(awaitResolved(hasSaveSlots:PromiseExportSaveSlotToCode())).toEqual(false)
-		end)
+		context.sharedMock:FailNextRequests(1)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseExportSaveSlotToCode())
+
+		context:Destroy()
 	end)
 
 	it("rejects load-from-code when the shared store read fails", function()
-		runWithContext(function(context)
-			local hasSaveSlots = context.hasSaveSlots
-			createSelectAndWrite(hasSaveSlots, 2)
-			local code = awaitValueOf(hasSaveSlots:PromiseExportSaveSlotToCode())
+		local context = setup()
+		local hasSaveSlots = context.hasSaveSlots
+		createSelectAndWrite(hasSaveSlots, 2)
+		local code = PromiseTestUtils.awaitFulfilled(hasSaveSlots:PromiseExportSaveSlotToCode())
 
-			context.sharedMock:FailNextRequests(1)
-			expect(awaitResolved(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))).toEqual(false)
-		end)
+		context.sharedMock:FailNextRequests(1)
+		PromiseTestUtils.awaitRejected(hasSaveSlots:PromiseImportEphemeralSaveSlotFromCode(code))
+
+		context:Destroy()
 	end)
 end)

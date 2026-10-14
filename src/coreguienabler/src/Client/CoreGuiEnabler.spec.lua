@@ -21,14 +21,9 @@ local function setupLocalPlayer(): Player
 	local maid = Maid.new()
 	JestUtils.afterThis(maid)
 
-	local player = PlayerMock.new({ UserId = 66123001 })
+	local player = maid:Add(PlayerMock.new({ UserId = 66123001 }))
 	player.Parent = Workspace
-	local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(player)
-
-	maid:GiveTask(function()
-		restoreLocalPlayer()
-		player:Destroy()
-	end)
+	maid:Add(PlayerMock.setMockedLocalPlayer(player))
 
 	return player
 end

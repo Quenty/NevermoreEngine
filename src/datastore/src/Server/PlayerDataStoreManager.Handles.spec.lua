@@ -17,23 +17,11 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 -- Returns the resolved value, or fails the spec and returns nil.
-local function awaitValue(promise, label: string): any
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		expect(`{label} hung`).toEqual(`{label} settled`)
-		return nil
-	end
-
-	local ok, value = promise:Yield()
-	expect(ok).toEqual(true)
-	return value
-end
 
 -- Drains the removals a test left in flight, so none of them settle during teardown. Note that this
 -- also *removes* every remaining store, so it belongs at the end of a test and nowhere else.
 local function settleSaves(controller): ()
-	if not PromiseTestUtils.awaitSettled(controller.manager:PromiseAllSaves(), 10) then
-		expect("saves hung").toEqual("saves settled")
-	end
+	expect(PromiseTestUtils.awaitSettled(controller.manager:PromiseAllSaves(), 10)).toEqual(true)
 end
 
 describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
@@ -42,7 +30,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local handle = awaitValue(controller.manager:PromiseDataStoreHandle(1), "handle")
+		local handle = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		expect(handle).never.toBeNil()
 		expect(handle:GetDataStore()).never.toBeNil()
 
@@ -60,12 +48,12 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local first = awaitValue(controller.manager:PromiseDataStoreHandle(1), "first")
+		local first = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		local released = first:GetDataStore()
 
 		first:Destroy()
 
-		local second = awaitValue(controller.manager:PromiseDataStoreHandle(1), "second")
+		local second = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		expect(second:GetDataStore() == released).toEqual(false)
 
 		second:Destroy()
@@ -79,8 +67,8 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local first = awaitValue(controller.manager:PromiseDataStoreHandle(1), "first")
-		local second = awaitValue(controller.manager:PromiseDataStoreHandle(1), "second")
+		local first = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
+		local second = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 
 		local shared = first:GetDataStore()
 
@@ -90,13 +78,13 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 		first:Destroy()
 
 		-- Still the same store, because the second handle never let go of it.
-		local third = awaitValue(controller.manager:PromiseDataStoreHandle(1), "third")
+		local third = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		expect(third:GetDataStore() == shared).toEqual(true)
 
 		second:Destroy()
 		third:Destroy()
 
-		local fourth = awaitValue(controller.manager:PromiseDataStoreHandle(1), "fourth")
+		local fourth = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		expect(fourth:GetDataStore() == shared).toEqual(false)
 
 		fourth:Destroy()
@@ -110,7 +98,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local handle = awaitValue(controller.manager:PromiseDataStoreHandle(1), "handle")
+		local handle = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		handle:Destroy()
 		handle:Destroy()
 		settleSaves(controller)
@@ -123,7 +111,7 @@ describe("PlayerDataStoreManager.PromiseDataStoreHandle", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local handle = awaitValue(controller.manager:PromiseDataStoreHandle(1), "handle")
+		local handle = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStoreHandle(1))
 		handle:Destroy()
 		settleSaves(controller)
 

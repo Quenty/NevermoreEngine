@@ -128,8 +128,8 @@ found nothing and returned early. Both flavors failed:
   guards firing on a loop for the rest of the shutdown window.
 
 The lesson is narrow and worth stating plainly: **the leak was a test-harness problem and belonged in
-the test harness.** `DataStoreTestUtils` now shuts a manager down the way Roblox does before tearing it
-down (`promiseSimulatedShutdown`), which removes the stores through the real path and cancels their
+the test harness.** `DataStoreTestUtils` now closes the game before tearing a manager down
+(`BindToCloseService:PromiseClose()`), which removes the stores through the real path and cancels their
 loops as a side effect. Production code did not need a second save path, and could not safely have one.
 
 ## Deliberate: a removing callback that never resolves blocks its removal forever
@@ -160,7 +160,9 @@ One consequence of dropping the flush: the `DataStore` instances are not owned b
 `_removePlayerDataStore`'s `Finally` destroys them), so **`manager:Destroy()` now destroys no stores.**
 A harness that tears down by destroying a ServiceBag therefore leaves every loaded store alive with its
 auto-save loop running — and a `PlayerMock` never fires the real `Players.PlayerRemoving`, so nothing
-else removes them either. Any spec built that way has to shut down explicitly before it tears down.
+else removes them either. Any spec built that way has to close the game before it tears down:
+`serviceBag:GetService(BindToCloseService):PromiseClose()` runs the close callback
+[PlayerDataStoreService] registered, which is the same `PromiseAllSaves()` a real shutdown yields on.
 
 Resist the urge to fix that by re-adding a destroy on the manager's maid. A destroy-only teardown is
 worse than the leak: it would leave `_datastores` populated with destroyed stores, and clearing
@@ -173,9 +175,9 @@ yielded resumes to find the store destroyed under it, and `SaveAndCloseSession()
 The leak is a harness problem; keep the fix in the harness.
 
 `manager:Destroy()` is not a shutdown and specs must not use it as one — several did, which is how the
-teardown flush looked well covered while being wrong. Drive
-`DataStoreTestUtils.promiseSimulatedShutdown(manager, userIds)` instead: it fires the removals, then
-returns the promise `BindToCloseService` would yield on.
+teardown flush looked well covered while being wrong. Model a shutdown the way Roblox runs one instead:
+`manager:RemovePlayerDataStore(userId)` for each player still in the server, then
+`BindToCloseService:PromiseClose()`, which returns the promise the closing server yields on.
 
 The assertion that matters is not "the data was saved" but "the data was saved *by the time the close
 resolved*" — that is the difference between a server that shuts down cleanly and one that dies holding

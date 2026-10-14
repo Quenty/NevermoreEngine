@@ -24,7 +24,6 @@ local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Signal = require("Signal")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
@@ -122,10 +121,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 			return Promise.resolved(true)
 		end)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local ok, owns = promise:Yield()
-		expect(ok).toEqual(true)
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -136,10 +132,7 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 			return Promise.resolved(false)
 		end)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local ok, owns = promise:Yield()
-		expect(ok).toEqual(true)
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -171,9 +164,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnership()", function()
 
 		context.tracker:SetOwnership(KEY_TO_ID.swordKey, true)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -191,9 +182,7 @@ describe("PlayerAssetOwnershipTracker market tracker integration", function()
 
 		context.marketTracker.Purchased:Fire(KEY_TO_ID.swordKey)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -262,9 +251,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -277,9 +264,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 
 		context.tracker:SetOwnershipOverride("swordKey", false)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -289,9 +274,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -302,9 +285,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 
 		context.tracker:SetOwnershipOverride("swordKey", false)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -315,9 +296,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 
 		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -348,15 +327,11 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		end)
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
-		local owned = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(owned, 5)).toEqual(true)
-		local _, ownsWhileOverridden = owned:Yield()
+		local ownsWhileOverridden = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(ownsWhileOverridden).toEqual(true)
 
 		context.tracker:ClearOwnershipOverride("swordKey")
-		local afterClear = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(afterClear, 5)).toEqual(true)
-		local _, ownsAfterClear = afterClear:Yield()
+		local ownsAfterClear = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(ownsAfterClear).toEqual(false)
 		context:Destroy()
 	end)
@@ -370,9 +345,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		context.tracker:SetOwnershipOverride("swordKey", true)
 		context.tracker:SetOwnershipOverride("swordKey", nil)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -401,9 +374,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
 
-		local promise = context.tracker:PromiseOwnsAsset(KEY_TO_ID.swordKey)
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset(KEY_TO_ID.swordKey), 5)
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -416,9 +387,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 
 		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
 
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -431,9 +400,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() combined keys", fun
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
 
-		local promise = context.tracker:PromiseOwnsAsset("shieldKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("shieldKey"), 5)
 		expect(owns).toEqual(false)
 		context:Destroy()
 	end)
@@ -455,8 +422,8 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 		test. So the claim is pinned structurally -- the failure is reported once at the query, and every
 		subscriber's continuation is consumed -- which is exactly what deleting either handler undoes.
 
-		Spied on the class, so an instance built inside `func` is already covered. Restored in afterEach
-		as well: a test killed mid-yield would otherwise leave the recorder installed for the whole run.
+		Spied on the class, so an instance built inside `func` is already covered. Restored through
+		afterThis: a test killed mid-yield would otherwise leave the recorder installed for the whole run.
 	]]
 	local trackerClass: any = PlayerAssetOwnershipTracker
 	local realWarn = trackerClass._warnQueryFailed
@@ -475,12 +442,12 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 		trackerClass._consumeObservedQueryFailure = function(_self, err)
 			table.insert(consumed, err)
 		end
-	end
 
-	afterEach(function()
-		trackerClass._warnQueryFailed = realWarn
-		trackerClass._consumeObservedQueryFailure = realConsume
-	end)
+		JestUtils.afterThis(function()
+			trackerClass._warnQueryFailed = realWarn
+			trackerClass._consumeObservedQueryFailure = realConsume
+		end)
+	end
 
 	it("should report once at the query and consume every subscriber's copy", function()
 		local context = setup()
@@ -565,9 +532,7 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 		-- Destroying the tracker rejects the query with nothing, which is teardown rather than a refusal.
 		-- The real _warnQueryFailed drops it on the nil check; here we see it arrive and assert the shape.
 		context:Destroy()
-		expect(PromiseTestUtils.awaitSettled(asked, 5)).toEqual(true)
-		local askedOk = asked:Yield()
-		expect(askedOk).toEqual(false)
+		PromiseTestUtils.awaitRejected(asked, 5)
 
 		for _, report in reports do
 			expect(report.err).toEqual(nil)
@@ -656,9 +621,7 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 		serverTracker:SetOwnershipOverride("swordKey", true)
 
 		local clientTracker, destroyClient = makeTracker(player)
-		local promise = clientTracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(clientTracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(true)
 
 		destroyClient()
@@ -676,9 +639,7 @@ describe("PlayerAssetOwnershipTracker override replication", function()
 		clientTracker:SetQueryOwnershipCallback(function()
 			return Promise.resolved(true)
 		end)
-		local promise = clientTracker:PromiseOwnsAsset("swordKey")
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _, owns = promise:Yield()
+		local owns = PromiseTestUtils.awaitFulfilled(clientTracker:PromiseOwnsAsset("swordKey"), 5)
 		expect(owns).toEqual(false)
 
 		destroyClient()

@@ -29,13 +29,7 @@ describe("DataStore saving callbacks that misbehave", function()
 		end)
 		dataStore:Store("x", 1)
 
-		local promise = dataStore:Save()
-		if not PromiseTestUtils.awaitSettled(promise, 5) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((promise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore:Save(), 5)
 		expect(ran).toEqual(true)
 
 		controller:Destroy()

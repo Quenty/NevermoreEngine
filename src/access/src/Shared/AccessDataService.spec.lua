@@ -336,8 +336,7 @@ describe("AccessDataService.PromiseFeature", function()
 			controller.maid:GivePromise(controller.accessDataService:PromiseFeature(controller.fakePlayer(), feature))
 		ownsGame.Value = true
 
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local _ok, state = promise:Yield()
+		local state = PromiseTestUtils.awaitFulfilled(promise, 5)
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
 
 		controller:Destroy()

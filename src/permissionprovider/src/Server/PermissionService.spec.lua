@@ -51,12 +51,6 @@ local function setup()
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -98,9 +92,7 @@ describe("PermissionService initialization", function()
 
 		controller.serviceBag:Start()
 
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		local ok, provider = promise:Yield()
-		expect(ok).toEqual(true)
+		local provider = PromiseTestUtils.awaitFulfilled(promise, 5)
 		expect((provider :: any).ClassName).toEqual("CreatorPermissionProvider")
 
 		controller:Destroy()
@@ -137,7 +129,7 @@ describe("PermissionService permission queries", function()
 		controller.serviceBag:Start()
 
 		local player = controller.fakePlayer(CREATOR_USER_ID)
-		expect(controller.awaitBool(controller.permissionService:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.permissionService:PromiseIsAdmin(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -148,7 +140,7 @@ describe("PermissionService permission queries", function()
 		controller.serviceBag:Start()
 
 		local player = controller.fakePlayer(CREATOR_USER_ID)
-		expect(controller.awaitBool(controller.permissionService:PromiseIsCreator(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.permissionService:PromiseIsCreator(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -159,7 +151,7 @@ describe("PermissionService permission queries", function()
 		controller.serviceBag:Start()
 
 		local player = controller.fakePlayer(CREATOR_USER_ID + 1)
-		expect(controller.awaitBool(controller.permissionService:PromiseIsAdmin(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.permissionService:PromiseIsAdmin(player))).toEqual(false)
 
 		controller:Destroy()
 	end)

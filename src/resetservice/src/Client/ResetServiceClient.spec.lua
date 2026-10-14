@@ -101,11 +101,7 @@ describe("ResetServiceClient.PromiseResetCharacter", function()
 			return Promise.resolved("custom")
 		end)
 
-		local promise = controller.resetServiceClient:PromiseResetCharacter()
-		expect(PromiseTestUtils.awaitSettled(promise, 10)).toBe(true)
-
-		local ok, value = promise:Yield()
-		expect(ok).toBe(true)
+		local value = PromiseTestUtils.awaitFulfilled(controller.resetServiceClient:PromiseResetCharacter(), 10)
 		expect(value).toBe("custom")
 		expect(humanoid.Health).toBe(0)
 		expect(resetPlayers).toEqual({ controller.mock })

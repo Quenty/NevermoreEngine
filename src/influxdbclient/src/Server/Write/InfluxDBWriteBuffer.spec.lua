@@ -79,8 +79,7 @@ describe("InfluxDBWriteBuffer.Add", function()
 		expect(#flushes).toEqual(1)
 
 		-- Nothing buffered now, so an explicit flush must not re-send the batch.
-		local promise = buffer:PromiseFlush()
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect(PromiseTestUtils.awaitSettled(buffer:PromiseFlush())).toEqual(true)
 		expect(#flushes).toEqual(1)
 
 		buffer:Destroy()
@@ -117,8 +116,7 @@ describe("InfluxDBWriteBuffer.PromiseFlush", function()
 		buffer:Add("b")
 		expect(#flushes).toEqual(0)
 
-		local promise = buffer:PromiseFlush()
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect(PromiseTestUtils.awaitSettled(buffer:PromiseFlush())).toEqual(true)
 		expect(flushes[1]).toEqual({ "a", "b" })
 
 		buffer:Destroy()
@@ -127,8 +125,7 @@ describe("InfluxDBWriteBuffer.PromiseFlush", function()
 	it("should resolve without calling the handler when empty", function()
 		local buffer, flushes = newRecordingBuffer(options({}))
 
-		local promise = buffer:PromiseFlush()
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		expect(PromiseTestUtils.awaitSettled(buffer:PromiseFlush())).toEqual(true)
 		expect(#flushes).toEqual(0)
 
 		buffer:Destroy()
