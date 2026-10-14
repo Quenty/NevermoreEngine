@@ -54,6 +54,15 @@ end
 --[=[
 	Fits a sphere to the camera, computing how far back to zoom the camera from
 	the center of the sphere.
+	Camera (C), object center (B) and a point in the bounding sphere (A) form a right angle triangle
+	A forms a 90 degree angle as any tangent to a circle is perpendicular to its radius. (This is hard to show in ascii).
+	AB is the radius and BC is the distance from the center to the camera (hypothenuse)
+	    A
+	   /  \
+	  /     \
+	 /        \
+	B----------C
+	Distance is given by equation sin(angle)=opposite/hypothenuse = sin(halfFov)=AB/BC => BC = AB/tan(halfFov)
 
 	@param radius number -- Radius of the sphere
 	@param fovDeg number -- Field of view in degrees (vertical)
