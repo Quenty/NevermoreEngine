@@ -53,6 +53,8 @@ nevermore
 ├── test                     test a single package
 ├── deploy [target]          build and upload a place
 │   ├── init                 create deploy.nevermore.json
+│   ├── version              manage pinned base place versions
+│   ├── asset upload         upload images, models, audio as assets
 │   └── run [target]         deploy a target                        (default)
 ├── batch <subcommand>       run across many packages (change detection)
 │   ├── test
@@ -173,6 +175,7 @@ nevermore deploy run                     # build + upload, saved (not live)
 nevermore deploy run --publish           # build + upload and publish live
 nevermore deploy production --publish    # 'run' is implied; deploy the 'production' target
 nevermore deploy version upgrade         # re-pin base place versions to latest
+nevermore deploy asset upload icon.png   # upload a file as an asset, print its id
 ```
 
 **`nevermore deploy init`** — writes a `deploy.nevermore.json` for the current package.
@@ -210,6 +213,20 @@ nevermore deploy version upgrade         # re-pin base place versions to latest
 | `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
 
 **`nevermore deploy version promote <from> <to>`** — copies base-place version pins from one target to another (e.g. promote validated `production-demo` pins to `production`). Places are matched by base place id, so content lines up even when the targets name their places differently. Pure config edit — no network. Supports `--dryrun` and `--yes`. See [Promoting pins between targets](deploy.md#promoting-pins-between-targets).
+
+**`nevermore deploy asset upload <files..>`** — uploads each file as a Roblox asset and prints the id it was given. Needs no flags: the asset type comes from the file extension, the name from the file name, and the owner from the surrounding project or the API key. See [Uploading assets](deploy.md#uploading-assets).
+
+| Flag | Description |
+|------|-------------|
+| `--user-id <id>` / `--group-id <id>` | Who owns the new assets. Defaults to the owner of the universe in the nearest `deploy.nevermore.json`, else the user the API key belongs to. |
+| `--type <type>` | Asset type, where the extension allows more than one: an image is an `Image` unless told `Decal`, an `.rbxm` a `Model` unless told `Animation`. |
+| `--name <name>` | Display name (single file only). Defaults to the file name without its extension. |
+| `--description <text>` | Description. Defaults to the display name. |
+| `--asset-id <id>` | Replace this existing asset instead of creating one, keeping its id. Single `Model` file only. |
+| `--output <file>` | Write JSON results to a file. |
+| `--timeout <seconds>` | How long to wait for Roblox to finish importing each file (default: 300). |
+| `--dryrun` | Print what would be uploaded, after checking every file, without uploading. |
+| `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
 
 ### `nevermore batch`
 

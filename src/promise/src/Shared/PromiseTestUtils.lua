@@ -45,6 +45,50 @@ function PromiseTestUtils.awaitSettled<T...>(promise: Promise.Promise<T...>, tim
 end
 
 --[=[
+	Yields until the promise fulfills and returns the first value it resolved with. Errors if the promise
+	rejects, or is still pending once the timeout (5 seconds by default) elapses, so a test fails at the
+	await instead of carrying a missing value forward. Only the first value comes back so the call can be
+	passed straight to `expect`, which takes one argument.
+
+	```lua
+	local dataStore = PromiseTestUtils.awaitFulfilled(playerDataStoreService:PromiseDataStore(player))
+	```
+]=]
+function PromiseTestUtils.awaitFulfilled<T...>(promise: Promise.Promise<T...>, timeout: number?): any
+	if not PromiseTestUtils.awaitSettled(promise, timeout) then
+		error(string.format("Promise is still pending after %s seconds", tostring(timeout or DEFAULT_TIMEOUT)), 2)
+	end
+
+	local ok, value = (promise :: Promise.Promise<...any>):Yield()
+	if not ok then
+		error(string.format("Promise rejected: %s", tostring(value)), 2)
+	end
+
+	return value
+end
+
+--[=[
+	Yields until the promise rejects and returns the first value it rejected with. Errors if the promise
+	fulfills, or is still pending once the timeout (5 seconds by default) elapses.
+
+	```lua
+	local err = PromiseTestUtils.awaitRejected(dataStore:Save())
+	```
+]=]
+function PromiseTestUtils.awaitRejected<T...>(promise: Promise.Promise<T...>, timeout: number?): any
+	if not PromiseTestUtils.awaitSettled(promise, timeout) then
+		error(string.format("Promise is still pending after %s seconds", tostring(timeout or DEFAULT_TIMEOUT)), 2)
+	end
+
+	local ok, err = (promise :: Promise.Promise<...any>):Yield()
+	if ok then
+		error("Promise fulfilled, expected it to reject", 2)
+	end
+
+	return err
+end
+
+--[=[
 	Yields until the predicate returns a truthy value or the timeout elapses. Used when the awaited
 	condition is observable state rather than a promise.
 

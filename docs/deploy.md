@@ -55,6 +55,7 @@ That's the whole pipeline. There are no deploy hooks or post-processing steps to
 | `universe.place.luau-execution-session:write` | Running scripts (used by `nevermore test` and smoke tests) |
 | `universe.place.luau-execution-session:read` | Reading script execution results |
 | `legacy-asset:manage` | Downloading a [base place](testing/integration-testing.md#merging-with-an-existing-place-baseplace) (only needed if you use `basePlace`) |
+| `asset:read`, `asset:write` | [Uploading assets](#uploading-assets) (only needed for `deploy asset upload`) |
 
 Save the key to your machine once:
 
@@ -679,6 +680,102 @@ The service's source carries a `versionType`, and the CLI sends the one your `ba
 ```
 
 The rest of the monitor registers normally. Sharing a key is what lifts this — `buildWatchPlan` gates it on whether the run is credentialed.
+
+## Uploading assets
+
+A place is not the only thing a game ships. Images, models, and sounds live on Roblox as **assets**, each with its own id, and code refers to them by that id. `nevermore deploy asset upload` puts a file on Roblox as an asset and prints the id it was given:
+
+```bash
+nevermore deploy asset upload assets/icon.png
+```
+
+```
+Owner: user 4397833 (owns universe 10768811747, from deploy.nevermore.json)
+Uploading 1 asset...
+File             Type   Result   Asset                    Moderation
+---------------  -----  -------  -----------------------  ----------
+assets/icon.png  Image  created  rbxassetid://1234567890  Reviewing
+```
+
+That is the whole command: the asset type comes from the file, the name from the file name, and the owner is worked out for you. It is independent of deploying a place — nothing is built, and it runs from any directory. The API key needs the `asset:read` and `asset:write` scopes, which the place-deploy scopes do not include.
+
+### What can be uploaded
+
+The asset type comes from the file extension:
+
+| Extension | Uploads as |
+|-----------|------------|
+| `.png`, `.jpg`, `.jpeg`, `.bmp`, `.tga` | `Image` (or `Decal` with `--type Decal`) |
+| `.fbx`, `.gltf`, `.glb` | `Model` |
+| `.rbxm`, `.rbxmx` | `Model` (or `Animation` with `--type Animation`) |
+| `.mp3`, `.ogg`, `.wav`, `.flac` | `Audio` |
+| `.mp4`, `.mov` | `Video` |
+
+An image defaults to `Image` rather than `Decal` because an Image id works directly as `rbxassetid://` in an `ImageLabel`. A Decal is a wrapper around an image, and its id has to be resolved to the image inside it first.
+
+An `.fbx` or glTF file is imported as a `Model` asset holding one or more `MeshPart`s, which a server loads with `InsertService:LoadAsset`. Anything a game needs done to it afterwards — anchoring, pivots, colour — is the game's job, not the upload's.
+
+### Who owns it
+
+A new asset needs an owner, and the command says who it picked before it uploads anything. In order:
+
+1. `--user-id` or `--group-id`, if you pass one.
+2. Whoever owns the universe in the nearest `deploy.nevermore.json`, searching upward from the current directory.
+3. The user the API key belongs to.
+
+The project's universe comes before the key's owner on purpose. An experience can only be counted on to load assets its own creator owns, so inside a group's game the right owner is the group, not whoever happens to hold the key. Outside a project there is no game to ask, and the key's owner is the only sensible answer.
+
+For a group, the API key has to belong to someone with permission to manage that group's assets. If the universe can't be read, the command says so and falls back to the key's owner.
+
+### Replacing a model, and why images get new ids
+
+`--asset-id` uploads a file as a new version of an existing asset, so its id — and every reference to it — stays put:
+
+```bash
+nevermore deploy asset upload assets/City.fbx --asset-id 1234567890
+```
+
+Roblox only allows this for models. A changed image, sound, or video is always a new asset with a new id, so whatever refers to the old id has to be updated. The CLI refuses `--asset-id` for those types rather than sending a request the API will reject.
+
+### Uploading several files
+
+Pass as many files as you like. Every file is checked before the first upload starts, so a typo or an unsupported extension stops the run while nothing has been created:
+
+```bash
+nevermore deploy asset upload assets/art/*.png assets/sfx/*.ogg --output assets.json
+```
+
+Once uploads start, each file is attempted and reported even if another fails, and the command exits non-zero if any did. That is deliberate: the assets that did upload now exist, so their ids are the one thing a failed run must not lose.
+
+`--output` writes the same results as JSON, which is the form to read from a script:
+
+```json
+{
+  "creator": { "userId": 4397833 },
+  "assets": [
+    {
+      "file": "assets/art/icon.png",
+      "assetType": "Image",
+      "displayName": "icon",
+      "action": "created",
+      "success": true,
+      "assetId": 1234567890,
+      "assetUri": "rbxassetid://1234567890",
+      "revisionId": "1",
+      "moderationState": "Reviewing"
+    }
+  ]
+}
+```
+
+A failed file has `"success": false` and an `error` instead of an id.
+
+### Things to know before uploading
+
+- **Every run creates new assets.** Without `--asset-id` the command does not remember what it uploaded before, so running it twice on the same file gives you two assets, and it has no command to remove one. Use `--dryrun` to see what a command would upload.
+- **Assets are moderated, and usually still in review when the upload finishes.** The id is final straight away, but the `Moderation` column typically reads `Reviewing` rather than `Approved`, and the asset may not load until Roblox approves it.
+- **Roblox limits uploads per account.** Audio and video have their own monthly or daily caps, which vary by account. A run that hits one fails those files with Roblox's own message.
+- **A timeout is not a failure.** If Roblox takes longer than `--timeout` to import a file, the asset may still appear. Check your [creations](https://create.roblox.com/dashboard/creations) before uploading it again.
 
 ## Batch deploys
 

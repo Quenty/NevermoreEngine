@@ -7,8 +7,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -34,6 +34,7 @@ local function setup()
 	local serviceBag = ServiceBag.new()
 	serviceBag:GetService(require("TeleportDataService"))
 	serviceBag:GetService(require("SaveSlotSharedDataStoreService"))
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local binder = serviceBag:GetService(require("HasSaveSlots"))
@@ -57,10 +58,8 @@ local function setup()
 		return verdict or Promise.resolved(true)
 	end
 
-	-- A PlayerMock never fires the real Players.PlayerRemoving, and the store the spec loaded is only
-	-- destroyed by a removal, so shut it down the way Roblox does or its auto-save loop outlives this spec.
 	maid:GiveTask(function()
-		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		fakePlayer:Destroy()
 		serviceBag:Destroy()
 	end)
@@ -85,19 +84,12 @@ local function setup()
 	return context
 end
 
-local function await(promise: any): any
-	assert(PromiseTestUtils.awaitSettled(promise, 10), "promise never settled")
-	local ok, value = promise:Yield()
-	assert(ok, `promise rejected: {tostring(value)}`)
-	return value
-end
-
 describe("HasSaveSlots pre-select", function()
 	it("asks before the slot becomes active", function()
 		local context = setup()
 
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
+		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(slotId))
 
 		expect(#context.asks).toEqual(1)
 		expect(context.asks[1].slotId).toEqual(slotId)
@@ -110,10 +102,10 @@ describe("HasSaveSlots pre-select", function()
 	it("reports the selection being replaced when switching slots", function()
 		local context = setup()
 
-		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
-		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
-		await(context.hasSaveSlots:PromiseSelectSlot(secondId))
+		local firstId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
+		local secondId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(2))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(firstId))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(secondId))
 
 		expect(#context.asks).toEqual(2)
 		expect(context.asks[2].slotId).toEqual(secondId)
@@ -125,8 +117,9 @@ describe("HasSaveSlots pre-select", function()
 	it("asks for a new slot and for an ephemeral slot alike", function()
 		local context = setup()
 
-		local newId = await(context.hasSaveSlots:PromiseSelectNewSaveSlot())
-		local ephemeralId = await(context.hasSaveSlots:PromiseSelectEphemeralSlot({ SlotName = "Throwaway" }))
+		local newId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectNewSaveSlot())
+		local ephemeralId =
+			PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectEphemeralSlot({ SlotName = "Throwaway" }))
 
 		expect(#context.asks).toEqual(2)
 		expect(context.asks[1].slotId).toEqual(newId)
@@ -138,9 +131,9 @@ describe("HasSaveSlots pre-select", function()
 	it("does not ask when the slot is already active", function()
 		local context = setup()
 
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
-		await(context.hasSaveSlots:PromiseSelectSlot(slotId))
+		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(slotId))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(slotId))
 
 		expect(#context.asks).toEqual(1)
 
@@ -153,7 +146,7 @@ describe("HasSaveSlots pre-select", function()
 		local gate = Promise.new()
 		context.answerWith(gate)
 
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
+		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
 
 		expect(PromiseTestUtils.awaitSettled(selection, 0.5)).toEqual(false)
@@ -161,7 +154,7 @@ describe("HasSaveSlots pre-select", function()
 
 		gate:Resolve(true)
 
-		await(selection)
+		PromiseTestUtils.awaitFulfilled(selection)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(slotId)
 
 		context:Destroy()
@@ -172,7 +165,7 @@ describe("HasSaveSlots pre-select", function()
 
 		context.answerWith(Promise.resolved(false))
 
-		local slotId = await(context.hasSaveSlots:PromiseCreateSlot(1))
+		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
 
 		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
@@ -185,9 +178,9 @@ describe("HasSaveSlots pre-select", function()
 	it("leaves the previous selection standing when a switch is refused", function()
 		local context = setup()
 
-		local firstId = await(context.hasSaveSlots:PromiseCreateSlot(1))
-		local secondId = await(context.hasSaveSlots:PromiseCreateSlot(2))
-		await(context.hasSaveSlots:PromiseSelectSlot(firstId))
+		local firstId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
+		local secondId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(2))
+		PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseSelectSlot(firstId))
 
 		context.answerWith(Promise.resolved(false))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(secondId)

@@ -45,62 +45,39 @@ local function setup()
 	return controller
 end
 
-local function runWithContext(body)
-	local context = setup()
-	local ok, err = pcall(body, context)
-	context:Destroy()
-	if not ok then
-		error(err, 0)
-	end
-end
-
-local function awaitValueOf(promise)
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	local ok, value = promise:Yield()
-	if not ok then
-		error(`promise rejected: {tostring(value)}`, 0)
-	end
-	return value
-end
-
-local function awaitResolved(promise): boolean
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		error("promise hung", 0)
-	end
-	return (promise:Yield())
-end
-
 describe("SaveSlotSharedDataStoreService", function()
 	it("round-trips a value by key", function()
-		runWithContext(function(context)
-			awaitValueOf(context.service:PromiseWrite("code-1", { Coins = 9, World = { Eggs = 2 } }))
+		local context = setup()
+		PromiseTestUtils.awaitFulfilled(context.service:PromiseWrite("code-1", { Coins = 9, World = { Eggs = 2 } }))
 
-			local value = awaitValueOf(context.service:PromiseRead("code-1"))
-			expect(value.Coins).toEqual(9)
-			expect(value.World.Eggs).toEqual(2)
-		end)
+		local value = PromiseTestUtils.awaitFulfilled(context.service:PromiseRead("code-1"))
+		expect(value.Coins).toEqual(9)
+		expect(value.World.Eggs).toEqual(2)
+
+		context:Destroy()
 	end)
 
 	it("reads nil for an absent key", function()
-		runWithContext(function(context)
-			expect(awaitValueOf(context.service:PromiseRead("missing"))).toBeNil()
-		end)
+		local context = setup()
+		expect(PromiseTestUtils.awaitFulfilled(context.service:PromiseRead("missing"))).toBeNil()
+
+		context:Destroy()
 	end)
 
 	it("removes a value", function()
-		runWithContext(function(context)
-			awaitValueOf(context.service:PromiseWrite("code-2", { A = 1 }))
-			awaitValueOf(context.service:PromiseRemove("code-2"))
-			expect(awaitValueOf(context.service:PromiseRead("code-2"))).toBeNil()
-		end)
+		local context = setup()
+		PromiseTestUtils.awaitFulfilled(context.service:PromiseWrite("code-2", { A = 1 }))
+		PromiseTestUtils.awaitFulfilled(context.service:PromiseRemove("code-2"))
+		expect(PromiseTestUtils.awaitFulfilled(context.service:PromiseRead("code-2"))).toBeNil()
+
+		context:Destroy()
 	end)
 
 	it("surfaces datastore failures as rejections", function()
-		runWithContext(function(context)
-			context.mock:FailNextRequests(1)
-			expect(awaitResolved(context.service:PromiseWrite("code-3", { A = 1 }))).toEqual(false)
-		end)
+		local context = setup()
+		context.mock:FailNextRequests(1)
+		PromiseTestUtils.awaitRejected(context.service:PromiseWrite("code-3", { A = 1 }))
+
+		context:Destroy()
 	end)
 end)

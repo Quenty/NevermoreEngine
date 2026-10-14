@@ -12,9 +12,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local CmdrReplyUtils = require("CmdrReplyUtils")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -38,6 +38,7 @@ local SLOW_REPLY_SECONDS = 0.05
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
@@ -117,7 +118,7 @@ local function setup()
 			return mock:GetRaw(tostring(userId or ABSENT_USER_ID))
 		end,
 		Destroy = function(_self)
-			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+			PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 			maid:DoCleaning()
 		end,
 	}

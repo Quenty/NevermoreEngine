@@ -13,20 +13,12 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function expectSettled(promise, timeout: number?)
-	expect(PromiseTestUtils.awaitSettled(promise, timeout)).toEqual(true)
-end
-
 describe("DataStore without session locking", function()
 	it("should load the default value when the key is empty", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
-		local promise = dataStore:Load("coins", 99)
-		expectSettled(promise)
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(dataStore:Load("coins", 99))
 		expect(value).toEqual(99)
 
 		controller:Destroy()
@@ -38,16 +30,10 @@ describe("DataStore without session locking", function()
 		local writer = controller.newDataStore()
 		writer:Store("coins", 5)
 
-		local savePromise = writer:Save()
-		expectSettled(savePromise)
-		expect((savePromise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(writer:Save())
 
 		local reader = controller.newDataStore()
-		local loadPromise = reader:Load("coins")
-		expectSettled(loadPromise)
-
-		local ok, value = loadPromise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(reader:Load("coins"))
 		expect(value).toEqual(5)
 
 		controller:Destroy()
@@ -59,20 +45,14 @@ describe("DataStore without session locking", function()
 		local writer = controller.newDataStore()
 		writer:Store("coins", 5)
 		writer:Store("gems", 10)
-		expectSettled(writer:Save())
+		expect(PromiseTestUtils.awaitSettled(writer:Save())).toEqual(true)
 
 		local reader = controller.newDataStore()
-		local promise = reader:LoadAll()
-		expectSettled(promise)
-
-		local ok, all = promise:Yield()
-		expect(ok).toEqual(true)
+		local all = PromiseTestUtils.awaitFulfilled(reader:LoadAll())
 		expect(all.coins).toEqual(5)
 		expect(all.gems).toEqual(10)
 
-		local missingPromise = reader:Load("missing", "default")
-		expectSettled(missingPromise)
-		expect((missingPromise:Wait())).toEqual("default")
+		expect(PromiseTestUtils.awaitFulfilled(reader:Load("missing", "default"))).toEqual("default")
 
 		controller:Destroy()
 	end)
@@ -82,14 +62,10 @@ describe("DataStore without session locking", function()
 
 		local writer = controller.newDataStore()
 		writer:GetSubStore("inventory"):Store("sword", true)
-		expectSettled(writer:Save())
+		expect(PromiseTestUtils.awaitSettled(writer:Save())).toEqual(true)
 
 		local reader = controller.newDataStore()
-		local promise = reader:GetSubStore("inventory"):Load("sword")
-		expectSettled(promise)
-
-		local ok, value = promise:Yield()
-		expect(ok).toEqual(true)
+		local value = PromiseTestUtils.awaitFulfilled(reader:GetSubStore("inventory"):Load("sword"))
 		expect(value).toEqual(true)
 
 		controller:Destroy()
@@ -101,17 +77,13 @@ describe("DataStore without session locking", function()
 		local writer = controller.newDataStore()
 		writer:Store("a", 1)
 		writer:Store("b", 2)
-		expectSettled(writer:Save())
+		expect(PromiseTestUtils.awaitSettled(writer:Save())).toEqual(true)
 
 		writer:Delete("a")
-		expectSettled(writer:Save())
+		expect(PromiseTestUtils.awaitSettled(writer:Save())).toEqual(true)
 
 		local reader = controller.newDataStore()
-		local promise = reader:LoadAll()
-		expectSettled(promise)
-
-		local ok, all = promise:Yield()
-		expect(ok).toEqual(true)
+		local all = PromiseTestUtils.awaitFulfilled(reader:LoadAll())
 		expect(all.a).toEqual(nil)
 		expect(all.b).toEqual(2)
 
@@ -122,11 +94,9 @@ describe("DataStore without session locking", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
-		expectSettled(dataStore:Load("x"))
+		expect(PromiseTestUtils.awaitSettled(dataStore:Load("x"))).toEqual(true)
 
-		local savePromise = dataStore:Save()
-		expectSettled(savePromise)
-		expect((savePromise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore:Save())
 
 		controller:Destroy()
 	end)
@@ -136,11 +106,7 @@ describe("DataStore without session locking", function()
 		controller.mock:FailAllRequests()
 		local dataStore = controller.newDataStore()
 
-		local promise = dataStore:PromiseLoadSuccessful()
-		expectSettled(promise, 5)
-
-		local ok, loadedOk = promise:Yield()
-		expect(ok).toEqual(true)
+		local loadedOk = PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 5)
 		expect(loadedOk).toEqual(false)
 
 		controller:Destroy()
@@ -150,14 +116,12 @@ describe("DataStore without session locking", function()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore()
 
-		expectSettled(dataStore:Load("x"))
+		expect(PromiseTestUtils.awaitSettled(dataStore:Load("x"))).toEqual(true)
 
 		controller.mock:FailAllRequests()
 		dataStore:Store("x", 1)
 
-		local savePromise = dataStore:Save()
-		expectSettled(savePromise, 5)
-		expect((savePromise:Yield())).toEqual(false)
+		PromiseTestUtils.awaitRejected(dataStore:Save(), 5)
 
 		controller:Destroy()
 	end)
@@ -167,8 +131,7 @@ describe("DataStore without session locking", function()
 		controller.mock:FailAllRequests()
 		local dataStore = controller.newDataStore()
 
-		local promise = dataStore:PromiseLoadSuccessful()
-		expectSettled(promise, 5)
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5)).toEqual(true)
 
 		expect(dataStore:DidLoadFail()).toEqual(true)
 
@@ -184,11 +147,7 @@ describe("DataStore with session locking", function()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
-		local promise = dataStore:PromiseLoadSuccessful()
-		expectSettled(promise, 10)
-
-		local ok, loadedOk = promise:Yield()
-		expect(ok).toEqual(true)
+		local loadedOk = PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 10)
 		expect(loadedOk).toEqual(true)
 
 		controller:Destroy()
@@ -202,11 +161,7 @@ describe("DataStore with session locking", function()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
-		local promise = dataStore:PromiseLoadSuccessful()
-		expectSettled(promise, 5)
-
-		local ok, loadedOk = promise:Yield()
-		expect(ok).toEqual(true)
+		local loadedOk = PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 5)
 		expect(loadedOk).toEqual(false)
 
 		controller:Destroy()

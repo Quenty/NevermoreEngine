@@ -8,12 +8,13 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
 local MarketplaceServiceCache = require("MarketplaceServiceCache")
 local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 
-local afterEach = Jest.Globals.afterEach
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
@@ -24,56 +25,79 @@ local ASSET_ID = 444555666
 local BUNDLE_ID = 777888999
 local SUBSCRIPTION_ID = "EXP-88771001"
 
-local createdMocks: { Player } = {}
+local function setup()
+	local maid = Maid.new()
 
-local function makeMock(overrides: { [string]: any }?): Player
-	local player = PlayerMock.new(overrides)
-	player.Parent = Workspace
-	table.insert(createdMocks, player)
-	return player
-end
-
-local function awaitBool(promise: any): boolean
-	expect(PromiseTestUtils.awaitSettled(promise, 5)).toBe(true)
-	local ok, value = promise:Yield()
-	expect(ok).toBe(true)
-	return value
-end
-
-afterEach(function()
-	for _, player in createdMocks do
-		player:Destroy()
+	local function newMock(overrides: { [string]: any }?): Player
+		local player = PlayerMock.new(overrides)
+		player.Parent = Workspace
+		maid:GiveTask(player)
+		return player
 	end
-	table.clear(createdMocks)
-end)
+
+	local controller = {
+		newMock = newMock,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
 
 describe("MarketplaceUtils.promiseUserOwnsGamePass", function()
 	it("resolves false for a mock's userId with no injected ownership", function()
-		makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
 
-		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(false)
+		controller.newMock({ UserId = MOCK_USER_ID })
+
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(
+			false
+		)
+
+		controller:Destroy()
 	end)
 
 	it("resolves the ownership injected on the mock", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
-		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(true)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(
+			true
+		)
+
+		controller:Destroy()
 	end)
 
 	it("keys the injected ownership by gamePassId", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
-		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID + 1))).toBe(false)
+		expect(
+			PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID + 1))
+		).toBe(false)
+
+		controller:Destroy()
 	end)
 
 	it("clears back to false when the injection is cleared", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 		PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", nil, GAME_PASS_ID)
 
-		expect(awaitBool(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(false)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promiseUserOwnsGamePass(MOCK_USER_ID, GAME_PASS_ID))).toBe(
+			false
+		)
+
+		controller:Destroy()
 	end)
 
 	it("asserts on a non-number userId", function()
@@ -85,69 +109,109 @@ end)
 
 describe("MarketplaceUtils.promisePlayerOwnsAsset", function()
 	it("resolves false for a mock with no injected ownership", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAsset(player, ASSET_ID))).toBe(false)
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
+
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsAsset(player, ASSET_ID))).toBe(false)
+
+		controller:Destroy()
 	end)
 
 	it("resolves the ownership injected on the mock", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", true, ASSET_ID)
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAsset(player, ASSET_ID))).toBe(true)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsAsset(player, ASSET_ID))).toBe(true)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("MarketplaceUtils.promisePlayerOwnsAssetAsync", function()
 	it("resolves false for a mock with no injected ownership", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(false)
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
+
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(
+			false
+		)
+
+		controller:Destroy()
 	end)
 
 	it("resolves the ownership injected on the mock", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAssetAsync", true, ASSET_ID)
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(true)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(
+			true
+		)
+
+		controller:Destroy()
 	end)
 
 	it("reads a distinct domain from promisePlayerOwnsAsset", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsAsset", true, ASSET_ID)
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(false)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsAssetAsync(player, ASSET_ID))).toBe(
+			false
+		)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("MarketplaceUtils.promisePlayerOwnsBundle", function()
 	it("resolves false for a mock with no injected ownership", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsBundle(player, BUNDLE_ID))).toBe(false)
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
+
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsBundle(player, BUNDLE_ID))).toBe(false)
+
+		controller:Destroy()
 	end)
 
 	it("resolves the ownership injected on the mock", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.PlayerOwnsBundle", true, BUNDLE_ID)
 
-		expect(awaitBool(MarketplaceUtils.promisePlayerOwnsBundle(player, BUNDLE_ID))).toBe(true)
+		expect(PromiseTestUtils.awaitFulfilled(MarketplaceUtils.promisePlayerOwnsBundle(player, BUNDLE_ID))).toBe(true)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 	it("resolves an unsubscribed status for a mock with no injected status", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 
 		local outcome, status =
 			PromiseTestUtils.awaitOutcome(MarketplaceUtils.promiseUserSubscriptionStatus(player, SUBSCRIPTION_ID))
 		expect(outcome).toBe("resolved")
 		expect(status.IsSubscribed).toBe(false)
 		expect(status.IsRenewing).toBe(false)
+
+		controller:Destroy()
 	end)
 
 	it("resolves the status injected on the mock", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", {
 			IsSubscribed = true,
 			IsRenewing = true,
@@ -158,10 +222,14 @@ describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 		expect(outcome).toBe("resolved")
 		expect(status.IsSubscribed).toBe(true)
 		expect(status.IsRenewing).toBe(true)
+
+		controller:Destroy()
 	end)
 
 	it("keys the injected status by subscriptionId", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 		PlayerMock.writeLookup(player, "MarketplaceService.GetUserSubscriptionStatusAsync", {
 			IsSubscribed = true,
 			IsRenewing = false,
@@ -171,6 +239,8 @@ describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 			PromiseTestUtils.awaitOutcome(MarketplaceUtils.promiseUserSubscriptionStatus(player, "EXP-other"))
 		expect(outcome).toBe("resolved")
 		expect(status.IsSubscribed).toBe(false)
+
+		controller:Destroy()
 	end)
 
 	it("asserts on a non-player value", function()
@@ -180,11 +250,15 @@ describe("MarketplaceUtils.promiseUserSubscriptionStatus", function()
 	end)
 
 	it("asserts on a non-string subscriptionId", function()
-		local player = makeMock({ UserId = MOCK_USER_ID })
+		local controller = setup()
+
+		local player = controller.newMock({ UserId = MOCK_USER_ID })
 
 		expect(function()
 			MarketplaceUtils.promiseUserSubscriptionStatus(player, 123 :: any)
 		end).toThrow("Bad subscriptionId")
+
+		controller:Destroy()
 	end)
 end)
 

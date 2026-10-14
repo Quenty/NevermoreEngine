@@ -230,11 +230,7 @@ describe("datastore-unlock", function()
 	it("clears a key this server holds a live session for", function()
 		local controller = setup()
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
 		expect(string.find(controller.run("datastore-unlock", { 1 }), "Unlocked") ~= nil).toEqual(true)
 		expect(controller.mock:GetRaw("user_1").lock).toBeNil()

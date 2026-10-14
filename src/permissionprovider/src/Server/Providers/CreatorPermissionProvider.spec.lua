@@ -38,12 +38,6 @@ local function setup()
 		fakePlayer = function(userId: number): Player
 			return maid:Add(PlayerMock.new({ UserId = userId }))
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -71,7 +65,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup()
 		local player = controller.fakePlayer(CREATOR_USER_ID)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -80,7 +74,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup()
 		local player = controller.fakePlayer(CREATOR_USER_ID)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -89,7 +83,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup()
 		local player = controller.fakePlayer(CREATOR_USER_ID + 1)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsAdmin(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsAdmin(player))).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -98,7 +92,7 @@ describe("CreatorPermissionProvider.PromiseIsPermissionLevel", function()
 		local controller = setup()
 		local player = controller.fakePlayer(CREATOR_USER_ID + 1)
 
-		expect(controller.awaitBool(controller.provider:PromiseIsCreator(player))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.provider:PromiseIsCreator(player))).toEqual(false)
 
 		controller:Destroy()
 	end)

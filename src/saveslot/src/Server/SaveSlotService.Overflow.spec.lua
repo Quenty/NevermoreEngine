@@ -11,9 +11,9 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStore = require("DataStore")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -35,6 +35,7 @@ local function setup()
 	local mock = DataStoreMock.new()
 
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	serviceBag:Init()
@@ -55,10 +56,7 @@ local function setup()
 		-- cleanly, rather than throwing during cleanup and leaking a retry into a later spec (these all
 		-- share one test place).
 		mock:SetMaxValueLength(nil)
-		-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-		-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-		-- this spec and fires inside a later package's window.
-		DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		maid:DoCleaning()
 	end
 

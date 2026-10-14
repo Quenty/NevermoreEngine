@@ -255,8 +255,7 @@ describe("DataStoreLockHelper.PromiseCloseSession", function()
 		local helper = controller.newLockHelper()
 		local promise = helper:PromiseCloseSession()
 		helper:ToLockedProfile({ coins = 5 }, true)
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-		expect((promise:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(promise, 5)
 		controller:Destroy()
 	end)
 end)
@@ -283,13 +282,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local sessionA = controller.newDataStore()
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
-		local loadA = sessionA:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadA, 10) then
-			expect("A load hung").toEqual("A load settled")
-			controller:Destroy()
-			return
-		end
-		expect((loadA:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(sessionA:PromiseLoadSuccessful(), 10)
 
 		local sessionB = controller.newDataStore()
 		sessionB:SetSessionLockingEnabled(true)
@@ -298,19 +291,9 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		local loadB = sessionB:PromiseLoadSuccessful()
 		expect(PromiseTestUtils.awaitSettled(loadB, 0.5)).toEqual(false)
 
-		local closeA = sessionA:SaveAndCloseSession()
-		if not PromiseTestUtils.awaitSettled(closeA, 10) then
-			expect("A close hung").toEqual("A close settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(sessionA:SaveAndCloseSession(), 10)).toEqual(true)
 
-		if not PromiseTestUtils.awaitSettled(loadB, 20) then
-			expect("B never acquired the released lock").toEqual("B acquired the released lock")
-			controller:Destroy()
-			return
-		end
-		expect((loadB:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(loadB, 20)
 
 		controller:Destroy()
 	end)
@@ -322,23 +305,12 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		sessionA:SetSessionLockingEnabled(true)
 		sessionA:SetUserIdList({ 1 })
 
-		local loadA = sessionA:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(loadA, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((loadA:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(sessionA:PromiseLoadSuccessful(), 10)
 
 		controller.mock:SetRaw("player_1", lockedBy(foreignSession("winner-session"), os.time(), { coins = 20 }))
 
 		sessionA:Store("coins", 10)
-		local saveA = sessionA:Save()
-		if not PromiseTestUtils.awaitSettled(saveA, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(sessionA:Save(), 10)).toEqual(true)
 
 		local raw = controller.mock:GetRaw("player_1")
 		expect(raw.coins).toEqual(20)
@@ -358,12 +330,8 @@ describe("session lock edge cases and failure modes", function()
 
 		local first = dataStore:PromiseLoadSuccessful()
 		local second = dataStore:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(first, 10) or not PromiseTestUtils.awaitSettled(second, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((first:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(first, 10)
+		expect(PromiseTestUtils.awaitSettled(second, 10)).toEqual(true)
 
 		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(1)
 
@@ -377,23 +345,15 @@ describe("session lock edge cases and failure modes", function()
 		dataStore:SetSessionLockingEnabled(true)
 		dataStore:SetUserIdList({ 1 })
 
-		local load = dataStore:PromiseLoadSuccessful()
-		if not PromiseTestUtils.awaitSettled(load, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
 
 		dataStore:Store("coins", 1)
 		local saveOne = dataStore:Save()
 		dataStore:Store("coins", 2)
 		local saveTwo = dataStore:Save()
 
-		if not PromiseTestUtils.awaitSettled(saveOne, 10) or not PromiseTestUtils.awaitSettled(saveTwo, 10) then
-			expect("hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(saveOne, 10)).toEqual(true)
+		expect(PromiseTestUtils.awaitSettled(saveTwo, 10)).toEqual(true)
 
 		local raw = controller.mock:GetRaw("player_1")
 		expect(type(raw.coins)).toEqual("number")
@@ -414,28 +374,15 @@ describe("why session locking exists (unlocked stores can duplicate)", function(
 
 		local aLoad = serverA:Load("items")
 		local bLoad = serverB:Load("items")
-		if not PromiseTestUtils.awaitSettled(aLoad, 5) or not PromiseTestUtils.awaitSettled(bLoad, 5) then
-			expect("load hung").toEqual("load settled")
-			controller:Destroy()
-			return
-		end
-		expect((aLoad:Wait())).toEqual({ "rare_sword" })
-		expect((bLoad:Wait())).toEqual({ "rare_sword" })
+		expect(PromiseTestUtils.awaitFulfilled(aLoad, 5)).toEqual({ "rare_sword" })
+		expect(PromiseTestUtils.awaitFulfilled(bLoad, 5)).toEqual({ "rare_sword" })
 
 		serverA:Store("items", {})
-		if not PromiseTestUtils.awaitSettled(serverA:Save(), 5) then
-			expect("A save hung").toEqual("A save settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(serverA:Save(), 5)).toEqual(true)
 		expect(controller.mock:GetRaw("player_1").items).toEqual({})
 
 		serverB:Store("items", { "rare_sword" })
-		if not PromiseTestUtils.awaitSettled(serverB:Save(), 5) then
-			expect("B save hung").toEqual("B save settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(serverB:Save(), 5)).toEqual(true)
 
 		expect(controller.mock:GetRaw("player_1").items).toEqual({ "rare_sword" })
 

@@ -9,8 +9,8 @@
 ]]
 local require = require(script.Parent.loader).load(script)
 
+local BindToCloseService = require("BindToCloseService")
 local DataStoreMock = require("DataStoreMock")
-local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
@@ -31,6 +31,7 @@ local it = Jest.Globals.it
 local function setup()
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 	local playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService =
 		serviceBag:GetService(PlayerDataStoreService) :: any
 	local saveSlotService: SaveSlotService.SaveSlotService = serviceBag:GetService(SaveSlotService) :: any
@@ -46,17 +47,8 @@ local function setup()
 		fakePlayer = function(userId: number?): Player
 			return maid:Add(PlayerMock.new(if userId ~= nil then { UserId = userId } else nil))
 		end,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
-			-- The store the spec loaded is only destroyed by a removal, and a PlayerMock never fires the
-			-- real Players.PlayerRemoving, so shut down the way Roblox does or its auto-save loop outlives
-			-- this spec and fires inside a later package's window.
-			DataStoreTestUtils.awaitServiceShutdown(playerDataStoreService)
+			PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 			maid:DoCleaning()
 		end,
 	}
@@ -120,7 +112,7 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 			return nil
 		end)
 
-		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
 		expect(ran).toEqual(1)
 
 		controller:Destroy()
@@ -136,12 +128,12 @@ describe("SaveSlotService:RegisterPreSelectCallback", function()
 			return nil
 		end)
 
-		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
 		expect(ran).toEqual(1)
 
 		remove()
 
-		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
+		PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromisePreSelect(player, "slot-1"))
 		expect(ran).toEqual(1)
 
 		controller:Destroy()
@@ -152,9 +144,11 @@ describe("SaveSlotService:PromisePreSelect", function()
 	it("allows the selection when nothing is registered", function()
 		local controller = setup()
 
-		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
-			true
-		)
+		expect(
+			PromiseTestUtils.awaitFulfilled(
+				controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+			)
+		).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -169,7 +163,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return nil
 		end)
 
-		controller.awaitBool(controller.saveSlotService:PromisePreSelect(player, "slot-2", "slot-1"))
+		PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromisePreSelect(player, "slot-2", "slot-1"))
 
 		expect(#calls).toEqual(1)
 		expect(calls[1].player).toEqual(player)
@@ -186,9 +180,11 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return false
 		end)
 
-		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
-			false
-		)
+		expect(
+			PromiseTestUtils.awaitFulfilled(
+				controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+			)
+		).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -200,9 +196,11 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return Promise.resolved(false)
 		end)
 
-		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
-			false
-		)
+		expect(
+			PromiseTestUtils.awaitFulfilled(
+				controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+			)
+		).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -225,7 +223,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 		expect(PromiseTestUtils.awaitSettled(verdict, 0.5)).toEqual(false)
 
 		second:Resolve()
-		expect(controller.awaitBool(verdict)).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(verdict)).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -242,7 +240,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return nil
 		end)
 
-		controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))
+		PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))
 
 		expect(ranAfter).toEqual(1)
 
@@ -261,9 +259,11 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return nil
 		end)
 
-		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
-			true
-		)
+		expect(
+			PromiseTestUtils.awaitFulfilled(
+				controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+			)
+		).toEqual(true)
 		expect(ranAfter).toEqual(1)
 
 		controller:Destroy()
@@ -276,9 +276,11 @@ describe("SaveSlotService:PromisePreSelect", function()
 			return Promise.rejected("work blew up")
 		end)
 
-		expect(controller.awaitBool(controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1"))).toEqual(
-			true
-		)
+		expect(
+			PromiseTestUtils.awaitFulfilled(
+				controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
+			)
+		).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -444,7 +446,9 @@ describe("SaveSlotService internal teleport", function()
 			[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY] = "slot-1",
 		})
 
-		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(
+			true
+		)
 
 		controller:Destroy()
 	end)
@@ -459,7 +463,9 @@ describe("SaveSlotService internal teleport", function()
 		})
 		controller.teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(arrived, nil) -- no client band; seals
 
-		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromiseIsInternalTeleport(arrived))).toEqual(
+			true
+		)
 
 		controller:Destroy()
 	end)
@@ -471,7 +477,9 @@ describe("SaveSlotService internal teleport", function()
 		local fresh = controller.fakePlayer(111)
 		controller.teleportDataService:SetNonTrustedArrivedTeleportDataForTesting(fresh, nil) -- fresh-join sentinel; seals
 
-		expect(controller.awaitBool(controller.saveSlotService:PromiseIsInternalTeleport(fresh))).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(controller.saveSlotService:PromiseIsInternalTeleport(fresh))).toEqual(
+			false
+		)
 
 		controller:Destroy()
 	end)

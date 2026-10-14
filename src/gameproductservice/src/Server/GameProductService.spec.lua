@@ -79,12 +79,6 @@ local function setup()
 		gameProductServiceClient = gameProductServiceClient,
 		gameConfigService = gameConfigService,
 		playerMock = playerMock,
-		awaitBool = function(promise: any): boolean
-			expect(PromiseTestUtils.awaitSettled(promise, 10)).toEqual(true)
-			local ok, value = promise:Yield()
-			expect(ok).toEqual(true)
-			return value
-		end,
 		Destroy = function(_self)
 			clientBag:Destroy()
 			serverBag:Destroy()
@@ -129,7 +123,7 @@ describe("GameProductService server ownership from an injected lookup", function
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -138,7 +132,7 @@ describe("GameProductService server ownership from an injected lookup", function
 			)
 		).toEqual(false)
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -156,7 +150,7 @@ describe("GameProductService server ownership from an injected lookup", function
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -190,7 +184,7 @@ describe("GameProductService ownership override", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
-		controller.awaitBool(
+		PromiseTestUtils.awaitFulfilled(
 			controller.gameProductService:SetPlayerOwnershipOverride(
 				controller.playerMock,
 				GameConfigAssetTypes.PASS,
@@ -200,7 +194,7 @@ describe("GameProductService ownership override", function()
 		)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -216,7 +210,7 @@ describe("GameProductService ownership override", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
-		controller.awaitBool(
+		PromiseTestUtils.awaitFulfilled(
 			controller.gameProductService:SetPlayerOwnershipOverride(
 				controller.playerMock,
 				GameConfigAssetTypes.PASS,
@@ -224,7 +218,7 @@ describe("GameProductService ownership override", function()
 				false
 			) :: any
 		)
-		controller.awaitBool(
+		PromiseTestUtils.awaitFulfilled(
 			controller.gameProductService:ClearPlayerOwnershipOverride(
 				controller.playerMock,
 				GameConfigAssetTypes.PASS,
@@ -233,7 +227,7 @@ describe("GameProductService ownership override", function()
 		)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -252,7 +246,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -261,7 +255,7 @@ describe("GameProductServiceClient ownership for the designated mock", function(
 			)
 		).toEqual(true)
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductServiceClient:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -320,7 +314,7 @@ describe("client-initiated gamepass prompt", function()
 		end)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductServiceClient:PromisePromptPurchase(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -345,7 +339,7 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -372,7 +366,7 @@ describe("client-initiated gamepass prompt", function()
 		end)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductServiceClient:PromisePromptPurchase(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -406,7 +400,7 @@ describe("client-initiated gamepass prompt", function()
 		end)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductServiceClient:PromisePromptPurchase(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -470,7 +464,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 
 		-- Awaiting the ownership query also lets the server's verification settle first.
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -553,7 +547,7 @@ describe("server-initiated gamepass prompt", function()
 		end)
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerPromptPurchase(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -576,7 +570,7 @@ describe("server-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -592,7 +586,7 @@ describe("server-initiated gamepass prompt", function()
 		local controller = setup()
 
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerPromptPurchase(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,
@@ -609,7 +603,7 @@ describe("server-initiated gamepass prompt", function()
 			)
 		).toEqual(false)
 		expect(
-			controller.awaitBool(
+			PromiseTestUtils.awaitFulfilled(
 				controller.gameProductService:PromisePlayerOwnership(
 					controller.playerMock,
 					GameConfigAssetTypes.PASS,

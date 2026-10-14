@@ -32,22 +32,12 @@ local function seedForeignLock(mock, key: string, profile: { [string]: any }?)
 end
 
 -- Returns the resolved value, or fails the spec and returns nil.
-local function awaitValue(promise, label: string): any
-	if not PromiseTestUtils.awaitSettled(promise, 10) then
-		expect(`{label} hung`).toEqual(`{label} settled`)
-		return nil
-	end
-
-	local ok, value = promise:Yield()
-	expect(ok).toEqual(true)
-	return value
-end
 
 describe("PlayerDataStoreManager.PromiseReadSessionLock", function()
 	it("resolves nil for a key that was never written", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).toBeNil()
 
 		controller:Destroy()
@@ -58,7 +48,7 @@ describe("PlayerDataStoreManager.PromiseReadSessionLock", function()
 
 		seedForeignLock(controller.mock, "user_1", { coins = 5 })
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).never.toBeNil()
 		expect(lock.ActiveSession).toEqual(FOREIGN_SESSION)
 
@@ -70,7 +60,7 @@ describe("PlayerDataStoreManager.PromiseReadSessionLock", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).toBeNil()
 
 		controller:Destroy()
@@ -83,7 +73,7 @@ describe("PlayerDataStoreManager.PromiseUnlockSession", function()
 
 		seedForeignLock(controller.mock, "user_1", { coins = 5 })
 
-		local previous = awaitValue(controller.manager:PromiseUnlockSession(1), "unlock")
+		local previous = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseUnlockSession(1))
 		expect(previous).never.toBeNil()
 		expect(previous.ActiveSession).toEqual(FOREIGN_SESSION)
 
@@ -97,7 +87,7 @@ describe("PlayerDataStoreManager.PromiseUnlockSession", function()
 
 		seedForeignLock(controller.mock, "user_1", { coins = 5, level = 3 })
 
-		awaitValue(controller.manager:PromiseUnlockSession(1), "unlock")
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseUnlockSession(1))
 
 		local raw = controller.mock:GetRaw("user_1")
 		expect(raw.coins).toEqual(5)
@@ -111,7 +101,7 @@ describe("PlayerDataStoreManager.PromiseUnlockSession", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local previous = awaitValue(controller.manager:PromiseUnlockSession(1), "unlock")
+		local previous = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseUnlockSession(1))
 		expect(previous).toBeNil()
 
 		controller:Destroy()
@@ -120,7 +110,7 @@ describe("PlayerDataStoreManager.PromiseUnlockSession", function()
 	it("does not create an entry for a key that was never written", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		awaitValue(controller.manager:PromiseUnlockSession(1), "unlock")
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseUnlockSession(1))
 
 		expect(controller.mock:GetRaw("user_1")).toBeNil()
 
@@ -134,10 +124,10 @@ describe("PlayerDataStoreManager.PromiseLockSession", function()
 
 		controller.mock:SetRaw("user_1", { coins = 5 })
 
-		local previous = awaitValue(controller.manager:PromiseLockSession(1), "lock")
+		local previous = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseLockSession(1))
 		expect(previous).toBeNil()
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).never.toBeNil()
 		expect(lock.ActiveSession.PlaceId).toEqual(game.PlaceId)
 		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
@@ -150,7 +140,7 @@ describe("PlayerDataStoreManager.PromiseLockSession", function()
 
 		seedForeignLock(controller.mock, "user_1", { coins = 5 })
 
-		local previous = awaitValue(controller.manager:PromiseLockSession(1), "lock")
+		local previous = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseLockSession(1))
 		expect(previous).never.toBeNil()
 		expect(previous.ActiveSession).toEqual(FOREIGN_SESSION)
 
@@ -160,9 +150,9 @@ describe("PlayerDataStoreManager.PromiseLockSession", function()
 	it("claims a key that was never written", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		awaitValue(controller.manager:PromiseLockSession(1), "lock")
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseLockSession(1))
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).never.toBeNil()
 
 		controller:Destroy()
@@ -175,13 +165,9 @@ describe("PlayerDataStoreManager raw lock writes against a live session", functi
 	it("writes the lock while this server holds a session for that user", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
-		local previous = awaitValue(controller.manager:PromiseUnlockSession(1), "unlock")
+		local previous = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseUnlockSession(1))
 		expect(previous).never.toBeNil()
 		expect(previous.ActiveSession.JobId).toEqual(game.JobId)
 		expect(controller.mock:GetRaw("user_1").lock).toBeNil()
@@ -192,13 +178,9 @@ describe("PlayerDataStoreManager raw lock writes against a live session", functi
 	it("still serves a read while this server holds a session", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
-		local lock = awaitValue(controller.manager:PromiseReadSessionLock(1), "read")
+		local lock = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseReadSessionLock(1))
 		expect(lock).never.toBeNil()
 		expect(lock.ActiveSession.JobId).toEqual(game.JobId)
 
@@ -208,19 +190,12 @@ describe("PlayerDataStoreManager raw lock writes against a live session", functi
 	it("writes once the session has been removed", function()
 		local controller = DataStoreTestUtils.setupDataStoreManager()
 
-		if not controller.storeAndAwaitLock() then
-			expect("lock was never acquired").toEqual("lock was acquired")
-			controller:Destroy()
-			return
-		end
+		expect(controller.storeAndAwaitLock()).toEqual(true)
 
-		if not PromiseTestUtils.awaitSettled(controller.promiseShutdown({ 1 }), 10) then
-			expect("shutdown hung").toEqual("shutdown settled")
-			controller:Destroy()
-			return
-		end
+		controller.manager:RemovePlayerDataStore(1)
+		PromiseTestUtils.awaitFulfilled(controller.bindToCloseService:PromiseClose(), 10)
 
-		awaitValue(controller.manager:PromiseLockSession(1), "lock")
+		PromiseTestUtils.awaitFulfilled(controller.manager:PromiseLockSession(1))
 		expect(controller.mock:GetRaw("user_1").lock).never.toBeNil()
 
 		controller:Destroy()

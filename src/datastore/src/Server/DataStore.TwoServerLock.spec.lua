@@ -21,20 +21,11 @@ describe("two servers: clean handoff and crash recovery", function()
 		local serverA = controller.newServer()
 		expect(controller.awaitOwn(serverA)).toEqual(true)
 		serverA:Store("coins", 42)
-		if not PromiseTestUtils.awaitSettled(serverA:SaveAndCloseSession(), 10) then
-			expect("A close hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(serverA:SaveAndCloseSession(), 10)).toEqual(true)
 
 		local serverB = controller.newServer()
 		local coins = serverB:Load("coins")
-		if not PromiseTestUtils.awaitSettled(coins, 10) then
-			expect("B load hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((coins:Wait())).toEqual(42)
+		expect(PromiseTestUtils.awaitFulfilled(coins, 10)).toEqual(42)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:Destroy()
@@ -46,11 +37,7 @@ describe("two servers: clean handoff and crash recovery", function()
 		local serverA = controller.newServer()
 		expect(controller.awaitOwn(serverA)).toEqual(true)
 		serverA:Store("coins", 7)
-		if not PromiseTestUtils.awaitSettled(serverA:Save(), 10) then
-			expect("A save hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(serverA:Save(), 10)).toEqual(true)
 
 		local raw = controller.mock:GetRaw(KEY)
 		raw.lock.LastUpdateTime = os.time() - 1000000
@@ -58,12 +45,7 @@ describe("two servers: clean handoff and crash recovery", function()
 
 		local serverB = controller.newServer()
 		local coins = serverB:Load("coins")
-		if not PromiseTestUtils.awaitSettled(coins, 10) then
-			expect("B load hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((coins:Wait())).toEqual(7)
+		expect(PromiseTestUtils.awaitFulfilled(coins, 10)).toEqual(7)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:Destroy()
@@ -111,11 +93,7 @@ describe("two servers: clean handoff and crash recovery", function()
 			stolen = session
 		end)
 		serverA:Store("coins", 5)
-		if not PromiseTestUtils.awaitSettled(serverA:Save(), 10) then
-			expect("A save hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
+		expect(PromiseTestUtils.awaitSettled(serverA:Save(), 10)).toEqual(true)
 
 		expect(stolen).never.toBeNil()
 		expect(controller.mock:GetRaw(KEY).coins).toEqual(100)
@@ -133,13 +111,10 @@ describe("two servers: MessagingService graceful close", function()
 
 		local _serverB, helperB = controller.newServer({ messaging = true })
 
-		local graceful = helperB:PromiseCloseSessionGraceful(game.PlaceId, game.JobId, serverA:GetSessionId())
-		if not PromiseTestUtils.awaitSettled(graceful, 15) then
-			expect("graceful close hung").toEqual("resolved")
-			controller:Destroy()
-			return
-		end
-		expect((graceful:Yield())).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(
+			helperB:PromiseCloseSessionGraceful(game.PlaceId, game.JobId, serverA:GetSessionId()),
+			15
+		)
 
 		expect(PromiseTestUtils.awaitValue(function()
 			local raw = controller.mock:GetRaw(KEY)
@@ -159,12 +134,7 @@ describe("two servers: MessagingService graceful close", function()
 		serverB:SetSessionMessagingCloseDelaySeconds(0.1)
 		local loadB = serverB:PromiseLoadSuccessful()
 
-		if not PromiseTestUtils.awaitSettled(loadB, 8) then
-			expect("B messaging load hung").toEqual("settled")
-			controller:Destroy()
-			return
-		end
-		expect((loadB:Wait())).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(loadB, 8)).toEqual(true)
 		expect(controller.mock:GetRaw(KEY).lock.ActiveSession.SessionId).toEqual(serverB:GetSessionId())
 
 		controller:Destroy()

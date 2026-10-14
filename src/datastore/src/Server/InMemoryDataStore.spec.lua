@@ -14,13 +14,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function resolve(promise, timeout: number?)
-	expect(PromiseTestUtils.awaitSettled(promise, timeout or 10)).toEqual(true)
-	local ok, value = promise:Yield()
-	expect(ok).toEqual(true)
-	return value
-end
-
 local function newInMemoryController()
 	local maid = Maid.new()
 	return {
@@ -49,7 +42,7 @@ local function describeSharedBehavior(caseName: string, newController)
 	describe(caseName, function()
 		it("loads the default value when the key is empty", function()
 			local c = newController()
-			expect(resolve(c.makeStore():Load("coins", 99))).toEqual(99)
+			expect(PromiseTestUtils.awaitFulfilled(c.makeStore():Load("coins", 99))).toEqual(99)
 			c:Destroy()
 		end)
 
@@ -57,7 +50,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local c = newController()
 			local store = c.makeStore()
 			store:Store("coins", 5)
-			expect(resolve(store:Load("coins"))).toEqual(5)
+			expect(PromiseTestUtils.awaitFulfilled(store:Load("coins"))).toEqual(5)
 			c:Destroy()
 		end)
 
@@ -67,10 +60,10 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("coins", 5)
 			store:Store("gems", 10)
 
-			local all = resolve(store:LoadAll())
+			local all = PromiseTestUtils.awaitFulfilled(store:LoadAll())
 			expect(all.coins).toEqual(5)
 			expect(all.gems).toEqual(10)
-			expect(resolve(store:Load("missing", "default"))).toEqual("default")
+			expect(PromiseTestUtils.awaitFulfilled(store:Load("missing", "default"))).toEqual("default")
 			c:Destroy()
 		end)
 
@@ -81,7 +74,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("b", 2)
 			store:Delete("a")
 
-			local all = resolve(store:LoadAll())
+			local all = PromiseTestUtils.awaitFulfilled(store:LoadAll())
 			expect(all.a).toEqual(nil)
 			expect(all.b).toEqual(2)
 			c:Destroy()
@@ -94,7 +87,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("b", 2)
 			store:Overwrite({ c = 3 })
 
-			local all = resolve(store:LoadAll())
+			local all = PromiseTestUtils.awaitFulfilled(store:LoadAll())
 			expect(all.a).toEqual(nil)
 			expect(all.b).toEqual(nil)
 			expect(all.c).toEqual(3)
@@ -106,7 +99,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			local store = c.makeStore()
 			store:Store("a", 1)
 			store:Wipe()
-			expect(resolve(store:LoadAll({}))).toEqual({})
+			expect(PromiseTestUtils.awaitFulfilled(store:LoadAll({}))).toEqual({})
 			c:Destroy()
 		end)
 
@@ -115,9 +108,9 @@ local function describeSharedBehavior(caseName: string, newController)
 			local store = c.makeStore()
 			store:GetSubStore("inventory"):Store("sword", true)
 
-			expect(resolve(store:GetSubStore("inventory"):Load("sword"))).toEqual(true)
+			expect(PromiseTestUtils.awaitFulfilled(store:GetSubStore("inventory"):Load("sword"))).toEqual(true)
 
-			local all = resolve(store:LoadAll())
+			local all = PromiseTestUtils.awaitFulfilled(store:LoadAll())
 			expect(all.inventory.sword).toEqual(true)
 			c:Destroy()
 		end)
@@ -128,7 +121,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("a", 1)
 			store:Store("b", 2)
 
-			local keys = resolve(store:PromiseKeyList())
+			local keys = PromiseTestUtils.awaitFulfilled(store:PromiseKeyList())
 			table.sort(keys)
 			expect(keys).toEqual({ "a", "b" })
 			c:Destroy()
@@ -141,7 +134,7 @@ local function describeSharedBehavior(caseName: string, newController)
 			store:Store("data", source)
 			source.count = 999
 
-			expect(resolve(store:Load("data")).count).toEqual(1)
+			expect(PromiseTestUtils.awaitFulfilled(store:Load("data")).count).toEqual(1)
 			c:Destroy()
 		end)
 
@@ -184,7 +177,7 @@ describe("matrix: cross-implementation consistency", function()
 			store:Store("gems", 10)
 			store:GetSubStore("inventory"):Store("sword", true)
 			store:Delete("gems")
-			return resolve(store:LoadAll())
+			return PromiseTestUtils.awaitFulfilled(store:LoadAll())
 		end
 
 		local persistedView = runOps(dataStoreController.makeStore())
@@ -204,7 +197,7 @@ describe("InMemoryDataStore isolation and non-persistence", function()
 		first:Store("coins", 5)
 
 		local second = maid:Add(InMemoryDataStore.new())
-		expect(resolve(second:Load("coins", 0))).toEqual(0)
+		expect(PromiseTestUtils.awaitFulfilled(second:Load("coins", 0))).toEqual(0)
 
 		maid:DoCleaning()
 	end)
@@ -214,8 +207,8 @@ describe("InMemoryDataStore isolation and non-persistence", function()
 		local store = maid:Add(InMemoryDataStore.new())
 		store:Store("coins", 5)
 
-		expect(resolve(store:Save())).toEqual(nil)
-		expect(resolve(store:Load("coins"))).toEqual(5)
+		expect(PromiseTestUtils.awaitFulfilled(store:Save())).toEqual(nil)
+		expect(PromiseTestUtils.awaitFulfilled(store:Load("coins"))).toEqual(5)
 
 		maid:DoCleaning()
 	end)
@@ -224,7 +217,7 @@ describe("InMemoryDataStore isolation and non-persistence", function()
 		local maid = Maid.new()
 		local store = maid:Add(InMemoryDataStore.new())
 
-		expect(resolve(store:LoadAll({}))).toEqual({})
+		expect(PromiseTestUtils.awaitFulfilled(store:LoadAll({}))).toEqual({})
 
 		maid:DoCleaning()
 	end)
