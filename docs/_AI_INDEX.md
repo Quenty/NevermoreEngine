@@ -71,7 +71,7 @@ consumer-facing page has a matching package doc, link to it so readers can find 
 | [architecture/](architecture/index.md) | Architecture: workspace layout, design philosophy, ServiceBag, dependency injection |
 | [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition; Brio pipeline pitfalls |
 | [build.md](build.md) | Contributing: local setup, tools, versioning, custom Rojo |
-| [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
+| [testing/](testing/index.md) | Testing: Jest3, deploy config, batch discovery errors and skips, CLI commands, credentials, CI |
 | [testing/integration-testing.md](testing/integration-testing.md) | Integration testing: full-game tests, base place merging, deploy pipeline |
 | [conventions/luau.md](conventions/luau.md) | Strict typing patterns, class structure, common type imports |
 | [conventions/typescript.md](conventions/typescript.md) | CLI tool conventions: naming, commands, error handling, dryrun |
