@@ -1,3 +1,20 @@
+# v12.46.0 (Wed Oct 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Asset uploading allowed by nevermore CLI [#833](https://github.com/Quenty/NevermoreEngine/pull/833) ([@Quenty](https://github.com/Quenty))
+- feat: BindToClose service has a public method tests can use, simplify tests ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

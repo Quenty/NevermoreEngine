@@ -1,3 +1,16 @@
+# (Wed Oct 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.12.0`, `@quenty/bindtocloseservice@8.46.0`, `@quenty/camera@14.58.0`, `@quenty/characterutils@12.46.0`, `@quenty/coreguienabler@12.47.0`, `@quenty/datastore@13.59.0`, `@quenty/friendutils@12.44.0`, `@quenty/gameproductservice@14.75.0`, `@quenty/influxdbclient@7.46.0`, `@quenty/marketplaceutils@11.35.0`, `@quenty/permissionprovider@14.54.0`, `@quenty/promise@10.25.0`, `@quenty/ragdoll@15.73.0`, `@quenty/remoting@12.46.0`, `@quenty/resetservice@11.52.0`, `@quenty/saveslot@2.15.0`, `@quenty/teleportserviceutils@10.8.0`, `@quenty/nevermore-cli-helpers@1.19.0`, `@quenty/nevermore-cli@4.47.0`
+  - feat: Asset uploading allowed by nevermore CLI [#833](https://github.com/Quenty/NevermoreEngine/pull/833) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Fri Oct 09 2026)
 
 #### 🐛 Bug Fix
