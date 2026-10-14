@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.45.1...@quenty/characterutils@12.45.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/characterutils
+
 ## [12.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.45.0...@quenty/characterutils@12.45.1) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/characterutils

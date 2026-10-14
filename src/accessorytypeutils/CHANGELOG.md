@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/accessorytypeutils@1.9.3...@quenty/accessorytypeutils@1.9.4) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/accessorytypeutils
+
 ## [1.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/accessorytypeutils@1.9.2...@quenty/accessorytypeutils@1.9.3) (2026-09-24)
 
 **Note:** Version bump only for package @quenty/accessorytypeutils

@@ -111,8 +111,10 @@ function Loader.bootstrapStory(storyScript: Instance, options: LoaderOptions?)
 
 	local root = topNodeModules.Parent
 
-	local scheduler = self:_setupLoaderPopulationAsync(root, loaderOptions)
-	scheduler:ClearBudget()
+	if not LoaderLinkUtils.isPopulated(root, script.Name) then
+		local scheduler = self:_setupLoaderPopulationAsync(root, loaderOptions)
+		scheduler:ClearBudget()
+	end
 
 	-- Track the package root
 	GLOBAL_PACKAGE_TRACKER:AddPackageRoot(root)

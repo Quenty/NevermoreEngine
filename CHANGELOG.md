@@ -1,3 +1,29 @@
+# (Fri Oct 09 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@10.11.3`
+  - fix: Skip story loader population when the root already has its links [#832](https://github.com/Quenty/NevermoreEngine/pull/832) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.63.2`, `@quenty/tie@10.51.2`
+  - fix: Check if rogue modifier is alive [#831](https://github.com/Quenty/NevermoreEngine/pull/831) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
 # (Thu Sep 24 2026)
 
 #### 🚀 Enhancement
