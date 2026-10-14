@@ -277,7 +277,9 @@ function Signal.Wait<T...>(self: Signal<T...>): T...
 	local connection: Connection<T...>
 	connection = (self :: any):Connect(function(...)
 		connection:Disconnect()
-		task.spawn(waitingCoroutine, ...)
+		if coroutine.status(waitingCoroutine) == "suspended" then
+			task.spawn(waitingCoroutine, ...)
+		end
 	end)
 
 	return coroutine.yield()
