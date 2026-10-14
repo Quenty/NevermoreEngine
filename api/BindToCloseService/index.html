@@ -6,8 +6,8 @@
 <title data-rh="true">BindToCloseService | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/BindToCloseService"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="BindToCloseService | Nevermore"><meta data-rh="true" name="description" content="Allows unregisterable BindToClose callbacks. This is important because you can&#x27;t unbind
 :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns."><meta data-rh="true" property="og:description" content="Allows unregisterable BindToClose callbacks. This is important because you can&#x27;t unbind
 :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/BindToCloseService" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.5368eb26.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.b1489747.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.4e1ed400.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.43b68c4f.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -18,12 +18,41 @@
   Allows unregisterable BindToClose callbacks. This is important because you can't unbind
   :BindToClose calls normally, so we need to provide another place to guarantee clean shutdowns.
 </p>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterPromiseOnCloseCallback"><code style="text-decoration:none">RegisterPromiseOnCloseCallback</code><a href="#RegisterPromiseOnCloseCallback" class="hash-link" aria-label="Direct link to RegisterPromiseOnCloseCallback" title="Direct link to RegisterPromiseOnCloseCallback" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/bindtocloseservice/src/Server/BindToCloseService.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>BindToCloseService<!-- -->.</code><code class="green_DgR4">RegisterPromiseOnCloseCallback</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/BindToCloseService">BindToCloseService</a></code><code>,</code></div><div><code>saveCallback<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="PromiseClose"><code style="text-decoration:none">PromiseClose</code><a href="#PromiseClose" class="hash-link" aria-label="Direct link to PromiseClose" title="Direct link to PromiseClose" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/bindtocloseservice/src/Server/BindToCloseService.lua#L68"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>BindToCloseService<!-- -->.</code><code class="green_DgR4">PromiseClose</code><code>(</code><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/BindToCloseService">BindToCloseService</a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Promise">Promise</a></code></div><div>
+<p>
+  Closes the game: runs every registered close callback, as Roblox does when the server shuts down,
+  and resolves once they have all resolved. Destroying a <a href="/NevermoreEngine/api/ServiceBag">ServiceBag</a> does not close the game, so
+  call this before tearing down a server bag while the game keeps running, such as in tests.
+</p>
+<p>The game closes once. Later calls, including Roblox's own shutdown, return the same promise.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="RegisterPromiseOnCloseCallback"><code style="text-decoration:none">RegisterPromiseOnCloseCallback</code><a href="#RegisterPromiseOnCloseCallback" class="hash-link" aria-label="Direct link to RegisterPromiseOnCloseCallback" title="Direct link to RegisterPromiseOnCloseCallback" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/bindtocloseservice/src/Server/BindToCloseService.lua#L99"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>BindToCloseService<!-- -->.</code><code class="green_DgR4">RegisterPromiseOnCloseCallback</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/BindToCloseService">BindToCloseService</a></code><code>,</code></div><div><code>saveCallback<!-- -->: </code><code class="blue_P4bS">function</code></div></div><code>) → </code><code class="blue_P4bS">function</code><span class="inlineDescription_G7Er">-- <span>
 <p>Call to unregister callback</p>
 </span></span></div><div>
 <p>Binds the promise to call on close. Can be unregistered</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;PromiseClose&quot;,
+            &quot;desc&quot;: &quot;Closes the game: runs every registered close callback, as Roblox does when the server shuts down,\nand resolves once they have all resolved. Destroying a [ServiceBag] does not close the game, so\ncall this before tearing down a server bag while the game keeps running, such as in tests.\n\nThe game closes once. Later calls, including Roblox&#x27;s own shutdown, return the same promise.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;BindToCloseService&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Promise&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 68,
+                &quot;path&quot;: &quot;src/bindtocloseservice/src/Server/BindToCloseService.lua&quot;
+            }
+        },
         {
             &quot;name&quot;: &quot;RegisterPromiseOnCloseCallback&quot;,
             &quot;desc&quot;: &quot;Binds the promise to call on close. Can be unregistered&quot;,
@@ -47,7 +76,7 @@
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 99,
                 &quot;path&quot;: &quot;src/bindtocloseservice/src/Server/BindToCloseService.lua&quot;
             }
         }
@@ -60,6 +89,6 @@
         &quot;line&quot;: 8,
         &quot;path&quot;: &quot;src/bindtocloseservice/src/Server/BindToCloseService.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#RegisterPromiseOnCloseCallback" class="table-of-contents__link toc-highlight">.RegisterPromiseOnCloseCallback</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#PromiseClose" class="table-of-contents__link toc-highlight">.PromiseClose</a></li><li><a href="#RegisterPromiseOnCloseCallback" class="table-of-contents__link toc-highlight">.RegisterPromiseOnCloseCallback</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
