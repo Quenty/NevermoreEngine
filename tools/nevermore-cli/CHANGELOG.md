@@ -1,24 +1,13 @@
-# v4.47.0 (Wed Oct 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Asset uploading allowed by nevermore CLI [#833](https://github.com/Quenty/NevermoreEngine/pull/833) ([@Quenty](https://github.com/Quenty))
-- feat: Add asset upload support to Nevermore CLI ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.46.0...@quenty/nevermore-cli@4.47.0) (2026-10-14)
+
+### Features
+
+- Add asset upload support to Nevermore CLI ([10fbb90](https://github.com/Quenty/NevermoreEngine/commit/10fbb904d13ed05247dae6375991a3ff4b598aa3))
 
 # [4.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.45.0...@quenty/nevermore-cli@4.46.0) (2026-09-23)
 

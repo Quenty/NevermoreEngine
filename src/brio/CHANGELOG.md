@@ -1,19 +1,11 @@
-# v14.38.0 (Wed Oct 14 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.37.2...@quenty/brio@14.38.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/brio
 
 ## [14.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brio@14.37.1...@quenty/brio@14.37.2) (2026-10-09)
 

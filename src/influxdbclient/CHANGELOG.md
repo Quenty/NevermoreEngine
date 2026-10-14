@@ -1,24 +1,13 @@
-# v7.46.0 (Wed Oct 14 2026)
-
-#### 🚀 Enhancement
-
-- feat: Asset uploading allowed by nevermore CLI [#833](https://github.com/Quenty/NevermoreEngine/pull/833) ([@Quenty](https://github.com/Quenty))
-- feat: BindToClose service has a public method tests can use, simplify tests ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.45.2...@quenty/influxdbclient@7.46.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
 
 ## [7.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/influxdbclient@7.45.1...@quenty/influxdbclient@7.45.2) (2026-10-09)
 

@@ -1,19 +1,11 @@
-# v1.59.0 (Wed Oct 14 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.58.3...@quenty/soundgroup@1.59.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/soundgroup
 
 ## [1.58.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundgroup@1.58.2...@quenty/soundgroup@1.58.3) (2026-10-09)
 

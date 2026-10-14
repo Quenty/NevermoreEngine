@@ -1,19 +1,11 @@
-# v7.60.0 (Wed Oct 14 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/quenty/asset-upload-plan ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.3...@quenty/soundplayer@7.60.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/soundplayer
 
 ## [7.59.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.2...@quenty/soundplayer@7.59.3) (2026-10-09)
 
