@@ -10,6 +10,7 @@ local HttpService = game:GetService("HttpService")
 ]=]
 local require = require(script.Parent.loader).load(script)
 
+local Brio = require("Brio")
 local Jecs = require("Jecs")
 local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
 local JecsImmediateUtils = require("JecsImmediateUtils")
@@ -31,6 +32,40 @@ local LINEAR_WALK_EPSILON = 1e-4
 -- How many leading component values distributeIteration's fast path handles;
 -- wider queries fall back to packing values into a table per candidate.
 local DISTRIBUTE_ITERATION_MAX_PAYLOAD_SLOTS = 6
+
+-- Drops brios that died since the last call. Death is not applied during
+-- iteration, so a loop that kills the current brio does not skip the next one.
+local function compactAliveBrios(alive: { any }, indexOf: { [any]: number })
+	local writeIndex = 1
+	for readIndex = 1, #alive do
+		local brio = alive[readIndex]
+		if brio:IsDead() then
+			indexOf[brio] = nil
+		else
+			if writeIndex ~= readIndex then
+				alive[writeIndex] = brio
+				indexOf[brio] = writeIndex
+			end
+			writeIndex = writeIndex + 1
+		end
+	end
+	for clearIndex = writeIndex, #alive do
+		alive[clearIndex] = nil
+	end
+end
+
+local function nextAliveBrio(alive: { any }, index: number): (number?, any?)
+	local nextIndex = index + 1
+	local brio = alive[nextIndex]
+	while brio ~= nil and brio:IsDead() do
+		nextIndex = nextIndex + 1
+		brio = alive[nextIndex]
+	end
+	if brio == nil then
+		return nil
+	end
+	return nextIndex, brio
+end
 
 local function usesCFrame(goal: any?, value: any?): boolean
 	if goal ~= nil then
@@ -1055,6 +1090,67 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				end
 			end
 			return hookState, hookMaid
+		end,
+
+		--[=[
+			Alive brios from an observable that emits brios.
+
+			Subscribes once, to the observable from the first call. Pass a discriminator
+			when one call site tracks more than one observable. New brios are appended
+			as they emit. A brio that dies stays in the list until the next call, which
+			removes it before iteration. Iterate immediately.
+
+			```lua
+			for _, brio in hooks.brios(observeWeapons(character)) do
+				local weapon = brio:GetValue()
+			end
+			```
+
+			@param source Observable<Brio>
+			@param dis any?
+		]=]
+		brios = function(source: Observable.Observable<Brio.Brio<any>>, dis: any?)
+			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
+
+			if hookState.alive == nil then
+				local alive: { any } = {}
+				local indexOf: { [any]: number } = {}
+				hookState.alive = alive
+				hookState.indexOf = indexOf
+				hookState.deadCount = 0
+
+				local function addBrio(brio)
+					if not Brio.isBrio(brio) then
+						warn(`[hooks.brios] expected a brio, got {typeof(brio)}`)
+						return
+					end
+					if brio:IsDead() or indexOf[brio] ~= nil then
+						return
+					end
+
+					local index = #alive + 1
+					alive[index] = brio
+					indexOf[brio] = index
+
+					local connection = brio:GetDiedSignal():Connect(function()
+						hookState.deadCount = hookState.deadCount + 1
+					end)
+					hookMaid:GiveTask(function()
+						connection:Disconnect()
+					end)
+				end
+
+				hookMaid:GiveTask(source:Subscribe(addBrio, function(err)
+					warn(`[hooks.brios] observable failed: {err}`)
+				end))
+			end
+
+			if hookState.deadCount > 0 then
+				compactAliveBrios(hookState.alive, hookState.indexOf)
+				hookState.deadCount = 0
+			end
+
+			return nextAliveBrio, hookState.alive, 0
 		end,
 
 		subscribe = function(
