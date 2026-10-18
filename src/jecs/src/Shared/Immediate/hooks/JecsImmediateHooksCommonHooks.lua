@@ -10,6 +10,7 @@ local HttpService = game:GetService("HttpService")
 ]=]
 local require = require(script.Parent.loader).load(script)
 
+local Blend = require("Blend")
 local Brio = require("Brio")
 local Jecs = require("Jecs")
 local JecsImmediateHookUtils = require("JecsImmediateHookUtils")
@@ -52,6 +53,33 @@ local function compactAliveBrios(alive: { any }, indexOf: { [any]: number })
 	for clearIndex = writeIndex, #alive do
 		alive[clearIndex] = nil
 	end
+end
+
+-- First call subscribes. Later calls keep that subscription. The latest emit is
+-- packed so a synchronous fire (Blend.New) is visible before this returns.
+-- Dropping the subscription is the cleanup.
+local function subscribeHeld(hookState, hookMaid: Maid.Maid, source: any, label: string)
+	if hookState.held == true then
+		return
+	end
+	hookState.held = true
+	if not Observable.isObservable(source) then
+		warn(`[hooks.{label}] expected an observable, got {typeof(source)}`)
+		return
+	end
+	hookMaid:GiveTask(source:Subscribe(function(...)
+		hookState.packed = table.pack(...)
+	end, function(err)
+		warn(`[hooks.{label}] observable failed: {err}`)
+	end))
+end
+
+local function unpackHeld(hookState): ...any
+	local packed = hookState.packed
+	if packed == nil then
+		return nil
+	end
+	return table.unpack(packed, 1, packed.n)
 end
 
 local function nextAliveBrio(alive: { any }, index: number): (number?, any?)
@@ -1151,6 +1179,65 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			end
 
 			return nextAliveBrio, hookState.alive, 0
+		end,
+
+		--[=[
+			Subscribes once to a cold observable and returns its latest value.
+
+			The subscription from the first call stays alive until the discriminator
+			dies. Unsubscribing is the cleanup, so a Blend tree created by that
+			observable is destroyed with the hook. Later calls ignore a new observable.
+			Nil until the first emit. Blend.New emits during subscribe, so the
+			instance is available on that frame.
+
+			```lua
+			local sound = hooks.holdsub(Blend.New("Sound")({
+				Volume = volume,
+			}), bikeBrio)
+			```
+
+			@param source Observable<T>
+			@param dis any?
+			@return T?
+		]=]
+		holdsub = function(source: Observable.Observable<any>, dis: any?)
+			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
+			subscribeHeld(hookState, hookMaid, source, "holdsub")
+			return unpackHeld(hookState)
+		end,
+
+		--[=[
+			Blend.New for the lifetime of the discriminator.
+
+			Class name and props are read on the first call. Observables and
+			ValueObjects in the props stay live. Plain values are applied once.
+
+			```lua
+			local sound = hooks.holdnew("Sound", {
+				Volume = volume,
+				Looped = true,
+			}, bikeBrio)
+			```
+
+			@param className string
+			@param props BlendProps
+			@param dis any?
+			@return Instance?
+		]=]
+		holdnew = function(className: string, props: Blend.BlendProps, dis: any?)
+			assert(type(className) == "string", "Bad className")
+			assert(type(props) == "table", "Bad props")
+
+			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
+			if hookState.held ~= true then
+				subscribeHeld(hookState, hookMaid, Blend.New(className)(props), "holdnew")
+			end
+
+			local packed = hookState.packed
+			if packed == nil then
+				return nil
+			end
+			return packed[1]
 		end,
 
 		subscribe = function(

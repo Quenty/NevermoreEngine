@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/blend": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/immediateutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
