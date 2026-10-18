@@ -1,24 +1,13 @@
-# v1.10.0 (Sun Oct 18 2026)
-
-#### 🚀 Enhancement
-
-- feat: brio hook [#835](https://github.com/Quenty/NevermoreEngine/pull/835) ([@euvinkeel](https://github.com/euvinkeel))
-- feat: brio hook ([@euvinkeel](https://github.com/euvinkeel))
-
-#### 🐛 Bug Fix
-
-- new hold hooks for one subscription ([@euvinkeel](https://github.com/euvinkeel))
-
-#### Authors: 1
-
-- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jecs@1.9.0...@quenty/jecs@1.10.0) (2026-10-18)
+
+### Features
+
+- brio hook ([4177a8d](https://github.com/Quenty/NevermoreEngine/commit/4177a8d7138508723d9d101c6dbcc05ac1ff03ce))
 
 # [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/jecs@1.8.2...@quenty/jecs@1.9.0) (2026-10-14)
 
