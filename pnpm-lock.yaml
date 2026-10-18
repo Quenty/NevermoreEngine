@@ -3309,6 +3309,12 @@ importers:
 
   src/jecs:
     dependencies:
+      '@quenty/blend':
+        specifier: workspace:*
+        version: link:../blend
+      '@quenty/brio':
+        specifier: workspace:*
+        version: link:../brio
       '@quenty/immediateutils':
         specifier: workspace:*
         version: link:../immediateutils
