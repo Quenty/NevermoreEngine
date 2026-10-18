@@ -1,3 +1,20 @@
+# v1.10.0 (Sun Oct 18 2026)
+
+#### 🚀 Enhancement
+
+- feat: brio hook [#835](https://github.com/Quenty/NevermoreEngine/pull/835) ([@euvinkeel](https://github.com/euvinkeel))
+- feat: brio hook ([@euvinkeel](https://github.com/euvinkeel))
+
+#### 🐛 Bug Fix
+
+- new hold hooks for one subscription ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
