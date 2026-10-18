@@ -1,3 +1,16 @@
+# (Sun Oct 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/jecs@1.10.0`
+  - feat: brio hook [#835](https://github.com/Quenty/NevermoreEngine/pull/835) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Wed Oct 14 2026)
 
 #### 🚀 Enhancement
