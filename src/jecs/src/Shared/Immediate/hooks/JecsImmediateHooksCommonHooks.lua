@@ -82,7 +82,19 @@ local function unpackHeld(hookState): ...any
 	return table.unpack(packed, 1, packed.n)
 end
 
-local function nextAliveBrio(alive: { any }, index: number): (number?, any?)
+local function walkPath(parent: Instance, names: { string }): Instance?
+	local current = parent
+	for _, name in names do
+		local child = current:FindFirstChild(name)
+		if not child then
+			return nil
+		end
+		current = child
+	end
+	return current
+end
+
+local function nextAliveBrio(alive: { any }, index: number): (number?, any?, ...any)
 	local nextIndex = index + 1
 	local brio = alive[nextIndex]
 	while brio ~= nil and brio:IsDead() do
@@ -92,7 +104,7 @@ local function nextAliveBrio(alive: { any }, index: number): (number?, any?)
 	if brio == nil then
 		return nil
 	end
-	return nextIndex, brio
+	return nextIndex, brio, brio:GetValue()
 end
 
 local function usesCFrame(goal: any?, value: any?): boolean
@@ -405,6 +417,48 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 				warn(`findFirstChild: not finding {name} in {parentInstance:GetFullName()} after 5 seconds...`)
 			end
 			return hookState.foundChild
+		end,
+
+		--[=[
+			Walks a list of child names, retrying until the instance exists.
+
+			The first found instance is kept. Warns every 5 seconds while the path is missing.
+
+			```lua
+			local smoke = hooks.findPath(ReplicatedStorage, { "VFX", "Characters", "PizzaGuy", "SmokeVFX" })
+			```
+
+			@param parentInstance Instance
+			@param names { string }
+			@param dis any?
+			@return Instance?
+		]=]
+		findPath = function(parentInstance: Instance, names: { string }, dis: any?): Instance?
+			if not parentInstance then
+				error(`parentInstance is nil: {dis}`)
+			end
+			assert(type(names) == "table", "names must be an array of strings")
+			local hookState, _hookMaid = getOrCreateHookState(runtime, dis)
+			if hookState._init == nil then
+				hookState._init = true
+				hookState._startedAt = os.clock()
+				hookState._warnedAt = os.clock()
+				hookState.found = nil
+			end
+			if hookState.found == nil and #names > 0 then
+				hookState.found = walkPath(parentInstance, names)
+			end
+			if
+				hookState.found == nil
+				and os.clock() - hookState._startedAt > 5
+				and os.clock() - hookState._warnedAt > 5
+			then
+				hookState._warnedAt = os.clock()
+				warn(
+					`findPath: not finding {table.concat(names, "/")} in {parentInstance:GetFullName()} after 5 seconds...`
+				)
+			end
+			return hookState.found
 		end,
 
 		gate = function(dis: any?): boolean
@@ -1126,11 +1180,12 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			Subscribes once, to the observable from the first call. Pass a discriminator
 			when one call site tracks more than one observable. New brios are appended
 			as they emit. A brio that dies stays in the list until the next call, which
-			removes it before iteration. Iterate immediately.
+			removes it before iteration. Iterate immediately. The loop variables are the
+			index, the brio, and the brio's value.
 
 			```lua
-			for _, brio in hooks.brios(observeWeapons(character)) do
-				local weapon = brio:GetValue()
+			for _index, brio, weapon in hooks.brios(observeWeapons(character)) do
+				print(weapon)
 			end
 			```
 
