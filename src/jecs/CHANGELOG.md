@@ -1,3 +1,17 @@
+# v1.10.1 (Sun Oct 18 2026)
+
+#### 🐛 Bug Fix
+
+- Update JecsImmediateHooksCommonHooks.lua [#836](https://github.com/Quenty/NevermoreEngine/pull/836) ([@euvinkeel](https://github.com/euvinkeel))
+- Merge branch 'main' into users/euvinkeel/imm-tweaks ([@euvinkeel](https://github.com/euvinkeel))
+- Update JecsImmediateHooksCommonHooks.lua ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
