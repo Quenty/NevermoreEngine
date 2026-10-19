@@ -313,15 +313,14 @@ function reportCountsProvenance(options: {
     return;
   }
 
-  OutputHelper.warn(
-    `${packageName}: the run returned no test results, so its counts were ` +
-      (scrapedCounts ? 'scraped from log text' : 'unavailable') +
-      ` — the channel Open Cloud truncates on long runs (${logVolume}). ` +
-      (hadReturnChannel
-        ? 'The run delivered a return channel but nothing recognizable in it: the ' +
-          'test script should end with "return results" (see docs/testing/testing.md).'
-        : 'No return channel was delivered at all, so the transport lost it.')
-  );
+  const counts = scrapedCounts
+    ? 'counts read from logs, which Open Cloud truncates on long runs'
+    : 'no counts, the run returned none and the logs held none';
+  const remedy = hadReturnChannel
+    ? 'For exact counts, end the test script with `return results` (docs/testing/testing.md).'
+    : 'Open Cloud returned nothing from the run.';
+  OutputHelper.warn(`${packageName}: ${counts}. ${remedy}`);
+  OutputHelper.verbose(`${packageName}: log volume ${logVolume}`);
 }
 
 /**

@@ -35,11 +35,11 @@ end
 local RESULTS_FORMAT = "nevermore-test-results@1"
 
 -- Module NevermoreTestRunnerUtils leaves a run's results in, regardless of what
--- the script did with them. Most test scripts discard the return value
--- (`if runTestsIfNeededAsync(root) then return end`), and without this their
--- counts exist only in Jest's printed report — the first thing a long batch's
--- log window drops. Read as a fallback, never in preference to what the script
--- actually returned.
+-- the script did with them. Test scripts return their results, but one that
+-- discards them (`if runTestsIfNeededAsync(root) then return end`, as scripts
+-- written before that convention do) would otherwise have its counts only in
+-- Jest's printed report — the first thing a long batch's log window drops.
+-- Read as a fallback, never in preference to what the script actually returned.
 --
 -- Named rather than required by path: this script is raw source with no loader,
 -- so it finds the module under the package it just ran and requires the

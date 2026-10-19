@@ -203,7 +203,7 @@ describe('runSingleTestAsync', () => {
 
     await runAsync({ success: true, returnValues: [] }, PASSING_LOGS);
 
-    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
+    expect(warnings().some((w) => w.includes('counts read from logs'))).toBe(
       true
     );
   });

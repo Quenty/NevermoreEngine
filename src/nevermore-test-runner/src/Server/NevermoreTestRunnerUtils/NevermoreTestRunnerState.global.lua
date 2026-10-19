@@ -2,16 +2,15 @@
 --[[
 	Where a run leaves its results for a reader that never saw the return value.
 
-	A test script is free to discard what `runTestsIfNeededAsync` returns, and
-	most of them do (`if runTestsIfNeededAsync(root) then return end`). A single
-	run does not care — nothing reads its return value — but the batch runner
-	reads each package's, and a discarded one costs that package its counts. The
+	Test scripts return what `runTestsIfNeededAsync` returns, but one can still
+	discard it (`if runTestsIfNeededAsync(root) then return end`, the shape
+	scripts had before that convention). Both single and batch runs read a
+	script's return value, and a discarded one costs that package its counts. The
 	counts are then only in Jest's printed report, which is the first thing a
 	long batch's log window drops.
 
 	So results are left here as well as returned, and the batch runner reads this
-	when a package's script returned nothing. That lets a package report its
-	counts without its own test script changing.
+	when a package's script returned nothing.
 
 	Named `.global` for the same reason the loader's tracker is: jest hoists and
 	reloads ordinary modules between suites, which would hand the writer and the

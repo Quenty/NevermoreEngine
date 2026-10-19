@@ -448,28 +448,20 @@ local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
-	return
-end
-```
-
-Replace `mypackage` with the key used in your Rojo project tree.
-
-Discarding the guard's result, as above, is fine. The counts still reach the batch runner:
-every run also leaves its results in a module the runner reads, so a package reports exact
-counts without its test script changing. This matters because the engine truncates a long
-run's logs, and counts scraped back out of that text are exactly what goes missing on the
-runs where they matter most.
-
-A script can also return the table, which is the only way a *single* package run reports
-counts as a value rather than as log text:
-
-```luau
 local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
 if results then
 	return results
 end
 ```
+
+Replace `mypackage` with the key used in your Rojo project tree.
+
+Return the guard's results, as above. A single package run reads its counts from what the
+script returns, and a script that returns nothing falls back to scraping them out of the log,
+with a warning. This matters because the engine truncates a long run's logs, and counts
+scraped back out of that text are exactly what goes missing on the runs where they matter
+most. The batch runner also finds results a script discarded, through a module every run
+leaves them in, but a single run has no such fallback.
 
 A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
 keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `nil` when script
