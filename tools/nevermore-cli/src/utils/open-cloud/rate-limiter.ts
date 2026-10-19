@@ -1,4 +1,5 @@
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 /**
  * Extracts a short route label from a URL for logging.
@@ -16,6 +17,84 @@ function _extractRoute(url: string | URL | Request): string {
   } catch {
     return 'unknown';
   }
+}
+
+const ID_SEGMENT_PATTERN =
+  /^(\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+
+/**
+ * Identifies the quota a request draws from. Open Cloud meters each endpoint
+ * separately (task creation: 5/min, task polling: 200/min, …), so the key is
+ * the method plus the path with ids collapsed — every poll of every task
+ * shares one bucket, and it is not the bucket task creation uses.
+ */
+function _bucketKey(url: string | URL | Request, init?: RequestInit): string {
+  try {
+    const urlStr =
+      typeof url === 'string' ? url : url instanceof URL ? url.href : url.url;
+    const parsed = new URL(urlStr);
+    const path = parsed.pathname
+      .split('/')
+      .map((segment) => (ID_SEGMENT_PATTERN.test(segment) ? ':id' : segment))
+      .join('/');
+    const method = (init?.method ?? 'GET').toUpperCase();
+    return `${method} ${parsed.host}${path}`;
+  } catch {
+    return 'unknown';
+  }
+}
+
+/** A wait the limiter is about to sleep through before sending a request. */
+export interface RateLimitWait {
+  route: string;
+  waitMs: number;
+  /**
+   * `quota`: a prior response said this endpoint's quota is spent.
+   * `retry`: this request failed (429, 5xx, transport) and is backing off.
+   */
+  reason: 'quota' | 'retry';
+  /** HTTP status that triggered a `retry` wait, absent for transport errors. */
+  status?: number;
+}
+
+/**
+ * Builds an `onWait` that shows the wait as the package's progress label, so
+ * a spinner stuck on "Scheduling" reads as rate limiting rather than a hang.
+ */
+export function reportRateLimitWait(
+  reporter: Reporter,
+  packageName: string
+): (wait: RateLimitWait) => void {
+  return (wait) => {
+    reporter.onPackageProgressUpdate(packageName, {
+      kind: 'steps',
+      completed: 0,
+      total: 0,
+      label: formatRateLimitWait(wait),
+    });
+  };
+}
+
+/**
+ * Kept short enough that "◇ Scheduling (…)" fits the spinner's 32-column
+ * status cell: a longer label wraps on an 80-column terminal, and the
+ * spinner's cursor rewind doesn't count wrapped lines. The `--verbose`
+ * warnings carry the status code and route.
+ */
+export function formatRateLimitWait(wait: RateLimitWait): string {
+  if (wait.reason === 'quota') {
+    return `rate limited ${Math.ceil(wait.waitMs / 1000)}s`;
+  }
+  const waitSec = Math.round(wait.waitMs / 1000);
+  if (wait.status === 429) {
+    return `rate limited ${waitSec}s`;
+  }
+  return `retrying in ${waitSec}s`;
+}
+
+interface QuotaState {
+  remaining: number | null;
+  resetAtMs: number | null;
 }
 
 /**
@@ -53,6 +132,7 @@ export interface RateLimiterOptions {
  * Shared rate limiter for Roblox Open Cloud API requests.
  *
  * - Tracks `x-ratelimit-remaining` and `x-ratelimit-reset` (seconds until reset)
+ *   per endpoint, so a spent task-creation quota doesn't stall task polling
  * - Caps concurrent in-flight requests (default 4) via a semaphore so callers
  *   benefit from parallelism (e.g. multi-place deploys) while still getting
  *   header feedback before each wave widens past the quota
@@ -60,8 +140,7 @@ export interface RateLimiterOptions {
  *   concurrent callers don't all wake up on the same millisecond and re-collide
  */
 export class RateLimiter {
-  private _remaining: number | null = null;
-  private _resetAtMs: number | null = null;
+  private _quotas = new Map<string, QuotaState>();
 
   /** Queue of callers waiting to send a request. */
   private _queue: Array<() => void> = [];
@@ -77,38 +156,71 @@ export class RateLimiter {
     this._maxRetries = Math.max(1, options.maxRetries ?? DEFAULT_MAX_RETRIES);
   }
 
-  private _updateFromHeaders(headers: Headers): void {
+  private _updateFromHeaders(
+    bucketKey: string,
+    route: string,
+    status: number,
+    headers: Headers
+  ): void {
     const remaining = headers.get('x-ratelimit-remaining');
     const reset = headers.get('x-ratelimit-reset');
 
+    const rateLimitHeaders: string[] = [];
+    headers.forEach((value, key) => {
+      if (key.toLowerCase().includes('ratelimit') || key === 'retry-after') {
+        rateLimitHeaders.push(`${key}=${value}`);
+      }
+    });
+    OutputHelper.verbose(
+      `[rate-limit] ${status} ${route} ${
+        rateLimitHeaders.join(' ') || '(no rate-limit headers)'
+      }`
+    );
+
+    if (remaining === null && reset === null) {
+      return;
+    }
+
+    let quota = this._quotas.get(bucketKey);
+    if (!quota) {
+      quota = { remaining: null, resetAtMs: null };
+      this._quotas.set(bucketKey, quota);
+    }
+
     if (remaining !== null) {
-      this._remaining = parseInt(remaining, 10);
+      quota.remaining = parseInt(remaining, 10);
     }
 
     // x-ratelimit-reset is seconds until reset, not an epoch timestamp
     if (reset !== null) {
       const resetSec = parseFloat(reset);
-      this._resetAtMs = Date.now() + resetSec * 1000;
+      quota.resetAtMs = Date.now() + resetSec * 1000;
     }
   }
 
-  private async _waitIfNeededAsync(route: string): Promise<void> {
+  private async _waitIfNeededAsync(
+    bucketKey: string,
+    route: string,
+    onWait?: (wait: RateLimitWait) => void
+  ): Promise<void> {
+    const quota = this._quotas.get(bucketKey);
     if (
-      this._remaining !== null &&
-      this._remaining <= 0 &&
-      this._resetAtMs !== null
+      quota &&
+      quota.remaining !== null &&
+      quota.remaining <= 0 &&
+      quota.resetAtMs !== null
     ) {
-      const waitMs = this._resetAtMs - Date.now();
+      const waitMs = quota.resetAtMs - Date.now();
       if (waitMs > 0) {
         const waitSec = Math.ceil(waitMs / 1000);
         OutputHelper.warn(
           `Rate limit reached on ${route}. Waiting ${waitSec}s (Roblox requested)...`
         );
+        onWait?.({ route, waitMs, reason: 'quota' });
         await new Promise((resolve) => setTimeout(resolve, waitMs));
       }
       // Reset after waiting so the next request can proceed
-      this._remaining = null;
-      this._resetAtMs = null;
+      this._quotas.delete(bucketKey);
     }
   }
 
@@ -146,36 +258,47 @@ export class RateLimiter {
    * - Retries on 429, retryable 5xx (502/503/504), and transport errors
    *   with jittered back-off
    * - Tracks rate-limit headers from every response
+   * - Tells `onWait` before every sleep, so callers can say why they stalled
    */
   async fetchAsync(
     url: string | URL | Request,
     init?: RequestInit | (() => RequestInit),
-    options?: { fetchImpl?: FetchLike }
+    options?: {
+      fetchImpl?: FetchLike;
+      onWait?: (wait: RateLimitWait) => void;
+    }
   ): Promise<Response> {
     await this._acquireAsync();
 
     const route = _extractRoute(url);
     const doFetch = options?.fetchImpl ?? fetch;
+    const onWait = options?.onWait;
 
     try {
       let lastResponse: Response | null = null;
       let lastError: unknown = null;
 
       for (let attempt = 0; attempt < this._maxRetries; attempt++) {
-        await this._waitIfNeededAsync(route);
+        // Resolve init per attempt so a caller streaming a one-shot body
+        // (e.g. a progress-reporting upload) hands us a fresh, un-disturbed
+        // stream on every retry; a reused stream throws "body ... disturbed
+        // or locked". Plain-object inits (Uint8Array/string bodies) are just
+        // returned as-is and replay safely.
+        const resolvedInit = typeof init === 'function' ? init() : init;
+        const bucketKey = _bucketKey(url, resolvedInit);
+        await this._waitIfNeededAsync(bucketKey, route, onWait);
 
         let response: Response | null = null;
         let transportError: unknown = null;
 
         try {
-          // Resolve init per attempt so a caller streaming a one-shot body
-          // (e.g. a progress-reporting upload) hands us a fresh, un-disturbed
-          // stream on every retry; a reused stream throws "body ... disturbed
-          // or locked". Plain-object inits (Uint8Array/string bodies) are just
-          // returned as-is and replay safely.
-          const resolvedInit = typeof init === 'function' ? init() : init;
           response = await doFetch(url, resolvedInit);
-          this._updateFromHeaders(response.headers);
+          this._updateFromHeaders(
+            bucketKey,
+            route,
+            response.status,
+            response.headers
+          );
         } catch (err) {
           transportError = err;
         }
@@ -204,6 +327,12 @@ export class RateLimiter {
             this._maxRetries
           }). Retrying in ${waitSec.toFixed(1)}s...`
         );
+        onWait?.({
+          route,
+          waitMs: waitSec * 1000,
+          reason: 'retry',
+          status: response?.status,
+        });
         await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
       }
 

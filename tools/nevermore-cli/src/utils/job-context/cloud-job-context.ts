@@ -4,6 +4,7 @@ import {
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
+import { reportRateLimitWait } from '../open-cloud/rate-limiter.js';
 import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
@@ -60,7 +61,8 @@ export class CloudJobContext extends BaseJobContext {
           transferredBytes: transferred,
           totalBytes: total,
         });
-      }
+      },
+      reportRateLimitWait(this._reporter, packageName)
     );
 
     // Eagerly release build artifacts after upload (disposeAsync is safety net)
@@ -82,13 +84,16 @@ export class CloudJobContext extends BaseJobContext {
     const cloudDeployment = deployment as CloudDeployment;
     const { scriptContent, packageName, timeoutMs = 120_000 } = options;
 
+    const onRateLimitWait = reportRateLimitWait(this._reporter, packageName);
+
     this._reporter.onPackagePhaseChange(packageName, 'scheduling');
     const task = await this._openCloudClient!.createExecutionTaskAsync(
       cloudDeployment.universeId,
       cloudDeployment.placeId,
       cloudDeployment.version,
       scriptContent,
-      timeoutMs
+      timeoutMs,
+      onRateLimitWait
     );
 
     // Give the server-side timeout a head start so we observe the cancelled
@@ -97,19 +102,23 @@ export class CloudJobContext extends BaseJobContext {
 
     let pollCount = 0;
     const completedTask = await Promise.race([
-      this._openCloudClient!.pollTaskCompletionAsync(task.path, (state) => {
-        pollCount++;
-        if (state === 'PROCESSING') {
-          this._reporter.onPackagePhaseChange(packageName, 'executing');
-        }
-        const label = state === 'QUEUED' ? 'queued' : `poll #${pollCount}`;
-        this._reporter.onPackageProgressUpdate(packageName, {
-          kind: 'steps',
-          completed: pollCount,
-          total: 0,
-          label,
-        });
-      }),
+      this._openCloudClient!.pollTaskCompletionAsync(
+        task.path,
+        (state) => {
+          pollCount++;
+          if (state === 'PROCESSING') {
+            this._reporter.onPackagePhaseChange(packageName, 'executing');
+          }
+          const label = state === 'QUEUED' ? 'queued' : `poll #${pollCount}`;
+          this._reporter.onPackageProgressUpdate(packageName, {
+            kind: 'steps',
+            completed: pollCount,
+            total: 0,
+            label,
+          });
+        },
+        onRateLimitWait
+      ),
       timeoutAsync(
         timeoutMs + CLIENT_TIMEOUT_GRACE_MS,
         `Test timed out after ${timeoutMs / 1000}s`

@@ -5,10 +5,11 @@ vi.mock('@quenty/cli-output-helpers', () => ({
     warn: vi.fn(),
     info: vi.fn(),
     error: vi.fn(),
+    verbose: vi.fn(),
   },
 }));
 
-import { RateLimiter } from './rate-limiter.js';
+import { formatRateLimitWait, RateLimiter } from './rate-limiter.js';
 
 interface Deferred<T> {
   promise: Promise<T>;
@@ -105,9 +106,10 @@ describe('RateLimiter', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it('blocks the next request when x-ratelimit-remaining hits 0 until reset elapses', async () => {
+  it('blocks the next request to the same endpoint when x-ratelimit-remaining hits 0 until reset elapses', async () => {
     vi.useFakeTimers();
     const limiter = new RateLimiter();
+    const onWait = vi.fn();
 
     fetchMock
       .mockResolvedValueOnce(
@@ -118,18 +120,81 @@ describe('RateLimiter', () => {
       )
       .mockResolvedValueOnce(makeResponse(200));
 
-    await limiter.fetchAsync('https://apis.roblox.com/cloud/v2/a');
+    await limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/universes/1/places/2/versions/3/luau-execution-session-tasks',
+      { method: 'POST' }
+    );
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const second = limiter.fetchAsync('https://apis.roblox.com/cloud/v2/b');
+    const second = limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/universes/1/places/2/versions/4/luau-execution-session-tasks',
+      { method: 'POST' },
+      { onWait }
+    );
 
     // Without advancing time, the second fetch is parked in _waitIfNeededAsync
     await vi.advanceTimersByTimeAsync(0);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(onWait).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'quota', waitMs: 5000 })
+    );
 
     await vi.advanceTimersByTimeAsync(5000);
     await second;
     expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not let a spent quota on one endpoint stall another', async () => {
+    // Open Cloud meters task creation (5/min) and task polling (200/min)
+    // separately; creation running dry must not park the poll.
+    vi.useFakeTimers();
+    const limiter = new RateLimiter();
+
+    fetchMock
+      .mockResolvedValueOnce(
+        makeResponse(200, {
+          'x-ratelimit-remaining': '0',
+          'x-ratelimit-reset': '60',
+        })
+      )
+      .mockResolvedValueOnce(makeResponse(200));
+
+    await limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/universes/1/places/2/versions/3/luau-execution-session-tasks',
+      { method: 'POST' }
+    );
+
+    const poll = limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/universes/1/places/2/versions/3/luau-execution-sessions/12b4bf19-8ddc-4885-9e54-fa40bb0faca8/tasks/12b4bf19-8ddc-4885-9e54-fa40bb0faca8',
+      { method: 'GET' }
+    );
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect((await poll).status).toBe(200);
+  });
+
+  it('reports retry waits to onWait with the triggering status', async () => {
+    vi.useFakeTimers();
+    const limiter = new RateLimiter();
+    const onWait = vi.fn();
+
+    fetchMock
+      .mockResolvedValueOnce(makeResponse(429, { 'retry-after': '5' }))
+      .mockResolvedValueOnce(makeResponse(200));
+
+    const promise = limiter.fetchAsync(
+      'https://apis.roblox.com/cloud/v2/a',
+      undefined,
+      { onWait }
+    );
+    await vi.advanceTimersByTimeAsync(5000);
+    await promise;
+
+    expect(onWait).toHaveBeenCalledTimes(1);
+    expect(onWait).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'retry', status: 429, waitMs: 5000 })
+    );
   });
 
   it('returns the last 429 response after exhausting all retries without sleeping past the final attempt', async () => {
@@ -226,5 +291,42 @@ describe('RateLimiter', () => {
     const api = await limiter.fetchAsync('https://apis.roblox.com/cloud/v2/b');
     expect(api.status).toBe(400);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('formatRateLimitWait', () => {
+  it('says whether the wait is a rate limit or a retry', () => {
+    expect(
+      formatRateLimitWait({ route: 'r', waitMs: 54_000, reason: 'quota' })
+    ).toBe('rate limited 54s');
+    expect(
+      formatRateLimitWait({
+        route: 'r',
+        waitMs: 5_500,
+        reason: 'retry',
+        status: 429,
+      })
+    ).toBe('rate limited 6s');
+    expect(
+      formatRateLimitWait({
+        route: 'r',
+        waitMs: 1_000,
+        reason: 'retry',
+        status: 503,
+      })
+    ).toBe('retrying in 1s');
+    expect(
+      formatRateLimitWait({ route: 'r', waitMs: 2_000, reason: 'retry' })
+    ).toBe('retrying in 2s');
+  });
+
+  it('fits the spinner status column while scheduling', () => {
+    // "◇ Scheduling " is 13 columns; the status cell is 32.
+    const longest = formatRateLimitWait({
+      route: 'r',
+      waitMs: 300_000,
+      reason: 'quota',
+    });
+    expect(`◇ Scheduling (${longest})`.length).toBeLessThanOrEqual(32);
   });
 });

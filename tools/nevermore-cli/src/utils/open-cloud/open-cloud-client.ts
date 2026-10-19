@@ -3,7 +3,11 @@ import * as path from 'path';
 import { Readable, Transform } from 'node:stream';
 import nodeFetch from 'node-fetch';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { RateLimiter, type FetchLike } from './rate-limiter.js';
+import {
+  RateLimiter,
+  type FetchLike,
+  type RateLimitWait,
+} from './rate-limiter.js';
 import {
   parseTestLogs,
   type ParsedTestLogs,
@@ -264,7 +268,8 @@ export class OpenCloudClient {
     placeId: number,
     rbxlPath: string,
     publish?: boolean,
-    onProgress?: (transferredBytes: number, totalBytes: number) => void
+    onProgress?: (transferredBytes: number, totalBytes: number) => void,
+    onRateLimitWait?: (wait: RateLimitWait) => void
   ): Promise<number> {
     OutputHelper.verbose(
       `Uploading to https://www.roblox.com/games/${placeId}/place ...`
@@ -310,6 +315,7 @@ export class OpenCloudClient {
 
     const response = await this._rateLimiter.fetchAsync(url, makeUploadInit, {
       fetchImpl: nodeFetch as unknown as FetchLike,
+      onWait: onRateLimitWait,
     });
 
     if (!response.ok) {
@@ -362,7 +368,8 @@ export class OpenCloudClient {
     placeId: number,
     placeVersion: number,
     script: string,
-    timeoutMs?: number
+    timeoutMs?: number,
+    onRateLimitWait?: (wait: RateLimitWait) => void
   ): Promise<LuauTask> {
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
@@ -386,14 +393,18 @@ export class OpenCloudClient {
       body.timeout = `${clampedSeconds}s`;
     }
 
-    const response = await this._rateLimiter.fetchAsync(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': apiKey,
+    const response = await this._rateLimiter.fetchAsync(
+      url,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey,
+        },
+        body: JSON.stringify(body),
       },
-      body: JSON.stringify(body),
-    });
+      { onWait: onRateLimitWait }
+    );
 
     if (!response.ok) {
       const text = await response.text();
@@ -422,7 +433,8 @@ export class OpenCloudClient {
 
   async pollTaskCompletionAsync(
     taskPath: string,
-    onProgress?: (state: LuauTask['state']) => void
+    onProgress?: (state: LuauTask['state']) => void,
+    onRateLimitWait?: (wait: RateLimitWait) => void
   ): Promise<LuauTask> {
     const apiKey = await this._resolveApiKeyAsync();
     const pollIntervalMs = 3000;
@@ -435,7 +447,8 @@ export class OpenCloudClient {
           headers: {
             'X-API-Key': apiKey,
           },
-        }
+        },
+        { onWait: onRateLimitWait }
       );
 
       if (!response.ok) {
