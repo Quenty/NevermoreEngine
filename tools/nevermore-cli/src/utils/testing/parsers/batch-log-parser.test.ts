@@ -317,9 +317,9 @@ describe('parseBatchTestLogs', () => {
       SLUG_MAP
     );
 
-    expect(warnings().some((w) => w.includes('returned no test results'))).toBe(
-      false
-    );
+    expect(
+      warnings().some((w) => w.includes('fell back to log scraping'))
+    ).toBe(false);
   });
 
   it('passes every package whose returned counts are clean', () => {

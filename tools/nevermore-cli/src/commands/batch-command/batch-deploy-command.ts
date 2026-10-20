@@ -26,7 +26,10 @@ import {
   injectDeployMetadataAsync,
 } from '../../utils/deploy/deploy-metadata.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
+import {
+  RateLimiter,
+  reportRateLimitWait,
+} from '../../utils/open-cloud/rate-limiter.js';
 import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
 import {
   createBasePlaceResolver,
@@ -546,12 +549,16 @@ async function _runSmokeTestAsync(
     throw new Error(`Smoke test script not found: ${SMOKE_TEST_SCRIPT_PATH}`);
   }
 
+  const onRateLimitWait = reportRateLimitWait(reporter, packageName);
+
   reporter.onPackagePhaseChange(packageName, 'scheduling');
   const task = await client.createExecutionTaskAsync(
     universeId,
     placeId,
     version,
-    scriptContent
+    scriptContent,
+    undefined,
+    onRateLimitWait
   );
 
   const completedTask = await client.pollTaskCompletionAsync(
@@ -560,7 +567,8 @@ async function _runSmokeTestAsync(
       if (state === 'PROCESSING') {
         reporter.onPackagePhaseChange(packageName, 'executing');
       }
-    }
+    },
+    onRateLimitWait
   );
 
   const rawLogs = await client.getRawTaskLogsAsync(task.path);
