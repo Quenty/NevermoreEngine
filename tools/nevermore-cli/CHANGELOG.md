@@ -1,22 +1,14 @@
-# v4.47.1 (Tue Oct 20 2026)
-
-#### 🐛 Bug Fix
-
-- fix(nevermore-cli): Per-endpoint rate limits, and test scripts return their results [#837](https://github.com/Quenty/NevermoreEngine/pull/837) ([@Quenty](https://github.com/Quenty))
-- refactor(nevermore-cli): Split the batch test runner into named helpers ([@Quenty](https://github.com/Quenty))
-- fix: Test scripts return their results so single cloud runs report exact counts ([@Quenty](https://github.com/Quenty))
-- fix(nevermore-cli): Track Open Cloud rate limits per endpoint and show waits in the spinner ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.0...@quenty/nevermore-cli@4.47.1) (2026-10-20)
+
+### Bug Fixes
+
+- **nevermore-cli:** Track Open Cloud rate limits per endpoint and show waits in the spinner ([008773f](https://github.com/Quenty/NevermoreEngine/commit/008773f159ea2fe8838c43dc00401280ae940f7d))
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
 
 # [4.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.46.0...@quenty/nevermore-cli@4.47.0) (2026-10-14)
 

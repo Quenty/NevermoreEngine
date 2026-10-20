@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.43.0...@quenty/inputmode@13.43.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/inputmode
+
 # [13.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.42.2...@quenty/inputmode@13.43.0) (2026-10-14)
 
 **Note:** Version bump only for package @quenty/inputmode

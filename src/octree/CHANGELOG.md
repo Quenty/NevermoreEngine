@@ -1,20 +1,13 @@
-# v11.17.3 (Tue Oct 20 2026)
-
-#### 🐛 Bug Fix
-
-- fix(nevermore-cli): Per-endpoint rate limits, and test scripts return their results [#837](https://github.com/Quenty/NevermoreEngine/pull/837) ([@Quenty](https://github.com/Quenty))
-- fix: Test scripts return their results so single cloud runs report exact counts ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [11.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.17.2...@quenty/octree@11.17.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
 
 ## [11.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.17.1...@quenty/octree@11.17.2) (2026-10-09)
 

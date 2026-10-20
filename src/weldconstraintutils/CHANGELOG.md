@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/weldconstraintutils@3.2.2...@quenty/weldconstraintutils@3.2.3) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/weldconstraintutils
+
 ## [3.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/weldconstraintutils@3.2.1...@quenty/weldconstraintutils@3.2.2) (2026-10-09)
 
 **Note:** Version bump only for package @quenty/weldconstraintutils
