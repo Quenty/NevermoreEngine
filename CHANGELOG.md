@@ -1,3 +1,16 @@
+# (Tue Oct 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.12.1`, `@quenty/adorneeboundingbox@8.54.1`, `@quenty/adorneeutils@3.6.3`, `@quenty/animations@8.41.1`, `@quenty/attributeutils@14.39.1`, `@quenty/bindable-utils@1.1.3`, `@quenty/binder@14.48.1`, `@quenty/blend@12.51.1`, `@quenty/boundlinkutils@14.49.1`, `@quenty/brine@1.22.1`, `@quenty/brio@14.38.1`, `@quenty/camera@14.58.1`, `@quenty/characterutils@12.46.1`, `@quenty/chatproviderservice@9.75.1`, `@quenty/clienttranslator@14.54.1`, `@quenty/clipcharacters@12.56.1`, `@quenty/cmdrservice@13.64.1`, `@quenty/conditions@10.52.1`, `@quenty/coreguienabler@12.47.1`, `@quenty/countdowntext@4.13.1`, `@quenty/datastore@13.59.1`, `@quenty/deathreport@10.62.1`, `@quenty/ellipticcurvecryptography@1.15.3`, `@quenty/elo@7.52.1`, `@quenty/experiencecalculator@2.14.3`, `@quenty/fakeskybox@11.33.1`, `@quenty/friendutils@12.44.1`, `@quenty/fzy@5.18.3`, `@quenty/gameconfig@12.71.1`, `@quenty/gameproductservice@14.75.1`, `@quenty/gameversionutils@3.10.1`, `@quenty/genericscreenguiprovider@13.54.1`, `@quenty/grouputils@10.33.1`, `@quenty/humanoidkillerutils@2.5.1`, `@quenty/humanoidtracker@13.44.1`, `@quenty/humanoidutils@2.21.1`, `@quenty/ik@15.74.1`, `@quenty/immediateutils@1.9.1`, `@quenty/influxdbclient@7.46.1`, `@quenty/inputkeymaputils@14.60.1`, `@quenty/instance-path@1.2.3`, `@quenty/instanceutils@13.38.1`, `@quenty/iris@1.8.1`, `@quenty/jecs@1.10.2`, `@quenty/jestutils@1.1.3`, `@quenty/lipsum@14.51.1`, `@quenty/maid@3.12.3`, `@quenty/marketplaceutils@11.35.1`, `@quenty/nevermoreclimanifest@1.11.1`, `@quenty/nevermore-test-runner@1.6.3`, `@quenty/observablecollection@12.54.1`, `@quenty/octree@11.17.3`, `@quenty/pagesutils@5.26.1`, `@quenty/permissionprovider@14.54.1`, `@quenty/physicsutils@8.36.1`, `@quenty/playermock@1.11.1`, `@quenty/playerbinder@14.52.1`, `@quenty/playerhumanoidbinder@14.53.1`, `@quenty/playersservicepromises@10.31.1`, `@quenty/playerthumbnailutils@10.31.1`, `@quenty/playerutils@8.46.1`, `@quenty/promise@10.25.1`, `@quenty/promisemaid@5.25.1`, `@quenty/ragdoll@15.73.1`, `@quenty/randomutils@6.20.3`, `@quenty/receiptprocessing@7.47.1`, `@quenty/remoting@12.46.1`, `@quenty/resetservice@11.52.1`, `@quenty/roblox-api-dump@8.37.1`, `@quenty/rogue-humanoid@10.68.1`, `@quenty/rogue-properties@11.64.1`, `@quenty/rx@13.35.1`, `@quenty/rxbinderutils@14.48.1`, `@quenty/saveslot@2.15.1`, `@quenty/scoredactionservice@16.61.1`, `@quenty/screenshothudservice@7.43.1`, `@quenty/secrets@7.72.1`, `@quenty/servicebag@11.21.3`, `@quenty/settings-inputkeymap@10.78.1`, `@quenty/settings@11.75.1`, `@quenty/snackbar@11.57.1`, `@quenty/soundgroup@1.59.1`, `@quenty/steputils@3.9.3`, `@quenty/streamingutils@10.33.1`, `@quenty/string@3.5.3`, `@quenty/teleportserviceutils@10.8.1`, `@quenty/templateprovider@11.55.1`, `@quenty/throttle@10.15.3`, `@quenty/tie@10.52.1`, `@quenty/time@2.7.1`, `@quenty/timedtween@7.51.1`, `@quenty/transitionmodel@7.53.1`, `@quenty/userserviceutils@9.45.1`, `@quenty/vector3utils@10.12.3`, `@quenty/nevermore-cli@4.47.1`
+  - fix(nevermore-cli): Per-endpoint rate limits, and test scripts return their results [#837](https://github.com/Quenty/NevermoreEngine/pull/837) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Sun Oct 18 2026)
 
 #### 🐛 Bug Fix

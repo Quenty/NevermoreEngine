@@ -1,3 +1,16 @@
+# v8.37.1 (Tue Oct 20 2026)
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): Per-endpoint rate limits, and test scripts return their results [#837](https://github.com/Quenty/NevermoreEngine/pull/837) ([@Quenty](https://github.com/Quenty))
+- fix: Test scripts return their results so single cloud runs report exact counts ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
