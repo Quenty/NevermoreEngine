@@ -1,25 +1,13 @@
-# v0.21.1 (Thu Oct 22 2026)
-
-:tada: This release contains work from a new contributor! :tada:
-
-Thank you, Matthew Dean ([@matthewdean](https://github.com/matthewdean)), for all your work!
-
-#### 🐛 Bug Fix
-
-- fix: Unref tail stdout pipe so Linux Studio launch can exit [#830](https://github.com/Quenty/NevermoreEngine/pull/830) ([@matthewdean](https://github.com/matthewdean))
-- chore: Trim comments in Linux Studio launcher fix ([@matthewdean](https://github.com/matthewdean))
-- fix: Unref tail stdout pipe so Linux Studio launch can exit ([@matthewdean](https://github.com/matthewdean))
-
-#### Authors: 1
-
-- Matthew Dean ([@matthewdean](https://github.com/matthewdean))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.21.0...@quenty/studio-bridge@0.21.1) (2026-10-22)
+
+### Bug Fixes
+
+- Unref tail stdout pipe so Linux Studio launch can exit ([cdde05e](https://github.com/Quenty/NevermoreEngine/commit/cdde05e977c6bacb600b73a9cbd0024893f8af5b))
 
 # [0.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.20.0...@quenty/studio-bridge@0.21.0) (2026-10-14)
 
