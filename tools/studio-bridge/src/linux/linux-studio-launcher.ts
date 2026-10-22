@@ -70,13 +70,9 @@ export async function launchStudioLinuxAsync(
     }
   });
   tailProc.unref();
-  // `unref()` detaches the child handle only. A 'pipe' stdio is a separate,
-  // still-ref'd net.Socket, and `tail -f` never closes it, so the event loop
-  // stayed alive and the CLI could never exit. Unref the pipe as well.
-  // (@types/node types stdout as Readable, which does not declare unref.)
+  // The stdout pipe is ref'd separately and `tail -f` never closes it
   (tailProc.stdout as Socket | null)?.unref();
 
-  // Unreffing alone would leave `tail` behind as an orphan, so reap it.
   process.once('exit', () => {
     try {
       tailProc.kill('SIGTERM');

@@ -63,9 +63,6 @@ describe('launchStudioLinuxAsync', () => {
   it('unrefs the tail stdout pipe so the CLI can exit', async () => {
     await launchStudioLinuxAsync('/studio/Studio.exe', '/place.rbxl');
 
-    // Regression: child.unref() detaches only the process handle. The piped
-    // stdout is a separate ref'd net.Socket and `tail -f` never closes it, so
-    // without this the event loop is held open forever and the CLI hangs.
     expect(tailProc.unref).toHaveBeenCalled();
     expect(tailProc.stdout.unref).toHaveBeenCalled();
   });
@@ -78,7 +75,6 @@ describe('launchStudioLinuxAsync', () => {
     const exitHandler = onceSpy.mock.calls.find(([evt]) => evt === 'exit')?.[1];
     expect(exitHandler).toBeTypeOf('function');
 
-    // Unreffing alone would leave `tail` running as an orphan after we exit.
     (exitHandler as () => void)();
     expect(tailProc.kill).toHaveBeenCalledWith('SIGTERM');
   });
@@ -86,7 +82,6 @@ describe('launchStudioLinuxAsync', () => {
   it('does not unref the detached Studio process stdio', async () => {
     await launchStudioLinuxAsync('/studio/Studio.exe', '/place.rbxl');
 
-    // Studio uses raw fds, not pipes, and must outlive the CLI.
     expect(wineProc.unref).toHaveBeenCalled();
     const wineCall = mockSpawn.mock.calls.find(([cmd]) => cmd === 'wine');
     expect((wineCall?.[2] as { detached?: boolean })?.detached).toBe(true);
