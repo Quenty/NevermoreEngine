@@ -1,3 +1,21 @@
+# v0.21.1 (Thu Oct 22 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Matthew Dean ([@matthewdean](https://github.com/matthewdean)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix: Unref tail stdout pipe so Linux Studio launch can exit [#830](https://github.com/Quenty/NevermoreEngine/pull/830) ([@matthewdean](https://github.com/matthewdean))
+- chore: Trim comments in Linux Studio launcher fix ([@matthewdean](https://github.com/matthewdean))
+- fix: Unref tail stdout pipe so Linux Studio launch can exit ([@matthewdean](https://github.com/matthewdean))
+
+#### Authors: 1
+
+- Matthew Dean ([@matthewdean](https://github.com/matthewdean))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

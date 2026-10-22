@@ -1,3 +1,16 @@
+# (Thu Oct 22 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/studio-bridge@0.21.1`
+  - fix: Unref tail stdout pipe so Linux Studio launch can exit [#830](https://github.com/Quenty/NevermoreEngine/pull/830) ([@matthewdean](https://github.com/matthewdean))
+
+#### Authors: 1
+
+- Matthew Dean ([@matthewdean](https://github.com/matthewdean))
+
+---
+
 # (Tue Oct 20 2026)
 
 #### 🐛 Bug Fix
