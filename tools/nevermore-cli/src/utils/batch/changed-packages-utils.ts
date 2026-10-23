@@ -1,10 +1,12 @@
-import * as fs from 'fs/promises';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployTarget,
+  type DeployConfig,
+  DeployTargetNotFoundError,
   ManifestPlaceInfo,
   loadDeployConfigAsync,
+  parseTargetSelector,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
   toManifestPlaceInfo,
@@ -50,6 +52,7 @@ export interface BatchTarget {
 export async function discoverAllTargetPackagesAsync(
   targetName: string
 ): Promise<TargetPackage[]> {
+  parseTargetSelector(targetName);
   const { stdout } = await execa('pnpm', [
     'ls',
     '--json',
@@ -70,6 +73,7 @@ export async function discoverChangedTargetPackagesAsync(
   baseBranch: string,
   targetName: string
 ): Promise<TargetPackage[]> {
+  parseTargetSelector(targetName);
   // pnpm --filter "...[origin/main]" lists changed packages + their dependents
   const { stdout } = await execa('pnpm', [
     'ls',
@@ -192,19 +196,29 @@ async function _filterByTargetAsync(
   for (const pkg of packages) {
     const configPath = resolveDeployConfigPath(pkg.path);
 
+    let config: DeployConfig;
     try {
-      await fs.access(configPath);
-    } catch {
-      skippedNoConfig.push(pkg.name);
-      continue;
+      config = await loadDeployConfigAsync(configPath);
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.cause as NodeJS.ErrnoException | undefined)?.code === 'ENOENT'
+      ) {
+        skippedNoConfig.push(pkg.name);
+        continue;
+      }
+      throw _configError(pkg.name, configPath, err);
     }
 
     try {
-      const config = await loadDeployConfigAsync(configPath);
       const activeTargets = resolveDeployTargetPlaces(config, targetName);
       results.push({ name: pkg.name, path: pkg.path, activeTargets });
-    } catch {
-      skippedNoTarget.push(pkg.name);
+    } catch (err) {
+      if (err instanceof DeployTargetNotFoundError) {
+        skippedNoTarget.push(pkg.name);
+        continue;
+      }
+      throw _configError(pkg.name, configPath, err);
     }
   }
 
@@ -225,4 +239,13 @@ async function _filterByTargetAsync(
   }
 
   return results;
+}
+
+function _configError(name: string, configPath: string, cause: unknown): Error {
+  return new Error(
+    `Cannot discover deploy targets for package "${name}" (${configPath}): ${
+      cause instanceof Error ? cause.message : String(cause)
+    }`,
+    { cause }
+  );
 }
