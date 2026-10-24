@@ -584,3 +584,102 @@ describe("Binder teardown", function()
 		controller:Destroy()
 	end)
 end)
+
+describe("Binder:SetAddFrameBudgeted()", function()
+	-- Busy-waits so each bound object costs a known amount of frame time.
+	local function spin(seconds: number): number
+		local start = os.clock()
+		local iterations = 0
+		while os.clock() - start < seconds do
+			iterations += 1
+		end
+		return iterations
+	end
+
+	local function countBound(binder, instances: { Instance }): number
+		local count = 0
+		for _, inst in instances do
+			if binder:Get(inst) then
+				count += 1
+			end
+		end
+		return count
+	end
+
+	local function waitUntil(condition: () -> boolean, maxFrames: number)
+		for _ = 1, maxFrames do
+			if condition() then
+				return
+			end
+			task.wait()
+		end
+	end
+
+	it("binds every tagged instance, a few per frame", function()
+		local controller = setup()
+		local binder = controller.addBinder(function(inst)
+			spin(0.0005)
+			return { inst = inst }
+		end)
+		binder:SetAddFrameBudgeted(true)
+
+		local instances = {}
+		for index = 1, 100 do
+			instances[index] = controller.newInstance()
+			binder:Tag(instances[index])
+		end
+
+		controller.boot()
+		expect(countBound(binder, instances) < #instances).toEqual(true)
+
+		waitUntil(function()
+			return countBound(binder, instances) == #instances
+		end, 300)
+		expect(countBound(binder, instances)).toEqual(#instances)
+
+		controller:Destroy()
+	end)
+
+	it("skips an instance untagged before its turn", function()
+		local controller = setup()
+		local built = {}
+		local binder = controller.addBinder(function(inst)
+			spin(0.0005)
+			built[inst] = true
+			return { inst = inst }
+		end)
+		binder:SetAddFrameBudgeted(true)
+
+		local instances = {}
+		for index = 1, 50 do
+			instances[index] = controller.newInstance()
+			binder:Tag(instances[index])
+		end
+
+		controller.boot()
+		local last = instances[#instances]
+		binder:Untag(last)
+
+		waitUntil(function()
+			return countBound(binder, instances) == #instances - 1
+		end, 300)
+		task.wait()
+
+		expect(countBound(binder, instances)).toEqual(#instances - 1)
+		expect(built[last]).toBeNil()
+
+		controller:Destroy()
+	end)
+
+	it("can't be set after Start", function()
+		local controller = setup()
+		local binder = controller.addBinder(noopConstructor)
+		controller.boot()
+
+		expect(function()
+			binder:SetAddFrameBudgeted(true)
+		end).toThrow("Set before Start")
+
+		controller:Destroy()
+	end)
+end)
