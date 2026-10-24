@@ -220,6 +220,10 @@ end
 	@return (number, number)
 ]=]
 function ServiceBag.GetFrameBudgetStats(self: ServiceBag): (number, number)
+	if self._frameStartClock == 0 then
+		return self._budgetPauses, self._budgetLongestStretch
+	end
+
 	return self._budgetPauses, math.max(self._budgetLongestStretch, os.clock() - self._frameStartClock)
 end
 
@@ -409,12 +413,21 @@ function ServiceBag._initService(self: ServiceBag, serviceType)
 			local stopClock = self._serviceInitLogger:StartInitClock(serviceName)
 
 			current = coroutine.running()
-			service:Init(self)
 
-			stopClock()
+			-- Caught so that an Init that errors still counts as finished, as it does without a
+			-- budget, and a thread waiting on it after a budget pause is resumed instead of hanging.
+			local ok, err = xpcall(service.Init, debug.traceback, service, self)
+			if ok then
+				stopClock()
+			end
+
 			done = true
 			if waiter then
 				task.spawn(waiter)
+			end
+
+			if not ok then
+				error(err, 0)
 			end
 		end)
 
