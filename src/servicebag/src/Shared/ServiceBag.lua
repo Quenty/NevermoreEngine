@@ -67,6 +67,12 @@ export type ServiceBag =
 			_serviceStartLogger: ServiceInitLogger.ServiceInitLogger,
 
 			_destroyingSignal: Signal.Signal<()>,
+
+			_initFrameBudget: number?,
+			_frameStartClock: number,
+			_budgetPauses: number,
+			_budgetLongestStretch: number,
+			_budgetWaitingThreads: { [thread]: true },
 		},
 		{} :: typeof({ __index = ServiceBag })
 	))
@@ -91,6 +97,12 @@ function ServiceBag.new(parentProvider: ServiceBag?): ServiceBag
 
 	self._initRunAllowed = false
 	self._destructing = false
+
+	self._initFrameBudget = nil
+	self._frameStartClock = 0
+	self._budgetPauses = 0
+	self._budgetLongestStretch = 0
+	self._budgetWaitingThreads = setmetatable({}, { __mode = "k" }) :: any
 
 	self._serviceInitLogger = ServiceInitLogger.new("initialized")
 	self._serviceStartLogger = ServiceInitLogger.new("started")
@@ -175,6 +187,60 @@ function ServiceBag.HasService<T>(self: ServiceBag, serviceType: T): boolean
 end
 
 --[=[
+	Spreads [ServiceBag.Init] and [ServiceBag.Start] over several frames. Before each service
+	initializes or starts, if the current frame has already spent `seconds`, the bag waits a frame
+	first. Services still initialize and start in the same order; this only stops a large bag from
+	doing all of its work in one long frame, such as a client joining with a hundred or more
+	services.
+
+	A service that yields in its own `Init` still errors. With a budget set, [ServiceBag.Init] and
+	[ServiceBag.Start] yield, so call them from a thread that can yield.
+
+	```lua
+	local serviceBag = ServiceBag.new()
+	serviceBag:SetInitFrameBudget(0.012)
+	serviceBag:GetService(require("MyServiceClient"))
+	serviceBag:Init()
+	serviceBag:Start()
+	```
+
+	@param seconds number? -- Work allowed per frame. `nil` (the default) does everything at once.
+]=]
+function ServiceBag.SetInitFrameBudget(self: ServiceBag, seconds: number?): ()
+	assert(seconds == nil or (type(seconds) == "number" and seconds > 0), "Bad seconds")
+	assert(not self._initRunAllowed and self._serviceTypesToInitializeSet, "Set the budget before Init")
+
+	self._initFrameBudget = seconds
+end
+
+--[=[
+	How many frames [ServiceBag.Init] and [ServiceBag.Start] waited because of the frame budget,
+	and the longest stretch of work between two waits, in seconds.
+
+	@return (number, number)
+]=]
+function ServiceBag.GetFrameBudgetStats(self: ServiceBag): (number, number)
+	return self._budgetPauses, math.max(self._budgetLongestStretch, os.clock() - self._frameStartClock)
+end
+
+-- Waits a frame if this frame has used up the budget. The waiting thread is marked so that
+-- _initService can tell this pause apart from a service yielding in Init.
+function ServiceBag._pauseIfOverBudget(self: ServiceBag): ()
+	local budget = self._initFrameBudget
+	if not budget or os.clock() - self._frameStartClock < budget then
+		return
+	end
+
+	local thread = coroutine.running()
+	self._budgetPauses += 1
+	self._budgetLongestStretch = math.max(self._budgetLongestStretch, os.clock() - self._frameStartClock)
+	self._budgetWaitingThreads[thread] = true
+	task.wait()
+	self._budgetWaitingThreads[thread] = nil
+	self._frameStartClock = os.clock()
+end
+
+--[=[
 	Initializes the service bag and ensures recursive initialization
 	can occur
 ]=]
@@ -182,6 +248,7 @@ function ServiceBag.Init(self: ServiceBag)
 	assert(not self._initRunAllowed, "Already initializing")
 	assert(self._serviceTypesToInitializeSet, "Already initialized")
 	self._initRunAllowed = true
+	self._frameStartClock = os.clock()
 
 	while next(self._serviceTypesToInitializeSet) do
 		local serviceType = next(self._serviceTypesToInitializeSet)
@@ -201,8 +268,11 @@ function ServiceBag.Start(self: ServiceBag)
 	assert(not self._serviceTypesToInitializeSet, "Not initialized yet. Call serviceBag:Init() first.")
 
 	self._initRunAllowed = false
+	self._frameStartClock = os.clock()
 
 	while next(self._serviceTypesToStartSet) do
+		-- With a frame budget, :Start() is spread over frames too (between services only).
+		self:_pauseIfOverBudget()
 		local serviceType = table.remove(self._serviceTypesToStartSet)
 		local service = assert(self._services[serviceType], "No service")
 		local serviceName = self:_getServiceName(serviceType)
@@ -313,6 +383,7 @@ function ServiceBag._ensureInitialization<T>(self: ServiceBag, serviceType: T)
 		end
 
 		self._initializedServiceTypeSet[serviceType] = true
+		self:_pauseIfOverBudget()
 		self:_initService(serviceType)
 	elseif self._serviceTypesToInitializeSet then
 		self._serviceTypesToInitializeSet[serviceType] = true
@@ -330,6 +401,8 @@ function ServiceBag._initService(self: ServiceBag, serviceType)
 
 	if service.Init then
 		local current
+		local done = false
+		local waiter: thread? = nil
 		task.spawn(function()
 			debug.setmemorycategory(serviceName)
 
@@ -339,11 +412,25 @@ function ServiceBag._initService(self: ServiceBag, serviceType)
 			service:Init(self)
 
 			stopClock()
+			done = true
+			if waiter then
+				task.spawn(waiter)
+			end
 		end)
 
-		local isDead = coroutine.status(current) == "dead"
-		if not isDead then
-			error(debug.traceback(current, string.format("Initializing service %q yielded", serviceName)))
+		if not done then
+			local waitingThreads = self._budgetWaitingThreads
+			if waitingThreads[current] then
+				-- Paused by the frame budget, or waiting on a service that was. Wait for it to finish,
+				-- marked the same way, so that anything waiting on this thread waits too.
+				local thread = coroutine.running()
+				waiter = thread
+				waitingThreads[thread] = true
+				coroutine.yield()
+				waitingThreads[thread] = nil
+			else
+				error(debug.traceback(current, string.format("Initializing service %q yielded", serviceName)))
+			end
 		end
 	end
 
