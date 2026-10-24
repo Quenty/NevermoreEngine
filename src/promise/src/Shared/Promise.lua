@@ -41,7 +41,14 @@ export type Promise<T...> = typeof(setmetatable(
 	@return boolean
 ]=]
 function Promise.isPromise(value: any): boolean
-	return type(value) == "table" and value.ClassName == "Promise"
+	if type(value) ~= "table" then
+		return false
+	end
+
+	-- Read the metatable directly: indexing the value runs its __index, and some objects error on
+	-- unknown keys. Promises from another copy of this package have their own metatable.
+	local metatable = getmetatable(value)
+	return type(metatable) == "table" and rawget(metatable, "ClassName") == "Promise"
 end
 
 --[=[

@@ -26,6 +26,23 @@ describe("Promise.isPromise", function()
 		expect(Promise.isPromise({})).toEqual(false)
 		expect(Promise.isPromise({ ClassName = "NotAPromise" })).toEqual(false)
 	end)
+
+	it("returns false without indexing objects that error on unknown keys", function()
+		local strict = setmetatable({}, {
+			__index = function(_, key)
+				error(string.format("%s is not a valid member", tostring(key)))
+			end,
+		})
+
+		expect(Promise.isPromise(strict)).toEqual(false)
+	end)
+
+	it("returns true for a promise from another copy of the package", function()
+		local OtherPromise = { ClassName = "Promise" }
+		OtherPromise.__index = OtherPromise
+
+		expect(Promise.isPromise(setmetatable({}, OtherPromise))).toEqual(true)
+	end)
 end)
 
 describe("Promise.new", function()
