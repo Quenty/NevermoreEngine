@@ -8,7 +8,6 @@ local require = require(script.Parent.loader).load(script)
 local InputKeyMapList = require("InputKeyMapList")
 local InputKeyMapRegistryServiceShared = require("InputKeyMapRegistryServiceShared")
 local Maid = require("Maid")
-local PseudoLocalize = require("PseudoLocalize")
 local ServiceBag = require("ServiceBag")
 
 local InputKeyMapServiceClient = {}
@@ -57,21 +56,11 @@ function InputKeyMapServiceClient._ensureLocalizationEntries(self: InputKeyMapSe
 
 		local text = inputKeyMapList:GetBindingName()
 
-		local localizationTable = self._translator:GetLocalizationTable()
 		local key = inputKeyMapList:GetBindingTranslationKey()
-		local source = text
 		local context = string.format("InputKeyMapServiceClient.%s", inputKeyMapList:GetListName())
-		local localeId = "en"
-		local value = text
 
-		localizationTable:SetEntryValue(key, source, context, localeId, value)
-		localizationTable:SetEntryValue(
-			key,
-			source,
-			context,
-			PseudoLocalize.getDefaultPseudoLocaleId(),
-			PseudoLocalize.pseudoLocalize(value)
-		)
+		-- Batched with the translator's other writes
+		self._translator:SetEntryValue(key, text, context, "en", text)
 	end))
 end
 

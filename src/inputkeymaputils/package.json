@@ -39,7 +39,6 @@
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
-    "@quenty/pseudolocalize": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
