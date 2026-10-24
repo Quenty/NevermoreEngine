@@ -1,3 +1,16 @@
+# (Sat Oct 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/observablecollection@12.55.0`, `@quenty/templateprovider@11.56.0`, `@quenty/nevermore-cli@4.48.0`
+  - fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Oct 22 2026)
 
 #### 🐛 Bug Fix
