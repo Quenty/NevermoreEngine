@@ -73,6 +73,8 @@ export type Binder<T> = typeof(setmetatable(
 		_classAddedSignal: Signal.Signal<T, Instance>?,
 		_classRemovingSignal: Signal.Signal<T, Instance>?,
 		_classRemovedSignal: Signal.Signal<T, Instance>?,
+		_addFrameBudgeted: boolean?,
+		_queuedAdds: { [Instance]: true }?,
 	},
 	{} :: typeof({ __index = Binder })
 ))
@@ -199,6 +201,83 @@ function Binder:_argsMatch(...)
 	return true
 end
 
+-- Budgeted binders share one queue, built for at most this long each frame.
+local ADD_FRAME_BUDGET_SECONDS = 0.003
+local addQueue: { { any } } = {}
+local addQueueHead = 1
+local addQueueTail = 0
+local addQueueConnection: RBXScriptConnection? = nil
+
+local function stepAddQueue()
+	local deadline = os.clock() + ADD_FRAME_BUDGET_SECONDS
+	while addQueueHead <= addQueueTail do
+		local entry = addQueue[addQueueHead]
+		addQueue[addQueueHead] = nil
+		addQueueHead += 1
+
+		local binder, inst = entry[1], entry[2]
+		local queued = binder._queuedAdds
+		if queued and queued[inst] then
+			queued[inst] = nil
+			if CollectionService:HasTag(inst, binder._tagName) then
+				task.spawn(binder._add, binder, inst)
+			end
+		end
+
+		if os.clock() >= deadline then
+			break
+		end
+	end
+
+	if addQueueHead > addQueueTail and addQueueConnection then
+		addQueueConnection:Disconnect()
+		addQueueConnection = nil
+		addQueueHead, addQueueTail = 1, 0
+	end
+end
+
+--[=[
+	Builds bound objects a few at a time instead of all at once. Instances tagged before
+	[Binder.Start] and instances tagged afterwards are queued, and all budgeted binders share a
+	queue that builds for at most 3 ms per frame. The same objects get built; they may appear a
+	few frames after their tag. Use it for binders with many instances, where building everything
+	in the frame the tags arrive would freeze the game.
+
+	Call before [Binder.Start]. Off by default.
+
+	```lua
+	local seatBinder = Binder.new("Seat", require("Seat"))
+	seatBinder:SetAddFrameBudgeted(true)
+	```
+
+	@param isBudgeted boolean
+]=]
+function Binder.SetAddFrameBudgeted<T>(self: Binder<T>, isBudgeted: boolean): ()
+	assert(type(isBudgeted) == "boolean", "Bad isBudgeted")
+	assert(not self._started, "Set before Start")
+
+	self._addFrameBudgeted = isBudgeted
+end
+
+function Binder._queueAdd<T>(self: Binder<T>, inst: Instance): ()
+	if self._instToClass[inst] then
+		return
+	end
+
+	local queued: { [Instance]: true } = self._queuedAdds or {}
+	self._queuedAdds = queued
+	if queued[inst] then
+		return
+	end
+
+	queued[inst] = true
+	addQueueTail += 1
+	addQueue[addQueueTail] = { self, inst }
+	if not addQueueConnection then
+		addQueueConnection = RunService.Heartbeat:Connect(stepAddQueue)
+	end
+end
+
 --[=[
 	Listens for new instances and connects to the GetInstanceAddedSignal() and removed signal!
 ]=]
@@ -214,11 +293,19 @@ function Binder.Start<T>(self: Binder<T>)
 	self._started = true
 
 	for _, inst in CollectionService:GetTagged(self._tagName) do
-		task.spawn(self._add, self, inst)
+		if self._addFrameBudgeted then
+			self:_queueAdd(inst)
+		else
+			task.spawn(self._add, self, inst)
+		end
 	end
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
-		self:_add(inst)
+		if self._addFrameBudgeted then
+			self:_queueAdd(inst)
+		else
+			self:_add(inst)
+		end
 	end))
 	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(inst)
 		self:_remove(inst)
@@ -731,6 +818,10 @@ end
 
 function Binder._remove<T>(self: Binder<T>, inst: Instance)
 	self._pendingInstSet[inst] = nil
+	local queued = self._queuedAdds
+	if queued then
+		queued[inst] = nil
+	end
 
 	local class = self._instToClass[inst]
 	if class == nil then
@@ -768,6 +859,7 @@ end
 	Cleans up all bound classes, and disconnects all events.
 ]=]
 function Binder.Destroy<T>(self: Binder<T>)
+	self._queuedAdds = nil
 	local inst, class = next(self._instToClass)
 	while class ~= nil and inst ~= nil do
 		task.spawn(self._remove, self, inst)
