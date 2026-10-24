@@ -1,3 +1,22 @@
+# v14.55.1 (Sat Oct 24 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Oisin ([@oiisin](https://github.com/oiisin)), for all your work!
+
+#### 🐛 Bug Fix
+
+- fix(clienttranslator): Stop warning when the player translator times out [#843](https://github.com/Quenty/NevermoreEngine/pull/843) ([@oiisin](https://github.com/oiisin) [@Quenty](https://github.com/Quenty))
+- Merge branch 'main' into users/oiisin/translator-timeout-warning ([@Quenty](https://github.com/Quenty))
+- fix(clienttranslator): Stop warning when the player translator times out ([@oiisin](https://github.com/oiisin))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Oisin ([@oiisin](https://github.com/oiisin))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

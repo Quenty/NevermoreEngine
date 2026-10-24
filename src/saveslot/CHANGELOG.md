@@ -1,3 +1,15 @@
+# v2.16.1 (Sat Oct 24 2026)
+
+#### 🐛 Bug Fix
+
+- Merge branch 'main' into users/oiisin/translator-timeout-warning ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
