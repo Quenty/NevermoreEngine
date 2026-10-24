@@ -3,6 +3,7 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type JobContext } from '../../job-context/job-context.js';
+import { type DeployOverrides } from '../../build/build.js';
 import {
   type ParsedTestCounts,
   parseTestLogs,
@@ -74,6 +75,8 @@ export interface SingleTestOptions {
    * here (see flattenToBatchTargets) — the runner never picks places[0] itself.
    */
   target: DeployTarget;
+  /** CLI flags that replace the target's universeId, placeId, or scriptTemplate. */
+  overrides?: DeployOverrides;
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */
   scriptText?: string;
@@ -104,6 +107,7 @@ export async function runSingleTestAsync(
     timeoutMs = 300_000,
     scriptText,
     target,
+    overrides,
   } = options;
 
   const sessionId = randomUUID();
@@ -112,6 +116,7 @@ export async function runSingleTestAsync(
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
     packageName,
+    overrides,
   });
 
   // Packages that ship or use the manifest get the same deploy-metadata stamp a
