@@ -1,19 +1,11 @@
-# v4.14.1 (Sat Oct 24 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/oiisin/translator-timeout-warning ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.14.0...@quenty/countdowntext@4.14.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/countdowntext
 
 # [4.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.13.1...@quenty/countdowntext@4.14.0) (2026-10-24)
 

@@ -1,19 +1,11 @@
-# v12.72.1 (Sat Oct 24 2026)
-
-#### 🐛 Bug Fix
-
-- Merge branch 'main' into users/oiisin/translator-timeout-warning ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [12.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.72.0...@quenty/gameconfig@12.72.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
 
 # [12.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.71.1...@quenty/gameconfig@12.72.0) (2026-10-24)
 
