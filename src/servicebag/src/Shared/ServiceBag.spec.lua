@@ -374,6 +374,42 @@ describe("ServiceBag frame budget", function()
 		end).toThrow("yielded")
 	end)
 
+	it("carries on when a service errors in Init after a budget pause", function()
+		local events = {}
+		local serviceBag = ServiceBag.new()
+		local slow = makeSlowService("Slow", events, 0.006)
+		local fast = makeService("Fast", events)
+		local erroring = {}
+		erroring.ServiceName = "Erroring"
+		function erroring:Init(bag)
+			bag:GetService(slow)
+			-- Slow used up the budget, so this thread pauses here, then errors
+			bag:GetService(fast)
+			error("Init failed")
+		end
+		serviceBag:GetService(erroring)
+		serviceBag:GetService(makeSlowService("After", events, 0.003))
+		serviceBag:SetInitFrameBudget(0.004)
+
+		local finished = false
+		task.spawn(function()
+			serviceBag:Init()
+			serviceBag:Start()
+			finished = true
+		end)
+		for _ = 1, 60 do
+			if finished then
+				break
+			end
+			task.wait()
+		end
+
+		expect(finished).toBe(true)
+		expect(table.find(filterSuffix(events, ".start"), "After") ~= nil).toBe(true)
+
+		serviceBag:Destroy()
+	end)
+
 	it("can't be set once Init has run", function()
 		local serviceBag = ServiceBag.new()
 		serviceBag:Init()
