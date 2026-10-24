@@ -1,25 +1,17 @@
-# v4.48.0 (Sat Oct 24 2026)
-
-#### 🚀 Enhancement
-
-- fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
-- feat(nevermore-cli): Honor --script-template, --universe-id and --place-id on nevermore test ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore(nevermore-cli): Read --aggregated once with its declared default ([@Quenty](https://github.com/Quenty))
-- fix(nevermore-cli): Run only the scriptTemplate in aggregated batch test ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [4.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.2...@quenty/nevermore-cli@4.48.0) (2026-10-24)
+
+### Bug Fixes
+
+- **nevermore-cli:** Run only the scriptTemplate in aggregated batch test ([c609a70](https://github.com/Quenty/NevermoreEngine/commit/c609a70cae6c750ff102c8275486652365068542))
+
+### Features
+
+- **nevermore-cli:** Honor --script-template, --universe-id and --place-id on nevermore test ([929b2ce](https://github.com/Quenty/NevermoreEngine/commit/929b2ce8cbce0e25a5af8d007eb2145c2ad64d7a))
 
 ## [4.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.1...@quenty/nevermore-cli@4.47.2) (2026-10-22)
 

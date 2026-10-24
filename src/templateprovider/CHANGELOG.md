@@ -1,23 +1,11 @@
-# v11.56.0 (Sat Oct 24 2026)
-
-#### 🚀 Enhancement
-
-- fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- test(templateprovider): Cover initial containers whose folders become containers ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.55.1...@quenty/templateprovider@11.56.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/templateprovider
 
 ## [11.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.55.0...@quenty/templateprovider@11.55.1) (2026-10-20)
 

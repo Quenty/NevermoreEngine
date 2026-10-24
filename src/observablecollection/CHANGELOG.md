@@ -1,23 +1,13 @@
-# v12.55.0 (Sat Oct 24 2026)
-
-#### 🚀 Enhancement
-
-- fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix(observablecollection): Emit every existing key when a subscriber adds keys ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.54.1...@quenty/observablecollection@12.55.0) (2026-10-24)
+
+### Bug Fixes
+
+- **observablecollection:** Emit every existing key when a subscriber adds keys ([6d8859d](https://github.com/Quenty/NevermoreEngine/commit/6d8859dda5fed71922c1d18b66a6e1a304537498))
 
 ## [12.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.54.0...@quenty/observablecollection@12.54.1) (2026-10-20)
 
