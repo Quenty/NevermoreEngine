@@ -294,3 +294,94 @@ describe("ServiceBag destruction order", function()
 		end
 	end)
 end)
+
+describe("ServiceBag frame budget", function()
+	-- Busy-waits so each Init costs a known amount of frame time.
+	local function spin(seconds: number): number
+		local start = os.clock()
+		local iterations = 0
+		while os.clock() - start < seconds do
+			iterations += 1
+		end
+		return iterations
+	end
+
+	local function makeSlowService(name: string, events: { string }, cost: number, initDependencies: { any }?)
+		local serviceDefinition: any = makeService(name, events, initDependencies)
+		local init = serviceDefinition.Init
+		function serviceDefinition:Init(serviceBag)
+			spin(cost)
+			init(self, serviceBag)
+		end
+		return serviceDefinition
+	end
+
+	it("spreads Init over frames, keeping dependencies first", function()
+		local events = {}
+		local serviceBag = ServiceBag.new()
+		local leaf = makeSlowService("Leaf", events, 0.003)
+		local middle = makeSlowService("Middle", events, 0.003, { leaf })
+		serviceBag:GetService(makeSlowService("Root", events, 0.003, { middle }))
+		for index = 1, 4 do
+			serviceBag:GetService(makeSlowService("Other" .. index, events, 0.003))
+		end
+
+		serviceBag:SetInitFrameBudget(0.004)
+		serviceBag:Init()
+		serviceBag:Start()
+
+		local pauses = serviceBag:GetFrameBudgetStats()
+		local inits = filterSuffix(events, ".init")
+		local starts = filterSuffix(events, ".start")
+
+		expect(pauses > 0).toBe(true)
+		expect(#inits).toBe(7)
+		expect(#starts).toBe(7)
+		expect(table.find(inits, "Leaf") < table.find(inits, "Middle")).toBe(true)
+		expect(table.find(inits, "Middle") < table.find(inits, "Root")).toBe(true)
+
+		serviceBag:Destroy()
+	end)
+
+	it("doesn't pause without a budget", function()
+		local events = {}
+		local serviceBag = ServiceBag.new()
+		for index = 1, 4 do
+			serviceBag:GetService(makeSlowService("Service" .. index, events, 0.003))
+		end
+
+		serviceBag:Init()
+		serviceBag:Start()
+
+		expect((serviceBag:GetFrameBudgetStats())).toBe(0)
+		expect(#filterSuffix(events, ".init")).toBe(4)
+
+		serviceBag:Destroy()
+	end)
+
+	it("still errors when a service yields in Init", function()
+		local serviceBag = ServiceBag.new()
+		local yielding = {}
+		yielding.ServiceName = "Yielding"
+		function yielding:Init(_serviceBag)
+			task.wait()
+		end
+		serviceBag:GetService(yielding)
+		serviceBag:SetInitFrameBudget(0.004)
+
+		expect(function()
+			serviceBag:Init()
+		end).toThrow("yielded")
+	end)
+
+	it("can't be set once Init has run", function()
+		local serviceBag = ServiceBag.new()
+		serviceBag:Init()
+
+		expect(function()
+			serviceBag:SetInitFrameBudget(0.004)
+		end).toThrow("Set the budget before Init")
+
+		serviceBag:Destroy()
+	end)
+end)
