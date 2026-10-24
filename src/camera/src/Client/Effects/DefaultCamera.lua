@@ -36,6 +36,8 @@ export type DefaultCamera =
 			_maid: Maid.Maid,
 			_isFirstPerson: ValueObject.ValueObject<boolean>,
 			_cameraState: CameraState.CameraState,
+			_cameraStateDirty: boolean?,
+			_passthrough: boolean?,
 			_lastCameraFrame: CameraFrame.CameraFrame?,
 		},
 		{} :: typeof({ __index = DefaultCamera })
@@ -68,7 +70,9 @@ end
 	@param fieldOfView number
 ]=]
 function DefaultCamera.SetRobloxFieldOfView(self: DefaultCamera, fieldOfView: number)
+	self:_resolveCameraState()
 	self._cameraState.FieldOfView = fieldOfView
+	self._passthrough = false
 end
 
 -- Back compat
@@ -81,6 +85,8 @@ DefaultCamera.OverrideGlobalFieldOfView = DefaultCamera.SetRobloxFieldOfView
 ]=]
 function DefaultCamera.SetRobloxCameraState(self: DefaultCamera, cameraState: CameraState.CameraState)
 	self._cameraState = cameraState or error("No CameraState")
+	self._cameraStateDirty = false
+	self._passthrough = false
 end
 
 -- Back compat
@@ -92,7 +98,9 @@ DefaultCamera.OverrideCameraState = DefaultCamera.SetRobloxCameraState
 	@param cframe CFrame
 ]=]
 function DefaultCamera.SetRobloxCFrame(self: DefaultCamera, cframe: CFrame)
+	self:_resolveCameraState()
 	self._cameraState.CFrame = cframe
+	self._passthrough = false
 
 	if self._lastCameraFrame then
 		self._lastCameraFrame.CFrame = cframe
@@ -105,6 +113,7 @@ end
 	@return CameraState
 ]=]
 function DefaultCamera.GetRobloxCameraState(self: DefaultCamera): CameraState.CameraState
+	self:_resolveCameraState()
 	return self._cameraState
 end
 
@@ -115,6 +124,26 @@ end
 ]=]
 function DefaultCamera.SetLastSetCameraFrame(self: DefaultCamera, cameraFrame: CameraFrame.CameraFrame)
 	self._lastCameraFrame = CameraFrame.new(cameraFrame.QFrame, cameraFrame.FieldOfView)
+	self._passthrough = false
+end
+
+--[=[
+	Tells the camera that nothing changed the Roblox camera this frame, so it already holds Roblox's
+	own result and doesn't need restoring before Roblox's next camera update. The
+	[CameraStackService] calls this on frames where the default camera is the only camera on the
+	stack. Any of the setters above, or [DefaultCamera.SetLastSetCameraFrame], turns it off again.
+]=]
+function DefaultCamera.MarkPassthrough(self: DefaultCamera)
+	self._lastCameraFrame = nil
+	self._passthrough = true
+end
+
+-- Roblox's result is captured when something reads it, rather than as a new CameraState every frame.
+function DefaultCamera._resolveCameraState(self: DefaultCamera)
+	if self._cameraStateDirty then
+		self._cameraStateDirty = false
+		self._cameraState = CameraState.new(Workspace.CurrentCamera)
+	end
 end
 
 --[=[
@@ -156,6 +185,12 @@ function DefaultCamera.BindToRenderStep(self: DefaultCamera): Maid.Maid
 	RunService:BindToRenderStep("DefaultCamera_Preupdate" .. self._key, Enum.RenderPriority.Camera.Value - 2, function()
 		local camera = Workspace.CurrentCamera
 
+		if self._passthrough then
+			-- Nothing changed the camera last frame: it already holds Roblox's result.
+			return
+		end
+		self:_resolveCameraState()
+
 		if self._lastCameraFrame then
 			-- Assume something wrote these values and so we should
 			-- pass these through to Roblox's camera
@@ -185,8 +220,8 @@ function DefaultCamera.BindToRenderStep(self: DefaultCamera): Maid.Maid
 			local distance = (camera.CFrame.Position - camera.Focus.Position).magnitude
 			self._isFirstPerson.Value = distance <= 0.75
 
-			-- Capture
-			self._cameraState = CameraState.new(camera)
+			-- Capture (lazily, see _resolveCameraState)
+			self._cameraStateDirty = true
 		end
 	)
 
@@ -225,6 +260,7 @@ end
 ]=]
 function DefaultCamera.__index(self: DefaultCamera, index)
 	if index == "CameraState" then
+		DefaultCamera._resolveCameraState(self)
 		return rawget(self, "_cameraState")
 	elseif index == "_maid" or index == "_lastCameraFrame" or index == "_key" then
 		return rawget(self, index)

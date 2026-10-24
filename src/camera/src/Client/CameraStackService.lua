@@ -79,11 +79,17 @@ function CameraStackService.Start(self: CameraStackService): ()
 	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, self:GetRenderPriority(), function()
 		debug.profilebegin("camerastackservice")
 
-		local state = self:GetTopState()
+		if self._cameraStack:GetTopCamera() == self._defaultCamera and self._impulseCamera:IsIdle() then
+			-- Only the default camera, with no shake: the result is exactly the Roblox camera, which is
+			-- already set. Skip recomputing and rewriting it.
+			self._rawDefaultCamera:MarkPassthrough()
+		else
+			local state = self:GetTopState()
 
-		if state then
-			self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
-			state:Set(Workspace.CurrentCamera)
+			if state then
+				self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
+				state:Set(Workspace.CurrentCamera)
+			end
 		end
 
 		debug.profileend()
