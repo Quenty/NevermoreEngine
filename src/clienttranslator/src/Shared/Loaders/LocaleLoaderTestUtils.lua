@@ -4,7 +4,7 @@
 
 	Builds a real world through `setup()`: a real ServiceBag with the real
 	TranslatorService, plus factories that build the loaders against that bag. Loader
-	writes land in the real (shared, role-named) LocalizationService table, which is
+	writes land in the real (shared, role-named) generated table, which is
 	cleared before and after every test for isolation, so tests assert on what actually
 	reached the TranslatorService rather than on a stand-in recording writer.
 	`controller:Destroy()` tears the world down.
@@ -27,13 +27,15 @@ local TranslatorService = require("TranslatorService")
 
 local LocaleLoaderTestUtils = {}
 
--- Removes any generated tables so each test starts from a clean LocalizationService.
+-- Removes any generated tables so each test starts from a clean LocalizationService, including
+-- ones not yet parented because their service never started.
 function LocaleLoaderTestUtils.clearGeneratedTables()
 	for _, child in LocalizationService:GetChildren() do
 		if child:IsA("LocalizationTable") and string.match(child.Name, "^GeneratedJSONTable_") then
 			child:Destroy()
 		end
 	end
+	TranslatorService.DestroyDetachedTablesForTesting()
 end
 
 --[[
@@ -63,7 +65,7 @@ function LocaleLoaderTestUtils.setup(options)
 	-- Init but deliberately not Start. A loader is a service that pulls in services of its
 	-- own, and a bag rejects service types added after it has started -- so the tests build
 	-- their loaders in the same window production builds them in (during Init, from the
-	-- JSONTranslator consuming them). Nothing here defines Start, so nothing is skipped.
+	-- JSONTranslator consuming them). TranslatorService's Start only parents the table.
 	serviceBag:Init()
 
 	-- Adds one "<locale>.json" StringValue to a folder, as Rojo would.
