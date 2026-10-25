@@ -163,6 +163,11 @@ export class TestProjectCommand<T>
           packagePath: cwd,
           packageName,
           target,
+          overrides: {
+            universeId: args.universeId,
+            placeId: args.placeId,
+            scriptTemplate: args.scriptTemplate,
+          },
           scriptText: args.scriptText,
           timeoutMs:
             args.timeout !== undefined ? args.timeout * 1000 : undefined,

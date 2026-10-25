@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.54.1...@quenty/observablecollection@12.55.0) (2026-10-24)
+
+### Bug Fixes
+
+- **observablecollection:** Emit every existing key when a subscriber adds keys ([6d8859d](https://github.com/Quenty/NevermoreEngine/commit/6d8859dda5fed71922c1d18b66a6e1a304537498))
+
 ## [12.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/observablecollection@12.54.0...@quenty/observablecollection@12.54.1) (2026-10-20)
 
 ### Bug Fixes

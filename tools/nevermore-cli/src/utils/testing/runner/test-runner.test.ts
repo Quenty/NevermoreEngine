@@ -102,6 +102,26 @@ describe('runSingleTestAsync', () => {
     });
   }
 
+  it('hands overrides to the build, which owns applying them', async () => {
+    const context = createContext(
+      { success: true, returnValues: [structuredResults()] },
+      PASSING_LOGS
+    );
+    const buildSpy = vi.spyOn(context, 'buildPlaceAsync');
+    const overrides = { placeId: 7, scriptTemplate: 'ServerMain.server.lua' };
+
+    await runSingleTestAsync(context, {
+      packagePath,
+      packageName: 'maid',
+      target: {
+        scriptTemplate: 'ServerMain.server.lua',
+      } as unknown as DeployTarget,
+      overrides,
+    });
+
+    expect(buildSpy.mock.calls[0]![0].overrides).toBe(overrides);
+  });
+
   it('fails a run whose returned results say it failed', async () => {
     // The runner used to announce this by throwing, which failed the task. Now
     // it returns the verdict, and these logs are what a truncated window leaves
