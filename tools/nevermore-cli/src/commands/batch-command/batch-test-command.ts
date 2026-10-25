@@ -185,7 +185,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       : args.concurrency;
   const isGrouped = !process.stdout.isTTY || args.verbose || isCI();
   const packageNames = packages.map((p) => p.name);
-  const aggregated = args.aggregated ?? false;
+  const aggregated = args.aggregated ?? true;
   // Decided once, here, and passed down. Three separate isCI() lookups — the
   // renderer, OutputHelper's group markers and GroupedReporter — could each
   // answer differently, and a half-grouped log is worse than an ungrouped one.
@@ -252,7 +252,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   // In aggregated mode, the inner context gets a broadcast reporter that translates
   // phase changes from the shared '_batch_' operation to all real packages
-  const innerReporter: Reporter = args.aggregated
+  const innerReporter: Reporter = aggregated
     ? _createBroadcastReporter(reporter, packageNames)
     : reporter;
 
@@ -312,7 +312,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           pkg,
           context,
           timeoutMs,
-          args.aggregated ?? false
+          aggregated
         );
 
         return {
