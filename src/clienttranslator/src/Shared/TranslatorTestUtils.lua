@@ -5,8 +5,8 @@
 	Builds a real world through `setup()`: a real ServiceBag with the real
 	TranslatorService, translator factories initialized against it, and await
 	helpers for the (async) Roblox translator. Writes land in the real (shared,
-	role-named) LocalizationService table, which is cleared before and after every
-	test for isolation. `controller:Destroy()` tears the world down.
+	role-named) generated table, left unparented unless a test starts the bag, which is
+	cleared before and after every test for isolation. `controller:Destroy()` tears the world down.
 
 	@class TranslatorTestUtils
 ]]
@@ -39,13 +39,15 @@ function TranslatorTestUtils.getEntryMap(localizationTable)
 	return map
 end
 
--- Removes any generated tables so each test starts from a clean LocalizationService.
+-- Removes any generated tables so each test starts from a clean LocalizationService, including
+-- ones not yet parented because their service never started.
 function TranslatorTestUtils.clearGeneratedTables()
 	for _, child in LocalizationService:GetChildren() do
 		if child:IsA("LocalizationTable") and string.match(child.Name, "^GeneratedJSONTable_") then
 			child:Destroy()
 		end
 	end
+	TranslatorService.DestroyDetachedTablesForTesting()
 end
 
 --[[
@@ -77,7 +79,8 @@ function TranslatorTestUtils.setup(options)
 		-- Init but deliberately not Start: the translator factories below initialize their
 		-- translators against this bag, and a translator registers its loader (which
 		-- registers a TemplateProvider) as it initializes. A bag rejects service types added
-		-- after it has started. Nothing in this stack defines Start, so nothing is skipped.
+		-- after it has started. TranslatorService's Start only parents the table, so writes
+		-- and reads behave the same; a spec that needs it parented starts the bag itself.
 		serviceBag:Init()
 		return serviceBag:GetService(TranslatorService), serviceBag
 	end
