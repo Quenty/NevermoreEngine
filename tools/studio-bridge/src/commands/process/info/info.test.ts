@@ -3,7 +3,27 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { queryStateHandlerAsync } from './info.js';
+
+vi.mock('../../../process/studio-process-closer.js', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('../../../process/studio-process-closer.js')
+  >();
+  return {
+    ...actual,
+    listStudioProcessesAsync: vi.fn(async () => [
+      { pid: 42, windowTitle: 'C:/places/TestPlace - Roblox Studio' },
+    ]),
+  };
+});
+
+vi.mock('../../../process/studio-window-state.js', () => ({
+  tryGetStudioWindowStateAsync: vi.fn(async () => ({
+    focused: true,
+    minimized: false,
+  })),
+}));
+
+import { queryStateHandlerAsync, formatStateText } from './info.js';
 
 function createMockSession(stateResult: {
   state: string;
@@ -72,5 +92,32 @@ describe('queryStateHandlerAsync', () => {
     await expect(queryStateHandlerAsync(session)).rejects.toThrow(
       'Connection lost'
     );
+  });
+
+  it('reports the window showing the place', async () => {
+    const session = createMockSession({
+      state: 'Edit',
+      placeId: 0,
+      placeName: 'TestPlace',
+      gameId: 0,
+    });
+
+    const result = await queryStateHandlerAsync(session);
+
+    expect(result.window).toEqual({ pid: 42, focused: true, minimized: false });
+    expect(formatStateText(result)).toContain('Window:  pid 42, open, focused');
+  });
+
+  it('leaves the window out when no window shows the place', async () => {
+    const session = createMockSession({
+      state: 'Edit',
+      placeId: 0,
+      placeName: 'Elsewhere',
+      gameId: 0,
+    });
+
+    const result = await queryStateHandlerAsync(session);
+
+    expect(result.window).toBeUndefined();
   });
 });
