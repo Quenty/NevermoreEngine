@@ -110,7 +110,7 @@ export interface StudioBridgeResult {
   /**
    * Everything the script returned, in order, marshalled by the plugin.
    * Absent whenever no `scriptComplete` carrying a return channel arrived —
-   * a timeout, a disconnect, a plugin error, or an older plugin build — which
+   * a timeout, a disconnect, or a plugin error — which
    * is what separates "we never learned what it returned" from `[]`, "it
    * returned nothing".
    */

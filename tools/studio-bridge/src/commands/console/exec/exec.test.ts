@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { execHandlerAsync, runHandlerAsync } from './exec.js';
+import {
+  execCommand,
+  execHandlerAsync,
+  runHandlerAsync,
+  type ExecResult,
+} from './exec.js';
 
 // Mock fs/promises.readFile for runHandlerAsync
 vi.mock('fs/promises', () => ({
@@ -136,6 +141,69 @@ describe('execHandlerAsync', () => {
     await expect(
       execHandlerAsync(session, { scriptContent: 'print("test")' })
     ).rejects.toThrow('Connection lost');
+  });
+
+  it('carries the return values through', async () => {
+    const session = {
+      execAsync: vi.fn().mockResolvedValue({
+        success: true,
+        output: [],
+        returnValues: [12345, { type: 'Nil' }],
+      }),
+    } as any;
+
+    const result = await execHandlerAsync(session, {
+      scriptContent: 'return game.PlaceId, nil',
+    });
+
+    expect(result.returnValues).toEqual([12345, { type: 'Nil' }]);
+  });
+});
+
+describe('execCommand text format', () => {
+  const format = execCommand.cli!.format!;
+
+  function formatResult(result: Partial<ExecResult>): string {
+    return format({
+      success: true,
+      output: [],
+      summary: 'Script executed successfully',
+      ...result,
+    });
+  }
+
+  it('prints a returned string raw so returned JSON stays parseable', () => {
+    expect(formatResult({ returnValues: ['{"ok":true}'] })).toBe('{"ok":true}');
+  });
+
+  it('prints output lines before the return values', () => {
+    expect(formatResult({ output: ['hello'], returnValues: [42, true] })).toBe(
+      'hello\n42\ttrue'
+    );
+  });
+
+  it('spells a returned nil and JSON-encodes tables and datatypes', () => {
+    expect(
+      formatResult({
+        returnValues: [
+          { type: 'Nil' },
+          [1, 2],
+          { type: 'Vector3', value: [1, 2, 3] },
+        ],
+      })
+    ).toBe('nil\t[1,2]\t{"type":"Vector3","value":[1,2,3]}');
+  });
+
+  it('falls back to the summary when nothing was printed or returned', () => {
+    expect(formatResult({ returnValues: [] })).toBe(
+      'Script executed successfully'
+    );
+  });
+
+  it('appends the error after any output', () => {
+    expect(
+      formatResult({ success: false, output: ['before'], error: 'boom' })
+    ).toBe('before\nboom');
   });
 });
 

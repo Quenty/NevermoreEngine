@@ -56,8 +56,7 @@ export interface ExecResult {
   error?: string;
   /**
    * Everything the script returned, in order. Absent when the plugin reported
-   * no return channel at all (older plugin build, or a run that never reached
-   * a return) — distinct from `[]`, which means it returned nothing.
+   * no return channel at all (a run that never reached a return) — distinct from `[]`, which means it returned nothing.
    */
   returnValues?: SerializedReturnValue[];
 }

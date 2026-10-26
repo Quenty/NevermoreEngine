@@ -117,8 +117,8 @@ export interface ScriptCompleteMessage extends BaseMessage {
     output?: Array<{ level: string; body: string; timestamp: number }>;
     /**
      * Everything the script returned, in order, marshalled by the plugin.
-     * Absent when the plugin never reported a return channel (an older plugin
-     * build, or a script that failed before returning) — distinct from `[]`,
+     * Absent when the plugin never reported a return channel (a script that
+     * failed before returning) — distinct from `[]`,
      * which means the script ran and returned nothing.
      */
     returnValues?: SerializedReturnValue[];

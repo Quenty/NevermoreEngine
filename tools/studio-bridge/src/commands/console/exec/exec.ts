@@ -10,6 +10,7 @@ import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
 import type { BridgeSession } from '../../../bridge/index.js';
+import type { SerializedReturnValue } from '../../../server/web-socket-protocol.js';
 
 export interface ExecOptions {
   scriptContent: string;
@@ -20,6 +21,7 @@ export interface ExecResult {
   success: boolean;
   output: string[];
   error?: string;
+  returnValues?: SerializedReturnValue[];
   summary: string;
 }
 
@@ -32,6 +34,7 @@ export interface RunResult {
   success: boolean;
   output: string[];
   error?: string;
+  returnValues?: SerializedReturnValue[];
   summary: string;
 }
 
@@ -61,6 +64,7 @@ export async function execHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    returnValues: result.returnValues,
     summary: result.success
       ? 'Script executed successfully'
       : `Script failed: ${result.error}`,
@@ -85,10 +89,28 @@ export async function runHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    returnValues: result.returnValues,
     summary: result.success
       ? `Script ${options.scriptPath} executed successfully`
       : `Script ${options.scriptPath} failed: ${result.error}`,
   };
+}
+
+function formatReturnValues(returnValues: SerializedReturnValue[]): string {
+  return returnValues
+    .map((value) => {
+      if (typeof value === 'string') return value;
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value) &&
+        value.type === 'Nil'
+      ) {
+        return 'nil';
+      }
+      return JSON.stringify(value);
+    })
+    .join('\t');
 }
 
 export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
@@ -114,9 +136,12 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   },
   cli: {
     format: (result) => {
-      const lines = result.output.join('\n');
-      if (result.error) return lines + (lines ? '\n' : '') + result.error;
-      return lines || result.summary;
+      const lines = [...result.output];
+      if (result.returnValues && result.returnValues.length > 0) {
+        lines.push(formatReturnValues(result.returnValues));
+      }
+      if (result.error) lines.push(result.error);
+      return lines.length > 0 ? lines.join('\n') : result.summary;
     },
   },
   handler: async (session, args) => {
