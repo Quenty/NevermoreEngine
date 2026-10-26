@@ -96,7 +96,9 @@ export async function runHandlerAsync(
   };
 }
 
-function formatReturnValues(returnValues: SerializedReturnValue[]): string {
+export function formatReturnValues(
+  returnValues: SerializedReturnValue[]
+): string {
   return returnValues
     .map((value) => {
       if (typeof value === 'string') return value;

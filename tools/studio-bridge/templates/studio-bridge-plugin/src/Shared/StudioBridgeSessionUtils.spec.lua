@@ -13,23 +13,52 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 describe("StudioBridgeSessionUtils.getInstanceId()", function()
-	it("should use the game and place ids for a published place", function()
-		expect(StudioBridgeSessionUtils.getInstanceId(123, 456, "My Place", "abcd1234")).toEqual("123-456")
+	it("should slug the place name and append the nonce", function()
+		expect(StudioBridgeSessionUtils.getInstanceId("My Cool  Place!", "3f9a")).toEqual("my-cool-place-3f9a")
 	end)
 
-	it("should use the ids when only the place id is set", function()
-		expect(StudioBridgeSessionUtils.getInstanceId(0, 456, "My Place", "abcd1234")).toEqual("0-456")
+	it("should drop a place file extension", function()
+		expect(StudioBridgeSessionUtils.getInstanceId("test-place.rbxl", "3f9a")).toEqual("test-place-3f9a")
+		expect(StudioBridgeSessionUtils.getInstanceId("Map.rbxlx", "3f9a")).toEqual("map-3f9a")
 	end)
 
-	it("should use the sanitized place name and nonce for an unpublished place", function()
-		expect(StudioBridgeSessionUtils.getInstanceId(0, 0, "My Cool  Place!", "abcd1234")).toEqual(
-			"local-my-cool-place-abcd1234"
+	it("should keep long names short", function()
+		expect(StudioBridgeSessionUtils.getInstanceId("An Extremely Long Place Name For Testing", "3f9a")).toEqual(
+			"an-extremely-long-place-3f9a"
 		)
 	end)
 
-	it("should fall back to untitled when the name has nothing usable", function()
-		expect(StudioBridgeSessionUtils.getInstanceId(0, 0, "!!!", "abcd1234")).toEqual("local-untitled-abcd1234")
-		expect(StudioBridgeSessionUtils.getInstanceId(0, 0, nil, "abcd1234")).toEqual("local-untitled-abcd1234")
+	it("should fall back to place when the name has nothing usable", function()
+		expect(StudioBridgeSessionUtils.getInstanceId("!!!", "3f9a")).toEqual("place-3f9a")
+		expect(StudioBridgeSessionUtils.getInstanceId(nil, "3f9a")).toEqual("place-3f9a")
+	end)
+end)
+
+describe("StudioBridgeSessionUtils.getOrCreateNonce()", function()
+	it("should keep the first nonce for later calls", function()
+		local container = Instance.new("Folder")
+		local count = 0
+		local function createNonce(): string
+			count += 1
+			return "nonce" .. tostring(count)
+		end
+
+		expect(StudioBridgeSessionUtils.getOrCreateNonce(container, createNonce)).toEqual("nonce1")
+		expect(StudioBridgeSessionUtils.getOrCreateNonce(container, createNonce)).toEqual("nonce1")
+
+		container:Destroy()
+	end)
+
+	it("should not save the nonce with the place", function()
+		local container = Instance.new("Folder")
+
+		StudioBridgeSessionUtils.getOrCreateNonce(container, function()
+			return "3f9a"
+		end)
+
+		expect((container:FindFirstChild("StudioBridgeNonce") :: Instance).Archivable).toEqual(false)
+
+		container:Destroy()
 	end)
 end)
 
@@ -38,8 +67,8 @@ describe("StudioBridgeSessionUtils.getPlaytestArgs()", function()
 		expect(StudioBridgeSessionUtils.getPlaytestArgs({
 			studioBridgePlaytestId = "abc",
 			studioBridgePort = 38741,
-			studioBridgeInstanceId = "123-456",
-		})).toEqual({ port = 38741, instanceId = "123-456" })
+			studioBridgeInstanceId = "test-place-3f9a",
+		})).toEqual({ port = 38741, instanceId = "test-place-3f9a" })
 	end)
 
 	it("should return nil for a playtest studio-bridge did not start", function()
@@ -50,7 +79,7 @@ end)
 
 describe("StudioBridgeSessionUtils.getSessionId()", function()
 	it("should append the context to the instance id", function()
-		expect(StudioBridgeSessionUtils.getSessionId("123-456", "edit")).toEqual("123-456-edit")
+		expect(StudioBridgeSessionUtils.getSessionId("test-place-3f9a", "edit")).toEqual("test-place-3f9a-edit")
 	end)
 end)
 
@@ -62,9 +91,9 @@ end)
 
 describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 	it("should describe the plugin and the open place", function()
-		local payload = StudioBridgeSessionUtils.createRegisterPayload("123-456", "edit")
+		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "edit")
 
-		expect(payload.instanceId).toEqual("123-456")
+		expect(payload.instanceId).toEqual("test-place-3f9a")
 		expect(payload.context).toEqual("edit")
 		expect(payload.state).toEqual("Edit")
 		expect(payload.placeId).toEqual(game.PlaceId)
@@ -74,7 +103,7 @@ describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 	end)
 
 	it("should hand out a capabilities list the caller can change", function()
-		local payload = StudioBridgeSessionUtils.createRegisterPayload("123-456", "edit")
+		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "edit")
 
 		table.insert(payload.capabilities, "extra")
 

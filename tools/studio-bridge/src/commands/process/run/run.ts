@@ -11,6 +11,9 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
+import { isJsonOutputEnabled } from '../../../cli/cli-output-context.js';
+import { formatReturnValues } from '../../console/exec/exec.js';
+import type { SerializedReturnValue } from '../../../server/web-socket-protocol.js';
 
 export interface ProcessRunOptions {
   scriptContent: string;
@@ -20,10 +23,15 @@ export interface ProcessRunOptions {
   verbose: boolean;
   showLogs: boolean;
   filePath?: string;
+  quiet?: boolean;
 }
 
 export interface ProcessRunResult {
   success: boolean;
+  output: string[];
+  error?: string;
+  returnValues?: SerializedReturnValue[];
+  durationMs: number;
   summary: string;
 }
 
@@ -42,13 +50,11 @@ export async function processRunHandlerAsync(
     '../../../cli/script-executor.js'
   );
 
-  // executeScriptAsync calls process.exit internally, so this return
-  // is only reachable in test scenarios where it's mocked.
-  await executeScriptAsync(options);
+  const result = await executeScriptAsync(options);
 
   return {
-    success: true,
-    summary: 'Script execution completed.',
+    ...result,
+    summary: result.success ? 'Script completed.' : 'Script failed.',
   };
 }
 
@@ -81,6 +87,12 @@ export const processRunCommand = defineCommand<
       type: 'number',
     }),
   },
+  cli: {
+    format: (result) =>
+      result.returnValues && result.returnValues.length > 0
+        ? formatReturnValues(result.returnValues)
+        : '',
+  },
   handler: async (args) => {
     const { scriptContent, filePath } = await resolveScriptContentAsync(args);
 
@@ -92,6 +104,7 @@ export const processRunCommand = defineCommand<
       verbose: OutputHelper.isVerbose(),
       showLogs: true,
       filePath,
+      quiet: isJsonOutputEnabled(),
     });
   },
   // No MCP config -- process run is CLI-only

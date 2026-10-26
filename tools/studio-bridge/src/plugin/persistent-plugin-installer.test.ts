@@ -43,6 +43,10 @@ vi.mock('../process/studio-process-manager.js', () => ({
   findPluginsFolder: vi.fn(() => '/mock/plugins/folder'),
 }));
 
+vi.mock('./plugin-build-version.js', () => ({
+  getPluginBuildVersionAsync: vi.fn().mockResolvedValue('abc123'),
+}));
+
 vi.mock('./plugin-discovery.js', () => ({
   getPersistentPluginPath: mockGetPersistentPluginPath,
 }));

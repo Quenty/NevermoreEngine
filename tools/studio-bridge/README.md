@@ -132,7 +132,7 @@ studio-bridge viewport screenshot --output viewport.png
 studio-bridge process list
 ```
 
-Lists all active sessions with their ID, place, context, state, and origin.
+Lists the connected sessions with their ID, context, place, and state. `--target` and `--context` narrow the list. While a playtest studio-bridge started is running, every session of that Studio shows `Play` (or `Run` without a client).
 
 ### `process info`
 
@@ -161,10 +161,11 @@ Explicit ephemeral mode: launches Studio, executes the script, and shuts down.
 ### `process close`
 
 ```bash
-studio-bridge process close --target session-id
+studio-bridge process close --target test-place
+studio-bridge process close --target test-place --force
 ```
 
-Send a shutdown message to a connected Studio session.
+Closes the Studio process showing the session's place, found by its window title. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
 
 ### `playtest run` / `playtest start` / `playtest stop`
 
@@ -206,17 +207,21 @@ Invoke a named Studio action on the connected session.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--timeout` | `120000` | Timeout in milliseconds |
+| `--timeout` | `5000` | How long to wait for a Studio session to connect, in milliseconds |
 | `--verbose` | `false` | Show internal debug output |
 | `--remote` | — | Connect to a remote bridge host (`host:port`) |
 | `--local` | `false` | Force local mode (skip devcontainer auto-detection) |
 
+### Output
+
+Every command accepts `--format text|json` and `-o <file>`. stdout carries only the result; progress and warnings go to stderr. With `--format json`, failures print `{"success": false, "error": ...}` and exit with code 1, and warnings (an outdated CLI, or a Studio plugin older than the CLI) are kept in the result's `_warnings` field.
+
 ### Target Selection
 
-Commands that target a session accept `--target` and `--context`:
+Session IDs are the place name plus a short suffix and the context, like `test-place-a05a-edit`. They stay the same until Studio closes, including across plugin reinstalls. Commands that target a session accept `--target` and `--context`:
 
 - **No flags** — auto-resolves if only one session exists
-- **`--target <id>`** — target a specific session by ID
+- **`--target <id>`** — a session ID, an instance ID (`test-place-a05a`), or any unique prefix of one (`test-place`)
 - **`--context <ctx>`** — select context within an instance (`edit`, `client`, `server`)
 
 When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.

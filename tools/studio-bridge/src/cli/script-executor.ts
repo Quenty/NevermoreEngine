@@ -14,8 +14,10 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import {
   StudioBridgeServer,
+  type StudioBridgeResult,
   type StudioBridgePhase,
 } from '../server/studio-bridge-server.js';
+import type { SerializedReturnValue } from '../server/web-socket-protocol.js';
 
 export interface ExecuteScriptOptions {
   scriptContent: string;
@@ -25,6 +27,16 @@ export interface ExecuteScriptOptions {
   verbose: boolean;
   showLogs: boolean;
   filePath?: string;
+  /** Skip the progress reporter, for when stdout carries JSON. */
+  quiet?: boolean;
+}
+
+export interface ExecuteScriptResult {
+  success: boolean;
+  output: string[];
+  error?: string;
+  returnValues?: SerializedReturnValue[];
+  durationMs: number;
 }
 
 /**
@@ -52,7 +64,7 @@ export async function resolvePlacePathAsync(
  */
 export async function executeScriptAsync(
   options: ExecuteScriptOptions
-): Promise<void> {
+): Promise<ExecuteScriptResult> {
   const { shouldDelegateToDockerAsync, delegateToDockerAsync } = await import(
     '../docker/docker-delegator.js'
   );
@@ -62,7 +74,7 @@ export async function executeScriptAsync(
       '[StudioBridge] No Wine detected, delegating to Docker'
     );
     await delegateToDockerAsync(options);
-    return; // unreachable — delegateToDockerAsync calls process.exit
+    throw new Error('delegateToDockerAsync returned without exiting');
   }
 
   const {
@@ -72,9 +84,10 @@ export async function executeScriptAsync(
     timeoutMs,
     verbose,
     showLogs,
+    quiet = false,
   } = options;
 
-  const useSpinner = !!process.stdout.isTTY && !verbose;
+  const useSpinner = !quiet && !!process.stdout.isTTY && !verbose;
 
   const reporter = new CompositeReporter(
     [packageName],
@@ -85,15 +98,17 @@ export async function executeScriptAsync(
             actionVerb: 'Running',
           })
         : new SimpleReporter(state, {
-            alwaysShowLogs: showLogs,
+            alwaysShowLogs: false,
             successMessage: 'Script completed successfully.',
             failureMessage: 'Script failed.',
           }),
     ]
   );
 
-  await reporter.startAsync();
-  reporter.onPackageStart(packageName);
+  if (!quiet) {
+    await reporter.startAsync();
+    reporter.onPackageStart(packageName);
+  }
 
   const startTime = performance.now();
 
@@ -104,13 +119,13 @@ export async function executeScriptAsync(
 
   const outputLines: string[] = [];
   let server: StudioBridgeServer | undefined;
-  let result;
+  let result: StudioBridgeResult;
   try {
     server = new StudioBridgeServer({
       placePath,
       timeoutMs,
       onPhase: (phase: StudioBridgePhase) => {
-        if (phase === 'done') return;
+        if (phase === 'done' || quiet) return;
         reporter.onPackagePhaseChange(packageName, phase);
       },
     });
@@ -127,7 +142,7 @@ export async function executeScriptAsync(
         outputLines.push(body);
 
         // In verbose/simple mode, print output in real-time
-        if (!useSpinner) {
+        if (!useSpinner && !quiet) {
           switch (level) {
             case 'Warning':
               OutputHelper.warn(body);
@@ -154,14 +169,22 @@ export async function executeScriptAsync(
 
   const elapsed = performance.now() - startTime;
 
-  reporter.onPackageResult({
-    packageName,
+  if (!quiet) {
+    reporter.onPackageResult({
+      packageName,
+      success: result.success,
+      logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
+      durationMs: elapsed,
+    });
+
+    await reporter.stopAsync();
+  }
+
+  return {
     success: result.success,
-    logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
+    output: outputLines,
+    error: result.success || !result.logs ? undefined : result.logs,
+    returnValues: result.returnValues,
     durationMs: elapsed,
-  });
-
-  await reporter.stopAsync();
-
-  process.exit(result.success ? 0 : 1);
+  };
 }

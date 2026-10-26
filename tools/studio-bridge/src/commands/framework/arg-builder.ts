@@ -33,6 +33,8 @@ export const arg = {
     type?: 'string' | 'number';
     required?: boolean;
     choices?: readonly string[];
+    /** Collect every remaining positional into an array (`<name..>`). */
+    array?: boolean;
   }): ArgDefinition {
     return {
       kind: 'positional',
@@ -40,6 +42,7 @@ export const arg = {
       description: config.description,
       required: config.required ?? true,
       choices: config.choices,
+      array: config.array,
     };
   },
 
@@ -100,6 +103,7 @@ export interface YargsPositional {
     type: 'string' | 'number';
     demandOption?: boolean;
     choices?: readonly string[];
+    array?: boolean;
   };
 }
 
@@ -126,6 +130,7 @@ export function toYargsOptions(
           type: def.type as 'string' | 'number',
           demandOption: def.required,
           ...(def.choices ? { choices: def.choices } : {}),
+          ...(def.array ? { array: true } : {}),
         },
       });
     } else {

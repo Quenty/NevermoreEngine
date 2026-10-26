@@ -31,7 +31,7 @@ describe('queryLogsHandlerAsync', () => {
     expect(result.entries).toHaveLength(2);
     expect(result.total).toBe(42);
     expect(result.bufferCapacity).toBe(1000);
-    expect(result.summary).toBe('2 entries (42 total in buffer)');
+    expect(result.summary).toBe('2 entries (42 in buffer)');
   });
 
   it('passes default options to session', async () => {
@@ -84,7 +84,7 @@ describe('queryLogsHandlerAsync', () => {
 
     expect(result.entries).toEqual([]);
     expect(result.total).toBe(0);
-    expect(result.summary).toBe('0 entries (0 total in buffer)');
+    expect(result.summary).toBe('0 entries (0 in buffer)');
   });
 
   it('handles entries with all log levels', async () => {
@@ -133,6 +133,6 @@ describe('queryLogsHandlerAsync', () => {
     expect(result.entries).toEqual([]);
     expect(result.total).toBe(0);
     expect(result.bufferCapacity).toBe(0);
-    expect(result.summary).toBe('0 entries (0 total in buffer)');
+    expect(result.summary).toBe('0 entries (0 in buffer)');
   });
 });

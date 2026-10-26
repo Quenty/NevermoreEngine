@@ -26,6 +26,7 @@ import type {
 } from './internal/host-protocol.js';
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
+import { annotateInstanceState } from './internal/instance-state.js';
 import type {
   PluginMessage,
   ServerMessage,
@@ -34,7 +35,7 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 export interface BridgeConnectionOptions {
   /** Port for the bridge host. Default: 38741. */
   port?: number;
-  /** Max time to wait for initial connection setup. Default: 30_000ms. */
+  /** Max time to wait for the first Studio session to connect. Default: 5_000ms. */
   timeoutMs?: number;
   /** Keep the host alive even when idle. Default: false. */
   keepAlive?: boolean;
@@ -100,6 +101,7 @@ export class BridgeConnection extends EventEmitter {
   private _isConnected: boolean = false;
   private _keepAlive: boolean;
   private _hasSettled: boolean = false;
+  private _firstSessionTimeoutMs: number | undefined;
 
   // Host mode internals
   private _host: BridgeHost | undefined;
@@ -191,6 +193,7 @@ export class BridgeConnection extends EventEmitter {
     });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
+    conn._firstSessionTimeoutMs = options?.timeoutMs;
     OutputHelper.verbose(
       `[bridge] Role: ${detection.role}, port: ${detection.port}`
     );
@@ -286,14 +289,35 @@ export class BridgeConnection extends EventEmitter {
   /** List all currently connected Studio sessions. */
   listSessions(): SessionInfo[] {
     if (this._role === 'host' && this._tracker) {
-      return this._tracker.listSessions();
+      return annotateInstanceState(this._tracker.listSessions());
     }
 
     if (this._role === 'client' && this._client) {
-      return this._client.listSessions();
+      return annotateInstanceState(this._client.listSessions());
     }
 
     return [];
+  }
+
+  /**
+   * Sessions matching `--target` and `--context`. A target matches a
+   * session id or an instance id exactly, or else as a prefix.
+   */
+  findSessions(target?: string, context?: SessionContext): SessionInfo[] {
+    let sessions = this.listSessions();
+    if (target) {
+      const exact = sessions.find((s) => s.sessionId === target);
+      if (exact && !context) return [exact];
+
+      const instanceIds = exact
+        ? [exact.instanceId]
+        : this._matchInstanceIds(target);
+      sessions = sessions.filter((s) => instanceIds.includes(s.instanceId));
+    }
+    if (context) {
+      sessions = sessions.filter((s) => s.context === context);
+    }
+    return sessions;
   }
 
   /**
@@ -326,6 +350,31 @@ export class BridgeConnection extends EventEmitter {
   }
 
   /**
+   * Instances whose id, or one of whose session ids, is `target`. Falls
+   * back to ids that start with `target` when nothing matches exactly.
+   */
+  private _matchInstanceIds(target: string): string[] {
+    const sessions = this.listSessions();
+    const exact = new Set(
+      sessions
+        .filter((s) => s.instanceId === target || s.sessionId === target)
+        .map((s) => s.instanceId)
+    );
+    if (exact.size > 0) return [...exact];
+
+    return [
+      ...new Set(
+        sessions
+          .filter(
+            (s) =>
+              s.instanceId.startsWith(target) || s.sessionId.startsWith(target)
+          )
+          .map((s) => s.instanceId)
+      ),
+    ];
+  }
+
+  /**
    * Resolve a session for command execution. Instance-aware: groups sessions
    * by instanceId and auto-selects context within an instance.
    *
@@ -350,13 +399,28 @@ export class BridgeConnection extends EventEmitter {
 
     if (sessionId) {
       const session = this.getSession(sessionId);
-      if (session) {
+      if (session && (!context || session.info.context === context)) {
         return session;
       }
-      throw new SessionNotFoundError(
-        `Session '${sessionId}' not found`,
-        sessionId
-      );
+
+      const instanceIds = session
+        ? [session.info.instanceId]
+        : this._matchInstanceIds(sessionId);
+      if (instanceIds.length === 0) {
+        throw new SessionNotFoundError(
+          `Session '${sessionId}' not found`,
+          sessionId
+        );
+      }
+      if (instanceIds.length > 1) {
+        throw new SessionNotFoundError(
+          `'${sessionId}' matches several Studio instances: ${instanceIds.join(
+            ', '
+          )}. Use a longer --target.`,
+          sessionId
+        );
+      }
+      return this._resolveByInstance(instanceIds[0], context);
     }
 
     if (instanceId) {
@@ -434,7 +498,9 @@ export class BridgeConnection extends EventEmitter {
     OutputHelper.verbose(
       '[bridge] No sessions yet — waiting for plugins to discover us'
     );
-    await this.waitForSessionsToSettleAsync();
+    await this.waitForSessionsToSettleAsync({
+      firstSessionTimeout: this._firstSessionTimeoutMs,
+    });
     this._hasSettled = true;
     const settled = this.listSessions();
     OutputHelper.verbose(
@@ -466,7 +532,7 @@ export class BridgeConnection extends EventEmitter {
 
     const firstTimeout = options?.firstSessionTimeout ?? 5_000;
     const settleMs = options?.settleMs ?? 4_000;
-    const maxMs = options?.maxMs ?? 15_000;
+    const maxMs = options?.maxMs ?? Math.max(15_000, firstTimeout + settleMs);
 
     // Wait for the first session
     try {

@@ -74,7 +74,7 @@ describe('logs formatter', () => {
     const text = formatLogsText(result);
     expect(text).toContain('Hello');
     expect(text).toContain('Boom');
-    expect(text).toContain('(2 of 2 entries)');
+    expect(text).toContain('(2 shown, 2 in buffer)');
   });
 
   it('is wired into command definition', () => {

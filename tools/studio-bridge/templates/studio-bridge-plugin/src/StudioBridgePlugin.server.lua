@@ -54,12 +54,23 @@ if not RunService:IsStudio() or (RunService:IsRunning() and not playtestArgs) th
 	return
 end
 
--- Generated once per plugin lifetime, so the session id survives reconnects
-local nonce = string.sub(HttpService:GenerateGUID(false), 1, 8)
+local function createNonce(): string
+	return string.lower(string.sub(HttpService:GenerateGUID(false), 1, 4))
+end
+
 local context: StudioBridgeSessionUtils.PluginContext = StudioBridgeSessionUtils.getContext()
-local instanceId = if playtestArgs
-	then playtestArgs.instanceId
-	else StudioBridgeSessionUtils.getInstanceId(game.GameId, game.PlaceId, game.Name, nonce)
+local nonceOk, nonce = pcall(StudioBridgeSessionUtils.getOrCreateNonce, game:GetService("CoreGui"), createNonce)
+if not nonceOk then
+	nonce = createNonce()
+end
+
+-- Read on every connect: Studio can load plugins before it names the DataModel after the place
+local function getInstanceId(): string
+	if playtestArgs then
+		return playtestArgs.instanceId
+	end
+	return StudioBridgeSessionUtils.getInstanceId(game.Name, nonce)
+end
 local playtestPort = if playtestArgs then playtestArgs.port else nil
 
 local router = ActionRouter.new()
@@ -68,6 +79,7 @@ local currentConnection: StudioBridgeConnection.StudioBridgeConnection? = nil
 local currentWebSocket: any = nil
 local discovery: DiscoveryStateMachine.DiscoveryStateMachine? = nil
 local pollThread: thread? = nil
+local nameConnection: RBXScriptConnection? = nil
 local isUnloaded = false
 
 local pngOk, png = pcall(function()
@@ -112,7 +124,7 @@ local function openConnection(webSocket: any, sessionId: string, label: string)
 		webSocket = webSocket,
 		router = router,
 		sessionId = sessionId,
-		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(instanceId, context),
+		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(getInstanceId(), context),
 	})
 
 	StudioBridgeLogUtils.logVerbose(`Connected to {label} as {sessionId}`)
@@ -133,6 +145,10 @@ end
 plugin.Unloading:Connect(function()
 	isUnloaded = true
 	logConnection:Disconnect()
+	if nameConnection then
+		nameConnection:Disconnect()
+		nameConnection = nil
+	end
 
 	if pollThread then
 		task.cancel(pollThread)
@@ -225,8 +241,6 @@ if IS_EPHEMERAL then
 	return
 end
 
-local sessionId = StudioBridgeSessionUtils.getSessionId(instanceId, context)
-
 local stateMachine: DiscoveryStateMachine.DiscoveryStateMachine
 stateMachine = DiscoveryStateMachine.new(nil, {
 	scanPortsAsync = if playtestPort
@@ -242,7 +256,11 @@ stateMachine = DiscoveryStateMachine.new(nil, {
 	end,
 	onConnected = function(webSocket, port)
 		webSocket.Opened:Connect(function()
-			openConnection(webSocket, sessionId, `localhost:{port}`)
+			openConnection(
+				webSocket,
+				StudioBridgeSessionUtils.getSessionId(getInstanceId(), context),
+				`localhost:{port}`
+			)
 		end)
 		webSocket.Closed:Connect(function()
 			stateMachine:HandleDisconnect("closed")
@@ -256,8 +274,16 @@ stateMachine = DiscoveryStateMachine.new(nil, {
 
 discovery = stateMachine
 
-StudioBridgeLogUtils.logVerbose(`Session ID: {sessionId}`)
 stateMachine:Start()
+
+-- Reconnecting re-registers under the session id for the new name
+nameConnection = game:GetPropertyChangedSignal("Name"):Connect(function()
+	if currentWebSocket then
+		pcall(function()
+			currentWebSocket:Close()
+		end)
+	end
+end)
 
 -- Each cycle gets a fixed time budget, which PollAsync threads through to the port scan
 pollThread = task.spawn(function()

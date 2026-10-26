@@ -101,6 +101,25 @@ describe("ActionRouter:Dispatch()", function()
 		expect(router:Dispatch(createMessage("ping"))).toBeNil()
 	end)
 
+	it("should answer a handler's failure as an error with its code", function()
+		local router = ActionRouter.new()
+		router:register("ping", function()
+			return { success = false, code = "INSTANCE_NOT_FOUND", message = "Instance not found" }
+		end)
+
+		local response = router:Dispatch(createMessage("ping", nil, "req-5"))
+
+		expect(response).toEqual({
+			type = "error",
+			sessionId = "session-1",
+			requestId = "req-5",
+			payload = {
+				code = "INSTANCE_NOT_FOUND",
+				message = "Instance not found",
+			},
+		})
+	end)
+
 	it("should answer a throwing handler with INTERNAL_ERROR", function()
 		local router = ActionRouter.new()
 		router:register("ping", function()

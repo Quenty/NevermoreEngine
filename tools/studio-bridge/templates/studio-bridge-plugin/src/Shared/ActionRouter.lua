@@ -101,6 +101,10 @@ function ActionRouter.Dispatch(self: ActionRouter, message: Message): Message?
 		return nil
 	end
 
+	if result.success == false and type(result.code) == "string" and type(result.message) == "string" then
+		return ActionRouter._errorResponse(message, result.code, result.message)
+	end
+
 	return {
 		type = self._responseTypes[message.type] or `{message.type}Result`,
 		sessionId = message.sessionId,

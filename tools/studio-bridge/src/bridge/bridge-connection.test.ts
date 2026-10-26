@@ -39,6 +39,7 @@ async function performRegisterHandshake(
         instanceId: options?.instanceId ?? 'inst-1',
         placeName: options?.placeName ?? 'TestPlace',
         state: options?.state ?? 'Edit',
+        context: options?.context,
         capabilities: options?.capabilities ?? ['execute', 'queryState'],
       },
     })
@@ -653,6 +654,95 @@ describe('BridgeConnection', () => {
       await expect(
         conn.resolveSessionAsync(undefined, undefined, 'nonexistent-inst')
       ).rejects.toThrow(SessionNotFoundError);
+    });
+  });
+
+  describe('target matching', () => {
+    async function connectPlaytestAsync(): Promise<BridgeConnection> {
+      const conn = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+      });
+      connections.push(conn);
+
+      const plugins: Array<[string, string, string, string]> = [
+        ['test-place-3f9a-edit', 'test-place-3f9a', 'edit', 'test-place.rbxl'],
+        ['test-place-3f9a-server', 'test-place-3f9a', 'server', 'Game'],
+        ['test-place-3f9a-client', 'test-place-3f9a', 'client', 'Game'],
+        ['other-map-77c1-edit', 'other-map-77c1', 'edit', 'Other Map'],
+      ];
+      for (const [sessionId, instanceId, context, placeName] of plugins) {
+        const { ws } = await performRegisterHandshake(conn.port, sessionId, {
+          instanceId,
+          context,
+          placeName,
+        });
+        openClients.push(ws);
+      }
+      await new Promise((r) => setTimeout(r, 50));
+      return conn;
+    }
+
+    it('resolves an instance id prefix to its edit session', async () => {
+      const conn = await connectPlaytestAsync();
+
+      const session = await conn.resolveSessionAsync('test-place');
+      expect(session.info.sessionId).toBe('test-place-3f9a-edit');
+    });
+
+    it('applies --context within the targeted instance', async () => {
+      const conn = await connectPlaytestAsync();
+
+      const session = await conn.resolveSessionAsync(
+        'test-place-3f9a-edit',
+        'server'
+      );
+      expect(session.info.sessionId).toBe('test-place-3f9a-server');
+    });
+
+    it('refuses a prefix that matches several instances', async () => {
+      const conn = await connectPlaytestAsync();
+      const { ws } = await performRegisterHandshake(
+        conn.port,
+        'test-place-b2c4-edit',
+        { instanceId: 'test-place-b2c4', context: 'edit' }
+      );
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      await expect(conn.resolveSessionAsync('test-place')).rejects.toThrow(
+        /matches several Studio instances/
+      );
+      await expect(conn.resolveSessionAsync('missing')).rejects.toThrow(
+        SessionNotFoundError
+      );
+    });
+
+    it('filters listed sessions by target and context', async () => {
+      const conn = await connectPlaytestAsync();
+
+      expect(conn.findSessions('test-place').map((s) => s.sessionId)).toEqual([
+        'test-place-3f9a-edit',
+        'test-place-3f9a-server',
+        'test-place-3f9a-client',
+      ]);
+      expect(
+        conn.findSessions(undefined, 'edit').map((s) => s.sessionId)
+      ).toEqual(['test-place-3f9a-edit', 'other-map-77c1-edit']);
+      expect(
+        conn.findSessions('other-map-77c1-edit').map((s) => s.sessionId)
+      ).toEqual(['other-map-77c1-edit']);
+    });
+
+    it('reports a running playtest as the state of its instance', async () => {
+      const conn = await connectPlaytestAsync();
+
+      const byId = new Map(conn.listSessions().map((s) => [s.sessionId, s]));
+      expect(byId.get('test-place-3f9a-edit')?.state).toBe('Play');
+      expect(byId.get('test-place-3f9a-server')?.placeName).toBe(
+        'test-place.rbxl'
+      );
+      expect(byId.get('other-map-77c1-edit')?.state).toBe('Edit');
     });
   });
 

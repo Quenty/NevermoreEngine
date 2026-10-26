@@ -113,7 +113,7 @@ describe('serveHandlerAsync', () => {
     const result = await serveHandlerAsync({ timeout: 10 });
 
     expect(mockConnection.disconnectAsync).toHaveBeenCalled();
-    expect(result).toEqual({ port: 38741, event: 'stopped' });
+    expect(result).toMatchObject({ port: 38741, event: 'stopped' });
   });
 
   it('logs JSON startup when json option is set', async () => {

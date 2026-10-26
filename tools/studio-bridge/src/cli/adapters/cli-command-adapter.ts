@@ -23,6 +23,7 @@ import type {
   SessionTargeting,
 } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
+import { getWarnings, warnIfPluginStaleAsync } from '../cli-output-context.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
 export interface AdapterArgs {
@@ -95,8 +96,10 @@ async function executeCommandAsync(
         targeting.target,
         targeting.context
       );
+      await warnIfPluginStaleAsync([session.info]);
       return await (def.handler as any)(session, commandArgs);
     }
+    await warnIfPluginStaleAsync(connection.listSessions());
     return await (def.handler as any)(connection, commandArgs, targeting);
   } finally {
     if (!existingConnection) {
@@ -107,10 +110,8 @@ async function executeCommandAsync(
 
 /** Inject version/diagnostic warnings into JSON result objects. */
 function injectWarnings(result: unknown): unknown {
-  const warnings = (globalThis as any).__studioBridgeWarnings as
-    | string[]
-    | undefined;
-  if (!warnings || warnings.length === 0) return result;
+  const warnings = getWarnings();
+  if (warnings.length === 0) return result;
   if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
     return { ...result, _warnings: warnings };
   }
@@ -170,7 +171,10 @@ export function buildYargsCommand(
   const { positionals, options: yargsOptions } = toYargsOptions(def.args);
 
   const positionalSuffix = positionals
-    .map((p) => (p.options.demandOption ? `<${p.name}>` : `[${p.name}]`))
+    .map((p) => {
+      const name = p.options.array ? `${p.name}..` : p.name;
+      return p.options.demandOption ? `<${name}>` : `[${name}]`;
+    })
     .join(' ');
 
   const command = positionalSuffix
@@ -193,7 +197,7 @@ export function buildYargsCommand(
         yargs.option('target', {
           alias: 't',
           type: 'string',
-          describe: 'Target session ID (or "all" for broadcast)',
+          describe: 'Target session or instance ID',
         });
         yargs.option('context', {
           type: 'string',
@@ -256,7 +260,16 @@ export function buildYargsCommand(
           await runOnceAsync(def, commandArgs, argv, reporter, connect);
         }
       } catch (err) {
-        OutputHelper.error(err instanceof Error ? err.message : String(err));
+        const message = err instanceof Error ? err.message : String(err);
+        if (explicitFormat === 'json') {
+          console.log(
+            formatJson(injectWarnings({ success: false, error: message }), {
+              pretty: process.stdout.isTTY,
+            })
+          );
+        } else {
+          OutputHelper.error(message);
+        }
         process.exit(1);
       }
     },

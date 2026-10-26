@@ -131,8 +131,8 @@ describe("queryDataModel", function()
 
 		local response = controller.query({ path = `{controller.rootPath}.Missing` })
 
+		expect(response.type).toEqual("error")
 		expect(response.payload).toEqual({
-			success = false,
 			code = "INSTANCE_NOT_FOUND",
 			message = `Instance not found at path: {controller.rootPath}.Missing`,
 		})

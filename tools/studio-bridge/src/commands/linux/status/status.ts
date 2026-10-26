@@ -18,17 +18,25 @@ interface PrerequisiteStatus {
   hint?: string;
 }
 
-interface StatusResult {
+export interface StatusResult {
+  success: boolean;
   healthy: boolean;
+  summary: string;
+  error?: string;
   prerequisites: PrerequisiteStatus[];
-  display: { xvfb: boolean; openbox: boolean };
+  display: { name?: string; xvfb: boolean; openbox: boolean };
   studio: {
+    dir?: string;
     installed: boolean;
     version?: string;
     fflags: boolean;
     shaders: boolean;
   };
-  auth: { writeCredExe: boolean; credentialsInjected: boolean };
+  auth: {
+    writeCredExe: boolean;
+    winePrefix: boolean;
+    credentialsInjected: boolean;
+  };
 }
 
 async function fileExistsAsync(filePath: string): Promise<boolean> {
@@ -40,131 +48,126 @@ async function fileExistsAsync(filePath: string): Promise<boolean> {
   }
 }
 
+function unhealthy(error: string): StatusResult {
+  return {
+    success: false,
+    healthy: false,
+    summary: error,
+    error,
+    prerequisites: [],
+    display: { xvfb: false, openbox: false },
+    studio: { installed: false, fflags: false, shaders: false },
+    auth: {
+      writeCredExe: false,
+      winePrefix: false,
+      credentialsInjected: false,
+    },
+  };
+}
+
 export async function statusHandlerAsync(
   _args: StatusArgs
 ): Promise<StatusResult> {
   try {
     const envError = await checkLinuxEnvironmentAsync();
     if (envError) {
-      OutputHelper.error(envError);
-      process.exit(1);
+      return unhealthy(envError);
     }
 
     const linux = await import('../../../linux/index.js');
     const config = linux.resolveLinuxConfig();
-    let allOk = true;
 
-    // 1. Prerequisites
-    OutputHelper.info('System prerequisites:');
-    const prereqs = linux.checkPrerequisites();
-    for (const p of prereqs) {
-      const status = p.available
-        ? `  OK  ${p.name}${p.version ? ` (${p.version})` : ''}`
-        : `  MISSING  ${p.name} — ${p.hint}`;
-      if (p.available) {
-        OutputHelper.info(status);
-      } else {
-        OutputHelper.error(status);
-        allOk = false;
-      }
-    }
+    const prerequisites = linux.checkPrerequisites();
 
-    // 2. Display
     const displayNum = config.display.replace(':', '');
-    const xvfbOk = linux.isXvfbRunning(displayNum);
-    const openboxOk = linux.isOpenboxRunning();
-    OutputHelper.info('');
-    OutputHelper.info('Display:');
-    OutputHelper.info(
-      `  Xvfb (${config.display}): ${xvfbOk ? 'running' : 'not running'}`
-    );
-    OutputHelper.info(`  openbox: ${openboxOk ? 'running' : 'not running'}`);
-    if (!xvfbOk || !openboxOk) allOk = false;
+    const xvfb = linux.isXvfbRunning(displayNum);
+    const openbox = linux.isOpenboxRunning();
 
-    // 3. Studio installation
-    OutputHelper.info('');
-    OutputHelper.info('Studio installation:');
-    const studioExists = await fileExistsAsync(config.studioExe);
-    OutputHelper.info(
-      `  ${config.studioDir}: ${studioExists ? 'installed' : 'not found'}`
-    );
-    if (!studioExists) allOk = false;
-
+    const installed = await fileExistsAsync(config.studioExe);
     const { readInstalledVersionAsync } = await import(
       '../../../linux/linux-version-resolver.js'
     );
     const version = await readInstalledVersionAsync(config.studioDir);
-    if (version) {
-      OutputHelper.info(`  Version: ${version}`);
-    }
-
-    // 4. FFlags
-    const fflagsExist = await fileExistsAsync(config.clientSettingsPath);
-    OutputHelper.info(`  FFlags: ${fflagsExist ? 'configured' : 'not found'}`);
-
-    // 5. Shaders
-    const shadersExist = await fileExistsAsync(
+    const fflags = await fileExistsAsync(config.clientSettingsPath);
+    const shaders = await fileExistsAsync(
       `${config.shadersDir}/shaders_glsl3.pack`
     );
-    OutputHelper.info(`  Shaders: ${shadersExist ? 'present' : 'not found'}`);
 
-    // 6. Credentials
-    OutputHelper.info('');
-    OutputHelper.info('Authentication:');
-    const writeCredExists = await fileExistsAsync(config.writeCredExe);
-    OutputHelper.info(
-      `  write-cred.exe: ${writeCredExists ? 'compiled' : 'not found'}`
-    );
-
-    // Check Wine registry for credential entries
-    let credentialsInjected = false;
+    const writeCredExe = await fileExistsAsync(config.writeCredExe);
     const wineRegPath = `${config.winePrefix}/user.reg`;
-    const wineRegExists = await fileExistsAsync(wineRegPath);
-    if (wineRegExists) {
-      const regContent = await fs.readFile(wineRegPath, 'utf-8');
-      credentialsInjected = regContent.includes('RobloxStudioAuth');
-      OutputHelper.info(
-        `  Wine credentials: ${
-          credentialsInjected ? 'present' : 'not injected'
-        }`
-      );
-      if (!credentialsInjected) allOk = false;
-    } else {
-      OutputHelper.info('  Wine prefix: not initialized');
-      allOk = false;
-    }
+    const winePrefix = await fileExistsAsync(wineRegPath);
+    const credentialsInjected =
+      winePrefix &&
+      (await fs.readFile(wineRegPath, 'utf-8')).includes('RobloxStudioAuth');
 
-    // Summary
-    OutputHelper.info('');
-    if (allOk) {
-      OutputHelper.info('Environment is ready for Studio.');
-    } else {
-      OutputHelper.warn('Environment has issues. See above for details.');
-    }
+    const healthy =
+      prerequisites.every((p) => p.available) &&
+      xvfb &&
+      openbox &&
+      installed &&
+      credentialsInjected;
 
     return {
-      healthy: allOk,
-      prerequisites: prereqs,
-      display: { xvfb: xvfbOk, openbox: openboxOk },
+      success: healthy,
+      healthy,
+      summary: healthy
+        ? 'Environment is ready for Studio.'
+        : 'Environment has issues. See above for details.',
+      prerequisites,
+      display: { name: config.display, xvfb, openbox },
       studio: {
-        installed: studioExists,
+        dir: config.studioDir,
+        installed,
         version: version ?? undefined,
-        fflags: fflagsExist,
-        shaders: shadersExist,
+        fflags,
+        shaders,
       },
-      auth: { writeCredExe: writeCredExists, credentialsInjected },
+      auth: { writeCredExe, winePrefix, credentialsInjected },
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    OutputHelper.error(message);
-    return {
-      healthy: false,
-      prerequisites: [],
-      display: { xvfb: false, openbox: false },
-      studio: { installed: false, fflags: false, shaders: false },
-      auth: { writeCredExe: false, credentialsInjected: false },
-    };
+    return unhealthy(err instanceof Error ? err.message : String(err));
   }
+}
+
+export function formatStatusText(result: StatusResult): string {
+  if (result.error) return OutputHelper.formatError(result.error);
+
+  const { prerequisites, display, studio, auth } = result;
+  const lines = ['System prerequisites:'];
+  for (const p of prerequisites) {
+    lines.push(
+      p.available
+        ? `  OK  ${p.name}${p.version ? ` (${p.version})` : ''}`
+        : OutputHelper.formatError(`  MISSING  ${p.name} — ${p.hint}`)
+    );
+  }
+
+  lines.push(
+    '',
+    'Display:',
+    `  Xvfb (${display.name}): ${display.xvfb ? 'running' : 'not running'}`,
+    `  openbox: ${display.openbox ? 'running' : 'not running'}`,
+    '',
+    'Studio installation:',
+    `  ${studio.dir}: ${studio.installed ? 'installed' : 'not found'}`
+  );
+  if (studio.version) lines.push(`  Version: ${studio.version}`);
+  lines.push(
+    `  FFlags: ${studio.fflags ? 'configured' : 'not found'}`,
+    `  Shaders: ${studio.shaders ? 'present' : 'not found'}`,
+    '',
+    'Authentication:',
+    `  write-cred.exe: ${auth.writeCredExe ? 'compiled' : 'not found'}`,
+    auth.winePrefix
+      ? `  Wine credentials: ${
+          auth.credentialsInjected ? 'present' : 'not injected'
+        }`
+      : '  Wine prefix: not initialized',
+    '',
+    result.healthy ? result.summary : OutputHelper.formatWarning(result.summary)
+  );
+
+  return lines.join('\n');
 }
 
 export const linuxStatusCommand = defineCommand<StatusArgs, StatusResult>({
@@ -176,5 +179,8 @@ export const linuxStatusCommand = defineCommand<StatusArgs, StatusResult>({
   safety: 'none',
   scope: 'standalone',
   args: {},
+  cli: {
+    format: formatStatusText,
+  },
   handler: async (args) => statusHandlerAsync(args),
 });

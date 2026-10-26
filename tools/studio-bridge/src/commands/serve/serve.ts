@@ -7,6 +7,7 @@ import { defineCommand } from '../framework/define-command.js';
 import { arg } from '../framework/arg-builder.js';
 import { BridgeConnection } from '../../bridge/index.js';
 import type { BridgeSession } from '../../bridge/index.js';
+import { isJsonOutputEnabled } from '../../cli/cli-output-context.js';
 
 export interface ServeOptions {
   port?: number;
@@ -17,6 +18,8 @@ export interface ServeOptions {
 export interface ServeResult {
   port: number;
   event: string;
+  timestamp: string;
+  summary: string;
 }
 
 /** Blocks until shutdown signal or timeout. */
@@ -24,6 +27,7 @@ export async function serveHandlerAsync(
   options: ServeOptions = {}
 ): Promise<ServeResult> {
   const port = options.port ?? 38741;
+  options = { ...options, json: options.json || isJsonOutputEnabled() };
 
   const alreadyRunning = new Error(
     `Port ${port} is already in use. A bridge host is already running. ` +
@@ -51,6 +55,8 @@ export async function serveHandlerAsync(
     await connection.disconnectAsync();
     throw alreadyRunning;
   }
+
+  const listeningPort = connection.port;
 
   // Log startup
   if (options.json) {
@@ -143,7 +149,12 @@ export async function serveHandlerAsync(
     });
   }
 
-  return { port: connection.port, event: 'stopped' };
+  return {
+    port: listeningPort,
+    event: 'stopped',
+    timestamp: new Date().toISOString(),
+    summary: 'Bridge host stopped.',
+  };
 }
 
 export const serveCommand = defineCommand<ServeOptions, ServeResult>({

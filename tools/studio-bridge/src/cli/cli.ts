@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { VersionChecker } from '@quenty/nevermore-cli-helpers';
+import { addWarning, setJsonOutput } from './cli-output-context.js';
 
 import { CommandRegistry } from '../commands/framework/command-registry.js';
 import { buildGroupCommands } from './adapters/group-builder.js';
@@ -70,10 +71,13 @@ registry.register(linuxStatusCommand);
 
 const { groups, topLevel } = buildGroupCommands(registry);
 
-const formatArg = process.argv.includes('--format')
-  ? process.argv[process.argv.indexOf('--format') + 1]
-  : undefined;
-const isMachineReadable = formatArg === 'json';
+OutputHelper.setDiagnosticsToStderr(true);
+
+const formatIndex = process.argv.indexOf('--format');
+const isMachineReadable =
+  process.argv.includes('--format=json') ||
+  (formatIndex !== -1 && process.argv[formatIndex + 1] === 'json');
+setJsonOutput(isMachineReadable);
 
 const versionData = await VersionChecker.checkForUpdatesAsync({
   humanReadableName: 'Studio Bridge',
@@ -86,24 +90,19 @@ const versionData = await VersionChecker.checkForUpdatesAsync({
   silent: isMachineReadable,
 });
 
-// Expose version metadata so the adapter can inject it into JSON output
 if (isMachineReadable && versionData) {
-  const warnings: string[] = [];
   if (versionData.isLocalDev) {
-    warnings.push(
+    addWarning(
       `Studio Bridge is running in local development mode. Run 'npm install -g @quenty/studio-bridge@latest' to switch to production copy.`
     );
   } else if (versionData.updateAvailable) {
-    warnings.push(
+    addWarning(
       `Studio Bridge update available: ${VersionChecker.getVersionDisplayName(
         versionData
       )} → ${
         versionData.latestVersion
       }. Run 'npm install -g @quenty/studio-bridge@latest' to update.`
     );
-  }
-  if (warnings.length > 0) {
-    (globalThis as any).__studioBridgeWarnings = warnings;
   }
 }
 
@@ -115,7 +114,8 @@ const cli = yargs(hideBin(process.argv))
       : undefined) as any
   )
   .option('timeout', {
-    description: 'Timeout in milliseconds',
+    description:
+      'How long to wait for a Studio session to connect, in milliseconds',
     type: 'number',
     global: true,
   })

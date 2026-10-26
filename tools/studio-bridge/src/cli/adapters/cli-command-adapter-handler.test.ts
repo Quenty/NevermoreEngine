@@ -8,6 +8,11 @@ import { buildYargsCommand } from './cli-command-adapter.js';
 import { defineCommand } from '../../commands/framework/define-command.js';
 import type { CliLifecycleProvider } from './cli-command-adapter.js';
 
+vi.mock('../cli-output-context.js', () => ({
+  getWarnings: () => [],
+  warnIfPluginStaleAsync: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
   return {

@@ -8,7 +8,9 @@
 
 local RunService = game:GetService("RunService")
 
-local PLUGIN_VERSION = "0.7.0"
+local PLUGIN_VERSION = "{{PLUGIN_VERSION}}"
+local MAX_SLUG_LENGTH = 24
+local NONCE_VALUE_NAME = "StudioBridgeNonce"
 
 local StudioBridgeSessionUtils = {}
 
@@ -53,28 +55,40 @@ function StudioBridgeSessionUtils.getContext(): PluginContext
 end
 
 --[=[
-	Returns a stable id for the open place. Published places use their game and
-	place ids. Unpublished places all share id 0, so they use the place name plus
-	`nonce` to stay distinct from each other.
+	Returns a short, readable id for the open place: its name as a slug plus
+	`nonce`, which tells apart two Studios with the same place open.
 ]=]
-function StudioBridgeSessionUtils.getInstanceId(
-	gameId: number,
-	placeId: number,
-	placeName: string?,
-	nonce: string
-): string
-	if gameId ~= 0 or placeId ~= 0 then
-		return `{gameId}-{placeId}`
-	end
-
-	local name = string.lower(placeName or "untitled")
-	name = string.gsub(name, "%s+", "-")
-	name = string.gsub(name, "[^%w%-]", "")
+function StudioBridgeSessionUtils.getInstanceId(placeName: string?, nonce: string): string
+	local name = string.lower(placeName or "")
+	name = string.gsub(name, "%.rbxl[x]?$", "")
+	name = string.gsub(name, "[^%w]+", "-")
+	name = string.gsub(name, "^%-+", "")
+	name = string.sub(name, 1, MAX_SLUG_LENGTH)
+	name = string.gsub(name, "%-+$", "")
 	if name == "" then
-		name = "untitled"
+		name = "place"
 	end
 
-	return `local-{name}-{nonce}`
+	return `{name}-{nonce}`
+end
+
+--[=[
+	Returns the nonce stored under `container`, creating it on first use. The
+	value is not archivable, so it lasts as long as the DataModel: plugin reloads
+	keep their session id, and a fresh Studio gets a new one.
+]=]
+function StudioBridgeSessionUtils.getOrCreateNonce(container: Instance, createNonce: () -> string): string
+	local existing = container:FindFirstChild(NONCE_VALUE_NAME)
+	if existing and existing:IsA("StringValue") and existing.Value ~= "" then
+		return existing.Value
+	end
+
+	local value = Instance.new("StringValue")
+	value.Name = NONCE_VALUE_NAME
+	value.Archivable = false
+	value.Value = createNonce()
+	value.Parent = container
+	return value.Value
 end
 
 --[=[
@@ -86,7 +100,6 @@ end
 
 --[=[
 	Returns the payload of the `register` message the plugin sends on connect.
-	The plugin only runs in the edit DataModel, so its state is always `Edit`.
 ]=]
 function StudioBridgeSessionUtils.createRegisterPayload(instanceId: string, context: PluginContext): { [string]: any }
 	return {

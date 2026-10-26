@@ -71,7 +71,7 @@ describe('resolveSessionAsync', () => {
     const conn = createMockConnection(sessions);
 
     await expect(resolveSessionAsync(conn)).rejects.toThrow(
-      /Multiple sessions found.*--session.*--instance/s
+      /Multiple sessions found.*--target/s
     );
   });
 

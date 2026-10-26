@@ -44,7 +44,7 @@ export async function queryLogsHandlerAsync(
     bufferCapacity: result.bufferCapacity ?? 0,
     summary: `${(result.entries ?? []).length} entries (${
       result.total ?? 0
-    } total in buffer)`,
+    } in buffer)`,
   };
 }
 
@@ -70,7 +70,7 @@ export function formatLogsText(result: LogsResult): string {
   });
   lines.push(
     OutputHelper.formatDim(
-      `(${result.entries.length} of ${result.total} entries)`
+      `(${result.entries.length} shown, ${result.total} in buffer)`
     )
   );
   return lines.join('\n');
@@ -94,8 +94,9 @@ export const logsCommand = defineCommand<LogsOptions, LogsResult>({
       choices: ['head', 'tail'] as const,
     }),
     levels: arg.option({
-      description: 'Filter by output level (Print, Warning, Error)',
+      description: 'Filter by output level',
       array: true,
+      choices: ['Print', 'Info', 'Warning', 'Error'] as const,
     }),
     includeInternal: arg.flag({
       description: 'Include internal/system log messages',
