@@ -1,0 +1,89 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('../../../process/studio-process-closer.js', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('../../../process/studio-process-closer.js')
+  >();
+  return {
+    ...actual,
+    listStudioProcessesAsync: vi.fn(),
+    closeStudioProcessAsync: vi.fn(),
+  };
+});
+
+import { processCloseHandlerAsync } from './close.js';
+import {
+  closeStudioProcessAsync,
+  listStudioProcessesAsync,
+} from '../../../process/studio-process-closer.js';
+
+const session = {
+  info: { sessionId: 'test-place-edit', placeName: 'test-place.rbxl' },
+} as any;
+
+describe('processCloseHandlerAsync', () => {
+  beforeEach(() => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 10, windowTitle: 'C:\\places\\test-place.rbxl - Roblox Studio' },
+      { pid: 20, windowTitle: 'Other - Roblox Studio' },
+    ]);
+    vi.mocked(closeStudioProcessAsync).mockReset().mockResolvedValue(true);
+  });
+
+  it('closes the Studio window showing the session place', async () => {
+    const result = await processCloseHandlerAsync(session);
+
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(10, {
+      force: undefined,
+    });
+    expect(result).toMatchObject({ success: true, pid: 10 });
+  });
+
+  it('passes --force through', async () => {
+    await processCloseHandlerAsync(session, { force: true });
+
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(10, { force: true });
+  });
+
+  it('suggests --force when Studio stays open', async () => {
+    vi.mocked(closeStudioProcessAsync).mockResolvedValue(false);
+
+    const result = await processCloseHandlerAsync(session);
+
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain('--force');
+  });
+
+  it('fails without closing when no window shows the place', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 20, windowTitle: 'Other - Roblox Studio' },
+    ]);
+
+    const result = await processCloseHandlerAsync(session);
+
+    expect(result.success).toBe(false);
+    expect(closeStudioProcessAsync).not.toHaveBeenCalled();
+  });
+
+  it('asks for --pid when several windows show the place', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 10, windowTitle: 'C:\\a\\test-place.rbxl - Roblox Studio' },
+      { pid: 11, windowTitle: 'C:\\b\\test-place.rbxl - Roblox Studio' },
+    ]);
+
+    const result = await processCloseHandlerAsync(session);
+
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain('--pid');
+    expect(closeStudioProcessAsync).not.toHaveBeenCalled();
+  });
+
+  it('closes the process picked with --pid', async () => {
+    const result = await processCloseHandlerAsync(session, { pid: 20 });
+
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(20, {
+      force: undefined,
+    });
+    expect(result.success).toBe(true);
+  });
+});
