@@ -1,3 +1,16 @@
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.10.0`, `@quenty/jecs@1.11.0`
+  - feat: immediate systems hot reload feedback [#849](https://github.com/Quenty/NevermoreEngine/pull/849) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Sat Oct 24 2026)
 
 :tada: This release contains work from a new contributor! :tada:
