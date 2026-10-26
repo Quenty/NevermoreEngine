@@ -145,7 +145,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router, sendMessage)
 
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-rid",
 			requestId = "req-abc-123",
@@ -174,7 +174,7 @@ table.insert(tests, {
 		ExecuteAction.register(router, sendMessage)
 
 		-- ActionRouter passes "" when requestId is nil
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-v1",
 			payload = { code = "local x = 1" },
@@ -195,7 +195,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-direct",
 			requestId = "req-direct-123",
@@ -219,7 +219,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-load",
 			requestId = "req-load",
@@ -239,7 +239,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-runtime",
 			requestId = "req-runtime",
@@ -271,21 +271,21 @@ table.insert(tests, {
 		ExecuteAction.register(router, sendMessage)
 
 		-- Dispatch multiple requests
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-q",
 			requestId = "req-q1",
 			payload = { code = "local a = 1" },
 		})
 
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-q",
 			requestId = "req-q2",
 			payload = { code = "local b = 2" },
 		})
 
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-q",
 			requestId = "req-q3",
@@ -316,7 +316,7 @@ table.insert(tests, {
 		ExecuteAction.register(router, sendMessage)
 
 		-- First request: compile error
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-err-q",
 			requestId = "req-err1",
@@ -324,7 +324,7 @@ table.insert(tests, {
 		})
 
 		-- Second request: success
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-err-q",
 			requestId = "req-ok1",
@@ -355,7 +355,7 @@ table.insert(tests, {
 		ExecuteAction.register(router, sendMessage)
 
 		-- ActionRouter should return nil (handler sends messages directly)
-		local routerResponse = router:dispatch({
+		local routerResponse = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-send",
 			requestId = "req-send",
@@ -387,7 +387,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router, sendMessage)
 
-		router:dispatch({
+		router:Dispatch({
 			type = "execute",
 			sessionId = "sess-senderr",
 			requestId = "req-senderr",

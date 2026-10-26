@@ -1,164 +1,151 @@
---[[
-	Action dispatch module for routing incoming protocol messages to handlers.
+--!strict
+--[=[
+	Routes incoming studio-bridge messages to handlers by message type, and wraps
+	whatever a handler returns into the response message.
 
-	Maintains a registry of handler functions keyed by message type. When a
-	message is dispatched, the router looks up the handler, calls it with
-	(payload, requestId, sessionId), and constructs a response message if
-	the handler returns a payload table.
+	- An unknown message type answers with an `UNKNOWN_REQUEST` error.
+	- A handler that throws answers with an `INTERNAL_ERROR` error.
+	- A handler that returns nil sends nothing, which is how an action that
+	  replies on its own (through `sendMessage`) opts out.
 
-	Error handling:
-	- Unknown message type: returns error response with code UNKNOWN_REQUEST
-	- Handler throws: returns error response with code INTERNAL_ERROR
-	- Handler returns nil: no response is generated
+	Action modules pushed over the wire call `register` and `setResponseType` on
+	the router. Those two keep their lowercase names because a persistent plugin
+	installed from an older release still runs action source pushed by a newer CLI.
 
-	No Roblox APIs. Pure logic, testable under Lune.
-]]
+	@class ActionRouter
+]=]
 
 local ActionRouter = {}
+ActionRouter.ClassName = "ActionRouter"
 ActionRouter.__index = ActionRouter
 
--- ---------------------------------------------------------------------------
--- Constructor
--- ---------------------------------------------------------------------------
+export type Message = {
+	type: string,
+	sessionId: string,
+	payload: { [string]: any },
+	requestId: string?,
+}
 
-function ActionRouter.new()
-	local self = setmetatable({
-		_handlers = {} :: {
-			[string]: (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?,
-		},
-		_responseTypes = {} :: { [string]: string },
-		_actions = {} :: { [string]: { module: any, hash: string, handlerNames: { string } } },
-	}, ActionRouter)
+export type Handler = (payload: { [string]: any }, requestId: string, sessionId: string) -> { [string]: any }?
+
+export type SendMessage = (message: { [string]: any }) -> ()
+
+export type ActionInfo = {
+	module: any,
+	hash: string,
+	handlerNames: { string },
+}
+
+export type ActionRouter = typeof(setmetatable(
+	{} :: {
+		_handlers: { [string]: Handler },
+		_responseTypes: { [string]: string },
+		_actions: { [string]: ActionInfo },
+		_vendorPng: any?,
+	},
+	{} :: typeof({ __index = ActionRouter })
+))
+
+--[=[
+	Constructs a new router with no handlers.
+]=]
+function ActionRouter.new(): ActionRouter
+	local self: ActionRouter = setmetatable({} :: any, ActionRouter)
+
+	self._handlers = {}
+	self._responseTypes = {}
+	self._actions = {}
+
+	-- The screenshot action reads its PNG encoder off this field
+	self._vendorPng = nil
+
 	return self
 end
 
--- ---------------------------------------------------------------------------
--- Register a handler for a message type
--- ---------------------------------------------------------------------------
-
-function ActionRouter.register(
-	self: any,
-	messageType: string,
-	handler: (
-		payload: { [string]: any },
-		requestId: string,
-		sessionId: string
-	) -> { [string]: any }?
-)
+--[=[
+	Sets the handler for a message type, replacing any previous one.
+]=]
+function ActionRouter.register(self: ActionRouter, messageType: string, handler: Handler)
 	self._handlers[messageType] = handler
 end
 
--- ---------------------------------------------------------------------------
--- Dispatch an incoming message
--- ---------------------------------------------------------------------------
+--[=[
+	Overrides the response type for a message type. Defaults to `<messageType>Result`.
+]=]
+function ActionRouter.setResponseType(self: ActionRouter, messageType: string, responseType: string)
+	self._responseTypes[messageType] = responseType
+end
 
---[[
-	Dispatch an incoming message to the appropriate handler.
+--[=[
+	Sets the PNG encoder handed to the screenshot action.
+]=]
+function ActionRouter.SetVendorPng(self: ActionRouter, png: any)
+	self._vendorPng = png
+end
 
-	@param message Table with fields: type, sessionId, payload, requestId?
-	@return A response message table, or nil if the handler returns nil.
-]]
-function ActionRouter.dispatch(
-	self: any,
-	message: {
-		type: string,
-		sessionId: string,
-		payload: { [string]: any },
-		requestId: string?,
-	}
-): { [string]: any }?
+--[=[
+	Dispatches a message to its handler and returns the response message, if any.
+]=]
+function ActionRouter.Dispatch(self: ActionRouter, message: Message): Message?
 	local handler = self._handlers[message.type]
-
 	if handler == nil then
-		return {
-			type = "error",
-			sessionId = message.sessionId,
-			requestId = message.requestId,
-			payload = {
-				code = "UNKNOWN_REQUEST",
-				message = "Unknown message type: " .. tostring(message.type),
-			},
-		}
+		return ActionRouter._errorResponse(message, "UNKNOWN_REQUEST", `Unknown message type: {tostring(message.type)}`)
 	end
 
-	local requestId = message.requestId or ""
-	local ok, result = pcall(handler, message.payload, requestId, message.sessionId)
-
+	local ok, result = pcall(handler, message.payload, message.requestId or "", message.sessionId)
 	if not ok then
-		return {
-			type = "error",
-			sessionId = message.sessionId,
-			requestId = message.requestId,
-			payload = {
-				code = "INTERNAL_ERROR",
-				message = "Handler error: " .. tostring(result),
-			},
-		}
+		return ActionRouter._errorResponse(message, "INTERNAL_ERROR", `Handler error: {tostring(result)}`)
 	end
 
 	if result == nil then
 		return nil
 	end
 
-	-- Construct response with the appropriate response type
-	local responseType = self._responseTypes[message.type] or (message.type .. "Result")
-
 	return {
-		type = responseType,
+		type = self._responseTypes[message.type] or `{message.type}Result`,
 		sessionId = message.sessionId,
 		requestId = message.requestId,
 		payload = result,
 	}
 end
 
--- ---------------------------------------------------------------------------
--- Set a custom response type for a message type
--- ---------------------------------------------------------------------------
-
-function ActionRouter.setResponseType(self: any, messageType: string, responseType: string)
-	self._responseTypes[messageType] = responseType
+function ActionRouter._errorResponse(message: Message, code: string, errorMessage: string): Message
+	return {
+		type = "error",
+		sessionId = message.sessionId,
+		requestId = message.requestId,
+		payload = {
+			code = code,
+			message = errorMessage,
+		},
+	}
 end
 
--- ---------------------------------------------------------------------------
--- Register a dynamic action from source code
--- ---------------------------------------------------------------------------
+--[=[
+	Installs an action from Luau source received over the wire.
 
---[[
-	Dynamically register an action from Luau source code received over the wire.
+	The source returns either a table with `register(router, sendMessage?, logBuffer?)`
+	(and optionally `teardown()`), or a bare handler function registered under `name`.
 
-	The source is expected to be a module that returns a table with a `register`
-	function: `function(router, sendMessage?, logBuffer?)`. This mirrors the
-	static action module convention.
-
-	If the source defines a simple handler function instead, it is registered
-	directly as the handler for the given action name.
-
-	@param name The action name (used as the message type if not registered otherwise).
-	@param source The Luau source code string.
-	@param sendMessage Optional callback for actions that send their own responses.
-	@param logBuffer Optional log buffer instance.
-	@param responseType Optional response type override.
-	@param hash Optional content hash for skip-on-same-hash optimization.
-	@return success, error?
-]]
-function ActionRouter.registerAction(
-	self: any,
+	Re-registering a name tears the previous module down and removes its handlers
+	first. With a `hash`, the same hash installed twice is a no-op.
+]=]
+function ActionRouter.RegisterAction(
+	self: ActionRouter,
 	name: string,
 	source: string,
-	sendMessage: ((msg: { [string]: any }) -> ())?,
+	sendMessage: SendMessage?,
 	logBuffer: any?,
 	responseType: string?,
 	hash: string?
 ): (boolean, string?)
-	-- Hash-based skip: if the same hash is already installed, skip re-registration
-	if hash and self._actions[name] and self._actions[name].hash == hash then
+	local oldAction = self._actions[name]
+	if hash and oldAction and oldAction.hash == hash then
 		return true, nil
 	end
 
-	-- If an old module exists, tear it down and remove its handlers
-	local oldAction = self._actions[name]
 	if oldAction then
-		if type(oldAction.module.teardown) == "function" then
+		if type(oldAction.module) == "table" and type(oldAction.module.teardown) == "function" then
 			pcall(oldAction.module.teardown)
 		end
 		for _, handlerName in oldAction.handlerNames do
@@ -167,77 +154,77 @@ function ActionRouter.registerAction(
 		end
 	end
 
-	-- Snapshot handler keys before registration
-	local beforeHandlers = {}
-	for k, _ in self._handlers do
-		beforeHandlers[k] = true
+	local handlersBefore: { [string]: boolean } = {}
+	for handlerName in self._handlers do
+		handlersBefore[handlerName] = true
 	end
 
-	-- Load the source code
-	local loadOk, moduleOrErr = pcall(function()
+	local loadOk, chunkOrErr = pcall(function()
 		return (loadstring :: any)(source, `@action/{name}`)
 	end)
-
-	if not loadOk or not moduleOrErr then
-		return false, `Failed to load action source: {moduleOrErr or "loadstring returned nil"}`
+	if not loadOk or not chunkOrErr then
+		return false, `Failed to load action source: {chunkOrErr or "loadstring returned nil"}`
 	end
 
-	-- Execute the loaded chunk to get the module table
-	local execOk, moduleTable = pcall(moduleOrErr)
+	local execOk, moduleOrErr = pcall(chunkOrErr)
 	if not execOk then
-		return false, `Failed to execute action module: {moduleTable}`
+		return false, `Failed to execute action module: {moduleOrErr}`
 	end
 
-	-- If the module has a register function, call it
-	if type(moduleTable) == "table" and type(moduleTable.register) == "function" then
-		local regOk, regErr = pcall(moduleTable.register, self, sendMessage, logBuffer)
-		if not regOk then
-			return false, `register() failed: {regErr}`
+	if type(moduleOrErr) == "table" and type(moduleOrErr.register) == "function" then
+		local registerOk, registerErr = pcall(moduleOrErr.register, self, sendMessage, logBuffer)
+		if not registerOk then
+			return false, `register() failed: {registerErr}`
 		end
-	elseif type(moduleTable) == "function" then
-		-- Simple handler function
-		self:register(name, moduleTable)
+	elseif type(moduleOrErr) == "function" then
+		self:register(name, moduleOrErr)
 	else
-		return false, `Action module must return a table with .register() or a function`
+		return false, "Action module must return a table with .register() or a function"
 	end
 
-	-- Set custom response type if provided
 	if responseType then
 		self._responseTypes[name] = responseType
 	end
 
-	-- Diff handler keys to find newly registered handler names
-	local registeredNames = {}
-	for k, _ in self._handlers do
-		if not beforeHandlers[k] then
-			table.insert(registeredNames, k)
+	local handlerNames: { string } = {}
+	for handlerName in self._handlers do
+		if not handlersBefore[handlerName] then
+			table.insert(handlerNames, handlerName)
 		end
 	end
 
-	-- Store in _actions for hash tracking
 	if hash then
 		self._actions[name] = {
-			module = moduleTable,
+			module = moduleOrErr,
 			hash = hash,
-			handlerNames = registeredNames,
+			handlerNames = handlerNames,
 		}
 	end
 
 	return true, nil
 end
 
--- ---------------------------------------------------------------------------
--- Get installed actions with their hashes
--- ---------------------------------------------------------------------------
+--[=[
+	Returns the handler names an installed action registered, or nil when no
+	action with a hash is installed under `name`.
+]=]
+function ActionRouter.GetActionHandlerNames(self: ActionRouter, name: string): { string }?
+	local action = self._actions[name]
+	if not action then
+		return nil
+	end
 
---[[
-	Returns a map of action name -> content hash for all installed actions.
-	Used by the syncActions protocol to determine which actions need updating.
-]]
-function ActionRouter.getInstalledActions(self: any): { [string]: string }
-	local result = {}
-	for name, info in self._actions do
-		result[name] = info.hash
+	return table.clone(action.handlerNames)
+end
+
+--[=[
+	Returns action name to content hash for every installed action. The bridge
+	compares this against its own hashes to decide which actions to push.
+]=]
+function ActionRouter.GetInstalledActions(self: ActionRouter): { [string]: string }
+	local result: { [string]: string } = {}
+	for name, action in self._actions do
+		result[name] = action.hash
 	end
 	return result
 end

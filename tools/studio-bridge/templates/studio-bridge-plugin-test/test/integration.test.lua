@@ -96,7 +96,7 @@ table.insert(tests, {
 		assertEqual(decoded.requestId, "int-req-001")
 
 		-- Dispatch through ActionRouter
-		local response = router:dispatch(decoded)
+		local response = router:Dispatch(decoded)
 		assertNotNil(response, "dispatch response")
 		assertEqual(response.type, "stateResult")
 		assertEqual(response.sessionId, "int-sess-001")
@@ -149,7 +149,7 @@ table.insert(tests, {
 		-- Decode and dispatch
 		local decoded, err = Protocol.decode(executeMsg)
 		assertNil(err, "decode error")
-		local response = router:dispatch(decoded)
+		local response = router:Dispatch(decoded)
 
 		-- Verify handler received the script
 		assertEqual(capturedScript, "print('hello world')", "handler received script")
@@ -193,14 +193,14 @@ table.insert(tests, {
 		end)
 
 		-- Push log entries
-		buffer:push({ level = "Print", body = "Starting up...", timestamp = 1000 })
-		buffer:push({ level = "Warning", body = "Low memory", timestamp = 2000 })
-		buffer:push({ level = "Error", body = "Connection failed", timestamp = 3000 })
-		buffer:push({ level = "Print", body = "Retrying...", timestamp = 4000 })
-		buffer:push({ level = "Print", body = "Connected!", timestamp = 5000 })
+		buffer:Push({ level = "Print", body = "Starting up...", timestamp = 1000 })
+		buffer:Push({ level = "Warning", body = "Low memory", timestamp = 2000 })
+		buffer:Push({ level = "Error", body = "Connection failed", timestamp = 3000 })
+		buffer:Push({ level = "Print", body = "Retrying...", timestamp = 4000 })
+		buffer:Push({ level = "Print", body = "Connected!", timestamp = 5000 })
 
 		-- Dispatch a queryLogs request for tail 3
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "logs-sess",
 			requestId = "logs-req-001",
@@ -217,7 +217,7 @@ table.insert(tests, {
 		assertEqual(response.payload.bufferCapacity, 100)
 
 		-- Now request head 2
-		local headResponse = router:dispatch({
+		local headResponse = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "logs-sess",
 			requestId = "logs-req-002",
@@ -248,7 +248,7 @@ table.insert(tests, {
 
 		-- Push entries
 		for i = 1, 10 do
-			buffer:push({
+			buffer:Push({
 				level = if i % 3 == 0 then "Warning" else "Print",
 				body = "log entry " .. tostring(i),
 				timestamp = i * 1000,
@@ -268,7 +268,7 @@ table.insert(tests, {
 		assertNil(decErr, "decode error")
 
 		-- Dispatch
-		local response = router:dispatch(request)
+		local response = router:Dispatch(request)
 		assertNotNil(response, "response")
 
 		-- Encode response
@@ -335,15 +335,15 @@ table.insert(tests, {
 		})
 
 		-- Start the state machine
-		assertEqual(sm:getState(), "idle")
-		sm:start()
-		assertEqual(sm:getState(), "searching")
+		assertEqual(sm:GetState(), "idle")
+		sm:Start()
+		assertEqual(sm:GetState(), "searching")
 
 		-- First poll triggers immediate scan (nextPollAt was set to 0)
-		sm:pollAsync()
+		sm:PollAsync()
 
 		-- State machine should have found the port and connected
-		assertEqual(sm:getState(), "connected")
+		assertEqual(sm:GetState(), "connected")
 		assertNotNil(connectedConnection, "connection object")
 		assertEqual(connectedConnection.id, "mock-connection")
 
@@ -396,22 +396,22 @@ table.insert(tests, {
 		})
 
 		-- Start and connect
-		sm:start()
-		sm:pollAsync()
+		sm:Start()
+		sm:PollAsync()
 		assertEqual(currentState, "connected", "initial connection")
 
 		-- Simulate disconnect with server down
 		serverUp = false
-		sm:onDisconnect("connection lost")
+		sm:HandleDisconnect("connection lost")
 		-- Transitions straight to searching (no backoff)
 		assertEqual(currentState, "searching", "searching immediately after disconnect")
 
 		-- First poll triggers scan (primed), server still down -> stays searching
-		sm:pollAsync()
+		sm:PollAsync()
 		assertEqual(currentState, "searching", "stays searching when server is down")
 
 		-- Next poll should not scan yet (nextPollAt is in the future)
-		sm:pollAsync()
+		sm:PollAsync()
 		assertEqual(currentState, "searching", "still searching, waiting for poll interval")
 
 		-- Bring server back up and force next poll by setting _nextPollAt to 0
@@ -419,7 +419,7 @@ table.insert(tests, {
 		sm._nextPollAt = 0
 
 		-- Next poll triggers scan -> server responds -> connects
-		sm:pollAsync()
+		sm:PollAsync()
 		assertEqual(currentState, "connected", "reconnected after server came back")
 	end,
 })
@@ -439,7 +439,7 @@ table.insert(tests, {
 		router:setResponseType("execute", "scriptComplete")
 		router:register("execute", function(payload, _requestId, _sessionId)
 			-- Simulate: script produces output and completes
-			outputBuffer:push({
+			outputBuffer:Push({
 				level = "Print",
 				body = "Script output: " .. payload.script,
 				timestamp = 5000,
@@ -477,14 +477,14 @@ table.insert(tests, {
 		assertNil(execErr, "execute decode error")
 
 		-- Step 4: Plugin dispatches execute through ActionRouter
-		local scriptCompleteResponse = router:dispatch(executeDecoded)
+		local scriptCompleteResponse = router:Dispatch(executeDecoded)
 		assertNotNil(scriptCompleteResponse, "scriptComplete response")
 		assertEqual(scriptCompleteResponse.type, "scriptComplete")
 		assertEqual(scriptCompleteResponse.payload.success, true)
 		assertEqual(scriptCompleteResponse.requestId, "req-exec-001")
 
 		-- Step 5: Verify output was buffered
-		assertEqual(outputBuffer:size(), 1, "one output entry")
+		assertEqual(outputBuffer:GetCount(), 1, "one output entry")
 		local logs = outputBuffer:get("tail", 1)
 		assertContains(logs.entries[1].body, "print('hello')")
 
@@ -526,7 +526,7 @@ table.insert(tests, {
 		local decoded, err = Protocol.decode(unknownRequest)
 		assertNil(err, "decode error")
 
-		local errorResponse = router:dispatch(decoded)
+		local errorResponse = router:Dispatch(decoded)
 		assertNotNil(errorResponse, "error response")
 		assertEqual(errorResponse.type, "error")
 		assertEqual(errorResponse.payload.code, "UNKNOWN_REQUEST")
@@ -564,7 +564,7 @@ table.insert(tests, {
 
 		-- Push more entries than capacity
 		for i = 1, 20 do
-			buffer:push({
+			buffer:Push({
 				level = if i % 2 == 0 then "Warning" else "Print",
 				body = "overflow-" .. tostring(i),
 				timestamp = i * 100,
@@ -572,7 +572,7 @@ table.insert(tests, {
 		end
 
 		-- Query tail 3 via dispatch
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "overflow-sess",
 			requestId = "overflow-req",
@@ -618,7 +618,7 @@ table.insert(tests, {
 		end)
 
 		-- Push some logs
-		buffer:push({ level = "Print", body = "test log", timestamp = 1000 })
+		buffer:Push({ level = "Print", body = "test log", timestamp = 1000 })
 
 		-- Encode three requests with different requestIds
 		local requests = {
@@ -647,7 +647,7 @@ table.insert(tests, {
 		for _, reqJson in requests do
 			local decoded, err = Protocol.decode(reqJson)
 			assertNil(err, "decode error")
-			local resp = router:dispatch(decoded)
+			local resp = router:Dispatch(decoded)
 			assertNotNil(resp, "response")
 			table.insert(responses, resp)
 		end
@@ -703,14 +703,14 @@ table.insert(tests, {
 		})
 
 		-- Connect
-		sm:start()
-		sm:pollAsync()
+		sm:Start()
+		sm:PollAsync()
 		assertTrue(wasConnected, "should be connected")
-		assertEqual(sm:getState(), "connected")
+		assertEqual(sm:GetState(), "connected")
 
 		-- Stop while connected
-		sm:stop()
-		assertEqual(sm:getState(), "idle")
+		sm:Stop()
+		assertEqual(sm:GetState(), "idle")
 		assertEqual(disconnectReason, "stopped", "disconnect reason should be 'stopped'")
 	end,
 })
@@ -739,7 +739,7 @@ table.insert(tests, {
 		local decoded, decErr = Protocol.decode(requestJson)
 		assertNil(decErr, "decode error")
 
-		local errorResponse = router:dispatch(decoded)
+		local errorResponse = router:Dispatch(decoded)
 		assertNotNil(errorResponse, "error response")
 		assertEqual(errorResponse.type, "error")
 		assertEqual(errorResponse.payload.code, "INTERNAL_ERROR")
@@ -781,9 +781,9 @@ table.insert(tests, {
 		end)
 
 		-- Pre-populate the buffer (simulating logs accumulated during startup)
-		buffer:push({ level = "Print", body = "[StudioBridge] Plugin loaded", timestamp = 100 })
-		buffer:push({ level = "Print", body = "[StudioBridge] Searching for server...", timestamp = 200 })
-		buffer:push({ level = "Print", body = "[StudioBridge] Connected to port 38742", timestamp = 500 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Plugin loaded", timestamp = 100 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Searching for server...", timestamp = 200 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Connected to port 38742", timestamp = 500 })
 
 		-- Discovery finds the server on port 38742
 		local sm = DiscoveryStateMachine.new({
@@ -810,9 +810,9 @@ table.insert(tests, {
 			onDisconnected = function(_reason: string?) end,
 		})
 
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 		assertEqual(discoveredPort, 38742)
 
 		-- Now simulate the register handshake via Protocol
@@ -844,7 +844,7 @@ table.insert(tests, {
 		assertNil(qlErr, "queryLogs decode error")
 
 		-- Plugin dispatches through router
-		local logsResponse = router:dispatch(queryDecoded)
+		local logsResponse = router:Dispatch(queryDecoded)
 		assertNotNil(logsResponse, "logs response")
 		assertEqual(logsResponse.type, "logsResult")
 		assertEqual(#logsResponse.payload.entries, 2)
@@ -910,17 +910,17 @@ table.insert(tests, {
 			onDisconnected = function(_reason: string?) end,
 		})
 
-		sm:start()
+		sm:Start()
 		assertEqual(currentState, "searching")
 
 		-- Poll to trigger scan
-		sm:pollAsync()
+		sm:PollAsync()
 		-- All ports failed, should stay in searching
 		assertEqual(currentState, "searching")
 
 		-- Next poll should skip (nextPollAt is in the future), then force it
 		sm._nextPollAt = 0
-		sm:pollAsync()
+		sm:PollAsync()
 		assertEqual(currentState, "searching", "still searching after second scan")
 	end,
 })
@@ -972,7 +972,7 @@ table.insert(tests, {
 
 		local subDecoded, subErr = Protocol.decode(subJson)
 		assertNil(subErr, "subscribe decode error")
-		local subResponse = router:dispatch(subDecoded)
+		local subResponse = router:Dispatch(subDecoded)
 
 		assertNotNil(subResponse, "subscribe response")
 		assertEqual(subResponse.type, "subscribeResult")
@@ -999,7 +999,7 @@ table.insert(tests, {
 
 		local unsubDecoded, unsubErr = Protocol.decode(unsubJson)
 		assertNil(unsubErr, "unsubscribe decode error")
-		local unsubResponse = router:dispatch(unsubDecoded)
+		local unsubResponse = router:Dispatch(unsubDecoded)
 
 		assertNotNil(unsubResponse, "unsubscribe response")
 		assertEqual(unsubResponse.type, "unsubscribeResult")

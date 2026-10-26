@@ -1,0 +1,38 @@
+{
+  "name": "StudioBridgePluginTest",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "studiobridge": {
+        "$className": "Folder",
+        "jest.config": {
+          "$path": "jest.config.lua"
+        },
+        "Shared": {
+          "$path": "../templates/studio-bridge-plugin/src/Shared"
+        },
+        "node_modules": {
+          "$className": "Folder",
+          "@quenty": {
+            "$className": "Folder",
+            "nevermore-test-runner": {
+              "$path": "../node_modules/@quenty/nevermore-test-runner"
+            }
+          },
+          "@quentystudios": {
+            "$className": "Folder",
+            "jest-lua": {
+              "$path": "../node_modules/@quentystudios/jest-lua"
+            }
+          }
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}

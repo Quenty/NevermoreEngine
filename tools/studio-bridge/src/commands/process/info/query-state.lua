@@ -1,48 +1,46 @@
---[[
-	QueryState action handler for the studio-bridge plugin.
+--!strict
+--[=[
+	Action that answers `queryState` with Studio's run mode and the open place.
 
-	Returns the current Studio run mode, place name, place ID, and game ID.
+	Request: `{ type: "queryState", payload: {} }`
+	Response: `{ type: "stateResult", payload: { state, placeName, placeId, gameId } }`
 
-	Protocol:
-	  Request:  { type: "queryState", payload: {} }
-	  Response: { type: "stateResult", payload: { state, placeName, placeId, gameId } }
-]]
+	@class QueryStateAction
+]=]
 
 local RunService = game:GetService("RunService")
 
 local QueryStateAction = {}
 
--- ---------------------------------------------------------------------------
--- State detection
--- ---------------------------------------------------------------------------
-
-local function detectState(): string
-	if RunService:IsRunning() then
-		if RunService:IsClient() and not RunService:IsServer() then
-			return "Client"
-		elseif RunService:IsServer() and not RunService:IsClient() then
-			return "Server"
-		else
-			return "Play"
-		end
-	end
-	return "Edit"
-end
-
--- ---------------------------------------------------------------------------
--- Public API
--- ---------------------------------------------------------------------------
-
+--[=[
+	Registers the `queryState` handler.
+]=]
 function QueryStateAction.register(router: any)
 	router:setResponseType("queryState", "stateResult")
 	router:register("queryState", function(_payload: { [string]: any }, _requestId: string, _sessionId: string)
 		return {
-			state = detectState(),
+			state = QueryStateAction._getState(),
 			placeName = game.Name or "Unknown",
 			placeId = game.PlaceId,
 			gameId = game.GameId,
 		}
 	end)
+end
+
+function QueryStateAction._getState(): string
+	if not RunService:IsRunning() then
+		return "Edit"
+	end
+
+	local isClient = RunService:IsClient()
+	local isServer = RunService:IsServer()
+	if isClient and not isServer then
+		return "Client"
+	elseif isServer and not isClient then
+		return "Server"
+	else
+		return "Play"
+	end
 end
 
 return QueryStateAction

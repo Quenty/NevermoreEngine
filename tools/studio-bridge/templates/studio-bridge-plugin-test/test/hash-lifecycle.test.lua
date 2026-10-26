@@ -60,11 +60,7 @@ local function assertTableContains(tbl: { any }, value: any, label: string?)
 			return
 		end
 	end
-	error(string.format(
-		"%sexpected table to contain '%s'",
-		if label then label .. ": " else "",
-		tostring(value)
-	))
+	error(string.format("%sexpected table to contain '%s'", if label then label .. ": " else "", tostring(value)))
 end
 
 -- ---------------------------------------------------------------------------
@@ -128,12 +124,12 @@ table.insert(tests, {
 		local hash = "abc123"
 
 		-- First registration should succeed
-		local ok1, err1 = router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, hash)
+		local ok1, err1 = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, hash)
 		assertTrue(ok1, "first registration should succeed")
 		assertNil(err1, "first registration should not error")
 
 		-- Verify the handler works
-		local response1 = router:dispatch({
+		local response1 = router:Dispatch({
 			type = "testAction",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -143,12 +139,12 @@ table.insert(tests, {
 		assertEqual(response1.payload.result, "v1")
 
 		-- Second registration with same hash should skip (return true, no error)
-		local ok2, err2 = router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, hash)
+		local ok2, err2 = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, hash)
 		assertTrue(ok2, "same hash should succeed (skip)")
 		assertNil(err2, "same hash should not error")
 
 		-- Handler should still work (unchanged)
-		local response2 = router:dispatch({
+		local response2 = router:Dispatch({
 			type = "testAction",
 			sessionId = "sess-2",
 			requestId = "req-2",
@@ -165,11 +161,11 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register v1 with hash "abc"
-		local ok1, _ = router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "abc")
+		local ok1, _ = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "abc")
 		assertTrue(ok1, "v1 registration should succeed")
 
 		-- Verify v1 handler
-		local r1 = router:dispatch({
+		local r1 = router:Dispatch({
 			type = "testAction",
 			sessionId = "s1",
 			requestId = "r1",
@@ -178,11 +174,11 @@ table.insert(tests, {
 		assertEqual(r1.payload.result, "v1")
 
 		-- Register v2 with different hash "def"
-		local ok2, _ = router:registerAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "def")
+		local ok2, _ = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "def")
 		assertTrue(ok2, "v2 registration should succeed")
 
 		-- Verify v2 handler replaced v1
-		local r2 = router:dispatch({
+		local r2 = router:Dispatch({
 			type = "testAction",
 			sessionId = "s2",
 			requestId = "r2",
@@ -198,15 +194,15 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register without hash
-		local ok1, _ = router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, nil)
+		local ok1, _ = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, nil)
 		assertTrue(ok1, "first registration should succeed")
 
 		-- Register again without hash - should not skip
-		local ok2, _ = router:registerAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, nil)
+		local ok2, _ = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, nil)
 		assertTrue(ok2, "second registration should succeed")
 
 		-- Should be v2
-		local r = router:dispatch({
+		local r = router:Dispatch({
 			type = "testAction",
 			sessionId = "s1",
 			requestId = "r1",
@@ -225,7 +221,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash1")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash1")
 
 		local actionInfo = router._actions["myAction"]
 		assertNotNil(actionInfo, "action should be tracked")
@@ -241,7 +237,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("multiAction", MULTI_HANDLER_SOURCE, nil, nil, nil, "multi-hash")
+		router:RegisterAction("multiAction", MULTI_HANDLER_SOURCE, nil, nil, nil, "multi-hash")
 
 		local actionInfo = router._actions["multiAction"]
 		assertNotNil(actionInfo, "action should be tracked")
@@ -251,8 +247,12 @@ table.insert(tests, {
 		local hasSub = false
 		local hasUnsub = false
 		for _, name in actionInfo.handlerNames do
-			if name == "sub" then hasSub = true end
-			if name == "unsub" then hasUnsub = true end
+			if name == "sub" then
+				hasSub = true
+			end
+			if name == "unsub" then
+				hasUnsub = true
+			end
 		end
 		assertTrue(hasSub, "should have 'sub' handler")
 		assertTrue(hasUnsub, "should have 'unsub' handler")
@@ -265,10 +265,10 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register multi-handler action
-		router:registerAction("multiAction", MULTI_HANDLER_SOURCE, nil, nil, nil, "hash-old")
+		router:RegisterAction("multiAction", MULTI_HANDLER_SOURCE, nil, nil, nil, "hash-old")
 
 		-- Both handlers should work
-		local r1 = router:dispatch({
+		local r1 = router:Dispatch({
 			type = "sub",
 			sessionId = "s1",
 			requestId = "r1",
@@ -287,10 +287,10 @@ function M.register(router, sendMessage, logBuffer)
 end
 return M
 ]]
-		router:registerAction("multiAction", SINGLE_SOURCE, nil, nil, nil, "hash-new")
+		router:RegisterAction("multiAction", SINGLE_SOURCE, nil, nil, nil, "hash-new")
 
 		-- Old handlers should be removed
-		local r2 = router:dispatch({
+		local r2 = router:Dispatch({
 			type = "sub",
 			sessionId = "s2",
 			requestId = "r2",
@@ -300,7 +300,7 @@ return M
 		assertEqual(r2.payload.code, "UNKNOWN_REQUEST")
 
 		-- New handler should work
-		local r3 = router:dispatch({
+		local r3 = router:Dispatch({
 			type = "newHandler",
 			sessionId = "s3",
 			requestId = "r3",
@@ -319,7 +319,7 @@ table.insert(tests, {
 	name = "getInstalledActions: returns empty map for fresh router",
 	fn = function()
 		local router = ActionRouter.new()
-		local installed = router:getInstalledActions()
+		local installed = router:GetInstalledActions()
 		local count = 0
 		for _ in installed do
 			count = count + 1
@@ -333,10 +333,10 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("action1", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-aaa")
-		router:registerAction("action2", MULTI_HANDLER_SOURCE, nil, nil, nil, "hash-bbb")
+		router:RegisterAction("action1", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-aaa")
+		router:RegisterAction("action2", MULTI_HANDLER_SOURCE, nil, nil, nil, "hash-bbb")
 
-		local installed = router:getInstalledActions()
+		local installed = router:GetInstalledActions()
 		assertEqual(installed["action1"], "hash-aaa", "action1 hash")
 		assertEqual(installed["action2"], "hash-bbb", "action2 hash")
 	end,
@@ -347,11 +347,11 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "old-hash")
-		assertEqual(router:getInstalledActions()["myAction"], "old-hash")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "old-hash")
+		assertEqual(router:GetInstalledActions()["myAction"], "old-hash")
 
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "new-hash")
-		assertEqual(router:getInstalledActions()["myAction"], "new-hash", "hash should update")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "new-hash")
+		assertEqual(router:GetInstalledActions()["myAction"], "new-hash", "hash should update")
 	end,
 })
 
@@ -360,10 +360,10 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("noHash", SIMPLE_ACTION_SOURCE, nil, nil, nil, nil)
-		router:registerAction("withHash", MULTI_HANDLER_SOURCE, nil, nil, nil, "some-hash")
+		router:RegisterAction("noHash", SIMPLE_ACTION_SOURCE, nil, nil, nil, nil)
+		router:RegisterAction("withHash", MULTI_HANDLER_SOURCE, nil, nil, nil, "some-hash")
 
-		local installed = router:getInstalledActions()
+		local installed = router:GetInstalledActions()
 		assertNil(installed["noHash"], "no-hash action should not appear")
 		assertEqual(installed["withHash"], "some-hash", "hashed action should appear")
 	end,
@@ -381,7 +381,7 @@ table.insert(tests, {
 		-- Register the syncActions handler (simulating what StudioBridgePlugin does)
 		router:register("syncActions", function(payload, requestId, sessionId)
 			local clientActions = payload.actions or {}
-			local installed = router:getInstalledActions()
+			local installed = router:GetInstalledActions()
 			local needed = {}
 
 			for name, clientHash in clientActions do
@@ -394,7 +394,7 @@ table.insert(tests, {
 		end)
 		router:setResponseType("syncActions", "syncActionsResult")
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "syncActions",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -418,12 +418,12 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Install one action with a known hash
-		router:registerAction("action1", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-aaa")
+		router:RegisterAction("action1", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-aaa")
 
 		-- Register syncActions handler
 		router:register("syncActions", function(payload, requestId, sessionId)
 			local clientActions = payload.actions or {}
-			local installed = router:getInstalledActions()
+			local installed = router:GetInstalledActions()
 			local needed = {}
 
 			for name, clientHash in clientActions do
@@ -436,14 +436,14 @@ table.insert(tests, {
 		end)
 		router:setResponseType("syncActions", "syncActionsResult")
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "syncActions",
 			sessionId = "sess-1",
 			requestId = "req-1",
 			payload = {
 				actions = {
-					action1 = "hash-aaa",   -- matches installed
-					action2 = "hash-bbb",   -- not installed
+					action1 = "hash-aaa", -- matches installed
+					action2 = "hash-bbb", -- not installed
 				},
 			},
 		})
@@ -461,12 +461,12 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Install action with hash "old-hash"
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "old-hash")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "old-hash")
 
 		-- Register syncActions handler
 		router:register("syncActions", function(payload, requestId, sessionId)
 			local clientActions = payload.actions or {}
-			local installed = router:getInstalledActions()
+			local installed = router:GetInstalledActions()
 			local needed = {}
 
 			for name, clientHash in clientActions do
@@ -479,13 +479,13 @@ table.insert(tests, {
 		end)
 		router:setResponseType("syncActions", "syncActionsResult")
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "syncActions",
 			sessionId = "sess-1",
 			requestId = "req-1",
 			payload = {
 				actions = {
-					myAction = "new-hash",  -- different from installed
+					myAction = "new-hash", -- different from installed
 				},
 			},
 		})
@@ -501,12 +501,12 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "some-hash")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "some-hash")
 
 		-- Register syncActions handler
 		router:register("syncActions", function(payload, requestId, sessionId)
 			local clientActions = payload.actions or {}
-			local installed = router:getInstalledActions()
+			local installed = router:GetInstalledActions()
 			local needed = {}
 
 			for name, clientHash in clientActions do
@@ -519,7 +519,7 @@ table.insert(tests, {
 		end)
 		router:setResponseType("syncActions", "syncActionsResult")
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "syncActions",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -557,7 +557,7 @@ table.insert(tests, {
 				}
 			end
 
-			local success, err = router:registerAction(name, source, nil, nil, nil, hash)
+			local success, err = router:RegisterAction(name, source, nil, nil, nil, hash)
 			local handlers = {}
 			if success and router._actions[name] then
 				handlers = router._actions[name].handlerNames
@@ -575,7 +575,7 @@ table.insert(tests, {
 		router:setResponseType("registerAction", "registerActionResult")
 
 		-- First registration
-		local r1 = router:dispatch({
+		local r1 = router:Dispatch({
 			type = "registerAction",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -590,7 +590,7 @@ table.insert(tests, {
 		assertEqual(r1.payload.handlers[1], "testAction")
 
 		-- Second registration with same hash
-		local r2 = router:dispatch({
+		local r2 = router:Dispatch({
 			type = "registerAction",
 			sessionId = "sess-2",
 			requestId = "req-2",
@@ -625,7 +625,7 @@ table.insert(tests, {
 				}
 			end
 
-			local success, err = router:registerAction(name, source, nil, nil, nil, hash)
+			local success, err = router:RegisterAction(name, source, nil, nil, nil, hash)
 			local handlers = {}
 			if success and router._actions[name] then
 				handlers = router._actions[name].handlerNames
@@ -643,7 +643,7 @@ table.insert(tests, {
 		router:setResponseType("registerAction", "registerActionResult")
 
 		-- Register v1
-		router:dispatch({
+		router:Dispatch({
 			type = "registerAction",
 			sessionId = "s1",
 			requestId = "r1",
@@ -651,7 +651,7 @@ table.insert(tests, {
 		})
 
 		-- Register v2 with different hash
-		local r = router:dispatch({
+		local r = router:Dispatch({
 			type = "registerAction",
 			sessionId = "s2",
 			requestId = "r2",
@@ -664,7 +664,7 @@ table.insert(tests, {
 		assertEqual(r.payload.hash, "hash-v2")
 
 		-- Verify v2 handler is active
-		local dispatchResult = router:dispatch({
+		local dispatchResult = router:Dispatch({
 			type = "testAction",
 			sessionId = "s3",
 			requestId = "r3",
@@ -700,7 +700,7 @@ return M
 ]]
 		_G.__test_teardown_called = false
 
-		router:registerAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "hash-old")
+		router:RegisterAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "hash-old")
 		assertFalse(_G.__test_teardown_called, "teardown should not be called on first registration")
 
 		-- Re-register with different hash
@@ -713,7 +713,7 @@ function M.register(router, sendMessage, logBuffer)
 end
 return M
 ]]
-		router:registerAction("myAction", REPLACEMENT_SOURCE, nil, nil, nil, "hash-new")
+		router:RegisterAction("myAction", REPLACEMENT_SOURCE, nil, nil, nil, "hash-new")
 		assertTrue(_G.__test_teardown_called, "teardown should be called before re-registration")
 
 		-- Clean up global
@@ -740,11 +740,11 @@ return M
 ]]
 		_G.__test_teardown_called = false
 
-		router:registerAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "same-hash")
+		router:RegisterAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "same-hash")
 		assertFalse(_G.__test_teardown_called, "teardown should not be called on first registration")
 
 		-- Re-register with same hash (should skip entirely)
-		router:registerAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "same-hash")
+		router:RegisterAction("myAction", SOURCE_WITH_TEARDOWN, nil, nil, nil, "same-hash")
 		assertFalse(_G.__test_teardown_called, "teardown should not be called when hash matches")
 
 		_G.__test_teardown_called = nil
@@ -757,15 +757,15 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 
 		-- Register action without teardown function
-		router:registerAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-old")
+		router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE, nil, nil, nil, "hash-old")
 
 		-- Re-register with different hash - should not error
-		local ok, err = router:registerAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "hash-new")
+		local ok, err = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "hash-new")
 		assertTrue(ok, "re-registration should succeed without teardown")
 		assertNil(err, "should not error")
 
 		-- New handler should work
-		local r = router:dispatch({
+		local r = router:Dispatch({
 			type = "testAction",
 			sessionId = "s1",
 			requestId = "r1",
@@ -793,15 +793,15 @@ end
 return M
 ]]
 
-		router:registerAction("myAction", FAILING_TEARDOWN_SOURCE, nil, nil, nil, "hash-old")
+		router:RegisterAction("myAction", FAILING_TEARDOWN_SOURCE, nil, nil, nil, "hash-old")
 
 		-- Re-register with different hash - teardown will throw but pcall should catch it
-		local ok, err = router:registerAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "hash-new")
+		local ok, err = router:RegisterAction("myAction", SIMPLE_ACTION_SOURCE_V2, nil, nil, nil, "hash-new")
 		assertTrue(ok, "re-registration should succeed despite teardown failure")
 		assertNil(err, "should not error")
 
 		-- New handler should work
-		local r = router:dispatch({
+		local r = router:Dispatch({
 			type = "testAction",
 			sessionId = "s1",
 			requestId = "r1",

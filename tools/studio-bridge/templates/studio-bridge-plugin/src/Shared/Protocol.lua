@@ -1,23 +1,25 @@
---[[
-	Protocol module for encoding and decoding studio-bridge wire protocol messages.
+--!strict
+--[=[
+	Encodes and decodes studio-bridge wire protocol messages.
 
-	This module is a pure serialization layer with no Roblox dependencies. It uses
-	Lune's serde library for JSON and is testable outside of Studio.
+	Every message is an envelope of `{ type, sessionId, payload, requestId? }`.
 
-	Wire protocol envelope (all messages):
-	  { type: string, sessionId: string, payload: object }
+	Uses Lune's serde for JSON, so this only loads under Lune; the plugin itself
+	goes through HttpService and never requires it.
 
-	Extended fields (optional):
-	  { requestId?: string }
-]]
+	@class Protocol
+]=]
 
-local serde = require("@lune/serde")
+local serde = (require :: any)("@lune/serde")
 
 local Protocol = {}
 
--- ---------------------------------------------------------------------------
--- Known message types
--- ---------------------------------------------------------------------------
+export type Message = {
+	type: string,
+	sessionId: string,
+	payload: { [string]: any },
+	requestId: string?,
+}
 
 local KNOWN_TYPES: { [string]: boolean } = {
 	-- Plugin -> Server
@@ -46,23 +48,10 @@ local KNOWN_TYPES: { [string]: boolean } = {
 	error = true,
 }
 
--- ---------------------------------------------------------------------------
--- encode
--- ---------------------------------------------------------------------------
-
---[[
-	Encode a message table to a JSON string.
-
-	@param message - Table with required fields: type, sessionId, payload.
-	                 Optional fields: requestId.
-	@return JSON string representation of the message.
-]]
-function Protocol.encode(message: {
-	type: string,
-	sessionId: string,
-	payload: { [string]: any },
-	requestId: string?,
-}): string
+--[=[
+	Encodes a message to JSON, leaving `requestId` out when it is nil.
+]=]
+function Protocol.encode(message: Message): string
 	local envelope: { [string]: any } = {
 		type = message.type,
 		sessionId = message.sessionId,
@@ -76,27 +65,20 @@ function Protocol.encode(message: {
 	return serde.encode("json", envelope)
 end
 
--- ---------------------------------------------------------------------------
--- decode
--- ---------------------------------------------------------------------------
-
---[[
-	Decode a JSON string to a message table.
-
-	@param raw - JSON string to decode.
-	@return (message, nil) on success; (nil, errorString) on failure.
-]]
-function Protocol.decode(raw: string): ({ [string]: any }?, string?)
-	local ok, parsed = pcall(serde.decode, "json" :: any, raw)
+--[=[
+	Decodes and validates a JSON message. Returns the message, or nil and the
+	reason it was rejected.
+]=]
+function Protocol.decode(raw: string): (Message?, string?)
+	local ok, parsed = pcall(serde.decode, "json", raw)
 	if not ok then
-		return nil, "invalid JSON: " .. tostring(parsed)
+		return nil, `invalid JSON: {tostring(parsed)}`
 	end
 
 	if type(parsed) ~= "table" then
-		return nil, "expected JSON object, got " .. type(parsed)
+		return nil, `expected JSON object, got {type(parsed)}`
 	end
 
-	-- Validate required fields
 	if type(parsed.type) ~= "string" then
 		return nil, "missing or invalid field: type"
 	end
@@ -109,24 +91,17 @@ function Protocol.decode(raw: string): ({ [string]: any }?, string?)
 		return nil, "missing or invalid field: payload"
 	end
 
-	-- Validate known message type
 	if not KNOWN_TYPES[parsed.type] then
-		return nil, "unknown message type: " .. parsed.type
+		return nil, `unknown message type: {parsed.type}`
 	end
 
-	-- Build result with required fields
-	local result: { [string]: any } = {
+	return {
 		type = parsed.type,
 		sessionId = parsed.sessionId,
 		payload = parsed.payload,
-	}
-
-	-- Pass through optional fields when present
-	if type(parsed.requestId) == "string" then
-		result.requestId = parsed.requestId
-	end
-
-	return result, nil
+		requestId = if type(parsed.requestId) == "string" then parsed.requestId else nil,
+	},
+		nil
 end
 
 return Protocol

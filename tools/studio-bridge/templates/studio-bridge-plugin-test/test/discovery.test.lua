@@ -103,7 +103,7 @@ table.insert(tests, {
 	fn = function()
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		assertEqual(sm:getState(), "idle")
+		assertEqual(sm:GetState(), "idle")
 	end,
 })
 
@@ -113,8 +113,8 @@ table.insert(tests, {
 	fn = function()
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		assertEqual(sm:getState(), "searching")
+		sm:Start()
+		assertEqual(sm:GetState(), "searching")
 		assertEqual(#mock.stateChanges, 1)
 		assertEqual(mock.stateChanges[1].old, "idle")
 		assertEqual(mock.stateChanges[1].new, "searching")
@@ -129,8 +129,8 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = false, connection = nil }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
+		sm:Start()
+		sm:PollAsync()
 		local foundConnecting = false
 		for _, change in mock.stateChanges do
 			if change.old == "searching" and change.new == "connecting" then
@@ -151,9 +151,9 @@ table.insert(tests, {
 		local fakeConnection = { id = "conn-42" }
 		mock.wsResult = { success = true, connection = fakeConnection }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 		assertEqual(#mock.connectedCalls, 1)
 		assertEqual(mock.connectedCalls[1].id, "conn-42")
 		assertEqual(mock.stateChanges[1].new, "searching")
@@ -170,12 +170,12 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
-		sm:onDisconnect("server closed")
-		assertEqual(sm:getState(), "searching")
+		sm:HandleDisconnect("server closed")
+		assertEqual(sm:GetState(), "searching")
 		assertEqual(#mock.disconnectedCalls, 1)
 		assertEqual(mock.disconnectedCalls[1], "server closed")
 	end,
@@ -189,16 +189,16 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "initial connection")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "initial connection")
 
-		sm:onDisconnect("lost")
-		assertEqual(sm:getState(), "searching", "searching immediately after disconnect")
+		sm:HandleDisconnect("lost")
+		assertEqual(sm:GetState(), "searching", "searching immediately after disconnect")
 
 		-- Next pollAsync should scan immediately (nextPollAt was set to 0)
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "reconnected on next poll")
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "reconnected on next poll")
 		assertEqual(#mock.connectedCalls, 2, "onConnected called twice")
 	end,
 })
@@ -213,18 +213,18 @@ table.insert(tests, {
 
 		-- stop from searching
 		local sm1 = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm1:start()
-		assertEqual(sm1:getState(), "searching")
-		sm1:stop()
-		assertEqual(sm1:getState(), "idle", "stop from searching")
+		sm1:Start()
+		assertEqual(sm1:GetState(), "searching")
+		sm1:Stop()
+		assertEqual(sm1:GetState(), "idle", "stop from searching")
 
 		-- stop from connected
 		local sm2 = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm2:start()
-		sm2:pollAsync()
-		assertEqual(sm2:getState(), "connected")
-		sm2:stop()
-		assertEqual(sm2:getState(), "idle", "stop from connected")
+		sm2:Start()
+		sm2:PollAsync()
+		assertEqual(sm2:GetState(), "connected")
+		sm2:Stop()
+		assertEqual(sm2:GetState(), "idle", "stop from connected")
 	end,
 })
 
@@ -236,17 +236,17 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
 		-- After disconnect, nextPollAt should be 0 (immediate)
 		mock.defaultResponse = nil
-		sm:onDisconnect("lost")
-		assertEqual(sm:getState(), "searching", "searching immediately")
+		sm:HandleDisconnect("lost")
+		assertEqual(sm:GetState(), "searching", "searching immediately")
 
 		local scanCallsBefore = #mock.scanPortsCalls
-		sm:pollAsync()
+		sm:PollAsync()
 		assertTrue(#mock.scanPortsCalls > scanCallsBefore, "scan triggered on first poll after disconnect")
 	end,
 })
@@ -263,9 +263,9 @@ table.insert(tests, {
 		mock.respondingPorts[38742] = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(config, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
 		-- Verify the ports passed to scanPortsAsync
 		assertTrue(#mock.scanPortsCalls >= 1, "scanPortsAsync should have been called")
@@ -286,10 +286,10 @@ table.insert(tests, {
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
 
-		sm:start() -- idle -> searching
-		sm:pollAsync() -- searching -> connecting -> connected
+		sm:Start() -- idle -> searching
+		sm:PollAsync() -- searching -> connecting -> connected
 
-		sm:onDisconnect("lost") -- connected -> searching (immediate)
+		sm:HandleDisconnect("lost") -- connected -> searching (immediate)
 
 		assertEqual(#mock.stateChanges, 4)
 		assertEqual(mock.stateChanges[1].old, "idle")
@@ -315,9 +315,9 @@ table.insert(tests, {
 		mock.respondingPorts[38744] = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(config, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
 		local ports = mock.scanPortsCalls[1]
 		assertEqual(#ports, 6, "should receive all 6 ports in range")
@@ -332,9 +332,9 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "should connect on first poll after start")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "should connect on first poll after start")
 	end,
 })
 
@@ -344,8 +344,8 @@ table.insert(tests, {
 	fn = function()
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:pollAsync()
-		assertEqual(sm:getState(), "idle")
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "idle")
 		assertEqual(#mock.scanPortsCalls, 0)
 		assertEqual(#mock.stateChanges, 0)
 	end,
@@ -359,13 +359,13 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
 		local callsBefore = #mock.scanPortsCalls
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 		assertEqual(#mock.scanPortsCalls, callsBefore, "no new scans in connected state")
 	end,
 })
@@ -377,13 +377,13 @@ table.insert(tests, {
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
 
-		sm:onDisconnect("test")
-		assertEqual(sm:getState(), "idle")
+		sm:HandleDisconnect("test")
+		assertEqual(sm:GetState(), "idle")
 		assertEqual(#mock.disconnectedCalls, 0)
 
-		sm:start()
-		sm:onDisconnect("test")
-		assertEqual(sm:getState(), "searching")
+		sm:Start()
+		sm:HandleDisconnect("test")
+		assertEqual(sm:GetState(), "searching")
 		assertEqual(#mock.disconnectedCalls, 0)
 	end,
 })
@@ -394,11 +394,11 @@ table.insert(tests, {
 	fn = function()
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
+		sm:Start()
 		local changesBefore = #mock.stateChanges
-		sm:start()
+		sm:Start()
 		assertEqual(#mock.stateChanges, changesBefore)
-		assertEqual(sm:getState(), "searching")
+		assertEqual(sm:GetState(), "searching")
 	end,
 })
 
@@ -410,9 +410,9 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = false, connection = nil }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "searching")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "searching")
 		local found = false
 		for _, change in mock.stateChanges do
 			if change.old == "connecting" and change.new == "searching" then
@@ -432,12 +432,12 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 
-		sm:stop()
-		assertEqual(sm:getState(), "idle")
+		sm:Stop()
+		assertEqual(sm:GetState(), "idle")
 		assertEqual(#mock.disconnectedCalls, 1)
 		assertEqual(mock.disconnectedCalls[1], "stopped")
 	end,
@@ -451,9 +451,9 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(nil, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected")
 	end,
 })
 
@@ -469,8 +469,8 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = false, connection = nil }
 		local sm = DiscoveryStateMachine.new(config, mock)
-		sm:start()
-		sm:pollAsync()
+		sm:Start()
+		sm:PollAsync()
 		assertTrue(#mock.connectWebSocketCalls >= 1, "should have tried to connect")
 		assertEqual(mock.connectWebSocketCalls[1], "ws://localhost:38741/plugin")
 	end,
@@ -482,14 +482,14 @@ table.insert(tests, {
 	fn = function()
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
+		sm:Start()
 		-- First poll scans (nextPollAt was 0)
-		sm:pollAsync()
+		sm:PollAsync()
 		local callsAfterFirst = #mock.scanPortsCalls
 		assertTrue(callsAfterFirst > 0, "first poll should scan")
 
 		-- Next poll should NOT scan (nextPollAt is in the future)
-		sm:pollAsync()
+		sm:PollAsync()
 		assertEqual(#mock.scanPortsCalls, callsAfterFirst, "second poll should not scan yet")
 	end,
 })
@@ -502,17 +502,17 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "initial connection")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "initial connection")
 
-		sm:onDisconnect("error: connection lost")
-		assertEqual(sm:getState(), "searching", "state after disconnect")
+		sm:HandleDisconnect("error: connection lost")
+		assertEqual(sm:GetState(), "searching", "state after disconnect")
 		assertEqual(#mock.disconnectedCalls, 1, "onDisconnected called once")
 		assertEqual(mock.disconnectedCalls[1], "error: connection lost", "disconnect reason")
 
 		local scanCallsBefore = #mock.scanPortsCalls
-		sm:pollAsync()
+		sm:PollAsync()
 		assertTrue(#mock.scanPortsCalls > scanCallsBefore, "scan triggered immediately after disconnect")
 	end,
 })
@@ -525,14 +525,14 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "initial connection")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "initial connection")
 		assertEqual(#mock.connectedCalls, 1)
 
-		sm:onDisconnect("lost")
-		sm:pollAsync()
-		assertEqual(sm:getState(), "connected", "reconnected after re-discovery")
+		sm:HandleDisconnect("lost")
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "connected", "reconnected after re-discovery")
 		assertEqual(#mock.connectedCalls, 2, "onConnected called again")
 	end,
 })
@@ -544,13 +544,13 @@ table.insert(tests, {
 		local mock = createMockCallbacks()
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
 
-		sm:onDisconnect("some reason")
-		assertEqual(sm:getState(), "idle", "idle unchanged")
+		sm:HandleDisconnect("some reason")
+		assertEqual(sm:GetState(), "idle", "idle unchanged")
 		assertEqual(#mock.disconnectedCalls, 0)
 
-		sm:start()
-		sm:onDisconnect("some reason")
-		assertEqual(sm:getState(), "searching", "searching unchanged")
+		sm:Start()
+		sm:HandleDisconnect("some reason")
+		assertEqual(sm:GetState(), "searching", "searching unchanged")
 		assertEqual(#mock.disconnectedCalls, 0)
 	end,
 })
@@ -575,12 +575,12 @@ table.insert(tests, {
 
 		mock.wsResult = { success = true, connection = { id = "ws-scan" } }
 		local sm = DiscoveryStateMachine.new(config, mock)
-		sm:start()
-		sm:pollAsync()
+		sm:Start()
+		sm:PollAsync()
 
 		assertTrue(scanPortsCalled, "scanPortsAsync should have been called")
 		assertEqual(#scannedPorts, 4, "should receive all 4 ports")
-		assertEqual(sm:getState(), "connected", "should connect via scanPortsAsync result")
+		assertEqual(sm:GetState(), "connected", "should connect via scanPortsAsync result")
 		assertEqual(#mock.scanPortsCalls, 0, "default scanPortsAsync not called when overridden")
 	end,
 })
@@ -596,9 +596,9 @@ table.insert(tests, {
 		end
 
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		assertEqual(sm:getState(), "searching", "stays searching when scanPortsAsync finds nothing")
+		sm:Start()
+		sm:PollAsync()
+		assertEqual(sm:GetState(), "searching", "stays searching when scanPortsAsync finds nothing")
 	end,
 })
 
@@ -610,10 +610,10 @@ table.insert(tests, {
 		mock.defaultResponse = '{"status":"ok"}'
 		mock.wsResult = { success = true, connection = { id = "ws-1" } }
 		local sm = DiscoveryStateMachine.new(TEST_CONFIG, mock)
-		sm:start()
-		sm:pollAsync()
-		sm:stop()
-		assertEqual(sm:getState(), "idle")
+		sm:Start()
+		sm:PollAsync()
+		sm:Stop()
+		assertEqual(sm:GetState(), "idle")
 		assertTrue(#mock.disconnectedCalls >= 1, "onDisconnected called")
 		assertEqual(mock.disconnectedCalls[#mock.disconnectedCalls], "stopped")
 	end,

@@ -93,7 +93,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router, nil)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-4",
 			requestId = "req-4",
@@ -117,13 +117,13 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		buffer:push({ level = "Print", body = "first", timestamp = 1000 })
-		buffer:push({ level = "Warning", body = "second", timestamp = 2000 })
-		buffer:push({ level = "Error", body = "third", timestamp = 3000 })
-		buffer:push({ level = "Print", body = "fourth", timestamp = 4000 })
-		buffer:push({ level = "Print", body = "fifth", timestamp = 5000 })
+		buffer:Push({ level = "Print", body = "first", timestamp = 1000 })
+		buffer:Push({ level = "Warning", body = "second", timestamp = 2000 })
+		buffer:Push({ level = "Error", body = "third", timestamp = 3000 })
+		buffer:Push({ level = "Print", body = "fourth", timestamp = 4000 })
+		buffer:Push({ level = "Print", body = "fifth", timestamp = 5000 })
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -147,11 +147,11 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		buffer:push({ level = "Print", body = "first", timestamp = 1000 })
-		buffer:push({ level = "Print", body = "second", timestamp = 2000 })
-		buffer:push({ level = "Print", body = "third", timestamp = 3000 })
+		buffer:Push({ level = "Print", body = "first", timestamp = 1000 })
+		buffer:Push({ level = "Print", body = "second", timestamp = 2000 })
+		buffer:Push({ level = "Print", body = "third", timestamp = 3000 })
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -172,12 +172,12 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		buffer:push({ level = "Print", body = "info msg", timestamp = 1000 })
-		buffer:push({ level = "Warning", body = "warn msg", timestamp = 2000 })
-		buffer:push({ level = "Error", body = "err msg", timestamp = 3000 })
-		buffer:push({ level = "Print", body = "another info", timestamp = 4000 })
+		buffer:Push({ level = "Print", body = "info msg", timestamp = 1000 })
+		buffer:Push({ level = "Warning", body = "warn msg", timestamp = 2000 })
+		buffer:Push({ level = "Error", body = "err msg", timestamp = 3000 })
+		buffer:Push({ level = "Print", body = "another info", timestamp = 4000 })
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -198,12 +198,12 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		buffer:push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
-		buffer:push({ level = "Print", body = "user message", timestamp = 2000 })
-		buffer:push({ level = "Print", body = "[StudioBridge] Searching...", timestamp = 3000 })
-		buffer:push({ level = "Print", body = "another message", timestamp = 4000 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
+		buffer:Push({ level = "Print", body = "user message", timestamp = 2000 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Searching...", timestamp = 3000 })
+		buffer:Push({ level = "Print", body = "another message", timestamp = 4000 })
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -224,10 +224,10 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		buffer:push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
-		buffer:push({ level = "Print", body = "user message", timestamp = 2000 })
+		buffer:Push({ level = "Print", body = "[StudioBridge] Connected", timestamp = 1000 })
+		buffer:Push({ level = "Print", body = "user message", timestamp = 2000 })
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -247,7 +247,7 @@ table.insert(tests, {
 		local buffer = MessageBuffer.new(100)
 		QueryLogsAction.register(router, nil, buffer)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -277,7 +277,7 @@ table.insert(tests, {
 			table.insert(sentMessages, msg)
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "captureScreenshot",
 			sessionId = "sess-1",
 			requestId = "req-1",
@@ -305,7 +305,7 @@ table.insert(tests, {
 			table.insert(sentMessages, msg)
 		end)
 
-		router:dispatch({
+		router:Dispatch({
 			type = "captureScreenshot",
 			sessionId = "sess-2",
 			requestId = "",
@@ -323,7 +323,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		CaptureScreenshotAction.register(router, nil)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "captureScreenshot",
 			sessionId = "sess-3",
 			requestId = "req-3",

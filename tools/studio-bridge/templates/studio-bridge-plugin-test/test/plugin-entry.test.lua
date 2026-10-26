@@ -278,7 +278,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-dispatch",
 			requestId = "req-dispatch",
@@ -299,7 +299,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-err",
 			requestId = "req-err",
@@ -319,7 +319,7 @@ table.insert(tests, {
 		local router = ActionRouter.new()
 		ExecuteAction.register(router)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-rt",
 			requestId = "req-rt",
@@ -346,7 +346,7 @@ table.insert(tests, {
 
 		-- Simulate wiring LogService.MessageOut -> buffer
 		local conn = LogService.MessageOut:Connect(function(message, _messageType)
-			buf:push({
+			buf:Push({
 				level = "Print",
 				body = message,
 				timestamp = 1000,
@@ -356,7 +356,7 @@ table.insert(tests, {
 		LogService.MessageOut:Fire("hello from test", nil)
 		LogService.MessageOut:Fire("second message", nil)
 
-		assertEqual(buf:size(), 2)
+		assertEqual(buf:GetCount(), 2)
 		local result = buf:get()
 		assertEqual(result.entries[1].body, "hello from test")
 		assertEqual(result.entries[2].body, "second message")
@@ -375,7 +375,7 @@ table.insert(tests, {
 			if string.sub(message, 1, 14) == "[StudioBridge]" then
 				return
 			end
-			buf:push({
+			buf:Push({
 				level = "Print",
 				body = message,
 				timestamp = 1000,
@@ -385,7 +385,7 @@ table.insert(tests, {
 		LogService.MessageOut:Fire("[StudioBridge] internal message", nil)
 		LogService.MessageOut:Fire("visible message", nil)
 
-		assertEqual(buf:size(), 1)
+		assertEqual(buf:GetCount(), 1)
 		local result = buf:get()
 		assertEqual(result.entries[1].body, "visible message")
 

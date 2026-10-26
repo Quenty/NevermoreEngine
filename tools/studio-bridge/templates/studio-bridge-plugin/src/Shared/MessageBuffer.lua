@@ -1,96 +1,83 @@
---[[
-	Fixed-capacity ring buffer for storing log entries.
+--!strict
+--[=[
+	Fixed-capacity ring buffer of log entries. Once full, each push overwrites
+	the oldest entry.
 
-	Entries are added via push(). When the buffer reaches capacity, new entries
-	overwrite the oldest. Retrieval via get() supports both "head" (oldest first)
-	and "tail" (newest first) directions with an optional count limit.
+	The query-logs action pushed over the wire calls `get`, which keeps its
+	lowercase name because a persistent plugin installed from an older release
+	still runs action source pushed by a newer CLI.
 
-	No Roblox APIs. Pure logic, testable under Lune.
-]]
+	@class MessageBuffer
+]=]
+
+local DEFAULT_CAPACITY = 1000
 
 local MessageBuffer = {}
+MessageBuffer.ClassName = "MessageBuffer"
 MessageBuffer.__index = MessageBuffer
 
--- ---------------------------------------------------------------------------
--- Constructor
--- ---------------------------------------------------------------------------
+export type LogEntry = {
+	level: string,
+	body: string,
+	timestamp: number,
+}
 
---[[
-	Create a new MessageBuffer with the given capacity.
+export type Direction = "head" | "tail"
 
-	@param capacity Maximum number of entries (default 1000).
-]]
-function MessageBuffer.new(capacity: number?)
-	local cap = capacity or 1000
-	local self = setmetatable({
-		_capacity = cap,
-		_buffer = {} :: { { level: string, body: string, timestamp: number } },
-		_head = 1, -- next write position (1-indexed)
-		_count = 0, -- number of entries currently stored
-	}, MessageBuffer)
-	return self
-end
-
--- ---------------------------------------------------------------------------
--- Push an entry into the buffer
--- ---------------------------------------------------------------------------
-
---[[
-	Add an entry to the buffer. Overwrites the oldest entry if at capacity.
-
-	@param entry Table with level, body, timestamp fields.
-]]
-function MessageBuffer.push(
-	self: any,
-	entry: {
-		level: string,
-		body: string,
-		timestamp: number,
-	}
-)
-	self._buffer[self._head] = entry
-	self._head = (self._head % self._capacity) + 1
-	if self._count < self._capacity then
-		self._count = self._count + 1
-	end
-end
-
--- ---------------------------------------------------------------------------
--- Get entries from the buffer
--- ---------------------------------------------------------------------------
-
---[[
-	Retrieve entries from the buffer.
-
-	@param direction "head" for oldest first, "tail" for newest first (default "tail").
-	@param count Maximum number of entries to return (default: all).
-	@return Table with entries, total, and bufferCapacity.
-]]
-function MessageBuffer.get(
-	self: any,
-	direction: string?,
-	count: number?
-): {
-	entries: { { level: string, body: string, timestamp: number } },
+export type BufferSnapshot = {
+	entries: { LogEntry },
 	total: number,
 	bufferCapacity: number,
 }
-	local dir = direction or "tail"
-	local all = self:_toArray()
-	local maxCount = count or #all
-	local entries = {}
 
-	if dir == "head" then
-		-- Oldest first, take from the start
-		for i = 1, math.min(maxCount, #all) do
-			table.insert(entries, all[i])
-		end
+export type MessageBuffer = typeof(setmetatable(
+	{} :: {
+		_capacity: number,
+		_buffer: { LogEntry },
+		_nextIndex: number,
+		_count: number,
+	},
+	{} :: typeof({ __index = MessageBuffer })
+))
+
+--[=[
+	Constructs a buffer holding at most `capacity` entries (default 1000).
+]=]
+function MessageBuffer.new(capacity: number?): MessageBuffer
+	local self: MessageBuffer = setmetatable({} :: any, MessageBuffer)
+
+	self._capacity = capacity or DEFAULT_CAPACITY
+	self._buffer = {}
+	self._nextIndex = 1
+	self._count = 0
+
+	return self
+end
+
+--[=[
+	Adds an entry, overwriting the oldest one when the buffer is full.
+]=]
+function MessageBuffer.Push(self: MessageBuffer, entry: LogEntry)
+	self._buffer[self._nextIndex] = entry
+	self._nextIndex = (self._nextIndex % self._capacity) + 1
+	if self._count < self._capacity then
+		self._count += 1
+	end
+end
+
+--[=[
+	Returns up to `count` entries in chronological order. `"head"` takes the
+	oldest entries, `"tail"` (the default) the newest.
+]=]
+function MessageBuffer.get(self: MessageBuffer, direction: Direction?, count: number?): BufferSnapshot
+	local all = self:_toArray()
+	local takeCount = math.min(count or #all, #all)
+
+	local entries: { LogEntry }
+	if direction == "head" then
+		entries = table.move(all, 1, takeCount, 1, {})
 	else
-		-- Newest first (tail), take from the end
-		local start = math.max(1, #all - maxCount + 1)
-		for i = start, #all do
-			table.insert(entries, all[i])
-		end
+		entries = table.move(all, #all - takeCount + 1, #all, 1, {})
 	end
 
 	return {
@@ -100,45 +87,29 @@ function MessageBuffer.get(
 	}
 end
 
--- ---------------------------------------------------------------------------
--- Clear the buffer
--- ---------------------------------------------------------------------------
-
-function MessageBuffer.clear(self: any)
-	self._buffer = {}
-	self._head = 1
+--[=[
+	Removes every entry.
+]=]
+function MessageBuffer.Clear(self: MessageBuffer)
+	table.clear(self._buffer)
+	self._nextIndex = 1
 	self._count = 0
 end
 
--- ---------------------------------------------------------------------------
--- Get the number of entries
--- ---------------------------------------------------------------------------
-
-function MessageBuffer.size(self: any): number
+--[=[
+	Returns the number of entries currently stored.
+]=]
+function MessageBuffer.GetCount(self: MessageBuffer): number
 	return self._count
 end
 
--- ---------------------------------------------------------------------------
--- Internal: convert ring buffer to a chronological array
--- ---------------------------------------------------------------------------
-
-function MessageBuffer._toArray(self: any): { { level: string, body: string, timestamp: number } }
-	local result = {}
+function MessageBuffer._toArray(self: MessageBuffer): { LogEntry }
 	if self._count < self._capacity then
-		-- Buffer not full: entries are at indices 1..count
-		for i = 1, self._count do
-			table.insert(result, self._buffer[i])
-		end
-	else
-		-- Buffer full: oldest entry is at _head, wrap around
-		for i = self._head, self._capacity do
-			table.insert(result, self._buffer[i])
-		end
-		for i = 1, self._head - 1 do
-			table.insert(result, self._buffer[i])
-		end
+		return table.move(self._buffer, 1, self._count, 1, {})
 	end
-	return result
+
+	local result = table.move(self._buffer, self._nextIndex, self._capacity, 1, {})
+	return table.move(self._buffer, 1, self._nextIndex - 1, #result + 1, result)
 end
 
 return MessageBuffer

@@ -76,7 +76,7 @@ table.insert(tests, {
 			return { state = "Edit", placeId = 123, placeName = "TestPlace", gameId = 456 }
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryState",
 			sessionId = "sess-001",
 			requestId = "req-001",
@@ -98,7 +98,7 @@ table.insert(tests, {
 	fn = function()
 		local router = ActionRouter.new()
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "nonExistentAction",
 			sessionId = "sess-002",
 			requestId = "req-002",
@@ -123,7 +123,7 @@ table.insert(tests, {
 			error("something went wrong")
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryState",
 			sessionId = "sess-003",
 			requestId = "req-003",
@@ -160,7 +160,7 @@ table.insert(tests, {
 		end
 
 		for _, mapping in typeMap do
-			local response = router:dispatch({
+			local response = router:Dispatch({
 				type = mapping.input,
 				sessionId = "sess-type",
 				requestId = "req-type",
@@ -182,7 +182,7 @@ table.insert(tests, {
 			return { entries = {}, total = 0, bufferCapacity = 1000 }
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryLogs",
 			sessionId = "my-session-xyz",
 			requestId = "my-request-abc",
@@ -204,7 +204,7 @@ table.insert(tests, {
 			return nil
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-nil",
 			requestId = "req-nil",
@@ -233,21 +233,21 @@ table.insert(tests, {
 			return { entries = {}, total = 0, bufferCapacity = 1000 }
 		end)
 
-		router:dispatch({
+		router:Dispatch({
 			type = "queryState",
 			sessionId = "sess-multi",
 			requestId = "req-1",
 			payload = {},
 		})
 
-		router:dispatch({
+		router:Dispatch({
 			type = "queryLogs",
 			sessionId = "sess-multi",
 			requestId = "req-2",
 			payload = {},
 		})
 
-		router:dispatch({
+		router:Dispatch({
 			type = "queryState",
 			sessionId = "sess-multi",
 			requestId = "req-3",
@@ -273,7 +273,7 @@ table.insert(tests, {
 			return { instance = {} }
 		end)
 
-		router:dispatch({
+		router:Dispatch({
 			type = "queryDataModel",
 			sessionId = "sess-args",
 			requestId = "req-args",
@@ -297,9 +297,9 @@ table.insert(tests, {
 	name = "MessageBuffer: push entries and get them back",
 	fn = function()
 		local buf = MessageBuffer.new(100)
-		buf:push({ level = "Print", body = "hello", timestamp = 1000 })
-		buf:push({ level = "Warning", body = "careful", timestamp = 2000 })
-		buf:push({ level = "Error", body = "oops", timestamp = 3000 })
+		buf:Push({ level = "Print", body = "hello", timestamp = 1000 })
+		buf:Push({ level = "Warning", body = "careful", timestamp = 2000 })
+		buf:Push({ level = "Error", body = "oops", timestamp = 3000 })
 
 		local result = buf:get()
 		assertEqual(#result.entries, 3)
@@ -316,14 +316,14 @@ table.insert(tests, {
 	name = "MessageBuffer: at capacity overwrites oldest entries",
 	fn = function()
 		local buf = MessageBuffer.new(3)
-		buf:push({ level = "Print", body = "a", timestamp = 1 })
-		buf:push({ level = "Print", body = "b", timestamp = 2 })
-		buf:push({ level = "Print", body = "c", timestamp = 3 })
+		buf:Push({ level = "Print", body = "a", timestamp = 1 })
+		buf:Push({ level = "Print", body = "b", timestamp = 2 })
+		buf:Push({ level = "Print", body = "c", timestamp = 3 })
 		-- Buffer full: [a, b, c]
-		buf:push({ level = "Print", body = "d", timestamp = 4 })
+		buf:Push({ level = "Print", body = "d", timestamp = 4 })
 		-- Now oldest (a) overwritten: [d, b, c] but chronologically: b, c, d
 
-		assertEqual(buf:size(), 3, "size stays at capacity")
+		assertEqual(buf:GetCount(), 3, "size stays at capacity")
 		local result = buf:get()
 		assertEqual(#result.entries, 3)
 		assertEqual(result.entries[1].body, "b", "oldest remaining")
@@ -338,7 +338,7 @@ table.insert(tests, {
 	fn = function()
 		local buf = MessageBuffer.new(100)
 		for i = 1, 20 do
-			buf:push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
+			buf:Push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
 		end
 
 		local result = buf:get("tail", 5)
@@ -358,7 +358,7 @@ table.insert(tests, {
 	fn = function()
 		local buf = MessageBuffer.new(100)
 		for i = 1, 20 do
-			buf:push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
+			buf:Push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
 		end
 
 		local result = buf:get("head", 5)
@@ -376,12 +376,12 @@ table.insert(tests, {
 	name = "MessageBuffer: clear() empties the buffer",
 	fn = function()
 		local buf = MessageBuffer.new(100)
-		buf:push({ level = "Print", body = "a", timestamp = 1 })
-		buf:push({ level = "Print", body = "b", timestamp = 2 })
-		assertEqual(buf:size(), 2)
+		buf:Push({ level = "Print", body = "a", timestamp = 1 })
+		buf:Push({ level = "Print", body = "b", timestamp = 2 })
+		assertEqual(buf:GetCount(), 2)
 
-		buf:clear()
-		assertEqual(buf:size(), 0)
+		buf:Clear()
+		assertEqual(buf:GetCount(), 0)
 
 		local result = buf:get()
 		assertEqual(#result.entries, 0)
@@ -394,23 +394,23 @@ table.insert(tests, {
 	name = "MessageBuffer: size() returns correct count",
 	fn = function()
 		local buf = MessageBuffer.new(5)
-		assertEqual(buf:size(), 0)
+		assertEqual(buf:GetCount(), 0)
 
-		buf:push({ level = "Print", body = "a", timestamp = 1 })
-		assertEqual(buf:size(), 1)
+		buf:Push({ level = "Print", body = "a", timestamp = 1 })
+		assertEqual(buf:GetCount(), 1)
 
-		buf:push({ level = "Print", body = "b", timestamp = 2 })
-		assertEqual(buf:size(), 2)
+		buf:Push({ level = "Print", body = "b", timestamp = 2 })
+		assertEqual(buf:GetCount(), 2)
 
 		-- Fill to capacity
-		buf:push({ level = "Print", body = "c", timestamp = 3 })
-		buf:push({ level = "Print", body = "d", timestamp = 4 })
-		buf:push({ level = "Print", body = "e", timestamp = 5 })
-		assertEqual(buf:size(), 5)
+		buf:Push({ level = "Print", body = "c", timestamp = 3 })
+		buf:Push({ level = "Print", body = "d", timestamp = 4 })
+		buf:Push({ level = "Print", body = "e", timestamp = 5 })
+		assertEqual(buf:GetCount(), 5)
 
 		-- Overflow
-		buf:push({ level = "Print", body = "f", timestamp = 6 })
-		assertEqual(buf:size(), 5, "size stays at capacity after overflow")
+		buf:Push({ level = "Print", body = "f", timestamp = 6 })
+		assertEqual(buf:GetCount(), 5, "size stays at capacity after overflow")
 	end,
 })
 
@@ -420,7 +420,7 @@ table.insert(tests, {
 	fn = function()
 		local buf = MessageBuffer.new(100)
 		for i = 1, 10 do
-			buf:push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
+			buf:Push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
 		end
 
 		-- get() with no args should behave like get("tail")
@@ -439,9 +439,9 @@ table.insert(tests, {
 	name = "MessageBuffer: count larger than buffer size returns all entries",
 	fn = function()
 		local buf = MessageBuffer.new(100)
-		buf:push({ level = "Print", body = "a", timestamp = 1 })
-		buf:push({ level = "Print", body = "b", timestamp = 2 })
-		buf:push({ level = "Print", body = "c", timestamp = 3 })
+		buf:Push({ level = "Print", body = "a", timestamp = 1 })
+		buf:Push({ level = "Print", body = "b", timestamp = 2 })
+		buf:Push({ level = "Print", body = "c", timestamp = 3 })
 
 		local resultTail = buf:get("tail", 100)
 		assertEqual(#resultTail.entries, 3, "tail count > size returns all")
@@ -458,7 +458,7 @@ table.insert(tests, {
 		local buf = MessageBuffer.new(3)
 		-- Fill and overflow multiple times
 		for i = 1, 10 do
-			buf:push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
+			buf:Push({ level = "Print", body = "msg-" .. tostring(i), timestamp = i * 100 })
 		end
 
 		-- Should contain the last 3: msg-8, msg-9, msg-10
@@ -485,7 +485,7 @@ table.insert(tests, {
 	name = "MessageBuffer: get preserves entry fields (level, body, timestamp)",
 	fn = function()
 		local buf = MessageBuffer.new(10)
-		buf:push({ level = "Warning", body = "be careful", timestamp = 42000 })
+		buf:Push({ level = "Warning", body = "be careful", timestamp = 42000 })
 
 		local result = buf:get()
 		assertEqual(#result.entries, 1)
@@ -505,7 +505,7 @@ table.insert(tests, {
 			return { success = true }
 		end)
 
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "execute",
 			sessionId = "sess-no-rid",
 			payload = { script = "print('hi')" },
@@ -526,7 +526,7 @@ table.insert(tests, {
 	fn = function()
 		local buf = MessageBuffer.new(5)
 		for i = 1, 8 do
-			buf:push({ level = "Print", body = "m" .. tostring(i), timestamp = i })
+			buf:Push({ level = "Print", body = "m" .. tostring(i), timestamp = i })
 		end
 		-- Buffer contains: m4, m5, m6, m7, m8
 
@@ -547,7 +547,7 @@ table.insert(tests, {
 	name = "ActionRouter: UNKNOWN_REQUEST when no handlers registered",
 	fn = function()
 		local router = ActionRouter.new()
-		local response = router:dispatch({
+		local response = router:Dispatch({
 			type = "queryState",
 			sessionId = "sess-empty",
 			requestId = "req-empty",
@@ -564,13 +564,13 @@ table.insert(tests, {
 	name = "MessageBuffer: push after clear works correctly",
 	fn = function()
 		local buf = MessageBuffer.new(5)
-		buf:push({ level = "Print", body = "before", timestamp = 1 })
-		buf:push({ level = "Print", body = "before2", timestamp = 2 })
-		buf:clear()
-		assertEqual(buf:size(), 0)
+		buf:Push({ level = "Print", body = "before", timestamp = 1 })
+		buf:Push({ level = "Print", body = "before2", timestamp = 2 })
+		buf:Clear()
+		assertEqual(buf:GetCount(), 0)
 
-		buf:push({ level = "Print", body = "after", timestamp = 3 })
-		assertEqual(buf:size(), 1)
+		buf:Push({ level = "Print", body = "after", timestamp = 3 })
+		assertEqual(buf:GetCount(), 1)
 		local result = buf:get()
 		assertEqual(#result.entries, 1)
 		assertEqual(result.entries[1].body, "after")

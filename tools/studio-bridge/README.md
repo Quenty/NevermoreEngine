@@ -213,13 +213,15 @@ When Studio is in Play mode, a single instance has multiple contexts (Edit + Cli
 pnpm test              # Unit tests (Vitest, no Studio needed)
 pnpm test:watch        # Watch mode
 pnpm test:plugin       # Lune-based plugin tests
+nevermore test --cloud # Jest specs for the plugin, in a Roblox cloud place
 pnpm test:integration  # End-to-end smoke test (requires Studio)
 ```
 
 | Layer | What it tests | Studio? |
 |-------|--------------|---------|
 | Unit (`pnpm test`) | Protocol, bridge connection, session tracking, command handlers, WebSocket lifecycle | No |
-| Plugin (`pnpm test:plugin`) | Luau plugin logic via Lune runner | No |
+| Plugin (`pnpm test:plugin`) | Luau plugin logic and actions via Lune runner | No |
+| Plugin Jest (`nevermore test --cloud`) | Plugin modules (`*.spec.lua` beside them in `templates/studio-bridge-plugin/src/Shared`) in a real engine, built from `test/default.project.json` | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
 
 ## Platform Support
