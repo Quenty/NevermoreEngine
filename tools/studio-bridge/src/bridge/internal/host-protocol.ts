@@ -18,6 +18,7 @@ export interface HostEnvelope {
   requestId: string;
   targetSessionId: string;
   action: ServerMessage;
+  timeoutMs?: number;
 }
 
 export interface ListSessionsRequest {
@@ -191,6 +192,7 @@ const HostProtocolMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     targetSessionId: z.string(),
     action: ServerMessageSchema,
+    timeoutMs: z.number().optional(),
   }),
   z.object({
     type: z.literal('list-sessions'),

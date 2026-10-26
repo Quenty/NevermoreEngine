@@ -17,14 +17,19 @@ vi.mock('../../bridge/index.js', () => {
 import { BridgeConnection } from '../../bridge/index.js';
 import { serveHandlerAsync } from './serve.js';
 
-function createMockConnection(port: number): EventEmitter & {
+function createMockConnection(
+  port: number,
+  role: 'host' | 'client' = 'host'
+): EventEmitter & {
   disconnectAsync: ReturnType<typeof vi.fn>;
   port: number;
+  role: 'host' | 'client';
 } {
   const emitter = new EventEmitter();
   return Object.assign(emitter, {
     disconnectAsync: vi.fn().mockResolvedValue(undefined),
     port,
+    role,
   });
 }
 
@@ -84,6 +89,16 @@ describe('serveHandlerAsync', () => {
     await expect(serveHandlerAsync({ port: 38741 })).rejects.toThrow(
       'Port 38741 is already in use'
     );
+  });
+
+  it('exits instead of lingering as a client when a host already runs', async () => {
+    mockConnection = createMockConnection(38741, 'client');
+    connectAsyncMock.mockResolvedValue(mockConnection);
+
+    await expect(serveHandlerAsync({ port: 38741 })).rejects.toThrow(
+      'Port 38741 is already in use'
+    );
+    expect(mockConnection.disconnectAsync).toHaveBeenCalled();
   });
 
   it('re-throws non-EADDRINUSE errors', async () => {

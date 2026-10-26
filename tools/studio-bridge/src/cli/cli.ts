@@ -111,7 +111,6 @@ const cli = yargs(hideBin(process.argv))
   .option('timeout', {
     description: 'Timeout in milliseconds',
     type: 'number',
-    default: 120_000,
     global: true,
   })
   .option('verbose', {

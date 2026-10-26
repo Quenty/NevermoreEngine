@@ -228,6 +228,7 @@ export class BridgeClient extends EventEmitter {
       requestId,
       targetSessionId,
       action,
+      timeoutMs,
     };
 
     return new Promise<PluginMessage>((resolve, reject) => {

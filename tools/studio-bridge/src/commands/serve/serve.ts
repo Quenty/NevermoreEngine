@@ -25,6 +25,11 @@ export async function serveHandlerAsync(
 ): Promise<ServeResult> {
   const port = options.port ?? 38741;
 
+  const alreadyRunning = new Error(
+    `Port ${port} is already in use. A bridge host is already running. ` +
+      `Connect as a client with any studio-bridge command, or use --port to start on a different port.`
+  );
+
   let connection: BridgeConnection;
   try {
     connection = await BridgeConnection.connectAsync({
@@ -37,12 +42,14 @@ export async function serveHandlerAsync(
       'code' in err &&
       (err as NodeJS.ErrnoException).code === 'EADDRINUSE'
     ) {
-      throw new Error(
-        `Port ${port} is already in use. A bridge host is already running. ` +
-          `Connect as a client with any studio-bridge command, or use --port to start on a different port.`
-      );
+      throw alreadyRunning;
     }
     throw err;
+  }
+
+  if (connection.role !== 'host') {
+    await connection.disconnectAsync();
+    throw alreadyRunning;
   }
 
   // Log startup

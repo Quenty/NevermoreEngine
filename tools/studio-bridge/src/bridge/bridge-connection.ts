@@ -19,13 +19,17 @@ import {
 } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
 import type {
+  HostEnvelope,
   HostProtocolMessage,
   ListSessionsRequest,
   ListInstancesRequest,
 } from './internal/host-protocol.js';
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
-import type { ServerMessage } from '../server/web-socket-protocol.js';
+import type {
+  PluginMessage,
+  ServerMessage,
+} from '../server/web-socket-protocol.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 export interface BridgeConnectionOptions {
   /** Port for the bridge host. Default: 38741. */
@@ -586,6 +590,8 @@ export class BridgeConnection extends EventEmitter {
             requestId: req.requestId,
             instances: this._tracker!.listInstances(),
           });
+        } else if (msg.type === 'host-envelope') {
+          void this._relayEnvelopeAsync(msg as HostEnvelope, reply);
         }
       }
     );
@@ -595,6 +601,49 @@ export class BridgeConnection extends EventEmitter {
     // Don't start idle timer on init -- callers like `sessions` manage their
     // own lifecycle via disconnectAsync().  The idle timer should only fire
     // when sessions are removed (going from >0 to 0).
+  }
+
+  private async _relayEnvelopeAsync(
+    envelope: HostEnvelope,
+    reply: (m: HostProtocolMessage) => void
+  ): Promise<void> {
+    const sessionId = envelope.targetSessionId;
+    const handle = this._hostHandles.get(sessionId);
+
+    if (envelope.timeoutMs === undefined) {
+      handle?.sendMessage(envelope.action);
+      return;
+    }
+
+    let result: PluginMessage;
+    if (!handle) {
+      result = {
+        type: 'error',
+        sessionId,
+        payload: {
+          code: 'SESSION_MISMATCH',
+          message: `Session '${sessionId}' is not connected to this host`,
+        },
+      };
+    } else {
+      try {
+        result = await handle.sendActionAsync<PluginMessage>(
+          envelope.action,
+          envelope.timeoutMs
+        );
+      } catch (err) {
+        result = {
+          type: 'error',
+          sessionId,
+          payload: {
+            code: 'INTERNAL_ERROR',
+            message: err instanceof Error ? err.message : String(err),
+          },
+        };
+      }
+    }
+
+    reply({ type: 'host-response', requestId: envelope.requestId, result });
   }
 
   private async _initClientAsync(
