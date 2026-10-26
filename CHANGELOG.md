@@ -2,6 +2,19 @@
 
 #### 🚀 Enhancement
 
+- `@quenty/nevermore-cli@4.49.0`
+  - feat(nevermore-cli): Recompress place uploads and split oversized batches [#850](https://github.com/Quenty/NevermoreEngine/pull/850) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
 - `@quenty/immediateutils@1.10.0`, `@quenty/jecs@1.11.0`
   - feat: immediate systems hot reload feedback [#849](https://github.com/Quenty/NevermoreEngine/pull/849) ([@euvinkeel](https://github.com/euvinkeel))
 

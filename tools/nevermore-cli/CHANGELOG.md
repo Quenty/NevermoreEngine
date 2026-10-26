@@ -1,3 +1,15 @@
+# v4.49.0 (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- feat(nevermore-cli): Recompress place uploads and split oversized batches [#850](https://github.com/Quenty/NevermoreEngine/pull/850) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
