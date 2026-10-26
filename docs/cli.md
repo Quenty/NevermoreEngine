@@ -247,7 +247,8 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--all` | Test every package with a test target, not just changed ones. |
 | `--base <ref>` | Git ref to diff against for change detection (default: `origin/main`). |
 | `--concurrency <n>` | Max parallel tests (`0` = unlimited, the default). |
-| `--aggregated` | Build all packages into a single place and run one batch script (default: **on**). |
+| `--aggregated` | Build all packages into a single place and run one batch script (default: **on**). Each test place carries its own copy of its dependencies, so the combined place repeats the same modules many times; uploads are recompressed (zstd, long window) to store each repeat once, which takes a 69-package batch from 196 MB to 6 MB. If a recompressed place is still over the size budget, the batch is split into several places that upload and run in parallel. Local runs upload nothing and stay one place. |
+| `--max-place-mb <n>` | Size budget for one combined place, as uploaded, before the batch splits (default: `90` with `--cloud`, unlimited locally; `--aggregated` only). Open Cloud rejects place uploads over 150 MB. |
 | `--batch-place-id <id>` / `--batch-universe-id <id>` | Override IDs for the aggregated upload (`--aggregated` only). |
 | `--limit <n>` | Cap the number of packages (local debugging). |
 | `--logs` | Show execution logs for every package, not just failures. |

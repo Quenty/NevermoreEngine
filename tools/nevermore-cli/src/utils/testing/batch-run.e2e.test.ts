@@ -14,12 +14,13 @@
  * read and on what each package's result came out as.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BatchScriptJobContext } from '../job-context/batch-script-job-context.js';
 import {
   type BuiltPlace,
   type Deployment,
+  type DeployPlaceOptions,
   type JobContext,
   type JobLogs,
   type RunScriptOptions,
@@ -29,19 +30,33 @@ import { type TaskLogMessage } from '../open-cloud/open-cloud-client.js';
 import { type BatchTarget } from '../batch/changed-packages-utils.js';
 import { renderBatchOutcome } from './parsers/batch-log-renderer.js';
 
-const { SLUG_MAP } = vi.hoisted(() => ({
-  SLUG_MAP: new Map([
+const { SLUG_MAP, combined } = vi.hoisted(() => {
+  const SLUG_MAP = new Map([
     ['@quenty/alpha', 'alpha'],
     ['@quenty/beta', 'beta'],
-  ]),
-}));
+  ]);
+  return {
+    SLUG_MAP,
+    // Which packages share a place. One place unless a test splits them.
+    combined: {
+      chunks: [[...SLUG_MAP]] as Array<Array<[string, string]>>,
+    },
+  };
+});
 
 // The only mocked collaborator: building the combined place shells out to rojo
 // and lune, which is a different subject from what this test is about. What it
-// produces that matters downstream is the slug map.
-vi.mock('./runner/combined-project-generator.js', () => ({
+// produces that matters downstream is the slug map, and how it was split.
+vi.mock('./runner/combined-project-generator.js', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('./runner/combined-project-generator.js')
+  >()),
   generateCombinedProjectAsync: vi.fn(async () => ({
-    rbxlPath: '/tmp/batch.rbxl',
+    chunks: combined.chunks.map((entries, index) => ({
+      rbxlPath: `/tmp/batch-${index + 1}.rbxl`,
+      slugMap: new Map(entries),
+      sizeBytes: 1024,
+    })),
     slugMap: SLUG_MAP,
     primaryTarget: { placeId: 1, universeId: 2 },
     buildContext: { cleanupAsync: async () => {} },
@@ -119,11 +134,17 @@ const TASK_MESSAGES: TaskLogMessage[] = [
   { message: SUMMARY_JSON, messageType: 'OUTPUT' },
 ];
 
-/** A transport that runs nothing and reports the messages it was handed. */
+/**
+ * A transport that runs nothing and reports the messages it was handed — or,
+ * with `messagesFor`, the messages for whichever packages the script ran.
+ */
 class FakeTransport implements JobContext {
   public scriptContent?: string;
+  public scriptContents: string[] = [];
+  public deployedPaths: string[] = [];
   public deployCount = 0;
   public runCount = 0;
+  public messagesFor?: (script: string) => TaskLogMessage[];
 
   constructor(
     private readonly _messages: TaskLogMessage[],
@@ -134,8 +155,11 @@ class FakeTransport implements JobContext {
     throw new Error('the batch context builds the combined place itself');
   }
 
-  async deployBuiltPlaceAsync(): Promise<Deployment> {
+  async deployBuiltPlaceAsync(
+    options: DeployPlaceOptions
+  ): Promise<Deployment> {
     this.deployCount++;
+    this.deployedPaths.push(options.builtPlace.rbxlPath);
     return {};
   }
 
@@ -145,6 +169,7 @@ class FakeTransport implements JobContext {
   ): Promise<ScriptRunResult> {
     this.runCount++;
     this.scriptContent = options.scriptContent;
+    this.scriptContents.push(options.scriptContent);
     return {
       success: true,
       taskState: 'COMPLETE',
@@ -153,15 +178,17 @@ class FakeTransport implements JobContext {
   }
 
   async getLogsAsync(): Promise<JobLogs> {
-    const text = this._messages.map((m) => m.message).join('\n');
+    const messages =
+      this.messagesFor?.(this.scriptContent ?? '') ?? this._messages;
+    const text = messages.map((m) => m.message).join('\n');
     return {
       text,
-      messages: this._messages,
+      messages,
       stats: {
         requests: 1,
         pages: 1,
         entries: 1,
-        messages: this._messages.length,
+        messages: messages.length,
         chars: text.length,
       },
     };
@@ -210,6 +237,10 @@ async function runPackageAsync(
 }
 
 describe('an aggregated batch run, end to end', () => {
+  beforeEach(() => {
+    combined.chunks = [[...SLUG_MAP]];
+  });
+
   it('renders the whole run: every line, in order, grouped and titled', async () => {
     const { batch } = createBatch();
 
@@ -421,5 +452,54 @@ describe('an aggregated batch run, end to end', () => {
     // Still counted, because the counts came back in the summary rather than
     // being scraped out of the section that went missing.
     expect(outcome.results.get('@quenty/alpha')?.testCounts?.total).toBe(68);
+  });
+
+  it('uploads and runs each place of a split batch, and merges what they report', async () => {
+    combined.chunks = [
+      [['@quenty/alpha', 'alpha']],
+      [['@quenty/beta', 'beta']],
+    ];
+    const { batch, transport } = createBatch();
+    // Each place prints only the sections and summary of its own packages.
+    transport.messagesFor = (script) => {
+      const slug = script.includes('["alpha"]') ? 'alpha' : 'beta';
+      const entry = SUMMARY_ENTRIES.find((e) => e.slug === slug)!;
+      const verdict = entry.success ? 'PASS' : 'FAIL';
+      return [
+        { message: `===BATCH_TEST_BEGIN ${slug}===`, messageType: 'OUTPUT' },
+        {
+          message: `===BATCH_TEST_END ${slug} ${verdict} ${entry.durationMs}===`,
+          messageType: 'OUTPUT',
+        },
+        { message: '===BATCH_TEST_SUMMARY===', messageType: 'OUTPUT' },
+        { message: JSON.stringify([entry]), messageType: 'OUTPUT' },
+      ];
+    };
+
+    const outcome = await batch.getExecutionOutcomeAsync();
+    const alpha = await runPackageAsync(batch, '@quenty/alpha');
+    const beta = await runPackageAsync(batch, '@quenty/beta');
+
+    expect(transport.deployedPaths).toEqual([
+      '/tmp/batch-1.rbxl',
+      '/tmp/batch-2.rbxl',
+    ]);
+    expect(transport.runCount).toBe(2);
+    expect(transport.scriptContents[0]).toContain('["alpha"]');
+    expect(transport.scriptContents[1]).toContain('["beta"]');
+
+    expect(alpha.success).toBe(true);
+    expect(alpha.testResults).toMatchObject({ passed: 68, total: 68 });
+    expect(beta.success).toBe(false);
+    expect(beta.testResults).toMatchObject({ passed: 3, failed: 1 });
+    expect(outcome.stats?.requests).toBe(2);
+    expect(
+      renderBatchOutcome(outcome, { useGroups: true, color: false })
+    ).toEqual(
+      expect.arrayContaining([
+        '::group::@quenty/alpha - ✅ Passed (68/68) (1.5s)',
+        '::group::@quenty/beta - ❌ FAILED (3/4) (900ms)',
+      ])
+    );
   });
 });

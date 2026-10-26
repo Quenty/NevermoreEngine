@@ -54,6 +54,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   aggregated?: boolean;
   batchPlaceId?: number;
   batchUniverseId?: number;
+  maxPlaceMb?: number;
   timeout?: number;
 }
 
@@ -116,6 +117,11 @@ export const batchTestCommand: CommandModule<
         .option('batch-universe-id', {
           describe:
             'Override universeId for the aggregated batch upload (--aggregated only)',
+          type: 'number',
+        })
+        .option('max-place-mb', {
+          describe:
+            'Size budget in MB for one combined place (--aggregated only). Larger batches are split into several places that run in parallel. Open Cloud rejects place uploads over 150 MB. (default: 90 with --cloud, unlimited locally)',
           type: 'number',
         })
         .option('timeout', {
@@ -270,6 +276,14 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
         batchPlaceId: args.batchPlaceId,
         batchUniverseId: args.batchUniverseId,
         batchTimeoutMs: timeoutMs,
+        // Only an upload is size-limited, so a local run stays one place
+        // unless asked to split.
+        maxChunkBytes:
+          args.maxPlaceMb !== undefined
+            ? args.maxPlaceMb * 1024 * 1024
+            : cloud
+            ? undefined
+            : Infinity,
         reporter,
       })
     : undefined;
