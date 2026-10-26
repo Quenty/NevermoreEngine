@@ -47,6 +47,8 @@ export interface PluginSessionInfo {
   context?: PluginContext;
   /** Place file from register. */
   placeFile?: string;
+  /** Launch id from register, for a Studio that `process run` launched. */
+  launchId?: string;
 }
 
 const SHUTDOWN_TIMEOUT_MS = 2_000;
@@ -384,6 +386,7 @@ export class BridgeHost extends EventEmitter {
         state: msg.payload.state,
         context: msg.payload.context,
         placeFile: msg.payload.placeFile,
+        launchId: msg.payload.launchId,
       });
     };
 

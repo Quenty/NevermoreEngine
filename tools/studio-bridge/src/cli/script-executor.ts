@@ -17,7 +17,12 @@ import {
   type StudioBridgeResult,
   type StudioBridgePhase,
 } from '../server/studio-bridge-server.js';
-import type { SerializedReturnValue } from '../server/web-socket-protocol.js';
+import type {
+  OutputLevel,
+  SerializedReturnValue,
+} from '../server/web-socket-protocol.js';
+import { isPersistentPluginInstalled } from '../plugin/plugin-discovery.js';
+import { runInManagedStudioAsync } from './managed-studio-run.js';
 
 export interface ExecuteScriptOptions {
   scriptContent: string;
@@ -118,45 +123,58 @@ export async function executeScriptAsync(
   }
 
   const outputLines: string[] = [];
+  const onOutput = (level: OutputLevel, body: string): void => {
+    // Filter internal plugin messages that leak through LogService
+    if (body.startsWith('[StudioBridge]')) {
+      return;
+    }
+
+    // Collect output for the result logs
+    outputLines.push(body);
+
+    // In verbose/simple mode, print output in real-time
+    if (!useSpinner && !quiet) {
+      switch (level) {
+        case 'Warning':
+          OutputHelper.warn(body);
+          break;
+        case 'Error':
+          OutputHelper.error(body);
+          break;
+        default:
+          console.log(body);
+          break;
+      }
+    }
+  };
+  const onPhase = (phase: StudioBridgePhase): void => {
+    if (phase === 'done' || quiet) return;
+    reporter.onPackagePhaseChange(packageName, phase);
+  };
+
   let server: StudioBridgeServer | undefined;
   let result: StudioBridgeResult;
   try {
-    server = new StudioBridgeServer({
-      placePath,
-      timeoutMs,
-      onPhase: (phase: StudioBridgePhase) => {
-        if (phase === 'done' || quiet) return;
-        reporter.onPackagePhaseChange(packageName, phase);
-      },
-    });
-    await server.startAsync();
-    result = await server.executeAsync({
-      scriptContent,
-      onOutput: (level, body) => {
-        // Filter internal plugin messages that leak through LogService
-        if (body.startsWith('[StudioBridge]')) {
-          return;
-        }
-
-        // Collect output for the result logs
-        outputLines.push(body);
-
-        // In verbose/simple mode, print output in real-time
-        if (!useSpinner && !quiet) {
-          switch (level) {
-            case 'Warning':
-              OutputHelper.warn(body);
-              break;
-            case 'Error':
-              OutputHelper.error(body);
-              break;
-            default:
-              console.log(body);
-              break;
-          }
-        }
-      },
-    });
+    if (isPersistentPluginInstalled()) {
+      const execResult = await runInManagedStudioAsync({
+        scriptContent,
+        placePath,
+        timeoutMs,
+        onPhase,
+      });
+      for (const entry of execResult.output) {
+        onOutput(entry.level, entry.body);
+      }
+      result = {
+        success: execResult.success,
+        logs: execResult.error ?? '',
+        returnValues: execResult.returnValues,
+      };
+    } else {
+      server = new StudioBridgeServer({ placePath, timeoutMs, onPhase });
+      await server.startAsync();
+      result = await server.executeAsync({ scriptContent, onOutput });
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     result = {

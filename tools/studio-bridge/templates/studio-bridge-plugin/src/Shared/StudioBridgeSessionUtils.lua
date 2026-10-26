@@ -11,6 +11,7 @@ local RunService = game:GetService("RunService")
 local PLUGIN_VERSION = "{{PLUGIN_VERSION}}"
 local MAX_SLUG_LENGTH = 24
 local NONCE_VALUE_NAME = "StudioBridgeNonce"
+local LAUNCH_ID_ATTRIBUTE = "StudioBridgeSessionId"
 
 local StudioBridgeSessionUtils = {}
 
@@ -103,17 +104,31 @@ end
 --[=[
 	Returns the payload of the `register` message the plugin sends on connect.
 ]=]
-function StudioBridgeSessionUtils.createRegisterPayload(instanceId: string, context: PluginContext): { [string]: any }
+function StudioBridgeSessionUtils.createRegisterPayload(
+	instanceId: string,
+	context: PluginContext,
+	launchId: string?
+): { [string]: any }
 	return {
 		pluginVersion = PLUGIN_VERSION,
 		instanceId = instanceId,
 		context = context,
+		launchId = launchId,
 		placeName = game.Name or "Unknown",
 		placeId = game.PlaceId,
 		gameId = game.GameId,
 		state = "Edit",
 		capabilities = table.clone(StudioBridgeSessionUtils.CAPABILITIES),
 	}
+end
+
+--[=[
+	Returns the launch id `process run` stamped onto the place it launched
+	Studio with, or nil for a place the user opened.
+]=]
+function StudioBridgeSessionUtils.getLaunchId(workspace: Instance): string?
+	local launchId = workspace:GetAttribute(LAUNCH_ID_ATTRIBUTE)
+	return if type(launchId) == "string" then launchId else nil
 end
 
 --[=[

@@ -124,7 +124,11 @@ local function openConnection(webSocket: any, sessionId: string, label: string)
 		webSocket = webSocket,
 		router = router,
 		sessionId = sessionId,
-		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(getInstanceId(), context),
+		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(
+			getInstanceId(),
+			context,
+			StudioBridgeSessionUtils.getLaunchId(workspace)
+		),
 	})
 
 	StudioBridgeLogUtils.logVerbose(`Connected to {label} as {sessionId}`)
@@ -228,16 +232,27 @@ local function scanPortsAsync(ports: { number }, timeoutSec: number): (number?, 
 end
 
 if IS_EPHEMERAL then
-	local ok, webSocket = createWebSocket(`ws://localhost:{PORT}/{SESSION_ID}`)
-	if not (ok and webSocket) then
-		StudioBridgeLogUtils.warn("Failed to create WebSocket client")
-		return
+	-- Every open Studio loads this plugin, but only the one launched for this run
+	-- has the session id stamped on its place, which may load after the plugin
+	local function connectEphemeral()
+		if StudioBridgeSessionUtils.getLaunchId(workspace) ~= SESSION_ID or currentWebSocket then
+			return
+		end
+
+		local ok, webSocket = createWebSocket(`ws://localhost:{PORT}/{SESSION_ID}`)
+		if not (ok and webSocket) then
+			StudioBridgeLogUtils.warn("Failed to create WebSocket client")
+			return
+		end
+
+		webSocket.Opened:Connect(function()
+			openConnection(webSocket, SESSION_ID, `localhost:{PORT} (ephemeral)`)
+		end)
+		warnOnError(webSocket)
 	end
 
-	webSocket.Opened:Connect(function()
-		openConnection(webSocket, SESSION_ID, `localhost:{PORT} (ephemeral)`)
-	end)
-	warnOnError(webSocket)
+	workspace:GetAttributeChangedSignal("StudioBridgeSessionId"):Connect(connectEphemeral)
+	connectEphemeral()
 	return
 end
 

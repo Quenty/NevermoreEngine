@@ -37,6 +37,8 @@ export interface SessionInfo {
   capabilities: Capability[];
   connectedAt: Date;
   origin: SessionOrigin;
+  /** Set on sessions of a Studio that `process run` launched. */
+  launchId?: string;
   context: SessionContext;
   instanceId: string;
   placeId: number;

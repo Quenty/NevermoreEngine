@@ -62,6 +62,25 @@ describe("StudioBridgeSessionUtils.getOrCreateNonce()", function()
 	end)
 end)
 
+describe("StudioBridgeSessionUtils.getLaunchId()", function()
+	it("should read the launch id stamped onto the workspace", function()
+		local container = Instance.new("Folder")
+		container:SetAttribute("StudioBridgeSessionId", "launch-1")
+
+		expect(StudioBridgeSessionUtils.getLaunchId(container)).toEqual("launch-1")
+
+		container:Destroy()
+	end)
+
+	it("should be nil for a place the user opened", function()
+		local container = Instance.new("Folder")
+
+		expect(StudioBridgeSessionUtils.getLaunchId(container)).toBeNil()
+
+		container:Destroy()
+	end)
+end)
+
 describe("StudioBridgeSessionUtils.getPlaytestArgs()", function()
 	it("should read the port and instance id studio-bridge passed in the test args", function()
 		expect(StudioBridgeSessionUtils.getPlaytestArgs({
@@ -100,6 +119,12 @@ describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 		expect(payload.gameId).toEqual(game.GameId)
 		expect(type(payload.pluginVersion)).toEqual("string")
 		expect(payload.capabilities).toEqual(StudioBridgeSessionUtils.CAPABILITIES)
+	end)
+
+	it("should carry the launch id of a Studio that process run launched", function()
+		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "edit", "launch-1")
+
+		expect(payload.launchId).toEqual("launch-1")
 	end)
 
 	it("should hand out a capabilities list the caller can change", function()

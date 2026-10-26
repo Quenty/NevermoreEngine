@@ -142,6 +142,8 @@ export interface RegisterMessage extends PushMessage {
     /** Which DataModel the plugin runs in. Older plugins leave it out. */
     context?: PluginContext;
     pid?: number;
+    /** Set when `process run` launched this Studio, from the place it opened. */
+    launchId?: string;
     capabilities: Capability[];
   };
 }
@@ -517,6 +519,8 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
               ? payload.context
               : undefined,
           pid: typeof payload.pid === 'number' ? payload.pid : undefined,
+          launchId:
+            typeof payload.launchId === 'string' ? payload.launchId : undefined,
           capabilities: payload.capabilities as Capability[],
         },
       };

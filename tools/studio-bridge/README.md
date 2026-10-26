@@ -165,7 +165,7 @@ studio-bridge process run 'print("hello")'
 studio-bridge process run --file test.lua --place ./build/test.rbxl
 ```
 
-Explicit ephemeral mode: launches Studio, executes the script, and shuts down.
+Launches Studio on a copy of the place, runs the script there and nowhere else, then closes that Studio. Other open Studios are never used. While the script runs, the launched Studio is a session like any other, so `process list` shows it (origin `managed`) and other commands can target it.
 
 ### `process close`
 
