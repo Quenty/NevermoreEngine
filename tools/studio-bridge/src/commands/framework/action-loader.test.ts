@@ -98,6 +98,27 @@ describe('loadActionSourcesAsync', () => {
     expect(results[0].name).toBe('action');
   });
 
+  it('skips .spec.lua files', async () => {
+    await fs.writeFile(path.join(tmpDir, 'action.lua'), 'included');
+    await fs.writeFile(path.join(tmpDir, 'action.spec.lua'), 'not included');
+
+    const results = await loadActionSourcesAsync(tmpDir);
+
+    expect(results.map((r) => r.name)).toEqual(['action']);
+  });
+
+  it('finds every shipped action and none of their specs', async () => {
+    const results = await loadActionSourcesAsync();
+
+    expect(results.map((r) => r.name).sort()).toEqual([
+      'capture-screenshot',
+      'execute',
+      'query-data-model',
+      'query-logs',
+      'query-state',
+    ]);
+  });
+
   it('returns empty array for empty directory', async () => {
     const results = await loadActionSourcesAsync(tmpDir);
     expect(results).toHaveLength(0);

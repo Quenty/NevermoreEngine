@@ -14,6 +14,9 @@
         "Shared": {
           "$path": "../templates/studio-bridge-plugin/src/Shared"
         },
+        "commands": {
+          "$path": "../src/commands"
+        },
         "node_modules": {
           "$className": "Folder",
           "@quenty": {
