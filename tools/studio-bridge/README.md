@@ -116,6 +116,15 @@ studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
 | `--properties` | Include instance properties |
 | `--attributes` | Include instance attributes |
 
+### `explorer export` / `explorer import`
+
+```bash
+studio-bridge explorer export Workspace.Map Lighting -o map.rbxm
+studio-bridge explorer import map.rbxm --parent ServerStorage
+```
+
+`export` saves instances as a binary model (`.rbxm`) through `SerializationService`, and writes it with `-o`. `import` inserts a `.rbxm` under `--parent` (default: `Workspace`).
+
 ### `viewport screenshot`
 
 ```bash

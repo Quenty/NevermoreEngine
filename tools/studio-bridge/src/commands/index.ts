@@ -41,6 +41,15 @@ export {
   type DataModelNode,
 } from './explorer/query/query.js';
 export {
+  exportInstancesHandlerAsync,
+  type ExportResult,
+} from './explorer/export/export.js';
+export {
+  importInstancesHandlerAsync,
+  type ImportResult,
+  type ImportOptions,
+} from './explorer/import/import.js';
+export {
   execHandlerAsync,
   type ExecOptions,
   type ExecResult,

@@ -93,6 +93,16 @@ export interface DataModelResult {
   instance: DataModelInstance;
 }
 
+export interface ExportInstancesResult {
+  /** The binary model (.rbxm), base64-encoded. */
+  data: string;
+  paths: string[];
+}
+
+export interface ImportInstancesResult {
+  paths: string[];
+}
+
 export interface LogOptions {
   count?: number;
   direction?: 'head' | 'tail';

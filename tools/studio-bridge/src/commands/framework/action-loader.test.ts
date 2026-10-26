@@ -114,6 +114,8 @@ describe('loadActionSourcesAsync', () => {
       'capture-screenshot',
       'end-playtest',
       'execute',
+      'export-instances',
+      'import-instances',
       'query-data-model',
       'query-logs',
       'query-state',

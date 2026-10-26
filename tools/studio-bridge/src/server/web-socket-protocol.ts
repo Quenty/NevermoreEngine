@@ -21,6 +21,8 @@ export type Capability =
   | 'captureScreenshot'
   | 'queryDataModel'
   | 'queryLogs'
+  | 'exportInstances'
+  | 'importInstances'
   | 'startPlaytest'
   | 'endPlaytest'
   | 'heartbeat'
@@ -171,6 +173,22 @@ export interface DataModelResultMessage extends RequestMessage {
   };
 }
 
+export interface ExportInstancesResultMessage extends RequestMessage {
+  type: 'exportInstancesResult';
+  payload: {
+    /** The binary model (.rbxm), base64-encoded. */
+    data: string;
+    paths: string[];
+  };
+}
+
+export interface ImportInstancesResultMessage extends RequestMessage {
+  type: 'importInstancesResult';
+  payload: {
+    paths: string[];
+  };
+}
+
 export interface LogsResultMessage extends RequestMessage {
   type: 'logsResult';
   payload: {
@@ -254,6 +272,8 @@ export type PluginMessage =
   | StateResultMessage
   | ScreenshotResultMessage
   | DataModelResultMessage
+  | ExportInstancesResultMessage
+  | ImportInstancesResultMessage
   | LogsResultMessage
   | StateChangeMessage
   | HeartbeatMessage
@@ -285,6 +305,22 @@ export interface CaptureScreenshotMessage extends RequestMessage {
   type: 'captureScreenshot';
   payload: {
     format?: 'png';
+  };
+}
+
+export interface ExportInstancesMessage extends RequestMessage {
+  type: 'exportInstances';
+  payload: {
+    paths: string[];
+  };
+}
+
+export interface ImportInstancesMessage extends RequestMessage {
+  type: 'importInstances';
+  payload: {
+    /** The binary model (.rbxm), base64-encoded. */
+    data: string;
+    parentPath: string;
   };
 }
 
@@ -361,6 +397,8 @@ export type ServerMessage =
   | QueryStateMessage
   | CaptureScreenshotMessage
   | QueryDataModelMessage
+  | ExportInstancesMessage
+  | ImportInstancesMessage
   | QueryLogsMessage
   | RegisterActionMessage
   | SyncActionsMessage
@@ -370,6 +408,12 @@ export type ServerMessage =
 
 export function encodeMessage(msg: ServerMessage): string {
   return JSON.stringify(msg);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === 'string')
+  );
 }
 
 export function decodePluginMessage(raw: string): PluginMessage | null {
@@ -533,6 +577,27 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         payload: {
           instance: payload.instance as DataModelInstance,
         },
+      };
+
+    case 'exportInstancesResult':
+      if (requestId === undefined) return null;
+      if (typeof payload.data !== 'string' || !isStringArray(payload.paths))
+        return null;
+      return {
+        type: 'exportInstancesResult',
+        sessionId,
+        requestId,
+        payload: { data: payload.data, paths: payload.paths },
+      };
+
+    case 'importInstancesResult':
+      if (requestId === undefined) return null;
+      if (!isStringArray(payload.paths)) return null;
+      return {
+        type: 'importInstancesResult',
+        sessionId,
+        requestId,
+        payload: { paths: payload.paths },
       };
 
     case 'logsResult':
@@ -756,6 +821,30 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         payload: {
           format: payload.format === 'png' ? 'png' : undefined,
         },
+      };
+
+    case 'exportInstances':
+      if (requestId === undefined) return null;
+      if (!isStringArray(payload.paths)) return null;
+      return {
+        type: 'exportInstances',
+        sessionId,
+        requestId,
+        payload: { paths: payload.paths },
+      };
+
+    case 'importInstances':
+      if (requestId === undefined) return null;
+      if (
+        typeof payload.data !== 'string' ||
+        typeof payload.parentPath !== 'string'
+      )
+        return null;
+      return {
+        type: 'importInstances',
+        sessionId,
+        requestId,
+        payload: { data: payload.data, parentPath: payload.parentPath },
       };
 
     case 'queryDataModel':

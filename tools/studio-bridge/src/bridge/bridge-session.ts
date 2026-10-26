@@ -19,6 +19,8 @@ import type {
   ScreenshotResult,
   LogsResult,
   DataModelResult,
+  ExportInstancesResult,
+  ImportInstancesResult,
   LogOptions,
   QueryDataModelOptions,
   PlaytestMode,
@@ -41,6 +43,8 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   queryState: 5_000,
   captureScreenshot: 30_000,
   queryDataModel: 10_000,
+  exportInstances: 60_000,
+  importInstances: 60_000,
   queryLogs: 10_000,
   endPlaytest: 5_000,
 };
@@ -257,6 +261,53 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('dataModelResult', result);
+  }
+
+  /** Serialize the instances at `paths` into one binary model (.rbxm). */
+  async exportInstancesAsync(paths: string[]): Promise<ExportInstancesResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'exportInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: { paths },
+      },
+      DEFAULT_TIMEOUTS.exportInstances
+    );
+
+    if (result.type === 'exportInstancesResult') {
+      return { data: result.payload.data, paths: result.payload.paths };
+    }
+
+    throw pluginError('exportInstancesResult', result);
+  }
+
+  /** Insert a binary model (.rbxm), base64-encoded, under `parentPath`. */
+  async importInstancesAsync(
+    data: string,
+    parentPath: string
+  ): Promise<ImportInstancesResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'importInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: { data, parentPath },
+      },
+      DEFAULT_TIMEOUTS.importInstances
+    );
+
+    if (result.type === 'importInstancesResult') {
+      return { paths: result.payload.paths };
+    }
+
+    throw pluginError('importInstancesResult', result);
   }
 
   /**

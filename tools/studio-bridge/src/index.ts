@@ -107,6 +107,8 @@ export {
   queryLogsHandlerAsync,
   captureScreenshotHandlerAsync,
   queryDataModelHandlerAsync,
+  exportInstancesHandlerAsync,
+  importInstancesHandlerAsync,
   execHandlerAsync,
   runHandlerAsync,
   launchHandlerAsync,

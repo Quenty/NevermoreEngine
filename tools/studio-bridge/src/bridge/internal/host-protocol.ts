@@ -143,6 +143,18 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     }),
   }),
   z.object({
+    type: z.literal('exportInstances'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({ paths: z.array(z.string()) }),
+  }),
+  z.object({
+    type: z.literal('importInstances'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({ data: z.string(), parentPath: z.string() }),
+  }),
+  z.object({
     type: z.literal('queryLogs'),
     sessionId: z.string(),
     requestId: z.string(),
