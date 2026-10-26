@@ -203,6 +203,17 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z.object({}).loose(),
   }),
   z.object({
+    type: z.literal('runPlaytestScript'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({
+      mode: z.enum(['play', 'run']),
+      script: z.string(),
+      runnerSource: z.string(),
+      timeoutSec: z.number(),
+    }),
+  }),
+  z.object({
     type: z.literal('error'),
     sessionId: z.string(),
     requestId: z.string().optional(),

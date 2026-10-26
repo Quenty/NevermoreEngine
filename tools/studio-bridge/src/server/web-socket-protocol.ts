@@ -255,6 +255,8 @@ export interface EndPlaytestResultMessage extends RequestMessage {
   type: 'endPlaytestResult';
   payload: {
     playtestId?: string;
+    /** Absent from plugins older than this field. */
+    mode?: PlaytestMode;
   };
 }
 
@@ -383,6 +385,18 @@ export interface EndPlaytestMessage extends RequestMessage {
   payload: Record<string, never>;
 }
 
+/** Answered with `scriptComplete`, the same reply as `execute`. */
+export interface RunPlaytestScriptMessage extends RequestMessage {
+  type: 'runPlaytestScript';
+  payload: {
+    mode: PlaytestMode;
+    script: string;
+    /** Planted in the playtest's server to run the script and end the playtest. */
+    runnerSource: string;
+    timeoutSec: number;
+  };
+}
+
 export interface ServerErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -406,6 +420,7 @@ export type ServerMessage =
   | SyncActionsMessage
   | StartPlaytestMessage
   | EndPlaytestMessage
+  | RunPlaytestScriptMessage
   | ServerErrorMessage;
 
 export function encodeMessage(msg: ServerMessage): string {
@@ -730,6 +745,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
             typeof payload.playtestId === 'string'
               ? payload.playtestId
               : undefined,
+          mode:
+            payload.mode === 'play' || payload.mode === 'run'
+              ? payload.mode
+              : undefined,
         },
       };
 
@@ -964,6 +983,27 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         sessionId,
         requestId,
         payload: {} as Record<string, never>,
+      };
+
+    case 'runPlaytestScript':
+      if (requestId === undefined) return null;
+      if (
+        (payload.mode !== 'play' && payload.mode !== 'run') ||
+        typeof payload.script !== 'string' ||
+        typeof payload.runnerSource !== 'string' ||
+        typeof payload.timeoutSec !== 'number'
+      )
+        return null;
+      return {
+        type: 'runPlaytestScript',
+        sessionId,
+        requestId,
+        payload: {
+          mode: payload.mode,
+          script: payload.script,
+          runnerSource: payload.runnerSource,
+          timeoutSec: payload.timeoutSec,
+        },
       };
 
     case 'error':

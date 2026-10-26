@@ -12,7 +12,10 @@ import type {
   PlaytestMode,
   SessionContext,
 } from '../../../bridge/index.js';
-import { startPlaytestAsync } from '../playtest-sessions.js';
+import {
+  startPlaytestAsync,
+  type StartedPlaytest,
+} from '../playtest-sessions.js';
 
 export interface PlaytestStartOptions {
   mode: PlaytestMode;
@@ -44,16 +47,25 @@ export async function playtestStartHandlerAsync(
     options.mode
   );
 
-  const sessions = Object.values(playtest.sessions).map((session) => ({
-    sessionId: session.info.sessionId,
-    context: session.context,
-  }));
+  return toPlaytestStartResult(
+    playtest,
+    `Playtest started (${playtest.mode} mode)`
+  );
+}
 
+/** Report a started playtest and the sessions it opened. */
+export function toPlaytestStartResult(
+  playtest: StartedPlaytest,
+  summary: string
+): PlaytestStartResult {
   return {
     playtestId: playtest.playtestId,
     mode: playtest.mode,
-    sessions,
-    summary: `Playtest started (${playtest.mode} mode)`,
+    sessions: Object.values(playtest.sessions).map((session) => ({
+      sessionId: session.info.sessionId,
+      context: session.context,
+    })),
+    summary,
   };
 }
 

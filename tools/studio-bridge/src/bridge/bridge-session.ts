@@ -49,6 +49,46 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   endPlaytest: 5_000,
 };
 
+/** Time a playtest gets to start and stop on top of its script's own timeout. */
+const PLAYTEST_STARTUP_ALLOWANCE_MS = 60_000;
+
+export interface RunPlaytestScriptOptions {
+  mode: PlaytestMode;
+  script: string;
+  runnerSource: string;
+  timeoutSec: number;
+}
+
+/** Map an `execute`-style reply onto an ExecResult. */
+function toExecResult(result: PluginMessage): ExecResult {
+  if (result.type === 'scriptComplete') {
+    const output = (result.payload.output ?? []).map((entry) => ({
+      level: entry.level as OutputLevel,
+      body: entry.body,
+    }));
+    return {
+      success: result.payload.success,
+      output,
+      error: result.payload.error,
+      returnValues: result.payload.returnValues,
+    };
+  }
+
+  if (result.type === 'error') {
+    return {
+      success: false,
+      output: [],
+      error: result.payload?.message ?? 'Unknown plugin error',
+    };
+  }
+
+  return {
+    success: false,
+    output: [],
+    error: pluginError('scriptComplete', result).message,
+  };
+}
+
 /**
  * Build a descriptive error from a plugin response that didn't match the
  * expected type. Extracts error details from error-typed responses.
@@ -117,32 +157,37 @@ export class BridgeSession extends EventEmitter {
       timeoutMs
     );
 
-    if (result.type === 'scriptComplete') {
-      const output = (result.payload.output ?? []).map((entry) => ({
-        level: entry.level as OutputLevel,
-        body: entry.body,
-      }));
-      return {
-        success: result.payload.success,
-        output,
-        error: result.payload.error,
-        returnValues: result.payload.returnValues,
-      };
-    }
+    return toExecResult(result);
+  }
 
-    if (result.type === 'error') {
-      return {
-        success: false,
-        output: [],
-        error: result.payload?.message ?? 'Unknown plugin error',
-      };
-    }
+  /**
+   * Run a script in a fresh playtest's server, started from this edit
+   * session, and resolve with its result once the playtest has ended. Works
+   * without the playtest's own sessions connecting: the plugin plants
+   * `runnerSource` in the playtest to run the script and end the playtest.
+   */
+  async runPlaytestScriptAsync(
+    options: RunPlaytestScriptOptions
+  ): Promise<ExecResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
 
-    return {
-      success: false,
-      output: [],
-      error: pluginError('scriptComplete', result).message,
-    };
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'runPlaytestScript',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {
+          mode: options.mode,
+          script: options.script,
+          runnerSource: options.runnerSource,
+          timeoutSec: options.timeoutSec,
+        },
+      },
+      options.timeoutSec * 1000 + PLAYTEST_STARTUP_ALLOWANCE_MS
+    );
+
+    return toExecResult(result);
   }
 
   async queryStateAsync(): Promise<StateResult> {
@@ -367,7 +412,10 @@ export class BridgeSession extends EventEmitter {
     );
 
     if (result.type === 'endPlaytestResult') {
-      return { playtestId: result.payload.playtestId };
+      return {
+        playtestId: result.payload.playtestId,
+        mode: result.payload.mode,
+      };
     }
 
     throw pluginError('endPlaytestResult', result);

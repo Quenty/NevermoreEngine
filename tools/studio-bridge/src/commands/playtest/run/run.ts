@@ -4,15 +4,27 @@
  * The code runs in the playtest's server by default, or its client with
  * `--context client`. Its output and return values come back the same way as
  * `console exec`.
+ *
+ * In the server, the edit session plants a runner script in the playtest
+ * (playtest-runner.luau), so this works even when Studio does not load user
+ * plugins into playtests. The client has no such path: it needs the
+ * playtest's client session, so it needs that Studio setting on.
  */
 
+import * as fs from 'fs/promises';
+import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
-import { execHandlerAsync, formatExecText } from '../../console/exec/exec.js';
+import {
+  execHandlerAsync,
+  formatExecText,
+  type ExecResult as CommandExecResult,
+} from '../../console/exec/exec.js';
 import type {
   BridgeConnection,
   BridgeSession,
+  ExecResult,
   PlaytestMode,
   SessionContext,
 } from '../../../bridge/index.js';
@@ -33,9 +45,13 @@ export interface PlaytestRunOptions {
   timeout?: number;
 }
 
+/** Matches `console exec`'s default execution timeout. */
+const DEFAULT_TIMEOUT_MS = 120_000;
+
 export interface PlaytestRunResult {
   success: boolean;
-  playtestId: string;
+  /** Absent when the script ran through the planted runner. */
+  playtestId?: string;
   output: string[];
   error?: string;
   returnValues?: SerializedReturnValue[];
@@ -65,6 +81,11 @@ export async function playtestRunHandlerAsync(
     options.target,
     'edit'
   );
+
+  if (options.context === 'server') {
+    return runWithPlantedRunnerAsync(editSession, options);
+  }
+
   const playtest = await startPlaytestAsync(
     connection,
     editSession,
@@ -96,6 +117,45 @@ export async function playtestRunHandlerAsync(
     playtest.sessions.server
   );
   return stopError ? { ...result, stopError } : result;
+}
+
+async function runWithPlantedRunnerAsync(
+  editSession: BridgeSession,
+  options: PlaytestRunOptions
+): Promise<PlaytestRunResult> {
+  const runnerSource = await fs.readFile(
+    resolvePackagePath(
+      import.meta.url,
+      'src',
+      'commands',
+      'playtest',
+      'run',
+      'playtest-runner.luau'
+    ),
+    'utf-8'
+  );
+
+  const result = await editSession.runPlaytestScriptAsync({
+    mode: options.mode,
+    script: options.scriptContent,
+    runnerSource,
+    timeoutSec: (options.timeout ?? DEFAULT_TIMEOUT_MS) / 1000,
+  });
+
+  return toCommandResult(result);
+}
+
+/** Shapes a bridge ExecResult the way `console exec` reports it. */
+function toCommandResult(result: ExecResult): CommandExecResult {
+  return {
+    success: result.success,
+    output: result.output.map((entry) => entry.body),
+    error: result.error,
+    returnValues: result.returnValues,
+    summary: result.success
+      ? 'Script executed successfully'
+      : `Script failed: ${result.error}`,
+  };
 }
 
 /** Ends the playtest, returning why it could not instead of throwing. */

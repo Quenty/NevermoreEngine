@@ -176,19 +176,24 @@ studio-bridge process close --target test-place --force
 
 Closes the Studio process showing the session's place, found by its window title. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
 
-### `playtest run` / `playtest start` / `playtest stop`
+### `playtest run` / `playtest start` / `playtest restart` / `playtest stop`
 
 ```bash
 studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
 studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
 studio-bridge playtest start --mode run
 studio-bridge console exec --context server 'print("in the playtest")'
+studio-bridge playtest restart
 studio-bridge playtest stop
 ```
 
-Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server. `playtest run` executes the code in the playtest's server (or client, with `--context client`), returns its output and values like `console exec`, then stops the playtest. `playtest start` leaves it running, so other commands can target it with `--context server` or `--context client` until `playtest stop`.
+Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server.
 
-The playtest's server and client only connect when Studio's **Load user plugins on playtest** setting is on. With it off, the playtest still starts, but the command reports that its sessions never connected, and the playtest has to be stopped in Studio.
+`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It plants a temporary runner script in the playtest to do so, so it works whatever Studio's **Load user plugins on playtest** setting says. `--context client` runs the code in the playtest's client instead, which needs that setting on.
+
+`playtest start` leaves the playtest running, so other commands can target it with `--context server` or `--context client`. `playtest restart` stops it and starts a new one in the same mode, picking up code changed since it started; with none running, it starts one. `playtest stop` ends it.
+
+`start`, `restart`, and `stop` talk to the playtest's own server and client, which only connect when **Load user plugins on playtest** is on. With it off, `playtest start` still starts the playtest but reports that its sessions never connected, and the playtest has to be stopped in Studio.
 
 ### `plugin install` / `plugin uninstall`
 

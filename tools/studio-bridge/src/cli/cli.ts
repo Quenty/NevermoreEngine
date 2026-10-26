@@ -38,6 +38,7 @@ import { processCloseCommand } from '../commands/process/close/close.js';
 import { playtestStartCommand } from '../commands/playtest/start/start.js';
 import { playtestStopCommand } from '../commands/playtest/stop/stop.js';
 import { playtestRunCommand } from '../commands/playtest/run/run.js';
+import { playtestRestartCommand } from '../commands/playtest/restart/restart.js';
 import { installCommand } from '../commands/plugin/install/install.js';
 import { uninstallCommand } from '../commands/plugin/uninstall/uninstall.js';
 import { serveCommand } from '../commands/serve/serve.js';
@@ -58,6 +59,7 @@ registry.register(processRunCommand);
 registry.register(playtestStartCommand);
 registry.register(playtestStopCommand);
 registry.register(playtestRunCommand);
+registry.register(playtestRestartCommand);
 
 // Infrastructure commands
 registry.register(infoCommand);

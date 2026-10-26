@@ -131,6 +131,8 @@ export interface PlaytestEndResult {
 export interface EndPlaytestResult {
   /** Absent when the playtest was not started by studio-bridge. */
   playtestId?: string;
+  /** The mode the playtest ran in. Absent from older plugins. */
+  mode?: PlaytestMode;
 }
 
 export interface LogFollowOptions {

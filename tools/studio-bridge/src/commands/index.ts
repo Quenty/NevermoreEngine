@@ -86,6 +86,10 @@ export {
   type PlaytestRunResult,
 } from './playtest/run/run.js';
 export {
+  playtestRestartHandlerAsync,
+  type PlaytestRestartOptions,
+} from './playtest/restart/restart.js';
+export {
   processRunHandlerAsync,
   type ProcessRunOptions,
   type ProcessRunResult,

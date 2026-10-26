@@ -119,6 +119,7 @@ describe('loadActionSourcesAsync', () => {
       'query-data-model',
       'query-logs',
       'query-state',
+      'run-playtest-script',
       'start-playtest',
     ]);
   });

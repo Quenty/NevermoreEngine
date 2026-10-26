@@ -13,6 +13,7 @@ import { randomUUID } from 'crypto';
 import type {
   BridgeConnection,
   BridgeSession,
+  EndPlaytestResult,
   PlaytestEndResult,
   PlaytestMode,
   SessionContext,
@@ -164,16 +165,16 @@ export async function resolvePlaytestServerSessionAsync(
 }
 
 /**
- * End the playtest `serverSession` belongs to, resolving with its playtest id
- * once the session has closed.
+ * End the playtest `serverSession` belongs to, resolving once the session has
+ * closed with what the playtest reported about itself.
  */
 export async function endPlaytestAsync(
   connection: BridgeConnection,
   serverSession: BridgeSession
-): Promise<string | undefined> {
-  const { playtestId } = await serverSession.endPlaytestAsync();
+): Promise<EndPlaytestResult> {
+  const ended = await serverSession.endPlaytestAsync();
   await waitForSessionCloseAsync(connection, serverSession.info.sessionId);
-  return playtestId;
+  return ended;
 }
 
 async function waitForPlaytestSessionsAsync(

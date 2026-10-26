@@ -27,7 +27,7 @@ export async function playtestStopHandlerAsync(
     connection,
     options.target
   );
-  const playtestId = await endPlaytestAsync(connection, serverSession);
+  const { playtestId } = await endPlaytestAsync(connection, serverSession);
 
   return {
     playtestId,
