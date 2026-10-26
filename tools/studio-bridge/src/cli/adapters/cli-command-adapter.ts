@@ -17,7 +17,7 @@ import {
   formatJson,
 } from '@quenty/cli-output-helpers/reporting';
 import { BridgeConnection } from '../../bridge/index.js';
-import type { SessionContext } from '../../bridge/index.js';
+import type { BridgeSession, SessionContext } from '../../bridge/index.js';
 import type {
   CommandDefinition,
   SessionTargeting,
@@ -96,6 +96,9 @@ async function executeCommandAsync(
         targeting.target,
         targeting.context
       );
+      if (def.changesDataModel && !argv.allowEdit) {
+        assertNotEditingDuringPlaytest(connection, session);
+      }
       await warnIfPluginStaleAsync([session.info]);
       return await (def.handler as any)(session, commandArgs);
     }
@@ -105,6 +108,28 @@ async function executeCommandAsync(
     if (!existingConnection) {
       await connection.disconnectAsync();
     }
+  }
+}
+
+/**
+ * Refuses to change an edit DataModel while a playtest of it runs: the
+ * playtest runs a copy, so the change would not show up there.
+ */
+export function assertNotEditingDuringPlaytest(
+  connection: BridgeConnection,
+  session: BridgeSession
+): void {
+  if (session.context !== 'edit') return;
+
+  const playtest = connection
+    .listSessions()
+    .find(
+      (s) => s.instanceId === session.info.instanceId && s.context === 'server'
+    );
+  if (playtest) {
+    throw new Error(
+      `A playtest of '${session.info.placeName}' is running, so this would change Edit, not the playtest. Target the playtest with --context server (or client), or pass --allow-edit to change Edit anyway.`
+    );
   }
 }
 
@@ -203,6 +228,14 @@ export function buildYargsCommand(
           type: 'string',
           describe: 'Target context (edit, client, server)',
           choices: ['edit', 'client', 'server'],
+        });
+      }
+
+      if (def.changesDataModel && def.scope === 'session') {
+        yargs.option('allow-edit', {
+          type: 'boolean',
+          default: false,
+          describe: 'Allow changing Edit while a playtest of it runs',
         });
       }
 

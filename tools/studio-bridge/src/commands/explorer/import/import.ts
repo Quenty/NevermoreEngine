@@ -47,6 +47,7 @@ export const importCommand = defineCommand<ImportArgs, ImportResult>({
   description: 'Insert a binary model (.rbxm) into Studio',
   category: 'execution',
   safety: 'mutate',
+  changesDataModel: true,
   scope: 'session',
   args: {
     file: arg.positional({

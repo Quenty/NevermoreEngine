@@ -136,6 +136,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   description: 'Execute Luau code in a connected Studio session',
   category: 'execution',
   safety: 'mutate',
+  changesDataModel: true,
   scope: 'session',
   args: {
     code: arg.positional({

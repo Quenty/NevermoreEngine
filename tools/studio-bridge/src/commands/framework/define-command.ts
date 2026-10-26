@@ -52,6 +52,12 @@ interface BaseFields<TArgs, TResult> {
   description: string;
   category: CommandCategory;
   safety: CommandSafety;
+  /**
+   * Changes the DataModel. Refused on an edit session while a playtest of it
+   * runs, since those edits are not what the playtest is running, unless
+   * `--allow-edit` is passed.
+   */
+  changesDataModel?: boolean;
   args: Record<string, ArgDefinition>;
   cli?: CliConfig<TResult>;
 }
