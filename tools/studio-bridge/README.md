@@ -166,6 +166,20 @@ studio-bridge process close --target session-id
 
 Send a shutdown message to a connected Studio session.
 
+### `playtest run` / `playtest start` / `playtest stop`
+
+```bash
+studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
+studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
+studio-bridge playtest start --mode run
+studio-bridge console exec --context server 'print("in the playtest")'
+studio-bridge playtest stop
+```
+
+Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server. `playtest run` executes the code in the playtest's server (or client, with `--context client`), returns its output and values like `console exec`, then stops the playtest. `playtest start` leaves it running, so other commands can target it with `--context server` or `--context client` until `playtest stop`.
+
+The playtest's server and client only connect when Studio's **Load user plugins on playtest** setting is on. With it off, the playtest still starts, but the command reports that its sessions never connected, and the playtest has to be stopped in Studio.
+
 ### `plugin install` / `plugin uninstall`
 
 ```bash

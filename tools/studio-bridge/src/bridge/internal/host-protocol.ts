@@ -174,6 +174,23 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     }),
   }),
   z.object({
+    type: z.literal('startPlaytest'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({
+      mode: z.enum(['play', 'run']),
+      playtestId: z.string(),
+      bridgePort: z.number(),
+      instanceId: z.string(),
+    }),
+  }),
+  z.object({
+    type: z.literal('endPlaytest'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({}).loose(),
+  }),
+  z.object({
     type: z.literal('error'),
     sessionId: z.string(),
     requestId: z.string().optional(),

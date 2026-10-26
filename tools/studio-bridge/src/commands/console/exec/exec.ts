@@ -113,6 +113,21 @@ function formatReturnValues(returnValues: SerializedReturnValue[]): string {
     .join('\t');
 }
 
+/** Render an exec result as its output, then its return values, then its error. */
+export function formatExecText(result: {
+  output: string[];
+  returnValues?: SerializedReturnValue[];
+  error?: string;
+  summary: string;
+}): string {
+  const lines = [...result.output];
+  if (result.returnValues && result.returnValues.length > 0) {
+    lines.push(formatReturnValues(result.returnValues));
+  }
+  if (result.error) lines.push(result.error);
+  return lines.length > 0 ? lines.join('\n') : result.summary;
+}
+
 export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   group: 'console',
   name: 'exec',
@@ -135,14 +150,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     }),
   },
   cli: {
-    format: (result) => {
-      const lines = [...result.output];
-      if (result.returnValues && result.returnValues.length > 0) {
-        lines.push(formatReturnValues(result.returnValues));
-      }
-      if (result.error) lines.push(result.error);
-      return lines.length > 0 ? lines.join('\n') : result.summary;
-    },
+    format: formatExecText,
   },
   handler: async (session, args) => {
     const { scriptContent } = await resolveScriptContentAsync(args);

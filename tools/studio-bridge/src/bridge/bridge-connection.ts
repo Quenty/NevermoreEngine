@@ -109,6 +109,7 @@ export class BridgeConnection extends EventEmitter {
 
   // Client mode internals
   private _client: BridgeClient | undefined;
+  private _clientPort = 0;
 
   // Idle exit
   private _idleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -276,10 +277,10 @@ export class BridgeConnection extends EventEmitter {
 
   /** The actual port the bridge is bound to (host) or connected to (client). */
   get port(): number {
-    if (this._role === 'host' && this._host) {
+    if (this._host) {
       return this._host.port;
     }
-    return 0;
+    return this._clientPort;
   }
 
   /** List all currently connected Studio sessions. */
@@ -372,13 +373,13 @@ export class BridgeConnection extends EventEmitter {
       return this._resolveByInstance(instances[0].instanceId, context);
     }
 
-    // Multiple instances: list session IDs so the user can copy one into --session
+    // Multiple instances: list session IDs so the user can copy one into --target
     const sessionList = this.listSessions()
       .map((s) => `  - ${s.sessionId}: ${s.placeName} (${s.context})`)
       .join('\n');
 
     throw new SessionNotFoundError(
-      `Multiple Studio instances connected. Use --session <id> to select one.\n${sessionList}`
+      `Multiple Studio instances connected. Use --target <id> to select one.\n${sessionList}`
     );
   }
 
@@ -542,7 +543,7 @@ export class BridgeConnection extends EventEmitter {
 
     this._host.on('plugin-connected', (info) => {
       const state = info.state ?? 'Edit';
-      const context = BridgeConnection._deriveContext(state);
+      const context = info.context ?? BridgeConnection._deriveContext(state);
 
       const sessionInfo: SessionInfo = {
         sessionId: info.sessionId,
@@ -670,6 +671,7 @@ export class BridgeConnection extends EventEmitter {
 
     const host = remoteHost ? remoteHost.split(':')[0] : undefined;
     await this._client.connectAsync(port, host);
+    this._clientPort = port;
     this._isConnected = true;
   }
 

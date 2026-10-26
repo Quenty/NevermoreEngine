@@ -20,6 +20,7 @@ import {
   decodePluginMessage,
   encodeMessage,
   type Capability,
+  type PluginContext,
   type ServerMessage,
 } from '../../server/web-socket-protocol.js';
 import { PendingRequestMap } from '../../server/pending-request-map.js';
@@ -42,6 +43,8 @@ export interface PluginSessionInfo {
   placeName?: string;
   /** Studio state from register. */
   state?: string;
+  /** DataModel context from register. */
+  context?: PluginContext;
   /** Place file from register. */
   placeFile?: string;
 }
@@ -379,6 +382,7 @@ export class BridgeHost extends EventEmitter {
         instanceId: msg.payload.instanceId,
         placeName: msg.payload.placeName,
         state: msg.payload.state,
+        context: msg.payload.context,
         placeFile: msg.payload.placeFile,
       });
     };

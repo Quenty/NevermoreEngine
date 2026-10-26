@@ -62,6 +62,21 @@ export {
 } from './connect.js';
 export { disconnectHandler, type DisconnectResult } from './disconnect.js';
 export {
+  playtestStartHandlerAsync,
+  type PlaytestStartOptions,
+  type PlaytestStartResult,
+} from './playtest/start/start.js';
+export {
+  playtestStopHandlerAsync,
+  type PlaytestStopOptions,
+  type PlaytestStopResult,
+} from './playtest/stop/stop.js';
+export {
+  playtestRunHandlerAsync,
+  type PlaytestRunOptions,
+  type PlaytestRunResult,
+} from './playtest/run/run.js';
+export {
   processRunHandlerAsync,
   type ProcessRunOptions,
   type ProcessRunResult,

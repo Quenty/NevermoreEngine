@@ -9,7 +9,11 @@
  *   - `standalone` — `(args) => Promise<TResult>`
  */
 
-import type { BridgeSession, BridgeConnection } from '../../bridge/index.js';
+import type {
+  BridgeSession,
+  BridgeConnection,
+  SessionContext,
+} from '../../bridge/index.js';
 import type { ArgDefinition } from './arg-builder.js';
 
 /**
@@ -58,10 +62,20 @@ export interface SessionCommandInput<TArgs, TResult>
   handler: (session: BridgeSession, args: TArgs) => Promise<TResult>;
 }
 
+/** The `--target` and `--context` flags, for handlers that resolve sessions themselves. */
+export interface SessionTargeting {
+  target?: string;
+  context?: SessionContext;
+}
+
 export interface ConnectionCommandInput<TArgs, TResult>
   extends BaseFields<TArgs, TResult> {
   scope: 'connection';
-  handler: (connection: BridgeConnection, args: TArgs) => Promise<TResult>;
+  handler: (
+    connection: BridgeConnection,
+    args: TArgs,
+    targeting: SessionTargeting
+  ) => Promise<TResult>;
 }
 
 export interface StandaloneCommandInput<TArgs, TResult>

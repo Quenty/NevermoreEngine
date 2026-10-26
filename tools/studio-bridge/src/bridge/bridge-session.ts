@@ -21,6 +21,9 @@ import type {
   DataModelResult,
   LogOptions,
   QueryDataModelOptions,
+  PlaytestMode,
+  PlaytestEndResult,
+  EndPlaytestResult,
 } from './types.js';
 import { SessionDisconnectedError } from './types.js';
 import type {
@@ -39,6 +42,7 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   captureScreenshot: 30_000,
   queryDataModel: 10_000,
   queryLogs: 10_000,
+  endPlaytest: 5_000,
 };
 
 /**
@@ -253,6 +257,69 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('dataModelResult', result);
+  }
+
+  /**
+   * Start a playtest from this edit session. Resolves when the playtest
+   * ends, not when it starts: StudioTestService only reports a refusal to
+   * start (a playtest already running) by failing the call that would have
+   * waited for the end.
+   */
+  async runPlaytestAsync(
+    mode: PlaytestMode,
+    playtestId: string,
+    bridgePort: number,
+    timeoutMs: number
+  ): Promise<PlaytestEndResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'startPlaytest',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {
+          mode,
+          playtestId,
+          bridgePort,
+          instanceId: this._info.instanceId,
+        },
+      },
+      timeoutMs
+    );
+
+    if (result.type === 'playtestEnded') {
+      return {
+        playtestId: result.payload.playtestId,
+        success: result.payload.success,
+        error: result.payload.error,
+      };
+    }
+
+    throw pluginError('playtestEnded', result);
+  }
+
+  /** End the playtest this server session belongs to. */
+  async endPlaytestAsync(): Promise<EndPlaytestResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'endPlaytest',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {} as Record<string, never>,
+      },
+      DEFAULT_TIMEOUTS.endPlaytest
+    );
+
+    if (result.type === 'endPlaytestResult') {
+      return { playtestId: result.payload.playtestId };
+    }
+
+    throw pluginError('endPlaytestResult', result);
   }
 
   private _assertConnected(): void {

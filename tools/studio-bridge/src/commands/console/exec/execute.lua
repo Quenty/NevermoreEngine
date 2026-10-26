@@ -13,6 +13,10 @@
 	Loaded standalone inside the plugin, so it cannot require anything. Has no
 	Roblox dependencies and also loads under Lune.
 
+	Compiles through the router's `Compile`, which still works in a playtest's
+	client where `loadstring` does not exist. Routers from older plugins have no
+	`Compile`, and fall back to `loadstring`.
+
 	@class ExecuteAction
 ]=]
 
@@ -37,12 +41,19 @@ type LogEntry = {
 
 local queue: { QueuedRequest } = {}
 local isProcessing = false
+local compile: (source: string) -> (any, string?) = loadstring :: any
 
 --[=[
 	Registers the `execute` handler. With `sendMessage`, requests queue and each
 	reply is sent directly; without it, the reply goes back through the router.
 ]=]
 function ExecuteAction.register(router: any, sendMessage: SendMessage?)
+	if type(router.Compile) == "function" then
+		compile = function(source: string)
+			return router:Compile(source)
+		end
+	end
+
 	router:setResponseType("execute", "scriptComplete")
 	router:register("execute", function(payload: { [string]: any }, requestId: string, sessionId: string)
 		if not sendMessage then
@@ -142,7 +153,7 @@ function ExecuteAction._handleExecute(
 		return reply({ success = false, error = "Missing code in execute request", code = "SCRIPT_LOAD_ERROR" })
 	end
 
-	local compileOk, fn, compileErr = pcall(loadstring :: any, code)
+	local compileOk, fn, compileErr = pcall(compile, code)
 	if not compileOk then
 		return reply({ success = false, error = tostring(fn), code = "SCRIPT_LOAD_ERROR" })
 	end
@@ -154,7 +165,7 @@ function ExecuteAction._handleExecute(
 		})
 	end
 
-	-- loadstring'd code reads print/warn from its global environment, so
+	-- Compiled code reads print/warn from its global environment, so
 	-- shadowing them with locals here would capture nothing
 	local captured: { LogEntry } = {}
 	local env = getfenv(fn)

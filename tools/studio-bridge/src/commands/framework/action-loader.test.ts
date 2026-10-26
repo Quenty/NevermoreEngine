@@ -112,10 +112,12 @@ describe('loadActionSourcesAsync', () => {
 
     expect(results.map((r) => r.name).sort()).toEqual([
       'capture-screenshot',
+      'end-playtest',
       'execute',
       'query-data-model',
       'query-logs',
       'query-state',
+      'start-playtest',
     ]);
   });
 

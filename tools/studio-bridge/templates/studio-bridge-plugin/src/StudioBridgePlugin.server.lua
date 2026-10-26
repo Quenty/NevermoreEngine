@@ -38,20 +38,37 @@ local LOG_LEVELS: { [Enum.MessageType]: string } = {
 	[Enum.MessageType.MessageError] = "Error",
 }
 
--- Play mode spawns extra plugin instances for the client and server, which
--- cannot make HTTP requests. The edit instance stays alive through play mode.
-if not RunService:IsStudio() or RunService:IsRunning() then
+-- Playtests load a plugin instance into their server and client, but only when
+-- Studio's "load user plugins on playtest" setting is on. Those instances cannot
+-- make the HTTP requests port discovery needs, so they only connect in a
+-- playtest studio-bridge started, which hands them the port and the instance id
+-- of the edit session that started it.
+local playtestArgs: StudioBridgeSessionUtils.PlaytestArgs? = nil
+if RunService:IsRunning() then
+	local ok, testArgs = pcall(function()
+		return (game:GetService("StudioTestService") :: any):GetTestArgs()
+	end)
+	playtestArgs = if ok then StudioBridgeSessionUtils.getPlaytestArgs(testArgs) else nil
+end
+if not RunService:IsStudio() or (RunService:IsRunning() and not playtestArgs) then
 	return
 end
 
 -- Generated once per plugin lifetime, so the session id survives reconnects
 local nonce = string.sub(HttpService:GenerateGUID(false), 1, 8)
 local context: StudioBridgeSessionUtils.PluginContext = StudioBridgeSessionUtils.getContext()
-local instanceId = StudioBridgeSessionUtils.getInstanceId(game.GameId, game.PlaceId, game.Name, nonce)
+local instanceId = if playtestArgs
+	then playtestArgs.instanceId
+	else StudioBridgeSessionUtils.getInstanceId(game.GameId, game.PlaceId, game.Name, nonce)
+local playtestPort = if playtestArgs then playtestArgs.port else nil
 
 local router = ActionRouter.new()
 local logBuffer = MessageBuffer.new(LOG_BUFFER_CAPACITY)
 local currentConnection: StudioBridgeConnection.StudioBridgeConnection? = nil
+local currentWebSocket: any = nil
+local discovery: DiscoveryStateMachine.DiscoveryStateMachine? = nil
+local pollThread: thread? = nil
+local isUnloaded = false
 
 local pngOk, png = pcall(function()
 	return (require :: any)(script.Parent.Vendor.png)
@@ -70,7 +87,7 @@ end, logBuffer)
 local clockBase = os.clock()
 local timeBase = os.time()
 
-LogService.MessageOut:Connect(function(message, messageType)
+local logConnection = LogService.MessageOut:Connect(function(message, messageType)
 	if string.sub(message, 1, #StudioBridgeLogUtils.PREFIX) == StudioBridgeLogUtils.PREFIX then
 		return
 	end
@@ -83,6 +100,10 @@ LogService.MessageOut:Connect(function(message, messageType)
 end)
 
 local function openConnection(webSocket: any, sessionId: string, label: string)
+	if isUnloaded then
+		return
+	end
+
 	if currentConnection then
 		currentConnection:Destroy()
 	end
@@ -98,10 +119,41 @@ local function openConnection(webSocket: any, sessionId: string, label: string)
 end
 
 local function createWebSocket(url: string): (boolean, any)
-	return pcall(function()
+	local ok, webSocket = pcall(function()
 		return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = url })
 	end)
+	if ok then
+		currentWebSocket = webSocket
+	end
+	return ok, webSocket
 end
+
+-- Reloading the plugin destroys this script, but the socket callbacks and the
+-- poll loop outlive it, leaving the old instance connected beside the new one
+plugin.Unloading:Connect(function()
+	isUnloaded = true
+	logConnection:Disconnect()
+
+	if pollThread then
+		task.cancel(pollThread)
+		pollThread = nil
+	end
+	if discovery then
+		discovery:Stop()
+	end
+	if currentConnection then
+		currentConnection:Destroy()
+		currentConnection = nil
+	end
+	if currentWebSocket then
+		pcall(function()
+			currentWebSocket:Close()
+		end)
+		currentWebSocket = nil
+	end
+
+	router:Destroy()
+end)
 
 local function warnOnError(webSocket: any)
 	webSocket.Error:Connect(function(status, err)
@@ -175,9 +227,13 @@ end
 
 local sessionId = StudioBridgeSessionUtils.getSessionId(instanceId, context)
 
-local discovery: DiscoveryStateMachine.DiscoveryStateMachine
-discovery = DiscoveryStateMachine.new(nil, {
-	scanPortsAsync = scanPortsAsync,
+local stateMachine: DiscoveryStateMachine.DiscoveryStateMachine
+stateMachine = DiscoveryStateMachine.new(nil, {
+	scanPortsAsync = if playtestPort
+		then function()
+			return playtestPort, nil
+		end
+		else scanPortsAsync,
 	connectWebSocket = createWebSocket,
 	onStateChange = function(oldState, newState)
 		if oldState == "idle" and newState == "searching" then
@@ -189,7 +245,7 @@ discovery = DiscoveryStateMachine.new(nil, {
 			openConnection(webSocket, sessionId, `localhost:{port}`)
 		end)
 		webSocket.Closed:Connect(function()
-			discovery:HandleDisconnect("closed")
+			stateMachine:HandleDisconnect("closed")
 		end)
 		warnOnError(webSocket)
 	end,
@@ -198,14 +254,16 @@ discovery = DiscoveryStateMachine.new(nil, {
 	end,
 })
 
+discovery = stateMachine
+
 StudioBridgeLogUtils.logVerbose(`Session ID: {sessionId}`)
-discovery:Start()
+stateMachine:Start()
 
 -- Each cycle gets a fixed time budget, which PollAsync threads through to the port scan
-task.spawn(function()
+pollThread = task.spawn(function()
 	while true do
 		local startTime = os.clock()
-		discovery:PollAsync(POLL_INTERVAL_SEC)
+		stateMachine:PollAsync(POLL_INTERVAL_SEC)
 
 		local remaining = POLL_INTERVAL_SEC - (os.clock() - startTime)
 		if remaining > 0 then

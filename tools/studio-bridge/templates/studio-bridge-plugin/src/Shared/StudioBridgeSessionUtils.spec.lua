@@ -33,6 +33,21 @@ describe("StudioBridgeSessionUtils.getInstanceId()", function()
 	end)
 end)
 
+describe("StudioBridgeSessionUtils.getPlaytestArgs()", function()
+	it("should read the port and instance id studio-bridge passed in the test args", function()
+		expect(StudioBridgeSessionUtils.getPlaytestArgs({
+			studioBridgePlaytestId = "abc",
+			studioBridgePort = 38741,
+			studioBridgeInstanceId = "123-456",
+		})).toEqual({ port = 38741, instanceId = "123-456" })
+	end)
+
+	it("should return nil for a playtest studio-bridge did not start", function()
+		expect(StudioBridgeSessionUtils.getPlaytestArgs(nil)).toBeNil()
+		expect(StudioBridgeSessionUtils.getPlaytestArgs({ custom = true })).toBeNil()
+	end)
+end)
+
 describe("StudioBridgeSessionUtils.getSessionId()", function()
 	it("should append the context to the instance id", function()
 		expect(StudioBridgeSessionUtils.getSessionId("123-456", "edit")).toEqual("123-456-edit")

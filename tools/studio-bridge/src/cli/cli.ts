@@ -32,6 +32,9 @@ import { listCommand } from '../commands/process/list/list.js';
 import { launchCommand } from '../commands/process/launch/launch.js';
 import { processRunCommand } from '../commands/process/run/run.js';
 import { processCloseCommand } from '../commands/process/close/close.js';
+import { playtestStartCommand } from '../commands/playtest/start/start.js';
+import { playtestStopCommand } from '../commands/playtest/stop/stop.js';
+import { playtestRunCommand } from '../commands/playtest/run/run.js';
 import { installCommand } from '../commands/plugin/install/install.js';
 import { uninstallCommand } from '../commands/plugin/uninstall/uninstall.js';
 import { serveCommand } from '../commands/serve/serve.js';
@@ -47,6 +50,9 @@ registry.register(logsCommand);
 registry.register(queryCommand);
 registry.register(screenshotCommand);
 registry.register(processRunCommand);
+registry.register(playtestStartCommand);
+registry.register(playtestStopCommand);
+registry.register(playtestRunCommand);
 
 // Infrastructure commands
 registry.register(infoCommand);

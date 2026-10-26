@@ -13,12 +13,16 @@ export type StudioState =
   | 'Server'
   | 'Client';
 
+export type PluginContext = 'edit' | 'client' | 'server';
+
 export type Capability =
   | 'execute'
   | 'queryState'
   | 'captureScreenshot'
   | 'queryDataModel'
   | 'queryLogs'
+  | 'startPlaytest'
+  | 'endPlaytest'
   | 'heartbeat'
   | 'registerAction'
   | 'syncActions';
@@ -133,6 +137,8 @@ export interface RegisterMessage extends PushMessage {
     placeName: string;
     placeFile?: string;
     state: StudioState;
+    /** Which DataModel the plugin runs in. Older plugins leave it out. */
+    context?: PluginContext;
     pid?: number;
     capabilities: Capability[];
   };
@@ -214,6 +220,24 @@ export interface SyncActionsResultMessage extends RequestMessage {
   };
 }
 
+export type PlaytestMode = 'play' | 'run';
+
+export interface PlaytestEndedMessage extends RequestMessage {
+  type: 'playtestEnded';
+  payload: {
+    playtestId: string;
+    success: boolean;
+    error?: string;
+  };
+}
+
+export interface EndPlaytestResultMessage extends RequestMessage {
+  type: 'endPlaytestResult';
+  payload: {
+    playtestId?: string;
+  };
+}
+
 export interface PluginErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -235,6 +259,8 @@ export type PluginMessage =
   | HeartbeatMessage
   | RegisterActionResultMessage
   | SyncActionsResultMessage
+  | PlaytestEndedMessage
+  | EndPlaytestResultMessage
   | PluginErrorMessage;
 
 export interface ExecuteMessage extends BaseMessage {
@@ -302,6 +328,23 @@ export interface SyncActionsMessage extends RequestMessage {
   };
 }
 
+export interface StartPlaytestMessage extends RequestMessage {
+  type: 'startPlaytest';
+  payload: {
+    mode: PlaytestMode;
+    playtestId: string;
+    /** Handed to the playtest's DataModels, which can't discover the bridge themselves. */
+    bridgePort: number;
+    /** The edit session's instance id, which the playtest's sessions register under. */
+    instanceId: string;
+  };
+}
+
+export interface EndPlaytestMessage extends RequestMessage {
+  type: 'endPlaytest';
+  payload: Record<string, never>;
+}
+
 export interface ServerErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -321,6 +364,8 @@ export type ServerMessage =
   | QueryLogsMessage
   | RegisterActionMessage
   | SyncActionsMessage
+  | StartPlaytestMessage
+  | EndPlaytestMessage
   | ServerErrorMessage;
 
 export function encodeMessage(msg: ServerMessage): string {
@@ -421,6 +466,12 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
               ? payload.placeFile
               : undefined,
           state: stateVal as StudioState,
+          context:
+            payload.context === 'edit' ||
+            payload.context === 'client' ||
+            payload.context === 'server'
+              ? payload.context
+              : undefined,
           pid: typeof payload.pid === 'number' ? payload.pid : undefined,
           capabilities: payload.capabilities as Capability[],
         },
@@ -578,6 +629,38 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         payload: {
           needed: payload.needed as string[],
           installed: payload.installed as Record<string, string>,
+        },
+      };
+
+    case 'playtestEnded':
+      if (requestId === undefined) return null;
+      if (
+        typeof payload.playtestId !== 'string' ||
+        typeof payload.success !== 'boolean'
+      )
+        return null;
+      return {
+        type: 'playtestEnded',
+        sessionId,
+        requestId,
+        payload: {
+          playtestId: payload.playtestId,
+          success: payload.success,
+          error: typeof payload.error === 'string' ? payload.error : undefined,
+        },
+      };
+
+    case 'endPlaytestResult':
+      if (requestId === undefined) return null;
+      return {
+        type: 'endPlaytestResult',
+        sessionId,
+        requestId,
+        payload: {
+          playtestId:
+            typeof payload.playtestId === 'string'
+              ? payload.playtestId
+              : undefined,
         },
       };
 
@@ -758,6 +841,36 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         payload: {
           actions: payload.actions as Record<string, string>,
         },
+      };
+
+    case 'startPlaytest':
+      if (requestId === undefined) return null;
+      if (
+        (payload.mode !== 'play' && payload.mode !== 'run') ||
+        typeof payload.playtestId !== 'string' ||
+        typeof payload.bridgePort !== 'number' ||
+        typeof payload.instanceId !== 'string'
+      )
+        return null;
+      return {
+        type: 'startPlaytest',
+        sessionId,
+        requestId,
+        payload: {
+          mode: payload.mode,
+          playtestId: payload.playtestId,
+          bridgePort: payload.bridgePort,
+          instanceId: payload.instanceId,
+        },
+      };
+
+    case 'endPlaytest':
+      if (requestId === undefined) return null;
+      return {
+        type: 'endPlaytest',
+        sessionId,
+        requestId,
+        payload: {} as Record<string, never>,
       };
 
     case 'error':

@@ -14,6 +14,11 @@ local StudioBridgeSessionUtils = {}
 
 export type PluginContext = "edit" | "client" | "server"
 
+export type PlaytestArgs = {
+	port: number,
+	instanceId: string,
+}
+
 --[=[
 	Every message type the plugin can handle. Most arrive as action source pushed
 	by the bridge right after registering, but the plugin advertises them up front.
@@ -30,6 +35,8 @@ StudioBridgeSessionUtils.CAPABILITIES = table.freeze({
 	"captureScreenshot",
 	"queryDataModel",
 	"queryLogs",
+	"startPlaytest",
+	"endPlaytest",
 })
 
 --[=[
@@ -92,6 +99,25 @@ function StudioBridgeSessionUtils.createRegisterPayload(instanceId: string, cont
 		state = "Edit",
 		capabilities = table.clone(StudioBridgeSessionUtils.CAPABILITIES),
 	}
+end
+
+--[=[
+	Returns what studio-bridge handed a playtest through its StudioTestService
+	test args: the bridge port, and the instance id of the edit session that
+	started it. Nil when studio-bridge did not start the playtest.
+]=]
+function StudioBridgeSessionUtils.getPlaytestArgs(testArgs: any): PlaytestArgs?
+	if
+		type(testArgs) == "table"
+		and type(testArgs.studioBridgePort) == "number"
+		and type(testArgs.studioBridgeInstanceId) == "string"
+	then
+		return {
+			port = testArgs.studioBridgePort,
+			instanceId = testArgs.studioBridgeInstanceId,
+		}
+	end
+	return nil
 end
 
 return StudioBridgeSessionUtils

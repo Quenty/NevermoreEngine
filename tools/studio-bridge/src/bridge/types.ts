@@ -12,6 +12,7 @@ import type {
   DataModelInstance,
   OutputLevel,
   SerializedReturnValue,
+  PlaytestMode,
 } from '../server/web-socket-protocol.js';
 
 // Re-export protocol types used in the public API
@@ -21,6 +22,7 @@ export type {
   DataModelInstance,
   OutputLevel,
   SerializedReturnValue,
+  PlaytestMode,
 };
 
 export type SessionContext = 'edit' | 'client' | 'server';
@@ -105,6 +107,18 @@ export interface QueryDataModelOptions {
   includeAttributes?: boolean;
   find?: { name: string; recursive?: boolean };
   listServices?: boolean;
+}
+
+export interface PlaytestEndResult {
+  playtestId: string;
+  /** False when StudioTestService refused to start the playtest. */
+  success: boolean;
+  error?: string;
+}
+
+export interface EndPlaytestResult {
+  /** Absent when the playtest was not started by studio-bridge. */
+  playtestId?: string;
 }
 
 export interface LogFollowOptions {

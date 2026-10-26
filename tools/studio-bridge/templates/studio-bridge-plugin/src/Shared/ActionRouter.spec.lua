@@ -297,6 +297,63 @@ describe("ActionRouter:RegisterAction()", function()
 	end)
 end)
 
+describe("ActionRouter:Compile()", function()
+	it("should compile source into a callable function", function()
+		local router = ActionRouter.new()
+
+		local fn = router:Compile("return 1 + 2")
+
+		expect(fn()).toEqual(3)
+	end)
+
+	it("should return the compile error for invalid source", function()
+		local router = ActionRouter.new()
+
+		local fn, err = router:Compile("local x = = 1", "=test")
+
+		expect(fn).toBeNil()
+		expect(err).toEqual(expect.stringContaining("Expected identifier"))
+	end)
+end)
+
+describe("ActionRouter:Destroy()", function()
+	it("should tear down every action and drop all handlers", function()
+		local router = ActionRouter.new()
+		local tornDown = {}
+		router:register("recordTeardown", function(payload)
+			table.insert(tornDown, payload.name)
+			return nil
+		end)
+
+		router:RegisterAction(
+			"action",
+			[[
+				local router
+				return {
+					register = function(r)
+						router = r
+						r:register("actionA", function() return {} end)
+					end,
+					teardown = function()
+						router:Dispatch({ type = "recordTeardown", sessionId = "s", payload = { name = "action" } })
+					end,
+				}
+			]],
+			nil,
+			nil,
+			nil,
+			"hash-1"
+		)
+
+		router:Destroy()
+
+		expect(tornDown).toEqual({ "action" })
+		expect(router:GetInstalledActions()).toEqual({})
+		local response = router:Dispatch(createMessage("actionA"))
+		expect(response and response.payload.code).toEqual("UNKNOWN_REQUEST")
+	end)
+end)
+
 describe("ActionRouter:GetInstalledActions()", function()
 	it("should map each hashed action to its hash", function()
 		local router = ActionRouter.new()

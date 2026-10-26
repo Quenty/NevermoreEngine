@@ -18,7 +18,10 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import { BridgeConnection } from '../../bridge/index.js';
 import type { SessionContext } from '../../bridge/index.js';
-import type { CommandDefinition } from '../../commands/framework/define-command.js';
+import type {
+  CommandDefinition,
+  SessionTargeting,
+} from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
@@ -81,15 +84,20 @@ async function executeCommandAsync(
       waitForSessions: def.scope === 'connection',
     }));
 
+  const targeting: SessionTargeting = {
+    target: argv.target as string | undefined,
+    context: argv.context as SessionContext | undefined,
+  };
+
   try {
     if (def.scope === 'session') {
       const session = await connection.resolveSessionAsync(
-        argv.target as string | undefined,
-        argv.context as SessionContext | undefined
+        targeting.target,
+        targeting.context
       );
       return await (def.handler as any)(session, commandArgs);
     }
-    return await (def.handler as any)(connection, commandArgs);
+    return await (def.handler as any)(connection, commandArgs, targeting);
   } finally {
     if (!existingConnection) {
       await connection.disconnectAsync();

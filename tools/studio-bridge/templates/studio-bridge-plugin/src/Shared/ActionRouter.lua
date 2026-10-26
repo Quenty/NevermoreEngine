@@ -109,6 +109,66 @@ function ActionRouter.Dispatch(self: ActionRouter, message: Message): Message?
 	}
 end
 
+--[=[
+	Tears down every installed action and drops all handlers.
+]=]
+function ActionRouter.Destroy(self: ActionRouter)
+	for _, action in self._actions do
+		if type(action.module) == "table" and type(action.module.teardown) == "function" then
+			pcall(action.module.teardown)
+		end
+	end
+
+	table.clear(self._actions)
+	table.clear(self._handlers)
+	table.clear(self._responseTypes)
+end
+
+--[=[
+	Compiles Luau source into a function, like `loadstring`. A playtest's client
+	has no `loadstring`, so there the source compiles through a ModuleScript
+	instead. Returns nil and the compile error when the source does not compile.
+]=]
+function ActionRouter.Compile(_self: ActionRouter, source: string, chunkName: string?): (any, string?)
+	local loadstringOk, fn, compileErr = pcall(loadstring :: any, source, chunkName)
+	if loadstringOk then
+		return fn, compileErr
+	end
+
+	return ActionRouter._compileWithModuleScript(source, chunkName)
+end
+
+function ActionRouter._compileWithModuleScript(source: string, chunkName: string?): (any, string?)
+	local moduleName = if chunkName then string.gsub(chunkName, "^[@=]", "") else "compiled"
+
+	local moduleScript = Instance.new("ModuleScript")
+	moduleScript.Name = moduleName
+	-- Wrapping on the first line keeps a top-level `return` legal and line numbers unchanged
+	moduleScript.Source = `return function(...) {source}\nend`
+
+	-- require only reports that the module failed to load; the compile error
+	-- itself reaches the output a frame later
+	local compileErrors: { string } = {}
+	local logConnection = game:GetService("LogService").MessageOut:Connect(function(message, messageType)
+		if messageType == Enum.MessageType.MessageError and string.find(message, moduleName, 1, true) == 1 then
+			table.insert(compileErrors, message)
+		end
+	end)
+
+	local requireOk, result = pcall(require, moduleScript)
+	if not requireOk then
+		task.wait()
+	end
+
+	logConnection:Disconnect()
+	moduleScript:Destroy()
+
+	if requireOk then
+		return result, nil
+	end
+	return nil, compileErrors[1] or tostring(result)
+end
+
 function ActionRouter._errorResponse(message: Message, code: string, errorMessage: string): Message
 	return {
 		type = "error",
@@ -159,11 +219,9 @@ function ActionRouter.RegisterAction(
 		handlersBefore[handlerName] = true
 	end
 
-	local loadOk, chunkOrErr = pcall(function()
-		return (loadstring :: any)(source, `@action/{name}`)
-	end)
+	local loadOk, chunkOrErr, compileErr = pcall(self.Compile, self, source, `@action/{name}`)
 	if not loadOk or not chunkOrErr then
-		return false, `Failed to load action source: {chunkOrErr or "loadstring returned nil"}`
+		return false, `Failed to load action source: {compileErr or chunkOrErr or "compile returned nil"}`
 	end
 
 	local execOk, moduleOrErr = pcall(chunkOrErr)
