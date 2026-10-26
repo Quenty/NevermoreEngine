@@ -11,6 +11,8 @@
 	@class BuiltInActions
 ]=]
 
+local StudioBridgeLogUtils = require(script.Parent.StudioBridgeLogUtils)
+
 local BuiltInActions = {}
 
 type ActionRouter = any
@@ -72,6 +74,8 @@ function BuiltInActions._registerAction(
 end
 
 function BuiltInActions._syncActions(router: ActionRouter, payload: { [string]: any }): { [string]: any }
+	StudioBridgeLogUtils.setVerbose(payload.verbose == true)
+
 	local installed = router:GetInstalledActions()
 
 	local needed: { string } = {}

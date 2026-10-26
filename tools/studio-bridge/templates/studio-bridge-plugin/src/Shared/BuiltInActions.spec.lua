@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local ActionRouter = require("ActionRouter")
 local BuiltInActions = require("BuiltInActions")
 local Jest = require("Jest")
+local StudioBridgeLogUtils = require("StudioBridgeLogUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -151,5 +152,15 @@ describe("syncActions", function()
 		local response = controller.dispatch("syncActions", {})
 
 		expect(response and response.payload).toEqual({ needed = {}, installed = {} })
+	end)
+
+	it("should follow the bridge's verbose flag for plugin logging", function()
+		local controller = setup()
+
+		controller.dispatch("syncActions", { verbose = true })
+		expect(StudioBridgeLogUtils.isVerbose()).toEqual(true)
+
+		controller.dispatch("syncActions", {})
+		expect(StudioBridgeLogUtils.isVerbose()).toEqual(false)
 	end)
 end)

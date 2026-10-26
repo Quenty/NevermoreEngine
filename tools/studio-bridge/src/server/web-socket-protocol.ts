@@ -298,6 +298,7 @@ export interface SyncActionsMessage extends RequestMessage {
   type: 'syncActions';
   payload: {
     actions: Record<string, string>;
+    verbose?: boolean;
   };
 }
 

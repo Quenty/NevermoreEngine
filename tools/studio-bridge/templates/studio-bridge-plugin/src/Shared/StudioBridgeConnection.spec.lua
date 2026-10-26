@@ -10,6 +10,7 @@ local HttpService = game:GetService("HttpService")
 local ActionRouter = require("ActionRouter")
 local Jest = require("Jest")
 local StudioBridgeConnection = require("StudioBridgeConnection")
+local StudioBridgeLogUtils = require("StudioBridgeLogUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -189,6 +190,17 @@ describe("StudioBridgeConnection socket close", function()
 		expect(controller.connection:IsOpen()).toEqual(false)
 		expect(controller.webSocket.MessageReceived.GetHandlerCount()).toEqual(0)
 		expect(controller.webSocket.Closed.GetHandlerCount()).toEqual(0)
+
+		controller:Destroy()
+	end)
+
+	it("should end verbose logging with the command that asked for it", function()
+		local controller = setup()
+		StudioBridgeLogUtils.setVerbose(true)
+
+		controller.webSocket.Closed:Fire()
+
+		expect(StudioBridgeLogUtils.isVerbose()).toEqual(false)
 
 		controller:Destroy()
 	end)

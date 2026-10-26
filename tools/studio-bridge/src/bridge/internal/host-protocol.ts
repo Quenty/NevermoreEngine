@@ -170,6 +170,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     payload: z.object({
       actions: z.record(z.string(), z.string()),
+      verbose: z.boolean().optional(),
     }),
   }),
   z.object({

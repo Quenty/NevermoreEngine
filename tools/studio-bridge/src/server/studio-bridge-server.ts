@@ -482,7 +482,7 @@ export class StudioBridgeServer {
     const syncResult = await this.performActionAsync<PluginMessage>(
       {
         type: 'syncActions',
-        payload: { actions },
+        payload: { actions, verbose: OutputHelper.isVerbose() },
       },
       10_000
     );

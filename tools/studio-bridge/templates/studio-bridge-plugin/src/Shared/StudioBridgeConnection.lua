@@ -11,8 +11,9 @@
 
 local HttpService = game:GetService("HttpService")
 
+local StudioBridgeLogUtils = require(script.Parent.StudioBridgeLogUtils)
+
 local HEARTBEAT_INTERVAL_SEC = 15
-local LOG_PREFIX = "[StudioBridge]"
 
 local StudioBridgeConnection = {}
 StudioBridgeConnection.ClassName = "StudioBridgeConnection"
@@ -119,7 +120,7 @@ function StudioBridgeConnection.Send(self: StudioBridgeConnection, message: { [s
 		self._webSocket:Send(HttpService:JSONEncode(message))
 	end)
 	if not ok then
-		warn(`{LOG_PREFIX} Failed to send {tostring(message.type)}: {tostring(err)}`)
+		StudioBridgeLogUtils.warn(`Failed to send {tostring(message.type)}: {tostring(err)}`)
 	end
 end
 
@@ -138,18 +139,20 @@ end
 function StudioBridgeConnection._handleRawMessage(self: StudioBridgeConnection, rawData: string)
 	local ok, err = pcall(StudioBridgeConnection._dispatchRawMessage, self, rawData)
 	if not ok then
-		warn(`{LOG_PREFIX} MessageReceived handler error: {tostring(err)}`)
+		StudioBridgeLogUtils.warn(`MessageReceived handler error: {tostring(err)}`)
 	end
 end
 
 function StudioBridgeConnection._dispatchRawMessage(self: StudioBridgeConnection, rawData: string)
 	local decodeOk, message = pcall(HttpService.JSONDecode, HttpService, rawData)
 	if not decodeOk or type(message) ~= "table" or type(message.type) ~= "string" then
-		print(`{LOG_PREFIX} Failed to decode message: {string.sub(tostring(rawData), 1, 200)}`)
+		StudioBridgeLogUtils.warn(`Failed to decode message: {string.sub(tostring(rawData), 1, 200)}`)
 		return
 	end
 
-	print(`{LOG_PREFIX} Received: {message.type} (requestId={string.sub(tostring(message.requestId), 1, 8)}...)`)
+	StudioBridgeLogUtils.logVerbose(
+		`Received: {message.type} (requestId={string.sub(tostring(message.requestId), 1, 8)}...)`
+	)
 
 	if message.type == "shutdown" then
 		self:_close()
@@ -158,12 +161,12 @@ function StudioBridgeConnection._dispatchRawMessage(self: StudioBridgeConnection
 
 	local response = self._router:Dispatch(message)
 	if not response then
-		print(`{LOG_PREFIX} No response for: {message.type}`)
+		StudioBridgeLogUtils.logVerbose(`No response for: {message.type}`)
 		return
 	end
 
 	local encoded = HttpService:JSONEncode(response)
-	print(`{LOG_PREFIX} Sending: {response.type} ({#encoded} bytes)`)
+	StudioBridgeLogUtils.logVerbose(`Sending: {response.type} ({#encoded} bytes)`)
 	self._webSocket:Send(encoded)
 end
 
@@ -180,6 +183,7 @@ end
 ]=]
 function StudioBridgeConnection.Destroy(self: StudioBridgeConnection)
 	self._isOpen = false
+	StudioBridgeLogUtils.setVerbose(false)
 
 	for _, connection in self._signalConnections do
 		connection:Disconnect()

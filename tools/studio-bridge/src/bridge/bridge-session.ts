@@ -300,7 +300,7 @@ export class BridgeSession extends EventEmitter {
         type: 'syncActions',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { actions },
+        payload: { actions, verbose: OutputHelper.isVerbose() },
       },
       10_000
     );

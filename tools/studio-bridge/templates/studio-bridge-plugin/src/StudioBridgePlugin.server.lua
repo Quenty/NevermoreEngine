@@ -21,13 +21,13 @@ local BuiltInActions = require(script.Parent.Shared.BuiltInActions)
 local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine)
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
 local StudioBridgeConnection = require(script.Parent.Shared.StudioBridgeConnection)
+local StudioBridgeLogUtils = require(script.Parent.Shared.StudioBridgeLogUtils)
 local StudioBridgeSessionUtils = require(script.Parent.Shared.StudioBridgeSessionUtils)
 
 local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
 local IS_EPHEMERAL = ("{{EPHEMERAL}}" :: string) == "true"
 
-local LOG_PREFIX = "[StudioBridge]"
 local LOG_BUFFER_CAPACITY = 1000
 local POLL_INTERVAL_SEC = 2
 
@@ -71,7 +71,7 @@ local clockBase = os.clock()
 local timeBase = os.time()
 
 LogService.MessageOut:Connect(function(message, messageType)
-	if string.sub(message, 1, #LOG_PREFIX) == LOG_PREFIX then
+	if string.sub(message, 1, #StudioBridgeLogUtils.PREFIX) == StudioBridgeLogUtils.PREFIX then
 		return
 	end
 
@@ -94,7 +94,7 @@ local function openConnection(webSocket: any, sessionId: string, label: string)
 		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(instanceId, context),
 	})
 
-	print(`{LOG_PREFIX} Connected to {label} as {sessionId}`)
+	StudioBridgeLogUtils.logVerbose(`Connected to {label} as {sessionId}`)
 end
 
 local function createWebSocket(url: string): (boolean, any)
@@ -105,7 +105,7 @@ end
 
 local function warnOnError(webSocket: any)
 	webSocket.Error:Connect(function(status, err)
-		warn(`{LOG_PREFIX} WebSocket error ({status}): {err}`)
+		StudioBridgeLogUtils.logVerbose(`WebSocket error ({status}): {err}`)
 	end)
 end
 
@@ -162,7 +162,7 @@ end
 if IS_EPHEMERAL then
 	local ok, webSocket = createWebSocket(`ws://localhost:{PORT}/{SESSION_ID}`)
 	if not (ok and webSocket) then
-		warn(`{LOG_PREFIX} Failed to create WebSocket client`)
+		StudioBridgeLogUtils.warn("Failed to create WebSocket client")
 		return
 	end
 
@@ -181,7 +181,7 @@ discovery = DiscoveryStateMachine.new(nil, {
 	connectWebSocket = createWebSocket,
 	onStateChange = function(oldState, newState)
 		if oldState == "idle" and newState == "searching" then
-			print(`{LOG_PREFIX} Searching for host on ports 38741-38744...`)
+			StudioBridgeLogUtils.logVerbose("Searching for host on ports 38741-38744...")
 		end
 	end,
 	onConnected = function(webSocket, port)
@@ -194,11 +194,11 @@ discovery = DiscoveryStateMachine.new(nil, {
 		warnOnError(webSocket)
 	end,
 	onDisconnected = function(reason)
-		print(`{LOG_PREFIX} Disconnected ({reason}), searching...`)
+		StudioBridgeLogUtils.logVerbose(`Disconnected ({reason}), searching...`)
 	end,
 })
 
-print(`{LOG_PREFIX} Session ID: {sessionId}`)
+StudioBridgeLogUtils.logVerbose(`Session ID: {sessionId}`)
 discovery:Start()
 
 -- Each cycle gets a fixed time budget, which PollAsync threads through to the port scan
