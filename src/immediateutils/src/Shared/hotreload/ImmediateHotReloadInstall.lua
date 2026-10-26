@@ -627,6 +627,12 @@ local function beginRequire(controller: LiveController, record: PathRecord, sour
 			previousClone:Destroy()
 		end
 
+		if previousUnregister then
+			print(`{LOG_PREFIX} {record.relativePath} reloaded`)
+		else
+			print(`{LOG_PREFIX} {record.relativePath} loaded`)
+		end
+
 		resetErrorLog(controller.rt)
 	end)
 end

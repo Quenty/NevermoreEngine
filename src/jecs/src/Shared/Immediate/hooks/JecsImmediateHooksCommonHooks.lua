@@ -1295,6 +1295,15 @@ return function(runtime: JecsImmediateHookUtils.ImmediateRuntime_Jecs_HookBook<a
 			return packed[1]
 		end,
 
+		holdclone = function(original: Instance, dis: any?)
+			assert(typeof(original) == "Instance", "Bad original")
+			local hookState, hookMaid = getOrCreateHookState(runtime, dis)
+			if hookState.cachedClone == nil then
+				hookState.cachedClone = hookMaid:Add(original:Clone())
+			end
+			return hookState.cachedClone
+		end,
+
 		subscribe = function(
 			subscribable: Observable.Observable<any> | Signal.Signal<any>,
 			dis: any?,
