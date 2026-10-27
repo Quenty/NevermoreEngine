@@ -19,6 +19,7 @@ interface PrerequisiteStatus {
 }
 
 export interface StatusResult {
+  /** False only when the check could not run; an unhealthy environment still reports. */
   success: boolean;
   healthy: boolean;
   summary: string;
@@ -108,7 +109,7 @@ export async function statusHandlerAsync(
       credentialsInjected;
 
     return {
-      success: healthy,
+      success: true,
       healthy,
       summary: healthy
         ? 'Environment is ready for Studio.'
