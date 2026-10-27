@@ -198,6 +198,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
       playtestId: z.string(),
       bridgePort: z.number(),
       instanceId: z.string(),
+      players: z.number().int().min(1).optional(),
     }),
   }),
   z.object({

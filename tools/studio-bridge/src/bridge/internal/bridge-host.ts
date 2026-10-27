@@ -49,6 +49,8 @@ export interface PluginSessionInfo {
   placeFile?: string;
   /** Launch id from register, for a Studio that `process run` launched. */
   launchId?: string;
+  /** Player name from register, for a multiplayer test client. */
+  playerName?: string;
 }
 
 const SHUTDOWN_TIMEOUT_MS = 2_000;
@@ -387,6 +389,7 @@ export class BridgeHost extends EventEmitter {
         context: msg.payload.context,
         placeFile: msg.payload.placeFile,
         launchId: msg.payload.launchId,
+        playerName: msg.payload.playerName,
       });
     };
 

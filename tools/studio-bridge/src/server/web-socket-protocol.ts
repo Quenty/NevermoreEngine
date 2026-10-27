@@ -147,6 +147,8 @@ export interface RegisterMessage extends PushMessage {
     pid?: number;
     /** Set when `process run` launched this Studio, from the place it opened. */
     launchId?: string;
+    /** The player of a multiplayer test client. */
+    playerName?: string;
     capabilities: Capability[];
   };
 }
@@ -262,6 +264,8 @@ export interface EndPlaytestResultMessage extends RequestMessage {
     playtestId?: string;
     /** Absent from plugins older than this field. */
     mode?: PlaytestMode;
+    /** How many players a multiplayer test started with. */
+    players?: number;
   };
 }
 
@@ -384,6 +388,8 @@ export interface StartPlaytestMessage extends RequestMessage {
     bridgePort: number;
     /** The edit session's instance id, which the playtest's sessions register under. */
     instanceId: string;
+    /** Starts a multiplayer test, a server and a client process per player. */
+    players?: number;
   };
 }
 
@@ -555,6 +561,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           pid: typeof payload.pid === 'number' ? payload.pid : undefined,
           launchId:
             typeof payload.launchId === 'string' ? payload.launchId : undefined,
+          playerName:
+            typeof payload.playerName === 'string'
+              ? payload.playerName
+              : undefined,
           capabilities: payload.capabilities as Capability[],
         },
       };
@@ -771,6 +781,8 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
             payload.mode === 'play' || payload.mode === 'run'
               ? payload.mode
               : undefined,
+          players:
+            typeof payload.players === 'number' ? payload.players : undefined,
         },
       };
 
@@ -1000,6 +1012,9 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           playtestId: payload.playtestId,
           bridgePort: payload.bridgePort,
           instanceId: payload.instanceId,
+          ...(typeof payload.players === 'number'
+            ? { players: payload.players }
+            : {}),
         },
       };
 

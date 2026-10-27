@@ -371,7 +371,8 @@ export class BridgeSession extends EventEmitter {
     mode: PlaytestMode,
     playtestId: string,
     bridgePort: number,
-    timeoutMs: number
+    timeoutMs: number,
+    players?: number
   ): Promise<PlaytestEndResult> {
     this._assertConnected();
     await this._ensureActionsAsync();
@@ -386,6 +387,7 @@ export class BridgeSession extends EventEmitter {
           playtestId,
           bridgePort,
           instanceId: this._info.instanceId,
+          ...(players !== undefined ? { players } : {}),
         },
       },
       timeoutMs
@@ -421,6 +423,7 @@ export class BridgeSession extends EventEmitter {
       return {
         playtestId: result.payload.playtestId,
         mode: result.payload.mode,
+        players: result.payload.players,
       };
     }
 

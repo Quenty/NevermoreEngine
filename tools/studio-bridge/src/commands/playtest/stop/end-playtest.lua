@@ -9,7 +9,7 @@
 	the reply is sent, since stopping tears down the DataModel answering.
 
 	Request: `{ type: "endPlaytest", payload: {} }`
-	Response: `{ type: "endPlaytestResult", payload: { playtestId?, mode } }`
+	Response: `{ type: "endPlaytestResult", payload: { playtestId?, mode, players? } }`
 
 	@class EndPlaytestAction
 ]=]
@@ -35,9 +35,11 @@ function EndPlaytestAction.register(router: any)
 			studioTestService:EndTest(true)
 		end)
 
+		local isStudioBridgeTest = type(testArgs) == "table"
 		return {
-			playtestId = if type(testArgs) == "table" then testArgs.studioBridgePlaytestId else nil,
+			playtestId = if isStudioBridgeTest then testArgs.studioBridgePlaytestId else nil,
 			mode = if runService:IsRunMode() then "run" else "play",
+			players = if isStudioBridgeTest then testArgs.studioBridgePlayers else nil,
 		}
 	end)
 end

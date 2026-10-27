@@ -8,13 +8,15 @@
 	  playtest started from its server session connecting.
 	- A playtest already in progress fails the call only after it yields, so a
 	  refusal also arrives as a `playtestEnded` reply, with `success = false`.
+	- With `players`, it starts a multiplayer test instead: a server and a
+	  client per player, each in its own Studio process.
 	- The playtest id, bridge port and edit instance id ride along as the test
 	  args. The playtest's DataModels cannot make the HTTP requests port
 	  discovery needs, so the plugin in each connects straight to that port,
 	  registers under the edit session's instance, and answers with the
 	  playtest id when asked which playtest it belongs to.
 
-	Request: `{ type: "startPlaytest", payload: { mode: "play" | "run", playtestId, bridgePort, instanceId } }`
+	Request: `{ type: "startPlaytest", payload: { mode: "play" | "run", playtestId, bridgePort, instanceId, players? } }`
 	Response: `{ type: "playtestEnded", payload: { playtestId, success, error? } }`
 
 	@class StartPlaytestAction
@@ -49,10 +51,16 @@ function StartPlaytestAction.register(router: any, sendMessage: SendMessage?)
 				error("Starting a playtest requires a sendMessage callback")
 			end
 
+			local players = payload.players
+			if players ~= nil and (type(players) ~= "number" or players < 1) then
+				error(`Invalid player count: {tostring(players)}`)
+			end
+
 			local testArgs = {
 				studioBridgePlaytestId = playtestId,
 				studioBridgePort = bridgePort,
 				studioBridgeInstanceId = instanceId,
+				studioBridgePlayers = players,
 			}
 			task.spawn(StartPlaytestAction._runAsync, sendMessage, mode, testArgs, requestId, sessionId)
 
@@ -69,13 +77,16 @@ function StartPlaytestAction._runAsync(
 		studioBridgePlaytestId: string,
 		studioBridgePort: number,
 		studioBridgeInstanceId: string,
+		studioBridgePlayers: number?,
 	},
 	requestId: string,
 	sessionId: string
 )
 	local ok, err = pcall(function()
 		local studioTestService = game:GetService("StudioTestService") :: any
-		if mode == "play" then
+		if testArgs.studioBridgePlayers then
+			studioTestService:ExecuteMultiplayerTestAsync(testArgs.studioBridgePlayers, testArgs)
+		elseif mode == "play" then
 			studioTestService:ExecutePlayModeAsync(testArgs)
 		else
 			studioTestService:ExecuteRunModeAsync(testArgs)

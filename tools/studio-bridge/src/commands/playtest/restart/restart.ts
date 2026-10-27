@@ -17,6 +17,7 @@ import {
   type StartedPlaytest,
 } from '../playtest-sessions.js';
 import {
+  describePlaytest,
   formatPlaytestStartText,
   toPlaytestStartResult,
   type PlaytestStartResult,
@@ -29,12 +30,15 @@ const START_RETRY_DELAY_MS = 1_000;
 export interface PlaytestRestartOptions {
   /** Defaults to the running playtest's mode, or play when none is running. */
   mode?: PlaytestMode;
+  /** Defaults to the running multiplayer test's player count. */
+  players?: number;
   /** Picks the Studio: any of its sessions. */
   target?: string;
 }
 
 interface PlaytestRestartArgs {
   mode?: PlaytestMode;
+  players?: number;
 }
 
 export async function playtestRestartHandlerAsync(
@@ -58,11 +62,15 @@ export async function playtestRestartHandlerAsync(
             'edit',
             targetSession?.info.instanceId
           );
-    const mode = options.mode ?? 'play';
-    const playtest = await startWithRetryAsync(connection, editSession, mode);
+    const playtest = await startWithRetryAsync(
+      connection,
+      editSession,
+      options.mode ?? 'play',
+      options.players
+    );
     return toPlaytestStartResult(
       playtest,
-      `No playtest was running; started one (${mode} mode)`
+      `No playtest was running; started one (${describePlaytest(playtest)})`
     );
   }
 
@@ -74,8 +82,18 @@ export async function playtestRestartHandlerAsync(
 
   const ended = await endPlaytestAsync(connection, serverSession);
   const mode = options.mode ?? ended.mode ?? 'play';
-  const playtest = await startWithRetryAsync(connection, editSession, mode);
-  return toPlaytestStartResult(playtest, `Playtest restarted (${mode} mode)`);
+  const players =
+    options.players ?? (options.mode === undefined ? ended.players : undefined);
+  const playtest = await startWithRetryAsync(
+    connection,
+    editSession,
+    mode,
+    players
+  );
+  return toPlaytestStartResult(
+    playtest,
+    `Playtest restarted (${describePlaytest(playtest)})`
+  );
 }
 
 /** The running playtest's server session, within `instanceId` when given. */
@@ -108,11 +126,12 @@ function findServerSession(
 async function startWithRetryAsync(
   connection: BridgeConnection,
   editSession: BridgeSession,
-  mode: PlaytestMode
+  mode: PlaytestMode,
+  players: number | undefined
 ): Promise<StartedPlaytest> {
   for (let attempt = 1; ; attempt++) {
     try {
-      return await startPlaytestAsync(connection, editSession, mode);
+      return await startPlaytestAsync(connection, editSession, mode, players);
     } catch (err) {
       const stillWindingDown =
         err instanceof Error && err.message.includes('still in progress');
@@ -141,6 +160,11 @@ export const playtestRestartCommand = defineCommand<
         "Start in this mode instead of the running playtest's (play or run)",
       choices: ['play', 'run'],
     }),
+    players: arg.option({
+      description:
+        "Start a multiplayer test with this many players instead of the running playtest's",
+      type: 'number',
+    }),
   },
   cli: {
     format: formatPlaytestStartText,
@@ -148,6 +172,7 @@ export const playtestRestartCommand = defineCommand<
   handler: async (connection, args, targeting) =>
     playtestRestartHandlerAsync(connection, {
       mode: args.mode,
+      players: args.players,
       target: targeting.target,
     }),
 });

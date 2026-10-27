@@ -87,7 +87,17 @@ describe("StudioBridgeSessionUtils.getPlaytestArgs()", function()
 			studioBridgePlaytestId = "abc",
 			studioBridgePort = 38741,
 			studioBridgeInstanceId = "test-place-3f9a",
-		})).toEqual({ port = 38741, instanceId = "test-place-3f9a" })
+		})).toEqual({ port = 38741, instanceId = "test-place-3f9a", multiplayer = false })
+	end)
+
+	it("should report a multiplayer test", function()
+		local args = StudioBridgeSessionUtils.getPlaytestArgs({
+			studioBridgePort = 38741,
+			studioBridgeInstanceId = "test-place-3f9a",
+			studioBridgePlayers = 2,
+		})
+
+		expect(args and args.multiplayer).toEqual(true)
 	end)
 
 	it("should return nil for a playtest studio-bridge did not start", function()
@@ -99,6 +109,12 @@ end)
 describe("StudioBridgeSessionUtils.getSessionId()", function()
 	it("should append the context to the instance id", function()
 		expect(StudioBridgeSessionUtils.getSessionId("test-place-3f9a", "edit")).toEqual("test-place-3f9a-edit")
+	end)
+
+	it("should append the player of a multiplayer client", function()
+		expect(StudioBridgeSessionUtils.getSessionId("test-place-3f9a", "client", "Player2")).toEqual(
+			"test-place-3f9a-client-player2"
+		)
 	end)
 end)
 
@@ -125,6 +141,12 @@ describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "edit", "launch-1")
 
 		expect(payload.launchId).toEqual("launch-1")
+	end)
+
+	it("should carry the player of a multiplayer client", function()
+		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "client", nil, "Player2")
+
+		expect(payload.playerName).toEqual("Player2")
 	end)
 
 	it("should hand out a capabilities list the caller can change", function()

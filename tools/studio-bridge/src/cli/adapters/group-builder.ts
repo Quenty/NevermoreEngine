@@ -5,6 +5,9 @@
  * Grouped commands become parent commands with subcommands:
  *   `console exec <code>`  →  `console` parent, `exec` subcommand
  *
+ * A group name with a space nests under its first word:
+ *   `playtest player list`  →  `player` subcommand group of `playtest`
+ *
  * Top-level commands (group = null) are returned as standalone modules:
  *   `serve`, `mcp`, `terminal`
  */
@@ -21,6 +24,7 @@ const GROUP_DESCRIPTIONS: Record<string, string> = {
   viewport: 'Screenshots and camera control',
   data: 'Load and save serialized data',
   playtest: 'Control play test sessions',
+  'playtest player': 'List, add and remove the players of a multiplayer test',
   process: 'Manage Studio processes',
   plugin: 'Manage the bridge plugin',
   action: 'Invoke a Studio action',
@@ -50,26 +54,12 @@ export function buildGroupCommands(
   const groups: CommandModule[] = [];
   const topLevel: CommandModule[] = [];
 
-  // Grouped commands → parent module with subcommands
-  for (const groupName of registry.getGroups()) {
-    const commands = registry.getByGroup(groupName);
-    const description =
-      GROUP_DESCRIPTIONS[groupName] ?? `${groupName} commands`;
+  const allGroups = registry.getGroups();
+  const topGroups = [...new Set(allGroups.map((name) => name.split(' ')[0]))];
 
-    groups.push({
-      command: `${groupName} <command>`,
-      describe: description,
-      builder: (yargs) => {
-        for (const cmd of commands) {
-          yargs.command(buildYargsCommand(cmd, options) as any);
-        }
-        return yargs.demandCommand(
-          1,
-          `Run 'studio-bridge ${groupName} --help' for available commands`
-        );
-      },
-      handler: () => {},
-    });
+  // Grouped commands → parent module with subcommands
+  for (const groupName of topGroups) {
+    groups.push(buildGroupModule(registry, allGroups, groupName, options));
   }
 
   // Top-level commands (group = null) → standalone modules
@@ -78,4 +68,39 @@ export function buildGroupCommands(
   }
 
   return { groups, topLevel };
+}
+
+function buildGroupModule(
+  registry: CommandRegistry,
+  allGroups: string[],
+  groupName: string,
+  options: GroupBuilderOptions
+): CommandModule {
+  const commands = registry.getByGroup(groupName);
+  const subgroups = allGroups.filter(
+    (name) =>
+      name.startsWith(`${groupName} `) &&
+      !name.slice(groupName.length + 1).includes(' ')
+  );
+  const description = GROUP_DESCRIPTIONS[groupName] ?? `${groupName} commands`;
+
+  return {
+    command: `${groupName.split(' ').pop()} <command>`,
+    describe: description,
+    builder: (yargs) => {
+      for (const cmd of commands) {
+        yargs.command(buildYargsCommand(cmd, options) as any);
+      }
+      for (const subgroup of subgroups) {
+        yargs.command(
+          buildGroupModule(registry, allGroups, subgroup, options) as any
+        );
+      }
+      return yargs.demandCommand(
+        1,
+        `Run 'studio-bridge ${groupName} --help' for available commands`
+      );
+    },
+    handler: () => {},
+  };
 }

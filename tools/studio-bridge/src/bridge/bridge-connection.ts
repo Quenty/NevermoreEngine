@@ -412,6 +412,17 @@ export class BridgeConnection extends EventEmitter {
         return session;
       }
 
+      const prefixed = this.listSessions().filter(
+        (s) =>
+          s.sessionId.startsWith(sessionId) &&
+          (!context || s.context === context)
+      );
+      const onlyPrefixed =
+        prefixed.length === 1 ? this.getSession(prefixed[0].sessionId) : null;
+      if (onlyPrefixed) {
+        return onlyPrefixed;
+      }
+
       const instanceIds = session
         ? [session.info.instanceId]
         : this._matchInstanceIds(sessionId);
@@ -630,6 +641,7 @@ export class BridgeConnection extends EventEmitter {
         connectedAt: new Date(),
         origin: info.launchId ? 'managed' : 'user',
         launchId: info.launchId,
+        playerName: info.playerName,
         context,
         instanceId: info.instanceId ?? info.sessionId,
         placeId: 0,
@@ -775,7 +787,15 @@ export class BridgeConnection extends EventEmitter {
 
     // 5a: Context specified
     if (context) {
-      const match = sessions.find((s) => s.context === context);
+      const matches = sessions.filter((s) => s.context === context);
+      if (matches.length > 1) {
+        throw new SessionNotFoundError(
+          `Instance '${instanceId}' has several ${context} sessions. Use --target <session id> to pick one:\n${matches
+            .map((s) => `  - ${s.sessionId}`)
+            .join('\n')}`
+        );
+      }
+      const match = matches[0];
       if (match) {
         const session = this.getSession(match.sessionId);
         if (session) {

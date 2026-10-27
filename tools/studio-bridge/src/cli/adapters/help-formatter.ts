@@ -36,10 +36,11 @@ export function formatGroupedHelp(registry: CommandRegistry): string {
 
   for (const cmd of registry.getAll()) {
     if (cmd.group !== null) {
+      const topGroup = cmd.group.split(' ')[0];
       if (cmd.category === 'execution') {
-        executionGroups.add(cmd.group);
+        executionGroups.add(topGroup);
       } else {
-        infrastructureGroups.add(cmd.group);
+        infrastructureGroups.add(topGroup);
       }
     } else {
       const entry = { name: cmd.name, description: cmd.description };

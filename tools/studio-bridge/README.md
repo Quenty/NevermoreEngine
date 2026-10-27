@@ -199,6 +199,20 @@ Starts a playtest through `StudioTestService` in the open Studio. `--mode play` 
 
 `start`, `restart`, and `stop` talk to the playtest's own server and client, which only connect when **Load user plugins on playtest** is on. With it off, `playtest start` still starts the playtest but reports that its sessions never connected, and the playtest has to be stopped in Studio.
 
+### Multiplayer tests: `playtest start --players` / `playtest player`
+
+```bash
+studio-bridge playtest start --players 2
+studio-bridge playtest player list
+studio-bridge playtest player add 2
+studio-bridge playtest player remove Player2
+studio-bridge console exec --target test-place-3f9a-client-player1 'return game.Players.LocalPlayer.Name'
+```
+
+`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the player count.
+
+`playtest player list` shows each player with its client session. `add` adds players to a multiplayer test and waits for them to join. `remove` has each player's client leave the test, which closes its window; a player without a connected client session is kicked instead, and its window stays open.
+
 ### `plugin install` / `plugin uninstall`
 
 ```bash

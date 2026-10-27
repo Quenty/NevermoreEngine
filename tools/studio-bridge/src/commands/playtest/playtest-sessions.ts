@@ -24,6 +24,8 @@ import { ContextNotFoundError } from '../../bridge/index.js';
 const PLAYTEST_MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 
 const SESSION_WAIT_TIMEOUT_MS = 30_000;
+/** Each player of a multiplayer test boots its own Studio process. */
+const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
 
 const READ_PLAYTEST_ID_SCRIPT = [
@@ -36,8 +38,12 @@ const READ_PLAYTEST_ID_SCRIPT = [
 export interface StartedPlaytest {
   playtestId: string;
   mode: PlaytestMode;
+  /** Set for a multiplayer test. */
+  players?: number;
   /** The playtest's sessions: always `server`, plus `client` in play mode. */
   sessions: Partial<Record<SessionContext, BridgeSession>>;
+  /** Every client session, one per player. */
+  clients: BridgeSession[];
   /** Settles when the playtest ends. Never rejects. */
   ended: Promise<PlaytestEndResult>;
 }
@@ -49,18 +55,23 @@ export function getPlaytestContexts(mode: PlaytestMode): SessionContext[] {
 
 /**
  * Start a playtest from `editSession` and resolve once every session it opens
- * has connected. Rejects if Studio refuses to start it, e.g. because a
- * playtest is already running.
+ * has connected. With `players`, it is a multiplayer test with a client per
+ * player. Rejects if Studio refuses to start it, e.g. because a playtest is
+ * already running.
  */
 export async function startPlaytestAsync(
   connection: BridgeConnection,
   editSession: BridgeSession,
-  mode: PlaytestMode
+  mode: PlaytestMode,
+  players?: number
 ): Promise<StartedPlaytest> {
   if (editSession.context !== 'edit') {
     throw new Error(
       `Playtests start from an edit session, but '${editSession.info.sessionId}' is a ${editSession.context} session`
     );
+  }
+  if (players !== undefined && mode !== 'play') {
+    throw new Error('A multiplayer test runs in play mode');
   }
 
   const playtestId = randomUUID();
@@ -69,7 +80,8 @@ export async function startPlaytestAsync(
       mode,
       playtestId,
       connection.port,
-      PLAYTEST_MAX_DURATION_MS
+      PLAYTEST_MAX_DURATION_MS,
+      players
     )
     .catch(
       (err): PlaytestEndResult => ({
@@ -79,7 +91,11 @@ export async function startPlaytestAsync(
       })
     );
 
-  const contexts = getPlaytestContexts(mode);
+  const clientCount = players ?? (mode === 'play' ? 1 : 0);
+  const waitTimeoutMs =
+    players !== undefined
+      ? MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS
+      : SESSION_WAIT_TIMEOUT_MS;
   const abort = new AbortController();
   let outcome;
   try {
@@ -87,7 +103,8 @@ export async function startPlaytestAsync(
       waitForPlaytestSessionsAsync(
         connection,
         playtestId,
-        contexts,
+        clientCount,
+        waitTimeoutMs,
         abort.signal
       ).then((sessions) => ({ sessions })),
       ended.then((result) => ({ result })),
@@ -104,24 +121,36 @@ export async function startPlaytestAsync(
     );
   }
 
-  const { sessions } = outcome;
-  const missing = contexts.filter((context) => !sessions[context]);
-  if (missing.length === 0) {
-    return { playtestId, mode, sessions, ended };
+  const { server, clients } = outcome.sessions;
+  const missing = [
+    ...(server ? [] : ['server']),
+    ...(clients.length < clientCount
+      ? [`${clientCount - clients.length} client`]
+      : []),
+  ];
+  if (server && missing.length === 0) {
+    return {
+      playtestId,
+      mode,
+      players,
+      sessions: { server, client: clients[0] },
+      clients,
+      ended,
+    };
   }
 
-  const waited = `its ${missing.join(' and ')} session did not connect within ${
-    SESSION_WAIT_TIMEOUT_MS / 1000
-  }s`;
+  const waited = `its ${missing.join(' and ')} session${
+    missing.length > 1 || clientCount - clients.length > 1 ? 's' : ''
+  } did not connect within ${waitTimeoutMs / 1000}s`;
 
   // Without its server session the playtest can't be ended from here
-  if (!sessions.server?.isConnected) {
+  if (!server?.isConnected) {
     throw new Error(
       `Playtest started, but ${waited}, so stop it in Studio. Play sessions only connect with Studio's "Load user plugins on playtest" setting on.`
     );
   }
 
-  await endPlaytestAsync(connection, sessions.server);
+  await endPlaytestAsync(connection, server);
   throw new Error(`Playtest started, but ${waited}, so it was stopped.`);
 }
 
@@ -179,14 +208,20 @@ export async function endPlaytestAsync(
   return ended;
 }
 
+interface PlaytestSessions {
+  server?: BridgeSession;
+  clients: BridgeSession[];
+}
+
 async function waitForPlaytestSessionsAsync(
   connection: BridgeConnection,
   playtestId: string,
-  contexts: SessionContext[],
+  clientCount: number,
+  timeoutMs: number,
   signal: AbortSignal
-): Promise<Partial<Record<SessionContext, BridgeSession>>> {
+): Promise<PlaytestSessions> {
   return new Promise((resolve) => {
-    const found: Partial<Record<SessionContext, BridgeSession>> = {};
+    const found: PlaytestSessions = { clients: [] };
     const checked = new Set<string>();
 
     const cleanup = () => {
@@ -197,20 +232,22 @@ async function waitForPlaytestSessionsAsync(
 
     const onSession = (session: BridgeSession) => {
       const { sessionId } = session.info;
-      if (
-        !contexts.includes(session.context) ||
-        found[session.context] ||
-        checked.has(sessionId)
-      ) {
+      if (session.context === 'edit' || checked.has(sessionId)) {
         return;
       }
       checked.add(sessionId);
 
       void tryReadPlaytestIdAsync(session).then((id) => {
+        // A session that dropped mid-read re-registers under the same id
+        if (id === undefined) checked.delete(sessionId);
         if (signal.aborted || id !== playtestId) return;
 
-        found[session.context] = session;
-        if (contexts.every((context) => found[context])) {
+        if (session.context === 'server') {
+          found.server = session;
+        } else {
+          found.clients.push(session);
+        }
+        if (found.server && found.clients.length >= clientCount) {
           cleanup();
           resolve(found);
         }
@@ -221,7 +258,7 @@ async function waitForPlaytestSessionsAsync(
     const timer = setTimeout(() => {
       cleanup();
       resolve(found);
-    }, SESSION_WAIT_TIMEOUT_MS);
+    }, timeoutMs);
 
     signal.addEventListener('abort', cleanup);
     connection.on('session-connected', onSession);

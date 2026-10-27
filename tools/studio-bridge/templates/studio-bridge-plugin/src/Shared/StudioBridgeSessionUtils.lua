@@ -20,6 +20,7 @@ export type PluginContext = "edit" | "client" | "server"
 export type PlaytestArgs = {
 	port: number,
 	instanceId: string,
+	multiplayer: boolean,
 }
 
 --[=[
@@ -57,22 +58,22 @@ function StudioBridgeSessionUtils.getContext(): PluginContext
 	end
 end
 
+function StudioBridgeSessionUtils._slugify(text: string, fallback: string): string
+	local slug = string.lower(text)
+	slug = string.gsub(slug, "[^%w]+", "-")
+	slug = string.gsub(slug, "^%-+", "")
+	slug = string.sub(slug, 1, MAX_SLUG_LENGTH)
+	slug = string.gsub(slug, "%-+$", "")
+	return if slug == "" then fallback else slug
+end
+
 --[=[
 	Returns a short, readable id for the open place: its name as a slug plus
 	`nonce`, which tells apart two Studios with the same place open.
 ]=]
 function StudioBridgeSessionUtils.getInstanceId(placeName: string?, nonce: string): string
-	local name = string.lower(placeName or "")
-	name = string.gsub(name, "%.rbxl[x]?$", "")
-	name = string.gsub(name, "[^%w]+", "-")
-	name = string.gsub(name, "^%-+", "")
-	name = string.sub(name, 1, MAX_SLUG_LENGTH)
-	name = string.gsub(name, "%-+$", "")
-	if name == "" then
-		name = "place"
-	end
-
-	return `{name}-{nonce}`
+	local name = string.gsub(placeName or "", "%.rbxl[x]?$", "")
+	return `{StudioBridgeSessionUtils._slugify(name, "place")}-{nonce}`
 end
 
 --[=[
@@ -95,9 +96,13 @@ function StudioBridgeSessionUtils.getOrCreateNonce(container: Instance, createNo
 end
 
 --[=[
-	Returns the session id for an instance id and context.
+	Returns the session id for an instance id and context. The clients of a
+	multiplayer test share both, so they add their player's name.
 ]=]
-function StudioBridgeSessionUtils.getSessionId(instanceId: string, context: PluginContext): string
+function StudioBridgeSessionUtils.getSessionId(instanceId: string, context: PluginContext, playerName: string?): string
+	if playerName then
+		return `{instanceId}-{context}-{StudioBridgeSessionUtils._slugify(playerName, "player")}`
+	end
 	return `{instanceId}-{context}`
 end
 
@@ -107,13 +112,15 @@ end
 function StudioBridgeSessionUtils.createRegisterPayload(
 	instanceId: string,
 	context: PluginContext,
-	launchId: string?
+	launchId: string?,
+	playerName: string?
 ): { [string]: any }
 	return {
 		pluginVersion = PLUGIN_VERSION,
 		instanceId = instanceId,
 		context = context,
 		launchId = launchId,
+		playerName = playerName,
 		placeName = game.Name or "Unknown",
 		placeId = game.PlaceId,
 		gameId = game.GameId,
@@ -133,8 +140,9 @@ end
 
 --[=[
 	Returns what studio-bridge handed a playtest through its StudioTestService
-	test args: the bridge port, and the instance id of the edit session that
-	started it. Nil when studio-bridge did not start the playtest.
+	test args: the bridge port, the instance id of the edit session that
+	started it, and whether it is a multiplayer test. Nil when studio-bridge
+	did not start the playtest.
 ]=]
 function StudioBridgeSessionUtils.getPlaytestArgs(testArgs: any): PlaytestArgs?
 	if
@@ -145,6 +153,7 @@ function StudioBridgeSessionUtils.getPlaytestArgs(testArgs: any): PlaytestArgs?
 		return {
 			port = testArgs.studioBridgePort,
 			instanceId = testArgs.studioBridgeInstanceId,
+			multiplayer = type(testArgs.studioBridgePlayers) == "number",
 		}
 	end
 	return nil

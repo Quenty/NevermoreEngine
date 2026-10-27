@@ -39,6 +39,8 @@ export interface SessionInfo {
   origin: SessionOrigin;
   /** Set on sessions of a Studio that `process run` launched. */
   launchId?: string;
+  /** The player of a multiplayer test client session. */
+  playerName?: string;
   context: SessionContext;
   instanceId: string;
   placeId: number;
@@ -137,6 +139,8 @@ export interface EndPlaytestResult {
   playtestId?: string;
   /** The mode the playtest ran in. Absent from older plugins. */
   mode?: PlaytestMode;
+  /** How many players a multiplayer test started with. */
+  players?: number;
 }
 
 export interface LogFollowOptions {

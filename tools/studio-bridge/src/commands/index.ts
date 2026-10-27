@@ -90,6 +90,18 @@ export {
   type PlaytestRestartOptions,
 } from './playtest/restart/restart.js';
 export {
+  playtestPlayerListHandlerAsync,
+  type PlaytestPlayerListResult,
+} from './playtest/player/list/list.js';
+export {
+  playtestPlayerAddHandlerAsync,
+  type PlaytestPlayerAddResult,
+} from './playtest/player/add/add.js';
+export {
+  playtestPlayerRemoveHandlerAsync,
+  type PlaytestPlayerRemoveResult,
+} from './playtest/player/remove/remove.js';
+export {
   processRunHandlerAsync,
   type ProcessRunOptions,
   type ProcessRunResult,

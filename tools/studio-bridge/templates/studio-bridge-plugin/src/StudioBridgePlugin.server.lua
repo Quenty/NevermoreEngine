@@ -14,6 +14,7 @@
 
 local HttpService = game:GetService("HttpService")
 local LogService = game:GetService("LogService")
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local ActionRouter = require(script.Parent.Shared.ActionRouter)
@@ -73,6 +74,21 @@ local function getInstanceId(): string
 end
 local playtestPort = if playtestArgs then playtestArgs.port else nil
 
+local function getPlayerName(): string?
+	local player = if context == "client" then Players.LocalPlayer else nil
+	return if player then player.Name else nil
+end
+
+-- The clients of a multiplayer test share an instance id, so their session ids name their player
+local function getSessionId(): string
+	local isMultiplayerClient = playtestArgs and playtestArgs.multiplayer and context == "client"
+	return StudioBridgeSessionUtils.getSessionId(
+		getInstanceId(),
+		context,
+		if isMultiplayerClient then getPlayerName() else nil
+	)
+end
+
 local router = ActionRouter.new()
 local logBuffer = MessageBuffer.new(LOG_BUFFER_CAPACITY)
 local currentConnection: StudioBridgeConnection.StudioBridgeConnection? = nil
@@ -127,7 +143,8 @@ local function openConnection(webSocket: any, sessionId: string, label: string)
 		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(
 			getInstanceId(),
 			context,
-			StudioBridgeSessionUtils.getLaunchId(workspace)
+			StudioBridgeSessionUtils.getLaunchId(workspace),
+			getPlayerName()
 		),
 	})
 
@@ -256,6 +273,13 @@ if IS_EPHEMERAL then
 	return
 end
 
+-- A multiplayer client's session id names its player, so wait for one
+if playtestArgs and playtestArgs.multiplayer and context == "client" then
+	while not Players.LocalPlayer do
+		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	end
+end
+
 local stateMachine: DiscoveryStateMachine.DiscoveryStateMachine
 stateMachine = DiscoveryStateMachine.new(nil, {
 	scanPortsAsync = if playtestPort
@@ -271,11 +295,7 @@ stateMachine = DiscoveryStateMachine.new(nil, {
 	end,
 	onConnected = function(webSocket, port)
 		webSocket.Opened:Connect(function()
-			openConnection(
-				webSocket,
-				StudioBridgeSessionUtils.getSessionId(getInstanceId(), context),
-				`localhost:{port}`
-			)
+			openConnection(webSocket, getSessionId(), `localhost:{port}`)
 		end)
 		webSocket.Closed:Connect(function()
 			stateMachine:HandleDisconnect("closed")
@@ -291,9 +311,10 @@ discovery = stateMachine
 
 stateMachine:Start()
 
--- Reconnecting re-registers under the session id for the new name
+-- Reconnecting re-registers under the session id for the new name. A
+-- playtest's id comes from its test args, so a rename leaves it unchanged.
 nameConnection = game:GetPropertyChangedSignal("Name"):Connect(function()
-	if currentWebSocket then
+	if currentWebSocket and not playtestArgs then
 		pcall(function()
 			currentWebSocket:Close()
 		end)

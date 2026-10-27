@@ -19,18 +19,27 @@ import {
 
 export interface PlaytestStartOptions {
   mode: PlaytestMode;
+  /** Starts a multiplayer test with this many players. */
+  players?: number;
   target?: string;
 }
 
 export interface PlaytestStartResult {
   playtestId: string;
   mode: PlaytestMode;
-  sessions: Array<{ sessionId: string; context: SessionContext }>;
+  /** Set for a multiplayer test. */
+  players?: number;
+  sessions: Array<{
+    sessionId: string;
+    context: SessionContext;
+    playerName?: string;
+  }>;
   summary: string;
 }
 
 interface PlaytestStartArgs {
   mode?: PlaytestMode;
+  players?: number;
 }
 
 export async function playtestStartHandlerAsync(
@@ -44,13 +53,24 @@ export async function playtestStartHandlerAsync(
   const playtest = await startPlaytestAsync(
     connection,
     editSession,
-    options.mode
+    options.mode,
+    options.players
   );
 
   return toPlaytestStartResult(
     playtest,
-    `Playtest started (${playtest.mode} mode)`
+    `Playtest started (${describePlaytest(playtest)})`
   );
+}
+
+/** `play mode`, `run mode`, or `3 players` for a multiplayer test. */
+export function describePlaytest(playtest: {
+  mode: PlaytestMode;
+  players?: number;
+}): string {
+  return playtest.players !== undefined
+    ? `${playtest.players} player${playtest.players === 1 ? '' : 's'}`
+    : `${playtest.mode} mode`;
 }
 
 /** Report a started playtest and the sessions it opened. */
@@ -61,10 +81,14 @@ export function toPlaytestStartResult(
   return {
     playtestId: playtest.playtestId,
     mode: playtest.mode,
-    sessions: Object.values(playtest.sessions).map((session) => ({
-      sessionId: session.info.sessionId,
-      context: session.context,
-    })),
+    players: playtest.players,
+    sessions: [playtest.sessions.server, ...playtest.clients]
+      .filter((session) => session !== undefined)
+      .map((session) => ({
+        sessionId: session.info.sessionId,
+        context: session.context,
+        playerName: session.info.playerName,
+      })),
     summary,
   };
 }
@@ -96,6 +120,11 @@ export const playtestStartCommand = defineCommand<
       choices: ['play', 'run'],
       default: 'play',
     }),
+    players: arg.option({
+      description:
+        'Start a multiplayer test: a server and a client per player, each in its own Studio window',
+      type: 'number',
+    }),
   },
   cli: {
     format: formatPlaytestStartText,
@@ -103,6 +132,7 @@ export const playtestStartCommand = defineCommand<
   handler: async (connection, args, targeting) =>
     playtestStartHandlerAsync(connection, {
       mode: args.mode ?? 'play',
+      players: args.players,
       target: targeting.target,
     }),
 });

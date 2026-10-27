@@ -136,6 +136,38 @@ describe('buildGroupCommands', () => {
     expect(yargs.commands).toHaveLength(2);
   });
 
+  it('nests a group with a space under its first word', () => {
+    const registry = makeRegistry();
+    registry.register(
+      defineCommand({
+        group: 'console player',
+        name: 'list',
+        description: 'List players',
+        category: 'execution',
+        safety: 'read',
+        scope: 'connection',
+        args: {},
+        handler: async () => ({}),
+      })
+    );
+    const result = buildGroupCommands(registry);
+
+    const consoleMods = result.groups.filter((g) =>
+      (g.command as string).startsWith('console')
+    );
+    expect(consoleMods).toHaveLength(1);
+
+    const yargs = createMockYargs();
+    (consoleMods[0].builder as any)(yargs);
+    expect(yargs.commands).toHaveLength(3);
+
+    const playerMod = yargs.commands[2];
+    expect(playerMod.command).toBe('player <command>');
+    const playerYargs = createMockYargs();
+    playerMod.builder(playerYargs);
+    expect(playerYargs.commands.map((c: any) => c.command)).toEqual(['list']);
+  });
+
   it('returns empty arrays for empty registry', () => {
     const registry = new CommandRegistry();
     const result = buildGroupCommands(registry);

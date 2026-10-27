@@ -25,6 +25,7 @@ async function performRegisterHandshake(
     placeName?: string;
     state?: string;
     context?: string;
+    playerName?: string;
     capabilities?: string[];
   }
 ): Promise<{ ws: WebSocket }> {
@@ -40,6 +41,7 @@ async function performRegisterHandshake(
         placeName: options?.placeName ?? 'TestPlace',
         state: options?.state ?? 'Edit',
         context: options?.context,
+        playerName: options?.playerName,
         capabilities: options?.capabilities ?? ['execute', 'queryState'],
       },
     })
@@ -716,6 +718,37 @@ describe('BridgeConnection', () => {
       await expect(conn.resolveSessionAsync('missing')).rejects.toThrow(
         SessionNotFoundError
       );
+    });
+
+    it('resolves a prefix that matches one session to that session', async () => {
+      const conn = await connectPlaytestAsync();
+
+      const session = await conn.resolveSessionAsync('test-place-3f9a-ser');
+      expect(session.info.sessionId).toBe('test-place-3f9a-server');
+    });
+
+    it('refuses --context when a multiplayer test has several clients', async () => {
+      const conn = await connectPlaytestAsync();
+      const { ws } = await performRegisterHandshake(
+        conn.port,
+        'test-place-3f9a-client-player2',
+        {
+          instanceId: 'test-place-3f9a',
+          context: 'client',
+          playerName: 'Player2',
+        }
+      );
+      openClients.push(ws);
+      await new Promise((r) => setTimeout(r, 50));
+
+      await expect(
+        conn.resolveSessionAsync('test-place', 'client')
+      ).rejects.toThrow(/several client sessions/);
+      const session = await conn.resolveSessionAsync(
+        'test-place-3f9a-client-player2',
+        'client'
+      );
+      expect(session.info.playerName).toBe('Player2');
     });
 
     it('filters listed sessions by target and context', async () => {
