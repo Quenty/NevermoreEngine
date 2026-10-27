@@ -78,7 +78,6 @@ function RateAggregator.Promise<TArgs..., T...>(self: RateAggregator<TArgs..., T
 
 	local promise = self._maid:GivePromise(Promise.new())
 
-	-- Don't remember failures: the next request for these arguments should try again.
 	promise:Catch(function()
 		if self._promisesLruCache:get(tuple) == promise then
 			self._promisesLruCache:delete(tuple)
