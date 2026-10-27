@@ -116,6 +116,8 @@ export interface LogOptions {
   direction?: 'head' | 'tail';
   levels?: OutputLevel[];
   includeInternal?: boolean;
+  /** Only entries logged at or after this time, in epoch seconds. */
+  since?: number;
 }
 
 export interface QueryDataModelOptions {

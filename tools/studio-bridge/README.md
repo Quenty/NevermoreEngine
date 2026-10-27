@@ -98,15 +98,22 @@ Output includes everything logged while the script runs, including prints from m
 ```bash
 studio-bridge console logs
 studio-bridge console logs --count 100 --direction head
-studio-bridge console logs --levels Error,Warning
+studio-bridge console logs --levels Error Warning
+studio-bridge console logs --context server --since-restart
+studio-bridge console logs --since 5m
 ```
 
 | Option | Alias | Description |
 |--------|-------|-------------|
 | `--count` | `-n` | Number of entries (default: 50) |
-| `--direction` | `-d` | `head` or `tail` (default: `tail`) |
-| `--levels` | `-l` | Filter by level (comma-separated) |
-| `--includeInternal` | — | Include internal bridge messages |
+| `--direction` | — | `head` or `tail` (default: `tail`) |
+| `--levels` | — | Filter by level (`Print`, `Info`, `Warning`, `Error`) |
+| `--include-internal` | — | Include internal bridge messages |
+| `--since` | — | Only entries since a duration ago (`30s`, `5m`, `2h`, `1d`) or a date |
+| `--since-restart` | — | Only entries since the running playtest started |
+| `--no-group-repeats` | — | Keep identical consecutive entries separate |
+
+Identical consecutive entries are collapsed into one with a repeat count (`repeats` in JSON). Each playtest DataModel keeps its own log, so `--context server` or `--context client` reads only the running playtest; `--since-restart` trims Edit's log to the same window.
 
 ### `explorer query`
 

@@ -168,6 +168,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
       direction: z.enum(['head', 'tail']).optional(),
       levels: z.array(OutputLevelSchema).optional(),
       includeInternal: z.boolean().optional(),
+      since: z.number().optional(),
     }),
   }),
   z.object({

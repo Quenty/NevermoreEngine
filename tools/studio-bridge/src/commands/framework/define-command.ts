@@ -65,7 +65,11 @@ interface BaseFields<TArgs, TResult> {
 export interface SessionCommandInput<TArgs, TResult>
   extends BaseFields<TArgs, TResult> {
   scope: 'session';
-  handler: (session: BridgeSession, args: TArgs) => Promise<TResult>;
+  handler: (
+    session: BridgeSession,
+    args: TArgs,
+    connection: BridgeConnection
+  ) => Promise<TResult>;
 }
 
 /** The `--target` and `--context` flags, for handlers that resolve sessions themselves. */

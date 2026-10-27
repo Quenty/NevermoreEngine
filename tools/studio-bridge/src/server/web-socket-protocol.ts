@@ -360,6 +360,8 @@ export interface QueryLogsMessage extends RequestMessage {
     direction?: 'head' | 'tail';
     levels?: OutputLevel[];
     includeInternal?: boolean;
+    /** Only entries logged at or after this time, in epoch seconds. */
+    since?: number;
   };
 }
 
@@ -961,6 +963,7 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
             typeof payload.includeInternal === 'boolean'
               ? payload.includeInternal
               : undefined,
+          since: typeof payload.since === 'number' ? payload.since : undefined,
         },
       };
 

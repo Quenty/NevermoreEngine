@@ -104,7 +104,7 @@ async function executeCommandAsync(
         assertNotEditingDuringPlaytest(connection, session);
       }
       await warnIfPluginStaleAsync([session.info]);
-      return await (def.handler as any)(session, commandArgs);
+      return await (def.handler as any)(session, commandArgs, connection);
     }
     await warnIfPluginStaleAsync(connection.listSessions());
     return await (def.handler as any)(connection, commandArgs, targeting);

@@ -1,10 +1,11 @@
 --!strict
 --[=[
 	Action that answers `queryLogs` from the plugin's log buffer, filtered by
-	level and trimmed to `count` entries from the `head` or `tail`.
-	`[StudioBridge]` messages are left out unless `includeInternal` is set.
+	level and by `since` (epoch seconds), then trimmed to `count` entries from
+	the `head` or `tail`. `[StudioBridge]` messages are left out unless
+	`includeInternal` is set.
 
-	Request: `{ type: "queryLogs", payload: { count?, direction?, levels?, includeInternal? } }`
+	Request: `{ type: "queryLogs", payload: { count?, direction?, levels?, includeInternal?, since? } }`
 	Response: `{ type: "logsResult", payload: { entries, total, bufferCapacity } }`
 
 	@class QueryLogsAction
@@ -31,8 +32,12 @@ function QueryLogsAction.register(router: any, _sendMessage: any, logBuffer: any
 		local count = payload.count or DEFAULT_COUNT
 
 		local snapshot = logBuffer:get(direction, nil)
-		local filtered =
-			QueryLogsAction._filterEntries(snapshot.entries, payload.levels, payload.includeInternal == true)
+		local filtered = QueryLogsAction._filterEntries(
+			snapshot.entries,
+			payload.levels,
+			payload.includeInternal == true,
+			if type(payload.since) == "number" then payload.since else nil
+		)
 
 		local takeCount = math.min(count, #filtered)
 		local entries: { LogEntry }
@@ -53,7 +58,8 @@ end
 function QueryLogsAction._filterEntries(
 	entries: { LogEntry },
 	levels: { string }?,
-	includeInternal: boolean
+	includeInternal: boolean,
+	since: number?
 ): { LogEntry }
 	local filtered: { LogEntry } = {}
 	for _, entry in entries do
@@ -62,6 +68,10 @@ function QueryLogsAction._filterEntries(
 		end
 
 		if levels and #levels > 0 and not table.find(levels, entry.level) then
+			continue
+		end
+
+		if since and entry.timestamp < since then
 			continue
 		end
 

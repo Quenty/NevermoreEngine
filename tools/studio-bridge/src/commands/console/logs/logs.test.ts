@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { queryLogsHandlerAsync } from './logs.js';
+import {
+  formatLogsText,
+  groupRepeats,
+  parseSince,
+  queryLogsHandlerAsync,
+} from './logs.js';
 
 function createMockSession(logsResult: {
   entries: Array<{ level: string; body: string; timestamp: number }>;
@@ -134,5 +139,77 @@ describe('queryLogsHandlerAsync', () => {
     expect(result.total).toBe(0);
     expect(result.bufferCapacity).toBe(0);
     expect(result.summary).toBe('0 entries (0 in buffer)');
+  });
+});
+
+describe('parseSince', () => {
+  const now = Date.parse('2026-10-27T18:00:00Z');
+
+  it('reads a duration back from now', () => {
+    expect(parseSince('30s', now)).toBe(now / 1000 - 30);
+    expect(parseSince('5m', now)).toBe(now / 1000 - 300);
+    expect(parseSince('2h', now)).toBe(now / 1000 - 7200);
+  });
+
+  it('reads a date', () => {
+    expect(parseSince('2026-10-27T17:00:00Z', now)).toBe(now / 1000 - 3600);
+  });
+
+  it('refuses anything else', () => {
+    expect(() => parseSince('yesterday', now)).toThrow(/Can't read --since/);
+  });
+});
+
+describe('groupRepeats', () => {
+  it('collapses identical consecutive entries and keeps the first time', () => {
+    const grouped = groupRepeats([
+      { level: 'Warning', body: 'retrying', timestamp: 1 },
+      { level: 'Warning', body: 'retrying', timestamp: 2 },
+      { level: 'Print', body: 'retrying', timestamp: 3 },
+      { level: 'Warning', body: 'retrying', timestamp: 4 },
+      { level: 'Warning', body: 'retrying', timestamp: 5 },
+      { level: 'Warning', body: 'retrying', timestamp: 6 },
+    ]);
+
+    expect(grouped).toEqual([
+      { level: 'Warning', body: 'retrying', timestamp: 1, repeats: 2 },
+      { level: 'Print', body: 'retrying', timestamp: 3 },
+      { level: 'Warning', body: 'retrying', timestamp: 4, repeats: 3 },
+    ]);
+  });
+
+  it('is applied unless turned off', async () => {
+    const entries = [
+      { level: 'Print', body: 'tick', timestamp: 1 },
+      { level: 'Print', body: 'tick', timestamp: 2 },
+    ];
+    const session = createMockSession({
+      entries,
+      total: 2,
+      bufferCapacity: 1000,
+    });
+
+    expect((await queryLogsHandlerAsync(session)).entries).toHaveLength(1);
+    expect(
+      (await queryLogsHandlerAsync(session, { groupRepeats: false })).entries
+    ).toHaveLength(2);
+  });
+});
+
+describe('formatLogsText', () => {
+  it('shows the repeat count and counts every repeat as shown', () => {
+    const text = formatLogsText({
+      entries: [
+        { level: 'Print', body: 'tick', timestamp: 1793125630, repeats: 3 },
+      ],
+      total: 3,
+      bufferCapacity: 1000,
+      summary: '3 entries (3 in buffer)',
+    });
+
+    expect(text).toContain('tick');
+    expect(text).toContain('(x3)');
+    expect(text).toContain('(3 shown, 3 in buffer)');
+    expect(text).toContain(new Date(1793125630 * 1000).toLocaleTimeString());
   });
 });

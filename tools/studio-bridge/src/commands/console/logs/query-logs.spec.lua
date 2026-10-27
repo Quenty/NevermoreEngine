@@ -49,6 +49,14 @@ local MIXED_ENTRIES = {
 }
 
 describe("queryLogs", function()
+	it("should leave out entries logged before since, then apply count", function()
+		local controller = setup(MIXED_ENTRIES)
+
+		local response = controller.query({ since = 2, count = 2, direction = "head" })
+
+		expect(getBodies(response)).toEqual({ "two", "three" })
+	end)
+
 	it("should answer logsResult with the buffer's total and capacity", function()
 		local controller = setup(MIXED_ENTRIES)
 
