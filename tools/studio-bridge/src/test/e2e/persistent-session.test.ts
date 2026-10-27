@@ -478,4 +478,58 @@ describe('persistent session e2e', () => {
     expect(result.success).toBe(true);
     expect(result.returnValues).toEqual([42]);
   });
+
+  it('host finishes a relayed action before shutting down', async () => {
+    const host = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
+    connections.push(host);
+
+    const plugin = new MockPluginClient({
+      port: host.port,
+      instanceId: 'inst-drain',
+      capabilities: ['execute', 'syncActions'],
+    });
+    plugins.push(plugin);
+    plugin.autoRespond('syncActions', () => ({
+      type: 'syncActionsResult',
+      payload: { needed: [], installed: {} },
+    }));
+    plugin.onAnyMessage((msg) => {
+      if (msg.type === 'shutdown') {
+        void plugin.disconnectAsync();
+        return;
+      }
+      if (msg.type !== 'execute') return;
+      setTimeout(() => {
+        plugin.sendMessage({
+          type: 'scriptComplete',
+          sessionId: plugin.sessionId,
+          requestId: msg.requestId,
+          payload: { success: true, output: [], returnValues: ['late'] },
+        });
+      }, 300);
+    });
+    await plugin.connectAndRegisterAsync();
+    await new Promise((r) => setTimeout(r, 100));
+
+    const client = await BridgeConnection.connectAsync({
+      port: host.port,
+      local: true,
+    });
+    connections.push(client);
+
+    const session = await client.resolveSessionAsync(plugin.sessionId);
+    const resultPromise = session.execAsync('return "late"', 2_000);
+    await new Promise((r) => setTimeout(r, 100));
+    const hostShutdown = host.disconnectAsync();
+
+    const result = await resultPromise;
+    await hostShutdown;
+
+    expect(result.success).toBe(true);
+    expect(result.returnValues).toEqual(['late']);
+  });
 });

@@ -102,6 +102,7 @@ export class BridgeConnection extends EventEmitter {
   private _keepAlive: boolean;
   private _hasSettled: boolean = false;
   private _firstSessionTimeoutMs: number | undefined;
+  private _pendingRelays = new Set<Promise<void>>();
 
   // Host mode internals
   private _host: BridgeHost | undefined;
@@ -252,6 +253,14 @@ export class BridgeConnection extends EventEmitter {
     this._isConnected = false;
 
     if (this._role === 'host' && this._host) {
+      // Shutting down drops the plugins, so let actions relayed for clients finish
+      if (this._pendingRelays.size > 0) {
+        OutputHelper.verbose(
+          `[bridge] Waiting for ${this._pendingRelays.size} relayed action(s) before shutting down`
+        );
+        await Promise.allSettled([...this._pendingRelays]);
+      }
+
       for (const handle of this._hostHandles.values()) {
         handle.markDisconnected();
       }
@@ -659,7 +668,9 @@ export class BridgeConnection extends EventEmitter {
             instances: this._tracker!.listInstances(),
           });
         } else if (msg.type === 'host-envelope') {
-          void this._relayEnvelopeAsync(msg as HostEnvelope, reply);
+          const relay = this._relayEnvelopeAsync(msg as HostEnvelope, reply);
+          this._pendingRelays.add(relay);
+          void relay.finally(() => this._pendingRelays.delete(relay));
         }
       }
     );
