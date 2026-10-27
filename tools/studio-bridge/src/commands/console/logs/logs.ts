@@ -13,14 +13,9 @@ import type {
 } from '../../../bridge/index.js';
 import type { OutputLevel } from '../../../server/web-socket-protocol.js';
 
-/** A log entry, or a run of identical consecutive entries collapsed into one. */
-export interface LogsEntry extends LogEntry {
-  /** How many times the entry repeated in a row. Absent when it did not. */
-  repeats?: number;
-}
-
 export interface LogsResult {
-  entries: LogsEntry[];
+  /** With repeats grouped, a run of identical entries is one with `repeats` and `lastTimestamp`. */
+  entries: LogEntry[];
   total: number;
   bufferCapacity: number;
   /** The cutoff `--since` or `--since-restart` applied, in epoch seconds. */
@@ -77,15 +72,22 @@ export function parseSince(value: string, nowMs: number = Date.now()): number {
 
 const PLAYTEST_START_SCRIPT =
   'return DateTime.now().UnixTimestampMillis / 1000 - time()';
+/** The server's DataModel starts running a moment after Edit starts the playtest. */
+const PLAYTEST_START_SLACK_SEC = 2;
 
 /**
- * When the playtest running in `session`'s Studio started, in epoch seconds,
- * read from its server session.
+ * The `--since-restart` cutoff for `session`, in epoch seconds: none for a
+ * playtest's own session, whose log began with the playtest, and otherwise a
+ * little before the running playtest's server started.
  */
-export async function getPlaytestStartAsync(
+export async function getSinceRestartCutoffAsync(
   connection: BridgeConnection,
   session: BridgeSession
-): Promise<number> {
+): Promise<number | undefined> {
+  if (session.info.context !== 'edit') {
+    return undefined;
+  }
+
   const server = connection
     .listSessions()
     .find(
@@ -95,7 +97,7 @@ export async function getPlaytestStartAsync(
   const serverSession = server && connection.getSession(server.sessionId);
   if (!serverSession) {
     throw new Error(
-      `--since-restart needs a running playtest, and '${session.info.instanceId}' has none`
+      `--since-restart needs a running playtest, and '${session.info.instanceId}' has none. Use --since to read back to a time instead.`
     );
   }
 
@@ -108,21 +110,7 @@ export async function getPlaytestStartAsync(
       }`
     );
   }
-  return startedAt;
-}
-
-/** Collapse runs of entries with the same level and body into one. */
-export function groupRepeats(entries: LogEntry[]): LogsEntry[] {
-  const grouped: LogsEntry[] = [];
-  for (const entry of entries) {
-    const last = grouped[grouped.length - 1];
-    if (last && last.level === entry.level && last.body === entry.body) {
-      last.repeats = (last.repeats ?? 1) + 1;
-    } else {
-      grouped.push({ ...entry });
-    }
-  }
-  return grouped;
+  return startedAt - PLAYTEST_START_SLACK_SEC;
 }
 
 export async function queryLogsHandlerAsync(
@@ -135,18 +123,18 @@ export async function queryLogsHandlerAsync(
     levels: options.levels,
     includeInternal: options.includeInternal,
     since: options.since,
+    groupRepeats: options.groupRepeats !== false,
   });
 
-  const rawEntries = result.entries ?? [];
-  const entries =
-    options.groupRepeats === false ? rawEntries : groupRepeats(rawEntries);
+  const entries = result.entries ?? [];
+  const shown = entries.reduce((sum, e) => sum + (e.repeats ?? 1), 0);
 
   return {
     entries,
     total: result.total ?? 0,
     bufferCapacity: result.bufferCapacity ?? 0,
     since: options.since,
-    summary: `${rawEntries.length} entries (${result.total ?? 0} in buffer)`,
+    summary: `${shown} entries (${result.total ?? 0} in buffer)`,
   };
 }
 
@@ -225,7 +213,7 @@ export const logsCommand = defineCommand<ConsoleLogsArgs, LogsResult>({
     }
 
     const since = args.sinceRestart
-      ? await getPlaytestStartAsync(connection, session)
+      ? await getSinceRestartCutoffAsync(connection, session)
       : args.since
       ? parseSince(args.since)
       : undefined;

@@ -239,7 +239,7 @@ export interface GrepScriptsResultMessage extends RequestMessage {
   type: 'grepScriptsResult';
   payload: {
     matches: GrepMatch[];
-    scriptsSearched: number;
+    searched: number;
     /** True when the search stopped at the limit. */
     truncated: boolean;
   };
@@ -252,6 +252,10 @@ export interface LogsResultMessage extends RequestMessage {
       level: OutputLevel;
       body: string;
       timestamp: number;
+      /** With groupRepeats: how many identical entries in a row this stands for. */
+      repeats?: number;
+      /** With groupRepeats: when the last of the repeats was logged. */
+      lastTimestamp?: number;
     }>;
     total: number;
     bufferCapacity: number;
@@ -440,6 +444,8 @@ export interface QueryLogsMessage extends RequestMessage {
     includeInternal?: boolean;
     /** Only entries logged at or after this time, in epoch seconds. */
     since?: number;
+    /** Collapse identical consecutive entries, before `count` applies. */
+    groupRepeats?: boolean;
   };
 }
 
@@ -764,10 +770,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         requestId,
         payload: {
           matches: payload.matches as GrepMatch[],
-          scriptsSearched:
-            typeof payload.scriptsSearched === 'number'
-              ? payload.scriptsSearched
-              : 0,
+          searched: typeof payload.searched === 'number' ? payload.searched : 0,
           truncated: payload.truncated === true,
         },
       };
@@ -786,11 +789,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         sessionId,
         requestId,
         payload: {
-          entries: payload.entries as Array<{
-            level: OutputLevel;
-            body: string;
-            timestamp: number;
-          }>,
+          entries: payload.entries as LogsResultMessage['payload']['entries'],
           total: payload.total,
           bufferCapacity: payload.bufferCapacity,
         },
@@ -1123,6 +1122,10 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
               ? payload.includeInternal
               : undefined,
           since: typeof payload.since === 'number' ? payload.since : undefined,
+          groupRepeats:
+            typeof payload.groupRepeats === 'boolean'
+              ? payload.groupRepeats
+              : undefined,
         },
       };
 

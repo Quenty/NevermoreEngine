@@ -16,6 +16,7 @@ import {
   startPlaytestAsync,
   type StartedPlaytest,
 } from '../playtest-sessions.js';
+import { listPlaytestPlayersAsync } from '../player/playtest-players.js';
 import {
   describePlaytest,
   formatPlaytestStartText,
@@ -80,10 +81,18 @@ export async function playtestRestartHandlerAsync(
     serverSession.info.instanceId
   );
 
+  // Players added since the start count too, so read who is in the test now
+  const livePlayers =
+    options.players === undefined && options.mode === undefined
+      ? await tryCountMultiplayerPlayersAsync(connection, serverSession)
+      : undefined;
   const ended = await endPlaytestAsync(connection, serverSession);
   const mode = options.mode ?? ended.mode ?? 'play';
   const players =
-    options.players ?? (options.mode === undefined ? ended.players : undefined);
+    options.players ??
+    (options.mode === undefined && ended.players !== undefined
+      ? livePlayers || ended.players
+      : undefined);
   const playtest = await startWithRetryAsync(
     connection,
     editSession,
@@ -94,6 +103,18 @@ export async function playtestRestartHandlerAsync(
     playtest,
     `Playtest restarted (${describePlaytest(playtest)})`
   );
+}
+
+/** How many players the running test has, or undefined when it can't tell. */
+async function tryCountMultiplayerPlayersAsync(
+  connection: BridgeConnection,
+  serverSession: BridgeSession
+): Promise<number | undefined> {
+  try {
+    return (await listPlaytestPlayersAsync(connection, serverSession)).length;
+  } catch {
+    return undefined;
+  }
 }
 
 /** The running playtest's server session, within `instanceId` when given. */

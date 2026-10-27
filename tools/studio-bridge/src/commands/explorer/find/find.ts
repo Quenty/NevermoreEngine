@@ -91,7 +91,6 @@ export const findCommand = defineCommand<FindArgs, FindResult>({
     }),
     class: arg.option({
       description: 'Only instances of this class or a subclass (IsA)',
-      alias: 'c',
     }),
     tag: arg.option({
       description: 'Only instances with this CollectionService tag',
@@ -103,6 +102,7 @@ export const findCommand = defineCommand<FindArgs, FindResult>({
     limit: arg.option({
       description: 'Stop after this many matches (default: 200)',
       type: 'number',
+      alias: 'n',
     }),
   },
   cli: {

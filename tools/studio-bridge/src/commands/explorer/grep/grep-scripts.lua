@@ -10,7 +10,7 @@
 	- Stops after `limit` matching lines.
 
 	Request: `{ type: "grepScripts", payload: { pattern, root?, luaPattern?, caseSensitive?, limit? } }`
-	Response: `{ type: "grepScriptsResult", payload: { matches, scriptsSearched, truncated } }`
+	Response: `{ type: "grepScriptsResult", payload: { matches, searched, truncated } }`
 
 	@class GrepScriptsAction
 ]=]
@@ -76,15 +76,18 @@ function GrepScriptsAction.register(router: any)
 				end
 			end
 
-			local needle = if caseSensitive then pattern else string.lower(pattern)
+			local needle = if caseSensitive
+				then pattern
+				elseif luaPattern then GrepScriptsAction._lowerPattern(pattern)
+				else string.lower(pattern)
 			local limit = if type(payload.limit) == "number" then payload.limit else DEFAULT_LIMIT
 
 			local matches: { GrepMatch } = {}
-			local scriptsSearched = 0
+			local searched = 0
 			local truncated = false
 			for _, script in GrepScriptsAction._getScripts(root :: Instance) do
-				scriptsSearched += 1
-				if scriptsSearched % YIELD_EVERY == 0 then
+				searched += 1
+				if searched % YIELD_EVERY == 0 then
 					task.wait()
 				end
 
@@ -113,11 +116,25 @@ function GrepScriptsAction.register(router: any)
 
 			return {
 				matches = matches,
-				scriptsSearched = scriptsSearched,
+				searched = searched,
 				truncated = truncated,
 			}
 		end
 	)
+end
+
+--[[
+	Lowercases a Lua pattern's literal letters, leaving each character after a
+	`%` alone, since `%S` and `%s` are opposite classes.
+]]
+function GrepScriptsAction._lowerPattern(pattern: string): string
+	local lowered = {}
+	local isEscaped = false
+	for _, char in string.split(pattern, "") do
+		table.insert(lowered, if isEscaped then char else string.lower(char))
+		isEscaped = not isEscaped and char == "%"
+	end
+	return table.concat(lowered)
 end
 
 function GrepScriptsAction._readSource(script: LuaSourceContainer): string

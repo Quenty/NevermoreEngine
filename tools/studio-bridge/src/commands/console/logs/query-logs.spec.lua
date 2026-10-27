@@ -57,6 +57,23 @@ describe("queryLogs", function()
 		expect(getBodies(response)).toEqual({ "two", "three" })
 	end)
 
+	it("should group repeats before applying count", function()
+		local controller = setup({
+			{ level = "Print", body = "start" },
+			{ level = "Print", body = "tick" },
+			{ level = "Print", body = "tick" },
+			{ level = "Print", body = "tick" },
+			{ level = "Warning", body = "tick" },
+		})
+
+		local response = controller.query({ groupRepeats = true, count = 2 })
+
+		expect(response.payload.entries).toEqual({
+			{ level = "Print", body = "tick", timestamp = 2, repeats = 3, lastTimestamp = 4 },
+			{ level = "Warning", body = "tick", timestamp = 5 },
+		})
+	end)
+
 	it("should answer logsResult with the buffer's total and capacity", function()
 		local controller = setup(MIXED_ENTRIES)
 

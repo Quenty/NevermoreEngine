@@ -111,9 +111,9 @@ BuiltInActions.register(router, function(message)
 	end
 end, logBuffer)
 
--- Hybrid clock: os.time() for the wall clock, os.clock() deltas for sub-second precision
+-- Hybrid clock: the wall clock at load, then os.clock() deltas, which are cheaper per entry
 local clockBase = os.clock()
-local timeBase = os.time()
+local timeBase = DateTime.now().UnixTimestampMillis / 1000
 
 local logConnection = LogService.MessageOut:Connect(function(message, messageType)
 	if string.sub(message, 1, #StudioBridgeLogUtils.PREFIX) == StudioBridgeLogUtils.PREFIX then

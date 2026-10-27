@@ -74,7 +74,7 @@ describe("grepScripts", function()
 
 		expect(response.type).toEqual("grepScriptsResult")
 		expect(getLocations(response)).toEqual({ "Combat:1", "Combat:3" })
-		expect(response.payload.scriptsSearched).toEqual(2)
+		expect(response.payload.searched).toEqual(2)
 		controller:Destroy()
 	end)
 
@@ -96,6 +96,15 @@ describe("grepScripts", function()
 
 		expect(getLocations(plain)).toEqual({ "Main:2" })
 		expect(getLocations(pattern)).toEqual({ "Main:1" })
+		controller:Destroy()
+	end)
+
+	it("should keep a pattern's classes when matching case-insensitively", function()
+		local controller = setup()
+
+		local response = controller.grep({ root = controller.rootPath, pattern = "^%S+ DAMAGE", luaPattern = true })
+
+		expect(getLocations(response)).toEqual({ "Combat:1" })
 		controller:Destroy()
 	end)
 

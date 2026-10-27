@@ -24,8 +24,8 @@ import { getPluginBuildVersionAsync } from '../../../plugin/plugin-build-version
 
 export interface PlaytestInfo {
   mode: 'play' | 'run';
-  /** Set for a multiplayer test. */
-  players?: number;
+  /** Set for a multiplayer test: how many of its clients are connected. */
+  playerCount?: number;
   sessions: Array<{
     sessionId: string;
     context: SessionContext;
@@ -83,7 +83,7 @@ export async function queryStateHandlerAsync(
   // Each process of a multiplayer test has its own window; otherwise a
   // playtest shows in the edit window
   const ownWindow =
-    session.info.context !== 'edit' && playtest?.players !== undefined;
+    session.info.context !== 'edit' && playtest?.playerCount !== undefined;
   const [result, expectedVersion] = await Promise.all([
     session.queryStateAsync(),
     getPluginBuildVersionAsync(),
@@ -132,7 +132,7 @@ export function describePlaytest(
 
   return {
     mode: clients.length > 0 ? 'play' : 'run',
-    players: isMultiplayer ? clients.length : undefined,
+    playerCount: isMultiplayer ? clients.length : undefined,
     sessions: playtestSessions.map((s) => ({
       sessionId: s.sessionId,
       context: s.context,
@@ -179,9 +179,9 @@ function formatAge(isoTime: string): string {
 function formatPlaytest(playtest: PlaytestInfo | undefined): string {
   if (!playtest) return 'none running';
   const kind =
-    playtest.players !== undefined
-      ? `multiplayer, ${playtest.players} player${
-          playtest.players === 1 ? '' : 's'
+    playtest.playerCount !== undefined
+      ? `multiplayer, ${playtest.playerCount} player${
+          playtest.playerCount === 1 ? '' : 's'
         }`
       : `${playtest.mode} mode`;
   return `running (${kind}): ${playtest.sessions

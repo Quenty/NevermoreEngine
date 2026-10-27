@@ -211,7 +211,7 @@ export async function removePlaytestPlayersAsync(
   names: string[]
 ): Promise<RemovedPlayer[]> {
   const current = await listPlaytestPlayersAsync(connection, serverSession);
-  const targets = names.map((name) => {
+  const found = names.map((name) => {
     const player = current.find(
       (p) => p.name.toLowerCase() === name.toLowerCase()
     );
@@ -221,6 +221,7 @@ export async function removePlaytestPlayersAsync(
     }
     return player;
   });
+  const targets = [...new Set(found)];
 
   const removed: RemovedPlayer[] = [];
   const toKick: string[] = [];

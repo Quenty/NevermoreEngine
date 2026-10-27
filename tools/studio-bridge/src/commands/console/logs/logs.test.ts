@@ -3,12 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import {
-  formatLogsText,
-  groupRepeats,
-  parseSince,
-  queryLogsHandlerAsync,
-} from './logs.js';
+import { formatLogsText, parseSince, queryLogsHandlerAsync } from './logs.js';
 
 function createMockSession(logsResult: {
   entries: Array<{ level: string; body: string; timestamp: number }>;
@@ -53,6 +48,8 @@ describe('queryLogsHandlerAsync', () => {
       direction: 'tail',
       levels: undefined,
       includeInternal: undefined,
+      since: undefined,
+      groupRepeats: true,
     });
   });
 
@@ -68,6 +65,7 @@ describe('queryLogsHandlerAsync', () => {
       direction: 'head',
       levels: ['Error', 'Warning'],
       includeInternal: true,
+      since: 1793125630,
     });
 
     expect(session.queryLogsAsync).toHaveBeenCalledWith({
@@ -75,6 +73,8 @@ describe('queryLogsHandlerAsync', () => {
       direction: 'head',
       levels: ['Error', 'Warning'],
       includeInternal: true,
+      since: 1793125630,
+      groupRepeats: true,
     });
   });
 
@@ -160,39 +160,34 @@ describe('parseSince', () => {
   });
 });
 
-describe('groupRepeats', () => {
-  it('collapses identical consecutive entries and keeps the first time', () => {
-    const grouped = groupRepeats([
-      { level: 'Warning', body: 'retrying', timestamp: 1 },
-      { level: 'Warning', body: 'retrying', timestamp: 2 },
-      { level: 'Print', body: 'retrying', timestamp: 3 },
-      { level: 'Warning', body: 'retrying', timestamp: 4 },
-      { level: 'Warning', body: 'retrying', timestamp: 5 },
-      { level: 'Warning', body: 'retrying', timestamp: 6 },
-    ]);
-
-    expect(grouped).toEqual([
-      { level: 'Warning', body: 'retrying', timestamp: 1, repeats: 2 },
-      { level: 'Print', body: 'retrying', timestamp: 3 },
-      { level: 'Warning', body: 'retrying', timestamp: 4, repeats: 3 },
-    ]);
-  });
-
-  it('is applied unless turned off', async () => {
-    const entries = [
-      { level: 'Print', body: 'tick', timestamp: 1 },
-      { level: 'Print', body: 'tick', timestamp: 2 },
-    ];
+describe('repeat grouping', () => {
+  it('is asked of the plugin unless turned off', async () => {
     const session = createMockSession({
-      entries,
-      total: 2,
+      entries: [],
+      total: 0,
       bufferCapacity: 1000,
     });
 
-    expect((await queryLogsHandlerAsync(session)).entries).toHaveLength(1);
-    expect(
-      (await queryLogsHandlerAsync(session, { groupRepeats: false })).entries
-    ).toHaveLength(2);
+    await queryLogsHandlerAsync(session);
+    await queryLogsHandlerAsync(session, { groupRepeats: false });
+
+    expect(session.queryLogsAsync.mock.calls[0][0].groupRepeats).toBe(true);
+    expect(session.queryLogsAsync.mock.calls[1][0].groupRepeats).toBe(false);
+  });
+
+  it('counts each repeat in the summary', async () => {
+    const session = createMockSession({
+      entries: [
+        { level: 'Print', body: 'tick', timestamp: 1, repeats: 3 },
+        { level: 'Print', body: 'done', timestamp: 4 },
+      ],
+      total: 4,
+      bufferCapacity: 1000,
+    } as any);
+
+    expect((await queryLogsHandlerAsync(session)).summary).toBe(
+      '4 entries (4 in buffer)'
+    );
   });
 });
 

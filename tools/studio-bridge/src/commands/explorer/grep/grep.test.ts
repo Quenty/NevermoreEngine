@@ -19,7 +19,7 @@ describe('grepScriptsHandlerAsync', () => {
             text: 'damage += 1',
           },
         ],
-        scriptsSearched: 12,
+        searched: 12,
         truncated: false,
       }),
     } as any;

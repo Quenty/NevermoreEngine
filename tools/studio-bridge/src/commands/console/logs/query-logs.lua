@@ -3,9 +3,11 @@
 	Action that answers `queryLogs` from the plugin's log buffer, filtered by
 	level and by `since` (epoch seconds), then trimmed to `count` entries from
 	the `head` or `tail`. `[StudioBridge]` messages are left out unless
-	`includeInternal` is set.
+	`includeInternal` is set. With `groupRepeats`, identical consecutive
+	entries become one with `repeats` and `lastTimestamp`, before `count`
+	applies, so `count` counts the grouped lines.
 
-	Request: `{ type: "queryLogs", payload: { count?, direction?, levels?, includeInternal?, since? } }`
+	Request: `{ type: "queryLogs", payload: { count?, direction?, levels?, includeInternal?, since?, groupRepeats? } }`
 	Response: `{ type: "logsResult", payload: { entries, total, bufferCapacity } }`
 
 	@class QueryLogsAction
@@ -20,6 +22,8 @@ type LogEntry = {
 	level: string,
 	body: string,
 	timestamp: number,
+	repeats: number?,
+	lastTimestamp: number?,
 }
 
 --[=[
@@ -38,6 +42,9 @@ function QueryLogsAction.register(router: any, _sendMessage: any, logBuffer: any
 			payload.includeInternal == true,
 			if type(payload.since) == "number" then payload.since else nil
 		)
+		if payload.groupRepeats == true then
+			filtered = QueryLogsAction._groupRepeats(filtered)
+		end
 
 		local takeCount = math.min(count, #filtered)
 		local entries: { LogEntry }
@@ -53,6 +60,25 @@ function QueryLogsAction.register(router: any, _sendMessage: any, logBuffer: any
 			bufferCapacity = snapshot.bufferCapacity,
 		}
 	end)
+end
+
+--[[
+	Collapses runs of entries with the same level and body into the first,
+	with how many there were and when the last was logged.
+]]
+function QueryLogsAction._groupRepeats(entries: { LogEntry }): { LogEntry }
+	local grouped: { LogEntry } = {}
+	local last: LogEntry? = nil
+	for _, entry in entries do
+		if last and last.level == entry.level and last.body == entry.body then
+			last.repeats = (last.repeats or 1) + 1
+			last.lastTimestamp = entry.timestamp
+		else
+			last = table.clone(entry)
+			table.insert(grouped, last :: LogEntry)
+		end
+	end
+	return grouped
 end
 
 function QueryLogsAction._filterEntries(

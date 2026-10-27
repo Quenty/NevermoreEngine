@@ -18,7 +18,7 @@ export interface GrepOptions {
 
 export interface GrepResult {
   matches: GrepMatch[];
-  scriptsSearched: number;
+  searched: number;
   /** True when the search stopped at --limit; there may be more. */
   truncated: boolean;
   summary: string;
@@ -41,7 +41,7 @@ export async function grepScriptsHandlerAsync(
     ...result,
     summary: result.truncated
       ? `First ${result.matches.length} matching lines; raise --limit to see more`
-      : `${result.matches.length} matching line(s) in ${scripts} of ${result.scriptsSearched} scripts`,
+      : `${result.matches.length} matching line(s) in ${scripts} of ${result.searched} scripts`,
   };
 }
 
@@ -83,6 +83,7 @@ export const grepCommand = defineCommand<GrepOptions, GrepResult>({
     limit: arg.option({
       description: 'Stop after this many matching lines (default: 200)',
       type: 'number',
+      alias: 'n',
     }),
   },
   cli: {

@@ -19,6 +19,7 @@ import type {
   SessionContext,
 } from '../../bridge/index.js';
 import { ContextNotFoundError } from '../../bridge/index.js';
+import { getPluginBuildVersionAsync } from '../../plugin/plugin-build-version.js';
 
 /** How long a started playtest may run before its pending start request is dropped. */
 const PLAYTEST_MAX_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -27,6 +28,7 @@ const SESSION_WAIT_TIMEOUT_MS = 30_000;
 /** Each player of a multiplayer test boots its own Studio process. */
 const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
+const READ_RETRY_DELAY_MS = 1_000;
 
 const READ_PLAYTEST_ID_SCRIPT = [
   'local ok, args = pcall(function()',
@@ -70,8 +72,8 @@ export async function startPlaytestAsync(
       `Playtests start from an edit session, but '${editSession.info.sessionId}' is a ${editSession.context} session`
     );
   }
-  if (players !== undefined && mode !== 'play') {
-    throw new Error('A multiplayer test runs in play mode');
+  if (players !== undefined) {
+    await assertCanStartMultiplayerAsync(editSession, mode, players);
   }
 
   const playtestId = randomUUID();
@@ -152,6 +154,29 @@ export async function startPlaytestAsync(
 
   await endPlaytestAsync(connection, server);
   throw new Error(`Playtest started, but ${waited}, so it was stopped.`);
+}
+
+async function assertCanStartMultiplayerAsync(
+  editSession: BridgeSession,
+  mode: PlaytestMode,
+  players: number
+): Promise<void> {
+  if (!Number.isInteger(players) || players < 1) {
+    throw new Error(
+      `--players must be a whole number of at least 1, not ${players}`
+    );
+  }
+  if (mode !== 'play') {
+    throw new Error('A multiplayer test runs in play mode');
+  }
+
+  // Older plugins give every client the same session id, so all but one drop off
+  const expected = await getPluginBuildVersionAsync();
+  if (editSession.info.pluginVersion !== expected) {
+    throw new Error(
+      `Multiplayer tests need the current studio-bridge plugin, but '${editSession.info.placeName}' has an older one. Run 'studio-bridge plugin install' first.`
+    );
+  }
 }
 
 /**
@@ -237,15 +262,18 @@ async function waitForPlaytestSessionsAsync(
       }
       checked.add(sessionId);
 
-      void tryReadPlaytestIdAsync(session).then((id) => {
-        // A session that dropped mid-read re-registers under the same id
-        if (id === undefined) checked.delete(sessionId);
-        if (signal.aborted || id !== playtestId) return;
+      void readPlaytestIdAsync(connection, sessionId, signal).then((read) => {
+        if (signal.aborted || !read) return;
+        if (read.id !== playtestId) {
+          // The last playtest's session can linger under the same id; read its replacement too
+          checked.delete(sessionId);
+          return;
+        }
 
-        if (session.context === 'server') {
-          found.server = session;
+        if (read.session.context === 'server') {
+          found.server = read.session;
         } else {
-          found.clients.push(session);
+          found.clients.push(read.session);
         }
         if (found.server && found.clients.length >= clientCount) {
           cleanup();
@@ -270,17 +298,32 @@ async function waitForPlaytestSessionsAsync(
   });
 }
 
-/** Returns the playtest id a session was started under, if any. */
-async function tryReadPlaytestIdAsync(
-  session: BridgeSession
-): Promise<string | undefined> {
-  try {
-    const result = await session.execAsync(READ_PLAYTEST_ID_SCRIPT, 5_000);
-    const value = result.returnValues?.[0];
-    return typeof value === 'string' ? value : undefined;
-  } catch {
-    return undefined;
+/**
+ * Reads the playtest id a session was started under, retrying while the read
+ * fails: a playtest's DataModels are slow to answer while their Studio boots,
+ * and a session that reconnects is read again under the same id.
+ */
+async function readPlaytestIdAsync(
+  connection: BridgeConnection,
+  sessionId: string,
+  signal: AbortSignal
+): Promise<{ session: BridgeSession; id: string | undefined } | undefined> {
+  while (!signal.aborted) {
+    const session = connection.getSession(sessionId);
+    if (session) {
+      try {
+        const result = await session.execAsync(READ_PLAYTEST_ID_SCRIPT, 5_000);
+        if (result.success) {
+          const value = result.returnValues?.[0];
+          return { session, id: typeof value === 'string' ? value : undefined };
+        }
+      } catch {
+        // Retried below
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, READ_RETRY_DELAY_MS));
   }
+  return undefined;
 }
 
 async function waitForSessionCloseAsync(

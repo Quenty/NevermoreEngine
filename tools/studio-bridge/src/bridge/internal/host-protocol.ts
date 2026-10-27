@@ -216,6 +216,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
         levels: z.array(OutputLevelSchema).optional(),
         includeInternal: z.boolean().optional(),
         since: z.number().optional(),
+        groupRepeats: z.boolean().optional(),
       })
       .loose(),
   }),

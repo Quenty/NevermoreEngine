@@ -113,7 +113,7 @@ studio-bridge console logs --since 5m
 | `--since-restart` | — | Only entries since the running playtest started |
 | `--no-group-repeats` | — | Keep identical consecutive entries separate |
 
-Identical consecutive entries are collapsed into one with a repeat count (`repeats` in JSON). Each playtest DataModel keeps its own log, so `--context server` or `--context client` reads only the running playtest; `--since-restart` trims Edit's log to the same window.
+Identical consecutive entries are collapsed into one with a repeat count (`repeats` and `lastTimestamp` in JSON), before `--count` applies, so `-n 20` shows 20 distinct lines. Each playtest DataModel keeps its own log, so `--context server` or `--context client` already reads only the running playtest and `--since-restart` keeps all of it; on Edit, `--since-restart` keeps what was logged since that playtest started.
 
 ### `explorer query`
 
@@ -243,7 +243,7 @@ studio-bridge playtest player remove Player2
 studio-bridge console exec --target test-place-3f9a-client-player1 'return game.Players.LocalPlayer.Name'
 ```
 
-`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the player count.
+`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the number of players in the test, counting any added since it started. Multiplayer tests need the current plugin (`studio-bridge plugin install`), and `--players` refuses to start with an older one.
 
 `playtest player list` shows each player with its client session. `add` adds players to a multiplayer test and waits for them to join. `remove` has each player's client leave the test, which closes its window; a player without a connected client session is kicked instead, and its window stays open.
 

@@ -91,6 +91,10 @@ export interface LogEntry {
   level: OutputLevel;
   body: string;
   timestamp: number;
+  /** When grouped: how many identical entries in a row this stands for. */
+  repeats?: number;
+  /** When grouped: when the last of the repeats was logged. */
+  lastTimestamp?: number;
 }
 
 export interface LogsResult {
@@ -120,6 +124,8 @@ export interface LogOptions {
   includeInternal?: boolean;
   /** Only entries logged at or after this time, in epoch seconds. */
   since?: number;
+  /** Collapse identical consecutive entries, before `count` applies. */
+  groupRepeats?: boolean;
 }
 
 export interface QueryDataModelOptions {

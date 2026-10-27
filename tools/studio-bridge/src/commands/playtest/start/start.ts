@@ -27,8 +27,8 @@ export interface PlaytestStartOptions {
 export interface PlaytestStartResult {
   playtestId: string;
   mode: PlaytestMode;
-  /** Set for a multiplayer test. */
-  players?: number;
+  /** How many players a multiplayer test started with. */
+  playerCount?: number;
   sessions: Array<{
     sessionId: string;
     context: SessionContext;
@@ -81,7 +81,7 @@ export function toPlaytestStartResult(
   return {
     playtestId: playtest.playtestId,
     mode: playtest.mode,
-    players: playtest.players,
+    playerCount: playtest.players,
     sessions: [playtest.sessions.server, ...playtest.clients]
       .filter((session) => session !== undefined)
       .map((session) => ({

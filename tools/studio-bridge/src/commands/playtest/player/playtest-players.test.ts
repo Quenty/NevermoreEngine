@@ -114,6 +114,22 @@ describe('removePlaytestPlayersAsync', () => {
     expect(server.scripts[1]).not.toContain('"Player1"');
   });
 
+  it('removes a player named twice only once', async () => {
+    const server = createSession('place-1a2b-server', 'server', [
+      [[player('Player2', -2)]],
+      [],
+      [[]],
+    ]);
+
+    const removed = await removePlaytestPlayersAsync(
+      createConnection([server]),
+      server as any,
+      ['Player2', 'player2']
+    );
+
+    expect(removed).toEqual([{ name: 'Player2', how: 'kicked' }]);
+  });
+
   it('refuses an unknown name before removing anyone', async () => {
     const server = createSession('place-1a2b-server', 'server', [
       [[player('Player1', -1)]],

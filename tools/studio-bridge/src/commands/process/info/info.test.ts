@@ -122,7 +122,7 @@ describe('queryStateHandlerAsync', () => {
 
     expect(result.playtest).toEqual({
       mode: 'play',
-      players: undefined,
+      playerCount: undefined,
       sessions: [
         {
           sessionId: 'test-place-3f9a-server',
@@ -224,7 +224,7 @@ describe('describePlaytest', () => {
       'test-place-3f9a'
     );
 
-    expect(playtest?.players).toBe(2);
+    expect(playtest?.playerCount).toBe(2);
     expect(playtest?.sessions).toHaveLength(3);
   });
 });

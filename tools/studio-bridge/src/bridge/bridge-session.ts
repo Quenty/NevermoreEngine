@@ -286,6 +286,7 @@ export class BridgeSession extends EventEmitter {
           levels: options?.levels,
           includeInternal: options?.includeInternal,
           ...(options?.since !== undefined ? { since: options.since } : {}),
+          ...(options?.groupRepeats ? { groupRepeats: true } : {}),
         },
       },
       timeoutMs
