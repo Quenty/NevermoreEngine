@@ -157,6 +157,70 @@ describe("GroupUtils.promiseRoleInGroup", function()
 	end)
 end)
 
+describe("GroupUtils.promiseRoleIdsInGroup", function()
+	it("should resolve no roles for a mock with no injected membership", function()
+		local player = PlayerMock.new({ UserId = 111 })
+
+		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleIdsInGroup(player, GROUP_ID))
+		expect(outcome).toBe("resolved")
+		expect(value).toEqual({})
+
+		player:Destroy()
+	end)
+
+	it("should resolve an assigned role id", function()
+		local player = PlayerMock.new({ UserId = 111 })
+		GroupTestUtils.assignGroupInfo(player, GROUP_ID, { rank = 1, role = "Developer", roleId = 1001 })
+
+		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleIdsInGroup(player, GROUP_ID))
+		expect(outcome).toBe("resolved")
+		expect(value).toEqual({ 1001 })
+
+		player:Destroy()
+	end)
+
+	it("should resolve every role the player holds", function()
+		local player = PlayerMock.new({ UserId = 111 })
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
+			IsMember = true,
+			Roles = {
+				{ Id = 1001, Name = "VIP", Rank = 50 },
+				{ Id = 1002, Name = "Developer", Rank = 1 },
+			},
+		}, GROUP_ID)
+
+		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleIdsInGroup(player, GROUP_ID))
+		expect(outcome).toBe("resolved")
+		expect(value).toEqual({ 1001, 1002 })
+
+		player:Destroy()
+	end)
+
+	it("should resolve no roles for a non-member", function()
+		local player = PlayerMock.new({ UserId = 111 })
+		PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
+			IsMember = false,
+			Roles = { { Id = 1001, Name = "Guest", Rank = 0 } },
+		}, GROUP_ID)
+
+		local outcome, value = PromiseTestUtils.awaitOutcome(GroupUtils.promiseRoleIdsInGroup(player, GROUP_ID))
+		expect(outcome).toBe("resolved")
+		expect(value).toEqual({})
+
+		player:Destroy()
+	end)
+
+	it("should reject a bad groupId", function()
+		local player = PlayerMock.new({ UserId = 111 })
+
+		expect(function()
+			GroupUtils.promiseRoleIdsInGroup(player, "372" :: any)
+		end).toThrow("Bad groupId")
+
+		player:Destroy()
+	end)
+end)
+
 describe("GroupTestUtils.assignGroupInfo", function()
 	it("should keep rank and role coherent from one assignment", function()
 		local player = PlayerMock.new({ UserId = 111 })

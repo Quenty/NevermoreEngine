@@ -17,6 +17,7 @@ local BasePermissionProvider = require("BasePermissionProvider")
 local Brio = require("Brio")
 local CreatorPermissionProvider = require("CreatorPermissionProvider")
 local GroupPermissionProvider = require("GroupPermissionProvider")
+local GroupRolePermissionProvider = require("GroupRolePermissionProvider")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
@@ -55,8 +56,8 @@ function PermissionService.Init(self: PermissionService, _serviceBag: ServiceBag
 end
 
 --[=[
-	Sets the provider from a config. See [PermissionProviderUtils.createGroupRankConfig]
-	and [PermissionProviderUtils.createSingleUserConfig].
+	Sets the provider from a config. See [PermissionProviderUtils.createGroupRankConfig],
+	[PermissionProviderUtils.createGroupRoleConfig] and [PermissionProviderUtils.createSingleUserConfig].
 
 	@param config { type: string }
 ]=]
@@ -69,6 +70,8 @@ function PermissionService.SetProviderFromConfig(
 
 	if config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE then
 		self._provider = self._maid:Add(GroupPermissionProvider.new(config))
+	elseif config.type == PermissionProviderConstants.GROUP_ROLE_CONFIG_TYPE then
+		self._provider = self._maid:Add(GroupRolePermissionProvider.new(config))
 	elseif config.type == PermissionProviderConstants.SINGLE_USER_CONFIG_TYPE then
 		self._provider = self._maid:Add(CreatorPermissionProvider.new(config))
 	else
