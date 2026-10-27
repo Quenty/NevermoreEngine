@@ -18,11 +18,12 @@ import {
   getDefaultRemoteHost,
 } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
-import type {
-  HostEnvelope,
-  HostProtocolMessage,
-  ListSessionsRequest,
-  ListInstancesRequest,
+import {
+  HOST_PROTOCOL_VERSION,
+  type HostEnvelope,
+  type HostProtocolMessage,
+  type ListSessionsRequest,
+  type ListInstancesRequest,
 } from './internal/host-protocol.js';
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
@@ -285,6 +286,17 @@ export class BridgeConnection extends EventEmitter {
   /** Whether the connection is currently active. */
   get isConnected(): boolean {
     return this._isConnected;
+  }
+
+  /**
+   * True when this is a client relaying through a host from an older
+   * studio-bridge, which may not pass on options or actions it predates.
+   */
+  get isHostOutdated(): boolean {
+    return (
+      this._role === 'client' &&
+      (this._client?.hostProtocolVersion ?? 1) < HOST_PROTOCOL_VERSION
+    );
   }
 
   /** The actual port the bridge is bound to (host) or connected to (client). */
@@ -671,6 +683,7 @@ export class BridgeConnection extends EventEmitter {
             type: 'list-sessions-response',
             requestId: req.requestId,
             sessions: this._tracker!.listSessions(),
+            protocolVersion: HOST_PROTOCOL_VERSION,
           });
         } else if (msg.type === 'list-instances') {
           const req = msg as ListInstancesRequest;

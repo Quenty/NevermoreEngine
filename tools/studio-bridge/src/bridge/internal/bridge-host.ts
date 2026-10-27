@@ -129,6 +129,7 @@ export class BridgeHost extends EventEmitter {
         const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
         const msg = decodeHostMessage(data);
         if (!msg) {
+          this._replyUndecodable(ws, data);
           return;
         }
         this.emit('client-message', msg, (reply: HostProtocolMessage) => {
@@ -362,6 +363,42 @@ export class BridgeHost extends EventEmitter {
     } catch {
       // Plugin may already be disconnected
     }
+  }
+
+  /**
+   * Answers an envelope this host cannot decode with an error, so the client
+   * fails fast instead of waiting out its timeout. That is usually a newer
+   * client relaying an action this host does not know.
+   */
+  private _replyUndecodable(ws: WebSocket, data: string): void {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      return;
+    }
+    if (
+      parsed?.type !== 'host-envelope' ||
+      typeof parsed.requestId !== 'string'
+    ) {
+      return;
+    }
+
+    const actionType = String(parsed.action?.type ?? 'unknown');
+    ws.send(
+      encodeHostMessage({
+        type: 'host-response',
+        requestId: parsed.requestId,
+        result: {
+          type: 'error',
+          sessionId: String(parsed.targetSessionId ?? ''),
+          payload: {
+            code: 'INVALID_PAYLOAD',
+            message: `The bridge host could not relay '${actionType}'. It may run an older studio-bridge than this command; restart it (e.g. stop 'studio-bridge serve').`,
+          },
+        },
+      })
+    );
   }
 
   private _handlePluginConnection(

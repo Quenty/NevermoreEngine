@@ -41,6 +41,21 @@ function createSessionInfo(overrides: Partial<SessionInfo> = {}): SessionInfo {
 
 describe('host-protocol', () => {
   describe('HostEnvelope', () => {
+    it('keeps payload fields it does not list, for newer clients', () => {
+      const decoded = roundTrip({
+        type: 'host-envelope',
+        requestId: 'req-1',
+        targetSessionId: 'session-1',
+        action: {
+          type: 'execute',
+          sessionId: 'session-1',
+          payload: { script: 'return ...', futureOption: true },
+        },
+      } as any) as HostEnvelope;
+
+      expect((decoded.action.payload as any).futureOption).toBe(true);
+    });
+
     it('round-trips correctly', () => {
       const msg: HostEnvelope = {
         type: 'host-envelope',

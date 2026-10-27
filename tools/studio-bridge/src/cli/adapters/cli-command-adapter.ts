@@ -23,7 +23,11 @@ import type {
   SessionTargeting,
 } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
-import { getWarnings, warnIfPluginStaleAsync } from '../cli-output-context.js';
+import {
+  addWarning,
+  getWarnings,
+  warnIfPluginStaleAsync,
+} from '../cli-output-context.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
 export interface AdapterArgs {
@@ -93,6 +97,12 @@ async function executeCommandAsync(
     target: argv.target as string | undefined,
     context: argv.context as SessionContext | undefined,
   };
+
+  if (connection.isHostOutdated) {
+    addWarning(
+      `The bridge host on port ${connection.port} runs an older studio-bridge, which may drop newer options. Restart it (e.g. stop 'studio-bridge serve') to use this version.`
+    );
+  }
 
   try {
     if (def.scope === 'session') {

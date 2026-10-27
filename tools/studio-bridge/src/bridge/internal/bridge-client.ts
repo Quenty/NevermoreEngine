@@ -83,6 +83,7 @@ class RelayedTransportHandle extends EventEmitter implements TransportHandle {
 export class BridgeClient extends EventEmitter {
   private _transport = new TransportClient();
   private _sessions = new Map<string, SessionInfo>();
+  private _hostProtocolVersion: number | undefined;
   private _sessionHandles = new Map<string, RelayedTransportHandle>();
   private _bridgeSessions = new Map<string, BridgeSession>();
   private _pendingRequests = new Map<
@@ -163,6 +164,11 @@ export class BridgeClient extends EventEmitter {
   /**
    * List all known sessions.
    */
+  /** The host's HOST_PROTOCOL_VERSION, or undefined for hosts older than it. */
+  get hostProtocolVersion(): number | undefined {
+    return this._hostProtocolVersion;
+  }
+
   listSessions(): SessionInfo[] {
     return Array.from(this._sessions.values());
   }
@@ -307,6 +313,7 @@ export class BridgeClient extends EventEmitter {
   }
 
   private _handleListSessionsResponse(msg: ListSessionsResponse): void {
+    this._hostProtocolVersion = msg.protocolVersion;
     const pending = this._pendingRequests.get(msg.requestId);
     if (pending) {
       clearTimeout(pending.timer);
