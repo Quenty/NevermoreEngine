@@ -586,7 +586,6 @@ describe("Binder teardown", function()
 end)
 
 describe("Binder:SetAddFrameBudgeted()", function()
-	-- Busy-waits so each bound object costs a known amount of frame time.
 	local function spin(seconds: number): number
 		local start = os.clock()
 		local iterations = 0
