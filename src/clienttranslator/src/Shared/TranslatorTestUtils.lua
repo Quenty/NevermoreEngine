@@ -39,8 +39,6 @@ function TranslatorTestUtils.getEntryMap(localizationTable)
 	return map
 end
 
--- Removes any generated tables so each test starts from a clean LocalizationService, including
--- ones not yet parented because their service never started.
 function TranslatorTestUtils.clearGeneratedTables()
 	for _, child in LocalizationService:GetChildren() do
 		if child:IsA("LocalizationTable") and string.match(child.Name, "^GeneratedJSONTable_") then
@@ -79,8 +77,6 @@ function TranslatorTestUtils.setup(options)
 		-- Init but deliberately not Start: the translator factories below initialize their
 		-- translators against this bag, and a translator registers its loader (which
 		-- registers a TemplateProvider) as it initializes. A bag rejects service types added
-		-- after it has started. TranslatorService's Start only parents the table, so writes
-		-- and reads behave the same; a spec that needs it parented starts the bag itself.
 		serviceBag:Init()
 		return serviceBag:GetService(TranslatorService), serviceBag
 	end

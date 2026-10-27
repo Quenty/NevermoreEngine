@@ -105,15 +105,11 @@ type PendingWrite = {
 -- already requires (everything goes through TranslatorService).
 local entryCachesByTable: { [LocalizationTable]: EntryCache } = setmetatable({}, { __mode = "k" }) :: any
 
--- A table created before its service started, filled while unparented (see
--- [TranslatorService.Start]), with how many services hold it.
 type DetachedTable = {
 	Table: LocalizationTable,
 	Holders: number,
 }
 
--- By name: a second service in the same realm cannot find these under LocalizationService, so it
--- looks here instead. The last holder to be destroyed destroys the table.
 local detachedTablesByName: { [string]: DetachedTable } = {}
 
 export type TranslatorService = typeof(setmetatable(
@@ -962,7 +958,6 @@ function TranslatorService._flushWrites(self: TranslatorService)
 		self:_applyPendingEntries(pendingEntries)
 	end
 
-	-- Start left a flush that was already queued to land unparented: parent now it has.
 	if self._isStarted then
 		self:_parentLocalizationTable()
 	end
@@ -1378,8 +1373,6 @@ function TranslatorService.Destroy(self: TranslatorService)
 		promise:Resolve()
 	end
 
-	-- A table that was never parented has nothing else holding it once its last service goes,
-	-- and would otherwise be found (with its entries) by the next service in this realm.
 	self:_releaseDetachedTable()
 
 	self._maid:DoCleaning()
