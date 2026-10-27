@@ -18,6 +18,7 @@ import type {
   PlaytestMode,
   SessionContext,
 } from '../../bridge/index.js';
+import { ContextNotFoundError } from '../../bridge/index.js';
 
 /** How long a started playtest may run before its pending start request is dropped. */
 const PLAYTEST_MAX_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -125,21 +126,22 @@ export async function startPlaytestAsync(
 }
 
 /**
- * Resolve the server session of a running playtest. `target` names it
- * directly; otherwise there must be exactly one server session connected.
+ * Resolve the server session of a running playtest. `target` names it or
+ * any session of its Studio; otherwise there must be exactly one connected.
  */
 export async function resolvePlaytestServerSessionAsync(
   connection: BridgeConnection,
   target?: string
 ): Promise<BridgeSession> {
   if (target) {
-    const session = await connection.resolveSessionAsync(target);
-    if (session.context !== 'server') {
-      throw new Error(
-        `Session '${target}' is a ${session.context} session; a playtest is ended from its server session`
-      );
+    try {
+      return await connection.resolveSessionAsync(target, 'server');
+    } catch (err) {
+      if (err instanceof ContextNotFoundError) {
+        throw new Error(`No playtest of '${target}' is running`);
+      }
+      throw err;
     }
-    return session;
   }
 
   const servers = connection
