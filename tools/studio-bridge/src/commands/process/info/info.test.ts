@@ -105,7 +105,9 @@ describe('queryStateHandlerAsync', () => {
     const result = await queryStateHandlerAsync(session);
 
     expect(result.window).toEqual({ pid: 42, focused: true, minimized: false });
-    expect(formatStateText(result)).toContain('Window:  pid 42, open, focused');
+    expect(formatStateText(result)).toContain(
+      'Window:   pid 42, open, focused'
+    );
   });
 
   it('leaves the window out when no window shows the place', async () => {

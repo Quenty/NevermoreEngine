@@ -18,6 +18,8 @@ export interface StateResult {
   placeId: number;
   placeName: string;
   gameId: number;
+  /** The camera viewport in pixels. Absent without a camera. */
+  viewportSize?: [number, number];
   /** The Studio window showing the place. Absent when it cannot be told apart. */
   window?: {
     pid: number;
@@ -38,6 +40,7 @@ export async function queryStateHandlerAsync(
     placeId: result.placeId,
     placeName: result.placeName,
     gameId: result.gameId,
+    viewportSize: result.viewportSize,
     window,
     summary: `Mode: ${result.state}, Place: ${result.placeName} (${result.placeId})`,
   };
@@ -57,15 +60,18 @@ async function tryGetWindowAsync(
 
 export function formatStateText(result: StateResult): string {
   const lines = [
-    `Mode:    ${colorizeState(result.state)}`,
-    `Place:   ${result.placeName}`,
-    `PlaceId: ${result.placeId}`,
-    `GameId:  ${result.gameId}`,
+    `Mode:     ${colorizeState(result.state)}`,
+    `Place:    ${result.placeName}`,
+    `PlaceId:  ${result.placeId}`,
+    `GameId:   ${result.gameId}`,
   ];
+  if (result.viewportSize) {
+    lines.push(`Viewport: ${result.viewportSize[0]}x${result.viewportSize[1]}`);
+  }
   if (result.window) {
     const { pid, focused, minimized } = result.window;
     lines.push(
-      `Window:  pid ${pid}, ${minimized ? 'minimized' : 'open'}, ${
+      `Window:   pid ${pid}, ${minimized ? 'minimized' : 'open'}, ${
         focused ? 'focused' : 'not focused'
       }`
     );

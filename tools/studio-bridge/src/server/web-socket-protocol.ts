@@ -39,6 +39,7 @@ export type ErrorCode =
   | 'SCREENSHOT_FAILED'
   | 'SCRIPT_LOAD_ERROR'
   | 'SCRIPT_RUNTIME_ERROR'
+  | 'SCRIPT_TIMEOUT'
   | 'BUSY'
   | 'SESSION_MISMATCH'
   | 'INTERNAL_ERROR';
@@ -120,6 +121,8 @@ export interface ScriptCompleteMessage extends BaseMessage {
   payload: {
     success: boolean;
     error?: string;
+    /** Where a runtime error was thrown, as `debug.traceback` prints it. */
+    traceback?: string;
     output?: Array<{ level: string; body: string; timestamp: number }>;
     /**
      * Everything the script returned, in order, marshalled by the plugin.
@@ -155,6 +158,8 @@ export interface StateResultMessage extends RequestMessage {
     placeId: number;
     placeName: string;
     gameId: number;
+    /** The camera's viewport in pixels. Absent without a camera. */
+    viewportSize?: [number, number];
   };
 }
 
@@ -292,6 +297,8 @@ export interface ExecuteMessage extends BaseMessage {
   requestId?: string;
   payload: {
     script: string;
+    /** The plugin cancels the script once it runs this long. */
+    timeoutMs?: number;
   };
 }
 
@@ -427,6 +434,14 @@ export function encodeMessage(msg: ServerMessage): string {
   return JSON.stringify(msg);
 }
 
+function isViewportSize(value: unknown): value is [number, number] {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((item) => typeof item === 'number')
+  );
+}
+
 function isStringArray(value: unknown): value is string[] {
   return (
     Array.isArray(value) && value.every((item) => typeof item === 'string')
@@ -497,6 +512,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
             success: payload.success,
             error:
               typeof payload.error === 'string' ? payload.error : undefined,
+            traceback:
+              typeof payload.traceback === 'string'
+                ? payload.traceback
+                : undefined,
             output,
             returnValues,
           },
@@ -560,6 +579,9 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           placeId: payload.placeId,
           placeName: payload.placeName,
           gameId: payload.gameId,
+          viewportSize: isViewportSize(payload.viewportSize)
+            ? payload.viewportSize
+            : undefined,
         },
       };
 
@@ -814,7 +836,12 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           type: 'execute',
           sessionId,
           ...(requestId !== undefined ? { requestId } : {}),
-          payload: { script: payload.script },
+          payload: {
+            script: payload.script,
+            ...(typeof payload.timeoutMs === 'number'
+              ? { timeoutMs: payload.timeoutMs }
+              : {}),
+          },
         };
       }
       return null;

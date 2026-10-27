@@ -61,7 +61,7 @@ describe("ExecuteAction.handleExecute()", function()
 
 		expect(#result.output).toEqual(2)
 		expect(result.output[1].level).toEqual("Print")
-		expect(result.output[1].body).toEqual("hello\t1")
+		expect(result.output[1].body).toEqual("hello 1")
 		expect(result.output[2].level).toEqual("Warning")
 		expect(result.output[2].body).toEqual("careful")
 	end)
@@ -109,14 +109,39 @@ describe("ExecuteAction.handleExecute()", function()
 		expect(fromBoth and fromBoth.returnValues).toEqual({ "script" })
 	end)
 
-	it("should restore print and warn after running", function()
-		local originalPrint = print
-		local originalWarn = warn
+	it("should capture output from threads the script starts", function()
+		local result = runScript("task.defer(print, 'deferred')")
 
-		runScript("print('x')")
+		expect(result.output[1].body).toEqual("deferred")
+	end)
 
-		expect(print).toBe(originalPrint)
-		expect(warn).toBe(originalWarn)
+	it("should capture warnings from threads the script starts", function()
+		local result = runScript("task.defer(warn, 'thread warning')")
+
+		expect(result.output[1].level).toEqual("Warning")
+		expect(result.output[1].body).toEqual("thread warning")
+	end)
+
+	it("should report where a runtime error was thrown", function()
+		local result = runScript("local bomb = {}\nfunction bomb.explode()\n\terror('boom')\nend\nbomb.explode()")
+
+		expect(result.code).toEqual("SCRIPT_RUNTIME_ERROR")
+		expect(result.error).toContain("exec:3: boom")
+		expect(result.traceback).toContain("exec:3")
+		expect(result.traceback).toContain("exec:5")
+		expect(result.traceback).never.toContain("execute:")
+	end)
+
+	it("should cancel a script that outlives its timeout", function()
+		local result = ExecuteAction.handleExecute(
+			{ script = "task.wait(5) print('too late')", timeoutMs = 50 },
+			"req-1",
+			"session-1"
+		)
+
+		expect(result.success).toEqual(false)
+		expect(result.code).toEqual("SCRIPT_TIMEOUT")
+		expect(runScript("return 'next'").returnValues).toEqual({ "next" })
 	end)
 end)
 

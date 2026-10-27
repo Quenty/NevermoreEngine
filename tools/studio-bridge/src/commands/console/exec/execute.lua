@@ -4,14 +4,17 @@
 	`scriptComplete` message.
 
 	- Echoes the request's `requestId` on every response.
-	- Fails with `SCRIPT_LOAD_ERROR` when the code does not compile and
-	  `SCRIPT_RUNTIME_ERROR` when it throws.
+	- Fails with `SCRIPT_LOAD_ERROR` when the code does not compile,
+	  `SCRIPT_RUNTIME_ERROR` with a `traceback` when it throws, and
+	  `SCRIPT_TIMEOUT` when it outlives `payload.timeoutMs`. A timed out script
+	  is cancelled, so the requests queued behind it still run.
 	- Runs concurrent requests one at a time, in arrival order.
+	- Returns everything printed while the script runs, read from LogService, so
+	  output from required modules and from threads the script starts comes back.
 	- Marshals everything the script returns onto `payload.returnValues`, so a
 	  caller reads a result as a value instead of scraping it out of the output.
 
-	Loaded standalone inside the plugin, so it cannot require anything. Has no
-	Roblox dependencies and also loads under Lune.
+	Loaded standalone inside the plugin, so it cannot require anything.
 
 	Compiles through the router's `Compile`, which still works in a playtest's
 	client where `loadstring` does not exist. Routers from older plugins have no
@@ -21,6 +24,10 @@
 ]=]
 
 local MAX_DEPTH = 64
+local CHUNK_NAME = "=exec"
+local PLUGIN_PREFIX = "[StudioBridge]"
+-- Tracebacks name this module's frames the way its first line does
+local OWN_FRAME_PREFIX = string.match(debug.traceback(), "^([^\n]-):%d+")
 
 local ExecuteAction = {}
 
@@ -39,9 +46,16 @@ type LogEntry = {
 	timestamp: number,
 }
 
+local LOG_LEVELS: { [Enum.MessageType]: string } = {
+	[Enum.MessageType.MessageOutput] = "Print",
+	[Enum.MessageType.MessageInfo] = "Info",
+	[Enum.MessageType.MessageWarning] = "Warning",
+	[Enum.MessageType.MessageError] = "Error",
+}
+
 local queue: { QueuedRequest } = {}
 local isProcessing = false
-local compile: (source: string) -> (any, string?) = loadstring :: any
+local compile: (source: string, chunkName: string?) -> (any, string?) = loadstring :: any
 
 --[=[
 	Registers the `execute` handler. With `sendMessage`, requests queue and each
@@ -49,8 +63,8 @@ local compile: (source: string) -> (any, string?) = loadstring :: any
 ]=]
 function ExecuteAction.register(router: any, sendMessage: SendMessage?)
 	if type(router.Compile) == "function" then
-		compile = function(source: string)
-			return router:Compile(source)
+		compile = function(source: string, chunkName: string?)
+			return router:Compile(source, chunkName)
 		end
 	end
 
@@ -153,7 +167,7 @@ function ExecuteAction._handleExecute(
 		return reply({ success = false, error = "Missing code in execute request", code = "SCRIPT_LOAD_ERROR" })
 	end
 
-	local compileOk, fn, compileErr = pcall(compile, code)
+	local compileOk, fn, compileErr = pcall(compile, code, CHUNK_NAME)
 	if not compileOk then
 		return reply({ success = false, error = tostring(fn), code = "SCRIPT_LOAD_ERROR" })
 	end
@@ -165,31 +179,27 @@ function ExecuteAction._handleExecute(
 		})
 	end
 
-	-- Compiled code reads print/warn from its global environment, so
-	-- shadowing them with locals here would capture nothing
+	local timeoutMs = payload.timeoutMs
 	local captured: { LogEntry } = {}
-	local env = getfenv(fn)
-	local originalPrint = env.print
-	local originalWarn = env.warn
+	local logConnection = ExecuteAction._captureOutput(captured)
+	local status, result = ExecuteAction._runAsync(fn, if type(timeoutMs) == "number" then timeoutMs / 1000 else nil)
 
-	env.print = function(...)
-		table.insert(captured, ExecuteAction._createLogEntry("Print", ...))
-		originalPrint(...)
-	end
-	env.warn = function(...)
-		table.insert(captured, ExecuteAction._createLogEntry("Warning", ...))
-		originalWarn(...)
-	end
+	-- MessageOut can fire a frame late, after the script's last print
+	task.wait()
+	logConnection:Disconnect()
 
-	local returned = table.pack(pcall(fn))
-
-	env.print = originalPrint
-	env.warn = originalWarn
-
-	if not returned[1] then
+	if status == "timeout" then
 		return reply({
 			success = false,
-			error = tostring(returned[2]),
+			error = `Script timed out after {timeoutMs}ms and was cancelled`,
+			code = "SCRIPT_TIMEOUT",
+			output = captured,
+		})
+	elseif status == "error" then
+		return reply({
+			success = false,
+			error = result.message,
+			traceback = result.traceback,
 			code = "SCRIPT_RUNTIME_ERROR",
 			output = captured,
 		})
@@ -198,21 +208,99 @@ function ExecuteAction._handleExecute(
 	return reply({
 		success = true,
 		output = captured,
-		returnValues = ExecuteAction._serializeReturnValues(returned),
+		returnValues = ExecuteAction._serializeReturnValues(result),
 	})
 end
 
-function ExecuteAction._createLogEntry(level: string, ...: any): LogEntry
-	local parts = table.create(select("#", ...))
-	for index = 1, select("#", ...) do
-		parts[index] = tostring((select(index, ...)))
+--[[
+	Drops the frames of this module's own wrapper from a traceback, leaving only
+	the script's.
+]]
+function ExecuteAction._dropOwnFrames(traceback: string): string
+	if not OWN_FRAME_PREFIX then
+		return traceback
 	end
 
-	return {
-		level = level,
-		body = table.concat(parts, "\t"),
-		timestamp = os.clock(),
-	}
+	local lines = {}
+	for _, line in string.split(traceback, "\n") do
+		if string.sub(line, 1, #OWN_FRAME_PREFIX + 1) ~= `{OWN_FRAME_PREFIX}:` then
+			table.insert(lines, line)
+		end
+	end
+	return table.concat(lines, "\n")
+end
+
+--[[
+	Collects every message logged until the connection is disconnected, other
+	than the plugin's own.
+]]
+function ExecuteAction._captureOutput(captured: { LogEntry }): RBXScriptConnection
+	return game:GetService("LogService").MessageOut:Connect(function(message: string, messageType: Enum.MessageType)
+		if string.sub(message, 1, #PLUGIN_PREFIX) == PLUGIN_PREFIX then
+			return
+		end
+
+		table.insert(captured, {
+			level = LOG_LEVELS[messageType] or "Print",
+			body = message,
+			timestamp = os.clock(),
+		})
+	end)
+end
+
+--[[
+	Runs `fn` in its own thread. Returns "ok" and everything it returned
+	(pcall-style, status first), "error" and its message and traceback, or
+	"timeout" once `timeoutSec` passes, after cancelling the thread.
+]]
+function ExecuteAction._runAsync(fn: () -> ...any, timeoutSec: number?): (string, any)
+	local callerThread = coroutine.running()
+	local isWaiting = false
+	local outcome: { status: string, result: any }? = nil
+
+	local function finish(status: string, result: any)
+		if outcome then
+			return
+		end
+		outcome = { status = status, result = result }
+		if isWaiting then
+			task.defer(callerThread)
+		end
+	end
+
+	local scriptThread = task.spawn(function()
+		local packed = table.pack(xpcall(fn, function(err)
+			return {
+				message = tostring(err),
+				traceback = ExecuteAction._dropOwnFrames(debug.traceback(nil, 2)),
+			}
+		end))
+		if packed[1] then
+			finish("ok", packed)
+		else
+			finish("error", packed[2])
+		end
+	end)
+
+	if not outcome then
+		local timeoutThread = if timeoutSec
+			then task.delay(timeoutSec, function()
+				if not outcome then
+					pcall(task.cancel, scriptThread)
+					finish("timeout", nil)
+				end
+			end)
+			else nil
+
+		isWaiting = true
+		coroutine.yield()
+		if timeoutThread then
+			pcall(task.cancel, timeoutThread)
+		end
+	end
+
+	local final = outcome :: { status: string, result: any }
+	return final.status, final.result
 end
 
 --[[

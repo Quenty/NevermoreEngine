@@ -86,6 +86,10 @@ studio-bridge console exec 'return game.PlaceId' --format json
 | `--file` | `-f` | Path to a Luau script file |
 | `--target` | `-t` | Target session ID |
 | `--context` | — | Target context (`edit`, `client`, `server`) |
+| `--timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
+| `--allow-edit` | — | Change Edit even while a playtest of it runs |
+
+Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
 
 ### `console logs`
 
@@ -149,7 +153,7 @@ Lists the connected sessions with their ID, context, place, and state. `--target
 studio-bridge process info
 ```
 
-Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, and game ID.
+Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, game ID, and viewport size, plus whether the Studio window is focused or minimized.
 
 ### `process launch`
 

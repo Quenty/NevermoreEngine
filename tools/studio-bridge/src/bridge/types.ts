@@ -58,6 +58,8 @@ export interface ExecResult {
   success: boolean;
   output: Array<{ level: OutputLevel; body: string }>;
   error?: string;
+  /** Where a runtime error was thrown. */
+  traceback?: string;
   /**
    * Everything the script returned, in order. Absent when the plugin reported
    * no return channel at all (a run that never reached a return) — distinct from `[]`, which means it returned nothing.
@@ -70,6 +72,8 @@ export interface StateResult {
   placeId: number;
   placeName: string;
   gameId: number;
+  /** The camera's viewport in pixels. Absent without a camera. */
+  viewportSize?: [number, number];
 }
 
 export interface ScreenshotResult {

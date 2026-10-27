@@ -91,6 +91,7 @@ const ErrorCodeSchema = z.enum([
   'SCREENSHOT_FAILED',
   'SCRIPT_LOAD_ERROR',
   'SCRIPT_RUNTIME_ERROR',
+  'SCRIPT_TIMEOUT',
   'BUSY',
   'SESSION_MISMATCH',
   'INTERNAL_ERROR',
@@ -103,7 +104,10 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     type: z.literal('execute'),
     sessionId: z.string(),
     requestId: z.string().optional(),
-    payload: z.object({ script: z.string() }),
+    payload: z.object({
+      script: z.string(),
+      timeoutMs: z.number().optional(),
+    }),
   }),
   z.object({
     type: z.literal('shutdown'),

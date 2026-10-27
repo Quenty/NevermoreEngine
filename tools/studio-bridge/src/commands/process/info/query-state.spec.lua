@@ -28,6 +28,9 @@ describe("queryState", function()
 				placeName = game.Name,
 				placeId = game.PlaceId,
 				gameId = game.GameId,
+				viewportSize = if workspace.CurrentCamera
+					then { workspace.CurrentCamera.ViewportSize.X, workspace.CurrentCamera.ViewportSize.Y }
+					else nil,
 			},
 		})
 	end)

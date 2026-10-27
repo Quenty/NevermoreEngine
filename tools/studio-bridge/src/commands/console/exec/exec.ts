@@ -6,6 +6,7 @@
  */
 
 import * as fs from 'fs/promises';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
@@ -21,6 +22,7 @@ export interface ExecResult {
   success: boolean;
   output: string[];
   error?: string;
+  traceback?: string;
   returnValues?: SerializedReturnValue[];
   summary: string;
 }
@@ -34,6 +36,7 @@ export interface RunResult {
   success: boolean;
   output: string[];
   error?: string;
+  traceback?: string;
   returnValues?: SerializedReturnValue[];
   summary: string;
 }
@@ -64,6 +67,7 @@ export async function execHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    traceback: result.traceback,
     returnValues: result.returnValues,
     summary: result.success
       ? 'Script executed successfully'
@@ -89,6 +93,7 @@ export async function runHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    traceback: result.traceback,
     returnValues: result.returnValues,
     summary: result.success
       ? `Script ${options.scriptPath} executed successfully`
@@ -120,6 +125,7 @@ export function formatExecText(result: {
   output: string[];
   returnValues?: SerializedReturnValue[];
   error?: string;
+  traceback?: string;
   summary: string;
 }): string {
   const lines = [...result.output];
@@ -127,6 +133,8 @@ export function formatExecText(result: {
     lines.push(formatReturnValues(result.returnValues));
   }
   if (result.error) lines.push(result.error);
+  if (result.traceback)
+    lines.push(OutputHelper.formatDim(result.traceback.trimEnd()));
   return lines.length > 0 ? lines.join('\n') : result.summary;
 }
 

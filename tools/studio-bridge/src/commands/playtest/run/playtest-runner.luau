@@ -12,13 +12,16 @@
 
 	The result crosses back through `StudioTestService:EndTest` in the same shape
 	as an `execute` reply. Instances cannot cross DataModels, so values are
-	marshalled here, with a copy of the marshaller in execute.lua, since the
-	runner cannot require it.
+	marshalled here. Output capture, tracebacks and the marshaller are copies of
+	execute.lua's, since the runner cannot require it.
 
 	@class PlaytestRunner
 ]=]
 
 local MAX_DEPTH = 64
+local PLUGIN_PREFIX = "[StudioBridge]"
+-- Tracebacks name this module's frames the way its first line does
+local OWN_FRAME_PREFIX = string.match(debug.traceback(), "^([^\n]-):%d+")
 
 local PlaytestRunner = {}
 
@@ -26,6 +29,13 @@ type LogEntry = {
 	level: string,
 	body: string,
 	timestamp: number,
+}
+
+local LOG_LEVELS: { [Enum.MessageType]: string } = {
+	[Enum.MessageType.MessageOutput] = "Print",
+	[Enum.MessageType.MessageInfo] = "Info",
+	[Enum.MessageType.MessageWarning] = "Warning",
+	[Enum.MessageType.MessageError] = "Error",
 }
 
 --[=[
@@ -56,6 +66,7 @@ function PlaytestRunner.runAsync(runner: Instance, studioTestService: any, playe
 			endTest({
 				success = false,
 				error = `Script timed out after {timeoutSec}s`,
+				code = "SCRIPT_TIMEOUT",
 				output = captured,
 			})
 		end)
@@ -70,8 +81,8 @@ function PlaytestRunner.runAsync(runner: Instance, studioTestService: any, playe
 end
 
 --[=[
-	Runs a code module, collecting its print and warn output into `captured`, and
-	returns the result in the shape of an `execute` reply.
+	Runs a code module, collecting everything logged while it runs into
+	`captured`, and returns the result in the shape of an `execute` reply.
 ]=]
 function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }): { [string]: any }
 	if not (codeModule and codeModule:IsA("ModuleScript")) then
@@ -88,30 +99,23 @@ function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }): { [s
 		}
 	end
 
-	-- The code reads print/warn from its module's global environment, so
-	-- shadowing them with locals here would capture nothing
-	local env = getfenv(fn)
-	local originalPrint = env.print
-	local originalWarn = env.warn
+	local logConnection = PlaytestRunner._captureOutput(captured)
+	local returned = table.pack(xpcall(fn, function(err)
+		return {
+			message = tostring(err),
+			traceback = PlaytestRunner._dropOwnFrames(debug.traceback(nil, 2)),
+		}
+	end))
 
-	env.print = function(...)
-		table.insert(captured, PlaytestRunner._createLogEntry("Print", ...))
-		originalPrint(...)
-	end
-	env.warn = function(...)
-		table.insert(captured, PlaytestRunner._createLogEntry("Warning", ...))
-		originalWarn(...)
-	end
-
-	local returned = table.pack(pcall(fn))
-
-	env.print = originalPrint
-	env.warn = originalWarn
+	-- MessageOut can fire a frame late, after the code's last print
+	task.wait()
+	logConnection:Disconnect()
 
 	if not returned[1] then
 		return {
 			success = false,
-			error = tostring(returned[2]),
+			error = returned[2].message,
+			traceback = returned[2].traceback,
 			code = "SCRIPT_RUNTIME_ERROR",
 			output = captured,
 		}
@@ -124,17 +128,40 @@ function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }): { [s
 	}
 end
 
-function PlaytestRunner._createLogEntry(level: string, ...: any): LogEntry
-	local parts = table.create(select("#", ...))
-	for index = 1, select("#", ...) do
-		parts[index] = tostring((select(index, ...)))
+--[[
+	Drops the frames of this module's own wrapper from a traceback, leaving only
+	the script's.
+]]
+function PlaytestRunner._dropOwnFrames(traceback: string): string
+	if not OWN_FRAME_PREFIX then
+		return traceback
 	end
 
-	return {
-		level = level,
-		body = table.concat(parts, "\t"),
-		timestamp = os.clock(),
-	}
+	local lines = {}
+	for _, line in string.split(traceback, "\n") do
+		if string.sub(line, 1, #OWN_FRAME_PREFIX + 1) ~= `{OWN_FRAME_PREFIX}:` then
+			table.insert(lines, line)
+		end
+	end
+	return table.concat(lines, "\n")
+end
+
+--[[
+	Collects every message logged until the connection is disconnected, other
+	than the plugin's own.
+]]
+function PlaytestRunner._captureOutput(captured: { LogEntry }): RBXScriptConnection
+	return game:GetService("LogService").MessageOut:Connect(function(message: string, messageType: Enum.MessageType)
+		if string.sub(message, 1, #PLUGIN_PREFIX) == PLUGIN_PREFIX then
+			return
+		end
+
+		table.insert(captured, {
+			level = LOG_LEVELS[messageType] or "Print",
+			body = message,
+			timestamp = os.clock(),
+		})
+	end)
 end
 
 --[[

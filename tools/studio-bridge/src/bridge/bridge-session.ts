@@ -38,6 +38,8 @@ import {
 } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
+const EXECUTE_REPLY_GRACE_MS = 5_000;
+
 const DEFAULT_TIMEOUTS: Record<string, number> = {
   execute: 120_000,
   queryState: 5_000,
@@ -70,6 +72,7 @@ function toExecResult(result: PluginMessage): ExecResult {
       success: result.payload.success,
       output,
       error: result.payload.error,
+      traceback: result.payload.traceback,
       returnValues: result.payload.returnValues,
     };
   }
@@ -146,15 +149,17 @@ export class BridgeSession extends EventEmitter {
     this._assertConnected();
     await this._ensureActionsAsync();
 
+    // The plugin cancels the script at the timeout and replies, so wait a
+    // little longer than that for the reply
     const timeoutMs = timeout ?? DEFAULT_TIMEOUTS.execute;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'execute',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { script: code },
+        payload: { script: code, timeoutMs },
       },
-      timeoutMs
+      timeoutMs + EXECUTE_REPLY_GRACE_MS
     );
 
     return toExecResult(result);
@@ -211,6 +216,7 @@ export class BridgeSession extends EventEmitter {
         placeId: result.payload.placeId,
         placeName: result.payload.placeName,
         gameId: result.payload.gameId,
+        viewportSize: result.payload.viewportSize,
       };
     }
 

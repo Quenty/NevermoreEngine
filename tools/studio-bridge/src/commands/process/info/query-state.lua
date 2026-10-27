@@ -3,7 +3,7 @@
 	Action that answers `queryState` with Studio's run mode and the open place.
 
 	Request: `{ type: "queryState", payload: {} }`
-	Response: `{ type: "stateResult", payload: { state, placeName, placeId, gameId } }`
+	Response: `{ type: "stateResult", payload: { state, placeName, placeId, gameId, viewportSize? } }`
 
 	@class QueryStateAction
 ]=]
@@ -23,8 +23,20 @@ function QueryStateAction.register(router: any)
 			placeName = game.Name or "Unknown",
 			placeId = game.PlaceId,
 			gameId = game.GameId,
+			viewportSize = QueryStateAction._getViewportSize(),
 		}
 	end)
+end
+
+--[[
+	The camera's viewport in pixels, or nil when the DataModel has no camera.
+]]
+function QueryStateAction._getViewportSize(): { number }?
+	local camera = workspace.CurrentCamera
+	if not camera then
+		return nil
+	end
+	return { camera.ViewportSize.X, camera.ViewportSize.Y }
 end
 
 function QueryStateAction._getState(): string
