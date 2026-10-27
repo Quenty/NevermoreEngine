@@ -177,7 +177,6 @@ function CmdrServiceClient.PromiseCmdr(self: CmdrServiceClient): Promise.Promise
 			end)
 			:Then(function(isAdmin)
 				if not isAdmin then
-					-- Never resolves: non-admins don't load Cmdr.
 					return (Promise :: any).new()
 				end
 				return promiseChild(ReplicatedStorage, "CmdrClient", timeout)
@@ -188,7 +187,6 @@ function CmdrServiceClient.PromiseCmdr(self: CmdrServiceClient): Promise.Promise
 
 	local cmdrPromise = cmdrClientPromise:Then(function(cmdClient)
 		return (Promise :: any).spawn(function(resolve: any, _reject: any)
-			-- Requiring cmdr can yield
 			return resolve((require :: any)(cmdClient))
 		end)
 	end)

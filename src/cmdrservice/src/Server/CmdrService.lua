@@ -76,7 +76,6 @@ function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag):
 
 	self._promiseCmdr:Then(function(cmdr)
 		task.spawn(function()
-			-- Through the Registry: Cmdr 1.13 deprecates calling Registry methods on the Cmdr object.
 			cmdr.Registry:RegisterDefaultCommands()
 		end)
 
