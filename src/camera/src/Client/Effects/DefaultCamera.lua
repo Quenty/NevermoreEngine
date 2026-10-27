@@ -138,7 +138,6 @@ function DefaultCamera.MarkPassthrough(self: DefaultCamera)
 	self._passthrough = true
 end
 
--- Roblox's result is captured when something reads it, rather than as a new CameraState every frame.
 function DefaultCamera._resolveCameraState(self: DefaultCamera)
 	if self._cameraStateDirty then
 		self._cameraStateDirty = false

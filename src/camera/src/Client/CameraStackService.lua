@@ -80,8 +80,6 @@ function CameraStackService.Start(self: CameraStackService): ()
 		debug.profilebegin("camerastackservice")
 
 		if self._cameraStack:GetTopCamera() == self._defaultCamera and self._impulseCamera:IsIdle() then
-			-- Only the default camera, with no shake: the result is exactly the Roblox camera, which is
-			-- already set. Skip recomputing and rewriting it.
 			self._rawDefaultCamera:MarkPassthrough()
 		else
 			local state = self:GetTopState()
