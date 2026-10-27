@@ -20,6 +20,7 @@ local GroupTestUtils = {}
 export type AssignedGroupInfo = {
 	rank: number,
 	role: string,
+	roleId: number?,
 }
 
 --[=[
@@ -34,7 +35,7 @@ export type AssignedGroupInfo = {
 
 	@param player Player -- must be a PlayerMock
 	@param groupId number
-	@param groupInfo { rank: number, role: string }
+	@param groupInfo { rank: number, role: string, roleId: number? }
 ]=]
 function GroupTestUtils.assignGroupInfo(player: Player, groupId: number, groupInfo: AssignedGroupInfo)
 	assert(PlayerMock.isMock(player), "Not a PlayerMock")
@@ -42,10 +43,11 @@ function GroupTestUtils.assignGroupInfo(player: Player, groupId: number, groupIn
 	assert(type(groupInfo) == "table", "Bad groupInfo")
 	assert(type(groupInfo.rank) == "number", "Bad groupInfo.rank")
 	assert(type(groupInfo.role) == "string", "Bad groupInfo.role")
+	assert(type(groupInfo.roleId) == "number" or groupInfo.roleId == nil, "Bad groupInfo.roleId")
 
 	PlayerMock.writeLookup(player, "GroupService.GetRolesInGroupAsync", {
 		IsMember = true,
-		Roles = { { Name = groupInfo.role, Rank = groupInfo.rank } },
+		Roles = { { Id = groupInfo.roleId, Name = groupInfo.role, Rank = groupInfo.rank } },
 	}, groupId)
 
 	local groups = PlayerMock.readLookup(player, "GroupService.GetGroupsAsync", 0)
