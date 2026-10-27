@@ -296,7 +296,6 @@ describe("ServiceBag destruction order", function()
 end)
 
 describe("ServiceBag frame budget", function()
-	-- Busy-waits so each Init costs a known amount of frame time.
 	local function spin(seconds: number): number
 		local start = os.clock()
 		local iterations = 0
@@ -383,7 +382,6 @@ describe("ServiceBag frame budget", function()
 		erroring.ServiceName = "Erroring"
 		function erroring:Init(bag)
 			bag:GetService(slow)
-			-- Slow used up the budget, so this thread pauses here, then errors
 			bag:GetService(fast)
 			error("Init failed")
 		end
