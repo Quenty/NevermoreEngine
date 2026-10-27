@@ -227,8 +227,6 @@ function ServiceBag.GetFrameBudgetStats(self: ServiceBag): (number, number)
 	return self._budgetPauses, math.max(self._budgetLongestStretch, os.clock() - self._frameStartClock)
 end
 
--- Waits a frame if this frame has used up the budget. The waiting thread is marked so that
--- _initService can tell this pause apart from a service yielding in Init.
 function ServiceBag._pauseIfOverBudget(self: ServiceBag): ()
 	local budget = self._initFrameBudget
 	if not budget or os.clock() - self._frameStartClock < budget then
