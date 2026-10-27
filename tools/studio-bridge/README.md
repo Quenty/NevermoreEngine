@@ -271,6 +271,8 @@ Invoke a named Studio action on the connected session.
 
 Every command accepts `--format text|json` and `-o <file>`. stdout carries only the result; progress and warnings go to stderr. With `--format json`, failures print `{"success": false, "error": ...}` and exit with code 1, and warnings (an outdated CLI, or a Studio plugin older than the CLI) are kept in the result's `_warnings` field.
 
+A single reply from Studio can carry up to 256 MiB. A larger one, such as a script returning a huge string, fails that request with `RESULT_TOO_LARGE` and leaves the connection and every other request alone.
+
 ### Target Selection
 
 Session IDs are the place name plus a short suffix and the context, like `test-place-a05a-edit`. They stay the same until Studio closes, including across plugin reinstalls. Commands that target a session accept `--target` and `--context`:

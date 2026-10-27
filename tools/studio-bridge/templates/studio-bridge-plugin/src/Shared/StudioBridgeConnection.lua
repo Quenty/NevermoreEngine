@@ -6,6 +6,11 @@
 
 	A `shutdown` message closes the socket, and a closed socket destroys this.
 
+	A reply over `maxMessageBytes` (256 MiB by default) is replaced with a
+	`RESULT_TOO_LARGE` error for its request. Studio sends far larger messages,
+	but the bridge closes a socket that sends it more than it accepts, which
+	would fail every request in flight.
+
 	@class StudioBridgeConnection
 ]=]
 
@@ -14,6 +19,7 @@ local HttpService = game:GetService("HttpService")
 local StudioBridgeLogUtils = require(script.Parent.StudioBridgeLogUtils)
 
 local HEARTBEAT_INTERVAL_SEC = 15
+local DEFAULT_MAX_MESSAGE_BYTES = 256 * 1024 * 1024
 
 local StudioBridgeConnection = {}
 StudioBridgeConnection.ClassName = "StudioBridgeConnection"
@@ -41,6 +47,7 @@ export type StudioBridgeConnectionOptions = {
 	router: any,
 	sessionId: string,
 	registerPayload: { [string]: any },
+	maxMessageBytes: number?,
 }
 
 export type StudioBridgeConnection = typeof(setmetatable(
@@ -49,6 +56,7 @@ export type StudioBridgeConnection = typeof(setmetatable(
 		_router: any,
 		_sessionId: string,
 		_registerPayload: { [string]: any },
+		_maxMessageBytes: number,
 		_isOpen: boolean,
 		_startClock: number,
 		_signalConnections: { any },
@@ -67,6 +75,7 @@ function StudioBridgeConnection.new(options: StudioBridgeConnectionOptions): Stu
 	self._router = assert(options.router, "No router")
 	self._sessionId = assert(options.sessionId, "No sessionId")
 	self._registerPayload = assert(options.registerPayload, "No registerPayload")
+	self._maxMessageBytes = options.maxMessageBytes or DEFAULT_MAX_MESSAGE_BYTES
 	self._isOpen = true
 	self._startClock = os.clock()
 	self._signalConnections = {}
@@ -117,7 +126,7 @@ function StudioBridgeConnection.Send(self: StudioBridgeConnection, message: { [s
 	end
 
 	local ok, err = pcall(function()
-		self._webSocket:Send(HttpService:JSONEncode(message))
+		self._webSocket:Send(self:_encode(message))
 	end)
 	if not ok then
 		StudioBridgeLogUtils.warn(`Failed to send {tostring(message.type)}: {tostring(err)}`)
@@ -165,9 +174,33 @@ function StudioBridgeConnection._dispatchRawMessage(self: StudioBridgeConnection
 		return
 	end
 
-	local encoded = HttpService:JSONEncode(response)
+	local encoded = self:_encode(response)
 	StudioBridgeLogUtils.logVerbose(`Sending: {response.type} ({#encoded} bytes)`)
 	self._webSocket:Send(encoded)
+end
+
+--[[
+	Encodes `message`, or a RESULT_TOO_LARGE error for its request when it is
+	over the limit.
+]]
+function StudioBridgeConnection._encode(self: StudioBridgeConnection, message: { [string]: any }): string
+	local encoded = HttpService:JSONEncode(message)
+	if #encoded <= self._maxMessageBytes or message.requestId == nil then
+		return encoded
+	end
+
+	local megabytes = function(bytes: number): string
+		return string.format("%.1f MB", bytes / (1024 * 1024))
+	end
+	return HttpService:JSONEncode({
+		type = "error",
+		sessionId = message.sessionId,
+		requestId = message.requestId,
+		payload = {
+			code = "RESULT_TOO_LARGE",
+			message = `The {message.type} reply is {megabytes(#encoded)}, over the {megabytes(self._maxMessageBytes)} a reply can carry. Return less, or narrow the request.`,
+		},
+	})
 end
 
 function StudioBridgeConnection._close(self: StudioBridgeConnection)

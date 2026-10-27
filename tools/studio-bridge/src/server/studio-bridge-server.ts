@@ -29,6 +29,7 @@ import {
   type SerializedReturnValue,
   encodeMessage,
   decodePluginMessage,
+  MAX_MESSAGE_BYTES,
 } from './web-socket-protocol.js';
 import { ActionDispatcher } from './action-dispatcher.js';
 import {
@@ -322,7 +323,10 @@ export class StudioBridgeServer {
 
       // 1. Start HTTP + WebSocket server (unique path rejects wrong connections at upgrade level)
       this._httpServer = http.createServer();
-      this._wss = new WebSocketServer({ noServer: true });
+      this._wss = new WebSocketServer({
+        noServer: true,
+        maxPayload: MAX_MESSAGE_BYTES,
+      });
       const port = await startHttpAndWsServerAsync(
         this._httpServer,
         this._wss,

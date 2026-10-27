@@ -6,6 +6,7 @@
 
 import { EventEmitter } from 'events';
 import { WebSocket } from 'ws';
+import { MAX_MESSAGE_BYTES } from '../../server/web-socket-protocol.js';
 
 export interface TransportClientOptions {
   /** Maximum number of reconnection attempts. Default: 10. */
@@ -98,7 +99,7 @@ export class TransportClient extends EventEmitter {
 
   private _connectInternalAsync(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const ws = new WebSocket(this._url);
+      const ws = new WebSocket(this._url, { maxPayload: MAX_MESSAGE_BYTES });
       this._ws = ws;
 
       const onOpen = () => {

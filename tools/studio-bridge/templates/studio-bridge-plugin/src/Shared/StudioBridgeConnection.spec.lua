@@ -46,7 +46,7 @@ local function createFakeSignal(): any
 	}
 end
 
-local function setup(): any
+local function setup(maxMessageBytes: number?): any
 	local sentData: { string } = {}
 	local webSocket: any = {
 		closeCount = 0,
@@ -68,6 +68,7 @@ local function setup(): any
 		router = router,
 		sessionId = "session-1",
 		registerPayload = REGISTER_PAYLOAD,
+		maxMessageBytes = maxMessageBytes,
 	})
 
 	local controller = {
@@ -136,6 +137,25 @@ describe("StudioBridgeConnection message handling", function()
 				payload = { echo = 3 },
 			},
 		})
+
+		controller:Destroy()
+	end)
+
+	it("should answer a reply over the size limit with RESULT_TOO_LARGE instead", function()
+		local controller = setup(1000)
+		controller.router:register("dump", function()
+			return { data = string.rep("a", 2000) }
+		end)
+		controller.clearSent()
+
+		controller.receive({ type = "dump", sessionId = "session-1", requestId = "req-1", payload = {} })
+
+		local sent = controller.getSent()
+		expect(#sent).toEqual(1)
+		expect(sent[1].type).toEqual("error")
+		expect(sent[1].requestId).toEqual("req-1")
+		expect(sent[1].payload.code).toEqual("RESULT_TOO_LARGE")
+		expect(controller.connection:IsOpen()).toEqual(true)
 
 		controller:Destroy()
 	end)

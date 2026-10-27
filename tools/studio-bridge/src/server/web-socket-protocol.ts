@@ -15,6 +15,14 @@ export type StudioState =
 
 export type PluginContext = 'edit' | 'client' | 'server';
 
+/**
+ * The largest message a bridge socket accepts. The plugin refuses to send a
+ * reply over half this with RESULT_TOO_LARGE, so a large result fails its own
+ * request instead of closing the socket under every request in flight.
+ * Studio itself sends messages of at least 512 MiB.
+ */
+export const MAX_MESSAGE_BYTES = 512 * 1024 * 1024;
+
 export type Capability =
   | 'execute'
   | 'queryState'
@@ -39,6 +47,7 @@ export type ErrorCode =
   | 'INSTANCE_NOT_FOUND'
   | 'PROPERTY_NOT_FOUND'
   | 'SCREENSHOT_FAILED'
+  | 'RESULT_TOO_LARGE'
   | 'SCRIPT_LOAD_ERROR'
   | 'SCRIPT_RUNTIME_ERROR'
   | 'SCRIPT_TIMEOUT'
