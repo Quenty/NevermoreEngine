@@ -27,7 +27,7 @@
           },
           "@quentystudios": {
             "$className": "Folder",
-            "jest-lua": {
+            "Jest": {
               "$path": "../node_modules/@quentystudios/jest-lua"
             }
           }
