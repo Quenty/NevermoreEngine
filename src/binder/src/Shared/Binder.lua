@@ -201,7 +201,6 @@ function Binder:_argsMatch(...)
 	return true
 end
 
--- Budgeted binders share one queue, built for at most this long each frame.
 local ADD_FRAME_BUDGET_SECONDS = 0.003
 local addQueue: { { any } } = {}
 local addQueueHead = 1
