@@ -14,7 +14,7 @@
 	  runs the code and ends the playtest with the result.
 	- Removes the runner from the edit DataModel once the playtest ends.
 
-	Request: `{ type: "runPlaytestScript", payload: { mode: "play" | "run", script, runnerSource, timeoutSec } }`
+	Request: `{ type: "runPlaytestScript", payload: { mode: "play" | "run", script, runnerSource, timeoutSec, args? } }`
 	Response: `{ type: "scriptComplete", payload: { success, output, returnValues?, error?, code? } }`
 
 	@class RunPlaytestScriptAction
@@ -55,7 +55,7 @@ function RunPlaytestScriptAction.register(router: any, sendMessage: SendMessage?
 			end
 
 			task.spawn(function()
-				local result = RunPlaytestScriptAction._runAsync(mode, code, runnerSource, timeoutSec)
+				local result = RunPlaytestScriptAction._runAsync(mode, code, runnerSource, timeoutSec, payload.args)
 				sendMessage({
 					type = "scriptComplete",
 					sessionId = sessionId,
@@ -92,7 +92,8 @@ function RunPlaytestScriptAction._runAsync(
 	mode: string,
 	code: string,
 	runnerSource: string,
-	timeoutSec: number
+	timeoutSec: number,
+	args: { string }?
 ): { [string]: any }
 	local runnerId = game:GetService("HttpService"):GenerateGUID(false)
 
@@ -114,6 +115,7 @@ function RunPlaytestScriptAction._runAsync(
 		local testArgs = {
 			studioBridgeRunnerId = runnerId,
 			studioBridgeTimeoutSec = timeoutSec,
+			studioBridgeScriptArgs = args,
 			studioBridgeWaitForPlayer = mode == "play",
 		}
 		if mode == "play" then

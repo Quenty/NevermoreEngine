@@ -24,6 +24,8 @@ export interface ProcessRunOptions {
   showLogs: boolean;
   filePath?: string;
   quiet?: boolean;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface ProcessRunResult {
@@ -40,6 +42,7 @@ interface ProcessRunArgs {
   file?: string;
   place?: string;
   timeout?: number;
+  scriptArgs?: string[];
 }
 
 export async function processRunHandlerAsync(
@@ -86,6 +89,10 @@ export const processRunCommand = defineCommand<
       description: 'Execution timeout in milliseconds',
       type: 'number',
     }),
+    scriptArgs: arg.passthrough({
+      description:
+        'Arguments after --, passed to the script as ... (all strings)',
+    }),
   },
   cli: {
     format: (result) =>
@@ -105,6 +112,7 @@ export const processRunCommand = defineCommand<
       showLogs: true,
       filePath,
       quiet: isJsonOutputEnabled(),
+      args: args.scriptArgs,
     });
   },
   // No MCP config -- process run is CLI-only

@@ -77,14 +77,15 @@ function PlaytestRunner.runAsync(runner: Instance, studioTestService: any, playe
 		players.PlayerAdded:Wait()
 	end
 
-	endTest(PlaytestRunner.run(runner:FindFirstChild("Code"), captured))
+	local scriptArgs = if type(testArgs.studioBridgeScriptArgs) == "table" then testArgs.studioBridgeScriptArgs else {}
+	endTest(PlaytestRunner.run(runner:FindFirstChild("Code"), captured, scriptArgs))
 end
 
 --[=[
-	Runs a code module, collecting everything logged while it runs into
-	`captured`, and returns the result in the shape of an `execute` reply.
+	Runs a code module with `args`, collecting everything logged while it runs
+	into `captured`, and returns the result in the shape of an `execute` reply.
 ]=]
-function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }): { [string]: any }
+function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }, args: { any }?): { [string]: any }
 	if not (codeModule and codeModule:IsA("ModuleScript")) then
 		return { success = false, error = "Runner has no Code module", code = "SCRIPT_LOAD_ERROR", output = captured }
 	end
@@ -105,7 +106,7 @@ function PlaytestRunner.run(codeModule: Instance?, captured: { LogEntry }): { [s
 			message = tostring(err),
 			traceback = PlaytestRunner._dropOwnFrames(debug.traceback(nil, 2)),
 		}
-	end))
+	end, table.unpack(args or {})))
 
 	-- MessageOut can fire a frame late, after the code's last print
 	task.wait()

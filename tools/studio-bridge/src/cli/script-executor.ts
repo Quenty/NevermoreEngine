@@ -34,6 +34,8 @@ export interface ExecuteScriptOptions {
   filePath?: string;
   /** Skip the progress reporter, for when stdout carries JSON. */
   quiet?: boolean;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface ExecuteScriptResult {
@@ -161,6 +163,7 @@ export async function executeScriptAsync(
         placePath,
         timeoutMs,
         onPhase,
+        args: options.args,
       });
       for (const entry of execResult.output) {
         onOutput(entry.level, entry.body);
@@ -173,7 +176,11 @@ export async function executeScriptAsync(
     } else {
       server = new StudioBridgeServer({ placePath, timeoutMs, onPhase });
       await server.startAsync();
-      result = await server.executeAsync({ scriptContent, onOutput });
+      result = await server.executeAsync({
+        scriptContent,
+        onOutput,
+        args: options.args,
+      });
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

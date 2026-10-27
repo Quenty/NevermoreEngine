@@ -171,4 +171,5 @@ cli
     OutputHelper.formatHint("Hint: See 'studio-bridge help' for more help")
   )
   .wrap(null)
+  .parserConfiguration({ 'populate--': true })
   .strict().argv;

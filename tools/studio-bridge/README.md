@@ -79,6 +79,7 @@ Infrastructure:
 studio-bridge console exec 'print(workspace:GetChildren())'
 studio-bridge console exec --file test.lua
 studio-bridge console exec 'return game.PlaceId' --format json
+studio-bridge console exec -f spawn-npc.lua -- Goblin 3
 ```
 
 | Option | Alias | Description |
@@ -88,6 +89,7 @@ studio-bridge console exec 'return game.PlaceId' --format json
 | `--context` | — | Target context (`edit`, `client`, `server`) |
 | `--timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
 | `--allow-edit` | — | Change Edit even while a playtest of it runs |
+| `-- <args..>` | — | Passed to the script as `...`, as strings (`local name, count = ...`) |
 
 Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
 
@@ -166,7 +168,7 @@ studio-bridge process launch --place ./build/test.rbxl
 
 ```bash
 studio-bridge process run 'print("hello")'
-studio-bridge process run --file test.lua --place ./build/test.rbxl
+studio-bridge process run --file test.lua --place ./build/test.rbxl -- arg1 arg2
 ```
 
 Launches Studio on a copy of the place, runs the script there and nowhere else, then closes that Studio. Other open Studios are never used. While the script runs, the launched Studio is a session like any other, so `process list` shows it (origin `managed`) and other commands can target it.
@@ -185,6 +187,7 @@ Closes the Studio process showing the session's place, found by its window title
 ```bash
 studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
 studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
+studio-bridge playtest run --file spawn-test.lua -- Goblin 3
 studio-bridge playtest start --mode run
 studio-bridge console exec --context server 'print("in the playtest")'
 studio-bridge playtest restart

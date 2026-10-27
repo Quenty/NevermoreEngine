@@ -55,8 +55,12 @@ function extractCommandArgs(
   def: CommandDefinition
 ): Record<string, unknown> {
   const commandArgs: Record<string, unknown> = {};
-  for (const name of Object.keys(def.args)) {
-    if (name in argv) {
+  for (const [name, argDef] of Object.entries(def.args)) {
+    if (argDef.kind === 'passthrough') {
+      commandArgs[name] = ((argv['--'] as unknown[] | undefined) ?? []).map(
+        String
+      );
+    } else if (name in argv) {
       commandArgs[name] = argv[name];
     }
   }
@@ -212,6 +216,12 @@ export function buildYargsCommand(
     builder: (yargs: Argv) => {
       for (const pos of positionals) {
         yargs.positional(pos.name, pos.options as any);
+      }
+
+      for (const argDef of Object.values(def.args)) {
+        if (argDef.kind === 'passthrough') {
+          yargs.epilogue(`-- <args..>  ${argDef.description}`);
+        }
       }
 
       for (const [name, opt] of Object.entries(yargsOptions)) {

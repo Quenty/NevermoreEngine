@@ -36,6 +36,8 @@ export interface ManagedStudioRunOptions {
   timeoutMs: number;
   launchTimeoutMs?: number;
   onPhase?: (phase: StudioBridgePhase) => void;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export async function runInManagedStudioAsync(
@@ -84,7 +86,11 @@ export async function runInManagedStudioAsync(
     const session = await sessionPromise;
 
     options.onPhase?.('executing');
-    return await session.execAsync(options.scriptContent, options.timeoutMs);
+    return await session.execAsync(
+      options.scriptContent,
+      options.timeoutMs,
+      options.args
+    );
   } finally {
     await killStudioAsync?.();
     await connection.disconnectAsync();

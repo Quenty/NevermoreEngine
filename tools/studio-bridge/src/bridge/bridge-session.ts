@@ -59,6 +59,8 @@ export interface RunPlaytestScriptOptions {
   script: string;
   runnerSource: string;
   timeoutSec: number;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 /** Map an `execute`-style reply onto an ExecResult. */
@@ -145,7 +147,11 @@ export class BridgeSession extends EventEmitter {
     return this._handle.isConnected;
   }
 
-  async execAsync(code: string, timeout?: number): Promise<ExecResult> {
+  async execAsync(
+    code: string,
+    timeout?: number,
+    args?: string[]
+  ): Promise<ExecResult> {
     this._assertConnected();
     await this._ensureActionsAsync();
 
@@ -157,7 +163,11 @@ export class BridgeSession extends EventEmitter {
         type: 'execute',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { script: code, timeoutMs },
+        payload: {
+          script: code,
+          timeoutMs,
+          ...(args && args.length > 0 ? { args } : {}),
+        },
       },
       timeoutMs + EXECUTE_REPLY_GRACE_MS
     );
@@ -187,6 +197,9 @@ export class BridgeSession extends EventEmitter {
           script: options.script,
           runnerSource: options.runnerSource,
           timeoutSec: options.timeoutSec,
+          ...(options.args && options.args.length > 0
+            ? { args: options.args }
+            : {}),
         },
       },
       options.timeoutSec * 1000 + PLAYTEST_STARTUP_ALLOWANCE_MS

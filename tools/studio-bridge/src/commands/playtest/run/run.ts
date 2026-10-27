@@ -43,6 +43,8 @@ export interface PlaytestRunOptions {
   /** Picks the edit session to start the playtest from. */
   target?: string;
   timeout?: number;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 /** Matches `console exec`'s default execution timeout. */
@@ -65,6 +67,7 @@ interface PlaytestRunArgs {
   file?: string;
   mode?: PlaytestMode;
   timeout?: number;
+  scriptArgs?: string[];
 }
 
 export async function playtestRunHandlerAsync(
@@ -103,6 +106,7 @@ export async function playtestRunHandlerAsync(
       ...(await execHandlerAsync(session, {
         scriptContent: options.scriptContent,
         timeout: options.timeout,
+        args: options.args,
       })),
       playtestId: playtest.playtestId,
     };
@@ -140,6 +144,7 @@ async function runWithPlantedRunnerAsync(
     script: options.scriptContent,
     runnerSource,
     timeoutSec: (options.timeout ?? DEFAULT_TIMEOUT_MS) / 1000,
+    args: options.args,
   });
 
   return toCommandResult(result);
@@ -206,6 +211,10 @@ export const playtestRunCommand = defineCommand<
       description: 'Execution timeout in milliseconds',
       type: 'number',
     }),
+    scriptArgs: arg.passthrough({
+      description:
+        'Arguments after --, passed to the script as ... (all strings)',
+    }),
   },
   cli: {
     format: (result) =>
@@ -224,6 +233,7 @@ export const playtestRunCommand = defineCommand<
       context: targeting.context ?? 'server',
       target: targeting.target,
       timeout: args.timeout,
+      args: args.scriptArgs,
     });
   },
 });

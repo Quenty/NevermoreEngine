@@ -132,6 +132,15 @@ describe("ExecuteAction.handleExecute()", function()
 		expect(result.traceback).never.toContain("execute:")
 	end)
 
+	it("should pass args to the script as ...", function()
+		local result = ExecuteAction.handleExecute({
+			script = "local name, count = ... return name, tonumber(count), select('#', ...)",
+			args = { "Player1", "3" },
+		}, "req-1", "session-1")
+
+		expect(result.returnValues).toEqual({ "Player1", 3, 2 } :: { any })
+	end)
+
 	it("should cancel a script that outlives its timeout", function()
 		local result = ExecuteAction.handleExecute(
 			{ script = "task.wait(5) print('too late')", timeoutMs = 50 },

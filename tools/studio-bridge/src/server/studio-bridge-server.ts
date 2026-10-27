@@ -102,6 +102,8 @@ export interface ExecuteOptions {
   timeoutMs?: number;
   /** Callback for each output message */
   onOutput?: (level: OutputLevel, body: string) => void;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface StudioBridgeResult {
@@ -402,7 +404,12 @@ export class StudioBridgeServer {
         encodeMessage({
           type: 'execute',
           sessionId: this._sessionId,
-          payload: { script: options.scriptContent },
+          payload: {
+            script: options.scriptContent,
+            ...(options.args && options.args.length > 0
+              ? { args: options.args }
+              : {}),
+          },
         })
       );
 

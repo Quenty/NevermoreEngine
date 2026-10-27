@@ -16,6 +16,8 @@ import type { SerializedReturnValue } from '../../../server/web-socket-protocol.
 export interface ExecOptions {
   scriptContent: string;
   timeout?: number;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface ExecResult {
@@ -45,6 +47,7 @@ interface ConsoleExecArgs {
   code?: string;
   file?: string;
   timeout?: number;
+  scriptArgs?: string[];
 }
 
 /**
@@ -56,7 +59,8 @@ export async function execHandlerAsync(
 ): Promise<ExecResult> {
   const result = await session.execAsync(
     options.scriptContent,
-    options.timeout
+    options.timeout,
+    options.args
   );
 
   const output = (result.output ?? []).map((entry) =>
@@ -159,6 +163,10 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
       description: 'Execution timeout in milliseconds',
       type: 'number',
     }),
+    scriptArgs: arg.passthrough({
+      description:
+        'Arguments after --, passed to the script as ... (all strings)',
+    }),
   },
   cli: {
     format: formatExecText,
@@ -169,6 +177,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     return execHandlerAsync(session, {
       scriptContent,
       timeout: args.timeout,
+      args: args.scriptArgs,
     });
   },
 });

@@ -72,7 +72,28 @@ describe('execHandlerAsync', () => {
       timeout: 5000,
     });
 
-    expect(session.execAsync).toHaveBeenCalledWith('print("test")', 5000);
+    expect(session.execAsync).toHaveBeenCalledWith(
+      'print("test")',
+      5000,
+      undefined
+    );
+  });
+
+  it('forwards script args to session.execAsync', async () => {
+    const session = createMockSession({
+      success: true,
+      output: [],
+    });
+
+    await execHandlerAsync(session, {
+      scriptContent: 'return ...',
+      args: ['Player1', '3'],
+    });
+
+    expect(session.execAsync).toHaveBeenCalledWith('return ...', undefined, [
+      'Player1',
+      '3',
+    ]);
   });
 
   it('passes undefined timeout when not specified', async () => {
@@ -85,7 +106,11 @@ describe('execHandlerAsync', () => {
       scriptContent: 'print("test")',
     });
 
-    expect(session.execAsync).toHaveBeenCalledWith('print("test")', undefined);
+    expect(session.execAsync).toHaveBeenCalledWith(
+      'print("test")',
+      undefined,
+      undefined
+    );
   });
 
   it('captures multiple output lines', async () => {

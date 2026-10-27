@@ -303,6 +303,8 @@ export interface ExecuteMessage extends BaseMessage {
     script: string;
     /** The plugin cancels the script once it runs this long. */
     timeoutMs?: number;
+    /** Passed to the script as `...`. */
+    args?: string[];
   };
 }
 
@@ -407,6 +409,8 @@ export interface RunPlaytestScriptMessage extends RequestMessage {
     /** Planted in the playtest's server to run the script and end the playtest. */
     runnerSource: string;
     timeoutSec: number;
+    /** Passed to the script as `...`. */
+    args?: string[];
   };
 }
 
@@ -853,6 +857,7 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
             ...(typeof payload.timeoutMs === 'number'
               ? { timeoutMs: payload.timeoutMs }
               : {}),
+            ...(isStringArray(payload.args) ? { args: payload.args } : {}),
           },
         };
       }
@@ -1045,6 +1050,7 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           script: payload.script,
           runnerSource: payload.runnerSource,
           timeoutSec: payload.timeoutSec,
+          ...(isStringArray(payload.args) ? { args: payload.args } : {}),
         },
       };
 

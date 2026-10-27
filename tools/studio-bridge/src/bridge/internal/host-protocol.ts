@@ -107,6 +107,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z.object({
       script: z.string(),
       timeoutMs: z.number().optional(),
+      args: z.array(z.string()).optional(),
     }),
   }),
   z.object({
@@ -216,6 +217,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
       script: z.string(),
       runnerSource: z.string(),
       timeoutSec: z.number(),
+      args: z.array(z.string()).optional(),
     }),
   }),
   z.object({

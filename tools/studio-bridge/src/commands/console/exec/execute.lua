@@ -8,6 +8,7 @@
 	  `SCRIPT_RUNTIME_ERROR` with a `traceback` when it throws, and
 	  `SCRIPT_TIMEOUT` when it outlives `payload.timeoutMs`. A timed out script
 	  is cancelled, so the requests queued behind it still run.
+	- Passes `payload.args`, a list of strings, to the script as `...`.
 	- Runs concurrent requests one at a time, in arrival order.
 	- Returns everything printed while the script runs, read from LogService, so
 	  output from required modules and from threads the script starts comes back.
@@ -179,10 +180,16 @@ function ExecuteAction._handleExecute(
 		})
 	end
 
+	local args = payload.args or {}
+	if type(args) ~= "table" then
+		return reply({ success = false, error = "Script args must be a list", code = "SCRIPT_LOAD_ERROR" })
+	end
+
 	local timeoutMs = payload.timeoutMs
 	local captured: { LogEntry } = {}
 	local logConnection = ExecuteAction._captureOutput(captured)
-	local status, result = ExecuteAction._runAsync(fn, if type(timeoutMs) == "number" then timeoutMs / 1000 else nil)
+	local status, result =
+		ExecuteAction._runAsync(fn, if type(timeoutMs) == "number" then timeoutMs / 1000 else nil, args)
 
 	-- MessageOut can fire a frame late, after the script's last print
 	task.wait()
@@ -249,11 +256,11 @@ function ExecuteAction._captureOutput(captured: { LogEntry }): RBXScriptConnecti
 end
 
 --[[
-	Runs `fn` in its own thread. Returns "ok" and everything it returned
+	Runs `fn` with `args` in its own thread. Returns "ok" and everything it returned
 	(pcall-style, status first), "error" and its message and traceback, or
 	"timeout" once `timeoutSec` passes, after cancelling the thread.
 ]]
-function ExecuteAction._runAsync(fn: () -> ...any, timeoutSec: number?): (string, any)
+function ExecuteAction._runAsync(fn: (...any) -> ...any, timeoutSec: number?, args: { any }?): (string, any)
 	local callerThread = coroutine.running()
 	local isWaiting = false
 	local outcome: { status: string, result: any }? = nil
@@ -274,7 +281,7 @@ function ExecuteAction._runAsync(fn: () -> ...any, timeoutSec: number?): (string
 				message = tostring(err),
 				traceback = ExecuteAction._dropOwnFrames(debug.traceback(nil, 2)),
 			}
-		end))
+		end, table.unpack(args or {})))
 		if packed[1] then
 			finish("ok", packed)
 		else
