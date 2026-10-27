@@ -59,7 +59,6 @@ function InputKeyMapServiceClient._ensureLocalizationEntries(self: InputKeyMapSe
 		local key = inputKeyMapList:GetBindingTranslationKey()
 		local context = string.format("InputKeyMapServiceClient.%s", inputKeyMapList:GetListName())
 
-		-- Batched with the translator's other writes
 		self._translator:SetEntryValue(key, text, context, "en", text)
 	end))
 end
