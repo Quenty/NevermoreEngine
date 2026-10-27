@@ -50,6 +50,16 @@ export {
   type ImportOptions,
 } from './explorer/import/import.js';
 export {
+  findInstancesHandlerAsync,
+  type FindResult,
+  type FindOptions,
+} from './explorer/find/find.js';
+export {
+  grepScriptsHandlerAsync,
+  type GrepResult,
+  type GrepOptions,
+} from './explorer/grep/grep.js';
+export {
   execHandlerAsync,
   type ExecOptions,
   type ExecResult,

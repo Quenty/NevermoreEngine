@@ -31,6 +31,10 @@ import { SessionDisconnectedError } from './types.js';
 import type {
   PluginMessage,
   OutputLevel,
+  FindInstancesMessage,
+  FindInstancesResultMessage,
+  GrepScriptsMessage,
+  GrepScriptsResultMessage,
 } from '../server/web-socket-protocol.js';
 import {
   loadActionSourcesAsync,
@@ -47,6 +51,8 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   queryDataModel: 10_000,
   exportInstances: 60_000,
   importInstances: 60_000,
+  findInstances: 60_000,
+  grepScripts: 60_000,
   queryLogs: 10_000,
   endPlaytest: 5_000,
 };
@@ -326,6 +332,54 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('dataModelResult', result);
+  }
+
+  /** Search the DataModel for instances by name, class and tag. */
+  async findInstancesAsync(
+    options: FindInstancesMessage['payload']
+  ): Promise<FindInstancesResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'findInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      DEFAULT_TIMEOUTS.findInstances
+    );
+
+    if (result.type === 'findInstancesResult') {
+      return result.payload;
+    }
+
+    throw pluginError('findInstancesResult', result);
+  }
+
+  /** Search the source of every script for a pattern. */
+  async grepScriptsAsync(
+    options: GrepScriptsMessage['payload']
+  ): Promise<GrepScriptsResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'grepScripts',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      DEFAULT_TIMEOUTS.grepScripts
+    );
+
+    if (result.type === 'grepScriptsResult') {
+      return result.payload;
+    }
+
+    throw pluginError('grepScriptsResult', result);
   }
 
   /** Serialize the instances at `paths` into one binary model (.rbxm). */

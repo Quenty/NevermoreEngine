@@ -148,6 +148,31 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     }),
   }),
   z.object({
+    type: z.literal('findInstances'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({
+      root: z.string().optional(),
+      name: z.string().optional(),
+      exactName: z.boolean().optional(),
+      className: z.string().optional(),
+      tag: z.string().optional(),
+      limit: z.number().optional(),
+    }),
+  }),
+  z.object({
+    type: z.literal('grepScripts'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z.object({
+      pattern: z.string(),
+      root: z.string().optional(),
+      luaPattern: z.boolean().optional(),
+      caseSensitive: z.boolean().optional(),
+      limit: z.number().optional(),
+    }),
+  }),
+  z.object({
     type: z.literal('exportInstances'),
     sessionId: z.string(),
     requestId: z.string(),

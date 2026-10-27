@@ -23,6 +23,8 @@ export type Capability =
   | 'queryLogs'
   | 'exportInstances'
   | 'importInstances'
+  | 'findInstances'
+  | 'grepScripts'
   | 'startPlaytest'
   | 'endPlaytest'
   | 'heartbeat'
@@ -198,6 +200,40 @@ export interface ImportInstancesResultMessage extends RequestMessage {
   };
 }
 
+export interface FoundInstance {
+  path: string;
+  name: string;
+  className: string;
+}
+
+export interface FindInstancesResultMessage extends RequestMessage {
+  type: 'findInstancesResult';
+  payload: {
+    instances: FoundInstance[];
+    /** How many instances were looked at. */
+    searched: number;
+    /** True when the search stopped at the limit. */
+    truncated: boolean;
+  };
+}
+
+export interface GrepMatch {
+  path: string;
+  className: string;
+  line: number;
+  text: string;
+}
+
+export interface GrepScriptsResultMessage extends RequestMessage {
+  type: 'grepScriptsResult';
+  payload: {
+    matches: GrepMatch[];
+    scriptsSearched: number;
+    /** True when the search stopped at the limit. */
+    truncated: boolean;
+  };
+}
+
 export interface LogsResultMessage extends RequestMessage {
   type: 'logsResult';
   payload: {
@@ -287,6 +323,8 @@ export type PluginMessage =
   | DataModelResultMessage
   | ExportInstancesResultMessage
   | ImportInstancesResultMessage
+  | FindInstancesResultMessage
+  | GrepScriptsResultMessage
   | LogsResultMessage
   | StateChangeMessage
   | HeartbeatMessage
@@ -338,6 +376,35 @@ export interface ImportInstancesMessage extends RequestMessage {
     /** The binary model (.rbxm), base64-encoded. */
     data: string;
     parentPath: string;
+  };
+}
+
+export interface FindInstancesMessage extends RequestMessage {
+  type: 'findInstances';
+  payload: {
+    /** Dot-separated path to search under. Defaults to the whole DataModel. */
+    root?: string;
+    /** Matched case-insensitively anywhere in the name. */
+    name?: string;
+    /** Match the whole name instead. */
+    exactName?: boolean;
+    /** Matched with IsA. */
+    className?: string;
+    tag?: string;
+    limit?: number;
+  };
+}
+
+export interface GrepScriptsMessage extends RequestMessage {
+  type: 'grepScripts';
+  payload: {
+    pattern: string;
+    /** Dot-separated path to search under. Defaults to the whole DataModel. */
+    root?: string;
+    /** Treat `pattern` as a Lua pattern instead of plain text. */
+    luaPattern?: boolean;
+    caseSensitive?: boolean;
+    limit?: number;
   };
 }
 
@@ -434,6 +501,8 @@ export type ServerMessage =
   | QueryDataModelMessage
   | ExportInstancesMessage
   | ImportInstancesMessage
+  | FindInstancesMessage
+  | GrepScriptsMessage
   | QueryLogsMessage
   | RegisterActionMessage
   | SyncActionsMessage
@@ -655,6 +724,37 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         sessionId,
         requestId,
         payload: { paths: payload.paths },
+      };
+
+    case 'findInstancesResult':
+      if (requestId === undefined) return null;
+      if (!Array.isArray(payload.instances)) return null;
+      return {
+        type: 'findInstancesResult',
+        sessionId,
+        requestId,
+        payload: {
+          instances: payload.instances as FoundInstance[],
+          searched: typeof payload.searched === 'number' ? payload.searched : 0,
+          truncated: payload.truncated === true,
+        },
+      };
+
+    case 'grepScriptsResult':
+      if (requestId === undefined) return null;
+      if (!Array.isArray(payload.matches)) return null;
+      return {
+        type: 'grepScriptsResult',
+        sessionId,
+        requestId,
+        payload: {
+          matches: payload.matches as GrepMatch[],
+          scriptsSearched:
+            typeof payload.scriptsSearched === 'number'
+              ? payload.scriptsSearched
+              : 0,
+          truncated: payload.truncated === true,
+        },
       };
 
     case 'logsResult':
@@ -914,6 +1014,50 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         sessionId,
         requestId,
         payload: { data: payload.data, parentPath: payload.parentPath },
+      };
+
+    case 'findInstances':
+      if (requestId === undefined) return null;
+      return {
+        type: 'findInstances',
+        sessionId,
+        requestId,
+        payload: {
+          root: typeof payload.root === 'string' ? payload.root : undefined,
+          name: typeof payload.name === 'string' ? payload.name : undefined,
+          exactName:
+            typeof payload.exactName === 'boolean'
+              ? payload.exactName
+              : undefined,
+          className:
+            typeof payload.className === 'string'
+              ? payload.className
+              : undefined,
+          tag: typeof payload.tag === 'string' ? payload.tag : undefined,
+          limit: typeof payload.limit === 'number' ? payload.limit : undefined,
+        },
+      };
+
+    case 'grepScripts':
+      if (requestId === undefined) return null;
+      if (typeof payload.pattern !== 'string') return null;
+      return {
+        type: 'grepScripts',
+        sessionId,
+        requestId,
+        payload: {
+          pattern: payload.pattern,
+          root: typeof payload.root === 'string' ? payload.root : undefined,
+          luaPattern:
+            typeof payload.luaPattern === 'boolean'
+              ? payload.luaPattern
+              : undefined,
+          caseSensitive:
+            typeof payload.caseSensitive === 'boolean'
+              ? payload.caseSensitive
+              : undefined,
+          limit: typeof payload.limit === 'number' ? payload.limit : undefined,
+        },
       };
 
     case 'queryDataModel':

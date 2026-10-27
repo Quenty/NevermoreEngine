@@ -129,6 +129,19 @@ studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
 | `--properties` | Include instance properties |
 | `--attributes` | Include instance attributes |
 
+### `explorer find` / `explorer grep`
+
+```bash
+studio-bridge explorer find spawn
+studio-bridge explorer find --class BasePart --tag Hazard --root Workspace.Map
+studio-bridge explorer grep TakeDamage
+studio-bridge explorer grep "^local %w+ = require" --lua-pattern --root ReplicatedStorage
+```
+
+`find` lists instances whose name contains the text (case-insensitive; `--exact` for the whole name), narrowed by `--class` (matched with `IsA`, so `BasePart` finds every part) and `--tag`. `grep` prints every script line containing the text as `path:line: text`. It reads open editor tabs, so unsaved edits are searched. Text matches plainly and case-insensitively; `--lua-pattern` and `--case-sensitive` change that.
+
+Both search the whole place by default, skipping Studio's own services such as CoreGui; `--root` narrows the search to a path, and `--limit` (default 200) caps the results, with `truncated` set when there were more.
+
 ### `explorer export` / `explorer import`
 
 ```bash

@@ -115,6 +115,8 @@ describe('loadActionSourcesAsync', () => {
       'end-playtest',
       'execute',
       'export-instances',
+      'find-instances',
+      'grep-scripts',
       'import-instances',
       'query-data-model',
       'query-logs',
