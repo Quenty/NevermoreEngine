@@ -173,6 +173,8 @@ export interface StateResultMessage extends RequestMessage {
     gameId: number;
     /** The camera's viewport in pixels. Absent without a camera. */
     viewportSize?: [number, number];
+    /** Studio's version, such as `0.744.0.7440803`. Absent from older plugins. */
+    studioVersion?: string;
   };
 }
 
@@ -676,6 +678,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           viewportSize: isViewportSize(payload.viewportSize)
             ? payload.viewportSize
             : undefined,
+          studioVersion:
+            typeof payload.studioVersion === 'string'
+              ? payload.studioVersion
+              : undefined,
         },
       };
 

@@ -1,9 +1,10 @@
 --!strict
 --[=[
-	Action that answers `queryState` with Studio's run mode and the open place.
+	Action that answers `queryState` with Studio's run mode, the open place and
+	the Studio version.
 
 	Request: `{ type: "queryState", payload: {} }`
-	Response: `{ type: "stateResult", payload: { state, placeName, placeId, gameId, viewportSize? } }`
+	Response: `{ type: "stateResult", payload: { state, placeName, placeId, gameId, viewportSize?, studioVersion } }`
 
 	@class QueryStateAction
 ]=]
@@ -24,6 +25,8 @@ function QueryStateAction.register(router: any)
 			placeId = game.PlaceId,
 			gameId = game.GameId,
 			viewportSize = QueryStateAction._getViewportSize(),
+			-- selene: allow(undefined_variable)
+			studioVersion = version(),
 		}
 	end)
 end

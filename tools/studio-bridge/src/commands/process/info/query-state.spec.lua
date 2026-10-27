@@ -19,6 +19,8 @@ describe("queryState", function()
 		QueryStateAction.register(router)
 
 		local response = router:Dispatch({ type = "queryState", sessionId = "session-1", payload = {} })
+		expect(type(response.payload.studioVersion)).toEqual("string")
+		response.payload.studioVersion = nil
 
 		expect(response).toEqual({
 			type = "stateResult",

@@ -175,7 +175,18 @@ Lists the connected sessions with their ID, context, place, and state. `--target
 studio-bridge process info
 ```
 
-Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, game ID, and viewport size, plus whether the Studio window is focused or minimized.
+```text
+Session:  test-place-3f9a-edit (edit, user, connected 4m ago)
+Mode:     Edit
+Playtest: running (multiplayer, 2 players): test-place-3f9a-server, test-place-3f9a-client-player1, test-place-3f9a-client-player2
+Place:    test-place.rbxl (PlaceId 0, GameId 0)
+Viewport: 849x1003
+Window:   pid 31876, open, not focused
+Studio:   0.744.0.7441077
+Plugin:   6c751ae59131 (up to date)
+```
+
+Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; and whether its plugin matches the one this CLI installs. The two clients of a multiplayer test share a window title, so they report no window.
 
 ### `process launch`
 

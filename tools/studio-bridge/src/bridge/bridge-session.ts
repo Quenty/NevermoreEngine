@@ -236,6 +236,7 @@ export class BridgeSession extends EventEmitter {
         placeName: result.payload.placeName,
         gameId: result.payload.gameId,
         viewportSize: result.payload.viewportSize,
+        studioVersion: result.payload.studioVersion,
       };
     }
 

@@ -76,6 +76,8 @@ export interface StateResult {
   gameId: number;
   /** The camera's viewport in pixels. Absent without a camera. */
   viewportSize?: [number, number];
+  /** Studio's version. Absent from older plugins. */
+  studioVersion?: string;
 }
 
 export interface ScreenshotResult {
