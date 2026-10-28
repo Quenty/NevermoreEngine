@@ -80,6 +80,9 @@ class RelayedTransportHandle extends EventEmitter implements TransportHandle {
   }
 }
 
+/** Lets the host's own timeout error, which says what timed out, arrive first. */
+const HOST_REPLY_GRACE_MS = 2_000;
+
 export class BridgeClient extends EventEmitter {
   private _transport = new TransportClient();
   private _sessions = new Map<string, SessionInfo>();
@@ -243,7 +246,7 @@ export class BridgeClient extends EventEmitter {
         reject(
           new Error(`Request "${requestId}" timed out after ${timeoutMs}ms`)
         );
-      }, timeoutMs);
+      }, timeoutMs + HOST_REPLY_GRACE_MS);
 
       this._pendingRequests.set(requestId, { resolve, reject, timer });
 
