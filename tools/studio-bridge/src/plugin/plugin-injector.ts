@@ -9,6 +9,7 @@ import {
   resolveTemplatePath,
 } from '@quenty/nevermore-template-helpers';
 import { findPluginsFolder } from '../process/studio-process-manager.js';
+import { getPluginBuildVersionAsync } from './plugin-build-version.js';
 
 const templateDir = resolveTemplatePath(
   import.meta.url,
@@ -43,7 +44,12 @@ export async function injectPluginAsync(
     await TemplateHelper.createDirectoryContentsAsync(
       templateDir,
       buildContext.buildDir,
-      { PORT: String(port), SESSION_ID: sessionId, EPHEMERAL: 'true' },
+      {
+        PORT: String(port),
+        SESSION_ID: sessionId,
+        EPHEMERAL: 'true',
+        PLUGIN_VERSION: await getPluginBuildVersionAsync(),
+      },
       false
     );
 

@@ -15,6 +15,7 @@ export {
   type SessionCommandInput,
   type ConnectionCommandInput,
   type StandaloneCommandInput,
+  type SessionTargeting,
   type CliConfig,
 } from './define-command.js';
 

@@ -4,11 +4,9 @@
  * that multiple clients can coexist with the host without interfering
  * with plugin sessions.
  *
- * Note: The current BridgeHost does not implement full host-protocol
- * message routing (list-sessions, host-envelope relay). These tests
- * exercise the real transport layer and connection lifecycle, not the
- * relay protocol. Split-server relay is tested via BridgeConnection
- * with a mock host (see bridge-connection-remote.test.ts).
+ * These tests exercise the real transport layer and connection lifecycle,
+ * not the relay protocol. Relay through a real host is covered in
+ * persistent-session.test.ts.
  */
 
 import { describe, it, expect, afterEach } from 'vitest';

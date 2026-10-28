@@ -2,7 +2,10 @@
  * `process list` — list connected Studio sessions.
  */
 
-import { defineCommand } from '../../framework/define-command.js';
+import {
+  defineCommand,
+  type SessionTargeting,
+} from '../../framework/define-command.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   formatTable,
@@ -22,15 +25,18 @@ export interface SessionsResult {
  * List all connected Studio sessions with a summary message.
  */
 export async function listSessionsHandlerAsync(
-  connection: BridgeConnection
+  connection: BridgeConnection,
+  targeting: SessionTargeting = {}
 ): Promise<SessionsResult> {
-  const sessions = connection.listSessions();
+  const sessions = connection.findSessions(targeting.target, targeting.context);
 
   if (sessions.length === 0) {
     return {
       sessions: [],
       summary:
-        'No active sessions. Is Studio running with the studio-bridge plugin?',
+        connection.listSessions().length > 0
+          ? 'No sessions match --target/--context.'
+          : 'No active sessions. Is Studio running with the studio-bridge plugin?',
     };
   }
 
@@ -43,7 +49,7 @@ export async function listSessionsHandlerAsync(
 const sessionColumns: TableColumn<SessionInfo>[] = [
   {
     header: 'Session',
-    value: (s) => s.sessionId.slice(0, 8),
+    value: (s) => s.sessionId,
     format: (v) => OutputHelper.formatHint(v),
   },
   { header: 'Context', value: (s) => s.context },
@@ -67,9 +73,11 @@ export const listCommand = defineCommand({
   category: 'infrastructure',
   safety: 'read',
   scope: 'connection',
+  coversAllSessions: true,
   args: {},
   cli: {
     format: formatSessionsTable,
   },
-  handler: async (connection) => listSessionsHandlerAsync(connection),
+  handler: async (connection, _args, targeting) =>
+    listSessionsHandlerAsync(connection, targeting),
 });

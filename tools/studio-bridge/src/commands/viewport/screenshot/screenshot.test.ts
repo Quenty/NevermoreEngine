@@ -145,22 +145,19 @@ describe('captureScreenshotHandlerAsync', () => {
     );
   });
 
-  it('handles missing fields gracefully', async () => {
+  it('rejects data that is not a base64 string', async () => {
     const session = {
       captureScreenshotAsync: vi.fn().mockResolvedValue({
-        data: undefined,
+        data: { m: null, t: 'buffer', zbase64: 'KLUv' },
         format: 'png',
-        width: undefined,
-        height: undefined,
+        width: 1,
+        height: 1,
       }),
     } as any;
 
-    const result = await captureScreenshotHandlerAsync(session);
-
-    expect(result.data).toBe('');
-    expect(result.width).toBe(0);
-    expect(result.height).toBe(0);
-    expect(result.summary).toBe('Screenshot captured (0x0)');
+    await expect(captureScreenshotHandlerAsync(session)).rejects.toThrow(
+      'The plugin sent screenshot data as object, not a base64 string'
+    );
   });
 
   it('passes options without affecting capture', async () => {

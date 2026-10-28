@@ -19,13 +19,22 @@ import type {
   ScreenshotResult,
   LogsResult,
   DataModelResult,
+  ExportInstancesResult,
+  ImportInstancesResult,
   LogOptions,
   QueryDataModelOptions,
+  PlaytestMode,
+  PlaytestEndResult,
+  EndPlaytestResult,
 } from './types.js';
 import { SessionDisconnectedError } from './types.js';
 import type {
   PluginMessage,
   OutputLevel,
+  FindInstancesMessage,
+  FindInstancesResultMessage,
+  GrepScriptsMessage,
+  GrepScriptsResultMessage,
 } from '../server/web-socket-protocol.js';
 import {
   loadActionSourcesAsync,
@@ -33,13 +42,63 @@ import {
 } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
+const EXECUTE_REPLY_GRACE_MS = 5_000;
+
 const DEFAULT_TIMEOUTS: Record<string, number> = {
   execute: 120_000,
   queryState: 5_000,
   captureScreenshot: 30_000,
   queryDataModel: 10_000,
+  exportInstances: 60_000,
+  importInstances: 60_000,
+  findInstances: 60_000,
+  grepScripts: 60_000,
   queryLogs: 10_000,
+  endPlaytest: 5_000,
 };
+
+/** Time a playtest gets to start and stop on top of its script's own timeout. */
+const PLAYTEST_STARTUP_ALLOWANCE_MS = 60_000;
+
+export interface RunPlaytestScriptOptions {
+  mode: PlaytestMode;
+  script: string;
+  runnerSource: string;
+  timeoutSec: number;
+  /** Passed to the script as `...`. */
+  args?: string[];
+}
+
+/** Map an `execute`-style reply onto an ExecResult. */
+function toExecResult(result: PluginMessage): ExecResult {
+  if (result.type === 'scriptComplete') {
+    const output = (result.payload.output ?? []).map((entry) => ({
+      level: entry.level as OutputLevel,
+      body: entry.body,
+    }));
+    return {
+      success: result.payload.success,
+      output,
+      error: result.payload.error,
+      traceback: result.payload.traceback,
+      returnValues: result.payload.returnValues,
+    };
+  }
+
+  if (result.type === 'error') {
+    return {
+      success: false,
+      output: [],
+      error: result.payload?.message ?? 'Unknown plugin error',
+    };
+  }
+
+  return {
+    success: false,
+    output: [],
+    error: pluginError('scriptComplete', result).message,
+  };
+}
 
 /**
  * Build a descriptive error from a plugin response that didn't match the
@@ -94,47 +153,65 @@ export class BridgeSession extends EventEmitter {
     return this._handle.isConnected;
   }
 
-  async execAsync(code: string, timeout?: number): Promise<ExecResult> {
+  async execAsync(
+    code: string,
+    timeout?: number,
+    args?: string[]
+  ): Promise<ExecResult> {
     this._assertConnected();
     await this._ensureActionsAsync();
 
+    // The plugin cancels the script at the timeout and replies, so wait a
+    // little longer than that for the reply
     const timeoutMs = timeout ?? DEFAULT_TIMEOUTS.execute;
     const result = await this._handle.sendActionAsync<PluginMessage>(
       {
         type: 'execute',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { script: code },
+        payload: {
+          script: code,
+          timeoutMs,
+          ...(args && args.length > 0 ? { args } : {}),
+        },
       },
-      timeoutMs
+      timeoutMs + EXECUTE_REPLY_GRACE_MS
     );
 
-    if (result.type === 'scriptComplete') {
-      const output = (result.payload.output ?? []).map((entry) => ({
-        level: entry.level as OutputLevel,
-        body: entry.body,
-      }));
-      return {
-        success: result.payload.success,
-        output,
-        error: result.payload.error,
-        returnValues: result.payload.returnValues,
-      };
-    }
+    return toExecResult(result);
+  }
 
-    if (result.type === 'error') {
-      return {
-        success: false,
-        output: [],
-        error: result.payload?.message ?? 'Unknown plugin error',
-      };
-    }
+  /**
+   * Run a script in a fresh playtest's server, started from this edit
+   * session, and resolve with its result once the playtest has ended. Works
+   * without the playtest's own sessions connecting: the plugin plants
+   * `runnerSource` in the playtest to run the script and end the playtest.
+   */
+  async runPlaytestScriptAsync(
+    options: RunPlaytestScriptOptions
+  ): Promise<ExecResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
 
-    return {
-      success: false,
-      output: [],
-      error: pluginError('scriptComplete', result).message,
-    };
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'runPlaytestScript',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {
+          mode: options.mode,
+          script: options.script,
+          runnerSource: options.runnerSource,
+          timeoutSec: options.timeoutSec,
+          ...(options.args && options.args.length > 0
+            ? { args: options.args }
+            : {}),
+        },
+      },
+      options.timeoutSec * 1000 + PLAYTEST_STARTUP_ALLOWANCE_MS
+    );
+
+    return toExecResult(result);
   }
 
   async queryStateAsync(): Promise<StateResult> {
@@ -158,6 +235,8 @@ export class BridgeSession extends EventEmitter {
         placeId: result.payload.placeId,
         placeName: result.payload.placeName,
         gameId: result.payload.gameId,
+        viewportSize: result.payload.viewportSize,
+        studioVersion: result.payload.studioVersion,
       };
     }
 
@@ -206,6 +285,8 @@ export class BridgeSession extends EventEmitter {
           direction: options?.direction,
           levels: options?.levels,
           includeInternal: options?.includeInternal,
+          ...(options?.since !== undefined ? { since: options.since } : {}),
+          ...(options?.groupRepeats ? { groupRepeats: true } : {}),
         },
       },
       timeoutMs
@@ -255,6 +336,170 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('dataModelResult', result);
   }
 
+  /** Search the DataModel for instances by name, class and tag. */
+  async findInstancesAsync(
+    options: FindInstancesMessage['payload']
+  ): Promise<FindInstancesResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'findInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      DEFAULT_TIMEOUTS.findInstances
+    );
+
+    if (result.type === 'findInstancesResult') {
+      return result.payload;
+    }
+
+    throw pluginError('findInstancesResult', result);
+  }
+
+  /** Search the source of every script for a pattern. */
+  async grepScriptsAsync(
+    options: GrepScriptsMessage['payload']
+  ): Promise<GrepScriptsResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'grepScripts',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      DEFAULT_TIMEOUTS.grepScripts
+    );
+
+    if (result.type === 'grepScriptsResult') {
+      return result.payload;
+    }
+
+    throw pluginError('grepScriptsResult', result);
+  }
+
+  /** Serialize the instances at `paths` into one binary model (.rbxm). */
+  async exportInstancesAsync(paths: string[]): Promise<ExportInstancesResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'exportInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: { paths },
+      },
+      DEFAULT_TIMEOUTS.exportInstances
+    );
+
+    if (result.type === 'exportInstancesResult') {
+      return { data: result.payload.data, paths: result.payload.paths };
+    }
+
+    throw pluginError('exportInstancesResult', result);
+  }
+
+  /** Insert a binary model (.rbxm), base64-encoded, under `parentPath`. */
+  async importInstancesAsync(
+    data: string,
+    parentPath: string
+  ): Promise<ImportInstancesResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'importInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: { data, parentPath },
+      },
+      DEFAULT_TIMEOUTS.importInstances
+    );
+
+    if (result.type === 'importInstancesResult') {
+      return { paths: result.payload.paths };
+    }
+
+    throw pluginError('importInstancesResult', result);
+  }
+
+  /**
+   * Start a playtest from this edit session. Resolves when the playtest
+   * ends, not when it starts: StudioTestService only reports a refusal to
+   * start (a playtest already running) by failing the call that would have
+   * waited for the end.
+   */
+  async runPlaytestAsync(
+    mode: PlaytestMode,
+    playtestId: string,
+    bridgePort: number,
+    timeoutMs: number,
+    players?: number
+  ): Promise<PlaytestEndResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'startPlaytest',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {
+          mode,
+          playtestId,
+          bridgePort,
+          instanceId: this._info.instanceId,
+          ...(players !== undefined ? { players } : {}),
+        },
+      },
+      timeoutMs
+    );
+
+    if (result.type === 'playtestEnded') {
+      return {
+        playtestId: result.payload.playtestId,
+        success: result.payload.success,
+        error: result.payload.error,
+      };
+    }
+
+    throw pluginError('playtestEnded', result);
+  }
+
+  /** End the playtest this server session belongs to. */
+  async endPlaytestAsync(): Promise<EndPlaytestResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'endPlaytest',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: {} as Record<string, never>,
+      },
+      DEFAULT_TIMEOUTS.endPlaytest
+    );
+
+    if (result.type === 'endPlaytestResult') {
+      return {
+        playtestId: result.payload.playtestId,
+        mode: result.payload.mode,
+        players: result.payload.players,
+      };
+    }
+
+    throw pluginError('endPlaytestResult', result);
+  }
+
   private _assertConnected(): void {
     if (!this._handle.isConnected) {
       throw new SessionDisconnectedError(this._info.sessionId);
@@ -300,7 +545,7 @@ export class BridgeSession extends EventEmitter {
         type: 'syncActions',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { actions },
+        payload: { actions, verbose: OutputHelper.isVerbose() },
       },
       10_000
     );

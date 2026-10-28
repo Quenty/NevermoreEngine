@@ -485,8 +485,12 @@ describe('an aggregated batch run, end to end', () => {
       '/tmp/batch-2.rbxl',
     ]);
     expect(transport.runCount).toBe(2);
-    expect(transport.scriptContents[0]).toContain('["alpha"]');
-    expect(transport.scriptContents[1]).toContain('["beta"]');
+    // The places run in parallel, so their scripts arrive in either order
+    expect(
+      transport.scriptContents.map((script) =>
+        script.includes('["alpha"]') ? 'alpha' : 'beta'
+      )
+    ).toEqual(expect.arrayContaining(['alpha', 'beta']));
 
     expect(alpha.success).toBe(true);
     expect(alpha.testResults).toMatchObject({ passed: 68, total: 68 });

@@ -9,7 +9,11 @@
  *   - `standalone` — `(args) => Promise<TResult>`
  */
 
-import type { BridgeSession, BridgeConnection } from '../../bridge/index.js';
+import type {
+  BridgeSession,
+  BridgeConnection,
+  SessionContext,
+} from '../../bridge/index.js';
 import type { ArgDefinition } from './arg-builder.js';
 
 /**
@@ -48,6 +52,17 @@ interface BaseFields<TArgs, TResult> {
   description: string;
   category: CommandCategory;
   safety: CommandSafety;
+  /**
+   * Changes the DataModel. Refused on an edit session while a playtest of it
+   * runs, since those edits are not what the playtest is running, unless
+   * `--allow-edit` is passed.
+   */
+  changesDataModel?: boolean;
+  /**
+   * Reports on every session, so without `--target` it is not narrowed to the
+   * Studio that has the current folder's `deploy.nevermore.json` place open.
+   */
+  coversAllSessions?: boolean;
   args: Record<string, ArgDefinition>;
   cli?: CliConfig<TResult>;
 }
@@ -55,13 +70,27 @@ interface BaseFields<TArgs, TResult> {
 export interface SessionCommandInput<TArgs, TResult>
   extends BaseFields<TArgs, TResult> {
   scope: 'session';
-  handler: (session: BridgeSession, args: TArgs) => Promise<TResult>;
+  handler: (
+    session: BridgeSession,
+    args: TArgs,
+    connection: BridgeConnection
+  ) => Promise<TResult>;
+}
+
+/** The `--target` and `--context` flags, for handlers that resolve sessions themselves. */
+export interface SessionTargeting {
+  target?: string;
+  context?: SessionContext;
 }
 
 export interface ConnectionCommandInput<TArgs, TResult>
   extends BaseFields<TArgs, TResult> {
   scope: 'connection';
-  handler: (connection: BridgeConnection, args: TArgs) => Promise<TResult>;
+  handler: (
+    connection: BridgeConnection,
+    args: TArgs,
+    targeting: SessionTargeting
+  ) => Promise<TResult>;
 }
 
 export interface StandaloneCommandInput<TArgs, TResult>

@@ -74,7 +74,7 @@ describe('logs formatter', () => {
     const text = formatLogsText(result);
     expect(text).toContain('Hello');
     expect(text).toContain('Boom');
-    expect(text).toContain('(2 of 2 entries)');
+    expect(text).toContain('(2 shown, 2 in buffer)');
   });
 
   it('is wired into command definition', () => {
@@ -123,10 +123,16 @@ describe('list formatter', () => {
 describe('info formatter', () => {
   it('formats key-value pairs', () => {
     const result = {
+      sessionId: 'my-place-1a2b-edit',
+      instanceId: 'my-place-1a2b',
+      context: 'edit' as const,
+      origin: 'user' as const,
       state: 'Edit' as const,
       placeName: 'MyPlace',
       placeId: 123,
       gameId: 456,
+      plugin: { version: 'abc', expectedVersion: 'abc', upToDate: true },
+      connectedAt: new Date().toISOString(),
       summary: 'Mode: Edit, Place: MyPlace (123)',
     };
 

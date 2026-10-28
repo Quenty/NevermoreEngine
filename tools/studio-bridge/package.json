@@ -17,6 +17,7 @@
   "dependencies": {
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@quenty/nevermore-deploy": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
     "execa": "^9.6.1",
     "ws": "^8.18.0",
@@ -24,6 +25,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2",
     "@types/node": "^18.11.4",
     "@types/ws": "^8.5.13",
     "@types/yargs": "^17.0.13",
@@ -36,7 +39,6 @@
     "build:clean": "tsc --build --clean",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:plugin": "lune run templates/studio-bridge-plugin-test/test/test-runner",
     "test:integration": "node dist/test/integration/smoke-test.js"
   }
 }

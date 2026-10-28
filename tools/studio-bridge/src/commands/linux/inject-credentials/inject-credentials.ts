@@ -36,8 +36,7 @@ export async function injectCredentialsHandlerAsync(
   try {
     const envError = await checkLinuxEnvironmentAsync();
     if (envError) {
-      OutputHelper.error(envError);
-      process.exit(1);
+      return { success: false, summary: envError };
     }
 
     const linux = await import('../../../linux/index.js');
@@ -92,7 +91,6 @@ export async function injectCredentialsHandlerAsync(
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    OutputHelper.error(message);
     return { success: false, summary: message };
   }
 }

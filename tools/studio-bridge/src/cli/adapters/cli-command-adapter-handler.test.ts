@@ -6,7 +6,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildYargsCommand } from './cli-command-adapter.js';
 import { defineCommand } from '../../commands/framework/define-command.js';
+import { arg } from '../../commands/framework/arg-builder.js';
 import type { CliLifecycleProvider } from './cli-command-adapter.js';
+
+vi.mock('../cli-output-context.js', () => ({
+  getWarnings: () => [],
+  warnIfPluginStaleAsync: vi.fn().mockResolvedValue(undefined),
+}));
 
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
@@ -29,6 +35,7 @@ function createMockConnection() {
       resolveSessionAsync: vi.fn().mockResolvedValue(session),
       disconnectAsync: vi.fn().mockResolvedValue(undefined),
       listSessions: vi.fn().mockReturnValue([]),
+      listInstances: vi.fn().mockReturnValue([]),
     } as any,
     session,
   };
@@ -300,6 +307,27 @@ describe('handler — standalone scope', () => {
 
     expect(lifecycle.connectAsync).not.toHaveBeenCalled();
     expect(output[0]).toBe('done');
+  });
+
+  it('hands everything after -- to a passthrough arg as strings', async () => {
+    const handler = vi.fn(async () => ({ summary: 'done' }));
+    const cmd = defineCommand({
+      group: null,
+      name: 'standalone',
+      description: 'Standalone test',
+      category: 'infrastructure',
+      safety: 'none',
+      scope: 'standalone',
+      args: { scriptArgs: arg.passthrough({ description: 'Script args' }) },
+      handler,
+    });
+    const module = buildYargsCommand(cmd);
+
+    await captureOutput(async () => {
+      await (module.handler as any)({ format: 'text', '--': ['Player1', 3] });
+    });
+
+    expect(handler).toHaveBeenCalledWith({ scriptArgs: ['Player1', '3'] });
   });
 });
 

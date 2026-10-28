@@ -12,6 +12,7 @@ import {
 } from '@quenty/nevermore-template-helpers';
 import { findPluginsFolder } from '../process/studio-process-manager.js';
 import { getPersistentPluginPath } from './plugin-discovery.js';
+import { getPluginBuildVersionAsync } from './plugin-build-version.js';
 
 const templateDir = resolveTemplatePath(
   import.meta.url,
@@ -39,7 +40,7 @@ export async function installPersistentPluginAsync(): Promise<string> {
     await TemplateHelper.createDirectoryContentsAsync(
       templateDir,
       buildContext.buildDir,
-      {},
+      { PLUGIN_VERSION: await getPluginBuildVersionAsync() },
       false
     );
 

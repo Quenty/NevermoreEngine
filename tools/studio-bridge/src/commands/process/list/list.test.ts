@@ -26,6 +26,7 @@ function createSessionInfo(overrides: Partial<SessionInfo> = {}): SessionInfo {
 function createMockConnection(sessions: SessionInfo[]) {
   return {
     listSessions: () => sessions,
+    findSessions: () => sessions,
     getSession: (id: string) => sessions.find((s) => s.sessionId === id),
   } as any;
 }
