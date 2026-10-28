@@ -62,6 +62,7 @@ registry.register(importCommand);
 registry.register(findCommand);
 registry.register(grepCommand);
 registry.register(screenshotCommand);
+registry.register(launchCommand);
 registry.register(playtestStartCommand);
 registry.register(playtestStopCommand);
 registry.register(playtestRunCommand);
@@ -71,7 +72,6 @@ registry.register(playtestPlayerAddCommand);
 registry.register(playtestPlayerRemoveCommand);
 
 // Infrastructure commands
-registry.register(launchCommand);
 registry.register(listCommand);
 registry.register(infoCommand);
 registry.register(processCloseCommand);
