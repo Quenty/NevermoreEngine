@@ -1,19 +1,13 @@
-# v0.22.0 (Wed Oct 28 2026)
-
-#### 🚀 Enhancement
-
-- feat(studio-bridge): multiplayer playtests, Studio launching, search, and CLI fixes [#851](https://github.com/Quenty/NevermoreEngine/pull/851) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.21.1...@quenty/studio-bridge@0.22.0) (2026-10-28)
+
+### Features
+
+- **studio-bridge:** multiplayer playtests, Studio launching, search, and CLI fixes ([#851](https://github.com/Quenty/NevermoreEngine/issues/851)) ([e63f878](https://github.com/Quenty/NevermoreEngine/commit/e63f878764807773d1bb1bf96d582d6e6640af88))
 
 ## [0.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.21.0...@quenty/studio-bridge@0.21.1) (2026-10-22)
 
