@@ -131,7 +131,8 @@ function CaptureScreenshotAction._captureAsync(sendMessage: SendMessage, request
 	end
 
 	local encodeOk, encoded = pcall(function()
-		return encodingService:Base64Encode(data)
+		-- JSONEncode turns a buffer into a { t = "buffer", zbase64 } object, so send a string
+		return buffer.tostring(encodingService:Base64Encode(data))
 	end)
 	if not (encodeOk and encoded) then
 		fail("ENCODE_FAILED", `Failed to base64 encode data: {encoded or "unknown error"}`)
