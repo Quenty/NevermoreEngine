@@ -1,3 +1,15 @@
+# v1.19.0 (Wed Oct 28 2026)
+
+#### 🚀 Enhancement
+
+- feat(studio-bridge): multiplayer playtests, Studio launching, search, and CLI fixes [#851](https://github.com/Quenty/NevermoreEngine/pull/851) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
