@@ -171,19 +171,27 @@ end
 ]]
 function CaptureScreenshotAction._captureContentIdAsync(captureService: any): (boolean, any)
 	local callerThread = coroutine.running()
+	local isWaiting = false
+	local isReady = false
 	local contentId: string? = nil
 
 	local captureOk, captureErr = pcall(function()
 		captureService:CaptureScreenshot(function(id)
 			contentId = id
-			task.spawn(callerThread)
+			isReady = true
+			if isWaiting then
+				task.spawn(callerThread)
+			end
 		end)
 	end)
 	if not captureOk then
 		return false, captureErr
 	end
 
-	coroutine.yield()
+	if not isReady then
+		isWaiting = true
+		coroutine.yield()
+	end
 
 	return true, contentId
 end

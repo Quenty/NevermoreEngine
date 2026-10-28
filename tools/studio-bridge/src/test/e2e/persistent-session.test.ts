@@ -532,4 +532,48 @@ describe('persistent session e2e', () => {
     expect(result.success).toBe(true);
     expect(result.returnValues).toEqual(['late']);
   });
+
+  it('host stops waiting on a relayed action that never finishes', async () => {
+    const host = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
+    connections.push(host);
+
+    const plugin = new MockPluginClient({
+      port: host.port,
+      instanceId: 'inst-stuck',
+      capabilities: ['execute', 'syncActions'],
+    });
+    plugins.push(plugin);
+    plugin.autoRespond('syncActions', () => ({
+      type: 'syncActionsResult',
+      payload: { needed: [], installed: {} },
+    }));
+    plugin.onAnyMessage((msg) => {
+      if (msg.type === 'shutdown') {
+        void plugin.disconnectAsync();
+      }
+    });
+    await plugin.connectAndRegisterAsync();
+    await new Promise((r) => setTimeout(r, 100));
+
+    const client = await BridgeConnection.connectAsync({
+      port: host.port,
+      local: true,
+    });
+    connections.push(client);
+
+    const session = await client.resolveSessionAsync(plugin.sessionId);
+    void session
+      .execAsync('while true do task.wait() end', 60_000)
+      .catch(() => undefined);
+    await new Promise((r) => setTimeout(r, 100));
+
+    const started = Date.now();
+    await host.disconnectAsync({ relayDrainTimeoutMs: 200 });
+
+    expect(Date.now() - started).toBeLessThan(2_000);
+  });
 });

@@ -21,6 +21,7 @@ local function setup()
 
 	local pixels = buffer.fromstring("\255\0\0\255\0\0\255\255")
 	local captureError: string? = nil
+	local callsBackImmediately = false
 
 	local services: CaptureScreenshotAction.Services = {
 		captureService = {
@@ -28,7 +29,11 @@ local function setup()
 				if captureError then
 					error(captureError)
 				end
-				task.defer(onCaptureReady, "rbxassetid://1")
+				if callsBackImmediately then
+					onCaptureReady("rbxassetid://1")
+				else
+					task.defer(onCaptureReady, "rbxassetid://1")
+				end
 			end,
 		},
 		assetService = {
@@ -49,6 +54,9 @@ local function setup()
 		pixels = pixels,
 		setCaptureError = function(message: string)
 			captureError = message
+		end,
+		setCallsBackImmediately = function()
+			callsBackImmediately = true
 		end,
 		captureAsync = function(): { [string]: any }
 			local sent: { [string]: any }? = nil
@@ -98,6 +106,15 @@ describe("captureScreenshot", function()
 
 		local decoded = EncodingService:Base64Decode(buffer.fromstring(message.payload.data))
 		expect(buffer.tostring(decoded)).toBe(buffer.tostring(controller.pixels))
+	end)
+
+	it("should finish when CaptureService calls back before returning", function()
+		local controller = setup()
+		controller.setCallsBackImmediately()
+
+		local message = controller.captureAsync()
+
+		expect(message.type).toBe("screenshotResult")
 	end)
 
 	it("should answer CAPTURE_FAILED when CaptureService throws", function()

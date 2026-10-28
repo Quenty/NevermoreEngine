@@ -744,6 +744,9 @@ describe('BridgeConnection', () => {
       await expect(
         conn.resolveSessionAsync('test-place', 'client')
       ).rejects.toThrow(/several client sessions/);
+      await expect(
+        conn.resolveSessionAsync('test-place-3f9a-cl')
+      ).rejects.toThrow(/'test-place-3f9a-cl' matches several sessions/);
       const session = await conn.resolveSessionAsync(
         'test-place-3f9a-client-player2',
         'client'

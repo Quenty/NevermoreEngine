@@ -39,6 +39,58 @@ describe('processCloseHandlerAsync', () => {
     expect(result).toMatchObject({ success: true, pid: 10 });
   });
 
+  it('closes the Studio a single-process playtest runs in', async () => {
+    const server = {
+      info: {
+        sessionId: 'test-place-server',
+        instanceId: 'test-place',
+        context: 'server',
+        placeName: 'Game',
+      },
+    } as any;
+    const connection = {
+      listSessions: () => [
+        {
+          sessionId: 'test-place-server',
+          instanceId: 'test-place',
+          context: 'server',
+          placeName: 'test-place.rbxl',
+        },
+      ],
+    } as any;
+
+    const result = await processCloseHandlerAsync(server, {}, connection);
+
+    expect(result).toMatchObject({ success: true, pid: 10 });
+  });
+
+  it('refuses a multiplayer test process without --pid', async () => {
+    const client = {
+      info: {
+        sessionId: 'test-place-client-player1',
+        instanceId: 'test-place',
+        context: 'client',
+        placeName: 'Game',
+      },
+    } as any;
+    const connection = {
+      listSessions: () =>
+        ['player1', 'player2'].map((player) => ({
+          sessionId: `test-place-client-${player}`,
+          instanceId: 'test-place',
+          context: 'client',
+          placeName: 'test-place.rbxl',
+          playerName: player,
+        })),
+    } as any;
+
+    const result = await processCloseHandlerAsync(client, {}, connection);
+
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain("'studio-bridge playtest stop'");
+    expect(closeStudioProcessAsync).not.toHaveBeenCalled();
+  });
+
   it('passes --force through', async () => {
     await processCloseHandlerAsync(session, { force: true });
 

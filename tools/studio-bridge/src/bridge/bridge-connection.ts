@@ -55,6 +55,8 @@ export interface BridgeConnectionOptions {
 const DEFAULT_PORT = 38741;
 const DEFAULT_TIMEOUT_MS = 30_000;
 const IDLE_EXIT_GRACE_MS = 5_000;
+/** How long shutdown waits on relayed actions; a started playtest's request lasts until it ends. */
+const RELAY_DRAIN_TIMEOUT_MS = 10_000;
 
 /**
  * Transport handle that relays messages to a plugin's WebSocket via BridgeHost.
@@ -235,7 +237,9 @@ export class BridgeConnection extends EventEmitter {
     return conn;
   }
 
-  async disconnectAsync(): Promise<void> {
+  async disconnectAsync(
+    options: { relayDrainTimeoutMs?: number } = {}
+  ): Promise<void> {
     if (!this._isConnected) {
       return;
     }
@@ -259,7 +263,17 @@ export class BridgeConnection extends EventEmitter {
         OutputHelper.verbose(
           `[bridge] Waiting for ${this._pendingRelays.size} relayed action(s) before shutting down`
         );
-        await Promise.allSettled([...this._pendingRelays]);
+        let drainTimer: ReturnType<typeof setTimeout> | undefined;
+        await Promise.race([
+          Promise.allSettled([...this._pendingRelays]),
+          new Promise<void>((resolve) => {
+            drainTimer = setTimeout(
+              resolve,
+              options.relayDrainTimeoutMs ?? RELAY_DRAIN_TIMEOUT_MS
+            );
+          }),
+        ]);
+        clearTimeout(drainTimer);
       }
 
       for (const handle of this._hostHandles.values()) {
@@ -433,6 +447,17 @@ export class BridgeConnection extends EventEmitter {
         prefixed.length === 1 ? this.getSession(prefixed[0].sessionId) : null;
       if (onlyPrefixed) {
         return onlyPrefixed;
+      }
+      const namesInstance = prefixed.some((s) =>
+        s.instanceId.startsWith(sessionId)
+      );
+      if (!session && prefixed.length > 1 && !namesInstance) {
+        throw new SessionNotFoundError(
+          `'${sessionId}' matches several sessions. Use a longer --target:\n${prefixed
+            .map((s) => `  - ${s.sessionId}`)
+            .join('\n')}`,
+          sessionId
+        );
       }
 
       const instanceIds = session

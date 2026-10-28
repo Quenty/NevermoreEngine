@@ -39,6 +39,7 @@ type QueuedRequest = {
 	requestId: string?,
 	sessionId: string,
 	sendMessage: SendMessage?,
+	receivedAt: number,
 }
 
 type LogEntry = {
@@ -80,6 +81,7 @@ function ExecuteAction.register(router: any, sendMessage: SendMessage?)
 			requestId = requestId,
 			sessionId = sessionId,
 			sendMessage = sendMessage,
+			receivedAt = os.clock(),
 		})
 		ExecuteAction._processQueue()
 
@@ -134,7 +136,13 @@ function ExecuteAction._processQueue()
 
 	while #queue > 0 do
 		local request = table.remove(queue, 1) :: QueuedRequest
-		ExecuteAction._handleExecute(request.payload, request.requestId, request.sessionId, request.sendMessage)
+		ExecuteAction._handleExecute(
+			request.payload,
+			request.requestId,
+			request.sessionId,
+			request.sendMessage,
+			request.receivedAt
+		)
 	end
 
 	isProcessing = false
@@ -144,7 +152,8 @@ function ExecuteAction._handleExecute(
 	payload: { [string]: any },
 	requestId: string?,
 	sessionId: string,
-	sendMessage: SendMessage?
+	sendMessage: SendMessage?,
+	receivedAt: number?
 ): { [string]: any }?
 	-- An empty requestId means none was sent
 	local effectiveRequestId = if requestId ~= "" then requestId else nil
@@ -186,10 +195,22 @@ function ExecuteAction._handleExecute(
 	end
 
 	local timeoutMs = payload.timeoutMs
+	local timeoutSeconds = if type(timeoutMs) == "number" then timeoutMs / 1000 else nil
+	-- The caller's timeout started when it sent the request, not when its turn came
+	if timeoutSeconds and receivedAt then
+		timeoutSeconds -= os.clock() - receivedAt
+		if timeoutSeconds <= 0 then
+			return reply({
+				success = false,
+				error = `Script timed out after {timeoutMs}ms waiting behind other scripts, and never ran`,
+				code = "SCRIPT_TIMEOUT",
+			})
+		end
+	end
+
 	local captured: { LogEntry } = {}
 	local logConnection = ExecuteAction._captureOutput(captured)
-	local status, result =
-		ExecuteAction._runAsync(fn, if type(timeoutMs) == "number" then timeoutMs / 1000 else nil, args)
+	local status, result = ExecuteAction._runAsync(fn, timeoutSeconds, args)
 
 	-- MessageOut can fire a frame late, after the script's last print
 	task.wait()

@@ -210,6 +210,25 @@ describe("returnValues", function()
 end)
 
 describe("ExecuteAction.register()", function()
+	it("should time out a queued script that waited past its timeout without running it", function()
+		local controller = setup(true)
+
+		task.spawn(controller.execute, { script = "task.wait(0.3) return 1" }, "req-1")
+		controller.execute({ script = "print('ran') return 2", timeoutMs = 100 }, "req-2")
+		while #controller.sent < 2 do
+			task.wait()
+		end
+
+		expect(controller.sent[2].requestId).toEqual("req-2")
+		expect(controller.sent[2].payload).toEqual({
+			success = false,
+			error = "Script timed out after 100ms waiting behind other scripts, and never ran",
+			code = "SCRIPT_TIMEOUT",
+		})
+
+		controller:Destroy()
+	end)
+
 	it("should reply through the router as scriptComplete without sendMessage", function()
 		local controller = setup(false)
 
