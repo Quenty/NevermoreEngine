@@ -191,9 +191,13 @@ Reports on one session: its ID, context and origin; the run mode of its own Data
 ### `process launch`
 
 ```bash
-studio-bridge process launch
+studio-bridge process launch                          # default target of the nearest deploy.nevermore.json
+studio-bridge process launch integration.places.hub   # a named target, or one place of it
 studio-bridge process launch --place ./build/test.rbxl
+studio-bridge process launch --place-id 123 --universe-id 456
 ```
+
+Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json` it opens Studio with no place.
 
 ### `process run`
 

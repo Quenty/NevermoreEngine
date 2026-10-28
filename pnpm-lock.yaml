@@ -6987,6 +6987,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
+      '@quenty/nevermore-deploy':
+        specifier: workspace:*
+        version: link:../nevermore-deploy
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers

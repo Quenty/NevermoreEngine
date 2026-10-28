@@ -10,6 +10,7 @@
   "references": [
     { "path": "../cli-output-helpers" },
     { "path": "../nevermore-cli-helpers" },
+    { "path": "../nevermore-deploy" },
     { "path": "../nevermore-template-helpers" }
   ],
   "include": ["src/**/*", "test/**/*"]
