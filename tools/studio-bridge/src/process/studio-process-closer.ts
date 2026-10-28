@@ -1,7 +1,8 @@
 /**
  * Finds running Roblox Studio processes and closes them. The plugin API has
  * no process id, so a bridge session is matched to its process by the place
- * name Studio shows in the window title.
+ * name Studio shows in the window title, or by the place id a cloud place was
+ * launched with.
  */
 
 import { execa } from 'execa';
@@ -12,6 +13,7 @@ const EXIT_POLL_INTERVAL_MS = 250;
 export interface RunningStudioProcess {
   pid: number;
   windowTitle: string;
+  commandLine?: string;
 }
 
 export interface CloseStudioOptions {
@@ -29,7 +31,7 @@ export async function listStudioProcessesAsync(): Promise<
         '-NoProfile',
         '-NonInteractive',
         '-Command',
-        '@(Get-Process RobloxStudioBeta -ErrorAction SilentlyContinue | Select-Object Id, MainWindowTitle) | ConvertTo-Json -Compress',
+        '@(Get-CimInstance Win32_Process -Filter "Name=\'RobloxStudioBeta.exe\'" | ForEach-Object { [pscustomobject]@{ Id = $_.ProcessId; MainWindowTitle = (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).MainWindowTitle; CommandLine = $_.CommandLine } }) | ConvertTo-Json -Compress',
       ],
       { reject: false }
     );
@@ -52,14 +54,18 @@ export function parseWindowsProcessList(
   const trimmed = stdout.trim();
   if (!trimmed) return [];
 
-  const parsed = JSON.parse(trimmed) as
-    | { Id: number; MainWindowTitle: string | null }
-    | Array<{ Id: number; MainWindowTitle: string | null }>;
+  type Entry = {
+    Id: number;
+    MainWindowTitle: string | null;
+    CommandLine?: string | null;
+  };
+  const parsed = JSON.parse(trimmed) as Entry | Entry[];
   const entries = Array.isArray(parsed) ? parsed : [parsed];
 
   return entries.map((entry) => ({
     pid: entry.Id,
     windowTitle: entry.MainWindowTitle ?? '',
+    commandLine: entry.CommandLine ?? undefined,
   }));
 }
 
@@ -71,7 +77,11 @@ export function parseMacProcessList(stdout: string): RunningStudioProcess[] {
         line
       );
     if (match) {
-      processes.push({ pid: Number(match[1]), windowTitle: match[2] });
+      processes.push({
+        pid: Number(match[1]),
+        windowTitle: match[2],
+        commandLine: match[2],
+      });
     }
   }
   return processes;
@@ -83,9 +93,22 @@ export function parseMacProcessList(stdout: string): RunningStudioProcess[] {
  */
 export function matchStudioProcesses(
   processes: RunningStudioProcess[],
-  placeName: string
+  placeName: string,
+  placeId?: number
 ): RunningStudioProcess[] {
+  // Studio titles a cloud place by its name on the website, which the plugin can't see
+  const launchedPlaceId = placeId
+    ? new RegExp(`placeId:${placeId}(\\D|$)`)
+    : undefined;
   return processes.filter((proc) => {
+    if (
+      launchedPlaceId &&
+      proc.commandLine &&
+      launchedPlaceId.test(proc.commandLine)
+    ) {
+      return true;
+    }
+
     const title = proc.windowTitle.endsWith(WINDOW_TITLE_SUFFIX)
       ? proc.windowTitle.slice(0, -WINDOW_TITLE_SUFFIX.length)
       : proc.windowTitle;

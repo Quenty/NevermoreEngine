@@ -17,8 +17,11 @@ import {
   listStudioProcessesAsync,
 } from '../../../process/studio-process-closer.js';
 
+const queryStateAsync = async () => ({ placeId: 0 });
+
 const session = {
   info: { sessionId: 'test-place-edit', placeName: 'test-place.rbxl' },
+  queryStateAsync,
 } as any;
 
 describe('processCloseHandlerAsync', () => {
@@ -47,6 +50,7 @@ describe('processCloseHandlerAsync', () => {
         context: 'server',
         placeName: 'Game',
       },
+      queryStateAsync,
     } as any;
     const connection = {
       listSessions: () => [
@@ -72,6 +76,7 @@ describe('processCloseHandlerAsync', () => {
         context: 'client',
         placeName: 'Game',
       },
+      queryStateAsync,
     } as any;
     const connection = {
       listSessions: () =>
@@ -89,6 +94,25 @@ describe('processCloseHandlerAsync', () => {
     expect(result.success).toBe(false);
     expect(result.summary).toContain("'studio-bridge playtest stop'");
     expect(closeStudioProcessAsync).not.toHaveBeenCalled();
+  });
+
+  it('finds a cloud place by the place id Studio was launched with', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      {
+        pid: 30,
+        windowTitle: 'My Game (abc123) - Roblox Studio',
+        commandLine:
+          'RobloxStudioBeta.exe roblox-studio:1+placeId:555+universeId:9',
+      },
+    ]);
+    const cloudSession = {
+      info: { sessionId: 'place1-edit', placeName: 'Place1', placeId: 0 },
+      queryStateAsync: async () => ({ placeId: 555 }),
+    } as any;
+
+    const result = await processCloseHandlerAsync(cloudSession);
+
+    expect(result).toMatchObject({ success: true, pid: 30 });
   });
 
   it('passes --force through', async () => {

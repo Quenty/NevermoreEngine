@@ -44,6 +44,8 @@ describe('parseMacProcessList', () => {
         pid: 101,
         windowTitle:
           '/Applications/RobloxStudio.app/Contents/MacOS/RobloxStudio /Users/me/test-place.rbxl',
+        commandLine:
+          '/Applications/RobloxStudio.app/Contents/MacOS/RobloxStudio /Users/me/test-place.rbxl',
       },
     ]);
   });
@@ -61,6 +63,25 @@ describe('matchStudioProcesses', () => {
     expect(matchStudioProcesses(processes, 'test-place.rbxl')).toEqual([
       processes[0],
     ]);
+  });
+
+  it('matches a cloud place by the place id it was launched with', () => {
+    const cloud = [
+      {
+        pid: 5,
+        windowTitle: 'My Game (abc123) - Roblox Studio',
+        commandLine:
+          'RobloxStudioBeta.exe roblox-studio:1+launchmode:edit+task:EditPlace+placeId:123+universeId:9',
+      },
+      {
+        pid: 6,
+        windowTitle: 'Other - Roblox Studio',
+        commandLine: 'RobloxStudioBeta.exe roblox-studio:1+placeId:1234',
+      },
+    ];
+
+    expect(matchStudioProcesses(cloud, 'Place1', 123)).toEqual([cloud[0]]);
+    expect(matchStudioProcesses(cloud, 'Place1')).toEqual([]);
   });
 
   it('matches a cloud place by its exact name', () => {

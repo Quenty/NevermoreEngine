@@ -89,7 +89,8 @@ export async function queryStateHandlerAsync(
     getPluginBuildVersionAsync(),
   ]);
   const window = await tryGetWindowAsync(
-    ownWindow ? [result.placeName] : [result.placeName, listed?.placeName]
+    ownWindow ? [result.placeName] : [result.placeName, listed?.placeName],
+    ownWindow ? undefined : result.placeId
   );
 
   return {
@@ -148,12 +149,13 @@ export function describePlaytest(
  * a single-process playtest shares the edit window.
  */
 async function tryGetWindowAsync(
-  placeNames: Array<string | undefined>
+  placeNames: Array<string | undefined>,
+  placeId?: number
 ): Promise<StateResult['window']> {
   const processes = await listStudioProcessesAsync().catch(() => []);
   for (const placeName of placeNames) {
     if (!placeName) continue;
-    const matches = matchStudioProcesses(processes, placeName);
+    const matches = matchStudioProcesses(processes, placeName, placeId);
     if (matches.length === 0) continue;
     if (matches.length > 1) return undefined;
 

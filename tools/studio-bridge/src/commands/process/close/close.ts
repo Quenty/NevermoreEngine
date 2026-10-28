@@ -56,11 +56,16 @@ export async function processCloseHandlerAsync(
     );
   }
 
+  // A cloud place loads after the plugin registers, so its registered id can be 0
+  const placeId =
+    options.pid === undefined
+      ? (await session.queryStateAsync().catch(() => undefined))?.placeId
+      : undefined;
   const processes = await listStudioProcessesAsync();
   const candidates =
     options.pid !== undefined
       ? processes.filter((proc) => proc.pid === options.pid)
-      : matchStudioProcesses(processes, placeName);
+      : matchStudioProcesses(processes, placeName, placeId);
 
   if (candidates.length === 0) {
     return fail(
