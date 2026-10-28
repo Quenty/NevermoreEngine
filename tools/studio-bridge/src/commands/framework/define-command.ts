@@ -58,6 +58,11 @@ interface BaseFields<TArgs, TResult> {
    * `--allow-edit` is passed.
    */
   changesDataModel?: boolean;
+  /**
+   * Reports on every session, so without `--target` it is not narrowed to the
+   * Studio that has the current folder's `deploy.nevermore.json` place open.
+   */
+  coversAllSessions?: boolean;
   args: Record<string, ArgDefinition>;
   cli?: CliConfig<TResult>;
 }

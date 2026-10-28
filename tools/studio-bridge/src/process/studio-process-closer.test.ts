@@ -84,6 +84,19 @@ describe('matchStudioProcesses', () => {
     expect(matchStudioProcesses(cloud, 'Place1')).toEqual([]);
   });
 
+  it('prefers a title match over a launch place id', () => {
+    const cloud = [
+      {
+        pid: 5,
+        windowTitle: 'Other - Roblox Studio',
+        commandLine: 'RobloxStudioBeta.exe roblox-studio:1+placeId:123',
+      },
+      { pid: 6, windowTitle: 'Map - Roblox Studio' },
+    ];
+
+    expect(matchStudioProcesses(cloud, 'Map', 123)).toEqual([cloud[1]]);
+  });
+
   it('matches a cloud place by its exact name', () => {
     expect(matchStudioProcesses(processes, 'Map')).toEqual([processes[1]]);
   });

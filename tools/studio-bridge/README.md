@@ -213,9 +213,10 @@ Launches Studio on a copy of the place, runs the script there and nowhere else, 
 ```bash
 studio-bridge process close --target test-place
 studio-bridge process close --target test-place --force
+studio-bridge process close integration.places.hub   # the Studio showing a deploy.nevermore.json target
 ```
 
-Closes the Studio process showing the session's place, found by its window title. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
+Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
 
 ### `playtest run` / `playtest start` / `playtest restart` / `playtest stop`
 
@@ -292,7 +293,7 @@ A single reply from Studio can carry up to 256 MiB. A larger one, such as a scri
 
 Session IDs are the place name plus a short suffix and the context, like `test-place-a05a-edit`. They stay the same until Studio closes, including across plugin reinstalls. Commands that target a session accept `--target` and `--context`:
 
-- **No flags** — auto-resolves if only one session exists
+- **No flags** — auto-resolves if only one Studio is connected. With several, uses the one that has a place of the nearest `deploy.nevermore.json` open (and says which), so a command run in a package or game folder reaches that project's Studio.
 - **`--target <id>`** — a session ID, an instance ID (`test-place-a05a`), or any unique prefix of one (`test-place`)
 - **`--context <ctx>`** — select context within an instance (`edit`, `client`, `server`)
 

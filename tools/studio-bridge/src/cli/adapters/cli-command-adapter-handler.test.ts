@@ -35,6 +35,7 @@ function createMockConnection() {
       resolveSessionAsync: vi.fn().mockResolvedValue(session),
       disconnectAsync: vi.fn().mockResolvedValue(undefined),
       listSessions: vi.fn().mockReturnValue([]),
+      listInstances: vi.fn().mockReturnValue([]),
     } as any,
     session,
   };

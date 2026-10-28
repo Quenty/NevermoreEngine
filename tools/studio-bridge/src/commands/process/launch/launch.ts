@@ -3,28 +3,21 @@
  * cloud place, or a target from the nearest `deploy.nevermore.json`.
  */
 
-import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  formatTargetSelector,
-  loadDeployConfigAsync,
-  parseTargetSelector,
-  resolveDefaultTargetName,
-  resolveDeployTargetPlaces,
-  type DeployTarget,
-} from '@quenty/nevermore-deploy';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { launchStudioAsync } from '../../../process/studio-process-manager.js';
-
-const DEPLOY_CONFIG_FILE_NAME = 'deploy.nevermore.json';
+import {
+  DEPLOY_CONFIG_FILE_NAME,
+  resolveDeployPlaceAsync,
+} from '../../../deploy/deploy-places.js';
 
 export interface LaunchOptions {
   placePath?: string;
   placeId?: number;
   universeId?: number;
   /** A `deploy.nevermore.json` target, e.g. `test` or `integration.places.hub`. */
-  target?: string;
+  deployTarget?: string;
   /** Where to start looking for `deploy.nevermore.json`. Default: the current directory. */
   cwd?: string;
 }
@@ -32,16 +25,10 @@ export interface LaunchOptions {
 export interface LaunchResult {
   launched: boolean;
   /** The `deploy.nevermore.json` target that was opened, if any. */
-  target?: string;
+  deployTarget?: string;
   placeId?: number;
   universeId?: number;
   summary: string;
-}
-
-export interface DeployPlace {
-  selector: string;
-  place: DeployTarget;
-  configPath: string;
 }
 
 export async function launchHandlerAsync(
@@ -49,9 +36,9 @@ export async function launchHandlerAsync(
 ): Promise<LaunchResult> {
   const hasExplicitPlace =
     options.placePath !== undefined || options.placeId !== undefined;
-  if (hasExplicitPlace && options.target !== undefined) {
+  if (hasExplicitPlace && options.deployTarget !== undefined) {
     throw new Error(
-      `Pass a deploy target or --place / --place-id, not both (got target '${options.target}')`
+      `Pass a deploy target or --place / --place-id, not both (got '${options.deployTarget}')`
     );
   }
 
@@ -59,7 +46,7 @@ export async function launchHandlerAsync(
     ? undefined
     : await resolveDeployPlaceAsync(
         options.cwd ?? process.cwd(),
-        options.target
+        options.deployTarget
       );
   if (deployPlace) {
     const { placeId, universeId } = deployPlace.place;
@@ -70,7 +57,7 @@ export async function launchHandlerAsync(
     );
     return {
       launched: true,
-      target: deployPlace.selector,
+      deployTarget: deployPlace.selector,
       placeId,
       universeId,
       summary: `Studio launched with '${
@@ -98,68 +85,8 @@ export async function launchHandlerAsync(
   };
 }
 
-/**
- * The place a `deploy.nevermore.json` target names, from the config nearest
- * `cwd`. Without `target`, uses the config's default target. Undefined when no
- * config is found and no target was asked for.
- */
-export async function resolveDeployPlaceAsync(
-  cwd: string,
-  target?: string
-): Promise<DeployPlace | undefined> {
-  const configPath = await findDeployConfigPathAsync(cwd);
-  if (!configPath) {
-    if (target !== undefined) {
-      throw new Error(
-        `No ${DEPLOY_CONFIG_FILE_NAME} in ${cwd} or its parents to find target '${target}' in`
-      );
-    }
-    return undefined;
-  }
-
-  const config = await loadDeployConfigAsync(configPath);
-  const selector = target ?? resolveDefaultTargetName(config);
-  const places = resolveDeployTargetPlaces(config, selector);
-  if (places.length > 1) {
-    const { targetName } = parseTargetSelector(selector);
-    const choices = places
-      .map((place) =>
-        place.name
-          ? `  - ${formatTargetSelector({ targetName, placeName: place.name })}`
-          : `  - place ${place.placeId}`
-      )
-      .join('\n');
-    throw new Error(
-      `Target '${targetName}' has ${places.length} places. Pick one:\n${choices}`
-    );
-  }
-
-  return { selector, place: places[0], configPath };
-}
-
-async function findDeployConfigPathAsync(
-  startDir: string
-): Promise<string | undefined> {
-  let current = path.resolve(startDir);
-  while (true) {
-    const candidate = path.join(current, DEPLOY_CONFIG_FILE_NAME);
-    try {
-      await fs.access(candidate);
-      return candidate;
-    } catch {
-      // Not here, keep walking up
-    }
-
-    const parent = path.dirname(current);
-    if (parent === current) {
-      return undefined;
-    }
-    current = parent;
-  }
-}
-
 interface LaunchArgs {
-  target?: string;
+  deployTarget?: string;
   place?: string;
   placeId?: number;
   universeId?: number;
@@ -174,7 +101,7 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
   safety: 'none',
   scope: 'standalone',
   args: {
-    target: arg.positional({
+    deployTarget: arg.positional({
       description:
         'deploy.nevermore.json target to open, e.g. test or integration.places.hub (default: its default target)',
       required: false,
@@ -193,7 +120,7 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
   },
   handler: async (args) =>
     launchHandlerAsync({
-      target: args.target,
+      deployTarget: args.deployTarget,
       placePath: args.place,
       placeId: args.placeId,
       universeId: args.universeId,

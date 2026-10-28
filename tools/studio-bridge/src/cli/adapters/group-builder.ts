@@ -25,7 +25,7 @@ const GROUP_DESCRIPTIONS: Record<string, string> = {
   data: 'Load and save serialized data',
   playtest: 'Control play test sessions',
   'playtest player': 'List, add and remove the players of a multiplayer test',
-  process: 'Manage Studio processes',
+  process: 'Open (launch), list, inspect and close Studio',
   plugin: 'Manage the bridge plugin',
   action: 'Invoke a Studio action',
   linux: 'Linux/Wine environment management',

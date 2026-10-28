@@ -73,6 +73,7 @@ export const listCommand = defineCommand({
   category: 'infrastructure',
   safety: 'read',
   scope: 'connection',
+  coversAllSessions: true,
   args: {},
   cli: {
     format: formatSessionsTable,

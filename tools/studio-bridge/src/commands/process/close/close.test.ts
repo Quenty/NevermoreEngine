@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../../process/studio-process-closer.js', async (importOriginal) => {
   const actual = await importOriginal<
@@ -11,7 +11,10 @@ vi.mock('../../../process/studio-process-closer.js', async (importOriginal) => {
   };
 });
 
-import { processCloseHandlerAsync } from './close.js';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import { closeDeployTargetAsync, processCloseHandlerAsync } from './close.js';
 import {
   closeStudioProcessAsync,
   listStudioProcessesAsync,
@@ -161,5 +164,87 @@ describe('processCloseHandlerAsync', () => {
       force: undefined,
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('closeDeployTargetAsync', () => {
+  let tempDir: string;
+
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'close-test-'));
+    await fs.writeFile(
+      path.join(tempDir, 'deploy.nevermore.json'),
+      JSON.stringify({
+        targets: {
+          test: { universeId: 9, placeId: 555, project: 'test.project.json' },
+        },
+      })
+    );
+    vi.mocked(closeStudioProcessAsync).mockReset().mockResolvedValue(true);
+  });
+
+  afterEach(async () => {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  });
+
+  it('closes a Studio launched with the target place, connected or not', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      {
+        pid: 40,
+        windowTitle: 'My Game (abc123) - Roblox Studio',
+        commandLine: 'RobloxStudioBeta.exe roblox-studio:1+placeId:555',
+      },
+      { pid: 41, windowTitle: 'Other - Roblox Studio' },
+    ]);
+    const connection = { listInstances: () => [], listSessions: () => [] };
+
+    const result = await closeDeployTargetAsync(
+      connection as any,
+      'test',
+      {},
+      tempDir
+    );
+
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(40, {
+      force: undefined,
+    });
+    expect(result).toMatchObject({
+      success: true,
+      deployTarget: 'test',
+      pid: 40,
+    });
+  });
+
+  it('closes the connected Studio showing the target place', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 50, windowTitle: 'My Game (abc123) - Roblox Studio' },
+    ]);
+    const editSession = {
+      info: {
+        sessionId: 'place1-1a2b-edit',
+        instanceId: 'place1-1a2b',
+        context: 'edit',
+        placeName: 'My Game (abc123)',
+      },
+      queryStateAsync: async () => ({ placeId: 555 }),
+    };
+    const connection = {
+      listInstances: () => [{ instanceId: 'place1-1a2b', placeId: 555 }],
+      listSessions: () => [editSession.info],
+      resolveSessionAsync: vi.fn().mockResolvedValue(editSession),
+    };
+
+    const result = await closeDeployTargetAsync(
+      connection as any,
+      'test',
+      {},
+      tempDir
+    );
+
+    expect(connection.resolveSessionAsync).toHaveBeenCalledWith(
+      'place1-1a2b',
+      'edit'
+    );
+    expect(result).toMatchObject({ success: true, pid: 50 });
   });
 });

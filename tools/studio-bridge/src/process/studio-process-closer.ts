@@ -89,26 +89,16 @@ export function parseMacProcessList(stdout: string): RunningStudioProcess[] {
 
 /**
  * Processes whose window shows the given place. Studio titles a local file
- * by its full path and a cloud place by its name.
+ * by its full path and a cloud place by its name on the website, which the
+ * plugin can't see, so with no title match a cloud place is found by the
+ * `placeId` Studio was launched with.
  */
 export function matchStudioProcesses(
   processes: RunningStudioProcess[],
   placeName: string,
   placeId?: number
 ): RunningStudioProcess[] {
-  // Studio titles a cloud place by its name on the website, which the plugin can't see
-  const launchedPlaceId = placeId
-    ? new RegExp(`placeId:${placeId}(\\D|$)`)
-    : undefined;
-  return processes.filter((proc) => {
-    if (
-      launchedPlaceId &&
-      proc.commandLine &&
-      launchedPlaceId.test(proc.commandLine)
-    ) {
-      return true;
-    }
-
+  const byTitle = processes.filter((proc) => {
     const title = proc.windowTitle.endsWith(WINDOW_TITLE_SUFFIX)
       ? proc.windowTitle.slice(0, -WINDOW_TITLE_SUFFIX.length)
       : proc.windowTitle;
@@ -119,6 +109,21 @@ export function matchStudioProcesses(
       title.endsWith(`/${placeName}`)
     );
   });
+  if (byTitle.length > 0 || !placeId) {
+    return byTitle;
+  }
+  return matchStudioProcessesByPlaceId(processes, placeId);
+}
+
+/** Processes Studio launched with `placeId`, as `process launch` and the website's "Edit in Studio" do. */
+export function matchStudioProcessesByPlaceId(
+  processes: RunningStudioProcess[],
+  placeId: number
+): RunningStudioProcess[] {
+  const launchedPlaceId = new RegExp(`placeId:${placeId}(\\D|$)`);
+  return processes.filter(
+    (proc) => proc.commandLine && launchedPlaceId.test(proc.commandLine)
+  );
 }
 
 /**

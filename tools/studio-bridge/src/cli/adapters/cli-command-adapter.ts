@@ -9,6 +9,7 @@
  *   - Honors `--output` (file write), `--open`, `--watch`, `--interval`
  */
 
+import * as path from 'path';
 import type { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -16,7 +17,7 @@ import {
   type ResultReporter,
   formatJson,
 } from '@quenty/cli-output-helpers/reporting';
-import { BridgeConnection } from '../../bridge/index.js';
+import { BridgeConnection, SessionNotFoundError } from '../../bridge/index.js';
 import type { BridgeSession, SessionContext } from '../../bridge/index.js';
 import type {
   CommandDefinition,
@@ -24,6 +25,7 @@ import type {
 } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
 import { explainMissingPlaytestContextAsync } from '../../commands/playtest/playtest-sessions.js';
+import { tryFindFolderInstanceAsync } from '../../deploy/deploy-places.js';
 import {
   addWarning,
   getWarnings,
@@ -99,6 +101,11 @@ async function executeCommandAsync(
     context: argv.context as SessionContext | undefined,
   };
 
+  // Connection commands start once Studios have connected, so this can look now
+  if (def.scope === 'connection' && !def.coversAllSessions) {
+    await tryTargetFolderInstanceAsync(connection, targeting);
+  }
+
   if (connection.isHostOutdated) {
     addWarning(
       `The bridge host on port ${connection.port} runs an older studio-bridge, which may drop newer options. Restart it (e.g. stop 'studio-bridge serve') to use this version.`
@@ -107,11 +114,7 @@ async function executeCommandAsync(
 
   try {
     if (def.scope === 'session') {
-      const session = await connection
-        .resolveSessionAsync(targeting.target, targeting.context)
-        .catch(async (err: unknown) => {
-          throw await explainMissingPlaytestContextAsync(connection, err);
-        });
+      const session = await resolveTargetSessionAsync(connection, targeting);
       if (def.changesDataModel && !argv.allowEdit) {
         assertNotEditingDuringPlaytest(connection, session);
       }
@@ -125,6 +128,59 @@ async function executeCommandAsync(
       await connection.disconnectAsync();
     }
   }
+}
+
+/**
+ * The session `targeting` names. When it names none and several Studios are
+ * connected, the one with the current folder's deploy.nevermore.json place open.
+ */
+async function resolveTargetSessionAsync(
+  connection: BridgeConnection,
+  targeting: SessionTargeting
+): Promise<BridgeSession> {
+  try {
+    return await connection.resolveSessionAsync(
+      targeting.target,
+      targeting.context
+    );
+  } catch (err) {
+    if (
+      err instanceof SessionNotFoundError &&
+      (await tryTargetFolderInstanceAsync(connection, targeting))
+    ) {
+      return connection
+        .resolveSessionAsync(targeting.target, targeting.context)
+        .catch(async (retryErr: unknown) => {
+          throw await explainMissingPlaytestContextAsync(connection, retryErr);
+        });
+    }
+    throw await explainMissingPlaytestContextAsync(connection, err);
+  }
+}
+
+/**
+ * Without a --target, targets the one connected Studio that has the current
+ * folder's deploy.nevermore.json place open, and says so.
+ */
+async function tryTargetFolderInstanceAsync(
+  connection: BridgeConnection,
+  targeting: SessionTargeting
+): Promise<boolean> {
+  if (targeting.target) {
+    return false;
+  }
+  const folder = await tryFindFolderInstanceAsync(connection, process.cwd());
+  if (!folder) {
+    return false;
+  }
+
+  targeting.target = folder.instanceId;
+  OutputHelper.hint(
+    `Using ${folder.instanceId}, which has '${
+      folder.deployPlace.selector
+    }' of ${path.relative(process.cwd(), folder.deployPlace.configPath)} open`
+  );
+  return true;
 }
 
 /**

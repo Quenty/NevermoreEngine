@@ -110,7 +110,7 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
       universeId: 900,
     });
     expect(result).toMatchObject({
-      target: 'test',
+      deployTarget: 'test',
       placeId: 111,
       universeId: 900,
     });
@@ -132,7 +132,7 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
     });
 
     const result = await launchHandlerAsync({
-      target: 'integration.places.arena',
+      deployTarget: 'integration.places.arena',
       cwd: tempDir,
     });
 
@@ -140,7 +140,7 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
       placeId: 333,
       universeId: 900,
     });
-    expect(result.target).toBe('integration.places.arena');
+    expect(result.deployTarget).toBe('integration.places.arena');
   });
 
   it('asks which place to open for a target with several', async () => {
@@ -151,23 +151,42 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
     });
 
     await expect(
-      launchHandlerAsync({ target: 'integration', cwd: tempDir })
+      launchHandlerAsync({ deployTarget: 'integration', cwd: tempDir })
     ).rejects.toThrow(
       "Target 'integration' has 2 places. Pick one:\n  - integration.places.hub\n  - integration.places.arena"
     );
     expect(launchStudioAsync).not.toHaveBeenCalled();
   });
 
+  it('skips a config without targets, like a repo root universe id', async () => {
+    await writeDeployConfigAsync(tempDir, { universeId: 900 });
+
+    const result = await launchHandlerAsync({ cwd: tempDir });
+
+    expect(launchStudioAsync).toHaveBeenCalledWith({});
+    expect(result.summary).toBe('Studio launched');
+  });
+
+  it('asks for a target when the config has no default', async () => {
+    await writeDeployConfigAsync(tempDir, {
+      targets: { alpha: place(1), beta: place(2) },
+    });
+
+    await expect(launchHandlerAsync({ cwd: tempDir })).rejects.toThrow(
+      'has several targets and no default. Name one: alpha, beta'
+    );
+  });
+
   it('fails on a target when no deploy.nevermore.json is found', async () => {
     await expect(
-      launchHandlerAsync({ target: 'test', cwd: tempDir })
+      launchHandlerAsync({ deployTarget: 'test', cwd: tempDir })
     ).rejects.toThrow(/No deploy.nevermore.json in .* to find target 'test'/);
   });
 
   it('refuses a target together with --place', async () => {
     await expect(
       launchHandlerAsync({
-        target: 'test',
+        deployTarget: 'test',
         placePath: '/tmp/game.rbxl',
         cwd: tempDir,
       })
