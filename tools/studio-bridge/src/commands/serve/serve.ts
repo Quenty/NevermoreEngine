@@ -160,7 +160,8 @@ export async function serveHandlerAsync(
 export const serveCommand = defineCommand<ServeOptions, ServeResult>({
   group: null,
   name: 'serve',
-  description: 'Start the bridge server',
+  description:
+    'Start the bridge server (optional: keeps Studio connected, so commands run in about a second instead of ten)',
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',
