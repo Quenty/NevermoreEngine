@@ -19,6 +19,12 @@ local CaptureScreenshotAction = {}
 
 type SendMessage = (message: { [string]: any }) -> ()
 
+export type Services = {
+	captureService: any,
+	assetService: any,
+	encodingService: any,
+}
+
 -- The plugin hands its PNG encoder over through router._vendorPng
 local png: any = nil
 local isTornDown = false
@@ -63,7 +69,12 @@ function CaptureScreenshotAction.teardown()
 	isTornDown = true
 end
 
-function CaptureScreenshotAction._captureAsync(sendMessage: SendMessage, requestId: string?, sessionId: string)
+function CaptureScreenshotAction._captureAsync(
+	sendMessage: SendMessage,
+	requestId: string?,
+	sessionId: string,
+	services: Services?
+)
 	local function fail(code: string, message: string)
 		sendMessage(CaptureScreenshotAction._buildMessage("error", sessionId, requestId, {
 			code = code,
@@ -72,15 +83,22 @@ function CaptureScreenshotAction._captureAsync(sendMessage: SendMessage, request
 	end
 
 	-- Resolved here rather than at load, so the module still loads under Lune
-	local servicesOk, captureServiceOrErr, assetService, encodingService = pcall(function()
-		return game:GetService("CaptureService"), game:GetService("AssetService"), game:GetService("EncodingService")
+	local servicesOk, servicesOrErr = pcall(function()
+		return services
+			or {
+				captureService = game:GetService("CaptureService"),
+				assetService = game:GetService("AssetService"),
+				encodingService = game:GetService("EncodingService"),
+			}
 	end)
 	if not servicesOk then
-		fail("CAPTURE_FAILED", `Required services not available: {captureServiceOrErr}`)
+		fail("CAPTURE_FAILED", `Required services not available: {servicesOrErr}`)
 		return
 	end
+	local assetService = servicesOrErr.assetService
+	local encodingService = servicesOrErr.encodingService
 
-	local captureOk, contentIdOrErr = CaptureScreenshotAction._captureContentIdAsync(captureServiceOrErr)
+	local captureOk, contentIdOrErr = CaptureScreenshotAction._captureContentIdAsync(servicesOrErr.captureService)
 	if isTornDown then
 		return
 	end
