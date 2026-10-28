@@ -11,6 +11,7 @@ local Table = require("Table")
 export type PermissionProviderConstants = {
 	DEFAULT_REMOTE_FUNCTION_NAME: "PermissionProviderDefaultRemoteFunction",
 	GROUP_RANK_CONFIG_TYPE: "GroupRankConfigType",
+	GROUP_ROLE_CONFIG_TYPE: "GroupRoleConfigType",
 	SINGLE_USER_CONFIG_TYPE: "SingleUserConfigType",
 }
 
@@ -19,5 +20,6 @@ return Table.readonly({
 
 	-- types
 	GROUP_RANK_CONFIG_TYPE = "GroupRankConfigType",
+	GROUP_ROLE_CONFIG_TYPE = "GroupRoleConfigType",
 	SINGLE_USER_CONFIG_TYPE = "SingleUserConfigType",
 } :: PermissionProviderConstants)
