@@ -20,6 +20,7 @@ import type {
 } from '../../bridge/index.js';
 import { ContextNotFoundError } from '../../bridge/index.js';
 import { getPluginBuildVersionAsync } from '../../plugin/plugin-build-version.js';
+import { tryReadLoadUserPluginsOnPlaytestAsync } from '../../process/studio-settings.js';
 
 /** How long a started playtest may run before its pending start request is dropped. */
 const PLAYTEST_MAX_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -29,6 +30,8 @@ const SESSION_WAIT_TIMEOUT_MS = 30_000;
 const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
 const READ_RETRY_DELAY_MS = 1_000;
+
+const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into playtests and their sessions can't connect. Turn it on in Studio Settings, or use 'studio-bridge playtest run', which runs a script in a playtest without it.`;
 
 const READ_PLAYTEST_ID_SCRIPT = [
   'local ok, args = pcall(function()',
@@ -71,6 +74,9 @@ export async function startPlaytestAsync(
     throw new Error(
       `Playtests start from an edit session, but '${editSession.info.sessionId}' is a ${editSession.context} session`
     );
+  }
+  if ((await tryReadLoadUserPluginsOnPlaytestAsync()) === false) {
+    throw new Error(PLAYTEST_PLUGINS_OFF_MESSAGE);
   }
   if (players !== undefined) {
     await assertCanStartMultiplayerAsync(editSession, mode, players);
@@ -191,10 +197,7 @@ export async function resolvePlaytestServerSessionAsync(
     try {
       return await connection.resolveSessionAsync(target, 'server');
     } catch (err) {
-      if (err instanceof ContextNotFoundError) {
-        throw new Error(`No playtest of '${target}' is running`);
-      }
-      throw err;
+      throw await explainMissingPlaytestContextAsync(connection, err);
     }
   }
 
@@ -202,7 +205,7 @@ export async function resolvePlaytestServerSessionAsync(
     .listSessions()
     .filter((info) => info.context === 'server');
   if (servers.length === 0) {
-    throw new Error('No playtest is running');
+    throw new Error(await explainNoPlaytestAsync());
   }
   if (servers.length > 1) {
     const list = servers
@@ -218,6 +221,47 @@ export async function resolvePlaytestServerSessionAsync(
     throw new Error(`Session '${servers[0].sessionId}' disconnected`);
   }
   return session;
+}
+
+/**
+ * Explains a missing `server` or `client` session: no playtest is running, a
+ * run-mode playtest has no client, or the playtest's sessions can't connect.
+ * Other errors pass through unchanged.
+ */
+export async function explainMissingPlaytestContextAsync(
+  connection: BridgeConnection,
+  err: unknown
+): Promise<unknown> {
+  if (
+    !(err instanceof ContextNotFoundError) ||
+    (err.context !== 'server' && err.context !== 'client')
+  ) {
+    return err;
+  }
+
+  const placeName = connection
+    .listSessions()
+    .find((info) => info.instanceId === err.instanceId)?.placeName;
+  const studio = placeName ? `'${placeName}'` : `instance '${err.instanceId}'`;
+
+  if (err.context === 'client' && err.availableContexts.includes('server')) {
+    return new Error(
+      `The playtest of ${studio} runs in run mode, which has no client. Restart it in play mode with 'studio-bridge playtest restart --mode play'.`
+    );
+  }
+  return new Error(await explainNoPlaytestAsync(studio, err.context));
+}
+
+async function explainNoPlaytestAsync(
+  studio?: string,
+  context?: SessionContext
+): Promise<string> {
+  const of = studio ? ` of ${studio}` : '';
+  if ((await tryReadLoadUserPluginsOnPlaytestAsync()) === false) {
+    return `No playtest${of} is connected. ${PLAYTEST_PLUGINS_OFF_MESSAGE}`;
+  }
+  const missing = context ? `, so there is no ${context} session` : '';
+  return `No playtest${of} is running${missing}. Start one with 'studio-bridge playtest start'.`;
 }
 
 /**

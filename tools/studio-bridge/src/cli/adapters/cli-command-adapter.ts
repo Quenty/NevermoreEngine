@@ -23,6 +23,7 @@ import type {
   SessionTargeting,
 } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
+import { explainMissingPlaytestContextAsync } from '../../commands/playtest/playtest-sessions.js';
 import {
   addWarning,
   getWarnings,
@@ -106,10 +107,11 @@ async function executeCommandAsync(
 
   try {
     if (def.scope === 'session') {
-      const session = await connection.resolveSessionAsync(
-        targeting.target,
-        targeting.context
-      );
+      const session = await connection
+        .resolveSessionAsync(targeting.target, targeting.context)
+        .catch(async (err: unknown) => {
+          throw await explainMissingPlaytestContextAsync(connection, err);
+        });
       if (def.changesDataModel && !argv.allowEdit) {
         assertNotEditingDuringPlaytest(connection, session);
       }
