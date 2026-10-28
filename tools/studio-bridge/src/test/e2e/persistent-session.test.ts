@@ -566,14 +566,14 @@ describe('persistent session e2e', () => {
     connections.push(client);
 
     const session = await client.resolveSessionAsync(plugin.sessionId);
-    void session
-      .execAsync('while true do task.wait() end', 60_000)
-      .catch(() => undefined);
+    const stuck = session.execAsync('while true do task.wait() end', 60_000);
     await new Promise((r) => setTimeout(r, 100));
 
     const started = Date.now();
     await host.disconnectAsync({ relayDrainTimeoutMs: 200 });
 
     expect(Date.now() - started).toBeLessThan(2_000);
+    const result = await stuck;
+    expect(result.success).toBe(false);
   });
 });

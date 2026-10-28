@@ -115,6 +115,10 @@ export class BridgeClient extends EventEmitter {
 
     this._transport.on('disconnected', () => {
       this._isConnected = false;
+      // Replies to these went to the old host, so none will arrive
+      this._rejectPendingRequests(
+        'The bridge host shut down before replying. Studio may still have run the request.'
+      );
       this.emit('disconnected');
 
       // Trigger failover detection
@@ -138,6 +142,14 @@ export class BridgeClient extends EventEmitter {
     await this._fetchSessionsAsync();
   }
 
+  private _rejectPendingRequests(message: string): void {
+    for (const [, entry] of this._pendingRequests) {
+      clearTimeout(entry.timer);
+      entry.reject(new Error(message));
+    }
+    this._pendingRequests.clear();
+  }
+
   /**
    * Disconnect from the bridge host.
    */
@@ -148,12 +160,7 @@ export class BridgeClient extends EventEmitter {
     this._transport.disconnect();
     this._isConnected = false;
 
-    // Cancel all pending requests
-    for (const [, entry] of this._pendingRequests) {
-      clearTimeout(entry.timer);
-      entry.reject(new Error('Client disconnected'));
-    }
-    this._pendingRequests.clear();
+    this._rejectPendingRequests('Client disconnected');
 
     // Mark all handles as disconnected
     for (const handle of this._sessionHandles.values()) {

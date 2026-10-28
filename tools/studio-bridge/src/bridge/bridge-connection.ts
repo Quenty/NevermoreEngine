@@ -101,6 +101,7 @@ class HostTransportHandle extends EventEmitter {
 
 export class BridgeConnection extends EventEmitter {
   private _role: 'host' | 'client';
+  private _isRemote = false;
   private _isConnected: boolean = false;
   private _keepAlive: boolean;
   private _hasSettled: boolean = false;
@@ -180,6 +181,7 @@ export class BridgeConnection extends EventEmitter {
             ),
           ]);
 
+          autoConn._isRemote = true;
           return autoConn;
         } catch {
           console.warn(
@@ -197,6 +199,7 @@ export class BridgeConnection extends EventEmitter {
     });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
+    conn._isRemote = parsedRemoteHost !== undefined;
     conn._firstSessionTimeoutMs = options?.timeoutMs;
     OutputHelper.verbose(
       `[bridge] Role: ${detection.role}, port: ${detection.port}`
@@ -314,6 +317,11 @@ export class BridgeConnection extends EventEmitter {
   }
 
   /** The actual port the bridge is bound to (host) or connected to (client). */
+  /** Whether the bridge host, and so Studio, runs on another machine. */
+  get isRemote(): boolean {
+    return this._isRemote;
+  }
+
   get port(): number {
     if (this._host) {
       return this._host.port;

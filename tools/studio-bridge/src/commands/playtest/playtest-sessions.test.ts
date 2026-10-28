@@ -83,6 +83,15 @@ describe('with "Load user plugins on playtest" off', () => {
       `No playtest is connected. Studio's "Load user plugins on playtest" setting is off`
     );
   });
+
+  it("ignores this machine's setting when Studio is remote", async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const connection = { listSessions: () => [], isRemote: true } as any;
+
+    await expect(resolvePlaytestServerSessionAsync(connection)).rejects.toThrow(
+      "No playtest is running. Start one with 'studio-bridge playtest start'."
+    );
+  });
 });
 
 describe('explainMissingPlaytestContextAsync', () => {

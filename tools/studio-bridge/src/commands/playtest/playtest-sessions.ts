@@ -31,7 +31,7 @@ const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
 const READ_RETRY_DELAY_MS = 1_000;
 
-const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into playtests and their sessions can't connect. Turn it on in Studio Settings, or use 'studio-bridge playtest run', which runs a script in a playtest without it.`;
+const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into playtests and their sessions can't connect. Turn it on in Studio Settings, or run a script in a playtest's server with 'studio-bridge playtest run', which works without it.`;
 
 const READ_PLAYTEST_ID_SCRIPT = [
   'local ok, args = pcall(function()',
@@ -75,7 +75,7 @@ export async function startPlaytestAsync(
       `Playtests start from an edit session, but '${editSession.info.sessionId}' is a ${editSession.context} session`
     );
   }
-  if ((await tryReadLoadUserPluginsOnPlaytestAsync()) === false) {
+  if (await isPlaytestPluginsOffAsync(connection)) {
     throw new Error(PLAYTEST_PLUGINS_OFF_MESSAGE);
   }
   if (players !== undefined) {
@@ -205,7 +205,7 @@ export async function resolvePlaytestServerSessionAsync(
     .listSessions()
     .filter((info) => info.context === 'server');
   if (servers.length === 0) {
-    throw new Error(await explainNoPlaytestAsync());
+    throw new Error(await explainNoPlaytestAsync(connection));
   }
   if (servers.length > 1) {
     const list = servers
@@ -249,15 +249,31 @@ export async function explainMissingPlaytestContextAsync(
       `The playtest of ${studio} runs in run mode, which has no client. Restart it in play mode with 'studio-bridge playtest restart --mode play'.`
     );
   }
-  return new Error(await explainNoPlaytestAsync(studio, err.context));
+  return new Error(
+    await explainNoPlaytestAsync(connection, studio, err.context)
+  );
+}
+
+/**
+ * Whether this machine's Studio has "Load user plugins on playtest" off. A
+ * remote Studio's settings aren't on this machine, so they count as unknown.
+ */
+async function isPlaytestPluginsOffAsync(
+  connection: BridgeConnection
+): Promise<boolean> {
+  return (
+    !connection.isRemote &&
+    (await tryReadLoadUserPluginsOnPlaytestAsync()) === false
+  );
 }
 
 async function explainNoPlaytestAsync(
+  connection: BridgeConnection,
   studio?: string,
   context?: SessionContext
 ): Promise<string> {
   const of = studio ? ` of ${studio}` : '';
-  if ((await tryReadLoadUserPluginsOnPlaytestAsync()) === false) {
+  if (await isPlaytestPluginsOffAsync(connection)) {
     return `No playtest${of} is connected. ${PLAYTEST_PLUGINS_OFF_MESSAGE}`;
   }
   const missing = context ? `, so there is no ${context} session` : '';
