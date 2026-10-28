@@ -62,7 +62,6 @@ registry.register(importCommand);
 registry.register(findCommand);
 registry.register(grepCommand);
 registry.register(screenshotCommand);
-registry.register(processRunCommand);
 registry.register(playtestStartCommand);
 registry.register(playtestStopCommand);
 registry.register(playtestRunCommand);
@@ -72,10 +71,11 @@ registry.register(playtestPlayerAddCommand);
 registry.register(playtestPlayerRemoveCommand);
 
 // Infrastructure commands
-registry.register(infoCommand);
-registry.register(listCommand);
 registry.register(launchCommand);
+registry.register(listCommand);
+registry.register(infoCommand);
 registry.register(processCloseCommand);
+registry.register(processRunCommand);
 registry.register(installCommand);
 registry.register(uninstallCommand);
 registry.register(serveCommand);
@@ -156,7 +156,17 @@ const cli = yargs(hideBin(process.argv))
   .middleware((argv) => {
     OutputHelper.setVerbose(argv.verbose as boolean);
   })
-  .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'));
+  .usage(OutputHelper.formatInfo('Usage: $0 <command> [options]'))
+  .example(
+    '$0 process launch',
+    "Open the place of the nearest deploy.nevermore.json's default target in Studio"
+  )
+  .example('$0 process list', 'List the connected Studio sessions')
+  .example(
+    "$0 console exec 'return workspace:GetChildren()'",
+    'Run Luau in Studio and print what it returns'
+  )
+  .example('$0 playtest start', 'Start a playtest');
 
 // Register grouped commands (console, explorer, viewport, process, plugin)
 for (const group of groups) {

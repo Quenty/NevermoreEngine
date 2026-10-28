@@ -12,7 +12,7 @@ const GROUP_DESCRIPTIONS: Record<string, string> = {
   viewport: 'Screenshots and camera control',
   data: 'Load and save serialized data',
   playtest: 'Control play test sessions',
-  process: 'Open (launch), list, inspect and close Studio',
+  process: 'Open and manage Studio',
   plugin: 'Manage the bridge plugin',
   action: 'Invoke a Studio action',
 };

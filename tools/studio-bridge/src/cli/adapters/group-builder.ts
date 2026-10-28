@@ -25,7 +25,7 @@ const GROUP_DESCRIPTIONS: Record<string, string> = {
   data: 'Load and save serialized data',
   playtest: 'Control play test sessions',
   'playtest player': 'List, add and remove the players of a multiplayer test',
-  process: 'Open (launch), list, inspect and close Studio',
+  process: 'Open and manage Studio',
   plugin: 'Manage the bridge plugin',
   action: 'Invoke a Studio action',
   linux: 'Linux/Wine environment management',
@@ -82,7 +82,14 @@ function buildGroupModule(
       name.startsWith(`${groupName} `) &&
       !name.slice(groupName.length + 1).includes(' ')
   );
-  const description = GROUP_DESCRIPTIONS[groupName] ?? `${groupName} commands`;
+  // Naming the subcommands lets a reader find e.g. `process launch` from the top-level help
+  const names = [
+    ...commands.map((cmd) => cmd.name),
+    ...subgroups.map((subgroup) => subgroup.split(' ').pop()),
+  ];
+  const description = `${
+    GROUP_DESCRIPTIONS[groupName] ?? `${groupName} commands`
+  }: ${names.join(', ')}`;
 
   return {
     command: `${groupName.split(' ').pop()} <command>`,

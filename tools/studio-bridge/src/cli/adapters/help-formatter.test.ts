@@ -85,7 +85,7 @@ describe('formatGroupedHelp', () => {
   it('includes group descriptions', () => {
     const help = formatGroupedHelp(makeRegistry());
     expect(help).toContain('Execute code and view logs');
-    expect(help).toContain('Open (launch), list, inspect and close Studio');
+    expect(help).toContain('Open and manage Studio');
   });
 
   it('returns empty for empty registry', () => {

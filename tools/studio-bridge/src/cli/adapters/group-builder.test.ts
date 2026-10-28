@@ -112,14 +112,14 @@ describe('buildGroupCommands', () => {
     expect(consoleMod!.command).toBe('console <command>');
   });
 
-  it('group commands have descriptions', () => {
+  it('group commands have descriptions that name their subcommands', () => {
     const registry = makeRegistry();
     const result = buildGroupCommands(registry);
 
     const consoleMod = result.groups.find((g) =>
       (g.command as string).startsWith('console')
     );
-    expect(consoleMod!.describe).toBe('Execute code and view logs');
+    expect(consoleMod!.describe).toBe('Execute code and view logs: exec, logs');
   });
 
   it('group builder registers subcommands', () => {
