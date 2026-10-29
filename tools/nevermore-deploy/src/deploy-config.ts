@@ -182,23 +182,53 @@ function _validatePlace(label: string, place: DeployTarget): void {
   }
 }
 
+/** A metadata-only config can seed a universe without declaring deploy targets. */
+export class DeployTargetsMissingError extends Error {
+  override name = 'DeployTargetsMissingError';
+}
+
 export async function loadDeployConfigAsync(
   configPath: string
 ): Promise<DeployConfig> {
   let content: string;
   try {
     content = await fs.readFile(configPath, 'utf-8');
-  } catch {
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(
+        `deploy.nevermore.json not found at ${configPath}\nRun "nevermore deploy init" to create one.`,
+        { cause: err }
+      );
+    }
     throw new Error(
-      `deploy.nevermore.json not found at ${configPath}\nRun "nevermore deploy init" to create one.`
+      `Could not read deploy.nevermore.json at ${configPath}: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+      { cause: err }
     );
   }
 
   const config = JSON.parse(content) as DeployConfig;
 
-  if (!config.targets || typeof config.targets !== 'object') {
+  if (config === null || typeof config !== 'object' || Array.isArray(config)) {
     throw new Error(
+      `deploy.nevermore.json at ${configPath} must contain a JSON object`
+    );
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(config, 'targets')) {
+    throw new DeployTargetsMissingError(
       `deploy.nevermore.json at ${configPath} is missing "targets" field`
+    );
+  }
+
+  if (
+    !config.targets ||
+    typeof config.targets !== 'object' ||
+    Array.isArray(config.targets)
+  ) {
+    throw new Error(
+      `deploy.nevermore.json at ${configPath} has an invalid "targets" field; expected an object`
     );
   }
 
@@ -221,6 +251,11 @@ export async function loadDeployConfigAsync(
   return config;
 }
 
+/** A valid selector has no matching target or named place in this config. */
+export class DeployTargetNotFoundError extends Error {
+  override name = 'DeployTargetNotFoundError';
+}
+
 /**
  * Expand a target into one DeployTarget per place. Single-place targets resolve
  * to a 1-element array; multi-place targets expand to one entry per `places[]`.
@@ -239,7 +274,7 @@ export function resolveDeployTargetPlaces(
   const target = config.targets[targetName];
 
   if (!target) {
-    throw new Error(
+    throw new DeployTargetNotFoundError(
       [
         `Target "${targetName}" not found in deploy.nevermore.json.`,
         `Available targets: ${availableTargets.join(', ')}`,
@@ -255,7 +290,7 @@ export function resolveDeployTargetPlaces(
   const place = places.find((p) => p.name === placeName);
   if (!place) {
     const named = places.flatMap((p) => (p.name == null ? [] : [p.name]));
-    throw new Error(
+    throw new DeployTargetNotFoundError(
       [
         `Target "${targetName}" has no place named "${placeName}".`,
         named.length > 0

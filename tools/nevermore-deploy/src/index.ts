@@ -14,6 +14,8 @@
  */
 export {
   BASE_PLACE_VERSION_KEYWORDS,
+  DeployTargetNotFoundError,
+  DeployTargetsMissingError,
   discoverUniverseIdAsync,
   isBasePlaceVersionKeyword,
   loadDeployConfigAsync,

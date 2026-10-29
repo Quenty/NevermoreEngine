@@ -525,6 +525,8 @@ nevermore batch test --cloud --concurrency 3
 nevermore batch test --output results.json
 ```
 
+Batch discovery skips packages without `deploy.nevermore.json`, without a `targets` field, or without the requested target or named place. A config containing only `universeId`, such as this repository's root config, seeds metadata for CI without defining a deployment and is skipped. An unreadable config, malformed JSON, or an invalid declared `targets` value stops discovery with the package name, config path, and original diagnostic. This applies to changed-package and `--all` discovery, including batch deploys. Invalid target selectors fail even when no packages are found. Commands that explicitly deploy a package still require its config to declare targets.
+
 Options:
 | Flag | Description |
 |------|-------------|
