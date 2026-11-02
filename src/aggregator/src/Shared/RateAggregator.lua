@@ -70,13 +70,19 @@ end
 	@return Observable<T>
 ]=]
 function RateAggregator.Promise<TArgs..., T...>(self: RateAggregator<TArgs..., T...>, ...: T...): Promise.Promise<T...>
-	local promise = self._maid:GivePromise(Promise.new())
-
 	local tuple = self._tupleLookup:ToTuple(...)
 	local found = self._promisesLruCache:get(tuple)
 	if found then
 		return found
 	end
+
+	local promise = self._maid:GivePromise(Promise.new())
+
+	promise:Catch(function()
+		if self._promisesLruCache:get(tuple) == promise then
+			self._promisesLruCache:delete(tuple)
+		end
+	end)
 
 	self._queue:PushRight({
 		tuple = tuple,
