@@ -1,3 +1,15 @@
+# v4.50.1 (Mon Nov 02 2026)
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

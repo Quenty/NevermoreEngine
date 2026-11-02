@@ -1,3 +1,16 @@
+# (Mon Nov 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.19.1`, `@quenty/nevermore-cli@4.50.1`
+  - fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Oct 28 2026)
 
 #### 🚀 Enhancement
