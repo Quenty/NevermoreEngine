@@ -8,6 +8,10 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type BatchTarget } from '../../batch/changed-packages-utils.js';
 import { recompressPlace } from '../../build/place-recompression.js';
+import {
+  type TestRojoProject,
+  findTestProjectSlug,
+} from './test-project-slug.js';
 
 /**
  * Budget for one combined place, as uploaded (recompressed). Under the upload
@@ -38,10 +42,6 @@ export interface CombinedProjectResult {
   primaryTarget: DeployTarget;
   /** Owns the temp directory — caller must clean up via buildContext.cleanupAsync(). */
   buildContext: BuildContext;
-}
-
-interface RojoNode {
-  [key: string]: unknown;
 }
 
 import { type StepProgress } from '@quenty/cli-output-helpers/reporting';
@@ -345,20 +345,16 @@ async function _extractSlugAsync(
     );
   }
 
-  const project = JSON.parse(content) as {
-    tree: { ServerScriptService?: RojoNode };
-  };
-  const serverScriptService = project.tree?.ServerScriptService;
-  if (!serverScriptService) {
+  const project = JSON.parse(content) as TestRojoProject;
+  if (!project.tree?.ServerScriptService) {
     throw new Error(
       `Test project for ${batchTargetName} is missing ServerScriptService in tree`
     );
   }
 
-  for (const key of Object.keys(serverScriptService)) {
-    if (!key.startsWith('$') && key !== 'Script') {
-      return key;
-    }
+  const slug = findTestProjectSlug(project);
+  if (slug) {
+    return slug;
   }
 
   throw new Error(

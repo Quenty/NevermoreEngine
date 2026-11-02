@@ -136,25 +136,27 @@ describe('summarizeDiagnostics', () => {
 });
 
 describe('dedupeDiagnostics', () => {
-  it('drops repeats of the same file, line and title', () => {
+  it('drops identical repeats', () => {
+    const result = dedupeDiagnostics([
+      makeDiagnostic({ title: 'Runtime error' }),
+      makeDiagnostic({ title: 'Runtime error' }),
+      makeDiagnostic({ file: undefined, line: undefined }),
+      makeDiagnostic({ file: undefined, line: undefined }),
+    ]);
+    expect(result).toHaveLength(2);
+  });
+
+  it('keeps distinct errors at the same file, line and title', () => {
     const result = dedupeDiagnostics([
       makeDiagnostic({ title: 'Runtime error', message: 'first' }),
       makeDiagnostic({ title: 'Runtime error', message: 'second' }),
-      makeDiagnostic({ title: 'Runtime error', line: 11 }),
+      makeDiagnostic({ title: 'Runtime error', message: 'first', line: 11 }),
     ]);
-    expect(result.map((d) => d.message)).toEqual([
-      'first',
-      'Something went wrong',
+    expect(result.map((d) => [d.line, d.message])).toEqual([
+      [10, 'first'],
+      [10, 'second'],
+      [11, 'first'],
     ]);
-  });
-
-  it('keeps file-less diagnostics apart by message', () => {
-    const result = dedupeDiagnostics([
-      makeDiagnostic({ file: undefined, line: undefined, message: 'a' }),
-      makeDiagnostic({ file: undefined, line: undefined, message: 'a' }),
-      makeDiagnostic({ file: undefined, line: undefined, message: 'b' }),
-    ]);
-    expect(result.map((d) => d.message)).toEqual(['a', 'b']);
   });
 });
 

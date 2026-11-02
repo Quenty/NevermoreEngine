@@ -1,19 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { PathOrFileDescriptor } from 'fs';
 import { fileURLToPath } from 'url';
 import { parseJestLuaOutput } from './jest-lua-parser.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
 
-// Mock fs.readFileSync for _findTestLineInFile; existsSync stays real so paths
-// are checked against the real repo layout.
+// readFileSync passes through so the workspace and existence checks run
+// against the real repo layout; individual tests stub spec file contents.
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
-  return {
-    ...actual,
-    readFileSync: vi.fn(() => {
-      throw new Error('ENOENT');
-    }),
-  };
+  return { ...actual, readFileSync: vi.fn(actual.readFileSync) };
 });
 
 const REPO_ROOT = fileURLToPath(new URL('../../../../../../', import.meta.url));
@@ -143,19 +139,24 @@ describe('parseJestLuaOutput', () => {
   });
 
   it('searches spec file for it() call when at location has no line number', async () => {
+    const actualFs = await vi.importActual<typeof import('fs')>('fs');
     const { readFileSync } = await import('fs');
-    const mockedReadFileSync = vi.mocked(readFileSync);
-    mockedReadFileSync.mockReturnValue(
-      [
-        'local require = require(script.Parent.loader).load(script)',
-        '',
-        'describe("Suite", function()',
-        '  it("my test name", function()',
-        '    -- test body',
-        '  end)',
-        'end)',
-      ].join('\n')
-    );
+    const specContent = [
+      'local require = require(script.Parent.loader).load(script)',
+      '',
+      'describe("Suite", function()',
+      '  it("my test name", function()',
+      '    -- test body',
+      '  end)',
+      'end)',
+    ].join('\n');
+    vi.mocked(readFileSync).mockImplementation(((
+      filePath: PathOrFileDescriptor,
+      options?: BufferEncoding
+    ) =>
+      String(filePath).endsWith('MaidTaskUtils.spec.lua')
+        ? specContent
+        : actualFs.readFileSync(filePath, options)) as typeof readFileSync);
 
     const input = [
       '  ● Suite › my test name',
@@ -378,6 +379,28 @@ describe('parseJestLuaOutput', () => {
         'src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua'
       );
       expect(result[0].line).toBe(59);
+    });
+
+    it('does not let a sibling package frame land in the package under test', () => {
+      // run 32500891927, saveslot, with a sibling package's frame on top
+      const input = [
+        `[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call missing method 'GetSubStore' of table`,
+        '    Stack Begin',
+        `    Script '[string "ServerScriptService.othersibling.Server.SaveSlotService"]', Line 10`,
+        `    Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1668 - function _stagePlaytime`,
+        '    Stack End',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/saveslot',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe(
+        'src/saveslot/src/Server/HasSaveSlotsDataStore.lua'
+      );
+      expect(result[0].line).toBe(1668);
     });
 
     it('maps dependency frames back to the dependency source package', () => {

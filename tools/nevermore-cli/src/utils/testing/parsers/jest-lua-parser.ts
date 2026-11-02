@@ -33,11 +33,7 @@ import * as path from 'path';
 import { type Diagnostic } from '@quenty/cli-output-helpers/reporting';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { SourcemapResolver } from '../../sourcemap/index.js';
-import {
-  isDependencyInstancePath,
-  tryResolveRobloxSourceFile,
-  unwrapChunkName,
-} from './roblox-path-resolver.js';
+import { tryResolveRobloxSourceFile } from './roblox-path-resolver.js';
 
 /** Matches `at ServerScriptService.pkg.Path.spec:45`, line optional */
 const AT_FRAME_PATTERN = /^\s+at\s+(\S+?)(?::(\d+))?\s*$/;
@@ -148,11 +144,11 @@ function _resolveLocation(
   let fallback: ResolvedLocation | undefined;
 
   for (const frame of frames) {
-    const file = tryResolveRobloxSourceFile(frame.instancePath, options);
-    if (!file) continue;
+    const resolved = tryResolveRobloxSourceFile(frame.instancePath, options);
+    if (!resolved) continue;
 
-    const location = { file, line: frame.line };
-    if (!isDependencyInstancePath(unwrapChunkName(frame.instancePath))) {
+    const location = { file: resolved.file, line: frame.line };
+    if (resolved.isPackageUnderTest) {
       return location;
     }
     fallback ??= location;

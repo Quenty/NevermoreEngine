@@ -99,7 +99,7 @@ export function dedupeDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
       d.file,
       d.line,
       d.title,
-      d.file === undefined ? d.message : undefined,
+      d.message,
     ]);
     if (seen.has(key)) return false;
     seen.add(key);
