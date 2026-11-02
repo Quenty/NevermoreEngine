@@ -1,31 +1,10 @@
 /**
  * Parser for Jest-lua verbose output (`verbose=true, ci=true`).
  *
- * Handles two failure modes:
- *
- * 1. **Jest failures** — `●` blocks followed by stack frames:
- *    ```
- *      ● save slot playtime › persists accrued playtime
- *
- *        attempt to call missing method 'GetSubStore' of table
- *
- *          ServerScriptService.saveslot.Server.HasSaveSlotsDataStore:1668
- *    ```
- *
- * 2. **Runtime errors** — `Stack Begin`/`Stack End` blocks:
- *    ```
- *    [string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call ...
- *        Stack Begin
- *        Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1668 - function _stagePlaytime
- *        Stack End
- *    ```
- *
- * Each block yields one diagnostic, located at the innermost frame that maps
- * to a real repo file, preferring frames from the package under test over
- * dependency copies. When no frame resolves, the diagnostic carries no file.
- *
- * The parser is intentionally lenient — it extracts what it can, skips what
- * it can't, and never crashes on unexpected input.
+ * Emits one diagnostic per `●` failure block and per `Stack Begin`/`Stack End`
+ * runtime error, at the innermost frame that resolves to a repo file,
+ * preferring the package under test. Diagnostics with no resolvable frame
+ * carry no file. Unexpected input is skipped, never thrown on.
  */
 
 import * as fs from 'fs';
@@ -35,24 +14,21 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { SourcemapResolver } from '../../sourcemap/index.js';
 import { tryResolveRobloxSourceFile } from './roblox-path-resolver.js';
 
-/** Matches `at ServerScriptService.pkg.Path.spec:45`, line optional */
+/** `at ServerScriptService.pkg.Path.spec:45`, line optional */
 const AT_FRAME_PATTERN = /^\s+at\s+(\S+?)(?::(\d+))?\s*$/;
 
-/**
- * Matches Jest stack frames without `at`:
- * `ServerScriptService.pkg.Path:1263 function requireModule`
- */
+/** `ServerScriptService.pkg.Path:1263 function requireModule` */
 const BARE_FRAME_PATTERN =
   /^\s+(\[string "[^"]+"\]|ServerScriptService\.[^\s:"]+):(\d+)(?:\s+function\s+\S+)?\s*$/;
 
-/** Matches `Script '[string "ServerScriptService.pkg.Path"]', Line 23` */
+/** `Script '[string "ServerScriptService.pkg.Path"]', Line 23` */
 const SCRIPT_FRAME_PATTERN = /Script '(.+?)', Line (\d+)/;
 
-/** Matches `<chunk>:214:` error-location prefixes inside messages */
+/** `<chunk>:214:` location prefixes inside error messages */
 const MESSAGE_LOCATION_PATTERN =
   /(\[string "[^"]+"\]|ServerScriptService\.[^\s:"]+):(\d+):/g;
 
-/** Matches the Jest failure header: `● TestSuite › nested › test name` */
+/** `● TestSuite › nested › test name` */
 const FAILURE_HEADER_PATTERN = /^\s*●\s+(.+)$/;
 
 const TITLE_SEPARATOR_PATTERN = / [›>] /;
@@ -85,10 +61,10 @@ interface ResolvedLocation {
 }
 
 export interface JestLuaParseOptions {
-  /** npm name of the package under test, e.g. `@quenty/saveslot` */
+  /** npm name of the package under test, e.g. `@quenty/saveslot`. */
   packageName: string;
   sourcemapResolver?: SourcemapResolver;
-  /** Directory that resolved paths are checked against. Defaults to cwd. */
+  /** Repo root that holds `src/`. Defaults to cwd. */
   repoRoot?: string;
 }
 

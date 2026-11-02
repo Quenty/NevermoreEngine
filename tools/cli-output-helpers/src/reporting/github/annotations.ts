@@ -87,10 +87,7 @@ export function formatAnnotation(diagnostic: Diagnostic): string {
   return `::${diagnostic.severity}${properties}::${message}`;
 }
 
-/**
- * Drop repeats of the same annotation. GitHub shows at most 10 error
- * annotations per step, so repeats crowd out distinct failures.
- */
+/** Drop exact repeats; GitHub shows only 10 error annotations per step. */
 export function dedupeDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
   const seen = new Set<string>();
   return diagnostics.filter((d) => {

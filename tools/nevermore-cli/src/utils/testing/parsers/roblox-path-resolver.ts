@@ -1,26 +1,10 @@
 /**
- * Converts Roblox instance paths from Jest-lua output back to
- * repo-relative local filesystem paths.
+ * Maps Roblox instance paths from Jest-lua output to existing repo-relative
+ * source files, through `sourcemap.json` or else the `src/{folder}/src/` layout.
  *
- * Two strategies:
- *
- * 1. **Sourcemap** (preferred) — Uses the authoritative `sourcemap.json`
- *    mapping from `rojo sourcemap --absolute`. Exact and handles all
- *    project layouts.
- *
- * 2. **Heuristic** (fallback) — Assumes `src/{folder}/src/` layout and
- *    hard-codes `.spec`/`.story` as known dotted suffixes. Only accepted when
- *    the file exists.
- *
- * Paths may arrive wrapped in a Luau chunk name (`[string "..."]`) and may
- * point into a dependency's `node_modules` copy. Dependency copies are mapped
- * back to the dependency's own source package.
- *
- * A package goes by up to four names, none derivable from another: its npm
- * name (`@quenty/playermock`), its folder under `src/` (`player-mock`), its
- * Rojo project name, which the sourcemap uses (`playermock`), and its test
- * place slug (`gameproduct` for `src/gameproductservice`). The workspace index
- * reads them from each package's files.
+ * A package's npm name (`@quenty/playermock`), `src/` folder (`player-mock`),
+ * Rojo project name (`playermock`) and test-place slug (`gameproduct` for
+ * `src/gameproductservice`) can all differ.
  */
 
 import * as fs from 'fs';
@@ -48,16 +32,15 @@ export interface RobloxSourceResolveOptions {
 }
 
 export interface ResolvedSourceFile {
-  /** Repo-relative path of an existing file */
   file: string;
-  /** Whether the frame is the package under test's own code */
+  /** False for dependency copies and sibling packages. */
   isPackageUnderTest: boolean;
 }
 
 interface WorkspacePackage {
   folder: string;
   projectName?: string;
-  /** `undefined` until read, `null` when the package has no test project */
+  /** `undefined` until read, `null` when there is no test project */
   testSlug?: string | null;
 }
 
@@ -74,11 +57,8 @@ export function unwrapChunkName(name: string): string {
 }
 
 /**
- * Resolve a Roblox instance path (from Jest-lua or a stack trace, without a
- * `:LINE` suffix) to a repo-relative source file that exists.
- *
- * @returns `undefined` when no candidate maps to a real file (vendored
- *   third-party code, truncated chunk names, the runner script, ...).
+ * Resolve an instance path (no `:LINE` suffix) to an existing repo-relative
+ * source file, or `undefined` when none matches.
  */
 export function tryResolveRobloxSourceFile(
   instancePath: string,
@@ -128,6 +108,7 @@ export function tryResolveRobloxSourceFile(
   }
 
   const folder = workspacePackage?.folder ?? packageInstanceName;
+  // The sourcemap names packages by Rojo project name, not folder.
   const sourcemapNames = new Set([
     workspacePackage?.projectName ?? packageInstanceName,
     folder,
@@ -162,13 +143,13 @@ function _getWorkspaceIndex(repoRoot: string): WorkspaceIndex {
   if (cached) return cached;
 
   const packagesByNpmName = new Map<string, WorkspacePackage>();
-  let entries: fs.Dirent[] = [];
+  let entries: fs.Dirent[];
   try {
     entries = fs.readdirSync(path.join(repoRoot, 'src'), {
       withFileTypes: true,
     });
   } catch {
-    // Not a repo checkout; resolve by instance names alone.
+    entries = [];
   }
 
   for (const entry of entries) {
@@ -192,7 +173,6 @@ function _getWorkspaceIndex(repoRoot: string): WorkspaceIndex {
   return index;
 }
 
-/** Same rule as the batch runner's slug map, read from the test target's project. */
 function _getTestSlug(
   repoRoot: string,
   workspacePackage: WorkspacePackage
@@ -222,15 +202,10 @@ function _tryReadJson<T>(filePath: string): T | undefined {
   }
 }
 
-/**
- * Heuristic: `src/{folder}/src/{rest}` without an extension. In Rojo, dots
- * in filenames (e.g. "Maid.spec.lua" becomes instance "Maid.spec") are
- * ambiguous with the hierarchy separator, so known filename suffixes are
- * rejoined with a dot.
- */
 function _resolveHeuristic(folder: string, rest: string): string {
   if (!rest) return `src/${folder}/src`;
 
+  // Rojo turns `Maid.spec.lua` into instance `Maid.spec`, so rejoin suffixes.
   const rejoined: string[] = [];
   for (const segment of rest.split('.')) {
     if (rejoined.length > 0 && (segment === 'spec' || segment === 'story')) {

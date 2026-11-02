@@ -5,8 +5,7 @@ import { parseJestLuaOutput } from './jest-lua-parser.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
 
-// readFileSync passes through so the workspace and existence checks run
-// against the real repo layout; individual tests stub spec file contents.
+// Pass-through, so workspace reads and existence checks see the real repo.
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
   return { ...actual, readFileSync: vi.fn(actual.readFileSync) };
@@ -289,7 +288,6 @@ describe('parseJestLuaOutput', () => {
 
   describe('real CI logs', () => {
     it('unwraps chunk names and picks the innermost package frame of a runtime error', () => {
-      // run 32500891927, saveslot
       const input = [
         `[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call missing method 'GetSubStore' of table`,
         '    Stack Begin',
@@ -317,7 +315,6 @@ describe('parseJestLuaOutput', () => {
     });
 
     it('reads Jest frames without an `at` prefix', () => {
-      // run 32500891927, saveslot
       const input = [
         '\x1b[1m\x1b[31m  \x1b[1m● \x1b[22m\x1b[1msave slot playtime › persists accrued playtime on the save that triggered the flush\x1b[39m\x1b[22m',
         '',
@@ -357,7 +354,6 @@ describe('parseJestLuaOutput', () => {
     });
 
     it('prefers the package under test over dependency frames', () => {
-      // run 35638745222, gameproduct (test slug differs from the src/ directory)
       const input = [
         `[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]:726: [TemplateProvider.CmdrTemplateProviderServer.CloneTemplate] - Cannot provide template "CmdrExecutionTemplate"`,
         '    Stack Begin',
@@ -382,7 +378,6 @@ describe('parseJestLuaOutput', () => {
     });
 
     it('does not let a sibling package frame land in the package under test', () => {
-      // run 32500891927, saveslot, with a sibling package's frame on top
       const input = [
         `[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call missing method 'GetSubStore' of table`,
         '    Stack Begin',
@@ -404,7 +399,6 @@ describe('parseJestLuaOutput', () => {
     });
 
     it('maps dependency frames back to the dependency source package', () => {
-      // run 35638745222, gameproduct
       const input = [
         `[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]:726: [TemplateProvider.CmdrTemplateProviderServer.CloneTemplate] - Cannot provide template "CmdrExecutionTemplate"`,
         '    Stack Begin',
@@ -442,7 +436,6 @@ describe('parseJestLuaOutput', () => {
     ];
 
     it('falls back to a chunk location inside the message', () => {
-      // run 40424080351, studio-bridge
       const input = [
         ...studioBridgeHeader,
         `    ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_jest-runtime@3.10.0.jest-runtime:1263: [string "ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quenty.loader"]:214: [Loader] - "Jest" is not available. Please`,
@@ -462,7 +455,6 @@ describe('parseJestLuaOutput', () => {
     });
 
     it('emits no file when only vendored frames are present', () => {
-      // run 40424080351, studio-bridge
       const input = [...studioBridgeHeader, ...studioBridgeFrames].join('\n');
 
       const result = parseJestLuaOutput(input, {

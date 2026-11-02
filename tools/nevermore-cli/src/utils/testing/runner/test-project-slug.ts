@@ -3,8 +3,8 @@ export interface TestRojoProject {
 }
 
 /**
- * The slug is the instance name a package gets in its test place: the first
- * non-`$`, non-`Script` key under ServerScriptService.
+ * A package's instance name in its test place: the first non-`$`,
+ * non-`Script` key under ServerScriptService.
  */
 export function findTestProjectSlug(
   project: TestRojoProject
