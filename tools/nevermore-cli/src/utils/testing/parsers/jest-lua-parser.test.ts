@@ -1,17 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 import type { PathOrFileDescriptor } from 'fs';
 import { fileURLToPath } from 'url';
 import { parseJestLuaOutput } from './jest-lua-parser.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
+import {
+  type AnnotationWorkspace,
+  tryLoadAnnotationWorkspaceAsync,
+} from './annotation-workspace.js';
 
-// Pass-through, so workspace reads and existence checks see the real repo.
+// Pass-through, so spec searches read the real repo unless a test stubs them.
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
   return { ...actual, readFileSync: vi.fn(actual.readFileSync) };
 });
 
 const REPO_ROOT = fileURLToPath(new URL('../../../../../../', import.meta.url));
+
+let workspace: AnnotationWorkspace | undefined;
+beforeAll(async () => {
+  workspace = await tryLoadAnnotationWorkspaceAsync(REPO_ROOT);
+}, 30000);
 
 describe('parseJestLuaOutput', () => {
   beforeEach(() => {
@@ -33,6 +42,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/observablecollection',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -68,6 +78,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/observablecollection',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(2);
@@ -92,6 +103,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -112,6 +124,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -131,6 +144,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/unknownpkg',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -168,6 +182,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -186,6 +201,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -217,6 +233,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(2);
@@ -257,6 +274,7 @@ describe('parseJestLuaOutput', () => {
     const result = parseJestLuaOutput(input, {
       packageName: '@quenty/maid',
       repoRoot: REPO_ROOT,
+      workspace,
     });
 
     expect(result).toHaveLength(1);
@@ -286,6 +304,67 @@ describe('parseJestLuaOutput', () => {
     expect(result).toEqual([]);
   });
 
+  it('finds an aliased it() call by its quoted test name', () => {
+    const input = [
+      '  ● Brine.serialize / Brine.deserialize roundtrip › propagates a tag added after subscribe',
+      '',
+      '    assertion failed',
+      '',
+      '      at ServerScriptService.brine.Shared.Brine.spec',
+    ].join('\n');
+
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/brine',
+      repoRoot: REPO_ROOT,
+      workspace,
+    });
+
+    expect(result[0].file).toBe('src/brine/src/Shared/Brine.spec.lua');
+    expect(result[0].line).toBe(495);
+  });
+
+  it('falls back to the enclosing describe for a generated test name', () => {
+    const input = [
+      '  ● EllipticCurveCryptography Performance › should efficiently process 500 payloads of 100 bytes',
+      '',
+      '    assertion failed',
+      '',
+      '      at ServerScriptService.ellipticcurvecryptography.Shared.EllipticCurveCryptographyBenchmark.spec',
+    ].join('\n');
+
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/ellipticcurvecryptography',
+      repoRoot: REPO_ROOT,
+      workspace,
+    });
+
+    expect(result[0].file).toBe(
+      'src/ellipticcurvecryptography/src/Shared/EllipticCurveCryptographyBenchmark.spec.lua'
+    );
+    expect(result[0].line).toBe(20);
+  });
+
+  it('emits the file with no line when no test name matches', () => {
+    const input = [
+      '  ● should efficiently process 500 payloads of 100 bytes',
+      '',
+      '    assertion failed',
+      '',
+      '      at ServerScriptService.ellipticcurvecryptography.Shared.EllipticCurveCryptographyBenchmark.spec',
+    ].join('\n');
+
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/ellipticcurvecryptography',
+      repoRoot: REPO_ROOT,
+      workspace,
+    });
+
+    expect(result[0].file).toBe(
+      'src/ellipticcurvecryptography/src/Shared/EllipticCurveCryptographyBenchmark.spec.lua'
+    );
+    expect(result[0].line).toBeUndefined();
+  });
+
   describe('real CI logs', () => {
     it('unwraps chunk names and picks the innermost package frame of a runtime error', () => {
       const input = [
@@ -305,6 +384,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/saveslot',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -312,6 +392,30 @@ describe('parseJestLuaOutput', () => {
         'src/saveslot/src/Server/HasSaveSlotsDataStore.lua'
       );
       expect(result[0].line).toBe(1668);
+    });
+
+    it('reads past frames from other service roots', () => {
+      const input = [
+        '  ● GameProductCmdrService › registers commands',
+        '',
+        '    Cannot provide template "CmdrExecutionTemplate"',
+        '',
+        '      ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider:726 function CloneTemplate',
+        '      ReplicatedStorage.Packages.CmdrClient:5',
+        '      ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService:59 function _registerCommands',
+        '',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/gameproductservice',
+        repoRoot: REPO_ROOT,
+        workspace,
+      });
+
+      expect(result[0].file).toBe(
+        'src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua'
+      );
+      expect(result[0].line).toBe(59);
     });
 
     it('reads Jest frames without an `at` prefix', () => {
@@ -333,6 +437,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/saveslot',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(2);
@@ -368,6 +473,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/gameproductservice',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -389,6 +495,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/saveslot',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -413,6 +520,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/gameproductservice',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -446,6 +554,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/studio-bridge',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -460,6 +569,7 @@ describe('parseJestLuaOutput', () => {
       const result = parseJestLuaOutput(input, {
         packageName: '@quenty/studio-bridge',
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);
@@ -596,6 +706,7 @@ describe('parseJestLuaOutput', () => {
         packageName: '@quenty/observablecollection',
         sourcemapResolver: resolver,
         repoRoot: REPO_ROOT,
+        workspace,
       });
 
       expect(result).toHaveLength(1);

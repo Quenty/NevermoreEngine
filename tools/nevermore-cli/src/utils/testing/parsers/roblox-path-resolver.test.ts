@@ -1,10 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { beforeAll, describe, it, expect } from 'vitest';
 import { fileURLToPath } from 'url';
 import { tryResolveRobloxSourceFile } from './roblox-path-resolver.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
+import {
+  type AnnotationWorkspace,
+  tryLoadAnnotationWorkspaceAsync,
+} from './annotation-workspace.js';
 
 const REPO_ROOT = fileURLToPath(new URL('../../../../../../', import.meta.url));
+
+let workspace: AnnotationWorkspace | undefined;
+beforeAll(async () => {
+  workspace = await tryLoadAnnotationWorkspaceAsync(REPO_ROOT);
+}, 30000);
 
 function resolveFile(
   instancePath: string,
@@ -12,6 +21,7 @@ function resolveFile(
 ): string | undefined {
   return tryResolveRobloxSourceFile(instancePath, {
     repoRoot: REPO_ROOT,
+    workspace,
     packageName,
   })?.file;
 }
@@ -77,7 +87,11 @@ describe('tryResolveRobloxSourceFile', () => {
     expect(
       tryResolveRobloxSourceFile(
         'ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService',
-        { repoRoot: REPO_ROOT, packageName: '@quenty/gameproductservice' }
+        {
+          repoRoot: REPO_ROOT,
+          workspace,
+          packageName: '@quenty/gameproductservice',
+        }
       )
     ).toEqual({
       file: 'src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua',
@@ -91,11 +105,26 @@ describe('tryResolveRobloxSourceFile', () => {
     ).toBe('src/player-mock/src/Shared/PlayerMock.lua');
   });
 
+  it('resolves a package outside src/ by its workspace directory', () => {
+    expect(
+      resolveFile(
+        'ServerScriptService.studiobridge.commands.console.exec.execute.spec',
+        '@quenty/studio-bridge'
+      )
+    ).toBe('tools/studio-bridge/src/commands/console/exec/execute.spec.lua');
+  });
+
+  it('tries the script file names Rojo strips', () => {
+    expect(
+      resolveFile('ServerScriptService.x.node_modules.@quenty.preview-plugin')
+    ).toBe('plugins/preview-plugin/src/init.server.lua');
+  });
+
   it('flags dependency frames as not under test', () => {
     expect(
       tryResolveRobloxSourceFile(
         'ServerScriptService.saveslot.node_modules.@quenty.binder.Shared.Binder',
-        { repoRoot: REPO_ROOT, packageName: '@quenty/saveslot' }
+        { repoRoot: REPO_ROOT, workspace, packageName: '@quenty/saveslot' }
       )
     ).toEqual({
       file: 'src/binder/src/Shared/Binder.lua',

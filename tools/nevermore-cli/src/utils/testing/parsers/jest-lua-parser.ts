@@ -12,14 +12,15 @@ import * as path from 'path';
 import { type Diagnostic } from '@quenty/cli-output-helpers/reporting';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { SourcemapResolver } from '../../sourcemap/index.js';
+import type { AnnotationWorkspace } from './annotation-workspace.js';
 import { tryResolveRobloxSourceFile } from './roblox-path-resolver.js';
 
 /** `at ServerScriptService.pkg.Path.spec:45`, line optional */
 const AT_FRAME_PATTERN = /^\s+at\s+(\S+?)(?::(\d+))?\s*$/;
 
-/** `ServerScriptService.pkg.Path:1263 function requireModule` */
+/** `ServerScriptService.pkg.Path:1263 function requireModule`, any service root */
 const BARE_FRAME_PATTERN =
-  /^\s+(\[string "[^"]+"\]|ServerScriptService\.[^\s:"]+):(\d+)(?:\s+function\s+\S+)?\s*$/;
+  /^\s+(\[string "[^"]+"\]|[A-Za-z_][\w-]*(?:\.[^\s:"]+)+):(\d+)(?:\s+function\s+\S+)?\s*$/;
 
 /** `Script '[string "ServerScriptService.pkg.Path"]', Line 23` */
 const SCRIPT_FRAME_PATTERN = /Script '(.+?)', Line (\d+)/;
@@ -58,23 +59,21 @@ interface StackContext {
 interface ResolvedLocation {
   file: string;
   line?: number;
+  isPackageUnderTest: boolean;
 }
 
 export interface JestLuaParseOptions {
   /** npm name of the package under test, e.g. `@quenty/saveslot`. */
   packageName: string;
   sourcemapResolver?: SourcemapResolver;
-  /** Repo root that holds `src/`. Defaults to cwd. */
+  workspace?: AnnotationWorkspace;
+  /** Repo root that holds the workspace. Defaults to cwd. */
   repoRoot?: string;
 }
 
-/**
- * Search a `.spec.lua` file for an `it()` call matching `testName`.
- * Returns the 1-indexed line number, or `undefined` if not found.
- */
 function _findTestLineInFile(
   filePath: string,
-  testName: string
+  title: string
 ): number | undefined {
   let content: string;
   try {
@@ -84,13 +83,12 @@ function _findTestLineInFile(
   }
 
   const lines = content.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (
-      lines[i].includes(`it("${testName}"`) ||
-      lines[i].includes(`it('${testName}'`)
-    ) {
-      return i + 1;
-    }
+  const names = title.split(TITLE_SEPARATOR_PATTERN).map((name) => name.trim());
+  for (const name of names.reverse()) {
+    const index = lines.findIndex(
+      (line) => line.includes(`("${name}"`) || line.includes(`('${name}'`)
+    );
+    if (index !== -1) return index + 1;
   }
 
   return undefined;
@@ -123,7 +121,7 @@ function _resolveLocation(
     const resolved = tryResolveRobloxSourceFile(frame.instancePath, options);
     if (!resolved) continue;
 
-    const location = { file: resolved.file, line: frame.line };
+    const location = { ...resolved, line: frame.line };
     if (resolved.isPackageUnderTest) {
       return location;
     }
@@ -160,15 +158,13 @@ export function parseJestLuaOutput(
     );
 
     let line = location?.line;
-    if (location && line === undefined) {
-      const segments = ctx.title.split(TITLE_SEPARATOR_PATTERN);
-      const testName = segments[segments.length - 1].trim();
-      line =
-        _findTestLineInFile(path.join(repoRoot, location.file), testName) ?? 1;
+    if (location?.isPackageUnderTest && line === undefined) {
+      line = _findTestLineInFile(path.join(repoRoot, location.file), ctx.title);
     }
 
     diagnostics.push({
-      ...(location ? { file: location.file, line } : {}),
+      ...(location ? { file: location.file } : {}),
+      ...(line !== undefined ? { line } : {}),
       severity: 'error',
       title: ctx.title,
       message: message || 'Test failed',

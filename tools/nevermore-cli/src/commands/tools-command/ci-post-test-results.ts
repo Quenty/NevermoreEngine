@@ -17,6 +17,7 @@ import {
 } from '../../utils/testing/reporting/index.js';
 import { parseJestLuaOutput } from '../../utils/testing/parsers/index.js';
 import { tryLoadSourcemapResolver } from '../../utils/sourcemap/index.js';
+import { tryLoadAnnotationWorkspaceAsync } from '../../utils/testing/parsers/annotation-workspace.js';
 
 type ErrorReporter = Reporter & {
   setError(error: string): void;
@@ -100,11 +101,13 @@ export const ciPostTestResultsCommand: CommandModule<
 
       // Emit test failure annotations
       const sourcemapResolver = tryLoadSourcemapResolver(process.cwd());
+      const workspace = await tryLoadAnnotationWorkspaceAsync(process.cwd());
       const parsedDiagnostics: Diagnostic[] = [];
       for (const failure of state.getFailures()) {
         const diagnostics = parseJestLuaOutput(failure.logs, {
           packageName: failure.packageName,
           sourcemapResolver,
+          workspace,
         });
         parsedDiagnostics.push(...diagnostics);
       }
