@@ -1,19 +1,13 @@
-# v4.50.1 (Mon Nov 02 2026)
-
-#### 🐛 Bug Fix
-
-- fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [4.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.50.0...@quenty/nevermore-cli@4.50.1) (2026-11-02)
+
+### Bug Fixes
+
+- **nevermore-cli:** resolve test failure annotations to real files ([#853](https://github.com/Quenty/NevermoreEngine/issues/853)) ([aa52794](https://github.com/Quenty/NevermoreEngine/commit/aa5279471baa0877e72b6ee75d89f722a5dc5505))
 
 # [4.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.49.0...@quenty/nevermore-cli@4.50.0) (2026-10-28)
 
