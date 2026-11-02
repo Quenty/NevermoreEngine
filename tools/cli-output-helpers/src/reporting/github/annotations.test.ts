@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   type Diagnostic,
+  dedupeDiagnostics,
   formatAnnotation,
   emitAnnotations,
   summarizeDiagnostics,
@@ -18,6 +19,24 @@ function makeDiagnostic(overrides: Partial<Diagnostic> = {}): Diagnostic {
 }
 
 describe('formatAnnotation', () => {
+  it('omits file and line when the location is unknown', () => {
+    const result = formatAnnotation(
+      makeDiagnostic({
+        file: undefined,
+        line: undefined,
+        title: 'Runtime error',
+      })
+    );
+    expect(result).toBe('::error title=Runtime error::Something went wrong');
+  });
+
+  it('formats an annotation with no properties at all', () => {
+    const result = formatAnnotation(
+      makeDiagnostic({ file: undefined, line: undefined })
+    );
+    expect(result).toBe('::error::Something went wrong');
+  });
+
   it('formats a basic error annotation', () => {
     const result = formatAnnotation(makeDiagnostic());
     expect(result).toBe(
@@ -116,7 +135,40 @@ describe('summarizeDiagnostics', () => {
   });
 });
 
+describe('dedupeDiagnostics', () => {
+  it('drops repeats of the same file, line and title', () => {
+    const result = dedupeDiagnostics([
+      makeDiagnostic({ title: 'Runtime error', message: 'first' }),
+      makeDiagnostic({ title: 'Runtime error', message: 'second' }),
+      makeDiagnostic({ title: 'Runtime error', line: 11 }),
+    ]);
+    expect(result.map((d) => d.message)).toEqual([
+      'first',
+      'Something went wrong',
+    ]);
+  });
+
+  it('keeps file-less diagnostics apart by message', () => {
+    const result = dedupeDiagnostics([
+      makeDiagnostic({ file: undefined, line: undefined, message: 'a' }),
+      makeDiagnostic({ file: undefined, line: undefined, message: 'a' }),
+      makeDiagnostic({ file: undefined, line: undefined, message: 'b' }),
+    ]);
+    expect(result.map((d) => d.message)).toEqual(['a', 'b']);
+  });
+});
+
 describe('formatAnnotationSummaryMarkdown', () => {
+  it('counts only real files and groups file-less diagnostics', () => {
+    const md = formatAnnotationSummaryMarkdown('Test Failures', [
+      makeDiagnostic({ file: 'src/a.lua' }),
+      makeDiagnostic({ file: undefined, line: undefined }),
+    ]);
+    expect(md).toContain('across 1 file:');
+    expect(md).toContain('<summary>No file (1)</summary>');
+    expect(md).not.toContain('undefined');
+  });
+
   it('returns "no issues" for empty diagnostics', () => {
     const md = formatAnnotationSummaryMarkdown('luau-lsp', []);
     expect(md).toContain('### luau-lsp');

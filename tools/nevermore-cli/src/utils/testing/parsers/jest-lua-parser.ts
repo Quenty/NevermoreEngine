@@ -3,47 +3,63 @@
  *
  * Handles two failure modes:
  *
- * 1. **Jest assertion failures** — `●` blocks:
+ * 1. **Jest failures** — `●` blocks followed by stack frames:
  *    ```
- *      ● ObservableList > add and remove > should track count
+ *      ● save slot playtime › persists accrued playtime
  *
- *        expect(received).toEqual(expected)
+ *        attempt to call missing method 'GetSubStore' of table
  *
- *        Expected: 3
- *        Received: 2
- *
- *          at ServerScriptService.observablecollection.Shared.ObservableList.spec:45
+ *          ServerScriptService.saveslot.Server.HasSaveSlotsDataStore:1668
  *    ```
  *
  * 2. **Runtime errors** — `Stack Begin`/`Stack End` blocks:
  *    ```
- *    Error: attempt to index nil with "Connect"
- *    Stack Begin
- *    Script 'ServerScriptService.maid.Shared.Maid.spec', Line 23
- *    Stack End
+ *    [string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call ...
+ *        Stack Begin
+ *        Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1668 - function _stagePlaytime
+ *        Stack End
  *    ```
+ *
+ * Each block yields one diagnostic, located at the innermost frame that maps
+ * to a real repo file, preferring frames from the package under test over
+ * dependency copies. When no frame resolves, the diagnostic carries no file.
  *
  * The parser is intentionally lenient — it extracts what it can, skips what
  * it can't, and never crashes on unexpected input.
  */
 
 import * as fs from 'fs';
+import * as path from 'path';
 import { type Diagnostic } from '@quenty/cli-output-helpers/reporting';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { SourcemapResolver } from '../../sourcemap/index.js';
-import { resolveRobloxTestPath } from './roblox-path-resolver.js';
+import {
+  isDependencyInstancePath,
+  tryResolveRobloxSourceFile,
+  unwrapChunkName,
+} from './roblox-path-resolver.js';
 
-/** Matches `at ServerScriptService.pkg.Path.spec:45` (with line number) */
-const AT_LOCATION_PATTERN = /^\s+at\s+(.+):(\d+)\s*$/;
+/** Matches `at ServerScriptService.pkg.Path.spec:45`, line optional */
+const AT_FRAME_PATTERN = /^\s+at\s+(\S+?)(?::(\d+))?\s*$/;
 
-/** Matches `at ServerScriptService.pkg.Path.spec` (without line number) */
-const AT_LOCATION_NO_LINE_PATTERN = /^\s+at\s+(\S+)\s*$/;
+/**
+ * Matches Jest stack frames without `at`:
+ * `ServerScriptService.pkg.Path:1263 function requireModule`
+ */
+const BARE_FRAME_PATTERN =
+  /^\s+(\[string "[^"]+"\]|ServerScriptService\.[^\s:"]+):(\d+)(?:\s+function\s+\S+)?\s*$/;
 
-/** Matches `Script 'ServerScriptService.pkg.Path.spec', Line 23` */
-const SCRIPT_LOCATION_PATTERN = /Script '([^']+)', Line (\d+)/;
+/** Matches `Script '[string "ServerScriptService.pkg.Path"]', Line 23` */
+const SCRIPT_FRAME_PATTERN = /Script '(.+?)', Line (\d+)/;
 
-/** Matches the Jest failure header: `● TestSuite > nested > test name` */
+/** Matches `<chunk>:214:` error-location prefixes inside messages */
+const MESSAGE_LOCATION_PATTERN =
+  /(\[string "[^"]+"\]|ServerScriptService\.[^\s:"]+):(\d+):/g;
+
+/** Matches the Jest failure header: `● TestSuite › nested › test name` */
 const FAILURE_HEADER_PATTERN = /^\s*●\s+(.+)$/;
+
+const TITLE_SEPARATOR_PATTERN = / [›>] /;
 
 const enum State {
   IDLE,
@@ -51,17 +67,33 @@ const enum State {
   STACK_BLOCK,
 }
 
+interface Frame {
+  instancePath: string;
+  line?: number;
+}
+
 interface FailureContext {
   title: string;
   messageLines: string[];
-  file?: string;
-  line?: number;
+  frames: Frame[];
 }
 
 interface StackContext {
   errorMessage: string;
-  file?: string;
+  frames: Frame[];
+}
+
+interface ResolvedLocation {
+  file: string;
   line?: number;
+}
+
+export interface JestLuaParseOptions {
+  /** npm name of the package under test, e.g. `@quenty/saveslot` */
+  packageName: string;
+  sourcemapResolver?: SourcemapResolver;
+  /** Directory that resolved paths are checked against. Defaults to cwd. */
+  repoRoot?: string;
 }
 
 /**
@@ -92,19 +124,56 @@ function _findTestLineInFile(
   return undefined;
 }
 
+function _parseFrameLine(rawLine: string): Frame | undefined {
+  const match =
+    rawLine.match(BARE_FRAME_PATTERN) ?? rawLine.match(AT_FRAME_PATTERN);
+  if (!match) return undefined;
+  return {
+    instancePath: match[1],
+    line: match[2] ? parseInt(match[2], 10) : undefined,
+  };
+}
+
+function _parseMessageLocations(message: string): Frame[] {
+  return [...message.matchAll(MESSAGE_LOCATION_PATTERN)].map((match) => ({
+    instancePath: match[1],
+    line: parseInt(match[2], 10),
+  }));
+}
+
+function _resolveLocation(
+  frames: Frame[],
+  options: JestLuaParseOptions
+): ResolvedLocation | undefined {
+  let fallback: ResolvedLocation | undefined;
+
+  for (const frame of frames) {
+    const file = tryResolveRobloxSourceFile(frame.instancePath, options);
+    if (!file) continue;
+
+    const location = { file, line: frame.line };
+    if (!isDependencyInstancePath(unwrapChunkName(frame.instancePath))) {
+      return location;
+    }
+    fallback ??= location;
+  }
+
+  return fallback;
+}
+
 /**
  * Parse Jest-lua verbose output into `Diagnostic[]`.
  *
  * @param raw - Raw test output (may include ANSI codes)
- * @param options.packageName - Package name for fallback path resolution
  */
 export function parseJestLuaOutput(
   raw: string,
-  options: { packageName: string; sourcemapResolver?: SourcemapResolver }
+  options: JestLuaParseOptions
 ): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
   const clean = OutputHelper.stripAnsi(raw);
   const lines = clean.split('\n');
+  const repoRoot = options.repoRoot ?? process.cwd();
 
   let state: State = State.IDLE;
   let failureCtx: FailureContext | undefined;
@@ -113,32 +182,21 @@ export function parseJestLuaOutput(
 
   function _emitFailure(ctx: FailureContext): void {
     const message = ctx.messageLines.join('\n').trim();
+    const location = _resolveLocation(
+      [...ctx.frames, ..._parseMessageLocations(message)],
+      options
+    );
 
-    // 3-tier line resolution:
-    //  1. Primary: line number extracted from `at <path>:<line>` or similar
-    //  2. Secondary: search the resolved .spec.lua file for the it() call
-    //  3. Tertiary: fall back to line 1
-    let file: string;
-    let line: number;
-
-    if (ctx.file) {
-      file = resolveRobloxTestPath(ctx.file, options.sourcemapResolver);
-
-      if (ctx.line) {
-        line = ctx.line;
-      } else {
-        const segments = ctx.title.split(' > ');
-        const testName = segments[segments.length - 1].trim();
-        line = _findTestLineInFile(file, testName) ?? 1;
-      }
-    } else {
-      file = `src/${options.packageName}/src`;
-      line = 1;
+    let line = location?.line;
+    if (location && line === undefined) {
+      const segments = ctx.title.split(TITLE_SEPARATOR_PATTERN);
+      const testName = segments[segments.length - 1].trim();
+      line =
+        _findTestLineInFile(path.join(repoRoot, location.file), testName) ?? 1;
     }
 
     diagnostics.push({
-      file,
-      line,
+      ...(location ? { file: location.file, line } : {}),
       severity: 'error',
       title: ctx.title,
       message: message || 'Test failed',
@@ -147,14 +205,13 @@ export function parseJestLuaOutput(
   }
 
   function _emitStack(ctx: StackContext): void {
-    const file = ctx.file
-      ? resolveRobloxTestPath(ctx.file, options.sourcemapResolver)
-      : `src/${options.packageName}/src`;
-    const line = ctx.line ?? 1;
+    const location = _resolveLocation(
+      [...ctx.frames, ..._parseMessageLocations(ctx.errorMessage)],
+      options
+    );
 
     diagnostics.push({
-      file,
-      line,
+      ...(location ? { file: location.file, line: location.line ?? 1 } : {}),
       severity: 'error',
       title: 'Runtime error',
       message: ctx.errorMessage || 'Unknown runtime error',
@@ -162,7 +219,9 @@ export function parseJestLuaOutput(
     });
   }
 
-  for (const rawLine of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+
     switch (state) {
       case State.IDLE: {
         const failureMatch = rawLine.match(FAILURE_HEADER_PATTERN);
@@ -170,6 +229,7 @@ export function parseJestLuaOutput(
           failureCtx = {
             title: failureMatch[1].trim(),
             messageLines: [],
+            frames: [],
           };
           state = State.FAILURE_BLOCK;
           break;
@@ -178,6 +238,7 @@ export function parseJestLuaOutput(
         if (rawLine.trim() === 'Stack Begin') {
           stackCtx = {
             errorMessage: lastNonEmptyLine,
+            frames: [],
           };
           state = State.STACK_BLOCK;
           break;
@@ -195,32 +256,9 @@ export function parseJestLuaOutput(
           break;
         }
 
-        const atMatch = rawLine.match(AT_LOCATION_PATTERN);
-        if (atMatch) {
-          failureCtx.file = atMatch[1];
-          failureCtx.line = parseInt(atMatch[2], 10);
-          _emitFailure(failureCtx);
-          failureCtx = undefined;
-          state = State.IDLE;
-          break;
-        }
-
-        const atNoLineMatch = rawLine.match(AT_LOCATION_NO_LINE_PATTERN);
-        if (atNoLineMatch) {
-          failureCtx.file = atNoLineMatch[1];
-          _emitFailure(failureCtx);
-          failureCtx = undefined;
-          state = State.IDLE;
-          break;
-        }
-
-        const nextFailure = rawLine.match(FAILURE_HEADER_PATTERN);
-        if (nextFailure) {
-          _emitFailure(failureCtx);
-          failureCtx = {
-            title: nextFailure[1].trim(),
-            messageLines: [],
-          };
+        const frame = _parseFrameLine(rawLine);
+        if (frame) {
+          failureCtx.frames.push(frame);
           break;
         }
 
@@ -233,13 +271,27 @@ export function parseJestLuaOutput(
                     failureCtx.messageLines.length - 1
                   ].trim()
                 : failureCtx.title,
+            frames: [],
           };
           failureCtx = undefined;
           state = State.STACK_BLOCK;
           break;
         }
 
-        failureCtx.messageLines.push(rawLine);
+        const endsBlock =
+          FAILURE_HEADER_PATTERN.test(rawLine) ||
+          (failureCtx.frames.length > 0 && rawLine.trim() !== '');
+        if (endsBlock) {
+          _emitFailure(failureCtx);
+          failureCtx = undefined;
+          state = State.IDLE;
+          i--;
+          break;
+        }
+
+        if (failureCtx.frames.length === 0) {
+          failureCtx.messageLines.push(rawLine);
+        }
         break;
       }
 
@@ -249,10 +301,12 @@ export function parseJestLuaOutput(
           break;
         }
 
-        const scriptMatch = rawLine.match(SCRIPT_LOCATION_PATTERN);
+        const scriptMatch = rawLine.match(SCRIPT_FRAME_PATTERN);
         if (scriptMatch) {
-          stackCtx.file = scriptMatch[1];
-          stackCtx.line = parseInt(scriptMatch[2], 10);
+          stackCtx.frames.push({
+            instancePath: scriptMatch[1],
+            line: parseInt(scriptMatch[2], 10),
+          });
           break;
         }
 

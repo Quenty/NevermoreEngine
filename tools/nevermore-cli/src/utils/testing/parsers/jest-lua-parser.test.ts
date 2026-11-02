@@ -1,14 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fileURLToPath } from 'url';
 import { parseJestLuaOutput } from './jest-lua-parser.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
 
-// Mock fs.readFileSync for _findTestLineInFile
-vi.mock('fs', () => ({
-  readFileSync: vi.fn(() => {
-    throw new Error('ENOENT');
-  }),
-}));
+// Mock fs.readFileSync for _findTestLineInFile; existsSync stays real so paths
+// are checked against the real repo layout.
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs')>();
+  return {
+    ...actual,
+    readFileSync: vi.fn(() => {
+      throw new Error('ENOENT');
+    }),
+  };
+});
+
+const REPO_ROOT = fileURLToPath(new URL('../../../../../../', import.meta.url));
 
 describe('parseJestLuaOutput', () => {
   beforeEach(() => {
@@ -28,7 +36,8 @@ describe('parseJestLuaOutput', () => {
     ].join('\n');
 
     const result = parseJestLuaOutput(input, {
-      packageName: 'observablecollection',
+      packageName: '@quenty/observablecollection',
+      repoRoot: REPO_ROOT,
     });
 
     expect(result).toHaveLength(1);
@@ -51,22 +60,28 @@ describe('parseJestLuaOutput', () => {
       '    Expected: 1',
       '    Received: 2',
       '',
-      '      at ServerScriptService.mypkg.Shared.Foo.spec:10',
+      '      at ServerScriptService.observablecollection.Shared.ObservableList.spec:10',
       '',
       '  ● Suite > test two',
       '',
       '    Expected: true',
       '    Received: false',
       '',
-      '      at ServerScriptService.mypkg.Shared.Bar.spec:20',
+      '      at ServerScriptService.observablecollection.Shared.ObservableMap.spec:20',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'mypkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/observablecollection',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(2);
     expect(result[0].title).toBe('Suite > test one');
     expect(result[0].line).toBe(10);
     expect(result[1].title).toBe('Suite > test two');
+    expect(result[1].file).toBe(
+      'src/observablecollection/src/Shared/ObservableMap.spec.lua'
+    );
     expect(result[1].line).toBe(20);
   });
 
@@ -76,10 +91,13 @@ describe('parseJestLuaOutput', () => {
       '',
       '    failure message',
       '',
-      '      at ServerScriptService.pkg.Shared.Deep.spec:99',
+      '      at ServerScriptService.maid.Shared.MaidTaskUtils.spec:99',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'pkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe(
@@ -87,7 +105,7 @@ describe('parseJestLuaOutput', () => {
     );
   });
 
-  it('falls back to line 1 when no at location and file not found', () => {
+  it('emits no file when there is no location', () => {
     const input = [
       '  ● Suite > test without location',
       '',
@@ -96,11 +114,32 @@ describe('parseJestLuaOutput', () => {
       'Test Suites: 1 failed, 1 total',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'mypkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(1);
-    expect(result[0].line).toBe(1);
-    expect(result[0].file).toBe('src/mypkg/src');
+    expect(result[0].file).toBeUndefined();
+    expect(result[0].line).toBeUndefined();
+  });
+
+  it('emits no file when the location does not exist in the repo', () => {
+    const input = [
+      '  ● Suite > test one',
+      '',
+      '    Expected: 1',
+      '',
+      '      at ServerScriptService.unknownpkg.Shared.Bar.spec:10',
+    ].join('\n');
+
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/unknownpkg',
+      repoRoot: REPO_ROOT,
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].file).toBeUndefined();
   });
 
   it('searches spec file for it() call when at location has no line number', async () => {
@@ -119,17 +158,20 @@ describe('parseJestLuaOutput', () => {
     );
 
     const input = [
-      '  ● Suite > my test name',
+      '  ● Suite › my test name',
       '',
       '    assertion failed',
       '',
-      '      at ServerScriptService.mypkg.Shared.Foo.spec',
+      '      at ServerScriptService.maid.Shared.MaidTaskUtils.spec',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'mypkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(1);
-    expect(result[0].file).toBe('src/mypkg/src/Shared/Foo.spec.lua');
+    expect(result[0].file).toBe('src/maid/src/Shared/MaidTaskUtils.spec.lua');
     expect(result[0].line).toBe(4);
   });
 
@@ -137,15 +179,18 @@ describe('parseJestLuaOutput', () => {
     const input = [
       'Error: attempt to index nil with "Connect"',
       'Stack Begin',
-      "Script 'ServerScriptService.maid.Shared.Maid.spec', Line 23",
+      "Script 'ServerScriptService.maid.Shared.MaidTaskUtils', Line 23",
       'Stack End',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'maid' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
-      file: 'src/maid/src/Shared/Maid.spec.lua',
+      file: 'src/maid/src/Shared/MaidTaskUtils.lua',
       line: 23,
       severity: 'error',
       title: 'Runtime error',
@@ -161,20 +206,25 @@ describe('parseJestLuaOutput', () => {
       '    Expected: 1',
       '    Received: 2',
       '',
-      '      at ServerScriptService.pkg.Shared.Foo.spec:10',
+      '      at ServerScriptService.maid.Shared.MaidTaskUtils.spec:10',
       '',
       'Error: attempt to call nil value',
       'Stack Begin',
-      "Script 'ServerScriptService.pkg.Shared.Bar.spec', Line 5",
+      "Script 'ServerScriptService.maid.Shared.Maid', Line 5",
       'Stack End',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'pkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(2);
     expect(result[0].title).toBe('Suite > assertion test');
     expect(result[0].source).toBe('jest-lua');
     expect(result[1].title).toBe('Runtime error');
+    expect(result[1].message).toBe('Error: attempt to call nil value');
+    expect(result[1].file).toBe('src/maid/src/Shared/Maid.lua');
     expect(result[1].line).toBe(5);
   });
 
@@ -189,7 +239,7 @@ describe('parseJestLuaOutput', () => {
       'Tests:       2 passed, 2 total',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'maid' });
+    const result = parseJestLuaOutput(input, { packageName: '@quenty/maid' });
 
     expect(result).toEqual([]);
   });
@@ -201,10 +251,13 @@ describe('parseJestLuaOutput', () => {
       '    \x1b[31mExpected: 1\x1b[39m',
       '    \x1b[32mReceived: 2\x1b[39m',
       '',
-      '      at ServerScriptService.pkg.Shared.Foo.spec:10',
+      '      at ServerScriptService.maid.Shared.MaidTaskUtils.spec:10',
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'pkg' });
+    const result = parseJestLuaOutput(input, {
+      packageName: '@quenty/maid',
+      repoRoot: REPO_ROOT,
+    });
 
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('Suite > test');
@@ -221,33 +274,184 @@ describe('parseJestLuaOutput', () => {
       // No at-line, no Stack Begin, just ends
     ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'pkg' });
+    const result = parseJestLuaOutput(input, { packageName: '@quenty/maid' });
 
-    // Should still emit a diagnostic with fallback location
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('Suite > incomplete test');
-    expect(result[0].line).toBe(1);
+    expect(result[0].file).toBeUndefined();
   });
 
   it('handles empty input', () => {
-    const result = parseJestLuaOutput('', { packageName: 'pkg' });
+    const result = parseJestLuaOutput('', { packageName: '@quenty/maid' });
     expect(result).toEqual([]);
   });
 
-  it('uses last stack frame for location in multi-frame stack', () => {
-    const input = [
-      'Error: bad argument',
-      'Stack Begin',
-      "Script 'ServerScriptService.pkg.Shared.Inner', Line 10",
-      "Script 'ServerScriptService.pkg.Shared.Outer.spec', Line 30",
-      'Stack End',
-    ].join('\n');
+  describe('real CI logs', () => {
+    it('unwraps chunk names and picks the innermost package frame of a runtime error', () => {
+      // run 32500891927, saveslot
+      const input = [
+        `[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]:1668: attempt to call missing method 'GetSubStore' of table`,
+        '    Stack Begin',
+        `    Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1668 - function _stagePlaytime`,
+        `    Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1647 - function _flushPlaytime`,
+        `    Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1678 - function _endPlaySession`,
+        `    Script '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]', Line 1609`,
+        `    Script '[string "ServerScriptService.saveslot.node_modules.@quenty.adorneedata.node_modules.@quenty.attributeutils.node_modules.@quenty.baseobject.node_modules.@quenty.maid.Shared.Maid"]', Line 267 - function DoCleaning`,
+        `    Script '[string "ServerScriptService.saveslot.node_modules.@quenty.adorneedata.node_modules.@quenty.attributeutils.node_modules.@quenty.baseobject.Shared.BaseObject"]', Line 40 - function Destroy`,
+        `    Script '[string "ServerScriptService.saveslot.node_modules.@quenty.binder.Shared.Binder"]', Line 752 - function _remove`,
+        `    Script '[string "ServerScriptService.saveslot.node_modules.@quenty.binder.Shared.Binder"]', Line 224`,
+        '    Stack End',
+      ].join('\n');
 
-    const result = parseJestLuaOutput(input, { packageName: 'pkg' });
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/saveslot',
+        repoRoot: REPO_ROOT,
+      });
 
-    expect(result).toHaveLength(1);
-    expect(result[0].file).toBe('src/pkg/src/Shared/Outer.spec.lua');
-    expect(result[0].line).toBe(30);
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe(
+        'src/saveslot/src/Server/HasSaveSlotsDataStore.lua'
+      );
+      expect(result[0].line).toBe(1668);
+    });
+
+    it('reads Jest frames without an `at` prefix', () => {
+      // run 32500891927, saveslot
+      const input = [
+        '\x1b[1m\x1b[31m  \x1b[1m● \x1b[22m\x1b[1msave slot playtime › persists accrued playtime on the save that triggered the flush\x1b[39m\x1b[22m',
+        '',
+        "    attempt to call missing method 'GetSubStore' of table",
+        '\x1b[2m\x1b[22m',
+        '\x1b[2m      ServerScriptService.saveslot.Server.HasSaveSlotsDataStore:1668\x1b[22m',
+        '',
+        '\x1b[1m\x1b[31m  \x1b[1m● \x1b[22m\x1b[1msave slot playtime › keeps the replicated attribute and the stored value in step\x1b[39m\x1b[22m',
+        '',
+        "    attempt to call missing method 'GetSubStore' of table",
+        '\x1b[2m\x1b[22m',
+        '\x1b[2m      ServerScriptService.saveslot.Server.HasSaveSlotsDataStore:1668\x1b[22m',
+        '',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/saveslot',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(2);
+      expect(result.map((d) => [d.file, d.line, d.title])).toEqual([
+        [
+          'src/saveslot/src/Server/HasSaveSlotsDataStore.lua',
+          1668,
+          'save slot playtime › persists accrued playtime on the save that triggered the flush',
+        ],
+        [
+          'src/saveslot/src/Server/HasSaveSlotsDataStore.lua',
+          1668,
+          'save slot playtime › keeps the replicated attribute and the stored value in step',
+        ],
+      ]);
+      expect(result[0].message).toBe(
+        "attempt to call missing method 'GetSubStore' of table"
+      );
+    });
+
+    it('prefers the package under test over dependency frames', () => {
+      // run 35638745222, gameproduct (test slug differs from the src/ directory)
+      const input = [
+        `[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]:726: [TemplateProvider.CmdrTemplateProviderServer.CloneTemplate] - Cannot provide template "CmdrExecutionTemplate"`,
+        '    Stack Begin',
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]', Line 726 - function CloneTemplate`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.Server.CmdrService"]', Line 144 - function RegisterCommand`,
+        `    Script '[string "ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService"]', Line 59 - function _registerCommands`,
+        `    Script '[string "ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService"]', Line 55 - function Start`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.avatareditorutils.node_modules.@quenty.observablecollection.node_modules.@quenty.blend.node_modules.@quenty.playerthumbnailutils.node_modules.@quenty.playermock.node_modules.@quenty.servic..."]', Line 217`,
+        '    Stack End',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/gameproductservice',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe(
+        'src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua'
+      );
+      expect(result[0].line).toBe(59);
+    });
+
+    it('maps dependency frames back to the dependency source package', () => {
+      // run 35638745222, gameproduct
+      const input = [
+        `[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]:726: [TemplateProvider.CmdrTemplateProviderServer.CloneTemplate] - Cannot provide template "CmdrExecutionTemplate"`,
+        '    Stack Begin',
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.node_modules.@quenty.templateprovider.Shared.TemplateProvider"]', Line 726 - function CloneTemplate`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.cmdrservice.Server.CmdrService"]', Line 144 - function RegisterCommand`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.gameconfig.Server.Cmdr.GameConfigCommandService"]', Line 48 - function _registerCommands`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.gameconfig.Server.Cmdr.GameConfigCommandService"]', Line 37 - function Start`,
+        `    Script '[string "ServerScriptService.gameproduct.node_modules.@quenty.avatareditorutils.node_modules.@quenty.observablecollection.node_modules.@quenty.blend.node_modules.@quenty.playerthumbnailutils.node_modules.@quenty.playermock.node_modules.@quenty.servic..."]', Line 217`,
+        '    Stack End',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/gameproductservice',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe(
+        'src/templateprovider/src/Shared/TemplateProvider.lua'
+      );
+      expect(result[0].line).toBe(726);
+    });
+
+    const studioBridgeHeader = [
+      '\x1b[0m\x1b[7m\x1b[1m\x1b[31m FAIL \x1b[39m\x1b[22m\x1b[27m\x1b[0m \x1b[2mstudiobridge/Shared/\x1b[22m\x1b[1mActionRouter.spec\x1b[22m ',
+      '  \x1b[1m● \x1b[22mTest suite failed to run',
+      '',
+    ];
+    const studioBridgeFrames = [
+      '      ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_jest-runtime@3.10.0.jest-runtime:1263 function requireModule',
+      '      ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_jest-circus@3.10.0.jest-circus.circus.legacy-code-todo-rewrite.jestAdapter:113',
+      '      ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_promise@3.5.2.promise:172 function runExecutor',
+      '',
+      '\x1b[0m\x1b[7m\x1b[1m\x1b[31m FAIL \x1b[39m\x1b[22m\x1b[27m\x1b[0m \x1b[2mstudiobridge/Shared/\x1b[22m\x1b[1mBuiltInActions.spec\x1b[22m ',
+    ];
+
+    it('falls back to a chunk location inside the message', () => {
+      // run 40424080351, studio-bridge
+      const input = [
+        ...studioBridgeHeader,
+        `    ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_jest-runtime@3.10.0.jest-runtime:1263: [string "ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quenty.loader"]:214: [Loader] - "Jest" is not available. Please`,
+        '',
+        ...studioBridgeFrames,
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/studio-bridge',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Test suite failed to run');
+      expect(result[0].file).toBe('src/loader/src/init.lua');
+      expect(result[0].line).toBe(214);
+    });
+
+    it('emits no file when only vendored frames are present', () => {
+      // run 40424080351, studio-bridge
+      const input = [...studioBridgeHeader, ...studioBridgeFrames].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/studio-bridge',
+        repoRoot: REPO_ROOT,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Test suite failed to run');
+      expect(result[0].file).toBeUndefined();
+      expect(result[0].line).toBeUndefined();
+    });
   });
 
   describe('with sourcemap resolver', () => {
@@ -284,6 +488,24 @@ describe('parseJestLuaOutput', () => {
             },
           ],
         },
+        {
+          name: 'binder',
+          className: 'Folder',
+          filePaths: [`${repoRoot}/src/binder/default.project.json`],
+          children: [
+            {
+              name: 'Shared',
+              className: 'Folder',
+              children: [
+                {
+                  name: 'Binder',
+                  className: 'ModuleScript',
+                  filePaths: [`${repoRoot}/src/binder/src/Shared/Binder.lua`],
+                },
+              ],
+            },
+          ],
+        },
       ],
     };
 
@@ -300,7 +522,7 @@ describe('parseJestLuaOutput', () => {
       ].join('\n');
 
       const result = parseJestLuaOutput(input, {
-        packageName: 'mypkg',
+        packageName: '@quenty/mypkg',
         sourcemapResolver: resolver,
       });
 
@@ -309,16 +531,16 @@ describe('parseJestLuaOutput', () => {
       expect(result[0].line).toBe(10);
     });
 
-    it('uses sourcemap resolver for runtime error paths', () => {
+    it('uses sourcemap resolver for chunk-wrapped runtime error paths', () => {
       const input = [
         'Error: attempt to index nil',
         'Stack Begin',
-        "Script 'ServerScriptService.mypkg.Shared.Foo.Foo.spec', Line 5",
+        `Script '[string "ServerScriptService.mypkg.Shared.Foo.Foo.spec"]', Line 5`,
         'Stack End',
       ].join('\n');
 
       const result = parseJestLuaOutput(input, {
-        packageName: 'mypkg',
+        packageName: '@quenty/mypkg',
         sourcemapResolver: resolver,
       });
 
@@ -327,24 +549,44 @@ describe('parseJestLuaOutput', () => {
       expect(result[0].line).toBe(5);
     });
 
-    it('falls back to heuristic when sourcemap has no mapping', () => {
+    it('looks up dependency frames by their source package', () => {
+      const input = [
+        'Error: attempt to index nil',
+        '    Stack Begin',
+        `    Script '[string "ServerScriptService.mypkg.node_modules.@quenty.binder.Shared.Binder"]', Line 752 - function _remove`,
+        '    Stack End',
+      ].join('\n');
+
+      const result = parseJestLuaOutput(input, {
+        packageName: '@quenty/mypkg',
+        sourcemapResolver: resolver,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].file).toBe('src/binder/src/Shared/Binder.lua');
+      expect(result[0].line).toBe(752);
+    });
+
+    it('falls back to the repo layout when sourcemap has no mapping', () => {
       const input = [
         '  ● Suite > test one',
         '',
         '    Expected: 1',
         '    Received: 2',
         '',
-        '      at ServerScriptService.unknown.Shared.Bar.spec:10',
+        '      at ServerScriptService.observablecollection.Shared.ObservableList.spec:10',
       ].join('\n');
 
       const result = parseJestLuaOutput(input, {
-        packageName: 'unknown',
+        packageName: '@quenty/observablecollection',
         sourcemapResolver: resolver,
+        repoRoot: REPO_ROOT,
       });
 
       expect(result).toHaveLength(1);
-      // Falls back to heuristic
-      expect(result[0].file).toBe('src/unknown/src/Shared/Bar.spec.lua');
+      expect(result[0].file).toBe(
+        'src/observablecollection/src/Shared/ObservableList.spec.lua'
+      );
     });
   });
 });

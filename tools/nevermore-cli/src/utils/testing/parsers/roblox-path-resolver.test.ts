@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { resolveRobloxTestPath } from './roblox-path-resolver.js';
+import { fileURLToPath } from 'url';
+import {
+  resolveRobloxTestPath,
+  tryResolveRobloxSourceFile,
+} from './roblox-path-resolver.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
 
@@ -123,5 +127,66 @@ describe('resolveRobloxTestPath', () => {
         )
       ).toBe('src/mypkg/src/Shared/MyModule.spec.lua');
     });
+  });
+
+  it('unwraps a chunk-name wrapper', () => {
+    expect(
+      resolveRobloxTestPath(
+        '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]'
+      )
+    ).toBe('src/saveslot/src/Server/HasSaveSlotsDataStore.lua');
+  });
+
+  it('maps a nested dependency copy to its own package', () => {
+    expect(
+      resolveRobloxTestPath(
+        'ServerScriptService.saveslot.node_modules.@quenty.adorneedata.node_modules.@quenty.attributeutils.node_modules.@quenty.baseobject.node_modules.@quenty.maid.Shared.Maid'
+      )
+    ).toBe('src/maid/src/Shared/Maid.lua');
+  });
+});
+
+describe('tryResolveRobloxSourceFile', () => {
+  const repoRoot = fileURLToPath(
+    new URL('../../../../../../', import.meta.url)
+  );
+
+  it('resolves a dependency copy to an existing file', () => {
+    expect(
+      tryResolveRobloxSourceFile(
+        '[string "ServerScriptService.saveslot.node_modules.@quenty.binder.Shared.Binder"]',
+        { repoRoot }
+      )
+    ).toBe('src/binder/src/Shared/Binder.lua');
+  });
+
+  it('resolves a package root module to its init file', () => {
+    expect(
+      tryResolveRobloxSourceFile(
+        '[string "ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quenty.loader"]',
+        { repoRoot }
+      )
+    ).toBe('src/loader/src/init.lua');
+  });
+
+  it('maps the test slug to the package directory', () => {
+    expect(
+      tryResolveRobloxSourceFile(
+        'ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService',
+        { repoRoot, packageName: '@quenty/gameproductservice' }
+      )
+    ).toBe('src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua');
+  });
+
+  it('rejects vendored, truncated and missing paths', () => {
+    for (const instancePath of [
+      'ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_promise@3.5.2.promise',
+      '[string "ServerScriptService.gameproduct.node_modules.@quenty.playermock.node_modules.@quenty.servic..."]',
+      'ServerScriptService.unknownpkg.Shared.Foo',
+    ]) {
+      expect(tryResolveRobloxSourceFile(instancePath, { repoRoot })).toBe(
+        undefined
+      );
+    }
   });
 });
