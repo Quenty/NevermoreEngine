@@ -2,6 +2,7 @@ import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   type Diagnostic,
+  dedupeDiagnostics,
   emitAnnotations,
   writeAnnotationSummaryAsync,
 } from '@quenty/cli-output-helpers/reporting';
@@ -16,6 +17,7 @@ import {
 } from '../../utils/testing/reporting/index.js';
 import { parseJestLuaOutput } from '../../utils/testing/parsers/index.js';
 import { tryLoadSourcemapResolver } from '../../utils/sourcemap/index.js';
+import { tryLoadAnnotationWorkspaceAsync } from '../../utils/testing/parsers/annotation-workspace.js';
 
 type ErrorReporter = Reporter & {
   setError(error: string): void;
@@ -99,14 +101,17 @@ export const ciPostTestResultsCommand: CommandModule<
 
       // Emit test failure annotations
       const sourcemapResolver = tryLoadSourcemapResolver(process.cwd());
-      const allDiagnostics: Diagnostic[] = [];
+      const workspace = await tryLoadAnnotationWorkspaceAsync(process.cwd());
+      const parsedDiagnostics: Diagnostic[] = [];
       for (const failure of state.getFailures()) {
         const diagnostics = parseJestLuaOutput(failure.logs, {
           packageName: failure.packageName,
           sourcemapResolver,
+          workspace,
         });
-        allDiagnostics.push(...diagnostics);
+        parsedDiagnostics.push(...diagnostics);
       }
+      const allDiagnostics = dedupeDiagnostics(parsedDiagnostics);
 
       if (allDiagnostics.length > 0) {
         OutputHelper.info(
