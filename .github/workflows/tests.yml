@@ -54,7 +54,7 @@ jobs:
 
       - name: Build test places (for fork run)
         if: env.RUN_TESTS_IN_FORKS_TEST == 'true'
-        run: nevermore batch bundle pr-${{ github.event.pull_request.number }}.nevermore.tests.tar --base origin/${{ github.base_ref }} --yes --verbose
+        run: nevermore batch bundle pr-${{ github.event.pull_request.number }}.nevermore.tests.tar --test --base origin/${{ github.base_ref }} --yes --verbose
 
       - name: Upload test places (for fork run)
         if: env.RUN_TESTS_IN_FORKS_TEST == 'true'

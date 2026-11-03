@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import {
@@ -53,8 +54,22 @@ export interface GitDeployInfo {
 /**
  * Collect git metadata once per deploy. Every field is best-effort — a missing
  * git binary or a non-repo directory yields an empty object rather than an error.
+ *
+ * A `pull_request` run checks out `refs/pull/N/merge`, a synthetic commit that
+ * exists in neither repo, on a detached HEAD. There the PR's head commit and
+ * branch are read from the event payload instead, so a deployed build traces
+ * back to the commit its checks are reported on.
  */
 export function gatherGitDeployInfo(): GitDeployInfo {
+  const pullRequestHead = _readPullRequestHead();
+  if (pullRequestHead) {
+    return {
+      commit: pullRequestHead.sha.slice(0, 10),
+      version: pullRequestHead.sha,
+      branch: pullRequestHead.ref,
+    };
+  }
+
   const info: GitDeployInfo = {};
   const commit = _git(['rev-parse', '--short', 'HEAD']);
   if (commit) info.commit = commit;
@@ -63,6 +78,30 @@ export function gatherGitDeployInfo(): GitDeployInfo {
   const branch = _git(['rev-parse', '--abbrev-ref', 'HEAD']);
   if (branch && branch !== 'HEAD') info.branch = branch;
   return info;
+}
+
+function _readPullRequestHead(): { sha: string; ref?: string } | undefined {
+  const eventName = process.env.GITHUB_EVENT_NAME;
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (
+    !eventPath ||
+    (eventName !== 'pull_request' && eventName !== 'pull_request_target')
+  ) {
+    return undefined;
+  }
+  try {
+    const event = JSON.parse(readFileSync(eventPath, 'utf-8'));
+    const head = event?.pull_request?.head;
+    if (typeof head?.sha !== 'string' || !/^[0-9a-f]{40}$/.test(head.sha)) {
+      return undefined;
+    }
+    return {
+      sha: head.sha,
+      ref: typeof head.ref === 'string' ? head.ref : undefined,
+    };
+  } catch {
+    return undefined;
+  }
 }
 
 /** Per-place facts known at deploy time. */

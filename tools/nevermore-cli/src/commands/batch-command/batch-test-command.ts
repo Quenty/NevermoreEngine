@@ -138,7 +138,7 @@ export const batchTestCommand: CommandModule<
         })
         .option('bundle', {
           describe:
-            'Run the places in a *.nevermore.tests.tar written by "batch bundle" instead of finding ' +
+            'Run the places in a *.nevermore.tests.tar written by "batch bundle --test" instead of finding ' +
             'and building packages. The bundle never chooses where it is uploaded: ' +
             'that is --batch-place-id/--batch-universe-id, or else the test place this ' +
             'checkout gives one of its packages.',
