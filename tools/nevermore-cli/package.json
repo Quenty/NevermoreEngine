@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "4.50.1",
+  "version": "4.51.0",
   "description": "CLI interface for Nevermore",
   "type": "module",
   "keywords": [

@@ -1,19 +1,13 @@
-# v1.20.0 (Tue Nov 03 2026)
-
-#### 🚀 Enhancement
-
-- feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.1...@quenty/cli-output-helpers@1.20.0) (2026-11-03)
+
+### Features
+
+- **nevermore-cli:** run cloud tests for PRs from forks ([#855](https://github.com/Quenty/NevermoreEngine/issues/855)) ([5408e3d](https://github.com/Quenty/NevermoreEngine/commit/5408e3d52f31e1499afaa08ed79dfbeb42515b02))
 
 ## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.0...@quenty/cli-output-helpers@1.19.1) (2026-11-02)
 
