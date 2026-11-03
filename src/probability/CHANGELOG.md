@@ -1,3 +1,15 @@
+# v2.3.5 (Tue Nov 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

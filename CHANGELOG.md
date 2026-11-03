@@ -1,3 +1,16 @@
+# (Tue Nov 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/probability@2.3.5`
+  - fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Mon Nov 02 2026)
 
 #### 🐛 Bug Fix
