@@ -523,6 +523,10 @@ nevermore batch test --cloud --concurrency 3
 
 # Write JSON results to file
 nevermore batch test --output results.json
+
+# Build the test places without an API key, then run them elsewhere
+nevermore batch bundle my-change.nevermore.tests.tar
+nevermore batch test --cloud --bundle my-change.nevermore.tests.tar
 ```
 
 Options:
@@ -535,6 +539,9 @@ Options:
 | `--output` | Write JSON results to a file |
 | `--limit` | Max number of packages to test |
 | `--logs` | Show execution logs for all packages |
+| `--bundle <file>` | Run the places in a `*.nevermore.tests.tar` written by `nevermore batch bundle` instead of finding and building packages. Works locally or with `--cloud`. Uploads to `--batch-place-id`/`--batch-universe-id`, or else to the test place this checkout gives one of the bundled packages, never to one the bundle names |
+
+`nevermore batch bundle <file>` builds the same combined places `batch test` would, writes them with a manifest into one uncompressed tar (`tar -tf` lists it), and stops. It takes `--base`, `--all`, `--limit` and `--max-place-mb`, and needs no API key.
 
 ## Credential resolution
 
@@ -585,3 +592,13 @@ For CI, set `ROBLOSECURITY` as a repository or Codespace secret. The `.github/wo
 - **Post results via CLI**: `nevermore tools post-test-results <file>` posts or updates a PR comment with test results and writes to the GitHub Actions job summary. Requires `GITHUB_TOKEN` for PR comments; job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
 - **Live comment updates during the run**: When `nevermore batch test` detects a CI environment, it also updates the PR comment as packages transition between phases (throttled to ~10s). The `post-test-results` step still writes the final snapshot, but reviewers see progress without waiting for the full run to finish. In `--aggregated` mode every package shares one execution, so they move through `uploading` → `scheduling` → `executing` in lock-step — that's expected, not a bug.
 - **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment. The job summary is only written by `post-test-results` (not by the live batch run) to avoid duplicate entries on the workflow summary page.
+
+## Tests on PRs from forks
+
+GitHub gives a fork's `pull_request` run no secrets, so it cannot reach Open Cloud. Instead the PR is built where its code runs, and run where the API key lives:
+
+1. **`tests.yml`, on `pull_request`.** For a same-repo PR this is the whole test run, as before. For a fork the job is named `tests-build` and only runs `nevermore batch bundle`, uploading `pr-<n>.nevermore.tests.tar` as an artifact of the same name, with the fork's `sourcemap.json` beside it so failure annotations resolve against the fork's files, not `main`'s (`post-test-results --sourcemap`). Downloading that artifact is also how to run exactly what CI ran: `nevermore batch test --bundle pr-<n>.nevermore.tests.tar`.
+2. **`tests-forks.yml`, on `workflow_run`.** It runs once `tests` completes, with secrets, and always from `main`'s copy of the file. It checks out `main` only, downloads the artifact outside the checkout, finds the PR by the fork's owner and branch (`workflow_run` lists no PRs for a fork), then runs `nevermore batch test --bundle` on the build that triggered it, and reports the result as a `tests` check run on the built commit. The upload place comes from `main`'s checkout, the same place a same-repo PR's run would use, never from the artifact.
+3. **`tests-forks.yml`, by hand.** Run it from the Actions tab with a PR number to test that PR again without rebuilding. It uses the newest successful `tests-build` for the PR's current head, so it fails once that artifact has expired (3 days); re-run `tests-build` then.
+
+The required check stays `tests` for both kinds of PR. A fork's job is renamed rather than skipped because a job skipped by its `if:` counts as passing, so a skipped `tests` job would let a fork merge untested.

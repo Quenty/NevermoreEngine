@@ -42,6 +42,8 @@ class BatchDeployment implements Deployment {
   ) {}
 }
 
+type BatchBuild = Pick<CombinedProjectResult, 'chunks' | 'primaryTarget'>;
+
 /** One combined place's upload and execution, each started at most once. */
 interface ChunkRun {
   chunk: CombinedPlaceChunk;
@@ -98,7 +100,7 @@ export class BatchScriptJobContext implements JobContext {
   private _reporter?: Reporter;
 
   // Lazy-promise state
-  private _combinedBuildPromise?: Promise<CombinedProjectResult>;
+  private _combinedBuildPromise?: Promise<BatchBuild>;
   private _chunkRuns?: ChunkRun[];
   private _executionPromise?: Promise<BatchExecutionOutcome>;
 
@@ -119,6 +121,12 @@ export class BatchScriptJobContext implements JobContext {
        */
       maxChunkBytes?: number;
       reporter?: Reporter;
+      /**
+       * Places already built by `batch bundle`, run instead of building. They
+       * upload to `batchPlaceId` in `batchUniverseId`, which are then required.
+       * The context owns `buildContext` and cleans it up like its own build.
+       */
+      prebuilt?: { chunks: CombinedPlaceChunk[]; buildContext: BuildContext };
     }
   ) {
     this._inner = inner;
@@ -129,6 +137,25 @@ export class BatchScriptJobContext implements JobContext {
     this._batchTimeoutMs = options?.batchTimeoutMs ?? 300_000;
     this._maxChunkBytes = options?.maxChunkBytes;
     this._reporter = options?.reporter;
+
+    if (options?.prebuilt) {
+      if (!this._batchPlaceId || !this._batchUniverseId) {
+        throw new Error(
+          'Prebuilt places need batchPlaceId and batchUniverseId to upload to'
+        );
+      }
+      const { chunks, buildContext } = options.prebuilt;
+      this._combinedBuildContext = buildContext;
+      this._chunkRuns = chunks.map((chunk) => ({ chunk }));
+      this._combinedBuildPromise = Promise.resolve({
+        chunks,
+        primaryTarget: {
+          placeId: this._batchPlaceId,
+          universeId: this._batchUniverseId,
+          project: '',
+        },
+      });
+    }
 
     const withBasePlace = batchTargets.filter((t) => t.target.basePlace);
     if (withBasePlace.length > 0) {
@@ -203,6 +230,10 @@ export class BatchScriptJobContext implements JobContext {
     return this._getBatchExecutionAsync();
   }
 
+  async getBuiltChunksAsync(): Promise<CombinedPlaceChunk[]> {
+    return (await this._getChunkRunsAsync()).map((run) => run.chunk);
+  }
+
   async getLogsAsync(deployment: Deployment): Promise<JobLogs> {
     const batchDeployment = deployment as BatchDeployment;
     const { results, stats } = await this._getBatchExecutionAsync();
@@ -249,14 +280,14 @@ export class BatchScriptJobContext implements JobContext {
 
   // ---- Lazy-promise internals ----
 
-  private _getCombinedBuildAsync(): Promise<CombinedProjectResult> {
+  private _getCombinedBuildAsync(): Promise<BatchBuild> {
     if (!this._combinedBuildPromise) {
       this._combinedBuildPromise = this._doCombinedBuildAsync();
     }
     return this._combinedBuildPromise;
   }
 
-  private async _doCombinedBuildAsync(): Promise<CombinedProjectResult> {
+  private async _doCombinedBuildAsync(): Promise<BatchBuild> {
     OutputHelper.verbose('Building combined batch place...');
 
     // Set all packages to "waiting" — they're queued for building

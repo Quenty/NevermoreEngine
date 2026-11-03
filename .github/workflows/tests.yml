@@ -5,7 +5,10 @@ on:
     branches: [main]
 jobs:
   tests:
+    name: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'tests' || 'tests-build' }}
     runs-on: ubuntu-latest
+    env:
+      RUN_TESTS_IN_FORKS_TEST: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -46,19 +49,33 @@ jobs:
         run: npm install --ignore-scripts -g .
         working-directory: tools/nevermore-cli
 
+      - name: Build sourcemap for annotation resolution
+        run: npm run build:sourcemap
+
+      - name: Build test places (for fork run)
+        if: env.RUN_TESTS_IN_FORKS_TEST == 'true'
+        run: nevermore batch bundle pr-${{ github.event.pull_request.number }}.nevermore.tests.tar --base origin/${{ github.base_ref }} --yes --verbose
+
+      - name: Upload test places (for fork run)
+        if: env.RUN_TESTS_IN_FORKS_TEST == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-${{ github.event.pull_request.number }}.nevermore.tests
+          path: |
+            pr-${{ github.event.pull_request.number }}.nevermore.tests.tar
+            sourcemap.json
+          retention-days: 3
+
       - name: Run tests
         id: run-tests
+        if: env.RUN_TESTS_IN_FORKS_TEST != 'true'
         run: nevermore batch test --cloud --aggregated ${{ github.event_name == 'pull_request' && format('--base origin/{0}', github.base_ref) || '' }} --output test-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build sourcemap for annotation resolution
-        if: always()
-        run: npm run build:sourcemap
-
       - name: Post test results
-        if: always()
+        if: always() && env.RUN_TESTS_IN_FORKS_TEST != 'true'
         run: nevermore tools post-test-results test-results.json --yes --run-outcome ${{ steps.run-tests.outcome }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
