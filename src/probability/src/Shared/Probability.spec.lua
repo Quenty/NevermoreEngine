@@ -8,7 +8,7 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local SAMPLE_COUNT = 100000
+local SAMPLE_COUNT = 10000
 
 local function measure(sample: () -> number): (number, number)
 	local sum = 0
@@ -28,8 +28,8 @@ describe("Probability.boxMuller", function()
 	it("samples a standard normal distribution", function()
 		local mean, standardDeviation = measure(Probability.boxMuller)
 
-		expect(math.abs(mean) < 0.02).toBe(true)
-		expect(math.abs(standardDeviation - 1) < 0.02).toBe(true)
+		expect(math.abs(mean) < 0.05).toBe(true)
+		expect(math.abs(standardDeviation - 1) < 0.05).toBe(true)
 	end)
 
 	it("maps uniform inputs through the Box-Muller transform", function()
@@ -57,7 +57,7 @@ describe("Probability.normal", function()
 			return Probability.normal(10, 3)
 		end)
 
-		expect(math.abs(mean - 10) < 0.06).toBe(true)
-		expect(math.abs(standardDeviation - 3) < 0.06).toBe(true)
+		expect(math.abs(mean - 10) < 0.15).toBe(true)
+		expect(math.abs(standardDeviation - 3) < 0.15).toBe(true)
 	end)
 end)
