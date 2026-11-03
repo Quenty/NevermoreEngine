@@ -1,5 +1,18 @@
 # (Tue Nov 03 2026)
 
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.20.0`, `@quenty/nevermore-cli@4.51.0`
+  - feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
 #### 🐛 Bug Fix
 
 - `@quenty/probability@2.3.5`

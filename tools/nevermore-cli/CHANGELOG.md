@@ -1,3 +1,15 @@
+# v4.51.0 (Tue Nov 03 2026)
+
+#### 🚀 Enhancement
+
+- feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
