@@ -13,6 +13,7 @@ import {
 } from 'http';
 import type { Socket } from 'net';
 import { WebSocketServer, WebSocket } from 'ws';
+import { MAX_MESSAGE_BYTES } from '../../server/web-socket-protocol.js';
 import { URL } from 'url';
 
 export interface TransportServerOptions {
@@ -67,7 +68,10 @@ export class TransportServer {
       });
     });
 
-    this._wss = new WebSocketServer({ noServer: true });
+    this._wss = new WebSocketServer({
+      noServer: true,
+      maxPayload: MAX_MESSAGE_BYTES,
+    });
 
     this._httpServer.on('upgrade', (request, socket, head) => {
       const pathname = this._parsePath(request);

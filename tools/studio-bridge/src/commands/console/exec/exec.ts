@@ -6,20 +6,26 @@
  */
 
 import * as fs from 'fs/promises';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
 import type { BridgeSession } from '../../../bridge/index.js';
+import type { SerializedReturnValue } from '../../../server/web-socket-protocol.js';
 
 export interface ExecOptions {
   scriptContent: string;
   timeout?: number;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface ExecResult {
   success: boolean;
   output: string[];
   error?: string;
+  traceback?: string;
+  returnValues?: SerializedReturnValue[];
   summary: string;
 }
 
@@ -32,6 +38,8 @@ export interface RunResult {
   success: boolean;
   output: string[];
   error?: string;
+  traceback?: string;
+  returnValues?: SerializedReturnValue[];
   summary: string;
 }
 
@@ -39,6 +47,7 @@ interface ConsoleExecArgs {
   code?: string;
   file?: string;
   timeout?: number;
+  scriptArgs?: string[];
 }
 
 /**
@@ -50,7 +59,8 @@ export async function execHandlerAsync(
 ): Promise<ExecResult> {
   const result = await session.execAsync(
     options.scriptContent,
-    options.timeout
+    options.timeout,
+    options.args
   );
 
   const output = (result.output ?? []).map((entry) =>
@@ -61,6 +71,8 @@ export async function execHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    traceback: result.traceback,
+    returnValues: result.returnValues,
     summary: result.success
       ? 'Script executed successfully'
       : `Script failed: ${result.error}`,
@@ -85,10 +97,49 @@ export async function runHandlerAsync(
     success: result.success,
     output,
     error: result.error,
+    traceback: result.traceback,
+    returnValues: result.returnValues,
     summary: result.success
       ? `Script ${options.scriptPath} executed successfully`
       : `Script ${options.scriptPath} failed: ${result.error}`,
   };
+}
+
+export function formatReturnValues(
+  returnValues: SerializedReturnValue[]
+): string {
+  return returnValues
+    .map((value) => {
+      if (typeof value === 'string') return value;
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value) &&
+        value.type === 'Nil'
+      ) {
+        return 'nil';
+      }
+      return JSON.stringify(value);
+    })
+    .join('\t');
+}
+
+/** Render an exec result as its output, then its return values, then its error. */
+export function formatExecText(result: {
+  output: string[];
+  returnValues?: SerializedReturnValue[];
+  error?: string;
+  traceback?: string;
+  summary: string;
+}): string {
+  const lines = [...result.output];
+  if (result.returnValues && result.returnValues.length > 0) {
+    lines.push(formatReturnValues(result.returnValues));
+  }
+  if (result.error) lines.push(result.error);
+  if (result.traceback)
+    lines.push(OutputHelper.formatDim(result.traceback.trimEnd()));
+  return lines.length > 0 ? lines.join('\n') : result.summary;
 }
 
 export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
@@ -97,6 +148,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   description: 'Execute Luau code in a connected Studio session',
   category: 'execution',
   safety: 'mutate',
+  changesDataModel: true,
   scope: 'session',
   args: {
     code: arg.positional({
@@ -111,13 +163,13 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
       description: 'Execution timeout in milliseconds',
       type: 'number',
     }),
+    scriptArgs: arg.passthrough({
+      description:
+        'Arguments after --, passed to the script as ... (all strings)',
+    }),
   },
   cli: {
-    format: (result) => {
-      const lines = result.output.join('\n');
-      if (result.error) return lines + (lines ? '\n' : '') + result.error;
-      return lines || result.summary;
-    },
+    format: formatExecText,
   },
   handler: async (session, args) => {
     const { scriptContent } = await resolveScriptContentAsync(args);
@@ -125,6 +177,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     return execHandlerAsync(session, {
       scriptContent,
       timeout: args.timeout,
+      args: args.scriptArgs,
     });
   },
 });

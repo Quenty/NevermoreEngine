@@ -18,6 +18,9 @@ export class StdoutResultReporter<T = unknown> extends BaseResultReporter<T> {
   }
 
   override onResult(result: T): void {
-    console.log(this._render(result));
+    const text = this._render(result);
+    if (text !== '') {
+      console.log(text);
+    }
   }
 }

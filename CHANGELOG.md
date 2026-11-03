@@ -1,3 +1,81 @@
+# (Tue Nov 03 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.20.0`, `@quenty/nevermore-cli@4.51.0`
+  - feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/probability@2.3.5`
+  - fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.19.1`, `@quenty/nevermore-cli@4.50.1`
+  - fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Oct 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.19.0`, `@quenty/nevermore-cli@4.50.0`, `@quenty/studio-bridge@0.22.0`
+  - feat(studio-bridge): multiplayer playtests, Studio launching, search, and CLI fixes [#851](https://github.com/Quenty/NevermoreEngine/pull/851) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.49.0`
+  - feat(nevermore-cli): Recompress place uploads and split oversized batches [#850](https://github.com/Quenty/NevermoreEngine/pull/850) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.10.0`, `@quenty/jecs@1.11.0`
+  - feat: immediate systems hot reload feedback [#849](https://github.com/Quenty/NevermoreEngine/pull/849) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
 # (Sat Oct 24 2026)
 
 :tada: This release contains work from a new contributor! :tada:

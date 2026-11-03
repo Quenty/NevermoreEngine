@@ -1,111 +1,92 @@
---[[
-	QueryDataModel action handler for the studio-bridge plugin.
+--!strict
+--[=[
+	Action that resolves a dot-separated path to an Instance and answers with it
+	serialized, along with its properties, attributes, and children down to
+	`depth`.
 
-	Resolves a dot-separated path to a Roblox Instance and serializes it
-	into a DataModelInstance response with optional properties, attributes,
-	and children up to a specified depth.
+	Request: `{ type: "queryDataModel", payload: { path, depth?, properties?, includeAttributes? } }`
+	Response: `{ type: "dataModelResult", payload: { instance: DataModelInstance } }`
 
-	Protocol:
-	  Request:  { type: "queryDataModel", path: "Workspace.SpawnLocation", depth: 1, properties: [], includeAttributes: true }
-	  Response: { type: "dataModelResult", payload: { instance: DataModelInstance } }
-]]
+	@class QueryDataModelAction
+]=]
 
-local QueryDataModelAction = {}
-
--- ---------------------------------------------------------------------------
--- Property serialization
--- ---------------------------------------------------------------------------
-
+local COMMON_PROPERTIES = { "Name", "ClassName" }
 local SKIP_PROPERTIES = {
 	Parent = true,
 }
 
-local function serializeValue(value: any): any
-	local t = typeof(value)
+local QueryDataModelAction = {}
 
-	if t == "string" or t == "number" or t == "boolean" then
-		return value
-	elseif t == "nil" then
-		return nil
-	elseif t == "Vector3" then
-		return { type = "Vector3", value = { value.X, value.Y, value.Z } }
-	elseif t == "Vector2" then
-		return { type = "Vector2", value = { value.X, value.Y } }
-	elseif t == "CFrame" then
-		return { type = "CFrame", value = { value:GetComponents() } }
-	elseif t == "Color3" then
-		return { type = "Color3", value = { value.R, value.G, value.B } }
-	elseif t == "UDim2" then
-		return { type = "UDim2", value = { value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset } }
-	elseif t == "UDim" then
-		return { type = "UDim", value = { value.Scale, value.Offset } }
-	elseif t == "BrickColor" then
-		return { type = "BrickColor", name = value.Name, value = value.Number }
-	elseif t == "EnumItem" then
-		return { type = "EnumItem", enum = tostring(value.EnumType), name = value.Name, value = value.Value }
-	elseif t == "Instance" then
-		return { type = "Instance", className = value.ClassName, path = value:GetFullName() }
-	else
-		return { type = "Unsupported", typeName = t, toString = tostring(value) }
-	end
-end
-
-local function serializeProperties(instance: Instance, propertyFilter: { string }?): { [string]: any }
-	local result = {}
-
-	-- If a filter is provided and empty, return no properties
-	if propertyFilter and #propertyFilter == 0 then
-		return result
-	end
-
-	-- Use API dump approach: read common properties via pcall
-	-- Since Roblox doesn't expose a property list, we read known safe properties
-	-- and any specifically requested ones
-	if propertyFilter then
-		for _, propName in propertyFilter do
-			if not SKIP_PROPERTIES[propName] then
-				local ok, value = pcall(function()
-					return (instance :: any)[propName]
-				end)
-				if ok then
-					result[propName] = serializeValue(value)
-				end
+--[=[
+	Registers the `queryDataModel` handler.
+]=]
+function QueryDataModelAction.register(router: any)
+	router:setResponseType("queryDataModel", "dataModelResult")
+	router:register(
+		"queryDataModel",
+		function(payload: { [string]: any }, _requestId: string, _sessionId: string): { [string]: any }?
+			local path = payload.path
+			if type(path) ~= "string" then
+				return nil
 			end
-		end
-	else
-		-- No filter: read common properties
-		local commonProps = { "Name", "ClassName" }
-		for _, propName in commonProps do
-			local ok, value = pcall(function()
-				return (instance :: any)[propName]
-			end)
-			if ok then
-				result[propName] = serializeValue(value)
+
+			local instance = QueryDataModelAction._resolveInstance(path)
+			if not instance then
+				return {
+					success = false,
+					code = "INSTANCE_NOT_FOUND",
+					message = `Instance not found at path: {path}`,
+				}
 			end
-		end
-	end
 
-	return result
+			return {
+				instance = QueryDataModelAction._serializeInstance(
+					instance,
+					payload.depth or 0,
+					payload.properties,
+					payload.includeAttributes == true
+				),
+			}
+		end
+	)
 end
 
-local function serializeAttributes(instance: Instance): { [string]: any }
-	local result = {}
-	local ok, attrs = pcall(function()
-		return instance:GetAttributes()
-	end)
-	if ok and attrs then
-		for key, value in attrs do
-			result[key] = serializeValue(value)
+--[[
+	Walks `path` down from game, falling back to GetService for top-level names
+	that are not children by that name. A leading "game" is optional.
+]]
+function QueryDataModelAction._resolveInstance(path: string): Instance?
+	local parts = string.split(path, ".")
+	local startIndex = if parts[1] == "game" then 2 else 1
+
+	local current: Instance = game
+	for index = startIndex, #parts do
+		local part = parts[index]
+
+		local ok, child = pcall(current.FindFirstChild, current, part)
+		if ok and child then
+			current = child
+			continue
 		end
+
+		if current ~= game then
+			return nil
+		end
+
+		local serviceOk, service = pcall(game.GetService, game, part)
+		if not (serviceOk and service) then
+			return nil
+		end
+		current = service
 	end
-	return result
+
+	return current
 end
 
--- ---------------------------------------------------------------------------
--- Instance serialization
--- ---------------------------------------------------------------------------
-
-local function serializeInstance(
+--[[
+	A nil filter reads the common properties, an empty one reads none.
+]]
+function QueryDataModelAction._serializeInstance(
 	instance: Instance,
 	depth: number,
 	propertyFilter: { string }?,
@@ -116,15 +97,18 @@ local function serializeInstance(
 		name = instance.Name,
 		className = instance.ClassName,
 		path = instance:GetFullName(),
-		properties = serializeProperties(instance, propertyFilter),
-		attributes = if includeAttributes then serializeAttributes(instance) else {},
+		properties = QueryDataModelAction._serializeProperties(instance, propertyFilter or COMMON_PROPERTIES),
+		attributes = if includeAttributes then QueryDataModelAction._serializeAttributes(instance) else {},
 		childCount = #children,
 	}
 
 	if depth > 0 then
 		local serializedChildren = {}
 		for _, child in children do
-			table.insert(serializedChildren, serializeInstance(child, depth - 1, propertyFilter, includeAttributes))
+			table.insert(
+				serializedChildren,
+				QueryDataModelAction._serializeInstance(child, depth - 1, propertyFilter, includeAttributes)
+			)
 		end
 		node.children = serializedChildren
 	end
@@ -132,75 +116,63 @@ local function serializeInstance(
 	return node
 end
 
--- ---------------------------------------------------------------------------
--- Path resolution
--- ---------------------------------------------------------------------------
-
-local function resolveInstance(path: string): Instance?
-	-- Split path by dots, resolve from game
-	local parts = string.split(path, ".")
-	local startIndex = 1
-
-	-- Skip leading "game" since we start from game
-	if parts[1] == "game" then
-		startIndex = 2
-	end
-
-	local current: any = game
-	for i = startIndex, #parts do
-		local part = parts[i]
-		-- Try as a service first (e.g. "Workspace", "ReplicatedStorage")
-		local ok, child = pcall(function()
-			return current:FindFirstChild(part)
-		end)
-		if not ok or not child then
-			-- Try GetService for top-level services
-			if current == game then
-				local serviceOk, service = pcall(function()
-					return game:GetService(part)
-				end)
-				if serviceOk and service then
-					current = service
-					continue
-				end
-			end
-			return nil
+function QueryDataModelAction._serializeProperties(instance: Instance, propertyNames: { string }): { [string]: any }
+	local result = {}
+	for _, propertyName in propertyNames do
+		if SKIP_PROPERTIES[propertyName] then
+			continue
 		end
-		current = child
-	end
 
-	return current
+		-- Roblox exposes no property list, so read each name and skip the ones that throw
+		local ok, value = pcall(function()
+			return (instance :: any)[propertyName]
+		end)
+		if ok then
+			result[propertyName] = QueryDataModelAction._serializeValue(value)
+		end
+	end
+	return result
 end
 
--- ---------------------------------------------------------------------------
--- Public API
--- ---------------------------------------------------------------------------
+function QueryDataModelAction._serializeAttributes(instance: Instance): { [string]: any }
+	local result = {}
+	local ok, attributes = pcall(instance.GetAttributes, instance)
+	if not ok then
+		return result
+	end
 
-function QueryDataModelAction.register(router: any)
-	router:setResponseType("queryDataModel", "dataModelResult")
-	router:register("queryDataModel", function(payload: { [string]: any }, _requestId: string, _sessionId: string)
-		local path = payload.path
-		if not path or type(path) ~= "string" then
-			return nil -- ActionRouter will return UNKNOWN_REQUEST for nil
-		end
+	for key, value in attributes do
+		result[key] = QueryDataModelAction._serializeValue(value)
+	end
+	return result
+end
 
-		local depth = payload.depth or 0
-		local propertyFilter = payload.properties -- nil means common props, {} means none
-		local includeAttributes = payload.includeAttributes == true
+function QueryDataModelAction._serializeValue(value: any): any
+	local valueType = typeof(value)
 
-		local instance = resolveInstance(path)
-		if not instance then
-			return {
-				success = false,
-				code = "INSTANCE_NOT_FOUND",
-				message = `Instance not found at path: {path}`,
-			}
-		end
-
-		return {
-			instance = serializeInstance(instance, depth, propertyFilter, includeAttributes),
-		}
-	end)
+	if valueType == "nil" or valueType == "string" or valueType == "number" or valueType == "boolean" then
+		return value
+	elseif valueType == "Vector3" then
+		return { type = "Vector3", value = { value.X, value.Y, value.Z } }
+	elseif valueType == "Vector2" then
+		return { type = "Vector2", value = { value.X, value.Y } }
+	elseif valueType == "CFrame" then
+		return { type = "CFrame", value = { value:GetComponents() } }
+	elseif valueType == "Color3" then
+		return { type = "Color3", value = { value.R, value.G, value.B } }
+	elseif valueType == "UDim2" then
+		return { type = "UDim2", value = { value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset } }
+	elseif valueType == "UDim" then
+		return { type = "UDim", value = { value.Scale, value.Offset } }
+	elseif valueType == "BrickColor" then
+		return { type = "BrickColor", name = value.Name, value = value.Number }
+	elseif valueType == "EnumItem" then
+		return { type = "EnumItem", enum = tostring(value.EnumType), name = value.Name, value = value.Value }
+	elseif valueType == "Instance" then
+		return { type = "Instance", className = value.ClassName, path = value:GetFullName() }
+	else
+		return { type = "Unsupported", typeName = valueType, toString = tostring(value) }
+	end
 end
 
 return QueryDataModelAction

@@ -107,11 +107,16 @@ export {
   queryLogsHandlerAsync,
   captureScreenshotHandlerAsync,
   queryDataModelHandlerAsync,
+  exportInstancesHandlerAsync,
+  importInstancesHandlerAsync,
   execHandlerAsync,
   runHandlerAsync,
   launchHandlerAsync,
   connectHandlerAsync,
   disconnectHandler,
+  playtestStartHandlerAsync,
+  playtestStopHandlerAsync,
+  playtestRunHandlerAsync,
 } from './commands/index.js';
 
 export type {
@@ -130,6 +135,12 @@ export type {
   ConnectOptions,
   ConnectResult,
   DisconnectResult,
+  PlaytestStartOptions,
+  PlaytestStartResult,
+  PlaytestStopOptions,
+  PlaytestStopResult,
+  PlaytestRunOptions,
+  PlaytestRunResult,
 } from './commands/index.js';
 
 // Command option/result types that conflict with bridge types are aliased

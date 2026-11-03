@@ -79,6 +79,7 @@ Infrastructure:
 studio-bridge console exec 'print(workspace:GetChildren())'
 studio-bridge console exec --file test.lua
 studio-bridge console exec 'return game.PlaceId' --format json
+studio-bridge console exec -f spawn-npc.lua -- Goblin 3
 ```
 
 | Option | Alias | Description |
@@ -86,21 +87,33 @@ studio-bridge console exec 'return game.PlaceId' --format json
 | `--file` | `-f` | Path to a Luau script file |
 | `--target` | `-t` | Target session ID |
 | `--context` | — | Target context (`edit`, `client`, `server`) |
+| `--timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
+| `--allow-edit` | — | Change Edit even while a playtest of it runs |
+| `-- <args..>` | — | Passed to the script as `...`, as strings (`local name, count = ...`) |
+
+Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
 
 ### `console logs`
 
 ```bash
 studio-bridge console logs
 studio-bridge console logs --count 100 --direction head
-studio-bridge console logs --levels Error,Warning
+studio-bridge console logs --levels Error Warning
+studio-bridge console logs --context server --since-restart
+studio-bridge console logs --since 5m
 ```
 
 | Option | Alias | Description |
 |--------|-------|-------------|
 | `--count` | `-n` | Number of entries (default: 50) |
-| `--direction` | `-d` | `head` or `tail` (default: `tail`) |
-| `--levels` | `-l` | Filter by level (comma-separated) |
-| `--includeInternal` | — | Include internal bridge messages |
+| `--direction` | — | `head` or `tail` (default: `tail`) |
+| `--levels` | — | Filter by level (`Print`, `Info`, `Warning`, `Error`) |
+| `--include-internal` | — | Include internal bridge messages |
+| `--since` | — | Only entries since a duration ago (`30s`, `5m`, `2h`, `1d`) or a date |
+| `--since-restart` | — | Only entries since the running playtest started |
+| `--no-group-repeats` | — | Keep identical consecutive entries separate |
+
+Identical consecutive entries are collapsed into one with a repeat count (`repeats` and `lastTimestamp` in JSON), before `--count` applies, so `-n 20` shows 20 distinct lines. Each playtest DataModel keeps its own log, so `--context server` or `--context client` already reads only the running playtest and `--since-restart` keeps all of it; on Edit, `--since-restart` keeps what was logged since that playtest started.
 
 ### `explorer query`
 
@@ -115,6 +128,28 @@ studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
 | `--depth` | Max depth (default: 0) |
 | `--properties` | Include instance properties |
 | `--attributes` | Include instance attributes |
+
+### `explorer find` / `explorer grep`
+
+```bash
+studio-bridge explorer find spawn
+studio-bridge explorer find --class BasePart --tag Hazard --root Workspace.Map
+studio-bridge explorer grep TakeDamage
+studio-bridge explorer grep "^local %w+ = require" --lua-pattern --root ReplicatedStorage
+```
+
+`find` lists instances whose name contains the text (case-insensitive; `--exact` for the whole name), narrowed by `--class` (matched with `IsA`, so `BasePart` finds every part) and `--tag`. `grep` prints every script line containing the text as `path:line: text`. It reads open editor tabs, so unsaved edits are searched. Text matches plainly and case-insensitively; `--lua-pattern` and `--case-sensitive` change that.
+
+Both search the whole place by default, skipping Studio's own services such as CoreGui; `--root` narrows the search to a path, and `--limit` (default 200) caps the results, with `truncated` set when there were more.
+
+### `explorer export` / `explorer import`
+
+```bash
+studio-bridge explorer export Workspace.Map Lighting -o map.rbxm
+studio-bridge explorer import map.rbxm --parent ServerStorage
+```
+
+`export` saves instances as a binary model (`.rbxm`) through `SerializationService`, and writes it with `-o`. `import` inserts a `.rbxm` under `--parent` (default: `Workspace`).
 
 ### `viewport screenshot`
 
@@ -132,7 +167,7 @@ studio-bridge viewport screenshot --output viewport.png
 studio-bridge process list
 ```
 
-Lists all active sessions with their ID, place, context, state, and origin.
+Lists the connected sessions with their ID, context, place, and state. `--target` and `--context` narrow the list. While a playtest studio-bridge started is running, every session of that Studio shows `Play` (or `Run` without a client).
 
 ### `process info`
 
@@ -140,31 +175,82 @@ Lists all active sessions with their ID, place, context, state, and origin.
 studio-bridge process info
 ```
 
-Returns the Studio mode (`Edit`, `Play`, `Run`, etc.), place name, place ID, and game ID.
+```text
+Session:  test-place-3f9a-edit (edit, user, connected 4m ago)
+Mode:     Edit
+Playtest: running (multiplayer, 2 players): test-place-3f9a-server, test-place-3f9a-client-player1, test-place-3f9a-client-player2
+Place:    test-place.rbxl (PlaceId 0, GameId 0)
+Viewport: 849x1003
+Window:   pid 31876, open, not focused
+Studio:   0.744.0.7441077
+Plugin:   6c751ae59131 (up to date)
+```
+
+Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; and whether its plugin matches the one this CLI installs. The two clients of a multiplayer test share a window title, so they report no window.
 
 ### `process launch`
 
 ```bash
-studio-bridge process launch
+studio-bridge process launch                          # default target of the nearest deploy.nevermore.json
+studio-bridge process launch integration.places.hub   # a named target, or one place of it
 studio-bridge process launch --place ./build/test.rbxl
+studio-bridge process launch --place-id 123 --universe-id 456
 ```
+
+Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json` it opens Studio with no place.
 
 ### `process run`
 
 ```bash
 studio-bridge process run 'print("hello")'
-studio-bridge process run --file test.lua --place ./build/test.rbxl
+studio-bridge process run --file test.lua --place ./build/test.rbxl -- arg1 arg2
 ```
 
-Explicit ephemeral mode: launches Studio, executes the script, and shuts down.
+Launches Studio on a copy of the place, runs the script there and nowhere else, then closes that Studio. Other open Studios are never used. While the script runs, the launched Studio is a session like any other, so `process list` shows it (origin `managed`) and other commands can target it.
 
 ### `process close`
 
 ```bash
-studio-bridge process close --target session-id
+studio-bridge process close --target test-place
+studio-bridge process close --target test-place --force
+studio-bridge process close integration.places.hub   # the Studio showing a deploy.nevermore.json target
 ```
 
-Send a shutdown message to a connected Studio session.
+Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
+
+### `playtest run` / `playtest start` / `playtest restart` / `playtest stop`
+
+```bash
+studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
+studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
+studio-bridge playtest run --file spawn-test.lua -- Goblin 3
+studio-bridge playtest start --mode run
+studio-bridge console exec --context server 'print("in the playtest")'
+studio-bridge playtest restart
+studio-bridge playtest stop
+```
+
+Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server.
+
+`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It plants a temporary runner script in the playtest to do so, so it works whatever Studio's **Load user plugins on playtest** setting says. `--context client` runs the code in the playtest's client instead, which needs that setting on.
+
+`playtest start` leaves the playtest running, so other commands can target it with `--context server` or `--context client`. `playtest restart` stops it and starts a new one in the same mode, picking up code changed since it started; with none running, it starts one. `playtest stop` ends it.
+
+`start`, `restart`, and `stop` talk to the playtest's own server and client, which only connect when **Load user plugins on playtest** is on. With it off, `playtest start` still starts the playtest but reports that its sessions never connected, and the playtest has to be stopped in Studio.
+
+### Multiplayer tests: `playtest start --players` / `playtest player`
+
+```bash
+studio-bridge playtest start --players 2
+studio-bridge playtest player list
+studio-bridge playtest player add 2
+studio-bridge playtest player remove Player2
+studio-bridge console exec --target test-place-3f9a-client-player1 'return game.Players.LocalPlayer.Name'
+```
+
+`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the number of players in the test, counting any added since it started. Multiplayer tests need the current plugin (`studio-bridge plugin install`), and `--players` refuses to start with an older one.
+
+`playtest player list` shows each player with its client session. `add` adds players to a multiplayer test and waits for them to join. `remove` has each player's client leave the test, which closes its window; a player without a connected client session is kicked instead, and its window stays open.
 
 ### `plugin install` / `plugin uninstall`
 
@@ -192,17 +278,23 @@ Invoke a named Studio action on the connected session.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--timeout` | `120000` | Timeout in milliseconds |
+| `--timeout` | `5000` | How long to wait for a Studio session to connect, in milliseconds |
 | `--verbose` | `false` | Show internal debug output |
 | `--remote` | — | Connect to a remote bridge host (`host:port`) |
 | `--local` | `false` | Force local mode (skip devcontainer auto-detection) |
 
+### Output
+
+Every command accepts `--format text|json` and `-o <file>`. stdout carries only the result; progress and warnings go to stderr. With `--format json`, failures print `{"success": false, "error": ...}` and exit with code 1, and warnings (an outdated CLI, or a Studio plugin older than the CLI) are kept in the result's `_warnings` field.
+
+A single reply from Studio can carry up to 256 MiB. A larger one, such as a script returning a huge string, fails that request with `RESULT_TOO_LARGE` and leaves the connection and every other request alone.
+
 ### Target Selection
 
-Commands that target a session accept `--target` and `--context`:
+Session IDs are the place name plus a short suffix and the context, like `test-place-a05a-edit`. They stay the same until Studio closes, including across plugin reinstalls. Commands that target a session accept `--target` and `--context`:
 
-- **No flags** — auto-resolves if only one session exists
-- **`--target <id>`** — target a specific session by ID
+- **No flags** — auto-resolves if only one Studio is connected. With several, uses the one that has a place of the nearest `deploy.nevermore.json` open (and says which), so a command run in a package or game folder reaches that project's Studio.
+- **`--target <id>`** — a session ID, an instance ID (`test-place-a05a`), or any unique prefix of one (`test-place`)
 - **`--context <ctx>`** — select context within an instance (`edit`, `client`, `server`)
 
 When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.
@@ -212,14 +304,14 @@ When Studio is in Play mode, a single instance has multiple contexts (Edit + Cli
 ```bash
 pnpm test              # Unit tests (Vitest, no Studio needed)
 pnpm test:watch        # Watch mode
-pnpm test:plugin       # Lune-based plugin tests
+nevermore test --cloud # Jest specs for the plugin, in a Roblox cloud place
 pnpm test:integration  # End-to-end smoke test (requires Studio)
 ```
 
 | Layer | What it tests | Studio? |
 |-------|--------------|---------|
 | Unit (`pnpm test`) | Protocol, bridge connection, session tracking, command handlers, WebSocket lifecycle | No |
-| Plugin (`pnpm test:plugin`) | Luau plugin logic via Lune runner | No |
+| Plugin (`nevermore test --cloud`) | Plugin modules and action scripts, via the `*.spec.lua` beside them in `templates/studio-bridge-plugin/src/Shared` and `src/commands`, in a real engine built from `test/default.project.json` | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
 
 ## Platform Support

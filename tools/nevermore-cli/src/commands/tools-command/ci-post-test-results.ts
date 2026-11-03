@@ -2,6 +2,7 @@ import { CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   type Diagnostic,
+  dedupeDiagnostics,
   emitAnnotations,
   writeAnnotationSummaryAsync,
 } from '@quenty/cli-output-helpers/reporting';
@@ -16,6 +17,7 @@ import {
 } from '../../utils/testing/reporting/index.js';
 import { parseJestLuaOutput } from '../../utils/testing/parsers/index.js';
 import { tryLoadSourcemapResolver } from '../../utils/sourcemap/index.js';
+import { tryLoadAnnotationWorkspaceAsync } from '../../utils/testing/parsers/annotation-workspace.js';
 
 type ErrorReporter = Reporter & {
   setError(error: string): void;
@@ -25,6 +27,7 @@ type ErrorReporter = Reporter & {
 interface CiPostTestResultsArgs extends NevermoreGlobalArgs {
   input: string;
   runOutcome?: string;
+  sourcemap?: string;
 }
 
 /** Create the standard set of GitHub reporters for posting results. */
@@ -58,6 +61,12 @@ export const ciPostTestResultsCommand: CommandModule<
           'Outcome of the test step (e.g. "success", "failure"). ' +
           'When the results file is missing and run-outcome is "success", ' +
           'posts a neutral "no tests" comment instead of an error.',
+        type: 'string',
+      })
+      .option('sourcemap', {
+        describe:
+          'Sourcemap that test failure annotations resolve files against ' +
+          '(default: sourcemap.json in the current directory)',
         type: 'string',
       });
   },
@@ -98,15 +107,21 @@ export const ciPostTestResultsCommand: CommandModule<
       }
 
       // Emit test failure annotations
-      const sourcemapResolver = tryLoadSourcemapResolver(process.cwd());
-      const allDiagnostics: Diagnostic[] = [];
+      const sourcemapResolver = tryLoadSourcemapResolver(
+        process.cwd(),
+        args.sourcemap
+      );
+      const workspace = await tryLoadAnnotationWorkspaceAsync(process.cwd());
+      const parsedDiagnostics: Diagnostic[] = [];
       for (const failure of state.getFailures()) {
         const diagnostics = parseJestLuaOutput(failure.logs, {
           packageName: failure.packageName,
           sourcemapResolver,
+          workspace,
         });
-        allDiagnostics.push(...diagnostics);
+        parsedDiagnostics.push(...diagnostics);
       }
+      const allDiagnostics = dedupeDiagnostics(parsedDiagnostics);
 
       if (allDiagnostics.length > 0) {
         OutputHelper.info(

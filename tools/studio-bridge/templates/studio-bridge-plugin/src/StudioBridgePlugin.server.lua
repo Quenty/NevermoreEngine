@@ -1,439 +1,337 @@
+--!strict
 --[[
-	StudioBridge unified plugin entry point — Layer 2 Roblox glue.
+	Entry point for the studio-bridge plugin. Wires the modules under Shared/ to
+	Roblox services and boots in one of two modes:
 
-	Supports two boot modes:
-	  - Ephemeral: build constants substituted by the CLI, connects directly.
-	  - Persistent: template strings intact, uses DiscoveryStateMachine to
-	    scan ports and auto-connect to a running studio-bridge server.
+	- Ephemeral: the CLI substituted the build constants below, so it connects
+	  straight to that port and session.
+	- Persistent: the constants are left empty, so it scans for a
+	  running bridge with DiscoveryStateMachine and reconnects whenever it drops.
 
-	All protocol logic, state machine logic, action routing, and message
-	buffering live in Layer 1 modules under Shared/. This file is thin
-	glue that wires those modules to Roblox services.
+	The plugin cannot use the Nevermore loader: rojo builds this template on its
+	own from the published CLI package, without any node_modules.
 ]]
 
 local HttpService = game:GetService("HttpService")
 local LogService = game:GetService("LogService")
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Layer 1 modules (pure logic, no Roblox deps)
 local ActionRouter = require(script.Parent.Shared.ActionRouter)
+local BuiltInActions = require(script.Parent.Shared.BuiltInActions)
 local DiscoveryStateMachine = require(script.Parent.Shared.DiscoveryStateMachine)
 local MessageBuffer = require(script.Parent.Shared.MessageBuffer)
+local StudioBridgeConnection = require(script.Parent.Shared.StudioBridgeConnection)
+local StudioBridgeLogUtils = require(script.Parent.Shared.StudioBridgeLogUtils)
+local StudioBridgeSessionUtils = require(script.Parent.Shared.StudioBridgeSessionUtils)
 
--- Actions are pushed dynamically over the wire via registerAction.
--- No static action requires needed.
-
--- Build constants (Handlebars templates substituted at build time)
 local PORT = "{{PORT}}"
 local SESSION_ID = "{{SESSION_ID}}"
-local IS_EPHEMERAL = ("{{EPHEMERAL}}" == "true")
+local IS_EPHEMERAL = ("{{EPHEMERAL}}" :: string) == "true"
 
--- Only run inside Studio edit context. Plugin instances spawned by play
--- mode (client/server) cannot make HTTP requests, so they cannot discover
--- the bridge. The edit-context instance stays alive during play mode.
-if not RunService:IsStudio() or RunService:IsRunning() then
-	return
-end
+local LOG_BUFFER_CAPACITY = 1000
+local POLL_INTERVAL_SEC = 2
 
--- ---------------------------------------------------------------------------
--- Context detection
--- ---------------------------------------------------------------------------
-
-local function detectContext()
-	if RunService:IsRunning() then
-		if RunService:IsClient() then
-			return "client"
-		else
-			return "server"
-		end
-	end
-	return "edit"
-end
-
--- ---------------------------------------------------------------------------
--- Instance / session ID helpers
--- ---------------------------------------------------------------------------
-
--- Short unique nonce for disambiguating unpublished places with the same name.
--- Generated once per plugin lifecycle so the session ID stays stable across reconnects.
-local _nonce: string = string.sub(HttpService:GenerateGUID(false), 1, 8)
-
-local function getInstanceId()
-	if game.GameId ~= 0 or game.PlaceId ~= 0 then
-		return `{game.GameId}-{game.PlaceId}`
-	end
-	-- Unpublished place: use sanitized place name + nonce for uniqueness
-	local name = string.lower(game.Name or "untitled")
-	name = string.gsub(name, "%s+", "-")
-	name = string.gsub(name, "[^%w%-]", "")
-	if name == "" then
-		name = "untitled"
-	end
-	return `local-{name}-{_nonce}`
-end
-
-local function getSessionId()
-	return `{getInstanceId()}-{detectContext()}`
-end
-
--- ---------------------------------------------------------------------------
--- JSON helpers (HttpService wrappers for Roblox environment)
--- ---------------------------------------------------------------------------
-
-local function jsonEncode(tbl)
-	return HttpService:JSONEncode(tbl)
-end
-
-local function jsonDecode(raw)
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, raw)
-	if ok then
-		return result
-	end
-	return nil
-end
-
--- ---------------------------------------------------------------------------
--- Shared state
--- ---------------------------------------------------------------------------
-
-local router = ActionRouter.new()
-local logBuffer = MessageBuffer.new(1000)
-
--- Pre-load the PNG encoder and expose it to dynamically loaded actions
--- via router._vendorPng. The screenshot action reads this in its register().
-local _pngOk, _pngModule = pcall(function()
-	return require(script.Parent.Vendor.png)
-end)
-if _pngOk and _pngModule then
-	router._vendorPng = _pngModule
-end
-
--- Wire outgoing messages (set after WebSocket is connected)
-local sendMessageFn = nil
-
--- Callback that forwards messages through the active WebSocket
-local function sendMessage(msg)
-	if sendMessageFn then
-		sendMessageFn(msg)
-	end
-end
-
--- Register the built-in registerAction handler. This allows the bridge
--- server to push Luau action modules over the wire after a plugin connects.
-router:register("registerAction", function(payload, requestId, sessionId)
-	local name = payload.name
-	local source = payload.source
-	local responseType = payload.responseType
-	local hash = payload.hash -- optional content hash for skip-on-same-hash
-
-	if type(name) ~= "string" or type(source) ~= "string" then
-		return {
-			name = name or "unknown",
-			success = false,
-			error = "Invalid registerAction payload: name and source are required strings",
-		}
-	end
-
-	-- Check for hash-based skip before full registration
-	if type(hash) == "string" and router._actions[name] and router._actions[name].hash == hash then
-		return {
-			name = name,
-			success = true,
-			skipped = true,
-			hash = hash,
-			handlers = router._actions[name].handlerNames,
-		}
-	end
-
-	local success, err = router:registerAction(name, source, sendMessage, logBuffer, responseType, hash)
-
-	-- Build response with handler list from _actions if available
-	local handlers = {}
-	if success and router._actions[name] then
-		handlers = router._actions[name].handlerNames
-	end
-
-	return {
-		name = name,
-		success = success,
-		skipped = false,
-		hash = hash,
-		handlers = handlers,
-		error = err,
-	}
-end)
-router:setResponseType("registerAction", "registerActionResult")
-
--- Register the built-in syncActions handler. This allows the bridge server
--- to query which actions need updating by comparing content hashes.
-router:register("syncActions", function(payload, requestId, sessionId)
-	local clientActions = payload.actions or {}
-	local installed = router:getInstalledActions()
-	local needed = {}
-
-	for name, clientHash in clientActions do
-		if installed[name] ~= clientHash then
-			table.insert(needed, name)
-		end
-	end
-
-	return { needed = needed, installed = installed }
-end)
-router:setResponseType("syncActions", "syncActionsResult")
-
-local connected = false
-
-local LEVEL_MAP = {
+local LOG_LEVELS: { [Enum.MessageType]: string } = {
 	[Enum.MessageType.MessageOutput] = "Print",
 	[Enum.MessageType.MessageInfo] = "Info",
 	[Enum.MessageType.MessageWarning] = "Warning",
 	[Enum.MessageType.MessageError] = "Error",
 }
 
--- Hybrid clock: os.time() for absolute wall-clock, os.clock() deltas for sub-second precision
-local clockBase = os.clock()
-local timeBase = os.time()
+-- Playtests load a plugin instance into their server and client, but only when
+-- Studio's "load user plugins on playtest" setting is on. Those instances cannot
+-- make the HTTP requests port discovery needs, so they only connect in a
+-- playtest studio-bridge started, which hands them the port and the instance id
+-- of the edit session that started it.
+local playtestArgs: StudioBridgeSessionUtils.PlaytestArgs? = nil
+if RunService:IsRunning() then
+	local ok, testArgs = pcall(function()
+		return (game:GetService("StudioTestService") :: any):GetTestArgs()
+	end)
+	playtestArgs = if ok then StudioBridgeSessionUtils.getPlaytestArgs(testArgs) else nil
+end
+if not RunService:IsStudio() or (RunService:IsRunning() and not playtestArgs) then
+	return
+end
 
--- Capture logs from the moment the plugin loads, regardless of WebSocket state
-LogService.MessageOut:Connect(function(message, messageType)
-	if string.sub(message, 1, 14) == "[StudioBridge]" then
+local function createNonce(): string
+	return string.lower(string.sub(HttpService:GenerateGUID(false), 1, 4))
+end
+
+local context: StudioBridgeSessionUtils.PluginContext = StudioBridgeSessionUtils.getContext()
+local nonceOk, nonce = pcall(StudioBridgeSessionUtils.getOrCreateNonce, game:GetService("CoreGui"), createNonce)
+if not nonceOk then
+	nonce = createNonce()
+end
+
+-- Read on every connect: Studio can load plugins before it names the DataModel after the place
+local function getInstanceId(): string
+	if playtestArgs then
+		return playtestArgs.instanceId
+	end
+	return StudioBridgeSessionUtils.getInstanceId(game.Name, nonce)
+end
+local playtestPort = if playtestArgs then playtestArgs.port else nil
+
+local function getPlayerName(): string?
+	local player = if context == "client" then Players.LocalPlayer else nil
+	return if player then player.Name else nil
+end
+
+-- The clients of a multiplayer test share an instance id, so their session ids name their player
+local function getSessionId(): string
+	local isMultiplayerClient = playtestArgs and playtestArgs.multiplayer and context == "client"
+	return StudioBridgeSessionUtils.getSessionId(
+		getInstanceId(),
+		context,
+		if isMultiplayerClient then getPlayerName() else nil
+	)
+end
+
+local router = ActionRouter.new()
+local logBuffer = MessageBuffer.new(LOG_BUFFER_CAPACITY)
+local currentConnection: StudioBridgeConnection.StudioBridgeConnection? = nil
+local currentWebSocket: any = nil
+local discovery: DiscoveryStateMachine.DiscoveryStateMachine? = nil
+local pollThread: thread? = nil
+local nameConnection: RBXScriptConnection? = nil
+local isUnloaded = false
+
+local pngOk, png = pcall(function()
+	return (require :: any)(script.Parent.Vendor.png)
+end)
+if pngOk then
+	router:SetVendorPng(png)
+end
+
+BuiltInActions.register(router, function(message)
+	if currentConnection then
+		currentConnection:Send(message)
+	end
+end, logBuffer)
+
+-- Hybrid clock: the wall clock at load, then os.clock() deltas, which are cheaper per entry
+local clockBase = os.clock()
+local timeBase = DateTime.now().UnixTimestampMillis / 1000
+
+local logConnection = LogService.MessageOut:Connect(function(message, messageType)
+	if string.sub(message, 1, #StudioBridgeLogUtils.PREFIX) == StudioBridgeLogUtils.PREFIX then
 		return
 	end
-	logBuffer:push({
-		level = LEVEL_MAP[messageType] or "Print",
+
+	logBuffer:Push({
+		level = LOG_LEVELS[messageType] or "Print",
 		body = message,
 		timestamp = timeBase + (os.clock() - clockBase),
 	})
 end)
 
--- ---------------------------------------------------------------------------
--- Wire a WebSocket connection
--- ---------------------------------------------------------------------------
-
-local function wireConnection(ws, sessionId, connectLabel)
-	connected = true
-
-	-- Wire the sendMessage callback for action handlers
-	sendMessageFn = function(msg)
-		pcall(function()
-			ws:Send(jsonEncode(msg))
-		end)
+local function openConnection(webSocket: any, sessionId: string, label: string)
+	if isUnloaded then
+		return
 	end
 
-	-- Send register message. The plugin only runs in edit context (the
-	-- early-return at top of file rejects play-mode instances), so state
-	-- is always "Edit". Capabilities include the dynamically-dispatchable
-	-- actions — the bridge pushes their source via registerAction after
-	-- this register completes, but the plugin is capable of handling any
-	-- of them.
-	ws:Send(jsonEncode({
-		type = "register",
+	if currentConnection then
+		currentConnection:Destroy()
+	end
+
+	currentConnection = StudioBridgeConnection.new({
+		webSocket = webSocket,
+		router = router,
 		sessionId = sessionId,
-		payload = {
-			pluginVersion = "0.7.0",
-			instanceId = getInstanceId(),
-			context = detectContext(),
-			placeName = game.Name or "Unknown",
-			placeId = game.PlaceId,
-			gameId = game.GameId,
-			state = "Edit",
-			capabilities = {
-				"registerAction",
-				"syncActions",
-				"heartbeat",
-				"execute",
-				"queryState",
-				"captureScreenshot",
-				"queryDataModel",
-				"queryLogs",
-			},
-		},
-	}))
+		registerPayload = StudioBridgeSessionUtils.createRegisterPayload(
+			getInstanceId(),
+			context,
+			StudioBridgeSessionUtils.getLaunchId(workspace),
+			getPlayerName()
+		),
+	})
 
-	-- Incoming messages -> ActionRouter dispatch
-	ws.MessageReceived:Connect(function(rawData)
-		local ok, err = pcall(function()
-			local msg = jsonDecode(rawData)
-			if not msg or type(msg.type) ~= "string" then
-				print(`[StudioBridge] Failed to decode message: {tostring(rawData):sub(1, 200)}`)
-				return
-			end
-
-			print(`[StudioBridge] Received: {msg.type} (requestId={tostring(msg.requestId):sub(1, 8)}...)`)
-
-			if msg.type == "shutdown" then
-				connected = false
-				pcall(function()
-					ws:Close()
-				end)
-				return
-			end
-
-			local response = router:dispatch(msg)
-			if response then
-				local encoded = jsonEncode(response)
-				print(`[StudioBridge] Sending: {response.type} ({#encoded} bytes)`)
-				ws:Send(encoded)
-			else
-				print(`[StudioBridge] No response for: {msg.type}`)
-			end
-		end)
-		if not ok then
-			warn(`[StudioBridge] MessageReceived handler error: {tostring(err)}`)
-		end
-	end)
-
-	ws.Closed:Connect(function()
-		connected = false
-	end)
-
-	-- Heartbeat coroutine
-	local heartbeatStart = os.clock()
-	task.spawn(function()
-		while connected do
-			pcall(function()
-				ws:Send(jsonEncode({
-					type = "heartbeat",
-					sessionId = sessionId,
-					payload = {
-						uptimeMs = math.floor((os.clock() - heartbeatStart) * 1000),
-						state = detectContext() == "edit" and "Edit" or detectContext(),
-						pendingRequests = 0,
-					},
-				}))
-			end)
-			task.wait(15)
-		end
-	end)
-
-	print(`[StudioBridge] Connected to {connectLabel} as {sessionId}`)
+	StudioBridgeLogUtils.logVerbose(`Connected to {label} as {sessionId}`)
 end
 
--- ---------------------------------------------------------------------------
--- Boot
--- ---------------------------------------------------------------------------
-
-if IS_EPHEMERAL then
-	-- Ephemeral mode: CLI substituted PORT and SESSION_ID, connect directly
-	local wsUrl = `ws://localhost:{PORT}/{SESSION_ID}`
-	local ok, ws = pcall(function()
-		return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = wsUrl })
+local function createWebSocket(url: string): (boolean, any)
+	local ok, webSocket = pcall(function()
+		return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = url })
 	end)
-	if ok and ws then
-		ws.Opened:Connect(function()
-			wireConnection(ws, SESSION_ID, `localhost:{PORT} (ephemeral)`)
-		end)
-		ws.Error:Connect(function(status, err)
-			warn(`[StudioBridge] WebSocket error ({status}): {err}`)
-		end)
-	else
-		warn("[StudioBridge] Failed to create WebSocket client")
+	if ok then
+		currentWebSocket = webSocket
 	end
-else
-	-- Persistent mode: discover server via port scanning
-	local POLL_INTERVAL_SEC = 2
+	return ok, webSocket
+end
 
-	-- Forward-declare so closures inside the callback table can reference it.
-	local discovery
-	discovery = DiscoveryStateMachine.new(nil, {
-		scanPortsAsync = function(ports, timeoutSec)
-			-- Scan all ports in parallel using task.spawn. The calling thread
-			-- yields and is resumed as soon as any port succeeds, all fail,
-			-- or the timeout expires. Use task.defer (not task.spawn) to resume
-			-- the caller so it has time to reach coroutine.yield() first.
-			local callerThread = coroutine.running()
-			local foundPort = nil
-			local foundBody = nil
-			local remaining = #ports
-			local settled = false
-			local threads = {}
+-- Reloading the plugin destroys this script, but the socket callbacks and the
+-- poll loop outlive it, leaving the old instance connected beside the new one
+plugin.Unloading:Connect(function()
+	isUnloaded = true
+	logConnection:Disconnect()
+	if nameConnection then
+		nameConnection:Disconnect()
+		nameConnection = nil
+	end
 
-			for _, port in ports do
-				local thread = task.spawn(function()
-					local url = `http://localhost:{port}/health`
-					local ok2, body = pcall(HttpService.GetAsync, HttpService, url)
-					if ok2 and not settled then
-						foundPort = port
-						foundBody = body
-						settled = true
-						task.defer(callerThread)
-						return
-					end
-					remaining -= 1
-					if remaining <= 0 and not settled then
-						settled = true
-						task.defer(callerThread)
-					end
-				end)
-				table.insert(threads, thread)
-			end
+	if pollThread then
+		task.cancel(pollThread)
+		pollThread = nil
+	end
+	if discovery then
+		discovery:Stop()
+	end
+	if currentConnection then
+		currentConnection:Destroy()
+		currentConnection = nil
+	end
+	if currentWebSocket then
+		pcall(function()
+			currentWebSocket:Close()
+		end)
+		currentWebSocket = nil
+	end
 
-			-- Timeout: use the deadline from the poll loop
-			local timeoutThread = task.delay(timeoutSec, function()
-				if not settled then
-					settled = true
-					task.defer(callerThread)
+	router:Destroy()
+end)
+
+local function warnOnError(webSocket: any)
+	webSocket.Error:Connect(function(status, err)
+		StudioBridgeLogUtils.logVerbose(`WebSocket error ({status}): {err}`)
+	end)
+end
+
+--[[
+	Probes every port's /health endpoint in parallel and returns the first port
+	to answer, or nil once all fail or the timeout passes. The caller is resumed
+	with task.defer so it has reached coroutine.yield() first.
+]]
+local function scanPortsAsync(ports: { number }, timeoutSec: number): (number?, string?)
+	local callerThread = coroutine.running()
+	local foundPort: number? = nil
+	local foundBody: string? = nil
+	local remaining = #ports
+	local settled = false
+
+	local function settle()
+		if not settled then
+			settled = true
+			task.defer(callerThread)
+		end
+	end
+
+	local threads: { thread } = {}
+	for _, port in ports do
+		table.insert(
+			threads,
+			task.spawn(function()
+				local ok, body = pcall(HttpService.GetAsync, HttpService, `http://localhost:{port}/health`)
+				if ok and not settled then
+					foundPort = port
+					foundBody = body
+					settle()
+					return
+				end
+
+				remaining -= 1
+				if remaining <= 0 then
+					settle()
 				end
 			end)
+		)
+	end
+	table.insert(threads, task.delay(timeoutSec, settle))
 
-			coroutine.yield()
+	coroutine.yield()
 
-			-- Cancel remaining HTTP threads and the timeout
-			pcall(task.cancel, timeoutThread)
-			for _, thread in threads do
-				pcall(task.cancel, thread)
-			end
+	for _, thread in threads do
+		pcall(task.cancel, thread)
+	end
 
-			return foundPort, foundBody
-		end,
-		connectWebSocket = function(url)
-			local ok2, ws = pcall(function()
-				return HttpService:CreateWebStreamClient(Enum.WebStreamClientType.WebSocket, { Url = url })
-			end)
-			return ok2, ws
-		end,
-		onStateChange = function(oldState, newState)
-			if newState == "searching" and oldState == "idle" then
-				print("[StudioBridge] Searching for host on ports 38741-38744...")
-			end
-		end,
-		onConnected = function(ws, port)
-			local sessionId = getSessionId()
-			ws.Opened:Connect(function()
-				wireConnection(ws, sessionId, `localhost:{port}`)
-			end)
-			ws.Error:Connect(function(status, err)
-				warn(`[StudioBridge] WebSocket error ({status}): {err}`)
-			end)
-			ws.Closed:Connect(function()
-				connected = false
-				discovery:onDisconnect("closed")
-			end)
-		end,
-		onDisconnected = function(reason)
-			connected = false
-			print(`[StudioBridge] Disconnected ({reason}), searching...`)
-		end,
-	})
-	print(`[StudioBridge] Session ID: {getSessionId()}`)
-	discovery:start()
-
-	-- Drive the state machine with a simple polling loop.
-	-- Each iteration has a fixed time budget (POLL_INTERVAL_SEC). The
-	-- remaining time threads through pollAsync → scanPortsAsync so all
-	-- async operations complete within the budget.
-	task.spawn(function()
-		while true do
-			local startTime = os.clock()
-			discovery:pollAsync(POLL_INTERVAL_SEC)
-			-- Sleep for the remainder of the cycle
-			local elapsed = os.clock() - startTime
-			local remaining = POLL_INTERVAL_SEC - elapsed
-			if remaining > 0 then
-				task.wait(remaining)
-			else
-				task.wait() -- yield at least one frame
-			end
-		end
-	end)
+	return foundPort, foundBody
 end
+
+if IS_EPHEMERAL then
+	-- Every open Studio loads this plugin, but only the one launched for this run
+	-- has the session id stamped on its place, which may load after the plugin
+	local function connectEphemeral()
+		if StudioBridgeSessionUtils.getLaunchId(workspace) ~= SESSION_ID or currentWebSocket then
+			return
+		end
+
+		local ok, webSocket = createWebSocket(`ws://localhost:{PORT}/{SESSION_ID}`)
+		if not (ok and webSocket) then
+			StudioBridgeLogUtils.warn("Failed to create WebSocket client")
+			return
+		end
+
+		webSocket.Opened:Connect(function()
+			openConnection(webSocket, SESSION_ID, `localhost:{PORT} (ephemeral)`)
+		end)
+		warnOnError(webSocket)
+	end
+
+	workspace:GetAttributeChangedSignal("StudioBridgeSessionId"):Connect(connectEphemeral)
+	connectEphemeral()
+	return
+end
+
+-- A multiplayer client's session id names its player, so wait for one
+if playtestArgs and playtestArgs.multiplayer and context == "client" then
+	while not Players.LocalPlayer do
+		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	end
+end
+
+local stateMachine: DiscoveryStateMachine.DiscoveryStateMachine
+stateMachine = DiscoveryStateMachine.new(nil, {
+	scanPortsAsync = if playtestPort
+		then function()
+			return playtestPort, nil
+		end
+		else scanPortsAsync,
+	connectWebSocket = createWebSocket,
+	onStateChange = function(oldState, newState)
+		if oldState == "idle" and newState == "searching" then
+			StudioBridgeLogUtils.logVerbose("Searching for host on ports 38741-38744...")
+		end
+	end,
+	onConnected = function(webSocket, port)
+		webSocket.Opened:Connect(function()
+			openConnection(webSocket, getSessionId(), `localhost:{port}`)
+		end)
+		webSocket.Closed:Connect(function()
+			stateMachine:HandleDisconnect("closed")
+		end)
+		warnOnError(webSocket)
+	end,
+	onDisconnected = function(reason)
+		StudioBridgeLogUtils.logVerbose(`Disconnected ({reason}), searching...`)
+	end,
+})
+
+discovery = stateMachine
+
+stateMachine:Start()
+
+-- Reconnecting re-registers under the session id for the new name. A
+-- playtest's id comes from its test args, so a rename leaves it unchanged.
+nameConnection = game:GetPropertyChangedSignal("Name"):Connect(function()
+	if currentWebSocket and not playtestArgs then
+		pcall(function()
+			currentWebSocket:Close()
+		end)
+	end
+end)
+
+-- Each cycle gets a fixed time budget, which PollAsync threads through to the port scan
+pollThread = task.spawn(function()
+	while true do
+		local startTime = os.clock()
+		stateMachine:PollAsync(POLL_INTERVAL_SEC)
+
+		local remaining = POLL_INTERVAL_SEC - (os.clock() - startTime)
+		if remaining > 0 then
+			task.wait(remaining)
+		else
+			task.wait()
+		end
+	end
+end)

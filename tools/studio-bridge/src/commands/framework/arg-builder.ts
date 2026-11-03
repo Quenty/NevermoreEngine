@@ -1,12 +1,12 @@
 /**
  * Argument definition DSL and schema converters.
  *
- * `arg.positional()`, `arg.option()`, and `arg.flag()` produce `ArgDefinition`
+ * `arg.positional()`, `arg.option()`, `arg.flag()`, and `arg.passthrough()` produce `ArgDefinition`
  * objects that carry enough metadata to generate both yargs options and
  * JSON Schema properties for MCP tools.
  */
 
-export type ArgKind = 'positional' | 'option' | 'flag';
+export type ArgKind = 'positional' | 'option' | 'flag' | 'passthrough';
 export type ArgType = 'string' | 'number' | 'boolean';
 
 export interface ArgDefinition {
@@ -33,6 +33,8 @@ export const arg = {
     type?: 'string' | 'number';
     required?: boolean;
     choices?: readonly string[];
+    /** Collect every remaining positional into an array (`<name..>`). */
+    array?: boolean;
   }): ArgDefinition {
     return {
       kind: 'positional',
@@ -40,6 +42,7 @@ export const arg = {
       description: config.description,
       required: config.required ?? true,
       choices: config.choices,
+      array: config.array,
     };
   },
 
@@ -91,6 +94,22 @@ export const arg = {
       default: config.default ?? false,
     };
   },
+
+  /**
+   * Collect everything after `--` as a list of strings, unparsed.
+   *
+   * ```ts
+   * args: { scriptArgs: arg.passthrough({ description: 'Passed to the script' }) }
+   * ```
+   */
+  passthrough(config: { description: string }): ArgDefinition {
+    return {
+      kind: 'passthrough',
+      type: 'string',
+      description: config.description,
+      array: true,
+    };
+  },
 };
 
 export interface YargsPositional {
@@ -100,6 +119,7 @@ export interface YargsPositional {
     type: 'string' | 'number';
     demandOption?: boolean;
     choices?: readonly string[];
+    array?: boolean;
   };
 }
 
@@ -118,7 +138,9 @@ export function toYargsOptions(
   const options: Record<string, Record<string, unknown>> = {};
 
   for (const [name, def] of Object.entries(args)) {
-    if (def.kind === 'positional') {
+    if (def.kind === 'passthrough') {
+      continue;
+    } else if (def.kind === 'positional') {
       positionals.push({
         name,
         options: {
@@ -126,6 +148,7 @@ export function toYargsOptions(
           type: def.type as 'string' | 'number',
           demandOption: def.required,
           ...(def.choices ? { choices: def.choices } : {}),
+          ...(def.array ? { array: true } : {}),
         },
       });
     } else {

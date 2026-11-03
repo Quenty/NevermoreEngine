@@ -18,19 +18,25 @@ import {
   getDefaultRemoteHost,
 } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
-import type {
-  HostProtocolMessage,
-  ListSessionsRequest,
-  ListInstancesRequest,
+import {
+  HOST_PROTOCOL_VERSION,
+  type HostEnvelope,
+  type HostProtocolMessage,
+  type ListSessionsRequest,
+  type ListInstancesRequest,
 } from './internal/host-protocol.js';
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
-import type { ServerMessage } from '../server/web-socket-protocol.js';
+import { annotateInstanceState } from './internal/instance-state.js';
+import type {
+  PluginMessage,
+  ServerMessage,
+} from '../server/web-socket-protocol.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 export interface BridgeConnectionOptions {
   /** Port for the bridge host. Default: 38741. */
   port?: number;
-  /** Max time to wait for initial connection setup. Default: 30_000ms. */
+  /** Max time to wait for the first Studio session to connect. Default: 5_000ms. */
   timeoutMs?: number;
   /** Keep the host alive even when idle. Default: false. */
   keepAlive?: boolean;
@@ -49,6 +55,8 @@ export interface BridgeConnectionOptions {
 const DEFAULT_PORT = 38741;
 const DEFAULT_TIMEOUT_MS = 30_000;
 const IDLE_EXIT_GRACE_MS = 5_000;
+/** How long shutdown waits on relayed actions; a started playtest's request lasts until it ends. */
+const RELAY_DRAIN_TIMEOUT_MS = 10_000;
 
 /**
  * Transport handle that relays messages to a plugin's WebSocket via BridgeHost.
@@ -93,9 +101,12 @@ class HostTransportHandle extends EventEmitter {
 
 export class BridgeConnection extends EventEmitter {
   private _role: 'host' | 'client';
+  private _isRemote = false;
   private _isConnected: boolean = false;
   private _keepAlive: boolean;
   private _hasSettled: boolean = false;
+  private _firstSessionTimeoutMs: number | undefined;
+  private _pendingRelays = new Set<Promise<void>>();
 
   // Host mode internals
   private _host: BridgeHost | undefined;
@@ -105,6 +116,7 @@ export class BridgeConnection extends EventEmitter {
 
   // Client mode internals
   private _client: BridgeClient | undefined;
+  private _clientPort = 0;
 
   // Idle exit
   private _idleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -169,6 +181,7 @@ export class BridgeConnection extends EventEmitter {
             ),
           ]);
 
+          autoConn._isRemote = true;
           return autoConn;
         } catch {
           console.warn(
@@ -186,6 +199,8 @@ export class BridgeConnection extends EventEmitter {
     });
 
     const conn = new BridgeConnection(detection.role, keepAlive);
+    conn._isRemote = parsedRemoteHost !== undefined;
+    conn._firstSessionTimeoutMs = options?.timeoutMs;
     OutputHelper.verbose(
       `[bridge] Role: ${detection.role}, port: ${detection.port}`
     );
@@ -225,7 +240,9 @@ export class BridgeConnection extends EventEmitter {
     return conn;
   }
 
-  async disconnectAsync(): Promise<void> {
+  async disconnectAsync(
+    options: { relayDrainTimeoutMs?: number } = {}
+  ): Promise<void> {
     if (!this._isConnected) {
       return;
     }
@@ -244,6 +261,24 @@ export class BridgeConnection extends EventEmitter {
     this._isConnected = false;
 
     if (this._role === 'host' && this._host) {
+      // Shutting down drops the plugins, so let actions relayed for clients finish
+      if (this._pendingRelays.size > 0) {
+        OutputHelper.verbose(
+          `[bridge] Waiting for ${this._pendingRelays.size} relayed action(s) before shutting down`
+        );
+        let drainTimer: ReturnType<typeof setTimeout> | undefined;
+        await Promise.race([
+          Promise.allSettled([...this._pendingRelays]),
+          new Promise<void>((resolve) => {
+            drainTimer = setTimeout(
+              resolve,
+              options.relayDrainTimeoutMs ?? RELAY_DRAIN_TIMEOUT_MS
+            );
+          }),
+        ]);
+        clearTimeout(drainTimer);
+      }
+
       for (const handle of this._hostHandles.values()) {
         handle.markDisconnected();
       }
@@ -270,25 +305,62 @@ export class BridgeConnection extends EventEmitter {
     return this._isConnected;
   }
 
+  /**
+   * True when this is a client relaying through a host from an older
+   * studio-bridge, which may not pass on options or actions it predates.
+   */
+  get isHostOutdated(): boolean {
+    return (
+      this._role === 'client' &&
+      (this._client?.hostProtocolVersion ?? 1) < HOST_PROTOCOL_VERSION
+    );
+  }
+
   /** The actual port the bridge is bound to (host) or connected to (client). */
+  /** Whether the bridge host, and so Studio, runs on another machine. */
+  get isRemote(): boolean {
+    return this._isRemote;
+  }
+
   get port(): number {
-    if (this._role === 'host' && this._host) {
+    if (this._host) {
       return this._host.port;
     }
-    return 0;
+    return this._clientPort;
   }
 
   /** List all currently connected Studio sessions. */
   listSessions(): SessionInfo[] {
     if (this._role === 'host' && this._tracker) {
-      return this._tracker.listSessions();
+      return annotateInstanceState(this._tracker.listSessions());
     }
 
     if (this._role === 'client' && this._client) {
-      return this._client.listSessions();
+      return annotateInstanceState(this._client.listSessions());
     }
 
     return [];
+  }
+
+  /**
+   * Sessions matching `--target` and `--context`. A target matches a
+   * session id or an instance id exactly, or else as a prefix.
+   */
+  findSessions(target?: string, context?: SessionContext): SessionInfo[] {
+    let sessions = this.listSessions();
+    if (target) {
+      const exact = sessions.find((s) => s.sessionId === target);
+      if (exact && !context) return [exact];
+
+      const instanceIds = exact
+        ? [exact.instanceId]
+        : this._matchInstanceIds(target);
+      sessions = sessions.filter((s) => instanceIds.includes(s.instanceId));
+    }
+    if (context) {
+      sessions = sessions.filter((s) => s.context === context);
+    }
+    return sessions;
   }
 
   /**
@@ -321,6 +393,31 @@ export class BridgeConnection extends EventEmitter {
   }
 
   /**
+   * Instances whose id, or one of whose session ids, is `target`. Falls
+   * back to ids that start with `target` when nothing matches exactly.
+   */
+  private _matchInstanceIds(target: string): string[] {
+    const sessions = this.listSessions();
+    const exact = new Set(
+      sessions
+        .filter((s) => s.instanceId === target || s.sessionId === target)
+        .map((s) => s.instanceId)
+    );
+    if (exact.size > 0) return [...exact];
+
+    return [
+      ...new Set(
+        sessions
+          .filter(
+            (s) =>
+              s.instanceId.startsWith(target) || s.sessionId.startsWith(target)
+          )
+          .map((s) => s.instanceId)
+      ),
+    ];
+  }
+
+  /**
    * Resolve a session for command execution. Instance-aware: groups sessions
    * by instanceId and auto-selects context within an instance.
    *
@@ -345,13 +442,50 @@ export class BridgeConnection extends EventEmitter {
 
     if (sessionId) {
       const session = this.getSession(sessionId);
-      if (session) {
+      if (session && (!context || session.info.context === context)) {
         return session;
       }
-      throw new SessionNotFoundError(
-        `Session '${sessionId}' not found`,
-        sessionId
+
+      const prefixed = this.listSessions().filter(
+        (s) =>
+          s.sessionId.startsWith(sessionId) &&
+          (!context || s.context === context)
       );
+      const onlyPrefixed =
+        prefixed.length === 1 ? this.getSession(prefixed[0].sessionId) : null;
+      if (onlyPrefixed) {
+        return onlyPrefixed;
+      }
+      const namesInstance = prefixed.some((s) =>
+        s.instanceId.startsWith(sessionId)
+      );
+      if (!session && prefixed.length > 1 && !namesInstance) {
+        throw new SessionNotFoundError(
+          `'${sessionId}' matches several sessions. Use a longer --target:\n${prefixed
+            .map((s) => `  - ${s.sessionId}`)
+            .join('\n')}`,
+          sessionId
+        );
+      }
+
+      const instanceIds = session
+        ? [session.info.instanceId]
+        : this._matchInstanceIds(sessionId);
+      if (instanceIds.length === 0) {
+        throw new SessionNotFoundError(
+          `Session '${sessionId}' not found`,
+          sessionId
+        );
+      }
+      if (instanceIds.length > 1) {
+        throw new SessionNotFoundError(
+          `'${sessionId}' matches several Studio instances: ${instanceIds.join(
+            ', '
+          )}. Use a longer --target.`,
+          sessionId
+        );
+      }
+      return this._resolveByInstance(instanceIds[0], context);
     }
 
     if (instanceId) {
@@ -368,13 +502,13 @@ export class BridgeConnection extends EventEmitter {
       return this._resolveByInstance(instances[0].instanceId, context);
     }
 
-    // Multiple instances: list session IDs so the user can copy one into --session
+    // Multiple instances: list session IDs so the user can copy one into --target
     const sessionList = this.listSessions()
       .map((s) => `  - ${s.sessionId}: ${s.placeName} (${s.context})`)
       .join('\n');
 
     throw new SessionNotFoundError(
-      `Multiple Studio instances connected. Use --session <id> to select one.\n${sessionList}`
+      `Multiple Studio instances connected. Use --target <id> to select one.\n${sessionList}`
     );
   }
 
@@ -429,7 +563,9 @@ export class BridgeConnection extends EventEmitter {
     OutputHelper.verbose(
       '[bridge] No sessions yet — waiting for plugins to discover us'
     );
-    await this.waitForSessionsToSettleAsync();
+    await this.waitForSessionsToSettleAsync({
+      firstSessionTimeout: this._firstSessionTimeoutMs,
+    });
     this._hasSettled = true;
     const settled = this.listSessions();
     OutputHelper.verbose(
@@ -461,7 +597,7 @@ export class BridgeConnection extends EventEmitter {
 
     const firstTimeout = options?.firstSessionTimeout ?? 5_000;
     const settleMs = options?.settleMs ?? 4_000;
-    const maxMs = options?.maxMs ?? 15_000;
+    const maxMs = options?.maxMs ?? Math.max(15_000, firstTimeout + settleMs);
 
     // Wait for the first session
     try {
@@ -538,7 +674,7 @@ export class BridgeConnection extends EventEmitter {
 
     this._host.on('plugin-connected', (info) => {
       const state = info.state ?? 'Edit';
-      const context = BridgeConnection._deriveContext(state);
+      const context = info.context ?? BridgeConnection._deriveContext(state);
 
       const sessionInfo: SessionInfo = {
         sessionId: info.sessionId,
@@ -548,7 +684,9 @@ export class BridgeConnection extends EventEmitter {
         pluginVersion: info.pluginVersion ?? '',
         capabilities: info.capabilities,
         connectedAt: new Date(),
-        origin: 'user',
+        origin: info.launchId ? 'managed' : 'user',
+        launchId: info.launchId,
+        playerName: info.playerName,
         context,
         instanceId: info.instanceId ?? info.sessionId,
         placeId: 0,
@@ -578,6 +716,7 @@ export class BridgeConnection extends EventEmitter {
             type: 'list-sessions-response',
             requestId: req.requestId,
             sessions: this._tracker!.listSessions(),
+            protocolVersion: HOST_PROTOCOL_VERSION,
           });
         } else if (msg.type === 'list-instances') {
           const req = msg as ListInstancesRequest;
@@ -586,6 +725,10 @@ export class BridgeConnection extends EventEmitter {
             requestId: req.requestId,
             instances: this._tracker!.listInstances(),
           });
+        } else if (msg.type === 'host-envelope') {
+          const relay = this._relayEnvelopeAsync(msg as HostEnvelope, reply);
+          this._pendingRelays.add(relay);
+          void relay.finally(() => this._pendingRelays.delete(relay));
         }
       }
     );
@@ -595,6 +738,49 @@ export class BridgeConnection extends EventEmitter {
     // Don't start idle timer on init -- callers like `sessions` manage their
     // own lifecycle via disconnectAsync().  The idle timer should only fire
     // when sessions are removed (going from >0 to 0).
+  }
+
+  private async _relayEnvelopeAsync(
+    envelope: HostEnvelope,
+    reply: (m: HostProtocolMessage) => void
+  ): Promise<void> {
+    const sessionId = envelope.targetSessionId;
+    const handle = this._hostHandles.get(sessionId);
+
+    if (envelope.timeoutMs === undefined) {
+      handle?.sendMessage(envelope.action);
+      return;
+    }
+
+    let result: PluginMessage;
+    if (!handle) {
+      result = {
+        type: 'error',
+        sessionId,
+        payload: {
+          code: 'SESSION_MISMATCH',
+          message: `Session '${sessionId}' is not connected to this host`,
+        },
+      };
+    } else {
+      try {
+        result = await handle.sendActionAsync<PluginMessage>(
+          envelope.action,
+          envelope.timeoutMs
+        );
+      } catch (err) {
+        result = {
+          type: 'error',
+          sessionId,
+          payload: {
+            code: 'INTERNAL_ERROR',
+            message: err instanceof Error ? err.message : String(err),
+          },
+        };
+      }
+    }
+
+    reply({ type: 'host-response', requestId: envelope.requestId, result });
   }
 
   private async _initClientAsync(
@@ -621,6 +807,7 @@ export class BridgeConnection extends EventEmitter {
 
     const host = remoteHost ? remoteHost.split(':')[0] : undefined;
     await this._client.connectAsync(port, host);
+    this._clientPort = port;
     this._isConnected = true;
   }
 
@@ -646,7 +833,15 @@ export class BridgeConnection extends EventEmitter {
 
     // 5a: Context specified
     if (context) {
-      const match = sessions.find((s) => s.context === context);
+      const matches = sessions.filter((s) => s.context === context);
+      if (matches.length > 1) {
+        throw new SessionNotFoundError(
+          `Instance '${instanceId}' has several ${context} sessions. Use --target <session id> to pick one:\n${matches
+            .map((s) => `  - ${s.sessionId}`)
+            .join('\n')}`
+        );
+      }
+      const match = matches[0];
       if (match) {
         const session = this.getSession(match.sessionId);
         if (session) {
