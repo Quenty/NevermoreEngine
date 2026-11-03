@@ -32,6 +32,12 @@ describe("Probability.boxMuller", function()
 		expect(math.abs(standardDeviation - 1) < 0.02).toBe(true)
 	end)
 
+	it("maps uniform inputs through the Box-Muller transform", function()
+		local value = Probability._boxMullerFromUniform(1 - math.exp(-0.5), 0.5)
+
+		expect(value).toBeCloseTo(-1, 10)
+	end)
+
 	it("stays finite when math.random returns 0", function()
 		local value = Probability._boxMullerFromUniform(0, 0)
 

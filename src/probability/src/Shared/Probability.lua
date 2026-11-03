@@ -9,7 +9,6 @@ local Probability = {}
 --[=[
 	Returns a sample from the standard normal distribution (mean 0, standard deviation 1)
 	using the Box–Muller transform.
-	@return number
 ]=]
 function Probability.boxMuller(): number
 	return Probability._boxMullerFromUniform(math.random(), math.random())
