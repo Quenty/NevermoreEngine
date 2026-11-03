@@ -27,6 +27,7 @@ type ErrorReporter = Reporter & {
 interface CiPostTestResultsArgs extends NevermoreGlobalArgs {
   input: string;
   runOutcome?: string;
+  sourcemap?: string;
 }
 
 /** Create the standard set of GitHub reporters for posting results. */
@@ -60,6 +61,12 @@ export const ciPostTestResultsCommand: CommandModule<
           'Outcome of the test step (e.g. "success", "failure"). ' +
           'When the results file is missing and run-outcome is "success", ' +
           'posts a neutral "no tests" comment instead of an error.',
+        type: 'string',
+      })
+      .option('sourcemap', {
+        describe:
+          'Sourcemap that test failure annotations resolve files against ' +
+          '(default: sourcemap.json in the current directory)',
         type: 'string',
       });
   },
@@ -100,7 +107,10 @@ export const ciPostTestResultsCommand: CommandModule<
       }
 
       // Emit test failure annotations
-      const sourcemapResolver = tryLoadSourcemapResolver(process.cwd());
+      const sourcemapResolver = tryLoadSourcemapResolver(
+        process.cwd(),
+        args.sourcemap
+      );
       const workspace = await tryLoadAnnotationWorkspaceAsync(process.cwd());
       const parsedDiagnostics: Diagnostic[] = [];
       for (const failure of state.getFailures()) {
