@@ -1,19 +1,13 @@
-# v2.3.5 (Tue Nov 03 2026)
-
-#### 🐛 Bug Fix
-
-- fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.3.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.3.4...@quenty/probability@2.3.5) (2026-11-03)
+
+### Bug Fixes
+
+- **probability:** return unit-variance samples from boxMuller ([#856](https://github.com/Quenty/NevermoreEngine/issues/856)) ([b372eef](https://github.com/Quenty/NevermoreEngine/commit/b372eeff45b7b38b0cb7784015514807583cf60f))
 
 ## [2.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/probability@2.3.3...@quenty/probability@2.3.4) (2026-05-30)
 
