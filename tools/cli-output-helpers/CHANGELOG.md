@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.0...@quenty/cli-output-helpers@1.19.1) (2026-11-02)
+
+### Bug Fixes
+
+- **nevermore-cli:** resolve test failure annotations to real files ([#853](https://github.com/Quenty/NevermoreEngine/issues/853)) ([aa52794](https://github.com/Quenty/NevermoreEngine/commit/aa5279471baa0877e72b6ee75d89f722a5dc5505))
+
+# [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.18.0...@quenty/cli-output-helpers@1.19.0) (2026-10-28)
+
+### Features
+
+- **studio-bridge:** multiplayer playtests, Studio launching, search, and CLI fixes ([#851](https://github.com/Quenty/NevermoreEngine/issues/851)) ([e63f878](https://github.com/Quenty/NevermoreEngine/commit/e63f878764807773d1bb1bf96d582d6e6640af88))
+
 # [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.17.2...@quenty/cli-output-helpers@1.18.0) (2026-08-28)
 
 **Note:** Version bump only for package @quenty/cli-output-helpers

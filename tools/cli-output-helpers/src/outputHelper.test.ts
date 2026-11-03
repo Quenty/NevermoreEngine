@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { OutputHelper } from './outputHelper.js';
 
 describe('OutputHelper.formatErrorChain', () => {
@@ -66,5 +66,36 @@ describe('OutputHelper.formatErrorChain', () => {
     const out = OutputHelper.formatErrorChain(err);
     expect(out.startsWith('boom\n')).toBe(true);
     expect(out).toContain(err.stack!);
+  });
+});
+
+describe('OutputHelper.setDiagnosticsToStderr', () => {
+  afterEach(() => {
+    OutputHelper.setDiagnosticsToStderr(false);
+    vi.restoreAllMocks();
+  });
+
+  it('writes diagnostics to stdout by default', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    OutputHelper.info('hello');
+
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it('moves info, warnings, hints and boxes to stderr', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    OutputHelper.setDiagnosticsToStderr(true);
+
+    OutputHelper.info('info');
+    OutputHelper.warn('warn');
+    OutputHelper.hint('hint');
+    OutputHelper.box('box');
+
+    expect(log).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledTimes(4);
   });
 });

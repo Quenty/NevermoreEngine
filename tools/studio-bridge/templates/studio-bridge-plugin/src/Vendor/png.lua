@@ -529,7 +529,10 @@ local FIXED_LIT = {
 									-- assert table.insert(nil) is a no-op, the until
 									-- loop never reaches litsCount, and decoding spins
 									-- forever.
-									assert(litLength ~= nil, "deflate: code 16 cannot be the first dynamic Huffman symbol")
+									assert(
+										litLength ~= nil,
+										"deflate: code 16 cannot be the first dynamic Huffman symbol"
+									)
 									repeatCount = readBits(2) + 3
 								elseif code == 17 then
 									litLength = 0
@@ -552,7 +555,10 @@ local FIXED_LIT = {
 								if code <= 15 then
 									distLength = code
 								elseif code == 16 then
-									assert(distLength ~= nil, "deflate: code 16 cannot be the first dynamic Huffman symbol")
+									assert(
+										distLength ~= nil,
+										"deflate: code 16 cannot be the first dynamic Huffman symbol"
+									)
 									repeatCount = readBits(2) + 3
 								elseif code == 17 then
 									distLength = 0

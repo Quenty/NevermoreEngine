@@ -1,12 +1,35 @@
-import { describe, it, expect } from 'vitest';
-import { resolveRobloxTestPath } from './roblox-path-resolver.js';
+import { beforeAll, describe, it, expect } from 'vitest';
+import { fileURLToPath } from 'url';
+import { tryResolveRobloxSourceFile } from './roblox-path-resolver.js';
 import { SourcemapResolver } from '../../sourcemap/index.js';
 import type { SourcemapNode } from '../../sourcemap/index.js';
+import {
+  type AnnotationWorkspace,
+  tryLoadAnnotationWorkspaceAsync,
+} from './annotation-workspace.js';
 
-describe('resolveRobloxTestPath', () => {
+const REPO_ROOT = fileURLToPath(new URL('../../../../../../', import.meta.url));
+
+let workspace: AnnotationWorkspace | undefined;
+beforeAll(async () => {
+  workspace = await tryLoadAnnotationWorkspaceAsync(REPO_ROOT);
+}, 30000);
+
+function resolveFile(
+  instancePath: string,
+  packageName?: string
+): string | undefined {
+  return tryResolveRobloxSourceFile(instancePath, {
+    repoRoot: REPO_ROOT,
+    workspace,
+    packageName,
+  })?.file;
+}
+
+describe('tryResolveRobloxSourceFile', () => {
   it('resolves a standard ServerScriptService path', () => {
     expect(
-      resolveRobloxTestPath(
+      resolveFile(
         'ServerScriptService.observablecollection.Shared.ObservableList.spec'
       )
     ).toBe('src/observablecollection/src/Shared/ObservableList.spec.lua');
@@ -14,48 +37,121 @@ describe('resolveRobloxTestPath', () => {
 
   it('resolves a nested subdirectory path', () => {
     expect(
-      resolveRobloxTestPath('ServerScriptService.maid.Shared.Maid.spec')
-    ).toBe('src/maid/src/Shared/Maid.spec.lua');
-  });
-
-  it('resolves a deeply nested path', () => {
-    expect(
-      resolveRobloxTestPath(
-        'ServerScriptService.blend.Client.Blend.Spring.SpringObject.spec'
+      resolveFile(
+        'ServerScriptService.observablecollection.Shared.SortedList.ObservableSortedList'
       )
-    ).toBe('src/blend/src/Client/Blend/Spring/SpringObject.spec.lua');
+    ).toBe(
+      'src/observablecollection/src/Shared/SortedList/ObservableSortedList.lua'
+    );
   });
 
-  it('handles missing ServerScriptService prefix as fallback', () => {
-    expect(
-      resolveRobloxTestPath('observablecollection.Shared.ObservableList.spec')
-    ).toBe('src/observablecollection/src/Shared/ObservableList.spec.lua');
+  it('handles missing ServerScriptService prefix', () => {
+    expect(resolveFile('maid.Shared.MaidTaskUtils.spec')).toBe(
+      'src/maid/src/Shared/MaidTaskUtils.spec.lua'
+    );
   });
 
-  it('strips :LINE suffix', () => {
+  it('unwraps a chunk-name wrapper', () => {
     expect(
-      resolveRobloxTestPath(
-        'ServerScriptService.observablecollection.Shared.ObservableList.spec:45'
+      resolveFile(
+        '[string "ServerScriptService.saveslot.Server.HasSaveSlotsDataStore"]'
       )
-    ).toBe('src/observablecollection/src/Shared/ObservableList.spec.lua');
+    ).toBe('src/saveslot/src/Server/HasSaveSlotsDataStore.lua');
   });
 
-  it('handles path without ServerScriptService prefix and with :LINE suffix', () => {
-    expect(resolveRobloxTestPath('maid.Shared.Maid.spec:23')).toBe(
-      'src/maid/src/Shared/Maid.spec.lua'
-    );
+  it('maps a nested dependency copy to its own package', () => {
+    expect(
+      resolveFile(
+        'ServerScriptService.saveslot.node_modules.@quenty.adorneedata.node_modules.@quenty.attributeutils.node_modules.@quenty.baseobject.node_modules.@quenty.maid.Shared.Maid'
+      )
+    ).toBe('src/maid/src/Shared/Maid.lua');
   });
 
-  it('handles a bare package slug', () => {
-    expect(resolveRobloxTestPath('ServerScriptService.maid')).toBe(
-      'src/maid/src'
-    );
+  it('maps a dependency whose folder differs from its npm name', () => {
+    expect(
+      resolveFile(
+        '[string "ServerScriptService.gameproduct.node_modules.@quenty.playermock.Shared.PlayerMock"]'
+      )
+    ).toBe('src/player-mock/src/Shared/PlayerMock.lua');
   });
 
-  it('handles a single-level spec path', () => {
-    expect(resolveRobloxTestPath('ServerScriptService.maid.Maid.spec')).toBe(
-      'src/maid/src/Maid.spec.lua'
-    );
+  it('resolves a package root module to its init file', () => {
+    expect(
+      resolveFile(
+        '[string "ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quenty.loader"]'
+      )
+    ).toBe('src/loader/src/init.lua');
+  });
+
+  it('maps the test slug of the package under test to its folder', () => {
+    expect(
+      tryResolveRobloxSourceFile(
+        'ServerScriptService.gameproduct.Server.Cmdr.GameProductCmdrService',
+        {
+          repoRoot: REPO_ROOT,
+          workspace,
+          packageName: '@quenty/gameproductservice',
+        }
+      )
+    ).toEqual({
+      file: 'src/gameproductservice/src/Server/Cmdr/GameProductCmdrService.lua',
+      isPackageUnderTest: true,
+    });
+    expect(
+      resolveFile(
+        'ServerScriptService.playermock.Shared.PlayerMock',
+        '@quenty/playermock'
+      )
+    ).toBe('src/player-mock/src/Shared/PlayerMock.lua');
+  });
+
+  it('resolves a package outside src/ by its workspace directory', () => {
+    expect(
+      resolveFile(
+        'ServerScriptService.studiobridge.commands.console.exec.execute.spec',
+        '@quenty/studio-bridge'
+      )
+    ).toBe('tools/studio-bridge/src/commands/console/exec/execute.spec.lua');
+  });
+
+  it('tries the script file names Rojo strips', () => {
+    expect(
+      resolveFile('ServerScriptService.x.node_modules.@quenty.preview-plugin')
+    ).toBe('plugins/preview-plugin/src/init.server.lua');
+  });
+
+  it('flags dependency frames as not under test', () => {
+    expect(
+      tryResolveRobloxSourceFile(
+        'ServerScriptService.saveslot.node_modules.@quenty.binder.Shared.Binder',
+        { repoRoot: REPO_ROOT, workspace, packageName: '@quenty/saveslot' }
+      )
+    ).toEqual({
+      file: 'src/binder/src/Shared/Binder.lua',
+      isPackageUnderTest: false,
+    });
+  });
+
+  it('does not remap a sibling package frame into the package under test', () => {
+    expect(
+      resolveFile(
+        'ServerScriptService.othersibling.Server.SaveSlotService',
+        '@quenty/saveslot'
+      )
+    ).toBeUndefined();
+    expect(
+      resolveFile('ServerScriptService.Script', '@quenty/saveslot')
+    ).toBeUndefined();
+  });
+
+  it('rejects vendored, truncated and missing paths', () => {
+    for (const instancePath of [
+      'ServerScriptService.studiobridge.node_modules.@quenty.nevermore-test-runner.node_modules.@quentystudios.Jest._Index.jsdotlua_promise@3.5.2.promise',
+      '[string "ServerScriptService.gameproduct.node_modules.@quenty.playermock.node_modules.@quenty.servic..."]',
+      'ServerScriptService.unknownpkg.Shared.Foo',
+    ]) {
+      expect(resolveFile(instancePath)).toBeUndefined();
+    }
   });
 
   describe('with sourcemap resolver', () => {
@@ -66,26 +162,19 @@ describe('resolveRobloxTestPath', () => {
       className: 'DataModel',
       children: [
         {
-          name: 'mypkg',
+          name: 'playermock',
           className: 'Folder',
-          filePaths: [`${repoRoot}/src/mypkg/default.project.json`],
+          filePaths: [`${repoRoot}/src/player-mock/default.project.json`],
           children: [
             {
               name: 'Shared',
               className: 'Folder',
               children: [
                 {
-                  name: 'MyModule',
+                  name: 'PlayerMock',
                   className: 'ModuleScript',
-                  filePaths: [`${repoRoot}/src/mypkg/src/Shared/MyModule.lua`],
-                  children: [
-                    {
-                      name: 'MyModule.spec',
-                      className: 'ModuleScript',
-                      filePaths: [
-                        `${repoRoot}/src/mypkg/src/Shared/MyModule.spec.lua`,
-                      ],
-                    },
+                  filePaths: [
+                    `${repoRoot}/src/player-mock/src/Shared/PlayerMock.lua`,
                   ],
                 },
               ],
@@ -97,31 +186,25 @@ describe('resolveRobloxTestPath', () => {
 
     const resolver = SourcemapResolver.fromSourcemap(sourcemap, repoRoot);
 
-    it('uses sourcemap when path is found', () => {
+    it('looks up dependency copies under their Rojo project name', () => {
       expect(
-        resolveRobloxTestPath(
-          'ServerScriptService.mypkg.Shared.MyModule.MyModule.spec',
-          resolver
-        )
-      ).toBe('src/mypkg/src/Shared/MyModule.spec.lua');
+        tryResolveRobloxSourceFile(
+          'ServerScriptService.gameproduct.node_modules.@quenty.playermock.Shared.PlayerMock',
+          { repoRoot, sourcemapResolver: resolver }
+        )?.file
+      ).toBe('src/player-mock/src/Shared/PlayerMock.lua');
     });
 
-    it('falls back to heuristic when sourcemap has no mapping', () => {
+    it('returns undefined when neither sourcemap nor repo has the file', () => {
       expect(
-        resolveRobloxTestPath(
-          'ServerScriptService.unknownpkg.Shared.Foo.spec',
-          resolver
+        tryResolveRobloxSourceFile(
+          'ServerScriptService.unknownpkg.Shared.Foo',
+          {
+            repoRoot,
+            sourcemapResolver: resolver,
+          }
         )
-      ).toBe('src/unknownpkg/src/Shared/Foo.spec.lua');
-    });
-
-    it('strips :LINE suffix with sourcemap', () => {
-      expect(
-        resolveRobloxTestPath(
-          'ServerScriptService.mypkg.Shared.MyModule.MyModule.spec:42',
-          resolver
-        )
-      ).toBe('src/mypkg/src/Shared/MyModule.spec.lua');
+      ).toBeUndefined();
     });
   });
 });

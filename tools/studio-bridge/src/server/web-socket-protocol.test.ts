@@ -325,6 +325,39 @@ describe('decodePluginMessage', () => {
     });
   });
 
+  describe('exportInstancesResult / importInstancesResult', () => {
+    it('decodes an exported model', () => {
+      const msg = {
+        type: 'exportInstancesResult',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { data: 'PHJvYmxveCE=', paths: ['Workspace.Map'] },
+      };
+      expect(roundTripPlugin(msg)).toEqual(msg);
+    });
+
+    it('rejects an export without data', () => {
+      expect(
+        roundTripPlugin({
+          type: 'exportInstancesResult',
+          sessionId: 'sess-1',
+          requestId: 'req-1',
+          payload: { paths: ['Workspace.Map'] },
+        })
+      ).toBeNull();
+    });
+
+    it('decodes the imported paths', () => {
+      const msg = {
+        type: 'importInstancesResult',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { paths: ['Workspace.Map'] },
+      };
+      expect(roundTripPlugin(msg)).toEqual(msg);
+    });
+  });
+
   describe('logsResult', () => {
     it('decodes a valid logsResult', () => {
       const msg = roundTripPlugin({
@@ -657,6 +690,28 @@ describe('encodeMessage / decodeServerMessage', () => {
           })
         )
       ).toBeNull();
+    });
+  });
+
+  describe('exportInstances / importInstances', () => {
+    it('round-trips exportInstances', () => {
+      const msg: ServerMessage = {
+        type: 'exportInstances',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { paths: ['Workspace.Map', 'Lighting'] },
+      };
+      expect(roundTripServer(msg)).toEqual(msg);
+    });
+
+    it('round-trips importInstances', () => {
+      const msg: ServerMessage = {
+        type: 'importInstances',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { data: 'PHJvYmxveCE=', parentPath: 'Workspace' },
+      };
+      expect(roundTripServer(msg)).toEqual(msg);
     });
   });
 

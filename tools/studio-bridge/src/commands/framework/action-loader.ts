@@ -6,6 +6,9 @@
  * as its `.ts` file (e.g. `exec.lua` next to `exec.ts`). These files
  * are Luau modules that register action handlers in the plugin's
  * ActionRouter at runtime.
+ *
+ * `.spec.lua` files beside them are Jest specs. They are never pushed,
+ * since anything pushed runs inside the user's Studio.
  */
 
 import { createHash } from 'crypto';
@@ -26,7 +29,8 @@ export interface ActionSource {
 
 /**
  * Recursively scan `baseDir` for `.lua` files and return their contents
- * as `ActionSource` entries. Only files that end in `.lua` are included.
+ * as `ActionSource` entries. Only files that end in `.lua` are included,
+ * and `.spec.lua` files are skipped.
  */
 export async function loadActionSourcesAsync(
   baseDir?: string
@@ -54,7 +58,7 @@ async function scanDirAsync(
     const fullPath = path.join(currentDir, entry.name);
     if (entry.isDirectory()) {
       await scanDirAsync(baseDir, fullPath, results);
-    } else if (entry.name.endsWith('.lua')) {
+    } else if (isActionFile(entry.name)) {
       const source = await fs.readFile(fullPath, 'utf-8');
       const name = path.basename(entry.name, '.lua');
       const relativePath = path.relative(baseDir, fullPath);
@@ -62,4 +66,8 @@ async function scanDirAsync(
       results.push({ name, source, relativePath, hash });
     }
   }
+}
+
+function isActionFile(fileName: string): boolean {
+  return fileName.endsWith('.lua') && !fileName.endsWith('.spec.lua');
 }

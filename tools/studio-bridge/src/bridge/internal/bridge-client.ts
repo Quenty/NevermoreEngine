@@ -80,9 +80,13 @@ class RelayedTransportHandle extends EventEmitter implements TransportHandle {
   }
 }
 
+/** Lets the host's own timeout error, which says what timed out, arrive first. */
+const HOST_REPLY_GRACE_MS = 2_000;
+
 export class BridgeClient extends EventEmitter {
   private _transport = new TransportClient();
   private _sessions = new Map<string, SessionInfo>();
+  private _hostProtocolVersion: number | undefined;
   private _sessionHandles = new Map<string, RelayedTransportHandle>();
   private _bridgeSessions = new Map<string, BridgeSession>();
   private _pendingRequests = new Map<
@@ -111,6 +115,10 @@ export class BridgeClient extends EventEmitter {
 
     this._transport.on('disconnected', () => {
       this._isConnected = false;
+      // Replies to these went to the old host, so none will arrive
+      this._rejectPendingRequests(
+        'The bridge host shut down before replying. Studio may still have run the request.'
+      );
       this.emit('disconnected');
 
       // Trigger failover detection
@@ -134,6 +142,14 @@ export class BridgeClient extends EventEmitter {
     await this._fetchSessionsAsync();
   }
 
+  private _rejectPendingRequests(message: string): void {
+    for (const [, entry] of this._pendingRequests) {
+      clearTimeout(entry.timer);
+      entry.reject(new Error(message));
+    }
+    this._pendingRequests.clear();
+  }
+
   /**
    * Disconnect from the bridge host.
    */
@@ -144,12 +160,7 @@ export class BridgeClient extends EventEmitter {
     this._transport.disconnect();
     this._isConnected = false;
 
-    // Cancel all pending requests
-    for (const [, entry] of this._pendingRequests) {
-      clearTimeout(entry.timer);
-      entry.reject(new Error('Client disconnected'));
-    }
-    this._pendingRequests.clear();
+    this._rejectPendingRequests('Client disconnected');
 
     // Mark all handles as disconnected
     for (const handle of this._sessionHandles.values()) {
@@ -163,6 +174,11 @@ export class BridgeClient extends EventEmitter {
   /**
    * List all known sessions.
    */
+  /** The host's HOST_PROTOCOL_VERSION, or undefined for hosts older than it. */
+  get hostProtocolVersion(): number | undefined {
+    return this._hostProtocolVersion;
+  }
+
   listSessions(): SessionInfo[] {
     return Array.from(this._sessions.values());
   }
@@ -228,6 +244,7 @@ export class BridgeClient extends EventEmitter {
       requestId,
       targetSessionId,
       action,
+      timeoutMs,
     };
 
     return new Promise<PluginMessage>((resolve, reject) => {
@@ -236,7 +253,7 @@ export class BridgeClient extends EventEmitter {
         reject(
           new Error(`Request "${requestId}" timed out after ${timeoutMs}ms`)
         );
-      }, timeoutMs);
+      }, timeoutMs + HOST_REPLY_GRACE_MS);
 
       this._pendingRequests.set(requestId, { resolve, reject, timer });
 
@@ -306,6 +323,7 @@ export class BridgeClient extends EventEmitter {
   }
 
   private _handleListSessionsResponse(msg: ListSessionsResponse): void {
+    this._hostProtocolVersion = msg.protocolVersion;
     const pending = this._pendingRequests.get(msg.requestId);
     if (pending) {
       clearTimeout(pending.timer);

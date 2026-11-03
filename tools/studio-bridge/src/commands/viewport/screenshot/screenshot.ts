@@ -25,6 +25,11 @@ export async function captureScreenshotHandlerAsync(
   _options: ScreenshotOptions = {}
 ): Promise<ScreenshotResult> {
   const result: BridgeScreenshotResult = await session.captureScreenshotAsync();
+  if (typeof result.data !== 'string') {
+    throw new Error(
+      `The plugin sent screenshot data as ${typeof result.data}, not a base64 string`
+    );
+  }
 
   let pngBase64: string;
   if (result.format === 'rgba') {
@@ -32,7 +37,7 @@ export async function captureScreenshotHandlerAsync(
     const pngBuffer = rgbaToPng(rgbaBuffer, result.width, result.height);
     pngBase64 = pngBuffer.toString('base64');
   } else {
-    pngBase64 = result.data ?? '';
+    pngBase64 = result.data;
   }
 
   return {

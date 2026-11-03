@@ -19,8 +19,8 @@ interface GitHubContext {
  * Resolve GitHub context from environment variables.
  *
  * Reads GITHUB_TOKEN, GITHUB_REPOSITORY, and determines the PR number
- * from GITHUB_REF_NAME (e.g. "123/merge") or the event payload at
- * GITHUB_EVENT_PATH.
+ * from NEVERMORE_CI_PR_NUMBER, GITHUB_REF_NAME (e.g. "123/merge") or the
+ * event payload at GITHUB_EVENT_PATH.
  */
 export function resolveGitHubContext(): GitHubContext | undefined {
   const token = process.env.GITHUB_TOKEN;
@@ -35,10 +35,14 @@ export function resolveGitHubContext(): GitHubContext | undefined {
     return undefined;
   }
 
-  let prNumber: number | undefined;
+  const prNumberOverride = process.env.NEVERMORE_CI_PR_NUMBER;
+  let prNumber: number | undefined =
+    prNumberOverride && /^\d+$/.test(prNumberOverride)
+      ? parseInt(prNumberOverride, 10)
+      : undefined;
 
   const refName = process.env.GITHUB_REF_NAME;
-  if (refName) {
+  if (!prNumber && refName) {
     const match = refName.match(/^(\d+)\/merge$/);
     if (match) {
       prNumber = parseInt(match[1], 10);

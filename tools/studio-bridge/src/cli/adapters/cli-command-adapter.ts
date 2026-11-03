@@ -9,6 +9,7 @@
  *   - Honors `--output` (file write), `--open`, `--watch`, `--interval`
  */
 
+import * as path from 'path';
 import type { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
@@ -16,10 +17,20 @@ import {
   type ResultReporter,
   formatJson,
 } from '@quenty/cli-output-helpers/reporting';
-import { BridgeConnection } from '../../bridge/index.js';
-import type { SessionContext } from '../../bridge/index.js';
-import type { CommandDefinition } from '../../commands/framework/define-command.js';
+import { BridgeConnection, SessionNotFoundError } from '../../bridge/index.js';
+import type { BridgeSession, SessionContext } from '../../bridge/index.js';
+import type {
+  CommandDefinition,
+  SessionTargeting,
+} from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
+import { explainMissingPlaytestContextAsync } from '../../commands/playtest/playtest-sessions.js';
+import { tryFindFolderInstanceAsync } from '../../deploy/deploy-places.js';
+import {
+  addWarning,
+  getWarnings,
+  warnIfPluginStaleAsync,
+} from '../cli-output-context.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
 export interface AdapterArgs {
@@ -51,8 +62,12 @@ function extractCommandArgs(
   def: CommandDefinition
 ): Record<string, unknown> {
   const commandArgs: Record<string, unknown> = {};
-  for (const name of Object.keys(def.args)) {
-    if (name in argv) {
+  for (const [name, argDef] of Object.entries(def.args)) {
+    if (argDef.kind === 'passthrough') {
+      commandArgs[name] = ((argv['--'] as unknown[] | undefined) ?? []).map(
+        String
+      );
+    } else if (name in argv) {
       commandArgs[name] = argv[name];
     }
   }
@@ -81,15 +96,33 @@ async function executeCommandAsync(
       waitForSessions: def.scope === 'connection',
     }));
 
+  const targeting: SessionTargeting = {
+    target: argv.target as string | undefined,
+    context: argv.context as SessionContext | undefined,
+  };
+
+  // Connection commands start once Studios have connected, so this can look now
+  if (def.scope === 'connection' && !def.coversAllSessions) {
+    await tryTargetFolderInstanceAsync(connection, targeting);
+  }
+
+  if (connection.isHostOutdated) {
+    addWarning(
+      `The bridge host on port ${connection.port} runs an older studio-bridge, which may drop newer options. Restart it (e.g. stop 'studio-bridge serve') to use this version.`
+    );
+  }
+
   try {
     if (def.scope === 'session') {
-      const session = await connection.resolveSessionAsync(
-        argv.target as string | undefined,
-        argv.context as SessionContext | undefined
-      );
-      return await (def.handler as any)(session, commandArgs);
+      const session = await resolveTargetSessionAsync(connection, targeting);
+      if (def.changesDataModel && !argv.allowEdit) {
+        assertNotEditingDuringPlaytest(connection, session);
+      }
+      await warnIfPluginStaleAsync([session.info]);
+      return await (def.handler as any)(session, commandArgs, connection);
     }
-    return await (def.handler as any)(connection, commandArgs);
+    await warnIfPluginStaleAsync(connection.listSessions());
+    return await (def.handler as any)(connection, commandArgs, targeting);
   } finally {
     if (!existingConnection) {
       await connection.disconnectAsync();
@@ -97,12 +130,85 @@ async function executeCommandAsync(
   }
 }
 
+/**
+ * The session `targeting` names. When it names none and several Studios are
+ * connected, the one with the current folder's deploy.nevermore.json place open.
+ */
+async function resolveTargetSessionAsync(
+  connection: BridgeConnection,
+  targeting: SessionTargeting
+): Promise<BridgeSession> {
+  try {
+    return await connection.resolveSessionAsync(
+      targeting.target,
+      targeting.context
+    );
+  } catch (err) {
+    if (
+      err instanceof SessionNotFoundError &&
+      (await tryTargetFolderInstanceAsync(connection, targeting))
+    ) {
+      return connection
+        .resolveSessionAsync(targeting.target, targeting.context)
+        .catch(async (retryErr: unknown) => {
+          throw await explainMissingPlaytestContextAsync(connection, retryErr);
+        });
+    }
+    throw await explainMissingPlaytestContextAsync(connection, err);
+  }
+}
+
+/**
+ * Without a --target, targets the one connected Studio that has the current
+ * folder's deploy.nevermore.json place open, and says so.
+ */
+async function tryTargetFolderInstanceAsync(
+  connection: BridgeConnection,
+  targeting: SessionTargeting
+): Promise<boolean> {
+  if (targeting.target) {
+    return false;
+  }
+  const folder = await tryFindFolderInstanceAsync(connection, process.cwd());
+  if (!folder) {
+    return false;
+  }
+
+  targeting.target = folder.instanceId;
+  OutputHelper.hint(
+    `Using ${folder.instanceId}, which has '${
+      folder.deployPlace.selector
+    }' of ${path.relative(process.cwd(), folder.deployPlace.configPath)} open`
+  );
+  return true;
+}
+
+/**
+ * Refuses to change an edit DataModel while a playtest of it runs: the
+ * playtest runs a copy, so the change would not show up there.
+ */
+export function assertNotEditingDuringPlaytest(
+  connection: BridgeConnection,
+  session: BridgeSession
+): void {
+  if (session.context !== 'edit') return;
+
+  const playtest = connection
+    .listSessions()
+    .find(
+      (s) => s.instanceId === session.info.instanceId && s.context === 'server'
+    );
+  if (playtest) {
+    throw new Error(
+      `A playtest of '${session.info.placeName}' is running, so this would change Edit, not the playtest. Target the playtest with --context server (or client), or pass --allow-edit to change Edit anyway.`
+    );
+  }
+}
+
 /** Inject version/diagnostic warnings into JSON result objects. */
 function injectWarnings(result: unknown): unknown {
-  const warnings = (globalThis as any).__studioBridgeWarnings as
-    | string[]
-    | undefined;
-  if (!warnings || warnings.length === 0) return result;
+  const warnings = getWarnings();
+  if (warnings.length === 0) return result;
   if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
     return { ...result, _warnings: warnings };
   }
@@ -162,7 +268,10 @@ export function buildYargsCommand(
   const { positionals, options: yargsOptions } = toYargsOptions(def.args);
 
   const positionalSuffix = positionals
-    .map((p) => (p.options.demandOption ? `<${p.name}>` : `[${p.name}]`))
+    .map((p) => {
+      const name = p.options.array ? `${p.name}..` : p.name;
+      return p.options.demandOption ? `<${name}>` : `[${name}]`;
+    })
     .join(' ');
 
   const command = positionalSuffix
@@ -177,6 +286,12 @@ export function buildYargsCommand(
         yargs.positional(pos.name, pos.options as any);
       }
 
+      for (const argDef of Object.values(def.args)) {
+        if (argDef.kind === 'passthrough') {
+          yargs.epilogue(`-- <args..>  ${argDef.description}`);
+        }
+      }
+
       for (const [name, opt] of Object.entries(yargsOptions)) {
         yargs.option(name, opt as any);
       }
@@ -185,12 +300,20 @@ export function buildYargsCommand(
         yargs.option('target', {
           alias: 't',
           type: 'string',
-          describe: 'Target session ID (or "all" for broadcast)',
+          describe: 'Target session or instance ID',
         });
         yargs.option('context', {
           type: 'string',
           describe: 'Target context (edit, client, server)',
           choices: ['edit', 'client', 'server'],
+        });
+      }
+
+      if (def.changesDataModel && def.scope === 'session') {
+        yargs.option('allow-edit', {
+          type: 'boolean',
+          default: false,
+          describe: 'Allow changing Edit while a playtest of it runs',
         });
       }
 
@@ -248,7 +371,16 @@ export function buildYargsCommand(
           await runOnceAsync(def, commandArgs, argv, reporter, connect);
         }
       } catch (err) {
-        OutputHelper.error(err instanceof Error ? err.message : String(err));
+        const message = err instanceof Error ? err.message : String(err);
+        if (explicitFormat === 'json') {
+          console.log(
+            formatJson(injectWarnings({ success: false, error: message }), {
+              pretty: process.stdout.isTTY,
+            })
+          );
+        } else {
+          OutputHelper.error(message);
+        }
         process.exit(1);
       }
     },

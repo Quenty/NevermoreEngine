@@ -14,8 +14,15 @@ import {
 } from '@quenty/cli-output-helpers/reporting';
 import {
   StudioBridgeServer,
+  type StudioBridgeResult,
   type StudioBridgePhase,
 } from '../server/studio-bridge-server.js';
+import type {
+  OutputLevel,
+  SerializedReturnValue,
+} from '../server/web-socket-protocol.js';
+import { isPersistentPluginInstalled } from '../plugin/plugin-discovery.js';
+import { runInManagedStudioAsync } from './managed-studio-run.js';
 
 export interface ExecuteScriptOptions {
   scriptContent: string;
@@ -25,6 +32,18 @@ export interface ExecuteScriptOptions {
   verbose: boolean;
   showLogs: boolean;
   filePath?: string;
+  /** Skip the progress reporter, for when stdout carries JSON. */
+  quiet?: boolean;
+  /** Passed to the script as `...`. */
+  args?: string[];
+}
+
+export interface ExecuteScriptResult {
+  success: boolean;
+  output: string[];
+  error?: string;
+  returnValues?: SerializedReturnValue[];
+  durationMs: number;
 }
 
 /**
@@ -52,7 +71,7 @@ export async function resolvePlacePathAsync(
  */
 export async function executeScriptAsync(
   options: ExecuteScriptOptions
-): Promise<void> {
+): Promise<ExecuteScriptResult> {
   const { shouldDelegateToDockerAsync, delegateToDockerAsync } = await import(
     '../docker/docker-delegator.js'
   );
@@ -62,7 +81,7 @@ export async function executeScriptAsync(
       '[StudioBridge] No Wine detected, delegating to Docker'
     );
     await delegateToDockerAsync(options);
-    return; // unreachable — delegateToDockerAsync calls process.exit
+    throw new Error('delegateToDockerAsync returned without exiting');
   }
 
   const {
@@ -72,9 +91,10 @@ export async function executeScriptAsync(
     timeoutMs,
     verbose,
     showLogs,
+    quiet = false,
   } = options;
 
-  const useSpinner = !!process.stdout.isTTY && !verbose;
+  const useSpinner = !quiet && !!process.stdout.isTTY && !verbose;
 
   const reporter = new CompositeReporter(
     [packageName],
@@ -85,15 +105,17 @@ export async function executeScriptAsync(
             actionVerb: 'Running',
           })
         : new SimpleReporter(state, {
-            alwaysShowLogs: showLogs,
+            alwaysShowLogs: false,
             successMessage: 'Script completed successfully.',
             failureMessage: 'Script failed.',
           }),
     ]
   );
 
-  await reporter.startAsync();
-  reporter.onPackageStart(packageName);
+  if (!quiet) {
+    await reporter.startAsync();
+    reporter.onPackageStart(packageName);
+  }
 
   const startTime = performance.now();
 
@@ -103,45 +125,63 @@ export async function executeScriptAsync(
   }
 
   const outputLines: string[] = [];
+  const onOutput = (level: OutputLevel, body: string): void => {
+    // Filter internal plugin messages that leak through LogService
+    if (body.startsWith('[StudioBridge]')) {
+      return;
+    }
+
+    // Collect output for the result logs
+    outputLines.push(body);
+
+    // In verbose/simple mode, print output in real-time
+    if (!useSpinner && !quiet) {
+      switch (level) {
+        case 'Warning':
+          OutputHelper.warn(body);
+          break;
+        case 'Error':
+          OutputHelper.error(body);
+          break;
+        default:
+          console.log(body);
+          break;
+      }
+    }
+  };
+  const onPhase = (phase: StudioBridgePhase): void => {
+    if (phase === 'done' || quiet) return;
+    reporter.onPackagePhaseChange(packageName, phase);
+  };
+
   let server: StudioBridgeServer | undefined;
-  let result;
+  let result: StudioBridgeResult;
   try {
-    server = new StudioBridgeServer({
-      placePath,
-      timeoutMs,
-      onPhase: (phase: StudioBridgePhase) => {
-        if (phase === 'done') return;
-        reporter.onPackagePhaseChange(packageName, phase);
-      },
-    });
-    await server.startAsync();
-    result = await server.executeAsync({
-      scriptContent,
-      onOutput: (level, body) => {
-        // Filter internal plugin messages that leak through LogService
-        if (body.startsWith('[StudioBridge]')) {
-          return;
-        }
-
-        // Collect output for the result logs
-        outputLines.push(body);
-
-        // In verbose/simple mode, print output in real-time
-        if (!useSpinner) {
-          switch (level) {
-            case 'Warning':
-              OutputHelper.warn(body);
-              break;
-            case 'Error':
-              OutputHelper.error(body);
-              break;
-            default:
-              console.log(body);
-              break;
-          }
-        }
-      },
-    });
+    if (isPersistentPluginInstalled()) {
+      const execResult = await runInManagedStudioAsync({
+        scriptContent,
+        placePath,
+        timeoutMs,
+        onPhase,
+        args: options.args,
+      });
+      for (const entry of execResult.output) {
+        onOutput(entry.level, entry.body);
+      }
+      result = {
+        success: execResult.success,
+        logs: execResult.error ?? '',
+        returnValues: execResult.returnValues,
+      };
+    } else {
+      server = new StudioBridgeServer({ placePath, timeoutMs, onPhase });
+      await server.startAsync();
+      result = await server.executeAsync({
+        scriptContent,
+        onOutput,
+        args: options.args,
+      });
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     result = {
@@ -154,14 +194,22 @@ export async function executeScriptAsync(
 
   const elapsed = performance.now() - startTime;
 
-  reporter.onPackageResult({
-    packageName,
+  if (!quiet) {
+    reporter.onPackageResult({
+      packageName,
+      success: result.success,
+      logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
+      durationMs: elapsed,
+    });
+
+    await reporter.stopAsync();
+  }
+
+  return {
     success: result.success,
-    logs: outputLines.length > 0 ? outputLines.join('\n') : result.logs,
+    output: outputLines,
+    error: result.success || !result.logs ? undefined : result.logs,
+    returnValues: result.returnValues,
     durationMs: elapsed,
-  });
-
-  await reporter.stopAsync();
-
-  process.exit(result.success ? 0 : 1);
+  };
 }

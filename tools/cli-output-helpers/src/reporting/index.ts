@@ -104,6 +104,7 @@ export {
   type Diagnostic,
   type DiagnosticSummary,
   formatAnnotation,
+  dedupeDiagnostics,
   emitAnnotations,
   summarizeDiagnostics,
   formatAnnotationSummaryMarkdown,

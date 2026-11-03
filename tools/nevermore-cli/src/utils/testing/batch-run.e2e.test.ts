@@ -142,6 +142,7 @@ class FakeTransport implements JobContext {
   public scriptContent?: string;
   public scriptContents: string[] = [];
   public deployedPaths: string[] = [];
+  public deployedTargets: unknown[] = [];
   public deployCount = 0;
   public runCount = 0;
   public messagesFor?: (script: string) => TaskLogMessage[];
@@ -160,6 +161,7 @@ class FakeTransport implements JobContext {
   ): Promise<Deployment> {
     this.deployCount++;
     this.deployedPaths.push(options.builtPlace.rbxlPath);
+    this.deployedTargets.push(options.builtPlace.target);
     return {};
   }
 
@@ -485,8 +487,12 @@ describe('an aggregated batch run, end to end', () => {
       '/tmp/batch-2.rbxl',
     ]);
     expect(transport.runCount).toBe(2);
-    expect(transport.scriptContents[0]).toContain('["alpha"]');
-    expect(transport.scriptContents[1]).toContain('["beta"]');
+    // The places run in parallel, so their scripts arrive in either order
+    expect(
+      transport.scriptContents.map((script) =>
+        script.includes('["alpha"]') ? 'alpha' : 'beta'
+      )
+    ).toEqual(expect.arrayContaining(['alpha', 'beta']));
 
     expect(alpha.success).toBe(true);
     expect(alpha.testResults).toMatchObject({ passed: 68, total: 68 });
@@ -501,5 +507,45 @@ describe('an aggregated batch run, end to end', () => {
         '::group::@quenty/beta - ❌ FAILED (3/4) (900ms)',
       ])
     );
+  });
+
+  it('runs prebuilt places on the target it was given, without building', async () => {
+    const generate = vi.mocked(
+      (await import('./runner/combined-project-generator.js'))
+        .generateCombinedProjectAsync
+    );
+    generate.mockClear();
+    const { targets } = createBatch();
+    const transport = new FakeTransport(TASK_MESSAGES);
+    const cleanupAsync = vi.fn(async () => {});
+    const batch = new BatchScriptJobContext(transport, targets, {
+      repoRoot: '/repo',
+      batchPlaceId: 900,
+      batchUniverseId: 901,
+      prebuilt: {
+        chunks: [
+          {
+            rbxlPath: '/bundle/place-1.rbxl',
+            slugMap: SLUG_MAP,
+            sizeBytes: 1024,
+          },
+        ],
+        buildContext: { cleanupAsync } as any,
+      },
+    });
+
+    const alpha = await runPackageAsync(batch, '@quenty/alpha');
+    const beta = await runPackageAsync(batch, '@quenty/beta');
+
+    expect(generate).not.toHaveBeenCalled();
+    expect(transport.deployedPaths).toEqual(['/bundle/place-1.rbxl']);
+    expect(transport.deployedTargets).toEqual([
+      { placeId: 900, universeId: 901, project: '' },
+    ]);
+    expect(alpha.success).toBe(true);
+    expect(beta.success).toBe(false);
+
+    await batch.disposeAsync();
+    expect(cleanupAsync).toHaveBeenCalledOnce();
   });
 });

@@ -11,6 +11,8 @@ import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { renderBatchOutcome } from '../../utils/testing/parsers/batch-log-renderer.js';
 import { emitDiagnostic } from '../../utils/testing/parsers/batch-log-parser.js';
+import { type DeployTarget } from '@quenty/nevermore-deploy';
+import { type BuildContext } from '@quenty/nevermore-template-helpers';
 import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   type JobContext,
@@ -37,9 +39,13 @@ import {
   createTestCommentConfig,
 } from '../../utils/testing/reporting/index.js';
 import {
+  executePreparedTestAsync,
   runSingleTestAsync,
+  type SingleTestOptions,
   type SingleTestResult,
 } from '../../utils/testing/runner/test-runner.js';
+import { type CombinedPlaceChunk } from '../../utils/testing/runner/combined-project-generator.js';
+import { readPrebuiltBatchBundleAsync } from '../../utils/testing/runner/prebuilt-batch-bundle.js';
 import { isCI } from '../../utils/nevermore-cli-utils.js';
 
 interface BatchTestArgs extends NevermoreGlobalArgs {
@@ -56,6 +62,7 @@ interface BatchTestArgs extends NevermoreGlobalArgs {
   batchUniverseId?: number;
   maxPlaceMb?: number;
   timeout?: number;
+  bundle?: string;
 }
 
 export const batchTestCommand: CommandModule<
@@ -129,6 +136,14 @@ export const batchTestCommand: CommandModule<
             'Max script execution time in seconds for the whole batch. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
           type: 'number',
         })
+        .option('bundle', {
+          describe:
+            'Run the places in a *.nevermore.tests.tar written by "batch bundle" instead of finding ' +
+            'and building packages. The bundle never chooses where it is uploaded: ' +
+            'that is --batch-place-id/--batch-universe-id, or else the test place this ' +
+            'checkout gives one of its packages.',
+          type: 'string',
+        })
         // Accepted only to fail with a useful message. A batch runs one shared
         // script across packages, so there is nothing for arbitrary Luau to mean
         // here — but yargs strict mode would otherwise reject it with a bare
@@ -145,6 +160,18 @@ export const batchTestCommand: CommandModule<
                 '  cd <package> && nevermore test --cloud --script-text \'print("hi")\''
             );
           }
+          if (args.bundle !== undefined) {
+            if (args.all || args.limit !== undefined) {
+              throw new Error(
+                '--bundle runs every package in the bundle; drop --all and --limit.'
+              );
+            }
+            if (args.aggregated === false) {
+              throw new Error(
+                '--bundle runs an aggregated batch; drop --no-aggregated.'
+              );
+            }
+          }
           return true;
         })
     );
@@ -160,12 +187,38 @@ export const batchTestCommand: CommandModule<
 };
 
 async function _runAsync(args: BatchTestArgs): Promise<void> {
-  let packages = args.all
-    ? await discoverAllTestableBatchTargetsAsync()
-    : await discoverChangedTestableBatchTargetsAsync(args.base!);
+  const prebuilt =
+    args.bundle !== undefined
+      ? await _loadPrebuiltRunAsync(args, args.bundle)
+      : undefined;
+  let exitCode: number | undefined;
+  try {
+    exitCode = await _runPackagesAsync(args, prebuilt);
+  } finally {
+    await prebuilt?.buildContext.cleanupAsync();
+  }
 
-  if (args.limit && args.limit > 0) {
-    packages = packages.slice(0, args.limit);
+  // Node.js fetch (undici) keeps TCP connections alive in a global pool,
+  // which prevents the event loop from draining. Explicit exit required.
+  if (exitCode !== undefined) {
+    process.exit(exitCode);
+  }
+}
+
+async function _runPackagesAsync(
+  args: BatchTestArgs,
+  prebuilt: PrebuiltRun | undefined
+): Promise<number | undefined> {
+  let packages: BatchTarget[];
+  if (prebuilt) {
+    packages = prebuilt.packages;
+  } else {
+    packages = args.all
+      ? await discoverAllTestableBatchTargetsAsync()
+      : await discoverChangedTestableBatchTargetsAsync(args.base!);
+    if (args.limit && args.limit > 0) {
+      packages = packages.slice(0, args.limit);
+    }
   }
 
   if (packages.length === 0) {
@@ -173,7 +226,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
       'No testable packages found. Packages need a deploy.nevermore.json with a "test" target.\n' +
         'Run "nevermore deploy init" inside a package to set one up.'
     );
-    return;
+    return undefined;
   }
 
   if (args.dryrun) {
@@ -181,7 +234,7 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
     OutputHelper.info(
       `[DRYRUN] Would test ${packages.length} packages: ${names}`
     );
-    return;
+    return undefined;
   }
 
   const cloud = args.cloud ?? false;
@@ -273,8 +326,8 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
 
   const batchContext = aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
-        batchPlaceId: args.batchPlaceId,
-        batchUniverseId: args.batchUniverseId,
+        batchPlaceId: prebuilt?.target.placeId ?? args.batchPlaceId,
+        batchUniverseId: prebuilt?.target.universeId ?? args.batchUniverseId,
         batchTimeoutMs: timeoutMs,
         // Only an upload is size-limited, so a local run stays one place
         // unless asked to split.
@@ -285,6 +338,10 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
             ? undefined
             : Infinity,
         reporter,
+        prebuilt: prebuilt && {
+          chunks: prebuilt.chunks,
+          buildContext: prebuilt.buildContext,
+        },
       })
     : undefined;
   const context: JobContext = batchContext ?? innerContext;
@@ -326,7 +383,8 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
           pkg,
           context,
           timeoutMs,
-          aggregated
+          aggregated,
+          prebuilt?.hasJestConfig.get(pkg.name)
         );
 
         return {
@@ -360,19 +418,17 @@ async function _runAsync(args: BatchTestArgs): Promise<void> {
   }
 
   await reporter.stopAsync();
-
-  // Node.js fetch (undici) keeps TCP connections alive in a global pool,
-  // which prevents the event loop from draining. Explicit exit required.
-  process.exit(exitCode);
+  return exitCode;
 }
 
 async function _runWithRetryAsync(
   pkg: BatchTarget,
   context: JobContext,
   timeoutMs: number,
-  aggregated: boolean
+  aggregated: boolean,
+  prebuiltHasJestConfig: boolean | undefined
 ): Promise<SingleTestResult> {
-  const opts = {
+  const opts: SingleTestOptions = {
     packagePath: pkg.path,
     packageName: pkg.name,
     timeoutMs,
@@ -382,9 +438,93 @@ async function _runWithRetryAsync(
     suppressCountsProvenance: aggregated,
   };
 
+  if (prebuiltHasJestConfig !== undefined) {
+    return _retryOnTransientAsync(pkg.name, async () =>
+      executePreparedTestAsync(
+        context,
+        {
+          builtPlace: await context.buildPlaceAsync(opts),
+          scriptContent: '',
+          hasJestConfig: prebuiltHasJestConfig,
+        },
+        opts
+      )
+    );
+  }
+
   return _retryOnTransientAsync(pkg.name, () =>
     runSingleTestAsync(context, opts)
   );
+}
+
+interface PrebuiltRun {
+  target: DeployTarget;
+  packages: BatchTarget[];
+  chunks: CombinedPlaceChunk[];
+  hasJestConfig: Map<string, boolean>;
+  buildContext: BuildContext;
+}
+
+async function _loadPrebuiltRunAsync(
+  args: BatchTestArgs,
+  bundleFile: string
+): Promise<PrebuiltRun> {
+  const bundle = await readPrebuiltBatchBundleAsync(bundleFile);
+  let target: DeployTarget;
+  try {
+    target = await _resolvePrebuiltTargetAsync(
+      args,
+      new Set(bundle.packages.map((p) => p.name))
+    );
+  } catch (err) {
+    await bundle.buildContext.cleanupAsync();
+    throw err;
+  }
+
+  OutputHelper.info(
+    `Running ${bundle.packages.length} prebuilt package${
+      bundle.packages.length === 1 ? '' : 's'
+    } in ${bundle.chunks.length} place${
+      bundle.chunks.length === 1 ? '' : 's'
+    } on place ${target.placeId}.`
+  );
+
+  return {
+    target,
+    packages: bundle.packages.map((p) => ({
+      name: p.name,
+      packageName: p.name,
+      path: process.cwd(),
+      target,
+    })),
+    chunks: bundle.chunks,
+    hasJestConfig: new Map(
+      bundle.packages.map((p) => [p.name, p.hasJestConfig])
+    ),
+    buildContext: bundle.buildContext,
+  };
+}
+
+/**
+ * Where a bundle uploads to, picked the way a normal batch run picks it: the
+ * test place of one of its packages, read from this checkout rather than from
+ * the bundle.
+ */
+async function _resolvePrebuiltTargetAsync(
+  args: BatchTestArgs,
+  bundledNames: Set<string>
+): Promise<DeployTarget> {
+  const known = await discoverAllTestableBatchTargetsAsync();
+  const base = known.find((t) => bundledNames.has(t.name)) ?? known[0];
+  const universeId = args.batchUniverseId ?? base?.target.universeId;
+  const placeId = args.batchPlaceId ?? base?.target.placeId;
+  if (!universeId || !placeId) {
+    throw new Error(
+      'No test place to upload the bundle to: this checkout has no testable ' +
+        'package. Pass --batch-place-id and --batch-universe-id.'
+    );
+  }
+  return { universeId, placeId, project: '' };
 }
 
 /**

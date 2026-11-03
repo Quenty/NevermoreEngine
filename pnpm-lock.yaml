@@ -4247,7 +4247,17 @@ importers:
 
   src/preferredparentutils: {}
 
-  src/probability: {}
+  src/probability:
+    dependencies:
+      '@quenty/loader':
+        specifier: workspace:*
+        version: link:../loader
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
 
   src/promise:
     dependencies:
@@ -6861,6 +6871,9 @@ importers:
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
+      tar:
+        specifier: ^7.5.11
+        version: 7.5.11
       typescript-memoize:
         specifier: ^1.1.1
         version: 1.1.1
@@ -6987,6 +7000,9 @@ importers:
       '@quenty/nevermore-cli-helpers':
         specifier: workspace:*
         version: link:../nevermore-cli-helpers
+      '@quenty/nevermore-deploy':
+        specifier: workspace:*
+        version: link:../nevermore-deploy
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
@@ -7003,6 +7019,12 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
+      '@quenty/nevermore-test-runner':
+        specifier: workspace:*
+        version: link:../../src/nevermore-test-runner
+      '@quentystudios/jest-lua':
+        specifier: 3.10.0-quenty.2
+        version: 3.10.0-quenty.2
       '@types/node':
         specifier: ^18.11.4
         version: 18.19.130

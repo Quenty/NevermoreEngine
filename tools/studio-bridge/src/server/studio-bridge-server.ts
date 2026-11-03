@@ -29,6 +29,7 @@ import {
   type SerializedReturnValue,
   encodeMessage,
   decodePluginMessage,
+  MAX_MESSAGE_BYTES,
 } from './web-socket-protocol.js';
 import { ActionDispatcher } from './action-dispatcher.js';
 import {
@@ -102,6 +103,8 @@ export interface ExecuteOptions {
   timeoutMs?: number;
   /** Callback for each output message */
   onOutput?: (level: OutputLevel, body: string) => void;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface StudioBridgeResult {
@@ -110,7 +113,7 @@ export interface StudioBridgeResult {
   /**
    * Everything the script returned, in order, marshalled by the plugin.
    * Absent whenever no `scriptComplete` carrying a return channel arrived —
-   * a timeout, a disconnect, a plugin error, or an older plugin build — which
+   * a timeout, a disconnect, or a plugin error — which
    * is what separates "we never learned what it returned" from `[]`, "it
    * returned nothing".
    */
@@ -320,7 +323,10 @@ export class StudioBridgeServer {
 
       // 1. Start HTTP + WebSocket server (unique path rejects wrong connections at upgrade level)
       this._httpServer = http.createServer();
-      this._wss = new WebSocketServer({ noServer: true });
+      this._wss = new WebSocketServer({
+        noServer: true,
+        maxPayload: MAX_MESSAGE_BYTES,
+      });
       const port = await startHttpAndWsServerAsync(
         this._httpServer,
         this._wss,
@@ -402,7 +408,12 @@ export class StudioBridgeServer {
         encodeMessage({
           type: 'execute',
           sessionId: this._sessionId,
-          payload: { script: options.scriptContent },
+          payload: {
+            script: options.scriptContent,
+            ...(options.args && options.args.length > 0
+              ? { args: options.args }
+              : {}),
+          },
         })
       );
 
@@ -482,7 +493,7 @@ export class StudioBridgeServer {
     const syncResult = await this.performActionAsync<PluginMessage>(
       {
         type: 'syncActions',
-        payload: { actions },
+        payload: { actions, verbose: OutputHelper.isVerbose() },
       },
       10_000
     );

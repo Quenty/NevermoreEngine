@@ -17,6 +17,16 @@ const _outputStorage = new AsyncLocalStorage<OutputBuffer>();
  */
 export class OutputHelper {
   private static _verbose: boolean = true;
+  private static _diagnosticsToStderr: boolean = false;
+
+  private static _writeDiagnostic(text: string): void {
+    if (this._diagnosticsToStderr) {
+      console.error(text);
+    } else {
+      console.log(text);
+    }
+  }
+
   /**
    * Formats the error with markup
    * @param message Message to format
@@ -169,7 +179,9 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static info(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatInfo(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatInfo(message)
+    );
   }
 
   /**
@@ -190,6 +202,14 @@ export class OutputHelper {
   }
 
   /**
+   * Sends info, warnings, hints, verbose output and boxes to stderr, for CLIs
+   * whose stdout carries only the command result.
+   */
+  public static setDiagnosticsToStderr(toStderr: boolean): void {
+    this._diagnosticsToStderr = toStderr;
+  }
+
+  /**
    * Logs a verbose/intermediate message. Suppressed when verbose is false.
    * When running inside a buffered context (see runBuffered), messages are
    * captured to the buffer instead of printed.
@@ -206,7 +226,7 @@ export class OutputHelper {
     if (buffer) {
       buffer.lines.push(formatted);
     } else {
-      console.log(formatted);
+      this._writeDiagnostic(formatted);
     }
   }
 
@@ -228,7 +248,9 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static warn(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatWarning(message)
+    );
   }
 
   /**
@@ -240,7 +262,7 @@ export class OutputHelper {
    * after it.
    */
   public static startGroup(title: string, useGroups = isCI()): void {
-    console.log(
+    this._writeDiagnostic(
       useGroups ? `::group::${title}` : this.formatDim(`── ${title} ──`)
     );
   }
@@ -248,7 +270,7 @@ export class OutputHelper {
   /** Close the section opened by {@link startGroup}. */
   public static endGroup(useGroups = isCI()): void {
     if (useGroups) {
-      console.log('::endgroup::');
+      this._writeDiagnostic('::endgroup::');
     }
   }
 
@@ -257,7 +279,9 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static hint(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatHint(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatHint(message)
+    );
   }
 
   /**
@@ -265,6 +289,6 @@ export class OutputHelper {
    * @param message
    */
   public static box(message: string, options?: BoxOptions): void {
-    console.log(this.formatBox(message, options));
+    this._writeDiagnostic(this.formatBox(message, options));
   }
 }

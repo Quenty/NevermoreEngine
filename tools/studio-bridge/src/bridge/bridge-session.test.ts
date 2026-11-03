@@ -140,12 +140,13 @@ describe('BridgeSession', () => {
       const [msg, timeout] = handle.sendActionAsync.mock.calls[0];
       expect((msg as ServerMessage).type).toBe('execute');
       expect((msg as any).payload.script).toBe('print("hello")');
-      expect(timeout).toBe(120_000);
+      expect((msg as any).payload.timeoutMs).toBe(120_000);
+      expect(timeout).toBe(125_000);
 
       expect(result.success).toBe(true);
     });
 
-    it('uses custom timeout when provided', async () => {
+    it('has the plugin cancel the script at a custom timeout, then waits for its reply', async () => {
       const handle = new MockTransportHandle();
       handle.sendActionAsync.mockResolvedValueOnce({
         type: 'scriptComplete',
@@ -156,8 +157,9 @@ describe('BridgeSession', () => {
       const session = new BridgeSession(createSessionInfo(), handle);
       await session.execAsync('print("hello")', 5_000);
 
-      const [, timeout] = handle.sendActionAsync.mock.calls[0];
-      expect(timeout).toBe(5_000);
+      const [msg, timeout] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.timeoutMs).toBe(5_000);
+      expect(timeout).toBe(10_000);
     });
 
     it('returns error info from error response', async () => {
