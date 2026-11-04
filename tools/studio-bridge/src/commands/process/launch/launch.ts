@@ -12,6 +12,8 @@ import {
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
 
+const BASEPLATE_TEMPLATE = { placeId: 95206881, universeId: 28220420 };
+
 export interface LaunchOptions {
   placePath?: string;
   placeId?: number;
@@ -69,6 +71,14 @@ export async function launchHandlerAsync(
     };
   }
 
+  if (!hasExplicitPlace) {
+    await launchStudioAsync(BASEPLATE_TEMPLATE);
+    return {
+      launched: true,
+      summary: 'Studio launched with a new Baseplate',
+    };
+  }
+
   const { placePath, placeId, universeId } = options;
   await launchStudioAsync({ placePath, placeId, universeId });
   const opened =
@@ -96,7 +106,7 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
   group: 'process',
   name: 'launch',
   description:
-    "Launch Roblox Studio, by default with the place of the nearest deploy.nevermore.json's default target",
+    "Launch Roblox Studio, by default with the place of the nearest deploy.nevermore.json's default target, or else a new Baseplate",
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',

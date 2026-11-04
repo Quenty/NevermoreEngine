@@ -199,7 +199,7 @@ studio-bridge process launch --place ./build/test.rbxl
 studio-bridge process launch --place-id 123 --universe-id 456
 ```
 
-Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json` it opens Studio with no place.
+Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json`, or in one without targets like the repo root's, it opens a new Baseplate from Roblox's template, the same unsaved place the start page's Baseplate gives.
 
 ### `process run`
 
