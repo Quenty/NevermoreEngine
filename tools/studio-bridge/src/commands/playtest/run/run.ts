@@ -66,7 +66,7 @@ interface PlaytestRunArgs {
   code?: string;
   file?: string;
   mode?: PlaytestMode;
-  timeout?: number;
+  scriptTimeout?: number;
   scriptArgs?: string[];
 }
 
@@ -207,8 +207,8 @@ export const playtestRunCommand = defineCommand<
       choices: ['play', 'run'],
       default: 'play',
     }),
-    timeout: arg.option({
-      description: 'Execution timeout in milliseconds',
+    scriptTimeout: arg.option({
+      description: 'Cancel the script after this many milliseconds',
       type: 'number',
     }),
     scriptArgs: arg.passthrough({
@@ -232,7 +232,7 @@ export const playtestRunCommand = defineCommand<
       mode: args.mode ?? 'play',
       context: targeting.context ?? 'server',
       target: targeting.target,
-      timeout: args.timeout,
+      timeout: args.scriptTimeout,
       args: args.scriptArgs,
     });
   },

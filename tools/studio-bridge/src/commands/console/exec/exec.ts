@@ -49,7 +49,7 @@ export interface RunResult {
 interface ConsoleExecArgs {
   code?: string;
   file?: string;
-  timeout?: number;
+  scriptTimeout?: number;
   scriptArgs?: string[];
   input?: string[];
 }
@@ -170,8 +170,8 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
       description: 'Path to a Luau script file to execute',
       alias: 'f',
     }),
-    timeout: arg.option({
-      description: 'Execution timeout in milliseconds',
+    scriptTimeout: arg.option({
+      description: 'Cancel the script after this many milliseconds',
       type: 'number',
     }),
     input: arg.option({
@@ -201,7 +201,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
 
     return execHandlerAsync(session, {
       scriptContent,
-      timeout: args.timeout,
+      timeout: args.scriptTimeout,
       args: args.scriptArgs,
       inputs,
     });

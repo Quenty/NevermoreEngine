@@ -41,7 +41,7 @@ interface ProcessRunArgs {
   code?: string;
   file?: string;
   place?: string;
-  timeout?: number;
+  scriptTimeout?: number;
   scriptArgs?: string[];
 }
 
@@ -85,8 +85,8 @@ export const processRunCommand = defineCommand<
       description: 'Path to a .rbxl place file',
       alias: 'p',
     }),
-    timeout: arg.option({
-      description: 'Execution timeout in milliseconds',
+    scriptTimeout: arg.option({
+      description: 'Cancel the script after this many milliseconds',
       type: 'number',
     }),
     scriptArgs: arg.passthrough({
@@ -107,7 +107,7 @@ export const processRunCommand = defineCommand<
       scriptContent,
       packageName: 'studio-bridge',
       placePath: args.place,
-      timeoutMs: args.timeout ?? 120_000,
+      timeoutMs: args.scriptTimeout ?? 120_000,
       verbose: OutputHelper.isVerbose(),
       showLogs: true,
       filePath,

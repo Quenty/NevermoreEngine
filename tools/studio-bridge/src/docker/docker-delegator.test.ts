@@ -94,7 +94,7 @@ describe('buildDockerRunArgsAsync', () => {
     const bashCmd = args[args.length - 1];
     expect(bashCmd).toContain('studio-bridge linux inject-credentials');
     expect(bashCmd).toContain('studio-bridge process run');
-    expect(bashCmd).toContain('--timeout 120000');
+    expect(bashCmd).toContain('--script-timeout 120000');
     expect(bashCmd).not.toContain('--verbose');
   });
 

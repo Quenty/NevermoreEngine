@@ -88,12 +88,12 @@ studio-bridge console exec -f load-map.lua --input europe-15m.json.zst -- europe
 | `--file` | `-f` | Path to a Luau script file |
 | `--target` | `-t` | Target session ID |
 | `--context` | — | Target context (`edit`, `client`, `server`) |
-| `--timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
+| `--script-timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
 | `--allow-edit` | — | Change Edit even while a playtest of it runs |
 | `--input <file>` | — | Send a file with the script, which receives it as a `buffer` in `...` before any args (`local data, region = ...`). Repeat for more files, up to 192 MiB in all |
 | `-- <args..>` | — | Passed to the script as `...`, as strings (`local name, count = ...`) |
 
-Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
+Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--script-timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
 
 ### `console logs`
 
