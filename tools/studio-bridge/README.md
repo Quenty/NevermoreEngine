@@ -301,6 +301,10 @@ Session IDs are the place name plus a short suffix and the context, like `test-p
 
 When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.
 
+## Studio's MCP server
+
+`src/roblox-mcp/` reaches Studio through `StudioMCP.exe`, the MCP server Roblox ships with Studio, for things the plugin can't do or when it isn't running. All MCP knowledge stays in that folder; commands call `tryExecuteLuauAsync`, `tryCallStudioToolAsync` or `tryListStudiosAsync` with the bridge's usual `--target` and context. They never throw, run under a strict deadline, and return a `reason` when MCP is unavailable, finds no Studio, fails or times out. Windows only.
+
 ## Testing
 
 ```bash
