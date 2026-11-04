@@ -448,6 +448,18 @@ async function _runDeployAsync(
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
 
+        const deployed = {
+          packageName: buildTarget.name,
+          placeId: buildTarget.target.placeId,
+          universeId: buildTarget.target.universeId,
+          target: targetName,
+          version,
+          published: publish,
+          basePlaceVersion: builtPlace.basePlaceVersion,
+          commit: deployGitInfo.version,
+          branch: deployGitInfo.branch,
+        };
+
         let logs: string;
         if (args.smokeTest && buildTarget.target.basePlace) {
           OutputHelper.verbose('Running post-deploy smoke test...');
@@ -462,8 +474,7 @@ async function _runDeployAsync(
           logs = smokeResult.logs;
           if (!smokeResult.success) {
             return {
-              packageName: buildTarget.name,
-              placeId: buildTarget.target.placeId,
+              ...deployed,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
               failureLabel: 'SMOKE TEST FAILED',
@@ -475,8 +486,7 @@ async function _runDeployAsync(
         }
 
         return {
-          packageName: buildTarget.name,
-          placeId: buildTarget.target.placeId,
+          ...deployed,
           success: true,
           logs,
           progressSummary: {
