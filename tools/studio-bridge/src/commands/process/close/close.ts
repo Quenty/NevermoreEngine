@@ -26,6 +26,7 @@ export interface ProcessCloseResult {
   /** The `deploy.nevermore.json` target whose Studio was closed, if one was named. */
   deployTarget?: string;
   pid?: number;
+  pids?: number[];
   summary: string;
 }
 
@@ -36,6 +37,8 @@ export interface ProcessCloseOptions {
 
 interface ProcessCloseArgs {
   deployTarget?: string;
+  all?: boolean;
+  askToSave?: boolean;
   force?: boolean;
   pid?: number;
 }
@@ -129,6 +132,47 @@ export async function closeDeployTargetAsync(
   return closeCandidateAsync(candidates, showing, options, base);
 }
 
+export async function closeAllStudiosAsync(
+  options: Pick<ProcessCloseOptions, 'force'> = {}
+): Promise<ProcessCloseResult> {
+  const processes = await listStudioProcessesAsync();
+  if (processes.length === 0) {
+    return { success: true, pids: [], summary: 'No Studio is running' };
+  }
+
+  const results = await Promise.all(
+    processes.map(async ({ pid }) => ({
+      pid,
+      exited: await closeStudioProcessAsync(pid, { force: options.force }),
+    }))
+  );
+  const closed = results.filter((r) => r.exited).map((r) => r.pid);
+  const open = results.filter((r) => !r.exited).map((r) => r.pid);
+  const plural = (n: number) => (n === 1 ? 'Studio' : 'Studios');
+
+  if (open.length > 0) {
+    return {
+      success: false,
+      pids: closed,
+      summary:
+        `Closed ${closed.length} ${plural(closed.length)}; ${
+          open.length
+        } ${plural(open.length)} still open (pids ${open.join(', ')})` +
+        (options.force
+          ? ''
+          : ', likely asking to save. Run without --ask-to-save to close without saving.'),
+    };
+  }
+
+  return {
+    success: true,
+    pids: closed,
+    summary: `Closed ${closed.length} ${plural(
+      closed.length
+    )} (pids ${closed.join(', ')})`,
+  };
+}
+
 async function closeCandidateAsync(
   candidates: RunningStudioProcess[],
   showing: string,
@@ -163,7 +207,7 @@ async function closeCandidateAsync(
     return fail(
       options.force
         ? `Studio (pid ${pid}) did not exit`
-        : `Studio (pid ${pid}) is still open, likely asking to save. Use --force to close without saving.`,
+        : `Studio (pid ${pid}) is still open, likely asking to save. Run without --ask-to-save to close without saving.`,
       pid
     );
   }
@@ -183,7 +227,7 @@ export const processCloseCommand = defineCommand<
   group: 'process',
   name: 'close',
   description:
-    "Close a Studio: the one a session belongs to, or the one showing a deploy.nevermore.json target's place",
+    "Close a Studio without saving: the one a session belongs to, the one showing a deploy.nevermore.json target's place, or with --all every Studio",
   category: 'infrastructure',
   safety: 'mutate',
   scope: 'connection',
@@ -193,8 +237,16 @@ export const processCloseCommand = defineCommand<
         'deploy.nevermore.json target whose Studio to close, e.g. test or integration.places.hub',
       required: false,
     }),
+    all: arg.flag({
+      description: 'Close every running Studio, connected or not',
+    }),
+    askToSave: arg.flag({
+      description:
+        'Let Studio prompt to save first, instead of closing without saving',
+    }),
     force: arg.flag({
-      description: 'Kill Studio without letting it prompt to save',
+      description:
+        'Close without saving. The default, accepted for scripts that pass it',
       alias: 'f',
     }),
     pid: arg.option({
@@ -203,7 +255,19 @@ export const processCloseCommand = defineCommand<
     }),
   },
   handler: async (connection, args, targeting) => {
-    const options = { force: args.force, pid: args.pid };
+    const options = { force: !args.askToSave, pid: args.pid };
+    if (args.all) {
+      if (
+        args.deployTarget !== undefined ||
+        args.pid !== undefined ||
+        targeting.target !== undefined
+      ) {
+        throw new Error(
+          '--all closes every Studio; drop the target, --target and --pid.'
+        );
+      }
+      return closeAllStudiosAsync(options);
+    }
     if (args.deployTarget !== undefined) {
       return closeDeployTargetAsync(connection, args.deployTarget, options);
     }

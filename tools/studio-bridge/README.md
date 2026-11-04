@@ -214,11 +214,11 @@ Launches Studio on a copy of the place, runs the script there and nowhere else, 
 
 ```bash
 studio-bridge process close --target test-place
-studio-bridge process close --target test-place --force
 studio-bridge process close integration.places.hub   # the Studio showing a deploy.nevermore.json target
+studio-bridge process close --all                    # every running Studio, connected or not
 ```
 
-Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
+Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio is closed without saving, so no dialog waits on someone to click it. Pass `--ask-to-save` to let Studio prompt instead; if it is still open after that, the command says so. When several windows show the same place, pick one with `--pid`.
 
 ### `playtest run` / `playtest start` / `playtest restart` / `playtest stop`
 
