@@ -152,10 +152,14 @@ export const batchTestCommand: CommandModule<
           hidden: true,
           type: 'string',
         })
+        .option('script-file', {
+          hidden: true,
+          type: 'string',
+        })
         .check((args) => {
-          if (args.scriptText !== undefined) {
+          if (args.scriptText !== undefined || args.scriptFile !== undefined) {
             throw new Error(
-              '--script-text is not supported by "batch test", which runs one shared script for all packages.\n' +
+              '--script-text and --script-file are not supported by "batch test", which runs one shared script for all packages.\n' +
                 'Run it against a single package instead:\n' +
                 '  cd <package> && nevermore test --cloud --script-text \'print("hi")\''
             );

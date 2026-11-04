@@ -28,6 +28,8 @@ import { recompressPlace } from '../build/place-recompression.js';
  */
 export const PLACE_UPLOAD_MAX_BYTES = 150 * 1024 * 1024;
 
+export const LUAU_EXECUTION_SCRIPT_MAX_BYTES = 4_000_000;
+
 /**
  * One engine message, with the severity Open Cloud reported for it.
  *
@@ -397,6 +399,15 @@ export class OpenCloudClient {
     timeoutMs?: number,
     onRateLimitWait?: (wait: RateLimitWait) => void
   ): Promise<LuauTask> {
+    const scriptBytes = Buffer.byteLength(script, 'utf-8');
+    if (scriptBytes > LUAU_EXECUTION_SCRIPT_MAX_BYTES) {
+      throw new Error(
+        `The script is ${_formatMegabytes(
+          scriptBytes
+        )}, over the Open Cloud limit of 4 MB for a Luau execution script`
+      );
+    }
+
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
 

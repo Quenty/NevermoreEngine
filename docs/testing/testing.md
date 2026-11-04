@@ -500,12 +500,13 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run tests via Open Cloud instead of locally |
-| `--logs` | Show execution logs. On by default with `--script-text`; pass `--no-logs` to suppress |
+| `--logs` | Show execution logs. On by default with `--script-text` and `--script-file`; pass `--no-logs` to suppress |
 | `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
 | `--universe-id` | Override universe ID from deploy.nevermore.json |
 | `--place-id` | Override place ID from deploy.nevermore.json |
 | `--script-template` | Override script template path |
 | `--script-text` | Luau code to execute directly instead of the configured template. Implies `--logs` |
+| `--script-file` | Like `--script-text`, read from a file, for scripts too long for the command line. Open Cloud refuses scripts over 4 MB |
 
 ### Batch testing
 
