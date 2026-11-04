@@ -141,6 +141,26 @@ describe("ExecuteAction.handleExecute()", function()
 		expect(result.returnValues).toEqual({ "Player1", 3, 2 } :: { any })
 	end)
 
+	it("should pass inputs to the script as buffers before its args", function()
+		local result = ExecuteAction.handleExecute({
+			script = "local data, name = ... return typeof(data), buffer.tostring(data), name",
+			inputs = { "aGVsbG8=" },
+			args = { "Player1" },
+		}, "req-1", "session-1")
+
+		expect(result.returnValues).toEqual({ "buffer", "hello", "Player1" } :: { any })
+	end)
+
+	it("should reject an input that is not a string", function()
+		local result = ExecuteAction.handleExecute({
+			script = "return 1",
+			inputs = { 5 },
+		}, "req-1", "session-1")
+
+		expect(result.success).toEqual(false)
+		expect(result.error).toContain("Script input 1")
+	end)
+
 	it("should cancel a script that outlives its timeout", function()
 		local result = ExecuteAction.handleExecute(
 			{ script = "task.wait(5) print('too late')", timeoutMs = 50 },

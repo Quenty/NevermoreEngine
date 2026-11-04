@@ -8,7 +8,8 @@
 	  `SCRIPT_RUNTIME_ERROR` with a `traceback` when it throws, and
 	  `SCRIPT_TIMEOUT` when it outlives `payload.timeoutMs`. A timed out script
 	  is cancelled, so the requests queued behind it still run.
-	- Passes `payload.args`, a list of strings, to the script as `...`.
+	- Passes `payload.inputs`, a list of base64 files, to the script as buffers
+	  in `...`, followed by `payload.args`, a list of strings.
 	- Runs concurrent requests one at a time, in arrival order.
 	- Returns everything printed while the script runs, read from LogService, so
 	  output from required modules and from threads the script starts comes back.
@@ -194,6 +195,29 @@ function ExecuteAction._handleExecute(
 		return reply({ success = false, error = "Script args must be a list", code = "SCRIPT_LOAD_ERROR" })
 	end
 
+	local inputs = payload.inputs or {}
+	if type(inputs) ~= "table" then
+		return reply({ success = false, error = "Script inputs must be a list", code = "SCRIPT_LOAD_ERROR" })
+	end
+
+	local scriptArgs = {}
+	for index, encoded in inputs do
+		local decodeOk, decoded = pcall(function()
+			return game:GetService("EncodingService"):Base64Decode(buffer.fromstring(encoded))
+		end)
+		if not decodeOk or type(encoded) ~= "string" then
+			return reply({
+				success = false,
+				error = `Script input {index} is not valid base64`,
+				code = "SCRIPT_LOAD_ERROR",
+			})
+		end
+		table.insert(scriptArgs, decoded)
+	end
+	for _, arg in args do
+		table.insert(scriptArgs, arg)
+	end
+
 	local timeoutMs = payload.timeoutMs
 	local timeoutSeconds = if type(timeoutMs) == "number" then timeoutMs / 1000 else nil
 	-- The caller's timeout started when it sent the request, not when its turn came
@@ -210,7 +234,7 @@ function ExecuteAction._handleExecute(
 
 	local captured: { LogEntry } = {}
 	local logConnection = ExecuteAction._captureOutput(captured)
-	local status, result = ExecuteAction._runAsync(fn, timeoutSeconds, args)
+	local status, result = ExecuteAction._runAsync(fn, timeoutSeconds, scriptArgs)
 
 	-- MessageOut can fire a frame late, after the script's last print
 	task.wait()

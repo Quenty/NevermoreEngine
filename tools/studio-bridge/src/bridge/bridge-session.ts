@@ -41,6 +41,7 @@ import {
   type ActionSource,
 } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { MAX_EXECUTE_INPUT_BYTES } from '../server/web-socket-protocol.js';
 
 const EXECUTE_REPLY_GRACE_MS = 5_000;
 
@@ -156,8 +157,18 @@ export class BridgeSession extends EventEmitter {
   async execAsync(
     code: string,
     timeout?: number,
-    args?: string[]
+    args?: string[],
+    inputs?: Buffer[]
   ): Promise<ExecResult> {
+    const inputBytes = (inputs ?? []).reduce((sum, b) => sum + b.length, 0);
+    if (inputBytes > MAX_EXECUTE_INPUT_BYTES) {
+      throw new Error(
+        `The inputs are ${_formatMiB(inputBytes)}, over the ${_formatMiB(
+          MAX_EXECUTE_INPUT_BYTES
+        )} that can be sent to Studio with a script`
+      );
+    }
+
     this._assertConnected();
     await this._ensureActionsAsync();
 
@@ -173,6 +184,9 @@ export class BridgeSession extends EventEmitter {
           script: code,
           timeoutMs,
           ...(args && args.length > 0 ? { args } : {}),
+          ...(inputs && inputs.length > 0
+            ? { inputs: inputs.map((input) => input.toString('base64')) }
+            : {}),
         },
       },
       timeoutMs + EXECUTE_REPLY_GRACE_MS
@@ -608,4 +622,8 @@ export class BridgeSession extends EventEmitter {
     this._actionsReady = true;
     OutputHelper.verbose('[actions] Action sync complete');
   }
+}
+
+function _formatMiB(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }

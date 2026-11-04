@@ -96,6 +96,27 @@ describe('execHandlerAsync', () => {
     ]);
   });
 
+  it('forwards inputs to session.execAsync', async () => {
+    const session = createMockSession({
+      success: true,
+      output: [],
+    });
+    const input = Buffer.from('hello');
+
+    await execHandlerAsync(session, {
+      scriptContent: 'return ...',
+      args: ['Player1'],
+      inputs: [input],
+    });
+
+    expect(session.execAsync).toHaveBeenCalledWith(
+      'return ...',
+      undefined,
+      ['Player1'],
+      [input]
+    );
+  });
+
   it('passes undefined timeout when not specified', async () => {
     const session = createMockSession({
       success: true,

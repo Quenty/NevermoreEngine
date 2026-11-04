@@ -6,6 +6,7 @@
  */
 
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
@@ -18,6 +19,8 @@ export interface ExecOptions {
   timeout?: number;
   /** Passed to the script as `...`. */
   args?: string[];
+  /** Passed to the script as buffers in `...`, before `args`. */
+  inputs?: Buffer[];
 }
 
 export interface ExecResult {
@@ -48,6 +51,7 @@ interface ConsoleExecArgs {
   file?: string;
   timeout?: number;
   scriptArgs?: string[];
+  input?: string[];
 }
 
 /**
@@ -57,11 +61,18 @@ export async function execHandlerAsync(
   session: BridgeSession,
   options: ExecOptions
 ): Promise<ExecResult> {
-  const result = await session.execAsync(
-    options.scriptContent,
-    options.timeout,
-    options.args
-  );
+  const result = options.inputs?.length
+    ? await session.execAsync(
+        options.scriptContent,
+        options.timeout,
+        options.args,
+        options.inputs
+      )
+    : await session.execAsync(
+        options.scriptContent,
+        options.timeout,
+        options.args
+      );
 
   const output = (result.output ?? []).map((entry) =>
     typeof entry === 'string' ? entry : entry.body
@@ -163,6 +174,11 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
       description: 'Execution timeout in milliseconds',
       type: 'number',
     }),
+    input: arg.option({
+      description:
+        'File to send with the script, which receives it as a buffer in ... before any args. Repeat for more files',
+      array: true,
+    }),
     scriptArgs: arg.passthrough({
       description:
         'Arguments after --, passed to the script as ... (all strings)',
@@ -173,11 +189,21 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   },
   handler: async (session, args) => {
     const { scriptContent } = await resolveScriptContentAsync(args);
+    const inputs = await Promise.all(
+      (args.input ?? []).map(async (file) => {
+        try {
+          return await fs.readFile(path.resolve(file));
+        } catch {
+          throw new Error(`Input file not found: ${file}`);
+        }
+      })
+    );
 
     return execHandlerAsync(session, {
       scriptContent,
       timeout: args.timeout,
       args: args.scriptArgs,
+      inputs,
     });
   },
 });

@@ -23,6 +23,8 @@ export type PluginContext = 'edit' | 'client' | 'server';
  */
 export const MAX_MESSAGE_BYTES = 512 * 1024 * 1024;
 
+export const MAX_EXECUTE_INPUT_BYTES = 192 * 1024 * 1024;
+
 export type Capability =
   | 'execute'
   | 'queryState'
@@ -358,6 +360,8 @@ export interface ExecuteMessage extends BaseMessage {
     timeoutMs?: number;
     /** Passed to the script as `...`. */
     args?: string[];
+    /** Base64 files, passed to the script as buffers in `...` before `args`. */
+    inputs?: string[];
   };
 }
 
@@ -974,6 +978,9 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
               ? { timeoutMs: payload.timeoutMs }
               : {}),
             ...(isStringArray(payload.args) ? { args: payload.args } : {}),
+            ...(isStringArray(payload.inputs)
+              ? { inputs: payload.inputs }
+              : {}),
           },
         };
       }
