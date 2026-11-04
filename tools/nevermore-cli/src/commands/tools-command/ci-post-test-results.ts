@@ -59,8 +59,8 @@ export const ciPostTestResultsCommand: CommandModule<
       .option('run-outcome', {
         describe:
           'Outcome of the test step (e.g. "success", "failure"). ' +
-          'When the results file is missing and run-outcome is "success", ' +
-          'posts a neutral "no tests" comment instead of an error.',
+          'When the results file is missing, "success" posts a neutral comment, ' +
+          '"cancelled" posts nothing, and anything else posts a failure.',
         type: 'string',
       })
       .option('sourcemap', {
@@ -77,6 +77,13 @@ export const ciPostTestResultsCommand: CommandModule<
         state = await LoadedStateTracker.fromFileAsync(args.input);
       } catch {
         OutputHelper.warn(`Results file not found: ${args.input}`);
+
+        if (args.runOutcome === 'cancelled') {
+          OutputHelper.info(
+            'Test step was cancelled; leaving the PR comment to the run that replaced it.'
+          );
+          return;
+        }
 
         const reporters = _createGithubReporters(undefined);
 
