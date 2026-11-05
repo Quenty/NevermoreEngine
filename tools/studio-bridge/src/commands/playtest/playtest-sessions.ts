@@ -5,8 +5,14 @@
  * each connects to the bridge as its own session. Those sessions can't be
  * matched to the Studio that started them by instance id, since unpublished
  * places give every DataModel its own. Instead, `startPlaytestAsync` passes a
- * playtest id as the StudioTestService test args, and each new session is
- * asked for it back through `GetTestArgs`.
+ * playtest id as the StudioTestService test args, and each session registers
+ * with it.
+ *
+ * The playtest's server session is the plugin when Studio loads user plugins
+ * into playtests. Otherwise the edit session plants the same client into the
+ * playtest as an ordinary Script (see plugin/playtest-bridge.ts). That one can
+ * only run code compiled when the playtest started: the actions, and the
+ * scripts `startPlaytestAsync` is given.
  */
 
 import { randomUUID } from 'crypto';
@@ -20,6 +26,7 @@ import type {
 } from '../../bridge/index.js';
 import { ContextNotFoundError } from '../../bridge/index.js';
 import { getPluginBuildVersionAsync } from '../../plugin/plugin-build-version.js';
+import { buildPlaytestBridgeAsync } from '../../plugin/playtest-bridge.js';
 import { tryReadLoadUserPluginsOnPlaytestAsync } from '../../process/studio-settings.js';
 
 /** How long a started playtest may run before its pending start request is dropped. */
@@ -29,16 +36,19 @@ const SESSION_WAIT_TIMEOUT_MS = 30_000;
 /** Each player of a multiplayer test boots its own Studio process. */
 const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
-const READ_RETRY_DELAY_MS = 1_000;
 
-const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into playtests and their sessions can't connect. Turn it on in Studio Settings, or run a script in a playtest's server with 'studio-bridge playtest run', which works without it.`;
+const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into a playtest's client and it can't connect. Turn it on in Studio Settings, or use run mode, whose server session works without it.`;
 
-const READ_PLAYTEST_ID_SCRIPT = [
-  'local ok, args = pcall(function()',
-  '\treturn game:GetService("StudioTestService"):GetTestArgs()',
-  'end)',
-  'return if ok and type(args) == "table" then args.studioBridgePlaytestId else nil',
-].join('\n');
+export interface StartPlaytestOptions {
+  /**
+   * Code the caller will run in the playtest's server session. A server
+   * session planted without plugin permissions can only run code compiled
+   * when the playtest starts.
+   */
+  scripts?: string[];
+  /** Wait for the server session only, so play mode needs no client plugin. */
+  serverOnly?: boolean;
+}
 
 export interface StartedPlaytest {
   playtestId: string;
@@ -68,19 +78,31 @@ export async function startPlaytestAsync(
   connection: BridgeConnection,
   editSession: BridgeSession,
   mode: PlaytestMode,
-  players?: number
+  players?: number,
+  options: StartPlaytestOptions = {}
 ): Promise<StartedPlaytest> {
   if (editSession.context !== 'edit') {
     throw new Error(
       `Playtests start from an edit session, but '${editSession.info.sessionId}' is a ${editSession.context} session`
     );
   }
-  if (await isPlaytestPluginsOffAsync(connection)) {
+  const pluginsOnPlaytest = await tryReadPlaytestPluginsAsync(connection);
+  if (mode === 'play' && pluginsOnPlaytest === false && !options.serverOnly) {
     throw new Error(PLAYTEST_PLUGINS_OFF_MESSAGE);
   }
   if (players !== undefined) {
-    await assertCanStartMultiplayerAsync(editSession, mode, players);
+    assertValidMultiplayer(mode, players);
   }
+  // Plugin sessions in the playtest register with its id, which older plugins leave out
+  if (pluginsOnPlaytest !== false) {
+    await assertCurrentPluginAsync(editSession);
+  }
+
+  // A server plugin, when Studio does load one, stands down for a planted bridge
+  const bridge =
+    pluginsOnPlaytest === true
+      ? undefined
+      : await buildPlaytestBridgeAsync(options.scripts);
 
   const playtestId = randomUUID();
   const ended = editSession
@@ -89,7 +111,8 @@ export async function startPlaytestAsync(
       playtestId,
       connection.port,
       PLAYTEST_MAX_DURATION_MS,
-      players
+      players,
+      bridge
     )
     .catch(
       (err): PlaytestEndResult => ({
@@ -99,7 +122,9 @@ export async function startPlaytestAsync(
       })
     );
 
-  const clientCount = players ?? (mode === 'play' ? 1 : 0);
+  const clientCount = options.serverOnly
+    ? 0
+    : players ?? (mode === 'play' ? 1 : 0);
   const waitTimeoutMs =
     players !== undefined
       ? MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS
@@ -153,20 +178,14 @@ export async function startPlaytestAsync(
 
   // Without its server session the playtest can't be ended from here
   if (!server?.isConnected) {
-    throw new Error(
-      `Playtest started, but ${waited}, so stop it in Studio. Play sessions only connect with Studio's "Load user plugins on playtest" setting on.`
-    );
+    throw new Error(`Playtest started, but ${waited}, so stop it in Studio.`);
   }
 
   await endPlaytestAsync(connection, server);
   throw new Error(`Playtest started, but ${waited}, so it was stopped.`);
 }
 
-async function assertCanStartMultiplayerAsync(
-  editSession: BridgeSession,
-  mode: PlaytestMode,
-  players: number
-): Promise<void> {
+function assertValidMultiplayer(mode: PlaytestMode, players: number): void {
   if (!Number.isInteger(players) || players < 1) {
     throw new Error(
       `--players must be a whole number of at least 1, not ${players}`
@@ -175,12 +194,15 @@ async function assertCanStartMultiplayerAsync(
   if (mode !== 'play') {
     throw new Error('A multiplayer test runs in play mode');
   }
+}
 
-  // Older plugins give every client the same session id, so all but one drop off
+async function assertCurrentPluginAsync(
+  editSession: BridgeSession
+): Promise<void> {
   const expected = await getPluginBuildVersionAsync();
   if (editSession.info.pluginVersion !== expected) {
     throw new Error(
-      `Multiplayer tests need the current studio-bridge plugin, but '${editSession.info.placeName}' has an older one. Run 'studio-bridge plugin install' first.`
+      `Playtests with plugin sessions need the current studio-bridge plugin, but '${editSession.info.placeName}' has an older one. Run 'studio-bridge plugin install' first.`
     );
   }
 }
@@ -255,16 +277,15 @@ export async function explainMissingPlaytestContextAsync(
 }
 
 /**
- * Whether this machine's Studio has "Load user plugins on playtest" off. A
- * remote Studio's settings aren't on this machine, so they count as unknown.
+ * Whether this machine's Studio has "Load user plugins on playtest" on. A
+ * remote Studio's settings aren't on this machine, so they are unknown.
  */
-async function isPlaytestPluginsOffAsync(
+async function tryReadPlaytestPluginsAsync(
   connection: BridgeConnection
-): Promise<boolean> {
-  return (
-    !connection.isRemote &&
-    (await tryReadLoadUserPluginsOnPlaytestAsync()) === false
-  );
+): Promise<boolean | undefined> {
+  return connection.isRemote
+    ? undefined
+    : await tryReadLoadUserPluginsOnPlaytestAsync();
 }
 
 async function explainNoPlaytestAsync(
@@ -273,7 +294,10 @@ async function explainNoPlaytestAsync(
   context?: SessionContext
 ): Promise<string> {
   const of = studio ? ` of ${studio}` : '';
-  if (await isPlaytestPluginsOffAsync(connection)) {
+  if (
+    context === 'client' &&
+    (await tryReadPlaytestPluginsAsync(connection)) === false
+  ) {
     return `No playtest${of} is connected. ${PLAYTEST_PLUGINS_OFF_MESSAGE}`;
   }
   const missing = context ? `, so there is no ${context} session` : '';
@@ -307,7 +331,6 @@ async function waitForPlaytestSessionsAsync(
 ): Promise<PlaytestSessions> {
   return new Promise((resolve) => {
     const found: PlaytestSessions = { clients: [] };
-    const checked = new Set<string>();
 
     const cleanup = () => {
       clearTimeout(timer);
@@ -316,30 +339,22 @@ async function waitForPlaytestSessionsAsync(
     };
 
     const onSession = (session: BridgeSession) => {
-      const { sessionId } = session.info;
-      if (session.context === 'edit' || checked.has(sessionId)) {
+      if (session.info.playtestId !== playtestId) {
         return;
       }
-      checked.add(sessionId);
 
-      void readPlaytestIdAsync(connection, sessionId, signal).then((read) => {
-        if (signal.aborted || !read) return;
-        if (read.id !== playtestId) {
-          // The last playtest's session can linger under the same id; read its replacement too
-          checked.delete(sessionId);
-          return;
-        }
-
-        if (read.session.context === 'server') {
-          found.server = read.session;
-        } else {
-          found.clients.push(read.session);
-        }
-        if (found.server && found.clients.length >= clientCount) {
-          cleanup();
-          resolve(found);
-        }
-      });
+      if (session.context === 'server') {
+        found.server = session;
+      } else if (
+        session.context === 'client' &&
+        !found.clients.some((c) => c.info.sessionId === session.info.sessionId)
+      ) {
+        found.clients.push(session);
+      }
+      if (found.server && found.clients.length >= clientCount) {
+        cleanup();
+        resolve(found);
+      }
     };
 
     // Resolves with whichever sessions connected; the caller reports the rest
@@ -356,34 +371,6 @@ async function waitForPlaytestSessionsAsync(
       if (session) onSession(session);
     }
   });
-}
-
-/**
- * Reads the playtest id a session was started under, retrying while the read
- * fails: a playtest's DataModels are slow to answer while their Studio boots,
- * and a session that reconnects is read again under the same id.
- */
-async function readPlaytestIdAsync(
-  connection: BridgeConnection,
-  sessionId: string,
-  signal: AbortSignal
-): Promise<{ session: BridgeSession; id: string | undefined } | undefined> {
-  while (!signal.aborted) {
-    const session = connection.getSession(sessionId);
-    if (session) {
-      try {
-        const result = await session.execAsync(READ_PLAYTEST_ID_SCRIPT, 5_000);
-        if (result.success) {
-          const value = result.returnValues?.[0];
-          return { session, id: typeof value === 'string' ? value : undefined };
-        }
-      } catch {
-        // Retried below
-      }
-    }
-    await new Promise((resolve) => setTimeout(resolve, READ_RETRY_DELAY_MS));
-  }
-  return undefined;
 }
 
 async function waitForSessionCloseAsync(

@@ -41,7 +41,17 @@ import {
   type ActionSource,
 } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { MAX_EXECUTE_INPUT_BYTES } from '../server/web-socket-protocol.js';
+import {
+  MAX_EXECUTE_INPUT_BYTES,
+  type PlaytestBridgePayload,
+  type PlaytestPlayerPayload,
+  type PlaytestPlayersRequest,
+} from '../server/web-socket-protocol.js';
+
+export interface PlaytestPlayersResult {
+  players: PlaytestPlayerPayload[];
+  remaining: string[];
+}
 
 const EXECUTE_REPLY_GRACE_MS = 5_000;
 
@@ -57,18 +67,6 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   queryLogs: 10_000,
   endPlaytest: 5_000,
 };
-
-/** Time a playtest gets to start and stop on top of its script's own timeout. */
-const PLAYTEST_STARTUP_ALLOWANCE_MS = 60_000;
-
-export interface RunPlaytestScriptOptions {
-  mode: PlaytestMode;
-  script: string;
-  runnerSource: string;
-  timeoutSec: number;
-  /** Passed to the script as `...`. */
-  args?: string[];
-}
 
 /** Map an `execute`-style reply onto an ExecResult. */
 function toExecResult(result: PluginMessage): ExecResult {
@@ -190,39 +188,6 @@ export class BridgeSession extends EventEmitter {
         },
       },
       timeoutMs + EXECUTE_REPLY_GRACE_MS
-    );
-
-    return toExecResult(result);
-  }
-
-  /**
-   * Run a script in a fresh playtest's server, started from this edit
-   * session, and resolve with its result once the playtest has ended. Works
-   * without the playtest's own sessions connecting: the plugin plants
-   * `runnerSource` in the playtest to run the script and end the playtest.
-   */
-  async runPlaytestScriptAsync(
-    options: RunPlaytestScriptOptions
-  ): Promise<ExecResult> {
-    this._assertConnected();
-    await this._ensureActionsAsync();
-
-    const result = await this._handle.sendActionAsync<PluginMessage>(
-      {
-        type: 'runPlaytestScript',
-        sessionId: this._info.sessionId,
-        requestId: randomUUID(),
-        payload: {
-          mode: options.mode,
-          script: options.script,
-          runnerSource: options.runnerSource,
-          timeoutSec: options.timeoutSec,
-          ...(options.args && options.args.length > 0
-            ? { args: options.args }
-            : {}),
-        },
-      },
-      options.timeoutSec * 1000 + PLAYTEST_STARTUP_ALLOWANCE_MS
     );
 
     return toExecResult(result);
@@ -456,7 +421,8 @@ export class BridgeSession extends EventEmitter {
     playtestId: string,
     bridgePort: number,
     timeoutMs: number,
-    players?: number
+    players?: number,
+    bridge?: PlaytestBridgePayload
   ): Promise<PlaytestEndResult> {
     this._assertConnected();
     await this._ensureActionsAsync();
@@ -472,6 +438,7 @@ export class BridgeSession extends EventEmitter {
           bridgePort,
           instanceId: this._info.instanceId,
           ...(players !== undefined ? { players } : {}),
+          ...(bridge ? { bridge } : {}),
         },
       },
       timeoutMs
@@ -512,6 +479,37 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('endPlaytestResult', result);
+  }
+
+  /**
+   * Read or change the players of the playtest this session belongs to.
+   * `timeoutMs` bounds the whole request, including any wait in the plugin.
+   */
+  async playtestPlayersAsync(
+    request: PlaytestPlayersRequest,
+    timeoutMs: number
+  ): Promise<PlaytestPlayersResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'playtestPlayers',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: request,
+      },
+      timeoutMs
+    );
+
+    if (result.type === 'playtestPlayersResult') {
+      return {
+        players: result.payload.players ?? [],
+        remaining: result.payload.remaining ?? [],
+      };
+    }
+
+    throw pluginError('playtestPlayersResult', result);
   }
 
   private _assertConnected(): void {

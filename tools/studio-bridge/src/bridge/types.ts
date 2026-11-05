@@ -41,6 +41,8 @@ export interface SessionInfo {
   launchId?: string;
   /** The player of a multiplayer test client session. */
   playerName?: string;
+  /** The playtest studio-bridge started this session's DataModel for. */
+  playtestId?: string;
   context: SessionContext;
   instanceId: string;
   placeId: number;

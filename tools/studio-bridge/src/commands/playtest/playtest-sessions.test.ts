@@ -12,6 +12,14 @@ vi.mock('../../process/studio-settings.js', () => ({
     settings.loadUserPluginsOnPlaytest,
 }));
 
+vi.mock('../../plugin/playtest-bridge.js', () => ({
+  buildPlaytestBridgeAsync: async (scripts?: string[]) => ({
+    entrySource: 'entry',
+    modules: {},
+    precompiled: scripts ?? [],
+  }),
+}));
+
 import { ContextNotFoundError } from '../../bridge/index.js';
 import {
   explainMissingPlaytestContextAsync,
@@ -75,12 +83,12 @@ describe('with "Load user plugins on playtest" off', () => {
     expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
   });
 
-  it('names the setting when no server session is connected', async () => {
+  it('does not blame the setting for a missing server session, which is planted', async () => {
     settings.loadUserPluginsOnPlaytest = false;
     const connection = { listSessions: () => [] } as any;
 
     await expect(resolvePlaytestServerSessionAsync(connection)).rejects.toThrow(
-      `No playtest is connected. Studio's "Load user plugins on playtest" setting is off`
+      "No playtest is running. Start one with 'studio-bridge playtest start'."
     );
   });
 
@@ -139,5 +147,74 @@ describe('explainMissingPlaytestContextAsync', () => {
     expect(await explainMissingPlaytestContextAsync(connection, original)).toBe(
       original
     );
+  });
+});
+
+describe('planting the server session', () => {
+  function createConnection() {
+    return {
+      port: 38741,
+      isRemote: false,
+      listSessions: () => [],
+      getSession: () => undefined,
+      on: vi.fn(),
+      off: vi.fn(),
+    } as any;
+  }
+
+  // The start fails at once, so the test sees what it was asked to start
+  function createFailingEditSession(pluginVersion: string) {
+    const editSession = createEditSession(pluginVersion);
+    editSession.runPlaytestAsync.mockResolvedValue({
+      playtestId: 'p',
+      success: false,
+      error: 'refused',
+    });
+    return editSession;
+  }
+
+  it('plants a bridge with the scripts to run when the setting is off', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const editSession = createFailingEditSession('old');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run', undefined, {
+        scripts: ['return 1'],
+      })
+    ).rejects.toThrow('Playtest failed to start: refused');
+
+    const bridge = editSession.runPlaytestAsync.mock.calls[0][5];
+    expect(bridge.precompiled).toEqual(['return 1']);
+  });
+
+  it('plants a bridge when the setting is unknown', async () => {
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow('refused');
+
+    expect(editSession.runPlaytestAsync.mock.calls[0][5]).toBeDefined();
+  });
+
+  it('leaves the server to the plugin when the setting is on', async () => {
+    settings.loadUserPluginsOnPlaytest = true;
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow('refused');
+
+    expect(editSession.runPlaytestAsync.mock.calls[0][5]).toBeUndefined();
+  });
+
+  it('needs the current plugin when plugin sessions will connect', async () => {
+    settings.loadUserPluginsOnPlaytest = true;
+    const editSession = createFailingEditSession('old');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow("Run 'studio-bridge plugin install' first");
+    expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
   });
 });

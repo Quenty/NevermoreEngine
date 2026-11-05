@@ -5,26 +5,19 @@
  * `--context client`. Its output and return values come back the same way as
  * `console exec`.
  *
- * In the server, the edit session plants a runner script in the playtest
- * (playtest-runner.luau), so this works even when Studio does not load user
- * plugins into playtests. The client has no such path: it needs the
- * playtest's client session, so it needs that Studio setting on.
+ * Both run through the playtest's sessions. The server session works even
+ * when Studio does not load user plugins into playtests, since the edit
+ * session then plants it, with this code compiled ahead of time (see
+ * playtest-sessions.ts). The client session needs that Studio setting on.
  */
 
-import * as fs from 'fs/promises';
-import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
-import {
-  execHandlerAsync,
-  formatExecText,
-  type ExecResult as CommandExecResult,
-} from '../../console/exec/exec.js';
+import { execHandlerAsync, formatExecText } from '../../console/exec/exec.js';
 import type {
   BridgeConnection,
   BridgeSession,
-  ExecResult,
   PlaytestMode,
   SessionContext,
 } from '../../../bridge/index.js';
@@ -47,13 +40,11 @@ export interface PlaytestRunOptions {
   args?: string[];
 }
 
-/** Matches `console exec`'s default execution timeout. */
-const DEFAULT_TIMEOUT_MS = 120_000;
+const PLAYER_JOIN_TIMEOUT_MS = 30_000;
 
 export interface PlaytestRunResult {
   success: boolean;
-  /** Absent when the script ran through the planted runner. */
-  playtestId?: string;
+  playtestId: string;
   output: string[];
   error?: string;
   returnValues?: SerializedReturnValue[];
@@ -85,14 +76,15 @@ export async function playtestRunHandlerAsync(
     'edit'
   );
 
-  if (options.context === 'server') {
-    return runWithPlantedRunnerAsync(editSession, options);
-  }
-
   const playtest = await startPlaytestAsync(
     connection,
     editSession,
-    options.mode
+    options.mode,
+    undefined,
+    {
+      scripts: [options.scriptContent],
+      serverOnly: options.context === 'server',
+    }
   );
 
   let result: PlaytestRunResult;
@@ -100,6 +92,10 @@ export async function playtestRunHandlerAsync(
     const session = playtest.sessions[options.context];
     if (!session) {
       throw new Error(`Playtest has no ${options.context} session`);
+    }
+    // In play mode the server's code expects the player, who joins a moment later
+    if (options.mode === 'play' && options.context === 'server') {
+      await waitForPlayerAsync(session);
     }
 
     result = {
@@ -123,44 +119,19 @@ export async function playtestRunHandlerAsync(
   return stopError ? { ...result, stopError } : result;
 }
 
-async function runWithPlantedRunnerAsync(
-  editSession: BridgeSession,
-  options: PlaytestRunOptions
-): Promise<PlaytestRunResult> {
-  const runnerSource = await fs.readFile(
-    resolvePackagePath(
-      import.meta.url,
-      'src',
-      'commands',
-      'playtest',
-      'run',
-      'playtest-runner.luau'
-    ),
-    'utf-8'
+async function waitForPlayerAsync(serverSession: BridgeSession): Promise<void> {
+  const deadline = Date.now() + PLAYER_JOIN_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const { players } = await serverSession.playtestPlayersAsync(
+      { op: 'list' },
+      PLAYER_JOIN_TIMEOUT_MS
+    );
+    if (players.length > 0) return;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error(
+    `No player joined the playtest within ${PLAYER_JOIN_TIMEOUT_MS / 1000}s`
   );
-
-  const result = await editSession.runPlaytestScriptAsync({
-    mode: options.mode,
-    script: options.scriptContent,
-    runnerSource,
-    timeoutSec: (options.timeout ?? DEFAULT_TIMEOUT_MS) / 1000,
-    args: options.args,
-  });
-
-  return toCommandResult(result);
-}
-
-/** Shapes a bridge ExecResult the way `console exec` reports it. */
-function toCommandResult(result: ExecResult): CommandExecResult {
-  return {
-    success: result.success,
-    output: result.output.map((entry) => entry.body),
-    error: result.error,
-    returnValues: result.returnValues,
-    summary: result.success
-      ? 'Script executed successfully'
-      : `Script failed: ${result.error}`,
-  };
 }
 
 /** Ends the playtest, returning why it could not instead of throwing. */

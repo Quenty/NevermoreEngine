@@ -37,6 +37,7 @@ export type Capability =
   | 'grepScripts'
   | 'startPlaytest'
   | 'endPlaytest'
+  | 'playtestPlayers'
   | 'heartbeat'
   | 'registerAction'
   | 'syncActions';
@@ -162,6 +163,8 @@ export interface RegisterMessage extends PushMessage {
     launchId?: string;
     /** The player of a multiplayer test client. */
     playerName?: string;
+    /** The playtest studio-bridge started this session's DataModel for. */
+    playtestId?: string;
     capabilities: Capability[];
   };
 }
@@ -322,6 +325,22 @@ export interface EndPlaytestResultMessage extends RequestMessage {
   };
 }
 
+export interface PlaytestPlayerPayload {
+  name: string;
+  userId: number;
+  displayName: string;
+}
+
+export interface PlaytestPlayersResultMessage extends RequestMessage {
+  type: 'playtestPlayersResult';
+  payload: {
+    /** The players `list` found or `add` added. */
+    players?: PlaytestPlayerPayload[];
+    /** The players `remove` waited for that had not left by its timeout. */
+    remaining?: string[];
+  };
+}
+
 export interface PluginErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -349,6 +368,7 @@ export type PluginMessage =
   | SyncActionsResultMessage
   | PlaytestEndedMessage
   | EndPlaytestResultMessage
+  | PlaytestPlayersResultMessage
   | PluginErrorMessage;
 
 export interface ExecuteMessage extends BaseMessage {
@@ -482,7 +502,16 @@ export interface StartPlaytestMessage extends RequestMessage {
     instanceId: string;
     /** Starts a multiplayer test, a server and a client process per player. */
     players?: number;
+    /** Plants a studio-bridge client as the playtest's server session. */
+    bridge?: PlaytestBridgePayload;
   };
+}
+
+/** The studio-bridge client a `startPlaytest` plants, see playtest-bridge.ts. */
+export interface PlaytestBridgePayload {
+  entrySource: string;
+  modules: Record<string, string>;
+  precompiled: string[];
 }
 
 export interface EndPlaytestMessage extends RequestMessage {
@@ -490,18 +519,15 @@ export interface EndPlaytestMessage extends RequestMessage {
   payload: Record<string, never>;
 }
 
-/** Answered with `scriptComplete`, the same reply as `execute`. */
-export interface RunPlaytestScriptMessage extends RequestMessage {
-  type: 'runPlaytestScript';
-  payload: {
-    mode: PlaytestMode;
-    script: string;
-    /** Planted in the playtest's server to run the script and end the playtest. */
-    runnerSource: string;
-    timeoutSec: number;
-    /** Passed to the script as `...`. */
-    args?: string[];
-  };
+export type PlaytestPlayersRequest =
+  | { op: 'list' }
+  | { op: 'add'; count: number; timeoutSec: number }
+  | { op: 'remove'; kick: string[]; names: string[]; timeoutSec: number }
+  | { op: 'leave' };
+
+export interface PlaytestPlayersMessage extends RequestMessage {
+  type: 'playtestPlayers';
+  payload: PlaytestPlayersRequest;
 }
 
 export interface ServerErrorMessage extends BaseMessage {
@@ -529,7 +555,7 @@ export type ServerMessage =
   | SyncActionsMessage
   | StartPlaytestMessage
   | EndPlaytestMessage
-  | RunPlaytestScriptMessage
+  | PlaytestPlayersMessage
   | ServerErrorMessage;
 
 export function encodeMessage(msg: ServerMessage): string {
@@ -660,6 +686,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           playerName:
             typeof payload.playerName === 'string'
               ? payload.playerName
+              : undefined,
+          playtestId:
+            typeof payload.playtestId === 'string'
+              ? payload.playtestId
               : undefined,
           capabilities: payload.capabilities as Capability[],
         },
@@ -907,6 +937,22 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
               : undefined,
           players:
             typeof payload.players === 'number' ? payload.players : undefined,
+        },
+      };
+
+    case 'playtestPlayersResult':
+      if (requestId === undefined) return null;
+      return {
+        type: 'playtestPlayersResult',
+        sessionId,
+        requestId,
+        payload: {
+          players: Array.isArray(payload.players)
+            ? (payload.players as PlaytestPlayerPayload[])
+            : undefined,
+          remaining: isStringArray(payload.remaining)
+            ? payload.remaining
+            : undefined,
         },
       };
 
@@ -1192,6 +1238,9 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           ...(typeof payload.players === 'number'
             ? { players: payload.players }
             : {}),
+          ...(isPlaytestBridge(payload.bridge)
+            ? { bridge: payload.bridge }
+            : {}),
         },
       };
 
@@ -1204,26 +1253,14 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         payload: {} as Record<string, never>,
       };
 
-    case 'runPlaytestScript':
+    case 'playtestPlayers':
       if (requestId === undefined) return null;
-      if (
-        (payload.mode !== 'play' && payload.mode !== 'run') ||
-        typeof payload.script !== 'string' ||
-        typeof payload.runnerSource !== 'string' ||
-        typeof payload.timeoutSec !== 'number'
-      )
-        return null;
+      if (!isPlaytestPlayersRequest(payload)) return null;
       return {
-        type: 'runPlaytestScript',
+        type: 'playtestPlayers',
         sessionId,
         requestId,
-        payload: {
-          mode: payload.mode,
-          script: payload.script,
-          runnerSource: payload.runnerSource,
-          timeoutSec: payload.timeoutSec,
-          ...(isStringArray(payload.args) ? { args: payload.args } : {}),
-        },
+        payload,
       };
 
     case 'error':
@@ -1245,5 +1282,39 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
 
     default:
       return null;
+  }
+}
+
+function isPlaytestBridge(value: unknown): value is PlaytestBridgePayload {
+  if (typeof value !== 'object' || value === null) return false;
+  const bridge = value as Record<string, unknown>;
+  return (
+    typeof bridge.entrySource === 'string' &&
+    typeof bridge.modules === 'object' &&
+    bridge.modules !== null &&
+    Object.values(bridge.modules).every((v) => typeof v === 'string') &&
+    isStringArray(bridge.precompiled)
+  );
+}
+
+function isPlaytestPlayersRequest(
+  value: Record<string, unknown>
+): value is PlaytestPlayersRequest {
+  switch (value.op) {
+    case 'list':
+    case 'leave':
+      return true;
+    case 'add':
+      return (
+        typeof value.count === 'number' && typeof value.timeoutSec === 'number'
+      );
+    case 'remove':
+      return (
+        isStringArray(value.kick) &&
+        isStringArray(value.names) &&
+        typeof value.timeoutSec === 'number'
+      );
+    default:
+      return false;
   }
 }

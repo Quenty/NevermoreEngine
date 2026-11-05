@@ -255,6 +255,13 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
         bridgePort: z.number(),
         instanceId: z.string(),
         players: z.number().int().min(1).optional(),
+        bridge: z
+          .object({
+            entrySource: z.string(),
+            modules: z.record(z.string(), z.string()),
+            precompiled: z.array(z.string()),
+          })
+          .optional(),
       })
       .loose(),
   }),
@@ -265,18 +272,24 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z.object({}).loose(),
   }),
   z.object({
-    type: z.literal('runPlaytestScript'),
+    type: z.literal('playtestPlayers'),
     sessionId: z.string(),
     requestId: z.string(),
-    payload: z
-      .object({
-        mode: z.enum(['play', 'run']),
-        script: z.string(),
-        runnerSource: z.string(),
+    payload: z.discriminatedUnion('op', [
+      z.object({ op: z.literal('list') }),
+      z.object({
+        op: z.literal('add'),
+        count: z.number().int().min(1),
         timeoutSec: z.number(),
-        args: z.array(z.string()).optional(),
-      })
-      .loose(),
+      }),
+      z.object({
+        op: z.literal('remove'),
+        kick: z.array(z.string()),
+        names: z.array(z.string()),
+        timeoutSec: z.number(),
+      }),
+      z.object({ op: z.literal('leave') }),
+    ]),
   }),
   z.object({
     type: z.literal('error'),

@@ -239,11 +239,13 @@ studio-bridge playtest stop
 
 Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server.
 
-`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It plants a temporary runner script in the playtest to do so, so it works whatever Studio's **Load user plugins on playtest** setting says. `--context client` runs the code in the playtest's client instead, which needs that setting on.
+`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. In play mode it waits for the player to join first. It works whatever Studio's **Load user plugins on playtest** setting says (see below). `--context client` runs the code in the playtest's client instead, which needs that setting on.
 
 `playtest start` leaves the playtest running, so other commands can target it with `--context server` or `--context client`. `playtest restart` stops it and starts a new one in the same mode, picking up code changed since it started; with none running, it starts one. `playtest stop` ends it.
 
-`start`, `restart`, and `stop` talk to the playtest's own server and client, which only connect when **Load user plugins on playtest** is on. With it off, `playtest start` still starts the playtest but reports that its sessions never connected, and the playtest has to be stopped in Studio.
+A playtest's sessions are the studio-bridge plugin, which Studio only loads into a playtest with **Load user plugins on playtest** on. With it off, the edit session plants the same client into the playtest's server as an ordinary Script, so the server session still connects: `start`, `restart`, `stop`, `playtest player`, `console logs` and the other actions all work in run mode. Without plugin permissions that session can't compile code, so it only runs the code `playtest run` gave it when the playtest started, and `console exec` with new code asks for the setting. A play-mode playtest's client has no such fallback, so `playtest start --mode play` needs the setting on. With the setting on, nothing is planted, and the plugin is the server session as well.
+
+Playtests whose sessions are the plugin need the current plugin (`studio-bridge plugin install`), since those sessions register with the playtest's id.
 
 ### Multiplayer tests: `playtest start --players` / `playtest player`
 
@@ -255,7 +257,7 @@ studio-bridge playtest player remove Player2
 studio-bridge console exec --target test-place-3f9a-client-player1 'return game.Players.LocalPlayer.Name'
 ```
 
-`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the number of players in the test, counting any added since it started. Multiplayer tests need the current plugin (`studio-bridge plugin install`), and `--players` refuses to start with an older one.
+`playtest start --players N` starts a multiplayer test: a server and a client per player, each in its own Studio window. Each client's session ID ends in its player's name (`<instance>-client-player1`), so `--context client` alone is ambiguous; pick a client with `--target`. `playtest restart` keeps the number of players in the test, counting any added since it started. Multiplayer tests need **Load user plugins on playtest** on and the current plugin (`studio-bridge plugin install`), and `--players` refuses to start with an older one.
 
 `playtest player list` shows each player with its client session. `add` adds players to a multiplayer test and waits for them to join. `remove` has each player's client leave the test, which closes its window; a player without a connected client session is kicked instead, and its window stays open.
 
@@ -324,6 +326,10 @@ pnpm test:integration  # End-to-end smoke test (requires Studio)
 | Unit (`pnpm test`) | Protocol, bridge connection, session tracking, command handlers, WebSocket lifecycle | No |
 | Plugin (`nevermore test --cloud`) | Plugin modules and action scripts, via the `*.spec.lua` beside them in `templates/studio-bridge-plugin/src/Shared` and `src/commands`, in a real engine built from `test/default.project.json` | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
+
+## Working on this package
+
+- [docs/playtest-bridge.md](docs/playtest-bridge.md): how a playtest gets a server session without Studio loading plugins into it, and what an ordinary playtest Script can and can't do.
 
 ## Platform Support
 

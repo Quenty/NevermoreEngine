@@ -27,6 +27,8 @@
 
 local MAX_DEPTH = 64
 local CHUNK_NAME = "=exec"
+local MIN_OUTPUT_WAIT_FRAMES = 3
+local MAX_OUTPUT_WAIT_FRAMES = 30
 local PLUGIN_PREFIX = "[StudioBridge]"
 -- Tracebacks name this module's frames the way its first line does
 local OWN_FRAME_PREFIX = string.match(debug.traceback(), "^([^\n]-):%d+")
@@ -236,8 +238,7 @@ function ExecuteAction._handleExecute(
 	local logConnection = ExecuteAction._captureOutput(captured)
 	local status, result = ExecuteAction._runAsync(fn, timeoutSeconds, scriptArgs)
 
-	-- MessageOut can fire a frame late, after the script's last print
-	task.wait()
+	ExecuteAction._waitForOutputAsync(captured)
 	logConnection:Disconnect()
 
 	if status == "timeout" then
@@ -280,6 +281,23 @@ function ExecuteAction._dropOwnFrames(traceback: string): string
 		end
 	end
 	return table.concat(lines, "\n")
+end
+
+--[[
+	Waits for the script's last output to arrive. MessageOut fires a frame or
+	two after a print, more in a playtest's server, so this waits a few frames
+	and then for one without new output.
+]]
+function ExecuteAction._waitForOutputAsync(captured: { LogEntry })
+	local seen = #captured
+	local frames = 0
+	local grew
+	repeat
+		task.wait()
+		frames += 1
+		grew = #captured ~= seen
+		seen = #captured
+	until frames >= MAX_OUTPUT_WAIT_FRAMES or (frames >= MIN_OUTPUT_WAIT_FRAMES and not grew)
 end
 
 --[[
