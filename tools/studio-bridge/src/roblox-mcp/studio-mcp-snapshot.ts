@@ -1,4 +1,5 @@
 import type { SessionInfo } from '../bridge/types.js';
+import type { StudioWindow } from './studio/studio-session.js';
 import {
   tryListStudiosAsync,
   type StudioMcpFailure,
@@ -20,6 +21,7 @@ export interface StudioMcpSnapshot {
 export interface StudioMcpSnapshotOptions {
   sessions?: SessionInfo[];
   sessionPids?: Map<string, number>;
+  windows?: StudioWindow[];
   maxWaitMs?: number;
   maxAgeMs?: number;
   listAsync?: (
@@ -73,6 +75,9 @@ async function _refreshAsync(
   const result = await (options.listAsync ?? tryListStudiosAsync)({
     sessions: options.sessions,
     sessionPids: options.sessionPids,
+    ...(options.windows
+      ? { listWindowsAsync: async () => options.windows! }
+      : {}),
     timeoutMs,
     readPlaceIds: false,
   });

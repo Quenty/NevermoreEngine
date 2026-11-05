@@ -303,8 +303,9 @@ export const infoCommand = defineCommand<InfoArgs, StateResult>({
   },
   handler: async (session, args, connection) =>
     queryStateHandlerAsync(session, connection, {
-      mcpSnapshotAsync: args.mcp
-        ? (sessions) => getStudioMcpSnapshotAsync({ sessions })
-        : undefined,
+      mcpSnapshotAsync:
+        args.mcp && !connection?.isRemote
+          ? (sessions) => getStudioMcpSnapshotAsync({ sessions })
+          : undefined,
     }),
 });

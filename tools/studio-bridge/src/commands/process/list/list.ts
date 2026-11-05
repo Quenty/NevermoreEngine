@@ -9,6 +9,7 @@ import {
 } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { formatDurationMs } from '@quenty/cli-output-helpers/cli-utils';
 import {
   formatTable,
   type TableColumn,
@@ -69,7 +70,8 @@ export interface ListSessionsOptions {
   readLaunchesAsync?: () => Promise<StudioLaunchRecord[]>;
   mcpSnapshotAsync?: (
     sessions: SessionInfo[],
-    sessionPids: Map<string, number>
+    sessionPids: Map<string, number>,
+    processes: RunningStudioProcess[] | undefined
   ) => Promise<StudioMcpSnapshot | undefined>;
   elapsedSec?: () => number;
 }
@@ -91,7 +93,7 @@ export async function listSessionsHandlerAsync(
       : new Map<string, number>();
   const [launches, snapshot] = await Promise.all([
     options.readLaunchesAsync?.().catch(() => []) ?? Promise.resolve([]),
-    options.mcpSnapshotAsync?.(allSessions, sessionPids),
+    options.mcpSnapshotAsync?.(allSessions, sessionPids, processes),
   ]);
 
   const sessions: ListedSession[] = connection
@@ -231,7 +233,9 @@ function studioColumns(
     {
       header: 'Up',
       value: (s) =>
-        s.startedAt ? formatDuration(now - Date.parse(s.startedAt)) : '',
+        s.startedAt
+          ? formatDurationMs(Math.max(0, now - Date.parse(s.startedAt)))
+          : '',
     },
     { header: 'Window', value: (s) => s.windowTitle },
     { header: 'Plugin', value: (s) => s.instanceId ?? 'none' },
@@ -295,15 +299,8 @@ export function formatSessionsTable(
   return lines.join('\n');
 }
 
-function formatDuration(ms: number): string {
-  const seconds = Math.max(0, Math.round(ms / 1000));
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  return `${Math.floor(seconds / 3600)}h${Math.floor((seconds % 3600) / 60)}m`;
-}
-
 function formatAgo(at: number, now: number): string {
-  return `${formatDuration(now - at)} ago`;
+  return `${formatDurationMs(Math.max(0, now - at))} ago`;
 }
 
 interface ListArgs {
@@ -330,15 +327,25 @@ export const listCommand = defineCommand<ListArgs, SessionsResult>({
     format: formatSessionsTable,
   },
   handler: async (connection, args, targeting) =>
-    listSessionsHandlerAsync(connection, targeting, {
-      listProcessesAsync: listStudioProcessesAsync,
-      resolveSessionPidsAsync: (processes) =>
-        resolveSessionPidsAsync(connection, processes),
-      readLaunchesAsync: () => readStudioLaunchesAsync(),
-      mcpSnapshotAsync: args.mcp
-        ? (sessions, sessionPids) =>
-            getStudioMcpSnapshotAsync({ sessions, sessionPids })
-        : undefined,
-      elapsedSec: () => process.uptime(),
-    }),
+    listSessionsHandlerAsync(
+      connection,
+      targeting,
+      connection.isRemote
+        ? { elapsedSec: () => process.uptime() }
+        : {
+            listProcessesAsync: listStudioProcessesAsync,
+            resolveSessionPidsAsync: (processes) =>
+              resolveSessionPidsAsync(connection, processes),
+            readLaunchesAsync: () => readStudioLaunchesAsync(),
+            mcpSnapshotAsync: args.mcp
+              ? (sessions, sessionPids, processes) =>
+                  getStudioMcpSnapshotAsync({
+                    sessions,
+                    sessionPids,
+                    windows: processes,
+                  })
+              : undefined,
+            elapsedSec: () => process.uptime(),
+          }
+    ),
 });

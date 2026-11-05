@@ -227,6 +227,7 @@ export class McpStdioClient {
   private _onLine(line: string) {
     let message: {
       id?: unknown;
+      method?: unknown;
       result?: unknown;
       error?: { message?: string; code?: number };
     };
@@ -235,7 +236,7 @@ export class McpStdioClient {
     } catch {
       return;
     }
-    if (typeof message?.id !== 'number') {
+    if (typeof message?.id !== 'number' || message.method !== undefined) {
       return;
     }
     const pending = this._pending.get(message.id);

@@ -46,6 +46,7 @@ jobs:
           pr: ${{ inputs.pr }}
 
       - name: Set up the Nevermore CLI
+        id: setup
         uses: ./.github/actions/setup-nevermore-cli
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +69,7 @@ jobs:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
 
       - name: Post test results
-        if: always() && env.NEVERMORE_CI_PR_NUMBER
+        if: always() && env.NEVERMORE_CI_PR_NUMBER && steps.setup.outcome == 'success'
         run: nevermore tools post-test-results test-results.json --sourcemap "$BUNDLE_DIR/sourcemap.json" --yes --run-outcome ${{ steps.run-tests.outcome }}
 
       - name: Report tests on the PR commit

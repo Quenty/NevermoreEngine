@@ -79,9 +79,9 @@ export async function processCloseHandlerAsync(
     candidates = matchStudioProcesses(processes, placeName, placeId);
   }
   if (candidates.length > 1 && options.pid === undefined && connection) {
-    const pid = (await resolveSessionPidsAsync(connection, processes)).get(
-      instanceId
-    );
+    const pid = (
+      await resolveSessionPidsAsync(connection, processes, [instanceId])
+    ).get(instanceId);
     const own = candidates.filter((proc) => proc.pid === pid);
     if (own.length === 1) {
       candidates = own;

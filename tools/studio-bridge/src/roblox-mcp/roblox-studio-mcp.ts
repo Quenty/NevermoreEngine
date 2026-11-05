@@ -220,7 +220,7 @@ async function _acquireAsync(
       args: launch.args,
       env: 'env' in launch ? launch.env : undefined,
       spawnProcess: options.spawnProcess,
-      requestTimeoutMs: Math.min(STEP_TIMEOUT_MS, remainingMs()),
+      requestTimeoutMs: STEP_TIMEOUT_MS,
     });
     _shared = {
       client,

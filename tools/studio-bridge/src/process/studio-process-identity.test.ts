@@ -16,6 +16,15 @@ describe('matchProcessByUptime', () => {
     ).toBe(2);
   });
 
+  it('allows for the clock starting after the process and drifting with age', () => {
+    expect(
+      matchProcessByUptime([{ pid: 9, startedAt: now - 3_600_000 - 10_000 }], {
+        uptimeSec: 3600,
+        observedAt: now,
+      })?.pid
+    ).toBe(9);
+  });
+
   it('finds nothing outside the tolerance', () => {
     expect(
       matchProcessByUptime(processes, { uptimeSec: 250, observedAt: now })
