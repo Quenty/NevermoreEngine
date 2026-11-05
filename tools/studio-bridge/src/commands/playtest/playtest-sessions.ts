@@ -37,7 +37,7 @@ const SESSION_WAIT_TIMEOUT_MS = 30_000;
 const MULTIPLAYER_SESSION_WAIT_TIMEOUT_MS = 90_000;
 const SESSION_CLOSE_TIMEOUT_MS = 10_000;
 
-const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into a playtest's client and it can't connect. Turn it on in Studio Settings, or use run mode, whose server session works without it.`;
+const PLAYTEST_PLUGINS_OFF_MESSAGE = `Studio's "Load user plugins on playtest" setting is off, so the studio-bridge plugin doesn't load into a playtest's client. A playtest started with 'studio-bridge playtest start' gets a planted client session instead, which runs only code compiled when it started; turn the setting on to run any code.`;
 
 export interface StartPlaytestOptions {
   /**
@@ -87,9 +87,6 @@ export async function startPlaytestAsync(
     );
   }
   const pluginsOnPlaytest = await tryReadPlaytestPluginsAsync(connection);
-  if (mode === 'play' && pluginsOnPlaytest === false && !options.serverOnly) {
-    throw new Error(PLAYTEST_PLUGINS_OFF_MESSAGE);
-  }
   if (players !== undefined) {
     assertValidMultiplayer(mode, players);
   }
@@ -102,7 +99,12 @@ export async function startPlaytestAsync(
   const bridge =
     pluginsOnPlaytest === true
       ? undefined
-      : await buildPlaytestBridgeAsync(options.scripts);
+      : await buildPlaytestBridgeAsync(options.scripts, {
+          withClient:
+            pluginsOnPlaytest === false &&
+            mode === 'play' &&
+            !options.serverOnly,
+        });
 
   const playtestId = randomUUID();
   const ended = editSession

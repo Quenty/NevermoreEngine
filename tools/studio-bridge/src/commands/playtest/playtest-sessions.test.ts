@@ -13,8 +13,12 @@ vi.mock('../../process/studio-settings.js', () => ({
 }));
 
 vi.mock('../../plugin/playtest-bridge.js', () => ({
-  buildPlaytestBridgeAsync: async (scripts?: string[]) => ({
+  buildPlaytestBridgeAsync: async (
+    scripts?: string[],
+    options?: { withClient?: boolean }
+  ) => ({
     entrySource: 'entry',
+    ...(options?.withClient ? { clientEntrySource: 'client entry' } : {}),
     modules: {},
     precompiled: scripts ?? [],
   }),
@@ -71,18 +75,6 @@ describe('startPlaytestAsync multiplayer checks', () => {
 });
 
 describe('with "Load user plugins on playtest" off', () => {
-  it('refuses to start a playtest whose sessions could never connect', async () => {
-    settings.loadUserPluginsOnPlaytest = false;
-    const editSession = createEditSession('current');
-
-    await expect(
-      startPlaytestAsync({} as any, editSession, 'play')
-    ).rejects.toThrow(
-      `Studio's "Load user plugins on playtest" setting is off`
-    );
-    expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
-  });
-
   it('does not blame the setting for a missing server session, which is planted', async () => {
     settings.loadUserPluginsOnPlaytest = false;
     const connection = { listSessions: () => [] } as any;
@@ -185,6 +177,39 @@ describe('planting the server session', () => {
 
     const bridge = editSession.runPlaytestAsync.mock.calls[0][5];
     expect(bridge.precompiled).toEqual(['return 1']);
+  });
+
+  it('plants a client bridge too for a play mode playtest when the setting is off', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const editSession = createFailingEditSession('old');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'play')
+    ).rejects.toThrow('Playtest failed to start: refused');
+
+    expect(
+      editSession.runPlaytestAsync.mock.calls[0][5].clientEntrySource
+    ).toContain('client entry');
+  });
+
+  it('plants no client bridge in run mode, or when the setting is unknown', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const runMode = createFailingEditSession('old');
+    await expect(
+      startPlaytestAsync(createConnection(), runMode, 'run')
+    ).rejects.toThrow('refused');
+    expect(
+      runMode.runPlaytestAsync.mock.calls[0][5].clientEntrySource
+    ).toBeUndefined();
+
+    settings.loadUserPluginsOnPlaytest = undefined;
+    const unknown = createFailingEditSession('current');
+    await expect(
+      startPlaytestAsync(createConnection(), unknown, 'play')
+    ).rejects.toThrow('refused');
+    expect(
+      unknown.runPlaytestAsync.mock.calls[0][5].clientEntrySource
+    ).toBeUndefined();
   });
 
   it('plants a bridge when the setting is unknown', async () => {

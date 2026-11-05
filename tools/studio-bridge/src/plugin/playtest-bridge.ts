@@ -19,6 +19,8 @@ import { getPluginBuildVersionAsync } from './plugin-build-version.js';
 export interface PlaytestBridge {
   /** Source of the planted entry Script. */
   entrySource: string;
+  /** Source of the entry LocalScript planted for the playtest's clients, if any. */
+  clientEntrySource?: string;
   /** The plugin's Shared modules, by name. */
   modules: Record<string, string>;
   /** ModuleScript sources compiled ahead of time, see `wrapPrecompiledSource`. */
@@ -35,13 +37,20 @@ const templateDir = resolveTemplatePath(
  * code a caller will send the playtest's server session.
  */
 export async function buildPlaytestBridgeAsync(
-  scripts: string[] = []
+  scripts: string[] = [],
+  options: { withClient?: boolean } = {}
 ): Promise<PlaytestBridge> {
-  const [entrySource, modules, actions] = await Promise.all([
+  const [entrySource, clientEntrySource, modules, actions] = await Promise.all([
     fs.readFile(
       path.join(templateDir, 'playtest', 'StudioBridgePlaytest.server.lua'),
       'utf-8'
     ),
+    options.withClient
+      ? fs.readFile(
+          path.join(templateDir, 'playtest', 'StudioBridgePlaytest.client.lua'),
+          'utf-8'
+        )
+      : Promise.resolve(undefined),
     readSharedModulesAsync(),
     loadActionSourcesAsync(),
   ]);
@@ -49,6 +58,7 @@ export async function buildPlaytestBridgeAsync(
   const sources = [...new Set([...actions.map((a) => a.source), ...scripts])];
   return {
     entrySource,
+    ...(clientEntrySource ? { clientEntrySource } : {}),
     modules,
     precompiled: sources.map(wrapPrecompiledSource),
   };

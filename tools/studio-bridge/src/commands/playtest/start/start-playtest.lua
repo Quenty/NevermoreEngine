@@ -17,11 +17,13 @@
 	- With `bridge`, it first plants the studio-bridge client as a Script in
 	  ServerScriptService, for when Studio does not load user plugins into
 	  playtests. The playtest copies the edit DataModel, so the client starts in
-	  its server and connects as its server session. The plant is removed once
-	  the playtest ends.
+	  its server and connects as its server session. With
+	  `bridge.clientEntrySource` it also plants a LocalScript in
+	  StarterPlayerScripts, which every player's client runs and connects as its
+	  client session. The plants are removed once the playtest ends.
 
 	Request: `{ type: "startPlaytest", payload: { mode: "play" | "run", playtestId, bridgePort, instanceId, players?, bridge? } }`
-	`bridge`: `{ entrySource, modules: { [name]: source }, precompiled: { source } }`
+	`bridge`: `{ entrySource, clientEntrySource?, modules: { [name]: source }, precompiled: { source } }`
 	Response: `{ type: "playtestEnded", payload: { playtestId, success, error? } }`
 
 	@class StartPlaytestAction
@@ -69,7 +71,7 @@ function StartPlaytestAction.register(router: any, sendMessage: SendMessage?)
 			}
 			local planted = if payload.bridge ~= nil
 				then StartPlaytestAction._plant(router, payload.bridge, playtestId)
-				else nil
+				else {}
 			task.spawn(StartPlaytestAction._runAsync, sendMessage, mode, testArgs, requestId, sessionId, planted)
 
 			-- Replied through sendMessage, so the router must not reply as well
@@ -89,7 +91,7 @@ function StartPlaytestAction._runAsync(
 	},
 	requestId: string,
 	sessionId: string,
-	planted: Instance?
+	planted: { Instance }
 )
 	local ok, err = pcall(function()
 		local studioTestService = game:GetService("StudioTestService") :: any
@@ -102,8 +104,8 @@ function StartPlaytestAction._runAsync(
 		end
 	end)
 
-	if planted then
-		planted:Destroy()
+	for _, instance in planted do
+		instance:Destroy()
 	end
 
 	sendMessage({
@@ -124,7 +126,7 @@ end
 	compile, before anything is planted: the planted client skips a source that
 	fails to load, which would hide the compile error.
 ]]
-function StartPlaytestAction._plant(router: any, bridge: any, playtestId: string): Instance
+function StartPlaytestAction._plant(router: any, bridge: any, playtestId: string): { Instance }
 	if
 		type(bridge) ~= "table"
 		or type(bridge.entrySource) ~= "string"
@@ -171,15 +173,35 @@ function StartPlaytestAction._plant(router: any, bridge: any, playtestId: string
 		moduleScript.Parent = precompiled
 	end
 
+	local planted = { entry }
+	local clientEntry: LocalScript? = nil
+	if type(bridge.clientEntrySource) == "string" then
+		clientEntry = Instance.new("LocalScript")
+		local client = clientEntry :: LocalScript
+		client.Name = "StudioBridgePlaytestClient"
+		client.Source = bridge.clientEntrySource
+		client:SetAttribute("PlaytestId", playtestId)
+		shared:Clone().Parent = client
+		precompiled:Clone().Parent = client
+		table.insert(planted, client)
+	end
+
 	-- A bridge left from an earlier playtest would stand in for this one's
 	local serverScriptService = game:GetService("ServerScriptService")
-	local stale = serverScriptService:FindFirstChild(entry.Name)
-	if stale and stale:IsA("Script") then
-		stale:Destroy()
+	local starterPlayerScripts = game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts")
+	for _, container in { serverScriptService, starterPlayerScripts } do
+		for _, child in container:GetChildren() do
+			if child.Name == entry.Name or child.Name == "StudioBridgePlaytestClient" then
+				child:Destroy()
+			end
+		end
 	end
 
 	entry.Parent = serverScriptService
-	return entry
+	if clientEntry then
+		clientEntry.Parent = starterPlayerScripts
+	end
+	return planted
 end
 
 return StartPlaytestAction
