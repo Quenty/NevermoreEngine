@@ -145,6 +145,7 @@ export interface ScriptCompleteMessage extends BaseMessage {
      * which means the script ran and returned nothing.
      */
     returnValues?: SerializedReturnValue[];
+    ranAs?: RunAs;
   };
 }
 
@@ -382,8 +383,11 @@ export interface ExecuteMessage extends BaseMessage {
     args?: string[];
     /** Base64 files, passed to the script as buffers in `...` before `args`. */
     inputs?: string[];
+    runAs?: RunAs;
   };
 }
+
+export type RunAs = 'plugin' | 'game' | 'mcp';
 
 export interface ShutdownMessage extends PushMessage {
   type: 'shutdown';
@@ -646,6 +650,11 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
                 : undefined,
             output,
             returnValues,
+            ...(payload.ranAs === 'plugin' ||
+            payload.ranAs === 'game' ||
+            payload.ranAs === 'mcp'
+              ? { ranAs: payload.ranAs }
+              : {}),
           },
         };
       }
@@ -1026,6 +1035,9 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
             ...(isStringArray(payload.args) ? { args: payload.args } : {}),
             ...(isStringArray(payload.inputs)
               ? { inputs: payload.inputs }
+              : {}),
+            ...(payload.runAs === 'plugin' || payload.runAs === 'game'
+              ? { runAs: payload.runAs }
               : {}),
           },
         };

@@ -13,6 +13,7 @@ import type {
   OutputLevel,
   SerializedReturnValue,
   PlaytestMode,
+  RunAs,
 } from '../server/web-socket-protocol.js';
 
 // Re-export protocol types used in the public API
@@ -23,6 +24,7 @@ export type {
   OutputLevel,
   SerializedReturnValue,
   PlaytestMode,
+  RunAs,
 };
 
 export type SessionContext = 'edit' | 'client' | 'server';
@@ -69,6 +71,7 @@ export interface ExecResult {
    * no return channel at all (a run that never reached a return) — distinct from `[]`, which means it returned nothing.
    */
   returnValues?: SerializedReturnValue[];
+  ranAs?: RunAs;
 }
 
 export interface StateResult {

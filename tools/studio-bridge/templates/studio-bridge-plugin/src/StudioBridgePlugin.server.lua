@@ -37,13 +37,13 @@ if not RunService:IsStudio() or (RunService:IsRunning() and not playtestArgs) th
 	return
 end
 
--- The bridge planted into this playtest's server is already its server session
-if
-	playtestArgs
-	and RunService:IsServer()
-	and StudioBridgeSessionUtils.findPlantedBridge(game:GetService("ServerScriptService"), playtestArgs.playtestId)
-then
-	return
+-- A plugin that loads into the playtest's server replaces the bridge planted for it, which can only run code compiled before the playtest
+if playtestArgs and RunService:IsServer() then
+	local planted =
+		StudioBridgeSessionUtils.findPlantedBridge(game:GetService("ServerScriptService"), playtestArgs.playtestId)
+	if planted then
+		planted:Destroy()
+	end
 end
 
 local pngOk, png = pcall(function()

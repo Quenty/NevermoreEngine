@@ -179,6 +179,28 @@ describe('BridgeSession', () => {
       expect((msg as any).payload.inputs).toEqual(['aGVsbG8=']);
     });
 
+    it('sends --run-as and carries back where the code ran', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true, ranAs: 'game' },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync(
+        'return 1',
+        undefined,
+        undefined,
+        undefined,
+        'game'
+      );
+
+      const [msg] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.runAs).toBe('game');
+      expect(result.ranAs).toBe('game');
+    });
+
     it('refuses inputs over the size limit without sending them', async () => {
       const handle = new MockTransportHandle();
       const session = new BridgeSession(createSessionInfo(), handle);

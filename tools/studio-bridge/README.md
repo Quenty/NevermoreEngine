@@ -95,6 +95,16 @@ studio-bridge console exec -f load-map.lua --input europe-15m.json.zst -- europe
 
 Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--script-timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
 
+`--run-as` says where the code runs, and the result says where it ran (`ranAs`, and a `(ran as …)` line when it was not the plugin). Asking for one that is not available fails with the reason:
+
+| `--run-as` | Runs as | `require(game.SomeModule)` | Available |
+|---|---|---|---|
+| `plugin` | the studio-bridge plugin | a separate copy from the running game's | wherever the plugin is connected |
+| `game` | an ordinary `Script` (server) or `LocalScript` (client) the plugin plants for the run | the instance the running game uses | a running playtest's server or client |
+| `mcp` | Studio's MCP Assistant sandbox | refused for the game's own modules | wherever Studio's MCP server reaches that Studio; takes no args or `--input` |
+
+Without `--run-as` the code runs in the plugin, or, in a playtest Studio loads no plugins into, as game code in the bridge planted there, which only runs code compiled when the playtest started. A plugin that does load into the playtest replaces that bridge.
+
 ### `console logs`
 
 ```bash

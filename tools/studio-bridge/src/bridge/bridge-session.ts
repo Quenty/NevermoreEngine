@@ -81,6 +81,7 @@ function toExecResult(result: PluginMessage): ExecResult {
       error: result.payload.error,
       traceback: result.payload.traceback,
       returnValues: result.payload.returnValues,
+      ...(result.payload.ranAs ? { ranAs: result.payload.ranAs } : {}),
     };
   }
 
@@ -156,7 +157,8 @@ export class BridgeSession extends EventEmitter {
     code: string,
     timeout?: number,
     args?: string[],
-    inputs?: Buffer[]
+    inputs?: Buffer[],
+    runAs?: 'plugin' | 'game'
   ): Promise<ExecResult> {
     const inputBytes = (inputs ?? []).reduce((sum, b) => sum + b.length, 0);
     if (inputBytes > MAX_EXECUTE_INPUT_BYTES) {
@@ -185,6 +187,7 @@ export class BridgeSession extends EventEmitter {
           ...(inputs && inputs.length > 0
             ? { inputs: inputs.map((input) => input.toString('base64')) }
             : {}),
+          ...(runAs ? { runAs } : {}),
         },
       },
       timeoutMs + EXECUTE_REPLY_GRACE_MS
