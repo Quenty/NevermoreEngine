@@ -14,7 +14,12 @@
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
-import { execHandlerAsync, formatExecText } from '../../console/exec/exec.js';
+import {
+  execHandlerAsync,
+  formatExecText,
+  INPUT_ARG_DESCRIPTION,
+  readInputFilesAsync,
+} from '../../console/exec/exec.js';
 import type {
   BridgeConnection,
   BridgeSession,
@@ -38,6 +43,8 @@ export interface PlaytestRunOptions {
   timeout?: number;
   /** Passed to the script as `...`. */
   args?: string[];
+  /** Passed to the script as buffers in `...`, before `args`. */
+  inputs?: Buffer[];
 }
 
 const PLAYER_JOIN_TIMEOUT_MS = 30_000;
@@ -59,6 +66,7 @@ interface PlaytestRunArgs {
   mode?: PlaytestMode;
   scriptTimeout?: number;
   scriptArgs?: string[];
+  input?: string[];
 }
 
 export async function playtestRunHandlerAsync(
@@ -103,6 +111,7 @@ export async function playtestRunHandlerAsync(
         scriptContent: options.scriptContent,
         timeout: options.timeout,
         args: options.args,
+        inputs: options.inputs,
       })),
       playtestId: playtest.playtestId,
     };
@@ -182,6 +191,10 @@ export const playtestRunCommand = defineCommand<
       description: 'Cancel the script after this many milliseconds',
       type: 'number',
     }),
+    input: arg.option({
+      description: INPUT_ARG_DESCRIPTION,
+      array: true,
+    }),
     scriptArgs: arg.passthrough({
       description:
         'Arguments after --, passed to the script as ... (all strings)',
@@ -197,6 +210,7 @@ export const playtestRunCommand = defineCommand<
   },
   handler: async (connection, args, targeting) => {
     const { scriptContent } = await resolveScriptContentAsync(args);
+    const inputs = await readInputFilesAsync(args.input);
 
     return playtestRunHandlerAsync(connection, {
       scriptContent,
@@ -205,6 +219,7 @@ export const playtestRunCommand = defineCommand<
       target: targeting.target,
       timeout: args.scriptTimeout,
       args: args.scriptArgs,
+      inputs,
     });
   },
 });

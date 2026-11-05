@@ -241,6 +241,7 @@ Closes the Studio process showing the session's place, found by its window title
 studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
 studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
 studio-bridge playtest run --file spawn-test.lua -- Goblin 3
+studio-bridge playtest run --file load-map.lua --input europe-15m.json.zst -- europe
 studio-bridge playtest start --mode run
 studio-bridge console exec --context server 'print("in the playtest")'
 studio-bridge playtest restart
@@ -249,7 +250,7 @@ studio-bridge playtest stop
 
 Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server.
 
-`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. In play mode it waits for the player to join first. It works whatever Studio's **Load user plugins on playtest** setting says (see below). `--context client` runs the code in the playtest's client instead, which needs that setting on.
+`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It takes `--input` like `console exec`. In play mode it waits for the player to join first. It works whatever Studio's **Load user plugins on playtest** setting says (see below). `--context client` runs the code in the playtest's client instead, which needs that setting on.
 
 `playtest start` leaves the playtest running, so other commands can target it with `--context server` or `--context client`. `playtest restart` stops it and starts a new one in the same mode, picking up code changed since it started; with none running, it starts one. `playtest stop` ends it.
 

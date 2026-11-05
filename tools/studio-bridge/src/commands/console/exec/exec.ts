@@ -110,6 +110,23 @@ export async function execHandlerAsync(
   };
 }
 
+export const INPUT_ARG_DESCRIPTION =
+  'File to send with the script, which receives it as a buffer in ... before any args. Repeat for more files';
+
+export async function readInputFilesAsync(
+  files: string[] | undefined
+): Promise<Buffer[]> {
+  return Promise.all(
+    (files ?? []).map(async (file) => {
+      try {
+        return await fs.readFile(path.resolve(file));
+      } catch {
+        throw new Error(`Input file not found: ${file}`);
+      }
+    })
+  );
+}
+
 async function execThroughMcpAsync(
   session: BridgeSession,
   options: ExecOptions,
@@ -245,8 +262,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
       type: 'number',
     }),
     input: arg.option({
-      description:
-        'File to send with the script, which receives it as a buffer in ... before any args. Repeat for more files',
+      description: INPUT_ARG_DESCRIPTION,
       array: true,
     }),
     runAs: arg.option({
@@ -264,15 +280,7 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
   },
   handler: async (session, args, connection) => {
     const { scriptContent } = await resolveScriptContentAsync(args);
-    const inputs = await Promise.all(
-      (args.input ?? []).map(async (file) => {
-        try {
-          return await fs.readFile(path.resolve(file));
-        } catch {
-          throw new Error(`Input file not found: ${file}`);
-        }
-      })
-    );
+    const inputs = await readInputFilesAsync(args.input);
 
     return execHandlerAsync(
       session,
