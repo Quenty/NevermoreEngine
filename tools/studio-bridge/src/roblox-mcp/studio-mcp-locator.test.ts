@@ -3,11 +3,11 @@ import * as os from 'os';
 import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  findStudioMcpPathAsync,
+  findStudioMcpLaunchAsync,
   parseContentFolder,
 } from './studio-mcp-locator.js';
 
-describe('findStudioMcpPathAsync', () => {
+describe('findStudioMcpLaunchAsync', () => {
   let localAppData: string;
   let versionsDir: string;
 
@@ -47,7 +47,7 @@ describe('findStudioMcpPathAsync', () => {
       new Date(2026, 5, 1)
     );
 
-    const found = await findStudioMcpPathAsync({
+    const { command: found } = await findStudioMcpLaunchAsync({
       platform: 'win32',
       localAppData,
       readContentFolderAsync: async () => path.join(dir, 'content') + path.sep,
@@ -68,7 +68,7 @@ describe('findStudioMcpPathAsync', () => {
       new Date(2026, 0, 1)
     );
 
-    const found = await findStudioMcpPathAsync({
+    const { command: found } = await findStudioMcpLaunchAsync({
       platform: 'win32',
       localAppData,
       readContentFolderAsync: async () => path.join(stale, 'content'),
@@ -94,7 +94,7 @@ describe('findStudioMcpPathAsync', () => {
       new Date(2026, 6, 1)
     );
 
-    const found = await findStudioMcpPathAsync({
+    const { command: found } = await findStudioMcpLaunchAsync({
       platform: 'win32',
       localAppData,
       readContentFolderAsync: async () => undefined,
@@ -111,7 +111,7 @@ describe('findStudioMcpPathAsync', () => {
     );
 
     await expect(
-      findStudioMcpPathAsync({
+      findStudioMcpLaunchAsync({
         platform: 'win32',
         localAppData,
         readContentFolderAsync: async () => undefined,
@@ -119,10 +119,49 @@ describe('findStudioMcpPathAsync', () => {
     ).rejects.toThrow('No StudioMCP.exe found next to RobloxStudioBeta.exe');
   });
 
-  it('refuses other platforms', async () => {
+  it('finds StudioMCP in the macOS app bundle', async () => {
+    const exe = path.join(localAppData, 'StudioMCP');
+    await fs.writeFile(exe, '');
+
+    const launch = await findStudioMcpLaunchAsync({
+      platform: 'darwin',
+      macCandidates: [path.join(localAppData, 'missing'), exe],
+    });
+
+    expect(launch).toEqual({ command: exe, args: [] });
+  });
+
+  it('runs the Linux StudioMCP.exe under wine with its environment', async () => {
+    await fs.writeFile(path.join(localAppData, 'StudioMCP.exe'), '');
+    const env = { WINEPREFIX: '/wine' };
+
+    const launch = await findStudioMcpLaunchAsync({
+      platform: 'linux',
+      linuxStudioDir: localAppData,
+      linuxEnv: env,
+    });
+
+    expect(launch).toEqual({
+      command: 'wine',
+      args: [path.join(localAppData, 'StudioMCP.exe')],
+      env,
+    });
+  });
+
+  it('says so when the Linux Studio has no StudioMCP.exe', async () => {
     await expect(
-      findStudioMcpPathAsync({ platform: 'darwin' })
-    ).rejects.toThrow('only supported on Windows');
+      findStudioMcpLaunchAsync({
+        platform: 'linux',
+        linuxStudioDir: localAppData,
+        linuxEnv: {},
+      })
+    ).rejects.toThrow('No StudioMCP.exe in');
+  });
+
+  it('refuses a platform Studio does not run on', async () => {
+    await expect(
+      findStudioMcpLaunchAsync({ platform: 'freebsd' })
+    ).rejects.toThrow('not available on freebsd');
   });
 });
 

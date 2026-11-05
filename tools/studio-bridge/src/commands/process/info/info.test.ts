@@ -228,3 +228,79 @@ describe('describePlaytest', () => {
     expect(playtest?.sessions).toHaveLength(3);
   });
 });
+
+describe('queryStateHandlerAsync with MCP', () => {
+  const ok = (studios: any[]) => async () => ({
+    status: 'ok' as const,
+    studios,
+    checkedAt: Date.now(),
+    latencyMs: 500,
+  });
+
+  it('reports the studio_id MCP reaches this Studio by', async () => {
+    const session = createMockSession({});
+
+    const result = await queryStateHandlerAsync(session, undefined, {
+      mcpSnapshotAsync: ok([
+        {
+          studioId: 'mcp-1',
+          placeName: 'TestPlace',
+          sessionId: 'test-place-3f9a-edit',
+        },
+      ]),
+    });
+
+    expect(result.mcp).toEqual({ status: 'ok', studioId: 'mcp-1' });
+    expect(formatStateText(result)).toContain(
+      'MCP:      reachable (studio_id mcp-1)'
+    );
+  });
+
+  it('says when MCP does not see this Studio', async () => {
+    const result = await queryStateHandlerAsync(
+      createMockSession({}),
+      undefined,
+      {
+        mcpSnapshotAsync: ok([]),
+      }
+    );
+
+    expect(formatStateText(result)).toContain(
+      'MCP:      not seen by its MCP server'
+    );
+  });
+
+  it('reports MCP being unavailable without failing the rest', async () => {
+    const result = await queryStateHandlerAsync(
+      createMockSession({}),
+      undefined,
+      {
+        mcpSnapshotAsync: async () => ({
+          status: 'timeout' as const,
+          studios: [],
+          message: 'tools/call timed out',
+          checkedAt: Date.now(),
+          latencyMs: 3000,
+        }),
+      }
+    );
+
+    expect(result.placeId).toBe(12345);
+    expect(formatStateText(result)).toContain(
+      'MCP:      timeout (tools/call timed out)'
+    );
+  });
+
+  it('leaves MCP out when the check gave up', async () => {
+    const result = await queryStateHandlerAsync(
+      createMockSession({}),
+      undefined,
+      {
+        mcpSnapshotAsync: async () => undefined,
+      }
+    );
+
+    expect(result.mcp).toBeUndefined();
+    expect(formatStateText(result)).not.toContain('MCP:');
+  });
+});

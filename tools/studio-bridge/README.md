@@ -171,6 +171,8 @@ studio-bridge process list
 
 Lists the connected sessions with their ID, context, place, and state. `--target` and `--context` narrow the list. While a playtest studio-bridge started is running, every session of that Studio shows `Play` (or `Run` without a client).
 
+It also asks [Studio's MCP server](#studios-mcp-server): an `MCP` column says whether it can reach each session's Studio, a `(no plugin)` row shows a Studio only it can see, such as one with the plugin turned off, and a last line reports its health. MCP never holds the list up: it waits at most 3 seconds, and under `--watch` each frame shows the latest check while the next one runs, so a stalled server shows up as a stale check rather than a frozen screen. `--no-mcp` skips it.
+
 ### `process info`
 
 ```bash
@@ -186,9 +188,10 @@ Viewport: 849x1003
 Window:   pid 31876, open, not focused
 Studio:   0.744.0.7441077
 Plugin:   6c751ae59131 (up to date)
+MCP:      reachable (studio_id 1268b6c6-47aa-4df9-8f3a-0a9ddb0c5f42)
 ```
 
-Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; and whether its plugin matches the one this CLI installs. The two clients of a multiplayer test share a window title, so they report no window.
+Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; whether its plugin matches the one this CLI installs; and whether Studio's MCP server can reach it (`--no-mcp` to skip). The two clients of a multiplayer test share a window title, so they report no window.
 
 ### `process launch`
 

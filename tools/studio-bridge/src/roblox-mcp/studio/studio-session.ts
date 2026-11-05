@@ -76,9 +76,10 @@ export async function runLuauAsync(
 export async function matchStudiosAsync(
   client: McpStdioClient,
   sessions: SessionInfo[] = [],
-  windows: StudioWindow[] = []
+  windows: StudioWindow[] = [],
+  options: { readPlaceIds?: boolean; studios?: McpStudio[] } = {}
 ): Promise<MatchedStudio[]> {
-  const studios = await listMcpStudiosAsync(client);
+  const studios = options.studios ?? (await listMcpStudiosAsync(client));
   const editSessions = sessions.filter((s) => s.context === 'edit');
   const nameCount = (name: string) =>
     studios.filter((s) => s.placeName === name).length;
@@ -95,7 +96,7 @@ export async function matchStudiosAsync(
         session = named[0];
         matched.placeId = session.placeId;
         matched.gameId = session.gameId;
-      } else {
+      } else if (options.readPlaceIds !== false) {
         const ids = await _readPlaceIdsAsync(client, studio.studioId);
         Object.assign(matched, ids);
         if (ids.placeId !== undefined) {

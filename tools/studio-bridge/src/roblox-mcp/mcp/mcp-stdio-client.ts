@@ -34,6 +34,7 @@ export type SpawnMcpProcess = (
 
 export interface McpStdioClientOptions {
   args?: string[];
+  env?: Record<string, string>;
   spawnProcess?: SpawnMcpProcess;
   requestTimeoutMs?: number;
   clientInfo?: { name: string; version: string };
@@ -72,6 +73,10 @@ export class McpStdioClient {
       this._stderrTail = (this._stderrTail + chunk).slice(-STDERR_TAIL_BYTES);
     });
     child.stdin.on('error', () => {});
+    child.unref?.();
+    for (const stream of [child.stdin, child.stdout, child.stderr]) {
+      (stream as { unref?: () => void }).unref?.();
+    }
     child.on('error', (err) => this._fail(err));
     child.on('close', (code) => {
       this._exited = true;
@@ -91,7 +96,12 @@ export class McpStdioClient {
   ): Promise<McpStdioClient> {
     const spawnProcess: SpawnMcpProcess =
       options.spawnProcess ??
-      ((cmd, args) => spawn(cmd, args, { stdio: 'pipe', windowsHide: true }));
+      ((cmd, args) =>
+        spawn(cmd, args, {
+          stdio: 'pipe',
+          windowsHide: true,
+          ...(options.env ? { env: options.env } : {}),
+        }));
     const client = new McpStdioClient(
       spawnProcess(command, options.args ?? []),
       options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS

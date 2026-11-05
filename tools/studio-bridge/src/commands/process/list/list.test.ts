@@ -4,7 +4,8 @@
 
 import { describe, it, expect } from 'vitest';
 import type { SessionInfo } from '../../../bridge/index.js';
-import { listSessionsHandlerAsync } from './list.js';
+import { formatSessionsTable, listSessionsHandlerAsync } from './list.js';
+import type { StudioMcpSnapshot } from '../../../roblox-mcp/index.js';
 
 function createSessionInfo(overrides: Partial<SessionInfo> = {}): SessionInfo {
   return {
@@ -79,5 +80,102 @@ describe('listSessionsHandlerAsync', () => {
     expect(s.context).toBe('server');
     expect(s.state).toBe('Play');
     expect(s.origin).toBe('managed');
+  });
+});
+
+describe('listSessionsHandlerAsync with MCP', () => {
+  const snapshot = (
+    overrides: Partial<StudioMcpSnapshot> = {}
+  ): StudioMcpSnapshot => ({
+    status: 'ok',
+    studios: [],
+    checkedAt: Date.now(),
+    latencyMs: 640,
+    ...overrides,
+  });
+
+  it('lists a Studio only MCP can see, for a plugin that is off', async () => {
+    const conn = createMockConnection([]);
+
+    const result = await listSessionsHandlerAsync(
+      conn,
+      {},
+      {
+        mcpSnapshotAsync: async () =>
+          snapshot({ studios: [{ studioId: 'mcp-1', placeName: 'Hub' }] }),
+      }
+    );
+
+    expect(result.summary).toContain('without the studio-bridge plugin: Hub');
+    expect(result.studiosWithoutPlugin).toEqual([
+      { studioId: 'mcp-1', placeName: 'Hub' },
+    ]);
+    const text = formatSessionsTable(result);
+    expect(text).toContain('(no plugin)');
+    expect(text).toContain('MCP: ok, 1 Studio(s), answered in 640ms');
+  });
+
+  it('marks which plugin sessions MCP can also reach', async () => {
+    const sessions = [
+      createSessionInfo({ sessionId: 'a-edit', instanceId: 'a' }),
+      createSessionInfo({ sessionId: 'b-edit', instanceId: 'b' }),
+    ];
+
+    const result = await listSessionsHandlerAsync(
+      createMockConnection(sessions),
+      {},
+      {
+        mcpSnapshotAsync: async () =>
+          snapshot({
+            studios: [
+              {
+                studioId: 'mcp-1',
+                placeName: 'TestPlace',
+                sessionId: 'a-edit',
+              },
+            ],
+          }),
+      }
+    );
+
+    const lines = formatSessionsTable(result).split('\n');
+    expect(lines.find((l) => l.includes('a-edit'))).toMatch(/yes\s*$/);
+    expect(lines.find((l) => l.includes('b-edit'))).toMatch(/no\s*$/);
+  });
+
+  it('still lists plugin sessions when MCP is unavailable, and says why', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+      {},
+      {
+        mcpSnapshotAsync: async () =>
+          snapshot({ status: 'timeout', message: 'tools/call timed out' }),
+      }
+    );
+
+    const text = formatSessionsTable(result);
+    expect(text).toContain('s1');
+    expect(text).toContain('MCP: timeout (tools/call timed out)');
+  });
+
+  it('lists plugin sessions alone when the MCP check gave up', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+      {},
+      { mcpSnapshotAsync: async () => undefined }
+    );
+
+    expect(result.mcp).toBeUndefined();
+    expect(formatSessionsTable(result)).not.toContain('MCP');
+  });
+
+  it('hides MCP on a platform it does not run on', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+      {},
+      { mcpSnapshotAsync: async () => snapshot({ status: 'unsupported' }) }
+    );
+
+    expect(formatSessionsTable(result)).not.toContain('MCP');
   });
 });
