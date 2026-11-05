@@ -3,6 +3,7 @@ import type { SessionInfo } from '../../bridge/types.js';
 import { McpStdioClient } from '../mcp/mcp-stdio-client.js';
 import { createFakeMcpServer, toolText } from '../test/fake-mcp-server.js';
 import {
+  cleanToolError,
   matchStudiosAsync,
   resolveStudio,
   runLuauAsync,
@@ -148,6 +149,22 @@ describe('matchStudiosAsync', () => {
     });
     expect(studio.sessionId).toBeUndefined();
     await client.closeAsync();
+  });
+});
+
+describe('cleanToolError', () => {
+  it("drops the Assistant's own frames from an execute_luau error", () => {
+    expect(
+      cleanToolError(
+        'sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Tools.ExecuteLuauTool:125: sabuiltin_Assistant.rbxm.Assistant.Packages._Index.AssistantUI.AssistantUI.Util.CommandExecution:54: AssistantCommand:1: boom'
+      )
+    ).toBe('boom');
+  });
+
+  it('leaves other errors alone', () => {
+    expect(
+      cleanToolError('Server datamodel is not available in Edit mode')
+    ).toBe('Server datamodel is not available in Edit mode');
   });
 });
 

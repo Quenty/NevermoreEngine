@@ -10,6 +10,16 @@ export const DATAMODEL_TYPES: Record<SessionContext, string> = {
 
 export class StudioNotFoundError extends Error {}
 
+const ASSISTANT_FRAME = /^(?:sabuiltin_[^\s:]+|AssistantCommand):\d+: /;
+
+export function cleanToolError(text: string): string {
+  let cleaned = text;
+  while (ASSISTANT_FRAME.test(cleaned)) {
+    cleaned = cleaned.replace(ASSISTANT_FRAME, '');
+  }
+  return cleaned;
+}
+
 export interface McpStudio {
   studioId: string;
   placeName: string;
@@ -71,7 +81,7 @@ export async function runLuauAsync(
     timeoutMs
   );
   return reply.isError
-    ? { success: false, error: reply.text }
+    ? { success: false, error: cleanToolError(reply.text) }
     : { success: true, result: reply.text };
 }
 

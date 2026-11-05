@@ -10,6 +10,7 @@ import {
   StudioMcpUnsupportedError,
 } from './studio-mcp-locator.js';
 import {
+  cleanToolError,
   DATAMODEL_TYPES,
   listMcpStudiosAsync,
   matchStudiosAsync,
@@ -121,7 +122,7 @@ export async function tryCallStudioToolAsync(
     if (reply.isError) {
       throw new StudioMcpError(
         'failed',
-        reply.text || `${tool} failed`,
+        cleanToolError(reply.text) || `${tool} failed`,
         studio
       );
     }
