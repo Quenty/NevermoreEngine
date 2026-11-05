@@ -14,6 +14,7 @@ interface FakeStudio {
   name: string;
   placeId: number;
   gameId: number;
+  uptime?: number;
 }
 
 async function startAsync(studios: FakeStudio[]) {
@@ -37,7 +38,7 @@ async function startAsync(studios: FakeStudio[]) {
         );
       }
       return studio
-        ? toolText(`${studio.placeId},${studio.gameId}`)
+        ? toolText(`${studio.uptime ?? 0},${studio.placeId},${studio.gameId}`)
         : toolText('not connected', true);
     }
     return undefined;
@@ -206,6 +207,61 @@ describe('runLuauAsync', () => {
       success: false,
       error: 'Server datamodel is not available in Edit mode',
     });
+    await client.closeAsync();
+  });
+});
+
+describe('matchStudiosAsync by uptime', () => {
+  it('tells same-named unsaved Studios apart by how long each has run', async () => {
+    const now = Date.now();
+    const { client } = await startAsync([
+      { id: 'mcp-old', name: 'Place1', placeId: 0, gameId: 0, uptime: 300 },
+      { id: 'mcp-new', name: 'Place1', placeId: 0, gameId: 0, uptime: 290 },
+    ]);
+    const windows = [
+      {
+        pid: 70,
+        windowTitle: 'Place1 - Roblox Studio',
+        startedAt: now - 300_000,
+      },
+      {
+        pid: 80,
+        windowTitle: 'Place1 - Roblox Studio',
+        startedAt: now - 290_000,
+      },
+    ];
+
+    const studios = await matchStudiosAsync(
+      client,
+      [
+        session({ sessionId: 'a-edit', instanceId: 'a' }),
+        session({ sessionId: 'b-edit', instanceId: 'b' }),
+      ],
+      windows,
+      {
+        sessionPids: new Map([
+          ['a', 80],
+          ['b', 70],
+        ]),
+      }
+    );
+
+    expect(studios.map((s) => [s.studioId, s.pid, s.sessionId])).toEqual([
+      ['mcp-old', 70, 'b-edit'],
+      ['mcp-new', 80, 'a-edit'],
+    ]);
+    await client.closeAsync();
+  });
+
+  it('never gives one session to two Studios', async () => {
+    const { client } = await startAsync([
+      { id: 'mcp-1', name: 'Place1', placeId: 0, gameId: 0 },
+      { id: 'mcp-2', name: 'Place1', placeId: 0, gameId: 0 },
+    ]);
+
+    const studios = await matchStudiosAsync(client, [session({})]);
+
+    expect(studios.filter((s) => s.sessionId).length).toBe(0);
     await client.closeAsync();
   });
 });

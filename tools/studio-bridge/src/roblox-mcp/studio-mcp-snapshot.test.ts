@@ -64,30 +64,35 @@ describe('getStudioMcpSnapshotAsync', () => {
   });
 
   it('runs one check at a time', async () => {
+    let finish: (result: ListResult) => void = () => {};
     const listAsync = vi.fn(
-      () =>
-        new Promise<ListResult>((resolve) => setTimeout(() => resolve(OK), 20))
+      () => new Promise<ListResult>((resolve) => (finish = resolve))
     );
 
-    await Promise.all([
+    const both = Promise.all([
       getStudioMcpSnapshotAsync({ listAsync }),
       getStudioMcpSnapshotAsync({ listAsync }),
     ]);
+    finish(OK);
+    await both;
 
     expect(listAsync).toHaveBeenCalledTimes(1);
   });
 
   it('gives up waiting rather than hang when the first check does not finish', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const listAsync = vi.fn(() => new Promise<ListResult>(() => {}));
+    let settled = false;
 
-    const started = Date.now();
-    const snapshot = await getStudioMcpSnapshotAsync({
-      listAsync,
-      maxWaitMs: 20,
+    const pending = getStudioMcpSnapshotAsync({ listAsync }).then((s) => {
+      settled = true;
+      return s;
     });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(250);
 
-    expect(snapshot).toBeUndefined();
-    expect(Date.now() - started).toBeLessThan(1000);
+    expect(await pending).toBeUndefined();
   });
 
   it('records a failure with its reason', async () => {

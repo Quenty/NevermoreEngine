@@ -19,6 +19,7 @@ export interface StudioMcpSnapshot {
 
 export interface StudioMcpSnapshotOptions {
   sessions?: SessionInfo[];
+  sessionPids?: Map<string, number>;
   maxWaitMs?: number;
   maxAgeMs?: number;
   listAsync?: (
@@ -71,6 +72,7 @@ async function _refreshAsync(
   const startedAt = Date.now();
   const result = await (options.listAsync ?? tryListStudiosAsync)({
     sessions: options.sessions,
+    sessionPids: options.sessionPids,
     timeoutMs,
     readPlaceIds: false,
   });

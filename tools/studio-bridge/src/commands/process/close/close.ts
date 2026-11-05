@@ -18,6 +18,7 @@ import {
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
 import { explainMissingPlaytestContextAsync } from '../../playtest/playtest-sessions.js';
+import { resolveSessionPidsAsync } from '../../../process/studio-process-identity.js';
 import { describePlaytest } from '../info/info.js';
 
 export interface ProcessCloseResult {
@@ -76,6 +77,15 @@ export async function processCloseHandlerAsync(
     const placeId = (await session.queryStateAsync().catch(() => undefined))
       ?.placeId;
     candidates = matchStudioProcesses(processes, placeName, placeId);
+  }
+  if (candidates.length > 1 && options.pid === undefined && connection) {
+    const pid = (await resolveSessionPidsAsync(connection, processes)).get(
+      instanceId
+    );
+    const own = candidates.filter((proc) => proc.pid === pid);
+    if (own.length === 1) {
+      candidates = own;
+    }
   }
 
   return closeCandidateAsync(candidates, `'${placeName}'`, options, {

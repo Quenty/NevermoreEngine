@@ -83,99 +83,130 @@ describe('listSessionsHandlerAsync', () => {
   });
 });
 
-describe('listSessionsHandlerAsync with MCP', () => {
+describe('listSessionsHandlerAsync with Studio processes and MCP', () => {
+  const now = Date.parse('2026-11-05T00:30:00Z');
   const snapshot = (
     overrides: Partial<StudioMcpSnapshot> = {}
   ): StudioMcpSnapshot => ({
     status: 'ok',
     studios: [],
-    checkedAt: Date.now(),
+    checkedAt: now,
     latencyMs: 640,
     ...overrides,
   });
+  const processes = [
+    {
+      pid: 70,
+      windowTitle: 'Place1 - Roblox Studio',
+      startedAt: now - 300_000,
+    },
+    {
+      pid: 80,
+      windowTitle: 'Place1 - Roblox Studio',
+      startedAt: now - 290_000,
+    },
+  ];
 
-  it('lists a Studio only MCP can see, for a plugin that is off', async () => {
-    const conn = createMockConnection([]);
-
+  it('says no Studio is open, and how long it waited', async () => {
     const result = await listSessionsHandlerAsync(
-      conn,
+      createMockConnection([]),
       {},
-      {
-        mcpSnapshotAsync: async () =>
-          snapshot({ studios: [{ studioId: 'mcp-1', placeName: 'Hub' }] }),
-      }
+      { listProcessesAsync: async () => [], elapsedSec: () => 12.34 }
     );
 
-    expect(result.summary).toContain('without the studio-bridge plugin: Hub');
-    expect(result.studiosWithoutPlugin).toEqual([
-      { studioId: 'mcp-1', placeName: 'Hub' },
-    ]);
-    const text = formatSessionsTable(result);
-    expect(text).toContain('(no plugin)');
-    expect(text).toContain('MCP: ok, 1 Studio(s), answered in 640ms');
+    expect(result.summary).toBe('No Roblox Studio processes are open (12.3s).');
   });
 
-  it('marks which plugin sessions MCP can also reach', async () => {
+  it('says Studio is open without the plugin, rather than that nothing is', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([]),
+      {},
+      { listProcessesAsync: async () => processes, elapsedSec: () => 5 }
+    );
+
+    expect(result.summary).toContain(
+      '2 Studio process(es) open, but none has the studio-bridge plugin connected (5.0s)'
+    );
+  });
+
+  it('lists each Studio with its plugin session, MCP id and where it was launched', async () => {
     const sessions = [
       createSessionInfo({ sessionId: 'a-edit', instanceId: 'a' }),
-      createSessionInfo({ sessionId: 'b-edit', instanceId: 'b' }),
     ];
 
     const result = await listSessionsHandlerAsync(
       createMockConnection(sessions),
       {},
       {
+        listProcessesAsync: async () => processes,
+        resolveSessionPidsAsync: async () => new Map([['a', 70]]),
+        readLaunchesAsync: async () => [
+          {
+            pid: 70,
+            cwd: 'C:gameshub',
+            opened: 'a new Baseplate',
+            launchedAt: now - 301_000,
+          },
+        ],
         mcpSnapshotAsync: async () =>
           snapshot({
             studios: [
               {
-                studioId: 'mcp-1',
-                placeName: 'TestPlace',
-                sessionId: 'a-edit',
+                studioId: 'aaaaaaaa-1',
+                placeName: 'Place1',
+                pid: 70,
+                instanceId: 'a',
               },
+              { studioId: 'bbbbbbbb-2', placeName: 'Place1', pid: 80 },
             ],
           }),
       }
     );
 
-    const lines = formatSessionsTable(result).split('\n');
-    expect(lines.find((l) => l.includes('a-edit'))).toMatch(/yes\s*$/);
-    expect(lines.find((l) => l.includes('b-edit'))).toMatch(/no\s*$/);
+    expect(result.sessions[0].pid).toBe(70);
+    expect(result.studios).toEqual([
+      expect.objectContaining({
+        pid: 70,
+        instanceId: 'a',
+        mcpStudioId: 'aaaaaaaa-1',
+        launch: expect.objectContaining({ cwd: 'C:gameshub' }),
+      }),
+      expect.objectContaining({ pid: 80, mcpStudioId: 'bbbbbbbb-2' }),
+    ]);
+    const text = formatSessionsTable(result, now);
+    expect(text).toContain('a new Baseplate from C:gameshub');
+    expect(text).toContain('not by studio-bridge');
+    expect(text).toContain('5m');
   });
 
-  it('still lists plugin sessions when MCP is unavailable, and says why', async () => {
+  it('still lists sessions and Studios when MCP is unavailable, and says why', async () => {
     const result = await listSessionsHandlerAsync(
       createMockConnection([createSessionInfo({ sessionId: 's1' })]),
       {},
       {
+        listProcessesAsync: async () => processes,
         mcpSnapshotAsync: async () =>
           snapshot({ status: 'timeout', message: 'tools/call timed out' }),
       }
     );
 
-    const text = formatSessionsTable(result);
+    const text = formatSessionsTable(result, now);
     expect(text).toContain('s1');
     expect(text).toContain('MCP: timeout (tools/call timed out)');
+    expect(result.studios).toHaveLength(2);
   });
 
-  it('lists plugin sessions alone when the MCP check gave up', async () => {
-    const result = await listSessionsHandlerAsync(
-      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
-      {},
-      { mcpSnapshotAsync: async () => undefined }
-    );
-
-    expect(result.mcp).toBeUndefined();
-    expect(formatSessionsTable(result)).not.toContain('MCP');
-  });
-
-  it('hides MCP on a platform it does not run on', async () => {
-    const result = await listSessionsHandlerAsync(
-      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
-      {},
-      { mcpSnapshotAsync: async () => snapshot({ status: 'unsupported' }) }
-    );
-
-    expect(formatSessionsTable(result)).not.toContain('MCP');
+  it('leaves MCP out when the check gave up or the platform has none', async () => {
+    for (const mcpSnapshotAsync of [
+      async () => undefined,
+      async () => snapshot({ status: 'unsupported' }),
+    ]) {
+      const result = await listSessionsHandlerAsync(
+        createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+        {},
+        { mcpSnapshotAsync }
+      );
+      expect(formatSessionsTable(result, now)).not.toContain('MCP');
+    }
   });
 });

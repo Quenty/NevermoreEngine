@@ -1,5 +1,6 @@
 import type { SessionContext, SessionInfo } from '../../bridge/types.js';
 import type { McpStdioClient } from '../mcp/mcp-stdio-client.js';
+import { matchProcessByUptime } from '../../process/studio-process-identity.js';
 
 export const DATAMODEL_TYPES: Record<SessionContext, string> = {
   edit: 'Edit',
@@ -17,6 +18,7 @@ export interface McpStudio {
 export interface StudioWindow {
   pid: number;
   windowTitle: string;
+  startedAt?: number;
 }
 
 export interface MatchedStudio {
@@ -73,57 +75,95 @@ export async function runLuauAsync(
     : { success: true, result: reply.text };
 }
 
+export interface MatchStudiosOptions {
+  readPlaceIds?: boolean;
+  studios?: McpStudio[];
+  sessionPids?: Map<string, number>;
+}
+
 export async function matchStudiosAsync(
   client: McpStdioClient,
   sessions: SessionInfo[] = [],
   windows: StudioWindow[] = [],
-  options: { readPlaceIds?: boolean; studios?: McpStudio[] } = {}
+  options: MatchStudiosOptions = {}
 ): Promise<MatchedStudio[]> {
   const studios = options.studios ?? (await listMcpStudiosAsync(client));
   const editSessions = sessions.filter((s) => s.context === 'edit');
   const nameCount = (name: string) =>
     studios.filter((s) => s.placeName === name).length;
+  const canTime = windows.some((w) => w.startedAt !== undefined);
 
-  return Promise.all(
-    studios.map(async (studio) => {
-      const matched: MatchedStudio = { ...studio };
+  const matched = await Promise.all(
+    studios.map(async (studio): Promise<MatchedStudio> => {
       const named = editSessions.filter(
         (s) => s.placeName === studio.placeName
       );
-
-      let session: SessionInfo | undefined;
-      if (named.length === 1 && nameCount(studio.placeName) === 1) {
-        session = named[0];
-        matched.placeId = session.placeId;
-        matched.gameId = session.gameId;
-      } else if (options.readPlaceIds !== false) {
-        const ids = await _readPlaceIdsAsync(client, studio.studioId);
-        Object.assign(matched, ids);
-        if (ids.placeId !== undefined) {
-          const byId = (named.length > 0 ? named : editSessions).filter(
-            (s) =>
-              s.placeId === ids.placeId &&
-              (ids.placeId !== 0 || s.placeName === studio.placeName)
-          );
-          if (byId.length === 1) {
-            session = byId[0];
+      const uniqueByName =
+        named.length === 1 && nameCount(studio.placeName) === 1;
+      const wantProbe =
+        canTime ||
+        (!uniqueByName && (named.length > 0 || options.readPlaceIds !== false));
+      return wantProbe
+        ? {
+            ...studio,
+            ...(await _probeAsync(client, studio.studioId, windows)),
           }
-        }
-      }
-      if (session) {
-        matched.sessionId = session.sessionId;
-        matched.instanceId = session.instanceId;
-      }
-
-      const window = windows.filter((w) =>
-        _windowShowsPlace(w.windowTitle, studio.placeName)
-      );
-      if (window.length === 1 && nameCount(studio.placeName) === 1) {
-        matched.pid = window[0].pid;
-      }
-      return matched;
+        : { ...studio };
     })
   );
+
+  const claimed = new Set<string>();
+  const assign = (studio: MatchedStudio, session: SessionInfo) => {
+    claimed.add(session.sessionId);
+    studio.sessionId = session.sessionId;
+    studio.instanceId = session.instanceId;
+    studio.placeId ??= session.placeId;
+    studio.gameId ??= session.gameId;
+  };
+  const unclaimed = () => editSessions.filter((s) => !claimed.has(s.sessionId));
+
+  if (options.sessionPids) {
+    for (const studio of matched) {
+      if (studio.pid === undefined) continue;
+      const byPid = unclaimed().filter(
+        (s) => options.sessionPids!.get(s.instanceId) === studio.pid
+      );
+      if (byPid.length === 1) {
+        assign(studio, byPid[0]);
+      }
+    }
+  }
+
+  for (const studio of matched) {
+    if (studio.sessionId) continue;
+    const named = unclaimed().filter((s) => s.placeName === studio.placeName);
+    const unmatchedSameName = matched.filter(
+      (m) => !m.sessionId && m.placeName === studio.placeName
+    ).length;
+    if (named.length === 1 && unmatchedSameName === 1) {
+      assign(studio, named[0]);
+    }
+  }
+
+  for (const studio of matched) {
+    if (studio.sessionId || !studio.placeId) continue;
+    const byId = unclaimed().filter((s) => s.placeId === studio.placeId);
+    if (byId.length === 1) {
+      assign(studio, byId[0]);
+    }
+  }
+
+  for (const studio of matched) {
+    if (studio.pid !== undefined || nameCount(studio.placeName) !== 1) continue;
+    const window = windows.filter((w) =>
+      _windowShowsPlace(w.windowTitle, studio.placeName)
+    );
+    if (window.length === 1) {
+      studio.pid = window[0].pid;
+    }
+  }
+
+  return matched;
 }
 
 export function resolveStudio(
@@ -175,17 +215,38 @@ export function resolveStudio(
   );
 }
 
-async function _readPlaceIdsAsync(
+const PROBE_LUAU =
+  'return tostring(os.clock()) .. "," .. tostring(game.PlaceId) .. "," .. tostring(game.GameId)';
+
+async function _probeAsync(
   client: McpStdioClient,
-  studioId: string
-): Promise<{ placeId?: number; gameId?: number }> {
-  const run = await runLuauAsync(
-    client,
-    studioId,
-    'return tostring(game.PlaceId) .. "," .. tostring(game.GameId)'
-  );
-  const match = run.success ? /^(\d+),(\d+)$/.exec(run.result ?? '') : null;
-  return match ? { placeId: Number(match[1]), gameId: Number(match[2]) } : {};
+  studioId: string,
+  windows: StudioWindow[]
+): Promise<Partial<MatchedStudio>> {
+  for (const context of ['edit', 'server', 'client'] as const) {
+    const sentAt = Date.now();
+    const run = await runLuauAsync(client, studioId, PROBE_LUAU, context);
+    const match = run.success
+      ? /^([\d.]+),(\d+),(\d+)$/.exec(run.result ?? '')
+      : null;
+    if (!match) {
+      if (run.success || !/not available/i.test(run.error ?? '')) {
+        return {};
+      }
+      continue;
+    }
+    const reading = {
+      uptimeSec: Number(match[1]),
+      observedAt: (sentAt + Date.now()) / 2,
+    };
+    const window = matchProcessByUptime(windows, reading);
+    return {
+      placeId: Number(match[2]),
+      gameId: Number(match[3]),
+      ...(window ? { pid: window.pid } : {}),
+    };
+  }
+  return {};
 }
 
 function _windowShowsPlace(title: string, placeName: string): boolean {

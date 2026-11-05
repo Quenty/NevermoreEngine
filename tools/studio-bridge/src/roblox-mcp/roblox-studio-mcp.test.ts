@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  closeStudioMcpAsync,
   tryCallStudioToolAsync,
   tryExecuteLuauAsync,
   tryListStudiosAsync,
@@ -25,9 +26,9 @@ function fake(handler: FakeHandler = () => undefined, studios = STUDIOS) {
     }
     if (
       params?.name === 'execute_luau' &&
-      params.arguments.code.includes('game.PlaceId')
+      params.arguments.code.includes('os.clock')
     ) {
-      return toolText('0,0');
+      return toolText('0,0,0');
     }
     return handler(method, params);
   });
@@ -40,6 +41,11 @@ function fake(handler: FakeHandler = () => undefined, studios = STUDIOS) {
     },
   };
 }
+
+afterEach(async () => {
+  vi.useRealTimers();
+  await closeStudioMcpAsync();
+});
 
 describe('tryExecuteLuauAsync', () => {
   it('runs Luau in the targeted Studio and returns its result', async () => {
@@ -113,30 +119,17 @@ describe('tryExecuteLuauAsync', () => {
   });
 
   it('fails with timeout when the whole call outlives its deadline', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const { server, options } = fake(() => undefined);
 
-    const started = Date.now();
-    const result = await tryExecuteLuauAsync('return 1', {
+    const pending = tryExecuteLuauAsync('return 1', {
       ...options,
       target: 'hub',
-      timeoutMs: 50,
     });
+    await vi.advanceTimersByTimeAsync(15_000);
 
-    expect(result).toMatchObject({ success: false, reason: 'timeout' });
-    expect(Date.now() - started).toBeLessThan(1000);
+    expect(await pending).toMatchObject({ success: false, reason: 'timeout' });
     expect(server.child.killed).toBe(true);
-  });
-
-  it('fails with timeout when the tool never answers', async () => {
-    const { options } = fake(() => undefined);
-
-    const result = await tryExecuteLuauAsync('return 1', {
-      ...options,
-      target: 'hub',
-      timeoutMs: 20,
-    });
-
-    expect(result).toMatchObject({ success: false, reason: 'timeout' });
   });
 });
 

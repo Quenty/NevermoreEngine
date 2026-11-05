@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { McpStdioClient } from './mcp-stdio-client.js';
 import {
   createFakeMcpServer,
@@ -134,11 +134,15 @@ describe('McpStdioClient', () => {
   });
 
   it('times out a request the server never answers', async () => {
-    const { client } = await startAsync(() => undefined, 20);
+    const { client } = await startAsync(() => undefined);
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 
-    await expect(client.callToolAsync('execute_luau')).rejects.toThrow(
-      'tools/call timed out after 20ms'
-    );
+    const pending = expect(
+      client.callToolAsync('execute_luau')
+    ).rejects.toThrow('tools/call timed out after 30000ms');
+    await vi.advanceTimersByTimeAsync(30_000);
+    await pending;
+    vi.useRealTimers();
     await client.closeAsync();
   });
 });

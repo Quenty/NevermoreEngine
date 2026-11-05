@@ -46,6 +46,7 @@ export interface StudioMcpOptions {
   spawnProcess?: SpawnMcpProcess;
   listWindowsAsync?: () => Promise<StudioWindow[]>;
   readPlaceIds?: boolean;
+  sessionPids?: Map<string, number>;
 }
 
 export interface StudioMcpLuauOptions extends StudioMcpOptions {
@@ -56,6 +57,7 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 const STEP_TIMEOUT_MS = 5_000;
 const STUDIO_RECONNECT_MS = 4_000;
 const RECONNECT_POLL_MS = 250;
+const SETTLE_RESERVE_MS = 2_500;
 const IDLE_CLOSE_MS = 15_000;
 
 interface SharedClient {
@@ -251,7 +253,7 @@ async function _listSettledAsync(
   while (
     !isEnough(studios) &&
     Date.now() < settlesAt &&
-    remainingMs() > RECONNECT_POLL_MS * 2
+    remainingMs() > SETTLE_RESERVE_MS
   ) {
     await new Promise((resolve) => setTimeout(resolve, RECONNECT_POLL_MS));
     studios = await listMcpStudiosAsync(shared.client);
@@ -270,6 +272,7 @@ async function _matchAsync(
   return matchStudiosAsync(shared.client, options.sessions ?? [], windows, {
     readPlaceIds: options.readPlaceIds,
     studios,
+    sessionPids: options.sessionPids,
   });
 }
 
@@ -316,10 +319,9 @@ function _toFailure(
 }
 
 async function _listWindowsAsync(): Promise<StudioWindow[]> {
-  return (await listStudioProcessesAsync()).map(({ pid, windowTitle }) => ({
-    pid,
-    windowTitle,
-  }));
+  return (await listStudioProcessesAsync()).map(
+    ({ pid, windowTitle, startedAt }) => ({ pid, windowTitle, startedAt })
+  );
 }
 
 function _message(err: unknown): string {

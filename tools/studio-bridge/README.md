@@ -171,7 +171,9 @@ studio-bridge process list
 
 Lists the connected sessions with their ID, context, place, and state. `--target` and `--context` narrow the list. While a playtest studio-bridge started is running, every session of that Studio shows `Play` (or `Run` without a client).
 
-It also asks [Studio's MCP server](#studios-mcp-server): an `MCP` column says whether it can reach each session's Studio, a `(no plugin)` row shows a Studio only it can see, such as one with the plugin turned off, and a last line reports its health. MCP never holds the list up: it waits at most 3 seconds, and under `--watch` each frame shows the latest check while the next one runs, so a stalled server shows up as a stale check rather than a frozen screen. `--no-mcp` skips it.
+Below the sessions, a table lists every running Studio process, whether or not its plugin is connected: its pid, how long it has run, its window, the plugin session in it, its id in [Studio's MCP server](#studios-mcp-server), and the folder and place `process launch` opened it with. Studios showing the same place, such as two unsaved `Place1` windows, are told apart by how long each has run: `os.clock()` in Studio is the process's uptime, read through the plugin and through MCP and matched against the start time of each process. `process close` uses the same match when several windows show the session's place. With no session, the summary says whether no Studio is open at all or Studios are open without the plugin, and how long it waited.
+
+The last line reports the MCP server's health. MCP never holds the list up: it waits at most 3 seconds, and under `--watch` each frame shows the latest check while the next one runs, so a stalled server shows up as a stale check rather than a frozen screen. `--no-mcp` skips it.
 
 ### `process info`
 
