@@ -76,7 +76,7 @@ function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag):
 
 	self._promiseCmdr:Then(function(cmdr)
 		task.spawn(function()
-			cmdr:RegisterDefaultCommands()
+			cmdr.Registry:RegisterDefaultCommands()
 		end)
 
 		cmdr.Registry:RegisterHook("BeforeRun", function(context): string?

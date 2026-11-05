@@ -29,6 +29,7 @@ export type CmdrServiceClient = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_permissionServiceClient: any,
 		_cmdrPromise: Promise.Promise<any>?,
+		_adminOnly: boolean?,
 	},
 	{} :: typeof({ __index = CmdrServiceClient })
 ))
@@ -110,6 +111,28 @@ function CmdrServiceClient.Start(self: CmdrServiceClient): ()
 	end)
 end
 
+--[=[
+	Only loads Cmdr's client (its code and interface) for players the permission provider says are
+	admins. For everyone else [CmdrServiceClient.PromiseCmdr] never resolves, so services that
+	register commands or types through it simply wait, and the client never requires Cmdr.
+
+	Off by default. Call before anything calls [CmdrServiceClient.PromiseCmdr], such as right after
+	getting the service and before the [ServiceBag] initializes.
+
+	```lua
+	serviceBag:GetService(require("CmdrServiceClient")):SetAdminOnly(true)
+	serviceBag:Init()
+	```
+
+	@param adminOnly boolean
+]=]
+function CmdrServiceClient.SetAdminOnly(self: CmdrServiceClient, adminOnly: boolean): ()
+	assert(type(adminOnly) == "boolean", "Bad adminOnly")
+	assert(not self._cmdrPromise, "Set before PromiseCmdr is called")
+
+	self._adminOnly = adminOnly
+end
+
 function CmdrServiceClient._setBindings(self: CmdrServiceClient, cmdr: any): ()
 	cmdr:SetActivationUnlocksMouse(true)
 	cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
@@ -145,14 +168,28 @@ function CmdrServiceClient.PromiseCmdr(self: CmdrServiceClient): Promise.Promise
 		timeout = 1e10
 	end
 
-	local cmdrPromise = self._maid
-		:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
-		:Then(function(cmdClient)
-			return (Promise :: any).spawn(function(resolve: any, _reject: any)
-				-- Requiring cmdr can yield
-				return resolve((require :: any)(cmdClient))
+	local cmdrClientPromise
+	if self._adminOnly then
+		cmdrClientPromise = self._maid
+			:GivePromise(self._permissionServiceClient:PromisePermissionProvider())
+			:Then(function(provider)
+				return provider:PromiseIsAdmin()
 			end)
+			:Then(function(isAdmin)
+				if not isAdmin then
+					return (Promise :: any).new()
+				end
+				return promiseChild(ReplicatedStorage, "CmdrClient", timeout)
+			end)
+	else
+		cmdrClientPromise = self._maid:GivePromise(promiseChild(ReplicatedStorage, "CmdrClient", timeout))
+	end
+
+	local cmdrPromise = cmdrClientPromise:Then(function(cmdClient)
+		return (Promise :: any).spawn(function(resolve: any, _reject: any)
+			return resolve((require :: any)(cmdClient))
 		end)
+	end)
 	self._cmdrPromise = cmdrPromise
 	self._maid:GiveTask(cmdrPromise)
 
