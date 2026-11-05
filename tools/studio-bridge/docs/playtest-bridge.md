@@ -1,6 +1,6 @@
 # The planted playtest bridge
 
-With Studio's **Load user plugins on playtest** off, the studio-bridge plugin never loads into a playtest. So `startPlaytest` plants the same client (`templates/studio-bridge-plugin/src/Shared/StudioBridgeClient.lua`) into the edit place's ServerScriptService. The playtest copies the edit place, so the client starts in the playtest's server as an ordinary Script and connects as its server session. With the setting on, nothing is planted and the plugin is the server session.
+With Studio's **Load user plugins on playtest** off, the studio-bridge plugin never loads into a playtest. So `startPlaytest` plants the same client (`templates/studio-bridge-plugin/src/Shared/StudioBridgeClient.lua`) into the edit place's ServerScriptService. The playtest copies the edit place, so the client starts in the playtest's server as an ordinary Script and connects as its server session. In play mode it also plants the client's twin as a LocalScript in StarterPlayerScripts, which every player's client runs and connects as its client session; a LocalScript there can open the WebSocket to the bridge and read the test args, measured in a Studio playtest client. With the setting on, nothing is planted and the plugin is the playtest's sessions.
 
 ## What an ordinary playtest Script can do
 
