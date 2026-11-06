@@ -175,4 +175,23 @@ describe('captureScreenshotHandlerAsync', () => {
     expect(result.data).toBe('base64data');
     expect(session.captureScreenshotAsync).toHaveBeenCalledOnce();
   });
+
+  it('asks Studio to crop and scale', async () => {
+    const session = createMockSession({
+      data: 'base64data',
+      format: 'png',
+      width: 320,
+      height: 180,
+    });
+
+    await captureScreenshotHandlerAsync(session, {
+      region: [0, 0, 640, 360],
+      scale: 0.5,
+    });
+
+    expect(session.captureScreenshotAsync).toHaveBeenCalledWith({
+      region: [0, 0, 640, 360],
+      scale: 0.5,
+    });
+  });
 });

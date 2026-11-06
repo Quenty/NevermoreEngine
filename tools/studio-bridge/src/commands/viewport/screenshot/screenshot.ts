@@ -8,6 +8,12 @@ import type { BridgeSession } from '../../../bridge/index.js';
 import type { ScreenshotResult as BridgeScreenshotResult } from '../../../bridge/index.js';
 import { rgbaToPng } from '../../rgba-to-png.js';
 import { formatJson } from '@quenty/cli-output-helpers/reporting';
+import type { ViewportReadOptions } from '../../../server/web-socket-protocol.js';
+import {
+  toViewportReadOptions,
+  viewportArgs,
+  type ViewportArgs,
+} from '../viewport-args.js';
 
 export interface ScreenshotResult {
   data: string;
@@ -16,15 +22,19 @@ export interface ScreenshotResult {
   summary: string;
 }
 
-export interface ScreenshotOptions {
+export interface ScreenshotOptions extends ViewportReadOptions {
   output?: string;
 }
 
 export async function captureScreenshotHandlerAsync(
   session: BridgeSession,
-  _options: ScreenshotOptions = {}
+  options: ScreenshotOptions = {}
 ): Promise<ScreenshotResult> {
-  const result: BridgeScreenshotResult = await session.captureScreenshotAsync();
+  const { region, scale } = options;
+  const result: BridgeScreenshotResult = await session.captureScreenshotAsync({
+    ...(region ? { region } : {}),
+    ...(scale !== undefined ? { scale } : {}),
+  });
   if (typeof result.data !== 'string') {
     throw new Error(
       `The plugin sent screenshot data as ${typeof result.data}, not a base64 string`
@@ -48,17 +58,14 @@ export async function captureScreenshotHandlerAsync(
   };
 }
 
-export const screenshotCommand = defineCommand<
-  ScreenshotOptions,
-  ScreenshotResult
->({
+export const screenshotCommand = defineCommand<ViewportArgs, ScreenshotResult>({
   group: 'viewport',
   name: 'screenshot',
   description: 'Capture a viewport screenshot from Studio',
   category: 'execution',
   safety: 'read',
   scope: 'session',
-  args: {},
+  args: { ...viewportArgs },
   cli: {
     binaryField: 'data',
     format: (result) => result.summary,
@@ -72,5 +79,6 @@ export const screenshotCommand = defineCommand<
         { pretty: process.stdout.isTTY }
       ),
   },
-  handler: async (session) => captureScreenshotHandlerAsync(session),
+  handler: async (session, args) =>
+    captureScreenshotHandlerAsync(session, toViewportReadOptions(args)),
 });

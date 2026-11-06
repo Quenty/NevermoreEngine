@@ -34,6 +34,8 @@ export type Capability =
   | 'exportInstances'
   | 'importInstances'
   | 'findInstances'
+  | 'sampleInstances'
+  | 'recordViewport'
   | 'grepScripts'
   | 'startPlaytest'
   | 'endPlaytest'
@@ -234,6 +236,74 @@ export interface FindInstancesResultMessage extends RequestMessage {
   };
 }
 
+/** A value `sampleInstances` read: a component of a property or attribute. */
+export type SampleValue = number | boolean | string;
+
+export interface SampleRow {
+  /** Seconds of frame time since frame 0. */
+  t: number;
+  frame: number;
+  path: string;
+  /** `Size.X.Scale` for a component, `@Name` for an attribute. */
+  property: string;
+  value: SampleValue;
+}
+
+/** Which frame event a recording stepped on. */
+export type RecordingClock = 'renderStep' | 'heartbeat';
+
+/** What every recording reports about its window of frames. */
+export interface RecordingStats {
+  /** Frames stepped through, frame 0 included. */
+  frameCount: number;
+  /** `t` of the last frame. */
+  elapsed: number;
+  /** Stopped at maxFrames before the duration had elapsed. */
+  truncated: boolean;
+  clock: RecordingClock;
+}
+
+export interface SampleInstancesResultMessage extends RequestMessage {
+  type: 'sampleInstancesResult';
+  payload: RecordingStats & {
+    /** Paths of the instances matched in frame 0. */
+    instances: string[];
+    rows: SampleRow[];
+    /** Frames recorded. */
+    recorded: number;
+  };
+}
+
+export interface RecordedViewportFrame {
+  t: number;
+  frame: number;
+  width: number;
+  height: number;
+  /** PNG, or raw RGBA from a plugin without a PNG encoder. */
+  format: 'png' | 'rgba';
+  /** The image, base64-encoded. */
+  data: string;
+}
+
+/** A capture `recordViewport` made but could not read. */
+export interface SkippedViewportFrame {
+  t: number;
+  frame: number;
+  reason: string;
+}
+
+export interface RecordViewportResultMessage extends RequestMessage {
+  type: 'recordViewportResult';
+  payload: RecordingStats & {
+    /** The captures CaptureService made; it drops most requests. */
+    frames: RecordedViewportFrame[];
+    /** Captures made but not read. */
+    skipped: SkippedViewportFrame[];
+    /** Captures asked for, one per recorded frame. */
+    requested: number;
+  };
+}
+
 export interface GrepMatch {
   path: string;
   className: string;
@@ -361,6 +431,8 @@ export type PluginMessage =
   | ExportInstancesResultMessage
   | ImportInstancesResultMessage
   | FindInstancesResultMessage
+  | SampleInstancesResultMessage
+  | RecordViewportResultMessage
   | GrepScriptsResultMessage
   | LogsResultMessage
   | StateChangeMessage
@@ -399,9 +471,19 @@ export interface QueryStateMessage extends RequestMessage {
   payload: Record<string, never>;
 }
 
+/** `[x, y, width, height]` in capture pixels. */
+export type ViewportRegion = [number, number, number, number];
+
+/** How a capture is cropped and scaled before its pixels are read. */
+export interface ViewportReadOptions {
+  region?: ViewportRegion;
+  /** Applied after cropping; 1 is full size. */
+  scale?: number;
+}
+
 export interface CaptureScreenshotMessage extends RequestMessage {
   type: 'captureScreenshot';
-  payload: {
+  payload: ViewportReadOptions & {
     format?: 'png';
   };
 }
@@ -422,20 +504,50 @@ export interface ImportInstancesMessage extends RequestMessage {
   };
 }
 
+/** What the plugin's `instance-selection` library matches on. */
+export interface InstanceSelection {
+  /** Dot-separated path to search under. Defaults to the whole DataModel. */
+  root?: string;
+  /** Matched case-insensitively anywhere in the name; any one is enough. */
+  names?: string[];
+  /** A single name, as callers before `names` sent it. */
+  name?: string;
+  /** Match the whole name instead. */
+  exactName?: boolean;
+  /** Matched with IsA. */
+  className?: string;
+  tag?: string;
+}
+
+/** What the plugin's `frame-recorder` library takes. */
+export interface RecordingOptions {
+  /** Luau source run in frame 0. */
+  trigger?: string;
+  /** Seconds to record. */
+  duration: number;
+  fps?: number;
+  maxFrames?: number;
+}
+
 export interface FindInstancesMessage extends RequestMessage {
   type: 'findInstances';
-  payload: {
-    /** Dot-separated path to search under. Defaults to the whole DataModel. */
-    root?: string;
-    /** Matched case-insensitively anywhere in the name. */
-    name?: string;
-    /** Match the whole name instead. */
-    exactName?: boolean;
-    /** Matched with IsA. */
-    className?: string;
-    tag?: string;
+  payload: InstanceSelection & {
     limit?: number;
   };
+}
+
+export interface SampleInstancesMessage extends RequestMessage {
+  type: 'sampleInstances';
+  payload: InstanceSelection &
+    RecordingOptions & {
+      properties?: string[];
+      attributes?: string[];
+    };
+}
+
+export interface RecordViewportMessage extends RequestMessage {
+  type: 'recordViewport';
+  payload: RecordingOptions & ViewportReadOptions;
 }
 
 export interface GrepScriptsMessage extends RequestMessage {
@@ -553,6 +665,8 @@ export type ServerMessage =
   | ExportInstancesMessage
   | ImportInstancesMessage
   | FindInstancesMessage
+  | SampleInstancesMessage
+  | RecordViewportMessage
   | GrepScriptsMessage
   | QueryLogsMessage
   | RegisterActionMessage
@@ -571,6 +685,105 @@ function isViewportSize(value: unknown): value is [number, number] {
     Array.isArray(value) &&
     value.length === 2 &&
     value.every((item) => typeof item === 'number')
+  );
+}
+
+function decodeInstanceSelection(
+  payload: Record<string, unknown>
+): InstanceSelection {
+  return {
+    root: typeof payload.root === 'string' ? payload.root : undefined,
+    names: isStringArray(payload.names) ? payload.names : undefined,
+    name: typeof payload.name === 'string' ? payload.name : undefined,
+    exactName:
+      typeof payload.exactName === 'boolean' ? payload.exactName : undefined,
+    className:
+      typeof payload.className === 'string' ? payload.className : undefined,
+    tag: typeof payload.tag === 'string' ? payload.tag : undefined,
+  };
+}
+
+function decodeRecordingOptions(
+  payload: Record<string, unknown>
+): RecordingOptions | null {
+  if (typeof payload.duration !== 'number') return null;
+  return {
+    trigger: typeof payload.trigger === 'string' ? payload.trigger : undefined,
+    duration: payload.duration,
+    fps: typeof payload.fps === 'number' ? payload.fps : undefined,
+    maxFrames:
+      typeof payload.maxFrames === 'number' ? payload.maxFrames : undefined,
+  };
+}
+
+function decodeRecordingStats(
+  payload: Record<string, unknown>
+): RecordingStats {
+  return {
+    frameCount: typeof payload.frameCount === 'number' ? payload.frameCount : 0,
+    elapsed: typeof payload.elapsed === 'number' ? payload.elapsed : 0,
+    truncated: payload.truncated === true,
+    clock: payload.clock === 'heartbeat' ? 'heartbeat' : 'renderStep',
+  };
+}
+
+function decodeViewportReadOptions(
+  payload: Record<string, unknown>
+): ViewportReadOptions {
+  const region = payload.region;
+  return {
+    region:
+      Array.isArray(region) &&
+      region.length === 4 &&
+      region.every((n) => typeof n === 'number')
+        ? (region as ViewportRegion)
+        : undefined,
+    scale: typeof payload.scale === 'number' ? payload.scale : undefined,
+  };
+}
+
+function isArrayOf<T>(
+  value: unknown,
+  isItem: (item: unknown) => item is T
+): value is T[] {
+  return Array.isArray(value) && value.every(isItem);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isSampleRow(value: unknown): value is SampleRow {
+  return (
+    isRecord(value) &&
+    typeof value.t === 'number' &&
+    typeof value.frame === 'number' &&
+    typeof value.path === 'string' &&
+    typeof value.property === 'string' &&
+    ['number', 'boolean', 'string'].includes(typeof value.value)
+  );
+}
+
+function isRecordedViewportFrame(
+  value: unknown
+): value is RecordedViewportFrame {
+  return (
+    isRecord(value) &&
+    typeof value.t === 'number' &&
+    typeof value.frame === 'number' &&
+    typeof value.width === 'number' &&
+    typeof value.height === 'number' &&
+    (value.format === 'png' || value.format === 'rgba') &&
+    typeof value.data === 'string'
+  );
+}
+
+function isSkippedViewportFrame(value: unknown): value is SkippedViewportFrame {
+  return (
+    isRecord(value) &&
+    typeof value.t === 'number' &&
+    typeof value.frame === 'number' &&
+    typeof value.reason === 'string'
   );
 }
 
@@ -801,6 +1014,43 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           instances: payload.instances as FoundInstance[],
           searched: typeof payload.searched === 'number' ? payload.searched : 0,
           truncated: payload.truncated === true,
+        },
+      };
+
+    case 'sampleInstancesResult':
+      if (requestId === undefined) return null;
+      if (
+        !isArrayOf(payload.rows, isSampleRow) ||
+        !isStringArray(payload.instances)
+      )
+        return null;
+      return {
+        type: 'sampleInstancesResult',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeRecordingStats(payload),
+          instances: payload.instances,
+          rows: payload.rows,
+          recorded: typeof payload.recorded === 'number' ? payload.recorded : 0,
+        },
+      };
+
+    case 'recordViewportResult':
+      if (requestId === undefined) return null;
+      if (!isArrayOf(payload.frames, isRecordedViewportFrame)) return null;
+      return {
+        type: 'recordViewportResult',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeRecordingStats(payload),
+          frames: payload.frames,
+          skipped: isArrayOf(payload.skipped, isSkippedViewportFrame)
+            ? payload.skipped
+            : [],
+          requested:
+            typeof payload.requested === 'number' ? payload.requested : 0,
         },
       };
 
@@ -1068,6 +1318,7 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         requestId,
         payload: {
           format: payload.format === 'png' ? 'png' : undefined,
+          ...decodeViewportReadOptions(payload),
         },
       };
 
@@ -1102,20 +1353,43 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         sessionId,
         requestId,
         payload: {
-          root: typeof payload.root === 'string' ? payload.root : undefined,
-          name: typeof payload.name === 'string' ? payload.name : undefined,
-          exactName:
-            typeof payload.exactName === 'boolean'
-              ? payload.exactName
-              : undefined,
-          className:
-            typeof payload.className === 'string'
-              ? payload.className
-              : undefined,
-          tag: typeof payload.tag === 'string' ? payload.tag : undefined,
+          ...decodeInstanceSelection(payload),
           limit: typeof payload.limit === 'number' ? payload.limit : undefined,
         },
       };
+
+    case 'sampleInstances': {
+      if (requestId === undefined) return null;
+      const recording = decodeRecordingOptions(payload);
+      if (!recording) return null;
+      return {
+        type: 'sampleInstances',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeInstanceSelection(payload),
+          ...recording,
+          properties: isStringArray(payload.properties)
+            ? payload.properties
+            : undefined,
+          attributes: isStringArray(payload.attributes)
+            ? payload.attributes
+            : undefined,
+        },
+      };
+    }
+
+    case 'recordViewport': {
+      if (requestId === undefined) return null;
+      const recording = decodeRecordingOptions(payload);
+      if (!recording) return null;
+      return {
+        type: 'recordViewport',
+        sessionId,
+        requestId,
+        payload: { ...recording, ...decodeViewportReadOptions(payload) },
+      };
+    }
 
     case 'grepScripts':
       if (requestId === undefined) return null;

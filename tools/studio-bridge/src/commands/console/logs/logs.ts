@@ -12,6 +12,7 @@ import type {
   LogsResult as BridgeLogsResult,
 } from '../../../bridge/index.js';
 import type { OutputLevel } from '../../../server/web-socket-protocol.js';
+import { tryParseDurationSeconds } from '../../shared/duration.js';
 
 export interface LogsResult {
   /** With repeats grouped, a run of identical entries is one with `repeats` and `lastTimestamp`. */
@@ -44,21 +45,14 @@ interface ConsoleLogsArgs {
   groupRepeats?: boolean;
 }
 
-const DURATION_UNITS_SEC: Record<string, number> = {
-  s: 1,
-  m: 60,
-  h: 3600,
-  d: 86400,
-};
-
 /**
  * The time `--since` names, in epoch seconds: a duration back from `nowMs`
  * (`30s`, `5m`, `2h`, `1d`) or a date (`2026-10-27T18:00:00`).
  */
 export function parseSince(value: string, nowMs: number = Date.now()): number {
-  const duration = /^(\d+(?:\.\d+)?)([smhd])$/.exec(value.trim());
-  if (duration) {
-    return nowMs / 1000 - Number(duration[1]) * DURATION_UNITS_SEC[duration[2]];
+  const durationSec = tryParseDurationSeconds(value);
+  if (durationSec !== undefined) {
+    return nowMs / 1000 - durationSec;
   }
 
   const dateMs = Date.parse(value);

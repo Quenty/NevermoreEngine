@@ -545,6 +545,68 @@ describe('decodePluginMessage', () => {
   });
 });
 
+describe('decodePluginMessage (recordings)', () => {
+  const stats = {
+    frameCount: 3,
+    elapsed: 0.2,
+    truncated: false,
+    clock: 'renderStep',
+  };
+  const row = { t: 0, frame: 0, path: 'A', property: 'Size.X.Scale', value: 1 };
+  const frame = {
+    t: 0,
+    frame: 0,
+    width: 2,
+    height: 1,
+    format: 'png',
+    data: 'AAAA',
+  };
+
+  function sampleResult(payload: Record<string, unknown>) {
+    return roundTripPlugin({
+      type: 'sampleInstancesResult',
+      sessionId: 'sess-1',
+      requestId: 'req-1',
+      payload: { ...stats, instances: ['A'], recorded: 1, ...payload },
+    });
+  }
+
+  function recordResult(payload: Record<string, unknown>) {
+    return roundTripPlugin({
+      type: 'recordViewportResult',
+      sessionId: 'sess-1',
+      requestId: 'req-1',
+      payload: { ...stats, requested: 3, ...payload },
+    });
+  }
+
+  it('decodes sample rows', () => {
+    const msg = sampleResult({ rows: [row] });
+    expect(msg?.type).toBe('sampleInstancesResult');
+    expect((msg as any).payload.rows).toEqual([row]);
+  });
+
+  it('rejects a malformed sample row', () => {
+    expect(sampleResult({ rows: [{ ...row, value: { x: 1 } }] })).toBeNull();
+    expect(sampleResult({ rows: [{ ...row, path: 3 }] })).toBeNull();
+  });
+
+  it('decodes recorded frames and skipped captures', () => {
+    const skipped = [{ t: 0.1, frame: 1, reason: 'could not read' }];
+    const msg = recordResult({ frames: [frame], skipped });
+    expect((msg as any).payload.frames).toEqual([frame]);
+    expect((msg as any).payload.skipped).toEqual(skipped);
+    expect((msg as any).payload.requested).toBe(3);
+  });
+
+  it('rejects a malformed recorded frame', () => {
+    expect(recordResult({ frames: [{ ...frame, format: 'jpg' }] })).toBeNull();
+    expect(
+      recordResult({ frames: [{ ...frame, data: undefined }] })
+    ).toBeNull();
+  });
+});
+
 describe('encodeMessage / decodeServerMessage', () => {
   describe('basic messages', () => {
     it('round-trips execute without requestId', () => {

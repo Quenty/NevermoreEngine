@@ -33,6 +33,11 @@ import type {
   OutputLevel,
   FindInstancesMessage,
   FindInstancesResultMessage,
+  SampleInstancesMessage,
+  SampleInstancesResultMessage,
+  RecordViewportMessage,
+  RecordViewportResultMessage,
+  ViewportReadOptions,
   GrepScriptsMessage,
   GrepScriptsResultMessage,
 } from '../server/web-socket-protocol.js';
@@ -63,6 +68,10 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   exportInstances: 60_000,
   importInstances: 60_000,
   findInstances: 60_000,
+  // On top of the recording's own duration
+  sampleInstances: 30_000,
+  // On top of the recording's own duration, for reading every capture after it
+  recordViewport: 120_000,
   grepScripts: 60_000,
   queryLogs: 10_000,
   endPlaytest: 5_000,
@@ -225,7 +234,10 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('stateResult', result);
   }
 
-  async captureScreenshotAsync(): Promise<ScreenshotResult> {
+  /** Capture the viewport, optionally cropped to a region and scaled. */
+  async captureScreenshotAsync(
+    options: ViewportReadOptions = {}
+  ): Promise<ScreenshotResult> {
     this._assertConnected();
     await this._ensureActionsAsync();
 
@@ -235,7 +247,7 @@ export class BridgeSession extends EventEmitter {
         type: 'captureScreenshot',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { format: 'png' },
+        payload: { format: 'png', ...options },
       },
       timeoutMs
     );
@@ -340,6 +352,60 @@ export class BridgeSession extends EventEmitter {
     }
 
     throw pluginError('findInstancesResult', result);
+  }
+
+  /**
+   * Record properties and attributes of matched instances over a window of
+   * frames, optionally after running a trigger.
+   */
+  async sampleInstancesAsync(
+    options: SampleInstancesMessage['payload']
+  ): Promise<SampleInstancesResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'sampleInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      Math.ceil(options.duration * 1000) + DEFAULT_TIMEOUTS.sampleInstances
+    );
+
+    if (result.type === 'sampleInstancesResult') {
+      return result.payload;
+    }
+
+    throw pluginError('sampleInstancesResult', result);
+  }
+
+  /**
+   * Capture the viewport over a window of frames, optionally after running a
+   * trigger. Frames come back as raw RGBA.
+   */
+  async recordViewportAsync(
+    options: RecordViewportMessage['payload']
+  ): Promise<RecordViewportResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync();
+
+    const result = await this._handle.sendActionAsync<PluginMessage>(
+      {
+        type: 'recordViewport',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      Math.ceil(options.duration * 1000) + DEFAULT_TIMEOUTS.recordViewport
+    );
+
+    if (result.type === 'recordViewportResult') {
+      return result.payload;
+    }
+
+    throw pluginError('recordViewportResult', result);
   }
 
   /** Search the source of every script for a pattern. */

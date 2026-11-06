@@ -110,6 +110,27 @@ const ErrorCodeSchema = z.enum([
 
 const OutputLevelSchema = z.enum(['Print', 'Info', 'Warning', 'Error']);
 
+const InstanceSelectionShape = {
+  root: z.string().optional(),
+  names: z.array(z.string()).optional(),
+  name: z.string().optional(),
+  exactName: z.boolean().optional(),
+  className: z.string().optional(),
+  tag: z.string().optional(),
+};
+
+const RecordingOptionsShape = {
+  trigger: z.string().optional(),
+  duration: z.number(),
+  fps: z.number().optional(),
+  maxFrames: z.number().optional(),
+};
+
+const ViewportReadOptionsShape = {
+  region: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
+  scale: z.number().optional(),
+};
+
 const ServerMessageSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('execute'),
@@ -141,6 +162,7 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z
       .object({
         format: z.literal('png').optional(),
+        ...ViewportReadOptionsShape,
       })
       .loose(),
   }),
@@ -170,12 +192,32 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     payload: z
       .object({
-        root: z.string().optional(),
-        name: z.string().optional(),
-        exactName: z.boolean().optional(),
-        className: z.string().optional(),
-        tag: z.string().optional(),
+        ...InstanceSelectionShape,
         limit: z.number().optional(),
+      })
+      .loose(),
+  }),
+  z.object({
+    type: z.literal('sampleInstances'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z
+      .object({
+        ...InstanceSelectionShape,
+        ...RecordingOptionsShape,
+        properties: z.array(z.string()).optional(),
+        attributes: z.array(z.string()).optional(),
+      })
+      .loose(),
+  }),
+  z.object({
+    type: z.literal('recordViewport'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z
+      .object({
+        ...RecordingOptionsShape,
+        ...ViewportReadOptionsShape,
       })
       .loose(),
   }),

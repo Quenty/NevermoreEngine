@@ -23,6 +23,8 @@ vi.mock('fs', async (importOriginal) => {
 });
 
 import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 function createMockSession() {
   return { sessionId: 'mock-session' };
@@ -283,6 +285,96 @@ describe('handler — output file writing', () => {
     expect(JSON.parse(written)).toEqual({ summary: 'Screenshot taken' });
 
     vi.restoreAllMocks();
+  });
+});
+
+describe('handler — csv and directory output', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const csvCli = {
+    format: (result: any) => result.summary,
+    csv: (result: any) => ['item', ...result.items].join(';'),
+  };
+
+  it('writes CSV when --output ends in .csv', async () => {
+    const lifecycle = createMockLifecycle();
+    const module = buildYargsCommand(readCommand({ cli: csvCli }), {
+      lifecycle,
+    });
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    await captureOutput(async () => {
+      await (module.handler as any)({ output: '/tmp/items.CSV' });
+    });
+
+    const call = vi.mocked(fs.writeFileSync).mock.calls[0];
+    expect(call[1]).toBe('item;a;b');
+  });
+
+  it('prints CSV with --format csv', async () => {
+    const lifecycle = createMockLifecycle();
+    const module = buildYargsCommand(readCommand({ cli: csvCli }), {
+      lifecycle,
+    });
+
+    const logs = await captureOutput(async () => {
+      await (module.handler as any)({ format: 'csv' });
+    });
+
+    expect(logs).toEqual(['item;a;b']);
+  });
+
+  it('keeps an explicit --format over the .csv extension', async () => {
+    const lifecycle = createMockLifecycle();
+    const module = buildYargsCommand(readCommand({ cli: csvCli }), {
+      lifecycle,
+    });
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+    await captureOutput(async () => {
+      await (module.handler as any)({
+        output: '/tmp/items.csv',
+        format: 'json',
+      });
+    });
+
+    const call = vi.mocked(fs.writeFileSync).mock.calls[0];
+    expect(JSON.parse(call[1] as string).items).toEqual(['a', 'b']);
+  });
+
+  it('writes the files into the --output directory and prints the text', async () => {
+    const lifecycle = createMockLifecycle();
+    const module = buildYargsCommand(
+      readCommand({
+        cli: {
+          format: (result: any) => result.summary,
+          files: (result: any) =>
+            result.items.map((item: string) => ({
+              path: `${item}.txt`,
+              data: item,
+            })),
+        },
+      }),
+      { lifecycle }
+    );
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const outputDir = path.join(os.tmpdir(), `adapter-dir-${process.pid}`);
+
+    const logs = await captureOutput(async () => {
+      await (module.handler as any)({ output: outputDir });
+    });
+
+    const written = vi
+      .mocked(fs.writeFileSync)
+      .mock.calls.map((call) => call[0]);
+    expect(written).toEqual([
+      path.join(outputDir, 'a.txt'),
+      path.join(outputDir, 'b.txt'),
+    ]);
+    expect(logs).toEqual(['Found 2 items']);
+    fs.rmSync(outputDir, { recursive: true, force: true });
   });
 });
 

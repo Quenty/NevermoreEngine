@@ -8,20 +8,26 @@ local require = require(script.Parent.loader).load(script)
 local EncodingService = game:GetService("EncodingService")
 local HttpService = game:GetService("HttpService")
 
+local ActionReply = require("action-reply")
 local ActionRouter = require("ActionRouter")
 local CaptureScreenshotAction = require("capture-screenshot")
 local Jest = require("Jest")
+local ViewportCapture = require("viewport-capture")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function setup()
-	CaptureScreenshotAction.register(ActionRouter.new(), function() end)
+	local router = ActionRouter.new()
+	CaptureScreenshotAction.register(router, function() end)
+	ViewportCapture.register(router)
+	ActionReply.register(router)
 
 	local pixels = buffer.fromstring("\255\0\0\255\0\0\255\255")
 	local captureError: string? = nil
 	local callsBackImmediately = false
+	local readRegion: { Vector2 }? = nil
 
 	local services: CaptureScreenshotAction.Services = {
 		captureService = {
@@ -40,7 +46,8 @@ local function setup()
 			CreateEditableImageAsync = function()
 				return {
 					Size = Vector2.new(2, 1),
-					ReadPixelsBuffer = function()
+					ReadPixelsBuffer = function(_self, position: Vector2, size: Vector2)
+						readRegion = { position, size }
 						return pixels
 					end,
 					Destroy = function() end,
@@ -58,11 +65,14 @@ local function setup()
 		setCallsBackImmediately = function()
 			callsBackImmediately = true
 		end,
-		captureAsync = function(): { [string]: any }
+		getReadRegion = function(): { Vector2 }?
+			return readRegion
+		end,
+		captureAsync = function(payload: { [string]: any }?): { [string]: any }
 			local sent: { [string]: any }? = nil
 			task.spawn(CaptureScreenshotAction._captureAsync, function(message)
 				sent = message
-			end, "request-1", "session-1", services)
+			end, "request-1", "session-1", services, payload)
 
 			local deadline = os.clock() + 5
 			while sent == nil and os.clock() < deadline do
@@ -106,6 +116,25 @@ describe("captureScreenshot", function()
 
 		local decoded = EncodingService:Base64Decode(buffer.fromstring(message.payload.data))
 		expect(buffer.tostring(decoded)).toBe(buffer.tostring(controller.pixels))
+	end)
+
+	it("should read only the region it was asked for", function()
+		local controller = setup()
+
+		local message = controller.captureAsync({ region = { 1, 0, 5, 5 } })
+
+		expect(message.type).toBe("screenshotResult")
+		expect(message.payload.width).toBe(1)
+		expect(controller.getReadRegion()).toEqual({ Vector2.new(1, 0), Vector2.new(1, 1) })
+	end)
+
+	it("should answer INVALID_REGION for a region outside the capture", function()
+		local controller = setup()
+
+		local message = controller.captureAsync({ region = { 10, 10, 5, 5 } })
+
+		expect(message.type).toBe("error")
+		expect(message.payload.code).toBe("INVALID_REGION")
 	end)
 
 	it("should finish when CaptureService calls back before returning", function()

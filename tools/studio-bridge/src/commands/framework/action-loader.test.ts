@@ -111,18 +111,24 @@ describe('loadActionSourcesAsync', () => {
     const results = await loadActionSourcesAsync();
 
     expect(results.map((r) => r.name).sort()).toEqual([
+      'action-reply',
       'capture-screenshot',
       'end-playtest',
       'execute',
       'export-instances',
       'find-instances',
+      'frame-recorder',
       'grep-scripts',
       'import-instances',
+      'instance-selection',
       'playtest-players',
       'query-data-model',
       'query-logs',
       'query-state',
+      'record-viewport',
+      'sample-instances',
       'start-playtest',
+      'viewport-capture',
     ]);
   });
 
