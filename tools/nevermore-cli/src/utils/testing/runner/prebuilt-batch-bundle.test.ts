@@ -249,4 +249,24 @@ describe('prebuilt batch bundle', () => {
       'Unsupported bundle format'
     );
   });
+
+  it('names the right command for a deploy bundle, before its unexpected entries', async () => {
+    const file = await writeRawAsync([
+      {
+        path: 'manifest.json',
+        body: JSON.stringify({
+          formatVersion: 1,
+          kind: 'deploy',
+          target: 'integration',
+          places: [],
+        }),
+      },
+      { path: 'place-1.rbxl', body: 'place bytes' },
+      { path: 'project-1.json', body: '{}' },
+    ]);
+
+    await expect(readAsync(file)).rejects.toThrow(
+      'This is a deploy bundle, not a tests bundle. Run it with "nevermore batch deploy --bundle <file>".'
+    );
+  });
 });

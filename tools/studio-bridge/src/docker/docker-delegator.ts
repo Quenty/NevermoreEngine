@@ -198,7 +198,7 @@ export async function buildDockerRunArgsAsync(
     'run',
     '--file',
     scriptFilePath,
-    '--timeout',
+    '--script-timeout',
     String(timeoutMs),
   ];
 

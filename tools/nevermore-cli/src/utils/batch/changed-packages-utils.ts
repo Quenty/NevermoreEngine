@@ -127,6 +127,29 @@ export async function discoverChangedTestableBatchTargetsAsync(
 }
 
 /**
+ * The places `batch deploy` deploys, and `batch bundle --deploy` builds for a
+ * later deploy. One function so the two can never pick different places: a
+ * fork's bundle must hold what a same-repo run would have deployed.
+ */
+export async function discoverDeployBatchTargetsAsync(options: {
+  targetName: string;
+  all?: boolean;
+  base: string;
+  limit?: number;
+}): Promise<BatchTarget[]> {
+  const discovered = options.all
+    ? await discoverAllTargetPackagesAsync(options.targetName)
+    : await discoverChangedTargetPackagesAsync(
+        options.base,
+        options.targetName
+      );
+  const batchTargets = flattenToBatchTargets(discovered);
+  return options.limit && options.limit > 0
+    ? batchTargets.slice(0, options.limit)
+    : batchTargets;
+}
+
+/**
  * Fan a list of TargetPackages out into BatchTargets — one per place. A
  * single-place package produces one BatchTarget with the package name; a
  * multi-place package produces one per place, with ` - <place.name>` suffix.

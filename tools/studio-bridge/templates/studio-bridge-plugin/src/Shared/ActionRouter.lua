@@ -30,6 +30,13 @@ export type Handler = (payload: { [string]: any }, requestId: string, sessionId:
 
 export type SendMessage = (message: { [string]: any }) -> ()
 
+--[=[
+	Compiles Luau source into a function, or returns nil and why it could not.
+	@type Compiler (source: string, chunkName: string?) -> (any, string?)
+	@within ActionRouter
+]=]
+export type Compiler = (source: string, chunkName: string?) -> (any, string?)
+
 export type ActionInfo = {
 	module: any,
 	hash: string,
@@ -42,6 +49,7 @@ export type ActionRouter = typeof(setmetatable(
 		_responseTypes: { [string]: string },
 		_actions: { [string]: ActionInfo },
 		_vendorPng: any?,
+		_compiler: Compiler?,
 	},
 	{} :: typeof({ __index = ActionRouter })
 ))
@@ -58,6 +66,7 @@ function ActionRouter.new(): ActionRouter
 
 	-- The screenshot action reads its PNG encoder off this field
 	self._vendorPng = nil
+	self._compiler = nil
 
 	return self
 end
@@ -81,6 +90,15 @@ end
 ]=]
 function ActionRouter.SetVendorPng(self: ActionRouter, png: any)
 	self._vendorPng = png
+end
+
+--[=[
+	Sets how source compiles where `loadstring` is off, in place of compiling
+	through a ModuleScript. The bridge planted into a playtest cannot set a
+	ModuleScript's source, so it looks up sources compiled for it ahead of time.
+]=]
+function ActionRouter.SetCompiler(self: ActionRouter, compiler: Compiler)
+	self._compiler = compiler
 end
 
 --[=[
@@ -130,15 +148,19 @@ end
 
 --[=[
 	Compiles Luau source into a function, like `loadstring`. A playtest's client
-	has no `loadstring`, so there the source compiles through a ModuleScript
-	instead. Returns nil and the compile error when the source does not compile.
+	has no `loadstring`, so there the source compiles through the compiler set
+	with `SetCompiler`, or else a ModuleScript. Returns nil and the compile error
+	when the source does not compile.
 ]=]
-function ActionRouter.Compile(_self: ActionRouter, source: string, chunkName: string?): (any, string?)
+function ActionRouter.Compile(self: ActionRouter, source: string, chunkName: string?): (any, string?)
 	local loadstringOk, fn, compileErr = pcall(loadstring :: any, source, chunkName)
 	if loadstringOk then
 		return fn, compileErr
 	end
 
+	if self._compiler then
+		return self._compiler(source, chunkName)
+	end
 	return ActionRouter._compileWithModuleScript(source, chunkName)
 end
 

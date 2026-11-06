@@ -162,6 +162,57 @@ describe('BridgeSession', () => {
       expect(timeout).toBe(10_000);
     });
 
+    it('sends inputs base64-encoded', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      await session.execAsync('return ...', undefined, undefined, [
+        Buffer.from('hello'),
+      ]);
+
+      const [msg] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.inputs).toEqual(['aGVsbG8=']);
+    });
+
+    it('sends --run-as and carries back where the code ran', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true, ranAs: 'game' },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync(
+        'return 1',
+        undefined,
+        undefined,
+        undefined,
+        'game'
+      );
+
+      const [msg] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.runAs).toBe('game');
+      expect(result.ranAs).toBe('game');
+    });
+
+    it('refuses inputs over the size limit without sending them', async () => {
+      const handle = new MockTransportHandle();
+      const session = new BridgeSession(createSessionInfo(), handle);
+
+      await expect(
+        session.execAsync('return ...', undefined, undefined, [
+          Buffer.alloc(192 * 1024 * 1024 + 1),
+        ])
+      ).rejects.toThrow('that can be sent to Studio with a script');
+      expect(handle.sendActionAsync).not.toHaveBeenCalled();
+    });
+
     it('returns error info from error response', async () => {
       const handle = new MockTransportHandle();
       handle.sendActionAsync.mockResolvedValueOnce({

@@ -80,6 +80,7 @@ studio-bridge console exec 'print(workspace:GetChildren())'
 studio-bridge console exec --file test.lua
 studio-bridge console exec 'return game.PlaceId' --format json
 studio-bridge console exec -f spawn-npc.lua -- Goblin 3
+studio-bridge console exec -f load-map.lua --input europe-15m.json.zst -- europe
 ```
 
 | Option | Alias | Description |
@@ -87,11 +88,22 @@ studio-bridge console exec -f spawn-npc.lua -- Goblin 3
 | `--file` | `-f` | Path to a Luau script file |
 | `--target` | `-t` | Target session ID |
 | `--context` | — | Target context (`edit`, `client`, `server`) |
-| `--timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
+| `--script-timeout` | — | Cancel the script after this many milliseconds (default: 120000) |
 | `--allow-edit` | — | Change Edit even while a playtest of it runs |
+| `--input <file>` | — | Send a file with the script, which receives it as a `buffer` in `...` before any args (`local data, region = ...`). Repeat for more files, up to 192 MiB in all |
 | `-- <args..>` | — | Passed to the script as `...`, as strings (`local name, count = ...`) |
 
-Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
+Output includes everything logged while the script runs, including prints from modules it requires and from threads it starts. A runtime error comes with a traceback. A script that runs past `--script-timeout` is cancelled, so the scripts queued behind it still run. While a playtest is running, `exec` on Edit is refused, since the playtest runs a copy and would not see the change; target the playtest with `--context server` or `--context client` instead.
+
+`--run-as` says where the code runs, and the result says where it ran (`ranAs`, and a `(ran as …)` line when it was not the plugin). Asking for one that is not available fails with the reason:
+
+| `--run-as` | Runs as | `require(game.SomeModule)` | Available |
+|---|---|---|---|
+| `plugin` | the studio-bridge plugin | a separate copy from the running game's | wherever the plugin is connected |
+| `game` | an ordinary `Script` (server) or `LocalScript` (client) the plugin plants for the run | the instance the running game uses | a running playtest's server or client |
+| `mcp` | Studio's MCP Assistant sandbox | refused for the game's own modules | wherever Studio's MCP server reaches that Studio; takes no args or `--input` |
+
+Without `--run-as` the code runs in the plugin, or, in a playtest Studio loads no plugins into, as game code in the bridge planted there, which only runs code compiled when the playtest started. A plugin that does load into the playtest replaces that bridge.
 
 ### `console logs`
 
@@ -169,6 +181,10 @@ studio-bridge process list
 
 Lists the connected sessions with their ID, context, place, and state. `--target` and `--context` narrow the list. While a playtest studio-bridge started is running, every session of that Studio shows `Play` (or `Run` without a client).
 
+Below the sessions, a table lists every running Studio process, whether or not its plugin is connected: its pid, how long it has run, its window, the plugin session in it, its id in [Studio's MCP server](#studios-mcp-server), and the folder and place `process launch` opened it with. Studios showing the same place, such as two unsaved `Place1` windows, are told apart by how long each has run: `os.clock()` in Studio is the process's uptime, read through the plugin and through MCP and matched against the start time of each process. `process close` uses the same match when several windows show the session's place. With no session, the summary says whether no Studio is open at all or Studios are open without the plugin, and how long it waited.
+
+The last line reports the MCP server's health. MCP never holds the list up: it waits at most 3 seconds, and under `--watch` each frame shows the latest check while the next one runs, so a stalled server shows up as a stale check rather than a frozen screen. `--no-mcp` skips it.
+
 ### `process info`
 
 ```bash
@@ -184,9 +200,10 @@ Viewport: 849x1003
 Window:   pid 31876, open, not focused
 Studio:   0.744.0.7441077
 Plugin:   6c751ae59131 (up to date)
+MCP:      reachable (studio_id 1268b6c6-47aa-4df9-8f3a-0a9ddb0c5f42)
 ```
 
-Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; and whether its plugin matches the one this CLI installs. The two clients of a multiplayer test share a window title, so they report no window.
+Reports on one session: its ID, context and origin; the run mode of its own DataModel; the playtest running in its Studio (mode, player count, and the playtest's sessions, when they are connected); the place; the viewport size; the Studio window, when exactly one window shows it; the Studio version; whether its plugin matches the one this CLI installs; and whether Studio's MCP server can reach it (`--no-mcp` to skip). The two clients of a multiplayer test share a window title, so they report no window.
 
 ### `process launch`
 
@@ -197,7 +214,7 @@ studio-bridge process launch --place ./build/test.rbxl
 studio-bridge process launch --place-id 123 --universe-id 456
 ```
 
-Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json` it opens Studio with no place.
+Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json`, or in one without targets like the repo root's, it opens a new Baseplate from Roblox's template, the same unsaved place the start page's Baseplate gives.
 
 ### `process run`
 
@@ -212,11 +229,11 @@ Launches Studio on a copy of the place, runs the script there and nowhere else, 
 
 ```bash
 studio-bridge process close --target test-place
-studio-bridge process close --target test-place --force
 studio-bridge process close integration.places.hub   # the Studio showing a deploy.nevermore.json target
+studio-bridge process close --all                    # every running Studio, connected or not
 ```
 
-Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio usually asks to save a local place first, so without `--force` the command reports that Studio is still open; `--force` kills it without saving. When several windows show the same place, pick one with `--pid`.
+Closes the Studio process showing the session's place, found by its window title, or for a cloud place by the place id Studio was launched with. Given a `deploy.nevermore.json` target instead, closes the Studio showing that target's place, whether or not its plugin is connected. Studio is closed without saving, so no dialog waits on someone to click it. Pass `--ask-to-save` to let Studio prompt instead; if it is still open after that, the command says so. When several windows show the same place, pick one with `--pid`.
 
 ### `playtest run` / `playtest start` / `playtest restart` / `playtest stop`
 
@@ -224,6 +241,7 @@ Closes the Studio process showing the session's place, found by its window title
 studio-bridge playtest run 'return #game:GetService("Players"):GetPlayers()'
 studio-bridge playtest run --context client 'return game:GetService("Players").LocalPlayer.Name'
 studio-bridge playtest run --file spawn-test.lua -- Goblin 3
+studio-bridge playtest run --file load-map.lua --input europe-15m.json.zst -- europe
 studio-bridge playtest start --mode run
 studio-bridge console exec --context server 'print("in the playtest")'
 studio-bridge playtest restart
@@ -232,11 +250,13 @@ studio-bridge playtest stop
 
 Starts a playtest through `StudioTestService` in the open Studio. `--mode play` (the default) runs a server and a client with a player; `--mode run` runs only the server.
 
-`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It plants a temporary runner script in the playtest to do so, so it works whatever Studio's **Load user plugins on playtest** setting says. `--context client` runs the code in the playtest's client instead, which needs that setting on.
+`playtest run` executes the code in a fresh playtest's server, returns its output and values like `console exec`, then stops the playtest. It takes `--input` like `console exec`. In play mode it waits for the player to join first. It works whatever Studio's **Load user plugins on playtest** setting says (see below). `--context client` runs the code in the playtest's client instead.
 
 `playtest start` leaves the playtest running, so other commands can target it with `--context server` or `--context client`. `playtest restart` stops it and starts a new one in the same mode, picking up code changed since it started; with none running, it starts one. `playtest stop` ends it.
 
-`start`, `restart`, and `stop` talk to the playtest's own server and client, which only connect when **Load user plugins on playtest** is on. With it off, `playtest start` still starts the playtest but reports that its sessions never connected, and the playtest has to be stopped in Studio.
+A playtest's sessions are the studio-bridge plugin, which Studio only loads into a playtest with **Load user plugins on playtest** on. With it off, the edit session plants the same client into the playtest as ordinary scripts: a Script for the server and, in play mode, a LocalScript that every player's client runs, so the server and client sessions still connect and `start`, `restart`, `stop`, `playtest player`, `console logs` and the other actions all work. Without plugin permissions those sessions can't compile code, so they only run the code `playtest run` gave them when the playtest started, and `console exec` with new code asks for the setting. With the setting on, nothing is planted, and the plugin is the playtest's sessions.
+
+Playtests whose sessions are the plugin need the current plugin (`studio-bridge plugin install`), since those sessions register with the playtest's id.
 
 ### Multiplayer tests: `playtest start --players` / `playtest player`
 
@@ -299,6 +319,10 @@ Session IDs are the place name plus a short suffix and the context, like `test-p
 
 When Studio is in Play mode, a single instance has multiple contexts (Edit + Client + Server). The default is `edit`.
 
+## Studio's MCP server
+
+`src/roblox-mcp/` reaches Studio through `StudioMCP.exe`, the MCP server Roblox ships with Studio, for things the plugin can't do or when it isn't running. All MCP knowledge stays in that folder; commands call `tryExecuteLuauAsync`, `tryCallStudioToolAsync` or `tryListStudiosAsync` with the bridge's usual `--target` and context. They never throw, run under a strict deadline, and return a `reason` when MCP is unavailable, finds no Studio, fails or times out. Windows only.
+
 ## Testing
 
 ```bash
@@ -313,6 +337,10 @@ pnpm test:integration  # End-to-end smoke test (requires Studio)
 | Unit (`pnpm test`) | Protocol, bridge connection, session tracking, command handlers, WebSocket lifecycle | No |
 | Plugin (`nevermore test --cloud`) | Plugin modules and action scripts, via the `*.spec.lua` beside them in `templates/studio-bridge-plugin/src/Shared` and `src/commands`, in a real engine built from `test/default.project.json` | No |
 | Integration (`pnpm test:integration`) | Full pipeline: rojo build, plugin injection, Studio launch, output capture | Yes |
+
+## Working on this package
+
+- [docs/playtest-bridge.md](docs/playtest-bridge.md): how a playtest gets a server session without Studio loading plugins into it, and what an ordinary playtest Script can and can't do.
 
 ## Platform Support
 

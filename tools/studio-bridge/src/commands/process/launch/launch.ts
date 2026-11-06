@@ -7,10 +7,13 @@ import * as path from 'path';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { launchStudioAsync } from '../../../process/studio-process-manager.js';
+import { recordStudioLaunchAsync } from '../../../process/studio-launch-registry.js';
 import {
   DEPLOY_CONFIG_FILE_NAME,
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
+
+const BASEPLATE_TEMPLATE = { placeId: 95206881, universeId: 28220420 };
 
 export interface LaunchOptions {
   placePath?: string;
@@ -50,7 +53,11 @@ export async function launchHandlerAsync(
       );
   if (deployPlace) {
     const { placeId, universeId } = deployPlace.place;
-    await launchStudioAsync({ placeId, universeId });
+    await _launchAndRecordAsync(
+      { placeId, universeId },
+      `'${deployPlace.selector}' (place ${placeId})`,
+      options.cwd
+    );
     const configDir = path.relative(
       options.cwd ?? process.cwd(),
       path.dirname(deployPlace.configPath)
@@ -69,8 +76,24 @@ export async function launchHandlerAsync(
     };
   }
 
+  if (!hasExplicitPlace) {
+    await _launchAndRecordAsync(
+      BASEPLATE_TEMPLATE,
+      'a new Baseplate',
+      options.cwd
+    );
+    return {
+      launched: true,
+      summary: 'Studio launched with a new Baseplate',
+    };
+  }
+
   const { placePath, placeId, universeId } = options;
-  await launchStudioAsync({ placePath, placeId, universeId });
+  await _launchAndRecordAsync(
+    { placePath, placeId, universeId },
+    placeId != null ? `place ${placeId}` : placePath ?? 'Studio',
+    options.cwd
+  );
   const opened =
     placeId != null
       ? `place ${placeId}${
@@ -85,6 +108,21 @@ export async function launchHandlerAsync(
   };
 }
 
+async function _launchAndRecordAsync(
+  launch: Parameters<typeof launchStudioAsync>[0],
+  opened: string,
+  cwd = process.cwd()
+): Promise<void> {
+  const launchedAt = Date.now();
+  const studio = await launchStudioAsync(launch);
+  await recordStudioLaunchAsync({
+    pid: studio?.process?.pid,
+    cwd,
+    opened,
+    launchedAt,
+  }).catch(() => {});
+}
+
 interface LaunchArgs {
   deployTarget?: string;
   place?: string;
@@ -96,7 +134,7 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
   group: 'process',
   name: 'launch',
   description:
-    "Launch Roblox Studio, by default with the place of the nearest deploy.nevermore.json's default target",
+    "Launch Roblox Studio, by default with the place of the nearest deploy.nevermore.json's default target, or else a new Baseplate",
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',

@@ -687,6 +687,7 @@ export class BridgeConnection extends EventEmitter {
         origin: info.launchId ? 'managed' : 'user',
         launchId: info.launchId,
         playerName: info.playerName,
+        playtestId: info.playtestId,
         context,
         instanceId: info.instanceId ?? info.sessionId,
         placeId: 0,

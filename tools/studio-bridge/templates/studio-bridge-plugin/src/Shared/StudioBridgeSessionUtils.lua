@@ -12,6 +12,8 @@ local PLUGIN_VERSION = "{{PLUGIN_VERSION}}"
 local MAX_SLUG_LENGTH = 24
 local NONCE_VALUE_NAME = "StudioBridgeNonce"
 local LAUNCH_ID_ATTRIBUTE = "StudioBridgeSessionId"
+local PLANTED_BRIDGE_NAME = "StudioBridgePlaytest"
+local PLAYTEST_ID_ATTRIBUTE = "PlaytestId"
 
 local StudioBridgeSessionUtils = {}
 
@@ -21,6 +23,7 @@ export type PlaytestArgs = {
 	port: number,
 	instanceId: string,
 	multiplayer: boolean,
+	playtestId: string?,
 }
 
 --[=[
@@ -45,6 +48,7 @@ StudioBridgeSessionUtils.CAPABILITIES = table.freeze({
 	"grepScripts",
 	"startPlaytest",
 	"endPlaytest",
+	"playtestPlayers",
 })
 
 --[=[
@@ -115,7 +119,8 @@ function StudioBridgeSessionUtils.createRegisterPayload(
 	instanceId: string,
 	context: PluginContext,
 	launchId: string?,
-	playerName: string?
+	playerName: string?,
+	playtestId: string?
 ): { [string]: any }
 	return {
 		pluginVersion = PLUGIN_VERSION,
@@ -123,6 +128,7 @@ function StudioBridgeSessionUtils.createRegisterPayload(
 		context = context,
 		launchId = launchId,
 		playerName = playerName,
+		playtestId = playtestId,
 		placeName = game.Name or "Unknown",
 		placeId = game.PlaceId,
 		gameId = game.GameId,
@@ -143,8 +149,8 @@ end
 --[=[
 	Returns what studio-bridge handed a playtest through its StudioTestService
 	test args: the bridge port, the instance id of the edit session that
-	started it, and whether it is a multiplayer test. Nil when studio-bridge
-	did not start the playtest.
+	started it, whether it is a multiplayer test, and the playtest id. Nil when
+	studio-bridge did not start the playtest.
 ]=]
 function StudioBridgeSessionUtils.getPlaytestArgs(testArgs: any): PlaytestArgs?
 	if
@@ -156,7 +162,27 @@ function StudioBridgeSessionUtils.getPlaytestArgs(testArgs: any): PlaytestArgs?
 			port = testArgs.studioBridgePort,
 			instanceId = testArgs.studioBridgeInstanceId,
 			multiplayer = type(testArgs.studioBridgePlayers) == "number",
+			playtestId = if type(testArgs.studioBridgePlaytestId) == "string"
+				then testArgs.studioBridgePlaytestId
+				else nil,
 		}
+	end
+	return nil
+end
+
+--[=[
+	Returns the bridge planted under `container` for the playtest `playtestId`,
+	or nil. The edit session plants it when Studio does not load user plugins
+	into playtests, and a playtest copies it from the edit DataModel.
+]=]
+function StudioBridgeSessionUtils.findPlantedBridge(container: Instance, playtestId: string?): Instance?
+	if not playtestId then
+		return nil
+	end
+
+	local planted = container:FindFirstChild(PLANTED_BRIDGE_NAME)
+	if planted and planted:GetAttribute(PLAYTEST_ID_ATTRIBUTE) == playtestId then
+		return planted
 	end
 	return nil
 end

@@ -8,7 +8,8 @@
 	  `SCRIPT_RUNTIME_ERROR` with a `traceback` when it throws, and
 	  `SCRIPT_TIMEOUT` when it outlives `payload.timeoutMs`. A timed out script
 	  is cancelled, so the requests queued behind it still run.
-	- Passes `payload.args`, a list of strings, to the script as `...`.
+	- Passes `payload.inputs`, a list of base64 files, to the script as buffers
+	  in `...`, followed by `payload.args`, a list of strings.
 	- Runs concurrent requests one at a time, in arrival order.
 	- Returns everything printed while the script runs, read from LogService, so
 	  output from required modules and from threads the script starts comes back.
@@ -26,6 +27,18 @@
 
 local MAX_DEPTH = 64
 local CHUNK_NAME = "=exec"
+local GAME_RUNNER_NAME = "StudioBridgeRunAsGame"
+local GAME_RUNNER_HEADER =
+	'local __bridgeArgs = table.pack(script:WaitForChild("Args"):Invoke()) local __bridgeResult = table.pack(xpcall(function(...) '
+local GAME_RUNNER_FOOTER =
+	'\nend, function(err) return { message = tostring(err), traceback = debug.traceback(nil, 2) } end, table.unpack(__bridgeArgs, 1, __bridgeArgs.n))) local __bridgeOut = { n = __bridgeResult.n, ok = __bridgeResult[1] } for i = 2, __bridgeResult.n do __bridgeOut["v" .. (i - 1)] = __bridgeResult[i] end script:WaitForChild("Done"):Fire(__bridgeOut)'
+local NO_PLUGIN_MESSAGE =
+	"This session runs as game code: it is the bridge planted into a playtest because Studio's \"Load user plugins on playtest\" setting is off, so there is no plugin to run in. Turn the setting on, or use --run-as mcp, which runs any code here but cannot require the game's modules."
+local NOT_RUNNING_MESSAGE =
+	"--run-as game needs a running playtest. Start one with 'studio-bridge playtest start', then target --context server or client."
+
+local MIN_OUTPUT_WAIT_FRAMES = 3
+local MAX_OUTPUT_WAIT_FRAMES = 30
 local PLUGIN_PREFIX = "[StudioBridge]"
 -- Tracebacks name this module's frames the way its first line does
 local OWN_FRAME_PREFIX = string.match(debug.traceback(), "^([^\n]-):%d+")
@@ -177,21 +190,55 @@ function ExecuteAction._handleExecute(
 		return reply({ success = false, error = "Missing code in execute request", code = "SCRIPT_LOAD_ERROR" })
 	end
 
+	local canPlant = ExecuteAction._canPlantScripts()
+	if payload.runAs == "plugin" and not canPlant then
+		return reply({ success = false, error = NO_PLUGIN_MESSAGE, code = "SCRIPT_LOAD_ERROR", ranAs = "game" })
+	end
+	local asGame = payload.runAs == "game" and canPlant
+	if asGame and not game:GetService("RunService"):IsRunning() then
+		return reply({ success = false, error = NOT_RUNNING_MESSAGE, code = "SCRIPT_LOAD_ERROR" })
+	end
+	local ranAs = if asGame or not canPlant then "game" else "plugin"
+
 	local compileOk, fn, compileErr = pcall(compile, code, CHUNK_NAME)
 	if not compileOk then
-		return reply({ success = false, error = tostring(fn), code = "SCRIPT_LOAD_ERROR" })
+		return reply({ success = false, error = tostring(fn), code = "SCRIPT_LOAD_ERROR", ranAs = ranAs })
 	end
 	if not fn then
 		return reply({
 			success = false,
 			error = if compileErr then tostring(compileErr) else "Failed to compile script",
 			code = "SCRIPT_LOAD_ERROR",
+			ranAs = ranAs,
 		})
 	end
 
 	local args = payload.args or {}
 	if type(args) ~= "table" then
 		return reply({ success = false, error = "Script args must be a list", code = "SCRIPT_LOAD_ERROR" })
+	end
+
+	local inputs = payload.inputs or {}
+	if type(inputs) ~= "table" then
+		return reply({ success = false, error = "Script inputs must be a list", code = "SCRIPT_LOAD_ERROR" })
+	end
+
+	local scriptArgs = {}
+	for index, encoded in inputs do
+		local decodeOk, decoded = pcall(function()
+			return game:GetService("EncodingService"):Base64Decode(buffer.fromstring(encoded))
+		end)
+		if not decodeOk or type(encoded) ~= "string" then
+			return reply({
+				success = false,
+				error = `Script input {index} is not valid base64`,
+				code = "SCRIPT_LOAD_ERROR",
+			})
+		end
+		table.insert(scriptArgs, decoded)
+	end
+	for _, arg in args do
+		table.insert(scriptArgs, arg)
 	end
 
 	local timeoutMs = payload.timeoutMs
@@ -210,10 +257,14 @@ function ExecuteAction._handleExecute(
 
 	local captured: { LogEntry } = {}
 	local logConnection = ExecuteAction._captureOutput(captured)
-	local status, result = ExecuteAction._runAsync(fn, timeoutSeconds, args)
+	local status, result
+	if asGame then
+		status, result = ExecuteAction._runAsGameAsync(code, timeoutSeconds, scriptArgs)
+	else
+		status, result = ExecuteAction._runAsync(fn, timeoutSeconds, scriptArgs)
+	end
 
-	-- MessageOut can fire a frame late, after the script's last print
-	task.wait()
+	ExecuteAction._waitForOutputAsync(captured)
 	logConnection:Disconnect()
 
 	if status == "timeout" then
@@ -222,6 +273,7 @@ function ExecuteAction._handleExecute(
 			error = `Script timed out after {timeoutMs}ms and was cancelled`,
 			code = "SCRIPT_TIMEOUT",
 			output = captured,
+			ranAs = ranAs,
 		})
 	elseif status == "error" then
 		return reply({
@@ -230,6 +282,7 @@ function ExecuteAction._handleExecute(
 			traceback = result.traceback,
 			code = "SCRIPT_RUNTIME_ERROR",
 			output = captured,
+			ranAs = ranAs,
 		})
 	end
 
@@ -237,6 +290,7 @@ function ExecuteAction._handleExecute(
 		success = true,
 		output = captured,
 		returnValues = ExecuteAction._serializeReturnValues(result),
+		ranAs = ranAs,
 	})
 end
 
@@ -256,6 +310,23 @@ function ExecuteAction._dropOwnFrames(traceback: string): string
 		end
 	end
 	return table.concat(lines, "\n")
+end
+
+--[[
+	Waits for the script's last output to arrive. MessageOut fires a frame or
+	two after a print, more in a playtest's server, so this waits a few frames
+	and then for one without new output.
+]]
+function ExecuteAction._waitForOutputAsync(captured: { LogEntry })
+	local seen = #captured
+	local frames = 0
+	local grew
+	repeat
+		task.wait()
+		frames += 1
+		grew = #captured ~= seen
+		seen = #captured
+	until frames >= MAX_OUTPUT_WAIT_FRAMES or (frames >= MIN_OUTPUT_WAIT_FRAMES and not grew)
 end
 
 --[[
@@ -329,6 +400,77 @@ function ExecuteAction._runAsync(fn: (...any) -> ...any, timeoutSec: number?, ar
 
 	local final = outcome :: { status: string, result: any }
 	return final.status, final.result
+end
+
+--[[
+	Whether this thread may set a script's source: a plugin can, the bridge
+	planted into a playtest cannot.
+]]
+function ExecuteAction._canPlantScripts(): boolean
+	return (pcall(function()
+		local probe = Instance.new("Script")
+		probe.Source = ""
+		probe:Destroy()
+	end))
+end
+
+--[[
+	Runs `code` as an ordinary game Script (server) or LocalScript (client), so
+	`require` returns the modules the running game uses rather than the plugin's
+	own copies. Returns what `_runAsync` returns.
+]]
+function ExecuteAction._runAsGameAsync(code: string, timeoutSec: number?, args: { any }?): (string, any)
+	local RunService = game:GetService("RunService")
+	local isServer = RunService:IsServer()
+	local runner = Instance.new(if isServer then "Script" else "LocalScript")
+	runner.Name = GAME_RUNNER_NAME
+
+	local packedArgs = args or {}
+	local argsFunction = Instance.new("BindableFunction")
+	argsFunction.Name = "Args"
+	argsFunction.OnInvoke = function()
+		return table.unpack(packedArgs)
+	end
+	argsFunction.Parent = runner
+
+	local done = Instance.new("BindableEvent")
+	done.Name = "Done"
+	done.Parent = runner
+
+	local outcome: { [string]: any }? = nil
+	local connection = done.Event:Connect(function(result)
+		outcome = result
+	end)
+
+	runner.Source = GAME_RUNNER_HEADER .. code .. GAME_RUNNER_FOOTER
+	runner.Parent = if isServer
+		then game:GetService("ServerScriptService")
+		else (game:GetService("Players").LocalPlayer :: any):WaitForChild("PlayerScripts")
+
+	local deadline = if timeoutSec then os.clock() + timeoutSec else math.huge
+	while not outcome and os.clock() < deadline do
+		task.wait()
+	end
+	connection:Disconnect()
+	runner:Destroy()
+
+	if not outcome then
+		return "timeout", nil
+	end
+	local final = outcome :: { [string]: any }
+	if final.ok then
+		local packed = { n = final.n, true }
+		for index = 2, final.n do
+			packed[index] = final["v" .. (index - 1)]
+		end
+		return "ok", packed
+	end
+	local err = final.v1
+	return "error",
+		{
+			message = if type(err) == "table" then tostring(err.message) else tostring(err),
+			traceback = if type(err) == "table" then err.traceback else nil,
+		}
 end
 
 --[[

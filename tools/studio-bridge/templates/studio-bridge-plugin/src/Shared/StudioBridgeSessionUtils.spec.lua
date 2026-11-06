@@ -82,12 +82,12 @@ describe("StudioBridgeSessionUtils.getLaunchId()", function()
 end)
 
 describe("StudioBridgeSessionUtils.getPlaytestArgs()", function()
-	it("should read the port and instance id studio-bridge passed in the test args", function()
+	it("should read the port, instance id and playtest id studio-bridge passed in the test args", function()
 		expect(StudioBridgeSessionUtils.getPlaytestArgs({
 			studioBridgePlaytestId = "abc",
 			studioBridgePort = 38741,
 			studioBridgeInstanceId = "test-place-3f9a",
-		})).toEqual({ port = 38741, instanceId = "test-place-3f9a", multiplayer = false })
+		})).toEqual({ port = 38741, instanceId = "test-place-3f9a", multiplayer = false, playtestId = "abc" })
 	end)
 
 	it("should report a multiplayer test", function()
@@ -149,11 +149,44 @@ describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 		expect(payload.playerName).toEqual("Player2")
 	end)
 
+	it("should carry the playtest id of a playtest studio-bridge started", function()
+		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "server", nil, nil, "abc")
+
+		expect(payload.playtestId).toEqual("abc")
+	end)
+
 	it("should hand out a capabilities list the caller can change", function()
 		local payload = StudioBridgeSessionUtils.createRegisterPayload("test-place-3f9a", "edit")
 
 		table.insert(payload.capabilities, "extra")
 
 		expect(table.find(StudioBridgeSessionUtils.CAPABILITIES, "extra")).toBeNil()
+	end)
+end)
+
+describe("StudioBridgeSessionUtils.findPlantedBridge()", function()
+	local function plant(playtestId: string): Folder
+		local container = Instance.new("Folder")
+		local planted = Instance.new("Folder")
+		planted.Name = "StudioBridgePlaytest"
+		planted:SetAttribute("PlaytestId", playtestId)
+		planted.Parent = container
+		return container
+	end
+
+	it("should find the bridge planted for the playtest", function()
+		local container = plant("abc")
+
+		expect(StudioBridgeSessionUtils.findPlantedBridge(container, "abc")).toBe(
+			container:FindFirstChild("StudioBridgePlaytest")
+		)
+	end)
+
+	it("should ignore a bridge planted for another playtest", function()
+		expect(StudioBridgeSessionUtils.findPlantedBridge(plant("old"), "abc")).toBeNil()
+	end)
+
+	it("should find nothing without a playtest id", function()
+		expect(StudioBridgeSessionUtils.findPlantedBridge(plant("abc"), nil)).toBeNil()
 	end)
 end)

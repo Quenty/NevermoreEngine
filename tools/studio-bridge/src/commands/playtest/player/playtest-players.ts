@@ -17,7 +17,7 @@ import {
 
 const PLAYER_CHANGE_TIMEOUT_SEC = 60;
 const CLIENT_SESSION_TIMEOUT_MS = 30_000;
-const SCRIPT_GRACE_MS = 10_000;
+const REPLY_GRACE_MS = 10_000;
 
 export interface PlaytestPlayer {
   name: string;
@@ -27,103 +27,12 @@ export interface PlaytestPlayer {
   sessionId?: string;
 }
 
-const PLAYER_INFO_FUNCTION = [
-  'local function playerInfo(player)',
-  '\treturn { name = player.Name, userId = player.UserId, displayName = player.DisplayName }',
-  'end',
-].join('\n');
+const REQUEST_TIMEOUT_MS = PLAYER_CHANGE_TIMEOUT_SEC * 1000 + REPLY_GRACE_MS;
 
-const LIST_PLAYERS_SCRIPT = [
-  PLAYER_INFO_FUNCTION,
-  'local players = {}',
-  'for _, player in game:GetService("Players"):GetPlayers() do',
-  '\ttable.insert(players, playerInfo(player))',
-  'end',
-  'return players',
-].join('\n');
-
-function addPlayersScript(count: number): string {
-  return [
-    PLAYER_INFO_FUNCTION,
-    'local Players = game:GetService("Players")',
-    'local before = {}',
-    'for _, player in Players:GetPlayers() do',
-    '\tbefore[player] = true',
-    'end',
-    `game:GetService("StudioTestService"):AddPlayers(${count})`,
-    `local deadline = os.clock() + ${PLAYER_CHANGE_TIMEOUT_SEC}`,
-    'local added = {}',
-    'repeat',
-    '\ttask.wait(0.25)',
-    '\tadded = {}',
-    '\tfor _, player in Players:GetPlayers() do',
-    '\t\tif not before[player] then',
-    '\t\t\ttable.insert(added, playerInfo(player))',
-    '\t\tend',
-    '\tend',
-    `until #added >= ${count} or os.clock() > deadline`,
-    'return added',
-  ].join('\n');
-}
-
-function kickPlayersScript(names: string[]): string {
-  return [
-    `local names = ${luaStringList(names)}`,
-    'local Players = game:GetService("Players")',
-    'for _, name in names do',
-    '\tlocal player = Players:FindFirstChild(name)',
-    '\tif player then',
-    '\t\tplayer:Kick("Removed by studio-bridge")',
-    '\tend',
-    'end',
-  ].join('\n');
-}
-
-function waitForPlayersGoneScript(names: string[]): string {
-  return [
-    `local names = ${luaStringList(names)}`,
-    'local Players = game:GetService("Players")',
-    `local deadline = os.clock() + ${PLAYER_CHANGE_TIMEOUT_SEC}`,
-    'local remaining',
-    'repeat',
-    '\tremaining = {}',
-    '\tfor _, name in names do',
-    '\t\tif Players:FindFirstChild(name) then',
-    '\t\t\ttable.insert(remaining, name)',
-    '\t\tend',
-    '\tend',
-    '\tif #remaining > 0 then',
-    '\t\ttask.wait(0.25)',
-    '\tend',
-    'until #remaining == 0 or os.clock() > deadline',
-    'return remaining',
-  ].join('\n');
-}
-
-const LEAVE_TEST_SCRIPT =
-  'task.defer(function() game:GetService("StudioTestService"):LeaveTest() end)';
-
-function luaStringList(values: string[]): string {
-  return `{ ${values.map((value) => JSON.stringify(value)).join(', ')} }`;
-}
-
-async function runScriptAsync(
-  session: BridgeSession,
-  script: string
-): Promise<unknown> {
-  const result = await session.execAsync(
-    script,
-    PLAYER_CHANGE_TIMEOUT_SEC * 1000 + SCRIPT_GRACE_MS
-  );
-  if (!result.success) {
-    throw new Error(result.error ?? 'Player script failed');
-  }
-  return result.returnValues?.[0];
-}
-
-function toPlayers(value: unknown): PlaytestPlayer[] {
-  if (!Array.isArray(value)) return [];
-  return value.map((entry) => ({
+function toPlayers(
+  players: Array<{ name: string; userId: number; displayName: string }>
+): PlaytestPlayer[] {
+  return players.map((entry) => ({
     name: String(entry.name),
     userId: Number(entry.userId),
     displayName: String(entry.displayName),
@@ -162,10 +71,15 @@ export async function listPlaytestPlayersAsync(
   connection: BridgeConnection,
   serverSession: BridgeSession
 ): Promise<PlaytestPlayer[]> {
-  const players = toPlayers(
-    await runScriptAsync(serverSession, LIST_PLAYERS_SCRIPT)
+  const { players } = await serverSession.playtestPlayersAsync(
+    { op: 'list' },
+    REQUEST_TIMEOUT_MS
   );
-  return withSessions(connection, serverSession.info.instanceId, players);
+  return withSessions(
+    connection,
+    serverSession.info.instanceId,
+    toPlayers(players)
+  );
 }
 
 /**
@@ -178,7 +92,12 @@ export async function addPlaytestPlayersAsync(
   count: number
 ): Promise<PlaytestPlayer[]> {
   const added = toPlayers(
-    await runScriptAsync(serverSession, addPlayersScript(count))
+    (
+      await serverSession.playtestPlayersAsync(
+        { op: 'add', count, timeoutSec: PLAYER_CHANGE_TIMEOUT_SEC },
+        REQUEST_TIMEOUT_MS
+      )
+    ).players
   );
   const { instanceId } = serverSession.info;
 
@@ -230,22 +149,23 @@ export async function removePlaytestPlayersAsync(
       ? connection.getSession(player.sessionId)
       : undefined;
     if (client) {
-      await runScriptAsync(client, LEAVE_TEST_SCRIPT);
+      await client.playtestPlayersAsync({ op: 'leave' }, REQUEST_TIMEOUT_MS);
       removed.push({ name: player.name, how: 'left' });
     } else {
       toKick.push(player.name);
       removed.push({ name: player.name, how: 'kicked' });
     }
   }
-  if (toKick.length > 0) {
-    await runScriptAsync(serverSession, kickPlayersScript(toKick));
-  }
-
-  const remaining = await runScriptAsync(
-    serverSession,
-    waitForPlayersGoneScript(targets.map((p) => p.name))
+  const { remaining } = await serverSession.playtestPlayersAsync(
+    {
+      op: 'remove',
+      kick: toKick,
+      names: targets.map((p) => p.name),
+      timeoutSec: PLAYER_CHANGE_TIMEOUT_SEC,
+    },
+    REQUEST_TIMEOUT_MS
   );
-  if (Array.isArray(remaining) && remaining.length > 0) {
+  if (remaining.length > 0) {
     throw new Error(
       `Players still in the playtest after ${PLAYER_CHANGE_TIMEOUT_SEC}s: ${remaining.join(
         ', '

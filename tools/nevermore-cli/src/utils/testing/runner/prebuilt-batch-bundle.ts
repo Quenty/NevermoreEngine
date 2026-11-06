@@ -1,13 +1,16 @@
 import * as fs from 'fs/promises';
-import { createReadStream, createWriteStream } from 'fs';
 import * as path from 'path';
 import * as tar from 'tar';
 import { BuildContext } from '@quenty/nevermore-template-helpers';
 import { type CombinedPlaceChunk } from './combined-project-generator.js';
 import { PLACE_UPLOAD_MAX_BYTES } from '../../open-cloud/open-cloud-client.js';
+import {
+  PACKAGE_NAME_PATTERN,
+  readUntrustedTarAsync,
+} from '../../bundle/untrusted-tar.js';
 
 /**
- * Places built by `nevermore batch bundle`, unpacked from a
+ * Places built by `nevermore batch bundle --test`, unpacked from a
  * `*.nevermore.tests.tar` and ready for `batch test --bundle` to run.
  */
 export interface PrebuiltBatchBundle {
@@ -24,6 +27,7 @@ export interface PrebuiltBatchPackage {
 
 interface ManifestFile {
   formatVersion: number;
+  kind?: 'tests';
   chunks: Array<{
     file: string;
     packages: Array<{ name: string; slug: string; hasJestConfig: boolean }>;
@@ -39,10 +43,6 @@ const MAX_CHUNKS = 32;
 const MAX_PACKAGES = 1000;
 const MAX_MANIFEST_BYTES = 1024 * 1024;
 const CHUNK_FILE_PATTERN = /^place-\d{1,3}\.rbxl$/;
-// Names reach the bot's PR comment, so a fork's bundle gets no Markdown links,
-// images, URLs, tables or @mentions: only a leading scope `@`, and plain text
-// for a multi-place target's place name ("pkg - Hub (Test)").
-const PACKAGE_NAME_PATTERN = /^@?[\p{L}\p{N} /()+.,'_~-]{1,200}$/u;
 const SLUG_PATTERN = /^[A-Za-z0-9_.-]{1,100}$/;
 
 export async function writePrebuiltBatchBundleAsync(
@@ -55,6 +55,7 @@ export async function writePrebuiltBatchBundleAsync(
   try {
     const manifest: ManifestFile = {
       formatVersion: FORMAT_VERSION,
+      kind: 'tests',
       chunks: [],
     };
     for (const [index, chunk] of chunks.entries()) {
@@ -107,88 +108,24 @@ export async function readPrebuiltBatchBundleAsync(
   });
   const dir = buildContext.buildDir;
   try {
-    const { manifestText, placeSizes } = await _unpackAsync(file, dir);
+    const { manifestText, entrySizes: placeSizes } =
+      await readUntrustedTarAsync(file, dir, {
+        kind: 'tests',
+        manifestName: MANIFEST_FILE_NAME,
+        maxManifestBytes: MAX_MANIFEST_BYTES,
+        isEntryAllowed: (name) => CHUNK_FILE_PATTERN.test(name),
+        maxEntries: MAX_CHUNKS,
+        maxEntriesMessage: `Bundle must hold at most ${MAX_CHUNKS} places`,
+        checkEntrySize: (name, size) =>
+          size > PLACE_UPLOAD_MAX_BYTES
+            ? `${name} is over the place upload limit`
+            : undefined,
+      });
     return { ..._parseManifest(manifestText, dir, placeSizes), buildContext };
   } catch (err) {
     await buildContext.cleanupAsync();
     throw err;
   }
-}
-
-async function _unpackAsync(
-  file: string,
-  dir: string
-): Promise<{ manifestText: string; placeSizes: Map<string, number> }> {
-  let manifestText: string | undefined;
-  const placeSizes = new Map<string, number>();
-  const writes: Promise<void>[] = [];
-  let failure: Error | undefined;
-
-  const parser = new tar.Parser({
-    strict: true,
-    onReadEntry: (entry) => {
-      const name = entry.path;
-      const reject = (message: string) => {
-        failure ??= new Error(message);
-        entry.resume();
-      };
-
-      if (entry.type !== 'File' && entry.type !== 'OldFile') {
-        return reject(`Bundle entry ${name} is not a regular file`);
-      }
-
-      if (name === MANIFEST_FILE_NAME) {
-        if (manifestText !== undefined || entry.size > MAX_MANIFEST_BYTES) {
-          return reject('Bundle has more than one manifest, or one too large');
-        }
-        const parts: Buffer[] = [];
-        entry.on('data', (part: Buffer) => parts.push(part));
-        entry.on('end', () => {
-          manifestText = Buffer.concat(parts).toString('utf-8');
-        });
-        return;
-      }
-
-      if (!CHUNK_FILE_PATTERN.test(name) || placeSizes.has(name)) {
-        return reject(`Bundle has an unexpected entry: ${name}`);
-      }
-      if (placeSizes.size >= MAX_CHUNKS) {
-        return reject(`Bundle must hold at most ${MAX_CHUNKS} places`);
-      }
-      if (entry.size > PLACE_UPLOAD_MAX_BYTES) {
-        return reject(`${name} is over the place upload limit`);
-      }
-      placeSizes.set(name, entry.size);
-      writes.push(
-        new Promise<void>((resolve, rejectWrite) => {
-          const out = createWriteStream(path.join(dir, name));
-          out.on('finish', () => resolve());
-          out.on('error', rejectWrite);
-          entry.on('error', rejectWrite);
-          entry.pipe(out);
-        })
-      );
-    },
-  });
-
-  await new Promise<void>((resolve, rejectRead) => {
-    const input = createReadStream(file);
-    input.on('error', rejectRead);
-    parser.on('error', (err: Error) =>
-      rejectRead(new Error(`Bundle is not a valid tar file: ${err.message}`))
-    );
-    parser.on('end', () => resolve());
-    input.pipe(parser);
-  });
-  await Promise.all(writes);
-
-  if (failure) {
-    throw failure;
-  }
-  if (manifestText === undefined) {
-    throw new Error(`Bundle is missing ${MANIFEST_FILE_NAME}`);
-  }
-  return { manifestText, placeSizes };
 }
 
 function _parseManifest(

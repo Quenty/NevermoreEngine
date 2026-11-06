@@ -4,7 +4,8 @@
 
 import { describe, it, expect } from 'vitest';
 import type { SessionInfo } from '../../../bridge/index.js';
-import { listSessionsHandlerAsync } from './list.js';
+import { formatSessionsTable, listSessionsHandlerAsync } from './list.js';
+import type { StudioMcpSnapshot } from '../../../roblox-mcp/index.js';
 
 function createSessionInfo(overrides: Partial<SessionInfo> = {}): SessionInfo {
   return {
@@ -79,5 +80,133 @@ describe('listSessionsHandlerAsync', () => {
     expect(s.context).toBe('server');
     expect(s.state).toBe('Play');
     expect(s.origin).toBe('managed');
+  });
+});
+
+describe('listSessionsHandlerAsync with Studio processes and MCP', () => {
+  const now = Date.parse('2026-11-05T00:30:00Z');
+  const snapshot = (
+    overrides: Partial<StudioMcpSnapshot> = {}
+  ): StudioMcpSnapshot => ({
+    status: 'ok',
+    studios: [],
+    checkedAt: now,
+    latencyMs: 640,
+    ...overrides,
+  });
+  const processes = [
+    {
+      pid: 70,
+      windowTitle: 'Place1 - Roblox Studio',
+      startedAt: now - 300_000,
+    },
+    {
+      pid: 80,
+      windowTitle: 'Place1 - Roblox Studio',
+      startedAt: now - 290_000,
+    },
+  ];
+
+  it('says no Studio is open, and how long it waited', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([]),
+      {},
+      { listProcessesAsync: async () => [], elapsedSec: () => 12.34 }
+    );
+
+    expect(result.summary).toBe('No Roblox Studio processes are open (12.3s).');
+  });
+
+  it('says Studio is open without the plugin, rather than that nothing is', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([]),
+      {},
+      { listProcessesAsync: async () => processes, elapsedSec: () => 5 }
+    );
+
+    expect(result.summary).toContain(
+      '2 Studio process(es) open, but none has the studio-bridge plugin connected (5.0s)'
+    );
+  });
+
+  it('lists each Studio with its plugin session, MCP id and where it was launched', async () => {
+    const sessions = [
+      createSessionInfo({ sessionId: 'a-edit', instanceId: 'a' }),
+    ];
+
+    const result = await listSessionsHandlerAsync(
+      createMockConnection(sessions),
+      {},
+      {
+        listProcessesAsync: async () => processes,
+        resolveSessionPidsAsync: async () => new Map([['a', 70]]),
+        readLaunchesAsync: async () => [
+          {
+            pid: 70,
+            cwd: 'C:gameshub',
+            opened: 'a new Baseplate',
+            launchedAt: now - 301_000,
+          },
+        ],
+        mcpSnapshotAsync: async () =>
+          snapshot({
+            studios: [
+              {
+                studioId: 'aaaaaaaa-1',
+                placeName: 'Place1',
+                pid: 70,
+                instanceId: 'a',
+              },
+              { studioId: 'bbbbbbbb-2', placeName: 'Place1', pid: 80 },
+            ],
+          }),
+      }
+    );
+
+    expect(result.sessions[0].pid).toBe(70);
+    expect(result.studios).toEqual([
+      expect.objectContaining({
+        pid: 70,
+        instanceId: 'a',
+        mcpStudioId: 'aaaaaaaa-1',
+        launch: expect.objectContaining({ cwd: 'C:gameshub' }),
+      }),
+      expect.objectContaining({ pid: 80, mcpStudioId: 'bbbbbbbb-2' }),
+    ]);
+    const text = formatSessionsTable(result, now);
+    expect(text).toContain('a new Baseplate from C:gameshub');
+    expect(text).toContain('not by studio-bridge');
+    expect(text).toContain('5m');
+  });
+
+  it('still lists sessions and Studios when MCP is unavailable, and says why', async () => {
+    const result = await listSessionsHandlerAsync(
+      createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+      {},
+      {
+        listProcessesAsync: async () => processes,
+        mcpSnapshotAsync: async () =>
+          snapshot({ status: 'timeout', message: 'tools/call timed out' }),
+      }
+    );
+
+    const text = formatSessionsTable(result, now);
+    expect(text).toContain('s1');
+    expect(text).toContain('MCP: timeout (tools/call timed out)');
+    expect(result.studios).toHaveLength(2);
+  });
+
+  it('leaves MCP out when the check gave up or the platform has none', async () => {
+    for (const mcpSnapshotAsync of [
+      async () => undefined,
+      async () => snapshot({ status: 'unsupported' }),
+    ]) {
+      const result = await listSessionsHandlerAsync(
+        createMockConnection([createSessionInfo({ sessionId: 's1' })]),
+        {},
+        { mcpSnapshotAsync }
+      );
+      expect(formatSessionsTable(result, now)).not.toContain('MCP');
+    }
   });
 });

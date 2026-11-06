@@ -118,10 +118,10 @@ describe('loadActionSourcesAsync', () => {
       'find-instances',
       'grep-scripts',
       'import-instances',
+      'playtest-players',
       'query-data-model',
       'query-logs',
       'query-state',
-      'run-playtest-script',
       'start-playtest',
     ]);
   });

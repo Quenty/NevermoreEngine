@@ -21,6 +21,11 @@ import {
 } from '../../../process/studio-process-closer.js';
 import { tryGetStudioWindowStateAsync } from '../../../process/studio-window-state.js';
 import { getPluginBuildVersionAsync } from '../../../plugin/plugin-build-version.js';
+import { arg } from '../../framework/arg-builder.js';
+import {
+  getStudioMcpSnapshotAsync,
+  type StudioMcpSnapshot,
+} from '../../../roblox-mcp/index.js';
 
 export interface PlaytestInfo {
   mode: 'play' | 'run';
@@ -65,13 +70,25 @@ export interface StateResult {
     focused: boolean;
     minimized: boolean;
   };
+  mcp?: {
+    status: StudioMcpSnapshot['status'];
+    studioId?: string;
+    message?: string;
+  };
   connectedAt: string;
   summary: string;
 }
 
+export interface QueryStateOptions {
+  mcpSnapshotAsync?: (
+    sessions: SessionInfo[]
+  ) => Promise<StudioMcpSnapshot | undefined>;
+}
+
 export async function queryStateHandlerAsync(
   session: BridgeSession,
-  connection?: BridgeConnection
+  connection?: BridgeConnection,
+  options: QueryStateOptions = {}
 ): Promise<StateResult> {
   // Listed sessions carry the edit session's place name for a playtest
   const listed = connection
@@ -84,9 +101,10 @@ export async function queryStateHandlerAsync(
   // playtest shows in the edit window
   const ownWindow =
     session.info.context !== 'edit' && playtest?.playerCount !== undefined;
-  const [result, expectedVersion] = await Promise.all([
+  const [result, expectedVersion, snapshot] = await Promise.all([
     session.queryStateAsync(),
     getPluginBuildVersionAsync(),
+    options.mcpSnapshotAsync?.(connection?.listSessions() ?? [session.info]),
   ]);
   const window = await tryGetWindowAsync(
     ownWindow ? [result.placeName] : [result.placeName, listed?.placeName],
@@ -111,6 +129,7 @@ export async function queryStateHandlerAsync(
     },
     playtest,
     window,
+    ...(snapshot ? { mcp: describeMcp(snapshot, session.info) } : {}),
     connectedAt: new Date(session.info.connectedAt).toISOString(),
     summary: `Mode: ${result.state}, Place: ${result.placeName} (${result.placeId})`,
   };
@@ -164,6 +183,36 @@ async function tryGetWindowAsync(
     return state ? { pid, ...state } : undefined;
   }
   return undefined;
+}
+
+function describeMcp(
+  snapshot: StudioMcpSnapshot,
+  info: SessionInfo
+): NonNullable<StateResult['mcp']> {
+  if (snapshot.status !== 'ok') {
+    return {
+      status: snapshot.status,
+      ...(snapshot.message ? { message: snapshot.message } : {}),
+    };
+  }
+  const editSessionId =
+    info.context === 'edit' ? info.sessionId : `${info.instanceId}-edit`;
+  const studio = snapshot.studios.find((s) => s.sessionId === editSessionId);
+  return studio
+    ? { status: 'ok', studioId: studio.studioId }
+    : { status: 'ok', message: "Studio's MCP server does not see this Studio" };
+}
+
+function formatMcp(mcp: StateResult['mcp']): string | undefined {
+  if (!mcp || mcp.status === 'unsupported') return undefined;
+  if (mcp.status === 'ok') {
+    return mcp.studioId
+      ? `reachable (studio_id ${mcp.studioId})`
+      : 'not seen by its MCP server';
+  }
+  return OutputHelper.formatWarning(
+    `${mcp.status}${mcp.message ? ` (${mcp.message})` : ''}`
+  );
 }
 
 function formatAge(isoTime: string): string {
@@ -223,10 +272,18 @@ export function formatStateText(result: StateResult): string {
           )
     }`
   );
+  const mcp = formatMcp(result.mcp);
+  if (mcp) {
+    lines.push(`MCP:      ${mcp}`);
+  }
   return lines.join('\n');
 }
 
-export const infoCommand = defineCommand({
+interface InfoArgs {
+  mcp?: boolean;
+}
+
+export const infoCommand = defineCommand<InfoArgs, StateResult>({
   group: 'process',
   name: 'info',
   description:
@@ -234,10 +291,21 @@ export const infoCommand = defineCommand({
   category: 'execution',
   safety: 'read',
   scope: 'session',
-  args: {},
+  args: {
+    mcp: arg.flag({
+      description:
+        "Also ask Studio's MCP server whether it can reach this Studio (--no-mcp to skip)",
+      default: true,
+    }),
+  },
   cli: {
     format: formatStateText,
   },
-  handler: async (session, _args, connection) =>
-    queryStateHandlerAsync(session, connection),
+  handler: async (session, args, connection) =>
+    queryStateHandlerAsync(session, connection, {
+      mcpSnapshotAsync:
+        args.mcp && !connection?.isRemote
+          ? (sessions) => getStudioMcpSnapshotAsync({ sessions })
+          : undefined,
+    }),
 });

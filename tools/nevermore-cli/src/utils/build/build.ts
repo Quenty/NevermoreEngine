@@ -10,6 +10,12 @@ export interface DeployOverrides {
   placeId?: number;
   scriptTemplate?: string;
   placeFile?: string;
+  /**
+   * Rojo project the base place merge grafts by, in place of the target's own.
+   * Set together with `placeFile` when the place was built from a different
+   * checkout, so the merge follows the project that built it.
+   */
+  projectFile?: string;
 }
 
 export interface BuildPlaceOptions {
@@ -35,6 +41,7 @@ export interface BuildPlaceOptions {
   overrides?: DeployOverrides;
   reporter?: Reporter;
   packageName?: string;
+  deferBasePlaceMerge?: boolean;
 }
 
 /**

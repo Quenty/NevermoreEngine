@@ -711,6 +711,13 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
           return {
             packageName: buildTarget.name,
             placeId: uploadedTarget.placeId,
+            universeId: uploadedTarget.universeId,
+            target: targetName,
+            version,
+            published: publish,
+            basePlaceVersion: builtPlace.basePlaceVersion,
+            commit: deployGitInfo.version,
+            branch: deployGitInfo.branch,
             success: true,
             logs: `${action} v${version}`,
             progressSummary: {
