@@ -3160,9 +3160,6 @@ importers:
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
-      '@quenty/pseudolocalize':
-        specifier: workspace:*
-        version: link:../pseudolocalize
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx
