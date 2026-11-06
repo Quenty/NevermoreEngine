@@ -23,6 +23,17 @@ export type GroupRankConfig = {
 	type: "GroupRankConfigType",
 } & GroupRankConfig_Input
 
+type GroupRoleConfig_Input = {
+	groupId: number,
+	adminRoleIds: { number },
+	creatorRoleIds: { number },
+	remoteFunctionName: string?,
+}
+
+export type GroupRoleConfig = {
+	type: "GroupRoleConfigType",
+} & GroupRoleConfig_Input
+
 export type SingleUserConfig_Input = {
 	userId: number,
 	remoteFunctionName: string?,
@@ -32,7 +43,7 @@ export type SingleUserConfig = {
 	type: "SingleUserConfigType",
 } & SingleUserConfig_Input
 
-export type PermissionProviderConfig = GroupRankConfig | SingleUserConfig
+export type PermissionProviderConfig = GroupRankConfig | GroupRoleConfig | SingleUserConfig
 
 --[=[
 	Creates a group rank config
@@ -49,6 +60,44 @@ function PermissionProviderUtils.createGroupRankConfig(config: GroupRankConfig_I
 		groupId = config.groupId,
 		minAdminRequiredRank = config.minAdminRequiredRank,
 		minCreatorRequiredRank = config.minCreatorRequiredRank,
+		remoteFunctionName = config.remoteFunctionName or PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME,
+	}
+end
+
+--[=[
+	Creates a group role config, which grants permissions by the roles a player holds rather than by
+	rank. Since the unified group roles update, rank no longer decides who outranks whom, so naming
+	the roles is the reliable way to pick admins. A creator is also an admin.
+
+	The roles must be public: `GetRolesInGroupAsync` doesn't list private roles.
+
+	```lua
+	permissionService:SetProviderFromConfig(PermissionProviderUtils.createGroupRoleConfig({
+		groupId = game.CreatorId,
+		adminRoleIds = { 908558100 },
+		creatorRoleIds = { 828315646 },
+	}))
+	```
+
+	@param config { groupId: number, adminRoleIds: { number }, creatorRoleIds: { number } }
+	@return table
+]=]
+function PermissionProviderUtils.createGroupRoleConfig(config: GroupRoleConfig_Input): GroupRoleConfig
+	assert(type(config.groupId) == "number", "Bad groupId")
+	assert(type(config.adminRoleIds) == "table", "Bad adminRoleIds")
+	assert(type(config.creatorRoleIds) == "table", "Bad creatorRoleIds")
+	for _, roleId in config.adminRoleIds do
+		assert(type(roleId) == "number", "Bad adminRoleIds")
+	end
+	for _, roleId in config.creatorRoleIds do
+		assert(type(roleId) == "number", "Bad creatorRoleIds")
+	end
+
+	return {
+		type = PermissionProviderConstants.GROUP_ROLE_CONFIG_TYPE,
+		groupId = config.groupId,
+		adminRoleIds = table.clone(config.adminRoleIds),
+		creatorRoleIds = table.clone(config.creatorRoleIds),
 		remoteFunctionName = config.remoteFunctionName or PermissionProviderConstants.DEFAULT_REMOTE_FUNCTION_NAME,
 	}
 end
