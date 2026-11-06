@@ -145,14 +145,41 @@ studio-bridge explorer query Workspace.SpawnLocation --children --depth 3
 
 ```bash
 studio-bridge explorer find spawn
+studio-bridge explorer find Pill Flag --exact --root StarterGui.StoryRouter
 studio-bridge explorer find --class BasePart --tag Hazard --root Workspace.Map
 studio-bridge explorer grep TakeDamage
 studio-bridge explorer grep "^local %w+ = require" --lua-pattern --root ReplicatedStorage
 ```
 
-`find` lists instances whose name contains the text (case-insensitive; `--exact` for the whole name), narrowed by `--class` (matched with `IsA`, so `BasePart` finds every part) and `--tag`. `grep` prints every script line containing the text as `path:line: text`. It reads open editor tabs, so unsaved edits are searched. Text matches plainly and case-insensitively; `--lua-pattern` and `--case-sensitive` change that.
+`find` lists instances whose name contains the text (case-insensitive; `--exact` for the whole name; give several names to match any of them), narrowed by `--class` (matched with `IsA`, so `BasePart` finds every part) and `--tag`. `grep` prints every script line containing the text as `path:line: text`. It reads open editor tabs, so unsaved edits are searched. Text matches plainly and case-insensitively; `--lua-pattern` and `--case-sensitive` change that.
 
 Both search the whole place by default, skipping Studio's own services such as CoreGui; `--root` narrows the search to a path, and `--limit` (default 200) caps the results, with `truncated` set when there were more.
+
+### `explorer sample`
+
+```bash
+studio-bridge explorer sample Pill Island Flag --root StarterGui.StoryRouter.Stage \
+  --properties Size,Position,GroupTransparency,Scale \
+  --trigger 'require(game.ReplicatedStorage.Story).playIntro()' --duration 0.8s -o samples.csv
+studio-bridge explorer sample Health --attributes Current --duration 2s --fps 10
+```
+
+Records properties and attributes of instances every frame for `--duration`, and answers with one row per value per frame: `{ t, frame, path, property, value }`. Instances are picked the same way `explorer find` picks them (names, `--root`, `--class`, `--tag`, `--exact`), once, in frame 0.
+
+| Option | Description |
+|--------|-------------|
+| `--properties` | Properties to record, comma-separated or repeated |
+| `--attributes` | Attributes to record, comma-separated or repeated; rows name them `@Name` |
+| `--trigger` / `--trigger-file` | Luau to run in frame 0, as `console exec` runs code. Omit both to record passively |
+| `--duration` | How long to record: `800ms`, `0.8s`, `2s`; a bare number is seconds. Required |
+| `--fps` | Frames to record per second (default: every frame) |
+| `--max-frames` | Stop after this many recorded frames (default: 300) |
+
+- `t` is frame time since frame 0 (the sum of frame deltas), not wall time. Frame 0 and the first frame at or past `--duration` are always recorded.
+- Values are read with `BindToRenderStep` at `Enum.RenderPriority.Last`, after other render-step code that frame. TweenService moves GUI after that, so a tweened value read at frame `k` is the one drawn in frame `k - 1`. On a playtest's server, which has no render step, it records on Heartbeat.
+- Composite values split into a row per component: `Size.X.Scale`, `Size.X.Offset`, `Size.Y.Scale`, `Size.Y.Offset` for UDim2; `.Scale`/`.Offset` for UDim; `.X`/`.Y`/`.Z` for vectors; `.R`/`.G`/`.B` for Color3. A property or attribute an instance lacks is skipped.
+- Text output is a short summary; `--format json` gives the rows; `--format csv`, or `-o` ending in `.csv`, writes them as CSV.
+- Recording runs in Studio and comes back in one reply at the end. A trigger can change the place, so like `console exec` it is refused on Edit while a playtest runs, unless `--allow-edit`.
 
 ### `explorer export` / `explorer import`
 
@@ -167,11 +194,31 @@ studio-bridge explorer import map.rbxm --parent ServerStorage
 
 ```bash
 studio-bridge viewport screenshot --output viewport.png
+studio-bridge viewport screenshot --region 0,0,640,360 --scale 0.5 -o corner.png
 ```
 
 | Option | Alias | Description |
 |--------|-------|-------------|
 | `--output` | `-o` | Write PNG to file |
+| `--region` | — | Crop to `x,y,width,height` in viewport pixels |
+| `--scale` | — | Scale by this factor after cropping, up to 1 |
+
+Studio reads at most 1024x1024 pixels at a time, so a larger image is scaled down to fit.
+
+### `viewport record`
+
+```bash
+studio-bridge viewport record --trigger 'require(game.ReplicatedStorage.Story).playIntro()' \
+  --duration 600ms --fps 30 --region 0,0,800,450 --scale 0.5 -o intro
+```
+
+Captures the viewport over `--duration`, with the same `--trigger`, `--duration`, `--fps` and `--max-frames` as `explorer sample`, and the same `--region` and `--scale` as `viewport screenshot`. `-o` is a required directory, which gets:
+
+- `frame-000.png` onward, one per capture;
+- `manifest.json`, the command's JSON result: each frame's `index`, `t`, `frame` and `file`; how many captures were `requested` and `captured`; `elapsed` and the `captureRate` achieved; and `skipped`, the captures that could not be read and why, when there were any. Times and rates are rounded to milliseconds;
+- `sheet.png`, a contact sheet of `--sheet-frames` (default 16, `0` for none) evenly spaced frames. A header gives the counts, rate and duration (`6 of 19 captured · 5.0/s · 1.201s`), and a strip under each frame its time and frame number (`0.268s · f4`), so gaps left by dropped captures show. The column count keeps the sheet near 4:3, so wide strips stack in a column; it is scaled down to fit 2048 pixels each way.
+
+`--region` is checked against the viewport before the trigger runs. While recording it only asks for captures; reading, cropping, scaling and PNG encoding wait until the window is over, and a capture that fails to read is skipped rather than failing the recording. CaptureService accepts about one request every three frames and silently drops the rest, so expect far fewer captures than `--fps` asks for. The manifest has the frames really captured, at the times they show. Each capture shows the frame it was requested in. A playtest's server renders nothing, so recording it is refused; record Edit, or the client with `--context client`.
 
 ### `process list`
 
@@ -305,7 +352,7 @@ Invoke a named Studio action on the connected session.
 
 ### Output
 
-Every command accepts `--format text|json` and `-o <file>`. stdout carries only the result; progress and warnings go to stderr. With `--format json`, failures print `{"success": false, "error": ...}` and exit with code 1, and warnings (an outdated CLI, or a Studio plugin older than the CLI) are kept in the result's `_warnings` field.
+Every command accepts `--format text|json` and `-o <file>`. Commands with tabular results (`explorer sample`) also take `--format csv`, which is the default when `-o` ends in `.csv`. For `viewport record`, `-o` is a required directory. stdout carries only the result; progress and warnings go to stderr. With `--format json`, failures print `{"success": false, "error": ...}` and exit with code 1, and warnings (an outdated CLI, or a Studio plugin older than the CLI) are kept in the result's `_warnings` field.
 
 A single reply from Studio can carry up to 256 MiB. A larger one, such as a script returning a huge string, fails that request with `RESULT_TOO_LARGE` and leaves the connection and every other request alone.
 

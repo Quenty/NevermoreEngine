@@ -22,7 +22,7 @@ describe('findInstancesHandlerAsync', () => {
     });
 
     expect(session.findInstancesAsync).toHaveBeenCalledWith({
-      name: 'spawn',
+      names: ['spawn'],
       className: 'BasePart',
       exactName: true,
       root: undefined,
@@ -31,6 +31,20 @@ describe('findInstancesHandlerAsync', () => {
     });
     expect(result.summary).toBe('1 match(es) among 120 instances');
     expect(formatFindText(result)).toContain('Workspace.RedSpawn');
+  });
+
+  it('passes several names through', async () => {
+    const session = createSession({
+      instances: [],
+      searched: 3,
+      truncated: false,
+    });
+
+    await findInstancesHandlerAsync(session, { names: ['pill', 'flag'] });
+
+    expect(session.findInstancesAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ names: ['pill', 'flag'] })
+    );
   });
 
   it('says when it stopped at the limit', async () => {

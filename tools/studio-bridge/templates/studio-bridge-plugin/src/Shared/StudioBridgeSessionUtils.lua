@@ -45,6 +45,8 @@ StudioBridgeSessionUtils.CAPABILITIES = table.freeze({
 	"exportInstances",
 	"importInstances",
 	"findInstances",
+	"sampleInstances",
+	"recordViewport",
 	"grepScripts",
 	"startPlaytest",
 	"endPlaytest",

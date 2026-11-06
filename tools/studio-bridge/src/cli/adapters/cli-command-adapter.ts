@@ -216,17 +216,37 @@ function injectWarnings(result: unknown): unknown {
 }
 
 /**
- * Render a command result for stdout/file output. `--format=json` (or any
- * explicit non-text format) routes through the command's `json` override or
- * falls back to `formatJson`. Anything else (default, `--format=text`)
- * routes through the command's `format` callback, then `result.summary`,
- * then JSON as a last resort.
+ * The output format: `--format` when given, else `csv` for a command that
+ * renders CSV writing to a `.csv` file, else undefined (text).
+ */
+export function resolveOutputFormat(
+  def: CommandDefinition,
+  format: string | undefined,
+  outputPath: string | undefined
+): string | undefined {
+  if (format !== undefined) return format;
+  if (def.cli?.csv && outputPath?.toLowerCase().endsWith('.csv')) {
+    return 'csv';
+  }
+  return undefined;
+}
+
+/**
+ * Render a command result for stdout/file output. `--format=json` routes
+ * through the command's `json` override or falls back to `formatJson`, and
+ * `--format=csv` through its `csv` renderer. Anything else (default,
+ * `--format=text`) routes through the command's `format` callback, then
+ * `result.summary`, then JSON as a last resort.
  */
 function renderResult(
   def: CommandDefinition,
   result: unknown,
   explicitFormat: string | undefined
 ): string {
+  if (explicitFormat === 'csv' && def.cli?.csv) {
+    return def.cli.csv(result as any);
+  }
+
   if (explicitFormat === 'json') {
     if (def.cli?.json) return def.cli.json(result as any);
     return formatJson(injectWarnings(result), { pretty: process.stdout.isTTY });
@@ -243,16 +263,16 @@ function renderResult(
 
 /**
  * Extract a Buffer from the result's binary field, or undefined if no
- * binary field is configured / extractable / requested. When `--format=json`
- * is explicit the user wants JSON not raw bytes — return undefined so the
- * file reporter falls back to text rendering.
+ * binary field is configured / extractable / requested. With an explicit
+ * `--format` other than text the user wants that format, not raw bytes —
+ * return undefined so the file reporter falls back to text rendering.
  */
 function extractBinaryBuffer(
   def: CommandDefinition,
   result: unknown,
   format: string | undefined
 ): Buffer | undefined {
-  if (format === 'json') return undefined;
+  if (format !== undefined && format !== 'text') return undefined;
   const binaryField = def.cli?.binaryField;
   if (!binaryField) return undefined;
   if (typeof result !== 'object' || result === null) return undefined;
@@ -319,18 +339,26 @@ export function buildYargsCommand(
 
       yargs.option('format', {
         type: 'string',
-        choices: ['text', 'json'],
-        describe: 'Output format',
+        choices: def.cli?.csv ? ['text', 'json', 'csv'] : ['text', 'json'],
+        describe: def.cli?.csv
+          ? 'Output format (default: csv when --output ends in .csv)'
+          : 'Output format',
       });
       yargs.option('output', {
         alias: 'o',
         type: 'string',
-        describe: 'Write output to file',
+        describe: def.cli?.files
+          ? 'Write output files into this directory'
+          : 'Write output to file',
+        // A command that writes files has nothing useful to print without one
+        ...(def.cli?.files ? { demandOption: true } : {}),
       });
       yargs.option('open', {
         type: 'boolean',
         default: false,
-        describe: 'Open output file after writing',
+        describe: def.cli?.files
+          ? 'Open the output directory after writing'
+          : 'Open output file after writing',
       });
 
       if (def.safety === 'read') {
@@ -351,7 +379,12 @@ export function buildYargsCommand(
     },
     handler: async (argv: any) => {
       const commandArgs = extractCommandArgs(argv, def);
-      const explicitFormat = argv.format as string | undefined;
+      const explicitFormat = resolveOutputFormat(
+        def,
+        argv.format as string | undefined,
+        argv.output as string | undefined
+      );
+      const files = def.cli?.files;
       const reporter = buildResultReporter<unknown>({
         outputPath: argv.output as string | undefined,
         watch: !!argv.watch && def.safety === 'read',
@@ -359,6 +392,7 @@ export function buildYargsCommand(
         intervalMs: argv.interval as number | undefined,
         render: (result) => renderResult(def, result, explicitFormat),
         binary: (result) => extractBinaryBuffer(def, result, explicitFormat),
+        ...(files ? { files: (result: unknown) => files(result as any) } : {}),
       });
       const connect =
         options?.lifecycle?.connectAsync.bind(options.lifecycle) ??

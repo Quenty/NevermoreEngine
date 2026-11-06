@@ -27,6 +27,11 @@ export {
   type WatchResultReporterOptions,
 } from './watch-result-reporter.js';
 export { AggregatedBatchReporter } from './aggregated-batch-reporter.js';
+export {
+  DirectoryResultReporter,
+  type DirectoryResultReporterOptions,
+  type OutputFile,
+} from './directory-result-reporter.js';
 export { CompositeResultReporter } from './composite-result-reporter.js';
 export {
   buildResultReporter,

@@ -9,6 +9,13 @@
  *
  * `.spec.lua` files beside them are Jest specs. They are never pushed,
  * since anything pushed runs inside the user's Studio.
+ *
+ * Each pushed source compiles on its own, so actions cannot `require` one
+ * another. Code several actions share lives in a library: a `.lua` file pushed
+ * like an action whose `register` puts it on `router._libraries[name]` instead
+ * of registering handlers (e.g. `explorer/instance-selection.lua`,
+ * `shared/frame-recorder.lua`). Actions look libraries up when a request
+ * arrives, since the push order is not fixed.
  */
 
 import { createHash } from 'crypto';

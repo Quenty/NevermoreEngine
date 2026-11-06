@@ -55,6 +55,18 @@ export {
   type FindOptions,
 } from './explorer/find/find.js';
 export {
+  sampleInstancesHandlerAsync,
+  type SampleResult,
+  type SampleOptions,
+  type SampleRow,
+} from './explorer/sample/sample.js';
+export {
+  recordViewportHandlerAsync,
+  type RecordResult,
+  type RecordOptions,
+  type RecordedFrame,
+} from './viewport/record/record.js';
+export {
   grepScriptsHandlerAsync,
   type GrepResult,
   type GrepOptions,

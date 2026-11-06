@@ -11,8 +11,16 @@ import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { FoundInstance } from '../../../server/web-socket-protocol.js';
+import {
+  assertHasCriteria,
+  selectionArgs,
+  type SelectionArgs,
+} from '../selection-args.js';
 
 export interface FindOptions {
+  /** Text in the name; any one of them matching is enough. */
+  names?: string[];
+  /** A single name, as before `names`. */
   name?: string;
   exact?: boolean;
   className?: string;
@@ -33,16 +41,20 @@ export async function findInstancesHandlerAsync(
   session: BridgeSession,
   options: FindOptions
 ): Promise<FindResult> {
-  if (!options.name && !options.className && !options.tag) {
-    throw new Error('Give a name, --class or --tag to search for');
-  }
+  const selection = assertHasCriteria(
+    {
+      root: options.root,
+      names: options.names,
+      name: options.name,
+      exactName: options.exact,
+      className: options.className,
+      tag: options.tag,
+    },
+    'search for'
+  );
 
   const result = await session.findInstancesAsync({
-    root: options.root,
-    name: options.name,
-    exactName: options.exact,
-    className: options.className,
-    tag: options.tag,
+    ...selection,
     limit: options.limit,
   });
 
@@ -70,8 +82,8 @@ export function formatFindText(result: FindResult): string {
   )}`;
 }
 
-interface FindArgs extends Omit<FindOptions, 'className'> {
-  class?: string;
+interface FindArgs extends SelectionArgs {
+  limit?: number;
 }
 
 export const findCommand = defineCommand<FindArgs, FindResult>({
@@ -82,23 +94,7 @@ export const findCommand = defineCommand<FindArgs, FindResult>({
   safety: 'read',
   scope: 'session',
   args: {
-    name: arg.positional({
-      description: 'Text in the instance name (case-insensitive)',
-      required: false,
-    }),
-    exact: arg.flag({
-      description: 'Match the whole name instead of part of it',
-    }),
-    class: arg.option({
-      description: 'Only instances of this class or a subclass (IsA)',
-    }),
-    tag: arg.option({
-      description: 'Only instances with this CollectionService tag',
-    }),
-    root: arg.option({
-      description:
-        'Dot-separated path to search under (default: the whole DataModel)',
-    }),
+    ...selectionArgs,
     limit: arg.option({
       description: 'Stop after this many matches (default: 200)',
       type: 'number',

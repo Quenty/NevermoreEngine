@@ -60,7 +60,7 @@ export class FileResultReporter<T = unknown> extends BaseResultReporter<T> {
 }
 
 /** Best-effort open a file with the platform's default viewer. */
-function tryOpenFile(filePath: string): void {
+export function tryOpenFile(filePath: string): void {
   try {
     if (process.platform === 'win32') {
       // `start` is a cmd builtin; the empty "" is the window title slot

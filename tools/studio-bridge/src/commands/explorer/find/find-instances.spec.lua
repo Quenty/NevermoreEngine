@@ -9,6 +9,7 @@ local HttpService = game:GetService("HttpService")
 
 local ActionRouter = require("ActionRouter")
 local FindInstancesAction = require("find-instances")
+local InstanceSelection = require("instance-selection")
 local Jest = require("Jest")
 
 local describe = Jest.Globals.describe
@@ -18,6 +19,7 @@ local it = Jest.Globals.it
 local function setup(): any
 	local router = ActionRouter.new()
 	FindInstancesAction.register(router)
+	InstanceSelection.register(router)
 
 	local root = Instance.new("Folder")
 	root.Name = `FindInstancesSpec{HttpService:GenerateGUID(false)}`
@@ -79,6 +81,16 @@ describe("findInstances", function()
 		expect(getNames(response)).toEqual({ "RedSpawn" })
 		expect(response.payload.instances[1].path).toEqual(`{controller.root:GetFullName()}.RedSpawn`)
 		expect(response.payload.instances[1].className).toEqual("Part")
+		controller:Destroy()
+	end)
+
+	it("should match any of several names", function()
+		local controller = setup()
+
+		local response =
+			controller.find({ root = controller.rootPath, names = { "redspawn", "spawnname" }, exactName = true })
+
+		expect(getNames(response)).toEqual({ "RedSpawn", "SpawnName" })
 		controller:Destroy()
 	end)
 

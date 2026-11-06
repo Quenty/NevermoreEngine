@@ -8,6 +8,10 @@ import type { ResultReporter } from './result-reporter.js';
 import { StdoutResultReporter } from './stdout-result-reporter.js';
 import { FileResultReporter } from './file-result-reporter.js';
 import { WatchResultReporter } from './watch-result-reporter.js';
+import {
+  DirectoryResultReporter,
+  type OutputFile,
+} from './directory-result-reporter.js';
 
 export interface BuildResultReporterOptions<T> {
   /** Output file path; if set, returns a `FileResultReporter`. */
@@ -26,11 +30,17 @@ export interface BuildResultReporterOptions<T> {
    * rendering and emits raw bytes instead.
    */
   binary?: (result: T) => Buffer | undefined;
+  /**
+   * Makes `outputPath` a directory: returns a `DirectoryResultReporter` that
+   * writes these files into it.
+   */
+  files?: (result: T) => OutputFile[];
 }
 
 /**
  * Build a `ResultReporter` from common argv-style flags. Selection rules:
  *
+ *   - `outputPath` and `files` → `DirectoryResultReporter`
  *   - `outputPath` set      → `FileResultReporter`
  *   - else `watch` truthy   → `WatchResultReporter`
  *   - else                  → `StdoutResultReporter`
@@ -38,6 +48,15 @@ export interface BuildResultReporterOptions<T> {
 export function buildResultReporter<T>(
   options: BuildResultReporterOptions<T>
 ): ResultReporter<T> {
+  if (options.outputPath !== undefined && options.files) {
+    return new DirectoryResultReporter<T>({
+      outputDir: options.outputPath,
+      files: options.files,
+      render: options.render,
+      open: options.open,
+    });
+  }
+
   if (options.outputPath !== undefined) {
     return new FileResultReporter<T>({
       outputPath: options.outputPath,

@@ -157,14 +157,23 @@ export function toYargsOptions(
         type: def.type,
       };
       if (def.alias) opt.alias = def.alias;
+      if (def.required) opt.demandOption = true;
       if (def.default !== undefined) opt.default = def.default;
       if (def.choices) opt.choices = def.choices;
       if (def.array) opt.array = def.array;
-      options[name] = opt;
+      options[toKebabCase(name)] = opt;
     }
   }
 
   return { positionals, options };
+}
+
+/**
+ * Option names are declared in camelCase and shown as `--kebab-case`. yargs
+ * expands `--kebab-case` back to the camelCase key handlers read.
+ */
+function toKebabCase(name: string): string {
+  return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
 export interface JsonSchemaOutput {

@@ -14,6 +14,7 @@ import type {
   BridgeConnection,
   SessionContext,
 } from '../../bridge/index.js';
+import type { OutputFile } from '@quenty/cli-output-helpers/reporting';
 import type { ArgDefinition } from './arg-builder.js';
 
 /**
@@ -43,6 +44,16 @@ export interface CliConfig<TResult> {
   json?: (result: TResult) => string;
   /** Field name containing base64 binary data for raw file writes via --output. */
   binaryField?: string;
+  /**
+   * Render the result as CSV. Adds `csv` to `--format`, and is the default
+   * when `--output` ends in `.csv`.
+   */
+  csv?: (result: TResult) => string;
+  /**
+   * Makes `--output` a directory, and writes these files into it. The text
+   * rendering still goes to stdout.
+   */
+  files?: (result: TResult) => OutputFile[];
 }
 
 interface BaseFields<TArgs, TResult> {

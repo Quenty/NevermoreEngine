@@ -3,6 +3,7 @@ import { buildResultReporter } from './build-result-reporter.js';
 import { StdoutResultReporter } from './stdout-result-reporter.js';
 import { FileResultReporter } from './file-result-reporter.js';
 import { WatchResultReporter } from './watch-result-reporter.js';
+import { DirectoryResultReporter } from './directory-result-reporter.js';
 
 describe('buildResultReporter', () => {
   const render = (r: unknown) => String(r);
@@ -18,6 +19,15 @@ describe('buildResultReporter', () => {
       render,
     });
     expect(reporter).toBeInstanceOf(FileResultReporter);
+  });
+
+  it('returns a DirectoryResultReporter when outputPath and files are set', () => {
+    const reporter = buildResultReporter({
+      outputPath: '/tmp/out',
+      render,
+      files: () => [],
+    });
+    expect(reporter).toBeInstanceOf(DirectoryResultReporter);
   });
 
   it('returns a WatchResultReporter when watch is true and no outputPath', () => {
