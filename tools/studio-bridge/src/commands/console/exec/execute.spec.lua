@@ -53,7 +53,7 @@ describe("ExecuteAction.handleExecute()", function()
 	it("should report success with no return values", function()
 		local result = runScript("local _ = 1")
 
-		expect(result).toEqual({ success = true, output = {}, returnValues = {} })
+		expect(result).toEqual({ success = true, output = {}, returnValues = {}, ranAs = "plugin" })
 	end)
 
 	it("should capture print and warn output in order", function()
@@ -272,7 +272,7 @@ describe("ExecuteAction.register()", function()
 				type = "scriptComplete",
 				sessionId = "session-1",
 				requestId = "req-1",
-				payload = { success = true, output = {}, returnValues = { 1 } },
+				payload = { success = true, output = {}, returnValues = { 1 }, ranAs = "plugin" },
 			},
 		})
 
