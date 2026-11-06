@@ -1,23 +1,13 @@
-# v10.13.0 (Fri Nov 06 2026)
-
-#### 🚀 Enhancement
-
-- feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- fix(softshutdown): reserve the shutdown server with ReservedServerId ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.1...@quenty/softshutdown@10.13.0) (2026-11-06)
+
+### Bug Fixes
+
+- **softshutdown:** reserve the shutdown server with ReservedServerId ([1af6b7f](https://github.com/Quenty/NevermoreEngine/commit/1af6b7fe14d64531cef9396d925eaddac8b97d8d))
 
 ## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.0...@quenty/softshutdown@10.12.1) (2026-10-24)
 
