@@ -180,7 +180,7 @@ function Binder:Init(...)
 		self._args = {}
 	end
 
-	self._maid._warning = task.delay(5, function()
+	self._maid._warning = task.delay(30, function()
 		warn(string.format("Binder %q is not loaded. Call :Start() on it!", self._tagName))
 	end)
 end
