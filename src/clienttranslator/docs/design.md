@@ -108,7 +108,8 @@ silently.
 ## One table per realm, and what that costs
 
 `TranslatorService.GetLocalizationTable` names the table by realm — `GeneratedJSONTable_Server` on
-the server, `GeneratedJSONTable_Client` on the client — both under `LocalizationService`. They were
+the server, `GeneratedJSONTable_Client` on the client — both under `LocalizationService` once the
+service has started (see "The table is filled before it is parented" below). They were
 a single `GeneratedJSONTable` until `c1a7b0a` (2023), whose message says only "fix localization
 table replication". The failure it removes is visible in the shape it replaced: with one name the
 server created the table, it replicated, and the client then wrote its own entries into a
@@ -226,6 +227,25 @@ only in Studio, where no cloud test can see it. The parser had been attaching th
 entry all along (`LocalizationEntryParserUtils`); `TableLocaleLoader` forwarded it and
 `InstanceLocaleLoader` did not. Now both do, on the source-locale pass, which is where it is
 derived from anyway. Minting backfilling it was always the accident.
+
+### The table is filled before it is parented
+
+A write to a table under `LocalizationService` costs milliseconds, an unparented one a fraction of
+one ([`engine-behavior.md`](engine-behavior.md), "A write to a parented table costs milliseconds").
+Batching makes that one cost per frame, but a service bag whose `Init` spans several frames (a
+frame budget, or an `Init` that yields) still flushes once per frame, and a game's whole startup
+registration lands in those frames. So a table `TranslatorService` creates stays unparented until
+`Start`, and is parented once. If a flush is already queued when `Start` runs, it lands first and
+the table is parented at the end of it: a bag that inits and starts in one frame would otherwise
+pay for its only flush parented.
+
+- A second service in the same realm cannot find an unparented table under `LocalizationService`,
+  so it is also kept in a module-level map by name. The last holder to be destroyed destroys it;
+  a started service parents it.
+- A table that already sits under `LocalizationService` (saved in the place) is used where it is.
+- Costs: GUI auto-localization does not see generated entries before `Start` (a loading screen
+  shown during `Init` stays in its source text), and a bag that never starts never parents its
+  table.
 
 ### The table is mirrored
 
@@ -418,7 +438,8 @@ in the output either way. Anything that needs the strict answer should ask a tra
 - The harnesses `Init()` their service bag but deliberately never `Start()` it. A bag refuses new
   service types once started, and building a translator or a loader registers services (a loader,
   and under it a `TemplateProvider`) — so tests build them in the same window production does,
-  during `Init`. Nothing in this stack defines `Start`, so nothing is skipped.
+  during `Init`. `TranslatorService.Start` only parents the table, so the harness tables stay
+  unparented unless a spec starts the bag; `clearGeneratedTables` clears unparented ones too.
 - Locale-file replication is **not** covered. Under the test runner `RunService:IsRunning()` is
   false, so the provider resolves everything locally and synchronously; the tombstone path only
   runs on a live server/client pair. What the specs do cover is the reactive half — a file
