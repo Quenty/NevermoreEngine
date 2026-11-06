@@ -1,3 +1,33 @@
+# v0.24.0 (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): plant a client bridge so play mode works with user plugins off ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): send files to playtest run with --input ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): say where exec runs code with --run-as plugin|game|mcp ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): plant the bridge client in playtests so they connect with user plugins off ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): tell Studios apart by uptime in process list and close ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): show Studio's MCP view in process list and info ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): reach Studio through its bundled MCP server ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): close Studio without a save prompt, and close --all ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): open a new Baseplate when process launch has no place ([@Quenty](https://github.com/Quenty))
+- feat(studio-bridge): send files to a script with console exec --input ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- test(studio-bridge): expect ranAs in execute replies ([@Quenty](https://github.com/Quenty))
+- docs(studio-bridge): play mode and multiplayer work with user plugins off ([@Quenty](https://github.com/Quenty))
+- fix(studio-bridge): drop the MCP Assistant's internal frames from execute_luau errors ([@Quenty](https://github.com/Quenty))
+- fix(studio-bridge): review fixes for Studio identity, MCP and fork workflows ([@Quenty](https://github.com/Quenty))
+- fix(studio-bridge): rename the script timeout to --script-timeout ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

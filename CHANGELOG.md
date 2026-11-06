@@ -1,3 +1,16 @@
+# (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/softshutdown@10.13.0`, `@quenty/nevermore-cli@4.52.0`, `@quenty/studio-bridge@0.24.0`
+  - feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Nov 03 2026)
 
 #### 🚀 Enhancement

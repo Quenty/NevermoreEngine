@@ -1,3 +1,19 @@
+# v10.13.0 (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(softshutdown): reserve the shutdown server with ReservedServerId ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

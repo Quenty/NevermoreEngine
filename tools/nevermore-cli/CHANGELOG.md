@@ -1,3 +1,22 @@
+# v4.52.0 (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): run a Luau file with nevermore test --script-file ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): record what each deploy shipped in --output ([@Quenty](https://github.com/Quenty))
+- feat(nevermore-cli): deploy integration games for PRs from forks ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): don't report a cancelled CI run as a crash ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
