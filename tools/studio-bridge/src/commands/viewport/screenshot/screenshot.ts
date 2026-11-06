@@ -6,7 +6,7 @@
 import { defineCommand } from '../../framework/define-command.js';
 import type { BridgeSession } from '../../../bridge/index.js';
 import type { ScreenshotResult as BridgeScreenshotResult } from '../../../bridge/index.js';
-import { rgbaToPng } from '../../rgba-to-png.js';
+import { rgbaToPng } from '../../../encoders/index.js';
 import { formatJson } from '@quenty/cli-output-helpers/reporting';
 import type { ViewportReadOptions } from '../../../server/web-socket-protocol.js';
 import {

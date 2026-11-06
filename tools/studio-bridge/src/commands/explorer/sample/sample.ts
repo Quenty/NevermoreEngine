@@ -8,6 +8,7 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import type { BridgeSession } from '../../../bridge/index.js';
+import { formatCsv } from '../../../encoders/index.js';
 import type {
   RecordingClock,
   SampleRow,
@@ -90,18 +91,12 @@ export function formatSampleText(result: SampleResult): string {
 
 const CSV_COLUMNS = ['t', 'frame', 'path', 'property', 'value'] as const;
 
-/** One header line, then one line per row. */
+/** The rows as CSV, one column per row field. */
 export function formatSampleCsv(result: SampleResult): string {
-  const lines = [CSV_COLUMNS.join(',')];
-  for (const row of result.rows) {
-    lines.push(CSV_COLUMNS.map((column) => toCsvField(row[column])).join(','));
-  }
-  return lines.join('\n') + '\n';
-}
-
-function toCsvField(value: string | number | boolean): string {
-  const text = String(value);
-  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  return formatCsv(
+    CSV_COLUMNS,
+    result.rows.map((row) => CSV_COLUMNS.map((column) => row[column]))
+  );
 }
 
 interface SampleArgs extends SelectionArgs, RecordingArgs {

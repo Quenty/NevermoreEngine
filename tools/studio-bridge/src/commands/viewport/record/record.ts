@@ -18,8 +18,7 @@ import type {
   SkippedViewportFrame,
   ViewportReadOptions,
 } from '../../../server/web-socket-protocol.js';
-import { pngToRgba } from '../../png-to-rgba.js';
-import { rgbaToPng } from '../../rgba-to-png.js';
+import { pngToRgba, rgbaToPng } from '../../../encoders/index.js';
 import {
   recordingArgs,
   resolveRecordingAsync,

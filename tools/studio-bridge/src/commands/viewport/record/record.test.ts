@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { rgbaToPng } from '../../rgba-to-png.js';
+import { rgbaToPng } from '../../../encoders/index.js';
 import {
   formatSheetHeader,
   recordViewportHandlerAsync,
