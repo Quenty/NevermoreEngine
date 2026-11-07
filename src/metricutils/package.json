@@ -1,12 +1,19 @@
 {
   "name": "@quenty/metricutils",
   "version": "2.4.4",
-  "description": "Provides ways to convert to or from metric",
+  "description": "Typed, immutable measurements in metric, US customary and Roblox stud units (time, length, mass, memory, temperature and derived SI units) with localized formatting",
   "keywords": [
     "Roblox",
     "Nevermore",
     "Lua",
-    "Metric"
+    "Metric",
+    "Units",
+    "SI",
+    "Measurement",
+    "Conversion",
+    "Localization",
+    "Imperial",
+    "Studs"
   ],
   "bugs": {
     "url": "https://github.com/Quenty/NevermoreEngine/issues"
@@ -27,6 +34,13 @@
   "contributors": [
     "Quenty"
   ],
+  "dependencies": {
+    "@quenty/clienttranslator": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/time": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  },
   "publishConfig": {
     "access": "public"
   }
