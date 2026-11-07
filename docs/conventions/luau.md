@@ -64,6 +64,10 @@ export type MyClass =
 
 The `& ParentClass.ParentClass` intersection gives you access to inherited fields like `_maid` and `_obj`.
 
+A class that overloads operators (`__add`, `__lt`, `__unm`, ...) must type its metatable as the whole class,
+`{} :: typeof(MyClass)`. `typeof({ __index = MyClass })` hides the metamethods, so every `a + b` on the class
+fails with "Binary operator '+' not supported". See `MetricUnit`.
+
 ### 4. Constructor
 
 ```lua

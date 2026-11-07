@@ -1,12 +1,17 @@
 --!strict
 --[=[
-	Provides ways to convert studs to metric and back.
+	Provides ways to convert studs to metric and back. For typed values, see [MetricUnit.studs].
 	@class MetricUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local MetricUnitScale = require("MetricUnitScale")
+
 local MetricUtils = {}
 
-local STUDS_PER_METER = 3.57
+-- Shared with MetricUnit so studs mean the same everywhere
+local STUDS_PER_METER = MetricUnitScale.STUDS_PER_METER
 local SECONDS_PER_HOUR = 3600
 local SPEED_OF_SOUND_IN_METERS_PER_SECOND = 343
 local KPH_TO_MPH = 0.621371192
