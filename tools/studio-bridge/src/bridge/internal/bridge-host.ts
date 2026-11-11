@@ -103,6 +103,10 @@ export class BridgeHost extends EventEmitter {
     this._lastFailoverAt = new Date().toISOString();
   }
 
+  get clientCount(): number {
+    return this._clients.size;
+  }
+
   /** Returns the actual bound port. */
   async startAsync(options?: BridgeHostOptions): Promise<number> {
     if (this._isRunning) {
@@ -126,8 +130,10 @@ export class BridgeHost extends EventEmitter {
     // Register /client WebSocket handler for CLI clients
     this._transport.onConnection('/client', (ws) => {
       this._clients.add(ws);
+      this.emit('client-activity');
 
       ws.on('message', (raw: RawData) => {
+        this.emit('client-activity');
         const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
         const msg = decodeHostMessage(data);
         if (!msg) {
@@ -141,6 +147,7 @@ export class BridgeHost extends EventEmitter {
 
       ws.on('close', () => {
         this._clients.delete(ws);
+        this.emit('client-activity');
       });
       ws.on('error', () => {
         // Errors are handled implicitly via close
@@ -547,7 +554,7 @@ export class BridgeHost extends EventEmitter {
       const payload = parsed.payload as
         | { code?: string; message?: string }
         | undefined;
-      OutputHelper.warn(
+      OutputHelper.verbose(
         `[host] plugin ${sessionId} sent error without requestId (${
           payload?.code ?? 'unknown'
         }): ${payload?.message ?? ''}`

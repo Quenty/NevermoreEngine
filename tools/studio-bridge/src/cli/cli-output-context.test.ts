@@ -1,12 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
 vi.mock('../plugin/plugin-build-version.js', () => ({
-  getPluginBuildVersionAsync: async () => 'current',
+  getPluginBuildVersionAsync: vi.fn(async () => 'current'),
 }));
 
-import { OutputHelper } from '@quenty/cli-output-helpers';
+import { getPluginBuildVersionAsync } from '../plugin/plugin-build-version.js';
 import {
-  addWarning,
   clearWarnings,
   getWarnings,
   setJsonOutput,
@@ -20,36 +19,43 @@ describe('cli-output-context', () => {
     vi.restoreAllMocks();
   });
 
-  it('prints warnings right away in text mode', () => {
-    const warn = vi.spyOn(OutputHelper, 'warn').mockImplementation(() => {});
-
-    addWarning('careful');
-
-    expect(warn).toHaveBeenCalledWith('careful');
-    expect(getWarnings()).toEqual(['careful']);
-  });
-
-  it('only collects warnings in JSON mode', () => {
-    const warn = vi.spyOn(OutputHelper, 'warn').mockImplementation(() => {});
-    setJsonOutput(true);
-
-    addWarning('careful');
-    addWarning('careful');
-
-    expect(warn).not.toHaveBeenCalled();
-    expect(getWarnings()).toEqual(['careful']);
-  });
-
-  it('warns about plugins built from a different template', async () => {
+  it('warns about an outdated plugin without its build hashes', async () => {
     setJsonOutput(true);
 
     await warnIfPluginStaleAsync([
-      { sessionId: 'a-edit', placeName: 'A', pluginVersion: 'current' },
-      { sessionId: 'b-edit', placeName: 'B', pluginVersion: 'old' },
+      { placeName: 'A', pluginVersion: 'current', context: 'edit' },
+      { placeName: 'B', pluginVersion: 'old', context: 'edit' },
     ] as any);
 
     expect(getWarnings()).toEqual([
-      expect.stringContaining("'B' (b-edit) is out of date"),
+      "The studio-bridge plugin in 'B' is out of date, so some commands may fail. Run 'studio-bridge plugin install'.",
+    ]);
+  });
+
+  it('points an outdated playtest plugin at playtest restart', async () => {
+    setJsonOutput(true);
+
+    await warnIfPluginStaleAsync([
+      { placeName: 'B', pluginVersion: 'old', context: 'server' },
+    ] as any);
+
+    expect(getWarnings()).toEqual([
+      "The studio-bridge plugin in the playtest of 'B' is out of date, so some commands may fail. Run 'studio-bridge plugin install', then 'studio-bridge playtest restart'.",
+    ]);
+  });
+
+  it('turns a failed plugin check into a warning instead of rejecting', async () => {
+    setJsonOutput(true);
+    vi.mocked(getPluginBuildVersionAsync).mockRejectedValueOnce(
+      new Error('template missing')
+    );
+
+    await expect(
+      warnIfPluginStaleAsync([{ pluginVersion: 'old' }] as any)
+    ).resolves.toBeUndefined();
+
+    expect(getWarnings()).toEqual([
+      "Couldn't check whether the studio-bridge plugin is up to date. Reinstall @quenty/studio-bridge if this keeps happening.",
     ]);
   });
 });

@@ -1,13 +1,19 @@
 import { describe, it, expect, vi } from 'vitest';
 import { exportInstancesHandlerAsync } from './export.js';
 
+const MAP = {
+  path: 'Workspace.Map',
+  segments: ['Workspace', 'Map'],
+  className: 'Model',
+};
+
 describe('exportInstancesHandlerAsync', () => {
-  it('returns the model with its size and the exported paths', async () => {
+  it('returns the model with its size and the exported instances', async () => {
     const data = Buffer.from('<roblox!model').toString('base64');
     const session = {
       exportInstancesAsync: vi
         .fn()
-        .mockResolvedValue({ data, paths: ['Workspace.Map'] }),
+        .mockResolvedValue({ data, instances: [MAP] }),
     } as any;
 
     const result = await exportInstancesHandlerAsync(session, [
@@ -19,9 +25,9 @@ describe('exportInstancesHandlerAsync', () => {
     ]);
     expect(result).toEqual({
       data,
-      paths: ['Workspace.Map'],
+      instances: [MAP],
       bytes: 13,
-      summary: 'Exported 1 instance(s) (13 bytes): Workspace.Map',
+      summary: 'Exported 1 instance (13 bytes)',
     });
   });
 });

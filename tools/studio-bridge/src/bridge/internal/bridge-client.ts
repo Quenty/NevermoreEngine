@@ -21,10 +21,14 @@ import {
   type HostResponse,
   type ListSessionsRequest,
   type ListSessionsResponse,
+  type HostInfo,
   type ListInstancesResponse,
   type SessionEvent,
 } from './host-protocol.js';
 import { HandOffManager } from './hand-off.js';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { StudioBridgeError } from '../../messages/studio-bridge-error.js';
+import { RequestTimeoutError } from '../../server/pending-request-map.js';
 import type { TransportHandle } from './session-tracker.js';
 import { BridgeSession } from '../bridge-session.js';
 import type { SessionInfo, InstanceInfo, SessionContext } from '../types.js';
@@ -87,6 +91,7 @@ export class BridgeClient extends EventEmitter {
   private _transport = new TransportClient();
   private _sessions = new Map<string, SessionInfo>();
   private _hostProtocolVersion: number | undefined;
+  private _hostInfo: HostInfo | undefined;
   private _sessionHandles = new Map<string, RelayedTransportHandle>();
   private _bridgeSessions = new Map<string, BridgeSession>();
   private _pendingRequests = new Map<
@@ -117,7 +122,12 @@ export class BridgeClient extends EventEmitter {
       this._isConnected = false;
       // Replies to these went to the old host, so none will arrive
       this._rejectPendingRequests(
-        'The bridge host shut down before replying. Studio may still have run the request.'
+        new StudioBridgeError({
+          code: 'HOST_STOPPED',
+          message:
+            'The bridge host stopped before Studio replied, so the command may have run only in part.',
+          fix: 'Run the command again.',
+        })
       );
       this.emit('disconnected');
 
@@ -142,10 +152,10 @@ export class BridgeClient extends EventEmitter {
     await this._fetchSessionsAsync();
   }
 
-  private _rejectPendingRequests(message: string): void {
+  private _rejectPendingRequests(error: Error): void {
     for (const [, entry] of this._pendingRequests) {
       clearTimeout(entry.timer);
-      entry.reject(new Error(message));
+      entry.reject(error);
     }
     this._pendingRequests.clear();
   }
@@ -160,7 +170,7 @@ export class BridgeClient extends EventEmitter {
     this._transport.disconnect();
     this._isConnected = false;
 
-    this._rejectPendingRequests('Client disconnected');
+    this._rejectPendingRequests(new Error('Client disconnected'));
 
     // Mark all handles as disconnected
     for (const handle of this._sessionHandles.values()) {
@@ -177,6 +187,10 @@ export class BridgeClient extends EventEmitter {
   /** The host's HOST_PROTOCOL_VERSION, or undefined for hosts older than it. */
   get hostProtocolVersion(): number | undefined {
     return this._hostProtocolVersion;
+  }
+
+  get hostInfo(): HostInfo | undefined {
+    return this._hostInfo;
   }
 
   listSessions(): SessionInfo[] {
@@ -250,9 +264,7 @@ export class BridgeClient extends EventEmitter {
     return new Promise<PluginMessage>((resolve, reject) => {
       const timer = setTimeout(() => {
         this._pendingRequests.delete(requestId);
-        reject(
-          new Error(`Request "${requestId}" timed out after ${timeoutMs}ms`)
-        );
+        reject(new RequestTimeoutError(requestId, timeoutMs));
       }, timeoutMs + HOST_REPLY_GRACE_MS);
 
       this._pendingRequests.set(requestId, { resolve, reject, timer });
@@ -324,6 +336,7 @@ export class BridgeClient extends EventEmitter {
 
   private _handleListSessionsResponse(msg: ListSessionsResponse): void {
     this._hostProtocolVersion = msg.protocolVersion;
+    this._hostInfo = msg.host;
     const pending = this._pendingRequests.get(msg.requestId);
     if (pending) {
       clearTimeout(pending.timer);
@@ -349,6 +362,8 @@ export class BridgeClient extends EventEmitter {
     switch (msg.event) {
       case 'connected': {
         if (msg.session) {
+          this._sessionHandles.get(msg.sessionId)?.markDisconnected();
+          this._sessionHandles.delete(msg.sessionId);
           this._addSessionFromInfo(msg.session);
           const bridgeSession = this._bridgeSessions.get(msg.sessionId);
           if (bridgeSession) {
@@ -434,7 +449,7 @@ export class BridgeClient extends EventEmitter {
       return;
     }
 
-    console.warn('Bridge host disconnected. Attempting recovery...');
+    OutputHelper.verbose('[client] Bridge host disconnected; recovering');
 
     try {
       const outcome = await this._handOff.onHostDisconnectedAsync();

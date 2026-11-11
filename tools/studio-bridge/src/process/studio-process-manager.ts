@@ -6,6 +6,7 @@
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 import { spawn, type ChildProcess } from 'child_process';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
@@ -22,13 +23,38 @@ export async function findStudioPathAsync(): Promise<string> {
   } else if (process.platform === 'linux') {
     return findStudioPathLinuxAsync();
   }
-  throw new Error(`Unsupported platform: ${process.platform}`);
+  throw unsupportedPlatform('launch Roblox Studio');
+}
+
+function unsupportedPlatform(action: string): StudioBridgeError {
+  return new StudioBridgeError({
+    code: 'UNSUPPORTED_PLATFORM',
+    message: `studio-bridge can't ${action} on ${process.platform}.`,
+    fix: 'Run it on Windows or macOS, or on Linux after "studio-bridge linux setup".',
+  });
+}
+
+function studioNotFound(cause: string): StudioBridgeError {
+  return new StudioBridgeError({
+    code: 'STUDIO_NOT_FOUND',
+    message: "Couldn't find Roblox Studio on this machine.",
+    fix: 'Install Roblox Studio from roblox.com/create, then run the command again.',
+    cause,
+  });
+}
+
+function missingEnvironmentVariable(name: string): StudioBridgeError {
+  return new StudioBridgeError({
+    code: 'MISSING_ENVIRONMENT',
+    message: `The ${name} environment variable isn't set, so Roblox Studio's folders can't be found.`,
+    fix: `Set ${name}, then run the command again.`,
+  });
 }
 
 async function findStudioPathWindowsAsync(): Promise<string> {
   const localAppData = process.env.LOCALAPPDATA;
   if (!localAppData) {
-    throw new Error('LOCALAPPDATA environment variable is not set');
+    throw missingEnvironmentVariable('LOCALAPPDATA');
   }
 
   const versionsDir = path.join(localAppData, 'Roblox', 'Versions');
@@ -37,7 +63,7 @@ async function findStudioPathWindowsAsync(): Promise<string> {
   try {
     entries = await fs.readdir(versionsDir);
   } catch {
-    throw new Error(`Could not read Roblox versions directory: ${versionsDir}`);
+    throw studioNotFound(`Could not read ${versionsDir}`);
   }
 
   // Each version folder may contain RobloxStudioBeta.exe
@@ -51,8 +77,8 @@ async function findStudioPathWindowsAsync(): Promise<string> {
     }
   }
 
-  throw new Error(
-    `Could not find RobloxStudioBeta.exe in any version folder under ${versionsDir}`
+  throw studioNotFound(
+    `No RobloxStudioBeta.exe in any version folder under ${versionsDir}`
   );
 }
 
@@ -63,7 +89,7 @@ async function findStudioPathMacAsync(): Promise<string> {
     await fs.access(candidate);
     return candidate;
   } catch {
-    throw new Error(`Could not find Roblox Studio at ${candidate}`);
+    throw studioNotFound(`Not found: ${candidate}`);
   }
 }
 
@@ -75,9 +101,12 @@ async function findStudioPathLinuxAsync(): Promise<string> {
     await fs.access(config.studioExe);
     return config.studioExe;
   } catch {
-    throw new Error(
-      `Could not find Roblox Studio at ${config.studioExe}. Run "studio-bridge linux setup" first.`
-    );
+    throw new StudioBridgeError({
+      code: 'STUDIO_NOT_FOUND',
+      message: "Roblox Studio isn't installed under Wine yet.",
+      fix: "Run 'studio-bridge linux setup'.",
+      cause: `Not found: ${config.studioExe}`,
+    });
   }
 }
 
@@ -88,13 +117,13 @@ export function findPluginsFolder(): string {
   if (process.platform === 'win32') {
     const localAppData = process.env.LOCALAPPDATA;
     if (!localAppData) {
-      throw new Error('LOCALAPPDATA environment variable is not set');
+      throw missingEnvironmentVariable('LOCALAPPDATA');
     }
     return path.join(localAppData, 'Roblox', 'Plugins');
   } else if (process.platform === 'darwin') {
     const home = process.env.HOME;
     if (!home) {
-      throw new Error('HOME environment variable is not set');
+      throw missingEnvironmentVariable('HOME');
     }
     return path.join(home, 'Documents', 'Roblox', 'Plugins');
   } else if (process.platform === 'linux') {
@@ -115,7 +144,7 @@ export function findPluginsFolder(): string {
       'Plugins'
     );
   }
-  throw new Error(`Unsupported platform: ${process.platform}`);
+  throw unsupportedPlatform('find the Studio plugins folder');
 }
 
 export interface StudioProcess {

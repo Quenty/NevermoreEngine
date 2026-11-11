@@ -5,6 +5,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   CompositeReporter,
@@ -59,8 +60,11 @@ export async function resolvePlacePathAsync(
   try {
     await fs.access(resolved);
   } catch {
-    OutputHelper.error(`Place file not found: ${resolved}`);
-    process.exit(1);
+    throw new StudioBridgeError({
+      code: 'INVALID_INPUT',
+      message: `The place file ${place} doesn't exist.`,
+      fix: 'Check the --place path.',
+    });
   }
   return resolved;
 }

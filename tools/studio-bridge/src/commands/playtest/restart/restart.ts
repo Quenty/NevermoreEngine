@@ -23,6 +23,7 @@ import {
   toPlaytestStartResult,
   type PlaytestStartResult,
 } from '../start/start.js';
+import { StudioBridgeError } from '../../../messages/studio-bridge-error.js';
 
 /** Studio refuses a new playtest until the old one has fully wound down. */
 const START_ATTEMPTS = 5;
@@ -134,9 +135,11 @@ function findServerSession(
     const list = servers
       .map((info) => `  - ${info.sessionId}: ${info.placeName}`)
       .join('\n');
-    throw new Error(
-      `Multiple playtests are running. Use --target <id> to pick one.\n${list}`
-    );
+    throw new StudioBridgeError({
+      code: 'SESSION_NOT_FOUND',
+      message: 'Several playtests are running, so this needs a --target.',
+      fix: `Pick one with --target <id>:\n${list}`,
+    });
   }
 
   return servers.length === 1
@@ -188,7 +191,7 @@ export const playtestRestartCommand = defineCommand<
     }),
   },
   cli: {
-    format: formatPlaytestStartText,
+    body: formatPlaytestStartText,
   },
   handler: async (connection, args, targeting) =>
     playtestRestartHandlerAsync(connection, {

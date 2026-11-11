@@ -147,7 +147,9 @@ describe('Inflight request handling during failover', () => {
     client = undefined;
 
     // The pending request should reject with 'Client disconnected'
-    await expect(execPromise).rejects.toThrow('Client disconnected');
+    await expect(execPromise).rejects.toMatchObject({
+      code: 'SESSION_DISCONNECTED',
+    });
   });
 
   it('ALL pending requests are rejected, not just the first', async () => {
@@ -182,7 +184,7 @@ describe('Inflight request handling during failover', () => {
     // All should reject with 'Client disconnected'
     for (const result of results) {
       if (result.status === 'rejected') {
-        expect(result.reason.message).toContain('Client disconnected');
+        expect(result.reason.code).toBe('SESSION_DISCONNECTED');
       }
     }
   });
@@ -250,7 +252,7 @@ describe('Inflight request handling during failover', () => {
       SessionDisconnectedError
     );
     await expect(
-      session!.queryDataModelAsync({ path: 'game' })
+      session!.inspectInstanceAsync({ query: 'Workspace' })
     ).rejects.toThrow(SessionDisconnectedError);
   });
 

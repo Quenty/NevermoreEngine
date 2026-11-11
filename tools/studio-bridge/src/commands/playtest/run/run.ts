@@ -32,6 +32,10 @@ import {
   getPlaytestContexts,
   startPlaytestAsync,
 } from '../playtest-sessions.js';
+import {
+  invalidInput,
+  StudioBridgeError,
+} from '../../../messages/studio-bridge-error.js';
 
 export interface PlaytestRunOptions {
   scriptContent: string;
@@ -74,8 +78,9 @@ export async function playtestRunHandlerAsync(
   options: PlaytestRunOptions
 ): Promise<PlaytestRunResult> {
   if (!getPlaytestContexts(options.mode).includes(options.context)) {
-    throw new Error(
-      `A ${options.mode} mode playtest has no ${options.context} session to run code in`
+    throw invalidInput(
+      `A ${options.mode}-mode playtest has no ${options.context} to run code in.`,
+      'Use --mode play to run code in the client.'
     );
   }
 
@@ -99,7 +104,7 @@ export async function playtestRunHandlerAsync(
   try {
     const session = playtest.sessions[options.context];
     if (!session) {
-      throw new Error(`Playtest has no ${options.context} session`);
+      throw new Error(`The playtest has no ${options.context} session`);
     }
     // In play mode the server's code expects the player, who joins a moment later
     if (options.mode === 'play' && options.context === 'server') {
@@ -138,9 +143,13 @@ async function waitForPlayerAsync(serverSession: BridgeSession): Promise<void> {
     if (players.length > 0) return;
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error(
-    `No player joined the playtest within ${PLAYER_JOIN_TIMEOUT_MS / 1000}s`
-  );
+  throw new StudioBridgeError({
+    code: 'PLAYTEST_NO_PLAYER',
+    message: `No player joined the playtest within ${
+      PLAYER_JOIN_TIMEOUT_MS / 1000
+    }s, so the server code didn't run.`,
+    fix: 'Check the playtest in Studio, then run the command again.',
+  });
 }
 
 /** Ends the playtest, returning why it could not instead of throwing. */
@@ -201,12 +210,14 @@ export const playtestRunCommand = defineCommand<
     }),
   },
   cli: {
-    format: (result) =>
-      result.stopError
-        ? `${formatExecText(result)}\nPlaytest is still running: ${
-            result.stopError
-          }`
-        : formatExecText(result),
+    output: 'data',
+    body: (result) =>
+      [
+        formatExecText(result),
+        result.stopError && `Playtest is still running: ${result.stopError}`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
   },
   handler: async (connection, args, targeting) => {
     const { scriptContent } = await resolveScriptContentAsync(args);

@@ -18,6 +18,7 @@ export interface ArgDefinition {
   alias?: string;
   choices?: readonly string[];
   array?: boolean;
+  hidden?: boolean;
 }
 
 export const arg = {
@@ -85,6 +86,7 @@ export const arg = {
     description: string;
     alias?: string;
     default?: boolean;
+    hidden?: boolean;
   }): ArgDefinition {
     return {
       kind: 'flag',
@@ -92,6 +94,7 @@ export const arg = {
       description: config.description,
       alias: config.alias,
       default: config.default ?? false,
+      ...(config.hidden ? { hidden: true } : {}),
     };
   },
 
@@ -157,14 +160,20 @@ export function toYargsOptions(
         type: def.type,
       };
       if (def.alias) opt.alias = def.alias;
+      if (def.required) opt.demandOption = true;
       if (def.default !== undefined) opt.default = def.default;
       if (def.choices) opt.choices = def.choices;
       if (def.array) opt.array = def.array;
-      options[name] = opt;
+      if (def.hidden) opt.hidden = true;
+      options[toKebabCase(name)] = opt;
     }
   }
 
   return { positionals, options };
+}
+
+function toKebabCase(name: string): string {
+  return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
 export interface JsonSchemaOutput {

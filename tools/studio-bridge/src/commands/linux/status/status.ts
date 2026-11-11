@@ -72,7 +72,7 @@ export async function statusHandlerAsync(
   try {
     const envError = await checkLinuxEnvironmentAsync();
     if (envError) {
-      return unhealthy(envError);
+      return unhealthy(`${envError.message} ${envError.fix ?? ''}`.trim());
     }
 
     const linux = await import('../../../linux/index.js');
@@ -163,9 +163,7 @@ export function formatStatusText(result: StatusResult): string {
       ? `  Wine credentials: ${
           auth.credentialsInjected ? 'present' : 'not injected'
         }`
-      : '  Wine prefix: not initialized',
-    '',
-    result.healthy ? result.summary : OutputHelper.formatWarning(result.summary)
+      : '  Wine prefix: not initialized'
   );
 
   return lines.join('\n');
@@ -181,7 +179,7 @@ export const linuxStatusCommand = defineCommand<StatusArgs, StatusResult>({
   scope: 'standalone',
   args: {},
   cli: {
-    format: formatStatusText,
+    body: formatStatusText,
   },
   handler: async (args) => statusHandlerAsync(args),
 });

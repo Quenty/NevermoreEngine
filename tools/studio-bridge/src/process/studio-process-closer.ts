@@ -6,6 +6,7 @@
  */
 
 import { execa } from 'execa';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const WINDOW_TITLE_SUFFIX = ' - Roblox Studio';
 const EXIT_POLL_INTERVAL_MS = 250;
@@ -46,7 +47,11 @@ export async function listStudioProcessesAsync(): Promise<
     return parseMacProcessList(stdout);
   }
 
-  throw new Error(`Closing Studio is not supported on ${process.platform}`);
+  throw new StudioBridgeError({
+    code: 'UNSUPPORTED_PLATFORM',
+    message: `studio-bridge can't list or close Studio processes on ${process.platform}.`,
+    fix: 'Close Studio yourself.',
+  });
 }
 
 export function parseWindowsProcessList(

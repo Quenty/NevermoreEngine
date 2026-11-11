@@ -14,6 +14,7 @@ import {
   formatTable,
   type TableColumn,
 } from '@quenty/cli-output-helpers/reporting';
+import { StudioBridgeError } from '../../../messages/studio-bridge-error.js';
 
 const PLAYER_CHANGE_TIMEOUT_SEC = 60;
 const CLIENT_SESSION_TIMEOUT_MS = 30_000;
@@ -136,7 +137,11 @@ export async function removePlaytestPlayersAsync(
     );
     if (!player) {
       const known = current.map((p) => p.name).join(', ') || 'none';
-      throw new Error(`No player named '${name}' (players: ${known})`);
+      throw new StudioBridgeError({
+        code: 'PLAYER_NOT_FOUND',
+        message: `No player named '${name}' is in the playtest, so nobody was removed.`,
+        fix: `Use one of: ${known}.`,
+      });
     }
     return player;
   });
@@ -166,11 +171,13 @@ export async function removePlaytestPlayersAsync(
     REQUEST_TIMEOUT_MS
   );
   if (remaining.length > 0) {
-    throw new Error(
-      `Players still in the playtest after ${PLAYER_CHANGE_TIMEOUT_SEC}s: ${remaining.join(
-        ', '
-      )}`
-    );
+    throw new StudioBridgeError({
+      code: 'PLAYERS_STILL_IN_PLAYTEST',
+      message: `${remaining.join(', ')} ${
+        remaining.length === 1 ? 'is' : 'are'
+      } still in the playtest after ${PLAYER_CHANGE_TIMEOUT_SEC}s.`,
+      fix: 'Run the command again, or close their client windows in Studio.',
+    });
   }
   return removed;
 }

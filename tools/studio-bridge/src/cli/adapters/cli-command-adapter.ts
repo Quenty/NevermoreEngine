@@ -9,28 +9,45 @@
  *   - Honors `--output` (file write), `--open`, `--watch`, `--interval`
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 import type { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   buildResultReporter,
   type ResultReporter,
+  formatCsv,
   formatJson,
 } from '@quenty/cli-output-helpers/reporting';
-import { BridgeConnection, SessionNotFoundError } from '../../bridge/index.js';
+import {
+  BridgeConnection,
+  SessionNotFoundError,
+  shouldAutoStartHost,
+} from '../../bridge/index.js';
 import type { BridgeSession, SessionContext } from '../../bridge/index.js';
 import type {
+  CliWatchConfig,
   CommandDefinition,
+  CommandResult,
   SessionTargeting,
+  WatchStream,
 } from '../../commands/framework/define-command.js';
 import { toYargsOptions } from '../../commands/framework/arg-builder.js';
-import { explainMissingPlaytestContextAsync } from '../../commands/playtest/playtest-sessions.js';
+import { explainMissingSessionAsync } from '../explain-missing-session.js';
+import { describeError } from '../../messages/describe-error.js';
+import { StudioBridgeError } from '../../messages/studio-bridge-error.js';
 import { tryFindFolderInstanceAsync } from '../../deploy/deploy-places.js';
 import {
-  addWarning,
   getWarnings,
+  isJsonOutputEnabled,
+  reportStaleHost,
   warnIfPluginStaleAsync,
 } from '../cli-output-context.js';
+import {
+  ensureCurrentPluginAsync,
+  resolvePluginUpdatePolicy,
+  setPluginUpdatePolicy,
+} from '../plugin-freshness.js';
 
 /** Args injected by the adapter (not defined on CommandDefinition). */
 export interface AdapterArgs {
@@ -41,6 +58,7 @@ export interface AdapterArgs {
   open?: boolean;
   watch?: boolean;
   interval?: number;
+  updatePlugin?: boolean;
 }
 
 /**
@@ -53,6 +71,7 @@ export interface CliLifecycleProvider {
     remoteHost?: string;
     local?: boolean;
     waitForSessions?: boolean;
+    autoHost?: boolean;
   }): Promise<BridgeConnection>;
 }
 
@@ -86,6 +105,15 @@ async function executeCommandAsync(
     return (def.handler as any)(commandArgs);
   }
 
+  setPluginUpdatePolicy(
+    resolvePluginUpdatePolicy({
+      updatePlugin: argv.updatePlugin as boolean | undefined,
+      json: isJsonOutputEnabled() || argv.format === 'json',
+      stdinIsTTY: process.stdin.isTTY,
+      stderrIsTTY: process.stderr.isTTY,
+    })
+  );
+
   // Reuse existing connection if provided (watch mode), otherwise connect fresh
   const connection =
     existingConnection ??
@@ -94,6 +122,7 @@ async function executeCommandAsync(
       remoteHost: argv.remote as string | undefined,
       local: argv.local as boolean | undefined,
       waitForSessions: def.scope === 'connection',
+      autoHost: shouldAutoStartHost(argv.autohost as boolean | undefined),
     }));
 
   const targeting: SessionTargeting = {
@@ -106,23 +135,26 @@ async function executeCommandAsync(
     await tryTargetFolderInstanceAsync(connection, targeting);
   }
 
-  if (connection.isHostOutdated) {
-    addWarning(
-      `The bridge host on port ${connection.port} runs an older studio-bridge, which may drop newer options. Restart it (e.g. stop 'studio-bridge serve') to use this version.`
-    );
-  }
+  reportStaleHost(connection);
 
   try {
     if (def.scope === 'session') {
-      const session = await resolveTargetSessionAsync(connection, targeting);
+      let session = await resolveTargetSessionAsync(connection, targeting);
       if (def.changesDataModel && !argv.allowEdit) {
         assertNotEditingDuringPlaytest(connection, session);
       }
-      await warnIfPluginStaleAsync([session.info]);
+      if (def.worksWithOutdatedPlugin) {
+        await warnIfPluginStaleAsync([session.info]);
+      } else {
+        session = await ensureCurrentPluginAsync(connection, session);
+      }
       return await (def.handler as any)(session, commandArgs, connection);
     }
-    await warnIfPluginStaleAsync(connection.listSessions());
-    return await (def.handler as any)(connection, commandArgs, targeting);
+    try {
+      return await (def.handler as any)(connection, commandArgs, targeting);
+    } finally {
+      await warnIfPluginStaleAsync(connection.listSessions());
+    }
   } finally {
     if (!existingConnection) {
       await connection.disconnectAsync();
@@ -151,10 +183,10 @@ async function resolveTargetSessionAsync(
       return connection
         .resolveSessionAsync(targeting.target, targeting.context)
         .catch(async (retryErr: unknown) => {
-          throw await explainMissingPlaytestContextAsync(connection, retryErr);
+          throw await explainMissingSessionAsync(connection, retryErr);
         });
     }
-    throw await explainMissingPlaytestContextAsync(connection, err);
+    throw await explainMissingSessionAsync(connection, err);
   }
 }
 
@@ -199,9 +231,11 @@ export function assertNotEditingDuringPlaytest(
       (s) => s.instanceId === session.info.instanceId && s.context === 'server'
     );
   if (playtest) {
-    throw new Error(
-      `A playtest of '${session.info.placeName}' is running, so this would change Edit, not the playtest. Target the playtest with --context server (or client), or pass --allow-edit to change Edit anyway.`
-    );
+    throw new StudioBridgeError({
+      code: 'EDIT_DURING_PLAYTEST',
+      message: `A playtest of '${session.info.placeName}' is running, so this would change Edit, not the playtest.`,
+      fix: 'Add --context server to change the playtest, or --allow-edit to change Edit anyway.',
+    });
   }
 }
 
@@ -215,44 +249,70 @@ function injectWarnings(result: unknown): unknown {
   return result;
 }
 
-/**
- * Render a command result for stdout/file output. `--format=json` (or any
- * explicit non-text format) routes through the command's `json` override or
- * falls back to `formatJson`. Anything else (default, `--format=text`)
- * routes through the command's `format` callback, then `result.summary`,
- * then JSON as a last resort.
- */
-function renderResult(
+export function resolveOutputFormat(
   def: CommandDefinition,
-  result: unknown,
-  explicitFormat: string | undefined
+  format: string | undefined,
+  outputPath: string | undefined
+): string | undefined {
+  if (format !== undefined) return format;
+  if (def.cli?.rows && outputPath?.toLowerCase().endsWith('.csv')) {
+    return 'csv';
+  }
+  return undefined;
+}
+
+function isSummaryOnStderr(
+  def: CommandDefinition,
+  format: string | undefined,
+  watch: boolean
+): boolean {
+  return (
+    def.cli?.output === 'data' &&
+    !watch &&
+    (format === undefined || format === 'text')
+  );
+}
+
+function formatReportText(body: string, summary: string): string {
+  const line = OutputHelper.formatDim(summary);
+  return body === ''
+    ? line
+    : `${body}
+${line}`;
+}
+
+export function renderResult(
+  def: CommandDefinition,
+  result: CommandResult,
+  explicitFormat: string | undefined,
+  summaryOnStderr = false
 ): string {
+  if (explicitFormat === 'csv' && def.cli?.rows) {
+    const { columns, rows } = def.cli.rows(result);
+    return formatCsv(columns, rows);
+  }
+
   if (explicitFormat === 'json') {
-    if (def.cli?.json) return def.cli.json(result as any);
+    if (def.cli?.json) return def.cli.json(result);
     return formatJson(injectWarnings(result), { pretty: process.stdout.isTTY });
   }
 
-  if (def.cli?.format) return def.cli.format(result as any);
-
-  if (typeof result === 'object' && result !== null && 'summary' in result) {
-    return (result as any).summary;
-  }
-
-  return formatJson(result);
+  const body = def.cli?.body?.(result) ?? '';
+  return summaryOnStderr ? body : formatReportText(body, result.summary);
 }
 
 /**
  * Extract a Buffer from the result's binary field, or undefined if no
- * binary field is configured / extractable / requested. When `--format=json`
- * is explicit the user wants JSON not raw bytes — return undefined so the
- * file reporter falls back to text rendering.
+ * binary field is configured / extractable / requested. With an explicit
+ * `--format` other than text the user wants that format, not raw bytes —
+ * return undefined so the file reporter falls back to text rendering.
  */
 function extractBinaryBuffer(
   def: CommandDefinition,
   result: unknown,
   format: string | undefined
 ): Buffer | undefined {
-  if (format === 'json') return undefined;
+  if (format !== undefined && format !== 'text') return undefined;
   const binaryField = def.cli?.binaryField;
   if (!binaryField) return undefined;
   if (typeof result !== 'object' || result === null) return undefined;
@@ -295,6 +355,9 @@ export function buildYargsCommand(
       for (const [name, opt] of Object.entries(yargsOptions)) {
         yargs.option(name, opt as any);
       }
+      for (const name of Object.keys(def.cli?.removedOptions ?? {})) {
+        yargs.option(name, { hidden: true });
+      }
 
       if (def.scope === 'session' || def.scope === 'connection') {
         yargs.option('target', {
@@ -306,6 +369,12 @@ export function buildYargsCommand(
           type: 'string',
           describe: 'Target context (edit, client, server)',
           choices: ['edit', 'client', 'server'],
+        });
+        yargs.option('update-plugin', {
+          type: 'boolean',
+          default: false,
+          describe:
+            'If the Studio plugin is outdated, update it, wait for Studio to reload it, and go on, without asking',
         });
       }
 
@@ -319,21 +388,35 @@ export function buildYargsCommand(
 
       yargs.option('format', {
         type: 'string',
-        choices: ['text', 'json'],
-        describe: 'Output format',
+        describe: def.cli?.rows
+          ? 'Output format: text, json or csv (default: csv when --output ends in .csv)'
+          : 'Output format: text or json',
       });
       yargs.option('output', {
         alias: 'o',
         type: 'string',
-        describe: 'Write output to file',
+        describe: def.cli?.files
+          ? 'Write output files into this directory'
+          : 'Write output to file',
+        ...(def.cli?.files ? { demandOption: true } : {}),
       });
       yargs.option('open', {
         type: 'boolean',
         default: false,
-        describe: 'Open output file after writing',
+        describe: def.cli?.files
+          ? 'Open the output directory after writing'
+          : 'Open output file after writing',
       });
 
-      if (def.safety === 'read') {
+      const streamWatch = getStreamWatch(def);
+      if (streamWatch) {
+        yargs.option('watch', {
+          alias: 'w',
+          type: 'boolean',
+          default: false,
+          describe: streamWatch.description,
+        });
+      } else if (def.safety === 'read') {
         yargs.option('watch', {
           alias: 'w',
           type: 'boolean',
@@ -351,40 +434,176 @@ export function buildYargsCommand(
     },
     handler: async (argv: any) => {
       const commandArgs = extractCommandArgs(argv, def);
-      const explicitFormat = argv.format as string | undefined;
+      const explicitFormat = resolveOutputFormat(
+        def,
+        argv.format as string | undefined,
+        argv.output as string | undefined
+      );
+      const files = def.cli?.files;
+      const watch = !!argv.watch && def.safety === 'read';
+      const summaryOnStderr = isSummaryOnStderr(def, explicitFormat, watch);
       const reporter = buildResultReporter<unknown>({
         outputPath: argv.output as string | undefined,
-        watch: !!argv.watch && def.safety === 'read',
+        watch,
         open: argv.open as boolean | undefined,
         intervalMs: argv.interval as number | undefined,
-        render: (result) => renderResult(def, result, explicitFormat),
+        render: (result) =>
+          renderResult(
+            def,
+            result as CommandResult,
+            explicitFormat,
+            summaryOnStderr
+          ),
         binary: (result) => extractBinaryBuffer(def, result, explicitFormat),
+        ...(files ? { files: (result: unknown) => files(result as any) } : {}),
       });
       const connect =
         options?.lifecycle?.connectAsync.bind(options.lifecycle) ??
         BridgeConnection.connectAsync.bind(BridgeConnection);
 
       try {
-        if (argv.watch && def.safety === 'read') {
+        assertNoRemovedOptions(def, argv);
+        assertSupportedFormat(def, argv.format as string | undefined);
+
+        const streamWatch = getStreamWatch(def);
+        if (argv.watch && streamWatch) {
+          await runStreamWatchAsync(
+            def,
+            streamWatch,
+            commandArgs,
+            argv,
+            toStreamFormat(explicitFormat),
+            connect
+          );
+        } else if (argv.watch && def.safety === 'read') {
           await runWatchModeAsync(def, commandArgs, argv, reporter, connect);
         } else {
-          await runOnceAsync(def, commandArgs, argv, reporter, connect);
+          await runOnceAsync(
+            def,
+            commandArgs,
+            argv,
+            reporter,
+            connect,
+            summaryOnStderr
+          );
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (explicitFormat === 'json') {
-          console.log(
-            formatJson(injectWarnings({ success: false, error: message }), {
-              pretty: process.stdout.isTTY,
-            })
-          );
-        } else {
-          OutputHelper.error(message);
-        }
+        reportError(err, explicitFormat === 'json');
         process.exit(1);
       }
     },
   };
+}
+
+export function reportError(err: unknown, json: boolean): void {
+  const report = describeError(err, OutputHelper.isVerbose());
+  if (json) {
+    console.log(
+      formatJson(injectWarnings({ success: false, ...report }), {
+        pretty: process.stdout.isTTY,
+      })
+    );
+    return;
+  }
+  OutputHelper.error(report.error);
+  if (report.fix) OutputHelper.hint(report.fix);
+  if (report.cause) OutputHelper.error(OutputHelper.formatDim(report.cause));
+}
+
+function assertNoRemovedOptions(
+  def: CommandDefinition,
+  argv: Record<string, unknown>
+): void {
+  for (const [name, replacement] of Object.entries(
+    def.cli?.removedOptions ?? {}
+  )) {
+    if (argv[name] !== undefined) {
+      throw new StudioBridgeError({
+        code: 'REMOVED_OPTION',
+        message: `--${name} was removed.`,
+        fix: replacement,
+      });
+    }
+  }
+}
+
+function assertSupportedFormat(
+  def: CommandDefinition,
+  format: string | undefined
+): void {
+  const formats = def.cli?.rows ? ['text', 'json', 'csv'] : ['text', 'json'];
+  if (format === undefined || formats.includes(format)) return;
+  throw new StudioBridgeError({
+    code: 'INVALID_INPUT',
+    message:
+      format === 'csv'
+        ? `'${[def.group, def.name]
+            .filter(Boolean)
+            .join(' ')}' has no table to write as CSV.`
+        : `--format ${format} isn't a format.`,
+    fix: `Use --format ${formats.join(' or ')}.`,
+  });
+}
+
+function getStreamWatch(
+  def: CommandDefinition
+): CliWatchConfig<unknown> | undefined {
+  return def.scope === 'session' ? def.cli?.watch : undefined;
+}
+
+function toStreamFormat(format: string | undefined): WatchStream['format'] {
+  return format === 'json' || format === 'csv' ? format : 'text';
+}
+
+async function runStreamWatchAsync(
+  def: CommandDefinition,
+  watch: CliWatchConfig<unknown>,
+  commandArgs: Record<string, unknown>,
+  argv: Record<string, unknown>,
+  format: WatchStream['format'],
+  connect: CliLifecycleProvider['connectAsync']
+): Promise<void> {
+  const controller = new AbortController();
+  const onSignal = (): void => {
+    if (controller.signal.aborted) {
+      process.exit(130);
+    }
+    controller.abort();
+  };
+  process.on('SIGINT', onSignal);
+  process.on('SIGTERM', onSignal);
+
+  const outputPath = argv.output as string | undefined;
+  const file = outputPath
+    ? fs.createWriteStream(path.resolve(outputPath))
+    : undefined;
+  const stream: WatchStream = {
+    format,
+    write: (text) => {
+      if (file) file.write(text);
+      else process.stdout.write(text);
+    },
+    signal: controller.signal,
+  };
+
+  try {
+    await executeCommandAsync(
+      {
+        ...def,
+        handler: (session: BridgeSession, args: unknown) =>
+          watch.handler(session, args, stream),
+      } as CommandDefinition,
+      commandArgs,
+      argv,
+      connect
+    );
+  } finally {
+    process.off('SIGINT', onSignal);
+    process.off('SIGTERM', onSignal);
+    if (file) {
+      await new Promise<void>((resolve) => file.end(resolve));
+    }
+  }
 }
 
 async function runOnceAsync(
@@ -392,13 +611,20 @@ async function runOnceAsync(
   commandArgs: Record<string, unknown>,
   argv: Record<string, unknown>,
   reporter: ResultReporter<unknown>,
-  connect: CliLifecycleProvider['connectAsync']
+  connect: CliLifecycleProvider['connectAsync'],
+  summaryOnStderr: boolean
 ): Promise<void> {
   const result = await executeCommandAsync(def, commandArgs, argv, connect);
 
   await reporter.startAsync();
   reporter.onResult(result);
   await reporter.stopAsync();
+  if (summaryOnStderr) {
+    process.stderr.write(
+      `${OutputHelper.formatDim((result as CommandResult).summary)}
+`
+    );
+  }
 
   if (
     typeof result === 'object' &&
@@ -428,6 +654,7 @@ async function runWatchModeAsync(
           remoteHost: argv.remote as string | undefined,
           local: argv.local as boolean | undefined,
           waitForSessions: def.scope === 'connection',
+          autoHost: shouldAutoStartHost(argv.autohost as boolean | undefined),
         });
 
   let stopped = false;

@@ -4,12 +4,14 @@
  */
 
 import * as fs from 'fs/promises';
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
-import type { BridgeSession } from '../../../bridge/index.js';
+import type { BridgeSession, InstanceRef } from '../../../bridge/index.js';
+import { formatInstanceTree } from '../../shared/instance-tree.js';
 
 export interface ImportResult {
-  paths: string[];
+  instances: InstanceRef[];
   summary: string;
 }
 
@@ -34,9 +36,11 @@ export async function importInstancesHandlerAsync(
   );
 
   return {
-    paths: result.paths,
-    summary: `Imported ${result.paths.length} instance(s): ${result.paths.join(
-      ', '
+    instances: result.instances,
+    summary: `Imported ${formatCount(
+      result.instances.length,
+      'instance',
+      'instances'
     )}`,
   };
 }
@@ -57,6 +61,9 @@ export const importCommand = defineCommand<ImportArgs, ImportResult>({
       description:
         'Dot-separated path of the parent instance (default: Workspace)',
     }),
+  },
+  cli: {
+    body: (result) => formatInstanceTree(result.instances),
   },
   handler: async (session, args) =>
     importInstancesHandlerAsync(session, {

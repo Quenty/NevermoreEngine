@@ -116,7 +116,7 @@ describe('findStudioMcpLaunchAsync', () => {
         localAppData,
         readContentFolderAsync: async () => undefined,
       })
-    ).rejects.toThrow('No StudioMCP.exe found next to RobloxStudioBeta.exe');
+    ).rejects.toThrow('No installed Roblox Studio ships an MCP server');
   });
 
   it('finds StudioMCP in the macOS app bundle', async () => {
@@ -155,7 +155,7 @@ describe('findStudioMcpLaunchAsync', () => {
         linuxStudioDir: localAppData,
         linuxEnv: {},
       })
-    ).rejects.toThrow('No StudioMCP.exe in');
+    ).rejects.toThrow('The Studio under Wine has no MCP server');
   });
 
   it('refuses a platform Studio does not run on', async () => {

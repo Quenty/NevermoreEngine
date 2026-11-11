@@ -2,6 +2,7 @@
  * `playtest player list` — list the players in the running playtest.
  */
 
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../../framework/define-command.js';
 import type { BridgeConnection } from '../../../../bridge/index.js';
 import { resolvePlaytestServerSessionAsync } from '../../playtest-sessions.js';
@@ -28,14 +29,16 @@ export async function playtestPlayerListHandlerAsync(
 
   return {
     players,
-    summary: `${players.length} player(s) in the playtest`,
+    summary: `${formatCount(
+      players.length,
+      'player',
+      'players'
+    )} in the playtest`,
   };
 }
 
 export function formatPlayerListText(result: PlaytestPlayerListResult): string {
-  return result.players.length === 0
-    ? 'No players in the playtest'
-    : formatPlayersTable(result.players);
+  return formatPlayersTable(result.players);
 }
 
 export const playtestPlayerListCommand = defineCommand<
@@ -50,7 +53,7 @@ export const playtestPlayerListCommand = defineCommand<
   scope: 'connection',
   args: {},
   cli: {
-    format: formatPlayerListText,
+    body: formatPlayerListText,
   },
   handler: async (connection, _args, targeting) =>
     playtestPlayerListHandlerAsync(connection, targeting.target),

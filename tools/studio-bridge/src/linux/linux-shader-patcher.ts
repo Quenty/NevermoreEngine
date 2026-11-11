@@ -11,6 +11,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import type { LinuxStudioConfig } from './linux-config.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const SHADER_PACK_NAME = 'shaders_glsl3.pack';
 const OLD_VERSION = Buffer.from('#version 150');
@@ -31,7 +32,13 @@ export async function patchShadersAsync(
   try {
     data = await fs.readFile(shaderPath);
   } catch {
-    throw new Error(`Shader pack not found: ${shaderPath}`);
+    throw new StudioBridgeError({
+      code: 'LINUX_SETUP_FAILED',
+      message:
+        "Studio's shader pack is missing, so its shaders can't be patched for Wine.",
+      fix: "Run 'studio-bridge linux setup --force' to reinstall Studio.",
+      cause: `Not found: ${shaderPath}`,
+    });
   }
 
   let count = 0;

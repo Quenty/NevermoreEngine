@@ -1,7 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
-import inquirer from 'inquirer';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
 export interface CredentialArgs {
@@ -133,6 +132,7 @@ async function promptAndSaveApiKeyAsync(): Promise<string> {
   OutputHelper.warn('No API key found. Starting login...');
   printApiKeySetupHelp();
 
+  const { default: inquirer } = await import('inquirer');
   const { apiKey } = await inquirer.prompt([
     {
       type: 'password',

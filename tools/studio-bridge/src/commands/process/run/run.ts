@@ -95,7 +95,8 @@ export const processRunCommand = defineCommand<
     }),
   },
   cli: {
-    format: (result) =>
+    output: 'data',
+    body: (result) =>
       result.returnValues && result.returnValues.length > 0
         ? formatReturnValues(result.returnValues)
         : '',

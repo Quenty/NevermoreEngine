@@ -11,8 +11,14 @@
         "jest.config": {
           "$path": "jest.config.lua"
         },
-        "Shared": {
-          "$path": "../templates/studio-bridge-plugin/src/Shared"
+        "plugin": {
+          "$className": "Folder",
+          "ActionRouter": {
+            "$path": "../../../plugins/studio-bridge-plugin/src/modules/Shared/ActionRouter.lua"
+          },
+          "MessageBuffer": {
+            "$path": "../../../plugins/studio-bridge-plugin/src/modules/Shared/MessageBuffer.lua"
+          }
         },
         "commands": {
           "$path": "../src/commands"

@@ -1,0 +1,40 @@
+{
+  "name": "@quenty/studio-bridge-plugin",
+  "version": "1.0.0",
+  "description": "Roblox Studio plugin side of studio-bridge, which runs Luau in Studio and its playtests for the studio-bridge CLI",
+  "keywords": [
+    "Roblox",
+    "Nevermore",
+    "Lua",
+    "Plugin"
+  ],
+  "bugs": {
+    "url": "https://github.com/Quenty/NevermoreEngine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "plugins/studio-bridge-plugin/"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/quenty"
+  },
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "contributors": [
+    "Quenty"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@quenty/loader": "workspace:*"
+  },
+  "devDependencies": {
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+  }
+}

@@ -3,6 +3,7 @@
  * Studio showing a `deploy.nevermore.json` target's place.
  */
 
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import type { BridgeConnection, BridgeSession } from '../../../bridge/index.js';
@@ -20,6 +21,7 @@ import {
 import { explainMissingPlaytestContextAsync } from '../../playtest/playtest-sessions.js';
 import { resolveSessionPidsAsync } from '../../../process/studio-process-identity.js';
 import { describePlaytest } from '../info/info.js';
+import { invalidInput } from '../../../messages/studio-bridge-error.js';
 
 export interface ProcessCloseResult {
   success: boolean;
@@ -105,7 +107,10 @@ export async function closeDeployTargetAsync(
 ): Promise<ProcessCloseResult> {
   const deployPlace = await resolveDeployPlaceAsync(cwd, deployTarget);
   if (!deployPlace) {
-    throw new Error(`Target '${deployTarget}' not found`);
+    throw invalidInput(
+      `No deploy target '${deployTarget}' in deploy.nevermore.json.`,
+      'Check the target name in deploy.nevermore.json.'
+    );
   }
   const { placeId } = deployPlace.place;
   const showing = `'${deployPlace.selector}' (place ${placeId})`;
@@ -158,16 +163,16 @@ export async function closeAllStudiosAsync(
   );
   const closed = results.filter((r) => r.exited).map((r) => r.pid);
   const open = results.filter((r) => !r.exited).map((r) => r.pid);
-  const plural = (n: number) => (n === 1 ? 'Studio' : 'Studios');
+  const studios = (n: number) => formatCount(n, 'Studio', 'Studios');
 
   if (open.length > 0) {
     return {
       success: false,
       pids: closed,
       summary:
-        `Closed ${closed.length} ${plural(closed.length)}; ${
+        `Closed ${studios(closed.length)}; ${studios(
           open.length
-        } ${plural(open.length)} still open (pids ${open.join(', ')})` +
+        )} still open (pids ${open.join(', ')})` +
         (options.force
           ? ''
           : ', likely asking to save. Run without --ask-to-save to close without saving.'),
@@ -177,9 +182,7 @@ export async function closeAllStudiosAsync(
   return {
     success: true,
     pids: closed,
-    summary: `Closed ${closed.length} ${plural(
-      closed.length
-    )} (pids ${closed.join(', ')})`,
+    summary: `Closed ${studios(closed.length)} (pids ${closed.join(', ')})`,
   };
 }
 
@@ -272,8 +275,9 @@ export const processCloseCommand = defineCommand<
         args.pid !== undefined ||
         targeting.target !== undefined
       ) {
-        throw new Error(
-          '--all closes every Studio; drop the target, --target and --pid.'
+        throw invalidInput(
+          '--all closes every Studio, so it takes no target, --target or --pid.',
+          'Drop the target, --target and --pid.'
         );
       }
       return closeAllStudiosAsync(options);

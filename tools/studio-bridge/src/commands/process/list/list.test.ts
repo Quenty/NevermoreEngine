@@ -4,7 +4,12 @@
 
 import { describe, it, expect } from 'vitest';
 import type { SessionInfo } from '../../../bridge/index.js';
-import { formatSessionsTable, listSessionsHandlerAsync } from './list.js';
+import { renderResult } from '../../../cli/adapters/cli-command-adapter.js';
+import {
+  formatSessionsTable,
+  listCommand,
+  listSessionsHandlerAsync,
+} from './list.js';
 import type { StudioMcpSnapshot } from '../../../roblox-mcp/index.js';
 
 function createSessionInfo(overrides: Partial<SessionInfo> = {}): SessionInfo {
@@ -38,7 +43,7 @@ describe('listSessionsHandlerAsync', () => {
     const result = await listSessionsHandlerAsync(conn);
 
     expect(result.sessions).toEqual([]);
-    expect(result.summary).toContain('No active sessions');
+    expect(result.summary).toContain('No Studio is connected');
     expect(result.summary).toContain('studio-bridge plugin');
   });
 
@@ -51,7 +56,7 @@ describe('listSessionsHandlerAsync', () => {
     const result = await listSessionsHandlerAsync(conn);
 
     expect(result.sessions).toHaveLength(2);
-    expect(result.summary).toBe('2 session(s) connected.');
+    expect(result.summary).toBe('2 sessions connected.');
   });
 
   it('returns single session with correct summary', async () => {
@@ -60,7 +65,7 @@ describe('listSessionsHandlerAsync', () => {
     const result = await listSessionsHandlerAsync(conn);
 
     expect(result.sessions).toHaveLength(1);
-    expect(result.summary).toBe('1 session(s) connected.');
+    expect(result.summary).toBe('1 session connected.');
   });
 
   it('sessions data includes expected fields', async () => {
@@ -114,7 +119,9 @@ describe('listSessionsHandlerAsync with Studio processes and MCP', () => {
       { listProcessesAsync: async () => [], elapsedSec: () => 12.34 }
     );
 
-    expect(result.summary).toBe('No Roblox Studio processes are open (12.3s).');
+    expect(result.summary).toBe(
+      "Roblox Studio isn't open (12.3s). Run 'studio-bridge process launch' to open it."
+    );
   });
 
   it('says Studio is open without the plugin, rather than that nothing is', async () => {
@@ -125,7 +132,7 @@ describe('listSessionsHandlerAsync with Studio processes and MCP', () => {
     );
 
     expect(result.summary).toContain(
-      '2 Studio process(es) open, but none has the studio-bridge plugin connected (5.0s)'
+      "2 Studio processes open, but the studio-bridge plugin hasn't connected (5.0s)"
     );
   });
 
@@ -208,5 +215,30 @@ describe('listSessionsHandlerAsync with Studio processes and MCP', () => {
       );
       expect(formatSessionsTable(result, now)).not.toContain('MCP');
     }
+  });
+});
+
+describe('process list --format csv', () => {
+  it('writes a row per session, leaving an unknown pid empty', () => {
+    const result = {
+      sessions: [
+        { ...createSessionInfo(), pid: 4242 },
+        createSessionInfo({
+          sessionId: 'session-2',
+          context: 'server',
+          state: 'Run',
+        }),
+      ],
+      summary: '',
+    };
+
+    expect(renderResult(listCommand, result, 'csv')).toBe(
+      [
+        'sessionId,context,placeName,state,pid',
+        'session-1,edit,TestPlace,Edit,4242',
+        'session-2,server,TestPlace,Run,',
+        '',
+      ].join('\n')
+    );
   });
 });

@@ -28,7 +28,9 @@ import { fileURLToPath } from 'url';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { ROBLOX_USERS_API, type LinuxStudioConfig } from './linux-config.js';
 import { buildWineEnv } from './linux-wine-env.js';
-import { COOKIE_NAME } from '@quenty/nevermore-cli-helpers';
+import { COOKIE_NAME } from '@quenty/nevermore-cli-helpers/cookie-parser';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { warnUser, type UserWarning } from '../messages/warn-user.js';
 
 /** Studio's first-party OAuth client ID (extracted from the Studio binary) */
 const STUDIO_OAUTH_CLIENT_ID = '7968549422692352298';
@@ -92,11 +94,13 @@ export async function compileWriteCredAsync(
       }
     );
   } catch (error) {
-    throw new Error(
-      `Failed to compile write-cred.exe: ${
-        error instanceof Error ? error.message : error
-      }`
-    );
+    throw new StudioBridgeError({
+      code: 'LINUX_SETUP_FAILED',
+      message:
+        "Couldn't compile the credential helper, so credentials can't be injected.",
+      fix: "Install MinGW (x86_64-w64-mingw32-gcc) with 'studio-bridge linux setup --install-deps'.",
+      cause: error,
+    });
   }
 
   OutputHelper.verbose('write-cred.exe compiled successfully.');
@@ -149,9 +153,13 @@ export async function injectCredentialsAsync(
     timeout: 120000,
   });
   if (bootResult.exitCode !== 0) {
-    OutputHelper.warn(
-      `wineboot exited with code ${bootResult.exitCode} (non-fatal)`
-    );
+    warnUser({
+      code: 'WINEBOOT_FAILED',
+      message:
+        "Wine didn't finish preparing its prefix, so Studio may not start under it.",
+      fix: "Run 'studio-bridge linux status' to check the Wine setup.",
+      cause: `wineboot exited with code ${bootResult.exitCode}`,
+    });
   }
 
   // Write all three credential entries in a single Wine invocation
@@ -170,8 +178,13 @@ export async function injectCredentialsAsync(
   });
 
   if (result.exitCode !== 0) {
-    const stderr = result.stderr || result.stdout || 'unknown error';
-    throw new Error(`Failed to write credentials: ${stderr}`);
+    throw new StudioBridgeError({
+      code: 'CREDENTIAL_WRITE_FAILED',
+      message:
+        "Couldn't save the Roblox login into Wine, so Studio won't be logged in.",
+      fix: "Run 'studio-bridge linux setup', then run this command again.",
+      cause: result.stderr || result.stdout || `exit code ${result.exitCode}`,
+    });
   }
 
   // Also write to the Windows Registry path that Studio checks on startup.
@@ -184,11 +197,13 @@ export async function injectCredentialsAsync(
   try {
     await injectOAuth2RefreshTokenAsync(cookie, userId, writeCredExe, env);
   } catch (error) {
-    OutputHelper.warn(
-      `OAuth2 refresh token injection failed (non-fatal): ${
-        error instanceof Error ? error.message : error
-      }`
-    );
+    warnUser({
+      code: 'OAUTH_TOKEN_FAILED',
+      message:
+        "Couldn't get an OAuth login for Studio, so newer Studio versions may show a login dialog.",
+      fix: 'Run this command again with a fresh .ROBLOSECURITY cookie.',
+      cause: error,
+    });
   }
 
   OutputHelper.info('Credentials injected into Wine Credential Manager.');
@@ -217,10 +232,8 @@ async function writeRegistryAuthAsync(
       { env, reject: false, timeout: 15000 }
     );
     if (result.exitCode !== 0) {
-      OutputHelper.warn(
-        `Failed to write registry entry ${name} (non-fatal): ${
-          result.stderr || result.stdout
-        }`
+      warnUser(
+        registryWriteWarning(`${name}: ${result.stderr || result.stdout}`)
       );
     }
   }
@@ -244,12 +257,22 @@ async function writeRegistryAuthAsync(
     { env, reject: false, timeout: 15000 }
   );
   if (userIdResult.exitCode !== 0) {
-    OutputHelper.warn(
-      `Failed to write UserId registry entry (non-fatal): ${
-        userIdResult.stderr || userIdResult.stdout
-      }`
+    warnUser(
+      registryWriteWarning(
+        `UserId: ${userIdResult.stderr || userIdResult.stdout}`
+      )
     );
   }
+}
+
+function registryWriteWarning(cause: string): UserWarning {
+  return {
+    code: 'REGISTRY_WRITE_FAILED',
+    message:
+      "Couldn't save the Roblox login into Wine's registry, so Studio may ask you to log in.",
+    fix: "Run 'studio-bridge linux status' to check the Wine setup.",
+    cause,
+  };
 }
 
 /**
@@ -411,9 +434,13 @@ async function resolveUserIdAsync(cookie: string): Promise<number> {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to resolve user ID: ${response.status} ${response.statusText}. Is your cookie valid?`
-    );
+    throw new StudioBridgeError({
+      code: 'INVALID_COOKIE',
+      message:
+        "Roblox didn't accept the .ROBLOSECURITY cookie, so it can't log Studio in.",
+      fix: 'Run this command again with a fresh .ROBLOSECURITY cookie.',
+      cause: `${response.status} ${response.statusText}`,
+    });
   }
 
   const data = (await response.json()) as { id: number };

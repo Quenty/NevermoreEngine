@@ -6,8 +6,10 @@
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { getRobloxCookieAsync } from '@quenty/nevermore-cli-helpers';
+import { getRobloxCookieAsync } from '@quenty/nevermore-cli-helpers/cookie';
 import { checkLinuxEnvironmentAsync } from '../../../linux/linux-env-guard.js';
+import { StudioBridgeError } from '../../../messages/studio-bridge-error.js';
+import { warnUser } from '../../../messages/warn-user.js';
 
 interface AuthArgs {
   cookie?: string;
@@ -33,66 +35,70 @@ function readStdinAsync(): Promise<string> {
 export async function injectCredentialsHandlerAsync(
   args: AuthArgs
 ): Promise<AuthResult> {
-  try {
-    const envError = await checkLinuxEnvironmentAsync();
-    if (envError) {
-      return { success: false, summary: envError };
-    }
-
-    const linux = await import('../../../linux/index.js');
-    const config = linux.resolveLinuxConfig();
-
-    // Resolve cookie from explicit arg, stdin, or shared auth
-    let cookie: string;
-    if (args.cookie === '-') {
-      // Read from stdin
-      cookie = await readStdinAsync();
-      if (!cookie.trim()) {
-        throw new Error('No cookie provided on stdin');
-      }
-      cookie = cookie.trim();
-    } else if (args.cookie) {
-      cookie = args.cookie;
-    } else {
-      cookie = await getRobloxCookieAsync();
-    }
-
-    // Validate cookie before attempting Wine injection
-    const { validateCookieAsync } = await import(
-      '@quenty/nevermore-cli-helpers'
-    );
-    const validation = await validateCookieAsync(cookie);
-    if (!validation.valid) {
-      if (validation.reason === 'network_error') {
-        OutputHelper.warn(
-          'Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.'
-        );
-      } else {
-        throw new Error(
-          `ROBLOSECURITY cookie is invalid or expired (HTTP ${validation.status}). Update the cookie and try again.`
-        );
-      }
-    }
-
-    // Ensure display is running (Wine needs it for credential write)
-    await linux.ensureDisplayAsync(config);
-
-    // Inject credentials
-    await linux.injectCredentialsAsync({ cookie, config });
-
-    OutputHelper.info('Credentials injected.');
-    OutputHelper.hint(
-      'Next: run "studio-bridge process launch" to start Studio'
-    );
-
-    return {
-      success: true,
-      summary: 'Credentials injected into Wine Credential Manager',
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return { success: false, summary: message };
+  const envError = await checkLinuxEnvironmentAsync();
+  if (envError) {
+    throw envError;
   }
+
+  const linux = await import('../../../linux/index.js');
+  const config = linux.resolveLinuxConfig();
+
+  // Resolve cookie from explicit arg, stdin, or shared auth
+  let cookie: string;
+  if (args.cookie === '-') {
+    // Read from stdin
+    cookie = await readStdinAsync();
+    if (!cookie.trim()) {
+      throw new StudioBridgeError({
+        code: 'MISSING_COOKIE',
+        message: '--cookie - reads the cookie from stdin, but stdin was empty.',
+        fix: 'Pipe the .ROBLOSECURITY cookie in, or pass it as --cookie <value>.',
+      });
+    }
+    cookie = cookie.trim();
+  } else if (args.cookie) {
+    cookie = args.cookie;
+  } else {
+    cookie = await getRobloxCookieAsync();
+  }
+
+  // Validate cookie before attempting Wine injection
+  const { validateCookieAsync } = await import(
+    '@quenty/nevermore-cli-helpers/cookie'
+  );
+  const validation = await validateCookieAsync(cookie);
+  if (!validation.valid) {
+    if (validation.reason === 'network_error') {
+      warnUser({
+        code: 'COOKIE_UNCHECKED',
+        message:
+          "Couldn't reach Roblox to check the .ROBLOSECURITY cookie, so Studio may fail to log in.",
+        fix: 'Check your network connection if it does.',
+      });
+    } else {
+      throw new StudioBridgeError({
+        code: 'INVALID_COOKIE',
+        message:
+          'Roblox rejected the .ROBLOSECURITY cookie: it is invalid or expired.',
+        fix: 'Run this command again with a fresh .ROBLOSECURITY cookie.',
+        cause: `HTTP ${validation.status}`,
+      });
+    }
+  }
+
+  // Ensure display is running (Wine needs it for credential write)
+  await linux.ensureDisplayAsync(config);
+
+  // Inject credentials
+  await linux.injectCredentialsAsync({ cookie, config });
+
+  OutputHelper.info('Credentials injected.');
+  OutputHelper.hint('Next: run "studio-bridge process launch" to start Studio');
+
+  return {
+    success: true,
+    summary: 'Credentials injected into Wine Credential Manager',
+  };
 }
 
 export const linuxInjectCredentialsCommand = defineCommand<

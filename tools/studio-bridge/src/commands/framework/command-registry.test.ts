@@ -33,19 +33,19 @@ function makeCommand(
     return defineCommand({
       ...base,
       scope: 'session',
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     });
   } else if (scope === 'connection') {
     return defineCommand({
       ...base,
       scope: 'connection',
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     });
   } else {
     return defineCommand({
       ...base,
       scope: 'standalone',
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     });
   }
 }

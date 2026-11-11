@@ -1,0 +1,16 @@
+{
+  "name": "StudioBridgePlugin",
+  "globIgnorePaths": [
+    "**/.package-lock.json",
+    "**/.pnpm",
+    "**/.pnpm-workspace-state-v1.json",
+    "**/.modules.yaml",
+    "**/.ignored",
+    "**/.ignored_*",
+    "**/*.spec.lua",
+    "**/jest.config.lua"
+  ],
+  "tree": {
+    "$path": "src"
+  }
+}

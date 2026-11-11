@@ -4,6 +4,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 
 const CLIENT_SETTINGS_URL =
@@ -32,9 +33,12 @@ export async function resolveStudioVersionAsync(
 
   const response = await fetch(CLIENT_SETTINGS_URL);
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch Studio version: ${response.status} ${response.statusText}`
-    );
+    throw new StudioBridgeError({
+      code: 'STUDIO_DOWNLOAD_FAILED',
+      message: "Couldn't look up the latest Roblox Studio version.",
+      fix: 'Check your network connection, or pass --studio-version.',
+      cause: `${response.status} ${response.statusText}`,
+    });
   }
 
   const data = (await response.json()) as ClientVersionResponse;

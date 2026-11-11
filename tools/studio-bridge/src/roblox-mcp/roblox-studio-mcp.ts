@@ -3,6 +3,7 @@ import { listStudioProcessesAsync } from '../process/studio-process-closer.js';
 import {
   McpStdioClient,
   McpTimeoutError,
+  type McpToolResult,
   type SpawnMcpProcess,
 } from './mcp/mcp-stdio-client.js';
 import {
@@ -97,37 +98,91 @@ export async function tryCallStudioToolAsync(
   options: StudioMcpLuauOptions = {}
 ): Promise<StudioMcpResult<string>> {
   return _withMcpAsync(options, async (shared, remainingMs) => {
-    const { studios } = await _listSettledAsync(
+    const { reply, studio } = await _callToolAsync(
       shared,
       remainingMs,
-      options.sessions
-    );
-    const studio = resolveStudio(
-      await _matchAsync(shared, options, studios),
-      options.target
-    );
-    const reply = await shared.client.callToolAsync(
       tool,
-      {
-        ...args,
-        studio_id: studio.studioId,
-        ...(options.context
-          ? { datamodel_type: DATAMODEL_TYPES[options.context] }
-          : tool === 'execute_luau'
-          ? { datamodel_type: DATAMODEL_TYPES.edit }
-          : {}),
-      },
-      remainingMs()
+      args,
+      options
     );
-    if (reply.isError) {
+    return { value: reply.text, studio };
+  });
+}
+
+export interface StudioScreenCapture {
+  data: Buffer;
+  mimeType: string;
+}
+
+export async function tryCaptureStudioScreenAsync(
+  options: StudioMcpOptions = {}
+): Promise<StudioMcpResult<StudioScreenCapture>> {
+  return _withMcpAsync(options, async (shared, remainingMs) => {
+    const { reply, studio } = await _callToolAsync(
+      shared,
+      remainingMs,
+      'screen_capture',
+      { capture_id: 'studio-bridge' },
+      options
+    );
+    const image = reply.content.find(
+      (c) => c.type === 'image' && typeof c.data === 'string'
+    );
+    if (!image) {
       throw new StudioMcpError(
         'failed',
-        cleanToolError(reply.text) || `${tool} failed`,
+        `screen_capture sent no image${reply.text ? `: ${reply.text}` : ''}`,
         studio
       );
     }
-    return { value: reply.text, studio };
+    return {
+      value: {
+        data: Buffer.from(image.data as string, 'base64'),
+        mimeType:
+          typeof image.mimeType === 'string' ? image.mimeType : 'image/png',
+      },
+      studio,
+    };
   });
+}
+
+async function _callToolAsync(
+  shared: SharedClient,
+  remainingMs: () => number,
+  tool: string,
+  args: Record<string, unknown>,
+  options: StudioMcpLuauOptions
+): Promise<{ reply: McpToolResult; studio: StudioMcpTarget }> {
+  const { studios } = await _listSettledAsync(
+    shared,
+    remainingMs,
+    options.sessions
+  );
+  const studio = resolveStudio(
+    await _matchAsync(shared, options, studios),
+    options.target
+  );
+  const reply = await shared.client.callToolAsync(
+    tool,
+    {
+      ...args,
+      studio_id: studio.studioId,
+      ...(options.context
+        ? { datamodel_type: DATAMODEL_TYPES[options.context] }
+        : tool === 'execute_luau'
+        ? { datamodel_type: DATAMODEL_TYPES.edit }
+        : {}),
+    },
+    remainingMs()
+  );
+  if (reply.isError) {
+    throw new StudioMcpError(
+      'failed',
+      cleanToolError(reply.text) || `${tool} failed`,
+      studio
+    );
+  }
+  return { reply, studio };
 }
 
 export async function closeStudioMcpAsync(): Promise<void> {
@@ -173,7 +228,7 @@ async function _withMcpAsync<T>(
       () =>
         reject(
           new McpTimeoutError(
-            `Studio's MCP server did not finish within ${totalMs}ms`
+            `Studio's MCP server didn't answer within ${totalMs / 1000}s`
           )
         ),
       totalMs

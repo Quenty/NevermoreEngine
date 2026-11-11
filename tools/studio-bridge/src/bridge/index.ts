@@ -9,6 +9,12 @@
 // Classes
 export { BridgeConnection } from './bridge-connection.js';
 export type { BridgeConnectionOptions } from './bridge-connection.js';
+export type { HostInfo } from './internal/host-protocol.js';
+export {
+  shouldAutoStartHost,
+  getHostLogPath,
+  AUTO_HOST_IDLE_TIMEOUT,
+} from './internal/auto-host.js';
 export { BridgeSession } from './bridge-session.js';
 
 // Types
@@ -21,16 +27,15 @@ export type {
   StateResult,
   ScreenshotResult,
   LogsResult,
-  DataModelResult,
   LogEntry,
   LogOptions,
-  QueryDataModelOptions,
   LogFollowOptions,
   PlaytestMode,
   PlaytestEndResult,
   EndPlaytestResult,
   StudioState,
-  DataModelInstance,
+  InspectedInstance,
+  InstanceRef,
   OutputLevel,
 } from './types.js';
 

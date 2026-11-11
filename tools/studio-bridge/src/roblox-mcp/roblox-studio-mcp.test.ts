@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   closeStudioMcpAsync,
   tryCallStudioToolAsync,
+  tryCaptureStudioScreenAsync,
   tryExecuteLuauAsync,
   tryListStudiosAsync,
 } from './roblox-studio-mcp.js';
@@ -164,5 +165,56 @@ describe('tryListStudiosAsync', () => {
       'Place1',
       'Hub',
     ]);
+  });
+});
+
+describe('tryCaptureStudioScreenAsync', () => {
+  it("returns the targeted Studio's screen_capture image", async () => {
+    const { server, options } = fake((_method, params) =>
+      params?.name === 'screen_capture'
+        ? {
+            result: {
+              content: [
+                {
+                  type: 'image',
+                  mimeType: 'image/jpeg',
+                  data: Buffer.from('jpeg').toString('base64'),
+                },
+              ],
+            },
+          }
+        : undefined
+    );
+
+    const result = await tryCaptureStudioScreenAsync({
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.value.mimeType).toBe('image/jpeg');
+    expect(result.value.data.toString()).toBe('jpeg');
+    expect(server.requests.at(-1)?.params.arguments).toEqual({
+      capture_id: 'studio-bridge',
+      studio_id: 'mcp-2',
+    });
+  });
+
+  it('fails when Studio sends no image', async () => {
+    const { options } = fake((_method, params) =>
+      params?.name === 'screen_capture' ? toolText('nothing') : undefined
+    );
+
+    const result = await tryCaptureStudioScreenAsync({
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result).toMatchObject({
+      success: false,
+      reason: 'failed',
+      message: 'screen_capture sent no image: nothing',
+    });
   });
 });

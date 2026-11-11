@@ -291,6 +291,7 @@ export const infoCommand = defineCommand<InfoArgs, StateResult>({
   category: 'execution',
   safety: 'read',
   scope: 'session',
+  worksWithOutdatedPlugin: true,
   args: {
     mcp: arg.flag({
       description:
@@ -299,7 +300,7 @@ export const infoCommand = defineCommand<InfoArgs, StateResult>({
     }),
   },
   cli: {
-    format: formatStateText,
+    body: formatStateText,
   },
   handler: async (session, args, connection) =>
     queryStateHandlerAsync(session, connection, {

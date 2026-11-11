@@ -12,6 +12,7 @@ import {
   type LinuxStudioConfig,
 } from './linux-config.js';
 import { writeInstalledVersionAsync } from './linux-version-resolver.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const DOWNLOAD_DIR = '/tmp/roblox-pkgs';
 
@@ -57,7 +58,7 @@ export async function installStudioAsync(
         }
       );
     } catch {
-      OutputHelper.warn(`Failed to extract ${pkg} (non-fatal)`);
+      OutputHelper.verbose(`Skipped ${pkg}, which unzip couldn't extract`);
     }
   }
 
@@ -103,9 +104,12 @@ async function downloadPackageAsync(
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(
-      `Failed to download ${pkg}: ${response.status} ${response.statusText}`
-    );
+    throw new StudioBridgeError({
+      code: 'STUDIO_DOWNLOAD_FAILED',
+      message: `Couldn't download Roblox Studio (${pkg}).`,
+      fix: 'Check your network connection, then run the command again.',
+      cause: `${response.status} ${response.statusText} from ${url}`,
+    });
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());

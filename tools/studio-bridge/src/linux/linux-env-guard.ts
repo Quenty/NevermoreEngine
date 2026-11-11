@@ -9,6 +9,7 @@
 import * as os from 'os';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -17,21 +18,26 @@ const execFileAsync = promisify(execFile);
  * Returns an error message if not, or undefined if OK.
  */
 export async function checkLinuxEnvironmentAsync(): Promise<
-  string | undefined
+  StudioBridgeError | undefined
 > {
   if (os.platform() !== 'linux') {
-    return "linux commands require a Linux environment. On Windows/macOS, Studio runs natively — use 'studio-bridge process run' instead.";
+    return new StudioBridgeError({
+      code: 'UNSUPPORTED_PLATFORM',
+      message:
+        "'linux' commands only run on Linux; on Windows and macOS, Studio runs natively.",
+      fix: "Use 'studio-bridge process run' instead.",
+    });
   }
 
   try {
     await execFileAsync('which', ['wine']);
-  } catch {
-    return (
-      'Wine is not installed. These commands require Wine and related tools.\n\n' +
-      "To run scripts, use 'studio-bridge process run' which auto-delegates to Docker.\n" +
-      'To set up a full Wine environment, run inside the Docker image:\n' +
-      '  docker run --rm -it ghcr.io/quenty/nevermore-studio-linux:latest bash'
-    );
+  } catch (err) {
+    return new StudioBridgeError({
+      code: 'WINE_MISSING',
+      message: "Wine isn't installed, and 'linux' commands need it.",
+      fix: "Use 'studio-bridge process run', which runs Studio in Docker without Wine.",
+      cause: err,
+    });
   }
 
   return undefined;

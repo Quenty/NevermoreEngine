@@ -10,41 +10,56 @@ export {
   type TestCountProgress,
   type ByteProgress,
   type StepProgress,
-} from './reporter.js';
+} from './batch/reporter.js';
 
 // Single-result reporter — for one-shot or polled command output.
-export { BaseResultReporter, type ResultReporter } from './result-reporter.js';
+export {
+  BaseResultReporter,
+  type ResultReporter,
+} from './result/result-reporter.js';
 export {
   StdoutResultReporter,
   type StdoutResultReporterOptions,
-} from './stdout-result-reporter.js';
+} from './result/stdout-result-reporter.js';
 export {
   FileResultReporter,
   type FileResultReporterOptions,
-} from './file-result-reporter.js';
+} from './result/file-result-reporter.js';
 export {
   WatchResultReporter,
   type WatchResultReporterOptions,
-} from './watch-result-reporter.js';
-export { AggregatedBatchReporter } from './aggregated-batch-reporter.js';
-export { CompositeResultReporter } from './composite-result-reporter.js';
+} from './result/watch-result-reporter.js';
+export { AggregatedBatchReporter } from './batch/aggregated-batch-reporter.js';
+export {
+  DirectoryResultReporter,
+  type DirectoryResultReporterOptions,
+  type OutputFile,
+} from './result/directory-result-reporter.js';
+export { CompositeResultReporter } from './result/composite-result-reporter.js';
 export {
   buildResultReporter,
   type BuildResultReporterOptions,
-} from './build-result-reporter.js';
+} from './result/build-result-reporter.js';
 
 // Output formatting primitives.
 export {
   formatTable,
   type TableColumn,
   type TableOptions,
-} from './format-table.js';
-export { formatJson, type JsonOutputOptions } from './format-json.js';
+} from './format/format-table.js';
+export {
+  formatTree,
+  type TreeNode,
+  type TreeOptions,
+} from './format/format-tree.js';
+export { formatCount } from './format/format-count.js';
+export { formatJson, type JsonOutputOptions } from './format/format-json.js';
+export { formatCsv, toCsvField, type CsvValue } from './format/format-csv.js';
 export {
   createWatchRenderer,
   type WatchRenderer,
   type WatchRendererOptions,
-} from './watch-renderer.js';
+} from './result/watch-renderer.js';
 
 // Progress formatting helpers
 export {
@@ -52,7 +67,7 @@ export {
   formatProgressResult,
   isEmptyTestRun,
   summarizeFailure,
-} from './progress-format.js';
+} from './format/progress-format.js';
 export {
   colorStatus,
   formatStatusText,
@@ -64,35 +79,35 @@ export {
   type ResultSeverity,
   type ResultStatus,
   type ResultStatusInput,
-} from './result-status.js';
+} from './batch/result-status.js';
 
 // State tracking
 export {
   type IStateTracker,
   type PackageState,
-} from './state/state-tracker.js';
-export { LiveStateTracker } from './state/live-state-tracker.js';
-export { LoadedStateTracker } from './state/loaded-state-tracker.js';
+} from './batch/state/state-tracker.js';
+export { LiveStateTracker } from './batch/state/live-state-tracker.js';
+export { LoadedStateTracker } from './batch/state/loaded-state-tracker.js';
 
 // Reporter implementations
-export { CompositeReporter } from './composite-reporter.js';
+export { CompositeReporter } from './batch/composite-reporter.js';
 export {
   SimpleReporter,
   type SimpleReporterOptions,
-} from './simple-reporter.js';
+} from './batch/simple-reporter.js';
 export {
   SpinnerReporter,
   type SpinnerReporterOptions,
-} from './spinner-reporter.js';
+} from './batch/spinner-reporter.js';
 export {
   GroupedReporter,
   type GroupedReporterOptions,
-} from './grouped-reporter.js';
+} from './batch/grouped-reporter.js';
 export {
   SummaryTableReporter,
   type SummaryTableReporterOptions,
-} from './summary-table-reporter.js';
-export { JsonFileReporter } from './json-file-reporter.js';
+} from './batch/summary-table-reporter.js';
+export { JsonFileReporter } from './batch/json-file-reporter.js';
 export {
   GithubCommentTableReporter,
   GithubJobSummaryReporter,

@@ -9,8 +9,10 @@ import * as os from 'os';
 import { posix as path } from 'path';
 import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { validateCookieAsync } from '@quenty/nevermore-cli-helpers';
+import { validateCookieAsync } from '@quenty/nevermore-cli-helpers/cookie';
 import type { ExecuteScriptOptions } from '../cli/script-executor.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { ONE_DAY_MS, warnUser } from '../messages/warn-user.js';
 
 const DOCKER_IMAGE_BASE = 'ghcr.io/quenty/nevermore-studio-linux';
 const CHECK_TIMEOUT_MS = 5_000;
@@ -62,23 +64,25 @@ export async function delegateToDockerAsync(
 ): Promise<never> {
   const cookie = process.env.ROBLOSECURITY;
   if (!cookie) {
-    OutputHelper.error(
-      'ROBLOSECURITY environment variable is required for Docker delegation.'
-    );
-    process.exit(1);
+    throw new StudioBridgeError({
+      code: 'MISSING_COOKIE',
+      message:
+        "Without Wine, scripts run in Docker, which needs a Roblox login, and ROBLOSECURITY isn't set.",
+      fix: 'Set ROBLOSECURITY to your .ROBLOSECURITY cookie, then run the command again.',
+    });
   }
 
   const validation = await validateCookieAsync(cookie);
   if (!validation.valid) {
     if (validation.reason === 'network_error') {
-      OutputHelper.warn(
-        'Could not validate ROBLOSECURITY cookie (network error). Continuing anyway.'
-      );
+      warnUser({
+        code: 'COOKIE_UNCHECKED',
+        message:
+          "Couldn't reach Roblox to check the ROBLOSECURITY cookie, so the run may fail to log in.",
+        fix: 'Check your network connection if it does.',
+      });
     } else {
-      OutputHelper.error(
-        `ROBLOSECURITY cookie is invalid or expired (HTTP ${validation.status}). Update the cookie and try again.`
-      );
-      process.exit(1);
+      throw invalidCookieError(validation.status);
     }
   }
 
@@ -104,6 +108,29 @@ export async function delegateToDockerAsync(
 
 const STALE_DAYS = 7;
 
+function outsideWorkingDirectoryError(
+  flag: string,
+  filePath: string
+): StudioBridgeError {
+  return new StudioBridgeError({
+    code: 'INVALID_INPUT',
+    message: `${flag} ${filePath} is outside this directory, which is all the Docker container can see.`,
+    fix: `Move it under this directory, or run from a directory that contains it.`,
+  });
+}
+
+export function invalidCookieError(
+  status: number | undefined
+): StudioBridgeError {
+  return new StudioBridgeError({
+    code: 'INVALID_COOKIE',
+    message:
+      'Roblox rejected the ROBLOSECURITY cookie: it is invalid or expired.',
+    fix: 'Set ROBLOSECURITY to a fresh .ROBLOSECURITY cookie, then run the command again.',
+    cause: status !== undefined ? `HTTP ${status}` : undefined,
+  });
+}
+
 /**
  * Ensures the Docker image is available locally, pulling if needed.
  * Warns if the local image is older than STALE_DAYS.
@@ -120,11 +147,14 @@ async function ensureImageAsync(image: string): Promise<void> {
     const created = new Date(stdout.trim());
     const ageDays = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
     if (ageDays > STALE_DAYS) {
-      OutputHelper.warn(
-        `Docker image is ${Math.floor(
+      warnUser({
+        code: 'DOCKER_IMAGE_STALE',
+        message: `The studio-bridge Docker image is ${Math.floor(
           ageDays
-        )} days old. Run 'docker pull ${image}' to update.`
-      );
+        )} days old, so it may lack recent fixes.`,
+        fix: `Run 'docker pull ${image}'.`,
+        oncePerMs: ONE_DAY_MS,
+      });
     }
   } catch {
     OutputHelper.info(`Pulling ${image}...`);
@@ -159,10 +189,7 @@ export async function buildDockerRunArgsAsync(
     scriptFilePath = path.resolve(options.filePath);
     // Validate file is within CWD
     if (!scriptFilePath.startsWith(cwd)) {
-      OutputHelper.error(
-        `Cannot delegate: file ${scriptFilePath} is outside working directory ${cwd}`
-      );
-      process.exit(1);
+      throw outsideWorkingDirectoryError('--file', scriptFilePath);
     }
   } else {
     tmpFile = path.join(cwd, `.studio-bridge-tmp-${process.pid}.lua`);
@@ -205,10 +232,7 @@ export async function buildDockerRunArgsAsync(
   if (placePath) {
     const resolvedPlace = path.resolve(placePath);
     if (!resolvedPlace.startsWith(cwd)) {
-      OutputHelper.error(
-        `Cannot delegate: place file ${resolvedPlace} is outside working directory ${cwd}`
-      );
-      process.exit(1);
+      throw outsideWorkingDirectoryError('--place', resolvedPlace);
     }
     innerArgs.push('--place', resolvedPlace);
   }

@@ -1,21 +1,56 @@
 # The planted playtest bridge
 
-With Studio's **Load user plugins on playtest** off, the studio-bridge plugin never loads into a playtest. So `startPlaytest` plants the same client (`templates/studio-bridge-plugin/src/Shared/StudioBridgeClient.lua`) into the edit place's ServerScriptService. The playtest copies the edit place, so the client starts in the playtest's server as an ordinary Script and connects as its server session. In play mode it also plants the client's twin as a LocalScript in StarterPlayerScripts, which every player's client runs and connects as its client session; a LocalScript there can open the WebSocket to the bridge and read the test args, measured in a Studio playtest client. With the setting on, nothing is planted and the plugin is the playtest's sessions.
+Studio only loads plugins into a playtest when **Load user plugins on playtest** is on. When it's off, `studio-bridge` still needs a session inside the playtest, so `playtest start` plants a copy of the plugin into the place before the playtest begins.
 
-## What an ordinary playtest Script can do
+With the setting on, nothing is planted: the plugin itself provides the playtest's sessions.
 
-These limits shape the design. They were measured in a Studio playtest server:
+## What gets planted
 
-| Capability | Result |
+| Where | As | Becomes |
+|---|---|---|
+| `ServerScriptService` | Script | the playtest's **server** session |
+| `StarterPlayerScripts` (play mode only) | LocalScript | each player's **client** session |
+
+Both are copies of the plugin's single entry script, `plugins/studio-bridge-plugin/src/init.server.lua`, and its modules. The playtest copies the edit place, so the copies come along and run as ordinary game scripts.
+
+Because the edit plugin plants itself, a playtest always runs the plugin version installed in Edit. `playtest start` therefore requires the current plugin.
+
+## How a copy knows to run
+
+The entry script checks for the `plugin` global, which only a plugin has. Without it, the script is a planted copy, and it starts only if the playtest's StudioTestService arguments name the playtest it was planted for.
+
+A copy saved into a place, or left behind by an earlier playtest, never starts.
+
+## What a playtest script can't do
+
+A planted copy runs with game-script permissions, measured in a Studio playtest:
+
+| Capability | In a playtest script |
 |---|---|
-| WebSocket to the bridge on localhost (`CreateWebStreamClient`) | Works, even with Allow HTTP Requests off |
-| `HttpService:GetAsync` to localhost | Refused, so the port comes from the StudioTestService test args instead of a scan |
-| `loadstring` | Off. `LoadStringEnabled` isn't scriptable, not even from a plugin |
-| Setting `ModuleScript.Source` | Needs the `PluginOrOpenCloud` capability |
-| `SerializationService` | `GetService` returns `nil` |
+| WebSocket to localhost (`CreateWebStreamClient`) | Works, even with HTTP requests off |
+| `HttpService` to localhost | Refused. The bridge port comes from the StudioTestService arguments instead |
+| `loadstring` | Off, and a plugin can't turn it on |
+| Setting `ModuleScript.Source` | Refused |
+| `SerializationService` | Unavailable |
 
-So the planted client can't compile code. The edit session compiles everything ahead of time: each action, and any script `playtest run` will send, becomes a ModuleScript returning its function and its own source text. The router finds a source by its exact text (`PrecompiledSources.lua`, built by `src/plugin/playtest-bridge.ts`). New code sent to a planted session fails and asks for the setting. Privileged compiling, for example through Studio's MCP `execute_luau`, would plug in at `ActionRouter:SetCompiler`.
+So a planted copy can't compile code.
 
-A precompiled source that fails to load is skipped, which would hide its compile error. So `startPlaytest` compiles every one in the edit session before planting.
+## Running code without compiling
 
-`LogService.MessageOut` fires a frame or two after a `print` in a playtest server, later than in a plugin. That's why `execute.lua` waits several frames before it stops capturing output.
+Everything a planted copy runs must exist before the playtest starts.
+
+- **Pushed actions.** Elsewhere, the plugin installs each action the CLI pushes as a ModuleScript tagged with its content hash. `playtest start` plants copies of those modules, and the planted copy requires the one whose name and hash match.
+- **`playtest run` scripts** are compiled ahead of time into ModuleScripts that the copy looks up by their exact source text. `playtest start` loads each one in Edit first, so a compile error shows there instead of being skipped silently.
+- **Anything else** sent to a planted session fails with a message to turn on the setting.
+
+## Updates during a playtest
+
+If the CLI pushes a newer action while a playtest runs, for example after a rebuild, the planted copy can't install it. It keeps answering with the version it has and marks it outdated, and the CLI warns:
+
+```
+This playtest runs an older 'explorer sample'; restart the playtest to update it
+```
+
+## Gotcha
+
+`LogService.MessageOut` reaches a playtest server a frame or two after the `print`, later than in a plugin. Code that captures output must wait a few frames before it stops listening.

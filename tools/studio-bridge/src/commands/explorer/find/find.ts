@@ -1,30 +1,33 @@
-/**
- * `explorer find` — search the DataModel for instances by name, class and tag.
- */
-
-import { OutputHelper } from '@quenty/cli-output-helpers';
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import {
-  formatTable,
-  type TableColumn,
-} from '@quenty/cli-output-helpers/reporting';
-import { defineCommand } from '../../framework/define-command.js';
+  defineCommand,
+  type ResultTable,
+} from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
-import type { BridgeSession } from '../../../bridge/index.js';
-import type { FoundInstance } from '../../../server/web-socket-protocol.js';
+import type { BridgeSession, InstanceRef } from '../../../bridge/index.js';
+import {
+  formatClassCount,
+  formatInstanceTree,
+  sharedClassName,
+} from '../../shared/instance-tree.js';
+import {
+  assertHasCriteria,
+  grepSelectionArgs,
+  removedSelectionOptions,
+  toInstanceQuery,
+  type GrepSelectionArgs,
+  type InstanceQuery,
+  type SelectionArgs,
+} from '../selection-args.js';
 
-export interface FindOptions {
-  name?: string;
-  exact?: boolean;
-  className?: string;
-  tag?: string;
-  root?: string;
+export interface FindOptions extends InstanceQuery {
   limit?: number;
 }
 
 export interface FindResult {
-  instances: FoundInstance[];
+  instances: InstanceRef[];
   searched: number;
-  /** True when the search stopped at --limit; there may be more. */
+  total: number;
   truncated: boolean;
   summary: string;
 }
@@ -33,72 +36,48 @@ export async function findInstancesHandlerAsync(
   session: BridgeSession,
   options: FindOptions
 ): Promise<FindResult> {
-  if (!options.name && !options.className && !options.tag) {
-    throw new Error('Give a name, --class or --tag to search for');
-  }
+  assertHasCriteria(options, 'search for', { grep: true });
 
-  const result = await session.findInstancesAsync({
-    root: options.root,
-    name: options.name,
-    exactName: options.exact,
-    className: options.className,
-    tag: options.tag,
-    limit: options.limit,
-  });
+  const result = await session.findInstancesAsync(options);
 
+  const className = result.truncated
+    ? undefined
+    : sharedClassName(result.instances);
+  const matches = className
+    ? formatClassCount(result.total, className)
+    : formatCount(result.total, 'match', 'matches');
   return {
     ...result,
-    summary: result.truncated
-      ? `First ${result.instances.length} matches; raise --limit to see more`
-      : `${result.instances.length} match(es) among ${result.searched} instances`,
+    summary: `${
+      result.truncated ? `${result.instances.length} of ${matches}` : matches
+    } among ${formatCount(result.searched, 'instance', 'instances')}`,
   };
 }
 
-const columns: TableColumn<FoundInstance>[] = [
-  {
-    header: 'Path',
-    value: (i) => i.path,
-    format: (v) => OutputHelper.formatHint(v),
-  },
-  { header: 'Class', value: (i) => i.className },
-];
-
-export function formatFindText(result: FindResult): string {
-  if (result.instances.length === 0) return 'No instances match';
-  return `${formatTable(result.instances, columns)}\n${OutputHelper.formatDim(
-    result.summary
-  )}`;
+export function toFindTable(result: FindResult): ResultTable {
+  return {
+    columns: ['path', 'className'],
+    rows: result.instances.map((instance) => [
+      instance.path,
+      instance.className,
+    ]),
+  };
 }
 
-interface FindArgs extends Omit<FindOptions, 'className'> {
-  class?: string;
+interface FindArgs extends SelectionArgs, GrepSelectionArgs {
+  limit?: number;
 }
 
 export const findCommand = defineCommand<FindArgs, FindResult>({
   group: 'explorer',
   name: 'find',
-  description: 'Find instances by name, class or tag',
+  description:
+    'Find instances with Roblox Explorer search syntax, a QueryDescendants selector or script source text',
   category: 'execution',
   safety: 'read',
   scope: 'session',
   args: {
-    name: arg.positional({
-      description: 'Text in the instance name (case-insensitive)',
-      required: false,
-    }),
-    exact: arg.flag({
-      description: 'Match the whole name instead of part of it',
-    }),
-    class: arg.option({
-      description: 'Only instances of this class or a subclass (IsA)',
-    }),
-    tag: arg.option({
-      description: 'Only instances with this CollectionService tag',
-    }),
-    root: arg.option({
-      description:
-        'Dot-separated path to search under (default: the whole DataModel)',
-    }),
+    ...grepSelectionArgs,
     limit: arg.option({
       description: 'Stop after this many matches (default: 200)',
       type: 'number',
@@ -106,8 +85,16 @@ export const findCommand = defineCommand<FindArgs, FindResult>({
     }),
   },
   cli: {
-    format: formatFindText,
+    body: (result) =>
+      formatInstanceTree(result.instances, {
+        omitSharedClassName: !result.truncated,
+      }),
+    rows: toFindTable,
+    removedOptions: removedSelectionOptions,
   },
-  handler: async (session, { class: className, ...args }) =>
-    findInstancesHandlerAsync(session, { ...args, className }),
+  handler: async (session, args) =>
+    findInstancesHandlerAsync(session, {
+      ...toInstanceQuery(args),
+      limit: args.limit,
+    }),
 });

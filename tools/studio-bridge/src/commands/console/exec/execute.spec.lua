@@ -242,7 +242,7 @@ describe("ExecuteAction.register()", function()
 		expect(controller.sent[2].requestId).toEqual("req-2")
 		expect(controller.sent[2].payload).toEqual({
 			success = false,
-			error = "Script timed out after 100ms waiting behind other scripts, and never ran",
+			error = "The script waited 0.1s behind other scripts and never ran. Run it again once they finish, or pass a longer --script-timeout.",
 			code = "SCRIPT_TIMEOUT",
 		})
 

@@ -14,7 +14,7 @@
 import { createHash } from 'crypto';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
+import { resolvePackagePath } from '@quenty/nevermore-template-helpers/resolve-template-path';
 
 export interface ActionSource {
   /** Action module name (derived from the filename, e.g. "exec"). */
@@ -23,7 +23,6 @@ export interface ActionSource {
   source: string;
   /** Relative path within the commands directory (for diagnostics). */
   relativePath: string;
-  /** SHA-256 hex digest of the source content. */
   hash: string;
 }
 
@@ -39,7 +38,50 @@ export async function loadActionSourcesAsync(
 
   const actions: ActionSource[] = [];
   await scanDirAsync(dir, dir, actions);
-  return actions;
+  return orderByDependencies(actions);
+}
+
+const REQUIRE_PATTERN = /\brequire\(\s*["']([^"']+)["']\s*\)/g;
+
+function orderByDependencies(actions: ActionSource[]): ActionSource[] {
+  const byName = new Map(actions.map((action) => [action.name, action]));
+  const ordered: ActionSource[] = [];
+  const visiting = new Set<string>();
+  const done = new Set<string>();
+
+  const visit = (action: ActionSource) => {
+    if (done.has(action.name)) return;
+    if (visiting.has(action.name)) {
+      throw new Error(
+        `Action modules require each other in a cycle through '${action.name}'`
+      );
+    }
+    visiting.add(action.name);
+
+    const dependencyHashes: string[] = [];
+    for (const match of action.source.matchAll(REQUIRE_PATTERN)) {
+      const dependency = byName.get(match[1]);
+      if (dependency && dependency !== action) {
+        visit(dependency);
+        dependencyHashes.push(dependency.hash);
+      }
+    }
+    if (dependencyHashes.length > 0) {
+      action.hash = createHash('sha256')
+        .update(action.source)
+        .update(dependencyHashes.join('\n'))
+        .digest('hex');
+    }
+
+    visiting.delete(action.name);
+    done.add(action.name);
+    ordered.push(action);
+  };
+
+  for (const action of actions) {
+    visit(action);
+  }
+  return ordered;
 }
 
 async function scanDirAsync(

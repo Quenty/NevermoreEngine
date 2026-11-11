@@ -14,16 +14,15 @@
 	  args. The playtest's DataModels cannot make the HTTP requests port
 	  discovery needs, so the plugin in each connects straight to that port and
 	  registers under the edit session's instance and the playtest id.
-	- With `bridge`, it first plants the studio-bridge client as a Script in
-	  ServerScriptService, for when Studio does not load user plugins into
-	  playtests. The playtest copies the edit DataModel, so the client starts in
-	  its server and connects as its server session. With
-	  `bridge.clientEntrySource` it also plants a LocalScript in
-	  StarterPlayerScripts, which every player's client runs and connects as its
-	  client session. The plants are removed once the playtest ends.
+	- With `bridge`, it first plants a copy of the plugin's script tree as a
+	  Script in ServerScriptService, for when Studio does not load user plugins
+	  into playtests, and with `bridge.client` as a LocalScript in
+	  StarterPlayerScripts. The copy cannot compile code, so it carries the
+	  action modules installed here and the scripts in `bridge.precompiled`.
+	  The plants are removed once the playtest ends.
 
 	Request: `{ type: "startPlaytest", payload: { mode: "play" | "run", playtestId, bridgePort, instanceId, players?, bridge? } }`
-	`bridge`: `{ entrySource, clientEntrySource?, modules: { [name]: source }, precompiled: { source } }`
+	`bridge`: `{ precompiled: { source }, client: boolean? }`
 	Response: `{ type: "playtestEnded", payload: { playtestId, success, error? } }`
 
 	@class StartPlaytestAction
@@ -69,9 +68,14 @@ function StartPlaytestAction.register(router: any, sendMessage: SendMessage?)
 				studioBridgeInstanceId = instanceId,
 				studioBridgePlayers = players,
 			}
-			local planted = if payload.bridge ~= nil
-				then StartPlaytestAction._plant(router, payload.bridge, playtestId)
-				else {}
+			local planted = {}
+			if payload.bridge ~= nil then
+				local plantOk, plantedOrError = pcall(StartPlaytestAction._plant, router, payload.bridge, playtestId)
+				if not plantOk then
+					return { success = false, code = "SCRIPT_LOAD_ERROR", message = tostring(plantedOrError) }
+				end
+				planted = plantedOrError
+			end
 			task.spawn(StartPlaytestAction._runAsync, sendMessage, mode, testArgs, requestId, sessionId, planted)
 
 			-- Replied through sendMessage, so the router must not reply as well
@@ -120,20 +124,20 @@ function StartPlaytestAction._runAsync(
 	})
 end
 
---[[
-	Plants the studio-bridge client for the playtest `playtestId` and returns it.
-	Errors on a malformed `bridge`, or a precompiled source that does not
-	compile, before anything is planted: the planted client skips a source that
-	fails to load, which would hide the compile error.
-]]
 function StartPlaytestAction._plant(router: any, bridge: any, playtestId: string): { Instance }
-	if
-		type(bridge) ~= "table"
-		or type(bridge.entrySource) ~= "string"
-		or type(bridge.modules) ~= "table"
-		or type(bridge.precompiled) ~= "table"
-	then
+	if type(bridge) ~= "table" or type(bridge.precompiled) ~= "table" then
 		error("Invalid bridge in startPlaytest request")
+	end
+
+	local template = if type(router.GetPlaytestBridgeTemplate) == "function"
+		then router:GetPlaytestBridgeTemplate()
+		else nil
+	local moduleFolder = if type(router.GetModuleFolder) == "function" then router:GetModuleFolder() else nil
+	if not (template and moduleFolder) then
+		error(
+			"The studio-bridge plugin is too old to start a playtest with \"Load user plugins on playtest\" off. Run 'studio-bridge plugin install'.",
+			0
+		)
 	end
 
 	for _, source in bridge.precompiled do
@@ -144,45 +148,52 @@ function StartPlaytestAction._plant(router: any, bridge: any, playtestId: string
 			fn, compileErr = (loadstring :: any)(source, "=exec")
 		end
 		if not fn then
-			error(`Script does not compile: {compileErr or "unknown error"}`, 0)
+			error(
+				`The code to run in the playtest doesn't compile: {compileErr or "no reason given"}. Fix it, then run the command again.`,
+				0
+			)
 		end
 	end
 
-	local entry = Instance.new("Script")
+	local entry = template:Clone()
 	entry.Name = "StudioBridgePlaytest"
-	entry.Source = bridge.entrySource
 	entry:SetAttribute("PlaytestId", playtestId)
 
-	local shared = Instance.new("Folder")
-	shared.Name = "Shared"
-	shared.Parent = entry
-	for name, source in bridge.modules do
-		local moduleScript = Instance.new("ModuleScript")
-		moduleScript.Name = name
-		moduleScript.Source = source
-		moduleScript.Parent = shared
+	local plantedModules = Instance.new("Folder")
+	plantedModules.Name = moduleFolder.Name
+	for _, child in moduleFolder:GetChildren() do
+		if child:IsA("ModuleScript") and child:GetAttribute("Hash") ~= nil then
+			child:Clone().Parent = plantedModules
+		end
 	end
+	local entryModules = entry:WaitForChild("modules")
+	local templateModules = entryModules:FindFirstChild(moduleFolder.Name)
+	if templateModules then
+		templateModules:Destroy()
+	end
+	plantedModules.Parent = entryModules
 
 	local precompiled = Instance.new("Folder")
 	precompiled.Name = "Precompiled"
-	precompiled.Parent = entry
 	for index, source in bridge.precompiled do
 		local moduleScript = Instance.new("ModuleScript")
 		moduleScript.Name = tostring(index)
 		moduleScript.Source = source
 		moduleScript.Parent = precompiled
 	end
+	precompiled.Parent = entry
 
 	local planted = { entry }
 	local clientEntry: LocalScript? = nil
-	if type(bridge.clientEntrySource) == "string" then
+	if bridge.client == true then
 		clientEntry = Instance.new("LocalScript")
 		local client = clientEntry :: LocalScript
 		client.Name = "StudioBridgePlaytestClient"
-		client.Source = bridge.clientEntrySource
+		client.Source = entry.Source
 		client:SetAttribute("PlaytestId", playtestId)
-		shared:Clone().Parent = client
-		precompiled:Clone().Parent = client
+		for _, child in entry:GetChildren() do
+			child:Clone().Parent = client
+		end
 		table.insert(planted, client)
 	end
 

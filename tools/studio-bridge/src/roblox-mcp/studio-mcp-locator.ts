@@ -72,7 +72,7 @@ async function _findWindowsAsync(
 
   const localAppData = options.localAppData ?? process.env.LOCALAPPDATA;
   if (!localAppData) {
-    throw new Error('LOCALAPPDATA is not set, so Studio cannot be found');
+    throw new Error("LOCALAPPDATA isn't set, so Roblox Studio can't be found");
   }
   const versionsDir = path.join(localAppData, 'Roblox', 'Versions');
   for (const versionDir of await _listVersionDirsNewestFirstAsync(
@@ -84,7 +84,7 @@ async function _findWindowsAsync(
   }
 
   throw new Error(
-    `No ${MCP_EXE} found next to ${STUDIO_EXE} under ${versionsDir}. Is Roblox Studio installed and up to date?`
+    `No installed Roblox Studio ships an MCP server (${MCP_EXE} beside ${STUDIO_EXE} under ${versionsDir}); update Studio to get one`
   );
 }
 
@@ -104,9 +104,9 @@ async function _findMacAsync(
     }
   }
   throw new Error(
-    `No StudioMCP found in Roblox Studio's app bundle (${candidates.join(
+    `Roblox Studio's app bundle has no MCP server (${candidates.join(
       ', '
-    )})`
+    )}); update Studio to get one`
   );
 }
 
@@ -126,7 +126,7 @@ async function _findLinuxAsync(
   const exe = path.join(studioDir, MCP_EXE);
   if (!(await _isFileAsync(exe))) {
     throw new Error(
-      `No ${MCP_EXE} in ${studioDir}. Run "studio-bridge linux setup" with a Studio that ships it.`
+      `The Studio under Wine has no MCP server (no ${MCP_EXE} in ${studioDir}); run 'studio-bridge linux setup --force' to install a newer Studio`
     );
   }
   return { command: 'wine', args: [exe], env };

@@ -18,21 +18,47 @@ import {
   getDefaultRemoteHost,
 } from './internal/environment-detection.js';
 import { BridgeSession } from './bridge-session.js';
+import { getHostBuildAsync, type HostBuild } from './internal/host-build.js';
+import {
+  argvDependsOnCwd,
+  assessHost,
+  describeHostBuild,
+  isServeArgv,
+  replaceHostAsync,
+  staleHostFromInfo,
+  tryFindLegacyHostAsync,
+  type StaleHostReport,
+} from './internal/stale-host.js';
+import {
+  describeStaleHost,
+  type StaleHostOutcome,
+} from './internal/stale-host-report.js';
+import { tryAutoStartHostAsync } from './internal/auto-host.js';
 import {
   HOST_PROTOCOL_VERSION,
   type HostEnvelope,
+  type HostInfo,
   type HostProtocolMessage,
   type ListSessionsRequest,
   type ListInstancesRequest,
 } from './internal/host-protocol.js';
 import type { SessionInfo, SessionContext, InstanceInfo } from './types.js';
-import { SessionNotFoundError, ContextNotFoundError } from './types.js';
+import {
+  SessionNotFoundError,
+  ContextNotFoundError,
+  NO_STUDIO_CONNECTED,
+  formatSeconds,
+} from './types.js';
 import { annotateInstanceState } from './internal/instance-state.js';
 import type {
   PluginMessage,
   ServerMessage,
 } from '../server/web-socket-protocol.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { RequestTimeoutError } from '../server/pending-request-map.js';
+import { warnUser } from '../messages/warn-user.js';
+
 export interface BridgeConnectionOptions {
   /** Port for the bridge host. Default: 38741. */
   port?: number;
@@ -50,13 +76,28 @@ export interface BridgeConnectionOptions {
    * need all sessions available immediately. Default: false.
    */
   waitForSessions?: boolean;
+  replaceStaleHost?: boolean;
+  autoHost?: boolean;
+  hostDetails?: Pick<HostInfo, 'autoStarted' | 'idleTimeoutMs' | 'logPath'>;
 }
+
+export type { StaleHostReport };
 
 const DEFAULT_PORT = 38741;
 const DEFAULT_TIMEOUT_MS = 30_000;
 const IDLE_EXIT_GRACE_MS = 5_000;
 /** How long shutdown waits on relayed actions; a started playtest's request lasts until it ends. */
 const RELAY_DRAIN_TIMEOUT_MS = 10_000;
+const SESSION_RECONNECT_TIMEOUT_MS = 10_000;
+const PLUGIN_DISCOVERY_MS = 2_500;
+const LIST_SESSIONS_FIX =
+  "Run 'studio-bridge process list' to see the connected sessions.";
+
+function formatSessionList(sessions: SessionInfo[]): string {
+  return sessions
+    .map((s) => `  - ${s.sessionId}: ${s.placeName} (${s.context})`)
+    .join('\n');
+}
 
 /**
  * Transport handle that relays messages to a plugin's WebSocket via BridgeHost.
@@ -107,6 +148,11 @@ export class BridgeConnection extends EventEmitter {
   private _hasSettled: boolean = false;
   private _firstSessionTimeoutMs: number | undefined;
   private _pendingRelays = new Set<Promise<void>>();
+  private _staleHost: StaleHostReport | undefined;
+  private _hostBuild: HostBuild | undefined;
+  private _hostDetails: BridgeConnectionOptions['hostDetails'];
+  private _hostStartedAt = 0;
+  private _clientConnectedAt = 0;
 
   // Host mode internals
   private _host: BridgeHost | undefined;
@@ -182,13 +228,15 @@ export class BridgeConnection extends EventEmitter {
           ]);
 
           autoConn._isRemote = true;
+          await autoConn._checkStaleHostAsync(options ?? {});
           return autoConn;
-        } catch {
-          console.warn(
-            `Devcontainer detected, but could not connect to bridge host at ${autoRemoteHost}. ` +
-              `Falling back to local mode. Run \`studio-bridge serve\` on the host OS, ` +
-              `or use --remote to specify a different address.`
-          );
+        } catch (err) {
+          warnUser({
+            code: 'DEVCONTAINER_HOST_UNREACHABLE',
+            message: `In a devcontainer, but no bridge host answered at ${autoRemoteHost}, so this command looks for Studio inside the container instead.`,
+            fix: "Run 'studio-bridge serve' on the host machine, or pass --local to skip this check.",
+            cause: err,
+          });
         }
       }
     }
@@ -198,14 +246,18 @@ export class BridgeConnection extends EventEmitter {
       remoteHost: parsedRemoteHost,
     });
 
-    const conn = new BridgeConnection(detection.role, keepAlive);
+    let role = detection.role;
+    if (role === 'host' && options?.autoHost) {
+      role = await BridgeConnection._tryAutoStartHostAsync(detection.port);
+    }
+
+    const conn = new BridgeConnection(role, keepAlive);
     conn._isRemote = parsedRemoteHost !== undefined;
     conn._firstSessionTimeoutMs = options?.timeoutMs;
-    OutputHelper.verbose(
-      `[bridge] Role: ${detection.role}, port: ${detection.port}`
-    );
+    conn._hostDetails = options?.hostDetails;
+    OutputHelper.verbose(`[bridge] Role: ${role}, port: ${detection.port}`);
 
-    if (detection.role === 'host') {
+    if (role === 'host') {
       await conn._initHostAsync(detection.port);
     } else {
       try {
@@ -214,30 +266,50 @@ export class BridgeConnection extends EventEmitter {
         if (parsedRemoteHost && err instanceof Error) {
           const code = (err as NodeJS.ErrnoException).code;
           if (code === 'ECONNREFUSED') {
-            throw new Error(
-              `Could not connect to bridge host at ${parsedRemoteHost}. ` +
-                `Is \`studio-bridge serve\` running on the host?`
-            );
+            throw new StudioBridgeError({
+              code: 'REMOTE_HOST_UNREACHABLE',
+              message: `No bridge host answered at ${parsedRemoteHost}.`,
+              fix: "Run 'studio-bridge serve' on that machine, then run the command again.",
+              cause: err,
+            });
           }
           if (
             err.message.includes('timed out') ||
             err.message.includes('timeout')
           ) {
-            throw new Error(
-              `Connection to bridge host at ${parsedRemoteHost} timed out after 5 seconds.`
-            );
+            throw new StudioBridgeError({
+              code: 'REMOTE_HOST_TIMEOUT',
+              message: `The bridge host at ${parsedRemoteHost} didn't answer within 5s.`,
+              fix: `Check that machine is reachable and 'studio-bridge serve' runs there.`,
+              cause: err,
+            });
           }
         }
         throw err;
       }
     }
 
-    // If requested, wait for active Studios to discover this host and connect
-    if (conn._role === 'host' && options?.waitForSessions) {
+    if (conn._role === 'client' && options?.replaceStaleHost !== false) {
+      const replacement = await conn._checkStaleHostAsync(options ?? {});
+      if (replacement) {
+        return replacement;
+      }
+    }
+
+    if (options?.waitForSessions) {
       await conn._ensureSettledAsync();
     }
 
     return conn;
+  }
+
+  private static async _tryAutoStartHostAsync(
+    port: number
+  ): Promise<'host' | 'client'> {
+    if (await tryAutoStartHostAsync(port)) {
+      return 'client';
+    }
+    return (await detectRoleAsync({ port })).role;
   }
 
   async disconnectAsync(
@@ -305,18 +377,21 @@ export class BridgeConnection extends EventEmitter {
     return this._isConnected;
   }
 
-  /**
-   * True when this is a client relaying through a host from an older
-   * studio-bridge, which may not pass on options or actions it predates.
-   */
-  get isHostOutdated(): boolean {
-    return (
-      this._role === 'client' &&
-      (this._client?.hostProtocolVersion ?? 1) < HOST_PROTOCOL_VERSION
-    );
+  get staleHost(): StaleHostReport | undefined {
+    return this._staleHost;
   }
 
-  /** The actual port the bridge is bound to (host) or connected to (client). */
+  get hostInfo(): HostInfo | undefined {
+    if (this._role === 'host') {
+      return this._host ? this._describeHost() : undefined;
+    }
+    return this._client?.hostInfo;
+  }
+
+  get clientCount(): number {
+    return this._host?.clientCount ?? 0;
+  }
+
   /** Whether the bridge host, and so Studio, runs on another machine. */
   get isRemote(): boolean {
     return this._isRemote;
@@ -460,30 +535,29 @@ export class BridgeConnection extends EventEmitter {
         s.instanceId.startsWith(sessionId)
       );
       if (!session && prefixed.length > 1 && !namesInstance) {
-        throw new SessionNotFoundError(
-          `'${sessionId}' matches several sessions. Use a longer --target:\n${prefixed
-            .map((s) => `  - ${s.sessionId}`)
-            .join('\n')}`,
-          sessionId
-        );
+        throw new SessionNotFoundError({
+          message: `--target '${sessionId}' matches several sessions.`,
+          fix: `Use a longer --target, one of:\n${formatSessionList(prefixed)}`,
+          sessionId,
+        });
       }
 
       const instanceIds = session
         ? [session.info.instanceId]
         : this._matchInstanceIds(sessionId);
       if (instanceIds.length === 0) {
-        throw new SessionNotFoundError(
-          `Session '${sessionId}' not found`,
-          sessionId
-        );
+        throw new SessionNotFoundError({
+          message: `No connected Studio matches --target '${sessionId}'.`,
+          fix: LIST_SESSIONS_FIX,
+          sessionId,
+        });
       }
       if (instanceIds.length > 1) {
-        throw new SessionNotFoundError(
-          `'${sessionId}' matches several Studio instances: ${instanceIds.join(
-            ', '
-          )}. Use a longer --target.`,
-          sessionId
-        );
+        throw new SessionNotFoundError({
+          message: `--target '${sessionId}' matches several Studios.`,
+          fix: `Use a longer --target, one of: ${instanceIds.join(', ')}`,
+          sessionId,
+        });
       }
       return this._resolveByInstance(instanceIds[0], context);
     }
@@ -495,7 +569,11 @@ export class BridgeConnection extends EventEmitter {
     const instances = this.listInstances();
 
     if (instances.length === 0) {
-      throw new SessionNotFoundError('No sessions connected');
+      throw new SessionNotFoundError({
+        code: NO_STUDIO_CONNECTED,
+        message: 'No Studio is connected to studio-bridge.',
+        fix: "Open a place in Studio with the studio-bridge plugin installed ('studio-bridge plugin install').",
+      });
     }
 
     if (instances.length === 1) {
@@ -503,13 +581,12 @@ export class BridgeConnection extends EventEmitter {
     }
 
     // Multiple instances: list session IDs so the user can copy one into --target
-    const sessionList = this.listSessions()
-      .map((s) => `  - ${s.sessionId}: ${s.placeName} (${s.context})`)
-      .join('\n');
-
-    throw new SessionNotFoundError(
-      `Multiple Studio instances connected. Use --target <id> to select one.\n${sessionList}`
-    );
+    throw new SessionNotFoundError({
+      message: 'Several Studios are connected, so this needs a --target.',
+      fix: `Pick one with --target <id>:\n${formatSessionList(
+        this.listSessions()
+      )}`,
+    });
   }
 
   /** Resolves with the first connected session. Rejects after timeout. */
@@ -537,9 +614,11 @@ export class BridgeConnection extends EventEmitter {
       timer = setTimeout(() => {
         this.off('session-connected', onSession);
         reject(
-          new Error(
-            `Timed out waiting for a session to connect (${timeoutMs}ms)`
-          )
+          new SessionNotFoundError({
+            code: NO_STUDIO_CONNECTED,
+            message: `No Studio connected within ${formatSeconds(timeoutMs)}.`,
+            fix: "Open a place in Studio with the studio-bridge plugin installed ('studio-bridge plugin install').",
+          })
         );
       }, timeoutMs);
 
@@ -547,17 +626,16 @@ export class BridgeConnection extends EventEmitter {
     });
   }
 
-  /**
-   * Ensure that session discovery has completed at least once for this
-   * host connection. No-op if already settled, not a host, or sessions
-   * are already connected.
-   */
   private async _ensureSettledAsync(): Promise<void> {
-    if (
-      this._hasSettled ||
-      this._role !== 'host' ||
-      this.listSessions().length > 0
-    ) {
+    if (this._hasSettled) {
+      return;
+    }
+    if (this._role === 'client') {
+      this._hasSettled = true;
+      await this._waitForNewHostDiscoveryAsync();
+      return;
+    }
+    if (this.listSessions().length > 0) {
       return;
     }
     OutputHelper.verbose(
@@ -575,6 +653,29 @@ export class BridgeConnection extends EventEmitter {
           : ''
       }`
     );
+  }
+
+  private async _waitForNewHostDiscoveryAsync(): Promise<void> {
+    const uptimeMs = this._client?.hostInfo?.uptimeMs;
+    if (uptimeMs === undefined) {
+      return;
+    }
+    const hostStartedAt = this._clientConnectedAt - uptimeMs;
+    const discoveredIn = hostStartedAt + PLUGIN_DISCOVERY_MS - Date.now();
+    if (discoveredIn <= 0) {
+      return;
+    }
+    OutputHelper.verbose(
+      `[bridge] The host started ${uptimeMs}ms ago — waiting ${discoveredIn}ms for Studios to find it`
+    );
+    await new Promise((resolve) => setTimeout(resolve, discoveredIn));
+    if (this.listSessions().length === 0) {
+      const remaining =
+        hostStartedAt + (this._firstSessionTimeoutMs ?? 5_000) - Date.now();
+      if (remaining > 0) {
+        await this.waitForSessionAsync(remaining).catch(() => undefined);
+      }
+    }
   }
 
   /**
@@ -629,8 +730,10 @@ export class BridgeConnection extends EventEmitter {
   }
 
   private async _initHostAsync(port: number): Promise<void> {
+    this._hostBuild = await getHostBuildAsync();
     this._host = new BridgeHost();
     this._tracker = new SessionTracker();
+    this._host.on('client-activity', () => this.emit('client-activity'));
 
     this._tracker.on('session-added', (tracked: TrackedSession) => {
       const session = new BridgeSession(tracked.info, tracked.handle);
@@ -718,6 +821,7 @@ export class BridgeConnection extends EventEmitter {
             requestId: req.requestId,
             sessions: this._tracker!.listSessions(),
             protocolVersion: HOST_PROTOCOL_VERSION,
+            host: this._describeHost(),
           });
         } else if (msg.type === 'list-instances') {
           const req = msg as ListInstancesRequest;
@@ -735,10 +839,26 @@ export class BridgeConnection extends EventEmitter {
     );
 
     await this._host.startAsync({ port });
+    this._hostStartedAt = Date.now();
     this._isConnected = true;
     // Don't start idle timer on init -- callers like `sessions` manage their
     // own lifecycle via disconnectAsync().  The idle timer should only fire
     // when sessions are removed (going from >0 to 0).
+  }
+
+  private _describeHost(): HostInfo {
+    return {
+      version: this._hostBuild?.version ?? 'unknown',
+      build: this._hostBuild?.build,
+      packagePath: this._hostBuild?.packagePath,
+      cwd: process.cwd(),
+      pid: process.pid,
+      argv: process.argv.slice(2),
+      clients: this._host?.clientCount ?? 0,
+      pendingRelays: this._pendingRelays.size,
+      uptimeMs: Date.now() - this._hostStartedAt,
+      ...this._hostDetails,
+    };
   }
 
   private async _relayEnvelopeAsync(
@@ -774,7 +894,8 @@ export class BridgeConnection extends EventEmitter {
           type: 'error',
           sessionId,
           payload: {
-            code: 'INTERNAL_ERROR',
+            code:
+              err instanceof RequestTimeoutError ? 'TIMEOUT' : 'INTERNAL_ERROR',
             message: err instanceof Error ? err.message : String(err),
           },
         };
@@ -808,8 +929,96 @@ export class BridgeConnection extends EventEmitter {
 
     const host = remoteHost ? remoteHost.split(':')[0] : undefined;
     await this._client.connectAsync(port, host);
+    this._clientConnectedAt = Date.now();
     this._clientPort = port;
     this._isConnected = true;
+  }
+
+  private async _checkStaleHostAsync(
+    options: BridgeConnectionOptions
+  ): Promise<BridgeConnection | undefined> {
+    const host = this._client?.hostInfo;
+    const ours = await getHostBuildAsync();
+    const verdict = assessHost(host, ours);
+    if (verdict.action === 'current') {
+      return undefined;
+    }
+
+    const builds = {
+      port: this.port,
+      hostBuild: describeHostBuild(host),
+      ourBuild: describeHostBuild(ours),
+      isOlder: verdict.action === 'replace',
+    };
+    const leave = (outcome: StaleHostOutcome): undefined => {
+      this._staleHost = describeStaleHost(outcome, builds);
+      return undefined;
+    };
+
+    if (verdict.action === 'warn') {
+      return leave(
+        verdict.reason === 'other-install'
+          ? { kind: 'other-install' }
+          : { kind: 'unreadable', pid: host?.pid }
+      );
+    }
+
+    if (this._isRemote) {
+      return leave({ kind: 'remote' });
+    }
+    const stale = host
+      ? staleHostFromInfo(host)
+      : await tryFindLegacyHostAsync(this.port);
+    if (!stale) {
+      return leave({ kind: 'process-unknown' });
+    }
+    if (!isServeArgv(stale.argv)) {
+      return leave({ kind: 'inside-command', pid: stale.pid });
+    }
+    if (!stale.cwd && argvDependsOnCwd(stale.argv)) {
+      return leave({ kind: 'unknown-cwd', pid: stale.pid });
+    }
+    if (stale.inUse) {
+      return leave({ kind: 'in-use' });
+    }
+
+    const sessionIds = this.listSessions().map((s) => s.sessionId);
+    await this.disconnectAsync();
+    let outcome: StaleHostOutcome;
+    try {
+      const pid = await replaceHostAsync(this.port, stale);
+      OutputHelper.verbose(
+        `[bridge] Replaced the bridge host on port ${this.port}: pid ${
+          stale.pid
+        } -> ${pid ?? '?'}`
+      );
+      outcome = { kind: 'restarted' };
+    } catch (error) {
+      outcome = { kind: 'restart-failed', pid: stale.pid, error };
+    }
+
+    const conn = await BridgeConnection.connectAsync({
+      ...options,
+      port: this.port,
+      local: true,
+      replaceStaleHost: false,
+    });
+    if (outcome.kind === 'restarted') {
+      await conn._waitForSessionIdsAsync(sessionIds);
+    }
+    conn._staleHost = describeStaleHost(outcome, builds);
+    return conn;
+  }
+
+  private async _waitForSessionIdsAsync(sessionIds: string[]): Promise<void> {
+    const deadline = Date.now() + SESSION_RECONNECT_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+      const live = new Set(this.listSessions().map((s) => s.sessionId));
+      if (sessionIds.every((id) => live.has(id))) {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
   }
 
   private static _deriveContext(state: string): SessionContext {
@@ -827,7 +1036,10 @@ export class BridgeConnection extends EventEmitter {
     );
 
     if (sessions.length === 0) {
-      throw new SessionNotFoundError(`Instance '${instanceId}' not found`);
+      throw new SessionNotFoundError({
+        message: `No connected Studio matches '${instanceId}'.`,
+        fix: LIST_SESSIONS_FIX,
+      });
     }
 
     const contexts = sessions.map((s) => s.context);
@@ -836,11 +1048,10 @@ export class BridgeConnection extends EventEmitter {
     if (context) {
       const matches = sessions.filter((s) => s.context === context);
       if (matches.length > 1) {
-        throw new SessionNotFoundError(
-          `Instance '${instanceId}' has several ${context} sessions. Use --target <session id> to pick one:\n${matches
-            .map((s) => `  - ${s.sessionId}`)
-            .join('\n')}`
-        );
+        throw new SessionNotFoundError({
+          message: `This Studio has several ${context} sessions, so this needs a session id.`,
+          fix: `Pick one with --target <id>:\n${formatSessionList(matches)}`,
+        });
       }
       const match = matches[0];
       if (match) {
@@ -875,9 +1086,10 @@ export class BridgeConnection extends EventEmitter {
       return fallback;
     }
 
-    throw new SessionNotFoundError(
-      `No session found for instance '${instanceId}'`
-    );
+    throw new SessionNotFoundError({
+      message: `No connected Studio matches '${instanceId}'.`,
+      fix: LIST_SESSIONS_FIX,
+    });
   }
 
   private _resetIdleTimer(): void {

@@ -33,9 +33,9 @@ local GAME_RUNNER_HEADER =
 local GAME_RUNNER_FOOTER =
 	'\nend, function(err) return { message = tostring(err), traceback = debug.traceback(nil, 2) } end, table.unpack(__bridgeArgs, 1, __bridgeArgs.n))) local __bridgeOut = { n = __bridgeResult.n, ok = __bridgeResult[1] } for i = 2, __bridgeResult.n do __bridgeOut["v" .. (i - 1)] = __bridgeResult[i] end script:WaitForChild("Done"):Fire(__bridgeOut)'
 local NO_PLUGIN_MESSAGE =
-	"This session runs as game code: it is the bridge planted into a playtest because Studio's \"Load user plugins on playtest\" setting is off, so there is no plugin to run in. Turn the setting on, or use --run-as mcp, which runs any code here but cannot require the game's modules."
+	"This playtest session can't run plugin code, since Studio's \"Load user plugins on playtest\" setting is off. Turn the setting on, or pass --run-as mcp, which can't require the game's modules."
 local NOT_RUNNING_MESSAGE =
-	"--run-as game needs a running playtest. Start one with 'studio-bridge playtest start', then target --context server or client."
+	"--run-as game needs a running playtest. Run 'studio-bridge playtest start', then add --context server."
 
 local MIN_OUTPUT_WAIT_FRAMES = 3
 local MAX_OUTPUT_WAIT_FRAMES = 30
@@ -249,7 +249,7 @@ function ExecuteAction._handleExecute(
 		if timeoutSeconds <= 0 then
 			return reply({
 				success = false,
-				error = `Script timed out after {timeoutMs}ms waiting behind other scripts, and never ran`,
+				error = `The script waited {ExecuteAction._formatSeconds(timeoutMs)} behind other scripts and never ran. Run it again once they finish, or pass a longer --script-timeout.`,
 				code = "SCRIPT_TIMEOUT",
 			})
 		end
@@ -270,7 +270,7 @@ function ExecuteAction._handleExecute(
 	if status == "timeout" then
 		return reply({
 			success = false,
-			error = `Script timed out after {timeoutMs}ms and was cancelled`,
+			error = `The script ran longer than {ExecuteAction._formatSeconds(timeoutMs)} and was stopped. Pass a longer --script-timeout, or make it finish sooner.`,
 			code = "SCRIPT_TIMEOUT",
 			output = captured,
 			ranAs = ranAs,
@@ -292,6 +292,10 @@ function ExecuteAction._handleExecute(
 		returnValues = ExecuteAction._serializeReturnValues(result),
 		ranAs = ranAs,
 	})
+end
+
+function ExecuteAction._formatSeconds(milliseconds: number): string
+	return `{math.round(milliseconds / 100) / 10}s`
 end
 
 --[[
@@ -492,8 +496,6 @@ end
 
 --[[
 	Produces the SerializedReturnValue shapes declared in web-socket-protocol.ts.
-	Duplicates the marshaller in query-data-model.lua, since actions cannot
-	require each other.
 ]]
 function ExecuteAction._serializeValue(value: any, depth: number, seen: { [any]: boolean }): any
 	local valueType = typeof(value)
