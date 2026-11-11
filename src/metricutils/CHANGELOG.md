@@ -1,3 +1,15 @@
+# v2.5.0 (Wed Nov 11 2026)
+
+#### 🚀 Enhancement
+
+- feat(metricutils): add MetricUnit, typed measurements with parsing and localized formatting [#859](https://github.com/Quenty/NevermoreEngine/pull/859) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
