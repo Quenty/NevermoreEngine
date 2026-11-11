@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Localized text utils which changes translationKey structures to shared locations
 	@class LocalizedTextUtils
@@ -8,6 +8,7 @@ local HttpService = game:GetService("HttpService")
 
 local require = require(script.Parent.loader).load(script)
 
+local Observable = require("Observable")
 local Rx = require("Rx")
 local RxAttributeUtils = require("RxAttributeUtils")
 
@@ -68,16 +69,16 @@ end
 	@return string
 ]=]
 function LocalizedTextUtils.formatByKeyRecursive(
-	translator: Translator,
+	translator: any,
 	translationKey: string,
 	translationArgs: TranslationArgs?,
-	extraArgs
-)
+	extraArgs: { [string]: any }?
+): string
 	assert(translator, "Bad translator")
 	assert(type(translationKey) == "string", "Bad translationKey")
 	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
 
-	local formattedArgs = {}
+	local formattedArgs: { [string]: any } = {}
 	if translationArgs then
 		for name, value in translationArgs do
 			if type(value) == "table" then
@@ -118,16 +119,16 @@ end
 	@return Observable<string>
 ]=]
 function LocalizedTextUtils.observeFormatByKeyRecursive(
-	translator,
+	translator: any,
 	translationKey: string,
 	translationArgs: TranslationArgs?,
-	extraArgs
-)
+	extraArgs: { [string]: any }?
+): Observable.Observable<string>
 	assert(translator, "Bad translator")
 	assert(type(translationKey) == "string", "Bad translationKey")
 	assert(type(translationArgs) == "table" or translationArgs == nil, "Bad translationArgs")
 
-	local observableFormattedArgs = {}
+	local observableFormattedArgs: { [string]: any } = {}
 	if translationArgs then
 		for name, value in translationArgs do
 			if type(value) == "table" then
@@ -166,7 +167,11 @@ end
 	@param extraArgs table?
 	@return Observable<string>
 ]=]
-function LocalizedTextUtils.observeLocalizedTextToString(translator, localizedText: LocalizedTextData, extraArgs)
+function LocalizedTextUtils.observeLocalizedTextToString(
+	translator: any,
+	localizedText: LocalizedTextData,
+	extraArgs: { [string]: any }?
+): Observable.Observable<string>
 	assert(translator, "Bad translator")
 	assert(LocalizedTextUtils.isLocalizedText(localizedText), "No localizedText")
 
@@ -190,7 +195,11 @@ end
 	@param extraArgs table?
 	@return string
 ]=]
-function LocalizedTextUtils.localizedTextToString(translator, localizedText: LocalizedTextData, extraArgs)
+function LocalizedTextUtils.localizedTextToString(
+	translator: any,
+	localizedText: LocalizedTextData,
+	extraArgs: { [string]: any }?
+): string
 	assert(translator, "Bad translator")
 	assert(LocalizedTextUtils.isLocalizedText(localizedText), "No localizedText")
 
@@ -210,7 +219,7 @@ end
 function LocalizedTextUtils.fromJSON(text: string): LocalizedTextData?
 	assert(type(text) == "string", "Bad text")
 
-	local decoded
+	local decoded: any
 	local ok = pcall(function()
 		decoded = HttpService:JSONDecode(text)
 	end)
@@ -245,7 +254,7 @@ function LocalizedTextUtils.setFromAttribute(
 	attributeName: string,
 	translationKey: string,
 	translationArgs: TranslationArgs
-)
+): ()
 	assert(typeof(obj) == "Instance", "Bad obj")
 	assert(type(attributeName) == "string", "Bad attributeName")
 
@@ -280,10 +289,10 @@ end
 	@return string?
 ]=]
 function LocalizedTextUtils.getTranslationFromAttribute(
-	translator,
+	translator: any,
 	obj: Instance,
 	attributeName: string,
-	extraArgs
+	extraArgs: { [string]: any }?
 ): string?
 	assert(translator, "Bad translator")
 	assert(typeof(obj) == "Instance", "Bad obj")
@@ -305,11 +314,11 @@ end
 	@param defaultTranslationArgs table?
 ]=]
 function LocalizedTextUtils.initializeAttribute(
-	obj,
+	obj: Instance,
 	attributeName: string,
-	defaultTranslationKey,
-	defaultTranslationArgs
-)
+	defaultTranslationKey: string,
+	defaultTranslationArgs: TranslationArgs
+): ()
 	assert(typeof(obj) == "Instance", "Bad obj")
 	assert(type(attributeName) == "string", "Bad attributeName")
 	assert(type(defaultTranslationKey) == "string", "Bad defaultTranslationKey")
@@ -330,7 +339,12 @@ end
 	@param extraArgs table?
 	@return Observable<string?>
 ]=]
-function LocalizedTextUtils.observeTranslation(translator, obj: Instance, attributeName: string, extraArgs)
+function LocalizedTextUtils.observeTranslation(
+	translator: any,
+	obj: Instance,
+	attributeName: string,
+	extraArgs: { [string]: any }?
+): Observable.Observable<string?>
 	assert(translator, "Bad translator")
 	assert(typeof(obj) == "Instance", "Bad obj")
 	assert(type(attributeName) == "string", "Bad attributeName")

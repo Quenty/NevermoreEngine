@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class MantleConfigProvider
 ]=]
@@ -18,17 +18,28 @@ local MantleConfigProvider = {}
 MantleConfigProvider.ClassName = "MantleConfigProvider"
 MantleConfigProvider.__index = MantleConfigProvider
 
-function MantleConfigProvider.new(container)
-	local self = setmetatable({}, MantleConfigProvider)
+export type MantleConfigProvider = typeof(setmetatable(
+	{} :: {
+		_container: Instance,
+		_serviceBag: ServiceBag.ServiceBag,
+		_gameConfigService: GameConfigService.GameConfigService,
+		_gameConfigBindersServer: any,
+		_maid: Maid.Maid,
+	},
+	{} :: typeof({ __index = MantleConfigProvider })
+))
+
+function MantleConfigProvider.new(container: Instance): MantleConfigProvider
+	local self: MantleConfigProvider = setmetatable({} :: any, MantleConfigProvider)
 
 	self._container = assert(container, "No container")
 
 	return self
 end
 
-function MantleConfigProvider:Init(serviceBag: ServiceBag.ServiceBag)
+function MantleConfigProvider.Init(self: MantleConfigProvider, serviceBag: ServiceBag.ServiceBag): ()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._gameConfigService = self._serviceBag:GetService(GameConfigService)
+	self._gameConfigService = self._serviceBag:GetService(GameConfigService :: any)
 	self._gameConfigBindersServer = self._serviceBag:GetService(GameConfigBindersServer)
 	self._maid = Maid.new()
 
@@ -39,21 +50,21 @@ function MantleConfigProvider:Init(serviceBag: ServiceBag.ServiceBag)
 	end
 end
 
-function MantleConfigProvider:_loadConfig(item)
-	local current
+function MantleConfigProvider._loadConfig(self: MantleConfigProvider, item: ModuleScript): ()
+	local current: thread? = nil
 
 	task.spawn(function()
 		current = coroutine.running()
-		local data = require(item)
+		local data = (require :: any)(item)
 		if type(data) == "table" then
 			self:_parseDataToConfig(data, item.Name)
 		end
 	end)
 
-	assert(coroutine.status(current) == "dead", "Loading the mantle config yielded")
+	assert(coroutine.status(current :: thread) == "dead", "Loading the mantle config yielded")
 end
 
-function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
+function MantleConfigProvider._parseDataToConfig(self: MantleConfigProvider, mantleConfigData: any, name: string)
 	assert(type(mantleConfigData) == "table", "Bad mantleConfigData")
 
 	-- Just blind unpack these, we'll error if we can't find these.
@@ -63,7 +74,7 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 	local gameConfig = GameConfigUtils.create(self._gameConfigBindersServer.GameConfig, gameId)
 	gameConfig.Name = name
 
-	local function getIcon(mantleType, assetName)
+	local function getIcon(mantleType: string, assetName: string)
 		local entryName = mantleType .. "Icon"
 		local entryKey = entryName .. "_" .. assetName
 
@@ -74,7 +85,7 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 		return assetId
 	end
 
-	local function addAsset(mantleType, assetType, key, value)
+	local function addAsset(mantleType: string, assetType: any, key: string, value: any)
 		local data = value[mantleType]
 
 		if not data then
@@ -114,7 +125,7 @@ function MantleConfigProvider:_parseDataToConfig(mantleConfigData, name)
 	return gameConfig
 end
 
-function MantleConfigProvider:Destroy()
+function MantleConfigProvider.Destroy(self: MantleConfigProvider): ()
 	self._maid:DoCleaning()
 end
 

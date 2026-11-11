@@ -29,7 +29,36 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | Entirely new topic area | Create a new doc + add to Index below |
 | Universal rule for every session | Update CLAUDE.md (rare) |
 | A gotchas section has 10+ items | Graduate it to its own doc |
+| How one package works inside, and why | `src/<package>/docs/` — see below |
 | Ambiguous case not covered above | Resolve it, then add a row to this table |
+
+### Package docs
+
+`docs/` here is for **consumers** of Nevermore. A package may also carry its own
+`src/<package>/docs/`, linked from its `README.md` under "Working on this package".
+
+Package docs are for **design intent and design decisions that cannot live in code**: why an
+implementation is shaped the way it is, what was tried and rejected and why, the outside behavior
+it is built around. They answer "why is this like this" for the person who changes it next.
+
+They are **public documents** — they live in a public repo and ship inside the published npm
+package. A different reader, not a lower standard.
+
+Two rules:
+
+- **Same quality bar as these docs.** Written for a person, context before rules, edited, kept
+  true as the code changes. A package doc that has gone stale is worse than no package doc.
+- **Used sparingly.** These are not scratch notes, a changelog, or a place to restate what the
+  code already says. If the knowledge fits in a comment beside the code, it goes there instead.
+  Prefer improving an existing page over adding another. Most packages should have none.
+
+Split by audience, not topic: if a game developer using the package would act on it, it belongs in
+`docs/`; if only someone changing that package would, it belongs in the package. When a
+consumer-facing page has a matching package doc, link to it so readers can find the "why".
+
+`src/clienttranslator/docs/` is the reference example
+([design.md](../src/clienttranslator/docs/design.md),
+[engine-behavior.md](../src/clienttranslator/docs/engine-behavior.md)).
 
 ## Index
 
@@ -37,9 +66,10 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 |-----|-------------|
 | [intro.md](intro.md) | Getting started with Nevermore, why use it, key packages |
 | [install.md](install.md) | Installation methods: NPM + CLI, existing Rojo projects, plugins |
-| [deploy.md](deploy.md) | `nevermore deploy`: login, `deploy init`, `deploy run`, config schema, flag reference, common workflows |
+| [cli.md](cli.md) | `nevermore` CLI command reference: every command and flag (`init`, `install`, `login`, `test`, `deploy`, `batch`, `tools`), global options, command tree |
+| [deploy.md](deploy.md) | `nevermore deploy`: login, `deploy init`, `deploy run`, config schema, base place version pinning, `deploy.nevermore.lock.json`, watches / base place hot reload, target selectors, `deploy asset upload` (images/models/audio), flag reference, common workflows |
 | [architecture/](architecture/index.md) | Architecture: workspace layout, design philosophy, ServiceBag, dependency injection |
-| [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition |
+| [architecture/patterns.md](architecture/patterns.md) | Core patterns: Maid, BaseObject, Binder, Rx, Brio, Blend, AdorneeData, TieDefinition; Brio pipeline pitfalls |
 | [build.md](build.md) | Contributing: local setup, tools, versioning, custom Rojo |
 | [testing/](testing/index.md) | Testing: Jest3, deploy config, CLI commands, credentials, CI |
 | [testing/integration-testing.md](testing/integration-testing.md) | Integration testing: full-game tests, base place merging, deploy pipeline |
@@ -50,3 +80,4 @@ This file is an index for AI agents. The `_` prefix keeps it out of Docusaurus. 
 | [ides/vscode.md](ides/vscode.md) | VSCode/Cursor setup: extensions, luau-lsp config, settings |
 | [gotchas/tooling.md](gotchas/tooling.md) | Tooling gotchas: Lune, symlinks, Rojo, linter CLI tools, CI annotations |
 | [gotchas/troubleshooting.md](gotchas/troubleshooting.md) | Troubleshooting: setup failures, linting issues, test auth, Rojo errors |
+| [gotchas/localization.md](gotchas/localization.md) | Localization gotchas **for consumers**: which locale file a player gets (script vs region), missing-key behavior, runtime-generated keys belonging to the realm that generated them, self-correcting text, one entry per key. Design intent lives in `src/clienttranslator/docs/` |

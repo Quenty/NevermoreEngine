@@ -27,3 +27,6 @@ Usage is designed to be simple.
 
 ### `CoreGuiUtils.tryToSetCore(...)`
 
+### `CoreGuiUtils.promiseRetryGetCore(tries, initialWaitTime, coreName)`
+
+### `CoreGuiUtils.tryToGetCore(coreName)`

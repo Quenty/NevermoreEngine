@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles searching for bound objects following links (object values) under a parent
 	with a specific name.
@@ -8,6 +8,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local Maid = require("Maid")
 local Signal = require("Signal")
 
@@ -15,8 +16,25 @@ local BoundLinkCollection = {}
 BoundLinkCollection.ClassName = "BoundLinkCollection"
 BoundLinkCollection.__index = BoundLinkCollection
 
-function BoundLinkCollection.new(binder, linkName, parent)
-	local self = setmetatable({}, BoundLinkCollection)
+export type BoundLinkCollection = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_linkName: string,
+		_binder: Binder.Binder<any>,
+		ClassAdded: Signal.Signal<any>,
+		ClassRemoved: Signal.Signal<any>,
+		_classes: { [any]: boolean },
+		_canidateMaid: Maid.Maid,
+		_canidateToClass: { [Instance]: any },
+		_canidates: { [Instance]: { [Instance]: boolean } },
+		_linkCanidate: { [Instance]: Instance },
+		_linkValues: { [Instance]: boolean },
+	},
+	{} :: typeof({ __index = BoundLinkCollection })
+))
+
+function BoundLinkCollection.new(binder: Binder.Binder<any>, linkName: string, parent: Instance): BoundLinkCollection
+	local self: BoundLinkCollection = setmetatable({} :: any, BoundLinkCollection)
 
 	self._maid = Maid.new()
 
@@ -28,22 +46,17 @@ function BoundLinkCollection.new(binder, linkName, parent)
 
 	self._classes = {} -- [class] = true
 	self._canidates = {} -- [inst] = { [objValue] = true }
+	self._canidateToClass = {}
 	self._linkCanidate = {} -- [objValue] = [inst]
 	self._linkValues = {} -- [objValue] = true
-
-	self._maid:GiveTask(self._binder:GetClassAddedSignal():Connect(function(...)
-		self:_handleNewClassBound(...)
-	end))
-	self._maid:GiveTask(self._binder:GetClassRemovingSignal():Connect(function(class)
-		self:_removeClass(class)
-	end))
+	self._canidateMaid = self._maid:Add(Maid.new())
 
 	self:TrackParent(parent)
 
 	return self
 end
 
-function BoundLinkCollection:GetClasses()
+function BoundLinkCollection.GetClasses(self: BoundLinkCollection): { any }
 	local list = {}
 	for class, _ in self._classes do
 		table.insert(list, class)
@@ -51,11 +64,11 @@ function BoundLinkCollection:GetClasses()
 	return list
 end
 
-function BoundLinkCollection:HasClass(class)
+function BoundLinkCollection.HasClass(self: BoundLinkCollection, class: any): boolean
 	return self._classes[class] ~= nil
 end
 
-function BoundLinkCollection:TrackParent(parent: Instance)
+function BoundLinkCollection.TrackParent(self: BoundLinkCollection, parent: Instance): ()
 	assert(parent, "Bad parent")
 
 	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)
@@ -75,11 +88,11 @@ function BoundLinkCollection:TrackParent(parent: Instance)
 	end
 end
 
-function BoundLinkCollection:_removeLink(objValue)
+function BoundLinkCollection._removeLink(self: BoundLinkCollection, objValue: Instance): ()
 	self._maid[objValue] = nil
 end
 
-function BoundLinkCollection:_handleNewLink(objValue)
+function BoundLinkCollection._handleNewLink(self: BoundLinkCollection, objValue: ObjectValue): ()
 	local maid = Maid.new()
 
 	maid:GiveTask(objValue.Changed:Connect(function()
@@ -95,7 +108,7 @@ function BoundLinkCollection:_handleNewLink(objValue)
 	self:_handleLinkChanged(objValue)
 end
 
-function BoundLinkCollection:_handleLinkChanged(objValue)
+function BoundLinkCollection._handleLinkChanged(self: BoundLinkCollection, objValue: ObjectValue): ()
 	self:_removeLinkCanidates(objValue)
 
 	if objValue.Value then
@@ -103,7 +116,7 @@ function BoundLinkCollection:_handleLinkChanged(objValue)
 	end
 end
 
-function BoundLinkCollection:_removeLinkCanidates(objValue)
+function BoundLinkCollection._removeLinkCanidates(self: BoundLinkCollection, objValue: Instance): ()
 	local canidate = self._linkCanidate[objValue]
 	if not canidate then
 		return
@@ -113,7 +126,6 @@ function BoundLinkCollection:_removeLinkCanidates(objValue)
 
 	if not self._canidates[canidate] then
 		error("[BoundLinkCollection] - Got link canidate that isn''t real. This shouldn't happen.")
-		return
 	end
 
 	local canidateLinks = self._canidates[canidate]
@@ -124,35 +136,47 @@ function BoundLinkCollection:_removeLinkCanidates(objValue)
 	end
 end
 
-function BoundLinkCollection:_removeCanidate(canidate)
+function BoundLinkCollection._removeCanidate(self: BoundLinkCollection, canidate: Instance): ()
 	self._canidates[canidate] = nil
+	self._canidateMaid[canidate] = nil
 
-	local class = self._binder:Get(canidate)
-	if not class then
-		return
-	end
-
-	self:_removeClass(class)
+	self:_setCanidateClass(canidate, nil)
 end
 
-function BoundLinkCollection:_addCanidate(objValue, canidate)
+function BoundLinkCollection._addCanidate(self: BoundLinkCollection, objValue: Instance, canidate: Instance): ()
 	assert(not self._linkCanidate[objValue], "Should not have existing canidate set for link")
 
 	self._linkCanidate[objValue] = canidate
 
 	if not self._canidates[canidate] then
 		self._canidates[canidate] = {}
+		self._canidateMaid[canidate] = self._binder:ObserveInstance(canidate, function(class)
+			self:_setCanidateClass(canidate, class)
+		end)
 	end
 	self._canidates[canidate][objValue] = true
 
-	local class = self._binder:Get(canidate)
-	if not class then
-		return
-	end
-	self:_addClass(class)
+	self:_setCanidateClass(canidate, self._binder:Get(canidate))
 end
 
-function BoundLinkCollection:_removeClass(class)
+function BoundLinkCollection._setCanidateClass(self: BoundLinkCollection, canidate: Instance, class: any): ()
+	local existing = self._canidateToClass[canidate]
+	if existing == class then
+		return
+	end
+
+	if existing ~= nil then
+		self._canidateToClass[canidate] = nil
+		self:_removeClass(existing)
+	end
+
+	if class ~= nil then
+		self._canidateToClass[canidate] = class
+		self:_addClass(class)
+	end
+end
+
+function BoundLinkCollection._removeClass(self: BoundLinkCollection, class: any): ()
 	if not self._classes[class] then
 		return
 	end
@@ -161,7 +185,7 @@ function BoundLinkCollection:_removeClass(class)
 	self.ClassRemoved:Fire(class)
 end
 
-function BoundLinkCollection:_addClass(class)
+function BoundLinkCollection._addClass(self: BoundLinkCollection, class: any): ()
 	if self._classes[class] then
 		return
 	end
@@ -170,17 +194,9 @@ function BoundLinkCollection:_addClass(class)
 	self.ClassAdded:Fire(class)
 end
 
-function BoundLinkCollection:_handleNewClassBound(class, inst)
-	if not self._canidates[inst] then
-		return
-	end
-
-	self:_addClass(class)
-end
-
-function BoundLinkCollection:Destroy()
+function BoundLinkCollection.Destroy(self: BoundLinkCollection): ()
 	self._maid:Destroy()
-	setmetatable(self, nil)
+	setmetatable(self :: any, nil)
 end
 
 return BoundLinkCollection

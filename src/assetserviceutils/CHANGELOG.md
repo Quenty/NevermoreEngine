@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.42.0...@quenty/assetserviceutils@5.42.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.41.2...@quenty/assetserviceutils@5.42.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+## [5.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.41.1...@quenty/assetserviceutils@5.41.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+## [5.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.41.0...@quenty/assetserviceutils@5.41.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.40.0...@quenty/assetserviceutils@5.41.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.39.2...@quenty/assetserviceutils@5.40.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+## [5.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.39.1...@quenty/assetserviceutils@5.39.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+## [5.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.39.0...@quenty/assetserviceutils@5.39.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.38.0...@quenty/assetserviceutils@5.39.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.37.0...@quenty/assetserviceutils@5.38.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.36.0...@quenty/assetserviceutils@5.37.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.35.0...@quenty/assetserviceutils@5.36.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.34.0...@quenty/assetserviceutils@5.35.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
+# [5.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.33.1...@quenty/assetserviceutils@5.34.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/assetserviceutils
+
 ## [5.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/assetserviceutils@5.33.0...@quenty/assetserviceutils@5.33.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/assetserviceutils

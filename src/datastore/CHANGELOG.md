@@ -3,6 +3,169 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.59.1...@quenty/datastore@13.60.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.59.0...@quenty/datastore@13.59.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [13.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.58.3...@quenty/datastore@13.59.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [13.58.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.58.2...@quenty/datastore@13.58.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.58.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.58.1...@quenty/datastore@13.58.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.58.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.58.0...@quenty/datastore@13.58.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.57.0...@quenty/datastore@13.58.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.56.1...@quenty/datastore@13.57.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.56.0...@quenty/datastore@13.56.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.55.0...@quenty/datastore@13.56.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.54.0...@quenty/datastore@13.55.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.53.1...@quenty/datastore@13.54.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.53.0...@quenty/datastore@13.53.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.52.1...@quenty/datastore@13.53.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.52.0...@quenty/datastore@13.52.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.51.1...@quenty/datastore@13.52.0) (2026-08-13)
+
+### Bug Fixes
+
+- **datastore:** break the cmdr/service require cycle ([b7ece57](https://github.com/Quenty/NevermoreEngine/commit/b7ece577b509e2a394b864e4a538070fbe94ffc9))
+- **datastore:** release a borrowed session even when the caller is torn down ([2537a0b](https://github.com/Quenty/NevermoreEngine/commit/2537a0b8e90a658cca96f83a515b5ffac8662518))
+
+### Features
+
+- **datastore:** add Cmdr commands for session locks and stored data ([adc36ac](https://github.com/Quenty/NevermoreEngine/commit/adc36ac2a25dc5aa0c481b6746b78fec331951e4))
+- **datastore:** read and write a key's session lock without opening a session ([21da4a6](https://github.com/Quenty/NevermoreEngine/commit/21da4a6b9fa4ce7752a41a386385033a785becef))
+- **datastore:** release borrowed sessions through a counted handle ([8c3d2f8](https://github.com/Quenty/NevermoreEngine/commit/8c3d2f8f32595be89f6297e4a223d858c3634822))
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+- **saveslot:** make every save slot command work on players who are not in this server ([795549c](https://github.com/Quenty/NevermoreEngine/commit/795549cdcb4c8584a4acd22eb7377c7aea149182))
+
+## [13.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.51.0...@quenty/datastore@13.51.1) (2026-07-30)
+
+### Bug Fixes
+
+- **datastore:** stop manager teardown from destroying stores before PlayerRemoving saves them ([44d786e](https://github.com/Quenty/NevermoreEngine/commit/44d786edb1501c37d540d6a3226084f4d0859f8b))
+- **datastore:** stop the spec shutdown helper stalling on a bag that was never started ([0696638](https://github.com/Quenty/NevermoreEngine/commit/0696638700a33cbcedc85f4c75099f54cb952a6c))
+
+# [13.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.50.2...@quenty/datastore@13.51.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.50.1...@quenty/datastore@13.50.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/datastore
+
+## [13.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.50.0...@quenty/datastore@13.50.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.49.0...@quenty/datastore@13.50.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.48.0...@quenty/datastore@13.49.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.47.0...@quenty/datastore@13.48.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.46.1...@quenty/datastore@13.47.0) (2026-07-23)
+
+### Bug Fixes
+
+- Data store tear down fixes that are graceful ([79152d0](https://github.com/Quenty/NevermoreEngine/commit/79152d03156f2328ab2a4a07bc68e27b5b666775))
+
+### Features
+
+- Even more stuff ([fea7e95](https://github.com/Quenty/NevermoreEngine/commit/fea7e9587e7195bbfa7f4753c130a3d597f9a34b))
+
+## [13.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.46.0...@quenty/datastore@13.46.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.45.0...@quenty/datastore@13.46.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Improve stuff ([ae11166](https://github.com/Quenty/NevermoreEngine/commit/ae1116636cea882a51754b0a74cb5a641bad9ae4))
+
+# [13.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.44.0...@quenty/datastore@13.45.0) (2026-07-21)
+
+### Features
+
+- Add ephemeral save slots ([16bd91b](https://github.com/Quenty/NevermoreEngine/commit/16bd91b87943a65165245cba90d44274585903d6))
+
+# [13.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.43.0...@quenty/datastore@13.44.0) (2026-07-21)
+
+### Features
+
+- Add data store overflow handling ([96df5f5](https://github.com/Quenty/NevermoreEngine/commit/96df5f57bff20c41a8293dfaadb951e1831297b3))
+
+# [13.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.42.0...@quenty/datastore@13.43.0) (2026-07-20)
+
+### Features
+
+- Datastore keys and error messages ([0fb1380](https://github.com/Quenty/NevermoreEngine/commit/0fb1380735d601b4a8ced180c38d3470aa1b1916))
+
+# [13.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.41.0...@quenty/datastore@13.42.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [13.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.40.0...@quenty/datastore@13.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/datastore
+
+# [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.39.1...@quenty/datastore@13.40.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/datastore
+
 ## [13.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.39.0...@quenty/datastore@13.39.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/datastore

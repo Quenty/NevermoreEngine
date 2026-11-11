@@ -14,6 +14,7 @@ local pluralMap: { [GameConfigAssetTypes.GameConfigAssetType]: string } = {
 	[GameConfigAssetTypes.PRODUCT] = "products",
 	[GameConfigAssetTypes.PASS] = "passes",
 	[GameConfigAssetTypes.PLACE] = "places",
+	[GameConfigAssetTypes.GAME] = "games",
 	[GameConfigAssetTypes.ASSET] = "assets",
 	[GameConfigAssetTypes.BUNDLE] = "bundles",
 	[GameConfigAssetTypes.SUBSCRIPTION] = "subscriptions",

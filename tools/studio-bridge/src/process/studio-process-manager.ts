@@ -125,24 +125,63 @@ export interface StudioProcess {
   killAsync: () => Promise<void>;
 }
 
+export interface LaunchStudioOptions {
+  /** Path to a local `.rbxl` place file to open. */
+  placePath?: string;
+  /** Cloud place id to open in Studio (via the `EditPlace` deep-link). */
+  placeId?: number;
+  /** Cloud universe id for the place (recommended alongside `placeId`). */
+  universeId?: number;
+}
+
 /**
- * Launch Roblox Studio with the given place file.
+ * Resolve the single argument handed to `RobloxStudioBeta`: a cloud
+ * `roblox-studio:` EditPlace deep-link when a `placeId` is given, otherwise
+ * the local `.rbxl` path (or `''` to open Studio with no place). The deep-link
+ * is exactly what the OS protocol handler passes to Studio, so Studio opens the
+ * cloud place in edit mode using the current logged-in session.
+ */
+export function buildStudioLaunchArg(options: LaunchStudioOptions): string {
+  if (options.placeId != null) {
+    const parts = [
+      'roblox-studio:1',
+      'launchmode:edit',
+      'task:EditPlace',
+      `placeId:${options.placeId}`,
+    ];
+    if (options.universeId != null) {
+      parts.push(`universeId:${options.universeId}`);
+    }
+    return parts.join('+');
+  }
+  return options.placePath ?? '';
+}
+
+/**
+ * Launch Roblox Studio with a local place file or a cloud place.
+ *
+ * Accepts a `LaunchStudioOptions` object (`{ placePath | placeId, universeId }`)
+ * or, for backward compatibility, a bare `.rbxl` path string.
  *
  * Uses Node's built-in `spawn` with `detached: true` + `unref()` so that
  * Studio survives after the CLI process exits. execa's internal Job Object
  * on Windows kills children on parent exit, so we avoid it here.
  */
 export async function launchStudioAsync(
-  placePath: string
+  options: LaunchStudioOptions | string = {}
 ): Promise<StudioProcess> {
+  const resolved: LaunchStudioOptions =
+    typeof options === 'string' ? { placePath: options } : options;
+  const launchArg = buildStudioLaunchArg(resolved);
+
   if (process.platform === 'linux') {
-    return launchStudioLinuxAsync(placePath);
+    return launchStudioLinuxAsync(launchArg);
   }
 
   const studioExe = await findStudioPathAsync();
-  OutputHelper.verbose(`[StudioBridge] ${studioExe} "${placePath}"`);
+  OutputHelper.verbose(`[StudioBridge] ${studioExe} "${launchArg}"`);
 
-  const proc = spawn(studioExe, placePath ? [placePath] : [], {
+  const proc = spawn(studioExe, launchArg ? [launchArg] : [], {
     detached: true,
     stdio: 'ignore',
   });

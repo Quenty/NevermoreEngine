@@ -3,6 +3,104 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.51.0...@quenty/blend@12.51.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [12.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.50.2...@quenty/blend@12.51.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.50.1...@quenty/blend@12.50.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.50.0...@quenty/blend@12.50.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.49.1...@quenty/blend@12.50.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.49.0...@quenty/blend@12.49.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.48.0...@quenty/blend@12.49.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.47.0...@quenty/blend@12.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.46.0...@quenty/blend@12.47.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.45.1...@quenty/blend@12.46.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.45.0...@quenty/blend@12.45.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.44.2...@quenty/blend@12.45.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.44.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.44.1...@quenty/blend@12.44.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.44.0...@quenty/blend@12.44.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.43.0...@quenty/blend@12.44.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.42.0...@quenty/blend@12.43.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.41.0...@quenty/blend@12.42.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.40.1...@quenty/blend@12.41.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/blend
+
+## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.40.0...@quenty/blend@12.40.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.39.0...@quenty/blend@12.40.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.38.0...@quenty/blend@12.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [12.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.37.0...@quenty/blend@12.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/blend
+
+# [12.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.36.1...@quenty/blend@12.37.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/blend
+
 ## [12.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/blend@12.36.0...@quenty/blend@12.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/blend

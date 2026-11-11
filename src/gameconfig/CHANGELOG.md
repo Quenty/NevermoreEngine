@@ -3,6 +3,190 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.72.0...@quenty/gameconfig@12.72.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.71.1...@quenty/gameconfig@12.72.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.71.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.71.0...@quenty/gameconfig@12.71.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [12.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.70.3...@quenty/gameconfig@12.71.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.70.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.70.2...@quenty/gameconfig@12.70.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.70.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.70.1...@quenty/gameconfig@12.70.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.70.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.70.0...@quenty/gameconfig@12.70.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.69.0...@quenty/gameconfig@12.70.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.68.1...@quenty/gameconfig@12.69.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.68.0...@quenty/gameconfig@12.68.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.67.0...@quenty/gameconfig@12.68.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.66.0...@quenty/gameconfig@12.67.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.65.1...@quenty/gameconfig@12.66.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.65.0...@quenty/gameconfig@12.65.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.64.1...@quenty/gameconfig@12.65.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.64.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.64.0...@quenty/gameconfig@12.64.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.63.0...@quenty/gameconfig@12.64.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.6...@quenty/gameconfig@12.63.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.5...@quenty/gameconfig@12.62.6) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.4...@quenty/gameconfig@12.62.5) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.3...@quenty/gameconfig@12.62.4) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.2...@quenty/gameconfig@12.62.3) (2026-07-29)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.1...@quenty/gameconfig@12.62.2) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.62.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.62.0...@quenty/gameconfig@12.62.1) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.61.2...@quenty/gameconfig@12.62.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.61.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.61.1...@quenty/gameconfig@12.61.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.61.0...@quenty/gameconfig@12.61.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.60.0...@quenty/gameconfig@12.61.0) (2026-07-25)
+
+### Features
+
+- Improve cmdr line ([2bc4966](https://github.com/Quenty/NevermoreEngine/commit/2bc496608d90440d7473ec804f761c2a862ec574))
+
+# [12.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.59.0...@quenty/gameconfig@12.60.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.58.0...@quenty/gameconfig@12.59.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.57.1...@quenty/gameconfig@12.58.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.57.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.57.0...@quenty/gameconfig@12.57.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.56.0...@quenty/gameconfig@12.57.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [12.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.55.0...@quenty/gameconfig@12.56.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.54.0...@quenty/gameconfig@12.55.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.53.0...@quenty/gameconfig@12.54.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- **gameconfig:** add asset selection priority for key clashes ([ae7d765](https://github.com/Quenty/NevermoreEngine/commit/ae7d7651f6a3270e8e0ee9fc592b4e6bc2fc5a51))
+- **gameconfig:** auto-register manifest places via NevermoreManifestConfigProvider ([db58cfc](https://github.com/Quenty/NevermoreEngine/commit/db58cfc62b9164f316895c4252942bd292a02f89))
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
+
+# [12.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.52.0...@quenty/gameconfig@12.53.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.51.1...@quenty/gameconfig@12.52.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+## [12.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.51.0...@quenty/gameconfig@12.51.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.50.0...@quenty/gameconfig@12.51.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/gameconfig
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.49.2...@quenty/gameconfig@12.50.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **gameconfig:** convert package to --!strict ([360d65c](https://github.com/Quenty/NevermoreEngine/commit/360d65cc66e9cf4e169af175f1914286ccdb789f))
+
 ## [12.49.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.49.1...@quenty/gameconfig@12.49.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/gameconfig

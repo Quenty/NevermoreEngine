@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles IK rigging for a humanoid
 	@class IKRigClient
@@ -19,8 +19,19 @@ local IKRigClient = setmetatable({}, IKRigBase)
 IKRigClient.ClassName = "IKRigClient"
 IKRigClient.__index = IKRigClient
 
-function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRigClient)
+export type IKRigClient =
+	typeof(setmetatable(
+		{} :: {
+			_remoting: any,
+			_localPlayerAimer: IKRigAimerLocalPlayer.IKRigAimerLocalPlayer?,
+			_target: Vector3?,
+		},
+		{} :: typeof({ __index = IKRigClient })
+	))
+	& IKRigBase.IKRigBase
+
+function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): IKRigClient
+	local self: IKRigClient = setmetatable(IKRigBase.new(humanoid, serviceBag) :: any, IKRigClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
@@ -30,7 +41,7 @@ function IKRigClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
 		self:_setupLocalPlayer()
 	end
 
-	self._maid:Add(IKRigInterface.Client:Implement(self._obj, self))
+	self._maid:Add((IKRigInterface :: any).Client:Implement(self._obj :: Instance, self))
 
 	return self
 end
@@ -40,8 +51,8 @@ end
 
 	@return Vector3?
 ]=]
-function IKRigClient:GetPositionOrNil(): Vector3?
-	local rootPart = self._obj.RootPart
+function IKRigClient.GetPositionOrNil(self: IKRigClient): Vector3?
+	local rootPart = (self._obj :: Humanoid).RootPart
 	if not rootPart then
 		return nil
 	end
@@ -54,7 +65,7 @@ end
 
 	@return IKRigAimerLocalPlayer?
 ]=]
-function IKRigClient:GetLocalPlayerAimer()
+function IKRigClient.GetLocalPlayerAimer(self: IKRigClient): IKRigAimerLocalPlayer.IKRigAimerLocalPlayer?
 	return self._localPlayerAimer
 end
 
@@ -63,7 +74,7 @@ end
 
 	@return Vector3?
 ]=]
-function IKRigClient:GetAimPosition(): Vector3?
+function IKRigClient.GetAimPosition(self: IKRigClient): Vector3?
 	if self._localPlayerAimer then
 		return self._localPlayerAimer:GetAimPosition()
 	end
@@ -71,7 +82,7 @@ function IKRigClient:GetAimPosition(): Vector3?
 	return self._target
 end
 
-function IKRigClient:_setAimPosition(newTarget: Vector3?)
+function IKRigClient._setAimPosition(self: IKRigClient, newTarget: Vector3?): ()
 	assert(typeof(newTarget) == "Vector3" or newTarget == nil, "Bad newTarget")
 
 	local torso = self:GetTorso()
@@ -83,22 +94,22 @@ function IKRigClient:_setAimPosition(newTarget: Vector3?)
 	self._target = newTarget
 end
 
-function IKRigClient:_setupRemoting()
-	self._remoting = self._maid:Add(Remoting.Client.new(self._obj, "IKRig"))
+function IKRigClient._setupRemoting(self: IKRigClient): ()
+	self._remoting = self._maid:Add(Remoting.Client.new(self._obj :: Instance, "IKRig"))
 
 	self._maid:GiveTask(self._remoting.SetAimPosition:Connect(function(...)
 		self:_setAimPosition(...)
 	end))
 end
 
-function IKRigClient:_setupLocalPlayer()
+function IKRigClient._setupLocalPlayer(self: IKRigClient): ()
 	self._localPlayerAimer = self._maid:Add(IKRigAimerLocalPlayer.new(self._serviceBag, self))
 end
 
-function IKRigClient:FireSetAimPosition(newTarget: Vector3?)
+function IKRigClient.FireSetAimPosition(self: IKRigClient, newTarget: Vector3?): ()
 	assert(self:GetPlayer() == Players.LocalPlayer, "Canot only fire from client")
 
 	self._remoting.SetAimPosition:FireServer(newTarget)
 end
 
-return Binder.new("IKRig", IKRigClient)
+return Binder.new("IKRig", IKRigClient :: any) :: Binder.Binder<IKRigClient>

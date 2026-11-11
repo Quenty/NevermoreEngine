@@ -59,9 +59,9 @@ end
 	@param sound Sound
 	@param soundGroupPath string? -- Optional
 ]=]
-function SoundEffectService.RegisterSFX(self: SoundEffectService, sound: Sound, soundGroupPath: string): ()
+function SoundEffectService.RegisterSFX(self: SoundEffectService, sound: Sound, soundGroupPath: string?): ()
 	assert(typeof(sound) == "Instance" and sound:IsA("Sound"), "Bad sound")
-	assert(SoundGroupPathUtils.isSoundGroupPath(soundGroupPath) or soundGroupPath == nil, "Bad soundGroupPath")
+	assert(soundGroupPath == nil or SoundGroupPathUtils.isSoundGroupPath(soundGroupPath), "Bad soundGroupPath")
 
 	sound.SoundGroup = self:GetOrCreateSoundGroup(soundGroupPath or WellKnownSoundGroups.SFX)
 end

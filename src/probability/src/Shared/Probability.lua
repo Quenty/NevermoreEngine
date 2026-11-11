@@ -7,11 +7,18 @@
 local Probability = {}
 
 --[=[
-	Returns a boxMuller random distribution
-	@return number
+	Returns a sample from the standard normal distribution (mean 0, standard deviation 1)
+	using the Box–Muller transform.
 ]=]
 function Probability.boxMuller(): number
-	return math.sqrt(-2 * math.log(math.random())) * math.cos(2 * math.pi * math.random()) / 2
+	return Probability._boxMullerFromUniform(math.random(), math.random())
+end
+
+--[[
+	math.random() is in [0, 1), so flip u1 to (0, 1] to keep math.log finite
+]]
+function Probability._boxMullerFromUniform(u1: number, u2: number): number
+	return math.sqrt(-2 * math.log(1 - u1)) * math.cos(2 * math.pi * u2)
 end
 
 --[=[

@@ -22,11 +22,22 @@ src/<package>/
     Shared/                 # or Client/, Server/
       MyModule.lua
       MyModule.spec.lua     # test files live alongside source
+  docs/                     # optional, design intent for the package (see below)
   test/                     # optional, for packages with test targets
     default.project.json    # Rojo project for test place
     scripts/Server/         # script template for test runner
   deploy.nevermore.json      # optional, for deployable/testable packages
 ```
+
+A package's `docs/` is for **design intent and design decisions that cannot live in code**: why an
+implementation is shaped the way it is, what was tried and rejected, the outside behavior it is
+built around. Not a scratchpad, and not a place to restate what the code already says.
+
+These are **public documents** — public repo, and they ship inside the published package. They are
+held to the **same quality bar as `docs/`**, and used **sparingly**: most packages should have
+none. If the knowledge fits in a comment next to the code, put it there instead. Link the directory
+from the package `README.md` under "Working on this package". `src/clienttranslator/docs/` is the
+reference example.
 
 ## Setup
 
@@ -88,7 +99,7 @@ Key rules (full guide with examples in `docs/conventions/luau.md`):
 
 ## Testing & Deployment
 
-- `nevermore init-package` scaffolds new packages. It can also fill in missing standard files on existing packages.
+- `nevermore init package` scaffolds new packages. It can also fill in missing standard files on existing packages.
 - `nevermore deploy run` builds and uploads; pass `--publish` for Published.
 - `nevermore ci post-test-results` posts or updates a PR comment with test results.
 

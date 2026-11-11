@@ -16,8 +16,9 @@ import { isCI } from '../../cli-utils.js';
 export type DiagnosticSeverity = 'error' | 'warning' | 'notice';
 
 export interface Diagnostic {
-  file: string;
-  line: number;
+  /** Repo-relative path. Omit when the location is unknown. */
+  file?: string;
+  line?: number;
   endLine?: number;
   column?: number;
   endColumn?: number;
@@ -61,8 +62,12 @@ function _escapeMessage(value: string): string {
 export function formatAnnotation(diagnostic: Diagnostic): string {
   const props: string[] = [];
 
-  props.push(`file=${_escapeProperty(diagnostic.file)}`);
-  props.push(`line=${diagnostic.line}`);
+  if (diagnostic.file !== undefined) {
+    props.push(`file=${_escapeProperty(diagnostic.file)}`);
+  }
+  if (diagnostic.line !== undefined) {
+    props.push(`line=${diagnostic.line}`);
+  }
 
   if (diagnostic.endLine !== undefined) {
     props.push(`endLine=${diagnostic.endLine}`);
@@ -78,7 +83,25 @@ export function formatAnnotation(diagnostic: Diagnostic): string {
   }
 
   const message = _escapeMessage(diagnostic.message);
-  return `::${diagnostic.severity} ${props.join(',')}::${message}`;
+  const properties = props.length > 0 ? ` ${props.join(',')}` : '';
+  return `::${diagnostic.severity}${properties}::${message}`;
+}
+
+/** Drop exact repeats; GitHub shows only 10 error annotations per step. */
+export function dedupeDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
+  const seen = new Set<string>();
+  return diagnostics.filter((d) => {
+    const key = JSON.stringify([
+      d.severity,
+      d.file,
+      d.line,
+      d.title,
+      d.message,
+    ]);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /**
@@ -103,7 +126,9 @@ export function summarizeDiagnostics(
   const files = new Set<string>();
 
   for (const d of diagnostics) {
-    files.add(d.file);
+    if (d.file !== undefined) {
+      files.add(d.file);
+    }
     switch (d.severity) {
       case 'error':
         errors++;
@@ -158,7 +183,7 @@ export function formatAnnotationSummaryMarkdown(
   } file${summary.fileCount !== 1 ? 's' : ''}: ${parts.join(', ')}\n\n`;
 
   // Group diagnostics by file
-  const byFile = new Map<string, Diagnostic[]>();
+  const byFile = new Map<string | undefined, Diagnostic[]>();
   for (const d of diagnostics) {
     const list = byFile.get(d.file) ?? [];
     list.push(d);
@@ -176,7 +201,8 @@ export function formatAnnotationSummaryMarkdown(
       break;
     }
 
-    md += `<details><summary><code>${file}</code> (${diags.length})</summary>\n\n`;
+    const label = file === undefined ? 'No file' : `<code>${file}</code>`;
+    md += `<details><summary>${label} (${diags.length})</summary>\n\n`;
     md += '| Line | Severity | Message |\n';
     md += '|------|----------|---------|\n';
 
@@ -189,7 +215,7 @@ export function formatAnnotationSummaryMarkdown(
           ? '`warning`'
           : '`notice`';
       const escapedMsg = d.message.replace(/\|/g, '\\|').replace(/\n/g, ' ');
-      md += `| ${d.line} | ${sev} | ${escapedMsg} |\n`;
+      md += `| ${d.line ?? ''} | ${sev} | ${escapedMsg} |\n`;
     }
 
     if (diags.length > MAX_PER_FILE) {

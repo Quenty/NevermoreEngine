@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SoundLoopScheduleUtils
 ]=]
@@ -7,7 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local NumberRangeUtils = require("NumberRangeUtils")
 local Table = require("Table")
-local t = require("t")
+local t: any = require("t")
 
 local SoundLoopScheduleUtils = {}
 
@@ -23,7 +23,7 @@ function SoundLoopScheduleUtils.onNextLoop(loopedSchedule: SoundLoopSchedule): S
 	loopedSchedule = loopedSchedule or {}
 	return SoundLoopScheduleUtils.schedule(Table.merge(loopedSchedule, {
 		playOnNextLoop = true,
-	}))
+	}) :: SoundLoopSchedule)
 end
 
 function SoundLoopScheduleUtils.maxLoops(maxLoops: number, loopedSchedule: SoundLoopSchedule): SoundLoopSchedule
@@ -33,7 +33,7 @@ function SoundLoopScheduleUtils.maxLoops(maxLoops: number, loopedSchedule: Sound
 	loopedSchedule = loopedSchedule or {}
 	return SoundLoopScheduleUtils.schedule(Table.merge(loopedSchedule, {
 		maxLoops = maxLoops,
-	}))
+	}) :: SoundLoopSchedule)
 end
 
 function SoundLoopScheduleUtils.default(): SoundLoopSchedule

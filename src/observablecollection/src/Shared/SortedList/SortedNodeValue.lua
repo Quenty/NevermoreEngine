@@ -70,6 +70,13 @@ function SortedNodeValue.__lt<T>(self: SortedNodeValue<T>, other: SortedNodeValu
 	return self._compare(self._value, other._value) < 0
 end
 
+function SortedNodeValue.__le<T>(self: SortedNodeValue<T>, other: SortedNodeValue<T>): boolean
+	assert(SortedNodeValue.isSortedNodeValue(other), "Bad other")
+	assert(other._compare == self._compare, "Bad compare")
+
+	return self._compare(self._value, other._value) <= 0
+end
+
 function SortedNodeValue.__gt<T>(self: SortedNodeValue<T>, other: SortedNodeValue<T>): boolean
 	assert(SortedNodeValue.isSortedNodeValue(other), "Bad other")
 	assert(other._compare == self._compare, "Bad compare")

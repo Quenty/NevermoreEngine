@@ -26,12 +26,13 @@ local ConverterPane = setmetatable({}, BasicPane)
 ConverterPane.ClassName = "ConverterPane"
 ConverterPane.__index = ConverterPane
 
-function ConverterPane.new()
+function ConverterPane.new(converter)
 	local self = setmetatable(BasicPane.new(), ConverterPane)
 
 	self._previewTextName = "ClassConverterPreviewText" .. HttpService:GenerateGUID(false)
 
-	self._converter = self._maid:Add(UIConverter.new())
+	self._converter = converter or self._maid:Add(UIConverter.new())
+	self._codeValid = false
 	self._vDividerPosition = self._maid:Add(ValueObject.new(0.3))
 	self._hDividerPosition = self._maid:Add(ValueObject.new(0.5))
 	self._draggingState = self._maid:Add(ValueObject.new(false))
@@ -43,6 +44,7 @@ function ConverterPane.new()
 	self._copyPreview = self._maid:Add(ValueObject.new(nil))
 	self._renderPreview = self._maid:Add(ValueObject.new(nil))
 	self._libraryName = self._maid:Add(ValueObject.new("Blend"))
+	self._openScriptStatus = self._maid:Add(ValueObject.new(nil))
 
 	self._maid:GiveTask(Rx.combineLatest({
 		library = self._libraryName:Observe(),
@@ -52,6 +54,10 @@ function ConverterPane.new()
 	end))
 
 	return self
+end
+
+function ConverterPane:SetOutputScriptManager(outputScriptManager)
+	self._outputScriptManager = outputScriptManager
 end
 
 function ConverterPane:SetupSettings(plugin: Plugin)
@@ -238,6 +244,8 @@ function ConverterPane:_renderFromInstance(state)
 	local maid = Maid.new()
 
 	if #state.selectedList > 0 and state.library then
+		self._codeValid = false
+		self._code.Value = ""
 		self._copyPreview.Value = self:_showPreviewText("Generating...")
 		self._renderPreview.Value = self:_showPreviewText("Generating...")
 
@@ -255,55 +263,17 @@ function ConverterPane:_renderFromInstance(state)
 			maid._genMaid = nil
 			local genMaid = Maid.new()
 
-			local codePromises = {}
 			genMaid
-				:GivePromise(
-					UIConverterUtils.promiseCreateLookupMap(state.library, self._converter, state.selectedList)
-				)
-				:Then(function(refLookupMap)
-					for _, item in state.selectedList do
-						table.insert(
-							codePromises,
-							genMaid:GivePromise(
-								UIConverterUtils.promiseToLibraryInstance(
-									state.library,
-									self._converter,
-									item,
-									refLookupMap
-								)
-							)
-						)
-					end
+				:GivePromise(UIConverterUtils.promiseCode(state.library, self._converter, state.selectedList))
+				:Then(function(code)
+					self._codeValid = true
+					self._code.Value = code
 
-					genMaid
-						:GivePromise(PromiseUtils.all(codePromises))
-						:Then(function(...)
-							local results = {}
-							for _, item in { ... } do
-								if item then
-									table.insert(results, item)
-								end
-							end
-
-							local prefix = UIConverterUtils.getEntryListCode(state.library, refLookupMap)
-
-							if #results == 0 then
-								return UIConverterUtils.toLuaComment("error while making code, no results")
-							elseif #results == 1 then
-								return prefix .. results[1]
-							else
-								return prefix .. UIConverterUtils.convertListOfItemsToTable(results)
-							end
-						end)
-						:Then(function(code)
-							self._code.Value = code
-
-							ensureRenderPreview()
-						end)
-						:Catch(function(err)
-							self._code.Value =
-								UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
-						end)
+					ensureRenderPreview()
+				end)
+				:Catch(function(err)
+					self._codeValid = false
+					self._code.Value = UIConverterUtils.toLuaComment("error while converting: " .. tostring(err))
 				end)
 
 			local clonePromises = {}
@@ -376,6 +346,7 @@ function ConverterPane:_renderFromInstance(state)
 
 		generate()
 	else
+		self._codeValid = false
 		self._copyPreview.Value = self:_showPreviewText()
 		self._renderPreview.Value = self:_showPreviewText()
 		self._code.Value = UIConverterUtils.toLuaComment("select an object")
@@ -633,6 +604,65 @@ function ConverterPane:_previewCode(codeValue)
 	}
 end
 
+function ConverterPane:_setOpenScriptStatus(text: string?)
+	self._maid._openScriptStatusMaid = nil
+
+	self._openScriptStatus.Value = text
+
+	if text == nil then
+		return
+	end
+
+	self._maid._openScriptStatusMaid = task.delay(2, function()
+		self._openScriptStatus.Value = nil
+	end)
+end
+
+function ConverterPane:OpenInScript()
+	if not self._outputScriptManager then
+		self:_setOpenScriptStatus("No output target")
+		return
+	end
+
+	local code = self._code.Value
+	if not self._codeValid or type(code) ~= "string" or #code == 0 then
+		self:_setOpenScriptStatus("Nothing to open")
+		return
+	end
+
+	local _, message = self._outputScriptManager:Open(UIConverterUtils.toModuleSource(code))
+	self:_setOpenScriptStatus(message)
+end
+
+function ConverterPane:_renderOpenInScriptButton()
+	return Blend.New "TextButton" {
+		Name = "OpenInScript",
+		AutoButtonColor = true,
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(1, -18, 1, -10),
+		Size = UDim2.fromOffset(120, 22),
+		BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+		TextColor3 = Color3.fromRGB(200, 200, 200),
+		Font = Enum.Font.Arial,
+		TextSize = 12,
+		ZIndex = 10,
+
+		Text = Blend.Computed(self._openScriptStatus, function(status)
+			return status or "Open in Script"
+		end),
+
+		[Blend.OnEvent "Activated"] = function()
+			self:OpenInScript()
+		end,
+
+		[Blend.Children] = {
+			Blend.New "UICorner" {
+				CornerRadius = UDim.new(0, 4),
+			},
+		},
+	}
+end
+
 function ConverterPane:Render(props)
 	local handleInputEnd = function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -808,7 +838,10 @@ function ConverterPane:Render(props)
 						return string.format("Quenty's UI Converter - %s Code %s", libraryName, name)
 					end)),
 
-					content(self:_previewCode(self._code)),
+					content({
+						self:_previewCode(self._code),
+						self:_renderOpenInScriptButton(),
+					}),
 				},
 			},
 		},

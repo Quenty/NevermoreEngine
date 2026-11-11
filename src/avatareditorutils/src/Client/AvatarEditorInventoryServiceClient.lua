@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class AvatarEditorInventoryServiceClient
 ]=]
@@ -24,11 +24,18 @@ export type AvatarEditorInventoryServiceClient = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
 		_serviceBag: ServiceBag.ServiceBag,
+		_isAccessAllowed: ValueObject.ValueObject<boolean>,
+		_assetTypeToInventoryPromises: { [Enum.AvatarAssetType]: any },
+		_promiseInventoryPages: any,
+		_currentAccessPromise: any,
 	},
 	{} :: typeof({ __index = AvatarEditorInventoryServiceClient })
 ))
 
-function AvatarEditorInventoryServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
+function AvatarEditorInventoryServiceClient.Init(
+	self: AvatarEditorInventoryServiceClient,
+	serviceBag: ServiceBag.ServiceBag
+): ()
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
@@ -42,25 +49,37 @@ function AvatarEditorInventoryServiceClient:Init(serviceBag: ServiceBag.ServiceB
 		end
 	end))
 
-	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes)
-		return AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
-			-- Allow for replay
-			return PagesProxy.new(catalogPages)
-		end)
+	self._promiseInventoryPages = MemorizeUtils.memoize(function(avatarAssetTypes: { Enum.AvatarAssetType })
+		return (
+			AvatarEditorUtils.promiseInventoryPages(avatarAssetTypes):Then(function(catalogPages)
+				-- Allow for replay
+				return PagesProxy.new(catalogPages)
+			end)
+		) :: any
 	end)
 end
 
-function AvatarEditorInventoryServiceClient:PromiseInventoryPages(avatarAssetTypes: Enum.AvatarAssetType)
-	return self:PromiseEnsureAccess()
-		:Then(function()
-			return self._promiseInventoryPages(avatarAssetTypes)
-		end)
-		:Then(function(pagesProxy)
-			return pagesProxy:Clone()
-		end)
+function AvatarEditorInventoryServiceClient.PromiseInventoryPages(
+	self: AvatarEditorInventoryServiceClient,
+	avatarAssetTypes: Enum.AvatarAssetType
+): Promise.Promise<PagesProxy.PagesProxy>
+	return (
+		self:PromiseEnsureAccess()
+			:Then(function()
+				return self._promiseInventoryPages(avatarAssetTypes)
+			end)
+			:Then(function(pagesProxy)
+				return pagesProxy:Clone()
+			end)
+	) :: any
 end
 
-function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(avatarAssetType: Enum.AvatarAssetType)
+function AvatarEditorInventoryServiceClient.PromiseInventoryForAvatarAssetType(
+	self: AvatarEditorInventoryServiceClient,
+	avatarAssetType: Enum.AvatarAssetType
+): Promise.Promise<
+	AvatarEditorInventory.AvatarEditorInventory
+>
 	assert(EnumUtils.isOfType(Enum.AvatarAssetType, avatarAssetType), "Bad avatarAssetType")
 
 	if self._assetTypeToInventoryPromises[avatarAssetType] then
@@ -69,37 +88,43 @@ function AvatarEditorInventoryServiceClient:PromiseInventoryForAvatarAssetType(a
 
 	local inventory = self._maid:Add(AvatarEditorInventory.new())
 
-	self._assetTypeToInventoryPromises[avatarAssetType] = AvatarEditorUtils.promiseInventoryPages({
-		avatarAssetType,
-	})
-		:Then(function(inventoryPages)
-			return inventory:PromiseProcessPages(inventoryPages)
-		end)
-		:Then(function()
-			return inventory
-		end)
+	self._assetTypeToInventoryPromises[avatarAssetType] = (
+		AvatarEditorUtils.promiseInventoryPages({
+			avatarAssetType,
+		})
+			:Then(function(inventoryPages)
+				return inventory:PromiseProcessPages(inventoryPages)
+			end)
+			:Then(function()
+				return inventory
+			end)
+	) :: any
 
 	return self._assetTypeToInventoryPromises[avatarAssetType]
 end
 
-function AvatarEditorInventoryServiceClient:IsInventoryAccessAllowed(): boolean
+function AvatarEditorInventoryServiceClient.IsInventoryAccessAllowed(self: AvatarEditorInventoryServiceClient): boolean
 	return self._isAccessAllowed.Value
 end
 
-function AvatarEditorInventoryServiceClient:ObserveIsInventoryAccessAllowed()
+function AvatarEditorInventoryServiceClient.ObserveIsInventoryAccessAllowed(
+	self: AvatarEditorInventoryServiceClient
+): any
 	return self._isAccessAllowed:Observe()
 end
 
-function AvatarEditorInventoryServiceClient:PromiseEnsureAccess(): Promise.Promise<()>
+function AvatarEditorInventoryServiceClient.PromiseEnsureAccess(
+	self: AvatarEditorInventoryServiceClient
+): Promise.Promise<()>
 	if self._isAccessAllowed.Value then
-		return Promise.resolved()
+		return (Promise :: any).resolved()
 	end
 
 	if self._currentAccessPromise and self._currentAccessPromise:IsPending() then
 		return self._currentAccessPromise
 	end
 
-	local promise = self._maid:GivePromise(AvatarEditorUtils.promptAllowInventoryReadAccess())
+	local promise: any = self._maid:GivePromise(AvatarEditorUtils.promptAllowInventoryReadAccess())
 
 	promise:Then(function(avatarPromptResult)
 		if avatarPromptResult == Enum.AvatarPromptResult.Success then
@@ -109,10 +134,10 @@ function AvatarEditorInventoryServiceClient:PromiseEnsureAccess(): Promise.Promi
 
 	self._currentAccessPromise = promise
 
-	return self._currentAccessPromise
+	return promise
 end
 
-function AvatarEditorInventoryServiceClient:Destroy()
+function AvatarEditorInventoryServiceClient.Destroy(self: AvatarEditorInventoryServiceClient): ()
 	self._maid:DoCleaning()
 end
 

@@ -10,12 +10,16 @@ interface StripSourcemapJestArgs extends NevermoreGlobalArgs {
 }
 
 /**
- * Temporary workaround: remove Jest nodes from sourcemap.json.
+ * Temporary workaround: strip shadowing modules from Jest subtrees in sourcemap.json.
  *
  * luau-lsp's require-by-name resolution picks the first file matching a name
  * in the sourcemap. Jest vendors internal copies of modules (Promise, string,
  * symbol, etc.) that shadow Nevermore packages. The real loader handles this
  * correctly, but luau-lsp doesn't yet.
+ *
+ * We drop only the Jest descendants whose name also exists elsewhere in the
+ * sourcemap (the shadowing copies), and keep the Jest-unique modules (Jest,
+ * JestGlobals, ...) so `require("Jest")` still resolves.
  *
  * Long-term fix: smarter require resolution in luau-lsp (plugins or fork).
  */
@@ -25,7 +29,7 @@ export const stripSourcemapJestCommand: CommandModule<
 > = {
   command: 'strip-sourcemap-jest',
   describe:
-    'Remove Jest nodes from sourcemap.json to avoid luau-lsp name conflicts',
+    "Strip modules from Jest subtrees in sourcemap.json that shadow names elsewhere, keeping require('Jest') resolvable",
   builder: (yargs) => {
     return yargs.option('sourcemap', {
       describe: 'Path to sourcemap.json',
@@ -46,31 +50,57 @@ export const stripSourcemapJestCommand: CommandModule<
 
     const sourcemap = JSON.parse(content) as SourcemapNode;
 
-    let removed = 0;
-
-    function removeJestNodes(node: SourcemapNode): void {
+    // Every module name that lives OUTSIDE any Jest subtree. Jest's vendored copies of these
+    // are what shadow the real Nevermore modules under luau-lsp's first-match resolution.
+    const externalNames = new Set<string>();
+    function collectExternalNames(
+      node: SourcemapNode,
+      insideJest: boolean
+    ): void {
       if (!node.children) return;
-
-      node.children = node.children.filter((child) => {
-        if (child.name === 'Jest') {
-          removed++;
-          return false;
-        }
-        return true;
-      });
-
       for (const child of node.children) {
-        removeJestNodes(child);
+        const childInsideJest = insideJest || child.name === 'Jest';
+        if (!childInsideJest) {
+          externalNames.add(child.name);
+        }
+        collectExternalNames(child, childInsideJest);
       }
     }
+    collectExternalNames(sourcemap, false);
 
-    removeJestNodes(sourcemap);
+    // Within each Jest subtree, drop any node whose name also exists elsewhere (the shadowing
+    // copies), keeping the Jest-unique modules so require("Jest") still resolves. Also drop a
+    // Jest node nested inside another Jest: the jest-lua package folder ("Jest", whose
+    // init.lua exports `.Globals`) contains a leaf "Jest" submodule that lacks `.Globals`, and
+    // the duplicate name makes require("Jest") resolve to the wrong one for some packages.
+    let stripped = 0;
+    function stripShadowingNodes(
+      node: SourcemapNode,
+      insideJest: boolean
+    ): void {
+      if (!node.children) return;
+
+      if (insideJest) {
+        node.children = node.children.filter((child) => {
+          if (externalNames.has(child.name) || child.name === 'Jest') {
+            stripped++;
+            return false;
+          }
+          return true;
+        });
+      }
+
+      for (const child of node.children) {
+        stripShadowingNodes(child, insideJest || child.name === 'Jest');
+      }
+    }
+    stripShadowingNodes(sourcemap, false);
 
     fs.writeFileSync(sourcemapPath, JSON.stringify(sourcemap));
 
-    if (removed > 0) {
+    if (stripped > 0) {
       OutputHelper.info(
-        `Removed ${removed} Jest node(s) from ${sourcemapPath}`
+        `Stripped ${stripped} shadowing node(s) from Jest subtrees in ${sourcemapPath}`
       );
     }
   },

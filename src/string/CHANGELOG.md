@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.5.2...@quenty/string@3.5.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [3.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.5.1...@quenty/string@3.5.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/string
+
+## [3.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.5.0...@quenty/string@3.5.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/string
+
+# [3.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.4.1...@quenty/string@3.5.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/string
+
+## [3.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.4.0...@quenty/string@3.4.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/string
+
+# [3.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.3.7...@quenty/string@3.4.0) (2026-07-23)
+
+### Features
+
+- Add unit tests to string package ([f15f2f2](https://github.com/Quenty/NevermoreEngine/commit/f15f2f2892d782bed552a882e31f3b5d07975184))
+
 ## [3.3.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/string@3.3.6...@quenty/string@3.3.7) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/string

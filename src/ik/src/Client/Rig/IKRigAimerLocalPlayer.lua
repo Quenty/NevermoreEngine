@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles repliation and aiming of the local player's character for
 	IK.
@@ -21,6 +21,32 @@ local IKRigAimerLocalPlayer = setmetatable({}, BaseObject)
 IKRigAimerLocalPlayer.ClassName = "IKRigAimerLocalPlayer"
 IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 
+export type AimData = {
+	priority: number,
+	position: Vector3?,
+	timeStamp: number,
+}
+
+export type ReplicationRateData = {
+	replicateRate: number,
+}
+
+export type IKRigAimerLocalPlayer =
+	typeof(setmetatable(
+		{} :: {
+			_cameraStackService: CameraStackService.CameraStackService,
+			_ikRig: any,
+			_lastUpdate: number,
+			_lastReplication: number,
+			_lookAround: boolean,
+			_aimData: AimData?,
+			_replicationRate: number,
+			_replicationRates: { ReplicationRateData },
+		},
+		{} :: typeof({ __index = IKRigAimerLocalPlayer })
+	))
+	& BaseObject.BaseObject
+
 --[=[
 	Constructs a new IKRigAimerLocalPlayer. Should not be used directly.
 	See [IKServiceClient] for the correct usage.
@@ -29,10 +55,12 @@ IKRigAimerLocalPlayer.__index = IKRigAimerLocalPlayer
 	@param ikRig IKRigClient
 	@return IKRigAimerLocalPlayer
 ]=]
-function IKRigAimerLocalPlayer.new(serviceBag: ServiceBag.ServiceBag, ikRig)
-	local self = setmetatable(BaseObject.new(), IKRigAimerLocalPlayer)
+function IKRigAimerLocalPlayer.new(serviceBag: ServiceBag.ServiceBag, ikRig: any): IKRigAimerLocalPlayer
+	local self: IKRigAimerLocalPlayer = setmetatable(BaseObject.new() :: any, IKRigAimerLocalPlayer)
 
-	self._cameraStackService = serviceBag:GetService(CameraStackService)
+	self._cameraStackService = (
+		serviceBag:GetService(CameraStackService) :: any
+	) :: CameraStackService.CameraStackService
 	self._ikRig = ikRig or error("No ikRig")
 
 	self._lastUpdate = 0
@@ -51,7 +79,7 @@ end
 	Sets whether the local player should look around automatically.
 	@param lookAround boolean
 ]=]
-function IKRigAimerLocalPlayer:SetLookAround(lookAround: boolean)
+function IKRigAimerLocalPlayer.SetLookAround(self: IKRigAimerLocalPlayer, lookAround: boolean): ()
 	assert(type(lookAround) == "boolean", "Bad lookAround")
 
 	self._lookAround = lookAround
@@ -63,23 +91,27 @@ end
 	@param position Vector3? -- May be nil to say to aim at nothing
 	@param optionalPriority number
 ]=]
-function IKRigAimerLocalPlayer:SetAimPosition(position, optionalPriority)
-	optionalPriority = optionalPriority or IKAimPositionPriorites.DEFAULT
+function IKRigAimerLocalPlayer.SetAimPosition(
+	self: IKRigAimerLocalPlayer,
+	position: Vector3?,
+	optionalPriority: number?
+): ()
+	local priority = optionalPriority or IKAimPositionPriorites.DEFAULT
 
 	if self._aimData and (os.clock() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
-		if self._aimData.priority > optionalPriority then
+		if self._aimData.priority > priority then
 			return -- Don't overwrite
 		end
 	end
 
 	self._aimData = {
-		priority = optionalPriority,
+		priority = priority,
 		position = position, -- May be nil
 		timeStamp = os.clock(),
 	}
 end
 
-function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
+function IKRigAimerLocalPlayer.PushReplicationRate(self: IKRigAimerLocalPlayer, replicateRate: number): () -> ()
 	assert(type(replicateRate) == "number", "Bad replicateRate")
 
 	local data = {
@@ -106,7 +138,7 @@ function IKRigAimerLocalPlayer:PushReplicationRate(replicateRate: number)
 	end
 end
 
-function IKRigAimerLocalPlayer:_updateReplicationRate()
+function IKRigAimerLocalPlayer._updateReplicationRate(self: IKRigAimerLocalPlayer): ()
 	local best = nil
 	for _, rateData in self._replicationRates do
 		local rate = rateData.replicateRate
@@ -122,7 +154,7 @@ end
 	Gets the current aim position.
 	@return Vector3?
 ]=]
-function IKRigAimerLocalPlayer:GetAimPosition()
+function IKRigAimerLocalPlayer.GetAimPosition(self: IKRigAimerLocalPlayer): Vector3?
 	if self._aimData and (os.clock() - self._aimData.timeStamp) < MAX_AGE_FOR_AIM_DATA then
 		-- If we have aim data within the last 0.2 seconds start pointing at that
 		return self._aimData.position -- May be nil
@@ -134,13 +166,13 @@ function IKRigAimerLocalPlayer:GetAimPosition()
 
 	local humanoid = self._ikRig:GetHumanoid()
 
-	local cameraCFrame = self._cameraStackService:GetRawDefaultCamera().CameraState.CFrame
+	local cameraCFrame = self._cameraStackService:GetRawDefaultCamera().CameraState.CFrame :: CFrame
 	local characterCFrame = humanoid.RootPart and humanoid.RootPart.CFrame
 	local multiplier = 1000
 
 	-- Make the character look at the camera instead of trying to turn 180
 	if characterCFrame then
-		local relative = cameraCFrame:vectorToObjectSpace(characterCFrame.lookVector)
+		local relative = cameraCFrame:VectorToObjectSpace(characterCFrame.lookVector)
 
 		-- Angle between forward vector of character and the camera (only Y axis)
 		local angle = math.acos(relative.Z)
@@ -150,7 +182,7 @@ function IKRigAimerLocalPlayer:GetAimPosition()
 		end
 	end
 
-	local direction = cameraCFrame.lookVector * multiplier
+	local direction = cameraCFrame.LookVector * multiplier
 
 	return cameraCFrame.Position + direction
 end
@@ -159,7 +191,7 @@ end
 	Updates the aimer on stepped.
 	@private
 ]=]
-function IKRigAimerLocalPlayer:UpdateStepped()
+function IKRigAimerLocalPlayer.UpdateStepped(self: IKRigAimerLocalPlayer): ()
 	if (os.clock() - self._lastUpdate) <= 0.05 then
 		return
 	end

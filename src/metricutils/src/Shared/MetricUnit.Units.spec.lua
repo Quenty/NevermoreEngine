@@ -1,0 +1,210 @@
+--!strict
+--[[
+	@class MetricUnit.Units.spec.lua
+]]
+
+local require = require(script.Parent.loader).load(script)
+
+local Jest = require("Jest")
+local MetricUnit = require("MetricUnit")
+local MetricUnitDefinitions = require("MetricUnitDefinitions")
+local MetricUtils = require("MetricUtils")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+-- Formatting puts a no-break space between a number and its unit; these compare it as a plain space
+local function plain(text: string): string
+	return (string.gsub(text, "\u{00A0}", " "))
+end
+
+local function format(value: any, options: MetricUnit.FormatOptions?): string
+	return plain(MetricUnit.format(value, options))
+end
+
+describe("MetricUnit:In", function()
+	it("reads by unit id, by @quenty/time's names for time, and by unit value", function()
+		expect(MetricUnit.kilometers(2):In("meter")).toBe(2000)
+		expect(MetricUnit.minutes(90):In("hour")).toBe(1.5)
+		expect(MetricUnit.minutes(90):In("hours")).toBe(1.5)
+		expect(MetricUnit.minutes(90):In("h")).toBe(1.5)
+		expect(MetricUnit.minutes(90):In(MetricUnit.hours(1))).toBe(1.5)
+		expect(MetricUnit.perDay(48):In("perHour")).toBeCloseTo(2, 9)
+		expect(MetricUnit.years(1):In("quarter")).toBeCloseTo(4, 9)
+	end)
+
+	it("reads a temperature scale from its zero when absolute", function()
+		expect(MetricUnit.celsius(100):In("fahrenheit")).toBeCloseTo(212, 9)
+		expect(MetricUnit.difference(5, "celsius"):In("fahrenheit")).toBeCloseTo(9, 9)
+	end)
+
+	it("errors on an unknown id, and on another dimension naming both", function()
+		expect(function()
+			MetricUnit.meters(1):In("klicks" :: any)
+		end).toThrow('MetricUnit:In knows no unit "klicks"')
+		expect(function()
+			MetricUnit.meters(1):In("second")
+		end).toThrow('In("second") reads time, not length')
+		expect(function()
+			MetricUnit.seconds(1):InSeconds()
+		end).never.toThrow()
+	end)
+end)
+
+describe("MetricUnit.new", function()
+	it("makes a value from an amount and a unit id", function()
+		expect(MetricUnit.new(5, "kilometer") == MetricUnit.kilometers(5)).toBe(true)
+		expect(MetricUnit.new(90, "minutes") == MetricUnit.hours(1.5)).toBe(true)
+		expect(MetricUnit.new(20, "celsius"):IsAbsolute()).toBe(true)
+		expect(function()
+			MetricUnit.new(1, "klicks" :: any)
+		end).toThrow('MetricUnit.new knows no unit "klicks"')
+	end)
+end)
+
+describe("MetricUnit dimension queries", function()
+	it("names what a value measures", function()
+		expect(MetricUnit.kilometers(1):GetKind()).toBe("length")
+		expect((MetricUnit.kilometers(1) / MetricUnit.hours(1)):GetKind()).toBe("speed")
+		expect(MetricUnit.celsius(5):GetKind()).toBe("temperature")
+		expect(MetricUnit.difference(5, "celsius"):GetKind()).toBe("temperatureDifference")
+		expect(MetricUnit.none(1):GetKind()).toBe("none")
+		expect(MetricUnit.pow(MetricUnit.meters(1), 4):GetKind()).toBeNil()
+	end)
+
+	it("checks kinds by name or exponents, and errors on an unknown name", function()
+		local speed = MetricUnit.meters(1) / MetricUnit.seconds(1)
+		expect(speed:IsKind("speed")).toBe(true)
+		expect(speed:IsKind({ length = 1, time = -1 })).toBe(true)
+		expect(MetricUnit.isKind(speed, "length")).toBe(false)
+		expect(MetricUnit.isKind(5, "length")).toBe(false)
+		expect(function()
+			MetricUnit.isKind(speed, "velocity" :: any)
+		end).toThrow('no kind named "velocity"')
+	end)
+
+	it("gives the base amount, frozen dimensions and absoluteness", function()
+		local length = MetricUnit.kilometers(2)
+		expect(length:GetBaseAmount()).toBe(2000)
+		expect(length:GetDimensions()).toEqual({ length = 1 })
+		expect(table.isfrozen(length:GetDimensions())).toBe(true)
+		expect(length:IsAbsolute()).toBe(false)
+	end)
+
+	it("lists the unit ids a value can be read in, metric first", function()
+		local ids = MetricUnit.meters(1):GetUnitIds()
+		expect(ids[1]).toBe("meter")
+		expect(table.find(ids, "nanometer")).never.toBeNil()
+		expect(table.find(ids, "mile")).never.toBeNil()
+		expect(table.find(ids, "stud")).never.toBeNil()
+		expect(table.find(ids, "kilogram")).toBeNil()
+		expect(table.find(MetricUnit.celsius(5):GetUnitIds(), "fahrenheit")).never.toBeNil()
+	end)
+end)
+
+describe("MetricUnit studs", function()
+	it("counts a stud as 28 cm, as Roblox documents it", function()
+		expect(MetricUnitDefinitions.ROBLOX_METERS_PER_STUD).toBe(0.28)
+		expect(MetricUnit.studs(100):In("meter")).toBeCloseTo(28, 9)
+		expect(MetricUnit.meters(1):In("stud")).toBeCloseTo(1 / 0.28, 9)
+		expect(MetricUnit.new(100, "studPerSecond"):In("meterPerSecond")).toBeCloseTo(28, 9)
+	end)
+
+	it("keeps MetricUtils at the 3.57 studs to the metre it has always used", function()
+		expect(MetricUtils.studsToMeters(357)).toBeCloseTo(100, 9)
+		expect(MetricUtils.studsPerSecondToMetersPerSecond(35.7)).toBeCloseTo(10, 9)
+	end)
+
+	it("shows studs as studs, until converted", function()
+		expect(format(MetricUnit.studs(250))).toBe("250 studs")
+		expect(format(MetricUnit.studs(250):ToMetric())).toBe("70 m")
+		expect(format(MetricUnit.studs(250), { unit = "stud" })).toBe("250 studs")
+		expect(format(MetricUnit.studs(1), { unit = "stud" })).toBe("1 stud")
+		expect(format(MetricUnit.new(16, "studPerSecond"), { unit = "studPerSecond" })).toBe("16 studs/s")
+		expect(format(MetricUnit.studs(250):ToUSCustomary())).toBe("229.659 ft")
+	end)
+end)
+
+describe("MetricUnit US customary units", function()
+	it("converts with exact definitions", function()
+		expect(MetricUnit.new(1, "inch"):In("millimeter")).toBeCloseTo(25.4, 9)
+		expect(MetricUnit.fuzzyEq(MetricUnit.new(3, "foot"), MetricUnit.new(1, "yard"))).toBe(true)
+		expect(MetricUnit.new(1, "mile"):In("foot")).toBeCloseTo(5280, 9)
+		expect(MetricUnit.new(1, "pound"):In("kilogram")).toBe(0.45359237)
+		expect(MetricUnit.new(1, "pound"):In("ounce")).toBeCloseTo(16, 9)
+		expect(MetricUnit.new(1, "stone"):In("pound")).toBeCloseTo(14, 9)
+		expect(MetricUnit.new(1, "acre"):In("squareFoot")).toBeCloseTo(43560, 6)
+		expect(MetricUnit.new(1, "usGallon"):In("usFluidOunce")).toBeCloseTo(128, 9)
+		expect(MetricUnit.new(1, "imperialGallon"):In("liter")).toBeCloseTo(4.54609, 9)
+		expect(MetricUnit.new(60, "milePerHour"):In("kilometerPerHour")).toBeCloseTo(96.56064, 9)
+		expect(MetricUnit.new(1, "knot"):In("kilometerPerHour")).toBeCloseTo(1.852, 9)
+		expect(MetricUnit.new(1, "poundForce"):In("newton")).toBeCloseTo(4.4482216152605, 12)
+		expect(MetricUnit.new(1, "poundForcePerSquareInch"):In("pascal")).toBeCloseTo(6894.757293168, 6)
+		expect(
+			(MetricUnit.new(1, "poundForce") / MetricUnit.pow(MetricUnit.new(1, "inch"), 2)):In(
+				"poundForcePerSquareInch"
+			)
+		).toBeCloseTo(1, 12)
+	end)
+
+	it("shows a value made in a customary unit in customary units, until converted", function()
+		expect(format(MetricUnit.new(1, "mile"))).toBe("1 mi")
+		expect(format(MetricUnit.new(1, "mile"):ToMetric())).toBe("1.609 km")
+		expect(format(MetricUnit.kilometers(1.609))).toBe("1.609 km")
+		expect(format(MetricUnit.new(1, "mile"), { unit = "mile" })).toBe("1 mi")
+		expect(format(MetricUnit.new(2, "foot"), { unit = "foot", unitDisplay = "long" })).toBe("2 feet")
+		expect(format(MetricUnit.new(1, "foot"), { unit = "foot", unitDisplay = "long" })).toBe("1 foot")
+	end)
+
+	it("picks customary units for a value that prefers them", function()
+		local function usCustomary(value: MetricUnit.MetricUnit): string
+			return format(value:ToUSCustomary())
+		end
+		expect(usCustomary(MetricUnit.kilometers(5))).toBe("3.107 mi")
+		expect(usCustomary(MetricUnit.meters(1))).toBe("3.281 ft")
+		expect(usCustomary(MetricUnit.new(10, "centimeter"))).toBe("3.937 in")
+		expect(usCustomary(MetricUnit.kilograms(1))).toBe("2.205 lb")
+		expect(usCustomary(MetricUnit.new(100, "kilometerPerHour"))).toBe("62.137 mph")
+		expect(usCustomary(MetricUnit.celsius(100))).toBe("212 °F")
+		expect(usCustomary(MetricUnit.difference(5, "celsius"))).toBe("9 °F")
+		expect(usCustomary(MetricUnit.new(1, "bar"))).toBe("14.504 psi")
+		expect(usCustomary(MetricUnit.new(1500, "joule"))).toBe("1.422 Btu")
+		-- Dimensions without US customary display units stay metric
+		expect(usCustomary(MetricUnit.new(5, "volt"))).toBe("5 V")
+		expect(format(MetricUnit.kilometers(5):ToUSCustomary(), { autoUnit = false })).toBe("5,000 m")
+	end)
+end)
+
+describe("MetricUnit bits", function()
+	it("shares the memory dimension with bytes, eight to a byte", function()
+		expect(MetricUnit.new(8, "bit") == MetricUnit.bytes(1)).toBe(true)
+		expect(MetricUnit.new(8, "megabit"):In("kilobyte")).toBeCloseTo(1000, 9)
+		expect(MetricUnit.new(8, "megabitPerSecond"):In("kilobytePerSecond")).toBeCloseTo(1000, 9)
+		expect(MetricUnit.new(1, "gigabitPerSecond"):GetKind()).toBe("dataRate")
+	end)
+
+	it("never switches between bits and bytes on its own", function()
+		expect(format(MetricUnit.new(8, "bit"))).toBe("1 B")
+		expect(format(MetricUnit.new(8, "kilobit"), { unit = "kilobit" })).toBe("8 kbit")
+		expect(format(MetricUnit.new(100, "megabitPerSecond"), { unit = "megabitPerSecond" })).toBe("100 Mbit/s")
+	end)
+end)
+
+describe("MetricUnit percentages", function()
+	it("reads and makes dimensionless proportions", function()
+		expect(MetricUnit.percent(45):In("percent")).toBeCloseTo(45, 9)
+		expect(MetricUnit.percent(45):GetBaseAmount()).toBeCloseTo(0.45, 12)
+		expect(MetricUnit.new(5, "permille"):In("percent")).toBeCloseTo(0.5, 12)
+		expect((MetricUnit.percent(45) * MetricUnit.meters(10)):In("meter")).toBeCloseTo(4.5, 9)
+	end)
+
+	it("formats a proportion as a percent only on request", function()
+		local used = MetricUnit.kilobytes(450) / MetricUnit.megabytes(1)
+		expect(format(used)).toBe("0.45")
+		expect(format(used, { unit = "percent" })).toBe("45%")
+		expect(format(used, { unit = "percent", unitDisplay = "long" })).toBe("45 percent")
+		expect(format(MetricUnit.new(5, "permille"), { unit = "permille" })).toBe("5‰")
+		expect(format(MetricUnit.percent(45):As("percent"))).toBe("45%")
+	end)
+end)

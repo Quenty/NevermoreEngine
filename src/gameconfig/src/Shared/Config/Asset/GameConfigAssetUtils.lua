@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigAssetUtils
 ]=]
@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local AttributeUtils = require("AttributeUtils")
 local BadgeUtils = require("BadgeUtils")
+local Binder = require("Binder")
 local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local MarketplaceServiceCache = require("MarketplaceServiceCache")
@@ -17,17 +18,25 @@ local GameConfigAssetUtils = {}
 
 --[=[
 	Creates a new game configuration
+
+	`priority` is only stamped when given; an asset without it reads back as
+	[GameConfigAssetConstants.DEFAULT_PRIORITY]. Pass a higher value to win over
+	hand-authored assets that share this type and key (see
+	[GameConfigPicker.FindFirstActiveAssetOfKey]).
+
 	@param binder Binder<GameConfigAssetBase>
 	@param assetType GameConfigAssetType
 	@param assetKey string
 	@param assetId number
+	@param priority number?
 	@return Instance
 ]=]
 function GameConfigAssetUtils.create(
-	binder,
+	binder: Binder.Binder<any>, -- GameConfigAssetBase.GameConfigAssetBase (require cycle: GameConfigAssetBase requires this module)
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	assetKey: string,
-	assetId: number
+	assetId: number,
+	priority: number?
 ): Folder
 	local asset = Instance.new("Folder")
 	asset.Name = assetKey
@@ -36,6 +45,9 @@ function GameConfigAssetUtils.create(
 
 	AttributeUtils.initAttribute(asset, GameConfigAssetConstants.ASSET_TYPE_ATTRIBUTE, assetType)
 	AttributeUtils.initAttribute(asset, GameConfigAssetConstants.ASSET_ID_ATTRIBUTE, assetId)
+	if priority ~= nil then
+		AttributeUtils.initAttribute(asset, GameConfigAssetConstants.PRIORITY_ATTRIBUTE, priority)
+	end
 
 	return asset
 end
@@ -56,7 +68,8 @@ function GameConfigAssetUtils.promiseCloudDataForAssetType(
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(type(assetId) == "number", "Bad assetId")
 
-	local marketplaceServiceCache = serviceBag:GetService(MarketplaceServiceCache)
+	local marketplaceServiceCache: MarketplaceServiceCache.MarketplaceServiceCache =
+		serviceBag:GetService(MarketplaceServiceCache) :: any
 
 	-- We really hope this stuff is cached
 	if assetType == GameConfigAssetTypes.BADGE then
@@ -66,6 +79,8 @@ function GameConfigAssetUtils.promiseCloudDataForAssetType(
 	elseif assetType == GameConfigAssetTypes.PASS then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.GamePass)
 	elseif assetType == GameConfigAssetTypes.PLACE then
+		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)
+	elseif assetType == GameConfigAssetTypes.GAME then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)
 	elseif assetType == GameConfigAssetTypes.ASSET then
 		return marketplaceServiceCache:PromiseProductInfo(assetId, Enum.InfoType.Asset)

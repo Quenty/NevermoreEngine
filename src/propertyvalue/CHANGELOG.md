@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.38.0...@quenty/propertyvalue@7.38.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.37.2...@quenty/propertyvalue@7.38.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+## [7.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.37.1...@quenty/propertyvalue@7.37.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+## [7.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.37.0...@quenty/propertyvalue@7.37.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.36.0...@quenty/propertyvalue@7.37.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.35.2...@quenty/propertyvalue@7.36.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+## [7.35.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.35.1...@quenty/propertyvalue@7.35.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+## [7.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.35.0...@quenty/propertyvalue@7.35.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.34.0...@quenty/propertyvalue@7.35.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.33.0...@quenty/propertyvalue@7.34.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.32.0...@quenty/propertyvalue@7.33.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.31.0...@quenty/propertyvalue@7.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
+# [7.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.30.1...@quenty/propertyvalue@7.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/propertyvalue
+
 ## [7.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/propertyvalue@7.30.0...@quenty/propertyvalue@7.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/propertyvalue

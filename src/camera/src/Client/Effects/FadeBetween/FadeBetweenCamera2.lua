@@ -1,37 +1,64 @@
---!nonstrict
+--!strict
 --[=[
 	@class FadeBetweenCamera2
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local CubicSplineUtils = require("CubicSplineUtils")
 
 local FadeBetweenCamera2 = {}
 FadeBetweenCamera2.ClassName = "FadeBetweenCamera2"
-FadeBetweenCamera2.__index = FadeBetweenCamera2
+
+export type FadeBetweenCamera2 =
+	typeof(setmetatable(
+		{} :: {
+			CameraA: CameraEffectUtils.CameraEffect,
+			CameraB: CameraEffectUtils.CameraEffect,
+			CameraState: CameraState.CameraState,
+			Value: number,
+			Target: number,
+			HasReachedTarget: boolean,
+			Speed: number,
+			Velocity: number,
+			_state0: CameraState.CameraState,
+			_time0: number,
+			_target: number,
+			_position0: number,
+			_speed: number,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera2 })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
 	@param cameraB CameraLike
 	@return FadeBetweenCamera2
 ]=]
-function FadeBetweenCamera2.new(cameraA, cameraB)
-	local self = setmetatable({
-		CameraA = cameraA or error("No cameraA"),
-		CameraB = cameraB or error("No cameraB"),
-		_state0 = cameraA.CameraState,
-		_time0 = os.clock(),
-		_target = 0,
-		_position0 = 0,
-		_speed = 15,
-	}, FadeBetweenCamera2)
+function FadeBetweenCamera2.new(
+	cameraA: CameraEffectUtils.CameraEffect,
+	cameraB: CameraEffectUtils.CameraEffect
+): FadeBetweenCamera2
+	local self: FadeBetweenCamera2 = setmetatable(
+		{
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+			_state0 = cameraA.CameraState,
+			_time0 = os.clock(),
+			_target = 0,
+			_position0 = 0,
+			_speed = 15,
+		} :: any,
+		FadeBetweenCamera2
+	)
 
 	return self
 end
 
-function FadeBetweenCamera2:__newindex(index, value)
+function FadeBetweenCamera2.__newindex(self: FadeBetweenCamera2, index, value)
 	if index == "Value" then
 		assert(type(value) == "number", "Bad value")
 
@@ -61,7 +88,7 @@ function FadeBetweenCamera2:__newindex(index, value)
 		local now = os.clock()
 		self._state0, self._position0 = self:_computeCameraState(self:_computeDoneProportion(now))
 		self._time0 = now
-		rawset(self, index, value)
+		rawset(self :: any, index, value)
 	else
 		error(string.format("%q is not a valid member of FadeBetweenCamera2", tostring(index)))
 	end
@@ -73,7 +100,7 @@ end
 	@prop CameraState CameraState
 	@within FadeBetweenCamera2
 ]=]
-function FadeBetweenCamera2:__index(index)
+function FadeBetweenCamera2.__index(self: FadeBetweenCamera2, index)
 	if index == "CameraState" then
 		local state, _ = self:_computeCameraState(self:_computeDoneProportion(os.clock()))
 		return state
@@ -94,7 +121,7 @@ function FadeBetweenCamera2:__index(index)
 	end
 end
 
-function FadeBetweenCamera2:_computeTargetState()
+function FadeBetweenCamera2._computeTargetState(self: FadeBetweenCamera2): CameraState.CameraState
 	if self._target == 0 then
 		return self.CameraA.CameraState
 	elseif self._target == 1 then
@@ -112,7 +139,7 @@ function FadeBetweenCamera2:_computeTargetState()
 	end
 end
 
-function FadeBetweenCamera2:_computeCameraState(t)
+function FadeBetweenCamera2._computeCameraState(self: FadeBetweenCamera2, t: number): (CameraState.CameraState, number)
 	if t <= 0 then
 		return self._state0, 0
 	end
@@ -133,7 +160,7 @@ function FadeBetweenCamera2:_computeCameraState(t)
 	end
 end
 
-function FadeBetweenCamera2:_computeDoneProportion(now)
+function FadeBetweenCamera2._computeDoneProportion(self: FadeBetweenCamera2, now: number): number
 	local dist_to_travel = math.abs(self._position0 - self._target)
 	if dist_to_travel == 0 then
 		return 1

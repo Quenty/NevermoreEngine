@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This holds the definition for a variety of tables.
 	@class RoguePropertyTableDefinition
@@ -19,10 +19,24 @@ local Table = require("Table")
 
 local RoguePropertyTableDefinition = {} -- Inherits from RoguePropertyDefinition
 RoguePropertyTableDefinition.ClassName = "RoguePropertyTableDefinition"
-RoguePropertyTableDefinition.__index = RoguePropertyTableDefinition
 
-function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable: Table.Map<string, any>?)
-	local self = setmetatable(RoguePropertyDefinition.new(), RoguePropertyTableDefinition)
+export type RoguePropertyTableDefinition =
+	typeof(setmetatable(
+		{} :: {
+			_definitionMap: { [string]: any }, -- RoguePropertyDefinition.RoguePropertyDefinition | RoguePropertyTableDefinition
+			_arrayDefinitionHelper: RoguePropertyDefinitionArrayHelper.RoguePropertyDefinitionArrayHelper?,
+			[string | number]: any,
+		},
+		{} :: typeof({ __index = RoguePropertyTableDefinition })
+	))
+	& RoguePropertyDefinition.RoguePropertyDefinition
+
+function RoguePropertyTableDefinition.new(
+	tableName: string?,
+	defaultValueTable: Table.Map<string, any>?
+): RoguePropertyTableDefinition
+	local self: RoguePropertyTableDefinition =
+		setmetatable(RoguePropertyDefinition.new() :: any, RoguePropertyTableDefinition)
 
 	if tableName then
 		self:SetName(tableName)
@@ -35,11 +49,14 @@ function RoguePropertyTableDefinition.new(tableName: string?, defaultValueTable:
 	return self
 end
 
-function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value): boolean
+function RoguePropertyTableDefinition.isRoguePropertyTableDefinition(value: any): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyTableDefinition, value)
 end
 
-function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: Table.Map<string, any>?)
+function RoguePropertyTableDefinition.SetDefaultValue(
+	self: RoguePropertyTableDefinition,
+	defaultValueTable: Table.Map<string, any>?
+): ()
 	assert(type(defaultValueTable) == "table", "Bad defaultValueTable")
 
 	RoguePropertyDefinition.SetDefaultValue(self, defaultValueTable)
@@ -48,7 +65,7 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: Table.M
 
 	local defaultArrayData = {}
 
-	for key, defaultValue in defaultValueTable do
+	for key, defaultValue in defaultValueTable :: Table.Map<string, any> do
 		if type(key) == "number" then
 			table.insert(defaultArrayData, defaultValue)
 		else
@@ -89,7 +106,11 @@ function RoguePropertyTableDefinition:SetDefaultValue(defaultValueTable: Table.M
 	end
 end
 
-function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): (boolean, string?)
+function RoguePropertyTableDefinition.CanAssign(
+	self: RoguePropertyTableDefinition,
+	mainValue: any,
+	strict: boolean
+): (boolean, string?)
 	assert(type(strict) == "boolean", "Bad strict")
 
 	if type(mainValue) ~= "table" then
@@ -172,15 +193,17 @@ function RoguePropertyTableDefinition:CanAssign(mainValue, strict: boolean): (bo
 	return true, nil
 end
 
-function RoguePropertyTableDefinition:GetDefinitionArrayHelper()
+function RoguePropertyTableDefinition.GetDefinitionArrayHelper(
+	self: RoguePropertyTableDefinition
+): RoguePropertyDefinitionArrayHelper.RoguePropertyDefinitionArrayHelper?
 	return self._arrayDefinitionHelper
 end
 
-function RoguePropertyTableDefinition:GetDefinitionMap()
+function RoguePropertyTableDefinition.GetDefinitionMap(self: RoguePropertyTableDefinition): { [string]: any }
 	return self._definitionMap
 end
 
-function RoguePropertyTableDefinition:HasChildren()
+function RoguePropertyTableDefinition.HasChildren(_self: RoguePropertyTableDefinition): boolean
 	return true
 end
 
@@ -189,10 +212,10 @@ end
 	@param propertyName
 	@return RoguePropertyDefinition?
 ]=]
-function RoguePropertyTableDefinition:GetDefinition(propertyName: string)
+function RoguePropertyTableDefinition.GetDefinition(self: RoguePropertyTableDefinition, propertyName: string): any
 	assert(type(propertyName) == "string", "Bad propertyName")
 
-	local definitions = rawget(self, "_definitionMap")
+	local definitions: any = rawget(self :: any, "_definitionMap")
 	return definitions[propertyName]
 end
 
@@ -204,11 +227,15 @@ end
 	@param adornee Instance
 	@return RoguePropertyTable
 ]=]
-function RoguePropertyTableDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
+function RoguePropertyTableDefinition.Get(
+	self: RoguePropertyTableDefinition,
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance
+): RoguePropertyTable.RoguePropertyTable
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	local cacheService = serviceBag:GetService(RoguePropertyCacheService)
+	local cacheService: any = serviceBag:GetService(RoguePropertyCacheService)
 	local cache = cacheService:GetCache(self)
 	local found = cache:Find(adornee)
 	if found then
@@ -220,7 +247,8 @@ function RoguePropertyTableDefinition:Get(serviceBag: ServiceBag.ServiceBag, ado
 
 	if not self:GetParentPropertyDefinition() then
 		-- Set default value for top level only
-		roguePropertyTable:SetCanInitialize(serviceBag:GetService(RoguePropertyService):CanInitializeProperties())
+		local roguePropertyService: any = serviceBag:GetService(RoguePropertyService)
+		roguePropertyTable:SetCanInitialize(roguePropertyService:CanInitializeProperties())
 	end
 
 	return roguePropertyTable
@@ -233,7 +261,11 @@ RoguePropertyTableDefinition.GetPropertyTable = RoguePropertyTableDefinition.Get
 
 	@return Observable<Brio<Folder>>
 ]=]
-function RoguePropertyTableDefinition:ObserveContainerBrio(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
+function RoguePropertyTableDefinition.ObserveContainerBrio(
+	self: RoguePropertyTableDefinition,
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance
+): any
 	assert(serviceBag, "No serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -248,7 +280,11 @@ end
 	Gets the current container for the given adornee.
 	@return Folder?
 ]=]
-function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.ServiceBag, adornee: Instance): Folder?
+function RoguePropertyTableDefinition.GetContainer(
+	self: RoguePropertyTableDefinition,
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance
+): Folder?
 	assert(serviceBag, "No serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -257,18 +293,18 @@ function RoguePropertyTableDefinition:GetContainer(serviceBag: ServiceBag.Servic
 	return found:GetContainer()
 end
 
-function RoguePropertyTableDefinition:FindInstance(parent: Instance): Instance?
+function RoguePropertyTableDefinition.FindInstance(self: RoguePropertyTableDefinition, parent: Instance): Instance?
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	return parent:FindFirstChild(self:GetName())
 end
 
-function RoguePropertyTableDefinition:GetOrCreateInstance(parent: Instance): Folder
+function RoguePropertyTableDefinition.GetOrCreateInstance(self: RoguePropertyTableDefinition, parent: Instance): Folder
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	local existing = parent:FindFirstChild(self:GetName())
 	if existing then
-		return existing
+		return existing :: Folder
 	end
 
 	local folder = Instance.new("Folder")
@@ -277,17 +313,17 @@ function RoguePropertyTableDefinition:GetOrCreateInstance(parent: Instance): Fol
 	return folder
 end
 
-function RoguePropertyTableDefinition:__index(index: string)
+function RoguePropertyTableDefinition.__index(self: RoguePropertyTableDefinition, index: string): any
 	assert(type(index) == "string", "Bad index")
 
 	if index == "_definitionMap" or index == "_arrayDefinitionHelper" or index == "_parentPropertyTableDefinition" then
-		return rawget(self, index)
+		return rawget(self :: any, index)
 	elseif RoguePropertyTableDefinition[index] then
 		return RoguePropertyTableDefinition[index]
 	elseif RoguePropertyDefinition[index] then
 		return RoguePropertyDefinition[index]
 	elseif type(index) == "string" then
-		local definitions = rawget(self, "_definitionMap")
+		local definitions: any = rawget(self :: any, "_definitionMap")
 
 		if definitions[index] then
 			return definitions[index]
@@ -295,7 +331,7 @@ function RoguePropertyTableDefinition:__index(index: string)
 			error(string.format("Bad definition %q", tostring(index)))
 		end
 	elseif type(index) == "number" then
-		local definitionArrayHelper = rawget(self, "_arrayDefinitionHelper")
+		local definitionArrayHelper: any = rawget(self :: any, "_arrayDefinitionHelper")
 		if definitionArrayHelper then
 			local defaultDefinitions = definitionArrayHelper:GetDefaultDefinitions()
 			if defaultDefinitions then

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Promise that returns an objectValue's value that has a bound
 	value to it.
@@ -8,10 +8,11 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local Maid = require("Maid")
 local Promise = require("Promise")
 
-return function(binder, objValue)
+return function<T>(binder: Binder.Binder<T>, objValue: ObjectValue): Promise.Promise<T>
 	if objValue.Value then
 		local class = binder:Get(objValue.Value)
 		if class then
@@ -20,20 +21,29 @@ return function(binder, objValue)
 	end
 
 	local maid = Maid.new()
-	local promise = Promise.new()
+	local promise: Promise.Promise<T> = Promise.new() :: any
 
-	maid:GiveTask(objValue.Changed:Connect(function()
-		local class = binder:Get(objValue.Value)
+	local function watchValue()
+		local value = objValue.Value
+		if not value then
+			maid._valueWatch = nil
+			return
+		end
+
+		maid._valueWatch = binder:ObserveInstance(value, function(class)
+			if class then
+				promise:Resolve(class)
+			end
+		end)
+
+		local class = binder:Get(value)
 		if class then
 			promise:Resolve(class)
 		end
-	end))
+	end
 
-	maid:GiveTask(binder:GetClassAddedSignal():Connect(function(class, instance)
-		if instance == objValue.Value then
-			promise:Resolve(class)
-		end
-	end))
+	maid:GiveTask(objValue.Changed:Connect(watchValue))
+	watchValue()
 
 	promise:Finally(function()
 		maid:Destroy()

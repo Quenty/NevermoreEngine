@@ -3,6 +3,136 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.66.1...@quenty/spawning@10.67.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.66.0...@quenty/spawning@10.66.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.65.3...@quenty/spawning@10.66.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.65.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.65.2...@quenty/spawning@10.65.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.65.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.65.1...@quenty/spawning@10.65.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.65.0...@quenty/spawning@10.65.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.64.0...@quenty/spawning@10.65.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.63.1...@quenty/spawning@10.64.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.63.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.63.0...@quenty/spawning@10.63.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.62.0...@quenty/spawning@10.63.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.61.0...@quenty/spawning@10.62.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.60.1...@quenty/spawning@10.61.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.60.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.60.0...@quenty/spawning@10.60.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.59.1...@quenty/spawning@10.60.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.59.0...@quenty/spawning@10.59.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.58.1...@quenty/spawning@10.59.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.58.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.58.0...@quenty/spawning@10.58.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.57.2...@quenty/spawning@10.58.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.57.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.57.1...@quenty/spawning@10.57.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.57.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.57.0...@quenty/spawning@10.57.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.56.0...@quenty/spawning@10.57.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.55.0...@quenty/spawning@10.56.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.54.0...@quenty/spawning@10.55.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.53.1...@quenty/spawning@10.54.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.53.0...@quenty/spawning@10.53.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.52.0...@quenty/spawning@10.53.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.51.0...@quenty/spawning@10.52.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.50.0...@quenty/spawning@10.51.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.49.1...@quenty/spawning@10.50.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/spawning
+
+## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.49.0...@quenty/spawning@10.49.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.48.0...@quenty/spawning@10.49.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/spawning
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.2...@quenty/spawning@10.48.0) (2026-07-14)
+
+### Features
+
+- **spawning:** convert package to --!strict ([541257b](https://github.com/Quenty/NevermoreEngine/commit/541257b9ce23eacaf298f5b2aad8939ac3ea17ad))
+
 ## [10.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/spawning@10.47.1...@quenty/spawning@10.47.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/spawning

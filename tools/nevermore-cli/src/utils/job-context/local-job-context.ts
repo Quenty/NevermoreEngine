@@ -6,7 +6,9 @@ import {
   type DeployPlaceOptions,
   type RunScriptOptions,
   type ScriptRunResult,
+  type JobLogs,
 } from './job-context.js';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
 import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
 
@@ -24,8 +26,12 @@ class LocalDeployment implements Deployment {
 export class LocalJobContext extends BaseJobContext {
   private _deployments = new Set<LocalDeployment>();
 
-  constructor(reporter: Reporter, openCloudClient?: OpenCloudClient) {
-    super(reporter, openCloudClient);
+  constructor(
+    reporter: Reporter,
+    openCloudClient?: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
+    super(reporter, openCloudClient, basePlaceResolver);
   }
 
   async deployBuiltPlaceAsync(
@@ -64,7 +70,7 @@ export class LocalJobContext extends BaseJobContext {
         timeoutMs,
       });
       localDeployment.cachedLogs = result.logs;
-      return { success: result.success };
+      return { success: result.success, returnValues: result.returnValues };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -73,9 +79,12 @@ export class LocalJobContext extends BaseJobContext {
     }
   }
 
-  async getLogsAsync(deployment: Deployment): Promise<string> {
+  async getLogsAsync(deployment: Deployment): Promise<JobLogs> {
     const localDeployment = deployment as LocalDeployment;
-    return localDeployment.cachedLogs;
+
+    // No severity and no fetch: the bridge hands over text it already has.
+    // Both stay absent rather than being invented.
+    return { text: localDeployment.cachedLogs, messages: [] };
   }
 
   async releaseAsync(deployment: Deployment): Promise<void> {

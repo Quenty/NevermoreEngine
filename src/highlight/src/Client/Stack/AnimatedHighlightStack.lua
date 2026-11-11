@@ -73,7 +73,7 @@ function AnimatedHighlightStack.new(adornee: Instance, defaultModelValues): Anim
 			end
 		end))
 
-	self:_setupHighlight()
+	self._maid:GiveTask(self:_setupHighlight())
 
 	self._maid:GiveTask(self._hasEntries:Observe():Subscribe(function(isEnabled)
 		if isEnabled then

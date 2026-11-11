@@ -14,6 +14,7 @@ local BasePermissionProvider = require("BasePermissionProvider")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local CreatorPermissionProvider = setmetatable({}, BasePermissionProvider)
@@ -56,11 +57,14 @@ function CreatorPermissionProvider.PromiseIsPermissionLevel(
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN or permissionLevel == PermissionLevel.CREATOR then
-		return Promise.resolved(player.UserId == self._userId or RunService:IsStudio())
+		return Promise.resolved(
+			(if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId) == self._userId
+				or RunService:IsStudio()
+		)
 	else
 		error("Unknown permissionLevel")
 	end

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Holds camera states and allows for the last camera state to be retrieved. Also
 	initializes an impulse and default camera at the bottom of the stack. Is a singleton.
@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
@@ -18,6 +19,7 @@ local CameraState = require("CameraState")
 local DefaultCamera = require("DefaultCamera")
 local ImpulseCamera = require("ImpulseCamera")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
 local CameraStackService = {}
@@ -65,14 +67,22 @@ function CameraStackService.GetRenderPriority(_self: CameraStackService): number
 end
 
 function CameraStackService.Start(self: CameraStackService): ()
+	self._started = true
+
+	-- BindToRenderStep is a client-only engine call. With a mock local player designated (headless
+	-- test runs, where nothing renders), there is no render loop to drive, so the stack stays passive.
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if localPlayer ~= nil and PlayerMock.isMock(localPlayer) then
+		return
+	end
+
 	RunService:BindToRenderStep("CameraStackUpdateInternal" .. self._key, self:GetRenderPriority(), function()
 		debug.profilebegin("camerastackservice")
 
 		local state = self:GetTopState()
 
-		self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
-
 		if state then
+			self._rawDefaultCamera:SetLastSetCameraFrame(state.CameraFrame)
 			state:Set(Workspace.CurrentCamera)
 		end
 
@@ -82,8 +92,6 @@ function CameraStackService.Start(self: CameraStackService): ()
 	self._maid:GiveTask(function()
 		RunService:UnbindFromRenderStep("CameraStackUpdateInternal" .. self._key)
 	end)
-
-	self._started = true
 
 	-- TODO: Allow rebinding
 	if self._doNotUseDefaultCamera then

@@ -3,6 +3,90 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.48.0...@quenty/binder@14.48.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.47.2...@quenty/binder@14.48.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/binder
+
+## [14.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.47.1...@quenty/binder@14.47.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/binder
+
+## [14.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.47.0...@quenty/binder@14.47.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.46.0...@quenty/binder@14.47.0) (2026-09-23)
+
+### Bug Fixes
+
+- Binder cleans up during construct/deconstruct moment ([404160e](https://github.com/Quenty/NevermoreEngine/commit/404160efddacbdf95eba0ede5e15066c5d71ed64))
+
+# [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.45.0...@quenty/binder@14.46.0) (2026-09-02)
+
+### Features
+
+- Add RxBinderUtils.observeBoundAncestor<T>() and make sure everything is using binder:ObserveInstance() for performance ([9236c34](https://github.com/Quenty/NevermoreEngine/commit/9236c343fb438d75d29bcfcbaae71025fd344b0e))
+
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.44.0...@quenty/binder@14.45.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.43.2...@quenty/binder@14.44.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/binder
+
+## [14.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.43.1...@quenty/binder@14.43.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/binder
+
+## [14.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.43.0...@quenty/binder@14.43.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.42.0...@quenty/binder@14.43.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.41.0...@quenty/binder@14.42.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.40.0...@quenty/binder@14.41.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.39.0...@quenty/binder@14.40.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.38.0...@quenty/binder@14.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.37.0...@quenty/binder@14.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/binder
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.36.1...@quenty/binder@14.37.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **binder:** convert package to --!strict ([78f42c2](https://github.com/Quenty/NevermoreEngine/commit/78f42c2265f2ef9313db146220cb15e87baf6747))
+
 ## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/binder@14.36.0...@quenty/binder@14.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/binder

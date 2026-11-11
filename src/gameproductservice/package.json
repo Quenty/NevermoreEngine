@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameproductservice",
-  "version": "14.52.0",
+  "version": "14.76.1",
   "description": "Generalized monetization system for handling products and purchases correctly.",
   "keywords": [
     "Roblox",
@@ -39,12 +39,15 @@
     "@quenty/enumutils": "workspace:*",
     "@quenty/gameconfig": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/marketplaceutils": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
+    "@quenty/permissionprovider": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/playerutils": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/promisemaid": "workspace:*",
@@ -55,9 +58,11 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/statestack": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

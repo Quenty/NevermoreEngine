@@ -7,20 +7,48 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local StarterGui = game:GetService("StarterGui")
 
 local Brio = require("Brio")
+local CoreGuiUtils = require("CoreGuiUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
+
+local MAX_GET_CORE_ATTEMPTS = 5
+local GET_CORE_INITIAL_WAIT_TIME = 0.5
 
 local RxFriendUtils = {}
+
+local function getUserId(player: Player): number
+	return if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+end
+
+local function readFriendship(observedPlayer: Player, otherPlayer: Player): boolean
+	if PlayerMock.isMock(observedPlayer) then
+		return PlayerMock.callMethod(observedPlayer, "Player.IsFriendsWithAsync", getUserId(otherPlayer))
+	elseif PlayerMock.isMock(otherPlayer) then
+		return PlayerMock.callMethod(otherPlayer, "Player.IsFriendsWithAsync", getUserId(observedPlayer))
+	end
+
+	return observedPlayer:IsFriendsWithAsync(getUserId(otherPlayer))
+end
 
 --[=[
 	Observe friends in the current server (not including the LocalPlayer!), useful for social GUIs.
 	The lifetimes exist for the whole duration another player is a friend and in your server.
 	This means if a player is unfriended + friended multiple times per session, they will have emitted multiple friend lifetimes.
+
+	Works against [PlayerMock] players on either side: mocks in the DataModel are enumerated alongside
+	real players, and friendship resolves through the mock's `"Player.IsFriendsWithAsync"` domain. A
+	mock local player answers `StarterGui:GetCore` with its own stand-in for the CoreGui events below,
+	so a test fires a friending the way the CoreGui does:
+
+	```lua
+	PlayerMock.callMethod(player, "StarterGui.GetCore", "PlayerFriendedEvent"):Fire(otherPlayer)
+	```
 
 	@param player Player?
 	@return Observable<Brio<Player>>
@@ -29,6 +57,8 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 	player = player or Players.LocalPlayer
 
 	assert(typeof(player) == "Instance", "Bad player")
+
+	local observedPlayer: Player = player :: Player
 
 	-- Note that 'PlayerFriendedEvent' and 'PlayerUnfriendedEvent' are currently unreliable.
 	-- See: https://devforum.roblox.com/t/getcores-playerfriendedevent-and-playerunfriendedevent-bindableevents-firing-at-inappropriate-times/570403/4
@@ -57,53 +87,93 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 		end
 
 		local function handleNewPlayerAsync(otherPlayer: Player)
-			if otherPlayer ~= player then
-				local isFriendsWith = false
-				local ok = pcall(function()
-					isFriendsWith = player:IsFriendsWithAsync(otherPlayer.UserId)
-				end)
-				if not ok then
-					warn(
-						string.format(
-							"[RxFriendUtils.observeFriendsInServerAsBrios] Couldn't get friendship status with %q!",
-							otherPlayer.Name
-						)
-					)
-
-					-- If the call failed, then 'isFriendsWith' will be nil.
-					-- We'll assume that this player isn't a friend on failure.
-					handleFriendState(otherPlayer, false)
-					return
-				end
-
-				handleFriendState(otherPlayer, isFriendsWith)
+			if otherPlayer == observedPlayer then
+				return
 			end
+
+			local isFriendsWith = false
+			local ok = pcall(function()
+				isFriendsWith = readFriendship(observedPlayer, otherPlayer)
+			end)
+			if not ok then
+				warn(
+					string.format(
+						"[RxFriendUtils.observeFriendsInServerAsBrios] Couldn't get friendship status with %q!",
+						otherPlayer.Name
+					)
+				)
+
+				-- If the call failed, then 'isFriendsWith' will be nil.
+				-- We'll assume that this player isn't a friend on failure.
+				handleFriendState(otherPlayer, false)
+				return
+			end
+
+			handleFriendState(otherPlayer, isFriendsWith)
+		end
+
+		local function handlePlayerRemoving(otherPlayer: Player)
+			maid[otherPlayer] = nil
 		end
 
 		-- Handle players leaving / joining.
-		maid:GiveTask(Players.PlayerRemoving:Connect(function(otherPlayer: Player)
-			maid[otherPlayer] = nil
-		end))
+		maid:GiveTask(Players.PlayerRemoving:Connect(handlePlayerRemoving))
 		maid:GiveTask(Players.PlayerAdded:Connect(handleNewPlayerAsync))
+
+		-- Mocks never appear in Players:GetPlayers()/PlayerAdded; enumerate them through their tag,
+		-- mirroring the DataModel-scoped engine calls (see [PlayerMock.TAG]).
+		maid:GiveTask(CollectionService:GetInstanceAddedSignal(PlayerMock.TAG):Connect(function(instance)
+			handleNewPlayerAsync((instance :: any) :: Player)
+		end))
+		maid:GiveTask(CollectionService:GetInstanceRemovedSignal(PlayerMock.TAG):Connect(function(instance)
+			handlePlayerRemoving((instance :: any) :: Player)
+		end))
 
 		for _, otherPlayer in Players:GetPlayers() do
 			task.spawn(handleNewPlayerAsync, otherPlayer)
 		end
 
+		for _, tagged in CollectionService:GetTagged(PlayerMock.TAG) do
+			task.spawn(handleNewPlayerAsync, (tagged :: any) :: Player)
+		end
+
 		-- Handle changes for players already in this server.
 		-- There's a non-zero chance these get removed someday... :(
 		-- https://devforum.roblox.com/t/playerfriendedevent-was-deleted-from-corescripts/696683
-		-- So just incase these connections throw, use a new thread so we don't error out the whole observable.
+		-- So just incase these connections throw, retrieve them off-thread so we don't error out the whole observable.
 		-- Only allow this while the game is running too
-		if player == Players.LocalPlayer and RunService:IsRunning() then
-			task.spawn(function()
-				maid:GiveTask(StarterGui:GetCore("PlayerFriendedEvent").Event:Connect(function(otherPlayer: Player)
-					handleFriendState(otherPlayer, true)
-				end))
-				maid:GiveTask(StarterGui:GetCore("PlayerUnfriendedEvent").Event:Connect(function(otherPlayer: Player)
-					handleFriendState(otherPlayer, false)
-				end))
+		local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+		if observedPlayer == localPlayer and (RunService:IsRunning() or PlayerMock.isMock(observedPlayer)) then
+			-- Getting the core yields, so the subscription may be cleaned up before it resolves.
+			local cancelled = false
+			maid:GiveTask(function()
+				cancelled = true
 			end)
+
+			local function connectCoreEvent(coreName: string, isFriendsWith: boolean)
+				local promise = maid:GivePromise(
+					CoreGuiUtils.promiseRetryGetCore(MAX_GET_CORE_ATTEMPTS, GET_CORE_INITIAL_WAIT_TIME, coreName)
+				)
+
+				promise:Then(function(coreEvent)
+					if cancelled then
+						return
+					end
+
+					maid:GiveTask(coreEvent.Event:Connect(function(otherPlayer: Player)
+						handleFriendState(otherPlayer, isFriendsWith)
+					end))
+				end, function(err)
+					if cancelled then
+						return
+					end
+
+					warn(`[RxFriendUtils] Couldn't get core {coreName}: {tostring(err)}`)
+				end)
+			end
+
+			connectCoreEvent("PlayerFriendedEvent", true)
+			connectCoreEvent("PlayerUnfriendedEvent", false)
 		end
 
 		return maid

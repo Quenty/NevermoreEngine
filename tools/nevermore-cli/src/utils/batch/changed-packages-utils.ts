@@ -3,10 +3,17 @@ import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployTarget,
+  ManifestPlaceInfo,
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveDeployTargetPlaces,
-} from '../build/deploy-config.js';
+  toManifestPlaceInfo,
+} from '@quenty/nevermore-deploy';
+
+export interface WorkspacePackageInfo {
+  name: string;
+  path: string;
+}
 
 export interface TargetPackage {
   name: string;
@@ -33,6 +40,13 @@ export interface BatchTarget {
   path: string;
   /** The single resolved place this BatchTarget represents. */
   target: DeployTarget;
+  /**
+   * Every place of this package's target (including `target` itself), stamped
+   * into the runtime manifest so a deployed place can resolve its siblings' IDs.
+   * Same for every BatchTarget fanned out from one package. Only the deploy
+   * paths populate this; test/script BatchTargets omit it.
+   */
+  manifestPlaces?: ManifestPlaceInfo[];
 }
 
 /**
@@ -41,16 +55,19 @@ export interface BatchTarget {
 export async function discoverAllTargetPackagesAsync(
   targetName: string
 ): Promise<TargetPackage[]> {
-  const { stdout } = await execa('pnpm', [
-    'ls',
-    '--json',
-    '-r',
-    '--depth',
-    '-1',
-  ]);
+  return filterByTargetAsync(await listWorkspacePackagesAsync(), targetName);
+}
 
-  const packages = JSON.parse(stdout) as Array<{ name: string; path: string }>;
-  return _filterByTargetAsync(packages, targetName);
+/** Every package in the pnpm workspace, with absolute paths. */
+export async function listWorkspacePackagesAsync(
+  cwd?: string
+): Promise<WorkspacePackageInfo[]> {
+  const { stdout } = await execa(
+    'pnpm',
+    ['ls', '--json', '-r', '--depth', '-1'],
+    { cwd }
+  );
+  return JSON.parse(stdout) as WorkspacePackageInfo[];
 }
 
 /**
@@ -83,7 +100,7 @@ export async function discoverChangedTargetPackagesAsync(
     return [];
   }
 
-  return _filterByTargetAsync(packages, targetName);
+  return filterByTargetAsync(packages, targetName);
 }
 
 /**
@@ -110,6 +127,29 @@ export async function discoverChangedTestableBatchTargetsAsync(
 }
 
 /**
+ * The places `batch deploy` deploys, and `batch bundle --deploy` builds for a
+ * later deploy. One function so the two can never pick different places: a
+ * fork's bundle must hold what a same-repo run would have deployed.
+ */
+export async function discoverDeployBatchTargetsAsync(options: {
+  targetName: string;
+  all?: boolean;
+  base: string;
+  limit?: number;
+}): Promise<BatchTarget[]> {
+  const discovered = options.all
+    ? await discoverAllTargetPackagesAsync(options.targetName)
+    : await discoverChangedTargetPackagesAsync(
+        options.base,
+        options.targetName
+      );
+  const batchTargets = flattenToBatchTargets(discovered);
+  return options.limit && options.limit > 0
+    ? batchTargets.slice(0, options.limit)
+    : batchTargets;
+}
+
+/**
  * Fan a list of TargetPackages out into BatchTargets — one per place. A
  * single-place package produces one BatchTarget with the package name; a
  * multi-place package produces one per place, with ` - <place.name>` suffix.
@@ -119,19 +159,27 @@ export function flattenToBatchTargets(
 ): BatchTarget[] {
   const result: BatchTarget[] = [];
   for (const pkg of packages) {
+    const manifestPlaces = pkg.activeTargets.map(toManifestPlaceInfo);
     if (pkg.activeTargets.length === 1) {
       result.push({
         name: pkg.name,
         packageName: pkg.name,
         path: pkg.path,
         target: pkg.activeTargets[0]!,
+        manifestPlaces,
       });
       continue;
     }
     for (const target of pkg.activeTargets) {
       const suffix = target.name;
       const name = suffix ? `${pkg.name} - ${suffix}` : pkg.name;
-      result.push({ name, packageName: pkg.name, path: pkg.path, target });
+      result.push({
+        name,
+        packageName: pkg.name,
+        path: pkg.path,
+        target,
+        manifestPlaces,
+      });
     }
   }
   return result;
@@ -164,8 +212,9 @@ function _requireScriptTemplate(targets: BatchTarget[]): BatchTarget[] {
   return withTemplate;
 }
 
-async function _filterByTargetAsync(
-  packages: Array<{ name: string; path: string }>,
+/** Keep the packages whose deploy config has `targetName`, with its places. */
+export async function filterByTargetAsync(
+  packages: WorkspacePackageInfo[],
   targetName: string
 ): Promise<TargetPackage[]> {
   const results: TargetPackage[] = [];

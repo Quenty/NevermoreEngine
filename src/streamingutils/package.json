@@ -1,6 +1,6 @@
 {
   "name": "@quenty/streamingutils",
-  "version": "10.18.1",
+  "version": "10.33.1",
   "description": "Provides utilities for working with Roblox's streaming system",
   "keywords": [
     "Roblox",
@@ -29,8 +29,17 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quenty/remoting": "workspace:*",
+    "@quenty/rx": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quenty/statestack": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

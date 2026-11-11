@@ -14,6 +14,7 @@ local EnumUtils = require("EnumUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -82,9 +83,10 @@ end
 	@return Observable<ReceiptInfo>
 ]=]
 function ReceiptProcessingService:ObserveReceiptProcessedForPlayer(player: Player): Observable.Observable<ReceiptInfo>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
-	return self:ObserveReceiptProcessedForUserId(player.UserId)
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+	return self:ObserveReceiptProcessedForUserId(userId)
 end
 --[=[
 	Observes receipt by userId
@@ -108,6 +110,7 @@ export type ReceiptProcessor = (
 
 	@param processor (receiptInfo) -> ProductPurchaseDecision | Promise<ProductPurchaseDecision> | nil
 	@param priority number?
+	@return function -- Unregisters the processor. Safe to call after [ReceiptProcessingService.Destroy].
 ]=]
 function ReceiptProcessingService:RegisterReceiptProcessor(processor: ReceiptProcessor, priority: number?): () -> ()
 	assert(self._processors, "Not initialized")
@@ -133,9 +136,14 @@ function ReceiptProcessingService:RegisterReceiptProcessor(processor: ReceiptPro
 	end)
 
 	return function()
-		local index = table.find(self._handles, data)
+		-- Destroy clears the list, and a maid holding this task will run it after that.
+		if not self._processors then
+			return
+		end
+
+		local index = table.find(self._processors, data)
 		if index then
-			table.remove(self._handles, index)
+			table.remove(self._processors, index)
 		end
 	end
 end

@@ -3,6 +3,110 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.59.0...@quenty/hintscoringutils@14.59.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.58.2...@quenty/hintscoringutils@14.59.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.58.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.58.1...@quenty/hintscoringutils@14.58.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.58.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.58.0...@quenty/hintscoringutils@14.58.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.57.0...@quenty/hintscoringutils@14.58.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.56.1...@quenty/hintscoringutils@14.57.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.56.0...@quenty/hintscoringutils@14.56.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.55.0...@quenty/hintscoringutils@14.56.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.54.0...@quenty/hintscoringutils@14.55.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.53.1...@quenty/hintscoringutils@14.54.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.53.0...@quenty/hintscoringutils@14.53.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.52.1...@quenty/hintscoringutils@14.53.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.52.0...@quenty/hintscoringutils@14.52.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.51.2...@quenty/hintscoringutils@14.52.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.51.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.51.1...@quenty/hintscoringutils@14.51.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.51.0...@quenty/hintscoringutils@14.51.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.50.0...@quenty/hintscoringutils@14.51.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.49.0...@quenty/hintscoringutils@14.50.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.48.0...@quenty/hintscoringutils@14.49.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.47.1...@quenty/hintscoringutils@14.48.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+## [14.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.47.0...@quenty/hintscoringutils@14.47.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.46.0...@quenty/hintscoringutils@14.47.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.45.0...@quenty/hintscoringutils@14.46.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.44.0...@quenty/hintscoringutils@14.45.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.43.0...@quenty/hintscoringutils@14.44.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.42.1...@quenty/hintscoringutils@14.43.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/hintscoringutils
+
 ## [14.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/hintscoringutils@14.42.0...@quenty/hintscoringutils@14.42.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/hintscoringutils

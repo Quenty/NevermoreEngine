@@ -51,6 +51,21 @@ export async function readPackageNameAsync(
   }
 }
 
+export async function readPackageVersionAsync(
+  packagePath: string
+): Promise<string | undefined> {
+  try {
+    const content = await fs.readFile(
+      path.join(packagePath, 'package.json'),
+      'utf-8'
+    );
+    const pkg = JSON.parse(content) as { version?: string };
+    return pkg.version;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function fileExistsAsync(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);

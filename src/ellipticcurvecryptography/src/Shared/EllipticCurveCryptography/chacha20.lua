@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --!native
 
 -- Chacha20 cipher in ComputerCraft
@@ -8,7 +8,7 @@
 -- http://www.computercraft.info/forums2/index.php?/user/12870-anavrins
 -- http://pastebin.com/GPzf9JSa
 -- Last update: April 17, 2017
-local twoPower = require(script.Parent.twoPower)
+local twoPower: any = require(script.Parent.twoPower)
 local util = require(script.Parent.util)
 
 local bxor = bit32.bxor
@@ -20,13 +20,13 @@ local mod = 2 ^ 32
 local tau = table.pack(string.byte("expand 16-byte k", 1, -1))
 local sigma = table.pack(string.byte("expand 32-byte k", 1, -1))
 
-local function rotl(n, b)
+local function rotl(n: number, b: number): number
 	local s = n / twoPower[32 - b]
 	local f = s % 1
 	return (s - f) + f * mod
 end
 
-local function quarterRound(s, a, b, c, d)
+local function quarterRound(s: { number }, a: number, b: number, c: number, d: number): { number }
 	s[a] = (s[a] + s[b]) % mod
 	s[d] = rotl(bxor(s[d], s[a]), 16)
 	s[c] = (s[c] + s[d]) % mod
@@ -38,8 +38,8 @@ local function quarterRound(s, a, b, c, d)
 	return s
 end
 
-local function hashBlock(state, rnd)
-	local s = { table.unpack(state) }
+local function hashBlock(state: { number }, rnd: number): { number }
+	local s: { number } = { table.unpack(state) }
 	for i = 1, rnd do
 		local r = i % 2 == 1
 		s = r and quarterRound(s, 1, 5, 9, 13) or quarterRound(s, 1, 6, 11, 16)
@@ -55,17 +55,17 @@ local function hashBlock(state, rnd)
 	return s
 end
 
-local function LE_toInt(bs, i)
+local function LE_toInt(bs: { number }, i: number): number
 	return (bs[i + 1] or 0)
 		+ blshift((bs[i + 2] or 0), 8)
 		+ blshift((bs[i + 3] or 0), 16)
 		+ blshift((bs[i + 4] or 0), 24)
 end
 
-local function initState(key, nonce, counter)
+local function initState(key: { number }, nonce: { number }, counter: number): { number }
 	local isKey256 = #key == 32
-	local const = isKey256 and sigma or tau
-	local state = table.create(16)
+	local const: { number } = isKey256 and sigma or tau
+	local state: { number } = table.create(16)
 
 	state[1] = LE_toInt(const, 0)
 	state[2] = LE_toInt(const, 4)
@@ -89,8 +89,9 @@ local function initState(key, nonce, counter)
 	return state
 end
 
-local function serialize(state)
-	local r, len_r = table.create(16), 0
+local function serialize(state: { number }): { number }
+	local r: { number } = table.create(16)
+	local len_r = 0
 	for i = 1, 16 do
 		r[len_r + 1] = band(state[i], 0xFF)
 		r[len_r + 2] = band(brshift(state[i], 8), 0xFF)
@@ -102,24 +103,34 @@ local function serialize(state)
 	return r
 end
 
-local function crypt(data, key, nonce, cntr, round)
+export type ByteTable = typeof(setmetatable({} :: { number }, {} :: typeof(util.byteTableMT)))
+
+local function crypt(
+	data: string | { number },
+	key: { number },
+	nonce: { number },
+	cntr: number?,
+	round: number?
+): ByteTable
 	assert(type(key) == "table", "ChaCha20: Invalid key format (" .. type(key) .. "), must be table")
 	assert(type(nonce) == "table", "ChaCha20: Invalid nonce format (" .. type(nonce) .. "), must be table")
 	assert(#key == 16 or #key == 32, "ChaCha20: Invalid key length (" .. #key .. "), must be 16 or 32")
 	assert(#nonce == 12, "ChaCha20: Invalid nonce length (" .. #nonce .. "), must be 12")
 
-	local newData = type(data) == "table" and { table.unpack(data) } or util.stringToByteArray(data)
-	cntr = tonumber(cntr) or 1
-	round = tonumber(round) or 20
+	local newData: { number } = type(data) == "table" and { table.unpack(data :: { number }) }
+		or util.stringToByteArray(data :: string)
+	local counter = tonumber(cntr) or 1
+	local rounds = tonumber(round) or 20
 
-	local out, out_len = {}, 0
-	local state = initState(key, nonce, cntr)
+	local out: { number } = {}
+	local out_len = 0
+	local state = initState(key, nonce, counter)
 	local blockAmt = math.floor(#newData / 64)
 	for i = 0, blockAmt do
-		local ks = serialize(hashBlock(state, round))
+		local ks = serialize(hashBlock(state, rounds))
 		state[13] = (state[13] + 1) % mod
 
-		local block = table.create(64)
+		local block: { number } = table.create(64)
 		for j = 1, 64 do
 			block[j] = newData[(i * 64) + j]
 		end

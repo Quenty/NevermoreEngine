@@ -3,162 +3,99 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [2.4.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.3...@quenty/qgui@2.4.4) (2026-01-12)
-
+# [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.4...@quenty/qgui@2.5.0) (2026-07-14)
 
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
 
+### Features
 
+- **qgui:** convert package to --!strict ([eaaa2e3](https://github.com/Quenty/NevermoreEngine/commit/eaaa2e398ee6d3a65a3698dac9e7440a1afe7ae7))
 
+## [2.4.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.3...@quenty/qgui@2.4.4) (2026-01-12)
 
+### Bug Fixes
+
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [2.4.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.2...@quenty/qgui@2.4.3) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 ## [2.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.1...@quenty/qgui@2.4.2) (2026-01-03)
 
 **Note:** Version bump only for package @quenty/qgui
-
-
-
-
 
 ## [2.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.4.0...@quenty/qgui@2.4.1) (2025-11-12)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 # [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.4...@quenty/qgui@2.4.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/qgui
-
-
-
-
 
 ## [2.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.3...@quenty/qgui@2.3.4) (2025-04-10)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 ## [2.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.1...@quenty/qgui@2.3.3) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [2.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.1...@quenty/qgui@2.3.2) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 ## [2.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.3.0...@quenty/qgui@2.3.1) (2024-10-09)
 
-
 ### Bug Fixes
 
-* Deprecate a large set of APIs ([#506](https://github.com/Quenty/NevermoreEngine/issues/506)) ([d6bdd65](https://github.com/Quenty/NevermoreEngine/commit/d6bdd6567668f238c45d3bd0c85bedb763d30e5c))
-
-
-
-
+- Deprecate a large set of APIs ([#506](https://github.com/Quenty/NevermoreEngine/issues/506)) ([d6bdd65](https://github.com/Quenty/NevermoreEngine/commit/d6bdd6567668f238c45d3bd0c85bedb763d30e5c))
 
 # [2.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.2.1...@quenty/qgui@2.3.0) (2024-05-09)
 
-
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 ## [2.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.2.0...@quenty/qgui@2.2.1) (2023-03-06)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 # [2.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.1.0...@quenty/qgui@2.2.0) (2023-02-21)
 
 **Note:** Version bump only for package @quenty/qgui
-
-
-
-
 
 # [2.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.0.1...@quenty/qgui@2.1.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 ## [2.0.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@2.0.0...@quenty/qgui@2.0.1) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/qgui
 
-
-
-
-
 # [2.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/qgui@1.2.0...@quenty/qgui@2.0.0) (2021-09-05)
-
 
 ### Bug Fixes
 
-* Remove peer dependencies. This is because lerna doesn't really support peer dependencies being linked and getting a new version on build, which is unfortunate. ([5f5aeee](https://github.com/Quenty/NevermoreEngine/commit/5f5aeeea8de9975435309e53679f0ef7064f9dd0))
-
-
-
-
+- Remove peer dependencies. This is because lerna doesn't really support peer dependencies being linked and getting a new version on build, which is unfortunate. ([5f5aeee](https://github.com/Quenty/NevermoreEngine/commit/5f5aeeea8de9975435309e53679f0ef7064f9dd0))
 
 # 1.2.0 (2021-07-31)
 
-
 ### Bug Fixes
 
-* Add CI and CD ([47513e9](https://github.com/Quenty/NevermoreEngine/commit/47513e9b568162707534af132396dd8756947dd3))
-* Adjust CI badge to show automatic build and release state ([5a55d3f](https://github.com/Quenty/NevermoreEngine/commit/5a55d3f19bf8d66a760d67da9b56ed47fab74656))
-* Fix selene linting ([45fc074](https://github.com/Quenty/NevermoreEngine/commit/45fc07489ee59127ac6582689f19a0e87c1e5b5a))
-
-
+- Add CI and CD ([47513e9](https://github.com/Quenty/NevermoreEngine/commit/47513e9b568162707534af132396dd8756947dd3))
+- Adjust CI badge to show automatic build and release state ([5a55d3f](https://github.com/Quenty/NevermoreEngine/commit/5a55d3f19bf8d66a760d67da9b56ed47fab74656))
+- Fix selene linting ([45fc074](https://github.com/Quenty/NevermoreEngine/commit/45fc07489ee59127ac6582689f19a0e87c1e5b5a))
 
 ## 1.0.2 (2021-07-25)
 
-
-
 ## 1.0.1 (2021-07-25)
-
-
 
 # 1.0.0 (2021-07-24)

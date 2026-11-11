@@ -6,14 +6,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local BaseObject = require("BaseObject")
 local Flipbook = require("Flipbook")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local Promise = require("Promise")
 local Rx = require("Rx")
+local StepUtils = require("StepUtils")
 local ValueObject = require("ValueObject")
 
 local FlipbookPlayer = setmetatable({}, BaseObject)
@@ -227,7 +226,7 @@ function FlipbookPlayer:_execPlay(flipbook: Flipbook.Flipbook, playData: PlayDat
 
 	local maid = Maid.new()
 
-	maid:GiveTask(RunService.RenderStepped:Connect(function()
+	maid:GiveTask(StepUtils.getAnimationStepSignal():Connect(function()
 		self:_update(flipbook, os.clock(), playData)
 	end))
 	self:_update(flipbook, os.clock(), playData)

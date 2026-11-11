@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles the replication of inverse kinematics (IK) from clients to servers
 
@@ -23,13 +23,26 @@ local require = require(script.Parent.loader).load(script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local Binder = require("Binder")
+local IKRig = require("IKRig")
 local Maid = require("Maid")
+local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
 local SERVER_UPDATE_RATE = 1 / 10
 
 local IKService = {}
 IKService.ServiceName = "IKService"
+
+export type IKService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_humanoidTrackerService: any,
+		_ikRigBinder: Binder.Binder<IKRig.IKRig>,
+	},
+	{} :: typeof({ __index = IKService })
+))
 
 --[=[
 	Initializes the IKService. Should be done via the ServiceBag.
@@ -44,8 +57,8 @@ IKService.ServiceName = "IKService"
 
 	@param serviceBag ServiceBag
 ]=]
-function IKService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._maid, "Already initialized")
+function IKService.Init(self: IKService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._maid, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -66,7 +79,7 @@ end
 --[=[
 	Starts the IKService. Should be done via the ServiceBag.
 ]=]
-function IKService:Start()
+function IKService.Start(self: IKService): ()
 	assert(self._maid, "Not initialized")
 
 	self._maid:GiveTask(Players.PlayerAdded:Connect(function(player)
@@ -91,7 +104,7 @@ end
 	@param humanoid Humanoid
 	@return IKRig?
 ]=]
-function IKService:GetRig(humanoid: Humanoid)
+function IKService.GetRig(self: IKService, humanoid: Humanoid): IKRig.IKRig?
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	return self._ikRigBinder:Bind(humanoid)
@@ -102,7 +115,7 @@ end
 	@param humanoid Humanoid
 	@return Promise<IKRig>
 ]=]
-function IKService:PromiseRig(humanoid: Humanoid)
+function IKService.PromiseRig(self: IKService, humanoid: Humanoid): Promise.Promise<IKRig.IKRig>
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikRigBinder:Bind(humanoid)
@@ -113,7 +126,7 @@ end
 	Unbinds the rig from the humanoid.
 	@param humanoid Humanoid
 ]=]
-function IKService:RemoveRig(humanoid: Humanoid)
+function IKService.RemoveRig(self: IKService, humanoid: Humanoid): ()
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 
 	self._ikRigBinder:Unbind(humanoid)
@@ -132,7 +145,7 @@ end
 	@param humanoid Humanoid
 	@param target Vector3?
 ]=]
-function IKService:UpdateServerRigTarget(humanoid: Humanoid, target)
+function IKService.UpdateServerRigTarget(self: IKService, humanoid: Humanoid, target: Vector3?): ()
 	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "Bad humanoid")
 	assert(typeof(target) == "Vector3", "Bad target")
 
@@ -145,11 +158,11 @@ function IKService:UpdateServerRigTarget(humanoid: Humanoid, target)
 	serverRig:SetAimPosition(target)
 end
 
-function IKService:_handlePlayerRemoving(player: Player)
+function IKService._handlePlayerRemoving(self: IKService, player: Player): ()
 	self._maid[player] = nil
 end
 
-function IKService:_handlePlayer(player: Player)
+function IKService._handlePlayer(self: IKService, player: Player): ()
 	local maid = Maid.new()
 
 	local humanoidTracker = self._humanoidTrackerService:GetHumanoidTracker(player)
@@ -170,10 +183,10 @@ function IKService:_handlePlayer(player: Player)
 	self._maid[player] = maid
 end
 
-function IKService:_updateStepped()
+function IKService._updateStepped(self: IKService): ()
 	debug.profilebegin("IKUpdateServer")
 
-	for _, rig in self._ikRigBinder:GetAll() do
+	for _, rig: any in self._ikRigBinder:GetAll() do -- IKRig.IKRig (method calls blow up old solver via cyclic ServiceBag type)
 		debug.profilebegin("RigUpdateServer")
 
 		local lastUpdateTime = rig:GetLastUpdateTime()
@@ -188,7 +201,7 @@ function IKService:_updateStepped()
 	debug.profileend()
 end
 
-function IKService:Destroy()
+function IKService.Destroy(self: IKService): ()
 	self._maid:DoCleaning()
 end
 

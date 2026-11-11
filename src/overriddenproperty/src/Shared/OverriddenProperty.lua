@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Sets properties on the client and then replicates them to the server
 	@class OverriddenProperty
@@ -13,6 +13,19 @@ local OverriddenProperty = setmetatable({}, BaseObject)
 OverriddenProperty.ClassName = "OverriddenProperty"
 OverriddenProperty.__index = OverriddenProperty
 
+export type OverriddenProperty<T> =
+	typeof(setmetatable(
+		{} :: {
+			_obj: Instance,
+			_disconnectCount: number,
+			_propertyName: string,
+			_value: T,
+			_throttledExecuteReplicate: ThrottledFunction.ThrottledFunction<T>?,
+		},
+		{} :: typeof({ __index = OverriddenProperty })
+	))
+	& BaseObject.BaseObject
+
 --[=[
 	Constructs a new OverriddenProperty.
 
@@ -22,20 +35,20 @@ OverriddenProperty.__index = OverriddenProperty
 	@param replicateCallback (T)?
 	@return OverriddenProperty
 ]=]
-function OverriddenProperty.new(
+function OverriddenProperty.new<T>(
 	robloxInstance: Instance,
 	propertyName: string,
 	replicateRate: number?,
-	replicateCallback: (any) -> ()
-)
-	local self = setmetatable(BaseObject.new(robloxInstance), OverriddenProperty)
+	replicateCallback: ((T) -> ())?
+): OverriddenProperty<T>
+	local self: OverriddenProperty<T> = setmetatable(BaseObject.new(robloxInstance) :: any, OverriddenProperty)
 
 	assert(typeof(robloxInstance) == "Instance", "Bad robloxInstance")
 	assert(type(propertyName) == "string", "Bad propertyName")
 
 	self._disconnectCount = 0
 	self._propertyName = propertyName or error("No propertyName")
-	self._value = self._obj[self._propertyName]
+	self._value = (self._obj :: any)[self._propertyName]
 
 	if replicateRate ~= nil then
 		assert(type(replicateRate) == "number", "Bad replicateRate")
@@ -54,7 +67,7 @@ end
 
 	@param value T
 ]=]
-function OverriddenProperty:Set(value)
+function OverriddenProperty.Set<T>(self: OverriddenProperty<T>, value: T): ()
 	assert(typeof(value) == typeof(self._value), "Bad value")
 
 	self._value = value
@@ -66,13 +79,15 @@ end
 
 	@return T
 ]=]
-function OverriddenProperty:Get()
+function OverriddenProperty.Get<T>(self: OverriddenProperty<T>): T
 	return self._value
 end
 
-function OverriddenProperty:_executeSet(doReplicate: boolean)
+function OverriddenProperty._executeSet<T>(self: OverriddenProperty<T>, doReplicate: boolean): ()
 	self:_pushDisconnectChange()
-	self._obj[self._propertyName] = self._value
+
+	local obj = self._obj :: any
+	obj[self._propertyName] = self._value
 
 	if doReplicate and self._throttledExecuteReplicate then
 		self._throttledExecuteReplicate:Call(self._value)
@@ -81,7 +96,7 @@ function OverriddenProperty:_executeSet(doReplicate: boolean)
 	self:_popDisconnectChange()
 end
 
-function OverriddenProperty:_pushDisconnectChange()
+function OverriddenProperty._pushDisconnectChange<T>(self: OverriddenProperty<T>): ()
 	self._disconnectCount = self._disconnectCount + 1
 
 	if self._disconnectCount >= 5 then
@@ -91,7 +106,7 @@ function OverriddenProperty:_pushDisconnectChange()
 	self:_updateListenBinding()
 end
 
-function OverriddenProperty:_popDisconnectChange()
+function OverriddenProperty._popDisconnectChange<T>(self: OverriddenProperty<T>): ()
 	self._disconnectCount = self._disconnectCount - 1
 
 	if self._disconnectCount < 0 then
@@ -101,7 +116,7 @@ function OverriddenProperty:_popDisconnectChange()
 	self:_updateListenBinding()
 end
 
-function OverriddenProperty:_updateListenBinding()
+function OverriddenProperty._updateListenBinding<T>(self: OverriddenProperty<T>): ()
 	if self._disconnectCount == 0 then
 		self:_listenForChange()
 	else
@@ -109,11 +124,11 @@ function OverriddenProperty:_updateListenBinding()
 	end
 end
 
-function OverriddenProperty:_disconnectListenForChange()
+function OverriddenProperty._disconnectListenForChange<T>(self: OverriddenProperty<T>): ()
 	self._maid._update = nil
 end
 
-function OverriddenProperty:_listenForChange()
+function OverriddenProperty._listenForChange<T>(self: OverriddenProperty<T>): ()
 	if self._maid._update and self._maid._update.Connected then
 		return
 	end

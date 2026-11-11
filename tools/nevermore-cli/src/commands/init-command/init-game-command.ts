@@ -62,12 +62,12 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     }
 
     try {
-      await runCommandAsync(args, 'npm', ['run', 'format'], {
+      await runCommandAsync(args, 'pnpm', ['run', 'format'], {
         cwd: srcRoot,
       });
     } catch {
       OutputHelper.error(
-        'Failed to run `npm run format`, is stylua installed?'
+        'Failed to run `pnpm run format`, is stylua installed?'
       );
     }
 
@@ -85,7 +85,7 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
   public async handler(args: InitGameArgs) {
     const rawGameName = await InitGameCommand._ensureGameName(args);
 
-    const gameName = TemplateHelper.camelize(rawGameName).toLowerCase();
+    const gameName = TemplateHelper.toPackageName(rawGameName);
     const gameNameProper = TemplateHelper.camelize(rawGameName);
 
     const srcRoot = process.cwd();

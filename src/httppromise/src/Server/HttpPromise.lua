@@ -35,7 +35,7 @@ local HttpPromise = {}
 
 export type HTTPRequest = {
 	Url: string,
-	Method: "POST" | "GET" | "PUT" | "DELETE",
+	Method: ("POST" | "GET" | "PUT" | "DELETE")?,
 	Headers: { [string]: string | Secret }?,
 	Body: string?,
 	Compress: Enum.HttpCompression?,
@@ -64,9 +64,9 @@ export type HTTPResponse = {
 	```
 
 	@param request HTTPRequest
-	@return Promise<table>
+	@return Promise<HTTPResponse>
 ]=]
-function HttpPromise.request(request: HTTPRequest): Promise.Promise<()>
+function HttpPromise.request(request: HTTPRequest): Promise.Promise<HTTPResponse>
 	if DEBUG_REQUEST then
 		print("Sending request", HttpService:JSONEncode(request))
 	end
@@ -78,7 +78,10 @@ function HttpPromise.request(request: HTTPRequest): Promise.Promise<()>
 		end)
 
 		if DEBUG_RESPONSE then
-			print(string.format("Response: %d %s %s", response.StatusCode, request.Method, request.Url), response.Body)
+			print(
+				string.format("Response: %d %s %s", response.StatusCode, request.Method or "GET", request.Url),
+				response.Body
+			)
 		end
 
 		if not ok then

@@ -12,9 +12,11 @@ local Signal = require("Signal")
 local PromiseUtils = {}
 
 --[=[
-	Returns the value of the first promise resolved
-	@param promises { Promise<T> }
-	@return Promise<T> -- Promise that resolves with first result
+	Settles with the first of the given promises to settle, resolving if it resolved or rejecting if
+	it rejected. Also available as [PromiseUtils.race].
+
+	@param promises { Promise<T...> }
+	@return Promise<T...> -- Promise that settles with the first result
 ]=]
 function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Promise<T...>
 	local returnPromise = Promise.new()
@@ -33,6 +35,17 @@ function PromiseUtils.any<T...>(promises: { Promise.Promise<T...> }): Promise.Pr
 
 	return returnPromise
 end
+
+--[=[
+	Alias for [PromiseUtils.any]. Settles with the first of the given promises to settle, resolving
+	if it resolved or rejecting if it rejected.
+
+	@function race
+	@within PromiseUtils
+	@param promises { Promise<T...> }
+	@return Promise<T...>
+]=]
+PromiseUtils.race = PromiseUtils.any
 
 --[=[
 	Returns a promise that will resolve after the set amount of seconds
@@ -132,6 +145,11 @@ end
 --[=[
 	Combines the result of promises together
 
+	On failure, rejects with the results table when any input rejected with a value (the
+	error is stored under that input's key). When every failing input rejected with no
+	values (i.e. was cancelled), rejects with no values so the cancellation stays a
+	cancellation instead of becoming a valued rejection of partial results.
+
 	@param stateTable any
 	@return Promise<any>
 ]=]
@@ -155,16 +173,25 @@ function PromiseUtils.combine(stateTable: any): Promise.Promise<any>
 
 	local returnPromise = Promise.new()
 	local allFulfilled = true
+	local sawRejectionValue = false
 
 	local function syncronize(key, isFullfilled)
-		return function(value)
+		return function(value, ...)
 			allFulfilled = allFulfilled and isFullfilled
+			if not isFullfilled and (value ~= nil or select("#", ...) > 0) then
+				sawRejectionValue = true
+			end
 			results[key] = value
 			remainingCount = remainingCount - 1
 
 			if remainingCount == 0 then
-				local method = allFulfilled and "Resolve" or "Reject"
-				returnPromise[method](returnPromise, results)
+				if allFulfilled then
+					returnPromise:Resolve(results)
+				elseif sawRejectionValue then
+					returnPromise:Reject(results)
+				else
+					returnPromise:Reject()
+				end
 			end
 		end
 	end

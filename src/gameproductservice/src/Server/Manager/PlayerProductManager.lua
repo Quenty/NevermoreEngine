@@ -14,7 +14,9 @@ local Players = game:GetService("Players")
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
+local MarketplaceUtils = require("MarketplaceUtils")
 local PlayerBinder = require("PlayerBinder")
+local PlayerMock = require("PlayerMock")
 local PlayerProductManagerBase = require("PlayerProductManagerBase")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local ReceiptProcessingService = require("ReceiptProcessingService")
@@ -29,7 +31,9 @@ export type PlayerProductManager =
 	typeof(setmetatable(
 		{} :: {
 			_serviceBag: ServiceBag.ServiceBag,
-			_receiptProcessingService: ReceiptProcessingService.ReceiptProcessingService,
+			_receiptProcessingService: any, -- ReceiptProcessingService.ReceiptProcessingService
+			_gameProductDataService: any, -- GameProductDataService.GameProductDataService
+			_remoting: any,
 		},
 		{} :: typeof({ __index = PlayerProductManager })
 	))
@@ -47,38 +51,43 @@ function PlayerProductManager.new(player: Player, serviceBag: ServiceBag.Service
 		setmetatable(PlayerProductManagerBase.new(player, serviceBag) :: any, PlayerProductManager)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService)
+	self._receiptProcessingService = self._serviceBag:GetService(ReceiptProcessingService) :: any
+	self._gameProductDataService = self._serviceBag:GetService(GameProductDataService) :: any
 
-	self:_setupRemoting()
+	-- Route internal setup through an `any` view: resolving these heavy-`self` method
+	-- calls against the intersected type otherwise overwhelms the old solver.
+	local selfAny = self :: any
+	selfAny:_setupRemoting()
 
 	-- Setup each ownership tracker
-	self:_setupAssetTracker()
-	self:_setupMembershipTracker()
-	self:_setupSubscriptionTracker()
-	self:_setupProductTracker()
-	self:_setupPassTracker()
-	self:_setupBundleTracker()
+	selfAny:_setupAssetTracker()
+	selfAny:_setupMembershipTracker()
+	selfAny:_setupSubscriptionTracker()
+	selfAny:_setupProductTracker()
+	selfAny:_setupPassTracker()
+	selfAny:_setupBundleTracker()
 
 	-- Initialize attributes
 
-	local serverOnlyPrompting = self._serviceBag:GetService(GameProductDataService):GetServerOnlyPromptingValue()
+	local serverOnlyPrompting = self._gameProductDataService:GetServerOnlyPromptingValue()
 	self._maid:GiveTask(serverOnlyPrompting:Observe():Subscribe(function(value)
 		self._obj:SetAttribute(GameProductDataService.ServerOnlyPromptingAttribute, value)
 	end))
 
 	-- Implement
 	local impl = self._maid:Add(PlayerProductManagerInterface.Server:Implement(self._obj, self))
-	self:ExportMarketTrackers(impl:GetImplParent())
+	selfAny:ExportMarketTrackers(impl:GetImplParent())
 
 	return self
 end
 
 function PlayerProductManager._setupRemoting(self: PlayerProductManager): ()
-	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
+	self._remoting =
+		self._maid:Add((Remoting.Server :: any).new(self._obj, "PlayerProductManager", Remoting.Realms.SERVER))
 end
 
 function PlayerProductManager._setupAssetTracker(self: PlayerProductManager): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.ASSET) :: any
 
 	self._maid:GiveTask(self._remoting.AssetPromptPurchaseFinished:Connect(function(player, assetId, isPurchased)
 		assert(self._obj == player, "Bad player")
@@ -92,7 +101,7 @@ function PlayerProductManager._setupAssetTracker(self: PlayerProductManager): ()
 end
 
 function PlayerProductManager._setupProductTracker(self: PlayerProductManager): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PRODUCT) :: any
 
 	-- Source of truth for purchase is here
 	self._remoting.DeveloperProductPurchased:DeclareEvent()
@@ -109,9 +118,8 @@ function PlayerProductManager._setupProductTracker(self: PlayerProductManager): 
 	end))
 
 	self._maid:GiveTask(
-		self._receiptProcessingService
-			:ObserveReceiptProcessedForPlayer(self._obj)
-			:Subscribe(function(receiptInfo, productPurchaseDecision)
+		(self._receiptProcessingService:ObserveReceiptProcessedForPlayer(self._obj) :: any):Subscribe(
+			function(receiptInfo, productPurchaseDecision)
 				assert(type(receiptInfo) == "table", "Bad receiptInfo")
 				assert(EnumUtils.isOfType(Enum.ProductPurchaseDecision, productPurchaseDecision), "Bad decision")
 
@@ -119,26 +127,66 @@ function PlayerProductManager._setupProductTracker(self: PlayerProductManager): 
 				tracker:HandlePurchaseEvent(productId, true)
 
 				self._remoting.DeveloperProductPurchased:FireClient(self._obj, productId)
-			end)
+			end
+		)
 	)
 end
 
 function PlayerProductManager._setupPassTracker(self: PlayerProductManager): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.PASS) :: any
 
 	self._maid:GiveTask(self._remoting.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, isPurchased)
 		assert(player == self._obj, "Bad player")
 		assert(type(gamePassId) == "number", "Bad gamePassId")
 		assert(type(isPurchased) == "boolean", "Bad isPurchased")
 
-		-- TODO: Validate in purchased scenario
+		-- Closing the prompt is safe to take on the client's word: it only unblocks pending prompt
+		-- state and grants nothing.
 		tracker:HandlePromptClosedEvent(gamePassId)
-		tracker:HandlePurchaseEvent(gamePassId, isPurchased)
+
+		if not isPurchased then
+			tracker:HandlePurchaseEvent(gamePassId, false)
+			return
+		end
+
+		-- Verification rides on server-only prompting rather than a switch of its own. Enabling it is a
+		-- game saying the server drives purchases, which is also what makes the ownership check safe to
+		-- pay for. Left off, this stays on the client's word -- knowingly, because
+		-- UserOwnsGamePassAsync answers from a per-server cache that can still read `false` for the
+		-- purchase that just completed, and denying on that stale read loses a pass the player paid for.
+		-- See [GameProductService.SetServerOnlyPromptingEnabled].
+		if not self._gameProductDataService:GetServerOnlyPromptingValue().Value then
+			tracker:HandlePurchaseEvent(gamePassId, true)
+			return
+		end
+
+		-- The purchase itself is not. This event is fired by the client, so `isPurchased == true` is an
+		-- unverified claim -- a client can fire it for any gamepass id without ever paying, and granting
+		-- ownership on it hands the pass out for free. Confirm against the marketplace before it counts,
+		-- so only a pass the player genuinely owns is recorded as purchased.
+		local userId = if PlayerMock.isMock(self._obj) then PlayerMock.read(self._obj, "UserId") else self._obj.UserId
+
+		self._maid:GivePromise(MarketplaceUtils.promiseUserOwnsGamePass(userId, gamePassId)):Then(function(ownsPass)
+			tracker:HandlePurchaseEvent(gamePassId, ownsPass == true)
+		end, function(err)
+			-- The ownership check could not answer (a marketplace hiccup, not a purchase). Grant nothing
+			-- on the failure, and resolve the pending prompt as unbought so a server-initiated caller is
+			-- not left waiting forever.
+			warn(
+				string.format(
+					"[PlayerProductManager] - Failed to verify gamepass %d ownership for %s: %s",
+					gamePassId,
+					tostring(self._obj),
+					tostring(err)
+				)
+			)
+			tracker:HandlePurchaseEvent(gamePassId, false)
+		end)
 	end))
 end
 
 function PlayerProductManager._setupMembershipTracker(self: PlayerProductManager): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.MEMBERSHIP)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.MEMBERSHIP) :: any
 
 	self._maid:GiveTask(Players.PlayerMembershipChanged:Connect(function(player)
 		if player == self._obj then
@@ -152,7 +200,7 @@ end
 function PlayerProductManager._setupSubscriptionTracker(self: PlayerProductManager): ()
 	self._remoting.UserSubscriptionStatusChanged:DeclareEvent()
 
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.SUBSCRIPTION) :: any
 
 	self._maid:GiveTask(self._remoting.PromptSubscriptionPurchaseFinished:Connect(function(player, subscriptionId)
 		assert(player == self._obj, "Bad player")
@@ -183,7 +231,7 @@ function PlayerProductManager._setupSubscriptionTracker(self: PlayerProductManag
 end
 
 function PlayerProductManager._setupBundleTracker(self: PlayerProductManager): ()
-	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE)
+	local tracker = self:GetAssetTrackerOrError(GameConfigAssetTypes.BUNDLE) :: any
 
 	self._maid:GiveTask(MarketplaceService.PromptBundlePurchaseFinished:Connect(function(player, bundleId, isPurchased)
 		if player == self._obj then
@@ -202,4 +250,7 @@ function PlayerProductManager._setupBundleTracker(self: PlayerProductManager): (
 	end))
 end
 
-return PlayerBinder.new("PlayerProductManager", PlayerProductManager)
+return PlayerBinder.new(
+		"PlayerProductManager",
+		PlayerProductManager :: any
+	) :: PlayerBinder.PlayerBinder<PlayerProductManager>

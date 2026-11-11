@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.43.0...@quenty/inputmode@13.43.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.42.2...@quenty/inputmode@13.43.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+## [13.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.42.1...@quenty/inputmode@13.42.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+## [13.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.42.0...@quenty/inputmode@13.42.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.41.0...@quenty/inputmode@13.42.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.40.2...@quenty/inputmode@13.41.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+## [13.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.40.1...@quenty/inputmode@13.40.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+## [13.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.40.0...@quenty/inputmode@13.40.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.39.0...@quenty/inputmode@13.40.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.38.0...@quenty/inputmode@13.39.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.37.0...@quenty/inputmode@13.38.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.36.0...@quenty/inputmode@13.37.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.35.0...@quenty/inputmode@13.36.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/inputmode
+
+# [13.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.34.1...@quenty/inputmode@13.35.0) (2026-07-14)
+
+### Features
+
+- **inputmode:** convert package to --!strict ([7468a77](https://github.com/Quenty/NevermoreEngine/commit/7468a779a9ac8e23dc80b0162a931cda8a1247ef))
+
 ## [13.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputmode@13.34.0...@quenty/inputmode@13.34.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/inputmode

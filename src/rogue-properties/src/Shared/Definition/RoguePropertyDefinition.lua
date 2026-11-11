@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoguePropertyDefinition
 ]=]
@@ -17,28 +17,40 @@ local RoguePropertyDefinition = {}
 RoguePropertyDefinition.ClassName = "RoguePropertyDefinition"
 RoguePropertyDefinition.__index = RoguePropertyDefinition
 
-function RoguePropertyDefinition.new()
-	local self = setmetatable({}, RoguePropertyDefinition)
+export type RoguePropertyDefinition = typeof(setmetatable(
+	{} :: {
+		_name: string,
+		_defaultValue: any,
+		_valueType: string,
+		_storageType: string,
+		_encodedDefaultValue: any,
+		_parentPropertyTableDefinition: any,
+	},
+	{} :: typeof({ __index = RoguePropertyDefinition })
+))
+
+function RoguePropertyDefinition.new(): RoguePropertyDefinition
+	local self: RoguePropertyDefinition = setmetatable({} :: any, RoguePropertyDefinition)
 
 	self._name = "Unnamed"
 
 	return self
 end
 
-function RoguePropertyDefinition:SetDefaultValue(defaultValue)
+function RoguePropertyDefinition.SetDefaultValue(self: RoguePropertyDefinition, defaultValue: any): ()
 	assert(defaultValue ~= nil, "Bad defaultValue")
 
 	self._defaultValue = defaultValue
 	self._valueType = typeof(self._defaultValue)
 	self._storageType = self:_computeStorageInstanceType()
-	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self, self._defaultValue)
+	self._encodedDefaultValue = RoguePropertyUtils.encodeProperty(self :: any, self._defaultValue)
 end
 
 function RoguePropertyDefinition.isRoguePropertyDefinition(value: any): boolean
 	return DuckTypeUtils.isImplementation(RoguePropertyDefinition, value)
 end
 
-function RoguePropertyDefinition:HasChildren(): boolean
+function RoguePropertyDefinition.HasChildren(_self: RoguePropertyDefinition): boolean
 	return false
 end
 
@@ -47,12 +59,16 @@ end
 	@param adornee Instance
 	@return RogueProperty
 ]=]
-function RoguePropertyDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee: Instance)
+function RoguePropertyDefinition.Get(
+	self: RoguePropertyDefinition,
+	serviceBag: ServiceBag.ServiceBag,
+	adornee: Instance
+): RogueProperty.RogueProperty
 	assert(ServiceBag.isServiceBag(serviceBag), "Bad serviceBag")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
 	local cacheService = serviceBag:GetService(RoguePropertyCacheService)
-	local cache = cacheService:GetCache(self)
+	local cache = (cacheService :: any):GetCache(self)
 	local found = cache:Find(adornee)
 	if found then
 		return found
@@ -64,35 +80,42 @@ function RoguePropertyDefinition:Get(serviceBag: ServiceBag.ServiceBag, adornee:
 	return rogueProperty
 end
 
-function RoguePropertyDefinition:GetOrCreateInstance(parent: Instance): Instance
+function RoguePropertyDefinition.GetOrCreateInstance(self: RoguePropertyDefinition, parent: Instance): Instance
 	assert(typeof(parent) == "Instance", "Bad parent")
 
 	-- Note, in forcing the creation, we move to an attribute
 	local original = parent:GetAttribute(self:GetName())
 	local created = ValueBaseUtils.getOrCreateValue(
 		parent,
-		self:GetStorageInstanceType(),
+		self:GetStorageInstanceType() :: any,
 		self:GetName(),
 		self:GetEncodedDefaultValue()
 	)
 
 	if original ~= nil and original ~= RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE then
-		created.Value = original
+		(created :: any).Value = original
 	end
 
 	parent:SetAttribute(self:GetName(), RoguePropertyConstants.INSTANCE_ATTRIBUTE_VALUE)
 	return created
 end
 
-function RoguePropertyDefinition:SetParentPropertyTableDefinition(parentPropertyTableDefinition)
+function RoguePropertyDefinition.SetParentPropertyTableDefinition(
+	self: RoguePropertyDefinition,
+	parentPropertyTableDefinition: any
+): ()
 	self._parentPropertyTableDefinition = parentPropertyTableDefinition
 end
 
-function RoguePropertyDefinition:GetParentPropertyDefinition()
+function RoguePropertyDefinition.GetParentPropertyDefinition(self: RoguePropertyDefinition): any
 	return self._parentPropertyTableDefinition
 end
 
-function RoguePropertyDefinition:CanAssign(value, _strict): (boolean, string?)
+function RoguePropertyDefinition.CanAssign(
+	self: RoguePropertyDefinition,
+	value: any,
+	_strict: boolean?
+): (boolean, string?)
 	if self._valueType == typeof(value) then
 		return true
 	else
@@ -106,7 +129,7 @@ function RoguePropertyDefinition:CanAssign(value, _strict): (boolean, string?)
 	end
 end
 
-function RoguePropertyDefinition:SetName(name: string): ()
+function RoguePropertyDefinition.SetName(self: RoguePropertyDefinition, name: string): ()
 	assert(type(name) == "string", "Bad name")
 
 	self._name = name
@@ -116,7 +139,7 @@ end
 	Gets the name of the rogue property
 	@return string
 ]=]
-function RoguePropertyDefinition:GetName(): string
+function RoguePropertyDefinition.GetName(self: RoguePropertyDefinition): string
 	return self._name
 end
 
@@ -124,7 +147,7 @@ end
 	Gets the full name of the rogue property
 	@return string
 ]=]
-function RoguePropertyDefinition:GetFullName(): string
+function RoguePropertyDefinition.GetFullName(self: RoguePropertyDefinition): string
 	if self._parentPropertyTableDefinition then
 		return self._parentPropertyTableDefinition:GetFullName() .. "." .. self._name
 	else
@@ -136,23 +159,23 @@ end
 	Gets the default value for the property
 	@return TProperty
 ]=]
-function RoguePropertyDefinition:GetDefaultValue()
+function RoguePropertyDefinition.GetDefaultValue(self: RoguePropertyDefinition): any
 	return self._defaultValue
 end
 
-function RoguePropertyDefinition:GetValueType()
+function RoguePropertyDefinition.GetValueType(self: RoguePropertyDefinition): string
 	return self._valueType
 end
 
-function RoguePropertyDefinition:GetStorageInstanceType(): string
+function RoguePropertyDefinition.GetStorageInstanceType(self: RoguePropertyDefinition): string
 	return self._storageType
 end
 
-function RoguePropertyDefinition:GetEncodedDefaultValue()
-	return rawget(self, "_encodedDefaultValue")
+function RoguePropertyDefinition.GetEncodedDefaultValue(self: RoguePropertyDefinition): any
+	return rawget(self :: any, "_encodedDefaultValue")
 end
 
-function RoguePropertyDefinition:_computeStorageInstanceType()
+function RoguePropertyDefinition._computeStorageInstanceType(self: RoguePropertyDefinition): string
 	if self._valueType == "string" then
 		return "StringValue"
 	elseif self._valueType == "table" then

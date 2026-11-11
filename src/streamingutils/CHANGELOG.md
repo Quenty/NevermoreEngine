@@ -3,6 +3,113 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.33.0...@quenty/streamingutils@10.33.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.32.2...@quenty/streamingutils@10.33.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.32.1...@quenty/streamingutils@10.32.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.32.0...@quenty/streamingutils@10.32.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.31.1...@quenty/streamingutils@10.32.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.31.0...@quenty/streamingutils@10.31.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.30.0...@quenty/streamingutils@10.31.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.29.0...@quenty/streamingutils@10.30.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.28.2...@quenty/streamingutils@10.29.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.28.1...@quenty/streamingutils@10.28.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.28.0...@quenty/streamingutils@10.28.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.27.2...@quenty/streamingutils@10.28.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.27.1...@quenty/streamingutils@10.27.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.27.0...@quenty/streamingutils@10.27.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.26.0...@quenty/streamingutils@10.27.0) (2026-07-25)
+
+### Bug Fixes
+
+- Streaming cinematic allows latest focus to work (for now) ([528cb41](https://github.com/Quenty/NevermoreEngine/commit/528cb41a8c4f233d0903faf66c67dd6e71450cea))
+
+### Features
+
+- Use ReplicationFocus instead of overwriting the focus ([daaf82f](https://github.com/Quenty/NevermoreEngine/commit/daaf82f22862570e1eaafd48188c8ed067005ef9))
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.25.0...@quenty/streamingutils@10.26.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.24.0...@quenty/streamingutils@10.25.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.23.1...@quenty/streamingutils@10.24.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+## [10.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.23.0...@quenty/streamingutils@10.23.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.22.0...@quenty/streamingutils@10.23.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.21.0...@quenty/streamingutils@10.22.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.20.0...@quenty/streamingutils@10.21.0) (2026-07-20)
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
+- **streamingutils:** add StreamingCinematicsService for camera streaming focus ([4853cd6](https://github.com/Quenty/NevermoreEngine/commit/4853cd6d64c9ca32ea454ca7ebe69697c0baba1e))
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.19.0...@quenty/streamingutils@10.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
+# [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.18.1...@quenty/streamingutils@10.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/streamingutils
+
 ## [10.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/streamingutils@10.18.0...@quenty/streamingutils@10.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/streamingutils

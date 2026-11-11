@@ -10,10 +10,13 @@ local Players = game:GetService("Players")
 local Binder = require("Binder")
 local HasSaveSlotsBase = require("HasSaveSlotsBase")
 local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Remoting = require("Remoting")
+local SaveSlotConstants = require("SaveSlotConstants")
 local SaveSlotData = require("SaveSlotData")
 local ServiceBag = require("ServiceBag")
+local TeleportDataServiceClient = require("TeleportDataServiceClient")
 
 local HasSaveSlotsClient = setmetatable({}, HasSaveSlotsBase)
 HasSaveSlotsClient.ClassName = "HasSaveSlotsClient"
@@ -25,19 +28,21 @@ export type HasSaveSlotsClient =
 			_obj: Player,
 			_serviceBag: ServiceBag.ServiceBag,
 			_remoting: any,
+			_teleportDataServiceClient: any,
 		},
 		{} :: typeof({ __index = HasSaveSlotsClient })
 	))
 	& HasSaveSlotsBase.HasSaveSlotsBase
 
 function HasSaveSlotsClient.new(player: Player, serviceBag: ServiceBag.ServiceBag): HasSaveSlotsClient
-	if player ~= Players.LocalPlayer then
+	if player ~= (Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()) then
 		return nil :: any
 	end
 
 	local self: HasSaveSlotsClient = setmetatable(HasSaveSlotsBase.new(player, serviceBag) :: any, HasSaveSlotsClient)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._teleportDataServiceClient = self._serviceBag:GetService(TeleportDataServiceClient)
 
 	self._remoting = self._maid:Add(Remoting.Client.new(self._obj, "HasSaveSlots"))
 
@@ -116,6 +121,13 @@ function HasSaveSlotsClient.PromiseLastActiveSlotId(self: HasSaveSlotsClient): P
 end
 
 --[=[
+	Clears the active slot selection, returning the player to a no-slot state
+]=]
+function HasSaveSlotsClient.PromiseDeselectSlot(self: HasSaveSlotsClient): Promise.Promise<()>
+	return self._remoting.PromiseDeselectSlot:PromiseInvokeServer()
+end
+
+--[=[
 	Returns the slot ID from the given index
 ]=]
 function HasSaveSlotsClient.PromiseSlotIdFromIndex(
@@ -123,6 +135,20 @@ function HasSaveSlotsClient.PromiseSlotIdFromIndex(
 	slotIndex: number
 ): Promise.Promise<SaveSlotData.SlotId?>
 	return self._remoting.PromiseSlotIdFromIndex:PromiseInvokeServer(slotIndex)
+end
+
+-- Client realm hook for HasSaveSlotsBase: the incoming slot id is whatever the local player teleported
+-- in with, read from the unified TeleportDataServiceClient view (a promise for symmetry with the
+-- server; on the client it resolves immediately from local teleport data).
+function HasSaveSlotsClient.PromiseIncomingSlotId(self: HasSaveSlotsClient): Promise.Promise<SaveSlotData.SlotId?>
+	return self._teleportDataServiceClient
+		:PromiseArrivedValue(SaveSlotConstants.TELEPORT_DATA_SLOT_KEY)
+		:Then(function(slotId): SaveSlotData.SlotId?
+			if type(slotId) == "string" then
+				return slotId
+			end
+			return nil
+		end)
 end
 
 return Binder.new("HasSaveSlots", HasSaveSlotsClient :: any) :: Binder.Binder<HasSaveSlotsClient>

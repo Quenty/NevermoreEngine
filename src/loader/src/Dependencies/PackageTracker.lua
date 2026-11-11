@@ -520,6 +520,7 @@ end
 
 function PackageTracker.Destroy(self: PackageTracker)
 	self._maid:DoCleaning()
+	setmetatable(self :: any, nil)
 end
 
 return PackageTracker

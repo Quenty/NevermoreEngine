@@ -191,6 +191,7 @@ nevermore batch deploy --output results.json
 | `--publish` | Publish all deployed places |
 | `--target` | Deploy target name (default: `test`) |
 | `--smoke-test` | Run a post-deploy smoke test on targets with `basePlace` (off by default) |
+| `--bundle <file>` | Deploy the places in a bundle from `nevermore batch bundle <file> --deploy` instead of building them. Place ids and base places come from this checkout |
 
 Change detection uses `pnpm ls --filter "...[base]"` to find packages (and their dependents) that changed since the base ref, then filters to those with a matching deploy target.
 
@@ -217,6 +218,8 @@ Add `basePlace` to your deploy target:
 ```
 
 The `basePlace` place is the source of truth for Studio-authored content. The target `placeId` is where the merged result gets uploaded. These can be in the same universe or different ones.
+
+By default the CLI downloads the **latest published version** of the base place on every deploy. To make deploys reproducible — so a broken Studio edit can't leak into a deploy — pin a specific version with an optional `basePlace.version`, and bump it deliberately with `nevermore deploy version upgrade`. Setting it to `"published"` or `"saved"` instead keeps following the base place but pins down which kind of Studio change counts. See [Pinning base place versions](../deploy.md#pinning-base-place-versions).
 
 ### How the merge works
 
@@ -249,10 +252,20 @@ nevermore tools post-deploy-results results.json --run-outcome success
 
 This creates or updates a PR comment with a table showing each game's deploy status and a "Try it" link to the Roblox place. Requires `GITHUB_TOKEN` for PR comments. Job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
 
+### Deploys on PRs from forks
+
+A fork's `pull_request` run gets no secrets, so it cannot download the base place or upload to Open Cloud. It works the same way as [tests on PRs from forks](testing.md#tests-on-prs-from-forks), split between where the PR's code is built and where the API key lives:
+
+1. **`integration.yml`, on `pull_request`.** For a same-repo PR this deploys, as before. For a fork the job is named `integration-build` and runs `nevermore batch bundle pr-<n>.nevermore.deploy.tar --deploy --target integration`, which rojo-builds each changed place without merging its base place, and uploads the file as the `pr-<n>.nevermore.deploy` artifact. Each place travels with its rojo project, so the merge grafts what the fork's project declares.
+2. **`integration-forks.yml`, on `workflow_run`.** It runs from `main`'s copy once `integration` completes, in the `integration` environment, and runs `nevermore batch deploy --target integration --publish --bundle <file>`. The bundle only names places: their place and universe ids and their base place come from `main`'s `deploy.nevermore.json`, so a place `main` has no target for fails rather than deploying where the fork says. The deploy is stamped with the PR's head commit and branch, as a same-repo PR's deploy is, rather than `main`'s or the synthetic merge commit. The run passes `--bundle-commit` with the PR head commit GitHub reports, so a bundle built from any other commit fails. Results are posted to the PR and reported as an `integration` check on the PR's commit.
+3. **By hand.** Run `integration-forks.yml` from the Actions tab with a PR number to deploy again from the newest successful `integration-build` for the PR's head, while its artifact lasts (3 days).
+
+`nevermore batch deploy --bundle <file>` works locally too, which reproduces exactly what CI deployed.
+
 ### Automatic discovery
 
 `nevermore batch deploy` discovers games the same way `nevermore batch test` discovers test packages — by scanning pnpm workspaces for `deploy.nevermore.json` files with the specified target. Any directory under `games/` (or anywhere in the workspace) with a valid config is picked up automatically.
 
 ## Luau template convention
 
-Luau scripts that run in Roblox contexts (smoke tests, transforms, templates) should be stored as `.luau` files in `build-scripts/` directories — not generated inline from TypeScript. This keeps Luau code editable, lintable, and follows the pattern established by `studio-bridge/build-scripts/`.
+Luau scripts that run in Roblox contexts (smoke tests, transforms, templates) should be stored as `.lua` files in `build-scripts/` directories — not generated inline from TypeScript. This keeps Luau code editable, lintable, and follows the pattern established by `studio-bridge/build-scripts/`.

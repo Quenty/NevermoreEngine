@@ -15,12 +15,12 @@ local HapticFeedbackUtils = {}
 	@param length number
 	@param amplitude number
 ]=]
-function HapticFeedbackUtils.smallVibrate(userInputType: Enum.UserInputType, length: number, amplitude: number)
-	length = length or 0.1
-	amplitude = amplitude or 1
+function HapticFeedbackUtils.smallVibrate(userInputType: Enum.UserInputType, length: number?, amplitude: number?)
+	local resolvedLength: number = length or 0.1
+	local resolvedAmplitude: number = amplitude or 1
 
-	if HapticFeedbackUtils.setSmallVibration(userInputType, amplitude) then
-		task.delay(length, function()
+	if HapticFeedbackUtils.setSmallVibration(userInputType, resolvedAmplitude) then
+		task.delay(resolvedLength, function()
 			HapticFeedbackUtils.setSmallVibration(userInputType, 0)
 		end)
 	end

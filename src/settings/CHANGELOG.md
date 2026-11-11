@@ -3,6 +3,174 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.76.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.75.1...@quenty/settings@11.76.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.75.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.75.0...@quenty/settings@11.75.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [11.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.74.3...@quenty/settings@11.75.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.74.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.74.2...@quenty/settings@11.74.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.74.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.74.1...@quenty/settings@11.74.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.74.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.74.0...@quenty/settings@11.74.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.73.0...@quenty/settings@11.74.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.72.1...@quenty/settings@11.73.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.72.0...@quenty/settings@11.72.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.71.0...@quenty/settings@11.72.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.70.0...@quenty/settings@11.71.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.69.1...@quenty/settings@11.70.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.69.0...@quenty/settings@11.69.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.68.1...@quenty/settings@11.69.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.68.0...@quenty/settings@11.68.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.2...@quenty/settings@11.68.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+
+## [11.67.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.1...@quenty/settings@11.67.2) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.67.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.67.0...@quenty/settings@11.67.1) (2026-07-30)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.3...@quenty/settings@11.67.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.66.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.2...@quenty/settings@11.66.3) (2026-07-27)
+
+### Bug Fixes
+
+- **settings:** stop settings hydration recursing until the C stack dies ([#757](https://github.com/Quenty/NevermoreEngine/issues/757)) ([d6ff0e3](https://github.com/Quenty/NevermoreEngine/commit/d6ff0e313c05ff618ca794dd4bdc70fb3e645f0a))
+
+## [11.66.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.1...@quenty/settings@11.66.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.66.0...@quenty/settings@11.66.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.65.0...@quenty/settings@11.66.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.64.0...@quenty/settings@11.65.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.63.0...@quenty/settings@11.64.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.62.1...@quenty/settings@11.63.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.62.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.62.0...@quenty/settings@11.62.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.61.0...@quenty/settings@11.62.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [11.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.60.0...@quenty/settings@11.61.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.59.0...@quenty/settings@11.60.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.58.0...@quenty/settings@11.59.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.57.0...@quenty/settings@11.58.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.56.0...@quenty/settings@11.57.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [11.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.55.1...@quenty/settings@11.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/settings
+
+## [11.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.55.0...@quenty/settings@11.55.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.54.0...@quenty/settings@11.55.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/settings
+
+# [11.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.3...@quenty/settings@11.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- add [@within](https://github.com/within) for moonwave on SettingDefinitionProvider \_\_index; cast Tie :Implement receiver ([388e3f8](https://github.com/Quenty/NevermoreEngine/commit/388e3f8c658b14d991b2328776d6cac5b11501c0))
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+- **settings:** cast cmdr handle to dodge flaky symlink-nominal analyze error ([bdaf1b4](https://github.com/Quenty/NevermoreEngine/commit/bdaf1b45f24882af05f40a941f48eb5b125eac84))
+- **settings:** cast cmdr service handle for strict CmdrServiceClient ([18b38b3](https://github.com/Quenty/NevermoreEngine/commit/18b38b3d4ceb3f1c9476015f545822a78f34747f))
+
+### Features
+
+- **settings:** convert package to --!strict ([5a93f97](https://github.com/Quenty/NevermoreEngine/commit/5a93f9791f9dcdc4843c3ada174ddc130e071104))
+
 ## [11.53.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings@11.53.2...@quenty/settings@11.53.3) (2026-06-15)
 
 ### Bug Fixes

@@ -2,7 +2,12 @@ import { OutputHelper } from '../outputHelper.js';
 import { formatDurationMs, isCI } from '../cli-utils.js';
 import { type PackageResult, BaseReporter } from './reporter.js';
 import { type IStateTracker } from './state/state-tracker.js';
-import { formatProgressResult, isEmptyTestRun } from './progress-format.js';
+import {
+  colorStatus,
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+} from './result-status.js';
 
 export interface GroupedReporterOptions {
   showLogs: boolean;
@@ -13,6 +18,11 @@ export interface GroupedReporterOptions {
   successLabel?: string;
   /** Label for failed results, e.g. "DEPLOY FAILED". Default: "FAILED" */
   failureLabel?: string;
+  /**
+   * When true, a success carrying no test counts prints as unverified. Set by
+   * test runs: a ✓ with no numbers behind it looks identical to a real pass.
+   */
+  expectsTestCounts?: boolean;
 }
 
 /**
@@ -70,43 +80,38 @@ export class GroupedReporter extends BaseReporter {
 
     const showLogs = this._options.showLogs || !result.success;
     const duration = formatDurationMs(result.durationMs);
-    const successLabel = this._options.successLabel ?? 'Passed';
-    const failureLabel =
-      result.failureLabel ?? this._options.failureLabel ?? 'FAILED';
 
-    const progressText = formatProgressResult(result.progressSummary);
-    const empty = isEmptyTestRun(result.progressSummary);
+    const status = resolveResultStatus(result, {
+      successLabel: this._options.successLabel,
+      failureLabel: this._options.failureLabel,
+      expectsTestCounts: this._options.expectsTestCounts,
+    });
 
-    if (result.success) {
-      const label = progressText
-        ? `${successLabel} ${progressText}`
-        : successLabel;
-      const formatted = empty
-        ? OutputHelper.formatWarning(`${label} ⚠`)
-        : OutputHelper.formatSuccess(label);
-      const icon = empty
-        ? OutputHelper.formatWarning('⚠')
-        : OutputHelper.formatSuccess('✓');
-      console.log(
-        `  ${icon} ${formatted} ${OutputHelper.formatDim(`(${duration})`)}`
-      );
-    } else {
-      const failedPhase = result.failedPhase;
-      const label = failedPhase
-        ? `${failureLabel} at ${failedPhase}`
-        : failureLabel;
-      console.log(
-        `  ${OutputHelper.formatError('✗')} ${OutputHelper.formatError(
-          label
-        )} ${OutputHelper.formatDim(`(${duration})`)}`
-      );
-    }
+    console.log(
+      `  ${colorStatus(
+        statusIcon(status.severity, 'ascii'),
+        status.severity
+      )} ${colorStatus(
+        formatStatusText(status),
+        status.severity
+      )} ${OutputHelper.formatDim(`(${duration})`)}`
+    );
 
     if (showLogs) {
       if (result.logs) {
-        console.log(result.logs);
+        // jest-lua's escape codes reach here as log content, past chalk.
+        console.log(
+          process.env.NO_COLOR
+            ? OutputHelper.stripAnsi(result.logs)
+            : result.logs
+        );
       } else {
-        console.log(OutputHelper.formatDim('  (no output)'));
+        // Says only what is known: this package has no logs attached. Whether
+        // the run produced none, or produced some that could not be attributed,
+        // is the parser's to report — claiming either here would be a guess.
+        console.log(
+          OutputHelper.formatWarning('  (no logs attached to this package)')
+        );
       }
       if (result.error) {
         console.log(`  ${OutputHelper.formatError(result.error)}`);

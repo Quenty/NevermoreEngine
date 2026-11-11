@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Holds single toggleable actions (like a tool system).
 
@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 
 local ContextActionService = game:GetService("ContextActionService")
 
+local BaseAction = require("BaseAction")
 local Maid = require("Maid")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -21,14 +22,24 @@ local ActionManager = {}
 ActionManager.__index = ActionManager
 ActionManager.ClassName = "ActionManager"
 
-function ActionManager.new()
-	local self = setmetatable({}, ActionManager)
+export type ActionManager = typeof(setmetatable(
+	{} :: {
+		_maid: Maid.Maid,
+		_actions: { [string]: BaseAction.BaseAction },
+		ActiveAction: ValueObject.ValueObject<BaseAction.BaseAction?>,
+		ActionAdded: Signal.Signal<BaseAction.BaseAction>,
+	},
+	{} :: typeof({ __index = ActionManager })
+))
+
+function ActionManager.new(): ActionManager
+	local self: ActionManager = setmetatable({} :: any, ActionManager)
 
 	self._maid = Maid.new()
 	self._actions = {}
 
-	self.ActiveAction = self._maid:Add(ValueObject.new())
-	self.ActionAdded = self._maid:Add(Signal.new()) -- :Fire(action)
+	self.ActiveAction = self._maid:Add(ValueObject.new() :: ValueObject.ValueObject<BaseAction.BaseAction?>)
+	self.ActionAdded = self._maid:Add(Signal.new() :: any) -- :Fire(action)
 
 	-- Stop actions while tool is in play
 	self._maid.ToolEquipped = ContextActionService.LocalToolEquipped:Connect(function(_)
@@ -42,7 +53,7 @@ function ActionManager.new()
 				value:Deactivate()
 			end)
 			maid:GiveTask(value.Deactivated:Connect(function()
-				if self.ActiveAction == value then
+				if self.ActiveAction.Value == value then
 					self.ActiveAction.Value = nil
 				end
 			end))
@@ -64,11 +75,11 @@ function ActionManager.new()
 	return self
 end
 
-function ActionManager:StopCurrentAction()
+function ActionManager.StopCurrentAction(self: ActionManager): ()
 	self.ActiveAction.Value = nil
 end
 
-function ActionManager:ActivateAction(name, ...)
+function ActionManager.ActivateAction(self: ActionManager, name: string, ...): ()
 	local action = self:GetAction(name)
 	if action then
 		action:Activate(...)
@@ -77,26 +88,25 @@ function ActionManager:ActivateAction(name, ...)
 	end
 end
 
-function ActionManager:GetAction(name)
+function ActionManager.GetAction(self: ActionManager, name: string): BaseAction.BaseAction?
 	return self._actions[name]
 end
 
-function ActionManager:GetActions()
-	local list = {}
+function ActionManager.GetActions(self: ActionManager): { BaseAction.BaseAction }
+	local list: { BaseAction.BaseAction } = {}
 
 	for _, action in self._actions do
-		table.insert(list, action)
+		table.insert(list, action :: any)
 	end
 
 	return list
 end
 
-function ActionManager:AddAction(action)
+function ActionManager.AddAction(self: ActionManager, action: BaseAction.BaseAction): ActionManager
 	local name = action:GetName()
 
 	if self._actions[name] then
 		error(string.format("[ActionManager] - action with name '%s' already exists", tostring(name)))
-		return
 	end
 
 	self._actions[name] = action
@@ -116,7 +126,7 @@ function ActionManager:AddAction(action)
 	return self
 end
 
-function ActionManager:Destroy()
+function ActionManager.Destroy(self: ActionManager): ()
 	self._maid:Destroy()
 end
 

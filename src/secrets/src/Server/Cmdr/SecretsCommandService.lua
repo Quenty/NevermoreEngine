@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SecretsCommandService
 ]=]
@@ -12,8 +12,18 @@ local ServiceBag = require("ServiceBag")
 local SecretsCommandService = {}
 SecretsCommandService.ServiceName = "SecretsCommandService"
 
-function SecretsCommandService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SecretsCommandService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_cmdrService: any,
+		_secretsService: any,
+	},
+	{} :: typeof({ __index = SecretsCommandService })
+))
+
+function SecretsCommandService.Init(self: SecretsCommandService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -21,11 +31,11 @@ function SecretsCommandService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._secretsService = self._serviceBag:GetService((require :: any)("SecretsService"))
 end
 
-function SecretsCommandService:Start()
+function SecretsCommandService.Start(self: SecretsCommandService): ()
 	self:_registerCommands()
 end
 
-function SecretsCommandService:_registerCommands()
+function SecretsCommandService._registerCommands(self: SecretsCommandService): ()
 	self._maid:GivePromise(self._cmdrService:PromiseCmdr()):Then(function(cmdr)
 		SecretsCmdrTypeUtils.registerSecretKeyTypes(cmdr, self._secretsService)
 	end)
@@ -153,7 +163,7 @@ function SecretsCommandService:_registerCommands()
 	end)
 end
 
-function SecretsCommandService:Destroy()
+function SecretsCommandService.Destroy(self: SecretsCommandService): ()
 	self._maid:DoCleaning()
 end
 

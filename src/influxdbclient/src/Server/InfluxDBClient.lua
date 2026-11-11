@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local InfluxDBClientConfigUtils = require("InfluxDBClientConfigUtils")
+local InfluxDBRequestHandlerMock = require("InfluxDBRequestHandlerMock")
 local InfluxDBWriteAPI = require("InfluxDBWriteAPI")
 local Maid = require("Maid")
 local Promise = require("Promise")
@@ -26,6 +27,7 @@ export type InfluxDBClient =
 			_clientConfig: ValueObject.ValueObject<InfluxDBClientConfigUtils.InfluxDBClientConfig>,
 			_writeApis: { [string]: { [string]: InfluxDBWriteAPI.InfluxDBWriteAPI } },
 			_flushAllPromises: Promise.Promise<()>,
+			_requestHandler: InfluxDBWriteAPI.InfluxDBRequestHandler?,
 		},
 		{} :: typeof({ __index = InfluxDBClient })
 	))
@@ -35,10 +37,19 @@ export type InfluxDBClient =
 	Creates a new InfluxDB client
 
 	@param clientConfig InfluxDBClientConfig?
+	@param requestHandler InfluxDBRequestHandler? -- Defaults to [HttpPromise.request]. Inject a mock to avoid real HTTP.
 	@return InfluxDBClient
 ]=]
-function InfluxDBClient.new(clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig?): InfluxDBClient
+function InfluxDBClient.new(
+	clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig?,
+	requestHandler: InfluxDBWriteAPI.InfluxDBRequestHandler?
+): InfluxDBClient
 	local self: InfluxDBClient = setmetatable(BaseObject.new() :: any, InfluxDBClient)
+
+	assert(type(requestHandler) == "function" or requestHandler == nil, "Bad requestHandler")
+
+	-- Threaded down into each write API created by GetWriteAPI so all of them share the same seam.
+	self._requestHandler = requestHandler
 
 	self._clientConfig = self._maid:Add(ValueObject.new(nil))
 
@@ -49,6 +60,33 @@ function InfluxDBClient.new(clientConfig: InfluxDBClientConfigUtils.InfluxDBClie
 	self._writeApis = {}
 
 	return self
+end
+
+--[=[
+	Creates a new InfluxDB client wired to an [InfluxDBRequestHandlerMock] so no real HTTP calls are
+	made. Returns both the client and the mock, so a test can inspect the requests it would have sent.
+
+	```lua
+	local client, requestMock = InfluxDBClient.newMock()
+	client:SetClientConfig({ url = "https://example.com", token = "token" })
+
+	local writeAPI = client:GetWriteAPI("org", "bucket")
+	writeAPI:QueuePoint(point)
+	writeAPI:PromiseFlush():Wait()
+
+	print(#requestMock:GetRequests()) --> 1
+	```
+
+	@param clientConfig InfluxDBClientConfig?
+	@return (InfluxDBClient, InfluxDBRequestHandlerMock)
+]=]
+function InfluxDBClient.newMock(
+	clientConfig: InfluxDBClientConfigUtils.InfluxDBClientConfig?
+): (InfluxDBClient, InfluxDBRequestHandlerMock.InfluxDBRequestHandlerMock)
+	local requestMock = InfluxDBRequestHandlerMock.new()
+	local client = InfluxDBClient.new(clientConfig, requestMock.Handler)
+
+	return client, requestMock
 end
 
 --[=[
@@ -83,10 +121,14 @@ function InfluxDBClient.GetWriteAPI(
 
 	local maid = Maid.new()
 
-	local writeAPI = maid:Add(InfluxDBWriteAPI.new(org, bucket, precision))
+	local writeAPI = maid:Add(InfluxDBWriteAPI.new(org, bucket, precision, self._requestHandler))
 
 	maid:GiveTask(self._clientConfig:Observe():Subscribe(function(clientConfig)
-		writeAPI:SetClientConfig(clientConfig)
+		-- The observable fires the current value immediately, which is nil until a config is set. Guard
+		-- so GetWriteAPI can be called before SetClientConfig; the later config is pushed through here.
+		if clientConfig then
+			writeAPI:SetClientConfig(clientConfig)
+		end
 	end))
 
 	maid:GiveTask(writeAPI.Destroying:Connect(function()

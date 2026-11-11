@@ -1,6 +1,6 @@
 {
   "name": "@quenty/scoredactionservice",
-  "version": "16.44.1",
+  "version": "16.62.1",
   "description": "Scores actions and picks the highest rated one every frame",
   "keywords": [
     "Roblox",
@@ -33,14 +33,18 @@
     "@quenty/brio": "workspace:*",
     "@quenty/inputkeymaputils": "workspace:*",
     "@quenty/inputmode": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/statestack": "workspace:*",
+    "@quenty/steputils": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

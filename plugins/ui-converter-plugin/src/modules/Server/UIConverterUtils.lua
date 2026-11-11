@@ -5,6 +5,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Math = require("Math")
+local Promise = require("Promise")
 local PromiseUtils = require("PromiseUtils")
 local String = require("String")
 
@@ -507,6 +508,59 @@ function UIConverterUtils.promiseCreateLookupMap(library: UIConverterLibrary, ui
 
 		return lookupMap
 	end)
+end
+
+--[=[
+	Converts a list of root instances into a single source string. This is the
+	composed entry point shared by the widget and the headless API, so the two
+	can never drift apart.
+]=]
+function UIConverterUtils.promiseCode(library: UIConverterLibrary, uiConverter, instances: { Instance })
+	assert(type(library) == "string", "Bad library")
+	assert(type(uiConverter) == "table", "Bad uiConverter")
+	assert(type(instances) == "table", "Bad instances")
+
+	return UIConverterUtils.promiseCreateLookupMap(library, uiConverter, instances):Then(function(refLookupMap)
+		local codePromises = {}
+		for _, item in instances do
+			table.insert(
+				codePromises,
+				UIConverterUtils.promiseToLibraryInstance(library, uiConverter, item, refLookupMap)
+			)
+		end
+
+		return PromiseUtils.all(codePromises):Then(function(...)
+			local results = {}
+			for i = 1, select("#", ...) do
+				local item = select(i, ...)
+				if item then
+					table.insert(results, item)
+				end
+			end
+
+			local prefix = UIConverterUtils.getEntryListCode(library, refLookupMap)
+
+			if #results == 0 then
+				return Promise.rejected("No convertible instances")
+			elseif #results == 1 then
+				return prefix .. results[1]
+			else
+				return prefix .. UIConverterUtils.convertListOfItemsToTable(results)
+			end
+		end)
+	end)
+end
+
+--[=[
+	Wraps generated code so it is valid as a ModuleScript body. Generated code
+	is a bare expression unless the ref-entry prefix already added a return.
+]=]
+function UIConverterUtils.toModuleSource(code: string): string
+	if string.match(code, "^%s*local ") or string.match(code, "^%s*return") then
+		return code
+	end
+
+	return "return " .. code
 end
 
 function UIConverterUtils.getLibraryRefEntryKey(library: UIConverterLibrary)

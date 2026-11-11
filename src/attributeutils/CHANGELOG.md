@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.39.0...@quenty/attributeutils@14.39.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.38.2...@quenty/attributeutils@14.39.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+## [14.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.38.1...@quenty/attributeutils@14.38.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+## [14.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.38.0...@quenty/attributeutils@14.38.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.37.0...@quenty/attributeutils@14.38.0) (2026-08-28)
+
+### Bug Fixes
+
+- Strict type AttributeUtils and add tests to all of them ([cbc351a](https://github.com/Quenty/NevermoreEngine/commit/cbc351a608794f2d2114b25ed5e3ef6c433dafea))
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.36.1...@quenty/attributeutils@14.37.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.36.0...@quenty/attributeutils@14.36.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.35.1...@quenty/attributeutils@14.36.0) (2026-07-28)
+
+### Bug Fixes
+
+- EncodedAttributeValue stores the defaultValue ([91e3da1](https://github.com/Quenty/NevermoreEngine/commit/91e3da16fe7e832c6d3e6e9d31fda89f5daafb65))
+
+## [14.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.35.0...@quenty/attributeutils@14.35.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.34.0...@quenty/attributeutils@14.35.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.33.0...@quenty/attributeutils@14.34.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.32.0...@quenty/attributeutils@14.33.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.31.0...@quenty/attributeutils@14.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
+# [14.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.30.1...@quenty/attributeutils@14.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/attributeutils
+
 ## [14.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/attributeutils@14.30.0...@quenty/attributeutils@14.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/attributeutils

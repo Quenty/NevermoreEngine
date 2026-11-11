@@ -29,6 +29,7 @@ export type ObservableList<T> = typeof(setmetatable(
 		_contents: { [Symbol.Symbol]: T },
 		_indexes: { [Symbol.Symbol]: number },
 		_indexObservers: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
+		_negativeIndexObservers: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<T?>,
 		_keyIndexObservables: any, -- ObservableSubscriptionTable.ObservableSubscriptionTable<number?>,
 		_countValue: ValueObject.ValueObject<number>,
 
@@ -72,6 +73,7 @@ function ObservableList.new<T>(): ObservableList<T>
 	self._indexes = {} -- { [Symbol]: number }
 
 	self._indexObservers = self._maid:Add(ObservableSubscriptionTable.new())
+	self._negativeIndexObservers = self._maid:Add(ObservableSubscriptionTable.new())
 	self._keyIndexObservables = self._maid:Add(ObservableSubscriptionTable.new())
 	self._countValue = self._maid:Add(ValueObject.new(0, "number"))
 
@@ -198,7 +200,9 @@ end
 function ObservableList.ObserveAtIndex<T>(self: ObservableList<T>, indexToObserve: number): Observable.Observable<T?>
 	assert(type(indexToObserve) == "number", "Bad indexToObserve")
 
-	return self._indexObservers:Observe(indexToObserve, function(sub)
+	local observers = if indexToObserve < 0 then self._negativeIndexObservers else self._indexObservers
+
+	return observers:Observe(indexToObserve, function(sub)
 		sub:Fire(self:Get(indexToObserve))
 	end)
 end
@@ -355,7 +359,6 @@ function ObservableList.InsertAt<T>(self: ObservableList<T>, item: T, index: num
 	end
 
 	self._keyList[index] = key
-	local listLength = #self._keyList
 
 	-- Fire off count
 	self._countValue.Value = self._countValue.Value + 1
@@ -366,14 +369,16 @@ function ObservableList.InsertAt<T>(self: ObservableList<T>, item: T, index: num
 	-- Fire off the index change on the value
 	self._keyIndexObservables:Fire(key, index)
 	self._indexObservers:Fire(index, item)
-	self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), item)
 
 	for _, data in changed do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
-			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
 			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
+	end
+
+	if self.Destroy then
+		self:_fireNegativeIndexObservers(index, n)
 	end
 
 	return function()
@@ -435,7 +440,6 @@ function ObservableList.RemoveByKey<T>(self: ObservableList<T>, key): T?
 		})
 	end
 	self._keyList[n] = nil
-	local listLength = #self._keyList
 
 	-- Fire off that count changed
 	self._countValue.Value = self._countValue.Value - 1
@@ -446,19 +450,18 @@ function ObservableList.RemoveByKey<T>(self: ObservableList<T>, key): T?
 
 	-- Fire off the index change on the value
 	self._keyIndexObservables:Complete(key)
-	self._indexObservers:Fire(listLength, nil)
-
-	if listLength == 0 then
-		self._indexObservers:Fire(-1, nil)
-	end
+	self._indexObservers:Fire(n, nil)
 
 	-- Fire off index change on each key list (if the data isn't stale)
 	for _, data in changed do
 		if self._indexes[data.key] == data.newIndex then
 			self._indexObservers:Fire(data.newIndex, self._contents[data.key])
-			self._indexObservers:Fire(ListIndexUtils.toNegativeIndex(listLength, index), self._contents[data.key])
 			self._keyIndexObservables:Fire(data.key, data.newIndex)
 		end
+	end
+
+	if self.Destroy then
+		self:_fireNegativeIndexObservers(index - 1, n)
 	end
 
 	return item
@@ -474,6 +477,39 @@ function ObservableList.GetList<T>(self: ObservableList<T>): { T }
 		list[index] = self._contents[key]
 	end
 	return list
+end
+
+function ObservableList._fireNegativeIndexObservers<T>(
+	self: ObservableList<T>,
+	lastChangedIndex: number,
+	previousLength: number
+)
+	local observers = self._negativeIndexObservers
+	if not observers:HasAnySubscriptions() then
+		return
+	end
+
+	local listLength = #self._keyList
+
+	-- Subscribers run synchronously and may (un)subscribe, so snapshot the keys first
+	local negativeIndexes: { number } = {}
+	for negativeIndex in observers:GetRawSubscriptionMap() do
+		table.insert(negativeIndexes, negativeIndex)
+	end
+
+	for _, negativeIndex in negativeIndexes do
+		local index = listLength + negativeIndex + 1
+		local previousIndex = previousLength + negativeIndex + 1
+
+		local changed = (index >= 1 and index <= lastChangedIndex) or (index < 1 and previousIndex >= 1)
+		if not changed then
+			continue
+		end
+
+		-- Emit the live value: an earlier subscriber may have mutated the list reentrantly
+		local key = self._keyList[#self._keyList + negativeIndex + 1]
+		observers:Fire(negativeIndex, if key ~= nil then self._contents[key] else nil)
+	end
 end
 
 --[=[

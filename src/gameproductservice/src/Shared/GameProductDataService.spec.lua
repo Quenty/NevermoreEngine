@@ -1,0 +1,173 @@
+--!strict
+--[[
+	Integration coverage for GameProductDataService driven through a real ServiceBag. Only
+	GameProductDataService (and its dependency TieRealmService) is registered, so the heavy
+	binder/MarketplaceService graph is never started. This focuses on the pieces that do not
+	require a live Player: the exported purchase signals, the server-only prompting ValueObject,
+	and the prompt guard's realm behavior. The realm is forced explicitly so the test is not
+	sensitive to where the runner executes.
+
+	@class GameProductDataService.spec.lua
+]]
+local require = require(script.Parent.loader).load(script)
+
+local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameProductDataService = require("GameProductDataService")
+local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
+local PromiseTestUtils = require("PromiseTestUtils")
+local ServiceBag = require("ServiceBag")
+local Signal = require("Signal")
+local TieRealmService = require("TieRealmService")
+local TieRealms = require("TieRealms")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+local function setup(tieRealm: TieRealms.TieRealm?)
+	local maid = Maid.new()
+	local serviceBag = maid:Add(ServiceBag.new())
+	local tieRealmService: TieRealmService.TieRealmService = serviceBag:GetService(TieRealmService) :: any
+	local gameProductDataService: GameProductDataService.GameProductDataService =
+		serviceBag:GetService(GameProductDataService) :: any
+	serviceBag:Init()
+	tieRealmService:SetTieRealm(tieRealm or TieRealms.SERVER)
+	serviceBag:Start()
+
+	local controller = {
+		serviceBag = serviceBag,
+		tieRealmService = tieRealmService,
+		gameProductDataService = gameProductDataService,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
+
+describe("GameProductDataService purchase signals", function()
+	it("should expose the six purchase signals after init", function()
+		local context = setup()
+		local service = context.gameProductDataService
+
+		for _, signalName in
+			{
+				"GamePassPurchased",
+				"ProductPurchased",
+				"AssetPurchased",
+				"BundlePurchased",
+				"SubscriptionPurchased",
+				"MembershipPurchased",
+			}
+		do
+			expect(Signal.isSignal((service :: any)[signalName])).toEqual(true)
+		end
+
+		context:Destroy()
+	end)
+end)
+
+describe("GameProductDataService server-only prompting", function()
+	it("should default to disabled", function()
+		local context = setup()
+		expect(context.gameProductDataService:GetServerOnlyPromptingValue().Value).toEqual(false)
+		context:Destroy()
+	end)
+
+	it("should enable and disable via SetServerOnlyPrompting on the server", function()
+		local context = setup()
+		local service = context.gameProductDataService
+
+		service:SetServerOnlyPrompting(true)
+		expect(service:GetServerOnlyPromptingValue().Value).toEqual(true)
+
+		service:SetServerOnlyPrompting(false)
+		expect(service:GetServerOnlyPromptingValue().Value).toEqual(false)
+		context:Destroy()
+	end)
+
+	it("should replicate the change through the ValueObject observable", function()
+		local context = setup()
+		local service = context.gameProductDataService
+
+		local values = {}
+		local sub = service:GetServerOnlyPromptingValue():Observe():Subscribe(function(value)
+			table.insert(values, value)
+		end)
+
+		service:SetServerOnlyPrompting(true)
+		sub:Destroy()
+
+		expect(values[1]).toEqual(false)
+		expect(values[#values]).toEqual(true)
+		context:Destroy()
+	end)
+
+	it("should reject a non-boolean argument", function()
+		local context = setup()
+		local service = context.gameProductDataService
+
+		expect(function()
+			service:SetServerOnlyPrompting("nope" :: any)
+		end).toThrow()
+		context:Destroy()
+	end)
+
+	it("should refuse to configure server-only prompting from the client realm", function()
+		local context = setup(TieRealms.CLIENT)
+		local service = context.gameProductDataService
+
+		expect(function()
+			service:SetServerOnlyPrompting(true)
+		end).toThrow()
+		context:Destroy()
+	end)
+end)
+
+describe("GameProductDataService ownership overrides", function()
+	it("should refuse to set an ownership override from the client realm", function()
+		local context = setup(TieRealms.CLIENT)
+		local service = context.gameProductDataService
+		local fakePlayer = PlayerMock.new()
+
+		expect(function()
+			service:SetPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123, true)
+		end).toThrow()
+
+		fakePlayer:Destroy()
+		context:Destroy()
+	end)
+
+	it("should refuse to clear an ownership override from the client realm", function()
+		local context = setup(TieRealms.CLIENT)
+		local service = context.gameProductDataService
+		local fakePlayer = PlayerMock.new()
+
+		expect(function()
+			service:ClearPlayerOwnershipOverride(fakePlayer :: any, GameConfigAssetTypes.GAME, 123)
+		end).toThrow()
+
+		fakePlayer:Destroy()
+		context:Destroy()
+	end)
+end)
+
+describe("GameProductDataService prompt guard", function()
+	it("should resolve immediately on the server realm", function()
+		local context = setup(TieRealms.SERVER)
+		local service = context.gameProductDataService
+
+		local fakePlayer = PlayerMock.new()
+		local outcome = PromiseTestUtils.awaitOutcome(service:_promiseServerOnlyPromptingGuard(fakePlayer :: any), 5)
+		expect(outcome).toEqual("resolved")
+
+		fakePlayer:Destroy()
+		context:Destroy()
+	end)
+end)

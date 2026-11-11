@@ -77,6 +77,18 @@ export function isEmptyTestRun(progress?: ProgressSummary): boolean {
 }
 
 /**
+ * True when a run that should have reported test counts reported none at all.
+ *
+ * Distinct from [[isEmptyTestRun]]: that one means the runner spoke and said
+ * zero tests, which is a legitimate answer. This one means we never heard the
+ * counts, so nothing is known about what ran — a result that must not render
+ * as a plain success.
+ */
+export function isUnreportedTestRun(progress?: ProgressSummary): boolean {
+  return progress === undefined;
+}
+
+/**
  * Condense a raw error string and optional failedPhase into a short one-liner.
  *
  * Examples:

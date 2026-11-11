@@ -1,3 +1,4 @@
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
@@ -6,6 +7,7 @@ import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
 import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
+import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
   CloudJobContext,
   LocalJobContext,
@@ -15,7 +17,7 @@ import {
   loadDeployConfigAsync,
   resolveDeployConfigPath,
   resolveSingleDeployTarget,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy';
 import {
   type Reporter,
   type LiveStateTracker,
@@ -35,6 +37,7 @@ export interface TestProjectArgs extends NevermoreGlobalArgs {
   placeId?: number;
   scriptTemplate?: string;
   scriptText?: string;
+  scriptFile?: string;
   output?: string;
   timeout?: number;
 }
@@ -56,9 +59,9 @@ export class TestProjectCommand<T>
       type: 'string',
     });
     args.option('logs', {
-      describe: 'Show execution logs',
+      describe:
+        'Show execution logs. Defaults on with --script-text and --script-file, whose output is the whole point of the run',
       type: 'boolean',
-      default: false,
     });
     args.option('universe-id', {
       describe:
@@ -77,6 +80,12 @@ export class TestProjectCommand<T>
       describe:
         'Luau code to execute directly instead of the configured script template',
       type: 'string',
+      conflicts: 'script-file',
+    });
+    args.option('script-file', {
+      describe:
+        'Path to a Luau file to execute directly, like --script-text but without the command line length limit',
+      type: 'string',
     });
     args.option('output', {
       describe: 'Write JSON results to this file',
@@ -84,7 +93,7 @@ export class TestProjectCommand<T>
     });
     args.option('timeout', {
       describe:
-        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun (default: 120)',
+        'Max script execution time in seconds. Sent to the Open Cloud API so Roblox cancels server-side on overrun. Max 300s (API limit). (default: 300)',
       type: 'number',
     });
 
@@ -94,7 +103,19 @@ export class TestProjectCommand<T>
   public handler = async (args: TestProjectArgs) => {
     const cwd = process.cwd();
     const packageName = (await readPackageNameAsync(cwd)) ?? path.basename(cwd);
-    const showLogs = args.logs ?? false;
+    // A probe run exists to show its output. Hiding it behind an opt-in flag
+    // made --script-text look broken enough that a workaround was written into
+    // the docs instead of a bug report.
+    let scriptText = args.scriptText;
+    if (args.scriptFile !== undefined) {
+      try {
+        scriptText = await fs.readFile(args.scriptFile, 'utf-8');
+      } catch {
+        OutputHelper.error(`Script file not found: ${args.scriptFile}`);
+        process.exit(1);
+      }
+    }
+    const showLogs = args.logs ?? scriptText !== undefined;
     const useSpinner = process.stdout.isTTY && !args.verbose;
 
     const reporter = new CompositeReporter(
@@ -129,32 +150,42 @@ export class TestProjectCommand<T>
 
     let exitCode = 0;
     try {
+      const config = await loadDeployConfigAsync(resolveDeployConfigPath(cwd));
+      const target = resolveSingleDeployTarget(
+        config,
+        'test',
+        'nevermore batch test'
+      );
+
+      // A local run needs Open Cloud only to fetch a base place. The key is
+      // resolved lazily so a package without one is never asked for credentials.
+      const client = args.cloud
+        ? new OpenCloudClient({
+            apiKey: await getApiKeyAsync(args),
+            rateLimiter: new RateLimiter(),
+          })
+        : new OpenCloudClient({
+            apiKey: () => getApiKeyAsync(args),
+            rateLimiter: new RateLimiter(),
+          });
+      const basePlaceResolver = createBasePlaceResolver(client, args);
+
       const context = args.cloud
-        ? new CloudJobContext(
-            reporter,
-            new OpenCloudClient({
-              apiKey: await getApiKeyAsync(args),
-              rateLimiter: new RateLimiter(),
-            })
-          )
-        : new LocalJobContext(reporter);
+        ? new CloudJobContext(reporter, client, basePlaceResolver)
+        : new LocalJobContext(reporter, client, basePlaceResolver);
 
       let result;
       try {
-        const config = await loadDeployConfigAsync(
-          resolveDeployConfigPath(cwd)
-        );
-        const target = resolveSingleDeployTarget(
-          config,
-          'test',
-          'nevermore batch test'
-        );
-
         result = await runSingleTestAsync(context, {
           packagePath: cwd,
           packageName,
           target,
-          scriptText: args.scriptText,
+          overrides: {
+            universeId: args.universeId,
+            placeId: args.placeId,
+            scriptTemplate: args.scriptTemplate,
+          },
+          scriptText,
           timeoutMs:
             args.timeout !== undefined ? args.timeout * 1000 : undefined,
         });

@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.31.0...@quenty/playerthumbnailutils@10.31.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.30.2...@quenty/playerthumbnailutils@10.31.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.30.1...@quenty/playerthumbnailutils@10.30.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.30.0...@quenty/playerthumbnailutils@10.30.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.29.1...@quenty/playerthumbnailutils@10.30.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.29.0...@quenty/playerthumbnailutils@10.29.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.28.0...@quenty/playerthumbnailutils@10.29.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.27.0...@quenty/playerthumbnailutils@10.28.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.26.1...@quenty/playerthumbnailutils@10.27.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.26.0...@quenty/playerthumbnailutils@10.26.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.25.2...@quenty/playerthumbnailutils@10.26.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.25.1...@quenty/playerthumbnailutils@10.25.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.25.0...@quenty/playerthumbnailutils@10.25.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.24.0...@quenty/playerthumbnailutils@10.25.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.23.0...@quenty/playerthumbnailutils@10.24.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.22.0...@quenty/playerthumbnailutils@10.23.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.21.1...@quenty/playerthumbnailutils@10.22.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+## [10.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.21.0...@quenty/playerthumbnailutils@10.21.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.20.0...@quenty/playerthumbnailutils@10.21.0) (2026-07-23)
+
+### Bug Fixes
+
+- Additional fixes ([8714d52](https://github.com/Quenty/NevermoreEngine/commit/8714d52ed996f2e41e6daa191554acca35860e36))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.19.0...@quenty/playerthumbnailutils@10.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
+# [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.18.1...@quenty/playerthumbnailutils@10.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/playerthumbnailutils
+
 ## [10.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerthumbnailutils@10.18.0...@quenty/playerthumbnailutils@10.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/playerthumbnailutils

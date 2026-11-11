@@ -3,6 +3,97 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.42.0...@quenty/uiobjectutils@6.42.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.41.2...@quenty/uiobjectutils@6.42.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.41.1...@quenty/uiobjectutils@6.41.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.41.0...@quenty/uiobjectutils@6.41.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.40.1...@quenty/uiobjectutils@6.41.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.40.0...@quenty/uiobjectutils@6.40.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.39.0...@quenty/uiobjectutils@6.40.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.38.0...@quenty/uiobjectutils@6.39.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.37.1...@quenty/uiobjectutils@6.38.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.37.0...@quenty/uiobjectutils@6.37.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.36.2...@quenty/uiobjectutils@6.37.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.36.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.36.1...@quenty/uiobjectutils@6.36.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.36.0...@quenty/uiobjectutils@6.36.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.35.0...@quenty/uiobjectutils@6.36.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.34.0...@quenty/uiobjectutils@6.35.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.33.0...@quenty/uiobjectutils@6.34.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.32.1...@quenty/uiobjectutils@6.33.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+## [6.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.32.0...@quenty/uiobjectutils@6.32.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.31.0...@quenty/uiobjectutils@6.32.0) (2026-07-23)
+
+### Bug Fixes
+
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Some more small cleanup ([1556cec](https://github.com/Quenty/NevermoreEngine/commit/1556cec4ae143160c915630be485b12576721c2e))
+
+# [6.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.30.0...@quenty/uiobjectutils@6.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
+# [6.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.29.1...@quenty/uiobjectutils@6.30.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/uiobjectutils
+
 ## [6.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/uiobjectutils@6.29.0...@quenty/uiobjectutils@6.29.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/uiobjectutils

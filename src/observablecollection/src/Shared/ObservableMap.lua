@@ -137,22 +137,29 @@ function ObservableMap._observeKeyValueChanged<TKey, TValue>(
 ): Observable.Observable<Brio.Brio<(TKey, TValue)>>
 	return Observable.new(function(sub)
 		local maid = Maid.new()
+		local emittedKeys: { [TKey]: true } = {}
 
 		local function handleValue(key: TKey, value: TValue?, _oldValue: TValue?)
 			if value ~= nil then
 				local brio = packValue(key, value)
+				emittedKeys[key] = true
 				maid[key :: any] = brio
 				sub:Fire(brio)
 			else
+				emittedKeys[key] = nil
 				maid[key :: any] = nil
 			end
 		end
 
-		for key, value in self._map do
-			handleValue(key, value)
-		end
-
 		local conn = self.KeyValueChanged:Connect(handleValue)
+
+		-- Walk a snapshot: inserting keys during a table walk can skip existing ones
+		for key in table.clone(self._map) do
+			local value = self._map[key]
+			if value ~= nil and not emittedKeys[key] then
+				handleValue(key, value)
+			end
+		end
 
 		local function cleanup()
 			self._maid[sub] = nil

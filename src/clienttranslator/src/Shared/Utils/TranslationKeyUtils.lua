@@ -17,6 +17,10 @@ local TranslationKeyUtils = {}
 	@return string
 ]=]
 function TranslationKeyUtils.getTranslationKey(prefix: string, text: string): string
+	--[[
+		Frozen derivation -- the key it returns is a persisted identifier, not an implementation
+		detail. See TranslationKeyUtils.spec.lua before touching it.
+	]]
 	local firstWordsBeginning = string.sub(string.gsub(text, "%s", ""), 1, 20)
 	local firstWords = String.toLowerCamelCase(firstWordsBeginning)
 

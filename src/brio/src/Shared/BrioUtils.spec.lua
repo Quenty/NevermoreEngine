@@ -1,11 +1,9 @@
---!nonstrict
+--!strict
 --[[
 	Unit tests for BrioUtils.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local BrioUtils = require("BrioUtils")

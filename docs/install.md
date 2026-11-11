@@ -205,5 +205,5 @@ Ensure that you have [Node.js](https://nodejs.org/en/download/) v14+ installed o
 Ensure that you have [rojo](https://rojo.space/docs/v7/getting-started/installation/) v7+ installed on your computer.
 
 ```bash
-npx nevermore init-plugin
+npx nevermore init plugin
 ```

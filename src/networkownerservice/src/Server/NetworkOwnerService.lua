@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Tracks a stack of owners so ownership isn't reverted or overwritten in delayed network owner set. Deduplicates network
 	ownership handles.
@@ -46,33 +46,45 @@ local WEAK_METATABLE = { __mode = "kv" }
 
 local SERVER_FLAG = "server"
 
+type OwnerData = {
+	player: Player | string,
+}
+
+export type NetworkOwnerService = typeof(setmetatable(
+	{} :: {
+		_partOwnerData: { [BasePart]: { OwnerData } },
+	},
+	{} :: typeof({ __index = NetworkOwnerService })
+))
+
 --[=[
 	Initializes the NetworkOwnerService. Should be done via [ServiceBag].
 ]=]
-function NetworkOwnerService:Init()
-	assert(not self._partOwnerData, "Already initialized")
+function NetworkOwnerService.Init(self: NetworkOwnerService): ()
+	assert(not (self :: any)._partOwnerData, "Already initialized")
 
-	self._partOwnerData = setmetatable({}, { __mode = "k" })
+	self._partOwnerData = setmetatable({}, { __mode = "k" }) :: any
 end
 
 --[=[
 	Tries to set the network owner handle to the given player.
 	@param part BasePart
 	@param player Player?
+	@return function -- Cleanup function
 ]=]
-function NetworkOwnerService:AddSetNetworkOwnerHandle(part: BasePart, player: Player?)
-	assert(self ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
+function NetworkOwnerService.AddSetNetworkOwnerHandle(
+	self: NetworkOwnerService,
+	part: BasePart,
+	player: Player?
+): () -> ()
+	assert((self :: any) ~= NetworkOwnerService, "Make sure to retrieve NetworkOwnerService from a ServiceBag")
 	assert(self._partOwnerData, "Not initialized")
 	assert(typeof(part) == "Instance" and part:IsA("BasePart"), "Bad part")
 	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
 
-	if player == nil then
-		player = SERVER_FLAG
-	end
-
 	-- wrap in table so we have unique value
-	local data = {
-		player = player,
+	local data: OwnerData = {
+		player = player or SERVER_FLAG,
 	}
 
 	self:_addOwnerData(part, data)
@@ -89,10 +101,10 @@ function NetworkOwnerService:AddSetNetworkOwnerHandle(part: BasePart, player: Pl
 	end
 end
 
-function NetworkOwnerService:_addOwnerData(part: BasePart, data)
+function NetworkOwnerService._addOwnerData(self: NetworkOwnerService, part: BasePart, data: OwnerData): ()
 	local ownerDataStack = self._partOwnerData[part]
 	if not ownerDataStack then
-		ownerDataStack = setmetatable({}, WEAK_METATABLE)
+		ownerDataStack = setmetatable({}, WEAK_METATABLE) :: any
 		self._partOwnerData[part] = ownerDataStack
 	end
 
@@ -103,7 +115,7 @@ function NetworkOwnerService:_addOwnerData(part: BasePart, data)
 	table.insert(ownerDataStack, data)
 end
 
-function NetworkOwnerService:_removeOwner(part: BasePart, toRemove)
+function NetworkOwnerService._removeOwner(self: NetworkOwnerService, part: BasePart, toRemove: OwnerData): boolean
 	local ownerDataStack = self._partOwnerData[part]
 	if not ownerDataStack then
 		warn("[NetworkOwnerService] - No data for part")
@@ -125,7 +137,7 @@ function NetworkOwnerService:_removeOwner(part: BasePart, toRemove)
 	return false
 end
 
-function NetworkOwnerService:_updateOwner(part: BasePart)
+function NetworkOwnerService._updateOwner(self: NetworkOwnerService, part: BasePart): ()
 	local ownerDataStack = self._partOwnerData[part]
 	if not ownerDataStack then
 		self:_setNetworkOwnershipAuto(part)
@@ -133,15 +145,16 @@ function NetworkOwnerService:_updateOwner(part: BasePart)
 	end
 
 	-- Prefer last set
-	local player = ownerDataStack[#ownerDataStack].player
-	if player == SERVER_FLAG then
-		player = nil
+	local owner = ownerDataStack[#ownerDataStack].player
+	local player: Player?
+	if owner ~= SERVER_FLAG then
+		player = owner :: Player
 	end
 
 	self:_setNetworkOwner(part, player)
 end
 
-function NetworkOwnerService:_setNetworkOwner(part: BasePart, player: Player)
+function NetworkOwnerService._setNetworkOwner(_self: NetworkOwnerService, part: BasePart, player: Player?): ()
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())
@@ -151,7 +164,7 @@ function NetworkOwnerService:_setNetworkOwner(part: BasePart, player: Player)
 	part:SetNetworkOwner(player)
 end
 
-function NetworkOwnerService:_setNetworkOwnershipAuto(part: BasePart)
+function NetworkOwnerService._setNetworkOwnershipAuto(_self: NetworkOwnerService, part: BasePart): ()
 	local canSet, err = part:CanSetNetworkOwnership()
 	if not canSet then
 		warn("[NetworkOwnerService] - Cannot set network ownership:", err, part:GetFullName())

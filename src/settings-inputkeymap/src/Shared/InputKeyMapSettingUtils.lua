@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Helper methods for encoding and decoding input lists into network storage
 	@class InputKeyMapSettingUtils
@@ -9,6 +9,8 @@ local require = require(script.Parent.loader).load(script)
 local HttpService = game:GetService("HttpService")
 
 local EnumUtils = require("EnumUtils")
+local InputKeyMapList = require("InputKeyMapList")
+local InputModeType = require("InputModeType")
 local InputTypeUtils = require("InputTypeUtils")
 local JSONUtils = require("JSONUtils")
 local String = require("String")
@@ -22,7 +24,10 @@ local InputKeyMapSettingUtils = {}
 	@param inputModeType InputModeType
 	@return string
 ]=]
-function InputKeyMapSettingUtils.getSettingName(inputKeyMapList, inputModeType)
+function InputKeyMapSettingUtils.getSettingName(
+	inputKeyMapList: InputKeyMapList.InputKeyMapList,
+	inputModeType: InputModeType.InputModeType
+): string
 	return string.format("Keybind_%s_%s", String.toCamelCase(inputKeyMapList:GetListName()), inputModeType.Name)
 end
 
@@ -32,12 +37,12 @@ end
 	@param list { InputType }
 	@return string
 ]=]
-function InputKeyMapSettingUtils.encodeInputTypeList(list)
-	local newList = {}
+function InputKeyMapSettingUtils.encodeInputTypeList(list: { InputTypeUtils.InputType }): string
+	local newList: { any } = {}
 
 	for _, inputType in list do
 		if typeof(inputType) == "EnumItem" then
-			table.insert(newList, EnumUtils.encodeAsString(inputType))
+			table.insert(newList, EnumUtils.encodeAsString(inputType :: any))
 		elseif InputTypeUtils.isKnownInputType(inputType) then
 			table.insert(newList, inputType)
 		else
@@ -55,26 +60,30 @@ end
 	@param encoded string?
 	@return string
 ]=]
-function InputKeyMapSettingUtils.decodeInputTypeList(encoded)
+function InputKeyMapSettingUtils.decodeInputTypeList(encoded: string?): { InputTypeUtils.InputType }?
 	if type(encoded) ~= "string" then
 		return nil
 	end
 
-	local ok, result = JSONUtils.jsonDecode(encoded)
+	local ok, jsonResult = JSONUtils.jsonDecode(encoded)
 	if not ok then
 		return nil
 	end
 
+	local result = jsonResult :: any
 	if type(result) ~= "table" then
 		warn("[InputKeyMapSettingUtils] - Failed to decode table")
 		return nil
 	end
 
-	local decodedList = {}
+	local decodedList: { InputTypeUtils.InputType } = {}
 
 	for _, inputType in result do
 		if EnumUtils.isEncodedEnum(inputType) then
-			table.insert(decodedList, EnumUtils.decodeFromString(inputType))
+			local decoded = EnumUtils.decodeFromString(inputType)
+			if decoded then
+				table.insert(decodedList, decoded :: any)
+			end
 		elseif InputTypeUtils.isKnownInputType(inputType) then
 			table.insert(decodedList, inputType)
 		else

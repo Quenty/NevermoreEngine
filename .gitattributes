@@ -1,0 +1,11 @@
+# LF in the repository and in the working tree, on every platform.
+#
+# Without `eol=lf`, a Windows clone with core.autocrlf=true checks files out as CRLF while stylua
+# writes LF (its line_endings default is Unix), so `npm run lint:stylua` reports every checked-out
+# file as a whole-file diff and the check is unusable locally. This matches the `end_of_line = lf`
+# the templates' .editorconfig already declares.
+* text=auto eol=lf
+
+*.png binary
+*.rbxl binary
+*.rbxm binary

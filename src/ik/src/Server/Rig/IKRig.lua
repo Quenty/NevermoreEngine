@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Serverside implementation of IKRig
 	@server
@@ -18,16 +18,26 @@ local IKRig = setmetatable({}, IKRigBase)
 IKRig.ClassName = "IKRig"
 IKRig.__index = IKRig
 
-function IKRig.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(IKRigBase.new(humanoid, serviceBag), IKRig)
+export type IKRig =
+	typeof(setmetatable(
+		{} :: {
+			_remoting: any,
+			_aimPosition: Vector3?,
+		},
+		{} :: typeof({ __index = IKRig })
+	))
+	& IKRigBase.IKRigBase
+
+function IKRig.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): IKRig
+	local self: IKRig = setmetatable(IKRigBase.new(humanoid, serviceBag) :: any, IKRig)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
-	Motor6DStackHumanoid:Tag(self._obj)
+	Motor6DStackHumanoid:Tag(self._obj :: Instance)
 
 	self:_setupRemoting()
 
-	self._maid:Add(IKRigInterface.Server:Implement(self._obj, self))
+	self._maid:Add((IKRigInterface :: any).Server:Implement(self._obj :: Instance, self))
 
 	return self
 end
@@ -37,7 +47,7 @@ end
 
 	@return Vector3?
 ]=]
-function IKRig:GetAimPosition(): Vector3?
+function IKRig.GetAimPosition(self: IKRig): Vector3?
 	return self._aimPosition
 end
 
@@ -46,17 +56,17 @@ end
 
 	@param target Vector3?
 ]=]
-function IKRig:SetAimPosition(target: Vector3?)
+function IKRig.SetAimPosition(self: IKRig, target: Vector3?): ()
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	self:_applyAimPosition(target)
 	self._remoting.SetAimPosition:FireAllClients(target)
 end
 
-function IKRig:_setupRemoting()
-	self._remoting = self._maid:Add(Remoting.Server.new(self._obj, "IKRig"))
+function IKRig._setupRemoting(self: IKRig): ()
+	self._remoting = self._maid:Add(Remoting.Server.new(self._obj :: Instance, "IKRig"))
 
-	self._maid:GiveTask(self._remoting.SetAimPosition:Connect(function(player, target)
+	self._maid:GiveTask(self._remoting.SetAimPosition:Connect(function(player: Player, target: Vector3?)
 		assert(player == self:GetPlayer(), "Bad player")
 
 		self:_applyAimPosition(target)
@@ -64,7 +74,7 @@ function IKRig:_setupRemoting()
 	end))
 end
 
-function IKRig:_applyAimPosition(target: Vector3?)
+function IKRig._applyAimPosition(self: IKRig, target: Vector3?): ()
 	assert(typeof(target) == "Vector3" or target == nil, "Bad target")
 
 	-- Guard against NaN
@@ -80,4 +90,4 @@ function IKRig:_applyAimPosition(target: Vector3?)
 	end
 end
 
-return Binder.new("IKRig", IKRig)
+return Binder.new("IKRig", IKRig :: any) :: Binder.Binder<IKRig>

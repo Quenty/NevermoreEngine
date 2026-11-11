@@ -11,10 +11,21 @@ import type {
   Capability,
   DataModelInstance,
   OutputLevel,
+  SerializedReturnValue,
+  PlaytestMode,
+  RunAs,
 } from '../server/web-socket-protocol.js';
 
 // Re-export protocol types used in the public API
-export type { StudioState, Capability, DataModelInstance, OutputLevel };
+export type {
+  StudioState,
+  Capability,
+  DataModelInstance,
+  OutputLevel,
+  SerializedReturnValue,
+  PlaytestMode,
+  RunAs,
+};
 
 export type SessionContext = 'edit' | 'client' | 'server';
 export type SessionOrigin = 'user' | 'managed';
@@ -28,6 +39,12 @@ export interface SessionInfo {
   capabilities: Capability[];
   connectedAt: Date;
   origin: SessionOrigin;
+  /** Set on sessions of a Studio that `process run` launched. */
+  launchId?: string;
+  /** The player of a multiplayer test client session. */
+  playerName?: string;
+  /** The playtest studio-bridge started this session's DataModel for. */
+  playtestId?: string;
   context: SessionContext;
   instanceId: string;
   placeId: number;
@@ -47,6 +64,14 @@ export interface ExecResult {
   success: boolean;
   output: Array<{ level: OutputLevel; body: string }>;
   error?: string;
+  /** Where a runtime error was thrown. */
+  traceback?: string;
+  /**
+   * Everything the script returned, in order. Absent when the plugin reported
+   * no return channel at all (a run that never reached a return) — distinct from `[]`, which means it returned nothing.
+   */
+  returnValues?: SerializedReturnValue[];
+  ranAs?: RunAs;
 }
 
 export interface StateResult {
@@ -54,6 +79,10 @@ export interface StateResult {
   placeId: number;
   placeName: string;
   gameId: number;
+  /** The camera's viewport in pixels. Absent without a camera. */
+  viewportSize?: [number, number];
+  /** Studio's version. Absent from older plugins. */
+  studioVersion?: string;
 }
 
 export interface ScreenshotResult {
@@ -67,6 +96,10 @@ export interface LogEntry {
   level: OutputLevel;
   body: string;
   timestamp: number;
+  /** When grouped: how many identical entries in a row this stands for. */
+  repeats?: number;
+  /** When grouped: when the last of the repeats was logged. */
+  lastTimestamp?: number;
 }
 
 export interface LogsResult {
@@ -79,11 +112,25 @@ export interface DataModelResult {
   instance: DataModelInstance;
 }
 
+export interface ExportInstancesResult {
+  /** The binary model (.rbxm), base64-encoded. */
+  data: string;
+  paths: string[];
+}
+
+export interface ImportInstancesResult {
+  paths: string[];
+}
+
 export interface LogOptions {
   count?: number;
   direction?: 'head' | 'tail';
   levels?: OutputLevel[];
   includeInternal?: boolean;
+  /** Only entries logged at or after this time, in epoch seconds. */
+  since?: number;
+  /** Collapse identical consecutive entries, before `count` applies. */
+  groupRepeats?: boolean;
 }
 
 export interface QueryDataModelOptions {
@@ -93,6 +140,22 @@ export interface QueryDataModelOptions {
   includeAttributes?: boolean;
   find?: { name: string; recursive?: boolean };
   listServices?: boolean;
+}
+
+export interface PlaytestEndResult {
+  playtestId: string;
+  /** False when StudioTestService refused to start the playtest. */
+  success: boolean;
+  error?: string;
+}
+
+export interface EndPlaytestResult {
+  /** Absent when the playtest was not started by studio-bridge. */
+  playtestId?: string;
+  /** The mode the playtest ran in. Absent from older plugins. */
+  mode?: PlaytestMode;
+  /** How many players a multiplayer test started with. */
+  players?: number;
 }
 
 export interface LogFollowOptions {

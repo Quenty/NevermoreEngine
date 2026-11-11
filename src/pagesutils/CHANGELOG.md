@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.26.0...@quenty/pagesutils@5.26.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [5.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.25.2...@quenty/pagesutils@5.26.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+## [5.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.25.1...@quenty/pagesutils@5.25.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+## [5.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.25.0...@quenty/pagesutils@5.25.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+# [5.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.24.1...@quenty/pagesutils@5.25.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+## [5.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.24.0...@quenty/pagesutils@5.24.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+# [5.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.23.0...@quenty/pagesutils@5.24.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+# [5.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.22.0...@quenty/pagesutils@5.23.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+# [5.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.21.0...@quenty/pagesutils@5.22.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [5.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.20.0...@quenty/pagesutils@5.21.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
+# [5.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.19.1...@quenty/pagesutils@5.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/pagesutils
+
 ## [5.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/pagesutils@5.19.0...@quenty/pagesutils@5.19.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/pagesutils

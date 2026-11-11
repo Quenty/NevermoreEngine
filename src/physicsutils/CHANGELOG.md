@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.36.0...@quenty/physicsutils@8.36.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [8.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.35.2...@quenty/physicsutils@8.36.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+## [8.35.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.35.1...@quenty/physicsutils@8.35.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+## [8.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.35.0...@quenty/physicsutils@8.35.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.34.0...@quenty/physicsutils@8.35.0) (2026-09-09)
+
+### Features
+
+- **vector3utils:** Add Vector3Utils.volume and unit tests for vector3utils and physicsutils ([#821](https://github.com/Quenty/NevermoreEngine/issues/821)) ([69630c0](https://github.com/Quenty/NevermoreEngine/commit/69630c0552e18a4cc1ecf44d65aef750327e20ec))
+
+# [8.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.33.1...@quenty/physicsutils@8.34.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+## [8.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.33.0...@quenty/physicsutils@8.33.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.32.0...@quenty/physicsutils@8.33.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.31.0...@quenty/physicsutils@8.32.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.30.0...@quenty/physicsutils@8.31.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.29.0...@quenty/physicsutils@8.30.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
+# [8.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.28.3...@quenty/physicsutils@8.29.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/physicsutils
+
 ## [8.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/physicsutils@8.28.2...@quenty/physicsutils@8.28.3) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/physicsutils

@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.35.0...@quenty/marketplaceutils@11.35.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.34.2...@quenty/marketplaceutils@11.35.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [11.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.34.1...@quenty/marketplaceutils@11.34.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.34.0...@quenty/marketplaceutils@11.34.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.33.1...@quenty/marketplaceutils@11.34.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.33.0...@quenty/marketplaceutils@11.33.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.32.0...@quenty/marketplaceutils@11.33.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.31.0...@quenty/marketplaceutils@11.32.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.30.1...@quenty/marketplaceutils@11.31.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.30.0...@quenty/marketplaceutils@11.30.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.29.2...@quenty/marketplaceutils@11.30.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.29.1...@quenty/marketplaceutils@11.29.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.29.0...@quenty/marketplaceutils@11.29.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.28.0...@quenty/marketplaceutils@11.29.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.27.0...@quenty/marketplaceutils@11.28.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.26.0...@quenty/marketplaceutils@11.27.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.25.1...@quenty/marketplaceutils@11.26.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.25.0...@quenty/marketplaceutils@11.25.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.24.0...@quenty/marketplaceutils@11.25.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [11.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.23.0...@quenty/marketplaceutils@11.24.0) (2026-07-20)
+
+### Features
+
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
+
+# [11.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.22.0...@quenty/marketplaceutils@11.23.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.21.0...@quenty/marketplaceutils@11.22.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/marketplaceutils
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.1...@quenty/marketplaceutils@11.21.0) (2026-07-14)
+
+### Features
+
+- **marketplaceutils:** convert package to --!strict ([13671ec](https://github.com/Quenty/NevermoreEngine/commit/13671ec4352370464ddce6f2e0ee8bf815e8e01f))
+
 ## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/marketplaceutils@11.20.0...@quenty/marketplaceutils@11.20.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/marketplaceutils

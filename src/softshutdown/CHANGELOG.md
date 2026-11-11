@@ -3,6 +3,202 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.1...@quenty/softshutdown@10.13.0) (2026-11-06)
+
+### Bug Fixes
+
+- **softshutdown:** reserve the shutdown server with ReservedServerId ([1af6b7f](https://github.com/Quenty/NevermoreEngine/commit/1af6b7fe14d64531cef9396d925eaddac8b97d8d))
+
+## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.0...@quenty/softshutdown@10.12.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.11.1...@quenty/softshutdown@10.12.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.11.0...@quenty/softshutdown@10.11.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.10.3...@quenty/softshutdown@10.11.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.10.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.10.2...@quenty/softshutdown@10.10.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.10.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.10.1...@quenty/softshutdown@10.10.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.10.0...@quenty/softshutdown@10.10.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.9.0...@quenty/softshutdown@10.10.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.8.1...@quenty/softshutdown@10.9.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.8.0...@quenty/softshutdown@10.8.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.7.0...@quenty/softshutdown@10.8.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.6.0...@quenty/softshutdown@10.7.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.5.1...@quenty/softshutdown@10.6.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.5.0...@quenty/softshutdown@10.5.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.4.1...@quenty/softshutdown@10.5.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.4.0...@quenty/softshutdown@10.4.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.8...@quenty/softshutdown@10.4.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.7...@quenty/softshutdown@10.3.8) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.6...@quenty/softshutdown@10.3.7) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.5...@quenty/softshutdown@10.3.6) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.4...@quenty/softshutdown@10.3.5) (2026-07-30)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.3...@quenty/softshutdown@10.3.4) (2026-07-30)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.2...@quenty/softshutdown@10.3.3) (2026-07-29)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.1...@quenty/softshutdown@10.3.2) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.3.0...@quenty/softshutdown@10.3.1) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.2.3...@quenty/softshutdown@10.3.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.2.2...@quenty/softshutdown@10.2.3) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.2.1...@quenty/softshutdown@10.2.2) (2026-07-26)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [10.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.2.0...@quenty/softshutdown@10.2.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.1.0...@quenty/softshutdown@10.2.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.0.0...@quenty/softshutdown@10.1.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.61.0...@quenty/softshutdown@10.0.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.60.0...@quenty/softshutdown@9.61.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.59.1...@quenty/softshutdown@9.60.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+## [9.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.59.0...@quenty/softshutdown@9.59.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.58.0...@quenty/softshutdown@9.59.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.57.0...@quenty/softshutdown@9.58.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.56.0...@quenty/softshutdown@9.57.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.55.0...@quenty/softshutdown@9.56.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.54.0...@quenty/softshutdown@9.55.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.53.0...@quenty/softshutdown@9.54.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.52.0...@quenty/softshutdown@9.53.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.51.0...@quenty/softshutdown@9.52.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.50.0...@quenty/softshutdown@9.51.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.49.0...@quenty/softshutdown@9.50.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/softshutdown
+
+# [9.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.48.1...@quenty/softshutdown@9.49.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **softshutdown:** convert package to --!strict ([91f7bfa](https://github.com/Quenty/NevermoreEngine/commit/91f7bfa6518461761599d492d83cd3dc6ecb0d4f))
+
 ## [9.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@9.48.0...@quenty/softshutdown@9.48.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/softshutdown

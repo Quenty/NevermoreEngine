@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.29.0...@quenty/sounds@10.29.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.28.3...@quenty/sounds@10.29.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.28.2...@quenty/sounds@10.28.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.28.1...@quenty/sounds@10.28.2) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.28.0...@quenty/sounds@10.28.1) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.2...@quenty/sounds@10.28.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.1...@quenty/sounds@10.27.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/sounds
+
+## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.27.0...@quenty/sounds@10.27.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.26.0...@quenty/sounds@10.27.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.25.0...@quenty/sounds@10.26.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.24.0...@quenty/sounds@10.25.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.23.0...@quenty/sounds@10.24.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.22.0...@quenty/sounds@10.23.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/sounds
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.21.1...@quenty/sounds@10.22.0) (2026-07-15)
+
+### Bug Fixes
+
+- Do not override sound volume when cloning from sound ([28ff010](https://github.com/Quenty/NevermoreEngine/commit/28ff01093b57338b13b64990aedf4a8c4d35c75f))
+
 ## [10.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sounds@10.21.0...@quenty/sounds@10.21.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/sounds

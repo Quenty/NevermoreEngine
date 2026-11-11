@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.17.2...@quenty/animationgroup@10.17.3) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+## [10.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.17.1...@quenty/animationgroup@10.17.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+## [10.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.17.0...@quenty/animationgroup@10.17.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+# [10.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.16.1...@quenty/animationgroup@10.17.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+## [10.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.16.0...@quenty/animationgroup@10.16.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+# [10.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.15.0...@quenty/animationgroup@10.16.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+# [10.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.14.0...@quenty/animationgroup@10.15.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
+# [10.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.13.1...@quenty/animationgroup@10.14.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/animationgroup
+
 ## [10.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animationgroup@10.13.0...@quenty/animationgroup@10.13.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/animationgroup

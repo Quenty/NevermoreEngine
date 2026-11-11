@@ -10,6 +10,7 @@ local Motor6DAnimator = require("Motor6DAnimator")
 local Motor6DPhysicsTransformer = require("Motor6DPhysicsTransformer")
 local Motor6DStackInterface = require("Motor6DStackInterface")
 local Motor6DTransformer = require("Motor6DTransformer")
+local R15Utils = require("R15Utils")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
 
@@ -20,7 +21,7 @@ Motor6DStackBase.__index = Motor6DStackBase
 export type Motor6DStackBase =
 	typeof(setmetatable(
 		{} :: {
-			_obj: Motor6D,
+			_obj: R15Utils.AnimationConstraintOrMotor6D,
 			_serviceBag: ServiceBag.ServiceBag,
 			_tieRealmService: any,
 			_animator: Motor6DAnimator.Motor6DAnimator,
@@ -29,7 +30,10 @@ export type Motor6DStackBase =
 	))
 	& BaseObject.BaseObject
 
-function Motor6DStackBase.new(motor6D: Motor6D, serviceBag: ServiceBag.ServiceBag): Motor6DStackBase
+function Motor6DStackBase.new(
+	motor6D: R15Utils.AnimationConstraintOrMotor6D,
+	serviceBag: ServiceBag.ServiceBag
+): Motor6DStackBase
 	local self: Motor6DStackBase = setmetatable(BaseObject.new(motor6D) :: any, Motor6DStackBase)
 
 	self._animator = self._maid:Add(Motor6DAnimator.new(motor6D))

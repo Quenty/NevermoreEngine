@@ -6,7 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
+local Brio = require("Brio")
 local DataStoreStringUtils = require("DataStoreStringUtils")
+local Maid = require("Maid")
+local Observable = require("Observable")
 local PlayerSettingsBase = require("PlayerSettingsBase")
 local PlayerSettingsConstants = require("PlayerSettingsConstants")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
@@ -15,20 +18,44 @@ local Remoting = require("Remoting")
 local ServiceBag = require("ServiceBag")
 local SettingsDataService = require("SettingsDataService")
 
-local PlayerSettings = setmetatable({}, PlayerSettingsBase)
+local PlayerSettings = {}
 PlayerSettings.ClassName = "PlayerSettings"
 PlayerSettings.__index = PlayerSettings
+-- Runtime inheritance only. Typing the metatable target as `any` keeps the old solver from
+-- chasing the full PlayerSettingsBase type here, which otherwise overflows its complexity
+-- budget ("Code is too complex"). The inherited surface is supplied structurally below.
+setmetatable(PlayerSettings :: any, PlayerSettingsBase)
+
+-- Minimal structural surface of SettingsDataService that this class actually uses. Embedding
+-- the full SettingsDataService metatable type blows up the old solver, so we type only what
+-- we call here.
+type SettingsDataServiceLike = {
+	ObserveRegisteredDefinitionsBrio: (self: SettingsDataServiceLike) -> Observable.Observable<Brio.Brio<any>>,
+}
+
+-- Only the dynamic remoting member this class touches.
+type RemotingLike = {
+	RequestUpdateSettings: any,
+}
+
+-- Minimal structural surface inherited from PlayerSettingsBase that this class uses. See the
+-- setmetatable note above for why we don't intersect PlayerSettingsBase.PlayerSettingsBase.
+type PlayerSettingsBaseLike = {
+	_obj: Folder,
+	_maid: Maid.Maid,
+	GetPlayer: (self: any) -> Player?,
+}
 
 export type PlayerSettings =
 	typeof(setmetatable(
 		{} :: {
 			_serviceBag: ServiceBag.ServiceBag,
-			_remoting: Remoting.Remoting,
-			_settingsDataService: SettingsDataService.SettingsDataService,
+			_remoting: RemotingLike,
+			_settingsDataService: SettingsDataServiceLike,
 		},
 		{} :: typeof({ __index = PlayerSettings })
 	))
-	& PlayerSettingsBase.PlayerSettingsBase
+	& PlayerSettingsBaseLike
 
 export type SettingsMap = { [string]: any }
 
@@ -49,7 +76,7 @@ function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): 
 		self:EnsureInitialized(value:GetSettingName(), value:GetDefaultValue())
 	end))
 
-	self._maid:GiveTask(PlayerSettingsInterface.Server:Implement(self._obj, self))
+	self._maid:GiveTask((PlayerSettingsInterface :: any).Server:Implement(self._obj, self))
 
 	return self
 end
@@ -78,7 +105,7 @@ function PlayerSettings.EnsureInitialized<T>(self: PlayerSettings, settingName: 
 end
 
 function PlayerSettings._setupRemoting(self: PlayerSettings): ()
-	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.SERVER))
+	self._remoting = self._maid:Add(Remoting.new(self._obj, "PlayerSettings", Remoting.Realms.SERVER)) :: any
 
 	self._maid:Add(self._remoting.RequestUpdateSettings:Bind(function(player: Player, settingsMap: SettingsMap)
 		assert(self:GetPlayer() == player, "Bad player")

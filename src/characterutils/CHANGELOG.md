@@ -3,6 +3,107 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.46.0...@quenty/characterutils@12.46.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [12.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.45.2...@quenty/characterutils@12.46.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [12.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.45.1...@quenty/characterutils@12.45.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.45.0...@quenty/characterutils@12.45.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.44.1...@quenty/characterutils@12.45.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.44.0...@quenty/characterutils@12.44.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.43.0...@quenty/characterutils@12.44.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.42.0...@quenty/characterutils@12.43.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.41.1...@quenty/characterutils@12.42.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.41.0...@quenty/characterutils@12.41.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.40.2...@quenty/characterutils@12.41.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.40.1...@quenty/characterutils@12.40.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.40.0...@quenty/characterutils@12.40.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.39.0...@quenty/characterutils@12.40.0) (2026-07-25)
+
+### Features
+
+- Add RootPartUtils.getPlayerRootPart(player) ([dc1c687](https://github.com/Quenty/NevermoreEngine/commit/dc1c68760c3e4b699b0a4e59eec464b73a61867b))
+- Add RootPartUtils.promisePlayerHumanoidRootPart(player) ([50a789b](https://github.com/Quenty/NevermoreEngine/commit/50a789b4ae0f126d893fd86405b1f5b2ccdfc5b7))
+
+# [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.38.0...@quenty/characterutils@12.39.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.37.0...@quenty/characterutils@12.38.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.36.1...@quenty/characterutils@12.37.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+## [12.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.36.0...@quenty/characterutils@12.36.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.35.0...@quenty/characterutils@12.36.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.34.0...@quenty/characterutils@12.35.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.33.0...@quenty/characterutils@12.34.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/characterutils
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.32.1...@quenty/characterutils@12.33.0) (2026-07-15)
+
+### Bug Fixes
+
+- Don't warn on the server, this is a valid usage ([78cf6c7](https://github.com/Quenty/NevermoreEngine/commit/78cf6c71e7b0ee01228b833175d8d5e8a7c703eb))
+
 ## [12.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterutils@12.32.0...@quenty/characterutils@12.32.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/characterutils

@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "nevermore": {
+      "source": {
+        "source": "github",
+        "repo": "Quenty/NevermoreEngine",
+        "sparsePaths": [".claude-plugin", "tools/nevermore-claude"]
+      }
+    }
+  },
+  "enabledPlugins": {
+    "nevermore-claude@nevermore": true
+  }
+}

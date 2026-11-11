@@ -3,6 +3,90 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.43.0...@quenty/inputobjectutils@4.43.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.42.2...@quenty/inputobjectutils@4.43.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.42.1...@quenty/inputobjectutils@4.42.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.42.0...@quenty/inputobjectutils@4.42.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.41.1...@quenty/inputobjectutils@4.42.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.41.0...@quenty/inputobjectutils@4.41.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.40.0...@quenty/inputobjectutils@4.41.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.39.0...@quenty/inputobjectutils@4.40.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.38.1...@quenty/inputobjectutils@4.39.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.38.0...@quenty/inputobjectutils@4.38.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.37.2...@quenty/inputobjectutils@4.38.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.37.1...@quenty/inputobjectutils@4.37.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.37.0...@quenty/inputobjectutils@4.37.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.36.0...@quenty/inputobjectutils@4.37.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.35.0...@quenty/inputobjectutils@4.36.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.34.0...@quenty/inputobjectutils@4.35.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.33.1...@quenty/inputobjectutils@4.34.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+## [4.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.33.0...@quenty/inputobjectutils@4.33.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.32.0...@quenty/inputobjectutils@4.33.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.31.0...@quenty/inputobjectutils@4.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
+# [4.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.30.1...@quenty/inputobjectutils@4.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/inputobjectutils
+
 ## [4.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/inputobjectutils@4.30.0...@quenty/inputobjectutils@4.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/inputobjectutils

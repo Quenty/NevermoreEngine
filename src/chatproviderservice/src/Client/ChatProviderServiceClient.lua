@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class ChatProviderServiceClient
 ]=]
@@ -7,8 +7,11 @@ local require = require(script.Parent.loader).load(script)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local TextChatService = game:GetService("TextChatService")
 
+local Binder = require("Binder")
+local HasChatTagsClient = require("HasChatTagsClient")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -18,26 +21,43 @@ local TextChannelUtils = require("TextChannelUtils")
 local ChatProviderServiceClient = {}
 ChatProviderServiceClient.ServiceName = "ChatProviderServiceClient"
 
-function ChatProviderServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type ChatProviderServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		MessageIncoming: Signal.Signal<TextChatMessage>,
+		_hasChatTagsBinder: Binder.Binder<HasChatTagsClient.HasChatTagsClient>,
+	},
+	{} :: typeof({ __index = ChatProviderServiceClient })
+))
+
+function ChatProviderServiceClient.Init(self: ChatProviderServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
 	-- State
-	self.MessageIncoming = self._maid:Add(Signal.new())
+	self.MessageIncoming = self._maid:Add((Signal.new() :: any) :: Signal.Signal<TextChatMessage>)
 
 	-- External
 	self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 
 	-- Binders
 	self._serviceBag:GetService(require("ChatTagClient"))
 	self._serviceBag:GetService(require("ChatProviderTranslator"))
 	self._serviceBag:GetService(require("ChatProviderCommandServiceClient"))
-	self._hasChatTagsBinder = self._serviceBag:GetService(require("HasChatTagsClient"))
+	self._hasChatTagsBinder = self._serviceBag:GetService(HasChatTagsClient)
 end
 
-function ChatProviderServiceClient:Start()
-	TextChatService.OnIncomingMessage = function(textChatMessage)
+function ChatProviderServiceClient.Start(self: ChatProviderServiceClient): ()
+	-- The engine rejects this assignment outside a client, and a headless test that boots a client bag
+	-- on the server would take the whole bag down with it. Nothing to render there anyway.
+	if not RunService:IsClient() then
+		return
+	end
+
+	TextChatService.OnIncomingMessage = function(textChatMessage): TextChatMessageProperties?
 		self.MessageIncoming:Fire(textChatMessage)
 
 		local metadata = textChatMessage.Metadata
@@ -63,10 +83,10 @@ function ChatProviderServiceClient:Start()
 
 		local textSource = textChatMessage.TextSource
 		if not textSource then
-			return
+			return nil
 		end
 
-		local tags = self:_renderTags(textSource)
+		local tags = ChatProviderServiceClient._renderTags(self, textSource)
 		if tags then
 			local properties = Instance.new("TextChatMessageProperties")
 			local name = String.removePostfix(textChatMessage.PrefixText, ":")
@@ -76,7 +96,7 @@ function ChatProviderServiceClient:Start()
 			return properties
 		end
 
-		return
+		return nil
 	end
 end
 
@@ -85,11 +105,12 @@ end
 	@param encodedMessageData string
 	@param channel TextChannel?
 ]=]
-function ChatProviderServiceClient:SendSystemMessage(
+function ChatProviderServiceClient.SendSystemMessage(
+	_self: ChatProviderServiceClient,
 	message: string,
 	encodedMessageData: string?,
 	channel: TextChannel?
-)
+): ()
 	assert(typeof(message) == "string", "[ChatProviderServiceClient.SendSystemMessage] - Bad message")
 
 	if not channel then
@@ -104,7 +125,7 @@ function ChatProviderServiceClient:SendSystemMessage(
 	channel:DisplaySystemMessage(message, encodedMessageData)
 end
 
-function ChatProviderServiceClient:_renderTags(textSource)
+function ChatProviderServiceClient._renderTags(self: ChatProviderServiceClient, textSource: TextSource): string?
 	local player = Players:GetPlayerByUserId(textSource.UserId)
 	if not player then
 		return nil
@@ -119,7 +140,7 @@ function ChatProviderServiceClient:_renderTags(textSource)
 	return hasChatTags:GetAsRichText()
 end
 
-function ChatProviderServiceClient:Destroy()
+function ChatProviderServiceClient.Destroy(self: ChatProviderServiceClient): ()
 	self._maid:DoCleaning()
 end
 

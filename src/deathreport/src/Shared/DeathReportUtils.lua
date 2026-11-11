@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local CharacterUtils = require("CharacterUtils")
 local HumanoidKillerUtils = require("HumanoidKillerUtils")
+local PlayerMock = require("PlayerMock")
 
 local DEFAULT_COLOR = Color3.new(0.9, 0.9, 0.9)
 
@@ -41,6 +42,14 @@ export type DeathReport = {
 	weaponData: WeaponData,
 }
 
+--[=[
+	Constructs a death report for the adornee that died
+
+	@param adornee Instance -- The humanoid or character that died
+	@param killerAdornee Instance? -- The humanoid or character that killed it
+	@param weaponData WeaponData?
+	@return DeathReport
+]=]
 function DeathReportUtils.create(adornee: Instance, killerAdornee: Instance?, weaponData: WeaponData?): DeathReport
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -105,8 +114,9 @@ end
 	@return string
 ]=]
 function DeathReportUtils.getDeadDisplayName(deathReport: DeathReport): string?
-	if deathReport.player then
-		return deathReport.player.DisplayName
+	local player = deathReport.player
+	if player then
+		return if PlayerMock.isMock(player) then PlayerMock.read(player, "DisplayName") else player.DisplayName
 	elseif deathReport.humanoid then
 		local character = deathReport.humanoid.Parent
 		if character then
@@ -130,7 +140,7 @@ end
 	@return string
 ]=]
 function DeathReportUtils.involvesPlayer(deathReport: DeathReport, player: Player): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return (deathReport.player == player) or (deathReport.killerPlayer == player)
 end
@@ -142,9 +152,12 @@ end
 	@return string?
 ]=]
 function DeathReportUtils.getKillerDisplayName(deathReport: DeathReport): string?
-	if deathReport.killerPlayer then
-		assert(deathReport.killerPlayer:IsA("Player"), "Bad player")
-		return deathReport.killerPlayer.DisplayName
+	local killerPlayer = deathReport.killerPlayer
+	if killerPlayer then
+		assert(killerPlayer:IsA("Player") or PlayerMock.isMock(killerPlayer), "Bad player")
+		return if PlayerMock.isMock(killerPlayer)
+			then PlayerMock.read(killerPlayer, "DisplayName")
+			else killerPlayer.DisplayName
 	elseif deathReport.killerHumanoid then
 		local character = deathReport.killerHumanoid.Parent
 		if character then
@@ -165,8 +178,9 @@ end
 	@return Color3?
 ]=]
 function DeathReportUtils.getDeadColor(deathReport: DeathReport): Color3?
-	if deathReport.player then
-		local team = deathReport.player.Team
+	local player = deathReport.player
+	if player then
+		local team = if PlayerMock.isMock(player) then PlayerMock.read(player, "Team") else player.Team
 		if team then
 			return team.TeamColor.Color
 		end
@@ -182,8 +196,11 @@ end
 	@return Color3?
 ]=]
 function DeathReportUtils.getKillerColor(deathReport: DeathReport): Color3?
-	if deathReport.killerPlayer then
-		local team = deathReport.killerPlayer.Team
+	local killerPlayer = deathReport.killerPlayer
+	if killerPlayer then
+		local team = if PlayerMock.isMock(killerPlayer)
+			then PlayerMock.read(killerPlayer, "Team")
+			else killerPlayer.Team
 		if team then
 			return team.TeamColor.Color
 		end

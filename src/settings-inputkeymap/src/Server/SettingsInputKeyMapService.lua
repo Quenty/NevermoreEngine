@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class SettingsInputKeyMapService
 ]=]
@@ -12,8 +12,17 @@ local ServiceBag = require("ServiceBag")
 local SettingsInputKeyMapService = {}
 SettingsInputKeyMapService.ServiceName = "SettingsInputKeyMapService"
 
-function SettingsInputKeyMapService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type SettingsInputKeyMapService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_inputKeyMapRegistry: any,
+	},
+	{} :: typeof({ __index = SettingsInputKeyMapService })
+))
+
+function SettingsInputKeyMapService.Init(self: SettingsInputKeyMapService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -22,7 +31,7 @@ function SettingsInputKeyMapService:Init(serviceBag: ServiceBag.ServiceBag)
 	self._inputKeyMapRegistry = self._serviceBag:GetService(require("InputKeyMapRegistryServiceShared"))
 end
 
-function SettingsInputKeyMapService:Start()
+function SettingsInputKeyMapService.Start(self: SettingsInputKeyMapService): ()
 	self._maid:GiveTask(self._inputKeyMapRegistry:ObserveInputKeyMapListsBrio():Subscribe(function(brio)
 		if brio:IsDead() then
 			return
@@ -35,7 +44,7 @@ function SettingsInputKeyMapService:Start()
 	end))
 end
 
-function SettingsInputKeyMapService:Destroy()
+function SettingsInputKeyMapService.Destroy(self: SettingsInputKeyMapService): ()
 	self._maid:DoCleaning()
 end
 

@@ -3,6 +3,135 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.22.0...@quenty/brine@1.22.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.21.2...@quenty/brine@1.22.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.21.1...@quenty/brine@1.21.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.21.0...@quenty/brine@1.21.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.20.0...@quenty/brine@1.21.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.19.1...@quenty/brine@1.20.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.19.0...@quenty/brine@1.19.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.18.0...@quenty/brine@1.19.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.17.0...@quenty/brine@1.18.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.16.1...@quenty/brine@1.17.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.16.0...@quenty/brine@1.16.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.15.2...@quenty/brine@1.16.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.15.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.15.1...@quenty/brine@1.15.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.15.0...@quenty/brine@1.15.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.14.2...@quenty/brine@1.15.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.14.1...@quenty/brine@1.14.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.14.0...@quenty/brine@1.14.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.13.0...@quenty/brine@1.14.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.12.0...@quenty/brine@1.13.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.11.0...@quenty/brine@1.12.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.10.1...@quenty/brine@1.11.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/brine
+
+## [1.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.10.0...@quenty/brine@1.10.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.9.0...@quenty/brine@1.10.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.8.0...@quenty/brine@1.9.0) (2026-07-21)
+
+### Bug Fixes
+
+- Fix brine ([277663b](https://github.com/Quenty/NevermoreEngine/commit/277663bc9c83838083d07288ac9c96e56316d3eb))
+- Resolve luau-lsp and moonwave lint failures ([286e352](https://github.com/Quenty/NevermoreEngine/commit/286e3527b52a86639fc0485359141d7805b3fefa))
+
+### Features
+
+- Add new brine.restore fnction ([4a0df0d](https://github.com/Quenty/NevermoreEngine/commit/4a0df0d4ae1593a656b1e2440926d79ee5480f73))
+- Brine restore/snapshot ([ab3ae72](https://github.com/Quenty/NevermoreEngine/commit/ab3ae7246e7b6d1823dd1b29adcd17225279c589))
+- Revert brine restoreFromStream ([070c36f](https://github.com/Quenty/NevermoreEngine/commit/070c36f0b39c985128f6019ac76530fab5a9b975))
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.7.0...@quenty/brine@1.8.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.6.0...@quenty/brine@1.7.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/brine
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.5.0...@quenty/brine@1.6.0) (2026-07-14)
+
+### Features
+
+- **brine:** convert package to --!strict ([39ab066](https://github.com/Quenty/NevermoreEngine/commit/39ab066e031734fe54ad149217300d2e9f1c04f5))
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.4.1...@quenty/brine@1.5.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/brine
+
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/brine@1.4.0...@quenty/brine@1.4.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/brine

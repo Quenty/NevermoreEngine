@@ -15,6 +15,7 @@ local GroupUtils = require("GroupUtils")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local GroupPermissionProvider = setmetatable({}, BasePermissionProvider)
@@ -62,7 +63,7 @@ function GroupPermissionProvider.Start(self: GroupPermissionProvider)
 	getmetatable(GroupPermissionProvider).Start(self)
 
 	self._maid:GiveTask(Players.PlayerRemoving:Connect(function(player: Player)
-		local userId = player.UserId
+		local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 
 		self._adminsCache[userId] = nil
 		self._creatorCache[userId] = nil
@@ -97,7 +98,7 @@ function GroupPermissionProvider.PromiseIsPermissionLevel(
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(PermissionLevel:IsValue(permissionLevel))
 
 	if permissionLevel == PermissionLevel.ADMIN then
@@ -113,10 +114,11 @@ function GroupPermissionProvider._promiseIsCreator(
 	self: GroupPermissionProvider,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(player:IsDescendantOf(game), "Bad player")
 
-	if self._creatorCache[player.UserId] then
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+	if self._creatorCache[userId] then
 		return Promise.resolved(true)
 	end
 
@@ -131,12 +133,13 @@ function GroupPermissionProvider._promiseIsAdmin(
 ): Promise.Promise<boolean>
 	assert(player:IsDescendantOf(game))
 
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 	-- really not saving much time.
-	if self._creatorCache[player.UserId] then
+	if self._creatorCache[userId] then
 		return Promise.resolved(true)
 	end
 
-	if self._adminsCache[player.UserId] then
+	if self._adminsCache[userId] then
 		return Promise.resolved(true)
 	end
 
@@ -148,13 +151,14 @@ end
 function GroupPermissionProvider._handlePlayer(self: GroupPermissionProvider, player: Player): ()
 	assert(player, "Bad player")
 
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
 	self:_promiseRankInGroup(player):Then(function(rank)
 		if rank >= self._config.minAdminRequiredRank then
-			self._adminsCache[player.UserId] = true
+			self._adminsCache[userId] = true
 		end
 
 		if rank >= self._config.minCreatorRequiredRank then
-			self._creatorCache[player.UserId] = true
+			self._creatorCache[userId] = true
 		end
 	end)
 end
@@ -165,12 +169,13 @@ function GroupPermissionProvider._promiseRankInGroup(
 ): Promise.Promise<number>
 	assert(typeof(player) == "Instance", "Bad player")
 
-	if self._promiseRankPromisesCache[player.UserId] then
-		return self._promiseRankPromisesCache[player.UserId]
+	local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+	if self._promiseRankPromisesCache[userId] then
+		return self._promiseRankPromisesCache[userId]
 	end
 
-	self._promiseRankPromisesCache[player.UserId] = GroupUtils.promiseRankInGroup(player, self._config.groupId)
-	return self._promiseRankPromisesCache[player.UserId]
+	self._promiseRankPromisesCache[userId] = GroupUtils.promiseRankInGroup(player, self._config.groupId)
+	return self._promiseRankPromisesCache[userId]
 end
 
 return GroupPermissionProvider

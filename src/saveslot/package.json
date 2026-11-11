@@ -1,6 +1,6 @@
 {
   "name": "@quenty/saveslot",
-  "version": "1.2.1",
+  "version": "2.16.1",
   "description": "PlayerDataStoreService wrapper for save slots",
   "keywords": [
     "Roblox",
@@ -29,15 +29,21 @@
   ],
   "dependencies": {
     "@quenty/adorneedata": "workspace:*",
+    "@quenty/attributeutils": "workspace:*",
     "@quenty/baseobject": "workspace:*",
     "@quenty/binder": "workspace:*",
+    "@quenty/bindtocloseservice": "workspace:*",
     "@quenty/brio": "workspace:*",
     "@quenty/cmdrservice": "workspace:*",
     "@quenty/datastore": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/observablecollection": "workspace:*",
     "@quenty/playerbinder": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/propertyvalue": "workspace:*",
     "@quenty/remoting": "workspace:*",
@@ -45,8 +51,11 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/signal": "workspace:*",
     "@quenty/table": "workspace:*",
+    "@quenty/teleportserviceutils": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quenty/valueobject": "workspace:*"
+    "@quenty/time": "workspace:*",
+    "@quenty/valueobject": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

@@ -1,0 +1,26 @@
+--!nonstrict
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local root = ServerScriptService.scoredactionservice
+local loader = root:FindFirstChild("LoaderUtils", true).Parent
+local require = require(loader).bootstrapGame(root)
+
+local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
+
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+if results then
+	return results
+end
+
+local Maid = require("Maid")
+
+local maid = Maid.new()
+
+maid:Add(task.defer(function()
+	maid:DoCleaning()
+
+	while true do
+		task.wait(0.1)
+		error("UPDATE (this should never print)")
+	end
+end))

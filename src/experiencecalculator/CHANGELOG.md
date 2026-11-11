@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.14.2...@quenty/experiencecalculator@2.14.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [2.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.14.1...@quenty/experiencecalculator@2.14.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
+## [2.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.14.0...@quenty/experiencecalculator@2.14.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
+# [2.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.13.1...@quenty/experiencecalculator@2.14.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
+## [2.13.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.13.0...@quenty/experiencecalculator@2.13.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
+# [2.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.12.0...@quenty/experiencecalculator@2.13.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
+# [2.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.11.0...@quenty/experiencecalculator@2.12.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
 # [2.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.10.0...@quenty/experiencecalculator@2.11.0) (2026-05-29)
 
 ### Bug Fixes

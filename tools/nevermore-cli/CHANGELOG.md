@@ -3,6 +3,192 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.51.0...@quenty/nevermore-cli@4.52.0) (2026-11-06)
+
+### Bug Fixes
+
+- **nevermore-cli:** don't report a cancelled CI run as a crash ([02a44d5](https://github.com/Quenty/NevermoreEngine/commit/02a44d50c473069c7c1966d4390adad2cf703dc4))
+
+### Features
+
+- **nevermore-cli:** deploy integration games for PRs from forks ([9223b4f](https://github.com/Quenty/NevermoreEngine/commit/9223b4f23198d5f7951210b0f3d32351ea91b14c))
+- **nevermore-cli:** record what each deploy shipped in --output ([ffdb6e4](https://github.com/Quenty/NevermoreEngine/commit/ffdb6e4be9b036e688df8fbea9d5d5d417845511))
+- **nevermore-cli:** run a Luau file with nevermore test --script-file ([ed8361d](https://github.com/Quenty/NevermoreEngine/commit/ed8361d411a243e91754e572176a416bcd62294a))
+
+# [4.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.50.1...@quenty/nevermore-cli@4.51.0) (2026-11-03)
+
+### Features
+
+- **nevermore-cli:** run cloud tests for PRs from forks ([#855](https://github.com/Quenty/NevermoreEngine/issues/855)) ([5408e3d](https://github.com/Quenty/NevermoreEngine/commit/5408e3d52f31e1499afaa08ed79dfbeb42515b02))
+
+## [4.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.50.0...@quenty/nevermore-cli@4.50.1) (2026-11-02)
+
+### Bug Fixes
+
+- **nevermore-cli:** resolve test failure annotations to real files ([#853](https://github.com/Quenty/NevermoreEngine/issues/853)) ([aa52794](https://github.com/Quenty/NevermoreEngine/commit/aa5279471baa0877e72b6ee75d89f722a5dc5505))
+
+# [4.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.49.0...@quenty/nevermore-cli@4.50.0) (2026-10-28)
+
+### Features
+
+- **studio-bridge:** multiplayer playtests, Studio launching, search, and CLI fixes ([#851](https://github.com/Quenty/NevermoreEngine/issues/851)) ([e63f878](https://github.com/Quenty/NevermoreEngine/commit/e63f878764807773d1bb1bf96d582d6e6640af88))
+
+# [4.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.48.0...@quenty/nevermore-cli@4.49.0) (2026-10-26)
+
+### Features
+
+- **nevermore-cli:** Recompress place uploads and split oversized batches ([#850](https://github.com/Quenty/NevermoreEngine/issues/850)) ([a516061](https://github.com/Quenty/NevermoreEngine/commit/a516061dab439f4ad553a4707c9a64537271c42e))
+
+# [4.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.2...@quenty/nevermore-cli@4.48.0) (2026-10-24)
+
+### Bug Fixes
+
+- **nevermore-cli:** Run only the scriptTemplate in aggregated batch test ([c609a70](https://github.com/Quenty/NevermoreEngine/commit/c609a70cae6c750ff102c8275486652365068542))
+
+### Features
+
+- **nevermore-cli:** Honor --script-template, --universe-id and --place-id on nevermore test ([929b2ce](https://github.com/Quenty/NevermoreEngine/commit/929b2ce8cbce0e25a5af8d007eb2145c2ad64d7a))
+
+## [4.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.1...@quenty/nevermore-cli@4.47.2) (2026-10-22)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+## [4.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.0...@quenty/nevermore-cli@4.47.1) (2026-10-20)
+
+### Bug Fixes
+
+- **nevermore-cli:** Track Open Cloud rate limits per endpoint and show waits in the spinner ([008773f](https://github.com/Quenty/NevermoreEngine/commit/008773f159ea2fe8838c43dc00401280ae940f7d))
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [4.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.46.0...@quenty/nevermore-cli@4.47.0) (2026-10-14)
+
+### Features
+
+- Add asset upload support to Nevermore CLI ([10fbb90](https://github.com/Quenty/NevermoreEngine/commit/10fbb904d13ed05247dae6375991a3ff4b598aa3))
+
+# [4.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.45.0...@quenty/nevermore-cli@4.46.0) (2026-09-23)
+
+### Bug Fixes
+
+- **nevermore-template-helpers:** Scaffold hyphenated package names correctly ([b978855](https://github.com/Quenty/NevermoreEngine/commit/b9788553c4759f430ec4a3b61d02d8881881b867))
+
+### Features
+
+- Upgrade rojo + aftman to latest higher performance rojo ([c0356e6](https://github.com/Quenty/NevermoreEngine/commit/c0356e643d5c571da86642e69709b77e3f1d13cf))
+
+# [4.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.44.0...@quenty/nevermore-cli@4.45.0) (2026-08-28)
+
+### Bug Fixes
+
+- Dryrun does not create place ([2c7f39d](https://github.com/Quenty/NevermoreEngine/commit/2c7f39d0374c423fae572fa36ccf7f9fd794a27b))
+
+# [4.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.4...@quenty/nevermore-cli@4.44.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+## [4.43.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.3...@quenty/nevermore-cli@4.43.4) (2026-08-16)
+
+### Bug Fixes
+
+- **nevermore-cli:** install with the project's package manager ([80f2a19](https://github.com/Quenty/NevermoreEngine/commit/80f2a190e0bc05191221d0a10efed50416869507))
+
+## [4.43.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.43.2...@quenty/nevermore-cli@4.43.3) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+## [4.43.2](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.43.1...@quenty/nevermore-cli@4.43.2) (2026-08-12)
+
+### Bug Fixes
+
+- A series of misc fixes + upgrade rojo ([#798](https://github.com/Quenty/Nevermore/issues/798)) ([33d83e2](https://github.com/Quenty/Nevermore/commit/33d83e26a384a17ee58b12f367890a63c73e8432))
+
+## [4.43.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.43.0...@quenty/nevermore-cli@4.43.1) (2026-08-10)
+
+### Bug Fixes
+
+- **nevermore-cli:** stop failing a batch run whose tests all passed ([#794](https://github.com/Quenty/Nevermore/issues/794)) ([0109f76](https://github.com/Quenty/Nevermore/commit/0109f7614166b086f57c0919af3e8f5f63dad436))
+
+# [4.43.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.42.0...@quenty/nevermore-cli@4.43.0) (2026-08-10)
+
+### Bug Fixes
+
+- **nevermore-cli:** close the defects a pre-merge review found ([f559265](https://github.com/Quenty/Nevermore/commit/f559265afb84205ac855eb240d899800fea08cec))
+- **nevermore-cli:** close three defects found consuming --watch ([f6b198e](https://github.com/Quenty/Nevermore/commit/f6b198e97e0142bea2c91f6190db62b477f51e3e))
+- **nevermore-cli:** make the watch context tests independent of the host ([453f415](https://github.com/Quenty/Nevermore/commit/453f415460db72eec511ecbea34434c82afb61c8))
+- **nevermore-cli:** notice an unreadable base place from the live event tail ([6ba20e8](https://github.com/Quenty/Nevermore/commit/6ba20e8373812605167ef352574d70b0701e1160))
+- **nevermore-cli:** stop naming an Open Cloud scope that does not exist ([b1d1bd6](https://github.com/Quenty/Nevermore/commit/b1d1bd638507439c71cb7726aa744d6caabff624))
+- **nevermore-deploy-config:** close lock resolution races found in review ([ea7b0a4](https://github.com/Quenty/Nevermore/commit/ea7b0a4a677d068bd7228c5b295f713986f8ae51))
+
+### Features
+
+- **nevermore-cli:** let `gh` supply the watch token, when asked ([4d53eb8](https://github.com/Quenty/Nevermore/commit/4d53eb87270020b19584b826221c3cff7ecc4e66))
+- **nevermore-cli:** let basePlace.version track "saved" or "published" ([a4f9492](https://github.com/Quenty/Nevermore/commit/a4f94927d1d9ede359e20628e65d68279a25fdfd))
+- **nevermore-cli:** rebuild a place when its base place changes ([ef82af0](https://github.com/Quenty/Nevermore/commit/ef82af0ea4c336ebc69167211fd82e1929eb5eb2))
+- **nevermore-cli:** stamp the base place version into the built place ([4e91c13](https://github.com/Quenty/Nevermore/commit/4e91c13904afd423fd39e26387087608a5da9e22))
+- **nevermore-cli:** use the shared Open Cloud key the service now spends ([d152305](https://github.com/Quenty/Nevermore/commit/d15230516bfc1cffb3e4f2cf0a5505cefee02fe4))
+- **nevermore-deploy-config:** add deploy.nevermore.lock.json ([1a76b36](https://github.com/Quenty/Nevermore/commit/1a76b36c12f79e1e0b1dd22a20170fc09e85c0e1))
+
+# [4.42.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.41.1...@quenty/nevermore-cli@4.42.0) (2026-07-29)
+
+### Features
+
+- **cli:** make a passing test run mean tests were seen to pass ([#772](https://github.com/Quenty/Nevermore/issues/772)) ([d8ba58c](https://github.com/Quenty/Nevermore/commit/d8ba58ce4f0badbf91cbba98d6d864dd4c85a731))
+
+## [4.41.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.41.0...@quenty/nevermore-cli@4.41.1) (2026-07-29)
+
+### Bug Fixes
+
+- **cli:** stop reporting a test pass that no test output backs ([#771](https://github.com/Quenty/Nevermore/issues/771)) ([5074ac0](https://github.com/Quenty/Nevermore/commit/5074ac0bdec6f075a562e9486b1e578d07fb018e))
+
+# [4.41.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.40.0...@quenty/nevermore-cli@4.41.0) (2026-07-21)
+
+### Features
+
+- Add additional metadata to versions ([c499aef](https://github.com/Quenty/Nevermore/commit/c499aef65462f5814c618920a0533b211a79f516))
+
+# [4.40.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.39.0...@quenty/nevermore-cli@4.40.0) (2026-07-20)
+
+### Features
+
+- **manifest:** stamp and read the deploy target's place table ([9542015](https://github.com/Quenty/Nevermore/commit/954201515424fa415a0cbfb3eb1101b3d6f3ec85))
+
+# [4.39.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.38.0...@quenty/nevermore-cli@4.39.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/Nevermore/issues/737)) ([1b7a536](https://github.com/Quenty/Nevermore/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [4.38.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.37.0...@quenty/nevermore-cli@4.38.0) (2026-07-17)
+
+### Features
+
+- **nevermore-cli:** pin and promote base place versions in deploy config ([#734](https://github.com/Quenty/Nevermore/issues/734)) ([2f265c4](https://github.com/Quenty/Nevermore/commit/2f265c47dac250b398fe3fc24d70a72b7e01c51c))
+
+# [4.37.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.36.0...@quenty/nevermore-cli@4.37.0) (2026-07-16)
+
+### Features
+
+- **nevermore-claude:** add Claude Code plugin with strict-typing-luau skill ([25494bf](https://github.com/Quenty/Nevermore/commit/25494bf63f336bd448c1422558bdf6d9f5e46483))
+
+# [4.36.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.35.0...@quenty/nevermore-cli@4.36.0) (2026-07-16)
+
+### Bug Fixes
+
+- **nevermore-cli:** stream Open Cloud uploads via node-fetch ([559601f](https://github.com/Quenty/Nevermore/commit/559601f4270141d67cc4cb32e37c473552d3ced1))
+
+### Features
+
+- **nevermore-cli-manifest:** stamp deployed places with deploy metadata ([ae632b2](https://github.com/Quenty/Nevermore/commit/ae632b2335636648275ff14a79285ba6e6dec2b7))
+- **nevermore-cli:** retry transient edge 400/408 on Open Cloud requests ([da826bf](https://github.com/Quenty/Nevermore/commit/da826bf691917ff7fec02d60551d4b5392748d22))
+
+# [4.35.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.34.0...@quenty/nevermore-cli@4.35.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+# [4.34.0](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.33.1...@quenty/nevermore-cli@4.34.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
 ## [4.33.1](https://github.com/Quenty/Nevermore/compare/@quenty/nevermore-cli@4.33.0...@quenty/nevermore-cli@4.33.1) (2026-06-02)
 
 ### Bug Fixes

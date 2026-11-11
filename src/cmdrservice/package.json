@@ -1,6 +1,6 @@
 {
   "name": "@quenty/cmdrservice",
-  "version": "13.45.2",
+  "version": "13.65.0",
   "description": "Bridge between cmdr and Nevermore services using servicebag",
   "keywords": [
     "Roblox",
@@ -28,6 +28,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
@@ -37,7 +38,9 @@
     "@quenty/servicebag": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/templateprovider": "workspace:*",
-    "@quentystudios/cmdr": "^1.12.0-quenty.0"
+    "@quenty/tie": "workspace:*",
+    "@quentystudios/cmdr": "^1.12.0-quenty.0",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

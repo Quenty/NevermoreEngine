@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.22.0...@quenty/sunpositionutils@2.22.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.21.2...@quenty/sunpositionutils@2.22.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.21.1...@quenty/sunpositionutils@2.21.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.21.0...@quenty/sunpositionutils@2.21.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.20.1...@quenty/sunpositionutils@2.21.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.20.0...@quenty/sunpositionutils@2.20.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.19.0...@quenty/sunpositionutils@2.20.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.18.0...@quenty/sunpositionutils@2.19.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.17.0...@quenty/sunpositionutils@2.18.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.16.1...@quenty/sunpositionutils@2.17.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.16.0...@quenty/sunpositionutils@2.16.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.15.2...@quenty/sunpositionutils@2.16.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.15.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.15.1...@quenty/sunpositionutils@2.15.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.15.0...@quenty/sunpositionutils@2.15.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.14.0...@quenty/sunpositionutils@2.15.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.14.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.13.0...@quenty/sunpositionutils@2.14.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.12.0...@quenty/sunpositionutils@2.13.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.12.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.11.1...@quenty/sunpositionutils@2.12.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+## [2.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.11.0...@quenty/sunpositionutils@2.11.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.10.0...@quenty/sunpositionutils@2.11.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.9.0...@quenty/sunpositionutils@2.10.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.8.0...@quenty/sunpositionutils@2.9.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
+# [2.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.7.1...@quenty/sunpositionutils@2.8.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/sunpositionutils
+
 ## [2.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/sunpositionutils@2.7.0...@quenty/sunpositionutils@2.7.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/sunpositionutils

@@ -3,6 +3,120 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.54.0...@quenty/permissionprovider@14.54.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.53.2...@quenty/permissionprovider@14.54.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [14.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.53.1...@quenty/permissionprovider@14.53.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.53.0...@quenty/permissionprovider@14.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.52.1...@quenty/permissionprovider@14.53.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.52.0...@quenty/permissionprovider@14.52.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.51.0...@quenty/permissionprovider@14.52.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.50.0...@quenty/permissionprovider@14.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.49.2...@quenty/permissionprovider@14.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.49.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.49.1...@quenty/permissionprovider@14.49.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.49.0...@quenty/permissionprovider@14.49.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.48.2...@quenty/permissionprovider@14.49.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.48.1...@quenty/permissionprovider@14.48.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.48.0...@quenty/permissionprovider@14.48.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.47.0...@quenty/permissionprovider@14.48.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.46.0...@quenty/permissionprovider@14.47.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.45.0...@quenty/permissionprovider@14.46.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.44.1...@quenty/permissionprovider@14.45.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.44.0...@quenty/permissionprovider@14.44.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.43.0...@quenty/permissionprovider@14.44.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.42.0...@quenty/permissionprovider@14.43.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.41.0...@quenty/permissionprovider@14.42.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.40.1...@quenty/permissionprovider@14.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+## [14.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.40.0...@quenty/permissionprovider@14.40.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.39.0...@quenty/permissionprovider@14.40.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/permissionprovider
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.2...@quenty/permissionprovider@14.39.0) (2026-07-14)
+
+### Features
+
+- **permissionprovider:** convert package to --!strict ([04813e7](https://github.com/Quenty/NevermoreEngine/commit/04813e72bb22546bc0bc460fc0761a2463d2d875))
+
 ## [14.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/permissionprovider@14.38.1...@quenty/permissionprovider@14.38.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/permissionprovider

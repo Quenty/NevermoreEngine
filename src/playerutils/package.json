@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerutils",
-  "version": "8.32.1",
+  "version": "8.46.1",
   "description": "Player utility functions",
   "keywords": [
     "Roblox",
@@ -34,9 +34,13 @@
     "@quenty/brio": "workspace:*",
     "@quenty/characterutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
-    "@quenty/rx": "workspace:*"
+    "@quenty/rx": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   }
 }

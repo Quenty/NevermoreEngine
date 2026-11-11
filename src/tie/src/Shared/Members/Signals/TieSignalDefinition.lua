@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TieSignalDefinition
 ]=]
@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local TieMemberDefinition = require("TieMemberDefinition")
 local TieRealmUtils = require("TieRealmUtils")
+local TieRealms = require("TieRealms")
 local TieSignalImplementation = require("TieSignalImplementation")
 local TieSignalInterface = require("TieSignalInterface")
 
@@ -14,22 +15,42 @@ local TieSignalDefinition = setmetatable({}, TieMemberDefinition)
 TieSignalDefinition.ClassName = "TieSignalDefinition"
 TieSignalDefinition.__index = TieSignalDefinition
 
-function TieSignalDefinition.new(tieDefinition, signalName: string, memberTieRealm)
+export type TieSignalDefinition =
+	typeof(setmetatable({} :: {}, {} :: typeof({ __index = TieSignalDefinition })))
+	& TieMemberDefinition.TieMemberDefinition
+
+function TieSignalDefinition.new(
+	tieDefinition: any,
+	signalName: string,
+	memberTieRealm: TieRealms.TieRealm
+): TieSignalDefinition
 	assert(TieRealmUtils.isTieRealm(memberTieRealm), "Bad memberTieRealm")
 
-	local self = setmetatable(TieMemberDefinition.new(tieDefinition, signalName, memberTieRealm), TieSignalDefinition)
+	local self: TieSignalDefinition =
+		setmetatable(TieMemberDefinition.new(tieDefinition, signalName, memberTieRealm) :: any, TieSignalDefinition)
 
 	return self
 end
 
-function TieSignalDefinition:Implement(implParent: Instance, initialValue, _actualSelf, tieRealm)
+function TieSignalDefinition.Implement(
+	self: TieSignalDefinition,
+	implParent: Instance,
+	initialValue: any,
+	_actualSelf: any,
+	tieRealm: TieRealms.TieRealm
+): TieSignalImplementation.TieSignalImplementation
 	assert(typeof(implParent) == "Instance", "Bad implParent")
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 
-	return TieSignalImplementation.new(self, implParent, initialValue, tieRealm)
+	return TieSignalImplementation.new(self, implParent, initialValue)
 end
 
-function TieSignalDefinition:GetInterface(implParent: Instance, _actualSelf, tieRealm)
+function TieSignalDefinition.GetInterface(
+	self: TieSignalDefinition,
+	implParent: Instance,
+	_actualSelf: any,
+	tieRealm: TieRealms.TieRealm
+): TieSignalInterface.TieSignalInterface
 	assert(typeof(implParent) == "Instance", "Bad implParent")
 	assert(TieRealmUtils.isTieRealm(tieRealm), "Bad tieRealm")
 

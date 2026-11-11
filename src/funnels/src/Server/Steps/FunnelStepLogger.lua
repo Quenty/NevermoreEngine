@@ -12,6 +12,7 @@ local HttpService = game:GetService("HttpService")
 
 local BaseObject = require("BaseObject")
 local FunnelStepTracker = require("FunnelStepTracker")
+local PlayerMock = require("PlayerMock")
 
 local FunnelStepLogger = setmetatable({}, BaseObject)
 FunnelStepLogger.ClassName = "FunnelStepLogger"
@@ -74,7 +75,9 @@ function FunnelStepLogger.IsStepComplete(self: FunnelStepLogger, stepNumber: num
 end
 
 function FunnelStepLogger._sendStep(self: FunnelStepLogger, stepNumber: number, stepName: string)
-	AnalyticsService:LogFunnelStepEvent(self._player, self._funnelName, self._funnelSessionId, stepNumber, stepName)
+	if not PlayerMock.isMock(self._player) then
+		AnalyticsService:LogFunnelStepEvent(self._player, self._funnelName, self._funnelSessionId, stepNumber, stepName)
+	end
 
 	if self._printDebugEnabled then
 		print(string.format("%s - %d - %s", self._funnelName, stepNumber, stepName))

@@ -8,6 +8,9 @@
       },
       "countdowntext": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

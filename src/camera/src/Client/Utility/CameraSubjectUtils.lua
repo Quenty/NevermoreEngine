@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class CameraSubjectUtils
 ]=]
@@ -35,7 +35,7 @@ function CameraSubjectUtils.getRobloxCameraSubjectCFrame(cameraSubject: Instance
 					heightOffset = R15_HEAD_OFFSET
 
 					local rootPart = humanoid.RootPart
-					if bodyPartToFollow == rootPart then
+					if bodyPartToFollow == rootPart and rootPart then
 						local rootPartSizeOffset = (rootPart.Size.Y - HUMANOID_ROOT_PART_SIZE.Y) / 2
 						heightOffset = heightOffset + Vector3.new(0, rootPartSizeOffset, 0)
 					end

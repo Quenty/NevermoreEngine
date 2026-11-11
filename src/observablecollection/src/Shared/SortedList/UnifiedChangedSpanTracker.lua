@@ -83,20 +83,25 @@ end
 --[=[
 	Computes the effective changed spans and clears internal state.
 
+	Also returns, for each final position, the index that item had before the mutations
+	(0 for a newly added item). Nil when nothing was logged. Negative-index observers use
+	this: slot -k changed iff the item now at that slot is not the item that was there before.
+
 	@param previousCount number -- List count before mutations
 	@param currentCount number -- List count after mutations
 	@return { ChangedSpanTracker.ChangedSpan }
+	@return { number }? -- originalIndexes
 ]=]
 function UnifiedChangedSpanTracker.ComputeEffectiveSpans(
 	self: UnifiedChangedSpanTracker,
 	previousCount: number,
 	currentCount: number
-): { ChangedSpan }
+): ({ ChangedSpan }, { number }?)
 	local ops = self._sortedSpans
 	self._sortedSpans = {}
 
 	if #ops == 0 then
-		return {}
+		return {}, nil
 	end
 
 	-- Simulate operations on a virtual list to determine exactly which indices changed.
@@ -170,7 +175,39 @@ function UnifiedChangedSpanTracker.ComputeEffectiveSpans(
 		)
 	end
 
-	return result
+	return result, items
+end
+
+--[=[
+	Returns whether the value observed at a negative index changed, given the originalIndexes
+	from [ComputeEffectiveSpans].
+
+	@param originalIndexes { number }?
+	@param previousCount number
+	@param negativeIndex number
+	@return boolean
+]=]
+function UnifiedChangedSpanTracker.isNegativeIndexChanged(
+	originalIndexes: { number }?,
+	previousCount: number,
+	negativeIndex: number
+): boolean
+	assert(negativeIndex < 0, "Bad negativeIndex")
+
+	if not originalIndexes then
+		return false
+	end
+
+	local index = #originalIndexes + negativeIndex + 1
+	local previousIndex = previousCount + negativeIndex + 1
+
+	if index >= 1 then
+		local originalIndex = originalIndexes[index]
+		return originalIndex == 0 or originalIndex ~= previousIndex
+	else
+		-- Slot fell off the front of the list
+		return previousIndex >= 1
+	end
 end
 
 function UnifiedChangedSpanTracker.isIndexInSpan(sortedSpans: { ChangedSpan }, index: number): boolean

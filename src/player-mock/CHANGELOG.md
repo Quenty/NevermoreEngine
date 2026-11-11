@@ -1,0 +1,129 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.11.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.11.0...@quenty/playermock@1.11.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [1.11.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.10.2...@quenty/playermock@1.11.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/playermock
+
+## [1.10.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.10.1...@quenty/playermock@1.10.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/playermock
+
+## [1.10.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.10.0...@quenty/playermock@1.10.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/playermock
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.9.1...@quenty/playermock@1.10.0) (2026-09-21)
+
+### Features
+
+- Support HumanoidKillerUtils supporting PlayerMock package ([93e40ea](https://github.com/Quenty/NevermoreEngine/commit/93e40ea35729944e8dd0f4464249e18a9f4355e8))
+
+## [1.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.9.0...@quenty/playermock@1.9.1) (2026-09-03)
+
+### Bug Fixes
+
+- **player-mock:** Give PlayerMockService its own type so callers do not need a cast ([64a9327](https://github.com/Quenty/NevermoreEngine/commit/64a932752134833a666b5b52902bb5a46852f967))
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.8.0...@quenty/playermock@1.9.0) (2026-09-02)
+
+### Bug Fixes
+
+- PlayerMock add more user input service events ([d963570](https://github.com/Quenty/NevermoreEngine/commit/d96357095a4aa4be014fced25a45fc7b0bc2bb37))
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.7.0...@quenty/playermock@1.8.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playermock
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.6.1...@quenty/playermock@1.7.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playermock
+
+## [1.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.6.0...@quenty/playermock@1.6.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/playermock
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.2...@quenty/playermock@1.6.0) (2026-07-28)
+
+### Features
+
+- Mock player utils + Player mock ([4caed96](https://github.com/Quenty/NevermoreEngine/commit/4caed968ad05b1bce254fbafb0998a7a1b207f29))
+
+## [1.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.1...@quenty/playermock@1.5.2) (2026-07-27)
+
+### Bug Fixes
+
+- **teleportserviceutils:** hold one outstanding teleport request at a time ([#755](https://github.com/Quenty/NevermoreEngine/issues/755)) ([7e8761e](https://github.com/Quenty/NevermoreEngine/commit/7e8761e5d6becc7391975a5cd465cb8f0ff23b72))
+
+## [1.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.5.0...@quenty/playermock@1.5.1) (2026-07-25)
+
+### Bug Fixes
+
+- Fix things ([de8a3b5](https://github.com/Quenty/NevermoreEngine/commit/de8a3b5fbe2aa839f6fc928d4052405d3a13cd71))
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.4.0...@quenty/playermock@1.5.0) (2026-07-25)
+
+### Features
+
+- Add teleport utils that retries ([89cd3c5](https://github.com/Quenty/NevermoreEngine/commit/89cd3c5a20968a361334c722cec58b833071b5ec))
+- Use ReplicationFocus instead of overwriting the focus ([daaf82f](https://github.com/Quenty/NevermoreEngine/commit/daaf82f22862570e1eaafd48188c8ed067005ef9))
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.3.0...@quenty/playermock@1.4.0) (2026-07-24)
+
+### Features
+
+- mock-safe teleport and screen-gui-provider teardown ([#751](https://github.com/Quenty/NevermoreEngine/issues/751)) ([743da25](https://github.com/Quenty/NevermoreEngine/commit/743da25a3eba46e0e498999ce4eec964f9774b18))
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.2.0...@quenty/playermock@1.3.0) (2026-07-24)
+
+### Features
+
+- PlayerMock seams for GuiService.SelectedObject and rich input firing ([#750](https://github.com/Quenty/NevermoreEngine/issues/750)) ([f424dda](https://github.com/Quenty/NevermoreEngine/commit/f424dda9304bc1616d8f13de42d5527fd126e151))
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.1.1...@quenty/playermock@1.2.0) (2026-07-23)
+
+### Features
+
+- Improve player mock ([17f18f0](https://github.com/Quenty/NevermoreEngine/commit/17f18f00b10e35374ffcad8112b4b36784b00e6f))
+
+## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playermock@1.1.0...@quenty/playermock@1.1.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/playermock
+
+# 1.1.0 (2026-07-23)
+
+### Bug Fixes
+
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Improve stuff ([ae11166](https://github.com/Quenty/NevermoreEngine/commit/ae1116636cea882a51754b0a74cb5a641bad9ae4))
+- Some more small cleanup ([1556cec](https://github.com/Quenty/NevermoreEngine/commit/1556cec4ae143160c915630be485b12576721c2e))
+
+# v1.1.0 (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
+- feat: Improve stuff ([@Quenty](https://github.com/Quenty))
+- feat: Some more small cleanup ([@Quenty](https://github.com/Quenty))
+- feat: Add baseline player-mock and support across Nevermore for mocked players. ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- fix: Cleanup code a bit ([@Quenty](https://github.com/Quenty))
+- fixx: Address review comments and harden stuff ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))

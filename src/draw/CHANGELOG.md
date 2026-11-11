@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.17.2...@quenty/draw@7.17.3) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/draw
+
+## [7.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.17.1...@quenty/draw@7.17.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/draw
+
+## [7.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.17.0...@quenty/draw@7.17.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/draw
+
+# [7.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.16.1...@quenty/draw@7.17.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/draw
+
+## [7.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.16.0...@quenty/draw@7.16.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/draw
+
+# [7.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.15.0...@quenty/draw@7.16.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/draw
+
+# [7.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.14.1...@quenty/draw@7.15.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/draw
+
 ## [7.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/draw@7.14.0...@quenty/draw@7.14.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/draw

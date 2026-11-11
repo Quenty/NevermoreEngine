@@ -3,6 +3,123 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.58.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.58.0...@quenty/camera@14.58.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.57.2...@quenty/camera@14.58.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [14.57.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.57.1...@quenty/camera@14.57.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.57.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.57.0...@quenty/camera@14.57.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.56.0...@quenty/camera@14.57.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.55.1...@quenty/camera@14.56.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.55.0...@quenty/camera@14.55.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.54.0...@quenty/camera@14.55.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.53.0...@quenty/camera@14.54.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.52.0...@quenty/camera@14.53.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.51.1...@quenty/camera@14.52.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.51.0...@quenty/camera@14.51.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.50.2...@quenty/camera@14.51.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.50.1...@quenty/camera@14.50.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.50.0...@quenty/camera@14.50.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.49.0...@quenty/camera@14.50.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.48.0...@quenty/camera@14.49.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.47.0...@quenty/camera@14.48.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.46.1...@quenty/camera@14.47.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/camera
+
+## [14.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.46.0...@quenty/camera@14.46.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.45.0...@quenty/camera@14.46.0) (2026-07-23)
+
+### Bug Fixes
+
+- Additional fixes ([8714d52](https://github.com/Quenty/NevermoreEngine/commit/8714d52ed996f2e41e6daa191554acca35860e36))
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.44.0...@quenty/camera@14.45.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.43.0...@quenty/camera@14.44.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/camera
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.42.0...@quenty/camera@14.43.0) (2026-07-14)
+
+### Features
+
+- **camera:** convert package to --!strict ([9fe73f4](https://github.com/Quenty/NevermoreEngine/commit/9fe73f4a3d2cc98a171f6e9f92e592d0aeb30d15))
+
+# [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.41.1...@quenty/camera@14.42.0) (2026-07-12)
+
+### Bug Fixes
+
+- Ensure valid camera state ([8458120](https://github.com/Quenty/NevermoreEngine/commit/8458120e26ebaa2cd44477470094886b8e4f1b4c))
+
 ## [14.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camera@14.41.0...@quenty/camera@14.41.1) (2026-06-05)
 
 ### Bug Fixes

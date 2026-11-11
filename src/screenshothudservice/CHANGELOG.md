@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.43.0...@quenty/screenshothudservice@7.43.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.42.2...@quenty/screenshothudservice@7.43.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+## [7.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.42.1...@quenty/screenshothudservice@7.42.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+## [7.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.42.0...@quenty/screenshothudservice@7.42.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.41.0...@quenty/screenshothudservice@7.42.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.40.2...@quenty/screenshothudservice@7.41.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+## [7.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.40.1...@quenty/screenshothudservice@7.40.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+## [7.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.40.0...@quenty/screenshothudservice@7.40.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.39.0...@quenty/screenshothudservice@7.40.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.38.0...@quenty/screenshothudservice@7.39.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.37.0...@quenty/screenshothudservice@7.38.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.36.0...@quenty/screenshothudservice@7.37.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.35.0...@quenty/screenshothudservice@7.36.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/screenshothudservice
+
+# [7.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.34.1...@quenty/screenshothudservice@7.35.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **screenshothudservice:** convert package to --!strict ([02f67bf](https://github.com/Quenty/NevermoreEngine/commit/02f67bfe7dbd55fc5c6a4982180f523a1a683807))
+
 ## [7.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/screenshothudservice@7.34.0...@quenty/screenshothudservice@7.34.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/screenshothudservice

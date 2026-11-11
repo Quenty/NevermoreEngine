@@ -1,0 +1,35 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.1.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindable-utils@1.1.2...@quenty/bindable-utils@1.1.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [1.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindable-utils@1.1.1...@quenty/bindable-utils@1.1.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/bindable-utils
+
+## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindable-utils@1.1.0...@quenty/bindable-utils@1.1.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/bindable-utils
+
+# 1.1.0 (2026-09-02)
+
+### Features
+
+- Add BindableUtils package ([1fc7b61](https://github.com/Quenty/NevermoreEngine/commit/1fc7b61851e84dac9a2f728d964c5f1c10884b5c))
+
+# v1.1.0 (Wed Sep 02 2026)
+
+#### 🚀 Enhancement
+
+- feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
+- feat: Add BindableUtils package ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))

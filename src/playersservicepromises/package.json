@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playersservicepromises",
-  "version": "10.18.1",
+  "version": "10.31.1",
   "description": "Utility methods for async methods in Players service",
   "keywords": [
     "Roblox",
@@ -30,7 +30,10 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

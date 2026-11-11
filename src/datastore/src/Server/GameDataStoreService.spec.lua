@@ -1,0 +1,151 @@
+--!nonstrict
+--[[
+	@class GameDataStoreService.spec.lua
+]]
+local require = require(script.Parent.loader).load(script)
+
+local DataStoreMock = require("DataStoreMock")
+local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
+local PromiseTestUtils = require("PromiseTestUtils")
+local ServiceBag = require("ServiceBag")
+
+local describe = Jest.Globals.describe
+local expect = Jest.Globals.expect
+local it = Jest.Globals.it
+
+local function setup(mock)
+	local maid = Maid.new()
+	mock = mock or DataStoreMock.new()
+
+	local serviceBag = maid:Add(ServiceBag.new())
+	local service = serviceBag:GetService(require("GameDataStoreService"))
+	serviceBag:Init()
+	service:SetRobloxDataStore(mock)
+	serviceBag:Start()
+
+	local controller = {
+		service = service,
+		mock = mock,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
+
+describe("GameDataStoreService.PromiseDataStore", function()
+	it("should resolve a datastore that loads successfully against a healthy mock", function()
+		local controller = setup()
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore())
+		expect(dataStore).never.toBeNil()
+
+		expect(PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful())).toEqual(true)
+
+		controller:Destroy()
+	end)
+
+	it("should return the same cached promise on repeated calls", function()
+		local controller = setup()
+
+		local first = controller.service:PromiseDataStore()
+		local second = controller.service:PromiseDataStore()
+		expect((first == second)).toEqual(true)
+
+		controller:Destroy()
+	end)
+end)
+
+describe("GameDataStoreService persistence", function()
+	it("should round-trip a stored value into the mock under the version1 key", function()
+		local controller = setup()
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore())
+
+		dataStore:Store("motd", "hello")
+
+		PromiseTestUtils.awaitFulfilled(dataStore:Save())
+
+		local raw = controller.mock:GetRaw("version1")
+		expect(raw).never.toBeNil()
+		expect(raw.motd).toEqual("hello")
+
+		controller:Destroy()
+	end)
+end)
+
+describe("GameDataStoreService.SetRobloxDataStore", function()
+	it("should throw when injected twice (already resolved)", function()
+		local controller = setup()
+
+		expect(function()
+			controller.service:SetRobloxDataStore(DataStoreMock.new())
+		end).toThrow("Already resolved robloxDataStore")
+
+		controller:Destroy()
+	end)
+
+	it("should throw on a non-datastore argument", function()
+		local controller = setup()
+
+		expect(function()
+			controller.service:SetRobloxDataStore({})
+		end).toThrow("Bad robloxDataStore")
+
+		expect(function()
+			controller.service:SetRobloxDataStore(nil)
+		end).toThrow("Bad robloxDataStore")
+
+		controller:Destroy()
+	end)
+end)
+
+describe("GameDataStoreService failure handling", function()
+	it("should resolve load as false (not hang) when the datastore is down", function()
+		local mock = DataStoreMock.new()
+		mock:FailAllRequests()
+
+		local controller = setup(mock)
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
+
+		local loadedOk = PromiseTestUtils.awaitFulfilled(dataStore:PromiseLoadSuccessful(), 5)
+		expect(loadedOk).toEqual(false)
+
+		controller:Destroy()
+	end)
+end)
+
+describe("GameDataStoreService teardown", function()
+	it("destroys its inner datastore when the service is destroyed", function()
+		local controller = setup()
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
+
+		controller:Destroy()
+
+		-- BaseObject.Destroy clears the metatable, so a torn-down store reads a nil metatable.
+		expect(getmetatable(dataStore)).toBeNil()
+	end)
+
+	it("flushes staged data synchronously to the underlying store when destroyed", function()
+		local controller = setup()
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.service:PromiseDataStore(), 5)
+
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 5)).toEqual(true)
+
+		dataStore:Store("motd", "goodbye")
+
+		controller:Destroy()
+
+		local raw = controller.mock:GetRaw("version1")
+		expect(raw).never.toBeNil()
+		expect(raw.motd).toEqual("goodbye")
+	end)
+end)

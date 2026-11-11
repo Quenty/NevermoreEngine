@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.49.0...@quenty/rigbuilderutils@10.49.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.48.2...@quenty/rigbuilderutils@10.49.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.48.1...@quenty/rigbuilderutils@10.48.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.48.0...@quenty/rigbuilderutils@10.48.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.47.1...@quenty/rigbuilderutils@10.48.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.47.0...@quenty/rigbuilderutils@10.47.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.46.0...@quenty/rigbuilderutils@10.47.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.45.0...@quenty/rigbuilderutils@10.46.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.44.0...@quenty/rigbuilderutils@10.45.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.43.1...@quenty/rigbuilderutils@10.44.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.43.0...@quenty/rigbuilderutils@10.43.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.42.2...@quenty/rigbuilderutils@10.43.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.42.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.42.1...@quenty/rigbuilderutils@10.42.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.42.0...@quenty/rigbuilderutils@10.42.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.41.0...@quenty/rigbuilderutils@10.42.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.40.0...@quenty/rigbuilderutils@10.41.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.39.0...@quenty/rigbuilderutils@10.40.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.38.1...@quenty/rigbuilderutils@10.39.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+## [10.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.38.0...@quenty/rigbuilderutils@10.38.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.37.0...@quenty/rigbuilderutils@10.38.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.36.0...@quenty/rigbuilderutils@10.37.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.35.0...@quenty/rigbuilderutils@10.36.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
+# [10.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.34.1...@quenty/rigbuilderutils@10.35.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/rigbuilderutils
+
 ## [10.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rigbuilderutils@10.34.0...@quenty/rigbuilderutils@10.34.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/rigbuilderutils

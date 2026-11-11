@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.35.0...@quenty/enabledmixin@11.35.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.34.2...@quenty/enabledmixin@11.35.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+## [11.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.34.1...@quenty/enabledmixin@11.34.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+## [11.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.34.0...@quenty/enabledmixin@11.34.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.33.0...@quenty/enabledmixin@11.34.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.32.2...@quenty/enabledmixin@11.33.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+## [11.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.32.1...@quenty/enabledmixin@11.32.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+## [11.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.32.0...@quenty/enabledmixin@11.32.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.31.0...@quenty/enabledmixin@11.32.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.30.0...@quenty/enabledmixin@11.31.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.29.0...@quenty/enabledmixin@11.30.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.28.0...@quenty/enabledmixin@11.29.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.27.0...@quenty/enabledmixin@11.28.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/enabledmixin
+
+# [11.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.1...@quenty/enabledmixin@11.27.0) (2026-07-14)
+
+### Features
+
+- **enabledmixin:** convert package to --!strict ([221965e](https://github.com/Quenty/NevermoreEngine/commit/221965ea0255cbd8fede74f7bc0cfe72d7ce8041))
+
 ## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/enabledmixin@11.26.0...@quenty/enabledmixin@11.26.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/enabledmixin

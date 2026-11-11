@@ -1,6 +1,6 @@
 {
   "name": "@quenty/uiobjectutils",
-  "version": "6.29.1",
+  "version": "6.42.1",
   "description": "UI object utils library for Roblox",
   "keywords": [
     "Roblox",
@@ -35,6 +35,7 @@
     "@quenty/enumutils": "workspace:*",
     "@quenty/instanceutils": "workspace:*",
     "@quenty/loader": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/rx": "workspace:*"
   }
 }

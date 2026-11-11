@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility library that defines a generalized interface for scriptable conditions. These conditions are rooted in [Rx] and
 	can be scripted by a variety of systems. For example, we may have conditions on what ammo we can consume, or whether
@@ -75,7 +75,10 @@ local AdorneeConditionUtils = {}
 	@param adornee -- Adornee to check conditions on
 	@return Observable<boolean>
 ]=]
-function AdorneeConditionUtils.observeConditionsMet(conditionObj: BindableFunction, adornee: Instance)
+function AdorneeConditionUtils.observeConditionsMet(
+	conditionObj: BindableFunction,
+	adornee: Instance
+): Observable.Observable<boolean>
 	assert(typeof(conditionObj) == "Instance" and conditionObj:IsA("BindableFunction"), "Bad conditionObj")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
@@ -99,7 +102,7 @@ function AdorneeConditionUtils.promiseQueryConditionsMet(
 	assert(typeof(conditionObj) == "Instance" and conditionObj:IsA("BindableFunction"), "Bad condition")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return Rx.toPromise(AdorneeConditionUtils.observeConditionsMet(conditionObj, adornee), cancelToken)
+	return Rx.toPromise(AdorneeConditionUtils.observeConditionsMet(conditionObj, adornee) :: any, cancelToken)
 end
 
 --[=[
@@ -123,7 +126,7 @@ end
 	@param observeCallback function
 	@return BindableFunction
 ]=]
-function AdorneeConditionUtils.create(observeCallback): BindableFunction
+function AdorneeConditionUtils.create(observeCallback: (adornee: Instance) -> any): BindableFunction
 	assert(type(observeCallback) == "function", "Bad observeCallback")
 
 	local condition = Instance.new("BindableFunction")
@@ -145,8 +148,8 @@ function AdorneeConditionUtils.createRequiredProperty(propertyName: string, requ
 	assert(type(propertyName) == "string", "Bad propertyName")
 
 	local condition = AdorneeConditionUtils.create(function(adornee: Instance)
-		return RxInstanceUtils.observeProperty(adornee, propertyName):Pipe({
-			Rx.map(function(value)
+		return (RxInstanceUtils.observeProperty(adornee, propertyName) :: any):Pipe({
+			Rx.map(function(value): any
 				return value == requiredValue
 			end),
 		})
@@ -171,8 +174,8 @@ function AdorneeConditionUtils.createRequiredAttribute(attributeName: string, at
 	assert(type(attributeName) == "string", "Bad attributeName")
 
 	local condition = AdorneeConditionUtils.create(function(adornee: Instance)
-		return RxAttributeUtils.observeAttribute(adornee, attributeName):Pipe({
-			Rx.map(function(value)
+		return (RxAttributeUtils.observeAttribute(adornee, attributeName) :: any):Pipe({
+			Rx.map(function(value): any
 				return value == attributeValue
 			end),
 		})
@@ -192,7 +195,7 @@ end
 	@param tieInterfaceDefinition TieDefinition
 	@return BindableFunction
 ]=]
-function AdorneeConditionUtils.createRequiredTieInterface(tieInterfaceDefinition): BindableFunction
+function AdorneeConditionUtils.createRequiredTieInterface(tieInterfaceDefinition: any): BindableFunction
 	assert(tieInterfaceDefinition, "Bad tieInterfaceDefinition")
 
 	local condition = AdorneeConditionUtils.create(function(adornee: Instance)
@@ -214,7 +217,7 @@ end
 	@return BindableFunction
 ]=]
 function AdorneeConditionUtils.createOrConditionGroup(): BindableFunction
-	local container
+	local container: BindableFunction
 	container = AdorneeConditionUtils.create(function(adornee: Instance)
 		assert(container, "Should not be invoking this on construction before container is assigned")
 
@@ -235,7 +238,7 @@ end
 	@return BindableFunction
 ]=]
 function AdorneeConditionUtils.createAndConditionGroup(): BindableFunction
-	local container
+	local container: BindableFunction
 	container = AdorneeConditionUtils.create(function(adornee: Instance)
 		assert(container, "Should not be invoking this on construction before container is assigned")
 
@@ -284,7 +287,7 @@ end
 	@param container BindableFunction
 	@param value boolean -- Value to default to
 ]=]
-function AdorneeConditionUtils.setValueWhenEmpty(container, value)
+function AdorneeConditionUtils.setValueWhenEmpty(container: BindableFunction, value: boolean): ()
 	assert(typeof(container) == "Instance", "Bad container")
 	assert(type(value) == "boolean", "Bad value")
 
@@ -297,7 +300,7 @@ end
 	@param container BindableFunction
 	@return boolean
 ]=]
-function AdorneeConditionUtils.getValueWhenEmpty(container: BindableFunction)
+function AdorneeConditionUtils.getValueWhenEmpty(container: BindableFunction): boolean
 	assert(typeof(container) == "Instance", "Bad container")
 
 	return AttributeUtils.getAttribute(container, VALUE_WHEN_EMPTY_ATTRIBUTE, DEFAULT_VALUE_WHEN_EMPTY_WHEN_UNDEFINED)
@@ -308,7 +311,7 @@ end
 	@param container BindableFunction
 	@return Observable<boolean>
 ]=]
-function AdorneeConditionUtils.observeValueWhenEmpty(container: BindableFunction)
+function AdorneeConditionUtils.observeValueWhenEmpty(container: BindableFunction): Observable.Observable<boolean>
 	assert(typeof(container) == "Instance", "Bad container")
 
 	return RxAttributeUtils.observeAttribute(
@@ -321,13 +324,13 @@ end
 --[[
 	Maps the given object to "and"
 ]]
-function AdorneeConditionUtils._mapToAnd(observeValueWhenEmpty)
+function AdorneeConditionUtils._mapToAnd(observeValueWhenEmpty: any): any
 	assert(observeValueWhenEmpty, "Bad observeValueWhenEmpty")
 
-	return function(source)
+	return function(source: any)
 		assert(source, "No source")
 
-		return Observable.new(function(sub)
+		return Observable.new(function(sub: any)
 			local topMaid = Maid.new()
 
 			local isDisabled = topMaid:Add(StateStack.new(false, "boolean"))
@@ -359,7 +362,7 @@ function AdorneeConditionUtils._mapToAnd(observeValueWhenEmpty)
 			update()
 
 			topMaid:GiveTask(
-				source:Subscribe(function(observableBrio)
+				source:Subscribe(function(observableBrio: any)
 					if observableBrio:IsDead() then
 						return
 					end
@@ -396,13 +399,13 @@ end
 --[[
 	Maps the given object to "or"
 ]]
-function AdorneeConditionUtils._mapToOr(observeValueWhenEmpty)
+function AdorneeConditionUtils._mapToOr(observeValueWhenEmpty: any): any
 	assert(observeValueWhenEmpty, "Bad observeValueWhenEmpty")
 
-	return function(source)
+	return function(source: any)
 		assert(source, "No source")
 
-		return Observable.new(function(sub)
+		return Observable.new(function(sub: any)
 			local topMaid = Maid.new()
 
 			local isEnabled = topMaid:Add(StateStack.new(false, "boolean"))
@@ -434,7 +437,7 @@ function AdorneeConditionUtils._mapToOr(observeValueWhenEmpty)
 			update()
 
 			topMaid:GiveTask(
-				source:Subscribe(function(observableBrio)
+				source:Subscribe(function(observableBrio: any)
 					if observableBrio:IsDead() then
 						return
 					end
@@ -473,14 +476,17 @@ end
 
 	@return Observable<Observable<boolean>>
 ]]
-function AdorneeConditionUtils._observeConditionObservablesBrio(parent: Instance, adornee: Instance)
+function AdorneeConditionUtils._observeConditionObservablesBrio(
+	parent: Instance,
+	adornee: Instance
+): Observable.Observable<any>
 	assert(typeof(parent) == "Instance", "Bad parent")
 	assert(typeof(adornee) == "Instance", "Bad adornee")
 
-	return RxInstanceUtils.observeChildrenBrio(parent, function(child)
+	return (RxInstanceUtils.observeChildrenBrio(parent, function(child)
 		return child:IsA("BindableFunction") and CollectionService:HasTag(child, AdorneeConditionUtils.getRequiredTag())
-	end):Pipe({
-		RxBrioUtils.map(function(conditionObj)
+	end) :: any):Pipe({
+		RxBrioUtils.map(function(conditionObj): any
 			return AdorneeConditionUtils._getObservableFromConditionObj(conditionObj, adornee)
 		end),
 	})
@@ -492,12 +498,15 @@ end
 
 	@return Observable<boolean>
 ]]
-function AdorneeConditionUtils._getObservableFromConditionObj(conditionObj: Instance, adornee: Instance)
+function AdorneeConditionUtils._getObservableFromConditionObj(
+	conditionObj: Instance,
+	adornee: Instance
+): Observable.Observable<boolean>
 	local observable
 	local current
 	task.spawn(function()
 		current = coroutine.running()
-		observable = TieUtils.invokeEncodedBindableFunction(conditionObj, adornee)
+		observable = TieUtils.invokeEncodedBindableFunction(conditionObj :: any, adornee)
 	end)
 
 	-- TODO: Allow yielding here
@@ -508,7 +517,7 @@ function AdorneeConditionUtils._getObservableFromConditionObj(conditionObj: Inst
 				conditionObj:GetFullName()
 			)
 		)
-		return Rx.EMPTY
+		return Rx.EMPTY :: any
 	end
 
 	-- TODO: Allow non-observables.
@@ -520,7 +529,7 @@ function AdorneeConditionUtils._getObservableFromConditionObj(conditionObj: Inst
 				tostring(observable)
 			)
 		)
-		return Rx.EMPTY
+		return Rx.EMPTY :: any
 	end
 
 	return observable

@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.26.0...@quenty/canceltoken@11.26.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.25.2...@quenty/canceltoken@11.26.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+## [11.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.25.1...@quenty/canceltoken@11.25.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+## [11.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.25.0...@quenty/canceltoken@11.25.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.24.1...@quenty/canceltoken@11.25.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+## [11.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.24.0...@quenty/canceltoken@11.24.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.23.0...@quenty/canceltoken@11.24.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.22.0...@quenty/canceltoken@11.23.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.21.0...@quenty/canceltoken@11.22.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.20.0...@quenty/canceltoken@11.21.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
+# [11.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.19.1...@quenty/canceltoken@11.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/canceltoken
+
 ## [11.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/canceltoken@11.19.0...@quenty/canceltoken@11.19.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/canceltoken

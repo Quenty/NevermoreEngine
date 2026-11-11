@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Quaternion data type object
 
@@ -11,13 +11,15 @@ local require = require(script.Parent.loader).load(script)
 
 local Quaternion = require("Quaternion")
 
+export type QuaternionObject = { w: number, x: number, y: number, z: number }
+
 local pi = math.pi
 local atan2 = math.atan2
 local exp, log = math.exp, math.log
 local cos, sin = math.cos, math.sin
 local acos = math.acos
 
-local function TYPE(x)
+local function TYPE(x: any): string
 	local xMet = getmetatable(x)
 	if type(xMet) == "table" and xMet.__type ~= nil then
 		return xMet.__type
@@ -27,32 +29,32 @@ local function TYPE(x)
 end
 
 local Q = {}
-local metatable = { __type = "quaternion" }
+local metatable: any = { __type = "quaternion" }
 local alt = { "w", "x", "y", "z" }
-function metatable.__index(q, i)
+function metatable.__index(q: any, i: any): any
 	return q[alt[i]]
 end
 
-local function new(w, x, y, z)
-	return setmetatable({ w = w or 1, x = x or 0, y = y or 0, z = z or 0 }, metatable)
+local function new(w: number?, x: number?, y: number?, z: number?): QuaternionObject
+	return setmetatable({ w = w or 1, x = x or 0, y = y or 0, z = z or 0 }, metatable) :: any
 end
 Q.new = new
 
-local function fromCFrame(cframe)
+local function fromCFrame(cframe: CFrame): QuaternionObject
 	return new(Quaternion.QuaternionFromCFrame(cframe))
 end
 Q.fromCFrame = fromCFrame
 
-local function toCFrame(q, position)
+local function toCFrame(q: QuaternionObject, position: Vector3?): CFrame
 	local x, y, z = 0, 0, 0
 	if position then
-		x, y, z = position.x, position.y, position.z
+		x, y, z = position.X, position.Y, position.Z
 	end
-	return CFrame.new(x, y, z, Quaternion.QuaternionToCFrame(q))
+	return CFrame.new(x, y, z, Quaternion.QuaternionToCFrame(q :: any))
 end
 Q.toCFrame = toCFrame
 
-local function inv(q)
+local function inv(q: QuaternionObject): QuaternionObject
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local m = w * w + x * x + y * y + z * z
 	if m > 0 then
@@ -64,12 +66,13 @@ end
 Q.inv = inv
 
 --Unary minus; -q
-local function unm(q)
+local function unm(q: QuaternionObject): QuaternionObject
 	return new(-q.w, -q.x, -q.y, -q.z)
 end
 metatable.__unm = unm
 Q.unm = unm
-local function add(q0, q1)
+
+local function add(q0: any, q1: any): QuaternionObject?
 	local t0, t1 = TYPE(q0), TYPE(q1)
 	if t0 == "quaternion" and t1 == "quaternion" then
 		return new(q0.w + q1.w, q0.x + q1.x, q0.y + q1.y, q0.z + q1.z)
@@ -83,7 +86,8 @@ local function add(q0, q1)
 end
 metatable.__add = add
 Q.add = add
-local function sub(q0, q1)
+
+local function sub(q0: any, q1: any): QuaternionObject?
 	local t0, t1 = TYPE(q0), TYPE(q1)
 	if t0 == "quaternion" and t1 == "quaternion" then
 		return new(q0.w - q1.w, q0.x - q1.x, q0.y - q1.y, q0.z - q1.z)
@@ -97,7 +101,8 @@ local function sub(q0, q1)
 end
 metatable.__sub = sub
 Q.sub = sub
-local function mul(q0, q1)
+
+local function mul(q0: any, q1: any): QuaternionObject?
 	local t0, t1 = TYPE(q0), TYPE(q1)
 	if t0 == "quaternion" and t1 == "quaternion" then
 		local w0, x0, y0, z0, w1, x1, y1, z1 = q0.w, q0.x, q0.y, q0.z, q1.w, q1.x, q1.y, q1.z
@@ -117,7 +122,8 @@ local function mul(q0, q1)
 end
 metatable.__mul = mul
 Q.mul = mul
-local function div(q0, q1)
+
+local function div(q0: any, q1: any): QuaternionObject?
 	local t0, t1 = TYPE(q0), TYPE(q1)
 	if t0 == "quaternion" and t1 == "quaternion" then
 		local w0, x0, y0, z0, w1, x1, y1, z1 = q0.w, q0.x, q0.y, q0.z, q1.w, q1.x, q1.y, q1.z
@@ -151,7 +157,8 @@ local function div(q0, q1)
 end
 metatable.__div = div
 Q.div = div
-local function pow(q0, q1)
+
+local function pow(q0: any, q1: any): QuaternionObject?
 	local t0, t1 = TYPE(q0), TYPE(q1)
 	if t0 == "quaternion" and t1 == "quaternion" then
 		local w0, x0, y0, z0 = q0.w, q0.x, q0.y, q0.z
@@ -240,21 +247,23 @@ local function pow(q0, q1)
 end
 metatable.__pow = pow
 Q.pow = pow
-local function length(q)
+
+local function length(q: QuaternionObject): number
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	return (w * w + x * x + y * y + z * z) ^ 0.5
 end
 metatable.__len = length
 Q.length = length
 Q.magnitude = length
-local function Qtostring(q, precision)
-	precision = precision or 3
-	return string.sub(string.rep(string.format(", %." .. precision .. "f", q.w, q.x, q.y, q.z), 4), 3)
+
+local function Qtostring(q: QuaternionObject, precision: number?): string
+	local p = precision or 3
+	return string.sub(string.rep(string.format(", %." .. p .. "f", q.w, q.x, q.y, q.z), 4), 3)
 end
 metatable.__tostring = Qtostring
 Q.tostring = Qtostring
 
-local function Qlog(q)
+local function Qlog(q: QuaternionObject): QuaternionObject
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local vv = x * x + y * y + z * z
 	local mm = w * w + vv
@@ -272,7 +281,7 @@ local function Qlog(q)
 end
 Q.log = Qlog
 
-local function Qexp(q)
+local function Qexp(q: QuaternionObject): QuaternionObject
 	local m = exp(q.w)
 	local x, y, z = q.x, q.y, q.z
 	local vv = x * x + y * y + z * z
@@ -286,7 +295,7 @@ local function Qexp(q)
 end
 Q.exp = Qexp
 
-local function Qnormalize(q)
+local function Qnormalize(q: QuaternionObject): QuaternionObject
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local mm = w * w + x * x + y * y + z * z
 	if mm > 0 then
@@ -299,7 +308,7 @@ end
 Q.normalize = Qnormalize
 Q.unit = Qnormalize
 
-local function Qsqrt(q)
+local function Qsqrt(q: QuaternionObject): QuaternionObject
 	local w, x, y, z = q.w, q.x, q.y, q.z
 	local vv = x * x + y * y + z * z
 	if vv > 0 then

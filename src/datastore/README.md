@@ -18,6 +18,16 @@ This system is a reliable datastore system designed with promises and asyncronio
 ## Executive overiew
 This datastore prevents data loss by being explicit about what we're writing to, and only modifying the data that exists there instead of modifying the whole structure.
 
+## Working on this package
+
+Read this before changing how player data is saved, and before adding any cleanup, teardown, or
+flush to that path. It records design intent that cannot live in the code, because the shape is
+driven by Roblox shutdown and cross-server session-lock behavior that is not visible from reading it:
+
+- [`docs/shutdown-and-session-locks.md`](docs/shutdown-and-session-locks.md) — why every save routes
+  through one function, what `PromiseAllSaves` has to wait on, and why flushing stores on manager
+  teardown was tried twice and removed.
+
 ## Comparison to other solutions
 
 * Not specifically locked to players

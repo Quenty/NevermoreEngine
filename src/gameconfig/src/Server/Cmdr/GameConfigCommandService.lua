@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles cmdr integration
 	@class GameConfigCommandService
@@ -16,19 +16,28 @@ local ServiceBag = require("ServiceBag")
 local GameConfigCommandService = {}
 GameConfigCommandService.ServiceName = "GameConfigCommandService"
 
-function GameConfigCommandService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type GameConfigCommandService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_cmdrService: any,
+		_gameConfigService: any,
+	},
+	{} :: typeof({ __index = GameConfigCommandService })
+))
+
+function GameConfigCommandService.Init(self: GameConfigCommandService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	self._cmdrService = self._serviceBag:GetService(require("CmdrService"))
 	self._gameConfigService = self._serviceBag:GetService(require("GameConfigService"))
 end
 
-function GameConfigCommandService:Start()
+function GameConfigCommandService.Start(self: GameConfigCommandService): ()
 	self:_registerCommands()
 end
 
-function GameConfigCommandService:_registerCommands()
+function GameConfigCommandService._registerCommands(self: GameConfigCommandService): ()
 	local configPicker = self._gameConfigService:GetConfigPicker()
 	assert(configPicker, "No configPicker")
 

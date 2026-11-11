@@ -3,6 +3,114 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.56.1...@quenty/highlight@10.57.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.56.0...@quenty/highlight@10.56.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.55.2...@quenty/highlight@10.56.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.55.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.55.1...@quenty/highlight@10.55.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.55.0...@quenty/highlight@10.55.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.54.0...@quenty/highlight@10.55.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.53.1...@quenty/highlight@10.54.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.53.0...@quenty/highlight@10.53.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.52.0...@quenty/highlight@10.53.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.51.0...@quenty/highlight@10.52.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.50.1...@quenty/highlight@10.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.50.0...@quenty/highlight@10.50.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.49.2...@quenty/highlight@10.50.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.49.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.49.1...@quenty/highlight@10.49.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.49.0...@quenty/highlight@10.49.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.48.2...@quenty/highlight@10.49.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.48.1...@quenty/highlight@10.48.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.48.0...@quenty/highlight@10.48.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.47.0...@quenty/highlight@10.48.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.46.0...@quenty/highlight@10.47.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.45.0...@quenty/highlight@10.46.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.44.1...@quenty/highlight@10.45.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/highlight
+
+## [10.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.44.0...@quenty/highlight@10.44.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.43.0...@quenty/highlight@10.44.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.42.0...@quenty/highlight@10.43.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.41.0...@quenty/highlight@10.42.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/highlight
+
+# [10.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.40.1...@quenty/highlight@10.41.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/highlight
+
 ## [10.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/highlight@10.40.0...@quenty/highlight@10.40.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/highlight

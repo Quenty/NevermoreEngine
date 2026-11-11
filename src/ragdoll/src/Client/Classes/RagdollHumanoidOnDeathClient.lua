@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Ragdolls the humanoid on death. Should be bound via [RagdollBindersClient].
 
@@ -22,50 +22,18 @@ local RagdollHumanoidOnDeathClient = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeathClient.ClassName = "RagdollHumanoidOnDeathClient"
 RagdollHumanoidOnDeathClient.__index = RagdollHumanoidOnDeathClient
 
---[=[
-	Constructs a new RagdollHumanoidOnDeathClient. This module exports a [Binder].
-	@param humanoid Humanoid
-	@param serviceBag ServiceBag
-	@return RagdollHumanoidOnDeathClient
-]=]
-function RagdollHumanoidOnDeathClient.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeathClient)
+export type RagdollHumanoidOnDeathClient =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_ragdollBinder: any, -- Binder.Binder<RagdollClient.RagdollClient> (heavy cyclic binder; old solver can't hold it)
+		},
+		{} :: typeof({ __index = RagdollHumanoidOnDeathClient })
+	))
+	& BaseObject.BaseObject
 
-	self._serviceBag = assert(serviceBag, "No serviceBag")
-	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
-
-	if self._obj:GetState() == Enum.HumanoidStateType.Dead then
-		self:_handleDeath()
-	else
-		self._maid._diedEvent = self._obj.Died:Connect(function()
-			self:_handleDeath(self._obj)
-		end)
-	end
-
-	return self
-end
-
-function RagdollHumanoidOnDeathClient:_getPlayer()
-	return CharacterUtils.getPlayerFromCharacter(self._obj)
-end
-
-function RagdollHumanoidOnDeathClient:_handleDeath()
-	-- Disconnect!
-	self._maid._diedEvent = nil
-
-	if self:_getPlayer() == Players.LocalPlayer then
-		self._ragdollBinder:BindClient(self._obj)
-	end
-
-	local character = self._obj.Parent
-	self._maid:GiveTask(task.delay(Players.RespawnTime - 0.5, function()
-		if not character:IsDescendantOf(Workspace) then
-			return
-		end
-
-		-- fade into the mist...
-		RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character, 0.4)
-	end))
+function RagdollHumanoidOnDeathClient._getPlayer(self: RagdollHumanoidOnDeathClient): Player?
+	return CharacterUtils.getPlayerFromCharacter(self._obj :: Instance)
 end
 
 --[=[
@@ -75,9 +43,9 @@ end
 	@param character Model
 	@param duration number
 ]=]
-function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character, duration)
+function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character: Model, duration: number): ()
 	local descendants = character:GetDescendants()
-	local transparencies = {}
+	local transparencies: { [Instance]: number } = {}
 	for _, instance in descendants do
 		if instance:IsA("BasePart") or instance:IsA("Decal") then
 			transparencies[instance] = instance.Transparency
@@ -93,9 +61,60 @@ function RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(
 		t = t + dt
 		local alpha = math.min(t / duration, 1)
 		for part, initialTransparency in transparencies do
-			part.Transparency = (1 - alpha) * initialTransparency + alpha
+			(part :: BasePart).Transparency = (1 - alpha) * initialTransparency + alpha
 		end
 	end
 end
 
-return Binder.new("RagdollHumanoidOnDeath", RagdollHumanoidOnDeathClient)
+function RagdollHumanoidOnDeathClient._handleDeath(self: RagdollHumanoidOnDeathClient): ()
+	-- Disconnect!
+	self._maid._diedEvent = nil
+
+	local humanoidObj = self._obj :: Humanoid
+	if self:_getPlayer() == Players.LocalPlayer then
+		self._ragdollBinder:BindClient(humanoidObj)
+	end
+
+	local character = humanoidObj.Parent
+	self._maid:GiveTask(task.delay(Players.RespawnTime - 0.5, function()
+		if not character or not character:IsDescendantOf(Workspace) then
+			return
+		end
+
+		-- fade into the mist...
+		RagdollHumanoidOnDeathClient.disableParticleEmittersAndFadeOutYielding(character :: Model, 0.4)
+	end))
+end
+
+--[=[
+	Constructs a new RagdollHumanoidOnDeathClient. This module exports a [Binder].
+	@param humanoid Humanoid
+	@param serviceBag ServiceBag
+	@return RagdollHumanoidOnDeathClient
+]=]
+function RagdollHumanoidOnDeathClient.new(
+	humanoid: Humanoid,
+	serviceBag: ServiceBag.ServiceBag
+): RagdollHumanoidOnDeathClient
+	local self: RagdollHumanoidOnDeathClient =
+		setmetatable(BaseObject.new(humanoid) :: any, RagdollHumanoidOnDeathClient)
+
+	self._serviceBag = assert(serviceBag, "No serviceBag")
+	self._ragdollBinder = self._serviceBag:GetService(RagdollClient)
+
+	local humanoidObj = self._obj :: Humanoid
+	if humanoidObj:GetState() == Enum.HumanoidStateType.Dead then
+		self:_handleDeath()
+	else
+		self._maid._diedEvent = humanoidObj.Died:Connect(function()
+			self:_handleDeath()
+		end)
+	end
+
+	return self
+end
+
+return Binder.new(
+		"RagdollHumanoidOnDeath",
+		RagdollHumanoidOnDeathClient :: any
+	) :: Binder.Binder<RagdollHumanoidOnDeathClient>

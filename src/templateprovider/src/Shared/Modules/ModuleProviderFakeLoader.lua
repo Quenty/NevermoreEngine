@@ -1,14 +1,15 @@
---!nonstrict
+--!strict
 --[=[
 	Creates a service that provides modules from a parent module, either by name, or by list!
 	@class ModuleProviderFakeLoader
 ]=]
 
-local function load(script)
+local function load(script: LuaSourceContainer): any
 	local moduleProvider = script:FindFirstAncestorWhichIsA("ModuleScript")
 	assert(moduleProvider, "No moduleProvider")
 
-	local loader = require(moduleProvider.Parent.loader)
+	local loaderModule = (moduleProvider.Parent :: any).loader
+	local loader = (require :: any)(loaderModule)
 	return loader.load(moduleProvider)
 end
 

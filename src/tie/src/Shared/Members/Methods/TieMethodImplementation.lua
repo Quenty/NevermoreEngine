@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TieMethodImplementation
 ]=]
@@ -12,8 +12,25 @@ local TieMethodImplementation = setmetatable({}, BaseObject)
 TieMethodImplementation.ClassName = "TieMethodImplementation"
 TieMethodImplementation.__index = TieMethodImplementation
 
-function TieMethodImplementation.new(memberDefinition, parent: Instance, initialValue, actualSelf)
-	local self = setmetatable(BaseObject.new(), TieMethodImplementation)
+export type TieMethodImplementation =
+	typeof(setmetatable(
+		{} :: {
+			_memberDefinition: any,
+			_parent: Instance,
+			_actualSelf: any,
+			_bindableFunction: BindableFunction,
+		},
+		{} :: typeof({ __index = TieMethodImplementation })
+	))
+	& BaseObject.BaseObject
+
+function TieMethodImplementation.new(
+	memberDefinition: any,
+	parent: Instance,
+	initialValue: any,
+	actualSelf: any
+): TieMethodImplementation
+	local self: TieMethodImplementation = setmetatable(BaseObject.new() :: any, TieMethodImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
 	self._parent = assert(parent, "No parent")
@@ -30,15 +47,15 @@ function TieMethodImplementation.new(memberDefinition, parent: Instance, initial
 	self._maid:GiveTask(function()
 		self._maid:DoCleaning()
 
-		for key, _ in pairs(self) do
-			rawset(self, key, nil)
+		for key, _ in pairs(self :: any) do
+			rawset(self :: any, key, nil)
 		end
 	end)
 
 	return self
 end
 
-function TieMethodImplementation:SetImplementation(implementation)
+function TieMethodImplementation.SetImplementation(self: TieMethodImplementation, implementation: any): ()
 	if type(implementation) == "function" then
 		self._bindableFunction.OnInvoke = function(...)
 			return TieUtils.encode(implementation(self._actualSelf, TieUtils.decode(...)))

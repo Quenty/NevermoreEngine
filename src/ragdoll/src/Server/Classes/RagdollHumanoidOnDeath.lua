@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Ragdolls the humanoid on death. This class exports a [Binder].
 	@server
@@ -16,30 +16,44 @@ local RagdollHumanoidOnDeath = setmetatable({}, BaseObject)
 RagdollHumanoidOnDeath.ClassName = "RagdollHumanoidOnDeath"
 RagdollHumanoidOnDeath.__index = RagdollHumanoidOnDeath
 
+export type RagdollHumanoidOnDeath =
+	typeof(setmetatable(
+		{} :: {
+			_serviceBag: ServiceBag.ServiceBag,
+			_ragdollBinder: typeof(Ragdoll),
+		},
+		{} :: typeof({ __index = RagdollHumanoidOnDeath })
+	))
+	& BaseObject.BaseObject
+
 --[=[
 	Constructs a new RagdollHumanoidOnDeath. This class exports a [Binder].
 	@param humanoid Humanoid
 	@param serviceBag ServiceBag
 	@return RagdollHumanoidOnDeath
 ]=]
-function RagdollHumanoidOnDeath.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(humanoid), RagdollHumanoidOnDeath)
+function RagdollHumanoidOnDeath.new(humanoid: Humanoid, serviceBag: ServiceBag.ServiceBag): RagdollHumanoidOnDeath
+	local self: RagdollHumanoidOnDeath = setmetatable(BaseObject.new(humanoid) :: any, RagdollHumanoidOnDeath)
 
 	self._serviceBag = assert(serviceBag, "Bad serviceBag")
 	self._ragdollBinder = self._serviceBag:GetService(Ragdoll)
 
-	self._obj.BreakJointsOnDeath = false
+	local humanoidObj = self._obj :: Humanoid
+	humanoidObj.BreakJointsOnDeath = false
 	self._maid:GiveTask(function()
-		self._obj.BreakJointsOnDeath = true
+		humanoidObj.BreakJointsOnDeath = true
 	end)
 
-	self._maid:GiveTask(self._obj:GetPropertyChangedSignal("Health"):Connect(function()
-		if self._obj.Health <= 0 then
-			self._ragdollBinder:Bind(self._obj)
+	self._maid:GiveTask(humanoidObj:GetPropertyChangedSignal("Health"):Connect(function()
+		if humanoidObj.Health <= 0 then
+			self._ragdollBinder:Bind(humanoidObj)
 		end
 	end))
 
 	return self
 end
 
-return PlayerHumanoidBinder.new("RagdollHumanoidOnDeath", RagdollHumanoidOnDeath)
+return PlayerHumanoidBinder.new(
+		"RagdollHumanoidOnDeath",
+		RagdollHumanoidOnDeath :: any
+	) :: PlayerHumanoidBinder.PlayerHumanoidBinder<RagdollHumanoidOnDeath>

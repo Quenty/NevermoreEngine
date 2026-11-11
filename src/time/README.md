@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Library handles time based parsing / operations. Untested. Based off of PHP's time system. Note: This library is out of date, and does not necessarily work. I recommend using os.time()
+Time based parsing and formatting
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/Time">View docs →</a></div>
 
@@ -19,70 +19,3 @@ Library handles time based parsing / operations. Untested. Based off of PHP's ti
 ```
 npm install @quenty/time --save
 ```
-
-## Usage
-Usage is designed to be simple.
-
-### `Time.getDaysMonthTable(year)`
-Returns a Days in months table for the given year
-
-### `Time.getSecond(currentTime)`
-
-### `Time.getMinute(currentTime)`
-
-### `Time.getHour(currentTime)`
-
-### `Time.getDay(currentTime)`
-
-### `Time.getYear(currentTime)`
-
-### `Time.getYearShort(currentTime)`
-
-### `Time.getYearShortFormatted(currentTime)`
-
-### `Time.getMonth(currentTime)`
-
-### `Time.getFormattedMonth(currentTime)`
-
-### `Time.getDayOfTheMonth(currentTime)`
-
-### `Time.getFormattedDayOfTheMonth(currentTime)`
-
-### `Time.getMonthName(currentTime)`
-
-### `Time.getMonthNameShort(currentTime)`
-
-### `Time.getJulianDate(currentTime)`
-
-### `Time.getDayOfTheWeek(currentTime)`
-
-### `Time.getDayOfTheWeekName(currentTime)`
-
-### `Time.getDayOfTheWeekNameShort(currentTime)`
-
-### `Time.getOrdinalOfNumber(number)`
-
-### `Time.getDayOfTheMonthOrdinal(currentTime)`
-
-### `Time.getFormattedSecond(currentTime)`
-
-### `Time.getFormattedMinute(currentTime)`
-
-### `Time.getRegularHour(currentTime)`
-
-### `Time.getHourFormatted(currentTime)`
-
-### `Time.getRegularHourFormatted(currentTime)`
-
-### `Time.getamOrpm(currentTime)`
-
-### `Time.getAMorPM(currentTime)`
-
-### `Time.getMilitaryHour(currentTime)`
-
-### `Time.isLeapYear(currentTime)`
-
-### `Time.getDaysInMonth(currentTime)`
-
-### `Time.getFormattedTime(format, currentTime)`
-

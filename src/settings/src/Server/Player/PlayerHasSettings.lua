@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class PlayerHasSettings
 ]=]
@@ -22,34 +22,37 @@ export type PlayerHasSettings =
 	typeof(setmetatable(
 		{} :: {
 			_serviceBag: ServiceBag.ServiceBag,
-			_playerSettingsBinder: PlayerSettings.PlayerSettings,
+			_playerSettingsBinder: any,
 			_playerDataStoreService: PlayerDataStoreService.PlayerDataStoreService,
+			_settings: Folder?,
 		},
 		{} :: typeof({ __index = PlayerHasSettings })
 	))
 	& BaseObject.BaseObject
 
-function PlayerHasSettings.new(player: Player, serviceBag)
-	local self = setmetatable(BaseObject.new(player), PlayerHasSettings)
+function PlayerHasSettings.new(player: Player, serviceBag: ServiceBag.ServiceBag): PlayerHasSettings
+	local self: PlayerHasSettings = setmetatable(BaseObject.new(player) :: any, PlayerHasSettings)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._playerSettingsBinder = self._serviceBag:GetService(PlayerSettings)
-	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService)
+	self._playerDataStoreService = self._serviceBag:GetService(PlayerDataStoreService) :: any
 
 	self:_promiseLoadSettings()
 
 	return self
 end
 
-function PlayerHasSettings:_promiseLoadSettings()
+function PlayerHasSettings._promiseLoadSettings(self: PlayerHasSettings): ()
 	self._settings = PlayerSettingsUtils.create()
 	self._maid:GiveTask(function()
-		self._settings:Destroy()
+		if self._settings then
+			self._settings:Destroy()
+		end
 		self._settings = nil
 	end)
 
-	self._maid
-		:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj))
+	local loadPromise = self._maid:GivePromise(self._playerDataStoreService:PromiseDataStore(self._obj :: Player));
+	(loadPromise :: any)
 		:Then(function(dataStore)
 			-- Ensure we've fully loaded before we parent.
 			-- This should ensure the cache is mostly instant.
@@ -82,8 +85,12 @@ function PlayerHasSettings:_promiseLoadSettings()
 		end)
 end
 
-function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
+function PlayerHasSettings._handleAttributeChanged(self: PlayerHasSettings, subStore: any, attributeName: string): ()
 	if not PlayerSettingsUtils.isSettingAttribute(attributeName) then
+		return
+	end
+
+	if not self._settings then
 		return
 	end
 
@@ -109,4 +116,4 @@ function PlayerHasSettings:_handleAttributeChanged(subStore, attributeName)
 	subStore:Store(settingName, newValue)
 end
 
-return PlayerBinder.new("PlayerHasSettings", PlayerHasSettings)
+return PlayerBinder.new("PlayerHasSettings", PlayerHasSettings :: any) :: PlayerBinder.PlayerBinder<PlayerHasSettings>

@@ -3,6 +3,154 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.60.1...@quenty/soundplayer@7.61.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.60.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.60.0...@quenty/soundplayer@7.60.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.3...@quenty/soundplayer@7.60.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.59.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.2...@quenty/soundplayer@7.59.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.59.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.1...@quenty/soundplayer@7.59.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.59.0...@quenty/soundplayer@7.59.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.58.0...@quenty/soundplayer@7.59.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.57.2...@quenty/soundplayer@7.58.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.57.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.57.1...@quenty/soundplayer@7.57.2) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.57.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.57.0...@quenty/soundplayer@7.57.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.56.0...@quenty/soundplayer@7.57.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.55.0...@quenty/soundplayer@7.56.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.54.1...@quenty/soundplayer@7.55.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.54.0...@quenty/soundplayer@7.54.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.53.3...@quenty/soundplayer@7.54.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.53.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.53.2...@quenty/soundplayer@7.53.3) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.53.1...@quenty/soundplayer@7.53.2) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.53.0...@quenty/soundplayer@7.53.1) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.52.2...@quenty/soundplayer@7.53.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.52.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.52.1...@quenty/soundplayer@7.52.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.52.0...@quenty/soundplayer@7.52.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.51.0...@quenty/soundplayer@7.52.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.50.0...@quenty/soundplayer@7.51.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.49.0...@quenty/soundplayer@7.50.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.48.1...@quenty/soundplayer@7.49.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.48.0...@quenty/soundplayer@7.48.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.47.0...@quenty/soundplayer@7.48.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.46.0...@quenty/soundplayer@7.47.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.45.0...@quenty/soundplayer@7.46.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.44.0...@quenty/soundplayer@7.45.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.43.2...@quenty/soundplayer@7.44.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.43.1...@quenty/soundplayer@7.43.2) (2026-07-17)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+## [7.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.43.0...@quenty/soundplayer@7.43.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.42.0...@quenty/soundplayer@7.43.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/soundplayer
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.41.0...@quenty/soundplayer@7.42.0) (2026-07-14)
+
+### Features
+
+- **soundplayer:** convert package to --!strict ([a71d19c](https://github.com/Quenty/NevermoreEngine/commit/a71d19c3d408204ccd2b2a04a91516b2bdb21ba6))
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.40.1...@quenty/soundplayer@7.41.0) (2026-07-12)
+
+### Bug Fixes
+
+- Prevent redundant emission ([2075628](https://github.com/Quenty/NevermoreEngine/commit/20756282d97f632928349e7f65d19fc15752be0b))
+
 ## [7.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/soundplayer@7.40.0...@quenty/soundplayer@7.40.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/soundplayer

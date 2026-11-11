@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility functions for animations
 	@class AnimationTrackUtils

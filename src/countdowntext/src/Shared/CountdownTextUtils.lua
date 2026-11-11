@@ -1,55 +1,50 @@
 --!strict
 --[=[
-	Utility functions to format countdowns in-game
+	Utility functions to format countdowns in-game, built on [TimeDurationUtils].
 
 	@class CountdownTextUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local TimeDurationUtils = require("TimeDurationUtils")
+
 local CountdownTextUtils = {}
 
 --[=[
-	Formats countdown text
+	Formats a number of seconds as countdown text, showing only as many units as the remaining
+	time needs: `45`, then `3:05`, then `1:02:03`, and `2 days 1:02:03` for longer waits. Each unit
+	counts up to a round number before the next is used, so a one minute countdown starts at `60`,
+	a one hour countdown at `60:00`, and a single day rolls into the hours as `47:15:00`.
+	The `days` word is localized through [TimeDurationUtils.format]; `locale` defaults to English.
+	Fractional seconds are truncated.
 
-	@param seconds number
-	@param whenAtZeroText string?
-	@return string
+	```lua
+	print(CountdownTextUtils.formatCountdown(0, "Now!")) --> Now!
+	print(CountdownTextUtils.formatCountdown(185)) --> 3:05
+	print(CountdownTextUtils.formatCountdown(3 * 86400 + 5, nil, "es-es")) --> 3 días 0:00:05
+	```
 ]=]
-function CountdownTextUtils.formatCountdown(seconds: number, whenAtZeroText: string?): string
+function CountdownTextUtils.formatCountdown(seconds: number, whenAtZeroText: string?, locale: string?): string
 	assert(type(seconds) == "number", "Bad seconds")
 	assert(type(whenAtZeroText) == "string" or whenAtZeroText == nil, "Bad whenAtZeroText")
+	assert(type(locale) == "string" or locale == nil, "Bad locale")
 
 	if seconds <= 0 then
 		return whenAtZeroText or "0"
 	end
 
-	-- less than 1 minute
-	if seconds <= 60 then
-		return string.format("%d", seconds)
-	end
-
-	-- less than 1 hour
-	if seconds <= 60 * 60 then
-		local hours = math.floor(seconds / 60)
-		return string.format("%0d:%02d", hours, seconds % 60)
-	end
-
-	local days = math.floor(seconds / 60 / 60 / 24)
-	local hours = math.floor(seconds / 60 / 60) % 24
-	local minutes = math.floor(seconds / 60) % 60
-
-	if days == 0 then
-		return string.format("%d:%02d:%02d", hours, minutes, seconds % 60)
-	elseif days == 1 then
-		-- People would be confused about "1 day 2:15:00"
-		-- So show 47:15:00
-		hours = math.floor(seconds / 60 / 60) % 48
-
-		return string.format("%d:%02d:%02d", hours, minutes, seconds % 60)
-	else
-		-- TODO: Localize this "days" part?
-
-		return string.format("%d days %d:%02d:%02d", days, hours, minutes, seconds % 60)
-	end
+	return TimeDurationUtils.format(seconds, "d __ h:mm:ss", {
+		locale = locale,
+		trunc = true,
+		-- A one minute countdown starts at 60, a one hour countdown at 60:00, and a single day
+		-- reads as 24 to 47 hours since "1 day 23:15:00" is easy to misread
+		limits = {
+			seconds = 60,
+			minutes = 60,
+			hours = 47,
+		},
+	})
 end
 
 return CountdownTextUtils

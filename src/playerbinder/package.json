@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerbinder",
-  "version": "14.36.1",
+  "version": "14.52.1",
   "description": "Binds the given class to each player in the game",
   "keywords": [
     "Roblox",
@@ -29,7 +29,13 @@
   ],
   "dependencies": {
     "@quenty/binder": "workspace:*",
-    "@quenty/loader": "workspace:*"
+    "@quenty/jestutils": "workspace:*",
+    "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/servicebag": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

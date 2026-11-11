@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.17.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.17.2...@quenty/octree@11.17.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [11.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.17.1...@quenty/octree@11.17.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/octree
+
+## [11.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.17.0...@quenty/octree@11.17.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/octree
+
+# [11.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.16.1...@quenty/octree@11.17.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/octree
+
+## [11.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.16.0...@quenty/octree@11.16.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/octree
+
+# [11.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.15.0...@quenty/octree@11.16.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/octree
+
+# [11.15.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.14.2...@quenty/octree@11.15.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+## [11.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.14.1...@quenty/octree@11.14.2) (2026-07-15)
+
+### Bug Fixes
+
+- **octree:** Provision test place and fix spec expect calls ([938a8e2](https://github.com/Quenty/NevermoreEngine/commit/938a8e217017570b50868faf4668985ea09d1dc5))
+
 ## [11.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/octree@11.14.0...@quenty/octree@11.14.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/octree

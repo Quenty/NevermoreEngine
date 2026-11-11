@@ -2,8 +2,11 @@ name: integration
 on: [pull_request]
 jobs:
   integration:
+    name: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'integration' || 'integration-build' }}
     runs-on: ubuntu-latest
     environment: integration
+    env:
+      RUN_INTEGRATION_IN_FORKS: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -43,15 +46,28 @@ jobs:
         run: npm install --ignore-scripts -g .
         working-directory: tools/nevermore-cli
 
+      - name: Build integration places (for fork run)
+        if: env.RUN_INTEGRATION_IN_FORKS == 'true'
+        run: nevermore batch bundle pr-${{ github.event.pull_request.number }}.nevermore.deploy.tar --deploy --target integration --base origin/${{ github.base_ref }} --yes --verbose
+
+      - name: Upload integration places (for fork run)
+        if: env.RUN_INTEGRATION_IN_FORKS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-${{ github.event.pull_request.number }}.nevermore.deploy
+          path: pr-${{ github.event.pull_request.number }}.nevermore.deploy.tar
+          retention-days: 3
+
       - name: Deploy integration games
         id: deploy-integration
+        if: env.RUN_INTEGRATION_IN_FORKS != 'true'
         run: nevermore batch deploy --target integration --publish --base origin/${{ github.base_ref }} --output integration-results.json --yes --verbose --logs
         env:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Post integration results
-        if: always()
+        if: always() && env.RUN_INTEGRATION_IN_FORKS != 'true'
         run: nevermore tools post-deploy-results integration-results.json --yes --run-outcome ${{ steps.deploy-integration.outcome }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

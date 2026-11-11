@@ -13,6 +13,7 @@ local Brio = require("Brio")
 local HumanoidTracker = require("HumanoidTracker")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 
 local HumanoidTrackerService = {}
 HumanoidTrackerService.ServiceName = "HumanoidTrackerService"
@@ -35,9 +36,12 @@ end
 	@return HumanoidTracker
 ]=]
 function HumanoidTrackerService:GetHumanoidTracker(player: Player?): HumanoidTracker.HumanoidTracker?
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	if player == nil then
 		return nil
@@ -68,9 +72,12 @@ end
 	@return Humanoid?
 ]=]
 function HumanoidTrackerService:GetHumanoid(player: Player?): Humanoid?
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 	return self:GetHumanoidTracker(player).Humanoid.Value
 end
 
@@ -81,9 +88,12 @@ end
 	@return Observable<Humanoid?>
 ]=]
 function HumanoidTrackerService:ObserveHumanoid(player: Player?): Observable.Observable<Humanoid?>
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	return self:GetHumanoidTracker(player).Humanoid:Observe()
 end
@@ -95,9 +105,12 @@ end
 	@return Observable<Brio<Humanoid>>
 ]=]
 function HumanoidTrackerService:ObserveHumanoidBrio(player: Player?): Observable.Observable<Brio.Brio<Humanoid>>
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	return self:GetHumanoidTracker(player).Humanoid:ObserveBrio(function(value)
 		return value ~= nil
@@ -111,9 +124,12 @@ end
 	@return Humanoid?
 ]=]
 function HumanoidTrackerService:GetAliveHumanoid(player: Player?): Humanoid?
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 	return self:GetHumanoidTracker(player).AliveHumanoid.Value
 end
 
@@ -124,9 +140,12 @@ end
 	@return Observable<Humanoid?>
 ]=]
 function HumanoidTrackerService:ObserveAliveHumanoid(player: Player?): Observable.Observable<Humanoid?>
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	return self:GetHumanoidTracker(player).AliveHumanoid:Observe()
 end
@@ -138,9 +157,12 @@ end
 	@return Observable<Brio<Humanoid>>
 ]=]
 function HumanoidTrackerService:ObserveAliveHumanoidBrio(player: Player?)
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+	assert(
+		(typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player) or player == nil,
+		"Bad player"
+	)
 
-	player = player or Players.LocalPlayer
+	player = player or Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
 
 	return self:GetHumanoidTracker(player).AliveHumanoid:ObserveBrio(function(value)
 		return value ~= nil

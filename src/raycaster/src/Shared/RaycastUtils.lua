@@ -59,9 +59,9 @@ function RaycastUtils.raycast(
 	origin: Vector3,
 	direction: Vector3,
 	ignoreListWorkingEnvironment: { Instance },
-	ignoreFunc: IgnoreFunction,
+	ignoreFunc: IgnoreFunction?,
 	keepIgnoreListChanges: boolean?,
-	ignoreWater: boolean
+	ignoreWater: boolean?
 ): RaycastResult?
 	local resultFinal
 	local initialIgnoreListLength = #ignoreListWorkingEnvironment

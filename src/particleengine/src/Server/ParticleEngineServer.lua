@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Handles replication on the server side
 
@@ -13,31 +13,53 @@ local Players = game:GetService("Players")
 local GetRemoteEvent = require("GetRemoteEvent")
 local ParticleEngineConstants = require("ParticleEngineConstants")
 
-local ParticleEngineServer = {}
-ParticleEngineServer.ServiceName = "ParticleEngineServer"
+type ParticleProperties = {
+	Position: Vector3?,
+	Velocity: Vector3?,
+	Size: Vector2?,
+	Bloom: Vector2?,
+	Gravity: Vector3?,
+	LifeTime: number?,
+	Color: Color3?,
+	Transparency: number?,
+	Global: any?,
+}
 
-function ParticleEngineServer:Init()
+local ParticleEngineServer = {
+	ServiceName = "ParticleEngineServer",
+	_remoteEvent = nil :: RemoteEvent?,
+}
+
+function ParticleEngineServer.Init(self: typeof(ParticleEngineServer))
 	assert(not self._remoteEvent, "Already initialized")
 
-	self._remoteEvent = GetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME)
+	local remoteEvent = GetRemoteEvent(ParticleEngineConstants.REMOTE_EVENT_NAME)
+	self._remoteEvent = remoteEvent
 
-	self._remoteEvent.OnServerEvent:Connect(function(player, particle)
+	remoteEvent.OnServerEvent:Connect(function(player, particle)
 		self:_replicate(player, particle)
 	end)
 end
 
-function ParticleEngineServer:_replicate(player: Player, particle)
+function ParticleEngineServer._replicate(
+	self: typeof(ParticleEngineServer),
+	player: Player,
+	particle: ParticleProperties
+)
 	particle.Global = nil
 
-	for _, otherPlayer in Players:GetPlayers() do
-		if otherPlayer ~= player then
-			self._remoteEvent:FireClient(otherPlayer, particle)
+	local remoteEvent = self._remoteEvent
+	if remoteEvent then
+		for _, otherPlayer in Players:GetPlayers() do
+			if otherPlayer ~= player then
+				remoteEvent:FireClient(otherPlayer, particle)
+			end
 		end
 	end
 end
 
 -- @param p PropertiesTable
-function ParticleEngineServer:ParticleNew(p)
+function ParticleEngineServer.ParticleNew(self: typeof(ParticleEngineServer), p: ParticleProperties): ParticleProperties
 	assert(self._remoteEvent, "Not initialized")
 
 	p.Position = p.Position or error("No Position")

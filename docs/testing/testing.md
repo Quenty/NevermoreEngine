@@ -5,6 +5,19 @@ sidebar_position: 1
 
 # Testing
 
+So you want to unit test your project. Roblox testing has a reputation for being painful — Nevermore removes
+most of the reasons why:
+
+- **Tests run in a real place, from your terminal.** `nevermore test` builds the package's test place and
+  executes it in Studio locally or headlessly via Open Cloud. No manual Studio sessions, no hand-wired runners.
+- **You write ordinary Jest.** Familiar `describe`/`it`/`expect`, strictly typed, with specs living next to
+  the code they test.
+- **Player I/O is already intercepted.** [PlayerMock](/api/PlayerMock) stands in for real players at the
+  lowest level of the stack, so server logic, remoting round-trips, and client UI all run headless through
+  production code paths — no connected client, no stubbing in your tests.
+- **CI is included.** `nevermore batch test` detects changed packages, runs them in the cloud, and posts
+  results to your PR.
+
 ## Writing tests
 
 We use [Jest3](https://github.com/jsdotlua/jest-lua) via the Nevermore-compatible wrapper `@quentystudios/jest-lua`. The only difference from upstream Jest is how you access globals — require `Jest` and access them via `Jest.Globals`.
@@ -19,9 +32,7 @@ Test files must end in `.spec.lua` and live alongside the code they test (e.g. `
 	@class MyUtils.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local MyUtils = require("MyUtils")
@@ -36,6 +47,299 @@ describe("MyUtils", function()
 	end)
 end)
 ```
+
+### Self-documenting code
+
+Spec files should be comment-free apart from lint directives (`--!strict`, `-- selene:`) and the
+`@class` docstring — the code and test names carry the intent. Do **not** write prose headers above
+`setup()` or other helpers describing what they build, comments narrating test flow, or comments
+restating what an assertion checks — `setup()`/`Destroy()` is an established pattern and needs no
+explanation. The only comment worth keeping is one documenting something impossible to infer from
+the code (e.g. an engine-bug workaround, with a link). When in doubt, omit it.
+
+### Clean up everything a test creates
+
+Batch runs (and CI) execute every package's specs in **one shared place**, sequentially, under
+`ServerScriptService.<package>`. There is no per-package isolation, so any background work a spec
+leaves running keeps executing after the test ends and can throw during a *later* package's window —
+which the runner reports as that innocent later package failing. A leaked `DataStore` auto-save loop
+throwing during the `secrets` suite is a real example we hit.
+
+So every object a test constructs must be torn down. Use the **`setup()` / `Destroy()` controller
+pattern** — the standard across the codebase (see the `rogue-properties` specs and
+`saveslot/.../HasSaveSlots.spec.lua`). A local `setup()` creates a `Maid`, `maid:Add`s the
+`ServiceBag` and every object it builds, and returns a controller: named fields plus factory
+functions, and a `Destroy` that cleans the maid. Each test calls `setup()`, does its work, and calls
+`controller:Destroy()` at the end. This is the same object-ownership idiom the Hoarcekat stories use.
+
+```luau
+local function setup()
+	local maid = Maid.new()
+
+	local serviceBag = maid:Add(ServiceBag.new())
+	serviceBag:GetService(require("SomeService"))
+	serviceBag:Init()
+	serviceBag:Start()
+
+	local thing = maid:Add(SomeClass.new(serviceBag))
+
+	return {
+		thing = thing,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+end
+
+it("does a thing", function()
+	local controller = setup()
+	expect(controller.thing:DoSomething()).toEqual(true)
+	controller:Destroy()
+end)
+```
+
+Guidelines:
+
+- `maid:Add` **every** object `setup()` creates, not just the `ServiceBag`. A standalone object the
+  bag does not own — a manager, a `DataStore`, a bound class — keeps its background work (an auto-save
+  loop, a subscription) running otherwise. This is the exact bug that leaked into the `secrets` suite.
+- Destroying a server `ServiceBag` does not close the game, so work that only stops on game close
+  outlives the bag — a `PlayerDataStoreService` store and its auto-save loop, for one. Close first:
+  `PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())`, then clean the maid.
+- For objects a test builds on demand (multiple stores, per-test config), expose a factory that
+  returns `maid:Add(X.new(...))` — e.g. a `newDataStore()` on the controller.
+- Await a promise's value with `PromiseTestUtils.awaitFulfilled(promise)`, or its error with
+  `awaitRejected`. Both error when the promise hangs or settles the other way, so the test fails at
+  the await with nothing else to write. Do not hand-roll an `if not awaitSettled(...) then expect(...)
+  controller:Destroy() return end` guard: the `expect` throws, so the lines after it never run.
+- A test may still `:Destroy()` an object mid-test when that teardown *is* the behavior under test —
+  the maid safely skips an already-destroyed object at `DoCleaning` (a destroyed `BaseObject` has its
+  metatable nil'd), so there is no double-destroy.
+- A plain object with no `ServiceBag` can skip the controller: create it in the test and
+  `object:Destroy()` at the end (and in any early-return guard).
+
+**Read a failure list from the top.** A failing `expect` throws, so the trailing
+`controller:Destroy()` never runs and that test leaks everything it built into the shared place.
+Later tests then fail for reasons of their own — timing out on an observable, seeing a slot that
+should have been filtered — and those look like independent bugs. They are usually one bug plus its
+wake. Fix the earliest failure and re-run before investigating any of the others; the count often
+drops by more than one. (This is why the guideline above matters even though it reads as
+belt-and-braces: teardown you only reach on the happy path is teardown you lose exactly when a test
+is failing.)
+
+**`JestUtils.afterThis` queues cleanup that survives a failed assertion.** `@quenty/jestutils` takes
+any maid task — a function, an `Instance`, a connection, a thread, anything with `Destroy` — next to
+the code that creates it, and unwinds the queue in reverse once the test finishes, pass or fail:
+
+```luau
+local JestUtils = require("JestUtils")
+
+it("does a thing", function()
+	local controller = setup()
+	JestUtils.afterThis(controller)
+
+	local thing = SomeClass.new()
+	JestUtils.afterThis(thing)
+
+	expect(thing:DoSomething()).toEqual(true)
+end)
+```
+
+The queue unwinds from a Jest `afterEach`, so a throwing `expect` no longer strands what the test
+built. Every queued task runs even when an earlier one throws, and the failures are reported together
+against the test that queued them.
+
+`afterThis` returns a function that unqueues the task again, and that function is itself a maid task.
+An object that already cleans up on its own can hand it back to its own maid, so whichever happens
+first wins and nothing is destroyed twice:
+
+```luau
+local maid = Maid.new()
+maid:GiveTask(JestUtils.afterThis(maid))
+```
+
+### Consume every rejection (or Jest passes but the run still fails)
+
+Jest only tracks assertions that run inside an `it`. Any **uncaught Luau error** raised outside that —
+printed as a `Stack Begin` / `Stack End` block — fails the whole run, so you can see
+`Tests: N passed` from Jest and `Tests failed!` from the CLI in the same output. It is a real leak to
+fix, not a false positive.
+
+The most common cause is an **unconsumed promise rejection**. A rejected `Promise` warns
+`[Promise] - Uncaught exception in promise: ...` at the end of the frame unless something consumes the
+rejection. Attaching a rejection handler (`Catch`, or `Then` with a reject callback) consumes it — and so
+does reading the settled outcome: `GetResults`, `Yield`, and `Wait` all mark the rejection consumed, since
+the caller has inspected it. What still leaks is the **fire-and-forget** promise nobody ever reads:
+
+```luau
+-- Leaks: nothing ever consumes the rejection
+store:Save()
+
+-- Fixed: a best-effort call consumes its own failure
+store:Save():Catch(function() end)
+```
+
+When you need to wait for a promise, `PromiseTestUtils.awaitFulfilled` / `awaitRejected` / `awaitOutcome` /
+`awaitSettled` attach handlers synchronously — prefer them over hand-rolled awaits, and over a spec-local
+`await` helper that re-implements one of them.
+
+A rejection is only reported if it carries information. Rejecting with no values at all (what `Destroy()`
+and cancellation produce), with values that are all nil (`Promise.rejected(nil)`), or with a single empty
+table (aggregators rejecting with an empty results table) is silent, because there is nothing a warning
+could relay. So an unconsumed cancellation is not noise you need to `Catch` away — only a *valued*
+rejection warns.
+
+One case is untestable rather than fixable: an error raised inside a `BindableFunction`/`BindableEvent`
+handler is **always printed by the engine** (as a `Stack Begin` block), even when the invoker wraps the
+call in `pcall` and correctly converts it to a rejection. So a round-trip spec asserting "a bound
+callback that errors rejects the caller's promise" cannot pass in a cloud run — assert the two halves
+separately instead: the callback-side error with `expect(...).toThrow()` in the test's own thread, and
+the `pcall`→reject conversion at the utility layer (e.g. `RemoteFunctionUtils`). See the note at the
+end of `Remoting.spec.lua`'s fidelity describe for a worked example.
+
+### Standing in for a `Player`
+
+A real `Player` cannot be `Instance.new`'d, and no client joins a headless test place — `Players.LocalPlayer`
+is nil and `Players:GetPlayers()` is empty. Tests use **[PlayerMock](/api/PlayerMock)** (package
+`@quenty/playermock`): a real `Instance` typed as `Player` that stands in anywhere production code touches a
+player.
+
+**The design contract is that it just works.** PlayerMock is the interception layer for everything that hits
+I/O for a player — properties, character and backpack, remoting, ID-keyed engine calls (group rank, asset
+ownership, ...). Core packages already branch on the mock internally, at the lowest level of the stack, so a
+test creates a mock and drives production APIs unchanged. You should not need to know how the mock is
+implemented to test against it; the API reference lives in the [moonwave docs](/api/PlayerMock).
+
+If production code does **not** work against a mock, that is the package failing its contract — the fix is a
+seam in the package (an `isMock` branch at the engine call, or a new domain in the `METHODS` table in
+`PlayerMockMethodUtils.lua`), never a stub in your test or at a call site. If the package isn't yours to change, file
+the gap upstream instead of working around it.
+
+Add `@quenty/playermock` to the package's `package.json` (then `pnpm install`) before requiring it.
+
+**Quick unit tests** construct mocks directly:
+
+```luau
+local PlayerMock = require("PlayerMock")
+
+local player = PlayerMock.new({ UserId = 12345, AccountAge = 30 })
+player.Parent = game:GetService("Players") -- where real players live; CreatePlayer does this for you
+
+PlayerMock.write(player, "AccountAge", 31) -- mock a property
+PlayerMock.writeLookup(player, "MarketplaceService.UserOwnsGamePassAsync", true, gamePassId)
+```
+
+`PlayerMock.writeLookup` injects the result of an engine call, keyed by the arguments that call turns on
+(here the gamePassId). Domains are named after the canonical engine `Service.Method` the production code
+path bottoms out in, and injected values are the raw engine result shape — the consuming util's real
+parsing, fallback ordering, and reject paths all execute; only the engine call is stubbed. (For coherent
+group rank/role pairs, see `GroupTestUtils.assignGroupInfo` in `@quenty/grouputils`.)
+
+**Full-flow tests** use the services:
+
+- Create mocks before or after booting bags — both work. `playerMockService:CreatePlayer({ UserId = 12345 })`
+  ties the mock's lifetime to the bag (teardown cleans it up); a hand-built `PlayerMock.new` is yours to
+  destroy.
+- For client-realm code, designate the local player — before boot via
+  `PlayerMock.setMockedLocalPlayer(player)` (the booting `PlayerMockServiceClient` adopts it, matching
+  production where `Players.LocalPlayer` exists before any service runs), or after boot via
+  `playerMockServiceClient:SetLocalPlayer(player)`. Client code resolves it as
+  `Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()`, and dummy-mode `Remoting` routes fires the
+  same way — client↔server round-trips run headless against production remoting, with no loopback stubs.
+- To run a server and a client bag in one DataModel, tell each bag its realm before `Init` with
+  `serviceBag:GetService(TieRealmService):SetTieRealm(TieRealms.CLIENT)`. A headless test reports
+  `RunService:IsServer()` even though nothing is running, so an untold bag infers the server. A service
+  whose server behavior is unsafe outside a running game (`TemplateProvider` hides templates under a
+  Camera) checks `TieRealmService:HasExplicitTieRealm()` and keeps its own inference otherwise.
+- A mock carries Folder stand-ins for the engine-inserted containers `PlayerGui` and `PlayerScripts`
+  (`PlayerMock.getPlayerGui` / `PlayerMock.getPlayerScripts`) — both classes are NotCreatable, so a Folder
+  is the best a mock can do. That means an `IsA`-class-filtered observe (e.g.
+  `RxInstanceUtils.observeLastNamedChildBrio(player, "PlayerScripts", "PlayerScripts")`) silently never
+  fires against a mock; the seam is the explicit class branch
+  `if PlayerMock.isMock(localPlayer) then "Folder" else "PlayerScripts"`. `LocalScript` **is**
+  `Instance.new`-able server-side, so a test can parent e.g. an `RbxCharacterSounds` stand-in into the
+  PlayerScripts Folder and assert production toggles its `Enabled`.
+- One server-realm mock service may be alive at a time; multiple client services (simulated clients) may
+  coexist, each knowing its own local player (`playerMockServiceClient:GetLocalPlayer()`).
+- Destroy every mock the test creates. Leak detection is built in: a mock may not outlive the mock service
+  that observed it — the next boot that sees one fails loudly.
+- **Tear down client bags before the server bag** — explicitly, not via a shared maid (maid order is not a
+  contract). Destroying the server side first destroys its mocks under a still-live client, and a mock's
+  PlayerGui may hold mounted UI: client code reacting to the engine's destroy cascade through a
+  ViewportFrame's `WorldModel` hard-crashes the engine, which cloud runs report only as a silent timeout.
+  Production parity: a client is gone before its player is removed — no client ever watches its own
+  PlayerGui die.
+
+Behavior beyond seeded properties is emulated with real engine semantics rather than recorded:
+`PlayerMock.loadCharacterAsync` is the spawn path (full avatar-loading event order, fresh `Backpack` per
+spawn) and `PlayerMock.kick` really performs the removal sequence. See each function's docs.
+
+:::warning
+Never fork production behavior at a call site to survive a headless test — no `pcall` around
+context-restricted engine calls, no gating on `RunService:IsRunning()`/`IsStudio()` environment queries.
+Both silently change what production executes. The one acceptable `RunService` branch is **signal
+selection**, and it lives centrally in `StepUtils`, never at call sites. `getAnimationStepSignal()`
+returns `RenderStepped` on the client and `Stepped` (the physics pre-step) on a live server so
+server-side writes stay in sync with constraints and replication (`SpringObject`, `TimedTween`);
+`getSteppedSignal()` drops the client branch for per-frame bookkeeping that is not driving visuals
+(`ScoredActionServiceClient` rescoring its pickers). Both fall back to `Heartbeat` on a non-running
+DataModel, where `Stepped` never fires.
+
+A loop reached through either getter therefore still ticks in a test place, so assert its effect by
+waiting on the getter's signal rather than poking a different input to force an update. Wait
+**twice**: the first fire may be the same one the code under test is already resuming from.
+:::
+
+### What a test place can drive
+
+A test place runs a non-running DataModel on the server, so only some of the frame machinery is
+alive. Knowing which decides what a spec can assert:
+
+| API | Headless behavior |
+| --- | --- |
+| `RunService.Heartbeat` | Fires (~60/s). The only usable frame signal. |
+| `RunService.Stepped` | Never fires, so `:Wait()` on it hangs and `:Once()` never resolves. |
+| `RunService.RenderStepped` | Can be read, but connecting throws `RenderStepped event can only be used from local scripts`. |
+| `RunService:BindToRenderStep` | Binds without erroring and then never invokes the callback — the silent one. |
+| `BindableEvent.Event` | A real `RBXScriptSignal` you can `:Fire()` on demand. |
+| `Humanoid:ChangeState` | Inert. The humanoid state machine never steps, so `StateChanged`, `Running`, `Jumping`, `Seated` and `Died` stay silent no matter how the rig is built. |
+| Property and flag writes | `GetPropertyChangedSignal` and signals like `Humanoid.StateEnabledChanged` run their handlers before the next line, so a spec can write and assert inline without waiting a frame. |
+
+That last row is the useful lever: anything taking a signal or an event — `StepUtils.bindToSignal`,
+`StepUtils.onceAtEvent` — is best tested by firing a `BindableEvent` rather than waiting on frames,
+which keeps the test synchronous and exact instead of timing-dependent. Reserve frame waiting for
+code that reaches a step signal internally. Where a helper is hard-wired to `Stepped` or
+`BindToRenderStep` its invocation simply cannot be asserted here; cover the parts that are real
+(argument validation, the connect/cancel contract) and leave the rest to integration testing rather
+than adding an environment branch to make it observable.
+
+For package authors adding a seam, the branch is explicit and greppable — `PlayerMock.read`/`write` error on
+anything that is not a mock, so the real-player branch stays a typed native access:
+
+```luau
+local userId = if PlayerMock.isMock(player) then PlayerMock.read(player, "UserId") else player.UserId
+
+assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+```
+
+`PlayerMock.findFirstAncestorMock` covers ancestor walks (`FindFirstAncestorWhichIsA("Player")` cannot see
+the mock) and `PlayerMock.getMockByUserId` covers utils that only hold a `userId`. Code that enumerates or
+watches the players present adds the mock counterparts alongside the engine calls, in the same body, so both
+kinds of player flow through one code path — `PlayerMock.getMocks` beside `Players:GetPlayers()`, and
+`PlayerMock.getMockAddedSignal` / `getMockRemovingSignal` beside `Players.PlayerAdded` / `PlayerRemoving`
+(mocks are invisible to the `Players` service, so its events never fire for them).
+
+Known limits — these are gaps in `player-mock`'s contract to fix there, not patterns to work around in tests:
+
+- Headless UI mounts into the designated mock's PlayerGui automatically (`ScreenGuiService` falls back to
+  it, resolved reactively — designation may happen after services boot). `SetGuiParent` remains for the
+  cases that need an explicitly *sized* surface (e.g. a 1280×720 `Frame`), since nothing computes a
+  viewport headless.
+- Concurrent simulated clients are distinct only through their services — the ambient
+  `PlayerMock.getMockedLocalPlayer()` global holds a single designation, so bag-less call sites (dummy-mode
+  `Remoting`) see the most recent one.
+- Per-player data with no lookup domain yet: add a domain to `LOOKUPS` rather than stubbing per call
+  site.
 
 ### jest.config.lua
 
@@ -72,6 +376,8 @@ Each testable package needs:
 1. **A `deploy.nevermore.json`** with a `test` target
 2. **A Rojo project file** (typically `test/default.project.json`) that builds the test place
 3. **A script template** (typically `test/scripts/Server/ServerMain.server.lua`) that boots the package and runs tests
+4. **A `@quentystudios/jest-lua` dependency** in the package's `package.json` (plus a `jest.config.lua`, see above) — the first `.spec.lua` in a package that has never had one must add this. Without it every spec fails to *run* with `[Loader] - "Jest" is not available` (a load error, not an assertion failure), because `require("Jest")` resolves through the package's own dependency graph. Run `pnpm install` after adding it so the workspace symlink is created.
+5. **A `@quenty/nevermore-test-runner` dependency**, for the same reason — the script template's `require("NevermoreTestRunnerUtils")` resolves through the package's own dependency graph.
 
 ### 1. deploy.nevermore.json
 
@@ -142,12 +448,25 @@ local require = require(loader).bootstrapGame(root)
 
 local NevermoreTestRunnerUtils = require("NevermoreTestRunnerUtils")
 
-if NevermoreTestRunnerUtils.runTestsIfNeededAsync(root) then
-	return
+local results = NevermoreTestRunnerUtils.runTestsIfNeededAsync(root)
+if results then
+	return results
 end
 ```
 
 Replace `mypackage` with the key used in your Rojo project tree.
+
+Return the guard's results, as above. A single package run reads its counts from what the
+script returns, and a script that returns nothing falls back to scraping them out of the log,
+with a warning. This matters because the engine truncates a long run's logs, and counts
+scraped back out of that text are exactly what goes missing on the runs where they matter
+most. The batch runner also finds results a script discarded, through a module every run
+leaves them in, but a single run has no such fallback.
+
+A package whose test place is a hand-driven demo (it boots a `ServiceBag` and sets up a scene to play in)
+keeps that code — put the `runTestsIfNeededAsync` guard above it. The guard returns `nil` when script
+source is unreadable, which is the case during ordinary play, so the demo still runs when you join the
+place and only the cloud/local test runs take the early return.
 
 ### NevermoreTestRunnerUtils
 
@@ -156,6 +475,9 @@ The `@quenty/nevermore-test-runner` package provides `NevermoreTestRunnerUtils`,
 - If a `jest.config` is found under the given root, it runs Jest tests
 - If no `jest.config` is found, boot success is the test (smoke test)
 - Detects Open Cloud vs local execution context and exits appropriately
+- Returns a [TestRunResults](/api/NevermoreTestRunnerUtils) table — counts, a capped failure
+  list, and the run's verdict — or `nil` when no test run was attempted, which is how a real
+  game server tells itself apart from a test place and falls through to its normal boot
 
 ## Running tests
 
@@ -178,12 +500,13 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run tests via Open Cloud instead of locally |
-| `--logs` | Show execution logs |
+| `--logs` | Show execution logs. On by default with `--script-text` and `--script-file`; pass `--no-logs` to suppress |
 | `--api-key` | Roblox Open Cloud API key (`--cloud` only) |
 | `--universe-id` | Override universe ID from deploy.nevermore.json |
 | `--place-id` | Override place ID from deploy.nevermore.json |
 | `--script-template` | Override script template path |
-| `--script-text` | Luau code to execute directly instead of the configured template |
+| `--script-text` | Luau code to execute directly instead of the configured template. Implies `--logs` |
+| `--script-file` | Like `--script-text`, read from a file, for scripts too long for the command line. Open Cloud refuses scripts over 4 MB |
 
 ### Batch testing
 
@@ -201,6 +524,10 @@ nevermore batch test --cloud --concurrency 3
 
 # Write JSON results to file
 nevermore batch test --output results.json
+
+# Build the test places without an API key, then run them elsewhere
+nevermore batch bundle my-change.nevermore.tests.tar --test
+nevermore batch test --cloud --bundle my-change.nevermore.tests.tar
 ```
 
 Options:
@@ -213,6 +540,9 @@ Options:
 | `--output` | Write JSON results to a file |
 | `--limit` | Max number of packages to test |
 | `--logs` | Show execution logs for all packages |
+| `--bundle <file>` | Run the places in a `*.nevermore.tests.tar` written by `nevermore batch bundle --test` instead of finding and building packages. Works locally or with `--cloud`. Uploads to `--batch-place-id`/`--batch-universe-id`, or else to the test place this checkout gives one of the bundled packages, never to one the bundle names |
+
+`nevermore batch bundle <file> --test` builds the same combined places `batch test` would, writes them with a manifest into one uncompressed tar (`tar -tf` lists it), and stops. It takes `--base`, `--all`, `--limit` and `--max-place-mb`, and needs no API key.
 
 ## Credential resolution
 
@@ -231,7 +561,11 @@ When tests fail in CI, the `post-test-results` command parses Jest-lua output an
 
 1. **Sourcemap resolution** (preferred) — If `sourcemap.json` exists (generated by `rojo sourcemap --absolute`), the `SourcemapResolver` builds a lookup index from the tree. This is exact and handles all project layouts. The CI workflow runs `npm run build:sourcemap` before posting results to ensure the file is available.
 
-2. **Heuristic fallback** — When no sourcemap is available, the resolver assumes the standard `src/{slug}/src/` layout and rejoins known dotted suffixes (`.spec`, `.story`). This works for the common case but can produce wrong paths for non-standard layouts or dotted filenames.
+2. **Heuristic fallback** — When the sourcemap has no mapping, the resolver assumes the standard `src/{slug}/src/` layout and rejoins known dotted suffixes (`.spec`, `.story`). A heuristic path is only used if the file exists.
+
+Stack traces name modules by their chunk name (`[string "ServerScriptService.saveslot.Server.Foo"]`) and often run through a dependency's `node_modules` copy. The resolver unwraps the chunk name and maps `…node_modules.@quenty.<pkg>.<rest>` to that package's own source, using the last `node_modules` segment. The repo sourcemap only covers some of these nested copies, so this rewrite is needed even with a sourcemap. A package's npm name, directory, Rojo project name, and test-place slug can all differ (`@quenty/playermock` lives in `src/player-mock`; `src/gameproductservice` runs as `gameproduct`), so the resolver indexes the pnpm workspace, reading each package's `default.project.json` and, through `@quenty/nevermore-deploy`, its `test` target's project. Only frames under the package under test's own slug are rewritten to its directory. Without a sourcemap entry, a file is found only if it lives under `<package dir>/src/`.
+
+Each failure is annotated at the innermost stack frame that resolves to a real file, preferring frames from the package under test. When that frame has no line number and belongs to the package under test, the file is searched for the test name as a quoted string, then for each enclosing `describe` name, innermost first; if none appears (generated names), the annotation has the file but no line. Failures where nothing resolves (for example, only vendored Jest frames) are emitted without a file. Exact repeats (same severity, file, line, title, and message) are dropped, because GitHub shows at most 10 error annotations per step.
 
 The resolver code lives in `tools/nevermore-cli/src/utils/sourcemap/` and is shared with the `strip-sourcemap-jest` command.
 
@@ -255,7 +589,17 @@ For CI, set `ROBLOSECURITY` as a repository or Codespace secret. The `.github/wo
 ## CI design principles
 
 - **Workflows should be thin.** All logic lives in `nevermore-cli` commands — GitHub Actions workflows just call them. This keeps CI debuggable locally.
-- **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` caps concurrent Open Cloud API requests (default 4 in-flight via a semaphore), reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers, and retries 429s with jittered back-off.
+- **Rate limiting** is shared across concurrent workers via the `OpenCloudClient` instance. The `RateLimiter` caps concurrent Open Cloud API requests (default 4 in-flight via a semaphore), reads `x-ratelimit-remaining` / `x-ratelimit-reset` headers per endpoint, and retries 429s with jittered back-off. Open Cloud meters each endpoint separately, and the tight one is Luau task creation at 5 per minute, so every cloud test run (including other `nevermore` processes on the same key) draws from that budget. Polling (200/min) and log fetches (45/min) rarely matter. When a package sits on "Scheduling (rate limited 47s)", it is waiting for that window to reset. `--verbose` prints every response's quota headers as `[rate-limit]` lines.
 - **Post results via CLI**: `nevermore tools post-test-results <file>` posts or updates a PR comment with test results and writes to the GitHub Actions job summary. Requires `GITHUB_TOKEN` for PR comments; job summaries are written automatically when `GITHUB_STEP_SUMMARY` is set.
 - **Live comment updates during the run**: When `nevermore batch test` detects a CI environment, it also updates the PR comment as packages transition between phases (throttled to ~10s). The `post-test-results` step still writes the final snapshot, but reviewers see progress without waiting for the full run to finish. In `--aggregated` mode every package shares one execution, so they move through `uploading` → `scheduling` → `executing` in lock-step — that's expected, not a bug.
 - **Job summaries**: Results are automatically written to the [GitHub Actions job summary](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary) when running in CI. This makes results visible on the workflow run summary page, complementing the PR comment. The job summary is only written by `post-test-results` (not by the live batch run) to avoid duplicate entries on the workflow summary page.
+
+## Tests on PRs from forks
+
+GitHub gives a fork's `pull_request` run no secrets, so it cannot reach Open Cloud. Instead the PR is built where its code runs, and run where the API key lives:
+
+1. **`tests.yml`, on `pull_request`.** For a same-repo PR this is the whole test run, as before. For a fork the job is named `tests-build` and only runs `nevermore batch bundle --test`, uploading `pr-<n>.nevermore.tests.tar` as an artifact of the same name, with the fork's `sourcemap.json` beside it so failure annotations resolve against the fork's files, not `main`'s (`post-test-results --sourcemap`). Downloading that artifact is also how to run exactly what CI ran: `nevermore batch test --bundle pr-<n>.nevermore.tests.tar`.
+2. **`tests-forks.yml`, on `workflow_run`.** It runs once `tests` completes, with secrets, and always from `main`'s copy of the file. It checks out `main` only, downloads the artifact outside the checkout, finds the PR by the fork's owner and branch (`workflow_run` lists no PRs for a fork), then runs `nevermore batch test --bundle` on the build that triggered it, and reports the result as a `tests` check run on the built commit. The upload place comes from `main`'s checkout, the same place a same-repo PR's run would use, never from the artifact.
+3. **`tests-forks.yml`, by hand.** Run it from the Actions tab with a PR number to test that PR again without rebuilding. It uses the newest successful `tests-build` for the PR's current head, so it fails once that artifact has expired (3 days); re-run `tests-build` then.
+
+The required check stays `tests` for both kinds of PR. A fork's job is renamed rather than skipped because a job skipped by its `if:` counts as passing, so a skipped `tests` job would let a fork merge untested.

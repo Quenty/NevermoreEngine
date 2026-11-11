@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides permissions on the client. See [PermissionService] for more details.
 
@@ -15,17 +15,27 @@ local require = require(script.Parent.loader).load(script)
 local Maid = require("Maid")
 local PermissionProviderClient = require("PermissionProviderClient")
 local PermissionProviderConstants = require("PermissionProviderConstants")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 
 local PermissionServiceClient = {}
 PermissionServiceClient.ServiceName = "PermissionServiceClient"
 
+export type PermissionServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_providerPromise: Promise.Promise<PermissionProviderClient.PermissionProviderClient>,
+	},
+	{} :: typeof({ __index = PermissionServiceClient })
+))
+
 --[=[
 	Initializes the permission service on the client. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function PermissionServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
+function PermissionServiceClient.Init(self: PermissionServiceClient, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not self._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "no serviceBag")
 	self._maid = Maid.new()
@@ -40,8 +50,14 @@ end
 	@param player Player | nil
 	@return Promise<boolean>
 ]=]
-function PermissionServiceClient:PromiseIsAdmin(player: Player?)
-	assert((typeof(player) == "Instance" and player:IsA("Player")) or player == nil, "Bad player")
+function PermissionServiceClient.PromiseIsAdmin(
+	self: PermissionServiceClient,
+	player: Player?
+): Promise.Promise<boolean>
+	assert(
+		(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player))) or player == nil,
+		"Bad player"
+	)
 
 	return self:PromisePermissionProvider():Then(function(permissionProvider)
 		return permissionProvider:PromiseIsAdmin(player)
@@ -52,11 +68,13 @@ end
 	Returns the permission provider
 	@return Promise<PermissionProviderClient>
 ]=]
-function PermissionServiceClient:PromisePermissionProvider()
+function PermissionServiceClient.PromisePermissionProvider(self: PermissionServiceClient): Promise.Promise<
+	PermissionProviderClient.PermissionProviderClient
+>
 	return self._providerPromise
 end
 
-function PermissionServiceClient:Destroy()
+function PermissionServiceClient.Destroy(self: PermissionServiceClient): ()
 	self._maid:DoCleaning()
 end
 

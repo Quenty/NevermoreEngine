@@ -1,6 +1,6 @@
 {
   "name": "@quenty/marketplaceutils",
-  "version": "11.20.1",
+  "version": "11.35.1",
   "description": "Provides utility methods for MarketplaceService",
   "keywords": [
     "Roblox",
@@ -29,10 +29,15 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
+    "@quenty/maid": "workspace:*",
     "@quenty/memoize": "workspace:*",
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
-    "@quenty/servicebag": "workspace:*"
+    "@quenty/servicebag": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

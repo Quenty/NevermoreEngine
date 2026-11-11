@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TieMethodInterfaceUtils
 ]=]
@@ -12,12 +12,12 @@ local TieUtils = require("TieUtils")
 local TieMethodInterfaceUtils = {}
 
 function TieMethodInterfaceUtils.get(
-	aliasSelf,
-	tieMethodDefinition,
+	aliasSelf: any,
+	tieMethodDefinition: any,
 	implParent: Instance?,
 	adornee: Instance?,
 	interfaceTieRealm: TieRealms.TieRealm
-)
+): (any, ...any) -> ...any
 	assert(TieRealmUtils.isTieRealm(interfaceTieRealm), "Bad interfaceTieRealm")
 
 	local tieDefinition = tieMethodDefinition:GetTieDefinition()
@@ -50,14 +50,14 @@ function TieMethodInterfaceUtils.get(
 				if found then
 					local bindableFunction = found:FindFirstChild(tieMethodDefinition:GetMemberName())
 					if bindableFunction then
-						return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
+						return TieUtils.decode((bindableFunction :: BindableFunction):Invoke(TieUtils.encode(...)))
 					end
 				end
 			end
 
 			error(
 				string.format(
-					"No implemented for %s on %q",
+					"Not implemented for %s on %q",
 					tieMethodDefinition:GetFriendlyName(),
 					implParent and implParent:GetFullName() or "nil"
 				)
@@ -68,14 +68,14 @@ function TieMethodInterfaceUtils.get(
 		if not bindableFunction then
 			error(
 				string.format(
-					"No implemented for %s on %q",
+					"Not implemented for %s on %q",
 					tieMethodDefinition:GetFriendlyName(),
 					implParent and implParent:GetFullName() or "nil"
 				)
 			)
 		end
 
-		return TieUtils.decode(bindableFunction:Invoke(TieUtils.encode(...)))
+		return TieUtils.decode((bindableFunction :: BindableFunction):Invoke(TieUtils.encode(...)))
 	end
 end
 

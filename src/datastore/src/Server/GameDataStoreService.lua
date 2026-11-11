@@ -25,6 +25,7 @@ export type GameDataStoreService = typeof(setmetatable(
 		_dataStorePromise: Promise.Promise<DataStore.DataStore>?,
 		_robloxDataStorePromise: Promise.Promise<any>?,
 		_bindToCloseService: any,
+		_key: string?,
 	},
 	{} :: typeof({ __index = GameDataStoreService })
 ))
@@ -35,6 +36,20 @@ function GameDataStoreService.Init(self: GameDataStoreService, serviceBag: Servi
 	self._maid = Maid.new()
 
 	self._bindToCloseService = self._serviceBag:GetService(require("BindToCloseService"))
+end
+
+--[=[
+	Injects the underlying datastore to use instead of resolving a real one. Accepts a real
+	datastore or a [DataStoreMock]. Intended for testing; must be called before the datastore
+	is first resolved.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function GameDataStoreService.SetRobloxDataStore(self: GameDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._robloxDataStorePromise, "Already resolved robloxDataStore, cannot override")
+
+	self._robloxDataStorePromise = Promise.resolved(robloxDataStore)
 end
 
 --[=[
@@ -61,6 +76,21 @@ function GameDataStoreService.PromiseDataStore(self: GameDataStoreService): Prom
 			end)
 		end))
 
+		-- On service teardown (hot reload / tests) flush and destroy the store. Save() is a best-effort
+		-- synchronous write before Destroy() cancels it. The guard skips it if the game-close callback
+		-- above already tore the store down.
+		self._maid:GiveTask(function()
+			if not dataStore.Destroy then
+				return
+			end
+			-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+			-- manufacture a guaranteed rejection.
+			if not dataStore:DidLoadFail() then
+				dataStore:Save()
+			end
+			dataStore:Destroy()
+		end)
+
 		return dataStore
 	end)
 	assert(self._dataStorePromise, "Typechecking assertion")
@@ -81,8 +111,15 @@ function GameDataStoreService._promiseRobloxDataStore(self: GameDataStoreService
 	return self._robloxDataStorePromise
 end
 
-function GameDataStoreService._getKey(_self: GameDataStoreService): string
-	return "version1"
+function GameDataStoreService.SetDataStoreKey(self: GameDataStoreService, key: string): ()
+	assert(type(key) == "string", "Bad key")
+	assert(not self._dataStorePromise, "Cannot set key after datastore has been promised")
+
+	self._key = key
+end
+
+function GameDataStoreService._getKey(self: GameDataStoreService): string
+	return self._key or "version1"
 end
 
 function GameDataStoreService.Destroy(self: GameDataStoreService)

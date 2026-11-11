@@ -1,0 +1,68 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.9.1...@quenty/immediateutils@1.10.0) (2026-10-26)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+## [1.9.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.9.0...@quenty/immediateutils@1.9.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.8.3...@quenty/immediateutils@1.9.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+## [1.8.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.8.2...@quenty/immediateutils@1.8.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+## [1.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.8.1...@quenty/immediateutils@1.8.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+## [1.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.8.0...@quenty/immediateutils@1.8.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.7.0...@quenty/immediateutils@1.8.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.6.0...@quenty/immediateutils@1.7.0) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.5.0...@quenty/immediateutils@1.6.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.4.0...@quenty/immediateutils@1.5.0) (2026-09-01)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.3.0...@quenty/immediateutils@1.4.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.2.0...@quenty/immediateutils@1.3.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/immediateutils@1.1.0...@quenty/immediateutils@1.2.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# 1.1.0 (2026-08-16)
+
+**Note:** Version bump only for package @quenty/immediateutils
+
+# 1.0.0 (2026-08-14)
+
+### Features
+
+- **immediateutils:** add immediate-mode ECS loop and hooks

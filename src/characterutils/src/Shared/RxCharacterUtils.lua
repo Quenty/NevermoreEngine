@@ -7,10 +7,12 @@
 local require = require(script.Parent.loader).load(script)
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Brio = require("Brio")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 local RxInstanceUtils = require("RxInstanceUtils")
@@ -26,9 +28,7 @@ local RxCharacterUtils = {}
 function RxCharacterUtils.observeLastCharacterBrio(player: Player): Observable.Observable<Brio.Brio<Model>>
 	-- This assumes a player's 'Character' field is set to nil when
 	-- their character is destroyed, or when they leave the game.
-	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
-		return character ~= nil
-	end)
+	return RxCharacterUtils.observeCharacterBrio(player)
 end
 
 --[=[
@@ -38,6 +38,17 @@ end
 	@return Observable<Model>
 ]=]
 function RxCharacterUtils.observeCharacter(player: Player): Observable.Observable<Model?>
+	if PlayerMock.isMock(player) then
+		-- A mock's backing Folder has no Character property; observe its stand-in instead.
+		return Observable.new(function(sub)
+			local connection = PlayerMock.getPropertyChangedSignal(player, "Character"):Connect(function()
+				sub:Fire(PlayerMock.read(player, "Character"))
+			end)
+			sub:Fire(PlayerMock.read(player, "Character"))
+			return connection
+		end) :: any
+	end
+
 	return RxInstanceUtils.observeProperty(player, "Character") :: any
 end
 
@@ -48,13 +59,18 @@ end
 	@return Observable<Brio<Model>>
 ]=]
 function RxCharacterUtils.observeCharacterBrio(player: Player): Observable.Observable<Brio.Brio<Model>>
+	if PlayerMock.isMock(player) then
+		-- switchToBrio matches observePropertyBrio's semantics: one brio per character, killed on change
+		return RxCharacterUtils.observeCharacter(player):Pipe({
+			RxBrioUtils.switchToBrio(function(character)
+				return character ~= nil
+			end) :: any,
+		}) :: any
+	end
+
 	return RxInstanceUtils.observePropertyBrio(player, "Character", function(character)
 		return character ~= nil
 	end)
-end
-
-function RxCharacterUtils._test_injectPlayerService(newPlayers: Players)
-	Players = newPlayers or game:GetService("Players")
 end
 
 --[=[
@@ -66,8 +82,8 @@ end
 function RxCharacterUtils.observeIsOfLocalCharacter(instance: Instance): Observable.Observable<boolean>
 	assert(typeof(instance) == "Instance", "Bad instance")
 
-	local localPlayer = Players.LocalPlayer
-	if not localPlayer then
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	if not localPlayer and RunService:IsClient() then
 		warn("[RxCharacterUtils] - No localPlayer")
 		return Rx.EMPTY :: any
 	end
@@ -108,6 +124,11 @@ end
 ]=]
 function RxCharacterUtils.observeLocalPlayerCharacter(): Observable.Observable<Model>
 	return RxInstanceUtils.observeProperty(Players, "LocalPlayer"):Pipe({
+		Rx.map(function(player: Player?): Player?
+			-- Headless tests have no Players.LocalPlayer; a test designates a PlayerMock instead.
+			-- Resolved when LocalPlayer emits, so designate the mock before subscribing.
+			return player or PlayerMock.getMockedLocalPlayer()
+		end) :: any,
 		Rx.switchMap(function(player: Player?): any
 			if player then
 				return RxCharacterUtils.observeCharacter(player)

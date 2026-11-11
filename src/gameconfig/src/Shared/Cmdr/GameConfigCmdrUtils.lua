@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class GameConfigCmdrUtils
 ]=]
@@ -6,19 +6,24 @@
 local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
+local GameConfigPicker = require("GameConfigPicker")
 
 local GameConfigCmdrUtils = {}
 
-function GameConfigCmdrUtils.registerAssetTypes(cmdr, configPicker)
+function GameConfigCmdrUtils.registerAssetTypes(cmdr: any, configPicker: GameConfigPicker.GameConfigPicker): ()
 	assert(cmdr, "Bad cmdr")
 	assert(configPicker, "Bad configPicker")
 
-	for _, assetType in GameConfigAssetTypes do
+	for _, assetType in GameConfigAssetTypes:GetValues() do
 		GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType)
 	end
 end
 
-function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType: GameConfigAssetTypes.GameConfigAssetType)
+function GameConfigCmdrUtils.registerAssetType(
+	cmdr: any,
+	configPicker: GameConfigPicker.GameConfigPicker,
+	assetType: GameConfigAssetTypes.GameConfigAssetType
+): ()
 	assert(cmdr, "Bad cmdr")
 	assert(type(assetType) == "string", "Bad assetType")
 	assert(configPicker, "Bad configPicker")
@@ -54,7 +59,7 @@ function GameConfigCmdrUtils.registerAssetType(cmdr, configPicker, assetType: Ga
 			end
 			return stringified
 		end,
-		Parse = function(keys)
+		Parse = function(keys): number?
 			local value = keys[1]
 			if type(value) == "number" then
 				return value

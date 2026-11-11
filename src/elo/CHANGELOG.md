@@ -3,6 +3,106 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.52.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.52.1...@quenty/elo@7.52.2) (2026-11-03)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.52.0...@quenty/elo@7.52.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [7.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.51.2...@quenty/elo@7.52.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.51.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.51.1...@quenty/elo@7.51.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.51.0...@quenty/elo@7.51.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.50.1...@quenty/elo@7.51.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.50.0...@quenty/elo@7.50.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.49.0...@quenty/elo@7.50.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.48.0...@quenty/elo@7.49.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.47.0...@quenty/elo@7.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.46.1...@quenty/elo@7.47.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.46.0...@quenty/elo@7.46.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.45.2...@quenty/elo@7.46.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.45.1...@quenty/elo@7.45.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.45.0...@quenty/elo@7.45.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.44.0...@quenty/elo@7.45.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.43.0...@quenty/elo@7.44.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.42.0...@quenty/elo@7.43.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.41.1...@quenty/elo@7.42.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/elo
+
+## [7.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.41.0...@quenty/elo@7.41.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.40.0...@quenty/elo@7.41.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.39.0...@quenty/elo@7.40.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.38.0...@quenty/elo@7.39.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/elo
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.37.1...@quenty/elo@7.38.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/elo
+
 ## [7.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.37.0...@quenty/elo@7.37.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/elo

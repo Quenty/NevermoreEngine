@@ -1,16 +1,20 @@
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
+  getTaskReturnValues,
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
+import { reportRateLimitWait } from '../open-cloud/rate-limiter.js';
 import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
 import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
 import {
   type Deployment,
   type DeployPlaceOptions,
+  type JobLogs,
   type RunScriptOptions,
   type ScriptRunResult,
 } from './job-context.js';
+import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
 import { BaseJobContext } from './base-job-context.js';
 
 const SKIP_RENAMING_PLACE = true;
@@ -30,8 +34,12 @@ class CloudDeployment implements Deployment {
 }
 
 export class CloudJobContext extends BaseJobContext {
-  constructor(reporter: Reporter, openCloudClient: OpenCloudClient) {
-    super(reporter, openCloudClient);
+  constructor(
+    reporter: Reporter,
+    openCloudClient: OpenCloudClient,
+    basePlaceResolver?: BasePlaceResolver
+  ) {
+    super(reporter, openCloudClient, basePlaceResolver);
   }
 
   async deployBuiltPlaceAsync(
@@ -53,7 +61,8 @@ export class CloudJobContext extends BaseJobContext {
           transferredBytes: transferred,
           totalBytes: total,
         });
-      }
+      },
+      reportRateLimitWait(this._reporter, packageName)
     );
 
     // Eagerly release build artifacts after upload (disposeAsync is safety net)
@@ -75,13 +84,16 @@ export class CloudJobContext extends BaseJobContext {
     const cloudDeployment = deployment as CloudDeployment;
     const { scriptContent, packageName, timeoutMs = 120_000 } = options;
 
+    const onRateLimitWait = reportRateLimitWait(this._reporter, packageName);
+
     this._reporter.onPackagePhaseChange(packageName, 'scheduling');
     const task = await this._openCloudClient!.createExecutionTaskAsync(
       cloudDeployment.universeId,
       cloudDeployment.placeId,
       cloudDeployment.version,
       scriptContent,
-      timeoutMs
+      timeoutMs,
+      onRateLimitWait
     );
 
     // Give the server-side timeout a head start so we observe the cancelled
@@ -90,19 +102,23 @@ export class CloudJobContext extends BaseJobContext {
 
     let pollCount = 0;
     const completedTask = await Promise.race([
-      this._openCloudClient!.pollTaskCompletionAsync(task.path, (state) => {
-        pollCount++;
-        if (state === 'PROCESSING') {
-          this._reporter.onPackagePhaseChange(packageName, 'executing');
-        }
-        const label = state === 'QUEUED' ? 'queued' : `poll #${pollCount}`;
-        this._reporter.onPackageProgressUpdate(packageName, {
-          kind: 'steps',
-          completed: pollCount,
-          total: 0,
-          label,
-        });
-      }),
+      this._openCloudClient!.pollTaskCompletionAsync(
+        task.path,
+        (state) => {
+          pollCount++;
+          if (state === 'PROCESSING') {
+            this._reporter.onPackagePhaseChange(packageName, 'executing');
+          }
+          const label = state === 'QUEUED' ? 'queued' : `poll #${pollCount}`;
+          this._reporter.onPackageProgressUpdate(packageName, {
+            kind: 'steps',
+            completed: pollCount,
+            total: 0,
+            label,
+          });
+        },
+        onRateLimitWait
+      ),
       timeoutAsync(
         timeoutMs + CLIENT_TIMEOUT_GRACE_MS,
         `Test timed out after ${timeoutMs / 1000}s`
@@ -129,27 +145,31 @@ export class CloudJobContext extends BaseJobContext {
       success: completedTask.state === 'COMPLETE',
       taskState: completedTask.state,
       errorMessage,
+      returnValues: getTaskReturnValues(completedTask),
     };
   }
 
-  async getLogsAsync(deployment: Deployment): Promise<string> {
+  async getLogsAsync(deployment: Deployment): Promise<JobLogs> {
     const cloudDeployment = deployment as CloudDeployment;
 
     if (!cloudDeployment.taskPath) {
       throw new Error('No task has been run yet');
     }
 
-    const logs = await this._openCloudClient!.getRawTaskLogsAsync(
+    const fetched = await this._openCloudClient!.getRawTaskLogsAsync(
       cloudDeployment.taskPath
     );
 
     if (cloudDeployment.taskState && cloudDeployment.taskState !== 'COMPLETE') {
-      return [logs, `Task ended with state: ${cloudDeployment.taskState}`]
-        .filter(Boolean)
-        .join('\n');
+      const note = `Task ended with state: ${cloudDeployment.taskState}`;
+      return {
+        text: [fetched.text, note].filter(Boolean).join('\n'),
+        messages: [...fetched.messages, { message: note }],
+        stats: fetched.stats,
+      };
     }
 
-    return logs;
+    return fetched;
   }
 
   async releaseAsync(_deployment: Deployment): Promise<void> {

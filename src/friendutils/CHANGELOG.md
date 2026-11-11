@@ -3,6 +3,102 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.44.0...@quenty/friendutils@12.44.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [12.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.43.2...@quenty/friendutils@12.44.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [12.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.43.1...@quenty/friendutils@12.43.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+## [12.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.43.0...@quenty/friendutils@12.43.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.42.1...@quenty/friendutils@12.43.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+## [12.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.42.0...@quenty/friendutils@12.42.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.41.0...@quenty/friendutils@12.42.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.40.0...@quenty/friendutils@12.41.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.39.0...@quenty/friendutils@12.40.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.38.1...@quenty/friendutils@12.39.0) (2026-08-24)
+
+### Bug Fixes
+
+- Retry on GetCore failure ([c8a595a](https://github.com/Quenty/NevermoreEngine/commit/c8a595a01876ff9324f81a4790ea478086740d2a))
+
+## [12.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.38.0...@quenty/friendutils@12.38.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.37.2...@quenty/friendutils@12.38.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+## [12.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.37.1...@quenty/friendutils@12.37.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+## [12.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.37.0...@quenty/friendutils@12.37.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.36.0...@quenty/friendutils@12.37.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.35.0...@quenty/friendutils@12.36.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.34.0...@quenty/friendutils@12.35.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.33.1...@quenty/friendutils@12.34.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+## [12.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.33.0...@quenty/friendutils@12.33.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.32.0...@quenty/friendutils@12.33.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.31.0...@quenty/friendutils@12.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/friendutils
+
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.30.1...@quenty/friendutils@12.31.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/friendutils
+
 ## [12.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/friendutils@12.30.0...@quenty/friendutils@12.30.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/friendutils

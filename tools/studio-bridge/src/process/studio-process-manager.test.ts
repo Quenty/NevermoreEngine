@@ -1,5 +1,40 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { findPluginsFolder } from './studio-process-manager.js';
+import {
+  findPluginsFolder,
+  buildStudioLaunchArg,
+} from './studio-process-manager.js';
+
+describe('buildStudioLaunchArg', () => {
+  it('builds an EditPlace deep-link from place + universe ids', () => {
+    expect(
+      buildStudioLaunchArg({ placeId: 84760113521251, universeId: 9893751595 })
+    ).toBe(
+      'roblox-studio:1+launchmode:edit+task:EditPlace+placeId:84760113521251+universeId:9893751595'
+    );
+  });
+
+  it('omits universeId from the deep-link when not provided', () => {
+    expect(buildStudioLaunchArg({ placeId: 123 })).toBe(
+      'roblox-studio:1+launchmode:edit+task:EditPlace+placeId:123'
+    );
+  });
+
+  it('prefers the cloud place id over a local place path', () => {
+    expect(
+      buildStudioLaunchArg({ placeId: 5, placePath: '/tmp/game.rbxl' })
+    ).toContain('placeId:5');
+  });
+
+  it('returns the local place path when no place id is given', () => {
+    expect(buildStudioLaunchArg({ placePath: '/tmp/game.rbxl' })).toBe(
+      '/tmp/game.rbxl'
+    );
+  });
+
+  it('returns an empty string for no place at all', () => {
+    expect(buildStudioLaunchArg({})).toBe('');
+  });
+});
 
 describe('findPluginsFolder', () => {
   const originalPlatform = process.platform;

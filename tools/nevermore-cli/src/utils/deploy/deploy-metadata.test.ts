@@ -1,0 +1,258 @@
+import { afterEach, describe, it, expect, vi } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import {
+  buildDeployMetadataAttributes,
+  gatherGitDeployInfo,
+  packageUsesManifestAsync,
+  type GitDeployInfo,
+  type DeployPlaceInfo,
+} from './deploy-metadata.js';
+
+async function withPackageJsonAsync(
+  contents: unknown,
+  fn: (dir: string) => Promise<void>
+): Promise<void> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'manifest-gate-'));
+  try {
+    if (contents !== undefined) {
+      await fs.writeFile(
+        path.join(dir, 'package.json'),
+        JSON.stringify(contents)
+      );
+    }
+    await fn(dir);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+}
+
+const PLACE: DeployPlaceInfo = {
+  target: 'integration',
+  published: true,
+  timestamp: '2026-07-15T00:00:00.000Z',
+  placeId: 123,
+  universeId: 456,
+};
+
+describe('buildDeployMetadataAttributes', () => {
+  it('always marks the build as deployed and includes place info', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect(attributes.Deployed).toBe(true);
+    expect(attributes.Target).toBe('integration');
+    expect(attributes.Published).toBe(true);
+    expect(attributes.Timestamp).toBe('2026-07-15T00:00:00.000Z');
+  });
+
+  it('stringifies place/universe IDs so Lune float32 does not corrupt them', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        placeId: 123456789,
+        universeId: 987654321,
+      }
+    );
+    // Must be exact strings — as numbers these round to 123456792 / 987654336.
+    expect(attributes.PlaceId).toBe('123456789');
+    expect(attributes.UniverseId).toBe('987654321');
+  });
+
+  it('includes git fields when present', () => {
+    const git: GitDeployInfo = {
+      commit: 'a1b2c3d',
+      version: 'a1b2c3d4e5f6',
+      branch: 'main',
+    };
+    const attributes = buildDeployMetadataAttributes(git, PLACE);
+    expect(attributes.Commit).toBe('a1b2c3d');
+    expect(attributes.Version).toBe('a1b2c3d4e5f6');
+    expect(attributes.Branch).toBe('main');
+  });
+
+  it('omits git fields that are unavailable', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect('Commit' in attributes).toBe(false);
+    expect('Version' in attributes).toBe(false);
+    expect('Branch' in attributes).toBe(false);
+  });
+
+  it('includes the package version when present', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      { ...PLACE, packageVersion: '1.0.0' }
+    );
+    expect(attributes.PackageVersion).toBe('1.0.0');
+  });
+
+  it('omits the package version when unavailable', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect('PackageVersion' in attributes).toBe(false);
+  });
+
+  // The one fact nothing downstream can recover: a "published" pin resolves at
+  // deploy time and the base place moves on afterwards, so without this a
+  // running build cannot say which upstream content it is made of.
+  it('records the base place it was merged from', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        basePlaceId: 71403466083947,
+        basePlaceVersion: 158,
+      }
+    );
+
+    expect(attributes.BasePlaceId).toBe('71403466083947');
+    expect(attributes.BasePlaceVersion).toBe('158');
+  });
+
+  // Stringified for the same reason as the place ids: Lune round-trips number
+  // attributes as float32, which silently corrupts anything above 2^24.
+  it('keeps a large base place id exact', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      {
+        ...PLACE,
+        basePlaceId: 140328750749206,
+        basePlaceVersion: 1,
+      }
+    );
+
+    expect(attributes.BasePlaceId).toBe('140328750749206');
+    expect(Number(attributes.BasePlaceId)).toBe(140328750749206);
+  });
+
+  it('omits the base place fields when nothing was merged', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+
+    expect('BasePlaceId' in attributes).toBe(false);
+    expect('BasePlaceVersion' in attributes).toBe(false);
+  });
+
+  it('reflects a Saved (unpublished) deploy', () => {
+    const attributes = buildDeployMetadataAttributes(
+      {},
+      { ...PLACE, published: false }
+    );
+    expect(attributes.Published).toBe(false);
+  });
+
+  it('omits Places when no place table is given', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE);
+    expect('Places' in attributes).toBe(false);
+  });
+
+  it('stamps Places as a JSON string preserving large IDs exactly', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE, [
+      { name: 'chapter0', placeId: 97235312452456, universeId: 10192566764 },
+      { name: 'chapter1', placeId: 87639818897831, universeId: 10192566764 },
+    ]);
+    expect(typeof attributes.Places).toBe('string');
+    const parsed = JSON.parse(attributes.Places as string);
+    // Large place IDs must survive exactly (JSON text, not a float32 attribute).
+    expect(parsed).toEqual([
+      { name: 'chapter0', placeId: 97235312452456, universeId: 10192566764 },
+      { name: 'chapter1', placeId: 87639818897831, universeId: 10192566764 },
+    ]);
+  });
+
+  it('omits the name key for a single-place (nameless) target', () => {
+    const attributes = buildDeployMetadataAttributes({}, PLACE, [
+      { placeId: 123, universeId: 456 },
+    ]);
+    const parsed = JSON.parse(attributes.Places as string);
+    expect(parsed).toEqual([{ placeId: 123, universeId: 456 }]);
+    expect('name' in parsed[0]).toBe(false);
+  });
+});
+
+describe('packageUsesManifestAsync', () => {
+  it('is true for the manifest package itself', async () => {
+    await withPackageJsonAsync(
+      { name: '@quenty/nevermoreclimanifest' },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(true);
+      }
+    );
+  });
+
+  it('is true for a direct dependent', async () => {
+    await withPackageJsonAsync(
+      {
+        name: '@quenty/somepackage',
+        dependencies: { '@quenty/nevermoreclimanifest': 'workspace:*' },
+      },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(true);
+      }
+    );
+  });
+
+  it('is false for an unrelated package', async () => {
+    await withPackageJsonAsync(
+      {
+        name: '@quenty/maid',
+        dependencies: { '@quenty/loader': 'workspace:*' },
+      },
+      async (dir) => {
+        expect(await packageUsesManifestAsync(dir)).toBe(false);
+      }
+    );
+  });
+
+  it('is false when there is no package.json', async () => {
+    await withPackageJsonAsync(undefined, async (dir) => {
+      expect(await packageUsesManifestAsync(dir)).toBe(false);
+    });
+  });
+});
+
+describe('gatherGitDeployInfo', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  async function withEventAsync(
+    eventName: string,
+    event: unknown,
+    fn: () => void
+  ): Promise<void> {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'git-info-'));
+    try {
+      const eventPath = path.join(dir, 'event.json');
+      await fs.writeFile(eventPath, JSON.stringify(event));
+      vi.stubEnv('GITHUB_EVENT_NAME', eventName);
+      vi.stubEnv('GITHUB_EVENT_PATH', eventPath);
+      fn();
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  it("stamps a pull_request run with the PR's head, not the merge checkout", async () => {
+    const sha = 'b'.repeat(40);
+    await withEventAsync(
+      'pull_request',
+      { pull_request: { head: { sha, ref: 'feature/x' } } },
+      () => {
+        expect(gatherGitDeployInfo()).toEqual({
+          commit: 'bbbbbbbbbb',
+          version: sha,
+          branch: 'feature/x',
+        });
+      }
+    );
+  });
+
+  it('reads the checkout for any other event', async () => {
+    await withEventAsync(
+      'push',
+      { pull_request: { head: { sha: 'b'.repeat(40), ref: 'feature/x' } } },
+      () => {
+        expect(gatherGitDeployInfo().version).not.toBe('b'.repeat(40));
+      }
+    );
+  });
+});

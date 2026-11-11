@@ -3,6 +3,236 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.76.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.76.0...@quenty/gameproductservice@14.76.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.76.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.75.1...@quenty/gameproductservice@14.76.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.75.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.75.0...@quenty/gameproductservice@14.75.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.74.3...@quenty/gameproductservice@14.75.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [14.74.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.74.2...@quenty/gameproductservice@14.74.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.74.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.74.1...@quenty/gameproductservice@14.74.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.74.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.74.0...@quenty/gameproductservice@14.74.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.73.0...@quenty/gameproductservice@14.74.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.72.1...@quenty/gameproductservice@14.73.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.72.0...@quenty/gameproductservice@14.72.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.71.0...@quenty/gameproductservice@14.72.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.70.0...@quenty/gameproductservice@14.71.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.69.1...@quenty/gameproductservice@14.70.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.69.0...@quenty/gameproductservice@14.69.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.68.2...@quenty/gameproductservice@14.69.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.68.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.68.1...@quenty/gameproductservice@14.68.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.68.0...@quenty/gameproductservice@14.68.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.67.0...@quenty/gameproductservice@14.68.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.10...@quenty/gameproductservice@14.67.0) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.10](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.9...@quenty/gameproductservice@14.66.10) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.9](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.8...@quenty/gameproductservice@14.66.9) (2026-08-08)
+
+### Bug Fixes
+
+- Server validation gate ([90ee99b](https://github.com/Quenty/NevermoreEngine/commit/90ee99be70cb20ddb01dc8cc43ed12974405d22e))
+
+## [14.66.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.7...@quenty/gameproductservice@14.66.8) (2026-08-08)
+
+### Bug Fixes
+
+- Check if alive ([b90db63](https://github.com/Quenty/NevermoreEngine/commit/b90db636b620e939929d64803e40aaa2de63616f))
+- Check if remoting is alive ([59b14cf](https://github.com/Quenty/NevermoreEngine/commit/59b14cff7b327cdab7e3510d593879a6cb0bf259))
+- Validate game pass ownership on server ([c89a788](https://github.com/Quenty/NevermoreEngine/commit/c89a788eee031ff955f1310902c5cf92bad76686))
+
+## [14.66.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.6...@quenty/gameproductservice@14.66.7) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.5...@quenty/gameproductservice@14.66.6) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.4...@quenty/gameproductservice@14.66.5) (2026-07-30)
+
+### Bug Fixes
+
+- **gameproductservice:** stop ownership queries spamming the log with failures they cannot avoid ([#778](https://github.com/Quenty/NevermoreEngine/issues/778)) ([2413adb](https://github.com/Quenty/NevermoreEngine/commit/2413adbabcfbd4df3dc639c1ef40ec2ffcfe0571))
+
+## [14.66.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.3...@quenty/gameproductservice@14.66.4) (2026-07-29)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.2...@quenty/gameproductservice@14.66.3) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.1...@quenty/gameproductservice@14.66.2) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.66.0...@quenty/gameproductservice@14.66.1) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.65.2...@quenty/gameproductservice@14.66.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.65.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.65.1...@quenty/gameproductservice@14.65.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.65.0...@quenty/gameproductservice@14.65.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.64.0...@quenty/gameproductservice@14.65.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.63.0...@quenty/gameproductservice@14.64.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.62.0...@quenty/gameproductservice@14.63.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.61.1...@quenty/gameproductservice@14.62.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.61.0...@quenty/gameproductservice@14.61.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.60.0...@quenty/gameproductservice@14.61.0) (2026-07-23)
+
+### Bug Fixes
+
+- Safey tests ([881e7a9](https://github.com/Quenty/NevermoreEngine/commit/881e7a9c9ca8c51d30b4791b84668425955f318d))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [14.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.59.0...@quenty/gameproductservice@14.60.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.58.0...@quenty/gameproductservice@14.59.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.57.0...@quenty/gameproductservice@14.58.0) (2026-07-21)
+
+### Bug Fixes
+
+- Resolve luau-lsp and moonwave lint failures ([286e352](https://github.com/Quenty/NevermoreEngine/commit/286e3527b52a86639fc0485359141d7805b3fefa))
+
+### Features
+
+- Add kinda risky ownership override method + cmdr commands ([b0aaa68](https://github.com/Quenty/NevermoreEngine/commit/b0aaa68ebfab7f34da05b57bca77b35bf7890c3b))
+- Game ownership works ([c09bdc3](https://github.com/Quenty/NevermoreEngine/commit/c09bdc32174fc17cfac7aeb6c7849b556be9cec4))
+
+# [14.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.56.0...@quenty/gameproductservice@14.57.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- **gameproductservice:** add paid-access game ownership tracking ([581a595](https://github.com/Quenty/NevermoreEngine/commit/581a5950d433ea4d6dfbcc33e88f254f9f13e14c))
+
+# [14.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.55.0...@quenty/gameproductservice@14.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.54.1...@quenty/gameproductservice@14.55.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+## [14.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.54.0...@quenty/gameproductservice@14.54.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.53.0...@quenty/gameproductservice@14.54.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/gameproductservice
+
+# [14.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.52.0...@quenty/gameproductservice@14.53.0) (2026-07-14)
+
+### Bug Fixes
+
+- add [@within](https://github.com/within) for moonwave on SettingDefinitionProvider \_\_index; cast Tie :Implement receiver ([388e3f8](https://github.com/Quenty/NevermoreEngine/commit/388e3f8c658b14d991b2328776d6cac5b11501c0))
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **gameproductservice:** annotate manager to avoid strict avatareditorutils inference blowup ([f80ea4a](https://github.com/Quenty/NevermoreEngine/commit/f80ea4a66ae7300790cad9427e1f22783005de14))
+- **gameproductservice:** drop PlayerProductManager to --!nonstrict (luau-lsp V1 symlink-nominal flake, unreproducible locally) ([a854eec](https://github.com/Quenty/NevermoreEngine/commit/a854eecbc9619ba59e01b8d2c92d1399a1604e28))
+- **gameproductservice:** pass selfAny to Tie :Implement to dodge symlink-nominal error ([f3b9c7d](https://github.com/Quenty/NevermoreEngine/commit/f3b9c7deaa7a7a381beced2dfd39d1a001649701))
+- **gameproductservice:** route PlayerProductManager :Implement line through selfAny (any) to kill nominal flake ([64832ab](https://github.com/Quenty/NevermoreEngine/commit/64832ab9ee9c433ad832298455530783d9cde18d))
+
+### Features
+
+- **gameproductservice:** convert package to --!strict ([c27613b](https://github.com/Quenty/NevermoreEngine/commit/c27613b12776c983a1c3c2a2df80cd2c1b93ac4d))
+
 # [14.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameproductservice@14.51.2...@quenty/gameproductservice@14.52.0) (2026-07-02)
 
 ### Bug Fixes

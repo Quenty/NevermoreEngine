@@ -5,7 +5,7 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployConfig,
   discoverUniverseIdAsync,
-} from '../../utils/build/deploy-config.js';
+} from '@quenty/nevermore-deploy';
 import {
   getRobloxCookieAsync,
   createPlaceInUniverseAsync,
@@ -23,13 +23,20 @@ import {
   detectTargetNameAsync,
 } from './deploy-init-utils.js';
 
+/**
+ * Stands in for the place ID in a `--dryrun` preview. A dryrun never creates a
+ * place, so there is no real ID to render — and the preview is never written.
+ */
+const DRYRUN_PLACE_ID = '<would-be-created>';
+
 interface InitState {
   packagePath: string;
   packageName: string;
   placeName: string;
   targetName: string;
   universeId?: number;
-  placeId?: number;
+  /** Resolved place ID, or {@link DRYRUN_PLACE_ID} on a dryrun. */
+  placeId?: number | typeof DRYRUN_PLACE_ID;
   project?: string;
   scriptTemplate?: string;
   mode: 'auto' | 'interactive' | 'non-interactive';
@@ -111,9 +118,8 @@ async function resolveNonInteractive(
   }
 
   if (args.createPlace && state.universeId && !state.placeId) {
-    const cookie = await getRobloxCookieAsync();
-    state.placeId = await createPlaceInUniverseAsync(
-      cookie,
+    state.placeId = await createPlaceAsync(
+      args,
       state.universeId,
       state.placeName
     );
@@ -133,7 +139,7 @@ async function resolveInteractiveAsync(
   await promptModeAsync(state);
   await ensureUniverseIdAsync(args, state); // Resolves targetName before script prompt
   await ensureProjectAndScriptAsync(args, state);
-  await ensurePromptPlaceIdAsync(state); // This modifies the cloud, so is last
+  await ensurePromptPlaceIdAsync(args, state); // This modifies the cloud, so is last
 }
 
 function isTestTarget(state: InitState): boolean {
@@ -232,15 +238,17 @@ async function ensureUniverseIdAsync(
   state.universeId = answers.universeId ?? state.universeId;
 }
 
-async function ensurePromptPlaceIdAsync(state: InitState): Promise<void> {
+async function ensurePromptPlaceIdAsync(
+  args: DeployArgs,
+  state: InitState
+): Promise<void> {
   if (!state.universeId) {
     throw new Error('Universe ID is required to set up place ID');
   }
 
   try {
-    const cookie = await getRobloxCookieAsync();
-    state.placeId = await createPlaceInUniverseAsync(
-      cookie,
+    state.placeId = await createPlaceAsync(
+      args,
       state.universeId,
       state.placeName
     );
@@ -253,6 +261,27 @@ async function ensurePromptPlaceIdAsync(state: InitState): Promise<void> {
 
     state.placeId = await promptPlaceIdAsync(state.universeId, state.placeName);
   }
+}
+
+/**
+ * Creates the place the target will point at. On a dryrun nothing is created
+ * and nothing is fetched — not even the cookie — so the caller gets
+ * {@link DRYRUN_PLACE_ID} to render instead.
+ */
+async function createPlaceAsync(
+  args: DeployArgs,
+  universeId: number,
+  placeName: string
+): Promise<number | typeof DRYRUN_PLACE_ID> {
+  if (args.dryrun) {
+    OutputHelper.info(
+      `[DRYRUN] Would create place '${placeName}' in universe ${universeId}`
+    );
+    return DRYRUN_PLACE_ID;
+  }
+
+  const cookie = await getRobloxCookieAsync();
+  return await createPlaceInUniverseAsync(cookie, universeId, placeName);
 }
 
 async function ensureProjectAndScriptAsync(
@@ -320,7 +349,8 @@ async function writeConfig(
     targets: {
       [state.targetName]: {
         universeId: state.universeId!,
-        placeId: state.placeId!,
+        // On a dryrun this is DRYRUN_PLACE_ID, which only ever gets printed.
+        placeId: state.placeId as number,
         project: state.project!.replace(/\\/g, '/'),
         ...(state.scriptTemplate
           ? { scriptTemplate: state.scriptTemplate.replace(/\\/g, '/') }
@@ -332,7 +362,7 @@ async function writeConfig(
   const configJson = JSON.stringify(config, null, 2);
 
   if (args.dryrun) {
-    OutputHelper.info('[DRYRUN]: Would write deploy.nevermore.json:');
+    OutputHelper.info('[DRYRUN] Would write deploy.nevermore.json:');
     console.log(configJson);
     return;
   }

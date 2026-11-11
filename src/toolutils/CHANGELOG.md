@@ -3,6 +3,94 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.30.0...@quenty/toolutils@1.30.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.29.2...@quenty/toolutils@1.30.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.29.1...@quenty/toolutils@1.29.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.29.0...@quenty/toolutils@1.29.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.28.1...@quenty/toolutils@1.29.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.28.0...@quenty/toolutils@1.28.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.27.0...@quenty/toolutils@1.28.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.26.0...@quenty/toolutils@1.27.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.25.1...@quenty/toolutils@1.26.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.25.0...@quenty/toolutils@1.25.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.24.2...@quenty/toolutils@1.25.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.24.1...@quenty/toolutils@1.24.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.24.0...@quenty/toolutils@1.24.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.23.0...@quenty/toolutils@1.24.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.22.0...@quenty/toolutils@1.23.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.21.0...@quenty/toolutils@1.22.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.20.1...@quenty/toolutils@1.21.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+## [1.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.20.0...@quenty/toolutils@1.20.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.19.0...@quenty/toolutils@1.20.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.18.0...@quenty/toolutils@1.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.17.0...@quenty/toolutils@1.18.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/toolutils
+
+# [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.16.1...@quenty/toolutils@1.17.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/toolutils
+
 ## [1.16.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/toolutils@1.16.0...@quenty/toolutils@1.16.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/toolutils

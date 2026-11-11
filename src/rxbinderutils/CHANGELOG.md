@@ -3,6 +3,80 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.48.0...@quenty/rxbinderutils@14.48.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [14.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.47.2...@quenty/rxbinderutils@14.48.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+## [14.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.47.1...@quenty/rxbinderutils@14.47.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+## [14.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.47.0...@quenty/rxbinderutils@14.47.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.46.0...@quenty/rxbinderutils@14.47.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.45.0...@quenty/rxbinderutils@14.46.0) (2026-09-02)
+
+### Features
+
+- Add RxBinderUtils.observeBoundAncestor<T>() and make sure everything is using binder:ObserveInstance() for performance ([9236c34](https://github.com/Quenty/NevermoreEngine/commit/9236c343fb438d75d29bcfcbaae71025fd344b0e))
+
+# [14.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.44.0...@quenty/rxbinderutils@14.45.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.43.2...@quenty/rxbinderutils@14.44.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+## [14.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.43.1...@quenty/rxbinderutils@14.43.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+## [14.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.43.0...@quenty/rxbinderutils@14.43.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.42.0...@quenty/rxbinderutils@14.43.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.41.0...@quenty/rxbinderutils@14.42.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.40.0...@quenty/rxbinderutils@14.41.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.39.0...@quenty/rxbinderutils@14.40.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.38.0...@quenty/rxbinderutils@14.39.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.37.0...@quenty/rxbinderutils@14.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/rxbinderutils
+
+# [14.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.36.1...@quenty/rxbinderutils@14.37.0) (2026-07-14)
+
+### Bug Fixes
+
+- **rxbinderutils:** launder Rx chain for strict binder observers ([516a304](https://github.com/Quenty/NevermoreEngine/commit/516a3044eb24b38634029af807fb1ecbc18a01e4))
+
 ## [14.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rxbinderutils@14.36.0...@quenty/rxbinderutils@14.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/rxbinderutils

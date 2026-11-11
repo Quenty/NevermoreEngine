@@ -8,9 +8,13 @@
 	@class HumanoidKillerUtils
 ]=]
 
-local HumanoidKillerUtils = {}
+local require = require(script.Parent.loader).load(script)
 
 local Debris = game:GetService("Debris")
+
+local PlayerMock = require("PlayerMock")
+
+local HumanoidKillerUtils = {}
 
 -- For legacy reasons we use creator tag
 local TAG_NAME = "creator"
@@ -36,9 +40,9 @@ end
 	:::
 
 	@param humanoid Humanoid
-	@param attacker Player
+	@param attacker Player | Humanoid
 ]=]
-function HumanoidKillerUtils.tagKiller(humanoid: Humanoid, attacker: Player)
+function HumanoidKillerUtils.tagKiller(humanoid: Humanoid, attacker: Player | Humanoid)
 	assert(typeof(humanoid) == "Instance", "Bad humanoid")
 	assert(typeof(attacker) == "Instance", "Bad attacker")
 
@@ -81,8 +85,9 @@ function HumanoidKillerUtils.getKillerHumanoidOfHumanoid(humanoid: Humanoid): Hu
 		return killer
 	end
 
-	if killer:IsA("Player") then
-		local character = killer.Character
+	if killer:IsA("Player") or PlayerMock.isMock(killer) then
+		local player = killer :: Player
+		local character = if PlayerMock.isMock(player) then PlayerMock.read(player, "Character") else player.Character
 		if character then
 			return character:FindFirstChildWhichIsA("Humanoid")
 		else
@@ -116,7 +121,7 @@ function HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid: Humanoid): Play
 		return nil
 	end
 
-	if not killer:IsA("Player") then
+	if not (killer:IsA("Player") or PlayerMock.isMock(killer)) then
 		return nil
 	end
 
@@ -124,7 +129,7 @@ function HumanoidKillerUtils.getPlayerKillerOfHumanoid(humanoid: Humanoid): Play
 		return nil
 	end
 
-	return killer
+	return killer :: Player
 end
 
 return HumanoidKillerUtils

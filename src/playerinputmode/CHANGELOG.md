@@ -3,6 +3,118 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.54.0...@quenty/playerinputmode@9.54.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.53.2...@quenty/playerinputmode@9.54.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.53.1...@quenty/playerinputmode@9.53.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.53.0...@quenty/playerinputmode@9.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.52.1...@quenty/playerinputmode@9.53.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.52.0...@quenty/playerinputmode@9.52.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.51.0...@quenty/playerinputmode@9.52.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.50.0...@quenty/playerinputmode@9.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.49.2...@quenty/playerinputmode@9.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.49.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.49.1...@quenty/playerinputmode@9.49.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.49.0...@quenty/playerinputmode@9.49.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.48.2...@quenty/playerinputmode@9.49.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.48.1...@quenty/playerinputmode@9.48.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.48.0...@quenty/playerinputmode@9.48.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.47.0...@quenty/playerinputmode@9.48.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.46.0...@quenty/playerinputmode@9.47.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.45.0...@quenty/playerinputmode@9.46.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.44.1...@quenty/playerinputmode@9.45.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.44.0...@quenty/playerinputmode@9.44.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.43.0...@quenty/playerinputmode@9.44.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [9.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.42.0...@quenty/playerinputmode@9.43.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.41.0...@quenty/playerinputmode@9.42.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.40.1...@quenty/playerinputmode@9.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+## [9.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.40.0...@quenty/playerinputmode@9.40.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.39.0...@quenty/playerinputmode@9.40.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/playerinputmode
+
+# [9.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.38.1...@quenty/playerinputmode@9.39.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **playerinputmode:** convert package to --!strict ([06370f9](https://github.com/Quenty/NevermoreEngine/commit/06370f973218d645ea3f60378032e66796340e44))
+
 ## [9.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/playerinputmode@9.38.0...@quenty/playerinputmode@9.38.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/playerinputmode

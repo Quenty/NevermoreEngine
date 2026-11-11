@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "nevermore",
+  "description": "Claude Code plugins for Nevermore Roblox development.",
+  "owner": {
+    "name": "James Onnen (Quenty)",
+    "url": "https://github.com/Quenty"
+  },
+  "plugins": [
+    {
+      "name": "nevermore-claude",
+      "source": "./tools/nevermore-claude",
+      "description": "Ships the strict-typing-luau skill for converting Luau files to --!strict following Nevermore's typing conventions."
+    }
+  ]
+}

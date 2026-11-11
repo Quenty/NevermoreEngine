@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Allows a model to have transparency set locally on the client
 
@@ -62,7 +62,7 @@ function ModelTransparencyEffect.new(
 	self._transparency = AccelTween.new(20)
 	self._transparencyServiceMethodName = transparencyServiceMethodName or ModelTransparencyMode.TRANSPARENCY
 
-	self._startAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update)
+	self._startAnimation, self._maid._stop = StepUtils.bindToRenderStep(self._update :: any)
 
 	return self
 end
@@ -110,7 +110,7 @@ end
 	finish the animation.
 	@param callback function
 ]=]
-function ModelTransparencyEffect.FinishTransparencyAnimation(self: ModelTransparencyEffect, callback)
+function ModelTransparencyEffect.FinishTransparencyAnimation(self: ModelTransparencyEffect, callback: () -> ()): ()
 	self:SetTransparency(0)
 
 	if self._transparency.rtime == 0 then
@@ -156,6 +156,8 @@ function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
 
 	self._parts = {}
 
+	local obj = assert(self._obj, "No obj")
+
 	local transparencyServiceMethod = self._transparencyService[self._transparencyServiceMethodName]
 
 	local function canHide(part: Instance): boolean
@@ -164,11 +166,11 @@ function ModelTransparencyEffect._setupParts(self: ModelTransparencyEffect)
 			else (part:IsA("BasePart") or part:IsA("Decal"))
 	end
 
-	if canHide(self._obj) then
-		self._parts[self._obj] = true
+	if canHide(obj) then
+		self._parts[obj] = true
 	end
 
-	self._maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(self._obj, canHide):Subscribe(function(brio)
+	self._maid:GiveTask(RxInstanceUtils.observeDescendantsBrio(obj, canHide):Subscribe(function(brio)
 		if brio:IsDead() then
 			return
 		end

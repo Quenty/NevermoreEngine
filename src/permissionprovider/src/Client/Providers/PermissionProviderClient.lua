@@ -12,6 +12,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local PermissionProviderConstants = require("PermissionProviderConstants")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local PromiseGetRemoteFunction = require("PromiseGetRemoteFunction")
 
@@ -46,10 +47,15 @@ function PermissionProviderClient.PromiseIsAdmin(
 	self: PermissionProviderClient,
 	player: Player?
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player") or player == nil, "Bad player")
+	assert(
+		typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)) or player == nil,
+		"Bad player"
+	)
 
 	if player ~= nil then
-		assert(player == Players.LocalPlayer, "We only support local player for now")
+		-- Headless (test) sessions have no Players.LocalPlayer; the designated PlayerMock stands in.
+		local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+		assert(player == localPlayer, "We only support local player for now")
 	end
 
 	if player == nil then

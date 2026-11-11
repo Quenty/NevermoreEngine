@@ -25,6 +25,14 @@ describe('StdoutResultReporter', () => {
     expect(logSpy).toHaveBeenNthCalledWith(2, 'name=second');
   });
 
+  it('prints nothing when the result renders empty', () => {
+    const reporter = new StdoutResultReporter<unknown>({ render: () => '' });
+
+    reporter.onResult({});
+
+    expect(logSpy).not.toHaveBeenCalled();
+  });
+
   it('startAsync and stopAsync are no-ops', async () => {
     const reporter = new StdoutResultReporter<unknown>({ render: () => '' });
     await reporter.startAsync();

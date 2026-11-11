@@ -1,6 +1,6 @@
 {
   "name": "@quenty/queue",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Queue class with better performance characteristics than table.remove()",
   "keywords": [
     "Roblox",
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Quenty/NevermoreEngine.git",
-    "directory": "ssrc/queue/"
+    "directory": "src/queue/"
   },
   "funding": {
     "type": "patreon",

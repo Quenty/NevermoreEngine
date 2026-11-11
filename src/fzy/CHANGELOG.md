@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.18.2...@quenty/fzy@5.18.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [5.18.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.18.1...@quenty/fzy@5.18.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/fzy
+
+## [5.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.18.0...@quenty/fzy@5.18.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/fzy
+
+# [5.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.17.1...@quenty/fzy@5.18.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/fzy
+
+## [5.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.17.0...@quenty/fzy@5.17.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/fzy
+
+# [5.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.16.0...@quenty/fzy@5.17.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [5.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.15.1...@quenty/fzy@5.16.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
 ## [5.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.15.0...@quenty/fzy@5.15.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/fzy

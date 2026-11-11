@@ -3,6 +3,126 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.62.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.62.0...@quenty/deathreport@10.62.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.61.3...@quenty/deathreport@10.62.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.61.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.61.2...@quenty/deathreport@10.61.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.61.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.61.1...@quenty/deathreport@10.61.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.61.0...@quenty/deathreport@10.61.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.60.0...@quenty/deathreport@10.61.0) (2026-09-23)
+
+### Bug Fixes
+
+- DeathReport supports player mocks and is strict typed ([1d1b21a](https://github.com/Quenty/NevermoreEngine/commit/1d1b21a01945ddd946cf25333a8591daddc5a939))
+
+# [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.59.1...@quenty/deathreport@10.60.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.59.0...@quenty/deathreport@10.59.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.58.0...@quenty/deathreport@10.59.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.57.0...@quenty/deathreport@10.58.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.56.2...@quenty/deathreport@10.57.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.56.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.56.1...@quenty/deathreport@10.56.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.56.0...@quenty/deathreport@10.56.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.55.2...@quenty/deathreport@10.56.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.55.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.55.1...@quenty/deathreport@10.55.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.55.0...@quenty/deathreport@10.55.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.54.0...@quenty/deathreport@10.55.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.53.0...@quenty/deathreport@10.54.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.52.0...@quenty/deathreport@10.53.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.51.1...@quenty/deathreport@10.52.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.51.0...@quenty/deathreport@10.51.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.50.0...@quenty/deathreport@10.51.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.49.0...@quenty/deathreport@10.50.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.48.0...@quenty/deathreport@10.49.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.47.1...@quenty/deathreport@10.48.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+## [10.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.47.0...@quenty/deathreport@10.47.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.46.0...@quenty/deathreport@10.47.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/deathreport
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.45.0...@quenty/deathreport@10.46.0) (2026-07-14)
+
+### Bug Fixes
+
+- **deathreport:** cast humanoid binder registration for strict PlayerHumanoidBinder ([778aa52](https://github.com/Quenty/NevermoreEngine/commit/778aa52bc206918f38327eaf7669a579aaaccfff))
+
 # [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/deathreport@10.44.1...@quenty/deathreport@10.45.0) (2026-06-24)
 
 ### Features

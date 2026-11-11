@@ -3,6 +3,136 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.68.1...@quenty/humanoidspeed@12.69.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.68.0...@quenty/humanoidspeed@12.68.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.67.3...@quenty/humanoidspeed@12.68.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.67.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.67.2...@quenty/humanoidspeed@12.67.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.67.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.67.1...@quenty/humanoidspeed@12.67.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.67.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.67.0...@quenty/humanoidspeed@12.67.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.66.0...@quenty/humanoidspeed@12.67.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.65.1...@quenty/humanoidspeed@12.66.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.65.0...@quenty/humanoidspeed@12.65.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.64.0...@quenty/humanoidspeed@12.65.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.63.0...@quenty/humanoidspeed@12.64.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.62.1...@quenty/humanoidspeed@12.63.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.62.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.62.0...@quenty/humanoidspeed@12.62.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.61.2...@quenty/humanoidspeed@12.62.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.61.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.61.1...@quenty/humanoidspeed@12.61.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.61.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.61.0...@quenty/humanoidspeed@12.61.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.60.2...@quenty/humanoidspeed@12.61.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.60.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.60.1...@quenty/humanoidspeed@12.60.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.60.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.60.0...@quenty/humanoidspeed@12.60.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.59.0...@quenty/humanoidspeed@12.60.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.58.0...@quenty/humanoidspeed@12.59.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.57.0...@quenty/humanoidspeed@12.58.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.56.1...@quenty/humanoidspeed@12.57.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.56.0...@quenty/humanoidspeed@12.56.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.55.0...@quenty/humanoidspeed@12.56.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.54.0...@quenty/humanoidspeed@12.55.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.53.0...@quenty/humanoidspeed@12.54.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.52.0...@quenty/humanoidspeed@12.53.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.51.1...@quenty/humanoidspeed@12.52.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+## [12.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.51.0...@quenty/humanoidspeed@12.51.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.50.0...@quenty/humanoidspeed@12.51.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/humanoidspeed
+
+# [12.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.1...@quenty/humanoidspeed@12.50.0) (2026-07-14)
+
+### Features
+
+- **humanoidspeed:** convert package to --!strict ([b37508d](https://github.com/Quenty/NevermoreEngine/commit/b37508dde19f2d8191e28a1e4d44bf09ffe63319))
+
 ## [12.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoidspeed@12.49.0...@quenty/humanoidspeed@12.49.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/humanoidspeed

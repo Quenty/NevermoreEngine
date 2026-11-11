@@ -1,0 +1,295 @@
+---
+title: CLI Reference
+sidebar_position: 4
+---
+
+import TOCInline from '@theme/TOCInline';
+
+# The `nevermore` CLI
+
+`nevermore` is the command-line tool that drives the Nevermore workflow: scaffolding new games and packages, installing dependencies, running tests, and deploying places to Roblox via the [Open Cloud API](https://create.roblox.com/docs/cloud). This page is the command reference. For the two deep workflows it links out to their own guides — [Deploying with the CLI](deploy.md) and [Test Infrastructure](testing/testing.md).
+
+## Installing the CLI
+
+You don't have to install anything to use it once — `npx` fetches and runs the latest version:
+
+```bash
+npx nevermore init
+```
+
+For day-to-day work, install it globally so `nevermore` is always on your `PATH`:
+
+```bash
+npm install -g @quenty/nevermore-cli
+```
+
+The CLI needs [Node.js](https://nodejs.org/en/download/) v18+. Most commands also expect the Luau toolchain (rojo, aftman) to be available — see [Install](install.md) for the full environment setup.
+
+## Getting help
+
+Every command and subcommand responds to `--help`, and the listing is generated from the CLI itself, so it never drifts from the installed version:
+
+```bash
+nevermore --help                # top-level commands
+nevermore deploy --help         # a command and its subcommands
+nevermore deploy init --help    # a specific subcommand's flags
+nevermore --version             # installed version (and update check)
+```
+
+## Command overview
+
+<TOCInline toc={toc.filter((node) => node.level === 3)} />
+
+At a glance:
+
+```
+nevermore
+├── init [name]              scaffold a game (default), package, or plugin
+│   ├── game [name]
+│   ├── package [name] [description] [template]
+│   └── plugin [name]
+├── install [packages..]     install @quenty/* packages from npm   (alias: i)
+├── login                    store a Roblox Open Cloud API key
+├── test                     test a single package
+├── deploy [target]          build and upload a place
+│   ├── init                 create deploy.nevermore.json
+│   ├── version              manage pinned base place versions
+│   ├── asset upload         upload images, models, audio as assets
+│   └── run [target]         deploy a target                        (default)
+├── batch <subcommand>       run across many packages (change detection)
+│   ├── test
+│   └── deploy
+└── tools <subcommand>       internal CI utilities
+```
+
+## Global options
+
+These apply to every command:
+
+| Flag | Description |
+|------|-------------|
+| `--yes` | Never prompt; fail instead of asking. Use in CI and scripts. |
+| `--dryrun` | Describe what would happen without touching the file system or Roblox. Exception: `--watch` registration still runs for real, since it has no deploy side effects and that is how you test it. |
+| `--verbose` | Show intermediate output (building, uploading, credential loading). Also disables the live spinner in favor of plain, scrollable logs. |
+| `--frozen-lockfile` | Fail instead of resolving a base place version that `deploy.nevermore.lock.json` doesn't already pin. Off by default, including in CI. See [The lock file](deploy.md#the-lock-file). |
+| `--refresh-base-place` | Re-resolve `"saved"`/`"published"` base place pins instead of reusing the locked version, and write the result back. Required in watch-triggered builds, which would otherwise rebuild the version they already shipped. Rejected alongside `--frozen-lockfile`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--help` | Show help for the current command. |
+| `--version` | Print the installed CLI version. |
+
+### `nevermore init`
+
+Scaffolds a new project from a template. The type is a subcommand; if you omit it, `init` scaffolds a **game**.
+
+```bash
+nevermore init                     # scaffold a game in the current directory
+nevermore init MyGame              # same, named "MyGame" (game is the default)
+nevermore init game MyGame         # explicit game
+nevermore init package brio "Lifecycle-scoped values"
+nevermore init plugin MyPlugin
+```
+
+| Subcommand | What it creates |
+|------------|-----------------|
+| `game [game-name]` | A working Nevermore game: `default.project.json`, server/client entry scripts, and the default packages (`loader`, `servicebag`, `binder`, `clienttranslator`, `cmdrservice`). |
+| `package [package-name] [description] [package-template]` | A new package inside a monorepo. `package-template` is `library` (default) or `service`. |
+| `plugin [plugin-name]` | A Roblox Studio plugin wired up with `loader` and `servicebag`. |
+
+Notes:
+
+- Positional arguments are optional. When omitted, the name defaults to the current directory (and, for `package`, `description` and the name fall back to an existing `package.json`). Run without arguments inside a package to fill in missing standard files.
+- `game` and `plugin` also run the toolchain bootstrap after scaffolding: `pnpm install`, `git init`, `aftman install`, `npm run format`, and `selene generate-roblox-std`. Missing tools are reported but don't abort the scaffold.
+- `--dryrun` previews the files that would be written.
+
+:::note Back-compat aliases
+`nevermore init-package` and `nevermore init-plugin` (hyphenated) still work as hidden back-compat aliases, but the subcommand forms `nevermore init package` and `nevermore init plugin` are canonical. Prefer them.
+:::
+
+### `nevermore install`
+
+Installs one or more Nevermore packages from npm. Names are given **without** the `@quenty/` scope — the CLI adds it and checks each name against the registry before installing. Alias: `i`.
+
+```bash
+nevermore install maid
+nevermore install maid rx blend
+nevermore i servicebag                        # short alias
+nevermore i blend --package-manager pnpm      # force a package manager
+```
+
+The install runs through the package manager the project already uses, detected by walking up from the current directory: a `packageManager` field in `package.json` first, then a lockfile (`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `bun.lock`, `yarn.lock`, `package-lock.json`). A directory that declares neither gets pnpm, which is what the game and plugin templates set up. Everything except npm gets `add` rather than `install`, since a bare `install` there means "install the lockfile" and wouldn't record the new dependency. Use `--package-manager` to override the detection.
+
+Installing by hand works too — `pnpm add @quenty/maid`. Reach for `npm install` only in a project that is actually npm-managed; inside a pnpm project it can fail outright, see [gotchas/tooling.md](gotchas/tooling.md).
+
+### `nevermore login`
+
+Stores a Roblox Open Cloud API key so `test --cloud` and `deploy` can authenticate. Prompts interactively (masked input) unless you pass `--api-key`. The key is validated before it's saved to `~/.nevermore/credentials.json`.
+
+```bash
+nevermore login                   # prompt for a key, validate, and store it
+nevermore login --api-key <key>   # non-interactive
+nevermore login --status          # show what's loaded and re-validate it
+nevermore login --force           # replace an existing key
+nevermore login --clear           # remove the stored key
+```
+
+| Flag | Description |
+|------|-------------|
+| `--api-key <key>` | Provide the key directly instead of being prompted. |
+| `--status` | Report the active credential source (flag, env var, or stored file) and validate it. |
+| `--force` | Overwrite an existing key rather than reporting "already logged in". |
+| `--clear` | Delete the stored credentials. |
+
+Credentials can also come from the `ROBLOX_OPEN_CLOUD_API_KEY` environment variable (preferred in CI) — see [Deploying → Credentials](deploy.md) for the full resolution order.
+
+### `nevermore test`
+
+Runs the test target for the package in the current directory. Reads the `test` target from `deploy.nevermore.json`. Runs locally by default; pass `--cloud` to run through Open Cloud. See [Test Infrastructure](testing/testing.md) for the full guide.
+
+```bash
+nevermore test                                        # run locally
+nevermore test --cloud                                # run via Open Cloud
+nevermore test --cloud --logs                         # include execution logs
+nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to debug
+nevermore test --cloud --script-file probe.lua         # the same, from a file
+```
+
+| Flag | Description |
+|------|-------------|
+| `--cloud` | Run via Open Cloud instead of locally. |
+| `--api-key <key>` | Open Cloud API key (`--cloud` only). Otherwise resolved from login/env. |
+| `--logs` | Show execution logs even on success. On by default with `--script-text` and `--script-file`; pass `--no-logs` to suppress. |
+| `--universe-id <id>` / `--place-id <id>` | Override the IDs from `deploy.nevermore.json` (`--cloud` only). |
+| `--script-template <path>` | Override the Luau script template to execute. |
+| `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging; implies `--logs`. |
+| `--script-file <path>` | Like `--script-text`, read from a file, for scripts too long for the command line. Open Cloud refuses scripts over 4 MB. |
+| `--output <file>` | Write JSON results to a file. |
+| `--timeout <seconds>` | Max execution time, sent to Open Cloud so Roblox cancels server-side on overrun (default: 120). |
+
+Engine logs are echoed with jest-lua's own colour codes, which the CLI's formatter
+never sees. Set `NO_COLOR=1` to strip them when you intend to grep the output.
+
+### `nevermore deploy`
+
+Builds a Rojo project and uploads it to a Roblox place. `run` is the default subcommand, so `nevermore deploy` and `nevermore deploy <target>` both deploy. Full walkthrough in [Deploying with the CLI](deploy.md).
+
+```bash
+nevermore deploy init                    # create deploy.nevermore.json (interactive)
+nevermore deploy run                     # build + upload, saved (not live)
+nevermore deploy run --publish           # build + upload and publish live
+nevermore deploy production --publish    # 'run' is implied; deploy the 'production' target
+nevermore deploy version upgrade         # re-pin base place versions to latest
+nevermore deploy asset upload icon.png   # upload a file as an asset, print its id
+```
+
+**`nevermore deploy init`** — writes a `deploy.nevermore.json` for the current package.
+
+| Flag | Description |
+|------|-------------|
+| `--universe-id <id>` / `--place-id <id>` | Roblox IDs to write into the config. |
+| `--target <name>` | Deploy target name (auto-detects `test` or `integration` if omitted). |
+| `--project <path>` | Rojo project file, relative to the package. |
+| `--script-template <path>` | Luau script `nevermore test` will execute after upload. |
+| `--create-place` | Auto-create a new place in the universe (uses cookie auth). |
+| `--force` | Overwrite an existing `deploy.nevermore.json`. |
+
+**`nevermore deploy run [target]`** — builds and uploads a target. Defaults to the only target if there's one, otherwise `test`. `target` may narrow to one place of a multi-place target with the `<target>.places.<place>` form (e.g. `integration.places.hub`).
+
+| Flag | Description |
+|------|-------------|
+| `--publish` | Publish the place live. Without it, the upload is *Saved* (draft) only. |
+| `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
+| `--universe-id <id>` / `--place-id <id>` | Override config IDs (single-place targets only). |
+| `--place-file <path>` | Upload a pre-built `.rbxl` instead of building via rojo (single-place targets only). |
+| `--output <file>` | Write JSON results to a file. |
+| `--logs` | Show build/upload logs even on success. |
+| `--watch <url>` | After a successful deploy: on GitHub Actions, register a watch so the target rebuilds when its base place changes; locally, hold a stream (or poll) and rebuild in place until Ctrl-C. Takes the register endpoint URL, ending in the lease — `https://<watch-service>/v1/register/7d`. Monitor name is `<package>/<target>/<ref>`. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-mode <auto\|dispatch\|notify>` | Which of those two `--watch` does. Defaults to `auto`, which detects GitHub Actions. Pass `dispatch` in any other automated context — detection reads it as local, and notifying there holds a stream forever. |
+| `--watch-use-gh-auth` | Let the GitHub CLI supply the watch token when no environment variable does. Off by default — registering sends the token to the watch service. |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll a private base place. Off by default. |
+
+**`nevermore deploy version upgrade [target]`** — rolls every `basePlace` forward, so deploys pull a fixed, git-tracked base place instead of whatever is live. Numeric (and unpinned) base places are re-pinned in `deploy.nevermore.json`; base places tracking `"saved"` or `"published"` have their resolved version rewritten in `deploy.nevermore.lock.json` instead. Without a target it walks every target and prunes unreferenced lock entries. See [Pinning base place versions](deploy.md#pinning-base-place-versions).
+
+| Flag | Description |
+|------|-------------|
+| `--dryrun` | Print the old → new version table without writing. |
+| `--yes` | Skip the confirmation prompt (for scripting/CI). |
+| `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
+
+**`nevermore deploy version promote <from> <to>`** — copies base-place version pins from one target to another (e.g. promote validated `production-demo` pins to `production`). Places are matched by base place id, so content lines up even when the targets name their places differently. Pure config edit — no network. Supports `--dryrun` and `--yes`. See [Promoting pins between targets](deploy.md#promoting-pins-between-targets).
+
+**`nevermore deploy asset upload <files..>`** — uploads each file as a Roblox asset and prints the id it was given. Needs no flags: the asset type comes from the file extension, the name from the file name, and the owner from the surrounding project or the API key. See [Uploading assets](deploy.md#uploading-assets).
+
+| Flag | Description |
+|------|-------------|
+| `--user-id <id>` / `--group-id <id>` | Who owns the new assets. Defaults to the owner of the universe in the nearest `deploy.nevermore.json`, else the user the API key belongs to. |
+| `--type <type>` | Asset type, where the extension allows more than one: an image is an `Image` unless told `Decal`, an `.rbxm` a `Model` unless told `Animation`. |
+| `--name <name>` | Display name (single file only). Defaults to the file name without its extension. |
+| `--description <text>` | Description. Defaults to the display name. |
+| `--asset-id <id>` | Replace this existing asset instead of creating one, keeping its id. Single `Model` file only. |
+| `--output <file>` | Write JSON results to a file. |
+| `--timeout <seconds>` | How long to wait for Roblox to finish importing each file (default: 300). |
+| `--dryrun` | Print what would be uploaded, after checking every file, without uploading. |
+| `--api-key <key>` | Open Cloud API key. Otherwise resolved from login/env. |
+
+### `nevermore batch`
+
+Runs `test` or `deploy` across many packages at once, using git change detection so PRs only touch what changed. Scans the pnpm workspace for packages with a matching deploy target. See [Test Infrastructure](testing/testing.md) and [Deploying](deploy.md) for how targets are configured.
+
+```bash
+nevermore batch test                       # test packages changed since origin/main
+nevermore batch test --all                 # test every package with a test target
+nevermore batch test --cloud --concurrency 3
+nevermore batch deploy --all --publish     # deploy + publish everything
+```
+
+**`nevermore batch test`**
+
+| Flag | Description |
+|------|-------------|
+| `--cloud` | Run via Open Cloud instead of locally. |
+| `--all` | Test every package with a test target, not just changed ones. |
+| `--base <ref>` | Git ref to diff against for change detection (default: `origin/main`). |
+| `--concurrency <n>` | Max parallel tests (`0` = unlimited, the default). |
+| `--aggregated` | Build all packages into a single place and run one batch script (default: **on**). Each test place carries its own copy of its dependencies, so the combined place repeats the same modules many times; uploads are recompressed (zstd, long window) to store each repeat once, which takes a 69-package batch from 196 MB to 6 MB. If a recompressed place is still over the size budget, the batch is split into several places that upload and run in parallel. Local runs upload nothing and stay one place. |
+| `--max-place-mb <n>` | Size budget for one combined place, as uploaded, before the batch splits (default: `90` with `--cloud`, unlimited locally; `--aggregated` only). Open Cloud rejects place uploads over 150 MB. |
+| `--batch-place-id <id>` / `--batch-universe-id <id>` | Override IDs for the aggregated upload (`--aggregated` only). |
+| `--limit <n>` | Cap the number of packages (local debugging). |
+| `--logs` | Show execution logs for every package, not just failures. |
+| `--output <file>` | Write JSON results to a file. |
+| `--api-key <key>` | Open Cloud API key (`--cloud` only). |
+| `--timeout <seconds>` | Max execution time for the whole batch, sent to Open Cloud (default: 300, the API max). |
+
+**`nevermore batch deploy`**
+
+| Flag | Description |
+|------|-------------|
+| `--target <name>` | Deploy target name in `deploy.nevermore.json` (default: `test`). |
+| `--publish` | Publish the places live (default: Saved). |
+| `--all` | Deploy every package with the target, not just changed ones. |
+| `--base <ref>` | Git ref to diff against (default: `origin/main`). |
+| `--concurrency <n>` | Max parallel deploys (default: 3). |
+| `--smoke-test` | After deploying targets with a `basePlace`, run server scripts via Open Cloud and fail on boot errors. |
+| `--limit <n>` | Cap the number of packages (debugging). |
+| `--logs` | Show build/upload logs for every package. |
+| `--output <file>` | Write JSON results to a file. |
+| `--api-key <key>` | Open Cloud API key. |
+| `--watch <url>` | After deploying, register one monitor per package — `<package>/<target>/<ref>`, the same name `deploy run --watch` uses — covering **every** package with that target, not just the changed ones, since a re-apply replaces a monitor's whole list. Registers even when nothing changed, so the lease doesn't lapse. See [Rebuilding when the base place changes](deploy.md#rebuilding-when-the-base-place-changes). |
+| `--watch-share-api-key` | Share the Open Cloud key with the watch service so it can poll private base places. Off by default. |
+
+### `nevermore tools`
+
+Internal tooling and CI utilities. You rarely run these by hand — they're wired into GitHub Actions workflows — but they're documented here for completeness.
+
+| Subcommand | Purpose |
+|------------|---------|
+| `post-test-results <input>` | Post test results as a PR comment (requires `GITHUB_TOKEN` and CI context). |
+| `post-deploy-results <input>` | Post deploy results as a PR comment (requires `GITHUB_TOKEN` and CI context). |
+| `post-lint-results <input>` | Parse linter output and emit GitHub Actions annotations (requires CI context). |
+| `download-roblox-types [file-name]` | Download the Roblox Luau type definitions. |
+| `strip-sourcemap-jest` | Remove Jest nodes from `sourcemap.json` to avoid luau-lsp name conflicts. |
+
+## See also
+
+- [Install](install.md) — Setting up Node, Rojo, the toolchain, and scaffolding your first project.
+- [Deploying with the CLI](deploy.md) — The full `deploy` / `login` workflow, config schema, and credentials.
+- [Test Infrastructure](testing/testing.md) — Configuring test targets, credentials, and CI.
+- [TypeScript Conventions](conventions/typescript.md) — How the CLI itself is built (for contributors).

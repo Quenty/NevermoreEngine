@@ -3,6 +3,167 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.74.1...@quenty/ik@15.75.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.74.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.74.0...@quenty/ik@15.74.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [15.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.73.3...@quenty/ik@15.74.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.73.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.73.2...@quenty/ik@15.73.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.73.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.73.1...@quenty/ik@15.73.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.73.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.73.0...@quenty/ik@15.73.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.72.0...@quenty/ik@15.73.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.71.0...@quenty/ik@15.72.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.70.1...@quenty/ik@15.71.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.70.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.70.0...@quenty/ik@15.70.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.69.0...@quenty/ik@15.70.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.68.0...@quenty/ik@15.69.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.67.1...@quenty/ik@15.68.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.67.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.67.0...@quenty/ik@15.67.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.66.1...@quenty/ik@15.67.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.66.0...@quenty/ik@15.66.1) (2026-08-14)
+
+### Bug Fixes
+
+- **ragdoll:** Clean up previous motor state when ragdoll inputs change ([9731cf7](https://github.com/Quenty/NevermoreEngine/commit/9731cf70a88f3924a5232c21aacc0ffc40b61826))
+
+# [15.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.65.2...@quenty/ik@15.66.0) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.65.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.65.1...@quenty/ik@15.65.2) (2026-08-12)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.65.0...@quenty/ik@15.65.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.64.2...@quenty/ik@15.65.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.64.1...@quenty/ik@15.64.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.64.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.64.0...@quenty/ik@15.64.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.63.0...@quenty/ik@15.64.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.62.0...@quenty/ik@15.63.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.61.0...@quenty/ik@15.62.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.60.1...@quenty/ik@15.61.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.60.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.60.0...@quenty/ik@15.60.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.59.0...@quenty/ik@15.60.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.58.0...@quenty/ik@15.59.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.57.0...@quenty/ik@15.58.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.56.0...@quenty/ik@15.57.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [15.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.2...@quenty/ik@15.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.55.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.1...@quenty/ik@15.55.2) (2026-07-17)
+
+**Note:** Version bump only for package @quenty/ik
+
+## [15.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.55.0...@quenty/ik@15.55.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.54.0...@quenty/ik@15.55.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ik
+
+# [15.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.53.0...@quenty/ik@15.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ik:** convert package to --!strict ([8728c25](https://github.com/Quenty/NevermoreEngine/commit/8728c25c8bcead4107630e2edd8d2cd7d1d06d65))
+
+# [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.52.1...@quenty/ik@15.53.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/ik
+
 ## [15.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ik@15.52.0...@quenty/ik@15.52.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/ik

@@ -26,6 +26,7 @@ export type PlayerAssetMarketTracker =
 	typeof(setmetatable(
 		{} :: {
 			_assetType: GameConfigAssetTypes.GameConfigAssetType,
+			_promptable: boolean,
 			_convertIds: (string | number) -> number?,
 			_observeIdsBrio: (string | number) -> Observable.Observable<Brio.Brio<number>>,
 			_pendingPurchasePromises: { Promise.Promise<boolean> },
@@ -51,18 +52,22 @@ export type PlayerAssetMarketTracker =
 	@param assetType GameConfigAssetTypes
 	@param convertIds function
 	@param observeIdsBrio function
+	@param promptable boolean? -- Defaults to true. When false, [PlayerAssetMarketTracker.PromisePromptPurchase] rejects instead of prompting. Used for asset types like games that cannot be prompted in-experience.
 	@return PlayerAssetMarketTracker
 ]=]
 function PlayerAssetMarketTracker.new(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	convertIds,
-	observeIdsBrio
+	observeIdsBrio,
+	promptable: boolean?
 ): PlayerAssetMarketTracker
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(promptable) == "boolean" or promptable == nil, "Bad promptable")
 
 	local self: PlayerAssetMarketTracker = setmetatable(BaseObject.new() :: any, PlayerAssetMarketTracker)
 
 	self._assetType = assert(assetType, "No assetType")
+	self._promptable = promptable ~= false
 	self._convertIds = assert(convertIds, "No convertIds")
 	self._observeIdsBrio = assert(observeIdsBrio, "No observeIdsBrio")
 
@@ -187,6 +192,15 @@ function PlayerAssetMarketTracker.PromisePromptPurchase(
 ): Promise.Promise<boolean>
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
+	if not self._promptable then
+		return Promise.rejected(
+			string.format(
+				"[PlayerAssetMarketTracker.PromisePromptPurchase] - The %s asset type cannot be prompted for purchase in-experience. Use ownership checks instead.",
+				tostring(self._assetType)
+			)
+		)
+	end
+
 	local id = self._convertIds(idOrKey)
 	if not id then
 		return Promise.rejected(
@@ -292,6 +306,16 @@ end
 ]=]
 function PlayerAssetMarketTracker.GetAssetType(self: PlayerAssetMarketTracker): GameConfigAssetTypes.GameConfigAssetType
 	return self._assetType
+end
+
+--[=[
+	Returns whether this asset type can be prompted for purchase in-experience. When
+	false, [PlayerAssetMarketTracker.PromisePromptPurchase] rejects.
+
+	@return boolean
+]=]
+function PlayerAssetMarketTracker.IsPromptable(self: PlayerAssetMarketTracker): boolean
+	return self._promptable
 end
 
 --[=[

@@ -3,6 +3,192 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.76.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.76.0...@quenty/chatproviderservice@9.76.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.76.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.75.1...@quenty/chatproviderservice@9.76.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.75.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.75.0...@quenty/chatproviderservice@9.75.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [9.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.74.3...@quenty/chatproviderservice@9.75.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.74.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.74.2...@quenty/chatproviderservice@9.74.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.74.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.74.1...@quenty/chatproviderservice@9.74.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.74.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.74.0...@quenty/chatproviderservice@9.74.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.73.0...@quenty/chatproviderservice@9.74.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.72.1...@quenty/chatproviderservice@9.73.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.72.0...@quenty/chatproviderservice@9.72.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.71.0...@quenty/chatproviderservice@9.72.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.70.0...@quenty/chatproviderservice@9.71.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.69.1...@quenty/chatproviderservice@9.70.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.69.0...@quenty/chatproviderservice@9.69.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.68.1...@quenty/chatproviderservice@9.69.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.68.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.68.0...@quenty/chatproviderservice@9.68.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.8...@quenty/chatproviderservice@9.68.0) (2026-08-13)
+
+### Features
+
+- Fix a lot of cmdr issues ([05b6025](https://github.com/Quenty/NevermoreEngine/commit/05b60255c6f436872895e8d9398fed12dd3ab1d5))
+
+## [9.67.8](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.7...@quenty/chatproviderservice@9.67.8) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.6...@quenty/chatproviderservice@9.67.7) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.5...@quenty/chatproviderservice@9.67.6) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.4...@quenty/chatproviderservice@9.67.5) (2026-07-30)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.3...@quenty/chatproviderservice@9.67.4) (2026-07-29)
+
+### Bug Fixes
+
+- **chatproviderservice:** let a PlayerMock be chat tagged ([#776](https://github.com/Quenty/NevermoreEngine/issues/776)) ([7d1843b](https://github.com/Quenty/NevermoreEngine/commit/7d1843b24225a3d3e2f70c2743688b28a0e2acb4))
+
+## [9.67.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.2...@quenty/chatproviderservice@9.67.3) (2026-07-29)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.1...@quenty/chatproviderservice@9.67.2) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.67.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.67.0...@quenty/chatproviderservice@9.67.1) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.66.2...@quenty/chatproviderservice@9.67.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.66.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.66.1...@quenty/chatproviderservice@9.66.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.66.0...@quenty/chatproviderservice@9.66.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.65.0...@quenty/chatproviderservice@9.66.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.64.0...@quenty/chatproviderservice@9.65.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.63.0...@quenty/chatproviderservice@9.64.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.62.1...@quenty/chatproviderservice@9.63.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.62.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.62.0...@quenty/chatproviderservice@9.62.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.61.0...@quenty/chatproviderservice@9.62.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.60.0...@quenty/chatproviderservice@9.61.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.59.0...@quenty/chatproviderservice@9.60.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.58.0...@quenty/chatproviderservice@9.59.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.57.0...@quenty/chatproviderservice@9.58.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.56.0...@quenty/chatproviderservice@9.57.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [9.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.55.1...@quenty/chatproviderservice@9.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+## [9.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.55.0...@quenty/chatproviderservice@9.55.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.54.0...@quenty/chatproviderservice@9.55.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/chatproviderservice
+
+# [9.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.53.0...@quenty/chatproviderservice@9.54.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **chatproviderservice:** convert package to --!strict ([3edae04](https://github.com/Quenty/NevermoreEngine/commit/3edae04e44a9bcda2cf43367719d67fb08769fa4))
+
 # [9.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/chatproviderservice@9.52.2...@quenty/chatproviderservice@9.53.0) (2026-06-24)
 
 ### Features

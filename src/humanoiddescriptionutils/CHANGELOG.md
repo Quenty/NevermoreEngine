@@ -3,6 +3,90 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.31.0...@quenty/humanoiddescriptionutils@10.31.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.30.2...@quenty/humanoiddescriptionutils@10.31.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.30.1...@quenty/humanoiddescriptionutils@10.30.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.30.0...@quenty/humanoiddescriptionutils@10.30.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.29.1...@quenty/humanoiddescriptionutils@10.30.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.29.0...@quenty/humanoiddescriptionutils@10.29.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.28.0...@quenty/humanoiddescriptionutils@10.29.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.27.0...@quenty/humanoiddescriptionutils@10.28.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.26.1...@quenty/humanoiddescriptionutils@10.27.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.26.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.26.0...@quenty/humanoiddescriptionutils@10.26.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.25.2...@quenty/humanoiddescriptionutils@10.26.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.25.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.25.1...@quenty/humanoiddescriptionutils@10.25.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.25.0...@quenty/humanoiddescriptionutils@10.25.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.24.0...@quenty/humanoiddescriptionutils@10.25.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.23.0...@quenty/humanoiddescriptionutils@10.24.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.22.0...@quenty/humanoiddescriptionutils@10.23.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.21.1...@quenty/humanoiddescriptionutils@10.22.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+## [10.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.21.0...@quenty/humanoiddescriptionutils@10.21.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.20.0...@quenty/humanoiddescriptionutils@10.21.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.19.0...@quenty/humanoiddescriptionutils@10.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
+# [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.18.1...@quenty/humanoiddescriptionutils@10.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/humanoiddescriptionutils
+
 ## [10.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/humanoiddescriptionutils@10.18.0...@quenty/humanoiddescriptionutils@10.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/humanoiddescriptionutils

@@ -3,6 +3,118 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.54.1...@quenty/adorneeboundingbox@8.55.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.54.0...@quenty/adorneeboundingbox@8.54.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [8.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.53.2...@quenty/adorneeboundingbox@8.54.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.53.1...@quenty/adorneeboundingbox@8.53.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.53.0...@quenty/adorneeboundingbox@8.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.52.0...@quenty/adorneeboundingbox@8.53.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.51.1...@quenty/adorneeboundingbox@8.52.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.51.0...@quenty/adorneeboundingbox@8.51.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.50.0...@quenty/adorneeboundingbox@8.51.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.49.0...@quenty/adorneeboundingbox@8.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.48.1...@quenty/adorneeboundingbox@8.49.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.48.0...@quenty/adorneeboundingbox@8.48.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.47.2...@quenty/adorneeboundingbox@8.48.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.47.1...@quenty/adorneeboundingbox@8.47.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.47.0...@quenty/adorneeboundingbox@8.47.1) (2026-08-12)
+
+### Bug Fixes
+
+- A series of misc fixes + upgrade rojo ([#798](https://github.com/Quenty/NevermoreEngine/issues/798)) ([33d83e2](https://github.com/Quenty/NevermoreEngine/commit/33d83e26a384a17ee58b12f367890a63c73e8432))
+
+# [8.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.46.2...@quenty/adorneeboundingbox@8.47.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.46.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.46.1...@quenty/adorneeboundingbox@8.46.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.46.0...@quenty/adorneeboundingbox@8.46.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.45.0...@quenty/adorneeboundingbox@8.46.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.44.0...@quenty/adorneeboundingbox@8.45.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.43.0...@quenty/adorneeboundingbox@8.44.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.42.1...@quenty/adorneeboundingbox@8.43.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+## [8.42.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.42.0...@quenty/adorneeboundingbox@8.42.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.41.0...@quenty/adorneeboundingbox@8.42.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.40.0...@quenty/adorneeboundingbox@8.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.39.0...@quenty/adorneeboundingbox@8.40.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
+# [8.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.38.1...@quenty/adorneeboundingbox@8.39.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/adorneeboundingbox
+
 ## [8.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/adorneeboundingbox@8.38.0...@quenty/adorneeboundingbox@8.38.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/adorneeboundingbox

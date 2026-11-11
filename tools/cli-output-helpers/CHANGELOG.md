@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.1...@quenty/cli-output-helpers@1.20.0) (2026-11-03)
+
+### Features
+
+- **nevermore-cli:** run cloud tests for PRs from forks ([#855](https://github.com/Quenty/NevermoreEngine/issues/855)) ([5408e3d](https://github.com/Quenty/NevermoreEngine/commit/5408e3d52f31e1499afaa08ed79dfbeb42515b02))
+
+## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.0...@quenty/cli-output-helpers@1.19.1) (2026-11-02)
+
+### Bug Fixes
+
+- **nevermore-cli:** resolve test failure annotations to real files ([#853](https://github.com/Quenty/NevermoreEngine/issues/853)) ([aa52794](https://github.com/Quenty/NevermoreEngine/commit/aa5279471baa0877e72b6ee75d89f722a5dc5505))
+
+# [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.18.0...@quenty/cli-output-helpers@1.19.0) (2026-10-28)
+
+### Features
+
+- **studio-bridge:** multiplayer playtests, Studio launching, search, and CLI fixes ([#851](https://github.com/Quenty/NevermoreEngine/issues/851)) ([e63f878](https://github.com/Quenty/NevermoreEngine/commit/e63f878764807773d1bb1bf96d582d6e6640af88))
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.17.2...@quenty/cli-output-helpers@1.18.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/cli-output-helpers
+
+## [1.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.17.1...@quenty/cli-output-helpers@1.17.2) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/cli-output-helpers
+
+## [1.17.1](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.17.0...@quenty/cli-output-helpers@1.17.1) (2026-07-29)
+
+### Bug Fixes
+
+- **cli:** stop reporting a test pass that no test output backs ([#771](https://github.com/Quenty/Nevermore/issues/771)) ([5074ac0](https://github.com/Quenty/Nevermore/commit/5074ac0bdec6f075a562e9486b1e578d07fb018e))
+
 # [1.17.0](https://github.com/Quenty/Nevermore/compare/@quenty/cli-output-helpers@1.16.0...@quenty/cli-output-helpers@1.17.0) (2026-05-26)
 
 ### Bug Fixes

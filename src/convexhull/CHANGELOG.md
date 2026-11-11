@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.19.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.19.2...@quenty/convexhull@4.19.3) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+## [4.19.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.19.1...@quenty/convexhull@4.19.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+## [4.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.19.0...@quenty/convexhull@4.19.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+# [4.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.18.0...@quenty/convexhull@4.19.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+# [4.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.17.2...@quenty/convexhull@4.18.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+## [4.17.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.17.1...@quenty/convexhull@4.17.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+## [4.17.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.17.0...@quenty/convexhull@4.17.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+# [4.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.16.0...@quenty/convexhull@4.17.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/convexhull
+
+# [4.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.15.1...@quenty/convexhull@4.16.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/convexhull
+
 ## [4.15.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/convexhull@4.15.0...@quenty/convexhull@4.15.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/convexhull

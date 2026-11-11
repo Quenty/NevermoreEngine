@@ -188,7 +188,8 @@ end
 
 --[=[
 	Yields until the promise is complete, and errors if an error
-	exists, otherwise returns the fulfilled results.
+	exists, otherwise returns the fulfilled results. Raising the rejection to the caller consumes it —
+	no uncaught-exception warning fires for a rejection surfaced here.
 
 	@yields
 	@return T
@@ -197,6 +198,7 @@ function Promise.Wait<T...>(self: Promise<T...>): T...
 	if self._fulfilled then
 		return table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
+		self._unconsumedException = false
 		error(tostring(self._rejected[1]), 2)
 	else
 		local waitingCoroutine = coroutine.running()
@@ -227,7 +229,8 @@ end
 
 --[=[
 	Yields until the promise is complete, then returns a boolean indicating
-	the result, followed by the values from the promise.
+	the result, followed by the values from the promise. Reading the outcome consumes a rejection — the
+	caller has inspected it, so no uncaught-exception warning fires for it.
 
 	@yields
 	@return boolean, T
@@ -236,6 +239,7 @@ function Promise.Yield<T...>(self: Promise<T...>): (boolean, T...)
 	if self._fulfilled then
 		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)
 	elseif self._rejected then
+		self._unconsumedException = false
 		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	else
 		local waitingCoroutine = coroutine.running()
@@ -346,7 +350,7 @@ function Promise.Reject<T...>(self: Promise<T...>, ...: any): ()
 	self:_reject(table.pack(...))
 end
 
-function Promise._reject<T...>(self: Promise<T...>, values: { any }): ()
+function Promise._reject<T...>(self: Promise<T...>, values: { n: number, [number]: any }): ()
 	if not self._pendingExecuteList then
 		return
 	end
@@ -360,7 +364,7 @@ function Promise._reject<T...>(self: Promise<T...>, values: { any }): ()
 	end
 
 	-- Check for uncaught exceptions
-	if self._unconsumedException and self._rejected.n > 0 then
+	if self._unconsumedException and self:_isReportableRejection(values) then
 		task.defer(function()
 			-- Yield to end of frame, giving control back to Roblox.
 			-- This is the equivalent of giving something back to a task manager.
@@ -379,10 +383,29 @@ function Promise._reject<T...>(self: Promise<T...>, values: { any }): ()
 	end
 end
 
+-- A rejection is only worth reporting if it carries information. Rejecting with no values at all
+-- (what Destroy() and cancellation produce), with values that are all nil, or with a single empty
+-- table (aggregators may reject with an empty results table) says nothing a warning could relay.
+function Promise._isReportableRejection<T...>(_self: Promise<T...>, values: { n: number, [number]: any }): boolean
+	if values.n == 1 and type(values[1]) == "table" and next(values[1]) == nil then
+		return false
+	end
+
+	for index = 1, values.n do
+		if values[index] ~= nil then
+			return true
+		end
+	end
+
+	return false
+end
+
 function Promise._toHumanReadable<T...>(_self: Promise<T...>, data: any): string
 	if type(data) == "table" then
+		-- A custom __tostring is the best human-readable form; only address-form tables
+		-- ("table: 0x...") fall through to JSON encoding.
 		local converted = tostring(data)
-		if string.sub(converted, 1, 8) ~= "table: 0x" then
+		if string.sub(converted, 1, 9) ~= "table: 0x" then
 			return converted
 		end
 
@@ -424,15 +447,24 @@ function Promise.Then<T...>(
 	onFulfilled: ((T...) -> ...any)?,
 	onRejected: ((...any) -> ...any)?
 ): Promise<...any>
-	if type(onRejected) == "function" then
-		self._unconsumedException = false
-	end
-
 	if self._pendingExecuteList then
+		-- Attaching any continuation delegates this promise's rejection to the returned
+		-- child promise, which becomes the new carrier of the unconsumed exception. So the
+		-- parent is consumed even without an onRejected here: a rejection flowing through a
+		-- handler-less Then is forwarded, not dropped, and the warning surfaces only at the
+		-- tail of the chain if nobody ever handles it.
+		self._unconsumedException = false
+
 		local promise: Promise<T...> = Promise.new()
 		self._pendingExecuteList[#self._pendingExecuteList + 1] = { onFulfilled, onRejected, promise } :: { any }
 		return promise
 	else
+		-- Already settled: _executeThen returns self when there is no matching handler, so
+		-- self stays the carrier. Only an actual onRejected consumes the rejection here.
+		if type(onRejected) == "function" then
+			self._unconsumedException = false
+		end
+
 		return self:_executeThen(onFulfilled, onRejected, nil)
 	end
 end
@@ -501,7 +533,8 @@ function Promise.Destroy<T...>(self: Promise<T...>): ()
 end
 
 --[=[
-	Returns the results from the promise.
+	Returns the results from the promise. Reading the outcome consumes a rejection — the caller has
+	inspected it, so no uncaught-exception warning fires for it.
 
 	:::warning
 	This API surface will error if the promise is still pending.
@@ -512,6 +545,7 @@ end
 ]=]
 function Promise.GetResults<T...>(self: Promise<T...>): (boolean, T...)
 	if self._rejected then
+		self._unconsumedException = false
 		return false, table.unpack(self._rejected, 1, self._rejected.n)
 	elseif self._fulfilled then
 		return true, table.unpack(self._fulfilled, 1, self._fulfilled.n)

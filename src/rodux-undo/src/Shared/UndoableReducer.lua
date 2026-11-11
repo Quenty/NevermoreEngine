@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Simple undo redo stack history
 	@class UndoableReducer
@@ -10,11 +10,15 @@ local Table = require("Table")
 
 local HISTORY_LIMIT = 50
 
-local function insert(state, reduced)
+type Action = { type: string?, [string]: any }
+type UndoableState = { past: { any }, present: any, future: { any } }
+type Reducer = (state: any, action: Action) -> any
+
+local function insert(state: UndoableState, reduced: any): UndoableState
 	local start = math.max(1, #state.past - HISTORY_LIMIT + 2)
 	local _end = math.min(#state.past, start + HISTORY_LIMIT)
 
-	local newPast = {}
+	local newPast: { any } = {}
 	for i = start, _end do
 		newPast[#newPast + 1] = state.past[i]
 	end
@@ -27,14 +31,14 @@ local function insert(state, reduced)
 	}
 end
 
-return function(reducer)
-	local actions = {
-		undo = function(state, _action)
+return function(reducer: Reducer): (state: UndoableState?, action: Action) -> UndoableState
+	local actions: { [string]: (state: UndoableState, action: Action) -> UndoableState } = {
+		undo = function(state: UndoableState, _action: Action): UndoableState
 			if #state.past == 0 then
 				return state
 			end
 
-			local newPast = {}
+			local newPast: { any } = {}
 			for i = 1, #state.past - 1 do
 				newPast[#newPast + 1] = state.past[i]
 			end
@@ -45,12 +49,12 @@ return function(reducer)
 				future = Table.mergeLists(state.future, { state.present }),
 			}
 		end,
-		redo = function(state, _action)
+		redo = function(state: UndoableState, _action: Action): UndoableState
 			if #state.future == 0 then
 				return state
 			end
 
-			local newFuture = {}
+			local newFuture: { any } = {}
 			for i = 1, #state.future - 1 do
 				newFuture[#newFuture + 1] = state.future[i]
 			end
@@ -63,25 +67,25 @@ return function(reducer)
 		end,
 	}
 
-	return function(state, action)
-		state = state or {
+	return function(state: UndoableState?, action: Action): UndoableState
+		local currentState: UndoableState = state or {
 			past = {},
 			present = reducer(nil, {}),
 			future = {},
 		}
 
 		if not action.type then
-			return state
+			return currentState
 		elseif actions[action.type] then
-			return actions[action.type](state, action)
+			return actions[action.type](currentState, action)
 		else
-			local reduced = reducer(state.present, action)
+			local reduced = reducer(currentState.present, action)
 
-			if state.present == reduced then
-				return state
+			if currentState.present == reduced then
+				return currentState
 			end
 
-			return insert(state, reduced)
+			return insert(currentState, reduced)
 		end
 	end
 end

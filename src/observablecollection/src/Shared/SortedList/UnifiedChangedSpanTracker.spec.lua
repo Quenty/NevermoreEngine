@@ -3,9 +3,7 @@
 	@class UnifiedChangedSpanTracker.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local UnifiedChangedSpanTracker = require("UnifiedChangedSpanTracker")
@@ -229,7 +227,6 @@ describe("UnifiedChangedSpanTracker", function()
 
 			local result = tracker:ComputeEffectiveSpans(5, 5)
 
-			-- Index 3 stays as item c, so it's not dirty
 			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
 			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
 			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(false)
@@ -298,7 +295,6 @@ describe("UnifiedChangedSpanTracker", function()
 			local result1 = tracker:ComputeEffectiveSpans(3, 4)
 			expect(#result1 > 0).toEqual(true)
 
-			-- Second call should return nothing since state was cleared
 			local result2 = tracker:ComputeEffectiveSpans(4, 4)
 			expect(#result2).toEqual(0)
 		end)
@@ -308,10 +304,6 @@ describe("UnifiedChangedSpanTracker", function()
 		it(
 			"should cover index 5 when two end-removes collapse to same recorded index and count is unchanged",
 			function()
-				-- List [a,b,c,d,e] (5 items)
-				-- Remove d at index 4 → [a,b,c,e], remove e at index 4 → [a,b,c]
-				-- Add f at index 2 → [a,f,b,c], add g at index 4 → [a,f,b,g,c]
-				-- Count stays 5. Both removes record index 4.
 				local tracker = UnifiedChangedSpanTracker.new()
 				tracker:LogRemove(4)
 				tracker:LogRemove(4)
@@ -320,7 +312,6 @@ describe("UnifiedChangedSpanTracker", function()
 
 				local result = tracker:ComputeEffectiveSpans(5, 5)
 
-				-- Index 5 changed content (was "e", now "c"). Must be covered.
 				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 1)).toEqual(false)
 				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 2)).toEqual(true)
 				expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 3)).toEqual(true)
@@ -330,10 +321,6 @@ describe("UnifiedChangedSpanTracker", function()
 		)
 
 		it("should only cover edges when removing first and last and replacing at edges", function()
-			-- List [a,b,c,d,e] (5 items)
-			-- Remove a at 1 → [b,c,d,e], remove e at 4 → [b,c,d]
-			-- Add f at 1 → [f,b,c,d], add g at 5 → [f,b,c,d,g]
-			-- Count stays 5. Middle indices 2,3,4 are unchanged.
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogRemove(1)
 			tracker:LogRemove(4)
@@ -350,7 +337,6 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 
 		it("should produce two separate spans for non-overlapping moves when count is unchanged", function()
-			-- Item at 2 moves to 3, item at 8 moves to 9. Count stays 10.
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogMove(2, 3)
 			tracker:LogMove(8, 9)
@@ -368,10 +354,6 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 
 		it("should not dirty index 3 when removing two and adding two leaves c at index 3", function()
-			-- List [a,b,c,d,e] (5 items)
-			-- Remove b at index 2 → [a,c,d,e], remove d at index 3 → [a,c,e]
-			-- Add f at index 2 (sort 1.5) → [a,f,c,e], add g at index 4 (sort 4.5) → [a,f,c,g,e]
-			-- Index 3 still has c.
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogRemove(2)
 			tracker:LogRemove(3)
@@ -388,10 +370,6 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 
 		it("should not dirty middle indices when removing first and last and adding at edges", function()
-			-- List [a,b,c,d,e] (5 items)
-			-- Remove a at index 1 → [b,c,d,e], remove e at index 4 → [b,c,d]
-			-- Add f at index 1 (sort 0.5) → [f,b,c,d], add g at index 5 (sort 5.5) → [f,b,c,d,g]
-			-- Indices 2,3,4 unchanged.
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogRemove(1)
 			tracker:LogRemove(4)
@@ -408,10 +386,6 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 
 		it("should not dirty index 3 when two opposite-end moves leave middle unchanged", function()
-			-- List [a,b,c,d,e] (5 items)
-			-- a moves from index 1 → index 2 (sort 1 → 2.5): remove at 1, insert at 2
-			-- e moves from index 5 → index 4 (sort 5 → 3.5): remove at 5, insert at 4
-			-- List becomes [b,a,c,e,d]. Index 3 still has c.
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogMove(1, 2)
 			tracker:LogMove(5, 4)
@@ -426,10 +400,6 @@ describe("UnifiedChangedSpanTracker", function()
 		end)
 
 		it("should dirty index 5 when two removes from end collapse and adds shift content", function()
-			-- List [a,b,c,d,e] (5 items)
-			-- Remove d at index 4 → [a,b,c,e], remove e at index 4 → [a,b,c]
-			-- Add f at index 2 (sort 1.5) → [a,f,b,c], add g at index 3 (sort 2.5) → [a,f,g,b,c]
-			-- Index 5 changed from "e" to "c".
 			local tracker = UnifiedChangedSpanTracker.new()
 			tracker:LogRemove(4)
 			tracker:LogRemove(4)
@@ -444,5 +414,88 @@ describe("UnifiedChangedSpanTracker", function()
 			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 4)).toEqual(true)
 			expect(UnifiedChangedSpanTracker.isIndexInSpan(result, 5)).toEqual(true)
 		end)
+	end)
+end)
+
+describe("UnifiedChangedSpanTracker.isNegativeIndexChanged", function()
+	local function changed(originalIndexes: { number }?, previousCount: number, negativeIndex: number): boolean
+		return UnifiedChangedSpanTracker.isNegativeIndexChanged(originalIndexes, previousCount, negativeIndex)
+	end
+
+	it("returns original indexes alongside the spans", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(2)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 4)
+
+		expect(originalIndexes).toEqual({ 1, 0, 2, 3 })
+	end)
+
+	it("returns nil original indexes when nothing happened", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 3)
+
+		expect(originalIndexes).toEqual(nil)
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+	end)
+
+	it("shifts every negative slot when adding at the end", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(2, 3)
+
+		expect(changed(originalIndexes, 2, -1)).toEqual(true)
+		expect(changed(originalIndexes, 2, -2)).toEqual(true)
+		expect(changed(originalIndexes, 2, -3)).toEqual(true)
+		expect(changed(originalIndexes, 2, -4)).toEqual(false)
+	end)
+
+	it("only changes the slot that fell off when removing from the front", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogRemove(1)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 2)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+		expect(changed(originalIndexes, 3, -2)).toEqual(false)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+		expect(changed(originalIndexes, 3, -4)).toEqual(false)
+	end)
+
+	it("shifts every negative slot when removing from the end", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogRemove(3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 2)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(true)
+		expect(changed(originalIndexes, 3, -2)).toEqual(true)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+	end)
+
+	it("only changes earlier slots when inserting in the middle", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogAdd(2)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 4)
+
+		expect(changed(originalIndexes, 3, -1)).toEqual(false)
+		expect(changed(originalIndexes, 3, -2)).toEqual(false)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
+		expect(changed(originalIndexes, 3, -4)).toEqual(true)
+	end)
+
+	it("treats a move across the whole list as changing every slot", function()
+		local tracker = UnifiedChangedSpanTracker.new()
+		tracker:LogMove(1, 3)
+
+		local _, originalIndexes = tracker:ComputeEffectiveSpans(3, 3)
+
+		expect(originalIndexes).toEqual({ 2, 3, 1 })
+		expect(changed(originalIndexes, 3, -1)).toEqual(true)
+		expect(changed(originalIndexes, 3, -2)).toEqual(true)
+		expect(changed(originalIndexes, 3, -3)).toEqual(true)
 	end)
 end)

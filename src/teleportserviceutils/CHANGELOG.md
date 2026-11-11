@@ -3,6 +3,155 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.8.0...@quenty/teleportserviceutils@10.8.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.7.2...@quenty/teleportserviceutils@10.8.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [10.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.7.1...@quenty/teleportserviceutils@10.7.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.7.0...@quenty/teleportserviceutils@10.7.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [10.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.6.1...@quenty/teleportserviceutils@10.7.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.6.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.6.0...@quenty/teleportserviceutils@10.6.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [10.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.5.0...@quenty/teleportserviceutils@10.6.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [10.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.4.0...@quenty/teleportserviceutils@10.5.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [10.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.3.3...@quenty/teleportserviceutils@10.4.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.3.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.3.2...@quenty/teleportserviceutils@10.3.3) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.3.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.3.1...@quenty/teleportserviceutils@10.3.2) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.3.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.3.0...@quenty/teleportserviceutils@10.3.1) (2026-07-30)
+
+### Bug Fixes
+
+- **teleportserviceutils:** let a server teleport hear a refusal raised after acceptance ([#779](https://github.com/Quenty/NevermoreEngine/issues/779)) ([77ac1e4](https://github.com/Quenty/NevermoreEngine/commit/77ac1e42074174b77c8fb559b3b1cdebb46a7ec9))
+
+# [10.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.3...@quenty/teleportserviceutils@10.3.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [10.2.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.2...@quenty/teleportserviceutils@10.2.3) (2026-07-27)
+
+### Bug Fixes
+
+- **teleportserviceutils:** hold one outstanding teleport request at a time ([#755](https://github.com/Quenty/NevermoreEngine/issues/755)) ([7e8761e](https://github.com/Quenty/NevermoreEngine/commit/7e8761e5d6becc7391975a5cd465cb8f0ff23b72))
+
+## [10.2.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.1...@quenty/teleportserviceutils@10.2.2) (2026-07-26)
+
+### Bug Fixes
+
+- **teleportserviceutils:** report a refused teleport instead of raising ([#754](https://github.com/Quenty/NevermoreEngine/issues/754)) ([a75f41e](https://github.com/Quenty/NevermoreEngine/commit/a75f41e5d5d798937806d95556d46735891878b7))
+
+## [10.2.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.2.0...@quenty/teleportserviceutils@10.2.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [10.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.1.0...@quenty/teleportserviceutils@10.2.0) (2026-07-25)
+
+### Bug Fixes
+
+- Improve docs ([a6fd136](https://github.com/Quenty/NevermoreEngine/commit/a6fd13630628db6b9139ca4c36fa707c288eb92f))
+
+### Features
+
+- Add teleport utils that retries ([89cd3c5](https://github.com/Quenty/NevermoreEngine/commit/89cd3c5a20968a361334c722cec58b833071b5ec))
+
+# [10.1.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.0.0...@quenty/teleportserviceutils@10.1.0) (2026-07-24)
+
+### Features
+
+- mock-safe teleport and screen-gui-provider teardown ([#751](https://github.com/Quenty/NevermoreEngine/issues/751)) ([743da25](https://github.com/Quenty/NevermoreEngine/commit/743da25a3eba46e0e498999ce4eec964f9774b18))
+
+# [10.0.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.40.0...@quenty/teleportserviceutils@10.0.0) (2026-07-24)
+
+### Features
+
+- **saveslot:** save slot export/import + cross-session transfer ([#748](https://github.com/Quenty/NevermoreEngine/issues/748)) ([3ef4fe0](https://github.com/Quenty/NevermoreEngine/commit/3ef4fe0024a6036f396babfc292099041bdf56d6))
+
+# [9.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.39.0...@quenty/teleportserviceutils@9.40.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [9.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.38.1...@quenty/teleportserviceutils@9.39.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+## [9.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.38.0...@quenty/teleportserviceutils@9.38.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [9.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.37.0...@quenty/teleportserviceutils@9.38.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Improve stuff ([ae11166](https://github.com/Quenty/NevermoreEngine/commit/ae1116636cea882a51754b0a74cb5a641bad9ae4))
+
+# [9.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.36.0...@quenty/teleportserviceutils@9.37.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [9.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.35.0...@quenty/teleportserviceutils@9.36.0) (2026-07-21)
+
+### Bug Fixes
+
+- Teleport service unpacks data properly ([9a9791f](https://github.com/Quenty/NevermoreEngine/commit/9a9791fe6a6c182102faae06f9253a7aff90d36a))
+
+# [9.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.34.0...@quenty/teleportserviceutils@9.35.0) (2026-07-21)
+
+### Features
+
+- Teleport data service allows teleport data per a player and per a packet ([3c2a88f](https://github.com/Quenty/NevermoreEngine/commit/3c2a88f882b7f490395b5f291b5094d8743a3a04))
+
+# [9.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.33.0...@quenty/teleportserviceutils@9.34.0) (2026-07-20)
+
+### Bug Fixes
+
+- Strict typing on tests ([efbc458](https://github.com/Quenty/NevermoreEngine/commit/efbc45882fac95755ea4ff4e007c5f71bedebf6f))
+
+### Features
+
+- Integrate teleport data service directly into save slots for cross-game continuation ([ffa7496](https://github.com/Quenty/NevermoreEngine/commit/ffa7496047b80a82623440221c019fdfe09e31ea))
+
+# [9.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.32.0...@quenty/teleportserviceutils@9.33.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
+# [9.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.31.1...@quenty/teleportserviceutils@9.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
 ## [9.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@9.31.0...@quenty/teleportserviceutils@9.31.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/teleportserviceutils

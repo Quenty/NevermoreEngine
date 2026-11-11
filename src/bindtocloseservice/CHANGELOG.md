@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.46.0...@quenty/bindtocloseservice@8.46.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.45.2...@quenty/bindtocloseservice@8.46.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [8.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.45.1...@quenty/bindtocloseservice@8.45.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.45.0...@quenty/bindtocloseservice@8.45.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.44.1...@quenty/bindtocloseservice@8.45.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.44.0...@quenty/bindtocloseservice@8.44.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.43.0...@quenty/bindtocloseservice@8.44.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.42.0...@quenty/bindtocloseservice@8.43.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.41.1...@quenty/bindtocloseservice@8.42.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.41.0...@quenty/bindtocloseservice@8.41.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.40.2...@quenty/bindtocloseservice@8.41.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.40.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.40.1...@quenty/bindtocloseservice@8.40.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.40.0...@quenty/bindtocloseservice@8.40.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.39.0...@quenty/bindtocloseservice@8.40.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.38.0...@quenty/bindtocloseservice@8.39.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.37.0...@quenty/bindtocloseservice@8.38.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.36.1...@quenty/bindtocloseservice@8.37.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+## [8.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.36.0...@quenty/bindtocloseservice@8.36.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.35.0...@quenty/bindtocloseservice@8.36.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.34.0...@quenty/bindtocloseservice@8.35.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.33.0...@quenty/bindtocloseservice@8.34.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/bindtocloseservice
+
+# [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.32.1...@quenty/bindtocloseservice@8.33.0) (2026-07-14)
+
+### Features
+
+- **bindtocloseservice:** convert package to --!strict ([e90dffb](https://github.com/Quenty/NevermoreEngine/commit/e90dffb75f355e31c5a8d60e2994c8d5fd82249e))
+
 ## [8.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bindtocloseservice@8.32.0...@quenty/bindtocloseservice@8.32.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/bindtocloseservice

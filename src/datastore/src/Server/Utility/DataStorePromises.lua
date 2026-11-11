@@ -9,6 +9,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreService = game:GetService("DataStoreService")
 
+local DataStoreMock = require("DataStoreMock")
 local PagesUtils = require("PagesUtils")
 local Promise = require("Promise")
 local Table = require("Table")
@@ -16,6 +17,18 @@ local Table = require("Table")
 local DataStorePromises = {}
 
 export type RobloxDataStore = DataStore
+
+--[=[
+	Returns whether the given value can be used as a datastore by these helpers. A real
+	datastore is an `Instance`, but the first-class [DataStoreMock] is also accepted so tests
+	can stand in for a real datastore.
+
+	@param robloxDataStore any
+	@return boolean
+]=]
+function DataStorePromises.isDataStore(robloxDataStore: any): boolean
+	return typeof(robloxDataStore) == "Instance" or DataStoreMock.isDataStoreMock(robloxDataStore)
+end
 
 --[=[
 	Promises a Roblox datastore object with the name and scope. Generally only fails
@@ -70,7 +83,7 @@ end
 	@return Promise<T>
 ]=]
 function DataStorePromises.getAsync<T>(robloxDataStore: DataStore, key: string): Promise.Promise<T>
-	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 
 	return Promise.spawn(function(resolve, reject)
@@ -99,7 +112,7 @@ function DataStorePromises.updateAsync<T>(
 	key: string,
 	updateFunc: (T, DataStoreKeyInfo) -> T?
 ): Promise.Promise<(T, DataStoreKeyInfo)>
-	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(updateFunc) == "function", "Bad updateFunc")
 
@@ -132,7 +145,7 @@ function DataStorePromises.setAsync(
 	value: string,
 	userIds: { number }?
 ): Promise.Promise<boolean>
-	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(userIds) == "table" or userIds == nil, "Bad userIds")
 
@@ -159,7 +172,7 @@ function DataStorePromises.promiseIncrementAsync(
 	key: string,
 	delta: number
 ): Promise.Promise<boolean>
-	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 	assert(type(delta) == "number" or delta == nil, "Bad delta")
 
@@ -181,7 +194,7 @@ end
 	@return Promise<boolean>
 ]=]
 function DataStorePromises.removeAsync(robloxDataStore: DataStore, key: string): Promise.Promise<boolean>
-	assert(typeof(robloxDataStore) == "Instance", "Bad robloxDataStore")
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
 	assert(type(key) == "string", "Bad key")
 
 	return Promise.spawn(function(resolve, reject)

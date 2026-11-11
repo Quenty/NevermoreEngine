@@ -27,6 +27,8 @@
 
 local loader = script.Parent.Parent
 
+local LoaderScheduler = require(loader.Timing.LoaderScheduler)
+local LoaderValueObject = require(loader.Helpers.LoaderValueObject)
 local Maid = require(loader.Maid)
 local ReplicationType = require(loader.Replication.ReplicationType)
 local ReplicationTypeUtils = require(loader.Replication.ReplicationTypeUtils)
@@ -41,10 +43,13 @@ export type Replicator = typeof(setmetatable(
 		_maid: Maid.Maid,
 		_replicationStarted: boolean,
 		_references: ReplicatorReferences.ReplicatorReferences,
-		_target: ObjectValue,
-		_replicatedDescendantCount: IntValue,
-		_hasReplicatedDescendants: BoolValue,
-		_replicationType: StringValue,
+		_scheduler: LoaderScheduler.LoaderScheduler,
+		_target: LoaderValueObject.LoaderValueObject<Instance?>,
+		_replicatedDescendantCount: LoaderValueObject.LoaderValueObject<number>,
+		_hasReplicatedDescendants: LoaderValueObject.LoaderValueObject<boolean>,
+		-- Held as a plain string the same way the old StringValue was -- read sites
+		-- narrow it back to a ReplicationType.
+		_replicationType: LoaderValueObject.LoaderValueObject<string>,
 	},
 	{} :: typeof({ __index = Replicator })
 ))
@@ -53,31 +58,27 @@ export type Replicator = typeof(setmetatable(
 	Constructs a new Replicator which will do the syncing.
 
 	@param references ReplicatorReferences
+	@param scheduler LoaderScheduler
 	@return Replicator
 ]=]
-function Replicator.new(references: ReplicatorReferences.ReplicatorReferences): Replicator
+function Replicator.new(
+	references: ReplicatorReferences.ReplicatorReferences,
+	scheduler: LoaderScheduler.LoaderScheduler
+): Replicator
 	local self = setmetatable({}, Replicator)
 
 	assert(ReplicatorReferences.isReplicatorReferences(references), "Bad references")
+	assert(LoaderScheduler.isLoaderScheduler(scheduler), "Bad scheduler")
 
 	self._maid = Maid.new()
 	self._references = references
+	self._scheduler = scheduler
 	self._replicationStarted = false
 
-	self._target = self._maid:Add(Instance.new("ObjectValue"))
-	self._target.Value = nil
-
-	self._replicatedDescendantCount = self._maid:Add(Instance.new("IntValue"))
-	self._replicatedDescendantCount.Name = "Replicator_ReplicatedDescendantCount"
-	self._replicatedDescendantCount.Value = 0
-
-	self._hasReplicatedDescendants = self._maid:Add(Instance.new("BoolValue"))
-	self._hasReplicatedDescendants.Name = "Replicator_HasReplicatedDescendants"
-	self._hasReplicatedDescendants.Value = false
-
-	self._replicationType = self._maid:Add(Instance.new("StringValue"))
-	self._replicationType.Name = "Replicator_ReplicationType"
-	self._replicationType.Value = ReplicationType.SHARED
+	self._target = self._maid:Add(LoaderValueObject.new(nil :: Instance?))
+	self._replicatedDescendantCount = self._maid:Add(LoaderValueObject.new(0))
+	self._hasReplicatedDescendants = self._maid:Add(LoaderValueObject.new(false))
+	self._replicationType = self._maid:Add(LoaderValueObject.new(ReplicationType.SHARED :: string))
 
 	self._maid:GiveTask(self._replicatedDescendantCount.Changed:Connect(function()
 		self._hasReplicatedDescendants.Value = self._replicatedDescendantCount.Value > 0
@@ -91,22 +92,33 @@ end
 
 	@param root Instance
 ]=]
-function Replicator.ReplicateFrom(self: Replicator, root: Instance)
+function Replicator.ReplicateFromAsync(self: Replicator, root: Instance)
 	assert(typeof(root) == "Instance", "Bad root")
 	if self._replicationStarted then
 		(error :: any)("[Replicator] - Replication already started")
 	end
-
 	self._replicationStarted = true
 
+	-- Yield before doing work if we need to
+	self._scheduler:YieldIfNeededAsync()
+
+	-- We may have been superseded or destroyed while we were yielded
+	if not self.Destroy then
+		return
+	end
+
 	self._maid:GiveTask(root.ChildAdded:Connect(function(child)
-		self:_handleChildAdded(child)
+		self:_handleChildAddedAsync(child)
 	end))
 	self._maid:GiveTask(root.ChildRemoved:Connect(function(child)
 		self:_handleChildRemoved(child)
 	end))
 	for _, child in root:GetChildren() do
-		self:_handleChildAdded(child)
+		self:_handleChildAddedAsync(child)
+
+		if not self.Destroy then
+			return
+		end
 	end
 end
 
@@ -122,9 +134,9 @@ end
 
 --[=[
 	Returns the replicated descendant count value.
-	@return IntValue
+	@return LoaderValueObject<number>
 ]=]
-function Replicator.GetReplicatedDescendantCountValue(self: Replicator): IntValue
+function Replicator.GetReplicatedDescendantCountValue(self: Replicator): LoaderValueObject.LoaderValueObject<number>
 	return self._replicatedDescendantCount
 end
 
@@ -163,13 +175,13 @@ end
 	Gets a value representing if there's any replicated children. Used to
 	avoid leaking more server-side information than needed for the user.
 
-	@return BoolValue
+	@return LoaderValueObject<boolean>
 ]=]
-function Replicator.GetHasReplicatedChildrenValue(self: Replicator): BoolValue
+function Replicator.GetHasReplicatedChildrenValue(self: Replicator): LoaderValueObject.LoaderValueObject<boolean>
 	return self._hasReplicatedDescendants
 end
 
-function Replicator.GetReplicationTypeValue(self: Replicator): StringValue
+function Replicator.GetReplicationTypeValue(self: Replicator): LoaderValueObject.LoaderValueObject<string>
 	return self._replicationType
 end
 
@@ -177,30 +189,33 @@ function Replicator._handleChildRemoved(self: Replicator, child: Instance)
 	self._maid[child] = nil
 end
 
-function Replicator._handleChildAdded(self: Replicator, child: Instance)
+function Replicator._handleChildAddedAsync(self: Replicator, child: Instance)
 	assert(typeof(child) == "Instance", "Bad child")
 
 	local maid = Maid.new()
-
-	if child.Archivable then
-		maid._current = self:_renderChild(child)
-	end
+	self._maid[child] = maid
 
 	maid:GiveTask(child:GetPropertyChangedSignal("Archivable"):Connect(function()
-		if child.Archivable then
-			maid._current = self:_renderChild(child)
-		else
-			maid._current = nil
-		end
+		self:_updateChildRenderAsync(maid, child)
 	end))
 
-	self._maid[child] = maid
+	self:_updateChildRenderAsync(maid, child)
 end
 
-function Replicator._renderChild(self: Replicator, child: Instance)
-	local maid = Maid.new()
+function Replicator._updateChildRenderAsync(self: Replicator, maid: Maid.Maid, child: Instance)
+	if not child.Archivable then
+		maid._current = nil
+		return
+	end
 
-	local replicator = Replicator.new(self._references)
+	local renderMaid = Maid.new()
+	maid._current = renderMaid
+
+	self:_renderChildAsync(renderMaid, child)
+end
+
+function Replicator._renderChildAsync(self: Replicator, maid: Maid.Maid, child: Instance)
+	local replicator = Replicator.new(self._references, self._scheduler)
 	self:_setupReplicatorDescendantCount(maid, replicator)
 	maid:GiveTask(replicator)
 
@@ -222,9 +237,7 @@ function Replicator._renderChild(self: Replicator, child: Instance)
 		)
 	end))
 
-	replicator:ReplicateFrom(child)
-
-	return maid
+	replicator:ReplicateFromAsync(child)
 end
 
 function Replicator._replicateBasedUponMode(
@@ -262,6 +275,8 @@ function Replicator._doReplicationServer(self: Replicator, replicator: Replicato
 	if hasReplicatedChildren.Value then
 		maid._current = self:_doServerClone(replicator, child)
 	end
+
+	return maid
 end
 
 function Replicator._doServerClone(self: Replicator, replicator: Replicator, child: Instance): Maid.Maid
@@ -356,7 +371,9 @@ function Replicator._setupReplicatedDescendantCountAdd(self: Replicator, maid: M
 	-- have any flickering.
 	self._replicatedDescendantCount.Value += amount
 	maid:GiveTask(function()
-		self._replicatedDescendantCount.Value -= amount
+		if self._replicatedDescendantCount.Destroy then
+			self._replicatedDescendantCount.Value -= amount
+		end
 	end)
 end
 
@@ -415,7 +432,10 @@ function Replicator._setupReplicatorDescendantCount(self: Replicator, maid: Maid
 	maid:GiveTask(function()
 		local value = lastValue
 		lastValue = 0
-		self._replicatedDescendantCount.Value -= value
+
+		if self._replicatedDescendantCount.Destroy then
+			self._replicatedDescendantCount.Value -= value
+		end
 	end)
 end
 
@@ -580,7 +600,7 @@ function Replicator._doObjectValueReplication(self: Replicator, child: ValueBase
 				(copy :: any).Value = newValue
 			else
 				-- Fall back to original value (pointing outside of tree)
-				newValue = childValue
+				(copy :: any).Value = childValue
 			end
 		end))
 

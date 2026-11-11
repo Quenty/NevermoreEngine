@@ -3,6 +3,112 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.54.0...@quenty/cooldown@11.54.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.53.2...@quenty/cooldown@11.54.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.53.1...@quenty/cooldown@11.53.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.53.0...@quenty/cooldown@11.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.52.0...@quenty/cooldown@11.53.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.51.1...@quenty/cooldown@11.52.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.51.0...@quenty/cooldown@11.51.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.50.0...@quenty/cooldown@11.51.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.49.0...@quenty/cooldown@11.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.48.2...@quenty/cooldown@11.49.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.48.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.48.1...@quenty/cooldown@11.48.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.48.0...@quenty/cooldown@11.48.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.47.2...@quenty/cooldown@11.48.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.47.1...@quenty/cooldown@11.47.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.47.0...@quenty/cooldown@11.47.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.46.0...@quenty/cooldown@11.47.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.45.0...@quenty/cooldown@11.46.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.44.0...@quenty/cooldown@11.45.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.43.1...@quenty/cooldown@11.44.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.43.0...@quenty/cooldown@11.43.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.42.0...@quenty/cooldown@11.43.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.41.0...@quenty/cooldown@11.42.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.40.0...@quenty/cooldown@11.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.39.1...@quenty/cooldown@11.40.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+## [11.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.39.0...@quenty/cooldown@11.39.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/cooldown
+
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.38.1...@quenty/cooldown@11.39.0) (2026-07-14)
+
+### Features
+
+- **cooldown:** convert package to --!strict ([f5ea8a9](https://github.com/Quenty/NevermoreEngine/commit/f5ea8a95563c51e8ed49d8c6817562a989bcfe66))
+
 ## [11.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cooldown@11.38.0...@quenty/cooldown@11.38.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/cooldown

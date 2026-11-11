@@ -1,0 +1,80 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.9.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.8.1...@quenty/iris@1.9.0) (2026-10-26)
+
+**Note:** Version bump only for package @quenty/iris
+
+## [1.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.8.0...@quenty/iris@1.8.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [1.8.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.7.3...@quenty/iris@1.8.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/iris
+
+## [1.7.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.7.2...@quenty/iris@1.7.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/iris
+
+## [1.7.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.7.1...@quenty/iris@1.7.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/iris
+
+## [1.7.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.7.0...@quenty/iris@1.7.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.6.0...@quenty/iris@1.7.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.6.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.5.0...@quenty/iris@1.6.0) (2026-09-19)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.4.0...@quenty/iris@1.5.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.3.0...@quenty/iris@1.4.0) (2026-09-01)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.2.0...@quenty/iris@1.3.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/iris
+
+# [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/iris@1.1.0...@quenty/iris@1.2.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/iris
+
+# 1.1.0 (2026-08-24)
+
+**Note:** Version bump only for package @quenty/iris
+
+# v1.1.0 (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- fix: jecs and iris nevermore-style integration, replace with separate forks [#805](https://github.com/Quenty/NevermoreEngine/pull/805) ([@euvinkeel](https://github.com/euvinkeel))
+- Merge branch 'main' into users/euvinkeel/implot ([@euvinkeel](https://github.com/euvinkeel))
+- hooks installation seem okay to use for now ([@euvinkeel](https://github.com/euvinkeel))
+- update deps ([@euvinkeel](https://github.com/euvinkeel))
+- separation iteration ([@euvinkeel](https://github.com/euvinkeel))
+- separation ([@euvinkeel](https://github.com/euvinkeel))
+- separate out iris and jecs from immediateutils ([@euvinkeel](https://github.com/euvinkeel))
+- fgdh ([@euvinkeel](https://github.com/euvinkeel))
+- packagify jecs and iris and remote immediateutils files ([@euvinkeel](https://github.com/euvinkeel))
+- remove jecs and iris only? ([@euvinkeel](https://github.com/euvinkeel))
+- Merge remote-tracking branch 'origin/main' into users/euvinkeel/implot ([@euvinkeel](https://github.com/euvinkeel))
+- remove iris and jecs from nevermore, replaced with forked repo ([@euvinkeel](https://github.com/euvinkeel))
+- add implot ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))

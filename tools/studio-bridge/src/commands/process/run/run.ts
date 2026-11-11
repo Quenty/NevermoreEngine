@@ -11,6 +11,9 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
+import { isJsonOutputEnabled } from '../../../cli/cli-output-context.js';
+import { formatReturnValues } from '../../console/exec/exec.js';
+import type { SerializedReturnValue } from '../../../server/web-socket-protocol.js';
 
 export interface ProcessRunOptions {
   scriptContent: string;
@@ -20,10 +23,17 @@ export interface ProcessRunOptions {
   verbose: boolean;
   showLogs: boolean;
   filePath?: string;
+  quiet?: boolean;
+  /** Passed to the script as `...`. */
+  args?: string[];
 }
 
 export interface ProcessRunResult {
   success: boolean;
+  output: string[];
+  error?: string;
+  returnValues?: SerializedReturnValue[];
+  durationMs: number;
   summary: string;
 }
 
@@ -31,7 +41,8 @@ interface ProcessRunArgs {
   code?: string;
   file?: string;
   place?: string;
-  timeout?: number;
+  scriptTimeout?: number;
+  scriptArgs?: string[];
 }
 
 export async function processRunHandlerAsync(
@@ -42,13 +53,11 @@ export async function processRunHandlerAsync(
     '../../../cli/script-executor.js'
   );
 
-  // executeScriptAsync calls process.exit internally, so this return
-  // is only reachable in test scenarios where it's mocked.
-  await executeScriptAsync(options);
+  const result = await executeScriptAsync(options);
 
   return {
-    success: true,
-    summary: 'Script execution completed.',
+    ...result,
+    summary: result.success ? 'Script completed.' : 'Script failed.',
   };
 }
 
@@ -76,10 +85,20 @@ export const processRunCommand = defineCommand<
       description: 'Path to a .rbxl place file',
       alias: 'p',
     }),
-    timeout: arg.option({
-      description: 'Execution timeout in milliseconds',
+    scriptTimeout: arg.option({
+      description: 'Cancel the script after this many milliseconds',
       type: 'number',
     }),
+    scriptArgs: arg.passthrough({
+      description:
+        'Arguments after --, passed to the script as ... (all strings)',
+    }),
+  },
+  cli: {
+    format: (result) =>
+      result.returnValues && result.returnValues.length > 0
+        ? formatReturnValues(result.returnValues)
+        : '',
   },
   handler: async (args) => {
     const { scriptContent, filePath } = await resolveScriptContentAsync(args);
@@ -88,10 +107,12 @@ export const processRunCommand = defineCommand<
       scriptContent,
       packageName: 'studio-bridge',
       placePath: args.place,
-      timeoutMs: args.timeout ?? 120_000,
+      timeoutMs: args.scriptTimeout ?? 120_000,
       verbose: OutputHelper.isVerbose(),
       showLogs: true,
       filePath,
+      quiet: isJsonOutputEnabled(),
+      args: args.scriptArgs,
     });
   },
   // No MCP config -- process run is CLI-only

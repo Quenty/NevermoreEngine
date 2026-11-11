@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class TieSignalImplementation
 ]=]
@@ -14,8 +14,23 @@ local TieSignalImplementation = setmetatable({}, BaseObject)
 TieSignalImplementation.ClassName = "TieSignalImplementation"
 TieSignalImplementation.__index = TieSignalImplementation
 
-function TieSignalImplementation.new(memberDefinition, implParent, initialValue)
-	local self = setmetatable(BaseObject.new(), TieSignalImplementation)
+export type TieSignalImplementation =
+	typeof(setmetatable(
+		{} :: {
+			_memberDefinition: any,
+			_implParent: Instance,
+			_bindableEvent: BindableEvent,
+		},
+		{} :: typeof({ __index = TieSignalImplementation })
+	))
+	& BaseObject.BaseObject
+
+function TieSignalImplementation.new(
+	memberDefinition: any,
+	implParent: Instance,
+	initialValue: any
+): TieSignalImplementation
+	local self: TieSignalImplementation = setmetatable(BaseObject.new() :: any, TieSignalImplementation)
 
 	self._memberDefinition = assert(memberDefinition, "No memberDefinition")
 	self._implParent = assert(implParent, "No implParent")
@@ -31,15 +46,15 @@ function TieSignalImplementation.new(memberDefinition, implParent, initialValue)
 	self._maid:GiveTask(function()
 		self._maid:DoCleaning()
 
-		for key, _ in pairs(self) do
-			rawset(self, key, nil)
+		for key, _ in pairs(self :: any) do
+			rawset(self :: any, key, nil)
 		end
 	end)
 
 	return self
 end
 
-function TieSignalImplementation:SetImplementation(signal)
+function TieSignalImplementation.SetImplementation(self: TieSignalImplementation, signal: any): ()
 	local maid = Maid.new()
 
 	if type(signal) == "table" then
@@ -48,7 +63,7 @@ function TieSignalImplementation:SetImplementation(signal)
 		local bindableEventFiredArgs = {}
 
 		maid:GiveTask(signal:Connect(function(...)
-			local args = Tuple.new(...)
+			local args = Tuple.new(...) :: any
 			for pendingArgs, _ in signalFiredArgs do
 				if pendingArgs == args then
 					-- Remove from queue
@@ -62,7 +77,7 @@ function TieSignalImplementation:SetImplementation(signal)
 		end))
 
 		maid:GiveTask(self._bindableEvent.Event:Connect(function(...)
-			local args = Tuple.new(TieUtils.decode(...))
+			local args = Tuple.new(TieUtils.decode(...)) :: any
 			for pendingArgs, _ in bindableEventFiredArgs do
 				if pendingArgs == args then
 					-- Remove from queue
@@ -76,7 +91,7 @@ function TieSignalImplementation:SetImplementation(signal)
 		end))
 	end
 
-	self._maid._implementationMaid = maid
+	(self :: any)._maid._implementationMaid = maid
 end
 
 return TieSignalImplementation

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.3.4...@quenty/characterparticleplayer@2.4.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene and moonwave issues from strict conversions ([d427005](https://github.com/Quenty/NevermoreEngine/commit/d42700569ecb085fee4166c5bfdad382dd8442c2))
+
+### Features
+
+- **characterparticleplayer:** convert package to --!strict ([b8a5c22](https://github.com/Quenty/NevermoreEngine/commit/b8a5c2244864e8cc804cfa7893dfe62a51f37d1b))
+
 ## [2.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/characterparticleplayer@2.3.3...@quenty/characterparticleplayer@2.3.4) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/characterparticleplayer

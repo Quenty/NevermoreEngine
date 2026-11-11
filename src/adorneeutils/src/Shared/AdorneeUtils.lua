@@ -7,6 +7,8 @@
 	@class AdorneeUtils
 ]=]
 
+-- NOTE: `Tool` inherits from `Model`, so every `IsA` chain below tests `Tool` before `Model`.
+
 local AdorneeUtils = {}
 
 --[=[
@@ -19,6 +21,13 @@ function AdorneeUtils.getCenter(adornee: Instance): Vector3?
 
 	if adornee:IsA("BasePart") then
 		return adornee.Position
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle.Position
+		else
+			return nil
+		end
 	elseif adornee:IsA("Model") then
 		return adornee:GetBoundingBox().Position
 	elseif adornee:IsA("Attachment") then
@@ -37,13 +46,6 @@ function AdorneeUtils.getCenter(adornee: Instance): Vector3?
 		else
 			return nil
 		end
-	elseif adornee:IsA("Tool") then
-		local handle = adornee:FindFirstChild("Handle")
-		if handle and handle:IsA("BasePart") then
-			return handle.Position
-		else
-			return nil
-		end
 	else
 		return nil
 	end
@@ -56,13 +58,47 @@ end
 	@return Vector3? -- Size of the bounding box
 ]=]
 function AdorneeUtils.getBoundingBox(adornee: Instance): (CFrame?, Vector3?)
-	if adornee:IsA("Model") then
+	if adornee:IsA("Tool") then
+		return AdorneeUtils.getPartCFrame(adornee), AdorneeUtils.getAlignedSize(adornee)
+	elseif adornee:IsA("Model") then
 		return adornee:GetBoundingBox()
 	elseif adornee:IsA("Attachment") then
 		return adornee.WorldCFrame, Vector3.zero -- This is a point
 	else
 		return AdorneeUtils.getPartCFrame(adornee), AdorneeUtils.getAlignedSize(adornee)
 	end
+end
+
+--[=[
+	Moves the adornee so its bounding box sits at the given cframe, keeping every part where it
+	sits relative to the others.
+
+	This is the counterpart to [AdorneeUtils.getBoundingBox], and is not the same as `PivotTo`,
+	which moves the adornee by its pivot rather than by the center of its bounds.
+
+	@param adornee Instance
+	@param cframe CFrame -- New bounding box cframe
+	@return boolean -- False when the adornee has no bounding box to move
+]=]
+function AdorneeUtils.setBoundingBoxCFrame(adornee: Instance, cframe: CFrame): boolean
+	assert(typeof(adornee) == "Instance", "Adornee must by of type 'Instance'")
+	assert(typeof(cframe) == "CFrame", "Bad cframe")
+
+	local bbCFrame = AdorneeUtils.getBoundingBox(adornee)
+	if not bbCFrame then
+		return false
+	end
+
+	local relativeCFrames: { [BasePart]: CFrame } = {}
+	for _, part in AdorneeUtils.getParts(adornee) do
+		relativeCFrames[part] = bbCFrame:ToObjectSpace(part.CFrame)
+	end
+
+	for part, relativeCFrame in relativeCFrames do
+		part.CFrame = cframe:ToWorldSpace(relativeCFrame)
+	end
+
+	return true
 end
 
 --[=[
@@ -122,7 +158,12 @@ end
 	@return Vector3?
 ]=]
 function AdorneeUtils.getAlignedSize(adornee: Instance): Vector3?
-	if adornee:IsA("Model") then
+	if adornee:IsA("Tool") then
+		local part = AdorneeUtils.getPart(adornee)
+		if part then
+			return part.Size
+		end
+	elseif adornee:IsA("Model") then
 		return select(2, adornee:GetBoundingBox())
 	elseif adornee:IsA("Humanoid") then
 		local character = adornee.Parent
@@ -197,6 +238,13 @@ function AdorneeUtils.getPart(adornee: Instance): BasePart?
 
 	if adornee:IsA("BasePart") then
 		return adornee
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle
+		else
+			return nil
+		end
 	elseif adornee:IsA("Model") then
 		if adornee.PrimaryPart ~= nil then
 			return adornee.PrimaryPart
@@ -210,13 +258,6 @@ function AdorneeUtils.getPart(adornee: Instance): BasePart?
 		return adornee.RootPart
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
 		return adornee:FindFirstChildWhichIsA("BasePart") :: BasePart
-	elseif adornee:IsA("Tool") then
-		local handle = adornee:FindFirstChild("Handle")
-		if handle and handle:IsA("BasePart") then
-			return handle
-		else
-			return nil
-		end
 	else
 		return nil
 	end
@@ -232,6 +273,13 @@ function AdorneeUtils.getRenderAdornee(adornee: Instance): Instance?
 
 	if adornee:IsA("BasePart") then
 		return adornee
+	elseif adornee:IsA("Tool") then
+		local handle = adornee:FindFirstChild("Handle")
+		if handle and handle:IsA("BasePart") then
+			return handle
+		else
+			return nil
+		end
 	elseif adornee:IsA("Model") then
 		return adornee
 	elseif adornee:IsA("Attachment") then
@@ -241,13 +289,6 @@ function AdorneeUtils.getRenderAdornee(adornee: Instance): Instance?
 	elseif adornee:IsA("Accessory") or adornee:IsA("Clothing") then
 		local basePart = adornee:FindFirstChildWhichIsA("BasePart")
 		return basePart
-	elseif adornee:IsA("Tool") then
-		local handle = adornee:FindFirstChild("Handle")
-		if handle and handle:IsA("BasePart") then
-			return handle
-		else
-			return nil
-		end
 	else
 		return nil
 	end

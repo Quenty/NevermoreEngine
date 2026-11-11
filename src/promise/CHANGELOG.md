@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.25.0...@quenty/promise@10.25.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.24.2...@quenty/promise@10.25.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [10.24.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.24.1...@quenty/promise@10.24.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/promise
+
+## [10.24.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.24.0...@quenty/promise@10.24.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/promise
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.23.1...@quenty/promise@10.24.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/promise
+
+## [10.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.23.0...@quenty/promise@10.23.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/promise
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.22.0...@quenty/promise@10.23.0) (2026-07-25)
+
+### Features
+
+- Promises don't reject on Promise.rejected(nil) ([be63400](https://github.com/Quenty/NevermoreEngine/commit/be63400f89c863624b75b1903f7e8357ddca7bf9))
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.21.0...@quenty/promise@10.22.0) (2026-07-23)
+
+### Features
+
+- Even more stuff ([fea7e95](https://github.com/Quenty/NevermoreEngine/commit/fea7e9587e7195bbfa7f4753c130a3d597f9a34b))
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.20.0...@quenty/promise@10.21.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+- Add promise tests ([ff0a2a6](https://github.com/Quenty/NevermoreEngine/commit/ff0a2a6f72bcd63dbecf1af0a57870bac62c77ca))
+
+# [10.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.19.0...@quenty/promise@10.20.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/promise
+
+# [10.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.18.1...@quenty/promise@10.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/promise
+
 ## [10.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/promise@10.18.0...@quenty/promise@10.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/promise

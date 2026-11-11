@@ -3,6 +3,94 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.33.0...@quenty/grouputils@10.33.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.32.2...@quenty/grouputils@10.33.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.32.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.32.1...@quenty/grouputils@10.32.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.32.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.32.0...@quenty/grouputils@10.32.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.31.1...@quenty/grouputils@10.32.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.31.0...@quenty/grouputils@10.31.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.30.0...@quenty/grouputils@10.31.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.29.0...@quenty/grouputils@10.30.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.28.1...@quenty/grouputils@10.29.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.28.0...@quenty/grouputils@10.28.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.27.2...@quenty/grouputils@10.28.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.27.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.27.1...@quenty/grouputils@10.27.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.27.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.27.0...@quenty/grouputils@10.27.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.26.0...@quenty/grouputils@10.27.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.25.0...@quenty/grouputils@10.26.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.24.0...@quenty/grouputils@10.25.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.23.1...@quenty/grouputils@10.24.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+## [10.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.23.0...@quenty/grouputils@10.23.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.22.0...@quenty/grouputils@10.23.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.21.0...@quenty/grouputils@10.22.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/grouputils
+
+# [10.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.2...@quenty/grouputils@10.21.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/grouputils
+
 ## [10.20.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/grouputils@10.20.1...@quenty/grouputils@10.20.2) (2026-06-03)
 
 **Note:** Version bump only for package @quenty/grouputils

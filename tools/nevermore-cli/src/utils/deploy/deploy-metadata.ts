@@ -1,0 +1,272 @@
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import {
+  BuildContext,
+  resolvePackagePath,
+} from '@quenty/nevermore-template-helpers';
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type BuiltPlace } from '../build/build.js';
+import { type ManifestPlaceInfo } from '@quenty/nevermore-deploy';
+
+/** npm name of the package that ships the manifest module. */
+export const MANIFEST_PACKAGE_NAME = '@quenty/nevermoreclimanifest';
+
+/**
+ * Attribute map written onto the built place's NevermoreCLIManifestUtils module.
+ * Keys are attribute names and MUST match the `ATTRIBUTE` table in
+ * src/nevermore-cli-manifest/src/Shared/NevermoreCLIManifestUtils.lua.
+ */
+export type DeployMetadataAttributes = Record<
+  string,
+  string | number | boolean
+>;
+
+const INJECT_SCRIPT_PATH = resolvePackagePath(
+  import.meta.url,
+  'build-scripts',
+  'transform-inject-deploy-metadata.lua'
+);
+
+function _git(args: string[]): string | undefined {
+  try {
+    return execSync(`git ${args.join(' ')}`, {
+      encoding: 'utf-8',
+      timeout: 5000,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+  } catch {
+    return undefined;
+  }
+}
+
+/** Git facts about the working tree the deploy was built from. */
+export interface GitDeployInfo {
+  /** Short commit SHA, e.g. "a1b2c3d". */
+  commit?: string;
+  /** Full commit SHA. */
+  version?: string;
+  /** Current branch name, or undefined in a detached HEAD. */
+  branch?: string;
+}
+
+/**
+ * Collect git metadata once per deploy. Every field is best-effort — a missing
+ * git binary or a non-repo directory yields an empty object rather than an error.
+ *
+ * A `pull_request` run checks out `refs/pull/N/merge`, a synthetic commit that
+ * exists in neither repo, on a detached HEAD. There the PR's head commit and
+ * branch are read from the event payload instead, so a deployed build traces
+ * back to the commit its checks are reported on.
+ */
+export function gatherGitDeployInfo(): GitDeployInfo {
+  const pullRequestHead = _readPullRequestHead();
+  if (pullRequestHead) {
+    return {
+      commit: pullRequestHead.sha.slice(0, 10),
+      version: pullRequestHead.sha,
+      branch: pullRequestHead.ref,
+    };
+  }
+
+  const info: GitDeployInfo = {};
+  const commit = _git(['rev-parse', '--short', 'HEAD']);
+  if (commit) info.commit = commit;
+  const version = _git(['rev-parse', 'HEAD']);
+  if (version) info.version = version;
+  const branch = _git(['rev-parse', '--abbrev-ref', 'HEAD']);
+  if (branch && branch !== 'HEAD') info.branch = branch;
+  return info;
+}
+
+function _readPullRequestHead(): { sha: string; ref?: string } | undefined {
+  const eventName = process.env.GITHUB_EVENT_NAME;
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (
+    !eventPath ||
+    (eventName !== 'pull_request' && eventName !== 'pull_request_target')
+  ) {
+    return undefined;
+  }
+  try {
+    const event = JSON.parse(readFileSync(eventPath, 'utf-8'));
+    const head = event?.pull_request?.head;
+    if (typeof head?.sha !== 'string' || !/^[0-9a-f]{40}$/.test(head.sha)) {
+      return undefined;
+    }
+    return {
+      sha: head.sha,
+      ref: typeof head.ref === 'string' ? head.ref : undefined,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+/** Per-place facts known at deploy time. */
+export interface DeployPlaceInfo {
+  /** Deploy target name from deploy.nevermore.json (e.g. "test", "integration"). */
+  target: string;
+  /** True when published live (`--publish`); false when only Saved. */
+  published: boolean;
+  /** ISO 8601 timestamp — pass one value for the whole deploy so every place agrees. */
+  timestamp: string;
+  placeId: number;
+  universeId: number;
+  /** `version` from the deploying package's package.json (e.g. "1.0.0"), if any. */
+  packageVersion?: string;
+  /**
+   * The base place this build was merged from, when there is one.
+   *
+   * `basePlaceVersion` is the answer to "which upstream content is this?" — a
+   * `"published"` pin resolves at deploy time and the base place moves on
+   * afterwards, so this is the only record of what the running build was made
+   * of. Reported alongside its place id, since a version number means nothing
+   * without knowing which place it counts.
+   */
+  basePlaceId?: number;
+  basePlaceVersion?: number;
+}
+
+/**
+ * Build the attribute map injected into the built place. `Deployed` is always
+ * true here — its mere presence is what distinguishes a deployed build from a
+ * Studio session at runtime.
+ *
+ * Place and universe IDs are stringified on purpose: Roblox `number` attributes
+ * round-trip through Lune serialization as float32, which silently corrupts IDs
+ * above 2^24 (e.g. 123456789 -> 123456792). Strings are exact; the Luau reader
+ * converts them back with `tonumber`.
+ *
+ * When `places` is given (the whole target's place table), it is stamped as a
+ * `Places` JSON-string attribute. The IDs inside stay numeric — a JSON string
+ * is exact text, and the Luau reader decodes it to 64-bit numbers, so the
+ * float32 hazard that forces the top-level IDs to be stringified doesn't apply.
+ */
+export function buildDeployMetadataAttributes(
+  git: GitDeployInfo,
+  place: DeployPlaceInfo,
+  places?: readonly ManifestPlaceInfo[]
+): DeployMetadataAttributes {
+  const attributes: DeployMetadataAttributes = {
+    Deployed: true,
+    Target: place.target,
+    Timestamp: place.timestamp,
+    Published: place.published,
+    PlaceId: String(place.placeId),
+    UniverseId: String(place.universeId),
+  };
+  if (git.commit) attributes.Commit = git.commit;
+  if (git.version) attributes.Version = git.version;
+  if (git.branch) attributes.Branch = git.branch;
+  if (place.packageVersion) attributes.PackageVersion = place.packageVersion;
+  // Stringified for the same reason as the other ids — see above. The version
+  // is small enough today to survive float32, but it travels with the id and
+  // the pair reads better as one kind of value.
+  if (place.basePlaceId != null) {
+    attributes.BasePlaceId = String(place.basePlaceId);
+  }
+  if (place.basePlaceVersion != null) {
+    attributes.BasePlaceVersion = String(place.basePlaceVersion);
+  }
+  if (places && places.length > 0) {
+    attributes.Places = JSON.stringify(
+      places.map((p) => ({
+        name: p.name,
+        placeId: p.placeId,
+        universeId: p.universeId,
+      }))
+    );
+  }
+  return attributes;
+}
+
+/** A built place with metadata injected, plus a handle to clean up its temp dir. */
+export interface InjectedPlace {
+  builtPlace: BuiltPlace;
+  cleanupAsync(): Promise<void>;
+}
+
+/**
+ * Run the Lune transform that writes `attributes` onto the place's manifest
+ * module. Produces a fresh .rbxl in its own temp directory so a shared rojo
+ * build (multi-place / batch deploys) is never mutated in place. The caller
+ * uploads `result.builtPlace` and then calls `result.cleanupAsync()`.
+ */
+export async function injectDeployMetadataAsync(
+  builtPlace: BuiltPlace,
+  attributes: DeployMetadataAttributes
+): Promise<InjectedPlace> {
+  const context = await BuildContext.createAsync({ prefix: 'deploy-meta-' });
+  const outputPath = context.resolvePath('deploy-metadata.rbxl');
+
+  OutputHelper.verbose('Injecting deploy metadata into built place...');
+  await context.executeLuneTransformScriptAsync(
+    INJECT_SCRIPT_PATH,
+    builtPlace.rbxlPath,
+    outputPath,
+    JSON.stringify(attributes)
+  );
+
+  return {
+    builtPlace: { ...builtPlace, rbxlPath: outputPath },
+    cleanupAsync: () => context.cleanupAsync(),
+  };
+}
+
+/**
+ * Inject `attributes` by rewriting `rbxlPath` in place. Only safe when the
+ * caller owns the file exclusively (e.g. a per-session test build); deploys use
+ * {@link injectDeployMetadataAsync} instead because they can share one rojo
+ * build across multiple places.
+ */
+export async function injectDeployMetadataInPlaceAsync(
+  rbxlPath: string,
+  attributes: DeployMetadataAttributes
+): Promise<void> {
+  const context = await BuildContext.createAsync({ prefix: 'deploy-meta-' });
+  try {
+    OutputHelper.verbose('Injecting deploy metadata into test build...');
+    // The transform reads the whole input before writing, so input === output
+    // rewrites the file safely.
+    await context.executeLuneTransformScriptAsync(
+      INJECT_SCRIPT_PATH,
+      rbxlPath,
+      rbxlPath,
+      JSON.stringify(attributes)
+    );
+  } finally {
+    await context.cleanupAsync();
+  }
+}
+
+/**
+ * True when the package at `packagePath` ships or directly depends on the
+ * manifest package, so its built place will contain the module to inject into.
+ * Gates injection during tests so unrelated packages don't pay for a Lune pass.
+ */
+export async function packageUsesManifestAsync(
+  packagePath: string
+): Promise<boolean> {
+  try {
+    const raw = await fs.readFile(
+      path.join(packagePath, 'package.json'),
+      'utf-8'
+    );
+    const pkg = JSON.parse(raw) as {
+      name?: string;
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+    if (pkg.name === MANIFEST_PACKAGE_NAME) {
+      return true;
+    }
+    return Boolean(
+      pkg.dependencies?.[MANIFEST_PACKAGE_NAME] ??
+        pkg.devDependencies?.[MANIFEST_PACKAGE_NAME]
+    );
+  } catch {
+    return false;
+  }
+}

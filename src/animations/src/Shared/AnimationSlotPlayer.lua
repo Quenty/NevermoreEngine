@@ -227,7 +227,7 @@ function AnimationSlotPlayer.AdjustWeight(
 	local topMaid = Maid.new()
 
 	topMaid:GiveTask(self._currentAnimationTrackData
-		:ObserveBrio(function(data)
+		:ObserveBrio(function(data: AnimationData)
 			return data and data.animationId == animationId
 		end)
 		:Subscribe(function(brio)
@@ -243,7 +243,7 @@ function AnimationSlotPlayer.AdjustWeight(
 			-- TODO: Use stack here?
 			-- TODO: Probably need rogue property mechanisms
 			maid:GiveTask(function()
-				if math.abs(data.track.Speed - weight) <= 1e-3 then
+				if math.abs(data.track.WeightTarget - weight) <= 1e-3 then
 					data.track:AdjustWeight(data.originalWeight, fadeTime)
 				end
 			end)

@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.39.0...@quenty/selectionutils@8.39.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.38.2...@quenty/selectionutils@8.39.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+## [8.38.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.38.1...@quenty/selectionutils@8.38.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+## [8.38.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.38.0...@quenty/selectionutils@8.38.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.37.0...@quenty/selectionutils@8.38.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.36.2...@quenty/selectionutils@8.37.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+## [8.36.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.36.1...@quenty/selectionutils@8.36.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+## [8.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.36.0...@quenty/selectionutils@8.36.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.35.0...@quenty/selectionutils@8.36.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.34.0...@quenty/selectionutils@8.35.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.33.0...@quenty/selectionutils@8.34.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.32.0...@quenty/selectionutils@8.33.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
+# [8.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.31.1...@quenty/selectionutils@8.32.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/selectionutils
+
 ## [8.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/selectionutils@8.31.0...@quenty/selectionutils@8.31.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/selectionutils

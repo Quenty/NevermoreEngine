@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Simple rig component to point at attachments given
 
@@ -15,15 +15,26 @@ local GripPointer = setmetatable({}, BaseObject)
 GripPointer.ClassName = "GripPointer"
 GripPointer.__index = GripPointer
 
-function GripPointer.new(ikRig)
-	local self = setmetatable(BaseObject.new(), GripPointer)
+export type GripPointer =
+	typeof(setmetatable(
+		{} :: {
+			_ikRig: any,
+			_leftGripAttachment: Attachment?,
+			_rightGripAttachment: Attachment?,
+		},
+		{} :: typeof({ __index = GripPointer })
+	))
+	& BaseObject.BaseObject
+
+function GripPointer.new(ikRig: any): GripPointer
+	local self: GripPointer = setmetatable(BaseObject.new() :: any, GripPointer)
 
 	self._ikRig = ikRig or error("No ikRig")
 
 	return self
 end
 
-function GripPointer:SetLeftGrip(leftGrip: Attachment)
+function GripPointer.SetLeftGrip(self: GripPointer, leftGrip: Attachment): ()
 	self._leftGripAttachment = leftGrip
 
 	if not self._leftGripAttachment then
@@ -38,7 +49,7 @@ function GripPointer:SetLeftGrip(leftGrip: Attachment)
 	self._maid._leftGripMaid = maid
 end
 
-function GripPointer:SetRightGrip(rightGrip: Attachment)
+function GripPointer.SetRightGrip(self: GripPointer, rightGrip: Attachment): ()
 	self._rightGripAttachment = rightGrip
 
 	if not self._rightGripAttachment then

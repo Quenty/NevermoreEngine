@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.35.0...@quenty/rx@13.35.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [13.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.34.2...@quenty/rx@13.35.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/rx
+
+## [13.34.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.34.1...@quenty/rx@13.34.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/rx
+
+## [13.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.34.0...@quenty/rx@13.34.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/rx
+
+# [13.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.33.1...@quenty/rx@13.34.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/rx
+
+## [13.33.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.33.0...@quenty/rx@13.33.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/rx
+
+# [13.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.32.0...@quenty/rx@13.33.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/rx
+
+# [13.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.31.0...@quenty/rx@13.32.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rx
+
+# [13.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.30.0...@quenty/rx@13.31.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/rx
+
+# [13.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.29.0...@quenty/rx@13.30.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [13.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.28.3...@quenty/rx@13.29.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/rx
+
 ## [13.28.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/rx@13.28.2...@quenty/rx@13.28.3) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/rx

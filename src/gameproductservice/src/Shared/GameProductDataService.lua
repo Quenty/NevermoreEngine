@@ -10,6 +10,7 @@ local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local PlayerProductManagerInterface = require("PlayerProductManagerInterface")
 local Promise = require("Promise")
 local Rx = require("Rx")
@@ -136,7 +137,7 @@ function GameProductDataService.ObserveServerOnlyPrompting(
 	_self: GameProductDataService,
 	player: Player
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	-- Always read the server-authoritative value (the server implementation), which
 	-- replicates down to clients as an attribute on the PlayerProductManager folder.
@@ -215,7 +216,7 @@ function GameProductDataService.HasPlayerPurchasedThisSession(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -243,7 +244,7 @@ function GameProductDataService.PromisePromptPurchase(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -267,7 +268,7 @@ function GameProductDataService.PromisePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -275,6 +276,67 @@ function GameProductDataService.PromisePlayerOwnership(
 		local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
 		return ownershipTracker:PromiseOwnsAsset(idOrKey)
 	end)
+end
+
+--[=[
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
+
+	The override is stored in a replicated attribute and applied to every realm's ownership tracker,
+	so it drives client-side ownership-gated UI. It can only be set from the server: this rejects on
+	the client realm, and [GameProductServiceClient] deliberately exposes no setter, so a player can
+	never grant themselves ownership.
+
+	@server
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@param ownsAsset boolean?
+	@return Promise
+]=]
+function GameProductDataService.SetPlayerOwnershipOverride(
+	self: GameProductDataService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number,
+	ownsAsset: boolean?
+): Promise.Promise<()>
+	-- Server authority: ownership overrides are never assignable from a client (otherwise a player
+	-- could grant themselves ownership of paid assets).
+	assert(
+		self._tieRealmService:GetTieRealm() ~= TieRealms.CLIENT,
+		"[GameProductDataService] - Ownership overrides can only be set from the server"
+	)
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
+
+	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
+		local ownershipTracker = playerProductManager:GetOwnershipTrackerOrError(assetType)
+		ownershipTracker:SetOwnershipOverride(idOrKey, ownsAsset)
+	end)
+end
+
+--[=[
+	Clears any ownership override for the asset, so ownership falls back to the cloud query.
+	Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`, and likewise
+	server-only.
+
+	@server
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise
+]=]
+function GameProductDataService.ClearPlayerOwnershipOverride(
+	self: GameProductDataService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<()>
+	return self:SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)
 end
 
 --[=[
@@ -289,7 +351,7 @@ function GameProductDataService.PromiseIsOwnable(
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 
 	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
@@ -307,7 +369,7 @@ function GameProductDataService.PromisePlayerIsPromptOpen(
 	self: GameProductDataService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
 		return playerProductManager:IsPromptOpen()
@@ -324,7 +386,7 @@ function GameProductDataService.PromisePlayerPromptClosed(
 	self: GameProductDataService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return self:_promisePlayerProductManager(player):Then(function(playerProductManager)
 		return playerProductManager:PromisePlayerPromptClosed()
@@ -345,7 +407,7 @@ function GameProductDataService.ObservePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -377,7 +439,7 @@ function GameProductDataService.ObservePlayerAssetPurchased(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<()>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -422,7 +484,7 @@ function GameProductDataService.ObserveAssetPurchased(
 						return playerProductManager:GetPlayer()
 					end),
 				})
-			end),
+			end) :: any,
 			Rx.map(function(brio)
 				-- I THINK THIS LEAKS
 				if brio:IsDead() then
@@ -430,10 +492,10 @@ function GameProductDataService.ObserveAssetPurchased(
 				end
 
 				return brio:GetValue()
-			end),
+			end) :: any,
 			Rx.where(function(value)
 				return value ~= nil
-			end),
+			end) :: any,
 		})
 end
 
@@ -453,7 +515,7 @@ function GameProductDataService.PromisePlayerOwnershipOrPrompt(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -485,7 +547,7 @@ function GameProductDataService._observePlayerProductManagerBrio(
 	self: GameProductDataService,
 	player: Player
 ): Observable.Observable<Brio.Brio<any>>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerProductManagerInterface:ObserveBrio(player, self._tieRealmService:GetTieRealm())
 end
@@ -494,13 +556,13 @@ function GameProductDataService._promisePlayerProductManager(
 	self: GameProductDataService,
 	player: Player
 ): Promise.Promise<any>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerProductManagerInterface:Promise(player, self._tieRealmService:GetTieRealm())
 end
 
-function GameProductDataService._getPlayerProductManager(self: GameProductDataService, player: Player)
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+function GameProductDataService._getPlayerProductManager(self: GameProductDataService, player: Player): any
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 
 	return PlayerProductManagerInterface:Find(player, self._tieRealmService:GetTieRealm())
 end

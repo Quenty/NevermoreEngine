@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Construct a rounded backing with a shadow.
 	@class RoundedBackingBuilder
@@ -11,6 +11,17 @@ RoundedBackingBuilder.DEFAULT_SHADOW_TRANSPARENCY = 0.7
 RoundedBackingBuilder.BACKING_ASSET_ID = "rbxassetid://735637144"
 RoundedBackingBuilder.SHADOW_ASSET_ID = "rbxassetid://735644155"
 
+export type RoundedBackingBuilderOptions = {
+	sibling: boolean,
+}
+
+export type RoundedBackingBuilder = typeof(setmetatable(
+	{} :: {
+		_options: RoundedBackingBuilderOptions,
+	},
+	{} :: typeof({ __index = RoundedBackingBuilder })
+))
+
 --[=[
 	Initializes a new RoundedBackingBuilder
 
@@ -18,8 +29,8 @@ RoundedBackingBuilder.SHADOW_ASSET_ID = "rbxassetid://735644155"
 	@param options { sibling: boolean } -- Options to set
 	@return RoundedBackingBuilder
 ]=]
-function RoundedBackingBuilder.new(options)
-	local self = setmetatable({}, RoundedBackingBuilder)
+function RoundedBackingBuilder.new(options: RoundedBackingBuilderOptions?): RoundedBackingBuilder
+	local self: RoundedBackingBuilder = setmetatable({} :: any, RoundedBackingBuilder)
 
 	self._options = options or {
 		sibling = true,
@@ -28,14 +39,14 @@ function RoundedBackingBuilder.new(options)
 	return self
 end
 
-function RoundedBackingBuilder:Create(gui)
+function RoundedBackingBuilder.Create(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = self:CreateBacking(gui)
 	self:CreateShadow(backing)
 
 	return backing
 end
 
-function RoundedBackingBuilder:CreateBacking(gui)
+function RoundedBackingBuilder.CreateBacking(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = Instance.new("ImageLabel")
 	backing.Name = "Backing"
 	backing.Size = UDim2.fromScale(1, 1)
@@ -57,7 +68,7 @@ function RoundedBackingBuilder:CreateBacking(gui)
 end
 
 -- Only top two corners are rounded
-function RoundedBackingBuilder:CreateTopBacking(gui)
+function RoundedBackingBuilder.CreateTopBacking(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(20, 16)
 	backing.SliceCenter = Rect.new(4, 4, 16, 16)
@@ -65,7 +76,7 @@ function RoundedBackingBuilder:CreateTopBacking(gui)
 	return backing
 end
 
-function RoundedBackingBuilder:CreateLeftBacking(gui)
+function RoundedBackingBuilder.CreateLeftBacking(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(16, 20)
 	backing.SliceCenter = Rect.new(4, 4, 16, 16)
@@ -73,7 +84,7 @@ function RoundedBackingBuilder:CreateLeftBacking(gui)
 	return backing
 end
 
-function RoundedBackingBuilder:CreateRightBacking(gui)
+function RoundedBackingBuilder.CreateRightBacking(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(16, 20)
 	backing.SliceCenter = Rect.new(4, 4, 16, 16)
@@ -83,7 +94,7 @@ function RoundedBackingBuilder:CreateRightBacking(gui)
 end
 
 -- Only bottom two corners are rounded
-function RoundedBackingBuilder:CreateBottomBacking(gui)
+function RoundedBackingBuilder.CreateBottomBacking(self: RoundedBackingBuilder, gui: GuiObject): ImageLabel
 	local backing = self:CreateBacking(gui)
 	backing.ImageRectSize = Vector2.new(20, 16)
 	backing.ImageRectOffset = Vector2.new(0, 4)
@@ -92,7 +103,7 @@ function RoundedBackingBuilder:CreateBottomBacking(gui)
 	return backing
 end
 
-function RoundedBackingBuilder:CreateTopShadow(backing)
+function RoundedBackingBuilder.CreateTopShadow(self: RoundedBackingBuilder, backing: GuiObject): ImageLabel
 	local shadow = self:CreateShadow(backing)
 	shadow.ImageRectSize = Vector2.new(80, 64)
 	shadow.SliceCenter = Rect.new(16, 16, 64, 64)
@@ -100,7 +111,7 @@ function RoundedBackingBuilder:CreateTopShadow(backing)
 	return shadow
 end
 
-function RoundedBackingBuilder:CreateShadow(backing)
+function RoundedBackingBuilder.CreateShadow(self: RoundedBackingBuilder, backing: GuiObject): ImageLabel
 	local shadow = Instance.new("ImageLabel")
 	shadow.Name = "Shadow"
 	shadow.Size = UDim2.new(1, 6, 1, 6)

@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local Motor6DStackBase = require("Motor6DStackBase")
+local R15Utils = require("R15Utils")
 local ServiceBag = require("ServiceBag")
 
 local Motor6DStack = setmetatable({}, Motor6DStackBase)
@@ -22,7 +23,10 @@ export type Motor6DStack =
 	))
 	& Motor6DStackBase.Motor6DStackBase
 
-function Motor6DStack.new(motor6D: Motor6D, serviceBag: ServiceBag.ServiceBag): Motor6DStack
+function Motor6DStack.new(
+	motor6D: R15Utils.AnimationConstraintOrMotor6D,
+	serviceBag: ServiceBag.ServiceBag
+): Motor6DStack
 	local self: Motor6DStack = setmetatable(Motor6DStackBase.new(motor6D, serviceBag) :: any, Motor6DStack)
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")

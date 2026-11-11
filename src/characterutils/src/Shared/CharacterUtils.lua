@@ -4,7 +4,11 @@
 	@class CharacterUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local Players = game:GetService("Players")
+
+local PlayerMock = require("PlayerMock")
 
 local CharacterUtils = {}
 
@@ -14,7 +18,8 @@ local CharacterUtils = {}
 	@return Humanoid? -- Nil if not found
 ]=]
 function CharacterUtils.getPlayerHumanoid(player: Player): Humanoid?
-	local character = player.Character
+	-- A mock's backing Folder has no Character property; read its stand-in instead.
+	local character = if PlayerMock.isMock(player) then PlayerMock.read(player, "Character") else player.Character
 	if not character then
 		return nil
 	end
@@ -110,12 +115,13 @@ end
 function CharacterUtils.getPlayerFromCharacter(descendant: Instance): Player?
 	local character = descendant
 	-- TODO: Only use models
-	local player = Players:GetPlayerFromCharacter(character :: any)
+	-- A mock's character is not resolvable through the Players service; check the mock registry too.
+	local player = Players:GetPlayerFromCharacter(character :: any) or PlayerMock.getMockFromCharacter(character)
 
 	while not player do
 		if character.Parent then
 			character = character.Parent
-			player = Players:GetPlayerFromCharacter(character)
+			player = Players:GetPlayerFromCharacter(character) or PlayerMock.getMockFromCharacter(character)
 		else
 			return nil
 		end

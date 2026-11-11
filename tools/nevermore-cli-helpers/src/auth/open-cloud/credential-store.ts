@@ -28,6 +28,16 @@ export function printApiKeySetupHelp(): void {
     '  - legacy-asset:manage             (download base places for integration builds)'
   );
   console.log('');
+  console.log('Only needed for `--watch --watch-share-api-key`:');
+  console.log(
+    '  - asset:read                      (let the watch service read base place versions)'
+  );
+  console.log('');
+  console.log('Only needed for `deploy asset upload`:');
+  console.log(
+    '  - asset:read, asset:write         (upload images, models, audio)'
+  );
+  console.log('');
 }
 
 interface StoredCredentials {

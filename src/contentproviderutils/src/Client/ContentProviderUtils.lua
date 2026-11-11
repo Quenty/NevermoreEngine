@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Utility functions to ensure that content is preloaded (wrapping calls in promises)
 	@class ContentProviderUtils
@@ -21,7 +21,7 @@ local ContentProviderUtils = {}
 	@param contentIdList { Instance | string }
 	@return Promise
 ]=]
-function ContentProviderUtils.promisePreload(contentIdList: { Instance | string })
+function ContentProviderUtils.promisePreload(contentIdList: { Instance | string }): Promise.Promise<()>
 	assert(type(contentIdList) == "table", "Bad contentIdList")
 
 	return Promise.spawn(function(resolve, reject)

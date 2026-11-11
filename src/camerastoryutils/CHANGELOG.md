@@ -3,6 +3,98 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.36.0...@quenty/camerastoryutils@10.36.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.35.2...@quenty/camerastoryutils@10.36.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.35.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.35.1...@quenty/camerastoryutils@10.35.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.35.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.35.0...@quenty/camerastoryutils@10.35.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.34.1...@quenty/camerastoryutils@10.35.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.34.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.34.0...@quenty/camerastoryutils@10.34.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.33.0...@quenty/camerastoryutils@10.34.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.32.0...@quenty/camerastoryutils@10.33.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.31.0...@quenty/camerastoryutils@10.32.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.30.1...@quenty/camerastoryutils@10.31.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.30.0...@quenty/camerastoryutils@10.30.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.29.2...@quenty/camerastoryutils@10.30.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.29.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.29.1...@quenty/camerastoryutils@10.29.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.29.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.29.0...@quenty/camerastoryutils@10.29.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.28.0...@quenty/camerastoryutils@10.29.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.27.0...@quenty/camerastoryutils@10.28.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.26.0...@quenty/camerastoryutils@10.27.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.25.1...@quenty/camerastoryutils@10.26.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+## [10.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.25.0...@quenty/camerastoryutils@10.25.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.24.0...@quenty/camerastoryutils@10.25.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.23.0...@quenty/camerastoryutils@10.24.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.22.0...@quenty/camerastoryutils@10.23.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
+# [10.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.21.1...@quenty/camerastoryutils@10.22.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/camerastoryutils
+
 ## [10.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/camerastoryutils@10.21.0...@quenty/camerastoryutils@10.21.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/camerastoryutils

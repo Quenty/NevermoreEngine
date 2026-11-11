@@ -3,6 +3,184 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.79.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.79.0...@quenty/settings-inputkeymap@10.79.1) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.79.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.78.1...@quenty/settings-inputkeymap@10.79.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.78.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.78.0...@quenty/settings-inputkeymap@10.78.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.78.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.77.3...@quenty/settings-inputkeymap@10.78.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.77.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.77.2...@quenty/settings-inputkeymap@10.77.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.77.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.77.1...@quenty/settings-inputkeymap@10.77.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.77.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.77.0...@quenty/settings-inputkeymap@10.77.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.77.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.76.0...@quenty/settings-inputkeymap@10.77.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.76.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.75.1...@quenty/settings-inputkeymap@10.76.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.75.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.75.0...@quenty/settings-inputkeymap@10.75.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.74.0...@quenty/settings-inputkeymap@10.75.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.73.0...@quenty/settings-inputkeymap@10.74.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.72.1...@quenty/settings-inputkeymap@10.73.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.72.0...@quenty/settings-inputkeymap@10.72.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.71.1...@quenty/settings-inputkeymap@10.72.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.71.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.71.0...@quenty/settings-inputkeymap@10.71.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.7...@quenty/settings-inputkeymap@10.71.0) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.7](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.6...@quenty/settings-inputkeymap@10.70.7) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.6](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.5...@quenty/settings-inputkeymap@10.70.6) (2026-08-07)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.4...@quenty/settings-inputkeymap@10.70.5) (2026-08-05)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.3...@quenty/settings-inputkeymap@10.70.4) (2026-07-30)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.2...@quenty/settings-inputkeymap@10.70.3) (2026-07-29)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.1...@quenty/settings-inputkeymap@10.70.2) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.70.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.70.0...@quenty/settings-inputkeymap@10.70.1) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.69.3...@quenty/settings-inputkeymap@10.70.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.69.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.69.2...@quenty/settings-inputkeymap@10.69.3) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.69.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.69.1...@quenty/settings-inputkeymap@10.69.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.69.0...@quenty/settings-inputkeymap@10.69.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.68.0...@quenty/settings-inputkeymap@10.69.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.67.0...@quenty/settings-inputkeymap@10.68.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.66.0...@quenty/settings-inputkeymap@10.67.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.65.1...@quenty/settings-inputkeymap@10.66.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.65.0...@quenty/settings-inputkeymap@10.65.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.64.0...@quenty/settings-inputkeymap@10.65.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.63.0...@quenty/settings-inputkeymap@10.64.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.62.0...@quenty/settings-inputkeymap@10.63.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.61.0...@quenty/settings-inputkeymap@10.62.0) (2026-07-21)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.60.0...@quenty/settings-inputkeymap@10.61.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.59.0...@quenty/settings-inputkeymap@10.60.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [10.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.58.1...@quenty/settings-inputkeymap@10.59.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+## [10.58.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.58.0...@quenty/settings-inputkeymap@10.58.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.57.0...@quenty/settings-inputkeymap@10.58.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/settings-inputkeymap
+
+# [10.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.56.3...@quenty/settings-inputkeymap@10.57.0) (2026-07-14)
+
+### Features
+
+- **settings-inputkeymap:** convert package to --!strict ([f4f876f](https://github.com/Quenty/NevermoreEngine/commit/f4f876f25653df06157c4070f04bc445e2c66b0d))
+
 ## [10.56.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/settings-inputkeymap@10.56.2...@quenty/settings-inputkeymap@10.56.3) (2026-06-15)
 
 **Note:** Version bump only for package @quenty/settings-inputkeymap

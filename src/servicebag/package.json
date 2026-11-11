@@ -1,6 +1,6 @@
 {
   "name": "@quenty/servicebag",
-  "version": "11.18.1",
+  "version": "11.21.3",
   "description": "Service providing mechanisms for Nevermore",
   "keywords": [
     "Roblox",
@@ -31,7 +31,9 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/loader": "workspace:*",
-    "@quenty/signal": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/signal": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

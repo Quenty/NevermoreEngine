@@ -3,6 +3,92 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.52.0...@quenty/tie@10.52.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [10.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.51.3...@quenty/tie@10.52.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/tie
+
+## [10.51.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.51.2...@quenty/tie@10.51.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/tie
+
+## [10.51.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.51.1...@quenty/tie@10.51.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/tie
+
+## [10.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.51.0...@quenty/tie@10.51.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.50.0...@quenty/tie@10.51.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.49.0...@quenty/tie@10.50.0) (2026-09-02)
+
+### Features
+
+- Add BindableUtils package ([1fc7b61](https://github.com/Quenty/NevermoreEngine/commit/1fc7b61851e84dac9a2f728d964c5f1c10884b5c))
+- Add TieDefinition.ObserveFirstAncestorImplementationBrio ([ea3e228](https://github.com/Quenty/NevermoreEngine/commit/ea3e228cd51627ccd51d774c21c0b00a6e10a77c))
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.48.0...@quenty/tie@10.49.0) (2026-08-28)
+
+### Bug Fixes
+
+- Fix implementation issues ([e66b446](https://github.com/Quenty/NevermoreEngine/commit/e66b44639e249e0531d842e7ccb0208f357dc351))
+- Tie implementations on client don't implement server methods and vice versa. ([29ca57a](https://github.com/Quenty/NevermoreEngine/commit/29ca57aab206911b06512d44f8a5834a6287dcb8))
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.47.1...@quenty/tie@10.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/tie
+
+## [10.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.47.0...@quenty/tie@10.47.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.46.1...@quenty/tie@10.47.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/tie
+
+## [10.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.46.0...@quenty/tie@10.46.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.45.0...@quenty/tie@10.46.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.44.0...@quenty/tie@10.45.0) (2026-07-23)
+
+### Features
+
+- Even more stuff ([fea7e95](https://github.com/Quenty/NevermoreEngine/commit/fea7e9587e7195bbfa7f4753c130a3d597f9a34b))
+
+# [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.43.0...@quenty/tie@10.44.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.42.0...@quenty/tie@10.43.0) (2026-07-18)
+
+### Bug Fixes
+
+- pin translation behavior with tests and fix camelCase key generation ([#737](https://github.com/Quenty/NevermoreEngine/issues/737)) ([1b7a536](https://github.com/Quenty/NevermoreEngine/commit/1b7a536dde7e124f8432e57612ec8138dd835d75))
+
+# [10.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.41.0...@quenty/tie@10.42.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/tie
+
+# [10.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.40.1...@quenty/tie@10.41.0) (2026-07-14)
+
+### Features
+
+- **tie:** convert package to --!strict ([4131f0d](https://github.com/Quenty/NevermoreEngine/commit/4131f0de67deb3ad97cddc74eae23c5aa9607acb))
+
 ## [10.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/tie@10.40.0...@quenty/tie@10.40.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/tie

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Renders the markdown. See [MarkdownParser] for parsing.
 
@@ -9,7 +9,11 @@
 	@class MarkdownRender
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
 local TextService = game:GetService("TextService")
+
+local MarkdownParser = require("MarkdownParser")
 
 local MarkdownRender = {}
 MarkdownRender.__index = MarkdownRender
@@ -22,14 +26,29 @@ MarkdownRender.Indent = 30
 MarkdownRender.TextColor3 = Color3.fromRGB(56, 56, 56)
 MarkdownRender.MaxHeaderLevel = 3 -- h5 is the largest
 
+export type MarkdownRenderOptions = {
+	TextSize: number,
+	SpaceAfterParagraph: number,
+}
+
+export type MarkdownRender = typeof(setmetatable(
+	{} :: {
+		_gui: GuiObject,
+		_width: number,
+		TextSize: number,
+		SpaceAfterParagraph: number,
+	},
+	{} :: typeof({ __index = MarkdownRender })
+))
+
 --[=[
 	Creates a new markdown render
 	@param gui GuiObject
 	@param width number -- Width to render at
 	@return MarkdownRender
 ]=]
-function MarkdownRender.new(gui, width)
-	local self = setmetatable({}, MarkdownRender)
+function MarkdownRender.new(gui: GuiObject, width: number): MarkdownRender
+	local self: MarkdownRender = setmetatable({} :: any, MarkdownRender)
 
 	self._gui = gui or error("No Gui")
 	self._width = width or error("No width")
@@ -37,7 +56,7 @@ function MarkdownRender.new(gui, width)
 	return self
 end
 
-function MarkdownRender:WithOptions(options)
+function MarkdownRender.WithOptions(self: MarkdownRender, options: MarkdownRenderOptions): MarkdownRender
 	self.TextSize = options.TextSize
 	self.SpaceAfterParagraph = options.SpaceAfterParagraph
 
@@ -48,28 +67,31 @@ end
 	Renders the data in the given gui
 	@param data table -- Data from MarkdownParser.
 ]=]
-function MarkdownRender:Render(data)
+function MarkdownRender.Render(self: MarkdownRender, data: { MarkdownParser.MarkdownLine }): ()
 	local height = 0
 	for index, item in data do
-		local gui
+		local gui: GuiObject? = nil
 		if type(item) == "string" then
-			gui = self:_renderParagraph(item)
-			gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-			height = height + gui.Size.Y.Offset
+			local paragraph = self:_renderParagraph(item)
+			paragraph.Position = UDim2.new(paragraph.Position.X, UDim.new(0, height))
+			height = height + paragraph.Size.Y.Offset
+			gui = paragraph
 
 			if index ~= #data then
 				height = height + self.SpaceAfterParagraph
 			end
 		elseif type(item) == "table" then
 			if item.Type == "List" then
-				gui = self:_renderList(item)
-				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-				height = height + gui.Size.Y.Offset
+				local frame = self:_renderList(item :: MarkdownParser.MarkdownList)
+				frame.Position = UDim2.new(frame.Position.X, UDim.new(0, height))
+				height = height + frame.Size.Y.Offset
+				gui = frame
 
+				local nextItem = data[index + 1]
 				local nextIsNestedList = (
-					type(data[index + 1]) == "table"
-					and data[index + 1].Type == "List"
-					and data[index + 1].Level ~= item.Level
+					type(nextItem) == "table"
+					and nextItem.Type == "List"
+					and nextItem.Level ~= item.Level
 				)
 
 				if index ~= #data then
@@ -80,9 +102,10 @@ function MarkdownRender:Render(data)
 					end
 				end
 			elseif item.Type == "Header" then
-				gui = self:_renderHeader(item)
-				gui.Position = UDim2.new(gui.Position.X, UDim.new(0, height))
-				height = height + gui.Size.Y.Offset
+				local header = self:_renderHeader(item :: MarkdownParser.MarkdownHeader)
+				header.Position = UDim2.new(header.Position.X, UDim.new(0, height))
+				height = height + header.Size.Y.Offset
+				gui = header
 
 				if index ~= #data then
 					height = height + self.SpaceAfterHeader
@@ -102,7 +125,7 @@ function MarkdownRender:Render(data)
 	self._gui.Size = UDim2.new(self._gui.Size.X, UDim.new(0, height))
 end
 
-function MarkdownRender:_getFrame()
+function MarkdownRender._getFrame(self: MarkdownRender): Frame
 	local frame = Instance.new("Frame")
 	frame.BackgroundTransparency = 1
 	frame.BorderSizePixel = 0
@@ -112,7 +135,7 @@ function MarkdownRender:_getFrame()
 	return frame
 end
 
-function MarkdownRender:_getTextLabel()
+function MarkdownRender._getTextLabel(self: MarkdownRender): TextLabel
 	local textLabel = Instance.new("TextLabel")
 	textLabel.BackgroundTransparency = 1
 	textLabel.Size = UDim2.fromScale(1, 0)
@@ -121,7 +144,7 @@ function MarkdownRender:_getTextLabel()
 	return self:_formatTextLabel(textLabel)
 end
 
-function MarkdownRender:_formatTextLabel(textLabel)
+function MarkdownRender._formatTextLabel(self: MarkdownRender, textLabel: TextLabel): TextLabel
 	textLabel.Font = Enum.Font.SourceSans
 	textLabel.TextColor3 = self.TextColor3
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -134,7 +157,7 @@ function MarkdownRender:_formatTextLabel(textLabel)
 end
 
 -- Strip ending punctuation which screws with roblox's wordwrapping and .TextFits
-function MarkdownRender:_renderParagraphLabel(label, text)
+function MarkdownRender._renderParagraphLabel(self: MarkdownRender, label: TextLabel, text: string): TextLabel
 	local labelWidth = label.Size.X.Scale * self._width + label.Size.X.Offset
 
 	local strippedText = string.gsub(text, "(%p+)$", "")
@@ -147,20 +170,20 @@ function MarkdownRender:_renderParagraphLabel(label, text)
 	return label
 end
 
-function MarkdownRender:_renderParagraph(text, options)
-	options = options or {}
+function MarkdownRender._renderParagraph(self: MarkdownRender, text: string, options: { Parent: Instance? }?): TextLabel
+	local resolvedOptions: { Parent: Instance? } = options or {}
 
 	local label = self:_getTextLabel()
 	label.Text = text
 	label.Name = "Paragraph"
-	label.Parent = options.Parent or self._gui
+	label.Parent = resolvedOptions.Parent or self._gui
 
 	self:_renderParagraphLabel(label, text)
 
 	return label
 end
 
-function MarkdownRender:_getBullet(level)
+function MarkdownRender._getBullet(self: MarkdownRender, level: number): Frame
 	local bullet = Instance.new("Frame")
 	bullet.Name = "bullet"
 	bullet.BorderSizePixel = 0
@@ -177,7 +200,7 @@ function MarkdownRender:_getBullet(level)
 	return bullet
 end
 
-function MarkdownRender:_renderList(listData)
+function MarkdownRender._renderList(self: MarkdownRender, listData: MarkdownParser.MarkdownList): Frame
 	assert(type(listData.Level) == "number" and listData.Level > 0, "Bad listData")
 
 	local frame = self:_getFrame()
@@ -188,7 +211,7 @@ function MarkdownRender:_renderList(listData)
 
 	local height = 0
 	for index, text in ipairs(listData) do
-		local textLabel = self:_renderParagraph(text, { Parent = frame })
+		local textLabel = self:_renderParagraph(text, { Parent = frame :: Instance })
 		textLabel.Name = string.format("%d_%s", index, textLabel.Name)
 		textLabel.Position = UDim2.new(textLabel.Position.X, UDim.new(0, height))
 
@@ -208,7 +231,7 @@ function MarkdownRender:_renderList(listData)
 	return frame
 end
 
-function MarkdownRender:_renderHeader(headerData)
+function MarkdownRender._renderHeader(self: MarkdownRender, headerData: MarkdownParser.MarkdownHeader): TextLabel
 	local label = self:_getTextLabel()
 	label.Name = "Header" .. headerData.Level
 	label.TextSize = self.TextSize + (self.MaxHeaderLevel - headerData.Level)

@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.40.0...@quenty/contentproviderutils@12.40.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.39.2...@quenty/contentproviderutils@12.40.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+## [12.39.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.39.1...@quenty/contentproviderutils@12.39.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+## [12.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.39.0...@quenty/contentproviderutils@12.39.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.38.0...@quenty/contentproviderutils@12.39.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.37.2...@quenty/contentproviderutils@12.38.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+## [12.37.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.37.1...@quenty/contentproviderutils@12.37.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+## [12.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.37.0...@quenty/contentproviderutils@12.37.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.36.0...@quenty/contentproviderutils@12.37.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.36.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.35.0...@quenty/contentproviderutils@12.36.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.35.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.34.0...@quenty/contentproviderutils@12.35.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.34.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.33.0...@quenty/contentproviderutils@12.34.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.33.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.32.0...@quenty/contentproviderutils@12.33.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/contentproviderutils
+
+# [12.32.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.31.1...@quenty/contentproviderutils@12.32.0) (2026-07-14)
+
+### Features
+
+- **contentproviderutils:** convert package to --!strict ([3e5fe61](https://github.com/Quenty/NevermoreEngine/commit/3e5fe613f68975b9ca4acd42d2806402f2ddbc58))
+
 ## [12.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/contentproviderutils@12.31.0...@quenty/contentproviderutils@12.31.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/contentproviderutils

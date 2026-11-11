@@ -41,6 +41,25 @@ export {
   type DataModelNode,
 } from './explorer/query/query.js';
 export {
+  exportInstancesHandlerAsync,
+  type ExportResult,
+} from './explorer/export/export.js';
+export {
+  importInstancesHandlerAsync,
+  type ImportResult,
+  type ImportOptions,
+} from './explorer/import/import.js';
+export {
+  findInstancesHandlerAsync,
+  type FindResult,
+  type FindOptions,
+} from './explorer/find/find.js';
+export {
+  grepScriptsHandlerAsync,
+  type GrepResult,
+  type GrepOptions,
+} from './explorer/grep/grep.js';
+export {
   execHandlerAsync,
   type ExecOptions,
   type ExecResult,
@@ -61,6 +80,37 @@ export {
   type ConnectResult,
 } from './connect.js';
 export { disconnectHandler, type DisconnectResult } from './disconnect.js';
+export {
+  playtestStartHandlerAsync,
+  type PlaytestStartOptions,
+  type PlaytestStartResult,
+} from './playtest/start/start.js';
+export {
+  playtestStopHandlerAsync,
+  type PlaytestStopOptions,
+  type PlaytestStopResult,
+} from './playtest/stop/stop.js';
+export {
+  playtestRunHandlerAsync,
+  type PlaytestRunOptions,
+  type PlaytestRunResult,
+} from './playtest/run/run.js';
+export {
+  playtestRestartHandlerAsync,
+  type PlaytestRestartOptions,
+} from './playtest/restart/restart.js';
+export {
+  playtestPlayerListHandlerAsync,
+  type PlaytestPlayerListResult,
+} from './playtest/player/list/list.js';
+export {
+  playtestPlayerAddHandlerAsync,
+  type PlaytestPlayerAddResult,
+} from './playtest/player/add/add.js';
+export {
+  playtestPlayerRemoveHandlerAsync,
+  type PlaytestPlayerRemoveResult,
+} from './playtest/player/remove/remove.js';
 export {
   processRunHandlerAsync,
   type ProcessRunOptions,

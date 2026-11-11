@@ -2,8 +2,9 @@ import {
   getApiKeyAsync,
   type CredentialArgs,
 } from '@quenty/nevermore-cli-helpers';
-import { type DeployTarget } from './deploy-config.js';
+import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+import { reportRateLimitWait } from '../open-cloud/rate-limiter.js';
 import { type BuiltPlace } from './build.js';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
@@ -53,7 +54,10 @@ export async function uploadPlaceAsync(
     target.placeId,
     rbxlPath,
     args.publish,
-    onProgress
+    onProgress,
+    reporter && packageName
+      ? reportRateLimitWait(reporter, packageName)
+      : undefined
   );
 
   return { client, apiKey, target, version };

@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Signal = require("Signal")
 local ValueObject = require("ValueObject")
@@ -79,7 +80,12 @@ function HumanoidTracker.new(player: Player): HumanoidTracker
 		self._maid._current = maid
 	end))
 
-	self._maid:GiveTask(self._player:GetPropertyChangedSignal("Character"):Connect(function()
+	-- A PlayerMock has no native Character property; its stand-in Character (see PlayerMock) is
+	-- observed through the mock's property-changed signal instead.
+	local characterChanged = if PlayerMock.isMock(player)
+		then PlayerMock.getPropertyChangedSignal(player, "Character")
+		else self._player:GetPropertyChangedSignal("Character")
+	self._maid:GiveTask(characterChanged:Connect(function()
 		if not self.Destroy then
 			return
 		end
@@ -128,7 +134,9 @@ function HumanoidTracker._onCharacterChanged(self: HumanoidTracker)
 	local maid = Maid.new()
 	self._maid._characterMaid = maid
 
-	local character = self._player.Character
+	local character = if PlayerMock.isMock(self._player)
+		then PlayerMock.read(self._player, "Character")
+		else self._player.Character
 	if not character then
 		self.Humanoid.Value = nil
 		return

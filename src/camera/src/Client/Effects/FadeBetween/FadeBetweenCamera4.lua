@@ -1,10 +1,11 @@
---!nonstrict
+--!strict
 --[=[
 	@class FadeBetweenCamera4
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local CameraEffectUtils = require("CameraEffectUtils")
 local CameraState = require("CameraState")
 local CubicSplineUtils = require("CubicSplineUtils")
 local Spring = require("Spring")
@@ -12,28 +13,52 @@ local SpringUtils = require("SpringUtils")
 
 local FadeBetweenCamera4 = {}
 FadeBetweenCamera4.ClassName = "FadeBetweenCamera4"
-FadeBetweenCamera4.__index = FadeBetweenCamera4
+
+export type FadeBetweenCamera4 =
+	typeof(setmetatable(
+		{} :: {
+			CameraA: CameraEffectUtils.CameraEffect,
+			CameraB: CameraEffectUtils.CameraEffect,
+			_spring: Spring.Spring<number>,
+			_position0: number,
+			_state0: CameraState.CameraState,
+			CameraState: CameraState.CameraState,
+			Value: number,
+			Target: number,
+			HasReachedTarget: boolean,
+			Speed: number,
+			Velocity: number,
+		},
+		{} :: typeof({ __index = FadeBetweenCamera4 })
+	))
+	& CameraEffectUtils.CameraEffect
 
 --[=[
 	@param cameraA CameraLike
 	@param cameraB CameraLike
 	@return FadeBetweenCamera4
 ]=]
-function FadeBetweenCamera4.new(cameraA, cameraB)
-	local self = setmetatable({
-		CameraA = cameraA or error("No cameraA"),
-		CameraB = cameraB or error("No cameraB"),
-		_spring = Spring.new(),
-		_position0 = 0,
-		_state0 = cameraA.CameraState,
-	}, FadeBetweenCamera4)
+function FadeBetweenCamera4.new(
+	cameraA: CameraEffectUtils.CameraEffect,
+	cameraB: CameraEffectUtils.CameraEffect
+): FadeBetweenCamera4
+	local self: FadeBetweenCamera4 = setmetatable(
+		{
+			CameraA = cameraA or error("No cameraA"),
+			CameraB = cameraB or error("No cameraB"),
+			_spring = Spring.new(0),
+			_position0 = 0,
+			_state0 = cameraA.CameraState,
+		} :: any,
+		FadeBetweenCamera4
+	)
 
 	self._spring.s = 15
 
 	return self
 end
 
-function FadeBetweenCamera4:__newindex(index, value)
+function FadeBetweenCamera4.__newindex(self: FadeBetweenCamera4, index, value)
 	if index == "Value" then
 		assert(type(value) == "number", "Bad value")
 
@@ -57,7 +82,7 @@ function FadeBetweenCamera4:__newindex(index, value)
 
 		local _, position = SpringUtils.animating(self._spring)
 		self._state0, self._position0 = self:_computeCameraState(position)
-		rawset(self, index, value)
+		rawset(self :: any, index, value)
 	else
 		error(string.format("%q is not a valid member of FadeBetweenCamera4", tostring(index)))
 	end
@@ -69,7 +94,7 @@ end
 	@prop CameraState CameraState
 	@within FadeBetweenCamera4
 ]=]
-function FadeBetweenCamera4:__index(index)
+function FadeBetweenCamera4.__index(self: FadeBetweenCamera4, index)
 	if index == "CameraState" then
 		local _, value = SpringUtils.animating(self._spring)
 		local state, _ = self:_computeCameraState(value)
@@ -93,7 +118,7 @@ function FadeBetweenCamera4:__index(index)
 	end
 end
 
-function FadeBetweenCamera4:_computeTargetState(target)
+function FadeBetweenCamera4._computeTargetState(self: FadeBetweenCamera4, target: number): CameraState.CameraState
 	if target <= 0 then
 		return self.CameraA.CameraState
 	elseif target >= 1 then
@@ -111,7 +136,10 @@ function FadeBetweenCamera4:_computeTargetState(target)
 	end
 end
 
-function FadeBetweenCamera4:_computeCameraState(position)
+function FadeBetweenCamera4._computeCameraState(
+	self: FadeBetweenCamera4,
+	position: number
+): (CameraState.CameraState, number)
 	if position <= 0 then
 		return self:_computeTargetState(0), 0
 	elseif position >= 1 then

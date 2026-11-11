@@ -1,6 +1,6 @@
---!nonstrict
+--!strict
 --[[
-	@class snackbarServiceClient.story
+	@class SnackbarServiceClient.story
 ]]
 
 local require = (require :: any)(

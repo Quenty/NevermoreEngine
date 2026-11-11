@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { AsyncLocalStorage } from 'async_hooks';
+import { isCI } from './cli-utils.js';
 
 export type BoxOptions = {
   centered?: boolean;
@@ -16,6 +17,16 @@ const _outputStorage = new AsyncLocalStorage<OutputBuffer>();
  */
 export class OutputHelper {
   private static _verbose: boolean = true;
+  private static _diagnosticsToStderr: boolean = false;
+
+  private static _writeDiagnostic(text: string): void {
+    if (this._diagnosticsToStderr) {
+      console.error(text);
+    } else {
+      console.log(text);
+    }
+  }
+
   /**
    * Formats the error with markup
    * @param message Message to format
@@ -168,7 +179,9 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static info(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatInfo(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatInfo(message)
+    );
   }
 
   /**
@@ -189,6 +202,14 @@ export class OutputHelper {
   }
 
   /**
+   * Sends info, warnings, hints, verbose output and boxes to stderr, for CLIs
+   * whose stdout carries only the command result.
+   */
+  public static setDiagnosticsToStderr(toStderr: boolean): void {
+    this._diagnosticsToStderr = toStderr;
+  }
+
+  /**
    * Logs a verbose/intermediate message. Suppressed when verbose is false.
    * When running inside a buffered context (see runBuffered), messages are
    * captured to the buffer instead of printed.
@@ -205,7 +226,7 @@ export class OutputHelper {
     if (buffer) {
       buffer.lines.push(formatted);
     } else {
-      console.log(formatted);
+      this._writeDiagnostic(formatted);
     }
   }
 
@@ -227,7 +248,30 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static warn(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatWarning(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatWarning(message)
+    );
+  }
+
+  /**
+   * Open a collapsible section, so a run of related output can be folded away.
+   *
+   * In CI this is a workflow command; elsewhere it is a plain header, since a
+   * `::group::` line is only noise in a terminal that cannot fold it. Always
+   * pair with {@link endGroup} — an unclosed group swallows everything printed
+   * after it.
+   */
+  public static startGroup(title: string, useGroups = isCI()): void {
+    this._writeDiagnostic(
+      useGroups ? `::group::${title}` : this.formatDim(`── ${title} ──`)
+    );
+  }
+
+  /** Close the section opened by {@link startGroup}. */
+  public static endGroup(useGroups = isCI()): void {
+    if (useGroups) {
+      this._writeDiagnostic('::endgroup::');
+    }
   }
 
   /**
@@ -235,7 +279,9 @@ export class OutputHelper {
    * @param message Message to write
    */
   public static hint(message: string): void {
-    console.log(this._hasAnsi(message) ? message : this.formatHint(message));
+    this._writeDiagnostic(
+      this._hasAnsi(message) ? message : this.formatHint(message)
+    );
   }
 
   /**
@@ -243,6 +289,6 @@ export class OutputHelper {
    * @param message
    */
   public static box(message: string, options?: BoxOptions): void {
-    console.log(this.formatBox(message, options));
+    this._writeDiagnostic(this.formatBox(message, options));
   }
 }

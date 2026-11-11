@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import type { Socket } from 'net';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { resolveLinuxConfig } from './linux-config.js';
 import { buildWineEnv } from './linux-wine-env.js';
@@ -69,6 +70,16 @@ export async function launchStudioLinuxAsync(
     }
   });
   tailProc.unref();
+  // The stdout pipe is ref'd separately and `tail -f` never closes it
+  (tailProc.stdout as Socket | null)?.unref();
+
+  process.once('exit', () => {
+    try {
+      tailProc.kill('SIGTERM');
+    } catch {
+      // Best effort
+    }
+  });
 
   let killed = false;
   const killAsync = async () => {

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.21.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.21.2...@quenty/servicebag@11.21.3) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+## [11.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.21.1...@quenty/servicebag@11.21.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+## [11.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.21.0...@quenty/servicebag@11.21.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+# [11.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.20.1...@quenty/servicebag@11.21.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+## [11.20.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.20.0...@quenty/servicebag@11.20.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/servicebag
+
+# [11.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.19.0...@quenty/servicebag@11.20.0) (2026-07-23)
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [11.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.18.1...@quenty/servicebag@11.19.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/servicebag
+
 ## [11.18.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/servicebag@11.18.0...@quenty/servicebag@11.18.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/servicebag

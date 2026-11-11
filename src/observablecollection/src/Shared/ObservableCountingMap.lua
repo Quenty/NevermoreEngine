@@ -167,22 +167,29 @@ function ObservableCountingMap.ObservePairsBrio<T>(
 	return Observable.new(function(sub)
 		local maid = Maid.new()
 		local keyMaid: any = maid:Add(Maid.new())
+		local emittedKeys: { [T]: true } = {}
 
 		local function handleValue(key: T, value: number)
 			if value ~= 0 then
 				local brio = Brio.new(key, value)
+				emittedKeys[key] = true
 				keyMaid[key] = brio
 				sub:Fire(brio)
 			else
+				emittedKeys[key] = nil
 				keyMaid[key] = nil
 			end
 		end
 
-		for key, value in self._map do
-			handleValue(key, value)
-		end
-
 		maid:GiveTask(self.KeyChanged:Connect(handleValue))
+
+		-- Walk a snapshot: inserting keys during a table walk can skip existing ones
+		for key in table.clone(self._map) do
+			local value = self._map[key]
+			if value ~= nil and not emittedKeys[key] then
+				handleValue(key, value)
+			end
+		end
 
 		self._maid[sub] = maid
 		maid:GiveTask(function()
@@ -233,8 +240,11 @@ function ObservableCountingMap.ObserveKeysBrio<T>(self: ObservableCountingMap<T>
 			keyMaid[key] = nil
 		end))
 
-		for key, _ in self._map do
-			handleItem(key)
+		-- Walk a snapshot: inserting keys during a table walk can skip existing ones
+		for key in table.clone(self._map) do
+			if self._map[key] ~= nil then
+				handleItem(key)
+			end
 		end
 
 		self._maid[sub] = maid
@@ -327,8 +337,12 @@ function ObservableCountingMap.Add<T>(self: ObservableCountingMap<T>, key: T, am
 			-- Remove item
 			self._map[key] = nil
 
-			-- Fire events
-			self._totalKeyCountValue.Value = self._totalKeyCountValue.Value - 1
+			-- Fire events. The backing ValueObject may already be destroyed when a stored removal
+			-- callback fires during this map's own teardown, in which case its Value reads nil.
+			local totalKeyCount = self._totalKeyCountValue.Value
+			if totalKeyCount ~= nil then
+				self._totalKeyCountValue.Value = totalKeyCount - 1
+			end
 
 			if self.Destroy then
 				self.KeyRemoved:Fire(key)
@@ -348,8 +362,11 @@ function ObservableCountingMap.Add<T>(self: ObservableCountingMap<T>, key: T, am
 		-- Add item
 		self._map[key] = change
 
-		-- Fire events
-		self._totalKeyCountValue.Value = self._totalKeyCountValue.Value + 1
+		-- Fire events (see the removal branch for why Value may read nil here)
+		local totalKeyCount = self._totalKeyCountValue.Value
+		if totalKeyCount ~= nil then
+			self._totalKeyCountValue.Value = totalKeyCount + 1
+		end
 
 		if self.Destroy then
 			self.KeyAdded:Fire(key)

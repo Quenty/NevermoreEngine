@@ -3,9 +3,7 @@
 	@class SortFunctionUtils.spec.lua
 ]]
 
-local require = (require :: any)(
-		game:GetService("ServerScriptService"):FindFirstChild("LoaderUtils", true).Parent
-	).bootstrapStory(script) :: typeof(require(script.Parent.loader).load(script))
+local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local SortFunctionUtils = require("SortFunctionUtils")
@@ -59,7 +57,7 @@ describe("SortFunctionUtils", function()
 	describe("emptyIterator", function()
 		it("should return nothing", function()
 			local count = 0
-			for _ in SortFunctionUtils.emptyIterator do
+			for _ in SortFunctionUtils.emptyIterator :: any do
 				count += 1
 			end
 			expect(count).toEqual(0)

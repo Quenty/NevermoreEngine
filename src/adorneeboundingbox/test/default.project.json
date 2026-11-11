@@ -1,5 +1,13 @@
 {
   "name": "AdorneeBoundingBoxTest",
+  "globIgnorePaths": [
+    "**/.package-lock.json",
+    "**/.pnpm",
+    "**/.pnpm-workspace-state-v1.json",
+    "**/.modules.yaml",
+    "**/.ignored",
+    "**/.ignored_*"
+  ],
   "tree": {
     "$className": "DataModel",
     "ServerScriptService": {
@@ -8,6 +16,9 @@
       },
       "adorneeboundingbox": {
         "$path": ".."
+      },
+      "Script": {
+        "$path": "scripts/Server"
       }
     }
   }

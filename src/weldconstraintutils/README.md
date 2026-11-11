@@ -11,7 +11,7 @@
   </a>
 </div>
 
-Utility functions to create WeldConstraint objects in Roblox
+Utility functions to create WeldConstraint objects in Roblox, and to joint wedge parts together into simulated fabric
 
 <div align="center"><a href="https://quenty.github.io/NevermoreEngine/api/WeldConstraintUtils">View docs →</a></div>
 
@@ -27,3 +27,4 @@ Usage is designed to be simple.
 
 ### `WeldConstraintUtils.namedBetweenForceWeldConstraint(name, part0, part1, parent)`
 
+### `FabricBallSocketUtils.create(adornee)`

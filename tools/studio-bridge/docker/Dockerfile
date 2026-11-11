@@ -62,6 +62,9 @@ RUN mkdir -p /home/studio/.aftman/bin \
 # --- Build studio-bridge from source (via named build context "workspace") ---
 COPY --from=workspace --chown=studio:studio package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json /home/studio/build/
 COPY --from=workspace --chown=studio:studio tools/ /home/studio/build/tools/
+# The Luau test runner studio-bridge's plugin specs depend on
+COPY --from=workspace --chown=studio:studio src/loader/ /home/studio/build/src/loader/
+COPY --from=workspace --chown=studio:studio src/nevermore-test-runner/ /home/studio/build/src/nevermore-test-runner/
 WORKDIR /home/studio/build
 RUN pnpm install --frozen-lockfile --filter "@quenty/studio-bridge..." \
     && pnpm -r --filter "@quenty/studio-bridge..." run build

@@ -102,10 +102,10 @@ end
 
 --[=[
 	Checks if a string is empty or nil
-	@param str string
+	@param str string?
 	@return boolean
 ]=]
-function String.isEmptyOrWhitespaceOrNil(str: string): boolean
+function String.isEmptyOrWhitespaceOrNil(str: string?): boolean
 	return type(str) ~= "string" or str == "" or String.isWhitespace(str)
 end
 

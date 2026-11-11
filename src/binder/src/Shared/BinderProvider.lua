@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Provides a basis for binders that can be retrieved anywhere
 	@class BinderProvider
@@ -6,6 +6,7 @@
 
 local require = require(script.Parent.loader).load(script)
 
+local Binder = require("Binder")
 local Maid = require("Maid")
 local Promise = require("Promise")
 
@@ -13,6 +14,21 @@ local BinderProvider = {}
 BinderProvider.ClassName = "BinderProvider"
 BinderProvider.ServiceName = "BinderProvider"
 BinderProvider.__index = BinderProvider
+
+export type BinderProvider = typeof(setmetatable(
+	{} :: {
+		ServiceName: string,
+		_initMethod: (self: BinderProvider, ...any) -> (),
+		_initialized: boolean,
+		_destroyed: boolean,
+		_started: boolean,
+		_maid: Maid.Maid,
+		_binders: { any },
+		_bindersAddedPromise: Promise.Promise<()>,
+		_startPromise: Promise.Promise<()>,
+	},
+	{} :: typeof({ __index = BinderProvider })
+))
 
 --[=[
 	Constructs a new BinderProvider.
@@ -43,8 +59,8 @@ BinderProvider.__index = BinderProvider
 	@param initMethod (self, serviceBag: ServiceBag)
 	@return BinderProvider
 ]=]
-function BinderProvider.new(serviceName: string, initMethod)
-	local self = setmetatable({}, BinderProvider)
+function BinderProvider.new(serviceName: string, initMethod: ((self: BinderProvider, ...any) -> ())?): BinderProvider
+	local self: BinderProvider = setmetatable({} :: any, BinderProvider)
 
 	if type(serviceName) == "string" then
 		self.ServiceName = serviceName
@@ -83,7 +99,7 @@ end
 	@param binderName string
 	@return Promise<Binder<T>>
 ]=]
-function BinderProvider:PromiseBinder(binderName)
+function BinderProvider.PromiseBinder(self: BinderProvider, binderName: string): Promise.Promise<Binder.Binder<any>>
 	if self._bindersAddedPromise:IsFulfilled() then
 		local binder = self:Get(binderName)
 		if binder then
@@ -100,7 +116,7 @@ function BinderProvider:PromiseBinder(binderName)
 		else
 			return Promise.rejected()
 		end
-	end)
+	end) :: any
 end
 
 --[=[
@@ -108,7 +124,7 @@ end
 
 	@param ... ServiceBag | any
 ]=]
-function BinderProvider:Init(...)
+function BinderProvider.Init(self: BinderProvider, ...: any): ()
 	assert(not self._initialized, "Already initialized")
 
 	self._maid = Maid.new()
@@ -134,7 +150,7 @@ end
 
 	@return Promise
 ]=]
-function BinderProvider:PromiseBindersAdded()
+function BinderProvider.PromiseBindersAdded(self: BinderProvider): Promise.Promise<()>
 	return assert(self._bindersAddedPromise, "Be sure to require via serviceBag")
 end
 
@@ -143,14 +159,14 @@ end
 
 	@return Promise
 ]=]
-function BinderProvider:PromiseBindersStarted()
+function BinderProvider.PromiseBindersStarted(self: BinderProvider): Promise.Promise<()>
 	return assert(self._startPromise, "Be sure to require via serviceBag")
 end
 
 --[=[
 	Starts all of the binders.
 ]=]
-function BinderProvider:Start()
+function BinderProvider.Start(self: BinderProvider): ()
 	assert(self._initialized, "Not initialized")
 	assert(not self._started, "Already started")
 
@@ -161,8 +177,7 @@ function BinderProvider:Start()
 
 	self._startPromise:Resolve()
 end
-
-function BinderProvider:__index(index)
+(BinderProvider :: any).__index = function(self, index)
 	if BinderProvider[index] then
 		return BinderProvider[index]
 	end
@@ -180,9 +195,9 @@ end
 	@param tagName string
 	@return Binder<T>?
 ]=]
-function BinderProvider:Get(tagName: string)
+function BinderProvider.Get(self: BinderProvider, tagName: string): Binder.Binder<any>?
 	assert(type(tagName) == "string", "Bad tagName")
-	return rawget(self, tagName)
+	return rawget(self :: any, tagName)
 end
 
 --[=[
@@ -190,30 +205,30 @@ end
 
 	@param binder Binder<T>
 ]=]
-function BinderProvider:Add(binder)
+function BinderProvider.Add(self: BinderProvider, binder: Binder.Binder<any>): ()
 	assert(not self._started, "Already inited")
 	assert(not self:Get(binder:GetTag()), "Binder already exists")
 
 	self._maid:GiveTask(binder)
 
-	table.insert(self._binders, binder)
-	self[binder:GetTag()] = binder
+	table.insert(self._binders, binder);
+	(self :: any)[binder:GetTag()] = binder
 end
 
-function BinderProvider:Destroy()
+function BinderProvider.Destroy(self: BinderProvider): ()
 	self._destroyed = true
 
-	local binders = rawget(self, "_binders")
-	rawset(self, "_binders", nil)
+	local binders = rawget(self :: any, "_binders")
+	rawset(self :: any, "_binders", nil)
 
 	if binders then
 		for _, item in binders do
-			rawset(self, item:GetTag(), nil)
+			rawset(self :: any, item:GetTag(), nil)
 		end
 	end
 
-	local maid = rawget(self, "_maid")
-	rawset(self, "_maid", nil)
+	local maid = rawget(self :: any, "_maid")
+	rawset(self :: any, "_maid", nil)
 
 	if maid then
 		maid:DoCleaning()

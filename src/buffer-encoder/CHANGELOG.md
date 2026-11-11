@@ -3,16 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# 1.1.0 (2026-04-23)
+## [1.1.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.3...@quenty/bufferencoder@1.1.4) (2026-10-09)
 
+**Note:** Version bump only for package @quenty/bufferencoder
+
+## [1.1.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.2...@quenty/bufferencoder@1.1.3) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/bufferencoder
+
+## [1.1.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.1...@quenty/bufferencoder@1.1.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/bufferencoder
+
+## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/bufferencoder@1.1.0...@quenty/bufferencoder@1.1.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/bufferencoder
+
+# 1.1.0 (2026-04-23)
 
 ### Features
 
-* Add initial brine library ([2fe6950](https://github.com/Quenty/NevermoreEngine/commit/2fe6950c3032a254f5812ca95cf368d1aa8c5861))
-
-
-
-
+- Add initial brine library ([2fe6950](https://github.com/Quenty/NevermoreEngine/commit/2fe6950c3032a254f5812ca95cf368d1aa8c5861))
 
 # v1.1.0 (Thu Apr 23 2026)
 

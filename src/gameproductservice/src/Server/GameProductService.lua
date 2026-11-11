@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service provides an interface to purchase produces, assets, and other
 	marketplace items. This listens to events, handles requests between server and
@@ -16,9 +16,9 @@ local require = require(script.Parent.loader).load(script)
 
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
-local GameProductDataService = require("GameProductDataService")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -30,7 +30,7 @@ export type GameProductService = typeof(setmetatable(
 	{} :: {
 		_serviceBag: ServiceBag.ServiceBag,
 		_maid: Maid.Maid,
-		_gameProductDataService: GameProductDataService.GameProductDataService,
+		_gameProductDataService: any,
 
 		GamePassPurchased: Signal.Signal<Player, number>,
 		ProductPurchased: Signal.Signal<Player, number>,
@@ -46,7 +46,7 @@ export type GameProductService = typeof(setmetatable(
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductService.Init(self: GameProductService, serviceBag: ServiceBag.ServiceBag)
+function GameProductService.Init(self: GameProductService, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not (self :: any)._serviceBag, "Already initialized")
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
@@ -86,7 +86,7 @@ function GameProductService.ObservePlayerAssetPurchased(
 	idOrKey: string | number
 ): Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._gameProductDataService:ObservePlayerAssetPurchased(player, assetType, idOrKey)
@@ -102,7 +102,7 @@ end
 function GameProductService.ObserveAssetPurchased(
 	self: GameProductService,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
-	idOrKey
+	idOrKey: string | number
 ): Observable.Observable<Player>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
@@ -124,7 +124,7 @@ function GameProductService.HasPlayerPurchasedThisSession(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -141,7 +141,7 @@ function GameProductService.PromisePlayerIsPromptOpen(
 	self: GameProductService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerIsPromptOpen(player)
@@ -157,7 +157,7 @@ function GameProductService.PromisePlayerPromptClosed(
 	self: GameProductService,
 	player: Player
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerPromptClosed(player)
@@ -177,7 +177,7 @@ function GameProductService.PromisePlayerPromptPurchase(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -198,11 +198,65 @@ function GameProductService.PromisePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._gameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
+end
+
+--[=[
+	Sets a server-authoritative override for the player's ownership of the asset. When set, the
+	override wins over the cloud query and any session purchase, forcing ownership on (`true`) or off
+	(`false`). Passing `nil` clears the override.
+
+	The override is replicated read-only to the client and applied to every realm's ownership
+	tracker, so it drives client-side ownership-gated UI. Useful for testing ownership-gated behavior
+	(including paid-access games, which cannot be prompted in-experience) or granting access from a
+	non-Roblox condition. Only the server may set it; the client has no setter, so a player can never
+	grant themselves ownership.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@param ownsAsset boolean?
+	@return Promise
+]=]
+function GameProductService.SetPlayerOwnershipOverride(
+	self: GameProductService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number,
+	ownsAsset: boolean?
+): Promise.Promise<()>
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+	assert(type(ownsAsset) == "boolean" or ownsAsset == nil, "Bad ownsAsset")
+
+	return self._gameProductDataService:SetPlayerOwnershipOverride(player, assetType, idOrKey, ownsAsset)
+end
+
+--[=[
+	Clears any local ownership override for the asset, so ownership falls back to the cloud
+	query. Equivalent to `SetPlayerOwnershipOverride(player, assetType, idOrKey, nil)`.
+
+	@param player Player
+	@param assetType GameConfigAssetType
+	@param idOrKey string | number
+	@return Promise
+]=]
+function GameProductService.ClearPlayerOwnershipOverride(
+	self: GameProductService,
+	player: Player,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Promise.Promise<()>
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
+
+	return self._gameProductDataService:ClearPlayerOwnershipOverride(player, assetType, idOrKey)
 end
 
 --[=[
@@ -221,7 +275,7 @@ function GameProductService.PromisePlayerOwnershipOrPrompt(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -242,7 +296,7 @@ function GameProductService.ObservePlayerOwnership(
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -254,6 +308,17 @@ end
 	prompt purchases directly via [GameProductServiceClient:PromisePromptPurchase] (it
 	rejects); prompts must be initiated from the server, where the developer can validate
 	the asset id. Defaults to disabled.
+
+	Enabling this also makes the server verify gamepass purchases against the marketplace
+	before granting them, instead of trusting the client's report that the prompt
+	succeeded. The two travel together deliberately: a game that has moved prompting to
+	the server is one that wants purchases established server-side.
+
+	Be aware of what that verification costs. `UserOwnsGamePassAsync` answers from a cache
+	held per server, so immediately after a real purchase it can still report the player
+	does not own the pass -- and a purchase that fails to verify is granted nothing. Games
+	whose flows depend on the pass being usable the instant the prompt closes should leave
+	this disabled until they can tolerate that delay.
 
 	@param enabled boolean
 ]=]
@@ -275,7 +340,7 @@ end
 --[=[
 	Cleans up the game product service
 ]=]
-function GameProductService.Destroy(self: GameProductService)
+function GameProductService.Destroy(self: GameProductService): ()
 	self._maid:DoCleaning()
 end
 

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RagdollAdditionalAttachmentUtils
 ]=]
@@ -23,7 +23,7 @@ local V3_LEFT = Vector3.new(-1, 0, 0)
 -- to be going down the limb. the waist and neck joints attachments actually have the same problem
 -- of non-ideal axis orientation, but it's not as noticable there since the limits for natural
 -- motion are tighter for those joints anyway.
-local R15_ADDITIONAL_ATTACHMENTS = {
+local R15_ADDITIONAL_ATTACHMENTS: { { any } } = {
 	{
 		"UpperTorso",
 		"RightShoulderRagdollAttachment",
@@ -50,7 +50,7 @@ local R15_ADDITIONAL_ATTACHMENTS = {
 	},
 }
 
-local R6_ADDITIONAL_ATTACHMENTS = {
+local R6_ADDITIONAL_ATTACHMENTS: { { any } } = {
 	{ "Head", "NeckAttachment", CFrame.new(0, -0.5, 0) },
 	{ "Torso", "NeckAttachment", CFrame.new(0, 1, 0) },
 
@@ -67,7 +67,7 @@ local R6_ADDITIONAL_ATTACHMENTS = {
 	{ "Left Leg", "LeftHipAttachment", CFrame.new(0, 1, 0) },
 }
 
-function RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)
+function RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType: Enum.HumanoidRigType): { { any } }
 	if rigType == Enum.HumanoidRigType.R15 then
 		return R15_ADDITIONAL_ATTACHMENTS
 	elseif rigType == Enum.HumanoidRigType.R6 then
@@ -77,7 +77,10 @@ function RagdollAdditionalAttachmentUtils.getAdditionalAttachmentData(rigType)
 	end
 end
 
-function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character, rigType)
+function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(
+	character: Model,
+	rigType: Enum.HumanoidRigType
+): Maid.Maid
 	assert(typeof(character) == "Instance" and character:IsA("Model"), "Bad character")
 	assert(EnumUtils.isOfType(Enum.HumanoidRigType, rigType), "Bad rigType")
 
@@ -90,9 +93,9 @@ function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character,
 			local observable = RxBrioUtils.flatCombineLatest({
 				part = RxR15Utils.observeCharacterPartBrio(character, partName),
 				baseAttachment = RxR15Utils.observeRigAttachmentBrio(character, partName, baseAttachmentName),
-			})
+			}) :: any
 
-			topMaid:GiveTask(observable:Subscribe(function(state)
+			topMaid:GiveTask(observable:Subscribe(function(state: any)
 				if state.part and state.baseAttachment then
 					local maid = Maid.new()
 
@@ -114,20 +117,22 @@ function RagdollAdditionalAttachmentUtils.ensureAdditionalAttachments(character,
 				end
 			end))
 		else
-			topMaid:GiveTask(RxR15Utils.observeCharacterPartBrio(character, partName):Subscribe(function(brio)
-				if brio:IsDead() then
-					return
-				end
+			topMaid:GiveTask(
+				(RxR15Utils.observeCharacterPartBrio(character, partName) :: any):Subscribe(function(brio: any)
+					if brio:IsDead() then
+						return
+					end
 
-				local maid = brio:ToMaid()
-				local part = brio:GetValue()
+					local maid = brio:ToMaid()
+					local part = brio:GetValue()
 
-				local attachment = Instance.new("Attachment")
-				attachment.Name = attachmentName
-				attachment.CFrame = cframe
-				attachment.Parent = part
-				maid:GiveTask(attachment)
-			end))
+					local attachment = Instance.new("Attachment")
+					attachment.Name = attachmentName
+					attachment.CFrame = cframe
+					attachment.Parent = part
+					maid:GiveTask(attachment)
+				end)
+			)
 		end
 	end
 

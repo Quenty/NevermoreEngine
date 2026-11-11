@@ -3,6 +3,116 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.52.0...@quenty/resetservice@11.52.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [11.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.51.2...@quenty/resetservice@11.52.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [11.51.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.51.1...@quenty/resetservice@11.51.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.51.0...@quenty/resetservice@11.51.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.50.1...@quenty/resetservice@11.51.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.50.0...@quenty/resetservice@11.50.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.49.0...@quenty/resetservice@11.50.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.48.0...@quenty/resetservice@11.49.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.47.0...@quenty/resetservice@11.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.46.2...@quenty/resetservice@11.47.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.46.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.46.1...@quenty/resetservice@11.46.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.46.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.46.0...@quenty/resetservice@11.46.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.45.2...@quenty/resetservice@11.46.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.45.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.45.1...@quenty/resetservice@11.45.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.45.0...@quenty/resetservice@11.45.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.44.0...@quenty/resetservice@11.45.0) (2026-07-25)
+
+### Features
+
+- Add ability for reset service to be disabled on the client ([cfaa06f](https://github.com/Quenty/NevermoreEngine/commit/cfaa06f6bb32abb877e10e9e26b972d32a605377))
+
+# [11.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.43.0...@quenty/resetservice@11.44.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.42.0...@quenty/resetservice@11.43.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.41.1...@quenty/resetservice@11.42.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.41.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.41.0...@quenty/resetservice@11.41.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.40.0...@quenty/resetservice@11.41.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.39.0...@quenty/resetservice@11.40.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.38.0...@quenty/resetservice@11.39.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.37.1...@quenty/resetservice@11.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+## [11.37.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.37.0...@quenty/resetservice@11.37.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/resetservice
+
+# [11.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.36.1...@quenty/resetservice@11.37.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/resetservice
+
 ## [11.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/resetservice@11.36.0...@quenty/resetservice@11.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/resetservice

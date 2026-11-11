@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.23.0...@quenty/aggregator@1.23.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.23.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.22.2...@quenty/aggregator@1.23.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+## [1.22.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.22.1...@quenty/aggregator@1.22.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+## [1.22.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.22.0...@quenty/aggregator@1.22.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.21.2...@quenty/aggregator@1.22.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+## [1.21.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.21.1...@quenty/aggregator@1.21.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+## [1.21.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.21.0...@quenty/aggregator@1.21.1) (2026-08-13)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.20.0...@quenty/aggregator@1.21.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.19.0...@quenty/aggregator@1.20.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.19.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.18.0...@quenty/aggregator@1.19.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.18.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.17.0...@quenty/aggregator@1.18.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.17.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.16.0...@quenty/aggregator@1.17.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/aggregator
+
+# [1.16.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.15.3...@quenty/aggregator@1.16.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/aggregator
+
 ## [1.15.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/aggregator@1.15.2...@quenty/aggregator@1.15.3) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/aggregator

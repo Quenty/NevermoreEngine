@@ -3,6 +3,116 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.55.1...@quenty/colorpalette@10.56.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.55.0...@quenty/colorpalette@10.55.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.54.2...@quenty/colorpalette@10.55.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.54.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.54.1...@quenty/colorpalette@10.54.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.54.0...@quenty/colorpalette@10.54.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.53.0...@quenty/colorpalette@10.54.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.52.1...@quenty/colorpalette@10.53.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.52.0...@quenty/colorpalette@10.52.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.51.0...@quenty/colorpalette@10.52.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.50.0...@quenty/colorpalette@10.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.49.1...@quenty/colorpalette@10.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.49.0...@quenty/colorpalette@10.49.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.48.1...@quenty/colorpalette@10.49.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.48.0...@quenty/colorpalette@10.48.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.47.2...@quenty/colorpalette@10.48.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.47.1...@quenty/colorpalette@10.47.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.47.0...@quenty/colorpalette@10.47.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.46.0...@quenty/colorpalette@10.47.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.45.0...@quenty/colorpalette@10.46.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.44.0...@quenty/colorpalette@10.45.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.43.2...@quenty/colorpalette@10.44.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.43.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.43.1...@quenty/colorpalette@10.43.2) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+## [10.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.43.0...@quenty/colorpalette@10.43.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.42.0...@quenty/colorpalette@10.43.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.41.0...@quenty/colorpalette@10.42.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.40.0...@quenty/colorpalette@10.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/colorpalette
+
+# [10.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.39.1...@quenty/colorpalette@10.40.0) (2026-07-14)
+
+### Features
+
+- **colorpalette:** convert package to --!strict ([1e7e2dd](https://github.com/Quenty/NevermoreEngine/commit/1e7e2dd09dbbac8d891739db1f7a5c91e8e427de))
+
 ## [10.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/colorpalette@10.39.0...@quenty/colorpalette@10.39.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/colorpalette

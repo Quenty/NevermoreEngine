@@ -1,9 +1,12 @@
---!nonstrict
+--!strict
 -- Big integer arithmetic for 168-bit (and 336-bit) numbers
 -- Numbers are represented as little-endian tables of 24-bit integers
 local twoPower = require(script.Parent.twoPower)
 
-local function isEqual(a, b)
+type BigInt = { number }
+type DoubleInt = { number }
+
+local function isEqual(a: BigInt, b: BigInt): boolean
 	return a[1] == b[1]
 		and a[2] == b[2]
 		and a[3] == b[3]
@@ -13,7 +16,7 @@ local function isEqual(a, b)
 		and a[7] == b[7]
 end
 
-local function compare(a, b)
+local function compare(a: BigInt, b: BigInt): number
 	for i = 7, 1, -1 do
 		if a[i] > b[i] then
 			return 1
@@ -25,7 +28,7 @@ local function compare(a, b)
 	return 0
 end
 
-local function add(a, b)
+local function add(a: BigInt, b: BigInt): BigInt
 	-- c7 may be greater than 2^24 before reduction
 	local c1 = a[1] + b[1]
 	local c2 = a[2] + b[2]
@@ -63,7 +66,7 @@ local function add(a, b)
 	return { c1, c2, c3, c4, c5, c6, c7 }
 end
 
-local function sub(a, b)
+local function sub(a: BigInt, b: BigInt): BigInt
 	-- c7 may be negative before reduction
 	local c1 = a[1] - b[1]
 	local c2 = a[2] - b[2]
@@ -101,7 +104,7 @@ local function sub(a, b)
 	return { c1, c2, c3, c4, c5, c6, c7 }
 end
 
-local function rShift(a)
+local function rShift(a: BigInt): BigInt
 	local c1 = a[1]
 	local c2 = a[2]
 	local c3 = a[3]
@@ -134,7 +137,7 @@ local function rShift(a)
 	return { c1, c2, c3, c4, c5, c6, c7 }
 end
 
-local function addDouble(a, b)
+local function addDouble(a: DoubleInt, b: DoubleInt): DoubleInt
 	-- a and b are 336-bit integers (14 words)
 	local c1 = a[1] + b[1]
 	local c2 = a[2] + b[2]
@@ -207,7 +210,7 @@ local function addDouble(a, b)
 	return { c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14 }
 end
 
-local function mult(a, b, half_multiply)
+local function mult(a: BigInt, b: BigInt, half_multiply: boolean): DoubleInt
 	local a1, a2, a3, a4, a5, a6, a7 = a[1], a[2], a[3], a[4], a[5], a[6], a[7]
 	local b1, b2, b3, b4, b5, b6, b7 = b[1], b[2], b[3], b[4], b[5], b[6], b[7]
 
@@ -218,7 +221,13 @@ local function mult(a, b, half_multiply)
 	local c5 = a1 * b5 + a2 * b4 + a3 * b3 + a4 * b2 + a5 * b1
 	local c6 = a1 * b6 + a2 * b5 + a3 * b4 + a4 * b3 + a5 * b2 + a6 * b1
 	local c7 = a1 * b7 + a2 * b6 + a3 * b5 + a4 * b4 + a5 * b3 + a6 * b2 + a7 * b1
-	local c8, c9, c10, c11, c12, c13, c14
+	local c8: number = 0
+	local c9: number = 0
+	local c10: number = 0
+	local c11: number = 0
+	local c12: number = 0
+	local c13: number = 0
+	local c14: number = 0
 	if not half_multiply then
 		c8 = a2 * b7 + a3 * b6 + a4 * b5 + a5 * b4 + a6 * b3 + a7 * b2
 		c9 = a3 * b7 + a4 * b6 + a5 * b5 + a6 * b4 + a7 * b3
@@ -277,7 +286,7 @@ local function mult(a, b, half_multiply)
 	return { c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14 }
 end
 
-local function square(a)
+local function square(a: BigInt): DoubleInt
 	-- returns a 336-bit integer (14 words)
 	local a1, a2, a3, a4, a5, a6, a7 = a[1], a[2], a[3], a[4], a[5], a[6], a[7]
 
@@ -340,8 +349,8 @@ local function square(a)
 	return { c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14 }
 end
 
-local function encodeInt(a)
-	local enc = table.create(21)
+local function encodeInt(a: BigInt): { number }
+	local enc: { number } = table.create(21)
 
 	for i = 1, 7 do
 		local word = a[i]
@@ -354,9 +363,9 @@ local function encodeInt(a)
 	return enc
 end
 
-local function decodeInt(enc)
-	local a = {}
-	local encCopy = table.create(21)
+local function decodeInt(enc: { number }): BigInt
+	local a: BigInt = {}
+	local encCopy: { number } = table.create(21)
 
 	for i = 1, 21 do
 		local byte = enc[i]
@@ -379,26 +388,27 @@ local function decodeInt(enc)
 	return a
 end
 
-local function mods(d, w)
-	local result = d[1] % twoPower[w]
+local function mods(d: BigInt, w: number): number
+	local result = d[1] % (twoPower :: any)[w]
 
-	if result >= twoPower[w - 1] then
-		result -= twoPower[w]
+	if result >= (twoPower :: any)[w - 1] then
+		result -= (twoPower :: any)[w]
 	end
 
 	return result
 end
 
 -- Represents a 168-bit number as the (2^w)-ary Non-Adjacent Form
-local function NAF(d, w)
-	local t, t_len = {}, 0
-	local newD = { table.unpack(d) }
+local function NAF(d: BigInt, w: number): { number }
+	local t: { number } = {}
+	local t_len = 0
+	local newD: BigInt = { table.unpack(d) }
 
 	for _ = 1, 168 do
 		if newD[1] % 2 == 1 then
 			t_len += 1
 			t[t_len] = mods(newD, w)
-			newD = sub(newD, { t[#t], 0, 0, 0, 0, 0, 0 })
+			newD = sub(newD, { t[t_len], 0, 0, 0, 0, 0, 0 })
 		else
 			t_len += 1
 			t[t_len] = 0

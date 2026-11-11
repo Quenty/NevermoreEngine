@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.31.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.31.0...@quenty/guivisiblemanager@12.31.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.31.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.30.2...@quenty/guivisiblemanager@12.31.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+## [12.30.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.30.1...@quenty/guivisiblemanager@12.30.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+## [12.30.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.30.0...@quenty/guivisiblemanager@12.30.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.30.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.29.0...@quenty/guivisiblemanager@12.30.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.29.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.28.2...@quenty/guivisiblemanager@12.29.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+## [12.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.28.1...@quenty/guivisiblemanager@12.28.2) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+## [12.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.28.0...@quenty/guivisiblemanager@12.28.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.28.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.27.0...@quenty/guivisiblemanager@12.28.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.26.0...@quenty/guivisiblemanager@12.27.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.26.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.25.0...@quenty/guivisiblemanager@12.26.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.25.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.24.0...@quenty/guivisiblemanager@12.25.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
+# [12.24.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.23.1...@quenty/guivisiblemanager@12.24.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/guivisiblemanager
+
 ## [12.23.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/guivisiblemanager@12.23.0...@quenty/guivisiblemanager@12.23.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/guivisiblemanager

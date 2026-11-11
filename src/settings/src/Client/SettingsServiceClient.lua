@@ -15,6 +15,7 @@ local Brio = require("Brio")
 local CancelToken = require("CancelToken")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local PlayerSettingsClient = require("PlayerSettingsClient")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
@@ -43,6 +44,7 @@ function SettingsServiceClient.Init(self: SettingsServiceClient, serviceBag: Ser
 
 	-- External
 	self._serviceBag:GetService(require("CmdrServiceClient"))
+	self._serviceBag:GetService(require("DataStoreServiceClient"))
 
 	-- Internal
 	self._settingsDataService = self._serviceBag:GetService(require("SettingsDataService"))
@@ -62,7 +64,7 @@ end
 function SettingsServiceClient.GetLocalPlayerSettings(
 	self: SettingsServiceClient
 ): PlayerSettingsClient.PlayerSettingsClient?
-	return self:GetPlayerSettings(Players.LocalPlayer)
+	return self:GetPlayerSettings(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer())
 end
 
 --[=[
@@ -73,7 +75,7 @@ end
 function SettingsServiceClient.ObserveLocalPlayerSettingsBrio(self: SettingsServiceClient): Observable.Observable<
 	Brio.Brio<PlayerSettingsClient.PlayerSettingsClient>
 >
-	return self:ObservePlayerSettingsBrio(Players.LocalPlayer)
+	return self:ObservePlayerSettingsBrio(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer())
 end
 
 --[=[
@@ -84,7 +86,7 @@ end
 function SettingsServiceClient.ObserveLocalPlayerSettings(self: SettingsServiceClient): Observable.Observable<
 	PlayerSettingsClient.PlayerSettingsClient
 >
-	return self:ObservePlayerSettings(Players.LocalPlayer)
+	return self:ObservePlayerSettings(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer())
 end
 
 --[=[
@@ -97,7 +99,7 @@ function SettingsServiceClient.PromiseLocalPlayerSettings(
 	self: SettingsServiceClient,
 	cancelToken: CancelToken.CancelToken
 ): Promise.Promise<PlayerSettingsClient.PlayerSettingsClient>
-	return self:PromisePlayerSettings(Players.LocalPlayer, cancelToken)
+	return self:PromisePlayerSettings(Players.LocalPlayer or PlayerMock.getMockedLocalPlayer(), cancelToken)
 end
 
 --[=[
@@ -110,7 +112,7 @@ function SettingsServiceClient.ObservePlayerSettings(
 	self: SettingsServiceClient,
 	player: Player
 ): Observable.Observable<PlayerSettingsClient.PlayerSettingsClient>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._settingsDataService:ObservePlayerSettings(player)
 end
@@ -127,7 +129,7 @@ function SettingsServiceClient.ObservePlayerSettingsBrio(
 ): Observable.Observable<
 	Brio.Brio<PlayerSettingsClient.PlayerSettingsClient>
 >
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._settingsDataService:ObservePlayerSettingsBrio(player)
 end
@@ -142,7 +144,7 @@ function SettingsServiceClient.GetPlayerSettings(
 	self: SettingsServiceClient,
 	player: Player
 ): PlayerSettingsClient.PlayerSettingsClient?
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._settingsDataService:GetPlayerSettings(player)
 end
@@ -159,7 +161,7 @@ function SettingsServiceClient.PromisePlayerSettings(
 	player: Player,
 	cancelToken: CancelToken.CancelToken
 ): Promise.Promise<PlayerSettingsClient.PlayerSettingsClient>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 
 	return self._settingsDataService:PromisePlayerSettings(player, cancelToken)
 end
@@ -167,7 +169,7 @@ end
 function SettingsServiceClient._setupCmdr(self: SettingsServiceClient)
 	local cmdrServiceClient = self._serviceBag:GetService(require("CmdrServiceClient"))
 
-	self._maid:GivePromise(cmdrServiceClient:PromiseCmdr()):Then(function(cmdr)
+	self._maid:GivePromise((cmdrServiceClient :: any):PromiseCmdr()):Then(function(cmdr)
 		SettingsCmdrUtils.registerSettingDefinition(cmdr, self._serviceBag)
 	end)
 end

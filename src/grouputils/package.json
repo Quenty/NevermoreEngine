@@ -1,6 +1,6 @@
 {
   "name": "@quenty/grouputils",
-  "version": "10.20.2",
+  "version": "10.33.1",
   "description": "Group utility functions for Roblox",
   "keywords": [
     "Roblox",
@@ -30,7 +30,10 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quenty/promise": "workspace:*"
+    "@quenty/nevermore-test-runner": "workspace:*",
+    "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
+    "@quentystudios/jest-lua": "3.10.0-quenty.2"
   },
   "publishConfig": {
     "access": "public"

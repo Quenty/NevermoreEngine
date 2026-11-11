@@ -15,11 +15,14 @@ import {
   type IStateTracker,
   type PackageState,
 } from '../state/state-tracker.js';
+import { formatProgressInline } from '../progress-format.js';
 import {
-  formatProgressInline,
-  formatProgressResult,
-  isEmptyTestRun,
-} from '../progress-format.js';
+  formatStatusText,
+  resolveResultStatus,
+  statusIcon,
+  tallyCaveats,
+  type ResultStatus,
+} from '../result-status.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
 
@@ -45,8 +48,14 @@ export interface GithubCommentTableConfig {
   successLabel?: string;
   /** Label for failed results, e.g. "Failed". Default: "Failed" */
   failureLabel?: string;
-  /** Verb in the footer, e.g. "tested" in "X tested, Y passed, Z failed". Default: "tested" */
+  /** Verb in the footer, e.g. "tested" in "X packages tested, Y passed, Z failed". Default: "tested" */
   summaryVerb?: string;
+  /**
+   * When true, a successful result that carries no test counts renders as a
+   * warning rather than a pass. Set by test reporters: a green check with no
+   * counts behind it is indistinguishable from a run that never tested anything.
+   */
+  expectsTestCounts?: boolean;
   /**
    * When set, the PR comment reporter uses section-based merging.
    * Multiple configs with different sectionIds share a single PR comment,
@@ -135,25 +144,40 @@ export function formatRunningStatus(
 export function formatResultStatus(
   pkg: PackageResult,
   successLabel: string,
-  failureLabel: string
+  failureLabel: string,
+  expectsTestCounts = false
 ): string {
-  const duration = formatDurationMs(pkg.durationMs);
-  const progressText = formatProgressResult(pkg.progressSummary);
-  const empty = isEmptyTestRun(pkg.progressSummary);
+  const status = resolveResultStatus(pkg, {
+    successLabel,
+    failureLabel,
+    expectsTestCounts,
+  });
 
-  if (pkg.success) {
-    const label = progressText
-      ? `${successLabel} ${progressText}`
-      : successLabel;
-    return empty ? `⚠️ ${label} (${duration})` : `✅ ${label} (${duration})`;
-  }
+  // Bolded verdict, plain caveats: a reader scans a column of these for the
+  // verdict, and bolding the qualifier too would flatten the difference between
+  // them. Everything else — which states exist, what they are called, what
+  // counts as a warning — is the resolver's.
+  const verdict =
+    status.severity === 'failure'
+      ? status.failedPhase
+        ? `**${status.label}** at ${status.failedPhase}`
+        : `**${status.label}**`
+      : status.label;
+  const caveats = status.caveats.length > 0 ? ` - ${caveatText(status)}` : '';
+  const head = [verdict, status.progress].filter(Boolean).join(' ');
 
-  const failedPhase = pkg.failedPhase;
-  const effectiveLabel = pkg.failureLabel ?? failureLabel;
-  const label = failedPhase
-    ? `**${effectiveLabel}** at ${failedPhase}`
-    : `**${effectiveLabel}**`;
-  return `❌ ${label} (${duration})`;
+  return `${statusIcon(
+    status.severity,
+    'emoji'
+  )} ${head}${caveats} (${formatDurationMs(pkg.durationMs)})`;
+}
+
+/** The caveat half of a status line, without the verdict in front of it. */
+function caveatText(status: ResultStatus): string {
+  return formatStatusText({ ...status, label: '', progress: '' }).replace(
+    /^ *- */,
+    ''
+  );
 }
 
 export function getActionsRunUrl(): string | undefined {
@@ -281,7 +305,8 @@ export function formatGithubTableBody(
         statusText = formatResultStatus(
           pkg.result!,
           config.successLabel ?? 'Passed',
-          config.failureLabel ?? 'Failed'
+          config.failureLabel ?? 'FAILED',
+          config.expectsTestCounts ?? false
         );
         break;
       default:
@@ -302,15 +327,28 @@ export function formatGithubTableBody(
   if (allDone) {
     const passed = packages.filter((p) => p.status === 'passed').length;
     const failed = packages.filter((p) => p.status === 'failed').length;
-    const emptyRuns = packages.filter((p) => isEmptyTestRun(p.progress)).length;
+    // Tallied off the same statuses the rows were drawn from, so a line here
+    // cannot contradict the column above it — which it could when each was
+    // counted separately. Read from the final result, not the live progress:
+    // progress is cleared once a package resolves.
+    const statuses = packages
+      .filter((p) => p.result !== undefined)
+      .map((p) =>
+        resolveResultStatus(p.result!, {
+          successLabel: config.successLabel ?? 'Passed',
+          failureLabel: config.failureLabel ?? 'FAILED',
+          expectsTestCounts: config.expectsTestCounts ?? false,
+        })
+      );
     const verb = config.summaryVerb ?? 'tested';
+    const unit = packages.length === 1 ? 'package' : 'packages';
     footer = `**${
       packages.length
-    } ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
+    } ${unit} ${verb}, ${passed} passed, ${failed} failed** in ${formatDurationMs(
       elapsedMs
     )}`;
-    if (emptyRuns > 0) {
-      footer += `\n⚠️ ${emptyRuns} package(s) ran 0 tests — check test discovery`;
+    for (const { message } of tallyCaveats(statuses)) {
+      footer += `\n⚠️ ${message}`;
     }
   } else {
     const done = packages.filter(

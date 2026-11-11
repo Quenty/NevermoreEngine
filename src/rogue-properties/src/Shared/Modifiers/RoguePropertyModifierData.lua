@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	@class RoguePropertyModifierData
 ]=]
@@ -8,7 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local AdorneeData = require("AdorneeData")
 local AdorneeDataEntry = require("AdorneeDataEntry")
 local ValueBaseValue = require("ValueBaseValue")
-local t = require("t")
+local t: any = require("t")
 
 return AdorneeData.new({
 	Enabled = true,

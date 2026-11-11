@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Scrolling model for scrolling frame
 	@class ScrollModel
@@ -15,8 +15,37 @@ ScrollModel._min = 0
 ScrollModel._max = 100
 ScrollModel._viewSize = 50
 
-function ScrollModel.new()
-	local self = setmetatable({}, ScrollModel)
+export type ScrollModel = typeof(setmetatable(
+	{} :: {
+		_min: number,
+		_max: number,
+		_viewSize: number,
+		_spring: Spring.Spring<number>,
+
+		TotalContentLength: number,
+		ViewSize: number,
+		Max: number,
+		ContentMax: number,
+		Min: number,
+		ContentMin: number,
+		Position: number,
+		BackBounceInputRange: number,
+		BackBounceRenderRange: number,
+		ContentScrollPercentSize: number,
+		RenderedContentScrollPercentSize: number,
+		ContentScrollPercent: number,
+		RenderedContentScrollPercent: number,
+		BoundedRenderPosition: number,
+		Velocity: number,
+		Target: number,
+		TargetContentScrollPercent: number,
+		AtRest: boolean,
+	},
+	{} :: typeof({ __index = ScrollModel })
+))
+
+function ScrollModel.new(): ScrollModel
+	local self: ScrollModel = setmetatable({} :: any, ScrollModel)
 
 	self._spring = Spring.new(0)
 	self._spring.Speed = 20
@@ -24,11 +53,11 @@ function ScrollModel.new()
 	return self
 end
 
-function ScrollModel:_getTimesOverBounds(position)
+function ScrollModel._getTimesOverBounds(self: ScrollModel, position: number): number
 	return self:GetDisplacementPastBounds(position) / self.BackBounceInputRange
 end
 
-function ScrollModel:GetDisplacementPastBounds(position)
+function ScrollModel.GetDisplacementPastBounds(self: ScrollModel, position: number): number
 	if position > self.ContentMax then
 		return position - self.ContentMax
 	elseif position < self.ContentMin then
@@ -38,11 +67,13 @@ function ScrollModel:GetDisplacementPastBounds(position)
 	end
 end
 
-function ScrollModel:GetScale(timesOverBounds)
+function ScrollModel.GetScale(_self: ScrollModel, timesOverBounds: number): number
 	return 1 - 0.5 ^ math.abs(timesOverBounds)
 end
 
-function ScrollModel:__index(index)
+local rawScrollModel = ScrollModel :: any
+
+rawScrollModel.__index = function(self: any, index: string): any
 	if index == "TotalContentLength" then
 		return self._max - self._min
 	elseif index == "ViewSize" then
@@ -100,15 +131,15 @@ function ScrollModel:__index(index)
 		return self._spring.Target
 	elseif index == "AtRest" then
 		return math.abs(self._spring.Target - self._spring.Position) < 1e-5 and math.abs(self._spring.Velocity) < 1e-5
-	elseif ScrollModel[index] then
-		return ScrollModel[index]
+	elseif rawScrollModel[index] then
+		return rawScrollModel[index]
 	else
 		error(string.format("[ScrollModel] - '%s' is not a valid member", tostring(index)))
 	end
 end
 
-function ScrollModel:__newindex(index, value)
-	if ScrollModel[index] or index == "_spring" then
+rawScrollModel.__newindex = function(self: any, index: string, value: any): ()
+	if rawScrollModel[index] or index == "_spring" then
 		rawset(self, index, value)
 	elseif index == "Min" or index == "ContentMin" then
 		self._min = value

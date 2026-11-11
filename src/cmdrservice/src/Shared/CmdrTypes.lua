@@ -24,12 +24,18 @@ export type CommandArgument = {
 	Default: any?,
 }
 
+export type ReplyOptions = Color3 | {
+	Color: Color3?,
+	RichText: boolean?,
+}
+
 export type CommandContext = {
 	GetData: (self: CommandContext) -> any,
 	GetPlayer: (self: CommandContext) -> Player,
 	GetArgs: (self: CommandContext) -> { any },
 	GetCommandName: (self: CommandContext) -> string,
 	GetCommandId: (self: CommandContext) -> string,
+	Reply: (self: CommandContext, text: string, options: ReplyOptions?) -> (),
 }
 
 export type CommandDefinition = {

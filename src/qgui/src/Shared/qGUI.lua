@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	A group of utility functions to be used to help create visual effectcs with ROBLOX GUIs
 
@@ -29,13 +29,13 @@ end
 -- @param updateFunction()
 -- @return ShouldStop, if true, will stop updating
 -- @return StartUpdate()
-local function createYieldedUpdate(updateFunction: () -> ())
+local function createYieldedUpdate(updateFunction: () -> boolean): () -> ()
 	local animationId = 0
 	local lastUpdatePoint = -1 -- If it's -1, no active thread.
 
 	-- Increments the animationId and returns a new updateFunction
 	-- to be bound into RenderStep
-	local function getNewUpdateFunction(renderStepKey: string)
+	local function getNewUpdateFunction(renderStepKey: string): (number) -> ()
 		local localAnimationId = animationId + 1
 		animationId = localAnimationId
 
@@ -44,7 +44,7 @@ local function createYieldedUpdate(updateFunction: () -> ())
 
 		-- Intended to be called each RenderStep. Will unbind itself if the updateFunction fails
 		-- or a new update function is generated
-		return function()
+		return function(_deltaTime: number)
 			lastUpdatePoint = tick()
 
 			if updateFunction() or (animationId ~= localAnimationId) then
@@ -70,7 +70,7 @@ local function createYieldedUpdate(updateFunction: () -> ())
 	end
 
 	-- Starts an update thread, potentialy removing the old one.
-	local function startNewThread()
+	local function startNewThread(): ()
 		local renderStepKey = "TweenTransparencyOnGuis" .. tostring(updateFunction) .. tick()
 		RunService:BindToRenderStep(renderStepKey, 2000, getNewUpdateFunction(renderStepKey))
 	end
@@ -91,14 +91,16 @@ end
 -- @param StartProperties The properties we started with
 -- @param NewProperties The properties we ended with
 -- @return
-local function makePropertyTweener(setProperties)
-	local guiMap: { [GuiBase]: any } = {} -- [Gui] = TweenData
+local function makePropertyTweener(
+	setProperties: (gui: any, percent: number, startProperties: any, newProperties: any) -> ()
+): ((any, any, number) -> (), (any) -> ())
+	local guiMap: { [any]: any } = {} -- [Gui] = TweenData
 
-	local function GetTweenData(Gui, NewProperties, Duration)
+	local function GetTweenData(Gui: any, NewProperties: any, Duration: number): any
 		-- Returns new tween data for the GUI in question
 
-		local StartProperties = {}
-		local EndProperties = {}
+		local StartProperties: { [string]: any } = {}
+		local EndProperties: { [string]: any } = {}
 
 		-- Copy data into the table
 		for index, Value in NewProperties do
@@ -116,15 +118,15 @@ local function makePropertyTweener(setProperties)
 		}
 	end
 
-	local StartRenderStepUpdater = createYieldedUpdate(function()
+	local StartRenderStepUpdater = createYieldedUpdate(function(): boolean
 		-- Update function that will be called each second
 
-		local tick = tick()
+		local currentTick = tick()
 		local ShouldStop = true
 
 		for Gui, TweenState in next, guiMap do
 			if Gui:IsDescendantOf(game) then
-				local TimeElapsed = tick - TweenState.StartTime
+				local TimeElapsed = currentTick - TweenState.StartTime
 
 				if TimeElapsed > TweenState.Duration then -- Then we end it.
 					setProperties(Gui, 1, TweenState.StartProperties, TweenState.NewProperties)
@@ -153,7 +155,7 @@ local function makePropertyTweener(setProperties)
 	--                      setup so {index = NewValue} that is, for example,
 	--                      {TextTransparency = 1}.
 	-- @param Duration The amount of time to spend transitioning.
-	return function(Gui: GuiBase, NewProperties, Duration: number)
+	return function(Gui: any, NewProperties: any, Duration: number)
 		if Duration <= 0 then
 			setProperties(Gui, 1, NewProperties, NewProperties)
 		else
@@ -163,7 +165,7 @@ local function makePropertyTweener(setProperties)
 
 		-- A tweening function to manually terminate tweening on a Gui element
 		-- @param Gui The GUI to stop tweening
-	end, function(Gui)
+	end, function(Gui: any)
 		guiMap[Gui] = nil
 	end
 end
@@ -177,7 +179,7 @@ end
 --                      {TextTransparency = 1}.
 -- @param Time The amount of time to spend transitioning.
 local TweenTransparency, StopTransparencyTween = makePropertyTweener(
-	function(Gui: any, percent: number, startProperties, newProperties)
+	function(Gui: any, percent: number, startProperties: any, newProperties: any)
 		for index, endValue in next, newProperties do
 			local StartProperty = startProperties[index]
 			Gui[index] = StartProperty + (endValue - StartProperty) * percent
@@ -202,7 +204,7 @@ do
 		return valueOne + ((valueTwo - valueOne) * alpha)
 	end
 
-	local function LerpColor3(colorOne: Color3, colorTwo: Color3, alpha: number)
+	local function LerpColor3(colorOne: Color3, colorTwo: Color3, alpha: number): Color3
 		return Color3.new(
 			LerpNumber(colorOne.R, colorTwo.R, alpha),
 			LerpNumber(colorOne.G, colorTwo.G, alpha),
@@ -210,22 +212,28 @@ do
 		)
 	end
 
-	TweenColor3, StopColor3Tween = makePropertyTweener(function(gui, percent, startProperties, newProperties)
-		for index, endValue in next, newProperties do
-			local StartProperty = startProperties[index]
-			gui[index] = LerpColor3(StartProperty, endValue, percent)
+	TweenColor3, StopColor3Tween = makePropertyTweener(
+		function(gui: any, percent: number, startProperties: any, newProperties: any)
+			for index, endValue in next, newProperties do
+				local StartProperty = startProperties[index]
+				gui[index] = LerpColor3(StartProperty, endValue, percent)
+			end
 		end
-	end)
+	)
 end
 
 qGUI.TweenColor3 = TweenColor3
 qGUI.StopColor3Tween = StopColor3Tween
 
 -- Makes a 'Textured' window...  9Scale thingy?
-function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: string)
-	type = type or "Frame"
+function qGUI.AddTexturedWindowTemplate(
+	frame: Frame,
+	radius: number,
+	instanceType: string?
+): (any, any, any, any, any, any, any)
+	local resolvedType = instanceType or "Frame"
 
-	local topLeft = Instance.new(type)
+	local topLeft: any = Instance.new(resolvedType)
 	topLeft.Archivable = false
 	topLeft.BackgroundColor3 = frame.BackgroundColor3
 	topLeft.BorderSizePixel = 0
@@ -236,7 +244,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	topLeft.ZIndex = frame.ZIndex
 	topLeft.Parent = frame
 
-	local bottomLeft = Instance.new(type)
+	local bottomLeft: any = Instance.new(resolvedType)
 	bottomLeft.Archivable = false
 	bottomLeft.BackgroundColor3 = frame.BackgroundColor3
 	bottomLeft.BorderSizePixel = 0
@@ -247,7 +255,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	bottomLeft.ZIndex = frame.ZIndex
 	bottomLeft.Parent = frame
 
-	local topRight = Instance.new(type)
+	local topRight: any = Instance.new(resolvedType)
 	topRight.Archivable = false
 	topRight.BackgroundColor3 = frame.BackgroundColor3
 	topRight.BorderSizePixel = 0
@@ -258,7 +266,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	topRight.ZIndex = frame.ZIndex
 	topRight.Parent = frame
 
-	local bottomRight = Instance.new(type)
+	local bottomRight: any = Instance.new(resolvedType)
 	bottomRight.Archivable = false
 	bottomRight.BackgroundColor3 = frame.BackgroundColor3
 	bottomRight.BorderSizePixel = 0
@@ -269,7 +277,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	bottomRight.ZIndex = frame.ZIndex
 	bottomRight.Parent = frame
 
-	local middle = Instance.new(type)
+	local middle: any = Instance.new(resolvedType)
 	middle.Archivable = false
 	middle.BackgroundColor3 = frame.BackgroundColor3
 	middle.BorderSizePixel = 0
@@ -280,7 +288,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	middle.ZIndex = frame.ZIndex
 	middle.Parent = frame
 
-	local middleLeft = Instance.new(type)
+	local middleLeft: any = Instance.new(resolvedType)
 	middleLeft.Archivable = false
 	middleLeft.BackgroundColor3 = frame.BackgroundColor3
 	middleLeft.BorderSizePixel = 0
@@ -291,7 +299,7 @@ function qGUI.AddTexturedWindowTemplate(frame: Frame, radius: number, type: stri
 	middleLeft.ZIndex = frame.ZIndex
 	middleLeft.Parent = frame
 
-	local middleRight = Instance.new(type)
+	local middleRight: any = Instance.new(resolvedType)
 	middleRight.Archivable = false
 	middleRight.BackgroundColor3 = frame.BackgroundColor3
 	middleRight.BorderSizePixel = 0
@@ -309,10 +317,10 @@ end
 	Makes a NinePatch in the frame, with the image.
 
 	@param frame Frame -- The frame to texturize
-	@param radius -- the radius you want the image to be at
-	@param type -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
 	@param image -- The URL of the image in question
 	@param imageSize -- The size of the image overall, suggested to be 99/divisible by 3. Vector2 value.
+	@param radius -- the radius you want the image to be at
+	@param instanceType -- The type (Class) that the frame should be, either an ImageLabel or an ImageButton
 	@param properties any
 ]=]
 function qGUI.AddNinePatch(
@@ -320,18 +328,18 @@ function qGUI.AddNinePatch(
 	image: string,
 	imageSize: Vector2,
 	radius: number,
-	type: "ImageLabel" | "ImageButton",
-	properties
-)
-	properties = properties or {}
-	type = type or "ImageLabel"
+	instanceType: ("ImageLabel" | "ImageButton")?,
+	properties: { [string]: any }?
+): (any, any, any, any, any, any, any, any, any)
+	local resolvedProperties = properties or {}
+	local resolvedType = instanceType or "ImageLabel"
 	local topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight =
-		qGUI.AddTexturedWindowTemplate(frame, radius, type)
+		qGUI.AddTexturedWindowTemplate(frame, radius, resolvedType)
 
 	middle.Size = UDim2.new(1, -radius * 2, 1, -radius * 2) -- Fix middle...
 	middle.Position = UDim2.fromOffset(radius, radius)
 
-	local middleTop = Instance.new(type)
+	local middleTop: any = Instance.new(resolvedType)
 	middleTop.Archivable = false
 	middleTop.BackgroundColor3 = frame.BackgroundColor3
 	middleTop.BorderSizePixel = 0
@@ -342,7 +350,7 @@ function qGUI.AddNinePatch(
 	middleTop.ZIndex = frame.ZIndex
 	middleTop.Parent = frame
 
-	local middleBottom = Instance.new(type)
+	local middleBottom: any = Instance.new(resolvedType)
 	middleBottom.Archivable = false
 	middleBottom.BackgroundColor3 = frame.BackgroundColor3
 	middleBottom.BorderSizePixel = 0
@@ -364,7 +372,7 @@ function qGUI.AddNinePatch(
 		middleTop,
 		middleBottom,
 	}) do
-		for Property, Value in properties do
+		for Property, Value in pairs(resolvedProperties) do
 			item[Property] = Value
 		end
 		item.Image = image
@@ -386,7 +394,11 @@ function qGUI.AddNinePatch(
 	return topLeft, topRight, bottomLeft, bottomRight, middle, middleLeft, middleRight, middleTop, middleBottom
 end
 
-function qGUI.BackWithRoundedRectangle(Frame: Frame, Radius: number, Color: Color3?)
+function qGUI.BackWithRoundedRectangle(
+	Frame: Frame,
+	Radius: number,
+	Color: Color3?
+): (any, any, any, any, any, any, any, any, any)
 	Color = Color or Color3.new(1, 1, 1)
 
 	return qGUI.AddNinePatch(Frame, "rbxassetid://176688412", Vector2.new(150, 150), Radius, "ImageLabel", {

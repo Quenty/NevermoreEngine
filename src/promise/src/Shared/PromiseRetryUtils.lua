@@ -15,6 +15,9 @@ export type RetryOptions = {
 	initialWaitTime: number,
 	maxAttempts: number,
 	printWarning: boolean,
+	-- Optional predicate consulted after each failure. Returning false stops retrying immediately and
+	-- rejects with that error (for failures that will not resolve by retrying).
+	shouldRetry: ((any) -> boolean)?,
 }
 
 --[=[
@@ -51,6 +54,13 @@ function PromiseRetryUtils.retry<T...>(callback: () -> Promise.Promise<T...>, op
 			if lastResults[1] then
 				isLoopResolved = true
 				promise:Resolve(table.unpack(lastResults, 2, lastResults.n))
+				return
+			end
+
+			-- Bail out early on a failure that will not resolve by retrying.
+			if options.shouldRetry and not options.shouldRetry(lastResults[2]) then
+				isLoopResolved = true
+				promise:Reject(table.unpack(lastResults, 2, lastResults.n))
 				return
 			end
 

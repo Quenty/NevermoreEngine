@@ -27,6 +27,42 @@ function HumanoidUtils.getHumanoid(descendant: Instance): Humanoid?
 end
 
 --[=[
+	Returns whether a humanoid state type is enabled on the humanoid.
+
+	@param humanoid Humanoid
+	@param stateType Enum.HumanoidStateType
+	@return boolean
+]=]
+function HumanoidUtils.isHumanoidStateEnabled(humanoid: Humanoid, stateType: Enum.HumanoidStateType): boolean
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "No humanoid")
+	assert(typeof(stateType) == "EnumItem", "No stateType")
+
+	return humanoid:GetStateEnabled(stateType)
+end
+
+--[=[
+	Returns whether the humanoid is allowed to jump. This is true when the jumping state is enabled
+	and the humanoid's jump strength is above zero, which is the strength Roblox reads for the
+	humanoid's [Humanoid.UseJumpPower] mode.
+
+	@param humanoid Humanoid
+	@return boolean
+]=]
+function HumanoidUtils.isJumpEnabled(humanoid: Humanoid): boolean
+	assert(typeof(humanoid) == "Instance" and humanoid:IsA("Humanoid"), "No humanoid")
+
+	if not humanoid:GetStateEnabled(Enum.HumanoidStateType.Jumping) then
+		return false
+	end
+
+	if humanoid.UseJumpPower then
+		return humanoid.JumpPower > 0
+	else
+		return humanoid.JumpHeight > 0
+	end
+end
+
+--[=[
 	Forcefully unseats the humanoid. Useful when teleporting humanoid.
 	Definitely a non-intuitive operation to do safely.
 

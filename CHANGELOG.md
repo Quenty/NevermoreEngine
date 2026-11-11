@@ -1,3 +1,1362 @@
+# (Wed Nov 11 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/metricutils@2.5.0`
+  - feat(metricutils): add MetricUnit, typed measurements with parsing and localized formatting [#859](https://github.com/Quenty/NevermoreEngine/pull/859) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/softshutdown@10.13.0`, `@quenty/nevermore-cli@4.52.0`, `@quenty/studio-bridge@0.24.0`
+  - feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.20.0`, `@quenty/nevermore-cli@4.51.0`
+  - feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/probability@2.3.5`
+  - fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.19.1`, `@quenty/nevermore-cli@4.50.1`
+  - fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Oct 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.19.0`, `@quenty/nevermore-cli@4.50.0`, `@quenty/studio-bridge@0.22.0`
+  - feat(studio-bridge): multiplayer playtests, Studio launching, search, and CLI fixes [#851](https://github.com/Quenty/NevermoreEngine/pull/851) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.49.0`
+  - feat(nevermore-cli): Recompress place uploads and split oversized batches [#850](https://github.com/Quenty/NevermoreEngine/pull/850) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.10.0`, `@quenty/jecs@1.11.0`
+  - feat: immediate systems hot reload feedback [#849](https://github.com/Quenty/NevermoreEngine/pull/849) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Oct 24 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Oisin ([@oiisin](https://github.com/oiisin)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.55.1`
+  - fix(clienttranslator): Stop warning when the player translator times out [#843](https://github.com/Quenty/NevermoreEngine/pull/843) ([@oiisin](https://github.com/oiisin) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Oisin ([@oiisin](https://github.com/oiisin))
+
+---
+
+# (Sat Oct 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/observablecollection@12.55.0`, `@quenty/templateprovider@11.56.0`, `@quenty/nevermore-cli@4.48.0`
+  - fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Oct 22 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/studio-bridge@0.21.1`
+  - fix: Unref tail stdout pipe so Linux Studio launch can exit [#830](https://github.com/Quenty/NevermoreEngine/pull/830) ([@matthewdean](https://github.com/matthewdean))
+
+#### Authors: 1
+
+- Matthew Dean ([@matthewdean](https://github.com/matthewdean))
+
+---
+
+# (Tue Oct 20 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.12.1`, `@quenty/adorneeboundingbox@8.54.1`, `@quenty/adorneeutils@3.6.3`, `@quenty/animations@8.41.1`, `@quenty/attributeutils@14.39.1`, `@quenty/bindable-utils@1.1.3`, `@quenty/binder@14.48.1`, `@quenty/blend@12.51.1`, `@quenty/boundlinkutils@14.49.1`, `@quenty/brine@1.22.1`, `@quenty/brio@14.38.1`, `@quenty/camera@14.58.1`, `@quenty/characterutils@12.46.1`, `@quenty/chatproviderservice@9.75.1`, `@quenty/clienttranslator@14.54.1`, `@quenty/clipcharacters@12.56.1`, `@quenty/cmdrservice@13.64.1`, `@quenty/conditions@10.52.1`, `@quenty/coreguienabler@12.47.1`, `@quenty/countdowntext@4.13.1`, `@quenty/datastore@13.59.1`, `@quenty/deathreport@10.62.1`, `@quenty/ellipticcurvecryptography@1.15.3`, `@quenty/elo@7.52.1`, `@quenty/experiencecalculator@2.14.3`, `@quenty/fakeskybox@11.33.1`, `@quenty/friendutils@12.44.1`, `@quenty/fzy@5.18.3`, `@quenty/gameconfig@12.71.1`, `@quenty/gameproductservice@14.75.1`, `@quenty/gameversionutils@3.10.1`, `@quenty/genericscreenguiprovider@13.54.1`, `@quenty/grouputils@10.33.1`, `@quenty/humanoidkillerutils@2.5.1`, `@quenty/humanoidtracker@13.44.1`, `@quenty/humanoidutils@2.21.1`, `@quenty/ik@15.74.1`, `@quenty/immediateutils@1.9.1`, `@quenty/influxdbclient@7.46.1`, `@quenty/inputkeymaputils@14.60.1`, `@quenty/instance-path@1.2.3`, `@quenty/instanceutils@13.38.1`, `@quenty/iris@1.8.1`, `@quenty/jecs@1.10.2`, `@quenty/jestutils@1.1.3`, `@quenty/lipsum@14.51.1`, `@quenty/maid@3.12.3`, `@quenty/marketplaceutils@11.35.1`, `@quenty/nevermoreclimanifest@1.11.1`, `@quenty/nevermore-test-runner@1.6.3`, `@quenty/observablecollection@12.54.1`, `@quenty/octree@11.17.3`, `@quenty/pagesutils@5.26.1`, `@quenty/permissionprovider@14.54.1`, `@quenty/physicsutils@8.36.1`, `@quenty/playermock@1.11.1`, `@quenty/playerbinder@14.52.1`, `@quenty/playerhumanoidbinder@14.53.1`, `@quenty/playersservicepromises@10.31.1`, `@quenty/playerthumbnailutils@10.31.1`, `@quenty/playerutils@8.46.1`, `@quenty/promise@10.25.1`, `@quenty/promisemaid@5.25.1`, `@quenty/ragdoll@15.73.1`, `@quenty/randomutils@6.20.3`, `@quenty/receiptprocessing@7.47.1`, `@quenty/remoting@12.46.1`, `@quenty/resetservice@11.52.1`, `@quenty/roblox-api-dump@8.37.1`, `@quenty/rogue-humanoid@10.68.1`, `@quenty/rogue-properties@11.64.1`, `@quenty/rx@13.35.1`, `@quenty/rxbinderutils@14.48.1`, `@quenty/saveslot@2.15.1`, `@quenty/scoredactionservice@16.61.1`, `@quenty/screenshothudservice@7.43.1`, `@quenty/secrets@7.72.1`, `@quenty/servicebag@11.21.3`, `@quenty/settings-inputkeymap@10.78.1`, `@quenty/settings@11.75.1`, `@quenty/snackbar@11.57.1`, `@quenty/soundgroup@1.59.1`, `@quenty/steputils@3.9.3`, `@quenty/streamingutils@10.33.1`, `@quenty/string@3.5.3`, `@quenty/teleportserviceutils@10.8.1`, `@quenty/templateprovider@11.55.1`, `@quenty/throttle@10.15.3`, `@quenty/tie@10.52.1`, `@quenty/time@2.7.1`, `@quenty/timedtween@7.51.1`, `@quenty/transitionmodel@7.53.1`, `@quenty/userserviceutils@9.45.1`, `@quenty/vector3utils@10.12.3`, `@quenty/nevermore-cli@4.47.1`
+  - fix(nevermore-cli): Per-endpoint rate limits, and test scripts return their results [#837](https://github.com/Quenty/NevermoreEngine/pull/837) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Oct 18 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/jecs@1.10.1`
+  - Update JecsImmediateHooksCommonHooks.lua [#836](https://github.com/Quenty/NevermoreEngine/pull/836) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sun Oct 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/jecs@1.10.0`
+  - feat: brio hook [#835](https://github.com/Quenty/NevermoreEngine/pull/835) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Wed Oct 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.12.0`, `@quenty/bindtocloseservice@8.46.0`, `@quenty/camera@14.58.0`, `@quenty/characterutils@12.46.0`, `@quenty/coreguienabler@12.47.0`, `@quenty/datastore@13.59.0`, `@quenty/friendutils@12.44.0`, `@quenty/gameproductservice@14.75.0`, `@quenty/influxdbclient@7.46.0`, `@quenty/marketplaceutils@11.35.0`, `@quenty/permissionprovider@14.54.0`, `@quenty/promise@10.25.0`, `@quenty/ragdoll@15.73.0`, `@quenty/remoting@12.46.0`, `@quenty/resetservice@11.52.0`, `@quenty/saveslot@2.15.0`, `@quenty/teleportserviceutils@10.8.0`, `@quenty/nevermore-cli-helpers@1.19.0`, `@quenty/nevermore-cli@4.47.0`
+  - feat: Asset uploading allowed by nevermore CLI [#833](https://github.com/Quenty/NevermoreEngine/pull/833) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Oct 09 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@10.11.3`
+  - fix: Skip story loader population when the root already has its links [#832](https://github.com/Quenty/NevermoreEngine/pull/832) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/rogue-properties@11.63.2`, `@quenty/tie@10.51.2`
+  - fix: Check if rogue modifier is alive [#831](https://github.com/Quenty/NevermoreEngine/pull/831) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Thu Sep 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/jecs@1.8.0`
+  - feat: guid hook [#827](https://github.com/Quenty/NevermoreEngine/pull/827) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Thu Sep 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/loader@10.11.2`
+  - fix: Detect plugin replication type during play solo [#829](https://github.com/Quenty/NevermoreEngine/pull/829) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.47.0`, `@quenty/clienttranslator@14.53.0`, `@quenty/countdowntext@4.12.0`, `@quenty/deathreport@10.61.0`, `@quenty/httppromise@10.25.0`, `@quenty/observablecollection@12.53.0`, `@quenty/saveslot@2.14.0`, `@quenty/time@2.6.0`, `@quenty/nevermore-cli@4.46.0`, `@quenty/nevermore-template-helpers@1.20.0`
+  - fix: A lot of misc updates [#828](https://github.com/Quenty/NevermoreEngine/pull/828) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 22 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/animations@8.40.1`
+  - fix: Compare animation weights [#826](https://github.com/Quenty/NevermoreEngine/pull/826) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Sep 21 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cmdrservice@13.62.0`, `@quenty/humanoidkillerutils@2.4.0`, `@quenty/playermock@1.10.0`, `@quenty/raycaster@3.6.0`, `@quenty/teamutils@10.39.0`, `@quenty/templateprovider@11.53.0`, `@quenty/tie@10.51.0`, `@quenty/weldconstraintutils@3.2.0`
+  - fix: Humanoid updates [#825](https://github.com/Quenty/NevermoreEngine/pull/825) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Sep 19 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/sounds@10.28.1`
+  - fix: soundutil methods shouldn't return anything other than the sound [#824](https://github.com/Quenty/NevermoreEngine/pull/824) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Sep 19 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.7.0`
+  - feat: immediate system hot reloads [#823](https://github.com/Quenty/NevermoreEngine/pull/823) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Thu Sep 17 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/jecs@1.5.1`
+  - fix: imm hook type fix [#820](https://github.com/Quenty/NevermoreEngine/pull/820) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Wed Sep 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ultrawidecontainerutils@2.6.0`
+  - feat: add headless UI converter API and script output management [#822](https://github.com/Quenty/NevermoreEngine/pull/822) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Wed Sep 09 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/physicsutils@8.35.0`, `@quenty/vector3utils@10.12.0`
+  - feat(vector3utils): Add Vector3Utils.volume and unit tests for vector3utils and physicsutils [#821](https://github.com/Quenty/NevermoreEngine/pull/821) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Sep 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/playermock@1.9.1`
+  - fix(player-mock): Give PlayerMockService its own type so callers do not need a cast [#819](https://github.com/Quenty/NevermoreEngine/pull/819) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Sep 02 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneeutils@3.6.0`, `@quenty/bindable-utils@1.1.0`, `@quenty/binder@14.46.0`, `@quenty/boundlinkutils@14.47.0`, `@quenty/coreguienabler@12.45.0`, `@quenty/coreguiutils@10.26.0`, `@quenty/friendutils@12.42.0`, `@quenty/gameproductservice@14.72.0`, `@quenty/grouputils@10.31.0`, `@quenty/instance-path@1.2.0`, `@quenty/marketplaceutils@11.33.0`, `@quenty/playermock@1.9.0`, `@quenty/playersservicepromises@10.29.0`, `@quenty/playerthumbnailutils@10.29.0`, `@quenty/ragdoll@15.69.0`, `@quenty/rxbinderutils@14.46.0`, `@quenty/teleportserviceutils@10.6.0`, `@quenty/tie@10.50.0`, `@quenty/userserviceutils@9.43.0`
+  - feat: Add some new methods to AdorneeBoundingBox [#818](https://github.com/Quenty/NevermoreEngine/pull/818) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Sep 01 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.5.0`, `@quenty/jecs@1.4.0`
+  - feat: distributed iteration helper [#813](https://github.com/Quenty/NevermoreEngine/pull/813) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.8.0`, `@quenty/adorneeboundingbox@8.50.0`, `@quenty/adorneeutils@3.5.0`, `@quenty/attributeutils@14.38.0`, `@quenty/binder@14.45.0`, `@quenty/camera@14.54.0`, `@quenty/characterutils@12.43.0`, `@quenty/chatproviderservice@9.71.0`, `@quenty/clienttranslator@14.50.0`, `@quenty/coreguienabler@12.44.0`, `@quenty/datastore@13.55.0`, `@quenty/gameproductservice@14.71.0`, `@quenty/humanoidtracker@13.41.0`, `@quenty/humanoidutils@2.20.0`, `@quenty/instance-path@1.1.0`, `@quenty/jestutils@1.1.0`, `@quenty/permissionprovider@14.51.0`, `@quenty/playermock@1.8.0`, `@quenty/playerbinder@14.48.0`, `@quenty/playerhumanoidbinder@14.49.0`, `@quenty/playerutils@8.43.0`, `@quenty/ragdoll@15.68.0`, `@quenty/remoting@12.43.0`, `@quenty/resetservice@11.49.0`, `@quenty/rogue-humanoid@10.64.0`, `@quenty/rogue-properties@11.60.0`, `@quenty/saveslot@2.11.0`, `@quenty/scoredactionservice@16.57.0`, `@quenty/settings@11.71.0`, `@quenty/soundgroup@1.55.0`, `@quenty/steputils@3.9.0`, `@quenty/teleportserviceutils@10.5.0`, `@quenty/tie@10.49.0`, `@quenty/timedtween@7.48.0`, `@quenty/transitionmodel@7.50.0`, `@quenty/nevermore-cli@4.45.0`
+  - Ensure tests cleanup if one fails [#815](https://github.com/Quenty/NevermoreEngine/pull/815) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.10.0`, `@quenty/nevermore-test-runner@1.6.0`, `@quenty/cli-output-helpers@1.18.0`, `@quenty/nevermore-cli@4.44.0`, `@quenty/nevermore-template-helpers@1.19.0`, `@quenty/studio-bridge@0.19.0`
+  - Return a test run's results instead of scraping them out of its logs [#795](https://github.com/Quenty/NevermoreEngine/pull/795) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeutils@3.3.6`, `@quenty/observablecollection@12.48.1`
+  - Users/quenty/small fixes [#814](https://github.com/Quenty/NevermoreEngine/pull/814) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/acceltween@2.8.0`, `@quenty/camera@14.52.0`, `@quenty/timedtween@7.46.0`, `@quenty/transitionmodel@7.48.0`
+  - users/quenty/transitions [#809](https://github.com/Quenty/NevermoreEngine/pull/809) ([@Quenty](https://github.com/Quenty))
+- `@quenty/hide@11.46.0`
+  - feat: StudioEditOnly binder [#808](https://github.com/Quenty/NevermoreEngine/pull/808) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.9.0`
+  - fix: Store save slot playtime synchronously [#812](https://github.com/Quenty/NevermoreEngine/pull/812) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/coreguiutils@10.24.0`, `@quenty/friendutils@12.39.0`
+  - refactor: Extract promiseRetryGetCore from RxFriendUtils [#811](https://github.com/Quenty/NevermoreEngine/pull/811) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/immediateutils@1.2.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - fix: jecs and iris nevermore-style integration, replace with separate forks [#805](https://github.com/Quenty/NevermoreEngine/pull/805) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/hide@11.46.0`
+  - fix: ...actually include StudioEditOnly within the service [#810](https://github.com/Quenty/NevermoreEngine/pull/810) ([@euvinkeel](https://github.com/euvinkeel))
+- `@quenty/friendutils@12.39.0`
+  - fix: Retry on GetCore failure [#807](https://github.com/Quenty/NevermoreEngine/pull/807) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 3
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Aug 16 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.4`
+  - fix(nevermore-cli): install with the project's package manager [#806](https://github.com/Quenty/NevermoreEngine/pull/806) ([@unrooot](https://github.com/unrooot))
+
+#### Authors: 1
+
+- [@unrooot](https://github.com/unrooot)
+
+---
+
+# (Sun Aug 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.1.0`, `@quenty/iris@1.1.0`, `@quenty/jecs@1.1.0`
+  - feat: new immediateutils package [#804](https://github.com/Quenty/NevermoreEngine/pull/804) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.6`, `@quenty/ik@15.66.1`, `@quenty/loader@10.11.1`, `@quenty/ragdoll@15.65.1`, `@quenty/templateprovider@11.48.2`
+  - fix: Fix loader times, and make localization replicate as a stream [#803](https://github.com/Quenty/NevermoreEngine/pull/803) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Aug 14 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/ragdoll@15.65.0`
+  - feat(ragdoll): add ragdoll and unragdoll cmdr commands [#802](https://github.com/Quenty/NevermoreEngine/pull/802) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/bufferencoder@1.1.1`, `@quenty/queue@2.4.3`, `@quenty/racketingropeconstraint@12.51.1`, `@quenty/cli-output-helpers@1.17.2`, `nevermore-claude@0.2.1`, `@quenty/nevermore-cli-helpers@1.17.1`, `@quenty/nevermore-cli@4.43.3`, `@quenty/nevermore-deploy@1.1.1`, `@quenty/nevermore-template-helpers@1.18.2`, `nevermore-vscode@0.3.2`
+  - chore(package): correct repository directory and url metadata [#801](https://github.com/Quenty/NevermoreEngine/pull/801) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/chatproviderservice@9.68.0`, `@quenty/cmdrservice@13.57.0`, `@quenty/datastore@13.52.0`, `@quenty/saveslot@2.8.0`, `@quenty/secrets@7.65.0`, `@quenty/settings@11.68.0`
+  - feat(saveslot): make save slot and datastore commands work on absent players [#799](https://github.com/Quenty/NevermoreEngine/pull/799) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Aug 13 2026)
+
+#### 🚀 Enhancement
+
+- chore(hooks): lint the worktree the push actually targets [#800](https://github.com/Quenty/NevermoreEngine/pull/800) ([@Quenty](https://github.com/Quenty))
+- `@quenty/humanoidutils@2.18.0`
+  - feat(humanoidutils): observe whether a humanoid can jump ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Aug 12 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/adorneeboundingbox@8.47.1`, `@quenty/motor6d@7.52.1`, `@quenty/r15utils@13.36.2`, `@quenty/nevermore-cli@4.43.2`
+  - fix: A series of misc fixes + upgrade rojo [#798](https://github.com/Quenty/NevermoreEngine/pull/798) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/nevermore-cli@4.43.1`
+  - fix(nevermore-cli): stop failing a batch run whose tests all passed [#794](https://github.com/Quenty/NevermoreEngine/pull/794) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@2.7.1`
+  - fix: Carry accrued playtime onto a copied save slot [#793](https://github.com/Quenty/NevermoreEngine/pull/793) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.9.0`, `@quenty/saveslot@2.7.0`, `@quenty/nevermore-cli-helpers@1.17.0`, `@quenty/nevermore-cli@4.43.0`, `@quenty/nevermore-deploy@1.1.0`
+  - feat(nevermore-cli): rebuild a place when its base place changes [#783](https://github.com/Quenty/NevermoreEngine/pull/783) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Aug 10 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@12.41.1`, `@quenty/rogue-properties@11.57.1`
+  - Users/euvinkeel/memleak2 [#789](https://github.com/Quenty/NevermoreEngine/pull/789) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.66.9`
+  - fix: Server pass purchase validation gate [#792](https://github.com/Quenty/NevermoreEngine/pull/792) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Sat Aug 08 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.66.8`
+  - fix: Validate game pass ownership on server [#791](https://github.com/Quenty/NevermoreEngine/pull/791) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/highlight@10.49.1`, `@quenty/performanceutils@4.12.1`, `@quenty/sounds@10.27.1`
+  - Update PerformanceUtils.lua [#787](https://github.com/Quenty/NevermoreEngine/pull/787) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Fri Aug 07 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.5`
+  - fix: Prevent more redundant localization table rebuilding [#788](https://github.com/Quenty/NevermoreEngine/pull/788) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Wed Aug 05 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.4`
+  - fix: Prevent redundant localization table rebuilding [#786](https://github.com/Quenty/NevermoreEngine/pull/786) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 1
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+
+---
+
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/datastore@13.51.1`, `@quenty/saveslot@2.6.2`
+  - fix(datastore): stop manager teardown from destroying stores before PlayerRemoving saves them [#780](https://github.com/Quenty/NevermoreEngine/pull/780) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameproductservice@14.66.5`
+  - fix(gameproductservice): stop ownership queries spamming the log with failures they cannot avoid [#778](https://github.com/Quenty/NevermoreEngine/pull/778) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 30 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/teleportserviceutils@10.3.1`
+  - fix(teleportserviceutils): let a server teleport hear a refusal raised after acceptance [#779](https://github.com/Quenty/NevermoreEngine/pull/779) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/chatproviderservice@9.67.4`
+  - fix(chatproviderservice): let a PlayerMock be chat tagged [#776](https://github.com/Quenty/NevermoreEngine/pull/776) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.3`
+  - fix(clienttranslator): freeze the translation key derivation [#774](https://github.com/Quenty/NevermoreEngine/pull/774) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 29 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.42.0`
+  - feat(cli): make a passing test run mean tests were seen to pass [#772](https://github.com/Quenty/NevermoreEngine/pull/772) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 29 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.17.1`, `@quenty/nevermore-cli@4.41.1`
+  - fix(cli): stop reporting a test pass that no test output backs [#771](https://github.com/Quenty/NevermoreEngine/pull/771) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.2`
+  - docs(clienttranslator): write down that localization tables are per realm [#770](https://github.com/Quenty/NevermoreEngine/pull/770) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/receiptprocessing@7.42.1`
+  - fix(receiptprocessing): unregister a receipt processor instead of erroring [#769](https://github.com/Quenty/NevermoreEngine/pull/769) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.3.3`
+  - fix(access): run client-realm policies for the local player [#768](https://github.com/Quenty/NevermoreEngine/pull/768) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.47.1`
+  - feat(clienttranslator): gate reactive translation on per-key readiness [#766](https://github.com/Quenty/NevermoreEngine/pull/766) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.3.1`
+  - fix(access): make the access-policy list readout deterministic and tested [#767](https://github.com/Quenty/NevermoreEngine/pull/767) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.3.0`
+  - feat(access): toggle several policies at once with access-policy [#765](https://github.com/Quenty/NevermoreEngine/pull/765) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/saveslot@2.6.0`
+  - feat(saveslot): let save-slot commands address ephemeral slots and persist them [#764](https://github.com/Quenty/NevermoreEngine/pull/764) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.2.0`
+  - fix(access): make client-realm policies actually run, and give them an off switch [#763](https://github.com/Quenty/NevermoreEngine/pull/763) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.1.2`
+  - fix(access): keep a destroyed layer out of a merge already in flight [#762](https://github.com/Quenty/NevermoreEngine/pull/762) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/access@1.1.1`
+  - fix(access): unregister a fact, feature or policy when it is destroyed [#761](https://github.com/Quenty/NevermoreEngine/pull/761) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/access@1.1.0`, `@quenty/attributeutils@14.36.0`, `@quenty/playermock@1.6.0`, `@quenty/playerutils@8.41.0`
+  - Users/quenty/access [#759](https://github.com/Quenty/NevermoreEngine/pull/759) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 27 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/saveslot@2.4.0`
+  - feat(saveslot): run consumer callbacks before a slot is selected [#758](https://github.com/Quenty/NevermoreEngine/pull/758) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 27 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/saveslot@2.3.0`
+  - feat(saveslot): save slot commands take a players argument [#756](https://github.com/Quenty/NevermoreEngine/pull/756) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 27 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/settings@11.66.3`
+  - fix(settings): stop settings hydration recursing until the C stack dies [#757](https://github.com/Quenty/NevermoreEngine/pull/757) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 27 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/playermock@1.5.2`, `@quenty/teleportserviceutils@10.2.3`
+  - fix(teleportserviceutils): hold one outstanding teleport request at a time [#755](https://github.com/Quenty/NevermoreEngine/pull/755) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jul 26 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/teleportserviceutils@10.2.2`
+  - fix(teleportserviceutils): report a refused teleport instead of raising [#754](https://github.com/Quenty/NevermoreEngine/pull/754) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jul 25 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/gameversionutils@3.6.1`, `@quenty/playermock@1.5.1`, `@quenty/scoredactionservice@16.53.1`, `@quenty/steputils@3.7.1`
+  - Users/quenty/scored action fix [#753](https://github.com/Quenty/NevermoreEngine/pull/753) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jul 25 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.40.0`, `@quenty/gameconfig@12.61.0`, `@quenty/gameversionutils@3.6.0`, `@quenty/playermock@1.5.0`, `@quenty/playerutils@8.40.0`, `@quenty/promise@10.23.0`, `@quenty/resetservice@11.45.0`, `@quenty/saveslot@2.2.0`, `@quenty/streamingutils@10.27.0`, `@quenty/teleportserviceutils@10.2.0`, `@quenty/transitionmodel@7.46.0`
+  - users/quenty/small updates [#752](https://github.com/Quenty/NevermoreEngine/pull/752) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/genericscreenguiprovider@13.46.0`, `@quenty/playermock@1.4.0`, `@quenty/teleportserviceutils@10.1.0`
+  - feat: mock-safe teleport and screen-gui-provider teardown [#751](https://github.com/Quenty/NevermoreEngine/pull/751) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
+#### 💥 Breaking Change
+
+- `@quenty/saveslot@2.0.0`, `@quenty/teleportserviceutils@10.0.0`
+  - feat(saveslot): save slot export/import + cross-session transfer [#748](https://github.com/Quenty/NevermoreEngine/pull/748) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/playermock@1.3.0`
+  - feat: PlayerMock seams for GuiService.SelectedObject and rich input firing [#750](https://github.com/Quenty/NevermoreEngine/pull/750) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 24 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@1.14.2`
+  - fix(saveslot): bind the client HasSaveSlots for a mocked local player [#749](https://github.com/Quenty/NevermoreEngine/pull/749) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/saveslot@1.14.1`
+  - fix(saveslot): selection chain consumes loads that settle after the player leaves [#747](https://github.com/Quenty/NevermoreEngine/pull/747) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.47.0`, `@quenty/playermock@1.2.0`, `@quenty/promise@10.22.0`, `@quenty/tie@10.45.0`
+  - feat: Improve standard patches [#746](https://github.com/Quenty/NevermoreEngine/pull/746) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/actionmanager@13.37.1`, `@quenty/colorpicker@10.41.2`
+  - fix: Update versions + README.md [#745](https://github.com/Quenty/NevermoreEngine/pull/745) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/genericscreenguiprovider@13.43.1`, `@quenty/permissionprovider@14.44.1`, `@quenty/playermock@1.1.1`, `@quenty/ragdoll@15.59.1`, `@quenty/streamingutils@10.23.1`, `@quenty/teleportserviceutils@9.38.1`
+  - test: Add more tests and fixes [#744](https://github.com/Quenty/NevermoreEngine/pull/744) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 23 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.41.0`, `@quenty/blend@12.40.0`, `@quenty/brine@1.10.0`, `@quenty/camera@14.46.0`, `@quenty/characterutils@12.36.0`, `@quenty/clienttranslator@14.42.0`, `@quenty/cmdrservice@13.51.0`, `@quenty/coreguienabler@12.37.0`, `@quenty/datastore@13.46.0`, `@quenty/ellipticcurvecryptography@1.14.0`, `@quenty/flipbook@9.36.0`, `@quenty/friendutils@12.33.0`, `@quenty/funnels@1.30.0`, `@quenty/fzy@5.17.0`, `@quenty/gameconfig@12.57.0`, `@quenty/gameproductservice@14.61.0`, `@quenty/genericscreenguiprovider@13.43.0`, `@quenty/grouputils@10.23.0`, `@quenty/humanoidtracker@13.34.0`, `@quenty/influxdbclient@7.40.0`, `@quenty/marketplaceutils@11.25.0`, `@quenty/nevermoreclimanifest@1.6.0`, `@quenty/nevermore-test-runner@1.5.0`, `@quenty/observablecollection@12.42.0`, `@quenty/pagesutils@5.22.0`, `@quenty/permissionprovider@14.44.0`, `@quenty/playermock@1.1.0`, `@quenty/playerbinder@14.41.0`, `@quenty/playerhumanoidbinder@14.42.0`, `@quenty/playerinputmode@9.44.0`, `@quenty/playersservicepromises@10.21.0`, `@quenty/playerthumbnailutils@10.21.0`, `@quenty/promise@10.21.0`, `@quenty/promisemaid@5.21.0`, `@quenty/ragdoll@15.59.0`, `@quenty/receiptprocessing@7.37.0`, `@quenty/remoting@12.36.0`, `@quenty/rogue-properties@11.52.0`, `@quenty/saveslot@1.13.0`, `@quenty/scoredactionservice@16.49.0`, `@quenty/servicebag@11.20.0`, `@quenty/settings@11.62.0`, `@quenty/sounds@10.25.0`, `@quenty/steputils@3.7.0`, `@quenty/string@3.4.0`, `@quenty/teleportserviceutils@9.38.0`, `@quenty/timedtween@7.40.0`, `@quenty/uiobjectutils@6.32.0`, `@quenty/userserviceutils@9.35.0`
+  - Mock player and add testing [#743](https://github.com/Quenty/NevermoreEngine/pull/743) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 22 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/binder@14.40.0`, `@quenty/influxdbclient@7.39.0`, `@quenty/remoting@12.35.0`
+  - Add more testing to Nevermore [#742](https://github.com/Quenty/NevermoreEngine/pull/742) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.45.0`, `@quenty/saveslot@1.11.0`
+  - feat: Add ephemeral save slots [#741](https://github.com/Quenty/NevermoreEngine/pull/741) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.5.0`, `@quenty/saveslot@1.10.0`, `@quenty/teleportserviceutils@9.36.0`, `@quenty/nevermore-cli@4.41.0`
+  - feat: Add additional metadata to versions [#740](https://github.com/Quenty/NevermoreEngine/pull/740) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 21 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/brine@1.9.0`, `@quenty/datastore@13.44.0`, `@quenty/gameproductservice@14.58.0`, `@quenty/influxdbclient@7.38.0`, `@quenty/saveslot@1.9.0`, `@quenty/teleportserviceutils@9.35.0`
+  - test(influxdbclient): Add comprehensive unit tests [#739](https://github.com/Quenty/NevermoreEngine/pull/739) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 20 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/adorneedata@7.37.0`, `@quenty/datastore@13.43.0`
+  - feat: Datastore keys and error messages [#735](https://github.com/Quenty/NevermoreEngine/pull/735) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Jul 20 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/gameconfig@12.54.0`, `@quenty/gameproductservice@14.57.0`, `@quenty/marketplaceutils@11.24.0`, `@quenty/nevermoreclimanifest@1.4.0`, `@quenty/saveslot@1.7.0`, `@quenty/streamingutils@10.21.0`, `@quenty/teleportserviceutils@9.34.0`, `@quenty/nevermore-cli@4.40.0`
+  - feat: Improve nevermore supporting work for egg hunt release [#738](https://github.com/Quenty/NevermoreEngine/pull/738) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jul 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/animations@8.35.0`, `@quenty/binder@14.39.0`, `@quenty/blend@12.39.0`, `@quenty/brine@1.8.0`, `@quenty/brio@14.32.0`, `@quenty/camera@14.45.0`, `@quenty/characterutils@12.35.0`, `@quenty/chatproviderservice@9.57.0`, `@quenty/clienttranslator@14.41.0`, `@quenty/clipcharacters@12.44.0`, `@quenty/datastore@13.42.0`, `@quenty/deathreport@10.49.0`, `@quenty/elo@7.40.0`, `@quenty/experiencecalculator@2.12.0`, `@quenty/fakeskybox@11.21.0`, `@quenty/fzy@5.16.0`, `@quenty/ik@15.57.0`, `@quenty/influxdbclient@7.37.0`, `@quenty/inputkeymaputils@14.47.0`, `@quenty/instanceutils@13.32.0`, `@quenty/lipsum@14.39.0`, `@quenty/maid@3.10.0`, `@quenty/nevermoreclimanifest@1.3.0`, `@quenty/observablecollection@12.41.0`, `@quenty/octree@11.15.0`, `@quenty/permissionprovider@14.42.0`, `@quenty/randomutils@6.18.0`, `@quenty/roblox-api-dump@8.24.0`, `@quenty/rogue-properties@11.49.0`, `@quenty/rx@13.30.0`, `@quenty/secrets@7.54.0`, `@quenty/settings-inputkeymap@10.60.0`, `@quenty/settings@11.57.0`, `@quenty/snackbar@11.45.0`, `@quenty/soundgroup@1.44.0`, `@quenty/throttle@10.13.0`, `@quenty/tie@10.43.0`, `@quenty/nevermore-cli@4.39.0`
+  - fix: pin translation behavior with tests and fix camelCase key generation [#737](https://github.com/Quenty/NevermoreEngine/pull/737) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sat Jul 18 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/datastore@13.41.0`, `@quenty/messagingserviceutils@7.23.0`, `@quenty/nevermoreclimanifest@1.2.0`, `@quenty/promise@10.19.0`, `@quenty/saveslot@1.5.0`
+  - datastore: fix session-locked load hang + comprehensive session-lock tests [#736](https://github.com/Quenty/NevermoreEngine/pull/736) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 17 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.38.0`
+  - feat(nevermore-cli): pin and promote base place versions in deploy config [#734](https://github.com/Quenty/NevermoreEngine/pull/734) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Jul 17 2026)
+
+#### 🐛 Bug Fix
+
+- Add Claude Code format-on-edit and pre-push luau lint hooks [#732](https://github.com/Quenty/NevermoreEngine/pull/732) ([@Quenty](https://github.com/Quenty))
+- `@quenty/hapticfeedbackutils@3.3.3`, `@quenty/soundgroup@1.42.2`
+  - fix: Fix some types that need to be fixed [#733](https://github.com/Quenty/NevermoreEngine/pull/733) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 16 2026)
+
+#### 🚀 Enhancement
+
+- `nevermore-claude@0.2.0`, `@quenty/nevermore-cli@4.37.0`
+  - feat(nevermore-claude): add Claude Code plugin with strict-typing-luau skill [#731](https://github.com/Quenty/NevermoreEngine/pull/731) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Thu Jul 16 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermoreclimanifest@1.1.0`, `@quenty/nevermore-cli@4.36.0`
+  - Users/quenty/deploy improvements [#730](https://github.com/Quenty/NevermoreEngine/pull/730) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/remoting@12.32.2`
+  - fix: Fix error messages [#715](https://github.com/Quenty/NevermoreEngine/pull/715) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/octree@11.14.2`
+  - test(octree): Add unit tests for Octree, OctreeNode, and OctreeRegionUtils [#728](https://github.com/Quenty/NevermoreEngine/pull/728) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Jul 15 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/characterutils@12.33.0`, `@quenty/clienttranslator@14.39.0`, `@quenty/sounds@10.22.0`
+  - feat: Localize numbers for new locales [#729](https://github.com/Quenty/NevermoreEngine/pull/729) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Jul 14 2026)
+
+#### 🚀 Enhancement
+
+- feat: Upgrade lune to latest version [#727](https://github.com/Quenty/NevermoreEngine/pull/727) ([@Quenty](https://github.com/Quenty))
+- `@quenty/actionmanager@13.34.0`, `@quenty/animations@8.33.0`, `@quenty/animationtrackutils@2.4.0`, `@quenty/avatareditorutils@7.40.0`, `@quenty/binder@14.37.0`, `@quenty/bindtocloseservice@8.33.0`, `@quenty/bodycolorsutils@7.37.0`, `@quenty/boundlinkutils@14.38.0`, `@quenty/brine@1.6.0`, `@quenty/camera@14.43.0`, `@quenty/characterparticleplayer@2.4.0`, `@quenty/chatproviderservice@9.54.0`, `@quenty/clienttranslator@14.38.0`, `@quenty/clipcharacters@12.41.0`, `@quenty/cmdrservice@13.46.0`, `@quenty/colorpalette@10.40.0`, `@quenty/colorpicker@10.38.0`, `@quenty/conditions@10.41.0`, `@quenty/contentproviderutils@12.32.0`, `@quenty/cooldown@11.39.0`, `@quenty/cubicspline@10.13.0`, `@quenty/deathreport@10.46.0`, `@quenty/ellipticcurvecryptography@1.13.0`, `@quenty/enabledmixin@11.27.0`, `@quenty/equippedtracker@13.34.0`, `@quenty/fakeskybox@11.19.0`, `@quenty/firstpersoncharactertransparency@14.35.0`, `@quenty/flipbook@9.33.0`, `@quenty/gameconfig@12.50.0`, `@quenty/gameproductservice@14.53.0`, `@quenty/generatewithmixin@11.12.0`, `@quenty/genericscreenguiprovider@13.40.0`, `@quenty/humanoidspeed@12.50.0`, `@quenty/idleservice@13.53.0`, `@quenty/ik@15.54.0`, `@quenty/inputkeymaputils@14.44.0`, `@quenty/inputmode@13.35.0`, `@quenty/isamixin@2.4.0`, `@quenty/linearsystemssolver@2.4.0`, `@quenty/linkutils@13.31.0`, `@quenty/localizedtextutils@12.31.0`, `@quenty/lrucache@1.10.0`, `@quenty/markdownrender@2.5.0`, `@quenty/marketplaceutils@11.21.0`, `@quenty/modeltransparencyeffect@11.18.0`, `@quenty/motor6d@7.43.0`, `@quenty/mouseovermixin@10.14.0`, `@quenty/mouseshiftlockservice@11.19.0`, `@quenty/networkownerservice@5.9.0`, `@quenty/observablecollection@12.39.0`, `@quenty/overriddenproperty@10.15.0`, `@quenty/particleengine@13.34.0`, `@quenty/parttouchingcalculator@14.41.0`, `@quenty/permissionprovider@14.39.0`, `@quenty/pillbacking@10.14.0`, `@quenty/playerbinder@14.37.0`, `@quenty/playerhumanoidbinder@14.38.0`, `@quenty/playerinputmode@9.39.0`, `@quenty/qgui@2.5.0`, `@quenty/quaternion@2.7.0`, `@quenty/racketingropeconstraint@12.44.0`, `@quenty/radial-image@9.38.0`, `@quenty/ragdoll@15.53.0`, `@quenty/rodux-actions@9.14.0`, `@quenty/rodux-undo@8.14.0`, `@quenty/rogue-humanoid@10.50.0`, `@quenty/rogue-properties@11.47.0`, `@quenty/roundedbackingbuilder@2.4.0`, `@quenty/rxbinderutils@14.37.0`, `@quenty/scoredactionservice@16.45.0`, `@quenty/screenshothudservice@7.35.0`, `@quenty/scrollingframe@12.19.0`, `@quenty/secrets@7.51.0`, `@quenty/settings-inputkeymap@10.57.0`, `@quenty/settings@11.54.0`, `@quenty/snackbar@11.43.0`, `@quenty/softshutdown@9.49.0`, `@quenty/soundplayer@7.42.0`, `@quenty/spawning@10.48.0`, `@quenty/sprites@13.30.0`, `@quenty/templateprovider@11.39.0`, `@quenty/tie@10.41.0`, `@quenty/time@2.5.0`, `@quenty/nevermore-cli@4.35.0`, `@quenty/studio-bridge@0.17.0`
+  - feat: Add strict typing to a lot of packages [#720](https://github.com/Quenty/NevermoreEngine/pull/720) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Sun Jul 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/studio-bridge@0.16.0`
+  - feat: Launch with placeId + universeId options [#723](https://github.com/Quenty/NevermoreEngine/pull/723) ([@Quenty](https://github.com/Quenty))
+
+#### 🐛 Bug Fix
+
+- `@quenty/soundplayer@7.41.0`
+  - fix: Prevent redundant emission [#726](https://github.com/Quenty/NevermoreEngine/pull/726) ([@alex-y-z](https://github.com/alex-y-z))
+- `@quenty/camera@14.42.0`
+  - fix: Ensure valid camera state [#724](https://github.com/Quenty/NevermoreEngine/pull/724) ([@alex-y-z](https://github.com/alex-y-z))
+
+#### Authors: 2
+
+- Alex Turner ([@alex-y-z](https://github.com/alex-y-z))
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Jul 02 2026)
 
 #### 🚀 Enhancement

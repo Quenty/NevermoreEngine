@@ -3,6 +3,156 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.73.1...@quenty/idleservice@13.74.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.73.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.73.0...@quenty/idleservice@13.73.1) (2026-10-20)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.72.3...@quenty/idleservice@13.73.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.72.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.72.2...@quenty/idleservice@13.72.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.72.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.72.1...@quenty/idleservice@13.72.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.72.0...@quenty/idleservice@13.72.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.71.0...@quenty/idleservice@13.72.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.70.0...@quenty/idleservice@13.71.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.69.1...@quenty/idleservice@13.70.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.69.0...@quenty/idleservice@13.69.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.68.0...@quenty/idleservice@13.69.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.67.0...@quenty/idleservice@13.68.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.66.1...@quenty/idleservice@13.67.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.66.0...@quenty/idleservice@13.66.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.65.1...@quenty/idleservice@13.66.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.65.0...@quenty/idleservice@13.65.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.64.2...@quenty/idleservice@13.65.0) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.64.1...@quenty/idleservice@13.64.2) (2026-08-12)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.64.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.64.0...@quenty/idleservice@13.64.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.63.2...@quenty/idleservice@13.64.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.63.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.63.1...@quenty/idleservice@13.63.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.63.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.63.0...@quenty/idleservice@13.63.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.62.0...@quenty/idleservice@13.63.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.61.0...@quenty/idleservice@13.62.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.60.0...@quenty/idleservice@13.61.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.59.1...@quenty/idleservice@13.60.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.59.0...@quenty/idleservice@13.59.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.58.0...@quenty/idleservice@13.59.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.57.0...@quenty/idleservice@13.58.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.56.0...@quenty/idleservice@13.57.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.55.0...@quenty/idleservice@13.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.54.2...@quenty/idleservice@13.55.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.54.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.54.1...@quenty/idleservice@13.54.2) (2026-07-17)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+## [13.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.54.0...@quenty/idleservice@13.54.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.53.0...@quenty/idleservice@13.54.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/idleservice
+
+# [13.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.52.0...@quenty/idleservice@13.53.0) (2026-07-14)
+
+### Features
+
+- **idleservice:** convert package to --!strict ([cf9f304](https://github.com/Quenty/NevermoreEngine/commit/cf9f304a7588231c711816ddf8ef7f9c3f9bc468))
+
+# [13.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.51.1...@quenty/idleservice@13.52.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/idleservice
+
 ## [13.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/idleservice@13.51.0...@quenty/idleservice@13.51.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/idleservice

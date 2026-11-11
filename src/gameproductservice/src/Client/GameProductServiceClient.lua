@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	This service provides an interface to purchase produces, assets, and other
 	marketplace items. This listens to events, handles requests between server and
@@ -20,6 +20,7 @@ local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local ServiceBag = require("ServiceBag")
 local Signal = require("Signal")
@@ -27,12 +28,27 @@ local Signal = require("Signal")
 local GameProductServiceClient = {}
 GameProductServiceClient.ServiceName = "GameProductServiceClient"
 
+export type GameProductServiceClient = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+		_maid: Maid.Maid,
+		_gameProductDataService: any,
+		GamePassPurchased: Signal.Signal<number>,
+		ProductPurchased: Signal.Signal<number>,
+		AssetPurchased: Signal.Signal<number>,
+		BundlePurchased: Signal.Signal<number>,
+		SubscriptionPurchased: Signal.Signal<string>,
+		MembershipPurchased: Signal.Signal<number>,
+	},
+	{} :: typeof({ __index = GameProductServiceClient })
+))
+
 --[=[
 	Initializes the service. Should be done via [ServiceBag]
 	@param serviceBag ServiceBag
 ]=]
-function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+function GameProductServiceClient.Init(self: GameProductServiceClient, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._maid = Maid.new()
 
@@ -45,23 +61,24 @@ function GameProductServiceClient:Init(serviceBag: ServiceBag.ServiceBag)
 	-- Internal
 	self._gameProductDataService = self._serviceBag:GetService(require("GameProductDataService"))
 	self._serviceBag:GetService(require("PlayerProductManagerClient"))
+	self._serviceBag:GetService((require :: any)("GameProductCmdrServiceClient"))
 
 	-- Additional API for ergonomics
-	self.GamePassPurchased = self._maid:Add(Signal.new()) -- :Fire(gamePassId)
-	self.ProductPurchased = self._maid:Add(Signal.new()) -- :Fire(productId)
-	self.AssetPurchased = self._maid:Add(Signal.new()) -- :Fire(assetId)
-	self.BundlePurchased = self._maid:Add(Signal.new()) -- :Fire(bundleId)
-	self.SubscriptionPurchased = self._maid:Add(Signal.new()) -- :Fire(subscriptionId)
-	self.MembershipPurchased = self._maid:Add(Signal.new()) -- :Fire(membershipId)
+	self.GamePassPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(gamePassId)
+	self.ProductPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(productId)
+	self.AssetPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(assetId)
+	self.BundlePurchased = self._maid:Add(Signal.new() :: any) -- :Fire(bundleId)
+	self.SubscriptionPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(subscriptionId)
+	self.MembershipPurchased = self._maid:Add(Signal.new() :: any) -- :Fire(membershipId)
 end
 
 --[=[
 	Starts the service. Should be done via [ServiceBag]
 ]=]
-function GameProductServiceClient:Start()
-	local function forwardSignal(origSignal, signal)
+function GameProductServiceClient.Start(self: GameProductServiceClient): ()
+	local function forwardSignal(origSignal: any, signal: any)
 		self._maid:GiveTask(origSignal:Connect(function(player, ...)
-			if player == Players.LocalPlayer then
+			if player == Players.LocalPlayer or player == PlayerMock.getMockedLocalPlayer() then
 				signal:Fire(...)
 			end
 		end))
@@ -82,7 +99,11 @@ end
 	@param idOrKey string | number
 	@return Observable<>
 ]=]
-function GameProductServiceClient:ObservePlayerAssetPurchased(assetType, idOrKey)
+function GameProductServiceClient.ObservePlayerAssetPurchased(
+	self: GameProductServiceClient,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	idOrKey: string | number
+): Observable.Observable<()>
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -96,7 +117,8 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObserveAssetPurchased(
+function GameProductServiceClient.ObserveAssetPurchased(
+	self: GameProductServiceClient,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
@@ -114,12 +136,13 @@ end
 	@param idOrKey string | number
 	@return boolean
 ]=]
-function GameProductServiceClient:HasPlayerPurchasedThisSession(
+function GameProductServiceClient.HasPlayerPurchasedThisSession(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): boolean
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -134,12 +157,13 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePromptPurchase(
+function GameProductServiceClient.PromisePromptPurchase(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -154,7 +178,9 @@ end
 	@return Observable<boolean>
 ]=]
 function GameProductServiceClient:ObserveServerOnlyPromptingEnabled(): Observable.Observable<boolean>
-	return self._gameProductDataService:ObserveServerOnlyPrompting(Players.LocalPlayer)
+	return self._gameProductDataService:ObserveServerOnlyPrompting(
+		Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+	)
 end
 
 --[=[
@@ -165,17 +191,24 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnership(
+function GameProductServiceClient.PromisePlayerOwnership(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
 	return self._gameProductDataService:PromisePlayerOwnership(player, assetType, idOrKey)
 end
+
+--[=[
+	Ownership overrides are intentionally not settable from the client. They are server-authoritative
+	and replicated read-only (see [GameProductService.SetPlayerOwnershipOverride]), so a player can
+	never grant themselves ownership. Read ownership with [GameProductServiceClient.ObservePlayerOwnership].
+]=]
 
 --[=[
 	Observes if the player owns this cloud asset or not
@@ -185,12 +218,13 @@ end
 	@param idOrKey string | number
 	@return Observable<boolean>
 ]=]
-function GameProductServiceClient:ObservePlayerOwnership(
+function GameProductServiceClient.ObservePlayerOwnership(
+	self: GameProductServiceClient,
 	player: Player,
-	assetType,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Observable.Observable<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -203,9 +237,12 @@ end
 	@param player Player
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerIsPromptOpen(player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
+function GameProductServiceClient.PromisePlayerIsPromptOpen(
+	self: GameProductServiceClient,
+	player: Player
+): Promise.Promise<boolean>
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerIsPromptOpen(player)
@@ -217,9 +254,12 @@ end
 	@param player Player
 	@return Promise
 ]=]
-function GameProductServiceClient:PromisePlayerPromptClosed(player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
-	assert(self ~= GameProductServiceClient, "Use serviceBag")
+function GameProductServiceClient.PromisePlayerPromptClosed(
+	self: GameProductServiceClient,
+	player: Player
+): Promise.Promise<boolean>
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(self ~= (GameProductServiceClient :: any), "Use serviceBag")
 	assert(self._serviceBag, "Not initialized")
 
 	return self._gameProductDataService:PromisePlayerPromptClosed(player)
@@ -235,12 +275,13 @@ end
 	@param idOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromisePlayerOwnershipOrPrompt(
+function GameProductServiceClient.PromisePlayerOwnershipOrPrompt(
+	self: GameProductServiceClient,
 	player: Player,
 	assetType: GameConfigAssetTypes.GameConfigAssetType,
 	idOrKey: string | number
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
 	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
 	assert(type(idOrKey) == "number" or type(idOrKey) == "string", "Bad idOrKey")
 
@@ -254,28 +295,30 @@ end
 	@param productIdOrKey string | number
 	@return Promise<boolean>
 ]=]
-function GameProductServiceClient:PromiseGamePassOrProductUnlockOrPrompt(
+function GameProductServiceClient.PromiseGamePassOrProductUnlockOrPrompt(
+	self: GameProductServiceClient,
 	gamePassIdOrKey: string | number,
 	productIdOrKey: string | number
 ): Promise.Promise<boolean>
 	assert(type(gamePassIdOrKey) == "number" or type(gamePassIdOrKey) == "string", "Bad gamePassIdOrKey")
 	assert(type(productIdOrKey) == "number" or type(productIdOrKey) == "string", "Bad productIdOrKey")
 
-	if self:HasPlayerPurchasedThisSession(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
+	local localPlayer = Players.LocalPlayer or PlayerMock.getMockedLocalPlayer()
+
+	if self:HasPlayerPurchasedThisSession(localPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey) then
 		return Promise.resolved(true)
 	end
 
-	return self:PromisePlayerOwnership(Players.LocalPlayer, GameConfigAssetTypes.PASS, gamePassIdOrKey)
-		:Then(function(owns)
-			if owns then
-				return true
-			else
-				return self:PromisePromptPurchase(Players.LocalPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
-			end
-		end)
+	return self:PromisePlayerOwnership(localPlayer, GameConfigAssetTypes.PASS, gamePassIdOrKey):Then(function(owns)
+		if owns then
+			return true
+		else
+			return self:PromisePromptPurchase(localPlayer, GameConfigAssetTypes.PRODUCT, productIdOrKey)
+		end
+	end)
 end
 
-function GameProductServiceClient:Destroy()
+function GameProductServiceClient.Destroy(self: GameProductServiceClient): ()
 	self._maid:DoCleaning()
 end
 

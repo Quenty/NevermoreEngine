@@ -47,6 +47,70 @@ describe('decodePluginMessage', () => {
       });
       expect(msg).not.toHaveProperty('requestId');
     });
+
+    it('carries returnValues through unchanged, nesting included', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: {
+          success: true,
+          returnValues: [
+            { slug: 'maid', counts: { passed: 1014, failed: 0 } },
+            'str',
+            42,
+            true,
+            { type: 'Vector3', value: [1, 2, 3] },
+            [1, 2],
+          ],
+        },
+      });
+      expect(msg?.type).toBe('scriptComplete');
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toEqual([
+        { slug: 'maid', counts: { passed: 1014, failed: 0 } },
+        'str',
+        42,
+        true,
+        { type: 'Vector3', value: [1, 2, 3] },
+        [1, 2],
+      ]);
+    });
+
+    it('leaves returnValues undefined when the plugin sent none', () => {
+      // Distinguishable from an empty array: nothing reported a return channel,
+      // so a caller can still fall back to the run's printed output.
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toBeUndefined();
+    });
+
+    it('preserves an empty returnValues array', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true, returnValues: [] },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toEqual([]);
+    });
+
+    it('ignores a returnValues field that is not an array', () => {
+      const msg = roundTripPlugin({
+        type: 'scriptComplete',
+        sessionId: 'sess-1',
+        payload: { success: true, returnValues: 'nope' },
+      });
+      expect(
+        (msg as { payload: { returnValues?: unknown[] } }).payload.returnValues
+      ).toBeUndefined();
+    });
   });
 
   describe('register', () => {
@@ -258,6 +322,39 @@ describe('decodePluginMessage', () => {
           payload: { instance: 'not-an-object' },
         })
       ).toBeNull();
+    });
+  });
+
+  describe('exportInstancesResult / importInstancesResult', () => {
+    it('decodes an exported model', () => {
+      const msg = {
+        type: 'exportInstancesResult',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { data: 'PHJvYmxveCE=', paths: ['Workspace.Map'] },
+      };
+      expect(roundTripPlugin(msg)).toEqual(msg);
+    });
+
+    it('rejects an export without data', () => {
+      expect(
+        roundTripPlugin({
+          type: 'exportInstancesResult',
+          sessionId: 'sess-1',
+          requestId: 'req-1',
+          payload: { paths: ['Workspace.Map'] },
+        })
+      ).toBeNull();
+    });
+
+    it('decodes the imported paths', () => {
+      const msg = {
+        type: 'importInstancesResult',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { paths: ['Workspace.Map'] },
+      };
+      expect(roundTripPlugin(msg)).toEqual(msg);
     });
   });
 
@@ -593,6 +690,28 @@ describe('encodeMessage / decodeServerMessage', () => {
           })
         )
       ).toBeNull();
+    });
+  });
+
+  describe('exportInstances / importInstances', () => {
+    it('round-trips exportInstances', () => {
+      const msg: ServerMessage = {
+        type: 'exportInstances',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { paths: ['Workspace.Map', 'Lighting'] },
+      };
+      expect(roundTripServer(msg)).toEqual(msg);
+    });
+
+    it('round-trips importInstances', () => {
+      const msg: ServerMessage = {
+        type: 'importInstances',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: { data: 'PHJvYmxveCE=', parentPath: 'Workspace' },
+      };
+      expect(roundTripServer(msg)).toEqual(msg);
     });
   });
 

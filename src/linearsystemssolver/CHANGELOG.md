@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linearsystemssolver@2.3.4...@quenty/linearsystemssolver@2.4.0) (2026-07-14)
+
+### Features
+
+- **linearsystemssolver:** convert package to --!strict ([b35afd1](https://github.com/Quenty/NevermoreEngine/commit/b35afd15d1f1e314306f54a12c23a7a8f6e20693))
+
 ## [2.3.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/linearsystemssolver@2.3.3...@quenty/linearsystemssolver@2.3.4) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/linearsystemssolver

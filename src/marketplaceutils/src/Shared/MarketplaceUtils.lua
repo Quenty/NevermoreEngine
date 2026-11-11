@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 
 local MarketplaceService = game:GetService("MarketplaceService")
 
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 
 local MarketplaceUtils = {}
@@ -153,13 +154,18 @@ function MarketplaceUtils.promiseUserSubscriptionStatus(
 	player: Player,
 	subscriptionId: string
 ): Promise.Promise<UserSubscriptonStatus>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "Bad player")
+	assert(typeof(player) == "Instance" and (player:IsA("Player") or PlayerMock.isMock(player)), "Bad player")
 	assert(type(subscriptionId) == "string", "Bad subscriptionId")
 
 	return Promise.spawn(function(resolve, reject)
 		local subStatus
 		local ok, err = pcall(function()
-			subStatus = MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)
+			if PlayerMock.isMock(player) then
+				subStatus =
+					PlayerMock.callMethod(player, "MarketplaceService.GetUserSubscriptionStatusAsync", subscriptionId)
+			else
+				subStatus = MarketplaceService:GetUserSubscriptionStatusAsync(player, subscriptionId)
+			end
 		end)
 		if not ok then
 			return reject(err)
@@ -184,7 +190,12 @@ function MarketplaceUtils.promiseUserOwnsGamePass(userId: number, gamePassId: nu
 	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
-			result = MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId)
+			local mockPlayer = PlayerMock.getMockByUserId(userId)
+			if mockPlayer ~= nil then
+				result = PlayerMock.callMethod(mockPlayer, "MarketplaceService.UserOwnsGamePassAsync", gamePassId)
+			else
+				result = MarketplaceService:UserOwnsGamePassAsync(userId, gamePassId)
+			end
 		end)
 		if not ok then
 			return reject(err)
@@ -209,7 +220,44 @@ function MarketplaceUtils.promisePlayerOwnsAsset(player: Player, assetId: number
 	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
-			result = MarketplaceService:PlayerOwnsAsset(player, assetId)
+			if PlayerMock.isMock(player) then
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsAsset", assetId)
+			else
+				result = MarketplaceService:PlayerOwnsAsset(player, assetId)
+			end
+		end)
+		if not ok then
+			return reject(err)
+		end
+		if type(result) ~= "boolean" then
+			return reject("Bad result type")
+		end
+		return resolve(result)
+	end)
+end
+
+--[=[
+	Retrieves whether a player owns an asset via the async variant. Unlike
+	[MarketplaceUtils.promisePlayerOwnsAsset], this queries whether the player owns
+	paid access to a game (universe), which is the mechanism paid-access games use.
+	See [MarketplaceService.PlayerOwnsAssetAsync].
+
+	@param player Player
+	@param assetId number
+	@return Promise<boolean>
+]=]
+function MarketplaceUtils.promisePlayerOwnsAssetAsync(player: Player, assetId: number): Promise.Promise<boolean>
+	assert(typeof(player) == "Instance", "Bad player")
+	assert(type(assetId) == "number", "Bad assetId")
+
+	return Promise.spawn(function(resolve, reject)
+		local result
+		local ok, err = pcall(function()
+			if PlayerMock.isMock(player) then
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsAssetAsync", assetId)
+			else
+				result = MarketplaceService:PlayerOwnsAssetAsync(player, assetId)
+			end
 		end)
 		if not ok then
 			return reject(err)
@@ -234,7 +282,11 @@ function MarketplaceUtils.promisePlayerOwnsBundle(player: Player, bundleId: numb
 	return Promise.spawn(function(resolve, reject)
 		local result
 		local ok, err = pcall(function()
-			result = MarketplaceService:PlayerOwnsBundle(player, bundleId)
+			if PlayerMock.isMock(player) then
+				result = PlayerMock.callMethod(player, "MarketplaceService.PlayerOwnsBundle", bundleId)
+			else
+				result = MarketplaceService:PlayerOwnsBundle(player, bundleId)
+			end
 		end)
 		if not ok then
 			return reject(err)

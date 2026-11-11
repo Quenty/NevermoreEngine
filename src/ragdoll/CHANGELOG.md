@@ -3,6 +3,175 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.73.1...@quenty/ragdoll@15.74.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.73.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.73.0...@quenty/ragdoll@15.73.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [15.73.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.72.3...@quenty/ragdoll@15.73.0) (2026-10-14)
+
+### Features
+
+- BindToClose service has a public method tests can use, simplify tests ([be4ca98](https://github.com/Quenty/NevermoreEngine/commit/be4ca986671cfd9b0757acc4f9ab85e6bfb7f38e))
+
+## [15.72.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.72.2...@quenty/ragdoll@15.72.3) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.72.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.72.1...@quenty/ragdoll@15.72.2) (2026-09-30)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.72.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.72.0...@quenty/ragdoll@15.72.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.72.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.71.0...@quenty/ragdoll@15.72.0) (2026-09-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.71.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.70.0...@quenty/ragdoll@15.71.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.70.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.69.1...@quenty/ragdoll@15.70.0) (2026-09-09)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.69.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.69.0...@quenty/ragdoll@15.69.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.69.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.68.0...@quenty/ragdoll@15.69.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.68.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.67.0...@quenty/ragdoll@15.68.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.67.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.66.1...@quenty/ragdoll@15.67.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.66.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.66.0...@quenty/ragdoll@15.66.1) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.66.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.65.1...@quenty/ragdoll@15.66.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.65.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.65.0...@quenty/ragdoll@15.65.1) (2026-08-14)
+
+### Bug Fixes
+
+- **ragdoll:** Clean up previous motor state when ragdoll inputs change ([9731cf7](https://github.com/Quenty/NevermoreEngine/commit/9731cf70a88f3924a5232c21aacc0ffc40b61826))
+
+# [15.65.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.2...@quenty/ragdoll@15.65.0) (2026-08-14)
+
+### Features
+
+- **ragdoll:** add ragdoll and unragdoll cmdr commands ([#802](https://github.com/Quenty/NevermoreEngine/issues/802)) ([dd3d887](https://github.com/Quenty/NevermoreEngine/commit/dd3d887b920fe80cc21f86bd1eceb58f43ad0e00))
+
+## [15.64.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.1...@quenty/ragdoll@15.64.2) (2026-08-12)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.64.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.64.0...@quenty/ragdoll@15.64.1) (2026-08-10)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.64.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.63.2...@quenty/ragdoll@15.64.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.63.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.63.1...@quenty/ragdoll@15.63.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.63.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.63.0...@quenty/ragdoll@15.63.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.63.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.62.0...@quenty/ragdoll@15.63.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.61.0...@quenty/ragdoll@15.62.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.61.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.60.0...@quenty/ragdoll@15.61.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.60.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.59.1...@quenty/ragdoll@15.60.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.59.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.59.0...@quenty/ragdoll@15.59.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.59.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.58.0...@quenty/ragdoll@15.59.0) (2026-07-23)
+
+### Bug Fixes
+
+- Additional fixes ([8714d52](https://github.com/Quenty/NevermoreEngine/commit/8714d52ed996f2e41e6daa191554acca35860e36))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [15.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.57.0...@quenty/ragdoll@15.58.0) (2026-07-22)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.57.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.56.0...@quenty/ragdoll@15.57.0) (2026-07-20)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.56.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.55.0...@quenty/ragdoll@15.56.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.54.2...@quenty/ragdoll@15.55.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.54.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.54.1...@quenty/ragdoll@15.54.2) (2026-07-17)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+## [15.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.54.0...@quenty/ragdoll@15.54.1) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.53.0...@quenty/ragdoll@15.54.0) (2026-07-15)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
+# [15.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.52.0...@quenty/ragdoll@15.53.0) (2026-07-14)
+
+### Bug Fixes
+
+- cast Tie interface at :Implement sites to dodge flaky symlink-nominal analyze errors ([17f54f8](https://github.com/Quenty/NevermoreEngine/commit/17f54f87c6d449386570b8a409175dc2d6d02016))
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **ragdoll:** convert package to --!strict ([3f16ada](https://github.com/Quenty/NevermoreEngine/commit/3f16ada0d2371662bde94d8949a52f853152dac3))
+
+# [15.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.1...@quenty/ragdoll@15.52.0) (2026-07-12)
+
+**Note:** Version bump only for package @quenty/ragdoll
+
 ## [15.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/ragdoll@15.51.0...@quenty/ragdoll@15.51.1) (2026-06-05)
 
 **Note:** Version bump only for package @quenty/ragdoll

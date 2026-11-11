@@ -22,6 +22,7 @@ local Observable = require("Observable")
 local PermissionLevel = require("PermissionLevel")
 local PermissionProviderConstants = require("PermissionProviderConstants")
 local PermissionProviderUtils = require("PermissionProviderUtils")
+local PlayerMock = require("PlayerMock")
 local Promise = require("Promise")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
@@ -67,9 +68,9 @@ function PermissionService.SetProviderFromConfig(
 	assert(not self._provider, "Already have provider set")
 
 	if config.type == PermissionProviderConstants.GROUP_RANK_CONFIG_TYPE then
-		self._provider = GroupPermissionProvider.new(config)
+		self._provider = self._maid:Add(GroupPermissionProvider.new(config))
 	elseif config.type == PermissionProviderConstants.SINGLE_USER_CONFIG_TYPE then
-		self._provider = CreatorPermissionProvider.new(config)
+		self._provider = self._maid:Add(CreatorPermissionProvider.new(config))
 	else
 		error("Bad provider")
 	end
@@ -106,7 +107,7 @@ end
 	@return Promise<boolean>
 ]=]
 function PermissionService.PromiseIsAdmin(self: PermissionService, player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.ADMIN)
 end
@@ -117,7 +118,7 @@ end
 	@return Promise<boolean>
 ]=]
 function PermissionService.PromiseIsCreator(self: PermissionService, player: Player): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "bad player")
 
 	return self:PromiseIsPermissionLevel(player, PermissionLevel.CREATOR)
 end
@@ -133,7 +134,7 @@ function PermissionService.PromiseIsPermissionLevel(
 	player: Player,
 	permissionLevel: PermissionLevel.PermissionLevel
 ): Promise.Promise<boolean>
-	assert(typeof(player) == "Instance" and player:IsA("Player"), "bad player")
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "bad player")
 	assert(PermissionLevel:IsValue(permissionLevel), "Bad permissionLevel")
 
 	if RunService:IsStudio() then

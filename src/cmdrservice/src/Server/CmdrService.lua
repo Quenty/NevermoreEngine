@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Bridge to https://eryn.io/Cmdr/
 
@@ -36,19 +36,19 @@ export type CmdrService = typeof(setmetatable(
 	{} :: typeof({ __index = CmdrService })
 ))
 
-local GLOBAL_REGISTRY = setmetatable({}, { __mode = "kv" })
+local GLOBAL_REGISTRY: { [string]: CmdrService } = setmetatable({}, { __mode = "kv" }) :: any
 
 --[=[
 	Initializes the CmdrService. Should be done via [ServiceBag].
 	@param serviceBag ServiceBag
 ]=]
-function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag)
+function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag): ()
 	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._maid = Maid.new()
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 
 	-- External
-	self._permissionService = self._serviceBag:GetService(PermissionService)
+	self._permissionService = self._serviceBag:GetService(PermissionService) :: any
 
 	-- Internal
 	self._cmdrTemplateProviderServer = self._serviceBag:GetService(CmdrTemplateProviderServer)
@@ -79,7 +79,7 @@ function CmdrService.Init(self: CmdrService, serviceBag: ServiceBag.ServiceBag)
 			cmdr:RegisterDefaultCommands()
 		end)
 
-		cmdr.Registry:RegisterHook("BeforeRun", function(context)
+		cmdr.Registry:RegisterHook("BeforeRun", function(context): string?
 			-- allow!
 			if context.Executor == nil then
 				return nil
@@ -115,7 +115,7 @@ end
 	Returns cmdr
 	@return Promise<Cmdr>
 ]=]
-function CmdrService.PromiseCmdr(self: CmdrService)
+function CmdrService.PromiseCmdr(self: CmdrService): Promise.Promise<any>
 	assert(self._promiseCmdr, "Not initialized")
 
 	return self._promiseCmdr
@@ -197,13 +197,13 @@ end
 	@return CmdrService
 	@private
 ]=]
-function CmdrService.__getServiceFromId(_self: CmdrService, cmdrServiceId: string)
+function CmdrService.__getServiceFromId(_self: CmdrService, cmdrServiceId: string): CmdrService?
 	assert(type(cmdrServiceId) == "string", "Bad cmdrServiceId")
 
 	return GLOBAL_REGISTRY[cmdrServiceId]
 end
 
-function CmdrService.Destroy(self: CmdrService)
+function CmdrService.Destroy(self: CmdrService): ()
 	self._maid:DoCleaning()
 end
 

@@ -1,3 +1,4 @@
+--!strict
 --[=[
 	@class FakeSkyboxService
 ]=]
@@ -9,8 +10,15 @@ local ServiceBag = require("ServiceBag")
 local FakeSkyboxService = {}
 FakeSkyboxService.ServiceName = "FakeSkyboxService"
 
-function FakeSkyboxService:Init(serviceBag: ServiceBag.ServiceBag)
-	assert(not self._serviceBag, "Already initialized")
+export type FakeSkyboxService = typeof(setmetatable(
+	{} :: {
+		_serviceBag: ServiceBag.ServiceBag,
+	},
+	{} :: typeof({ __index = FakeSkyboxService })
+))
+
+function FakeSkyboxService.Init(self: FakeSkyboxService, serviceBag: ServiceBag.ServiceBag): ()
+	assert(not (self :: any)._serviceBag, "Already initialized")
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 end
 

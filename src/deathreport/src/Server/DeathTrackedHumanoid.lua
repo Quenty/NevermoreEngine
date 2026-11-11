@@ -50,4 +50,4 @@ function DeathTrackedHumanoid._handleDeath(self: DeathTrackedHumanoid)
 	end
 end
 
-return PlayerHumanoidBinder.new("DeathTrackedHumanoid", DeathTrackedHumanoid)
+return PlayerHumanoidBinder.new("DeathTrackedHumanoid", DeathTrackedHumanoid :: any)

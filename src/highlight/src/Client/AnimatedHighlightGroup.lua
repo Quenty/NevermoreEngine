@@ -150,6 +150,11 @@ function AnimatedHighlightGroup:_getOrCreateHighlightStackHandle(adornee: Instan
 		self:_removeHighlightStack(highlightStack)
 	end))
 
+	-- Drop the stack when the adornee is destroyed (character replace), not only after Done delay.
+	maid:GiveTask(adornee.Destroying:Connect(function()
+		self:_removeHighlightStack(highlightStack)
+	end))
+
 	local handle = highlightStack:GetHandle(observeScore)
 
 	maid:GiveTask(highlightStack.Done:Connect(function()

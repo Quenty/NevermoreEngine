@@ -3,6 +3,114 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.54.0...@quenty/genericscreenguiprovider@13.54.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [13.54.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.53.2...@quenty/genericscreenguiprovider@13.54.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.53.1...@quenty/genericscreenguiprovider@13.53.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.53.0...@quenty/genericscreenguiprovider@13.53.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.52.1...@quenty/genericscreenguiprovider@13.53.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.52.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.52.0...@quenty/genericscreenguiprovider@13.52.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.51.0...@quenty/genericscreenguiprovider@13.52.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.50.0...@quenty/genericscreenguiprovider@13.51.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.49.0...@quenty/genericscreenguiprovider@13.50.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.48.1...@quenty/genericscreenguiprovider@13.49.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.48.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.48.0...@quenty/genericscreenguiprovider@13.48.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.47.2...@quenty/genericscreenguiprovider@13.48.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.47.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.47.1...@quenty/genericscreenguiprovider@13.47.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.47.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.47.0...@quenty/genericscreenguiprovider@13.47.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.46.0...@quenty/genericscreenguiprovider@13.47.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.45.0...@quenty/genericscreenguiprovider@13.46.0) (2026-07-24)
+
+### Features
+
+- mock-safe teleport and screen-gui-provider teardown ([#751](https://github.com/Quenty/NevermoreEngine/issues/751)) ([743da25](https://github.com/Quenty/NevermoreEngine/commit/743da25a3eba46e0e498999ce4eec964f9774b18))
+
+# [13.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.44.0...@quenty/genericscreenguiprovider@13.45.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.43.1...@quenty/genericscreenguiprovider@13.44.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+## [13.43.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.43.0...@quenty/genericscreenguiprovider@13.43.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.42.0...@quenty/genericscreenguiprovider@13.43.0) (2026-07-23)
+
+### Bug Fixes
+
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [13.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.41.0...@quenty/genericscreenguiprovider@13.42.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.40.0...@quenty/genericscreenguiprovider@13.41.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/genericscreenguiprovider
+
+# [13.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.39.1...@quenty/genericscreenguiprovider@13.40.0) (2026-07-14)
+
+### Bug Fixes
+
+- **lint:** resolve selene unused-self and Rx shadowing from --!strict conversions ([3f4a085](https://github.com/Quenty/NevermoreEngine/commit/3f4a085911808146f10a2435efbe9e89dff8edff))
+
+### Features
+
+- **genericscreenguiprovider:** convert package to --!strict ([4228844](https://github.com/Quenty/NevermoreEngine/commit/422884487c74eba827300a01e64661d39972580a))
+
 ## [13.39.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/genericscreenguiprovider@13.39.0...@quenty/genericscreenguiprovider@13.39.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/genericscreenguiprovider

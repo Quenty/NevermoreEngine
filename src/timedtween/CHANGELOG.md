@@ -3,6 +3,106 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.51.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.51.0...@quenty/timedtween@7.51.1) (2026-10-20)
+
+### Bug Fixes
+
+- Test scripts return their results so single cloud runs report exact counts ([2de06f4](https://github.com/Quenty/NevermoreEngine/commit/2de06f41300ada68db78527df4e953c2e398b14c))
+
+# [7.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.50.2...@quenty/timedtween@7.51.0) (2026-10-14)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.50.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.50.1...@quenty/timedtween@7.50.2) (2026-10-09)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.50.0...@quenty/timedtween@7.50.1) (2026-09-24)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.49.1...@quenty/timedtween@7.50.0) (2026-09-21)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.49.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.49.0...@quenty/timedtween@7.49.1) (2026-09-03)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.48.0...@quenty/timedtween@7.49.0) (2026-09-02)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.47.0...@quenty/timedtween@7.48.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.47.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.46.0...@quenty/timedtween@7.47.0) (2026-08-28)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.46.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.45.1...@quenty/timedtween@7.46.0) (2026-08-24)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.45.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.45.0...@quenty/timedtween@7.45.1) (2026-08-14)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.45.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.44.2...@quenty/timedtween@7.45.0) (2026-07-28)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.44.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.44.1...@quenty/timedtween@7.44.2) (2026-07-27)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.44.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.44.0...@quenty/timedtween@7.44.1) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.44.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.43.0...@quenty/timedtween@7.44.0) (2026-07-25)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.42.0...@quenty/timedtween@7.43.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.42.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.41.0...@quenty/timedtween@7.42.0) (2026-07-24)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.41.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.40.1...@quenty/timedtween@7.41.0) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+## [7.40.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.40.0...@quenty/timedtween@7.40.1) (2026-07-23)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.40.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.39.0...@quenty/timedtween@7.40.0) (2026-07-23)
+
+### Bug Fixes
+
+- Cleanup code a bit ([fa8c596](https://github.com/Quenty/NevermoreEngine/commit/fa8c596544e45610e180f5ae3797154f35930ccd))
+
+### Features
+
+- Add baseline player-mock and support across Nevermore for mocked players. ([567d121](https://github.com/Quenty/NevermoreEngine/commit/567d121ffc014b42391554088189a1a6296dda83))
+
+# [7.39.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.38.0...@quenty/timedtween@7.39.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.38.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.37.0...@quenty/timedtween@7.38.0) (2026-07-18)
+
+**Note:** Version bump only for package @quenty/timedtween
+
+# [7.37.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.36.1...@quenty/timedtween@7.37.0) (2026-07-14)
+
+**Note:** Version bump only for package @quenty/timedtween
+
 ## [7.36.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/timedtween@7.36.0...@quenty/timedtween@7.36.1) (2026-05-30)
 
 **Note:** Version bump only for package @quenty/timedtween

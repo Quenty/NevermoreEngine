@@ -1,5 +1,5 @@
---!optimize 2
 --!strict
+--!optimize 2
 --[=[
     @class BrineInstanceEncoder
 ]=]

@@ -1,4 +1,4 @@
---!nonstrict
+--!strict
 --[=[
 	Base class for ragdolls, meant to be used with binders. This class exports a [Binder].
 	While a humanoid is bound with this class, it is ragdolled.
@@ -38,16 +38,18 @@ local Ragdoll = setmetatable({}, BaseObject)
 Ragdoll.ClassName = "Ragdoll"
 Ragdoll.__index = Ragdoll
 
+export type Ragdoll = typeof(setmetatable({} :: {}, {} :: typeof({ __index = Ragdoll }))) & BaseObject.BaseObject
+
 --[=[
 	Constructs a new Ragdoll. Should be done via [Binder]. See [RagdollBindersServer].
 	@param humanoid Humanoid
 	@param _serviceBag ServiceBag
 	@return Ragdoll
 ]=]
-function Ragdoll.new(humanoid: Humanoid, _serviceBag: ServiceBag.ServiceBag)
-	local self = setmetatable(BaseObject.new(humanoid), Ragdoll)
+function Ragdoll.new(humanoid: Humanoid, _serviceBag: ServiceBag.ServiceBag): Ragdoll
+	local self: Ragdoll = setmetatable(BaseObject.new(humanoid) :: any, Ragdoll)
 
 	return self
 end
 
-return Binder.new("Ragdoll", Ragdoll)
+return Binder.new("Ragdoll", Ragdoll :: any) :: Binder.Binder<Ragdoll>

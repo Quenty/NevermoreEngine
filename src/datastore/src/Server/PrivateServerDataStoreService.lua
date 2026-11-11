@@ -51,7 +51,7 @@ function PrivateServerDataStoreService.PromiseDataStore(
 	end
 
 	self._dataStorePromise = self:_promiseRobloxDataStore():Then(function(robloxDataStore)
-		local dataStore = self._maid:Add(DataStore.new(robloxDataStore, self:_getKey()))
+		local dataStore = DataStore.new(robloxDataStore, self:_getKey())
 
 		if game.PrivateServerOwnerId ~= 0 then
 			dataStore:Store("LastPrivateServerOwnerId", game.PrivateServerOwnerId)
@@ -60,6 +60,17 @@ function PrivateServerDataStoreService.PromiseDataStore(
 		self._maid:GiveTask(self._bindToCloseService:RegisterPromiseOnCloseCallback(function()
 			return dataStore:Save()
 		end))
+
+		-- On service teardown (hot reload / tests) flush and destroy the store. Save() is a best-effort
+		-- synchronous write before Destroy() cancels it.
+		self._maid:GiveTask(function()
+			-- A failed load makes Save() reject unconditionally; skip it so teardown does not
+			-- manufacture a guaranteed rejection.
+			if not dataStore:DidLoadFail() then
+				dataStore:Save()
+			end
+			dataStore:Destroy()
+		end)
 
 		return dataStore
 	end)
@@ -75,6 +86,20 @@ function PrivateServerDataStoreService.SetCustomKey(self: PrivateServerDataStore
 	)
 
 	self._customKey = customKey
+end
+
+--[=[
+	Injects the underlying datastore to use instead of resolving a real one. Accepts a real
+	datastore or a [DataStoreMock]. Intended for testing; must be called before the datastore
+	is first resolved.
+
+	@param robloxDataStore DataStore | DataStoreMock
+]=]
+function PrivateServerDataStoreService.SetRobloxDataStore(self: PrivateServerDataStoreService, robloxDataStore: any): ()
+	assert(DataStorePromises.isDataStore(robloxDataStore), "Bad robloxDataStore")
+	assert(not self._robloxDataStorePromise, "Already resolved robloxDataStore, cannot override")
+
+	self._robloxDataStorePromise = Promise.resolved(robloxDataStore)
 end
 
 function PrivateServerDataStoreService._promiseRobloxDataStore(
