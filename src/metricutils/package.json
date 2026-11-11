@@ -1,6 +1,6 @@
 {
   "name": "@quenty/metricutils",
-  "version": "2.4.4",
+  "version": "2.5.0",
   "description": "Typed, immutable measurements in metric, US customary and Roblox stud units (time, length, mass, memory, temperature and derived SI units) with localized formatting",
   "keywords": [
     "Roblox",
