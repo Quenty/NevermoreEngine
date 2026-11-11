@@ -1,15 +1,47 @@
 --!strict
 --[=[
-	Provides ways to convert studs to metric and back.
+	Provides ways to convert studs to metric and back, at 3.57 studs to the metre as these functions have always
+	counted them. Each is a plain multiplication, by a factor [MetricUnit] works out once, so they are cheap enough
+	to call every frame; for typed values, or Roblox's own 28 cm stud, use [MetricUnit] directly.
 	@class MetricUtils
 ]=]
 
+local require = require(script.Parent.loader).load(script)
+
+local MetricUnit = require("MetricUnit")
+local MetricUnitSystems = require("MetricUnitSystems")
+
 local MetricUtils = {}
 
-local STUDS_PER_METER = 3.57
-local SECONDS_PER_HOUR = 3600
-local SPEED_OF_SOUND_IN_METERS_PER_SECOND = 343
-local KPH_TO_MPH = 0.621371192
+type Factors = {
+	secondsOfSoundPerStud: number,
+	kilometersPerStud: number,
+	metersPerStud: number,
+	kphPerStudPerSecond: number,
+	mphPerStudPerSecond: number,
+}
+
+local factors: Factors? = nil
+
+local function getFactors(): Factors
+	local found = factors
+	if found then
+		return found
+	end
+	local studs = MetricUnitSystems.roblox({ name = "metricUtils", metersPerStud = 1 / 3.57 })
+	local stud = studs:New(1, "stud")
+	local studPerSecond = studs:New(1, "studPerSecond")
+	local speedOfSoundInDryAirAt20C = MetricUnit.new(343, "meterPerSecond")
+	local computed: Factors = table.freeze({
+		secondsOfSoundPerStud = (stud / speedOfSoundInDryAirAt20C):InSeconds(),
+		kilometersPerStud = stud:In("kilometer"),
+		metersPerStud = stud:In("meter"),
+		kphPerStudPerSecond = studPerSecond:In("kilometerPerHour"),
+		mphPerStudPerSecond = studPerSecond:In("milePerHour"),
+	})
+	factors = computed
+	return computed
+end
 
 --[=[
 	Computes sound delay for the given studs
@@ -17,8 +49,7 @@ local KPH_TO_MPH = 0.621371192
 	@return number -- seconds
 ]=]
 function MetricUtils.getSoundDelaySeconds(studs: number): number
-	local meters = MetricUtils.studsToMeters(studs)
-	return meters / SPEED_OF_SOUND_IN_METERS_PER_SECOND
+	return studs * getFactors().secondsOfSoundPerStud
 end
 
 --[=[
@@ -27,7 +58,7 @@ end
 	@return number -- kilometers
 ]=]
 function MetricUtils.studsToKilometers(studs: number): number
-	return studs / STUDS_PER_METER / 1000
+	return studs * getFactors().kilometersPerStud
 end
 
 --[=[
@@ -36,7 +67,7 @@ end
 	@return number -- meters
 ]=]
 function MetricUtils.studsToMeters(studs: number): number
-	return studs / STUDS_PER_METER
+	return studs * getFactors().metersPerStud
 end
 
 --[=[
@@ -45,7 +76,7 @@ end
 	@return number -- kph
 ]=]
 function MetricUtils.studsPerSecondToKph(studsPerSecond: number): number
-	return studsPerSecond / STUDS_PER_METER / 1000 * SECONDS_PER_HOUR
+	return studsPerSecond * getFactors().kphPerStudPerSecond
 end
 
 --[=[
@@ -55,7 +86,7 @@ end
 	@return number -- meters per a second
 ]=]
 function MetricUtils.studsPerSecondToMetersPerSecond(studsPerSecond: number): number
-	return studsPerSecond / STUDS_PER_METER
+	return studsPerSecond * getFactors().metersPerStud
 end
 
 --[=[
@@ -64,16 +95,16 @@ end
 	@return number -- mph
 ]=]
 function MetricUtils.studsPerSecondToMph(studsPerSecond: number): number
-	return studsPerSecond / STUDS_PER_METER / 1000 * SECONDS_PER_HOUR * KPH_TO_MPH
+	return studsPerSecond * getFactors().mphPerStudPerSecond
 end
 
 --[=[
-	Convert mph to studs per a second
+	Convert kph to studs per a second
 	@param kph number
 	@return number -- studs per a second
 ]=]
 function MetricUtils.kphToStudsPerSecond(kph: number): number
-	return kph * STUDS_PER_METER * 1000 / SECONDS_PER_HOUR
+	return kph / getFactors().kphPerStudPerSecond
 end
 
 --[=[
@@ -82,7 +113,7 @@ end
 	@return number  -- studs per a second
 ]=]
 function MetricUtils.mphToStudsPerSecond(mph: number): number
-	return mph * STUDS_PER_METER * 1000 / SECONDS_PER_HOUR / KPH_TO_MPH
+	return mph / getFactors().mphPerStudPerSecond
 end
 
 return MetricUtils
