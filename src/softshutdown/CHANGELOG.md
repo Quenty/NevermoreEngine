@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.13.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.1...@quenty/softshutdown@10.13.0) (2026-11-06)
+
+### Bug Fixes
+
+- **softshutdown:** reserve the shutdown server with ReservedServerId ([1af6b7f](https://github.com/Quenty/NevermoreEngine/commit/1af6b7fe14d64531cef9396d925eaddac8b97d8d))
+
 ## [10.12.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/softshutdown@10.12.0...@quenty/softshutdown@10.12.1) (2026-10-24)
 
 **Note:** Version bump only for package @quenty/softshutdown

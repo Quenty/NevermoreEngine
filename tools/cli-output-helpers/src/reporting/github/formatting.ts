@@ -10,19 +10,19 @@ import {
   type PackageResult,
   type ProgressSummary,
   type JobPhase,
-} from '../reporter.js';
+} from '../batch/reporter.js';
 import {
   type IStateTracker,
   type PackageState,
-} from '../state/state-tracker.js';
-import { formatProgressInline } from '../progress-format.js';
+} from '../batch/state/state-tracker.js';
+import { formatProgressInline } from '../format/progress-format.js';
 import {
   formatStatusText,
   resolveResultStatus,
   statusIcon,
   tallyCaveats,
   type ResultStatus,
-} from '../result-status.js';
+} from '../batch/result-status.js';
 
 // ── Public types ────────────────────────────────────────────────────────────
 

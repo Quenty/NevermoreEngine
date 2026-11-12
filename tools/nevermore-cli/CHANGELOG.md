@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.53.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.52.0...@quenty/nevermore-cli@4.53.0) (2026-11-12)
+
+**Note:** Version bump only for package @quenty/nevermore-cli
+
+# [4.52.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.51.0...@quenty/nevermore-cli@4.52.0) (2026-11-06)
+
+### Bug Fixes
+
+- **nevermore-cli:** don't report a cancelled CI run as a crash ([02a44d5](https://github.com/Quenty/NevermoreEngine/commit/02a44d50c473069c7c1966d4390adad2cf703dc4))
+
+### Features
+
+- **nevermore-cli:** deploy integration games for PRs from forks ([9223b4f](https://github.com/Quenty/NevermoreEngine/commit/9223b4f23198d5f7951210b0f3d32351ea91b14c))
+- **nevermore-cli:** record what each deploy shipped in --output ([ffdb6e4](https://github.com/Quenty/NevermoreEngine/commit/ffdb6e4be9b036e688df8fbea9d5d5d417845511))
+- **nevermore-cli:** run a Luau file with nevermore test --script-file ([ed8361d](https://github.com/Quenty/NevermoreEngine/commit/ed8361d411a243e91754e572176a416bcd62294a))
+
+# [4.51.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.50.1...@quenty/nevermore-cli@4.51.0) (2026-11-03)
+
+### Features
+
+- **nevermore-cli:** run cloud tests for PRs from forks ([#855](https://github.com/Quenty/NevermoreEngine/issues/855)) ([5408e3d](https://github.com/Quenty/NevermoreEngine/commit/5408e3d52f31e1499afaa08ed79dfbeb42515b02))
+
+## [4.50.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.50.0...@quenty/nevermore-cli@4.50.1) (2026-11-02)
+
+### Bug Fixes
+
+- **nevermore-cli:** resolve test failure annotations to real files ([#853](https://github.com/Quenty/NevermoreEngine/issues/853)) ([aa52794](https://github.com/Quenty/NevermoreEngine/commit/aa5279471baa0877e72b6ee75d89f722a5dc5505))
+
+# [4.50.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.49.0...@quenty/nevermore-cli@4.50.0) (2026-10-28)
+
+### Features
+
+- **studio-bridge:** multiplayer playtests, Studio launching, search, and CLI fixes ([#851](https://github.com/Quenty/NevermoreEngine/issues/851)) ([e63f878](https://github.com/Quenty/NevermoreEngine/commit/e63f878764807773d1bb1bf96d582d6e6640af88))
+
+# [4.49.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.48.0...@quenty/nevermore-cli@4.49.0) (2026-10-26)
+
+### Features
+
+- **nevermore-cli:** Recompress place uploads and split oversized batches ([#850](https://github.com/Quenty/NevermoreEngine/issues/850)) ([a516061](https://github.com/Quenty/NevermoreEngine/commit/a516061dab439f4ad553a4707c9a64537271c42e))
+
 # [4.48.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.47.2...@quenty/nevermore-cli@4.48.0) (2026-10-24)
 
 ### Bug Fixes

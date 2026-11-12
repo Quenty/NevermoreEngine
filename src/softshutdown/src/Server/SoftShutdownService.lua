@@ -18,6 +18,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -93,8 +94,10 @@ function SoftShutdownService._promiseTeleportPlayersToLobby(self: SoftShutdownSe
 
 	Workspace:SetAttribute(SoftShutdownConstants.IS_SOFT_SHUTDOWN_UPDATING_ATTRIBUTE, true)
 
+	local reservedServerId = HttpService:GenerateGUID(false)
+
 	local initialTeleportOptions = Instance.new("TeleportOptions")
-	initialTeleportOptions.ShouldReserveServer = true
+	initialTeleportOptions.ReservedServerId = reservedServerId
 	initialTeleportOptions:SetTeleportData({
 		isSoftShutdownReserveServer = true,
 	})
@@ -117,8 +120,7 @@ function SoftShutdownService._promiseTeleportPlayersToLobby(self: SoftShutdownSe
 
 			-- Construct new teleport options
 			local newTeleportOptions = Instance.new("TeleportOptions")
-			newTeleportOptions.ServerInstanceId = teleportResult.PrivateServerId
-			newTeleportOptions.ReservedServerAccessCode = teleportResult.ReservedServerAccessCode
+			newTeleportOptions.ReservedServerId = reservedServerId
 			newTeleportOptions:SetTeleportData({
 				isSoftShutdownReserveServer = true,
 			})

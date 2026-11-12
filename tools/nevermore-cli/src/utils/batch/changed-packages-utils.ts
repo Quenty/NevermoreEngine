@@ -10,6 +10,11 @@ import {
   toManifestPlaceInfo,
 } from '@quenty/nevermore-deploy';
 
+export interface WorkspacePackageInfo {
+  name: string;
+  path: string;
+}
+
 export interface TargetPackage {
   name: string;
   path: string;
@@ -50,16 +55,19 @@ export interface BatchTarget {
 export async function discoverAllTargetPackagesAsync(
   targetName: string
 ): Promise<TargetPackage[]> {
-  const { stdout } = await execa('pnpm', [
-    'ls',
-    '--json',
-    '-r',
-    '--depth',
-    '-1',
-  ]);
+  return filterByTargetAsync(await listWorkspacePackagesAsync(), targetName);
+}
 
-  const packages = JSON.parse(stdout) as Array<{ name: string; path: string }>;
-  return _filterByTargetAsync(packages, targetName);
+/** Every package in the pnpm workspace, with absolute paths. */
+export async function listWorkspacePackagesAsync(
+  cwd?: string
+): Promise<WorkspacePackageInfo[]> {
+  const { stdout } = await execa(
+    'pnpm',
+    ['ls', '--json', '-r', '--depth', '-1'],
+    { cwd }
+  );
+  return JSON.parse(stdout) as WorkspacePackageInfo[];
 }
 
 /**
@@ -92,7 +100,7 @@ export async function discoverChangedTargetPackagesAsync(
     return [];
   }
 
-  return _filterByTargetAsync(packages, targetName);
+  return filterByTargetAsync(packages, targetName);
 }
 
 /**
@@ -116,6 +124,29 @@ export async function discoverChangedTestableBatchTargetsAsync(
 ): Promise<BatchTarget[]> {
   const packages = await discoverChangedTargetPackagesAsync(baseBranch, 'test');
   return _requireScriptTemplate(flattenToBatchTargets(packages));
+}
+
+/**
+ * The places `batch deploy` deploys, and `batch bundle --deploy` builds for a
+ * later deploy. One function so the two can never pick different places: a
+ * fork's bundle must hold what a same-repo run would have deployed.
+ */
+export async function discoverDeployBatchTargetsAsync(options: {
+  targetName: string;
+  all?: boolean;
+  base: string;
+  limit?: number;
+}): Promise<BatchTarget[]> {
+  const discovered = options.all
+    ? await discoverAllTargetPackagesAsync(options.targetName)
+    : await discoverChangedTargetPackagesAsync(
+        options.base,
+        options.targetName
+      );
+  const batchTargets = flattenToBatchTargets(discovered);
+  return options.limit && options.limit > 0
+    ? batchTargets.slice(0, options.limit)
+    : batchTargets;
 }
 
 /**
@@ -181,8 +212,9 @@ function _requireScriptTemplate(targets: BatchTarget[]): BatchTarget[] {
   return withTemplate;
 }
 
-async function _filterByTargetAsync(
-  packages: Array<{ name: string; path: string }>,
+/** Keep the packages whose deploy config has `targetName`, with its places. */
+export async function filterByTargetAsync(
+  packages: WorkspacePackageInfo[],
   targetName: string
 ): Promise<TargetPackage[]> {
   const results: TargetPackage[] = [];

@@ -149,16 +149,18 @@ nevermore test                                        # run locally
 nevermore test --cloud                                # run via Open Cloud
 nevermore test --cloud --logs                         # include execution logs
 nevermore test --cloud --script-text 'print("hi")'    # run arbitrary Luau to debug
+nevermore test --cloud --script-file probe.lua         # the same, from a file
 ```
 
 | Flag | Description |
 |------|-------------|
 | `--cloud` | Run via Open Cloud instead of locally. |
 | `--api-key <key>` | Open Cloud API key (`--cloud` only). Otherwise resolved from login/env. |
-| `--logs` | Show execution logs even on success. On by default with `--script-text`; pass `--no-logs` to suppress. |
+| `--logs` | Show execution logs even on success. On by default with `--script-text` and `--script-file`; pass `--no-logs` to suppress. |
 | `--universe-id <id>` / `--place-id <id>` | Override the IDs from `deploy.nevermore.json` (`--cloud` only). |
 | `--script-template <path>` | Override the Luau script template to execute. |
 | `--script-text <luau>` | Run the given Luau directly instead of the configured template. Handy for one-off debugging; implies `--logs`. |
+| `--script-file <path>` | Like `--script-text`, read from a file, for scripts too long for the command line. Open Cloud refuses scripts over 4 MB. |
 | `--output <file>` | Write JSON results to a file. |
 | `--timeout <seconds>` | Max execution time, sent to Open Cloud so Roblox cancels server-side on overrun (default: 120). |
 
@@ -247,7 +249,8 @@ nevermore batch deploy --all --publish     # deploy + publish everything
 | `--all` | Test every package with a test target, not just changed ones. |
 | `--base <ref>` | Git ref to diff against for change detection (default: `origin/main`). |
 | `--concurrency <n>` | Max parallel tests (`0` = unlimited, the default). |
-| `--aggregated` | Build all packages into a single place and run one batch script (default: **on**). |
+| `--aggregated` | Build all packages into a single place and run one batch script (default: **on**). Each test place carries its own copy of its dependencies, so the combined place repeats the same modules many times; uploads are recompressed (zstd, long window) to store each repeat once, which takes a 69-package batch from 196 MB to 6 MB. If a recompressed place is still over the size budget, the batch is split into several places that upload and run in parallel. Local runs upload nothing and stay one place. |
+| `--max-place-mb <n>` | Size budget for one combined place, as uploaded, before the batch splits (default: `90` with `--cloud`, unlimited locally; `--aggregated` only). Open Cloud rejects place uploads over 150 MB. |
 | `--batch-place-id <id>` / `--batch-universe-id <id>` | Override IDs for the aggregated upload (`--aggregated` only). |
 | `--limit <n>` | Cap the number of packages (local debugging). |
 | `--logs` | Show execution logs for every package, not just failures. |

@@ -439,4 +439,141 @@ describe('persistent session e2e', () => {
     const session = await waitPromise;
     expect(session.info.sessionId).toBe(plugin.sessionId);
   });
+
+  it('client execute is relayed through the host to the plugin', async () => {
+    const host = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
+    connections.push(host);
+
+    const plugin = new MockPluginClient({
+      port: host.port,
+      instanceId: 'inst-relay',
+      capabilities: ['execute', 'syncActions'],
+    });
+    plugins.push(plugin);
+    plugin.autoRespond('syncActions', () => ({
+      type: 'syncActionsResult',
+      payload: { needed: [], installed: {} },
+    }));
+    plugin.autoRespond('execute', () => ({
+      type: 'scriptComplete',
+      payload: { success: true, output: [], returnValues: [42] },
+    }));
+    await plugin.connectAndRegisterAsync();
+    await new Promise((r) => setTimeout(r, 100));
+
+    const client = await BridgeConnection.connectAsync({
+      port: host.port,
+      local: true,
+    });
+    connections.push(client);
+    expect(client.role).toBe('client');
+
+    const session = await client.resolveSessionAsync(plugin.sessionId);
+    const result = await session.execAsync('return 42', 2_000);
+
+    expect(result.success).toBe(true);
+    expect(result.returnValues).toEqual([42]);
+  });
+
+  it('host finishes a relayed action before shutting down', async () => {
+    const host = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
+    connections.push(host);
+
+    const plugin = new MockPluginClient({
+      port: host.port,
+      instanceId: 'inst-drain',
+      capabilities: ['execute', 'syncActions'],
+    });
+    plugins.push(plugin);
+    plugin.autoRespond('syncActions', () => ({
+      type: 'syncActionsResult',
+      payload: { needed: [], installed: {} },
+    }));
+    plugin.onAnyMessage((msg) => {
+      if (msg.type === 'shutdown') {
+        void plugin.disconnectAsync();
+        return;
+      }
+      if (msg.type !== 'execute') return;
+      setTimeout(() => {
+        plugin.sendMessage({
+          type: 'scriptComplete',
+          sessionId: plugin.sessionId,
+          requestId: msg.requestId,
+          payload: { success: true, output: [], returnValues: ['late'] },
+        });
+      }, 300);
+    });
+    await plugin.connectAndRegisterAsync();
+    await new Promise((r) => setTimeout(r, 100));
+
+    const client = await BridgeConnection.connectAsync({
+      port: host.port,
+      local: true,
+    });
+    connections.push(client);
+
+    const session = await client.resolveSessionAsync(plugin.sessionId);
+    const resultPromise = session.execAsync('return "late"', 2_000);
+    await new Promise((r) => setTimeout(r, 100));
+    const hostShutdown = host.disconnectAsync();
+
+    const result = await resultPromise;
+    await hostShutdown;
+
+    expect(result.success).toBe(true);
+    expect(result.returnValues).toEqual(['late']);
+  });
+
+  it('host stops waiting on a relayed action that never finishes', async () => {
+    const host = await BridgeConnection.connectAsync({
+      port: 0,
+      keepAlive: true,
+      local: true,
+    });
+    connections.push(host);
+
+    const plugin = new MockPluginClient({
+      port: host.port,
+      instanceId: 'inst-stuck',
+      capabilities: ['execute', 'syncActions'],
+    });
+    plugins.push(plugin);
+    plugin.autoRespond('syncActions', () => ({
+      type: 'syncActionsResult',
+      payload: { needed: [], installed: {} },
+    }));
+    plugin.onAnyMessage((msg) => {
+      if (msg.type === 'shutdown') {
+        void plugin.disconnectAsync();
+      }
+    });
+    await plugin.connectAndRegisterAsync();
+    await new Promise((r) => setTimeout(r, 100));
+
+    const client = await BridgeConnection.connectAsync({
+      port: host.port,
+      local: true,
+    });
+    connections.push(client);
+
+    const session = await client.resolveSessionAsync(plugin.sessionId);
+    const stuck = session.execAsync('while true do task.wait() end', 60_000);
+    await new Promise((r) => setTimeout(r, 100));
+
+    const started = Date.now();
+    await host.disconnectAsync({ relayDrainTimeoutMs: 200 });
+
+    expect(Date.now() - started).toBeLessThan(2_000);
+    const result = await stuck;
+    expect(result.success).toBe(false);
+  });
 });

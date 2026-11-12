@@ -1,82 +1,143 @@
 /**
- * Converts Roblox instance paths from Jest-lua output back to
- * repo-relative local filesystem paths.
+ * Maps Roblox instance paths from Jest-lua output to existing repo-relative
+ * source files, through `sourcemap.json` or else the `<package dir>/src/`
+ * layout.
  *
- * Two strategies:
- *
- * 1. **Sourcemap** (preferred) — Uses the authoritative `sourcemap.json`
- *    mapping from `rojo sourcemap --absolute`. Exact and handles all
- *    project layouts.
- *
- * 2. **Heuristic** (fallback) — Assumes `src/{slug}/src/` layout and
- *    hard-codes `.spec`/`.story` as known dotted suffixes. Works when no
- *    sourcemap is available.
+ * A package's npm name (`@quenty/playermock`), directory (`src/player-mock`),
+ * Rojo project name (`playermock`) and test-place slug (`gameproduct` for
+ * `src/gameproductservice`) can all differ; see `AnnotationWorkspace`.
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import type { SourcemapResolver } from '../../sourcemap/index.js';
+import type {
+  AnnotationWorkspace,
+  AnnotationWorkspacePackage,
+} from './annotation-workspace.js';
 
 const SERVER_SCRIPT_SERVICE_PREFIX = 'ServerScriptService.';
+const NODE_MODULES_SEGMENT = '.node_modules.';
+const QUENTY_SCOPE = '@quenty/';
+const QUENTY_SCOPE_SEGMENT = '@quenty.';
+const CHUNK_NAME_PATTERN = /^\[string "(.*)"\]$/;
+// Rojo strips `.server`/`.client` from script instance names.
+const SOURCE_EXTENSIONS = ['', '.server', '.client'].flatMap((kind) => [
+  `${kind}.lua`,
+  `${kind}.luau`,
+  `/init${kind}.lua`,
+  `/init${kind}.luau`,
+]);
 
-/**
- * Resolve a Roblox instance path (from Jest-lua or a stack trace) to a
- * repo-relative filesystem path.
- *
- * When a `sourcemapResolver` is provided, it is tried first. Falls back to
- * the heuristic if the resolver doesn't have a mapping.
- */
-export function resolveRobloxTestPath(
-  instancePath: string,
-  sourcemapResolver?: SourcemapResolver
-): string {
-  if (sourcemapResolver) {
-    const resolved = sourcemapResolver.resolve(instancePath);
-    if (resolved) return resolved;
-  }
+export interface RobloxSourceResolveOptions {
+  sourcemapResolver?: SourcemapResolver;
+  workspace?: AnnotationWorkspace;
+  /** npm name of the package under test, e.g. `@quenty/gameproductservice` */
+  packageName?: string;
+  /** Repo root that holds the workspace. Defaults to cwd. */
+  repoRoot?: string;
+}
 
-  return _resolveHeuristic(instancePath);
+export interface ResolvedSourceFile {
+  file: string;
+  /** False for dependency copies and sibling packages. */
+  isPackageUnderTest: boolean;
 }
 
 /**
- * Heuristic fallback: assumes `src/{slug}/src/` layout.
- *
- * Handles optional `:LINE` suffixes and missing `ServerScriptService.` prefix.
+ * Resolve an instance path (no `:LINE` suffix) to an existing repo-relative
+ * source file, or `undefined` when none matches.
  */
-function _resolveHeuristic(instancePath: string): string {
-  // Strip :LINE suffix if present
-  let path = instancePath.replace(/:\d+$/, '');
+export function tryResolveRobloxSourceFile(
+  instancePath: string,
+  options: RobloxSourceResolveOptions = {}
+): ResolvedSourceFile | undefined {
+  let unwrapped = _unwrapChunkName(instancePath);
 
-  // Strip ServerScriptService. prefix
-  if (path.startsWith(SERVER_SCRIPT_SERVICE_PREFIX)) {
-    path = path.slice(SERVER_SCRIPT_SERVICE_PREFIX.length);
+  // Roblox truncates long chunk names: `...@quenty.servic..."]`
+  if (unwrapped.endsWith('...')) return undefined;
+
+  if (unwrapped.startsWith(SERVER_SCRIPT_SERVICE_PREFIX)) {
+    unwrapped = unwrapped.slice(SERVER_SCRIPT_SERVICE_PREFIX.length);
   }
 
-  // First dot-separated segment is the package slug
-  const dotIndex = path.indexOf('.');
-  if (dotIndex === -1) {
-    // Just a package name with no sub-path — return the src dir
-    return `src/${path}/src`;
-  }
+  const packagesByName = options.workspace?.packagesByName;
 
-  const packageSlug = path.slice(0, dotIndex);
-  const remaining = path.slice(dotIndex + 1);
+  let workspacePackage: AnnotationWorkspacePackage | undefined;
+  let packageInstanceName: string;
+  let rest: string;
+  let isPackageUnderTest = false;
 
-  // Split into segments. In Rojo, dots in filenames (e.g. "Maid.spec.lua"
-  // becomes instance "Maid.spec") are ambiguous with the hierarchy separator.
-  // Rejoin known filename suffixes like ".spec" and ".story" with a dot
-  // instead of a slash.
-  const segments = remaining.split('.');
-  const rejoined: string[] = [];
-
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    // If this segment is a known file suffix, merge it with the previous
-    if (i > 0 && (seg === 'spec' || seg === 'story')) {
-      rejoined[rejoined.length - 1] += `.${seg}`;
-    } else {
-      rejoined.push(seg);
+  const nodeModulesIndex = unwrapped.lastIndexOf(NODE_MODULES_SEGMENT);
+  if (nodeModulesIndex !== -1) {
+    const dependencyPath = unwrapped.slice(
+      nodeModulesIndex + NODE_MODULES_SEGMENT.length
+    );
+    if (!dependencyPath.startsWith(QUENTY_SCOPE_SEGMENT)) return undefined;
+    [packageInstanceName, rest] = _splitFirstSegment(
+      dependencyPath.slice(QUENTY_SCOPE_SEGMENT.length)
+    );
+    workspacePackage = packagesByName?.get(QUENTY_SCOPE + packageInstanceName);
+  } else {
+    [packageInstanceName, rest] = _splitFirstSegment(unwrapped);
+    const packageUnderTest = options.packageName
+      ? packagesByName?.get(options.packageName)
+      : undefined;
+    if (packageUnderTest?.testSlugs.includes(packageInstanceName)) {
+      workspacePackage = packageUnderTest;
+      isPackageUnderTest = true;
     }
   }
 
-  const subPath = rejoined.join('/');
-  return `src/${packageSlug}/src/${subPath}.lua`;
+  const dir = workspacePackage?.dir ?? `src/${packageInstanceName}`;
+  // The sourcemap names packages by Rojo project name, not folder.
+  const sourcemapNames = new Set([
+    workspacePackage?.projectName ?? packageInstanceName,
+    path.posix.basename(dir),
+  ]);
+  for (const name of sourcemapNames) {
+    const mapped = options.sourcemapResolver?.resolve(
+      SERVER_SCRIPT_SERVICE_PREFIX + name + (rest ? `.${rest}` : '')
+    );
+    if (mapped) return { file: mapped, isPackageUnderTest };
+  }
+
+  const repoRoot = options.repoRoot ?? process.cwd();
+  const base = _resolveHeuristic(dir, rest);
+  for (const extension of SOURCE_EXTENSIONS) {
+    const file = `${base}${extension}`;
+    if (fs.existsSync(path.join(repoRoot, file))) {
+      return { file, isPackageUnderTest };
+    }
+  }
+
+  return undefined;
+}
+
+function _unwrapChunkName(name: string): string {
+  const match = name.trim().match(CHUNK_NAME_PATTERN);
+  return match ? match[1] : name.trim();
+}
+
+function _splitFirstSegment(dottedPath: string): [string, string] {
+  const dotIndex = dottedPath.indexOf('.');
+  return dotIndex === -1
+    ? [dottedPath, '']
+    : [dottedPath.slice(0, dotIndex), dottedPath.slice(dotIndex + 1)];
+}
+
+function _resolveHeuristic(dir: string, rest: string): string {
+  if (!rest) return `${dir}/src`;
+
+  // Rojo turns `Maid.spec.lua` into instance `Maid.spec`, so rejoin suffixes.
+  const rejoined: string[] = [];
+  for (const segment of rest.split('.')) {
+    if (rejoined.length > 0 && (segment === 'spec' || segment === 'story')) {
+      rejoined[rejoined.length - 1] += `.${segment}`;
+    } else {
+      rejoined.push(segment);
+    }
+  }
+
+  return `${dir}/src/${rejoined.join('/')}`;
 }

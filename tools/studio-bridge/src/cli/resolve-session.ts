@@ -61,6 +61,6 @@ export async function resolveSessionAsync(
     .join('\n');
 
   throw new Error(
-    `Multiple sessions found. Use --session or --instance to select one:\n${listing}`
+    `Multiple sessions found. Use --target <id> to select one:\n${listing}`
   );
 }

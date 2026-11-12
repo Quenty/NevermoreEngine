@@ -20,6 +20,7 @@ import {
   decodePluginMessage,
   encodeMessage,
   type Capability,
+  type PluginContext,
   type ServerMessage,
 } from '../../server/web-socket-protocol.js';
 import { PendingRequestMap } from '../../server/pending-request-map.js';
@@ -42,8 +43,16 @@ export interface PluginSessionInfo {
   placeName?: string;
   /** Studio state from register. */
   state?: string;
+  /** DataModel context from register. */
+  context?: PluginContext;
   /** Place file from register. */
   placeFile?: string;
+  /** Launch id from register, for a Studio that `process run` launched. */
+  launchId?: string;
+  /** Player name from register, for a multiplayer test client. */
+  playerName?: string;
+  /** Playtest id from register, for a playtest studio-bridge started. */
+  playtestId?: string;
 }
 
 const SHUTDOWN_TIMEOUT_MS = 2_000;
@@ -94,6 +103,10 @@ export class BridgeHost extends EventEmitter {
     this._lastFailoverAt = new Date().toISOString();
   }
 
+  get clientCount(): number {
+    return this._clients.size;
+  }
+
   /** Returns the actual bound port. */
   async startAsync(options?: BridgeHostOptions): Promise<number> {
     if (this._isRunning) {
@@ -117,11 +130,14 @@ export class BridgeHost extends EventEmitter {
     // Register /client WebSocket handler for CLI clients
     this._transport.onConnection('/client', (ws) => {
       this._clients.add(ws);
+      this.emit('client-activity');
 
       ws.on('message', (raw: RawData) => {
+        this.emit('client-activity');
         const data = typeof raw === 'string' ? raw : raw.toString('utf-8');
         const msg = decodeHostMessage(data);
         if (!msg) {
+          this._replyUndecodable(ws, data);
           return;
         }
         this.emit('client-message', msg, (reply: HostProtocolMessage) => {
@@ -131,6 +147,7 @@ export class BridgeHost extends EventEmitter {
 
       ws.on('close', () => {
         this._clients.delete(ws);
+        this.emit('client-activity');
       });
       ws.on('error', () => {
         // Errors are handled implicitly via close
@@ -357,6 +374,42 @@ export class BridgeHost extends EventEmitter {
     }
   }
 
+  /**
+   * Answers an envelope this host cannot decode with an error, so the client
+   * fails fast instead of waiting out its timeout. That is usually a newer
+   * client relaying an action this host does not know.
+   */
+  private _replyUndecodable(ws: WebSocket, data: string): void {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      return;
+    }
+    if (
+      parsed?.type !== 'host-envelope' ||
+      typeof parsed.requestId !== 'string'
+    ) {
+      return;
+    }
+
+    const actionType = String(parsed.action?.type ?? 'unknown');
+    ws.send(
+      encodeHostMessage({
+        type: 'host-response',
+        requestId: parsed.requestId,
+        result: {
+          type: 'error',
+          sessionId: String(parsed.targetSessionId ?? ''),
+          payload: {
+            code: 'INVALID_PAYLOAD',
+            message: `The bridge host could not relay '${actionType}'. It may run an older studio-bridge than this command; restart it (e.g. stop 'studio-bridge serve').`,
+          },
+        },
+      })
+    );
+  }
+
   private _handlePluginConnection(
     ws: WebSocket,
     _request: IncomingMessage
@@ -379,7 +432,11 @@ export class BridgeHost extends EventEmitter {
         instanceId: msg.payload.instanceId,
         placeName: msg.payload.placeName,
         state: msg.payload.state,
+        context: msg.payload.context,
         placeFile: msg.payload.placeFile,
+        launchId: msg.payload.launchId,
+        playerName: msg.payload.playerName,
+        playtestId: msg.payload.playtestId,
       });
     };
 
@@ -497,7 +554,7 @@ export class BridgeHost extends EventEmitter {
       const payload = parsed.payload as
         | { code?: string; message?: string }
         | undefined;
-      OutputHelper.warn(
+      OutputHelper.verbose(
         `[host] plugin ${sessionId} sent error without requestId (${
           payload?.code ?? 'unknown'
         }): ${payload?.message ?? ''}`

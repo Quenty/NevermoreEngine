@@ -3,11 +3,19 @@
  * TransportHandle, disconnect error handling, and event forwarding.
  */
 
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { describe, it, expect, vi } from 'vitest';
 import { EventEmitter } from 'events';
 import { BridgeSession } from './bridge-session.js';
+import { loadActionSourcesAsync } from '../commands/framework/action-loader.js';
 import type { SessionInfo } from './types.js';
-import { SessionDisconnectedError } from './types.js';
+import {
+  ActionTimeoutError,
+  SessionDisconnectedError,
+  STUDIO_BUSY_FIX,
+} from './types.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { RequestTimeoutError } from '../server/pending-request-map.js';
 import type {
   PluginMessage,
   ServerMessage,
@@ -119,7 +127,7 @@ describe('BridgeSession', () => {
         SessionDisconnectedError
       );
       await expect(
-        session.queryDataModelAsync({ path: 'game' })
+        session.inspectInstanceAsync({ query: 'Workspace' })
       ).rejects.toThrow(SessionDisconnectedError);
     });
   });
@@ -140,12 +148,13 @@ describe('BridgeSession', () => {
       const [msg, timeout] = handle.sendActionAsync.mock.calls[0];
       expect((msg as ServerMessage).type).toBe('execute');
       expect((msg as any).payload.script).toBe('print("hello")');
-      expect(timeout).toBe(120_000);
+      expect((msg as any).payload.timeoutMs).toBe(120_000);
+      expect(timeout).toBe(125_000);
 
       expect(result.success).toBe(true);
     });
 
-    it('uses custom timeout when provided', async () => {
+    it('has the plugin cancel the script at a custom timeout, then waits for its reply', async () => {
       const handle = new MockTransportHandle();
       handle.sendActionAsync.mockResolvedValueOnce({
         type: 'scriptComplete',
@@ -156,8 +165,60 @@ describe('BridgeSession', () => {
       const session = new BridgeSession(createSessionInfo(), handle);
       await session.execAsync('print("hello")', 5_000);
 
-      const [, timeout] = handle.sendActionAsync.mock.calls[0];
-      expect(timeout).toBe(5_000);
+      const [msg, timeout] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.timeoutMs).toBe(5_000);
+      expect(timeout).toBe(10_000);
+    });
+
+    it('sends inputs base64-encoded', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      await session.execAsync('return ...', undefined, undefined, [
+        Buffer.from('hello'),
+      ]);
+
+      const [msg] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.inputs).toEqual(['aGVsbG8=']);
+    });
+
+    it('sends --run-as and carries back where the code ran', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'scriptComplete',
+        sessionId: 'session-1',
+        payload: { success: true, ranAs: 'game' },
+      });
+
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const result = await session.execAsync(
+        'return 1',
+        undefined,
+        undefined,
+        undefined,
+        'game'
+      );
+
+      const [msg] = handle.sendActionAsync.mock.calls[0];
+      expect((msg as any).payload.runAs).toBe('game');
+      expect(result.ranAs).toBe('game');
+    });
+
+    it('refuses inputs over the size limit without sending them', async () => {
+      const handle = new MockTransportHandle();
+      const session = new BridgeSession(createSessionInfo(), handle);
+
+      await expect(
+        session.execAsync('return ...', undefined, undefined, [
+          Buffer.alloc(192 * 1024 * 1024 + 1),
+        ])
+      ).rejects.toThrow('a script can be sent with.');
+      expect(handle.sendActionAsync).not.toHaveBeenCalled();
     });
 
     it('returns error info from error response', async () => {
@@ -218,6 +279,107 @@ describe('BridgeSession', () => {
       const result = await session.execAsync('error("boom")');
 
       expect(result.returnValues).toBeUndefined();
+    });
+  });
+
+  describe('plugin errors', () => {
+    async function queryStateErrorAsync(code: string): Promise<any> {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'error',
+        sessionId: 'session-1',
+        payload: { code, message: "Invalid query: Missing ')'" },
+      });
+      const session = new BridgeSession(createSessionInfo(), handle);
+      return session.queryStateAsync().catch((err) => err);
+    }
+
+    it('shows an error in the request as its message alone, keeping the code', async () => {
+      const err = await queryStateErrorAsync('INVALID_PAYLOAD');
+
+      expect(err).toBeInstanceOf(StudioBridgeError);
+      expect(err.message).toBe("Invalid query: Missing ')'.");
+      expect(err.code).toBe('INVALID_PAYLOAD');
+    });
+
+    it('lists the instances that matched when one was needed', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockResolvedValueOnce({
+        type: 'error',
+        sessionId: 'session-1',
+        payload: {
+          code: 'INSTANCE_NOT_FOUND',
+          message: "2 instances match --root 'Door', where one is needed",
+          details: {
+            matches: [
+              {
+                path: 'Workspace.Door',
+                segments: ['Workspace', 'Door'],
+                className: 'Part',
+              },
+              {
+                path: 'Lighting.Door',
+                segments: ['Lighting', 'Door'],
+                className: 'Part',
+              },
+            ],
+            total: 2,
+          },
+        },
+      });
+      const session = new BridgeSession(createSessionInfo(), handle);
+      const err = await session
+        .findInstancesAsync({ root: 'Door', query: 'x' })
+        .catch((e) => e);
+
+      expect(OutputHelper.stripAnsi(err.message)).toContain(
+        "2 instances match --root 'Door', where one is needed:"
+      );
+      expect(OutputHelper.stripAnsi(err.message)).toContain('  Door (Part)');
+      expect(err.code).toBe('INSTANCE_NOT_FOUND');
+    });
+
+    it('treats an internal plugin failure as a bug, not an expected error', async () => {
+      const err = await queryStateErrorAsync('INTERNAL_ERROR');
+
+      expect(err).not.toBeInstanceOf(StudioBridgeError);
+      expect(err.message).toBe(
+        "Studio failed running 'stateResult': Invalid query: Missing ')'"
+      );
+    });
+
+    it('says the plugin is too old for a request it does not know', async () => {
+      const err = await queryStateErrorAsync('UNKNOWN_REQUEST');
+
+      expect(err).toMatchObject({
+        code: 'PLUGIN_OUTDATED',
+        fix: "Run 'studio-bridge plugin install'.",
+      });
+    });
+
+    it('turns a timeout the host relays into one the user can act on', async () => {
+      const err = await queryStateErrorAsync('TIMEOUT');
+
+      expect(err).toBeInstanceOf(ActionTimeoutError);
+      expect(err.message).toBe("Studio didn't reply within 5s.");
+      expect(err.fix).toBe(STUDIO_BUSY_FIX);
+    });
+
+    it('turns a reply that never came into a timeout the user can act on', async () => {
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync.mockRejectedValueOnce(
+        new RequestTimeoutError('a7c4e2b0-uuid', 5_000)
+      );
+      const session = new BridgeSession(createSessionInfo(), handle);
+
+      const err = await session.queryStateAsync().catch((e) => e);
+
+      expect(err).toMatchObject({
+        code: 'TIMEOUT',
+        message: "Studio didn't reply within 5s.",
+        fix: STUDIO_BUSY_FIX,
+      });
+      expect(err.message).not.toContain('a7c4e2b0');
     });
   });
 
@@ -324,11 +486,11 @@ describe('BridgeSession', () => {
     });
   });
 
-  describe('queryDataModelAsync', () => {
-    it('returns data model result', async () => {
+  describe('inspectInstanceAsync', () => {
+    it('returns the inspected instance', async () => {
       const handle = new MockTransportHandle();
       handle.sendActionAsync.mockResolvedValueOnce({
-        type: 'dataModelResult',
+        type: 'inspectInstanceResult',
         sessionId: 'session-1',
         requestId: 'r-1',
         payload: {
@@ -336,20 +498,20 @@ describe('BridgeSession', () => {
             name: 'Workspace',
             className: 'Workspace',
             path: 'game.Workspace',
-            properties: {},
-            attributes: {},
+            properties: [],
+            attributes: [],
             childCount: 5,
           },
         },
       });
 
       const session = new BridgeSession(createSessionInfo(), handle);
-      const result = await session.queryDataModelAsync({
-        path: 'game.Workspace',
+      const result = await session.inspectInstanceAsync({
+        query: 'Workspace',
       });
 
-      expect(result.instance.name).toBe('Workspace');
-      expect(result.instance.className).toBe('Workspace');
+      expect(result.instance?.name).toBe('Workspace');
+      expect(result.instance?.className).toBe('Workspace');
     });
   });
 
@@ -376,6 +538,96 @@ describe('BridgeSession', () => {
 
       expect(listener).toHaveBeenCalledWith('Play');
       expect(session.info.state).toBe('Play');
+    });
+  });
+
+  describe('actions that fail to update', () => {
+    it('warns once that a playtest runs an older version', async () => {
+      vi.mocked(loadActionSourcesAsync).mockResolvedValueOnce([
+        {
+          name: 'query-state',
+          source: '',
+          relativePath: 'process/info/query-state.lua',
+          hash: 'new',
+        },
+      ]);
+      const handle = new MockTransportHandle();
+      handle.sendActionAsync = vi.fn(async (message: ServerMessage) => {
+        if (message.type === 'syncActions') {
+          return {
+            type: 'syncActionsResult',
+            payload: { needed: ['query-state'] },
+          };
+        }
+        if (message.type === 'registerAction') {
+          return {
+            type: 'registerActionResult',
+            payload: {
+              name: 'query-state',
+              success: false,
+              outdated: true,
+              handlers: ['queryState'],
+            },
+          };
+        }
+        return { type: 'stateResult', payload: { state: 'Play' } };
+      }) as any;
+      const warn = vi.spyOn(OutputHelper, 'warn').mockImplementation(() => {});
+      const session = new BridgeSession(
+        createSessionInfo({ context: 'server' }),
+        handle
+      );
+
+      await session.queryStateAsync();
+      await session.queryStateAsync();
+
+      expect(warn.mock.calls).toEqual([
+        [
+          "This playtest runs an older 'process info', so it may not do what this version does.",
+        ],
+      ]);
+      warn.mockRestore();
+    });
+
+    it('does not push again a hash the plugin already failed to install', async () => {
+      vi.mocked(loadActionSourcesAsync).mockResolvedValueOnce([
+        {
+          name: 'query-state',
+          source: '',
+          relativePath: 'process/info/query-state.lua',
+          hash: 'new',
+        },
+      ]);
+      const handle = new MockTransportHandle();
+      const sent: string[] = [];
+      handle.sendActionAsync = vi.fn(async (message: ServerMessage) => {
+        sent.push(message.type);
+        if (message.type === 'syncActions') {
+          return {
+            type: 'syncActionsResult',
+            payload: {
+              needed: [],
+              installed: { 'query-state': 'old' },
+              failed: {
+                'query-state': { error: 'boom', handlers: ['queryState'] },
+              },
+            },
+          };
+        }
+        return { type: 'stateResult', payload: { state: 'Edit' } };
+      }) as any;
+      const warn = vi.spyOn(OutputHelper, 'warn').mockImplementation(() => {});
+      const session = new BridgeSession(createSessionInfo(), handle);
+
+      await session.queryStateAsync();
+
+      expect(sent).toEqual(['syncActions', 'queryState']);
+      expect(warn.mock.calls).toEqual([
+        [
+          "Studio runs an older 'process info', since the update failed to load, so it may not do what this version does.",
+        ],
+      ]);
+      warn.mockRestore();
     });
   });
 });

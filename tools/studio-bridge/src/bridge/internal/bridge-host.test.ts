@@ -254,6 +254,44 @@ describe('BridgeHost', () => {
     });
   });
 
+  describe('client relay', () => {
+    it('answers an envelope it cannot decode instead of dropping it', async () => {
+      host = new BridgeHost();
+      const port = await host.startAsync({ port: 0 });
+      const ws = await new Promise<WebSocket>((resolve, reject) => {
+        const client = new WebSocket(`ws://localhost:${port}/client`);
+        client.on('open', () => resolve(client));
+        client.on('error', reject);
+      });
+      openClients.push(ws);
+
+      const reply = new Promise<any>((resolve) => {
+        ws.once('message', (raw) => resolve(JSON.parse(raw.toString())));
+      });
+      ws.send(
+        JSON.stringify({
+          type: 'host-envelope',
+          requestId: 'req-1',
+          targetSessionId: 'session-1',
+          action: {
+            type: 'fromTheFuture',
+            sessionId: 'session-1',
+            payload: {},
+          },
+          timeoutMs: 1000,
+        })
+      );
+
+      const response = await reply;
+      expect(response.type).toBe('host-response');
+      expect(response.requestId).toBe('req-1');
+      expect(response.result.type).toBe('error');
+      expect(response.result.payload.message).toContain(
+        "could not relay 'fromTheFuture'"
+      );
+    });
+  });
+
   describe('health endpoint', () => {
     it('responds with valid JSON on /health', async () => {
       host = new BridgeHost();

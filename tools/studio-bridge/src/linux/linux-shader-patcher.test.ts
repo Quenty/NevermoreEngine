@@ -69,8 +69,9 @@ describe('patchShadersAsync', () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'shader-test-'));
     const config = makeConfig();
 
-    await expect(patchShadersAsync(config)).rejects.toThrow(
-      'Shader pack not found'
-    );
+    await expect(patchShadersAsync(config)).rejects.toMatchObject({
+      code: 'LINUX_SETUP_FAILED',
+      fix: "Run 'studio-bridge linux setup --force' to reinstall Studio.",
+    });
   });
 });

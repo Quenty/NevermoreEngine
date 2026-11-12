@@ -28,7 +28,7 @@ function sessionCommand(
         alias: 'T',
       }),
     },
-    handler: async (_session, _args) => ({ success: true }),
+    handler: async (_session, _args) => ({ success: true, summary: '' }),
   });
 }
 
@@ -47,7 +47,7 @@ function standaloneCommand(): CommandDefinition {
         default: 38741,
       }),
     },
-    handler: async () => ({ started: true }),
+    handler: async () => ({ started: true, summary: '' }),
   });
 }
 
@@ -60,7 +60,7 @@ function connectionCommand(): CommandDefinition {
     safety: 'read',
     scope: 'connection',
     args: {},
-    handler: async () => ({ sessions: [] }),
+    handler: async () => ({ sessions: [], summary: '' }),
   });
 }
 

@@ -21,7 +21,7 @@ function sessionCommand() {
     args: {
       code: arg.positional({ description: 'Luau source code' }),
     },
-    handler: async (_session, _args) => ({ success: true }),
+    handler: async (_session, _args) => ({ success: true, summary: '' }),
   });
 }
 
@@ -34,7 +34,7 @@ function connectionCommand() {
     safety: 'read',
     scope: 'connection',
     args: {},
-    handler: async (_connection) => ({ sessions: [] }),
+    handler: async (_connection) => ({ sessions: [], summary: '' }),
   });
 }
 
@@ -47,7 +47,7 @@ function standaloneCommand() {
     safety: 'none',
     scope: 'standalone',
     args: {},
-    handler: async () => ({ port: 38741 }),
+    handler: async () => ({ port: 38741, summary: '' }),
   });
 }
 
@@ -106,14 +106,30 @@ describe('defineCommand', () => {
       safety: 'mutate',
       scope: 'session',
       args: {},
-      handler: async () => ({ done: true }),
+      handler: async () => ({ done: true, summary: '' }),
       cli: {
-        format: () => 'formatted',
+        body: () => 'formatted',
       },
     });
 
     expect(cmd.cli).toBeDefined();
-    expect(cmd.cli!.format!({} as any)).toBe('formatted');
+    expect(cmd.cli!.body!({} as any)).toBe('formatted');
+  });
+
+  it('requires a result with a summary', () => {
+    const cmd = defineCommand({
+      group: 'console',
+      name: 'exec',
+      description: 'Execute code',
+      category: 'execution',
+      safety: 'mutate',
+      scope: 'session',
+      args: {},
+      // @ts-expect-error The result needs a summary, which the adapter places
+      handler: async () => ({ done: true }),
+    });
+
+    expect(cmd.name).toBe('exec');
   });
 
   it('allows null group for top-level commands', () => {

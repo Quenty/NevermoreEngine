@@ -1,0 +1,50 @@
+name: Set up the Nevermore CLI
+description: >-
+  Install dependencies and the Luau toolchain, build tools/, and install
+  nevermore-cli globally from this checkout.
+inputs:
+  github-token:
+    description: Token for GitHub Packages and Aftman downloads
+    required: true
+  npm-token:
+    description: Token for registry.npmjs.org
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        cache: true
+
+    - name: Setup registries
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        NPM_TOKEN: ${{ inputs.npm-token }}
+      run: |
+        echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
+        echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+        echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+        echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Setup Aftman
+      uses: ok-nick/setup-aftman@v0.4.2
+      with:
+        version: 'v0.3.0'
+        token: ${{ inputs.github-token }}
+        cache: true
+
+    - name: Build all tools
+      shell: bash
+      run: pnpm -r --filter './tools/**' run build
+
+    - name: Install nevermore-cli locally
+      shell: bash
+      run: npm install --ignore-scripts -g .
+      working-directory: tools/nevermore-cli

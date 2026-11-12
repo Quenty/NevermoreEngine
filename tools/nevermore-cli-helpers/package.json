@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli-helpers",
-  "version": "1.19.0",
+  "version": "1.22.0",
   "description": "Helpers to generate Nevermore package and game templates",
   "type": "module",
   "keywords": [
@@ -9,6 +9,25 @@
     "CLI"
   ],
   "main": "dist/utils.js",
+  "exports": {
+    ".": "./dist/utils.js",
+    "./version-checker": "./dist/version-checker.js",
+    "./cookie": "./dist/auth/cookie/index.js",
+    "./cookie-parser": "./dist/auth/cookie/cookie-parser.js"
+  },
+  "typesVersions": {
+    "*": {
+      "version-checker": [
+        "dist/version-checker.d.ts"
+      ],
+      "cookie": [
+        "dist/auth/cookie/index.d.ts"
+      ],
+      "cookie-parser": [
+        "dist/auth/cookie/cookie-parser.d.ts"
+      ]
+    }
+  },
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },

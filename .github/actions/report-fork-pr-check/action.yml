@@ -1,0 +1,21 @@
+name: Report a check on a fork PR's commit
+description: >-
+  A workflow_run job's own check lands on main's commit, so the PR's required
+  check is posted on HEAD_SHA (set by find-fork-pr-build) instead. Needs
+  GITHUB_TOKEN with checks write.
+inputs:
+  name:
+    description: Check name, matching the required check, e.g. tests
+    required: true
+  conclusion:
+    description: Check conclusion, normally job.status
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Report ${{ inputs.name }} on the PR commit
+      shell: bash
+      run: >-
+        gh api "repos/${{ github.repository }}/check-runs"
+        -f name="${{ inputs.name }}" -f head_sha="$HEAD_SHA" -f status=completed -f conclusion="${{ inputs.conclusion }}"
+        -f details_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

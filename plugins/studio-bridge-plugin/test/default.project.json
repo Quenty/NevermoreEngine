@@ -1,0 +1,34 @@
+{
+  "name": "StudioBridgePluginTest",
+  "globIgnorePaths": [
+    "**/.package-lock.json",
+    "**/.pnpm",
+    "**/.pnpm-workspace-state-v1.json",
+    "**/.modules.yaml",
+    "**/.ignored",
+    "**/.ignored_*"
+  ],
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$properties": {
+        "LoadStringEnabled": true
+      },
+      "studiobridgeplugin": {
+        "$className": "Folder",
+        "jest.config": {
+          "$path": "../src/jest.config.lua"
+        },
+        "Shared": {
+          "$path": "../src/modules/Shared"
+        },
+        "node_modules": {
+          "$path": "../node_modules"
+        }
+      },
+      "Script": {
+        "$path": "scripts/Server"
+      }
+    }
+  }
+}

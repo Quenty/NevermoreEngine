@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { formatResultStatus } from './formatting.js';
-import { type PackageResult } from '../reporter.js';
+import { type PackageResult } from '../batch/reporter.js';
 
 function buildResult(overrides: Partial<PackageResult> = {}): PackageResult {
   return {
