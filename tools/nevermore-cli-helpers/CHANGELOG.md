@@ -1,19 +1,13 @@
-# v1.22.0 (Thu Nov 12 2026)
-
-#### 🚀 Enhancement
-
-- feat(studio-bridge): sample, record, inspect, and Explorer-style instance queries [#858](https://github.com/Quenty/NevermoreEngine/pull/858) ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli-helpers@1.21.0...@quenty/nevermore-cli-helpers@1.22.0) (2026-11-12)
+
+### Features
+
+- **studio-bridge:** sample, record, inspect, and Explorer-style instance queries ([#858](https://github.com/Quenty/NevermoreEngine/issues/858)) ([20817cb](https://github.com/Quenty/NevermoreEngine/commit/20817cb137d2868ca9137ad22d7e1dbd977cc146))
 
 # [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli-helpers@1.20.1...@quenty/nevermore-cli-helpers@1.21.0) (2026-11-03)
 
