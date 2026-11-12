@@ -1,3 +1,16 @@
+# (Thu Nov 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.21.0`, `@quenty/nevermore-cli-helpers@1.22.0`, `@quenty/nevermore-template-helpers@1.23.0`, `@quenty/studio-bridge@0.25.0`
+  - feat(studio-bridge): sample, record, inspect, and Explorer-style instance queries [#858](https://github.com/Quenty/NevermoreEngine/pull/858) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Wed Nov 11 2026)
 
 #### 🚀 Enhancement

@@ -1,3 +1,15 @@
+# v1.23.0 (Thu Nov 12 2026)
+
+#### 🚀 Enhancement
+
+- feat(studio-bridge): sample, record, inspect, and Explorer-style instance queries [#858](https://github.com/Quenty/NevermoreEngine/pull/858) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
