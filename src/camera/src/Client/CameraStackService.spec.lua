@@ -171,3 +171,52 @@ describe("CameraStackService.SetDoNotUseDefaultCamera", function()
 		end).toThrow("Already started")
 	end)
 end)
+
+describe("CameraStackService idle fast path", function()
+	it("treats the impulse camera as idle until an impulse plays", function()
+		local service = setup()
+		local impulseCamera = service:GetImpulseCamera()
+
+		expect(impulseCamera:IsIdle()).toBe(true)
+
+		impulseCamera:Impulse(Vector3.new(1, 0, 0))
+		expect(impulseCamera:IsIdle()).toBe(false)
+	end)
+
+	it("treats an impulse with its own speed and damper as not idle", function()
+		local service = setup()
+		local impulseCamera = service:GetImpulseCamera()
+
+		impulseCamera:Impulse(Vector3.new(0, 1, 0), 5, 0.3)
+		expect(impulseCamera:IsIdle()).toBe(false)
+	end)
+
+	it("lets the Roblox camera setters through after a passthrough frame", function()
+		local service = setup()
+		local defaultCamera = service:GetRawDefaultCamera()
+
+		defaultCamera:MarkPassthrough()
+		expect(defaultCamera._passthrough).toBe(true)
+		defaultCamera:SetRobloxCFrame(CFrame.new(0, 10, 0))
+		expect(defaultCamera._passthrough).toBe(false)
+
+		defaultCamera:MarkPassthrough()
+		defaultCamera:SetRobloxFieldOfView(50)
+		expect(defaultCamera._passthrough).toBe(false)
+
+		defaultCamera:MarkPassthrough()
+		defaultCamera:SetRobloxCameraState(CameraState.new())
+		expect(defaultCamera._passthrough).toBe(false)
+	end)
+
+	it("keeps the CFrame set while passing through", function()
+		local service = setup()
+		local defaultCamera = service:GetRawDefaultCamera()
+		local cframe = CFrame.new(1, 2, 3)
+
+		defaultCamera:MarkPassthrough()
+		defaultCamera:SetRobloxCFrame(cframe)
+
+		expect(defaultCamera:GetRobloxCameraState().CFrame).toEqual(cframe)
+	end)
+end)
