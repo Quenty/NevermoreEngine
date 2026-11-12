@@ -316,6 +316,33 @@ describe('BridgeClient', () => {
     });
   });
 
+  describe('host loss', () => {
+    it('fails a pending request at once when the host drops without replying', async () => {
+      host = await createMockHostWithSessions([createSessionInfo()]);
+      host.wss.on('connection', (ws) => {
+        ws.on('message', (raw) => {
+          const msg = decodeHostMessage(raw.toString());
+          if (msg?.type === 'host-envelope') {
+            ws.terminate();
+          }
+        });
+      });
+
+      client = new BridgeClient();
+      await client.connectAsync(host.port);
+
+      const started = Date.now();
+      await expect(
+        client.getSession('session-1')!.queryStateAsync()
+      ).rejects.toMatchObject({
+        code: 'HOST_STOPPED',
+        message:
+          'The bridge host stopped before Studio replied, so the command may have run only in part.',
+      });
+      expect(Date.now() - started).toBeLessThan(2_000);
+    });
+  });
+
   describe('session events', () => {
     it('handles session-connected event from host', async () => {
       host = await createMockHost();

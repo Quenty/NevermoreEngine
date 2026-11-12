@@ -12,6 +12,7 @@
 
 import { createServer, type Server } from 'net';
 import { WebSocket } from 'ws';
+import { MAX_MESSAGE_BYTES } from '../../server/web-socket-protocol.js';
 import { HostUnreachableError } from '../types.js';
 
 export type TakeoverState =
@@ -79,7 +80,9 @@ function tryConnectAsClientDefaultAsync(port: number): Promise<boolean> {
   const CONNECT_TIMEOUT_MS = 2_000;
 
   return new Promise<boolean>((resolve) => {
-    const ws = new WebSocket(`ws://localhost:${port}/client`);
+    const ws = new WebSocket(`ws://localhost:${port}/client`, {
+      maxPayload: MAX_MESSAGE_BYTES,
+    });
 
     const timer = setTimeout(() => {
       ws.removeAllListeners();

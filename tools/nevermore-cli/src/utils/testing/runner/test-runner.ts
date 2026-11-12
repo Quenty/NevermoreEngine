@@ -2,7 +2,11 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
-import { type JobContext } from '../../job-context/job-context.js';
+import {
+  type BuiltPlace,
+  type JobContext,
+} from '../../job-context/job-context.js';
+import { type DeployOverrides } from '../../build/build.js';
 import {
   type ParsedTestCounts,
   parseTestLogs,
@@ -74,6 +78,8 @@ export interface SingleTestOptions {
    * here (see flattenToBatchTargets) — the runner never picks places[0] itself.
    */
   target: DeployTarget;
+  /** CLI flags that replace the target's universeId, placeId, or scriptTemplate. */
+  overrides?: DeployOverrides;
   timeoutMs?: number;
   /** Luau code to execute directly, bypassing the configured scriptTemplate. */
   scriptText?: string;
@@ -83,6 +89,12 @@ export interface SingleTestOptions {
    * the whole run and the per-package line says the same thing each time.
    */
   suppressCountsProvenance?: boolean;
+}
+
+export interface PreparedTest {
+  builtPlace: BuiltPlace;
+  scriptContent: string;
+  hasJestConfig: boolean;
 }
 
 /**
@@ -95,16 +107,15 @@ export async function runSingleTestAsync(
   context: JobContext,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
-  const {
-    packagePath,
-    packageName,
-    // 300s is the Open Cloud maximum. The old 120s default failed real suites
-    // with no jest summary at all, so "--timeout 300" had become folklore
-    // everyone had to know before their first useful run.
-    timeoutMs = 300_000,
-    scriptText,
-    target,
-  } = options;
+  const prepared = await prepareTestAsync(context, options);
+  return executePreparedTestAsync(context, prepared, options);
+}
+
+export async function prepareTestAsync(
+  context: JobContext,
+  options: SingleTestOptions
+): Promise<PreparedTest> {
+  const { packagePath, packageName, scriptText, target, overrides } = options;
 
   const sessionId = randomUUID();
   const builtPlace = await context.buildPlaceAsync({
@@ -112,6 +123,7 @@ export async function runSingleTestAsync(
     outputFileName: `test-${sessionId}.rbxl`,
     packagePath,
     packageName,
+    overrides,
   });
 
   // Packages that ship or use the manifest get the same deploy-metadata stamp a
@@ -134,6 +146,29 @@ export async function runSingleTestAsync(
   const scriptContent =
     scriptText ??
     (await readTestScriptAsync(packagePath, builtPlace.target.scriptTemplate));
+
+  return {
+    builtPlace,
+    scriptContent,
+    hasJestConfig: await packageHasJestConfigAsync(packagePath),
+  };
+}
+
+export async function executePreparedTestAsync(
+  context: JobContext,
+  prepared: PreparedTest,
+  options: SingleTestOptions
+): Promise<SingleTestResult> {
+  const {
+    packagePath,
+    packageName,
+    // 300s is the Open Cloud maximum. The old 120s default failed real suites
+    // with no jest summary at all, so "--timeout 300" had become folklore
+    // everyone had to know before their first useful run.
+    timeoutMs = 300_000,
+    scriptText,
+  } = options;
+  const { builtPlace, scriptContent, hasJestConfig } = prepared;
 
   const deployment = await context.deployBuiltPlaceAsync({
     builtPlace,
@@ -180,7 +215,7 @@ export async function runSingleTestAsync(
       structured !== undefined &&
       !structured.ranJest &&
       scriptText === undefined &&
-      (await packageHasJestConfigAsync(packagePath));
+      hasJestConfig;
 
     const reasons = mergeFailureReasons(result.errorMessage, [
       ...(smokeTestedWithSpecs

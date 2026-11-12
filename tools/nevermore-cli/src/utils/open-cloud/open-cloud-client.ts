@@ -13,6 +13,22 @@ import {
   type ParsedTestLogs,
 } from '../testing/test-log-parser.js';
 import { type LogFetchStats } from '../testing/log-fetch-stats.js';
+import { recompressPlace } from '../build/place-recompression.js';
+
+/**
+ * The largest place file the place version endpoint accepts, measured: 150 MiB
+ * exactly uploads, one byte more is refused from `Content-Length` before the
+ * body is sent, as `400 InvalidRequest: "Request upload was interrupted before
+ * completion."` — and somewhere past ~200 MB as `413 Payload Too Large`.
+ * Neither says anything about size, so it is checked here first.
+ *
+ * Not the 100 MB Roblox documents as supported
+ * (https://create.roblox.com/docs/projects/place-files); that is where Studio
+ * saving "might fail", not where the API cuts off.
+ */
+export const PLACE_UPLOAD_MAX_BYTES = 150 * 1024 * 1024;
+
+export const LUAU_EXECUTION_SCRIPT_MAX_BYTES = 4_000_000;
 
 /**
  * One engine message, with the severity Open Cloud reported for it.
@@ -276,8 +292,20 @@ export class OpenCloudClient {
     );
 
     const apiKey = await this._resolveApiKeyAsync();
-    const fileBuffer = await fs.readFile(rbxlPath);
+    const fileBuffer = _recompressForUpload(
+      rbxlPath,
+      await fs.readFile(rbxlPath)
+    );
     const totalBytes = fileBuffer.length;
+    if (totalBytes > PLACE_UPLOAD_MAX_BYTES) {
+      throw new Error(
+        `Upload failed: ${path.basename(rbxlPath)} is ${_formatMegabytes(
+          totalBytes
+        )}, over the Open Cloud ${_formatMegabytes(
+          PLACE_UPLOAD_MAX_BYTES
+        )} place upload limit`
+      );
+    }
     const versionType = publish ? 'Published' : 'Saved';
     const url = `https://apis.roblox.com/universes/v1/${universeId}/places/${placeId}/versions?versionType=${versionType}`;
 
@@ -371,6 +399,15 @@ export class OpenCloudClient {
     timeoutMs?: number,
     onRateLimitWait?: (wait: RateLimitWait) => void
   ): Promise<LuauTask> {
+    const scriptBytes = Buffer.byteLength(script, 'utf-8');
+    if (scriptBytes > LUAU_EXECUTION_SCRIPT_MAX_BYTES) {
+      throw new Error(
+        `The script is ${_formatMegabytes(
+          scriptBytes
+        )}, over the Open Cloud limit of 4 MB for a Luau execution script`
+      );
+    }
+
     const apiKey = await this._resolveApiKeyAsync();
     const url = `https://apis.roblox.com/cloud/v2/universes/${universeId}/places/${placeId}/versions/${placeVersion}/luau-execution-session-tasks`;
 
@@ -1096,4 +1133,35 @@ async function _readBodyWithProgressAsync(
   }
 
   return Buffer.concat(chunks);
+}
+
+/**
+ * The bytes to upload for a place file: recompressed when that is possible,
+ * the file as read when it is not. An upload never fails for want of zstd —
+ * it only goes up larger.
+ */
+function _recompressForUpload(rbxlPath: string, fileBuffer: Buffer): Buffer {
+  const name = path.basename(rbxlPath);
+  const result = recompressPlace(fileBuffer);
+
+  if (result.kind === 'recompressed') {
+    OutputHelper.verbose(
+      `Recompressed ${name}: ${_formatMegabytes(
+        result.originalBytes
+      )} -> ${_formatMegabytes(result.data.length)}`
+    );
+  } else if (result.kind === 'unsupported') {
+    OutputHelper.warn(
+      `Uploading ${name} as built (${_formatMegabytes(
+        fileBuffer.length
+      )}) without recompressing it: ${result.reason}`
+    );
+  }
+
+  return result.data;
+}
+
+/** In Roblox's MB, which are 1024 * 1024 bytes. */
+function _formatMegabytes(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }

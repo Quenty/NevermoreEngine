@@ -4,8 +4,9 @@
 export interface StudioBridgeGlobalArgs {
   verbose: boolean;
   place?: string;
-  timeout: number;
+  timeout?: number;
   logs: boolean;
   remote?: string;
   local?: boolean;
+  autohost?: boolean;
 }

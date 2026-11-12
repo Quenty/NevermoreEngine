@@ -4,17 +4,16 @@ import type { SourcemapNode } from './sourcemap-types.js';
 import { SourcemapResolver } from './sourcemap-resolver.js';
 
 /**
- * Try to load a `SourcemapResolver` from `sourcemap.json` in the given
- * directory.
+ * Try to load a `SourcemapResolver` for `repoRoot`, from its `sourcemap.json`
+ * unless another file is given.
  *
  * Returns `undefined` if the file doesn't exist or can't be parsed — callers
  * should fall back to heuristic resolution.
  */
 export function tryLoadSourcemapResolver(
-  repoRoot: string
+  repoRoot: string,
+  sourcemapPath = path.join(repoRoot, 'sourcemap.json')
 ): SourcemapResolver | undefined {
-  const sourcemapPath = path.join(repoRoot, 'sourcemap.json');
-
   let content: string;
   try {
     content = fs.readFileSync(sourcemapPath, 'utf-8');
@@ -22,12 +21,11 @@ export function tryLoadSourcemapResolver(
     return undefined;
   }
 
-  let root: SourcemapNode;
+  // A fork's build supplies this file, so a malformed tree is not fatal.
   try {
-    root = JSON.parse(content) as SourcemapNode;
+    const root = JSON.parse(content) as SourcemapNode;
+    return SourcemapResolver.fromSourcemap(root, repoRoot);
   } catch {
     return undefined;
   }
-
-  return SourcemapResolver.fromSourcemap(root, repoRoot);
 }

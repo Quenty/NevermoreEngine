@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-cli",
-  "version": "4.47.2",
+  "version": "4.53.0",
   "description": "CLI interface for Nevermore",
   "type": "module",
   "keywords": [
@@ -34,6 +34,7 @@
     "find-git-root": "^1.0.4",
     "inquirer": "^13.2.0",
     "node-fetch": "^3.3.2",
+    "tar": "^7.5.11",
     "typescript-memoize": "^1.1.1",
     "ws": "^8.18.0",
     "yargs": "^18.0.0"

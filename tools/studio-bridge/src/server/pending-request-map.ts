@@ -3,6 +3,17 @@
  * to incoming plugin responses by requestId.
  */
 
+/** A request whose reply did not arrive in time. */
+export class RequestTimeoutError extends Error {
+  constructor(
+    public readonly requestId: string,
+    public readonly timeoutMs: number
+  ) {
+    super(`Request "${requestId}" timed out after ${timeoutMs}ms`);
+    this.name = 'RequestTimeoutError';
+  }
+}
+
 interface PendingEntry<T> {
   resolve: (value: T) => void;
   reject: (error: Error) => void;
@@ -28,9 +39,7 @@ export class PendingRequestMap<T> {
     return new Promise<T>((resolve, reject) => {
       const timer = setTimeout(() => {
         this._pending.delete(requestId);
-        reject(
-          new Error(`Request "${requestId}" timed out after ${timeoutMs}ms`)
-        );
+        reject(new RequestTimeoutError(requestId, timeoutMs));
       }, timeoutMs);
 
       this._pending.set(requestId, { resolve, reject, timer });

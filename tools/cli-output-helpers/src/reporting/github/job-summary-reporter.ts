@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import { OutputHelper } from '../../outputHelper.js';
 import { isCI } from '../../cli-utils.js';
-import { BaseReporter } from '../reporter.js';
-import { type IStateTracker } from '../state/state-tracker.js';
+import { BaseReporter } from '../batch/reporter.js';
+import { type IStateTracker } from '../batch/state/state-tracker.js';
 import {
   type GithubCommentTableConfig,
   formatGithubTableBody,

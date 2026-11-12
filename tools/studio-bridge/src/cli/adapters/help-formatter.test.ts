@@ -19,7 +19,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'mutate',
       scope: 'session',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -32,7 +32,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'read',
       scope: 'connection',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -45,7 +45,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'none',
       scope: 'standalone',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -85,7 +85,7 @@ describe('formatGroupedHelp', () => {
   it('includes group descriptions', () => {
     const help = formatGroupedHelp(makeRegistry());
     expect(help).toContain('Execute code and view logs');
-    expect(help).toContain('Manage Studio processes');
+    expect(help).toContain('Open and manage Studio');
   });
 
   it('returns empty for empty registry', () => {

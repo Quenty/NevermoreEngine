@@ -17,10 +17,9 @@ const STAGING_REGEX = new RegExp(`^${escapeRegex(STAGING_PREFIX)}`);
 
 const {
   mockGetPersistentPluginPath,
-  mockRojoBuildAsync,
+  mockBuildPluginAsync,
   mockCleanupAsync,
   mockResolvePath,
-  mockCreateDirectoryContentsAsync,
   mockMkdir,
   mockCopyFile,
   mockRename,
@@ -29,10 +28,9 @@ const {
   mockGetPersistentPluginPath: vi.fn(
     () => '/mock/plugins/folder/StudioBridgePersistentPlugin.rbxm'
   ),
-  mockRojoBuildAsync: vi.fn().mockResolvedValue(undefined),
+  mockBuildPluginAsync: vi.fn().mockResolvedValue(undefined),
   mockCleanupAsync: vi.fn().mockResolvedValue(undefined),
   mockResolvePath: vi.fn((rel: string) => `/tmp/mock-build-dir/${rel}`),
-  mockCreateDirectoryContentsAsync: vi.fn().mockResolvedValue(undefined),
   mockMkdir: vi.fn().mockResolvedValue(undefined),
   mockCopyFile: vi.fn().mockResolvedValue(undefined),
   mockRename: vi.fn().mockResolvedValue(undefined),
@@ -43,23 +41,29 @@ vi.mock('../process/studio-process-manager.js', () => ({
   findPluginsFolder: vi.fn(() => '/mock/plugins/folder'),
 }));
 
+vi.mock('./plugin-build-version.js', () => ({
+  getPluginBuildVersionAsync: vi.fn().mockResolvedValue('abc123'),
+}));
+
+vi.mock('./plugin-builder.js', () => ({
+  buildPluginAsync: mockBuildPluginAsync,
+}));
+
 vi.mock('./plugin-discovery.js', () => ({
   getPersistentPluginPath: mockGetPersistentPluginPath,
 }));
 
-vi.mock('@quenty/nevermore-template-helpers', () => ({
+vi.mock('@quenty/nevermore-template-helpers/build', () => ({
   BuildContext: {
     createAsync: vi.fn().mockResolvedValue({
       buildDir: '/tmp/mock-build-dir',
       resolvePath: mockResolvePath,
-      rojoBuildAsync: mockRojoBuildAsync,
       cleanupAsync: mockCleanupAsync,
     }),
   },
-  TemplateHelper: {
-    createDirectoryContentsAsync: mockCreateDirectoryContentsAsync,
-  },
-  resolveTemplatePath: vi.fn(() => '/mock/templates/studio-bridge-plugin'),
+}));
+vi.mock('@quenty/nevermore-template-helpers/resolve-template-path', () => ({
+  resolvePackagePath: vi.fn(() => '/mock/plugins/studio-bridge-plugin'),
 }));
 
 vi.mock('fs/promises', async (importOriginal) => {
@@ -81,8 +85,7 @@ import {
 describe('persistent-plugin-installer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRojoBuildAsync.mockResolvedValue(undefined);
-    mockCreateDirectoryContentsAsync.mockResolvedValue(undefined);
+    mockBuildPluginAsync.mockResolvedValue(undefined);
     mockCleanupAsync.mockResolvedValue(undefined);
     mockMkdir.mockResolvedValue(undefined);
     mockCopyFile.mockResolvedValue(undefined);
@@ -95,12 +98,11 @@ describe('persistent-plugin-installer', () => {
       const result = await installPersistentPluginAsync();
 
       expect(result).toBe(EXPECTED_PLUGIN_PATH);
-      expect(mockCreateDirectoryContentsAsync).toHaveBeenCalled();
       // rojo builds into the temp dir, not the plugins folder.
-      expect(mockRojoBuildAsync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          output: '/tmp/mock-build-dir/StudioBridgePersistentPlugin.rbxm',
-        })
+      expect(mockBuildPluginAsync).toHaveBeenCalledWith(
+        expect.anything(),
+        { PLUGIN_VERSION: 'abc123' },
+        { output: '/tmp/mock-build-dir/StudioBridgePersistentPlugin.rbxm' }
       );
       // copyFile -> rename pattern keeps Studio's polling watcher from
       // observing a partially-written .rbxm.
@@ -113,12 +115,10 @@ describe('persistent-plugin-installer', () => {
     });
 
     it('cleans up build context on error', async () => {
-      mockCreateDirectoryContentsAsync.mockRejectedValueOnce(
-        new Error('template error')
-      );
+      mockBuildPluginAsync.mockRejectedValueOnce(new Error('build error'));
 
       await expect(installPersistentPluginAsync()).rejects.toThrow(
-        'template error'
+        'build error'
       );
       expect(mockCleanupAsync).toHaveBeenCalled();
     });
@@ -156,7 +156,7 @@ describe('persistent-plugin-installer', () => {
       mockUnlink.mockRejectedValueOnce(enoent);
 
       await expect(uninstallPersistentPluginAsync()).rejects.toThrow(
-        'Persistent plugin is not installed'
+        "The studio-bridge plugin isn't installed"
       );
     });
 

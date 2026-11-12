@@ -66,7 +66,7 @@ function LocalizationServiceUtils.promisePlayerTranslator(player: Player): Promi
 
 	return (
 		promiseTranslator:Catch(function(err)
-			if err ~= ERROR_PUBLISH_REQUIRED and (error :: any) ~= ERROR_TIMEOUT then
+			if err ~= ERROR_PUBLISH_REQUIRED and err ~= ERROR_TIMEOUT then
 				warn(string.format("[LocalizationServiceUtils.promisePlayerTranslator] - %s", tostring(err)))
 			end
 

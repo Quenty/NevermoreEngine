@@ -123,8 +123,11 @@ function ObservableSet.ObserveItemsBrio<T>(self: ObservableSet<T>): Observable.O
 			end
 		end))
 
-		for item, _ in self._set do
-			handleItem(item)
+		-- Walk a snapshot: inserting keys during a table walk can skip existing ones
+		for item in table.clone(self._set) do
+			if self._set[item] then
+				handleItem(item)
+			end
 		end
 
 		self._maid[sub] = maid

@@ -20,7 +20,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'mutate',
       scope: 'session',
       args: { code: arg.positional({ description: 'Code' }) },
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -33,7 +33,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'read',
       scope: 'session',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -46,7 +46,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'read',
       scope: 'connection',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -59,7 +59,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'none',
       scope: 'standalone',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -112,14 +112,14 @@ describe('buildGroupCommands', () => {
     expect(consoleMod!.command).toBe('console <command>');
   });
 
-  it('group commands have descriptions', () => {
+  it('group commands have descriptions that name their subcommands', () => {
     const registry = makeRegistry();
     const result = buildGroupCommands(registry);
 
     const consoleMod = result.groups.find((g) =>
       (g.command as string).startsWith('console')
     );
-    expect(consoleMod!.describe).toBe('Execute code and view logs');
+    expect(consoleMod!.describe).toBe('Execute code and view logs: exec, logs');
   });
 
   it('group builder registers subcommands', () => {
@@ -134,6 +134,68 @@ describe('buildGroupCommands', () => {
 
     // Should register 2 subcommands (exec, logs)
     expect(yargs.commands).toHaveLength(2);
+  });
+
+  it('nests a group with a space under its first word', () => {
+    const registry = makeRegistry();
+    registry.register(
+      defineCommand({
+        group: 'console player',
+        name: 'list',
+        description: 'List players',
+        category: 'execution',
+        safety: 'read',
+        scope: 'connection',
+        args: {},
+        handler: async () => ({ summary: '' }),
+      })
+    );
+    const result = buildGroupCommands(registry);
+
+    const consoleMods = result.groups.filter((g) =>
+      (g.command as string).startsWith('console')
+    );
+    expect(consoleMods).toHaveLength(1);
+
+    const yargs = createMockYargs();
+    (consoleMods[0].builder as any)(yargs);
+    expect(yargs.commands).toHaveLength(3);
+
+    const playerMod = yargs.commands[2];
+    expect(playerMod.command).toBe('player <command>');
+    const playerYargs = createMockYargs();
+    playerMod.builder(playerYargs);
+    expect(playerYargs.commands.map((c: any) => c.command)).toEqual(['list']);
+  });
+
+  it('registers a hidden alias under the old name, kept out of help', () => {
+    const registry = new CommandRegistry();
+    registry.register(
+      defineCommand({
+        group: 'explorer',
+        name: 'inspect',
+        description: 'Read one instance',
+        category: 'execution',
+        safety: 'read',
+        scope: 'session',
+        args: {
+          query: arg.positional({ description: 'Query', required: false }),
+        },
+        cli: { hiddenAliases: ['query'] },
+        handler: async () => ({ summary: '' }),
+      })
+    );
+    const result = buildGroupCommands(registry);
+
+    expect(result.groups[0].describe).toBe(
+      'Inspect, search and modify the DataModel: inspect'
+    );
+    const yargs = createMockYargs();
+    (result.groups[0].builder as any)(yargs);
+    expect(yargs.commands.map((c: any) => [c.command, c.describe])).toEqual([
+      ['inspect [query]', 'Read one instance'],
+      ['query [query]', false],
+    ]);
   });
 
   it('returns empty arrays for empty registry', () => {

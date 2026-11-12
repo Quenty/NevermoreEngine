@@ -537,6 +537,31 @@ describe("TemplateProvider.AddTemplates", function()
 		controller:Destroy()
 	end)
 
+	it("provides every initial container when their folders become containers too", function()
+		local controller = setup()
+
+		-- The skip depends on where containers hash, so one provider rarely shows it
+		for _ = 1, 30 do
+			local containers = {}
+			for index = 1, 5 do
+				local container = controller.newInstance("Configuration", `Container{index}`)
+				controller.newInstance("ModuleScript", `Template{index}`, container)
+				for folderIndex = 1, 3 do
+					controller.newInstance("Folder", `Folder{folderIndex}`, container)
+				end
+				table.insert(containers, container)
+			end
+
+			local provider = controller.newProvider(containers)
+
+			for index = 1, 5 do
+				expect(provider:GetTemplate(`Template{index}`)).never.toBeNil()
+			end
+		end
+
+		controller:Destroy()
+	end)
+
 	it("rejects a table entry that is not an instance or observable", function()
 		local controller = setup()
 		local provider = controller.newProvider({})

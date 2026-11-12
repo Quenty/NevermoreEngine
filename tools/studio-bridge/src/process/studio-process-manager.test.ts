@@ -90,14 +90,18 @@ describe('findPluginsFolder', () => {
   it('throws on unsupported platform', () => {
     Object.defineProperty(process, 'platform', { value: 'freebsd' });
 
-    expect(() => findPluginsFolder()).toThrow('Unsupported platform');
+    expect(() => findPluginsFolder()).toThrow(
+      "studio-bridge can't find the Studio plugins folder on freebsd."
+    );
   });
 
   it('throws when LOCALAPPDATA is missing on Windows', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' });
     delete process.env.LOCALAPPDATA;
 
-    expect(() => findPluginsFolder()).toThrow('LOCALAPPDATA');
+    expect(() => findPluginsFolder()).toThrow(
+      "The LOCALAPPDATA environment variable isn't set"
+    );
   });
 
   it('throws when HOME is missing on macOS', () => {

@@ -733,6 +733,21 @@ describe('OpenCloudClient asset owner lookups', () => {
   });
 });
 
+describe('OpenCloudClient.createExecutionTaskAsync', () => {
+  it('refuses a script over the 4 MB limit without sending it', async () => {
+    const fakeLimiter = { fetchAsync: vi.fn() };
+    const client = new OpenCloudClient({
+      apiKey: 'key',
+      rateLimiter: fakeLimiter as unknown as RateLimiter,
+    });
+
+    await expect(
+      client.createExecutionTaskAsync(1, 2, 3, 'a'.repeat(4_000_001))
+    ).rejects.toThrow('over the Open Cloud limit of 4 MB');
+    expect(fakeLimiter.fetchAsync).not.toHaveBeenCalled();
+  });
+});
+
 describe('getTaskReturnValues', () => {
   function makeTask(overrides: Partial<LuauTask>): LuauTask {
     return {

@@ -24,7 +24,13 @@ import {
   buildDeployMetadataAttributes,
   gatherGitDeployInfo,
   injectDeployMetadataAsync,
+  type GitDeployInfo,
 } from '../../utils/deploy/deploy-metadata.js';
+import {
+  type PrebuiltDeployBundle,
+  type PrebuiltDeployPlace,
+  readPrebuiltDeployBundleAsync,
+} from '../../utils/deploy/prebuilt-deploy-bundle.js';
 import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import {
   RateLimiter,
@@ -38,7 +44,7 @@ import {
 import {
   type BatchTarget,
   discoverAllTargetPackagesAsync,
-  discoverChangedTargetPackagesAsync,
+  discoverDeployBatchTargetsAsync,
   flattenToBatchTargets,
 } from '../../utils/batch/changed-packages-utils.js';
 import {
@@ -77,6 +83,8 @@ interface BatchDeployArgs extends NevermoreGlobalArgs {
   watch?: string;
   watchShareApiKey?: boolean;
   watchUseGhAuth?: boolean;
+  bundle?: string;
+  bundleCommit?: string;
 }
 
 export const batchDeployCommand: CommandModule<
@@ -157,6 +165,36 @@ export const batchDeployCommand: CommandModule<
           'Off by default — the key is stored by the service.',
         type: 'boolean',
         default: false,
+      })
+      .option('bundle', {
+        describe:
+          'Deploy the places in a *.nevermore.deploy.tar written by "batch bundle --deploy" instead of ' +
+          'finding and building packages. The bundle only names places: where each one deploys, ' +
+          "and the base place it merges onto, come from this checkout's deploy.nevermore.json.",
+        type: 'string',
+      })
+      .option('bundle-commit', {
+        describe:
+          'Fail unless the --bundle was built from this full commit sha, e.g. the PR head GitHub reports',
+        type: 'string',
+      })
+      .check((args) => {
+        if (args.bundleCommit !== undefined && args.bundle === undefined) {
+          throw new Error('--bundle-commit checks a --bundle; pass one.');
+        }
+        if (args.bundle !== undefined) {
+          if (args.all || args.limit !== undefined) {
+            throw new Error(
+              '--bundle deploys every place in the bundle; drop --all and --limit.'
+            );
+          }
+          if (args.watch !== undefined) {
+            throw new Error(
+              "--bundle deploys another checkout's build, which must not become a watch baseline; drop --watch."
+            );
+          }
+        }
+        return true;
       });
   },
   handler: async (args) => {
@@ -170,18 +208,58 @@ export const batchDeployCommand: CommandModule<
 };
 
 async function _runAsync(args: BatchDeployArgs): Promise<void> {
+  const bundle =
+    args.bundle !== undefined
+      ? await readPrebuiltDeployBundleAsync(args.bundle)
+      : undefined;
+  let exitCode: number;
+  try {
+    exitCode = await _runDeployAsync(args, bundle);
+  } finally {
+    await bundle?.buildContext.cleanupAsync();
+  }
+  process.exit(exitCode);
+}
+
+async function _runDeployAsync(
+  args: BatchDeployArgs,
+  bundle: PrebuiltDeployBundle | undefined
+): Promise<number> {
   const targetName = args.target ?? 'test';
   // Parsed up front so a typo'd duration fails before anything is deployed.
   const watchOption =
     args.watch == null ? undefined : parseWatchOption(args.watch);
 
-  const discovered = args.all
-    ? await discoverAllTargetPackagesAsync(targetName)
-    : await discoverChangedTargetPackagesAsync(args.base!, targetName);
-  let batchTargets = flattenToBatchTargets(discovered);
+  let batchTargets: BatchTarget[];
+  let prebuiltByName: Map<string, PrebuiltDeployPlace> | undefined;
+  if (
+    bundle &&
+    args.bundleCommit !== undefined &&
+    bundle.git.version !== args.bundleCommit
+  ) {
+    throw new Error(
+      `The bundle was built from ${bundle.git.version}, not ${args.bundleCommit}.`
+    );
+  }
+  if (bundle) {
+    ({ batchTargets, prebuiltByName } = await _resolveBundleTargetsAsync(
+      bundle,
+      targetName
+    ));
+  } else {
+    batchTargets = await discoverDeployBatchTargetsAsync({
+      targetName,
+      all: args.all,
+      base: args.base!,
+      limit: args.limit,
+    });
+  }
 
-  if (args.limit && args.limit > 0) {
-    batchTargets = batchTargets.slice(0, args.limit);
+  if (batchTargets.length === 0 && bundle) {
+    OutputHelper.warn(
+      `The bundle holds no places; nothing changed in a "${targetName}" target.`
+    );
+    return 0;
   }
 
   if (batchTargets.length === 0) {
@@ -217,7 +295,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         dryrun: args.dryrun,
       });
     }
-    return;
+    return 0;
   }
 
   if (args.dryrun) {
@@ -247,7 +325,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         dryrun: true,
       });
     }
-    return;
+    return 0;
   }
 
   const concurrency = args.concurrency ?? 3;
@@ -306,7 +384,8 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   const context = new CloudJobContext(reporter, client, basePlaceResolver);
 
   // Gathered once so every deployed package shares one timestamp and commit.
-  const deployGitInfo = gatherGitDeployInfo();
+  // A bundle's places carry the commit that built them, not this checkout's.
+  const deployGitInfo: GitDeployInfo = bundle?.git ?? gatherGitDeployInfo();
   const deployTimestamp = new Date().toISOString();
 
   await reporter.startAsync();
@@ -319,11 +398,18 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
       reporter,
       bufferOutput: isGrouped,
       executeAsync: async (buildTarget, pkgReporter) => {
+        const prebuilt = prebuiltByName?.get(buildTarget.name);
         const builtPlace = await context.buildPlaceAsync({
           target: buildTarget.target,
           outputFileName: publish ? 'publish.rbxl' : 'deploy.rbxl',
           packagePath: buildTarget.path,
           packageName: buildTarget.name,
+          overrides: prebuilt
+            ? {
+                placeFile: prebuilt.rbxlPath,
+                projectFile: prebuilt.projectPath,
+              }
+            : undefined,
         });
 
         const injected = await injectDeployMetadataAsync(
@@ -336,7 +422,9 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
               timestamp: deployTimestamp,
               universeId: buildTarget.target.universeId,
               placeId: buildTarget.target.placeId,
-              packageVersion: await readPackageVersionAsync(buildTarget.path),
+              packageVersion: prebuilt
+                ? prebuilt.packageVersion
+                : await readPackageVersionAsync(buildTarget.path),
               basePlaceId: buildTarget.target.basePlace?.placeId,
               basePlaceVersion: builtPlace.basePlaceVersion,
             },
@@ -360,6 +448,18 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         // Eagerly release build artifacts after upload
         await context.releaseBuiltPlaceAsync(builtPlace);
 
+        const deployed = {
+          packageName: buildTarget.name,
+          placeId: buildTarget.target.placeId,
+          universeId: buildTarget.target.universeId,
+          target: targetName,
+          version,
+          published: publish,
+          basePlaceVersion: builtPlace.basePlaceVersion,
+          commit: deployGitInfo.version,
+          branch: deployGitInfo.branch,
+        };
+
         let logs: string;
         if (args.smokeTest && buildTarget.target.basePlace) {
           OutputHelper.verbose('Running post-deploy smoke test...');
@@ -374,8 +474,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
           logs = smokeResult.logs;
           if (!smokeResult.success) {
             return {
-              packageName: buildTarget.name,
-              placeId: buildTarget.target.placeId,
+              ...deployed,
               success: false,
               logs: _annotateSmokeTestFailure(logs),
               failureLabel: 'SMOKE TEST FAILED',
@@ -387,8 +486,7 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
         }
 
         return {
-          packageName: buildTarget.name,
-          placeId: buildTarget.target.placeId,
+          ...deployed,
           success: true,
           logs,
           progressSummary: {
@@ -425,7 +523,53 @@ async function _runAsync(args: BatchDeployArgs): Promise<void> {
   }
 
   await reporter.stopAsync();
-  process.exit(exitCode);
+  return exitCode;
+}
+
+/**
+ * Match each bundled place to this checkout's target of the same name.
+ *
+ * The bundle is untrusted, so it only gets to say which places it built. Place
+ * ids, universe ids and the base place all come from this checkout, which is
+ * what a same-repo PR's run would have used. A place this checkout does not
+ * know — a fork adding a new game — has nowhere trusted to go, so it fails
+ * rather than deploying to ids the fork chose.
+ */
+async function _resolveBundleTargetsAsync(
+  bundle: PrebuiltDeployBundle,
+  targetName: string
+): Promise<{
+  batchTargets: BatchTarget[];
+  prebuiltByName: Map<string, PrebuiltDeployPlace>;
+}> {
+  if (bundle.target !== targetName) {
+    throw new Error(
+      `The bundle was built for the "${bundle.target}" target, not "${targetName}". ` +
+        `Pass --target ${bundle.target}.`
+    );
+  }
+
+  const known = new Map(
+    flattenToBatchTargets(await discoverAllTargetPackagesAsync(targetName)).map(
+      (t) => [t.name, t]
+    )
+  );
+  const unknown = bundle.places
+    .map((p) => p.name)
+    .filter((name) => !known.has(name));
+  if (unknown.length > 0) {
+    throw new Error(
+      `The bundle holds places this checkout has no "${targetName}" target for: ` +
+        `${unknown.join(
+          ', '
+        )}. A new place deploys once its deploy.nevermore.json is on this branch.`
+    );
+  }
+
+  return {
+    batchTargets: bundle.places.map((p) => known.get(p.name)!),
+    prebuiltByName: new Map(bundle.places.map((p) => [p.name, p])),
+  };
 }
 
 /**

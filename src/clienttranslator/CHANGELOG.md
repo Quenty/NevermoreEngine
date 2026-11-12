@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.55.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.55.0...@quenty/clienttranslator@14.55.1) (2026-10-24)
+
+### Bug Fixes
+
+- **clienttranslator:** Stop warning when the player translator times out ([5072adf](https://github.com/Quenty/NevermoreEngine/commit/5072adf389e94e08088fffc6e6112798af1b1bc6))
+
+# [14.55.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.54.1...@quenty/clienttranslator@14.55.0) (2026-10-24)
+
+**Note:** Version bump only for package @quenty/clienttranslator
+
 ## [14.54.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/clienttranslator@14.54.0...@quenty/clienttranslator@14.54.1) (2026-10-20)
 
 ### Bug Fixes

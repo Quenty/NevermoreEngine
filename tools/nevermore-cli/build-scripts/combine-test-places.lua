@@ -40,15 +40,23 @@ local baseContents = fs.readFile(packages[1].rbxlPath)
 local game = roblox.deserializePlace(baseContents)
 
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 ServerScriptService.LoadStringEnabled = true
 
--- Process first package
-for _, descendant in ServerScriptService:GetDescendants() do
-	if descendant:IsA("Script") then
-		descendant:AddTag("_BatchTest_" .. packages[1].slug)
-	end
+-- Tag only the scriptTemplate's source. Tagging every Script in a package's tree
+-- let a dependency's LocalScript (IsA("Script") is true for it) be run as the test.
+local batchScripts = roblox.Instance.new("Folder")
+batchScripts.Name = "_BatchScripts"
+batchScripts.Parent = ReplicatedStorage
+
+for _, pkg in packages do
+	local testScript = roblox.Instance.new("Script")
+	testScript.Name = pkg.slug
+	testScript.Source = fs.readFile(pkg.scriptPath)
+	testScript:AddTag("_BatchTest_" .. pkg.slug)
+	testScript.Parent = batchScripts
 end
 
 -- Process remaining packages: deserialize each and reparent ServerScriptService children.
@@ -67,12 +75,6 @@ for idx = 2, #packages do
 
 	if packageHttpService.HttpEnabled then
 		HttpService.HttpEnabled = true
-	end
-
-	for _, descendant in packageServerScriptService:GetDescendants() do
-		if descendant:IsA("Script") then
-			descendant:AddTag("_BatchTest_" .. pkg.slug)
-		end
 	end
 
 	-- Reparent all ServerScriptService children (non-recursively, just move the roots)

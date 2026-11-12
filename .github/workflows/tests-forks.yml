@@ -1,0 +1,80 @@
+name: tests-forks
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number of the fork PR to test
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: tests-forks-${{ inputs.pr || format('{0}:{1}', github.event.workflow_run.head_repository.full_name, github.event.workflow_run.head_branch) }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    if: >-
+      github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.event == 'pull_request' &&
+        github.event.workflow_run.head_repository.full_name != github.repository
+      )
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BUNDLE_DIR: ${{ github.workspace }}/../tests-forks-uploads
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Find the PR's build
+        uses: ./.github/actions/find-fork-pr-build
+        with:
+          build-workflow: tests.yml
+          build-job: tests-build
+          pr: ${{ inputs.pr }}
+
+      - name: Set up the Nevermore CLI
+        id: setup
+        uses: ./.github/actions/setup-nevermore-cli
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Download test places outside the checkout
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-${{ env.NEVERMORE_CI_PR_NUMBER }}.nevermore.tests
+          path: ${{ env.BUNDLE_DIR }}
+          run-id: ${{ env.BUILD_RUN_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run tests
+        id: run-tests
+        run: >-
+          nevermore batch test --cloud --bundle "$BUNDLE_DIR/pr-$NEVERMORE_CI_PR_NUMBER.nevermore.tests.tar"
+          --output test-results.json --yes --verbose --logs
+        env:
+          ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
+
+      - name: Post test results
+        if: always() && env.NEVERMORE_CI_PR_NUMBER && steps.setup.outcome == 'success'
+        run: nevermore tools post-test-results test-results.json --sourcemap "$BUNDLE_DIR/sourcemap.json" --yes --run-outcome ${{ steps.run-tests.outcome }}
+
+      - name: Report tests on the PR commit
+        if: always() && env.HEAD_SHA
+        uses: ./.github/actions/report-fork-pr-check
+        with:
+          name: tests
+          conclusion: ${{ job.status }}

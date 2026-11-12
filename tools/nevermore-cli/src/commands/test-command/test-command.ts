@@ -1,3 +1,4 @@
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
@@ -36,6 +37,7 @@ export interface TestProjectArgs extends NevermoreGlobalArgs {
   placeId?: number;
   scriptTemplate?: string;
   scriptText?: string;
+  scriptFile?: string;
   output?: string;
   timeout?: number;
 }
@@ -58,7 +60,7 @@ export class TestProjectCommand<T>
     });
     args.option('logs', {
       describe:
-        'Show execution logs. Defaults on with --script-text, whose output is the whole point of the run',
+        'Show execution logs. Defaults on with --script-text and --script-file, whose output is the whole point of the run',
       type: 'boolean',
     });
     args.option('universe-id', {
@@ -77,6 +79,12 @@ export class TestProjectCommand<T>
     args.option('script-text', {
       describe:
         'Luau code to execute directly instead of the configured script template',
+      type: 'string',
+      conflicts: 'script-file',
+    });
+    args.option('script-file', {
+      describe:
+        'Path to a Luau file to execute directly, like --script-text but without the command line length limit',
       type: 'string',
     });
     args.option('output', {
@@ -98,7 +106,16 @@ export class TestProjectCommand<T>
     // A probe run exists to show its output. Hiding it behind an opt-in flag
     // made --script-text look broken enough that a workaround was written into
     // the docs instead of a bug report.
-    const showLogs = args.logs ?? args.scriptText !== undefined;
+    let scriptText = args.scriptText;
+    if (args.scriptFile !== undefined) {
+      try {
+        scriptText = await fs.readFile(args.scriptFile, 'utf-8');
+      } catch {
+        OutputHelper.error(`Script file not found: ${args.scriptFile}`);
+        process.exit(1);
+      }
+    }
+    const showLogs = args.logs ?? scriptText !== undefined;
     const useSpinner = process.stdout.isTTY && !args.verbose;
 
     const reporter = new CompositeReporter(
@@ -163,7 +180,12 @@ export class TestProjectCommand<T>
           packagePath: cwd,
           packageName,
           target,
-          scriptText: args.scriptText,
+          overrides: {
+            universeId: args.universeId,
+            placeId: args.placeId,
+            scriptTemplate: args.scriptTemplate,
+          },
+          scriptText,
           timeoutMs:
             args.timeout !== undefined ? args.timeout * 1000 : undefined,
         });

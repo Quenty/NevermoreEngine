@@ -1,247 +1,139 @@
 --!optimize 2
---[[
-	CaptureScreenshot action handler for the studio-bridge plugin.
+--[=[
+	Action that captures the Studio viewport and answers with it as base64.
 
-	Captures the Studio viewport using CaptureService, loads the result into
-	an EditableImage to read raw RGBA pixels, encodes as PNG via png-luau,
-	base64-encodes the PNG via EncodingService, and sends it over the WebSocket.
+	Request: `{ type: "captureScreenshot", payload: { format?: "png", region?: { x, y, w, h }, scale? } }`
+	Response: `{ type: "screenshotResult", payload: { data, format, width, height } }`
 
-	Protocol:
-	  Request:  { type: "captureScreenshot", payload: { format?: "png" } }
-	  Response: { type: "screenshotResult", payload: { data, format, width, height } }
-]]
+	@class CaptureScreenshotAction
+]=]
 
--- PNG encoder is injected via router._vendorPng (set by the plugin before
--- actions are pushed). Falls back gracefully to raw RGBA if unavailable.
-local _png = nil
-local _disposed = false
+local require = require(script.Parent.loader).load(script)
+
+local ActionReply = require("ActionReply")
+local ViewportCapture = require("ViewportCapture")
 
 local CaptureScreenshotAction = {}
 
--- ---------------------------------------------------------------------------
--- Helpers
--- ---------------------------------------------------------------------------
+type SendMessage = (message: { [string]: any }) -> ()
 
-local function buildResponse(sessionId: string, requestId: string?, payload: { [string]: any }): { [string]: any }
-	local msg: { [string]: any } = {
-		type = "screenshotResult",
-		sessionId = sessionId,
-		payload = payload,
-	}
-	if requestId ~= nil and requestId ~= "" then
-		msg.requestId = requestId
-	end
-	return msg
-end
+export type Services = {
+	runService: any,
+	captureService: any,
+	assetService: any,
+	encodingService: any,
+}
 
-local function buildError(sessionId: string, requestId: string?, code: string, message: string): { [string]: any }
-	local msg: { [string]: any } = {
-		type = "error",
-		sessionId = sessionId,
-		payload = { code = code, message = message },
-	}
-	if requestId ~= nil and requestId ~= "" then
-		msg.requestId = requestId
-	end
-	return msg
-end
+-- The plugin hands its PNG encoder over through router._vendorPng
+local png: any = nil
+local isTornDown = false
 
--- ---------------------------------------------------------------------------
--- Core capture logic (runs in a spawned thread)
--- ---------------------------------------------------------------------------
+--[=[
+	Registers the `captureScreenshot` handler. Capturing replies asynchronously,
+	so it needs `sendMessage`.
+]=]
+function CaptureScreenshotAction.register(router: any, sendMessage: SendMessage?)
+	isTornDown = false
+	png = router._vendorPng
 
-local function captureAsync(sendMessage: (msg: { [string]: any }) -> (), requestId: string?, sessionId: string)
-	-- Resolve services (deferred so the module loads in Lune test context)
-	local getServiceOk, captureServiceOrErr, assetServiceOrErr, encodingServiceOrErr = pcall(function()
-		return game:GetService("CaptureService"), game:GetService("AssetService"), game:GetService("EncodingService")
-	end)
-	if not getServiceOk then
-		sendMessage(
-			buildError(sessionId, requestId, "CAPTURE_FAILED", `Required services not available: {captureServiceOrErr}`)
-		)
-		return
-	end
-	local CaptureService = captureServiceOrErr
-	local AssetService = assetServiceOrErr
-	local EncodingService = encodingServiceOrErr
-
-	-- Step 1: Capture the viewport via CaptureService
-	local callerThread = coroutine.running()
-	local contentId: string? = nil
-	local captureOk, captureErr = pcall(function()
-		CaptureService:CaptureScreenshot(function(id)
-			contentId = id
-			task.spawn(callerThread)
-		end)
-	end)
-
-	if not captureOk then
-		sendMessage(buildError(sessionId, requestId, "CAPTURE_FAILED", `CaptureService failed: {captureErr}`))
-		return
-	end
-
-	-- Wait for the callback
-	coroutine.yield()
-
-	if _disposed then return end
-
-	if not contentId or contentId == "" then
-		sendMessage(buildError(sessionId, requestId, "CAPTURE_FAILED", "CaptureService returned no content ID"))
-		return
-	end
-
-	-- Step 2: Load into an EditableImage to read pixels
-	local editableOk, editableImage = pcall(function()
-		return AssetService:CreateEditableImageAsync(Content.fromUri(contentId :: string))
-	end)
-
-	if not editableOk or not editableImage then
-		sendMessage(
-			buildError(
-				sessionId,
-				requestId,
-				"EDITABLE_IMAGE_FAILED",
-				`Failed to create EditableImage from capture: {editableImage or "unknown error"}`
-			)
-		)
-		return
-	end
-
-	-- Step 3: Read all pixels as RGBA buffer
-	-- ReadPixelsBuffer has a 1024x1024 limit. If the screenshot is larger,
-	-- scale it down into a new EditableImage that fits within the limit.
-	local MAX_SIZE = 1024
-	local srcWidth = editableImage.Size.X
-	local srcHeight = editableImage.Size.Y
-	local width = srcWidth
-	local height = srcHeight
-
-	local readTarget = editableImage
-	local scaledImage = nil
-
-	if srcWidth > MAX_SIZE or srcHeight > MAX_SIZE then
-		local scale = math.min(MAX_SIZE / srcWidth, MAX_SIZE / srcHeight)
-		width = math.floor(srcWidth * scale)
-		height = math.floor(srcHeight * scale)
-
-		local scaleOk, scaleResult = pcall(function()
-			local scaled = AssetService:CreateEditableImage({ Size = Vector2.new(width, height) })
-			scaled:DrawImageTransformed(
-				Vector2.new(width / 2, height / 2), -- center position
-				Vector2.new(scale, scale), -- scale
-				0, -- rotation
-				editableImage
-			)
-			return scaled
-		end)
-
-		if scaleOk and scaleResult then
-			scaledImage = scaleResult
-			readTarget = scaleResult
-		else
-			-- If scaling fails, just read the top-left 1024x1024 corner
-			width = math.min(srcWidth, MAX_SIZE)
-			height = math.min(srcHeight, MAX_SIZE)
-		end
-	end
-
-	local pixelsOk, pixelsBuf = pcall(function()
-		return readTarget:ReadPixelsBuffer(Vector2.zero, Vector2.new(width, height))
-	end)
-
-	-- Clean up EditableImages immediately to free memory
-	pcall(function()
-		editableImage:Destroy()
-	end)
-	if scaledImage then
-		pcall(function()
-			scaledImage:Destroy()
-		end)
-	end
-
-	if not pixelsOk or not pixelsBuf then
-		sendMessage(
-			buildError(
-				sessionId,
-				requestId,
-				"PIXEL_READ_FAILED",
-				`Failed to read pixels: {pixelsBuf or "unknown error"}`
-			)
-		)
-		return
-	end
-
-	-- Step 4: Encode as PNG (if available) or raw RGBA, then base64
-	local dataBuf = pixelsBuf
-	local format = "rgba"
-
-	if _png then
-		local pngOk, pngBuf = pcall(_png.encode, pixelsBuf, { width = width, height = height })
-		if pngOk and pngBuf then
-			dataBuf = pngBuf
-			format = "png"
-		end
-	end
-
-	local encodeOk, encoded = pcall(function()
-		return EncodingService:Base64Encode(dataBuf)
-	end)
-	if not encodeOk or not encoded then
-		sendMessage(
-			buildError(
-				sessionId,
-				requestId,
-				"ENCODE_FAILED",
-				`Failed to base64 encode data: {encoded or "unknown error"}`
-			)
-		)
-		return
-	end
-
-	-- Step 5: Send the result
-	sendMessage(buildResponse(sessionId, requestId, {
-		data = encoded,
-		format = format,
-		width = width,
-		height = height,
-	}))
-end
-
--- ---------------------------------------------------------------------------
--- Public API
--- ---------------------------------------------------------------------------
-
-function CaptureScreenshotAction.register(router: any, sendMessage: ((msg: { [string]: any }) -> ())?)
-	_disposed = false
 	router:setResponseType("captureScreenshot", "screenshotResult")
-	-- Capture the PNG encoder from the router's shared deps (set by the plugin)
-	_png = router._vendorPng or nil
+	router:register(
+		"captureScreenshot",
+		function(payload: { [string]: any }, requestId: string, sessionId: string): { [string]: any }?
+			if not sendMessage then
+				return {
+					code = "CAPABILITY_NOT_SUPPORTED",
+					message = "Screenshot capture requires a sendMessage callback",
+				}
+			end
 
-	router:register("captureScreenshot", function(_payload: { [string]: any }, requestId: string, sessionId: string): { [string]: any }?
-		if not sendMessage then
-			return {
-				code = "CAPABILITY_NOT_SUPPORTED",
-				message = "Screenshot capture requires a sendMessage callback",
-			}
+			-- Lune has no task library, so fall back to running inline there
+			local spawnOk = pcall(function()
+				task.spawn(CaptureScreenshotAction._captureAsync, sendMessage, requestId, sessionId, nil, payload)
+			end)
+			if not spawnOk then
+				CaptureScreenshotAction._captureAsync(sendMessage, requestId, sessionId, nil, payload)
+			end
+
+			-- Replied through sendMessage, so the router must not reply as well
+			return nil
 		end
-
-		-- Run asynchronously since CaptureService uses a callback.
-		-- pcall guards against Lune test context where task is not available.
-		local spawnOk = pcall(function()
-			task.spawn(captureAsync, sendMessage, requestId, sessionId)
-		end)
-		if not spawnOk then
-			-- Fallback: call directly (will fail on GetService in Lune)
-			captureAsync(sendMessage, requestId, sessionId)
-		end
-
-		-- Return nil so ActionRouter does not generate a wrapped response
-		return nil
-	end)
+	)
 end
 
+--[=[
+	Stops an in-flight capture from replying.
+]=]
 function CaptureScreenshotAction.teardown()
-	_disposed = true
+	isTornDown = true
+end
+
+function CaptureScreenshotAction._captureAsync(
+	sendMessage: SendMessage,
+	requestId: string?,
+	sessionId: string,
+	services: Services?,
+	payload: { [string]: any }?
+)
+	local result = CaptureScreenshotAction._capture(services, payload or {})
+	if not isTornDown then
+		sendMessage(ActionReply.build(sessionId, requestId, "screenshotResult", result))
+	end
+end
+
+function CaptureScreenshotAction._capture(services: Services?, payload: { [string]: any }): { [string]: any }
+	-- Resolved here rather than at load, so the module still loads under Lune
+	local servicesOk, servicesOrErr = pcall(function()
+		return services
+			or {
+				runService = game:GetService("RunService"),
+				captureService = game:GetService("CaptureService"),
+				assetService = game:GetService("AssetService"),
+				encodingService = game:GetService("EncodingService"),
+			}
+	end)
+	if not servicesOk then
+		return ActionReply.failure("CAPTURE_FAILED", `This session can't capture the viewport: {servicesOrErr}`)
+	end
+
+	local readError = ViewportCapture.checkCanRead(servicesOrErr.runService)
+	if readError then
+		return ActionReply.failure("CAPABILITY_NOT_SUPPORTED", readError)
+	end
+
+	local captureOk, contentId = ViewportCapture.captureAsync(servicesOrErr.captureService)
+	if not captureOk then
+		return ActionReply.failure(
+			"CAPTURE_FAILED",
+			`Studio couldn't take the screenshot: {contentId}. Make sure the Studio window is visible, then run the command again.`
+		)
+	end
+	if contentId == nil or contentId == "" then
+		return ActionReply.failure(
+			"CAPTURE_FAILED",
+			"Studio took no screenshot. Make sure the Studio window is visible, then run the command again."
+		)
+	end
+
+	local read, code, message = ViewportCapture.readPixelsAsync(servicesOrErr.assetService, contentId, {
+		region = payload.region,
+		scale = payload.scale,
+	})
+	if not read then
+		return ActionReply.failure(code or "PIXEL_READ_FAILED", message)
+	end
+
+	local encoded, formatOrErr = ViewportCapture.encodeBase64(png, servicesOrErr.encodingService, read)
+	if not encoded then
+		return ActionReply.failure("ENCODE_FAILED", formatOrErr)
+	end
+
+	return {
+		data = encoded,
+		format = formatOrErr,
+		width = read.width,
+		height = read.height,
+	}
 end
 
 return CaptureScreenshotAction

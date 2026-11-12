@@ -1,3 +1,151 @@
+# (Thu Nov 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.21.0`, `@quenty/nevermore-cli-helpers@1.22.0`, `@quenty/nevermore-template-helpers@1.23.0`, `@quenty/studio-bridge@0.25.0`
+  - feat(studio-bridge): sample, record, inspect, and Explorer-style instance queries [#858](https://github.com/Quenty/NevermoreEngine/pull/858) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Nov 11 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/metricutils@2.5.0`
+  - feat(metricutils): add MetricUnit, typed measurements with parsing and localized formatting [#859](https://github.com/Quenty/NevermoreEngine/pull/859) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/softshutdown@10.13.0`, `@quenty/nevermore-cli@4.52.0`, `@quenty/studio-bridge@0.24.0`
+  - feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.20.0`, `@quenty/nevermore-cli@4.51.0`
+  - feat(nevermore-cli): run cloud tests for PRs from forks [#855](https://github.com/Quenty/NevermoreEngine/pull/855) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Tue Nov 03 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/probability@2.3.5`
+  - fix(probability): return unit-variance samples from boxMuller [#856](https://github.com/Quenty/NevermoreEngine/pull/856) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Nov 02 2026)
+
+#### 🐛 Bug Fix
+
+- `@quenty/cli-output-helpers@1.19.1`, `@quenty/nevermore-cli@4.50.1`
+  - fix(nevermore-cli): resolve test failure annotations to real files [#853](https://github.com/Quenty/NevermoreEngine/pull/853) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Oct 28 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.19.0`, `@quenty/nevermore-cli@4.50.0`, `@quenty/studio-bridge@0.22.0`
+  - feat(studio-bridge): multiplayer playtests, Studio launching, search, and CLI fixes [#851](https://github.com/Quenty/NevermoreEngine/pull/851) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/nevermore-cli@4.49.0`
+  - feat(nevermore-cli): Recompress place uploads and split oversized batches [#850](https://github.com/Quenty/NevermoreEngine/pull/850) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Mon Oct 26 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/immediateutils@1.10.0`, `@quenty/jecs@1.11.0`
+  - feat: immediate systems hot reload feedback [#849](https://github.com/Quenty/NevermoreEngine/pull/849) ([@euvinkeel](https://github.com/euvinkeel))
+
+#### Authors: 1
+
+- euvinkeel ([@euvinkeel](https://github.com/euvinkeel))
+
+---
+
+# (Sat Oct 24 2026)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, Oisin ([@oiisin](https://github.com/oiisin)), for all your work!
+
+#### 🐛 Bug Fix
+
+- `@quenty/clienttranslator@14.55.1`
+  - fix(clienttranslator): Stop warning when the player translator times out [#843](https://github.com/Quenty/NevermoreEngine/pull/843) ([@oiisin](https://github.com/oiisin) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Oisin ([@oiisin](https://github.com/oiisin))
+
+---
+
+# (Sat Oct 24 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/observablecollection@12.55.0`, `@quenty/templateprovider@11.56.0`, `@quenty/nevermore-cli@4.48.0`
+  - fix: Batch test runs only each package's scriptTemplate; observable collections stop skipping keys [#838](https://github.com/Quenty/NevermoreEngine/pull/838) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Thu Oct 22 2026)
 
 #### 🐛 Bug Fix

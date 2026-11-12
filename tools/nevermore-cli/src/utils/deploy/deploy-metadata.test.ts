@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import {
   buildDeployMetadataAttributes,
+  gatherGitDeployInfo,
   packageUsesManifestAsync,
   type GitDeployInfo,
   type DeployPlaceInfo,
@@ -205,5 +206,53 @@ describe('packageUsesManifestAsync', () => {
     await withPackageJsonAsync(undefined, async (dir) => {
       expect(await packageUsesManifestAsync(dir)).toBe(false);
     });
+  });
+});
+
+describe('gatherGitDeployInfo', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  async function withEventAsync(
+    eventName: string,
+    event: unknown,
+    fn: () => void
+  ): Promise<void> {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'git-info-'));
+    try {
+      const eventPath = path.join(dir, 'event.json');
+      await fs.writeFile(eventPath, JSON.stringify(event));
+      vi.stubEnv('GITHUB_EVENT_NAME', eventName);
+      vi.stubEnv('GITHUB_EVENT_PATH', eventPath);
+      fn();
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  it("stamps a pull_request run with the PR's head, not the merge checkout", async () => {
+    const sha = 'b'.repeat(40);
+    await withEventAsync(
+      'pull_request',
+      { pull_request: { head: { sha, ref: 'feature/x' } } },
+      () => {
+        expect(gatherGitDeployInfo()).toEqual({
+          commit: 'bbbbbbbbbb',
+          version: sha,
+          branch: 'feature/x',
+        });
+      }
+    );
+  });
+
+  it('reads the checkout for any other event', async () => {
+    await withEventAsync(
+      'push',
+      { pull_request: { head: { sha: 'b'.repeat(40), ref: 'feature/x' } } },
+      () => {
+        expect(gatherGitDeployInfo().version).not.toBe('b'.repeat(40));
+      }
+    );
   });
 });
