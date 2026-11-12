@@ -1,3 +1,16 @@
+# v14.61.2 (Thu Nov 12 2026)
+
+#### 🐛 Bug Fix
+
+- fix(inputkeymaputils): Write binding names through the translator [#845](https://github.com/Quenty/NevermoreEngine/pull/845) ([@oiisin](https://github.com/oiisin) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Oisin ([@oiisin](https://github.com/oiisin))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.

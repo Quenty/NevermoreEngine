@@ -1,5 +1,19 @@
 # (Thu Nov 12 2026)
 
+#### 🐛 Bug Fix
+
+- `@quenty/inputkeymaputils@14.61.2`
+  - fix(inputkeymaputils): Write binding names through the translator [#845](https://github.com/Quenty/NevermoreEngine/pull/845) ([@oiisin](https://github.com/oiisin) [@Quenty](https://github.com/Quenty))
+
+#### Authors: 2
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+- Oisin ([@oiisin](https://github.com/oiisin))
+
+---
+
+# (Thu Nov 12 2026)
+
 #### 🚀 Enhancement
 
 - `@quenty/cli-output-helpers@1.21.0`, `@quenty/nevermore-cli-helpers@1.22.0`, `@quenty/nevermore-template-helpers@1.23.0`, `@quenty/studio-bridge@0.25.0`
