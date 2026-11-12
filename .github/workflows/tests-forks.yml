@@ -33,65 +33,24 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUNDLE_DIR: ${{ github.workspace }}/../tests-forks-uploads
     steps:
-      - name: Find the PR for the finished build
-        id: pr
-        if: github.event_name == 'workflow_run'
-        env:
-          HEAD: ${{ github.event.workflow_run.head_repository.owner.login }}:${{ github.event.workflow_run.head_branch }}
-          BASE: ${{ github.event.repository.default_branch }}
-        run: echo "number=$(gh api -X GET "repos/${{ github.repository }}/pulls" -f head="$HEAD" -f base="$BASE" --jq '.[0].number // empty')" >> "$GITHUB_OUTPUT"
-
-      - name: Find the PR's build
-        env:
-          PR: ${{ inputs.pr || steps.pr.outputs.number }}
-          BUILT_SHA: ${{ github.event.workflow_run.head_sha }}
-          BUILT_RUN: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.id || '' }}
-        run: |
-          test -n "$PR" || { echo "::error::No open PR for this build."; exit 1; }
-          sha=${BUILT_SHA:-$(gh api "repos/${{ github.repository }}/pulls/$PR" --jq .head.sha)}
-          run=${BUILT_RUN:-$(gh api -X GET "repos/${{ github.repository }}/actions/workflows/tests.yml/runs" \
-            -f head_sha="$sha" -f event=pull_request \
-            --jq '[.workflow_runs[] | select(.conclusion == "success")][0].id // empty')}
-          echo "NEVERMORE_CI_PR_NUMBER=$PR" >> "$GITHUB_ENV"
-          echo "HEAD_SHA=$sha" >> "$GITHUB_ENV"
-          echo "BUILD_RUN_ID=$run" >> "$GITHUB_ENV"
-          test -n "$run" || { echo "::error::PR #$PR has no successful tests-build at $sha."; exit 1; }
-
       - name: Checkout main
         uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Find the PR's build
+        uses: ./.github/actions/find-fork-pr-build
         with:
-          cache: true
+          build-workflow: tests.yml
+          build-job: tests-build
+          pr: ${{ inputs.pr }}
 
-      - name: Setup registries
-        run: |
-          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
-          echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
+      - name: Set up the Nevermore CLI
+        id: setup
+        uses: ./.github/actions/setup-nevermore-cli
         with:
-          version: 'v0.3.0'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          cache: true
-
-      - name: Build all tools
-        run: pnpm -r --filter './tools/**' run build
-
-      - name: Install nevermore-cli locally
-        run: npm install --ignore-scripts -g .
-        working-directory: tools/nevermore-cli
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Download test places outside the checkout
         uses: actions/download-artifact@v4
@@ -110,13 +69,12 @@ jobs:
           ROBLOX_OPEN_CLOUD_API_KEY: ${{ secrets.ROBLOX_UNIT_TEST_API_KEY }}
 
       - name: Post test results
-        if: always() && env.NEVERMORE_CI_PR_NUMBER
+        if: always() && env.NEVERMORE_CI_PR_NUMBER && steps.setup.outcome == 'success'
         run: nevermore tools post-test-results test-results.json --sourcemap "$BUNDLE_DIR/sourcemap.json" --yes --run-outcome ${{ steps.run-tests.outcome }}
 
-      # This job's own check lands on main's commit; the PR needs `tests` on its own.
       - name: Report tests on the PR commit
         if: always() && env.HEAD_SHA
-        run: >-
-          gh api "repos/${{ github.repository }}/check-runs"
-          -f name=tests -f head_sha="$HEAD_SHA" -f status=completed -f conclusion=${{ job.status }}
-          -f details_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        uses: ./.github/actions/report-fork-pr-check
+        with:
+          name: tests
+          conclusion: ${{ job.status }}

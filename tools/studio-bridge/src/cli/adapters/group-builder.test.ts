@@ -20,7 +20,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'mutate',
       scope: 'session',
       args: { code: arg.positional({ description: 'Code' }) },
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -33,7 +33,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'read',
       scope: 'session',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -46,7 +46,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'read',
       scope: 'connection',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -59,7 +59,7 @@ function makeRegistry(): CommandRegistry {
       safety: 'none',
       scope: 'standalone',
       args: {},
-      handler: async () => ({}),
+      handler: async () => ({ summary: '' }),
     })
   );
 
@@ -147,7 +147,7 @@ describe('buildGroupCommands', () => {
         safety: 'read',
         scope: 'connection',
         args: {},
-        handler: async () => ({}),
+        handler: async () => ({ summary: '' }),
       })
     );
     const result = buildGroupCommands(registry);
@@ -166,6 +166,36 @@ describe('buildGroupCommands', () => {
     const playerYargs = createMockYargs();
     playerMod.builder(playerYargs);
     expect(playerYargs.commands.map((c: any) => c.command)).toEqual(['list']);
+  });
+
+  it('registers a hidden alias under the old name, kept out of help', () => {
+    const registry = new CommandRegistry();
+    registry.register(
+      defineCommand({
+        group: 'explorer',
+        name: 'inspect',
+        description: 'Read one instance',
+        category: 'execution',
+        safety: 'read',
+        scope: 'session',
+        args: {
+          query: arg.positional({ description: 'Query', required: false }),
+        },
+        cli: { hiddenAliases: ['query'] },
+        handler: async () => ({ summary: '' }),
+      })
+    );
+    const result = buildGroupCommands(registry);
+
+    expect(result.groups[0].describe).toBe(
+      'Inspect, search and modify the DataModel: inspect'
+    );
+    const yargs = createMockYargs();
+    (result.groups[0].builder as any)(yargs);
+    expect(yargs.commands.map((c: any) => [c.command, c.describe])).toEqual([
+      ['inspect [query]', 'Read one instance'],
+      ['query [query]', false],
+    ]);
   });
 
   it('returns empty arrays for empty registry', () => {

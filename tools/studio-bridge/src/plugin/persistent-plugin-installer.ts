@@ -5,24 +5,17 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  BuildContext,
-  TemplateHelper,
-  resolveTemplatePath,
-} from '@quenty/nevermore-template-helpers';
+import { BuildContext } from '@quenty/nevermore-template-helpers/build';
 import { findPluginsFolder } from '../process/studio-process-manager.js';
 import { getPersistentPluginPath } from './plugin-discovery.js';
 import { getPluginBuildVersionAsync } from './plugin-build-version.js';
-
-const templateDir = resolveTemplatePath(
-  import.meta.url,
-  'studio-bridge-plugin'
-);
+import { buildPluginAsync } from './plugin-builder.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const PERSISTENT_PLUGIN_FILENAME = 'StudioBridgePersistentPlugin.rbxm';
 
 /**
- * Build the persistent plugin template via rojo and atomically install the
+ * Build the persistent plugin via rojo and atomically install the
  * resulting `.rbxm` into the Studio plugins folder.
  *
  * The build runs inside the BuildContext's temp dir; the file is then
@@ -37,18 +30,12 @@ export async function installPersistentPluginAsync(): Promise<string> {
   });
 
   try {
-    await TemplateHelper.createDirectoryContentsAsync(
-      templateDir,
-      buildContext.buildDir,
-      { PLUGIN_VERSION: await getPluginBuildVersionAsync() },
-      false
-    );
-
     const builtPath = buildContext.resolvePath(PERSISTENT_PLUGIN_FILENAME);
-    await buildContext.rojoBuildAsync({
-      projectPath: buildContext.resolvePath('default.project.json'),
-      output: builtPath,
-    });
+    await buildPluginAsync(
+      buildContext,
+      { PLUGIN_VERSION: await getPluginBuildVersionAsync() },
+      { output: builtPath }
+    );
 
     const pluginsFolder = findPluginsFolder();
     await fs.mkdir(pluginsFolder, { recursive: true });
@@ -84,7 +71,11 @@ export async function uninstallPersistentPluginAsync(): Promise<void> {
     await fs.unlink(pluginPath);
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-      throw new Error('Persistent plugin is not installed. Nothing to remove.');
+      throw new StudioBridgeError({
+        code: 'PLUGIN_NOT_INSTALLED',
+        message:
+          "The studio-bridge plugin isn't installed, so there was nothing to remove.",
+      });
     }
     throw err;
   }

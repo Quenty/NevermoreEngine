@@ -122,7 +122,7 @@ export class BatchScriptJobContext implements JobContext {
       maxChunkBytes?: number;
       reporter?: Reporter;
       /**
-       * Places already built by `batch bundle`, run instead of building. They
+       * Places already built by `batch bundle --test`, run instead of building. They
        * upload to `batchPlaceId` in `batchUniverseId`, which are then required.
        * The context owns `buildContext` and cleans it up like its own build.
        */

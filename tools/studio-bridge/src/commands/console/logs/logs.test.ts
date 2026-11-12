@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { formatLogsText, parseSince, queryLogsHandlerAsync } from './logs.js';
+import { renderResult } from '../../../cli/adapters/cli-command-adapter.js';
+import {
+  formatLogsText,
+  logsCommand,
+  parseSince,
+  queryLogsHandlerAsync,
+} from './logs.js';
 
 function createMockSession(logsResult: {
   entries: Array<{ level: string; body: string; timestamp: number }>;
@@ -204,7 +210,36 @@ describe('formatLogsText', () => {
 
     expect(text).toContain('tick');
     expect(text).toContain('(x3)');
-    expect(text).toContain('(3 shown, 3 in buffer)');
+    expect(text).not.toContain('in buffer');
     expect(text).toContain(new Date(1793125630 * 1000).toLocaleTimeString());
+  });
+});
+
+describe('console logs --format csv', () => {
+  it('writes a row per entry, counting an ungrouped entry once', () => {
+    const result = {
+      entries: [
+        { level: 'Print' as const, body: 'Hello', timestamp: 1000 },
+        {
+          level: 'Warning' as const,
+          body: 'Retrying, again',
+          timestamp: 1001.5,
+          repeats: 3,
+          lastTimestamp: 1003,
+        },
+      ],
+      total: 4,
+      bufferCapacity: 1000,
+      summary: '',
+    };
+
+    expect(renderResult(logsCommand, result, 'csv')).toBe(
+      [
+        'timestamp,level,body,repeats',
+        '1000,Print,Hello,1',
+        '1001.5,Warning,"Retrying, again",3',
+        '',
+      ].join('\n')
+    );
   });
 });

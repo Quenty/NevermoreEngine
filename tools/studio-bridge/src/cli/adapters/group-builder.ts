@@ -19,7 +19,7 @@ import { buildYargsCommand } from './cli-command-adapter.js';
 
 const GROUP_DESCRIPTIONS: Record<string, string> = {
   console: 'Execute code and view logs',
-  explorer: 'Query and modify the DataModel',
+  explorer: 'Inspect, search and modify the DataModel',
   properties: 'Read and write instance properties',
   viewport: 'Screenshots and camera control',
   data: 'Load and save serialized data',
@@ -96,7 +96,15 @@ function buildGroupModule(
     describe: description,
     builder: (yargs) => {
       for (const cmd of commands) {
-        yargs.command(buildYargsCommand(cmd, options) as any);
+        const module = buildYargsCommand(cmd, options);
+        yargs.command(module as any);
+        for (const alias of cmd.cli?.hiddenAliases ?? []) {
+          yargs.command({
+            ...module,
+            command: (module.command as string).replace(cmd.name, alias),
+            describe: false,
+          } as any);
+        }
       }
       for (const subgroup of subgroups) {
         yargs.command(

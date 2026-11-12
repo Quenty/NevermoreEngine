@@ -53,7 +53,7 @@ describe("ExecuteAction.handleExecute()", function()
 	it("should report success with no return values", function()
 		local result = runScript("local _ = 1")
 
-		expect(result).toEqual({ success = true, output = {}, returnValues = {} })
+		expect(result).toEqual({ success = true, output = {}, returnValues = {}, ranAs = "plugin" })
 	end)
 
 	it("should capture print and warn output in order", function()
@@ -141,6 +141,26 @@ describe("ExecuteAction.handleExecute()", function()
 		expect(result.returnValues).toEqual({ "Player1", 3, 2 } :: { any })
 	end)
 
+	it("should pass inputs to the script as buffers before its args", function()
+		local result = ExecuteAction.handleExecute({
+			script = "local data, name = ... return typeof(data), buffer.tostring(data), name",
+			inputs = { "aGVsbG8=" },
+			args = { "Player1" },
+		}, "req-1", "session-1")
+
+		expect(result.returnValues).toEqual({ "buffer", "hello", "Player1" } :: { any })
+	end)
+
+	it("should reject an input that is not a string", function()
+		local result = ExecuteAction.handleExecute({
+			script = "return 1",
+			inputs = { 5 },
+		}, "req-1", "session-1")
+
+		expect(result.success).toEqual(false)
+		expect(result.error).toContain("Script input 1")
+	end)
+
 	it("should cancel a script that outlives its timeout", function()
 		local result = ExecuteAction.handleExecute(
 			{ script = "task.wait(5) print('too late')", timeoutMs = 50 },
@@ -222,7 +242,7 @@ describe("ExecuteAction.register()", function()
 		expect(controller.sent[2].requestId).toEqual("req-2")
 		expect(controller.sent[2].payload).toEqual({
 			success = false,
-			error = "Script timed out after 100ms waiting behind other scripts, and never ran",
+			error = "The script waited 0.1s behind other scripts and never ran. Run it again once they finish, or pass a longer --script-timeout.",
 			code = "SCRIPT_TIMEOUT",
 		})
 
@@ -252,7 +272,7 @@ describe("ExecuteAction.register()", function()
 				type = "scriptComplete",
 				sessionId = "session-1",
 				requestId = "req-1",
-				payload = { success = true, output = {}, returnValues = { 1 } },
+				payload = { success = true, output = {}, returnValues = { 1 }, ranAs = "plugin" },
 			},
 		})
 

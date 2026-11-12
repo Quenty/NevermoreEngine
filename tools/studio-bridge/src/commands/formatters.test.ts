@@ -4,15 +4,19 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { stripVTControlCharacters } from 'node:util';
 import { execCommand } from './console/exec/exec.js';
 import { logsCommand, formatLogsText } from './console/logs/logs.js';
 import { listCommand, formatSessionsTable } from './process/list/list.js';
 import { infoCommand, formatStateText } from './process/info/info.js';
-import { queryCommand, formatQueryText } from './explorer/query/query.js';
+import {
+  inspectCommand,
+  formatInspectText,
+} from './explorer/inspect/inspect.js';
 import { screenshotCommand } from './viewport/screenshot/screenshot.js';
 
 describe('exec formatter', () => {
-  const format = execCommand.cli!.format!;
+  const format = execCommand.cli!.body!;
 
   it('joins output lines', () => {
     const result = { success: true, output: ['Hello', 'World'], summary: 'ok' };
@@ -29,13 +33,17 @@ describe('exec formatter', () => {
     expect(format(result)).toBe('partial\nboom');
   });
 
-  it('falls back to summary when no output lines', () => {
+  it('renders nothing, leaving the summary to the adapter, when no output lines', () => {
     const result = {
       success: true,
       output: [],
       summary: 'Script executed successfully',
     };
-    expect(format(result)).toBe('Script executed successfully');
+    expect(format(result)).toBe('');
+  });
+
+  it('is data, so its summary goes to stderr', () => {
+    expect(execCommand.cli!.output).toBe('data');
   });
 
   it('handles error with no output', () => {
@@ -50,14 +58,14 @@ describe('exec formatter', () => {
 });
 
 describe('logs formatter', () => {
-  it('returns summary when no entries', () => {
+  it('renders nothing when no entries', () => {
     const result = {
       entries: [],
       total: 0,
       bufferCapacity: 100,
       summary: '0 entries',
     };
-    expect(formatLogsText(result)).toBe('0 entries');
+    expect(formatLogsText(result)).toBe('');
   });
 
   it('formats timestamped log lines', () => {
@@ -74,18 +82,18 @@ describe('logs formatter', () => {
     const text = formatLogsText(result);
     expect(text).toContain('Hello');
     expect(text).toContain('Boom');
-    expect(text).toContain('(2 shown, 2 in buffer)');
+    expect(text).not.toContain('2 entries');
   });
 
   it('is wired into command definition', () => {
-    expect(logsCommand.cli!.format).toBe(formatLogsText);
+    expect(logsCommand.cli!.body).toBe(formatLogsText);
   });
 });
 
 describe('list formatter', () => {
-  it('returns summary when no sessions', () => {
+  it('renders nothing when no sessions', () => {
     const result = { sessions: [], summary: 'No active sessions.' };
-    expect(formatSessionsTable(result)).toBe('No active sessions.');
+    expect(formatSessionsTable(result)).toBe('');
   });
 
   it('formats session table', () => {
@@ -116,7 +124,7 @@ describe('list formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    expect(listCommand.cli!.format).toBe(formatSessionsTable);
+    expect(listCommand.cli!.body).toBe(formatSessionsTable);
   });
 });
 
@@ -144,82 +152,101 @@ describe('info formatter', () => {
   });
 
   it('is wired into command definition', () => {
-    expect(infoCommand.cli!.format).toBe(formatStateText);
+    expect(infoCommand.cli!.body).toBe(formatStateText);
   });
 });
 
-describe('query formatter', () => {
-  it('formats a simple node', () => {
-    const result = {
-      node: {
-        name: 'Workspace',
-        className: 'Workspace',
-        path: 'game.Workspace',
-      },
-      summary: 'Workspace (Workspace) at game.Workspace',
-    };
-
-    const text = formatQueryText(result);
-    expect(text).toContain('Workspace');
-  });
+describe('inspect formatter', () => {
+  const leaf = { properties: [], attributes: [], childCount: 0 };
 
   it('formats nested children with indentation', () => {
-    const result = {
-      node: {
+    const text = formatInspectText({
+      instance: {
+        ...leaf,
         name: 'Workspace',
         className: 'Workspace',
-        path: 'game.Workspace',
+        path: 'Workspace',
+        childCount: 1,
         children: [
-          {
-            name: 'Part',
-            className: 'Part',
-            path: 'game.Workspace.Part',
-          },
+          { ...leaf, name: 'Part', className: 'Part', path: 'Workspace.Part' },
         ],
       },
-      summary: 'Workspace',
-    };
+      summary: 'Workspace and 1 child',
+    });
 
-    const text = formatQueryText(result);
     const lines = text.split('\n');
-    // Root should not be indented
     expect(lines[0]).toMatch(/^Workspace/);
-    // Child should be indented
     expect(lines[1]).toMatch(/^ {2}Part/);
   });
 
   it('formats properties and attributes', () => {
-    const result = {
-      node: {
-        name: 'Part',
+    const text = formatInspectText({
+      instance: {
+        ...leaf,
+        name: 'Door',
         className: 'Part',
-        path: 'game.Workspace.Part',
-        properties: { Size: [4, 1, 2] },
-        attributes: { Health: 100 },
+        path: 'Workspace.Door',
+        properties: [
+          { name: 'Size', text: '4, 1, 2', value: { X: 4, Y: 1, Z: 2 } },
+          {
+            name: 'Source',
+            text: 'local a\nreturn a',
+            value: 'local a\nreturn a',
+          },
+        ],
+        attributes: [{ name: 'Health', text: '100', value: 100 }],
       },
-      summary: 'Part',
-    };
+      summary: 'Door, no children',
+    });
 
-    const text = formatQueryText(result);
-    expect(text).toContain('Size:');
-    expect(text).toContain('@Health:');
+    expect(stripVTControlCharacters(text).split('\n')).toEqual([
+      'Door (Part)',
+      '  Size: 4, 1, 2',
+      '  Source: local a\\nreturn a',
+      '  @Health: 100',
+    ]);
+  });
+
+  it('lists the place top level as its services, without game', () => {
+    const text = formatInspectText({
+      instance: {
+        ...leaf,
+        name: 'Place1',
+        className: 'DataModel',
+        path: 'Place1',
+        childCount: 2,
+        children: [
+          {
+            ...leaf,
+            name: 'Workspace',
+            className: 'Workspace',
+            path: 'Workspace',
+          },
+          {
+            ...leaf,
+            name: 'Lighting',
+            className: 'Lighting',
+            path: 'Lighting',
+          },
+        ],
+      },
+      summary: '2 services',
+    });
+
+    expect(stripVTControlCharacters(text).split('\n')).toEqual([
+      'Workspace',
+      'Lighting',
+    ]);
   });
 
   it('is wired into command definition', () => {
-    expect(queryCommand.cli!.format).toBe(formatQueryText);
+    expect(inspectCommand.cli!.body).toBe(formatInspectText);
   });
 });
 
 describe('screenshot formatter', () => {
-  it('format returns summary only', () => {
-    const format = screenshotCommand.cli!.format!;
-    const result = {
-      data: 'base64...',
-      width: 800,
-      height: 600,
-      summary: 'Screenshot captured (800x600)',
-    };
-    expect(format(result)).toBe('Screenshot captured (800x600)');
+  it('has no body, so its text is the summary alone', () => {
+    expect(screenshotCommand.cli!.body).toBeUndefined();
   });
 
   it('json override omits data field', () => {
@@ -228,12 +255,14 @@ describe('screenshot formatter', () => {
       data: 'base64...',
       width: 800,
       height: 600,
+      source: 'captureService' as const,
       summary: 'Screenshot captured (800x600)',
     };
     const parsed = JSON.parse(json(result));
     expect(parsed).not.toHaveProperty('data');
     expect(parsed.width).toBe(800);
     expect(parsed.height).toBe(600);
+    expect(parsed.source).toBe('captureService');
     expect(parsed.summary).toBe('Screenshot captured (800x600)');
   });
 

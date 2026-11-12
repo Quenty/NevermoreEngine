@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.21.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.20.0...@quenty/cli-output-helpers@1.21.0) (2026-11-12)
+
+### Features
+
+- **studio-bridge:** sample, record, inspect, and Explorer-style instance queries ([#858](https://github.com/Quenty/NevermoreEngine/issues/858)) ([20817cb](https://github.com/Quenty/NevermoreEngine/commit/20817cb137d2868ca9137ad22d7e1dbd977cc146))
+
+# [1.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.1...@quenty/cli-output-helpers@1.20.0) (2026-11-03)
+
+### Features
+
+- **nevermore-cli:** run cloud tests for PRs from forks ([#855](https://github.com/Quenty/NevermoreEngine/issues/855)) ([5408e3d](https://github.com/Quenty/NevermoreEngine/commit/5408e3d52f31e1499afaa08ed79dfbeb42515b02))
+
 ## [1.19.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/cli-output-helpers@1.19.0...@quenty/cli-output-helpers@1.19.1) (2026-11-02)
 
 ### Bug Fixes

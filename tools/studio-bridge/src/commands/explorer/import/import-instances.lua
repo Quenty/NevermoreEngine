@@ -4,10 +4,14 @@
 	SerializationService, and parents the instances under `parentPath`.
 
 	Request: `{ type: "importInstances", payload: { data, parentPath } }`
-	Response: `{ type: "importInstancesResult", payload: { paths } }`
+	Response: `{ type: "importInstancesResult", payload: { instances } }`, `instances` being InstanceRefs
 
 	@class ImportInstancesAction
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local InstanceRef = require("InstanceRef")
 
 local ImportInstancesAction = {}
 
@@ -58,14 +62,12 @@ function ImportInstancesAction.register(router: any)
 				}
 			end
 
-			local paths = {}
 			for _, instance in instances do
 				instance.Parent = parent
-				table.insert(paths, instance:GetFullName())
 			end
 
 			return {
-				paths = paths,
+				instances = InstanceRef.fromList(instances),
 			}
 		end
 	)

@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   execCommand,
   execHandlerAsync,
+  formatExecText,
   runHandlerAsync,
   type ExecResult,
 } from './exec.js';
@@ -15,14 +16,25 @@ vi.mock('fs/promises', () => ({
   readFile: vi.fn(),
 }));
 
+vi.mock('../../../roblox-mcp/index.js', () => ({
+  tryExecuteLuauAsync: vi.fn(),
+}));
+
 import * as fs from 'fs/promises';
+import { tryExecuteLuauAsync } from '../../../roblox-mcp/index.js';
 
 function createMockSession(execResult: {
   success: boolean;
   output: Array<{ level: string; body: string }>;
   error?: string;
+  ranAs?: string;
 }) {
   return {
+    info: {
+      sessionId: 'place1-aaaa-edit',
+      instanceId: 'place1-aaaa',
+      context: 'edit',
+    },
     execAsync: vi.fn().mockResolvedValue(execResult),
   } as any;
 }
@@ -58,7 +70,7 @@ describe('execHandlerAsync', () => {
     expect(result.success).toBe(false);
     expect(result.output).toEqual([]);
     expect(result.error).toBe('Syntax error on line 1');
-    expect(result.summary).toBe('Script failed: Syntax error on line 1');
+    expect(result.summary).toBe('Script failed.');
   });
 
   it('forwards timeout to session.execAsync', async () => {
@@ -94,6 +106,88 @@ describe('execHandlerAsync', () => {
       'Player1',
       '3',
     ]);
+  });
+
+  it('forwards inputs to session.execAsync', async () => {
+    const session = createMockSession({
+      success: true,
+      output: [],
+    });
+    const input = Buffer.from('hello');
+
+    await execHandlerAsync(session, {
+      scriptContent: 'return ...',
+      args: ['Player1'],
+      inputs: [input],
+    });
+
+    expect(session.execAsync).toHaveBeenCalledWith(
+      'return ...',
+      undefined,
+      ['Player1'],
+      [input]
+    );
+  });
+
+  it('forwards --run-as and reports where the code ran', async () => {
+    const session = createMockSession({
+      success: true,
+      output: [],
+      ranAs: 'game',
+    });
+
+    const result = await execHandlerAsync(session, {
+      scriptContent: 'return 1',
+      runAs: 'game',
+    });
+
+    expect(session.execAsync).toHaveBeenCalledWith(
+      'return 1',
+      undefined,
+      undefined,
+      undefined,
+      'game'
+    );
+    expect(result.ranAs).toBe('game');
+    expect(formatExecText({ ...result, output: [] })).toContain(
+      '(ran as game)'
+    );
+  });
+
+  it('runs --run-as mcp through Studio MCP, targeting the session Studio', async () => {
+    const session = createMockSession({ success: true, output: [] });
+    vi.mocked(tryExecuteLuauAsync).mockResolvedValueOnce({
+      success: true,
+      value: '42',
+    });
+
+    const result = await execHandlerAsync(session, {
+      scriptContent: 'return 42',
+      runAs: 'mcp',
+    });
+
+    expect(session.execAsync).not.toHaveBeenCalled();
+    expect(tryExecuteLuauAsync).toHaveBeenCalledWith(
+      'return 42',
+      expect.objectContaining({ target: session.info.instanceId })
+    );
+    expect(result).toMatchObject({
+      success: true,
+      returnValues: ['42'],
+      ranAs: 'mcp',
+    });
+  });
+
+  it('refuses args with --run-as mcp, which only takes the code', async () => {
+    const session = createMockSession({ success: true, output: [] });
+
+    await expect(
+      execHandlerAsync(session, {
+        scriptContent: 'return ...',
+        args: ['a'],
+        runAs: 'mcp',
+      })
+    ).rejects.toThrow("--run-as mcp can't pass args");
   });
 
   it('passes undefined timeout when not specified', async () => {
@@ -186,7 +280,7 @@ describe('execHandlerAsync', () => {
 });
 
 describe('execCommand text format', () => {
-  const format = execCommand.cli!.format!;
+  const format = execCommand.cli!.body!;
 
   function formatResult(result: Partial<ExecResult>): string {
     return format({
@@ -219,10 +313,8 @@ describe('execCommand text format', () => {
     ).toBe('nil\t[1,2]\t{"type":"Vector3","value":[1,2,3]}');
   });
 
-  it('falls back to the summary when nothing was printed or returned', () => {
-    expect(formatResult({ returnValues: [] })).toBe(
-      'Script executed successfully'
-    );
+  it('renders nothing when nothing was printed or returned', () => {
+    expect(formatResult({ returnValues: [] })).toBe('');
   });
 
   it('appends the error after any output', () => {
@@ -270,7 +362,7 @@ describe('runHandlerAsync', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('Syntax error');
-    expect(result.summary).toBe('Script /tmp/broken.lua failed: Syntax error');
+    expect(result.summary).toBe('Script /tmp/broken.lua failed.');
   });
 
   it('forwards timeout to session.execAsync', async () => {

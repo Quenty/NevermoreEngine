@@ -6,6 +6,7 @@
  */
 
 import { execa } from 'execa';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 const WINDOW_TITLE_SUFFIX = ' - Roblox Studio';
 const EXIT_POLL_INTERVAL_MS = 250;
@@ -14,6 +15,7 @@ export interface RunningStudioProcess {
   pid: number;
   windowTitle: string;
   commandLine?: string;
+  startedAt?: number;
 }
 
 export interface CloseStudioOptions {
@@ -31,7 +33,7 @@ export async function listStudioProcessesAsync(): Promise<
         '-NoProfile',
         '-NonInteractive',
         '-Command',
-        '@(Get-CimInstance Win32_Process -Filter "Name=\'RobloxStudioBeta.exe\'" | ForEach-Object { [pscustomobject]@{ Id = $_.ProcessId; MainWindowTitle = (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).MainWindowTitle; CommandLine = $_.CommandLine } }) | ConvertTo-Json -Compress',
+        "@(Get-CimInstance Win32_Process -Filter \"Name='RobloxStudioBeta.exe'\" | ForEach-Object { [pscustomobject]@{ Id = $_.ProcessId; MainWindowTitle = (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).MainWindowTitle; CommandLine = $_.CommandLine; StartTime = $_.CreationDate.ToUniversalTime().ToString('o') } }) | ConvertTo-Json -Compress",
       ],
       { reject: false }
     );
@@ -39,13 +41,17 @@ export async function listStudioProcessesAsync(): Promise<
   }
 
   if (process.platform === 'darwin') {
-    const { stdout } = await execa('ps', ['-axo', 'pid=,command='], {
+    const { stdout } = await execa('ps', ['-axo', 'pid=,etime=,command='], {
       reject: false,
     });
     return parseMacProcessList(stdout);
   }
 
-  throw new Error(`Closing Studio is not supported on ${process.platform}`);
+  throw new StudioBridgeError({
+    code: 'UNSUPPORTED_PLATFORM',
+    message: `studio-bridge can't list or close Studio processes on ${process.platform}.`,
+    fix: 'Close Studio yourself.',
+  });
 }
 
 export function parseWindowsProcessList(
@@ -58,33 +64,57 @@ export function parseWindowsProcessList(
     Id: number;
     MainWindowTitle: string | null;
     CommandLine?: string | null;
+    StartTime?: string | null;
   };
   const parsed = JSON.parse(trimmed) as Entry | Entry[];
   const entries = Array.isArray(parsed) ? parsed : [parsed];
 
-  return entries.map((entry) => ({
-    pid: entry.Id,
-    windowTitle: entry.MainWindowTitle ?? '',
-    commandLine: entry.CommandLine ?? undefined,
-  }));
+  return entries.map((entry) => {
+    const startedAt = entry.StartTime ? Date.parse(entry.StartTime) : NaN;
+    return {
+      pid: entry.Id,
+      windowTitle: entry.MainWindowTitle ?? '',
+      commandLine: entry.CommandLine ?? undefined,
+      ...(Number.isFinite(startedAt) ? { startedAt } : {}),
+    };
+  });
 }
 
-export function parseMacProcessList(stdout: string): RunningStudioProcess[] {
+export function parseMacProcessList(
+  stdout: string,
+  now = Date.now()
+): RunningStudioProcess[] {
   const processes: RunningStudioProcess[] = [];
   for (const line of stdout.split('\n')) {
     const match =
-      /^\s*(\d+)\s+(.*RobloxStudio\.app\/Contents\/MacOS\/RobloxStudio.*)$/.exec(
+      /^\s*(\d+)\s+(?:([\d:-]+)\s+)?(.*RobloxStudio\.app\/Contents\/MacOS\/RobloxStudio.*)$/.exec(
         line
       );
     if (match) {
+      const elapsedSec = match[2] ? parseElapsedSeconds(match[2]) : undefined;
       processes.push({
         pid: Number(match[1]),
-        windowTitle: match[2],
-        commandLine: match[2],
+        windowTitle: match[3],
+        commandLine: match[3],
+        ...(elapsedSec !== undefined
+          ? { startedAt: now - elapsedSec * 1000 }
+          : {}),
       });
     }
   }
   return processes;
+}
+
+export function parseElapsedSeconds(etime: string): number | undefined {
+  const match = /^(?:(\d+)-)?(?:(\d+):)?(\d+):(\d+)$/.exec(etime.trim());
+  if (!match) return undefined;
+  const [, days, hours, minutes, seconds] = match;
+  return (
+    Number(days ?? 0) * 86400 +
+    Number(hours ?? 0) * 3600 +
+    Number(minutes) * 60 +
+    Number(seconds)
+  );
 }
 
 /**

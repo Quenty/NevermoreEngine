@@ -30,6 +30,7 @@ export {
   ContextNotFoundError,
   HostUnreachableError,
 } from './bridge/index.js';
+export { StudioBridgeError } from './messages/studio-bridge-error.js';
 
 export type {
   BridgeConnectionOptions,
@@ -41,10 +42,8 @@ export type {
   StateResult,
   ScreenshotResult,
   LogsResult,
-  DataModelResult,
   LogEntry,
   LogOptions,
-  QueryDataModelOptions,
   LogFollowOptions,
 } from './bridge/index.js';
 
@@ -52,7 +51,9 @@ export type {
 export type {
   Capability,
   StudioState,
-  DataModelInstance,
+  InspectedInstance,
+  InstanceMatchesDetails,
+  ShownValue,
   ErrorCode,
   SerializedValue,
   SerializedReturnValue,
@@ -81,7 +82,7 @@ export type {
   RegisterMessage,
   StateResultMessage,
   ScreenshotResultMessage,
-  DataModelResultMessage,
+  InspectInstanceResultMessage,
   LogsResultMessage,
   StateChangeMessage,
   HeartbeatMessage,
@@ -89,7 +90,7 @@ export type {
   // server -> plugin
   QueryStateMessage,
   CaptureScreenshotMessage,
-  QueryDataModelMessage,
+  InspectInstanceMessage,
   QueryLogsMessage,
   ServerErrorMessage,
   // dynamic action registration
@@ -106,7 +107,7 @@ export {
   queryStateHandlerAsync,
   queryLogsHandlerAsync,
   captureScreenshotHandlerAsync,
-  queryDataModelHandlerAsync,
+  inspectInstanceHandlerAsync,
   exportInstancesHandlerAsync,
   importInstancesHandlerAsync,
   execHandlerAsync,
@@ -125,9 +126,8 @@ export type {
   ServeResult,
   InstallPluginResult,
   UninstallPluginResult,
-  QueryOptions,
-  QueryResult,
-  DataModelNode,
+  InspectOptions,
+  InspectResult,
   RunOptions,
   RunResult,
   LaunchOptions,

@@ -349,6 +349,19 @@ describe('host-protocol', () => {
       ).toBeNull();
     });
 
+    it('relays a watched sampleInstances without a duration', () => {
+      expect(
+        decodeHostMessage(
+          envelope({
+            type: 'sampleInstances',
+            sessionId: 's-1',
+            requestId: 'a',
+            payload: { watch: { id: 'w', wait: 0.5 } },
+          })
+        )
+      ).not.toBeNull();
+    });
+
     it('returns null when execute action has wrong script type', () => {
       expect(
         decodeHostMessage(
@@ -361,14 +374,14 @@ describe('host-protocol', () => {
       ).toBeNull();
     });
 
-    it('returns null when queryDataModel action is missing payload.path', () => {
+    it('returns null when inspectInstance action has a non-boolean selection', () => {
       expect(
         decodeHostMessage(
           envelope({
-            type: 'queryDataModel',
+            type: 'inspectInstance',
             sessionId: 's-1',
             requestId: 'a',
-            payload: {},
+            payload: { selection: 'yes' },
           })
         )
       ).toBeNull();
@@ -407,19 +420,20 @@ describe('host-protocol', () => {
       expect((decoded as HostEnvelope).action.type).toBe('execute');
     });
 
-    it('accepts a well-formed queryDataModel action with all fields', () => {
+    it('accepts a well-formed inspectInstance action with all fields', () => {
       const decoded = decodeHostMessage(
         envelope({
-          type: 'queryDataModel',
+          type: 'inspectInstance',
           sessionId: 's-1',
           requestId: 'q-1',
           payload: {
-            path: 'workspace',
+            root: 'Workspace',
+            query: 'is:Part',
+            selector: 'Part',
+            selection: false,
             depth: 2,
-            properties: ['Name', 'ClassName'],
-            includeAttributes: true,
-            find: { name: 'Camera', recursive: false },
-            listServices: false,
+            properties: true,
+            attributes: true,
           },
         })
       );

@@ -218,6 +218,37 @@ Global flags (available on every `nevermore` command):
 | `--frozen-lockfile` | Fail instead of resolving a base place version the lock file does not already pin |
 | `--refresh-base-place` | Re-resolve `"saved"`/`"published"` pins instead of reusing the locked version |
 
+### Reading the deploy result from a script
+
+`--output` (on `deploy run` and `batch deploy`) writes one entry per place under `packages`. Read the version from there rather than from the terminal output:
+
+```json
+{
+  "packages": [
+    {
+      "packageName": "@quenty/my-game",
+      "success": true,
+      "target": "prod",
+      "universeId": 456,
+      "placeId": 123,
+      "version": 853,
+      "published": true,
+      "basePlaceVersion": 77,
+      "commit": "<full sha>",
+      "branch": "main",
+      "logs": "Published v853"
+    }
+  ],
+  "summary": { "total": 1, "passed": 1, "failed": 0, "durationMs": 41000 }
+}
+```
+
+```bash
+jq -r '.packages[] | select(.placeId == 123) | .version' deploy-results.json
+```
+
+A multi-place target has one entry per place, so pick the place by `placeId`. A place that failed before uploading has no `version`; one whose smoke test failed after uploading keeps it. `basePlaceVersion` is present only for a target with a `basePlace`, and `commit`/`branch` only when git could say.
+
 ### Overriding the configured place
 
 `--universe-id` and `--place-id` let you redirect a single deploy without editing the config. This is useful when you want to push the same build to a personal staging place for a one-off test:

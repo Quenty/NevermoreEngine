@@ -1,0 +1,220 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  closeStudioMcpAsync,
+  tryCallStudioToolAsync,
+  tryCaptureStudioScreenAsync,
+  tryExecuteLuauAsync,
+  tryListStudiosAsync,
+} from './roblox-studio-mcp.js';
+import {
+  createFakeMcpServer,
+  toolText,
+  type FakeHandler,
+} from './test/fake-mcp-server.js';
+
+const STUDIOS = [
+  { id: 'mcp-1', name: 'Place1' },
+  { id: 'mcp-2', name: 'Hub' },
+];
+
+function fake(handler: FakeHandler = () => undefined, studios = STUDIOS) {
+  const server = createFakeMcpServer((method, params) => {
+    if (method === 'initialize') {
+      return { result: { protocolVersion: '2025-06-18', capabilities: {} } };
+    }
+    if (params?.name === 'list_roblox_studios') {
+      return toolText(JSON.stringify({ studios }));
+    }
+    if (
+      params?.name === 'execute_luau' &&
+      params.arguments.code.includes('os.clock')
+    ) {
+      return toolText('0,0,0');
+    }
+    return handler(method, params);
+  });
+  return {
+    server,
+    options: {
+      executablePath: 'StudioMCP.exe',
+      spawnProcess: () => server.child,
+      listWindowsAsync: async () => [],
+    },
+  };
+}
+
+afterEach(async () => {
+  vi.useRealTimers();
+  await closeStudioMcpAsync();
+});
+
+describe('tryExecuteLuauAsync', () => {
+  it('runs Luau in the targeted Studio and returns its result', async () => {
+    const { server, options } = fake((_method, params) =>
+      params?.name === 'execute_luau' ? toolText('42') : undefined
+    );
+
+    const result = await tryExecuteLuauAsync('return 42', {
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result).toMatchObject({ success: true, value: '42' });
+    expect(server.requests.at(-1)?.params.arguments).toEqual({
+      code: 'return 42',
+      studio_id: 'mcp-2',
+      datamodel_type: 'Edit',
+    });
+  });
+
+  it('sends the context as the data model', async () => {
+    const { server, options } = fake(() => toolText('ok'));
+
+    await tryExecuteLuauAsync('return 1', {
+      ...options,
+      target: 'hub',
+      context: 'server',
+    });
+
+    expect(server.requests.at(-1)?.params.arguments.datamodel_type).toBe(
+      'Server'
+    );
+  });
+
+  it('fails with the script error, naming the Studio', async () => {
+    const { options } = fake(() => toolText('boom', true));
+
+    const result = await tryExecuteLuauAsync('error("boom")', {
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result).toMatchObject({
+      success: false,
+      reason: 'failed',
+      message: 'boom',
+      studio: { studioId: 'mcp-2' },
+    });
+  });
+
+  it('fails with no-studio when the target is ambiguous', async () => {
+    const { options } = fake();
+
+    const result = await tryExecuteLuauAsync('return 1', options);
+
+    expect(result).toMatchObject({ success: false, reason: 'no-studio' });
+  });
+
+  it('fails with unavailable when the server exits before answering', async () => {
+    const server = createFakeMcpServer(() => undefined);
+    server.exit(1, 'no Studio');
+
+    const result = await tryExecuteLuauAsync('return 1', {
+      executablePath: 'StudioMCP.exe',
+      spawnProcess: () => server.child,
+      listWindowsAsync: async () => [],
+    });
+
+    expect(result).toMatchObject({ success: false, reason: 'unavailable' });
+    expect(result.success || result.message).toContain('no Studio');
+  });
+
+  it('fails with timeout when the whole call outlives its deadline', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const { server, options } = fake(() => undefined);
+
+    const pending = tryExecuteLuauAsync('return 1', {
+      ...options,
+      target: 'hub',
+    });
+    await vi.advanceTimersByTimeAsync(15_000);
+
+    expect(await pending).toMatchObject({ success: false, reason: 'timeout' });
+    expect(server.child.killed).toBe(true);
+  });
+});
+
+describe('tryCallStudioToolAsync', () => {
+  it('fills in the studio id and leaves other tools without a data model', async () => {
+    const { server, options } = fake(() => toolText('Edit'));
+
+    const result = await tryCallStudioToolAsync(
+      'get_studio_state',
+      {},
+      {
+        ...options,
+        target: 'place1',
+      }
+    );
+
+    expect(result).toMatchObject({ success: true, value: 'Edit' });
+    expect(server.requests.at(-1)?.params).toEqual({
+      name: 'get_studio_state',
+      arguments: { studio_id: 'mcp-1' },
+    });
+  });
+});
+
+describe('tryListStudiosAsync', () => {
+  it('lists the open Studios', async () => {
+    const { options } = fake();
+
+    const result = await tryListStudiosAsync(options);
+
+    expect(result.success && result.value.map((s) => s.placeName)).toEqual([
+      'Place1',
+      'Hub',
+    ]);
+  });
+});
+
+describe('tryCaptureStudioScreenAsync', () => {
+  it("returns the targeted Studio's screen_capture image", async () => {
+    const { server, options } = fake((_method, params) =>
+      params?.name === 'screen_capture'
+        ? {
+            result: {
+              content: [
+                {
+                  type: 'image',
+                  mimeType: 'image/jpeg',
+                  data: Buffer.from('jpeg').toString('base64'),
+                },
+              ],
+            },
+          }
+        : undefined
+    );
+
+    const result = await tryCaptureStudioScreenAsync({
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.value.mimeType).toBe('image/jpeg');
+    expect(result.value.data.toString()).toBe('jpeg');
+    expect(server.requests.at(-1)?.params.arguments).toEqual({
+      capture_id: 'studio-bridge',
+      studio_id: 'mcp-2',
+    });
+  });
+
+  it('fails when Studio sends no image', async () => {
+    const { options } = fake((_method, params) =>
+      params?.name === 'screen_capture' ? toolText('nothing') : undefined
+    );
+
+    const result = await tryCaptureStudioScreenAsync({
+      ...options,
+      target: 'hub',
+    });
+
+    expect(result).toMatchObject({
+      success: false,
+      reason: 'failed',
+      message: 'screen_capture sent no image: nothing',
+    });
+  });
+});

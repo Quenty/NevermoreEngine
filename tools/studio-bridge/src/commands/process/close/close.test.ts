@@ -14,7 +14,11 @@ vi.mock('../../../process/studio-process-closer.js', async (importOriginal) => {
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import { closeDeployTargetAsync, processCloseHandlerAsync } from './close.js';
+import {
+  closeAllStudiosAsync,
+  closeDeployTargetAsync,
+  processCloseHandlerAsync,
+} from './close.js';
 import {
   closeStudioProcessAsync,
   listStudioProcessesAsync,
@@ -124,13 +128,13 @@ describe('processCloseHandlerAsync', () => {
     expect(closeStudioProcessAsync).toHaveBeenCalledWith(10, { force: true });
   });
 
-  it('suggests --force when Studio stays open', async () => {
+  it('says Studio is asking to save when it stays open', async () => {
     vi.mocked(closeStudioProcessAsync).mockResolvedValue(false);
 
     const result = await processCloseHandlerAsync(session);
 
     expect(result.success).toBe(false);
-    expect(result.summary).toContain('--force');
+    expect(result.summary).toContain('likely asking to save');
   });
 
   it('fails without closing when no window shows the place', async () => {
@@ -246,5 +250,50 @@ describe('closeDeployTargetAsync', () => {
       'edit'
     );
     expect(result).toMatchObject({ success: true, pid: 50 });
+  });
+});
+
+describe('closeAllStudiosAsync', () => {
+  beforeEach(() => {
+    vi.mocked(closeStudioProcessAsync).mockReset().mockResolvedValue(true);
+  });
+
+  it('closes every running Studio without saving', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 10, windowTitle: 'Place1 - Roblox Studio' },
+      { pid: 20, windowTitle: 'Place2 - Roblox Studio' },
+    ]);
+
+    const result = await closeAllStudiosAsync({ force: true });
+
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(10, { force: true });
+    expect(closeStudioProcessAsync).toHaveBeenCalledWith(20, { force: true });
+    expect(result).toMatchObject({ success: true, pids: [10, 20] });
+    expect(result.summary).toBe('Closed 2 Studios (pids 10, 20)');
+  });
+
+  it('succeeds when no Studio is running', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([]);
+
+    const result = await closeAllStudiosAsync({ force: true });
+
+    expect(closeStudioProcessAsync).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ success: true, pids: [] });
+  });
+
+  it('names the Studios that stayed open', async () => {
+    vi.mocked(listStudioProcessesAsync).mockResolvedValue([
+      { pid: 10, windowTitle: 'Place1 - Roblox Studio' },
+      { pid: 20, windowTitle: 'Place2 - Roblox Studio' },
+    ]);
+    vi.mocked(closeStudioProcessAsync).mockImplementation(
+      async (pid) => pid === 10
+    );
+
+    const result = await closeAllStudiosAsync({ force: false });
+
+    expect(result.success).toBe(false);
+    expect(result.pids).toEqual([10]);
+    expect(result.summary).toContain('still open (pids 20)');
   });
 });

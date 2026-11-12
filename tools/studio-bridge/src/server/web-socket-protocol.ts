@@ -23,18 +23,23 @@ export type PluginContext = 'edit' | 'client' | 'server';
  */
 export const MAX_MESSAGE_BYTES = 512 * 1024 * 1024;
 
+export const MAX_EXECUTE_INPUT_BYTES = 192 * 1024 * 1024;
+
 export type Capability =
   | 'execute'
   | 'queryState'
   | 'captureScreenshot'
-  | 'queryDataModel'
+  | 'inspectInstance'
   | 'queryLogs'
   | 'exportInstances'
   | 'importInstances'
   | 'findInstances'
+  | 'sampleInstances'
+  | 'recordViewport'
   | 'grepScripts'
   | 'startPlaytest'
   | 'endPlaytest'
+  | 'playtestPlayers'
   | 'heartbeat'
   | 'registerAction'
   | 'syncActions';
@@ -103,14 +108,22 @@ export type SerializedReturnValue =
   | SerializedReturnValue[]
   | { [key: string]: SerializedReturnValue };
 
-export interface DataModelInstance {
+/** An instance `inspectInstance` serialized, down to the depth asked for. */
+export interface InspectedInstance {
   name: string;
   className: string;
   path: string;
-  properties: Record<string, SerializedValue>;
-  attributes: Record<string, SerializedValue>;
+  properties: ShownValue[];
+  attributes: ShownValue[];
   childCount: number;
-  children?: DataModelInstance[];
+  children?: InspectedInstance[];
+}
+
+/** A property or attribute as `inspectInstance` shows it. */
+export interface ShownValue {
+  name: string;
+  text: string;
+  value: unknown;
 }
 
 interface BaseMessage {
@@ -142,6 +155,7 @@ export interface ScriptCompleteMessage extends BaseMessage {
      * which means the script ran and returned nothing.
      */
     returnValues?: SerializedReturnValue[];
+    ranAs?: RunAs;
   };
 }
 
@@ -160,6 +174,8 @@ export interface RegisterMessage extends PushMessage {
     launchId?: string;
     /** The player of a multiplayer test client. */
     playerName?: string;
+    /** The playtest studio-bridge started this session's DataModel for. */
+    playtestId?: string;
     capabilities: Capability[];
   };
 }
@@ -188,11 +204,18 @@ export interface ScreenshotResultMessage extends RequestMessage {
   };
 }
 
-export interface DataModelResultMessage extends RequestMessage {
-  type: 'dataModelResult';
+/** The one instance `inspectInstance` picked out. */
+export interface InspectInstanceResultMessage extends RequestMessage {
+  type: 'inspectInstanceResult';
   payload: {
-    instance: DataModelInstance;
+    instance: InspectedInstance;
   };
+}
+
+/** The `details` of the error when a query or `--root` that must pick out one instance matches several. */
+export interface InstanceMatchesDetails {
+  matches: InstanceRef[];
+  total: number;
 }
 
 export interface ExportInstancesResultMessage extends RequestMessage {
@@ -200,37 +223,123 @@ export interface ExportInstancesResultMessage extends RequestMessage {
   payload: {
     /** The binary model (.rbxm), base64-encoded. */
     data: string;
-    paths: string[];
+    instances: InstanceRef[];
   };
 }
 
 export interface ImportInstancesResultMessage extends RequestMessage {
   type: 'importInstancesResult';
   payload: {
-    paths: string[];
+    instances: InstanceRef[];
   };
 }
 
-export interface FoundInstance {
+/** An instance in a list of instances an action reports (InstanceRef.lua). */
+export interface InstanceRef {
   path: string;
-  name: string;
+  segments: string[];
   className: string;
 }
 
 export interface FindInstancesResultMessage extends RequestMessage {
   type: 'findInstancesResult';
   payload: {
-    instances: FoundInstance[];
+    instances: InstanceRef[];
     /** How many instances were looked at. */
     searched: number;
-    /** True when the search stopped at the limit. */
+    total: number;
     truncated: boolean;
   };
 }
 
-export interface GrepMatch {
+/** A value `sampleInstances` read. */
+export type SampleValue = number | boolean | string;
+
+interface SampleRowBase {
+  t: number;
+  frame: number;
   path: string;
-  className: string;
+}
+
+/** A value read. */
+export interface SampleValueRow extends SampleRowBase {
+  kind: 'value';
+  property: string;
+  value: SampleValue;
+}
+
+/** An instance that entered or left what is watched. */
+export interface SampleMembershipRow extends SampleRowBase {
+  kind: 'added' | 'removed';
+}
+
+/** Changes counted rather than read, when too many came at once. */
+export interface SampleRollupRow extends SampleRowBase {
+  kind: 'rollup';
+  property?: string;
+  count: number;
+  instances: number;
+  example?: string;
+  value?: string;
+}
+
+export type SampleRow = SampleValueRow | SampleMembershipRow | SampleRollupRow;
+
+/** What `sampleInstances` watched. */
+export type SampleScope = 'query' | 'selection' | 'place';
+
+/** Which frame event a recording stepped on. */
+export type RecordingClock = 'renderStep' | 'heartbeat';
+
+/** What every recording reports about its window of frames. */
+export interface RecordingStats {
+  frameCount: number;
+  elapsed: number;
+  truncated: boolean;
+  clock: RecordingClock;
+}
+
+export interface SampleInstancesResultMessage extends RequestMessage {
+  type: 'sampleInstancesResult';
+  payload: RecordingStats & {
+    instances: InstanceRef[];
+    scope: SampleScope;
+    watched: number;
+    rows: SampleRow[];
+    refs: Record<string, InstanceRef>;
+    omitted: number;
+    recorded: number;
+    ended?: boolean;
+  };
+}
+
+export interface RecordedViewportFrame {
+  t: number;
+  frame: number;
+  width: number;
+  height: number;
+  format: 'png' | 'rgba';
+  data: string;
+}
+
+/** A capture `recordViewport` made but could not read. */
+export interface SkippedViewportFrame {
+  t: number;
+  frame: number;
+  reason: string;
+}
+
+export interface RecordViewportResultMessage extends RequestMessage {
+  type: 'recordViewportResult';
+  payload: RecordingStats & {
+    frames: RecordedViewportFrame[];
+    skipped: SkippedViewportFrame[];
+    requested: number;
+  };
+}
+
+/** A matching line, with the script it is in. */
+export interface GrepMatch extends InstanceRef {
   line: number;
   text: string;
 }
@@ -240,7 +349,8 @@ export interface GrepScriptsResultMessage extends RequestMessage {
   payload: {
     matches: GrepMatch[];
     searched: number;
-    /** True when the search stopped at the limit. */
+    total: number;
+    scripts: number;
     truncated: boolean;
   };
 }
@@ -286,6 +396,8 @@ export interface RegisterActionResultMessage extends RequestMessage {
     name: string;
     success: boolean;
     skipped?: boolean;
+    handlers?: string[];
+    outdated?: boolean;
     error?: string;
   };
 }
@@ -295,7 +407,13 @@ export interface SyncActionsResultMessage extends RequestMessage {
   payload: {
     needed: string[];
     installed: Record<string, string>;
+    failed?: Record<string, FailedActionInfo>;
   };
+}
+
+export interface FailedActionInfo {
+  error: string;
+  handlers?: string[];
 }
 
 export type PlaytestMode = 'play' | 'run';
@@ -320,6 +438,22 @@ export interface EndPlaytestResultMessage extends RequestMessage {
   };
 }
 
+export interface PlaytestPlayerPayload {
+  name: string;
+  userId: number;
+  displayName: string;
+}
+
+export interface PlaytestPlayersResultMessage extends RequestMessage {
+  type: 'playtestPlayersResult';
+  payload: {
+    /** The players `list` found or `add` added. */
+    players?: PlaytestPlayerPayload[];
+    /** The players `remove` waited for that had not left by its timeout. */
+    remaining?: string[];
+  };
+}
+
 export interface PluginErrorMessage extends BaseMessage {
   type: 'error';
   requestId?: string;
@@ -335,10 +469,12 @@ export type PluginMessage =
   | RegisterMessage
   | StateResultMessage
   | ScreenshotResultMessage
-  | DataModelResultMessage
+  | InspectInstanceResultMessage
   | ExportInstancesResultMessage
   | ImportInstancesResultMessage
   | FindInstancesResultMessage
+  | SampleInstancesResultMessage
+  | RecordViewportResultMessage
   | GrepScriptsResultMessage
   | LogsResultMessage
   | StateChangeMessage
@@ -347,6 +483,7 @@ export type PluginMessage =
   | SyncActionsResultMessage
   | PlaytestEndedMessage
   | EndPlaytestResultMessage
+  | PlaytestPlayersResultMessage
   | PluginErrorMessage;
 
 export interface ExecuteMessage extends BaseMessage {
@@ -358,8 +495,13 @@ export interface ExecuteMessage extends BaseMessage {
     timeoutMs?: number;
     /** Passed to the script as `...`. */
     args?: string[];
+    /** Base64 files, passed to the script as buffers in `...` before `args`. */
+    inputs?: string[];
+    runAs?: RunAs;
   };
 }
+
+export type RunAs = 'plugin' | 'game' | 'mcp';
 
 export interface ShutdownMessage extends PushMessage {
   type: 'shutdown';
@@ -371,9 +513,18 @@ export interface QueryStateMessage extends RequestMessage {
   payload: Record<string, never>;
 }
 
+/** `[x, y, width, height]` in capture pixels. */
+export type ViewportRegion = [number, number, number, number];
+
+/** How a capture is cropped and scaled before its pixels are read. */
+export interface ViewportReadOptions {
+  region?: ViewportRegion;
+  scale?: number;
+}
+
 export interface CaptureScreenshotMessage extends RequestMessage {
   type: 'captureScreenshot';
-  payload: {
+  payload: ViewportReadOptions & {
     format?: 'png';
   };
 }
@@ -394,28 +545,59 @@ export interface ImportInstancesMessage extends RequestMessage {
   };
 }
 
+/** What the plugin's `InstanceQuery` module matches on. */
+export interface InstanceQuery {
+  root?: string;
+  query?: string;
+  selector?: string;
+  grep?: string;
+  luaPattern?: boolean;
+  caseSensitive?: boolean;
+}
+
+/** What the plugin's `FrameRecorder` module takes. */
+export interface RecordingOptions {
+  trigger?: string;
+  duration: number;
+  fps?: number;
+  maxFrames?: number;
+}
+
 export interface FindInstancesMessage extends RequestMessage {
   type: 'findInstances';
-  payload: {
-    /** Dot-separated path to search under. Defaults to the whole DataModel. */
-    root?: string;
-    /** Matched case-insensitively anywhere in the name. */
-    name?: string;
-    /** Match the whole name instead. */
-    exactName?: boolean;
-    /** Matched with IsA. */
-    className?: string;
-    tag?: string;
+  payload: InstanceQuery & {
     limit?: number;
   };
 }
 
+/** Keeps a `sampleInstances` recording running in Studio between requests. */
+export interface SampleWatch {
+  id: string;
+  wait?: number;
+  stop?: boolean;
+}
+
+export interface SampleInstancesMessage extends RequestMessage {
+  type: 'sampleInstances';
+  payload: InstanceQuery &
+    Omit<RecordingOptions, 'duration'> & {
+      duration?: number;
+      selection?: boolean;
+      properties?: string[];
+      attributes?: string[];
+      watch?: SampleWatch;
+    };
+}
+
+export interface RecordViewportMessage extends RequestMessage {
+  type: 'recordViewport';
+  payload: RecordingOptions & ViewportReadOptions;
+}
+
 export interface GrepScriptsMessage extends RequestMessage {
   type: 'grepScripts';
-  payload: {
+  payload: Pick<InstanceQuery, 'root' | 'query' | 'selector'> & {
     pattern: string;
-    /** Dot-separated path to search under. Defaults to the whole DataModel. */
-    root?: string;
     /** Treat `pattern` as a Lua pattern instead of plain text. */
     luaPattern?: boolean;
     caseSensitive?: boolean;
@@ -423,15 +605,13 @@ export interface GrepScriptsMessage extends RequestMessage {
   };
 }
 
-export interface QueryDataModelMessage extends RequestMessage {
-  type: 'queryDataModel';
-  payload: {
-    path: string;
+export interface InspectInstanceMessage extends RequestMessage {
+  type: 'inspectInstance';
+  payload: Omit<InstanceQuery, 'grep' | 'luaPattern' | 'caseSensitive'> & {
+    selection?: boolean;
     depth?: number;
-    properties?: string[];
-    includeAttributes?: boolean;
-    find?: { name: string; recursive?: boolean };
-    listServices?: boolean;
+    properties?: boolean;
+    attributes?: boolean;
   };
 }
 
@@ -478,7 +658,14 @@ export interface StartPlaytestMessage extends RequestMessage {
     instanceId: string;
     /** Starts a multiplayer test, a server and a client process per player. */
     players?: number;
+    bridge?: PlaytestBridgePayload;
   };
+}
+
+/** What a `startPlaytest` plants beside the plugin's copy. */
+export interface PlaytestBridgePayload {
+  precompiled: string[];
+  client?: boolean;
 }
 
 export interface EndPlaytestMessage extends RequestMessage {
@@ -486,18 +673,15 @@ export interface EndPlaytestMessage extends RequestMessage {
   payload: Record<string, never>;
 }
 
-/** Answered with `scriptComplete`, the same reply as `execute`. */
-export interface RunPlaytestScriptMessage extends RequestMessage {
-  type: 'runPlaytestScript';
-  payload: {
-    mode: PlaytestMode;
-    script: string;
-    /** Planted in the playtest's server to run the script and end the playtest. */
-    runnerSource: string;
-    timeoutSec: number;
-    /** Passed to the script as `...`. */
-    args?: string[];
-  };
+export type PlaytestPlayersRequest =
+  | { op: 'list' }
+  | { op: 'add'; count: number; timeoutSec: number }
+  | { op: 'remove'; kick: string[]; names: string[]; timeoutSec: number }
+  | { op: 'leave' };
+
+export interface PlaytestPlayersMessage extends RequestMessage {
+  type: 'playtestPlayers';
+  payload: PlaytestPlayersRequest;
 }
 
 export interface ServerErrorMessage extends BaseMessage {
@@ -515,17 +699,19 @@ export type ServerMessage =
   | ShutdownMessage
   | QueryStateMessage
   | CaptureScreenshotMessage
-  | QueryDataModelMessage
+  | InspectInstanceMessage
   | ExportInstancesMessage
   | ImportInstancesMessage
   | FindInstancesMessage
+  | SampleInstancesMessage
+  | RecordViewportMessage
   | GrepScriptsMessage
   | QueryLogsMessage
   | RegisterActionMessage
   | SyncActionsMessage
   | StartPlaytestMessage
   | EndPlaytestMessage
-  | RunPlaytestScriptMessage
+  | PlaytestPlayersMessage
   | ServerErrorMessage;
 
 export function encodeMessage(msg: ServerMessage): string {
@@ -538,6 +724,182 @@ function isViewportSize(value: unknown): value is [number, number] {
     value.length === 2 &&
     value.every((item) => typeof item === 'number')
   );
+}
+
+function pickGrepScope(query: InstanceQuery): Omit<InstanceQuery, 'grep'> {
+  const { grep: _grep, ...rest } = query;
+  return rest;
+}
+
+function decodeInstanceQuery(payload: Record<string, unknown>): InstanceQuery {
+  return {
+    root: typeof payload.root === 'string' ? payload.root : undefined,
+    query: typeof payload.query === 'string' ? payload.query : undefined,
+    selector:
+      typeof payload.selector === 'string' ? payload.selector : undefined,
+    grep: typeof payload.grep === 'string' ? payload.grep : undefined,
+    luaPattern:
+      typeof payload.luaPattern === 'boolean' ? payload.luaPattern : undefined,
+    caseSensitive:
+      typeof payload.caseSensitive === 'boolean'
+        ? payload.caseSensitive
+        : undefined,
+  };
+}
+
+function decodeRecordingOptions(
+  payload: Record<string, unknown>
+): RecordingOptions | null {
+  if (typeof payload.duration !== 'number') return null;
+  return {
+    trigger: typeof payload.trigger === 'string' ? payload.trigger : undefined,
+    duration: payload.duration,
+    fps: typeof payload.fps === 'number' ? payload.fps : undefined,
+    maxFrames:
+      typeof payload.maxFrames === 'number' ? payload.maxFrames : undefined,
+  };
+}
+
+function decodeSampleWatch(value: unknown): SampleWatch | undefined {
+  if (!isRecord(value) || typeof value.id !== 'string') return undefined;
+  return {
+    id: value.id,
+    ...(typeof value.wait === 'number' ? { wait: value.wait } : {}),
+    ...(value.stop === true ? { stop: true } : {}),
+  };
+}
+
+function decodeRecordingStats(
+  payload: Record<string, unknown>
+): RecordingStats {
+  return {
+    frameCount: typeof payload.frameCount === 'number' ? payload.frameCount : 0,
+    elapsed: typeof payload.elapsed === 'number' ? payload.elapsed : 0,
+    truncated: payload.truncated === true,
+    clock: payload.clock === 'heartbeat' ? 'heartbeat' : 'renderStep',
+  };
+}
+
+function decodeViewportReadOptions(
+  payload: Record<string, unknown>
+): ViewportReadOptions {
+  const region = payload.region;
+  return {
+    region:
+      Array.isArray(region) &&
+      region.length === 4 &&
+      region.every((n) => typeof n === 'number')
+        ? (region as ViewportRegion)
+        : undefined,
+    scale: typeof payload.scale === 'number' ? payload.scale : undefined,
+  };
+}
+
+function isArrayOf<T>(
+  value: unknown,
+  isItem: (item: unknown) => item is T
+): value is T[] {
+  return Array.isArray(value) && value.every(isItem);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isSampleRow(value: unknown): value is SampleRow {
+  if (
+    !isRecord(value) ||
+    typeof value.t !== 'number' ||
+    typeof value.frame !== 'number' ||
+    typeof value.path !== 'string'
+  ) {
+    return false;
+  }
+  switch (value.kind) {
+    case 'value':
+      return (
+        typeof value.property === 'string' &&
+        ['number', 'boolean', 'string'].includes(typeof value.value)
+      );
+    case 'added':
+    case 'removed':
+      return true;
+    case 'rollup':
+      return (
+        typeof value.count === 'number' && typeof value.instances === 'number'
+      );
+    default:
+      return false;
+  }
+}
+
+function decodeSampleScope(value: unknown): SampleScope {
+  return value === 'selection' || value === 'place' ? value : 'query';
+}
+
+function isRecordedViewportFrame(
+  value: unknown
+): value is RecordedViewportFrame {
+  return (
+    isRecord(value) &&
+    typeof value.t === 'number' &&
+    typeof value.frame === 'number' &&
+    typeof value.width === 'number' &&
+    typeof value.height === 'number' &&
+    (value.format === 'png' || value.format === 'rgba') &&
+    typeof value.data === 'string'
+  );
+}
+
+function isSkippedViewportFrame(value: unknown): value is SkippedViewportFrame {
+  return (
+    isRecord(value) &&
+    typeof value.t === 'number' &&
+    typeof value.frame === 'number' &&
+    typeof value.reason === 'string'
+  );
+}
+
+function isInstanceRef(value: unknown): value is InstanceRef {
+  return (
+    isRecord(value) &&
+    typeof value.path === 'string' &&
+    isStringArray(value.segments) &&
+    typeof value.className === 'string'
+  );
+}
+
+function decodeInstanceRefs(value: unknown): Record<string, InstanceRef> {
+  const refs: Record<string, InstanceRef> = {};
+  if (isRecord(value)) {
+    for (const [path, ref] of Object.entries(value)) {
+      if (isInstanceRef(ref)) refs[path] = ref;
+    }
+  }
+  return refs;
+}
+
+function isGrepMatch(value: unknown): value is GrepMatch {
+  return (
+    isInstanceRef(value) &&
+    typeof (value as Partial<GrepMatch>).line === 'number' &&
+    typeof (value as Partial<GrepMatch>).text === 'string'
+  );
+}
+
+function decodeFailedActions(
+  value: unknown
+): Record<string, FailedActionInfo> | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const failed: Record<string, FailedActionInfo> = {};
+  for (const [name, info] of Object.entries(value)) {
+    if (typeof info !== 'object' || info === null) continue;
+    failed[name] = {
+      error: typeof info.error === 'string' ? info.error : '',
+      handlers: isStringArray(info.handlers) ? info.handlers : undefined,
+    };
+  }
+  return failed;
 }
 
 function isStringArray(value: unknown): value is string[] {
@@ -616,6 +978,11 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
                 : undefined,
             output,
             returnValues,
+            ...(payload.ranAs === 'plugin' ||
+            payload.ranAs === 'game' ||
+            payload.ranAs === 'mcp'
+              ? { ranAs: payload.ranAs }
+              : {}),
           },
         };
       }
@@ -656,6 +1023,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           playerName:
             typeof payload.playerName === 'string'
               ? payload.playerName
+              : undefined,
+          playtestId:
+            typeof payload.playtestId === 'string'
+              ? payload.playtestId
               : undefined,
           capabilities: payload.capabilities as Capability[],
         },
@@ -713,64 +1084,121 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         },
       };
 
-    case 'dataModelResult':
+    case 'inspectInstanceResult':
       if (requestId === undefined) return null;
       if (typeof payload.instance !== 'object' || payload.instance === null)
         return null;
       return {
-        type: 'dataModelResult',
+        type: 'inspectInstanceResult',
         sessionId,
         requestId,
-        payload: {
-          instance: payload.instance as DataModelInstance,
-        },
+        payload: { instance: payload.instance as InspectedInstance },
       };
 
     case 'exportInstancesResult':
       if (requestId === undefined) return null;
-      if (typeof payload.data !== 'string' || !isStringArray(payload.paths))
+      if (
+        typeof payload.data !== 'string' ||
+        !isArrayOf(payload.instances, isInstanceRef)
+      )
         return null;
       return {
         type: 'exportInstancesResult',
         sessionId,
         requestId,
-        payload: { data: payload.data, paths: payload.paths },
+        payload: { data: payload.data, instances: payload.instances },
       };
 
     case 'importInstancesResult':
       if (requestId === undefined) return null;
-      if (!isStringArray(payload.paths)) return null;
+      if (!isArrayOf(payload.instances, isInstanceRef)) return null;
       return {
         type: 'importInstancesResult',
         sessionId,
         requestId,
-        payload: { paths: payload.paths },
+        payload: { instances: payload.instances },
       };
 
     case 'findInstancesResult':
       if (requestId === undefined) return null;
-      if (!Array.isArray(payload.instances)) return null;
+      if (!isArrayOf(payload.instances, isInstanceRef)) return null;
       return {
         type: 'findInstancesResult',
         sessionId,
         requestId,
         payload: {
-          instances: payload.instances as FoundInstance[],
+          instances: payload.instances,
           searched: typeof payload.searched === 'number' ? payload.searched : 0,
+          total:
+            typeof payload.total === 'number'
+              ? payload.total
+              : payload.instances.length,
           truncated: payload.truncated === true,
+        },
+      };
+
+    case 'sampleInstancesResult':
+      if (requestId === undefined) return null;
+      if (
+        !isArrayOf(payload.rows, isSampleRow) ||
+        !isArrayOf(payload.instances, isInstanceRef)
+      )
+        return null;
+      return {
+        type: 'sampleInstancesResult',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeRecordingStats(payload),
+          instances: payload.instances,
+          scope: decodeSampleScope(payload.scope),
+          watched:
+            typeof payload.watched === 'number'
+              ? payload.watched
+              : payload.instances.length,
+          rows: payload.rows,
+          refs: decodeInstanceRefs(payload.refs),
+          omitted: typeof payload.omitted === 'number' ? payload.omitted : 0,
+          recorded: typeof payload.recorded === 'number' ? payload.recorded : 0,
+          ...(typeof payload.ended === 'boolean'
+            ? { ended: payload.ended }
+            : {}),
+        },
+      };
+
+    case 'recordViewportResult':
+      if (requestId === undefined) return null;
+      if (!isArrayOf(payload.frames, isRecordedViewportFrame)) return null;
+      return {
+        type: 'recordViewportResult',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeRecordingStats(payload),
+          frames: payload.frames,
+          skipped: isArrayOf(payload.skipped, isSkippedViewportFrame)
+            ? payload.skipped
+            : [],
+          requested:
+            typeof payload.requested === 'number' ? payload.requested : 0,
         },
       };
 
     case 'grepScriptsResult':
       if (requestId === undefined) return null;
-      if (!Array.isArray(payload.matches)) return null;
+      if (!isArrayOf(payload.matches, isGrepMatch)) return null;
       return {
         type: 'grepScriptsResult',
         sessionId,
         requestId,
         payload: {
-          matches: payload.matches as GrepMatch[],
+          matches: payload.matches,
           searched: typeof payload.searched === 'number' ? payload.searched : 0,
+          total:
+            typeof payload.total === 'number'
+              ? payload.total
+              : payload.matches.length,
+          scripts: typeof payload.scripts === 'number' ? payload.scripts : 0,
           truncated: payload.truncated === true,
         },
       };
@@ -846,6 +1274,10 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
           success: payload.success,
           skipped:
             typeof payload.skipped === 'boolean' ? payload.skipped : undefined,
+          handlers: isStringArray(payload.handlers)
+            ? payload.handlers
+            : undefined,
+          outdated: payload.outdated === true || undefined,
           error: typeof payload.error === 'string' ? payload.error : undefined,
         },
       };
@@ -865,6 +1297,7 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
         payload: {
           needed: payload.needed as string[],
           installed: payload.installed as Record<string, string>,
+          failed: decodeFailedActions(payload.failed),
         },
       };
 
@@ -903,6 +1336,22 @@ export function decodePluginMessage(raw: string): PluginMessage | null {
               : undefined,
           players:
             typeof payload.players === 'number' ? payload.players : undefined,
+        },
+      };
+
+    case 'playtestPlayersResult':
+      if (requestId === undefined) return null;
+      return {
+        type: 'playtestPlayersResult',
+        sessionId,
+        requestId,
+        payload: {
+          players: Array.isArray(payload.players)
+            ? (payload.players as PlaytestPlayerPayload[])
+            : undefined,
+          remaining: isStringArray(payload.remaining)
+            ? payload.remaining
+            : undefined,
         },
       };
 
@@ -974,6 +1423,12 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
               ? { timeoutMs: payload.timeoutMs }
               : {}),
             ...(isStringArray(payload.args) ? { args: payload.args } : {}),
+            ...(isStringArray(payload.inputs)
+              ? { inputs: payload.inputs }
+              : {}),
+            ...(payload.runAs === 'plugin' || payload.runAs === 'game'
+              ? { runAs: payload.runAs }
+              : {}),
           },
         };
       }
@@ -1003,6 +1458,7 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         requestId,
         payload: {
           format: payload.format === 'png' ? 'png' : undefined,
+          ...decodeViewportReadOptions(payload),
         },
       };
 
@@ -1037,20 +1493,49 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         sessionId,
         requestId,
         payload: {
-          root: typeof payload.root === 'string' ? payload.root : undefined,
-          name: typeof payload.name === 'string' ? payload.name : undefined,
-          exactName:
-            typeof payload.exactName === 'boolean'
-              ? payload.exactName
-              : undefined,
-          className:
-            typeof payload.className === 'string'
-              ? payload.className
-              : undefined,
-          tag: typeof payload.tag === 'string' ? payload.tag : undefined,
+          ...decodeInstanceQuery(payload),
           limit: typeof payload.limit === 'number' ? payload.limit : undefined,
         },
       };
+
+    case 'sampleInstances': {
+      if (requestId === undefined) return null;
+      const watch = decodeSampleWatch(payload.watch);
+      const recording = decodeRecordingOptions(
+        watch ? { duration: 0, ...payload } : payload
+      );
+      if (!recording) return null;
+      return {
+        type: 'sampleInstances',
+        sessionId,
+        requestId,
+        payload: {
+          ...decodeInstanceQuery(payload),
+          ...recording,
+          duration:
+            typeof payload.duration === 'number' ? payload.duration : undefined,
+          ...(watch ? { watch } : {}),
+          properties: isStringArray(payload.properties)
+            ? payload.properties
+            : undefined,
+          attributes: isStringArray(payload.attributes)
+            ? payload.attributes
+            : undefined,
+        },
+      };
+    }
+
+    case 'recordViewport': {
+      if (requestId === undefined) return null;
+      const recording = decodeRecordingOptions(payload);
+      if (!recording) return null;
+      return {
+        type: 'recordViewport',
+        sessionId,
+        requestId,
+        payload: { ...recording, ...decodeViewportReadOptions(payload) },
+      };
+    }
 
     case 'grepScripts':
       if (requestId === undefined) return null;
@@ -1060,47 +1545,39 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         sessionId,
         requestId,
         payload: {
+          ...pickGrepScope(decodeInstanceQuery(payload)),
           pattern: payload.pattern,
-          root: typeof payload.root === 'string' ? payload.root : undefined,
-          luaPattern:
-            typeof payload.luaPattern === 'boolean'
-              ? payload.luaPattern
-              : undefined,
-          caseSensitive:
-            typeof payload.caseSensitive === 'boolean'
-              ? payload.caseSensitive
-              : undefined,
           limit: typeof payload.limit === 'number' ? payload.limit : undefined,
         },
       };
 
-    case 'queryDataModel':
+    case 'inspectInstance': {
       if (requestId === undefined) return null;
-      if (typeof payload.path !== 'string') return null;
+      const { root, query, selector } = decodeInstanceQuery(payload);
       return {
-        type: 'queryDataModel',
+        type: 'inspectInstance',
         sessionId,
         requestId,
         payload: {
-          path: payload.path,
+          root,
+          query,
+          selector,
+          selection:
+            typeof payload.selection === 'boolean'
+              ? payload.selection
+              : undefined,
           depth: typeof payload.depth === 'number' ? payload.depth : undefined,
-          properties: Array.isArray(payload.properties)
-            ? (payload.properties as string[])
-            : undefined,
-          includeAttributes:
-            typeof payload.includeAttributes === 'boolean'
-              ? payload.includeAttributes
+          properties:
+            typeof payload.properties === 'boolean'
+              ? payload.properties
               : undefined,
-          find:
-            typeof payload.find === 'object' && payload.find !== null
-              ? (payload.find as { name: string; recursive?: boolean })
-              : undefined,
-          listServices:
-            typeof payload.listServices === 'boolean'
-              ? payload.listServices
+          attributes:
+            typeof payload.attributes === 'boolean'
+              ? payload.attributes
               : undefined,
         },
       };
+    }
 
     case 'queryLogs':
       if (requestId === undefined) return null;
@@ -1185,6 +1662,9 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
           ...(typeof payload.players === 'number'
             ? { players: payload.players }
             : {}),
+          ...(isPlaytestBridge(payload.bridge)
+            ? { bridge: payload.bridge }
+            : {}),
         },
       };
 
@@ -1197,26 +1677,14 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
         payload: {} as Record<string, never>,
       };
 
-    case 'runPlaytestScript':
+    case 'playtestPlayers':
       if (requestId === undefined) return null;
-      if (
-        (payload.mode !== 'play' && payload.mode !== 'run') ||
-        typeof payload.script !== 'string' ||
-        typeof payload.runnerSource !== 'string' ||
-        typeof payload.timeoutSec !== 'number'
-      )
-        return null;
+      if (!isPlaytestPlayersRequest(payload)) return null;
       return {
-        type: 'runPlaytestScript',
+        type: 'playtestPlayers',
         sessionId,
         requestId,
-        payload: {
-          mode: payload.mode,
-          script: payload.script,
-          runnerSource: payload.runnerSource,
-          timeoutSec: payload.timeoutSec,
-          ...(isStringArray(payload.args) ? { args: payload.args } : {}),
-        },
+        payload,
       };
 
     case 'error':
@@ -1238,5 +1706,36 @@ export function decodeServerMessage(raw: string): ServerMessage | null {
 
     default:
       return null;
+  }
+}
+
+function isPlaytestBridge(value: unknown): value is PlaytestBridgePayload {
+  if (typeof value !== 'object' || value === null) return false;
+  const bridge = value as Record<string, unknown>;
+  return (
+    isStringArray(bridge.precompiled) &&
+    (bridge.client === undefined || typeof bridge.client === 'boolean')
+  );
+}
+
+function isPlaytestPlayersRequest(
+  value: Record<string, unknown>
+): value is PlaytestPlayersRequest {
+  switch (value.op) {
+    case 'list':
+    case 'leave':
+      return true;
+    case 'add':
+      return (
+        typeof value.count === 'number' && typeof value.timeoutSec === 'number'
+      );
+    case 'remove':
+      return (
+        isStringArray(value.kick) &&
+        isStringArray(value.names) &&
+        typeof value.timeoutSec === 'number'
+      );
+    default:
+      return false;
   }
 }

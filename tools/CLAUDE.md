@@ -52,6 +52,8 @@ Both CLIs apply global args via middleware:
 
 All CLI output goes through `cli-output-helpers/reporting`. Don't build parallel formatting modules.
 
+Inside `reporting/`, `format/` holds the pure string formatters, `batch/` the `Reporter` side, and `result/` the `ResultReporter` side.
+
 There are two reporter shapes, for two output situations:
 
 - `Reporter` handles batch lifecycle. Many packages, phases (`onPackageStart`, `onPackagePhaseChange`, `onPackageProgressUpdate`, `onPackageResult`), aggregated `BatchSummary`. Used by `nevermore-cli batch`. Fan out via `CompositeReporter`. Concrete reporters: `SimpleReporter`, `SpinnerReporter`, `SummaryTableReporter`, `JsonFileReporter`, `GroupedReporter`, `github/*`.
@@ -71,17 +73,25 @@ Shared formatting primitives also live in `reporting/`. Command handlers can use
 ```typescript
 import {
 	formatTable,
+	formatTree,
+	formatCount,
 	formatJson,
+	formatCsv,
 	type TableColumn,
+	type TreeNode,
 } from "@quenty/cli-output-helpers/reporting";
 ```
+
+`formatCount(n, "match", "matches")` gives `1 match` / `1,532 matches` instead of `match(es)`.
+
+In `studio-bridge`, a command's `cli.body` renders only the body of its text output. Every result has a `summary`, and the CLI adapter alone places it: last and dim for `report` commands, or on stderr for `data` commands (`cli.output: 'data'`), whose stdout is the payload someone would pipe.
 
 Single-result commands usually don't need to construct reporters by hand. Pass argv-style flags to `buildResultReporter({ outputPath, watch, render, binary? })` and it picks the right concrete reporter.
 
 A few rules:
 
 - If a new output need fits one of the existing reporters, use it.
-- For a new output shape, extend `BaseReporter` (batch) or `BaseResultReporter` (single-result). Put the new reporter in `cli-output-helpers/src/reporting/`.
+- For a new output shape, extend `BaseReporter` (batch) or `BaseResultReporter` (single-result). Put the new reporter in `cli-output-helpers/src/reporting/batch/` or `reporting/result/`.
 - For primitives (table, JSON, watch redraw), use the ones in `reporting/`. Don't add a new formatting module elsewhere.
 - If you find yourself about to write a "format-output utility module" for your tool, you're rolling parallel infra. Use `ResultReporter` instead.
 
@@ -132,6 +142,15 @@ export async function tryRenamePlaceAsync(
 	return { success: false, reason: "api_error" };
 }
 ```
+
+### studio-bridge messages
+
+Every message a `studio-bridge` user sees follows one standard. It says what happened in the user's terms, then the consequence if that isn't obvious, then one concrete action. No internals (command lines, stacks, build hashes, raw execa output); those go in `cause`, shown only under `--verbose`.
+
+- Throw an expected failure as `StudioBridgeError({ code, message, fix?, cause? })` (`src/messages/studio-bridge-error.ts`), or `invalidInput(message, fix)` for bad flags and arguments. The CLI adapter alone renders it: the message, then the fix on its own line, or `{ success: false, code, error, fix }` in JSON. Anything else renders as `Unexpected error: <first line>. Run with --verbose for details.`, so a plain `Error` means a bug.
+- Warn through `warnUser({ code, message, fix?, cause?, oncePerMs? })` (`src/messages/warn-user.ts`). A warning that would repeat on every command, like auto-host failing, sets `oncePerMs: ONE_DAY_MS`. It is remembered in the state directory, and `--verbose` always shows it.
+- Pushed Luau actions return `ActionReply.failure(code, message)`. They put their action inside the message, since the plugin relays only `code`, `message` and `details`.
+- `src/messages/message-channels.test.ts` fails if a source file prints a warning or error directly.
 
 ## Naming Conventions
 

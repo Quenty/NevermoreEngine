@@ -9,6 +9,7 @@ local HttpService = game:GetService("HttpService")
 
 local ActionRouter = require("ActionRouter")
 local GrepScriptsAction = require("grep-scripts")
+local InstanceQuery = require("InstanceQuery")
 local Jest = require("Jest")
 
 local describe = Jest.Globals.describe
@@ -34,8 +35,8 @@ local function setup(): any
 	addScript("ModuleScript", "Combat", "local damage = 10\r\nfunction Combat.Hit()\n\treturn DAMAGE * 2\nend")
 	addScript("Script", "Main", "print('ready')\nlocal Combat = require(script.Parent.Combat)")
 
-	local readSource = GrepScriptsAction._readSource
-	GrepScriptsAction._readSource = function(script: LuaSourceContainer): string
+	local readSource = InstanceQuery.readSource
+	InstanceQuery.readSource = function(script: Instance): string
 		return sources[script] or ""
 	end
 
@@ -48,7 +49,7 @@ local function setup(): any
 			return router:Dispatch({ type = "grepScripts", sessionId = "session-1", payload = payload })
 		end,
 		Destroy = function(_self)
-			GrepScriptsAction._readSource = readSource
+			InstanceQuery.readSource = readSource
 			root:Destroy()
 		end,
 	}
@@ -108,13 +109,44 @@ describe("grepScripts", function()
 		controller:Destroy()
 	end)
 
-	it("should stop at the limit and say so", function()
+	it("should stop listing at the limit, and count past it", function()
 		local controller = setup()
 
 		local response = controller.grep({ root = controller.rootPath, pattern = "combat", limit = 1 })
 
 		expect(#response.payload.matches).toEqual(1)
 		expect(response.payload.truncated).toEqual(true)
+		expect(response.payload.total).toEqual(2)
+		expect(response.payload.scripts).toEqual(2)
+		controller:Destroy()
+	end)
+
+	it("should search only the scripts a query picks out", function()
+		local controller = setup()
+
+		local response = controller.grep({ root = controller.rootPath, pattern = "combat", query = "is:Script" })
+
+		expect(getLocations(response)).toEqual({ "Main:2" })
+		expect(response.payload.searched).toEqual(1)
+		controller:Destroy()
+	end)
+
+	it("should search only the scripts a selector picks out", function()
+		local controller = setup()
+
+		local response = controller.grep({ root = controller.rootPath, pattern = "combat", selector = "ModuleScript" })
+
+		expect(getLocations(response)).toEqual({ "Combat:2" })
+		controller:Destroy()
+	end)
+
+	it("should refuse a query that does not parse", function()
+		local controller = setup()
+
+		local response = controller.grep({ root = controller.rootPath, pattern = "combat", query = "is:" })
+
+		expect(response.type).toEqual("error")
+		expect(response.payload.code).toEqual("INVALID_PAYLOAD")
 		controller:Destroy()
 	end)
 

@@ -6,9 +6,16 @@ import {
   summarizeError,
 } from '@quenty/cli-output-helpers/reporting';
 
-/** Deploy-specific result that extends the generic PackageResult with placeId. */
+/** Deploy-specific result that extends the generic PackageResult with what was deployed where. */
 export interface BatchDeployResult extends PackageResult {
   placeId: number;
+  universeId?: number;
+  target?: string;
+  version?: number;
+  published?: boolean;
+  basePlaceVersion?: number;
+  commit?: string;
+  branch?: string;
 }
 
 /**

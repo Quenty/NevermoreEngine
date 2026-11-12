@@ -17,6 +17,10 @@ export {
   type StandaloneCommandInput,
   type SessionTargeting,
   type CliConfig,
+  type CliOutputKind,
+  type CommandResult,
+  type CliWatchConfig,
+  type WatchStream,
 } from './define-command.js';
 
 export {

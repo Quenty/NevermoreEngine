@@ -8,4 +8,5 @@ export interface StudioBridgeGlobalArgs {
   logs: boolean;
   remote?: string;
   local?: boolean;
+  autohost?: boolean;
 }

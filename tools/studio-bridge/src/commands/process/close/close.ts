@@ -3,6 +3,7 @@
  * Studio showing a `deploy.nevermore.json` target's place.
  */
 
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import type { BridgeConnection, BridgeSession } from '../../../bridge/index.js';
@@ -18,7 +19,9 @@ import {
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
 import { explainMissingPlaytestContextAsync } from '../../playtest/playtest-sessions.js';
+import { resolveSessionPidsAsync } from '../../../process/studio-process-identity.js';
 import { describePlaytest } from '../info/info.js';
+import { invalidInput } from '../../../messages/studio-bridge-error.js';
 
 export interface ProcessCloseResult {
   success: boolean;
@@ -26,6 +29,7 @@ export interface ProcessCloseResult {
   /** The `deploy.nevermore.json` target whose Studio was closed, if one was named. */
   deployTarget?: string;
   pid?: number;
+  pids?: number[];
   summary: string;
 }
 
@@ -36,6 +40,8 @@ export interface ProcessCloseOptions {
 
 interface ProcessCloseArgs {
   deployTarget?: string;
+  all?: boolean;
+  askToSave?: boolean;
   force?: boolean;
   pid?: number;
 }
@@ -74,6 +80,15 @@ export async function processCloseHandlerAsync(
       ?.placeId;
     candidates = matchStudioProcesses(processes, placeName, placeId);
   }
+  if (candidates.length > 1 && options.pid === undefined && connection) {
+    const pid = (
+      await resolveSessionPidsAsync(connection, processes, [instanceId])
+    ).get(instanceId);
+    const own = candidates.filter((proc) => proc.pid === pid);
+    if (own.length === 1) {
+      candidates = own;
+    }
+  }
 
   return closeCandidateAsync(candidates, `'${placeName}'`, options, {
     sessionId,
@@ -92,7 +107,10 @@ export async function closeDeployTargetAsync(
 ): Promise<ProcessCloseResult> {
   const deployPlace = await resolveDeployPlaceAsync(cwd, deployTarget);
   if (!deployPlace) {
-    throw new Error(`Target '${deployTarget}' not found`);
+    throw invalidInput(
+      `No deploy target '${deployTarget}' in deploy.nevermore.json.`,
+      'Check the target name in deploy.nevermore.json.'
+    );
   }
   const { placeId } = deployPlace.place;
   const showing = `'${deployPlace.selector}' (place ${placeId})`;
@@ -129,6 +147,45 @@ export async function closeDeployTargetAsync(
   return closeCandidateAsync(candidates, showing, options, base);
 }
 
+export async function closeAllStudiosAsync(
+  options: Pick<ProcessCloseOptions, 'force'> = {}
+): Promise<ProcessCloseResult> {
+  const processes = await listStudioProcessesAsync();
+  if (processes.length === 0) {
+    return { success: true, pids: [], summary: 'No Studio is running' };
+  }
+
+  const results = await Promise.all(
+    processes.map(async ({ pid }) => ({
+      pid,
+      exited: await closeStudioProcessAsync(pid, { force: options.force }),
+    }))
+  );
+  const closed = results.filter((r) => r.exited).map((r) => r.pid);
+  const open = results.filter((r) => !r.exited).map((r) => r.pid);
+  const studios = (n: number) => formatCount(n, 'Studio', 'Studios');
+
+  if (open.length > 0) {
+    return {
+      success: false,
+      pids: closed,
+      summary:
+        `Closed ${studios(closed.length)}; ${studios(
+          open.length
+        )} still open (pids ${open.join(', ')})` +
+        (options.force
+          ? ''
+          : ', likely asking to save. Run without --ask-to-save to close without saving.'),
+    };
+  }
+
+  return {
+    success: true,
+    pids: closed,
+    summary: `Closed ${studios(closed.length)} (pids ${closed.join(', ')})`,
+  };
+}
+
 async function closeCandidateAsync(
   candidates: RunningStudioProcess[],
   showing: string,
@@ -163,7 +220,7 @@ async function closeCandidateAsync(
     return fail(
       options.force
         ? `Studio (pid ${pid}) did not exit`
-        : `Studio (pid ${pid}) is still open, likely asking to save. Use --force to close without saving.`,
+        : `Studio (pid ${pid}) is still open, likely asking to save. Run without --ask-to-save to close without saving.`,
       pid
     );
   }
@@ -183,7 +240,7 @@ export const processCloseCommand = defineCommand<
   group: 'process',
   name: 'close',
   description:
-    "Close a Studio: the one a session belongs to, or the one showing a deploy.nevermore.json target's place",
+    "Close a Studio without saving: the one a session belongs to, the one showing a deploy.nevermore.json target's place, or with --all every Studio",
   category: 'infrastructure',
   safety: 'mutate',
   scope: 'connection',
@@ -193,8 +250,16 @@ export const processCloseCommand = defineCommand<
         'deploy.nevermore.json target whose Studio to close, e.g. test or integration.places.hub',
       required: false,
     }),
+    all: arg.flag({
+      description: 'Close every running Studio, connected or not',
+    }),
+    askToSave: arg.flag({
+      description:
+        'Let Studio prompt to save first, instead of closing without saving',
+    }),
     force: arg.flag({
-      description: 'Kill Studio without letting it prompt to save',
+      description:
+        'Close without saving. The default, accepted for scripts that pass it',
       alias: 'f',
     }),
     pid: arg.option({
@@ -203,7 +268,20 @@ export const processCloseCommand = defineCommand<
     }),
   },
   handler: async (connection, args, targeting) => {
-    const options = { force: args.force, pid: args.pid };
+    const options = { force: !args.askToSave, pid: args.pid };
+    if (args.all) {
+      if (
+        args.deployTarget !== undefined ||
+        args.pid !== undefined ||
+        targeting.target !== undefined
+      ) {
+        throw invalidInput(
+          '--all closes every Studio, so it takes no target, --target or --pid.',
+          'Drop the target, --target and --pid.'
+        );
+      }
+      return closeAllStudiosAsync(options);
+    }
     if (args.deployTarget !== undefined) {
       return closeDeployTargetAsync(connection, args.deployTarget, options);
     }

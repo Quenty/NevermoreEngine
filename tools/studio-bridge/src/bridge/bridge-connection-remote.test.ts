@@ -134,7 +134,7 @@ describe('BridgeConnection remote mode', () => {
         BridgeConnection.connectAsync({
           remoteHost: 'localhost:19999',
         })
-      ).rejects.toThrow(/Could not connect to bridge host at localhost:19999/);
+      ).rejects.toThrow('No bridge host answered at localhost:19999.');
     });
 
     it('includes helpful suggestion in ECONNREFUSED error', async () => {
@@ -142,7 +142,9 @@ describe('BridgeConnection remote mode', () => {
         BridgeConnection.connectAsync({
           remoteHost: 'localhost:19998',
         })
-      ).rejects.toThrow(/studio-bridge serve/);
+      ).rejects.toMatchObject({
+        fix: expect.stringContaining("'studio-bridge serve'"),
+      });
     });
   });
 

@@ -7,7 +7,7 @@ import type { CommandRegistry } from '../../commands/framework/command-registry.
 
 const GROUP_DESCRIPTIONS: Record<string, string> = {
   console: 'Execute code and view logs',
-  explorer: 'Query and modify the DataModel',
+  explorer: 'Inspect, search and modify the DataModel',
   properties: 'Read and write instance properties',
   viewport: 'Screenshots and camera control',
   data: 'Load and save serialized data',

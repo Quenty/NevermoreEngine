@@ -2,6 +2,7 @@
  * `playtest player add` — add players to the running multiplayer test.
  */
 
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../../framework/define-command.js';
 import { arg } from '../../../framework/arg-builder.js';
 import type { BridgeConnection } from '../../../../bridge/index.js';
@@ -11,6 +12,7 @@ import {
   formatPlayersTable,
   type PlaytestPlayer,
 } from '../playtest-players.js';
+import { invalidInput } from '../../../../messages/studio-bridge-error.js';
 
 export interface PlaytestPlayerAddResult {
   players: PlaytestPlayer[];
@@ -27,7 +29,10 @@ export async function playtestPlayerAddHandlerAsync(
   target?: string
 ): Promise<PlaytestPlayerAddResult> {
   if (!Number.isInteger(count) || count < 1) {
-    throw new Error(`Player count must be a whole number of at least 1`);
+    throw invalidInput(
+      `Can't add ${count} players.`,
+      'Give a whole number of at least 1.'
+    );
   }
 
   const serverSession = await resolvePlaytestServerSessionAsync(
@@ -44,15 +49,17 @@ export async function playtestPlayerAddHandlerAsync(
     players,
     summary:
       players.length < count
-        ? `Added ${players.length} of ${count} player(s); the rest did not join in time`
-        : `Added ${players.length} player(s)`,
+        ? `Added ${players.length} of ${formatCount(
+            count,
+            'player',
+            'players'
+          )}; the rest did not join in time`
+        : `Added ${formatCount(players.length, 'player', 'players')}`,
   };
 }
 
 export function formatPlayerAddText(result: PlaytestPlayerAddResult): string {
-  return result.players.length === 0
-    ? result.summary
-    : `${result.summary}\n${formatPlayersTable(result.players)}`;
+  return formatPlayersTable(result.players);
 }
 
 export const playtestPlayerAddCommand = defineCommand<
@@ -74,7 +81,7 @@ export const playtestPlayerAddCommand = defineCommand<
     }),
   },
   cli: {
-    format: formatPlayerAddText,
+    body: formatPlayerAddText,
   },
   handler: async (connection, args, targeting) =>
     playtestPlayerAddHandlerAsync(
