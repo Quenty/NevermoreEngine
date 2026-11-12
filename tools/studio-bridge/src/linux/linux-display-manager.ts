@@ -6,6 +6,7 @@
 import { execSync } from 'child_process';
 import { execa } from 'execa';
 import type { LinuxStudioConfig } from './linux-config.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 
 /**
  * Ensure Xvfb is running on the configured DISPLAY.
@@ -34,7 +35,11 @@ export async function ensureDisplayAsync(
   await sleepAsync(500);
 
   if (!isXvfbRunning(displayNum)) {
-    throw new Error(`Failed to start Xvfb on display ${display}`);
+    throw new StudioBridgeError({
+      code: 'DISPLAY_FAILED',
+      message: `Couldn't start the virtual display (Xvfb ${display}), which Studio needs to run.`,
+      fix: "Install Xvfb with 'studio-bridge linux setup --install-deps'.",
+    });
   }
 }
 

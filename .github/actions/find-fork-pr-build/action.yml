@@ -1,0 +1,50 @@
+name: Find a fork PR's build
+description: >-
+  For a workflow_run (or a hand dispatch with a PR number), find the fork PR and
+  the successful build run whose artifact to use. Sets NEVERMORE_CI_PR_NUMBER,
+  HEAD_SHA and BUILD_RUN_ID in the job's environment. Needs GITHUB_TOKEN.
+inputs:
+  build-workflow:
+    description: File name of the workflow that builds the artifact, e.g. tests.yml
+    required: true
+  build-job:
+    description: Name the build job runs under for a fork, for error messages
+    required: true
+  pr:
+    description: PR number from a hand dispatch; empty for a workflow_run
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    # `workflow_run` lists no PRs for a fork, so the PR is found by the fork's
+    # owner and branch. Not filtered by base, so a PR into any branch is found;
+    # when one branch has several open PRs, the one at the built commit wins.
+    - name: Find the PR for the finished build
+      id: pr
+      if: github.event_name == 'workflow_run'
+      shell: bash
+      env:
+        HEAD: ${{ github.event.workflow_run.head_repository.owner.login }}:${{ github.event.workflow_run.head_branch }}
+        SHA: ${{ github.event.workflow_run.head_sha }}
+      run: |
+        number=$(gh api -X GET "repos/${{ github.repository }}/pulls" -f head="$HEAD" -f state=open \
+          | jq -r --arg sha "$SHA" '(map(select(.head.sha == $sha)) + .)[0].number // empty')
+        echo "number=$number" >> "$GITHUB_OUTPUT"
+
+    - name: Find the PR's build
+      shell: bash
+      env:
+        PR: ${{ inputs.pr || steps.pr.outputs.number }}
+        BUILT_SHA: ${{ github.event.workflow_run.head_sha }}
+        BUILT_RUN: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.id || '' }}
+      run: |
+        test -n "$PR" || { echo "::error::No open PR for this build."; exit 1; }
+        sha=${BUILT_SHA:-$(gh api "repos/${{ github.repository }}/pulls/$PR" --jq .head.sha)}
+        run=${BUILT_RUN:-$(gh api -X GET "repos/${{ github.repository }}/actions/workflows/${{ inputs.build-workflow }}/runs" \
+          -f head_sha="$sha" -f event=pull_request \
+          --jq '[.workflow_runs[] | select(.conclusion == "success")][0].id // empty')}
+        echo "NEVERMORE_CI_PR_NUMBER=$PR" >> "$GITHUB_ENV"
+        echo "HEAD_SHA=$sha" >> "$GITHUB_ENV"
+        echo "BUILD_RUN_ID=$run" >> "$GITHUB_ENV"
+        test -n "$run" || { echo "::error::PR #$PR has no successful ${{ inputs.build-job }} at $sha."; exit 1; }

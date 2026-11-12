@@ -12,6 +12,16 @@ vi.mock('../../process/studio-settings.js', () => ({
     settings.loadUserPluginsOnPlaytest,
 }));
 
+vi.mock('../../plugin/playtest-bridge.js', () => ({
+  buildPlaytestBridgeAsync: async (
+    scripts?: string[],
+    options?: { withClient?: boolean }
+  ) => ({
+    precompiled: scripts ?? [],
+    ...(options?.withClient ? { client: true } : {}),
+  }),
+}));
+
 import { ContextNotFoundError } from '../../bridge/index.js';
 import {
   explainMissingPlaytestContextAsync,
@@ -41,7 +51,7 @@ describe('startPlaytestAsync multiplayer checks', () => {
       const editSession = createEditSession('current');
       await expect(
         startPlaytestAsync({} as any, editSession, 'play', players)
-      ).rejects.toThrow('--players must be a whole number of at least 1');
+      ).rejects.toThrow(`--players ${players} is out of range.`);
       expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
     }
   });
@@ -49,7 +59,7 @@ describe('startPlaytestAsync multiplayer checks', () => {
   it('refuses run mode', async () => {
     await expect(
       startPlaytestAsync({} as any, createEditSession('current'), 'run', 2)
-    ).rejects.toThrow('A multiplayer test runs in play mode');
+    ).rejects.toThrow("A multiplayer test can't run in run mode.");
   });
 
   it('refuses a Studio with an older plugin before starting anything', async () => {
@@ -57,40 +67,34 @@ describe('startPlaytestAsync multiplayer checks', () => {
 
     await expect(
       startPlaytestAsync({} as any, editSession, 'play', 2)
-    ).rejects.toThrow("Run 'studio-bridge plugin install' first");
+    ).rejects.toThrow("'place.rbxl' is out of date");
     expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
   });
 });
 
 describe('with "Load user plugins on playtest" off', () => {
-  it('refuses to start a playtest whose sessions could never connect', async () => {
-    settings.loadUserPluginsOnPlaytest = false;
-    const editSession = createEditSession('current');
-
-    await expect(
-      startPlaytestAsync({} as any, editSession, 'play')
-    ).rejects.toThrow(
-      `Studio's "Load user plugins on playtest" setting is off`
-    );
-    expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
-  });
-
-  it('names the setting when no server session is connected', async () => {
+  it('does not blame the setting for a missing server session, which is planted', async () => {
     settings.loadUserPluginsOnPlaytest = false;
     const connection = { listSessions: () => [] } as any;
 
-    await expect(resolvePlaytestServerSessionAsync(connection)).rejects.toThrow(
-      `No playtest is connected. Studio's "Load user plugins on playtest" setting is off`
-    );
+    await expect(
+      resolvePlaytestServerSessionAsync(connection)
+    ).rejects.toMatchObject({
+      message: 'No playtest is running.',
+      fix: "Start one with 'studio-bridge playtest start'.",
+    });
   });
 
   it("ignores this machine's setting when Studio is remote", async () => {
     settings.loadUserPluginsOnPlaytest = false;
     const connection = { listSessions: () => [], isRemote: true } as any;
 
-    await expect(resolvePlaytestServerSessionAsync(connection)).rejects.toThrow(
-      "No playtest is running. Start one with 'studio-bridge playtest start'."
-    );
+    await expect(
+      resolvePlaytestServerSessionAsync(connection)
+    ).rejects.toMatchObject({
+      message: 'No playtest is running.',
+      fix: "Start one with 'studio-bridge playtest start'.",
+    });
   });
 });
 
@@ -108,9 +112,12 @@ describe('explainMissingPlaytestContextAsync', () => {
       new ContextNotFoundError('server', 'inst-1', ['edit'])
     );
 
-    expect((err as Error).message).toBe(
-      "No playtest of 'place.rbxl' is running, so there is no server session. Start one with 'studio-bridge playtest start'."
-    );
+    expect(err).toMatchObject({
+      code: 'NO_PLAYTEST',
+      message:
+        "No playtest of 'place.rbxl' is running, so there is no server session.",
+      fix: "Start one with 'studio-bridge playtest start'.",
+    });
   });
 
   it('names the setting when it is off', async () => {
@@ -120,8 +127,8 @@ describe('explainMissingPlaytestContextAsync', () => {
       new ContextNotFoundError('client', 'inst-1', ['edit'])
     );
 
-    expect((err as Error).message).toContain(
-      `No playtest of 'place.rbxl' is connected. Studio's "Load user plugins on playtest" setting is off`
+    expect((err as Error).message).toBe(
+      `No playtest client of 'place.rbxl' is connected, since Studio's "Load user plugins on playtest" setting is off.`
     );
   });
 
@@ -131,7 +138,7 @@ describe('explainMissingPlaytestContextAsync', () => {
       new ContextNotFoundError('client', 'inst-1', ['edit', 'server'])
     );
 
-    expect((err as Error).message).toContain('runs in run mode');
+    expect((err as Error).message).toContain('runs in Run mode');
   });
 
   it('passes other errors through', async () => {
@@ -139,5 +146,111 @@ describe('explainMissingPlaytestContextAsync', () => {
     expect(await explainMissingPlaytestContextAsync(connection, original)).toBe(
       original
     );
+  });
+});
+
+describe('planting the server session', () => {
+  function createConnection() {
+    return {
+      port: 38741,
+      isRemote: false,
+      listSessions: () => [],
+      getSession: () => undefined,
+      on: vi.fn(),
+      off: vi.fn(),
+    } as any;
+  }
+
+  // The start fails at once, so the test sees what it was asked to start
+  function createFailingEditSession(pluginVersion: string) {
+    const editSession = createEditSession(pluginVersion);
+    editSession.runPlaytestAsync.mockResolvedValue({
+      playtestId: 'p',
+      success: false,
+      error: 'refused',
+    });
+    return editSession;
+  }
+
+  it('plants a bridge with the scripts to run when the setting is off', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run', undefined, {
+        scripts: ['return 1'],
+      })
+    ).rejects.toThrow("Studio didn't start the playtest: refused.");
+
+    const bridge = editSession.runPlaytestAsync.mock.calls[0][5];
+    expect(bridge.precompiled).toEqual(['return 1']);
+  });
+
+  it('plants a client bridge too for a play mode playtest when the setting is off', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'play')
+    ).rejects.toThrow("Studio didn't start the playtest: refused.");
+
+    expect(editSession.runPlaytestAsync.mock.calls[0][5].client).toBe(true);
+  });
+
+  it('plants no client bridge in run mode, or when the setting is unknown', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const runMode = createFailingEditSession('current');
+    await expect(
+      startPlaytestAsync(createConnection(), runMode, 'run')
+    ).rejects.toThrow('refused');
+    expect(runMode.runPlaytestAsync.mock.calls[0][5].client).toBeUndefined();
+
+    settings.loadUserPluginsOnPlaytest = undefined;
+    const unknown = createFailingEditSession('current');
+    await expect(
+      startPlaytestAsync(createConnection(), unknown, 'play')
+    ).rejects.toThrow('refused');
+    expect(unknown.runPlaytestAsync.mock.calls[0][5].client).toBeUndefined();
+  });
+
+  it('plants a bridge when the setting is unknown', async () => {
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow('refused');
+
+    expect(editSession.runPlaytestAsync.mock.calls[0][5]).toBeDefined();
+  });
+
+  it('leaves the server to the plugin when the setting is on', async () => {
+    settings.loadUserPluginsOnPlaytest = true;
+    const editSession = createFailingEditSession('current');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow('refused');
+
+    expect(editSession.runPlaytestAsync.mock.calls[0][5]).toBeUndefined();
+  });
+
+  it('needs the current plugin to plant a copy of it', async () => {
+    settings.loadUserPluginsOnPlaytest = false;
+    const editSession = createFailingEditSession('old');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow("'place.rbxl' is out of date");
+    expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
+  });
+
+  it('needs the current plugin when plugin sessions will connect', async () => {
+    settings.loadUserPluginsOnPlaytest = true;
+    const editSession = createFailingEditSession('old');
+
+    await expect(
+      startPlaytestAsync(createConnection(), editSession, 'run')
+    ).rejects.toThrow("'place.rbxl' is out of date");
+    expect(editSession.runPlaytestAsync).not.toHaveBeenCalled();
   });
 });

@@ -1,3 +1,42 @@
+# (Thu Nov 12 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/cli-output-helpers@1.21.0`, `@quenty/nevermore-cli-helpers@1.22.0`, `@quenty/nevermore-template-helpers@1.23.0`, `@quenty/studio-bridge@0.25.0`
+  - feat(studio-bridge): sample, record, inspect, and Explorer-style instance queries [#858](https://github.com/Quenty/NevermoreEngine/pull/858) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Nov 11 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/metricutils@2.5.0`
+  - feat(metricutils): add MetricUnit, typed measurements with parsing and localized formatting [#859](https://github.com/Quenty/NevermoreEngine/pull/859) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Fri Nov 06 2026)
+
+#### 🚀 Enhancement
+
+- `@quenty/softshutdown@10.13.0`, `@quenty/nevermore-cli@4.52.0`, `@quenty/studio-bridge@0.24.0`
+  - feat: fork integration deploys, studio-bridge playtest bridge, --run-as and Studio MCP [#857](https://github.com/Quenty/NevermoreEngine/pull/857) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # (Tue Nov 03 2026)
 
 #### 🚀 Enhancement

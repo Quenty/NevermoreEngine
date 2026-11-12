@@ -18,21 +18,31 @@ import type {
   StateResult,
   ScreenshotResult,
   LogsResult,
-  DataModelResult,
   ExportInstancesResult,
   ImportInstancesResult,
   LogOptions,
-  QueryDataModelOptions,
   PlaytestMode,
   PlaytestEndResult,
   EndPlaytestResult,
 } from './types.js';
-import { SessionDisconnectedError } from './types.js';
+import { ActionTimeoutError, SessionDisconnectedError } from './types.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { warnUser } from '../messages/warn-user.js';
+import { RequestTimeoutError } from '../server/pending-request-map.js';
 import type {
+  FailedActionInfo,
   PluginMessage,
+  ServerMessage,
   OutputLevel,
   FindInstancesMessage,
+  InspectInstanceMessage,
+  InspectInstanceResultMessage,
   FindInstancesResultMessage,
+  SampleInstancesMessage,
+  SampleInstancesResultMessage,
+  RecordViewportMessage,
+  RecordViewportResultMessage,
+  ViewportReadOptions,
   GrepScriptsMessage,
   GrepScriptsResultMessage,
 } from '../server/web-socket-protocol.js';
@@ -41,6 +51,21 @@ import {
   type ActionSource,
 } from '../commands/framework/action-loader.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import {
+  formatInstanceMatches,
+  isInstanceMatchesDetails,
+} from '../commands/shared/instance-tree.js';
+import {
+  MAX_EXECUTE_INPUT_BYTES,
+  type PlaytestBridgePayload,
+  type PlaytestPlayerPayload,
+  type PlaytestPlayersRequest,
+} from '../server/web-socket-protocol.js';
+
+export interface PlaytestPlayersResult {
+  players: PlaytestPlayerPayload[];
+  remaining: string[];
+}
 
 const EXECUTE_REPLY_GRACE_MS = 5_000;
 
@@ -48,26 +73,16 @@ const DEFAULT_TIMEOUTS: Record<string, number> = {
   execute: 120_000,
   queryState: 5_000,
   captureScreenshot: 30_000,
-  queryDataModel: 10_000,
+  inspectInstance: 60_000,
   exportInstances: 60_000,
   importInstances: 60_000,
   findInstances: 60_000,
+  sampleInstances: 30_000,
+  recordViewport: 120_000,
   grepScripts: 60_000,
   queryLogs: 10_000,
   endPlaytest: 5_000,
 };
-
-/** Time a playtest gets to start and stop on top of its script's own timeout. */
-const PLAYTEST_STARTUP_ALLOWANCE_MS = 60_000;
-
-export interface RunPlaytestScriptOptions {
-  mode: PlaytestMode;
-  script: string;
-  runnerSource: string;
-  timeoutSec: number;
-  /** Passed to the script as `...`. */
-  args?: string[];
-}
 
 /** Map an `execute`-style reply onto an ExecResult. */
 function toExecResult(result: PluginMessage): ExecResult {
@@ -82,6 +97,7 @@ function toExecResult(result: PluginMessage): ExecResult {
       error: result.payload.error,
       traceback: result.payload.traceback,
       returnValues: result.payload.returnValues,
+      ...(result.payload.ranAs ? { ranAs: result.payload.ranAs } : {}),
     };
   }
 
@@ -93,26 +109,56 @@ function toExecResult(result: PluginMessage): ExecResult {
     };
   }
 
-  return {
-    success: false,
-    output: [],
-    error: pluginError('scriptComplete', result).message,
-  };
+  throw pluginError('scriptComplete', result);
 }
 
-/**
- * Build a descriptive error from a plugin response that didn't match the
- * expected type. Extracts error details from error-typed responses.
- */
-function pluginError(expectedType: string, result: PluginMessage): Error {
-  if (result.type === 'error') {
-    const code = result.payload?.code ?? 'UNKNOWN';
-    const message = result.payload?.message ?? 'Unknown plugin error';
-    return new Error(`Plugin error (${code}): ${message}`);
+const PLUGIN_INSTALL_FIX = "Run 'studio-bridge plugin install'.";
+
+const BUG_ERROR_CODES = new Set(['INTERNAL_ERROR', 'UNKNOWN']);
+
+export function pluginError(
+  expectedType: string,
+  result: PluginMessage,
+  sessionId = result.sessionId
+): Error {
+  if (result.type !== 'error') {
+    return new Error(
+      `Expected '${expectedType}' response from plugin, got '${result.type}'`
+    );
   }
-  return new Error(
-    `Expected '${expectedType}' response from plugin, got '${result.type}'`
-  );
+
+  const code: string = result.payload?.code ?? 'UNKNOWN';
+  const details = result.payload?.details;
+  const message = isInstanceMatchesDetails(details)
+    ? formatInstanceMatches(
+        result.payload?.message ?? 'Several instances match',
+        details
+      )
+    : result.payload?.message ?? 'Unknown plugin error';
+
+  if (BUG_ERROR_CODES.has(code)) {
+    return new Error(`Studio failed running '${expectedType}': ${message}`);
+  }
+  if (code === 'SESSION_MISMATCH') {
+    return new SessionDisconnectedError(sessionId);
+  }
+  if (code === 'UNKNOWN_REQUEST') {
+    return new StudioBridgeError({
+      code: 'PLUGIN_OUTDATED',
+      message:
+        'The studio-bridge plugin in Studio is too old for this command.',
+      fix: PLUGIN_INSTALL_FIX,
+      cause: message,
+    });
+  }
+  return new StudioBridgeError({ code, message: asSentence(message) });
+}
+
+function asSentence(message: string): string {
+  const trimmed = message.trim();
+  const [first, ...rest] = trimmed.split('\n');
+  const sentence = /[.!?:]$/.test(first) ? first : `${first}.`;
+  return [sentence, ...rest].join('\n');
 }
 
 export class BridgeSession extends EventEmitter {
@@ -120,6 +166,8 @@ export class BridgeSession extends EventEmitter {
   private _handle: TransportHandle;
   private _actionsReady = false;
   private _actionSources: ActionSource[] | undefined;
+  private _outdated = new Map<string, string>();
+  private _warnedOutdated = new Set<string>();
 
   constructor(info: SessionInfo, handle: TransportHandle) {
     super();
@@ -156,15 +204,30 @@ export class BridgeSession extends EventEmitter {
   async execAsync(
     code: string,
     timeout?: number,
-    args?: string[]
+    args?: string[],
+    inputs?: Buffer[],
+    runAs?: 'plugin' | 'game'
   ): Promise<ExecResult> {
+    const inputBytes = (inputs ?? []).reduce((sum, b) => sum + b.length, 0);
+    if (inputBytes > MAX_EXECUTE_INPUT_BYTES) {
+      throw new StudioBridgeError({
+        code: 'INVALID_INPUT',
+        message: `The --input files add up to ${_formatMiB(
+          inputBytes
+        )}, over the ${_formatMiB(
+          MAX_EXECUTE_INPUT_BYTES
+        )} a script can be sent with.`,
+        fix: 'Split the input across several runs.',
+      });
+    }
+
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('execute');
 
     // The plugin cancels the script at the timeout and replies, so wait a
     // little longer than that for the reply
     const timeoutMs = timeout ?? DEFAULT_TIMEOUTS.execute;
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'execute',
         sessionId: this._info.sessionId,
@@ -173,6 +236,10 @@ export class BridgeSession extends EventEmitter {
           script: code,
           timeoutMs,
           ...(args && args.length > 0 ? { args } : {}),
+          ...(inputs && inputs.length > 0
+            ? { inputs: inputs.map((input) => input.toString('base64')) }
+            : {}),
+          ...(runAs ? { runAs } : {}),
         },
       },
       timeoutMs + EXECUTE_REPLY_GRACE_MS
@@ -181,45 +248,12 @@ export class BridgeSession extends EventEmitter {
     return toExecResult(result);
   }
 
-  /**
-   * Run a script in a fresh playtest's server, started from this edit
-   * session, and resolve with its result once the playtest has ended. Works
-   * without the playtest's own sessions connecting: the plugin plants
-   * `runnerSource` in the playtest to run the script and end the playtest.
-   */
-  async runPlaytestScriptAsync(
-    options: RunPlaytestScriptOptions
-  ): Promise<ExecResult> {
-    this._assertConnected();
-    await this._ensureActionsAsync();
-
-    const result = await this._handle.sendActionAsync<PluginMessage>(
-      {
-        type: 'runPlaytestScript',
-        sessionId: this._info.sessionId,
-        requestId: randomUUID(),
-        payload: {
-          mode: options.mode,
-          script: options.script,
-          runnerSource: options.runnerSource,
-          timeoutSec: options.timeoutSec,
-          ...(options.args && options.args.length > 0
-            ? { args: options.args }
-            : {}),
-        },
-      },
-      options.timeoutSec * 1000 + PLAYTEST_STARTUP_ALLOWANCE_MS
-    );
-
-    return toExecResult(result);
-  }
-
   async queryStateAsync(): Promise<StateResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('queryState');
 
     const timeoutMs = DEFAULT_TIMEOUTS.queryState;
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'queryState',
         sessionId: this._info.sessionId,
@@ -243,17 +277,19 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('stateResult', result);
   }
 
-  async captureScreenshotAsync(): Promise<ScreenshotResult> {
+  async captureScreenshotAsync(
+    options: ViewportReadOptions = {}
+  ): Promise<ScreenshotResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('captureScreenshot');
 
     const timeoutMs = DEFAULT_TIMEOUTS.captureScreenshot;
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'captureScreenshot',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: { format: 'png' },
+        payload: { format: 'png', ...options },
       },
       timeoutMs
     );
@@ -272,10 +308,10 @@ export class BridgeSession extends EventEmitter {
 
   async queryLogsAsync(options?: LogOptions): Promise<LogsResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('queryLogs');
 
     const timeoutMs = DEFAULT_TIMEOUTS.queryLogs;
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'queryLogs',
         sessionId: this._info.sessionId,
@@ -303,37 +339,27 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('logsResult', result);
   }
 
-  async queryDataModelAsync(
-    options: QueryDataModelOptions
-  ): Promise<DataModelResult> {
+  async inspectInstanceAsync(
+    options: InspectInstanceMessage['payload']
+  ): Promise<InspectInstanceResultMessage['payload']> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('inspectInstance');
 
-    const timeoutMs = DEFAULT_TIMEOUTS.queryDataModel;
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
-        type: 'queryDataModel',
+        type: 'inspectInstance',
         sessionId: this._info.sessionId,
         requestId: randomUUID(),
-        payload: {
-          path: options.path,
-          depth: options.depth,
-          properties: options.properties,
-          includeAttributes: options.includeAttributes,
-          find: options.find,
-          listServices: options.listServices,
-        },
+        payload: options,
       },
-      timeoutMs
+      DEFAULT_TIMEOUTS.inspectInstance
     );
 
-    if (result.type === 'dataModelResult') {
-      return {
-        instance: result.payload.instance,
-      };
+    if (result.type === 'inspectInstanceResult') {
+      return result.payload;
     }
 
-    throw pluginError('dataModelResult', result);
+    throw pluginError('inspectInstanceResult', result);
   }
 
   /** Search the DataModel for instances by name, class and tag. */
@@ -341,9 +367,9 @@ export class BridgeSession extends EventEmitter {
     options: FindInstancesMessage['payload']
   ): Promise<FindInstancesResultMessage['payload']> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('findInstances');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'findInstances',
         sessionId: this._info.sessionId,
@@ -360,14 +386,62 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('findInstancesResult', result);
   }
 
+  async sampleInstancesAsync(
+    options: SampleInstancesMessage['payload']
+  ): Promise<SampleInstancesResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync('sampleInstances');
+
+    const result = await this._sendAsync(
+      {
+        type: 'sampleInstances',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      Math.ceil(
+        (options.watch ? options.watch.wait ?? 0 : options.duration ?? 0) * 1000
+      ) + DEFAULT_TIMEOUTS.sampleInstances
+    );
+
+    if (result.type === 'sampleInstancesResult') {
+      return result.payload;
+    }
+
+    throw pluginError('sampleInstancesResult', result);
+  }
+
+  async recordViewportAsync(
+    options: RecordViewportMessage['payload']
+  ): Promise<RecordViewportResultMessage['payload']> {
+    this._assertConnected();
+    await this._ensureActionsAsync('recordViewport');
+
+    const result = await this._sendAsync(
+      {
+        type: 'recordViewport',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: options,
+      },
+      Math.ceil(options.duration * 1000) + DEFAULT_TIMEOUTS.recordViewport
+    );
+
+    if (result.type === 'recordViewportResult') {
+      return result.payload;
+    }
+
+    throw pluginError('recordViewportResult', result);
+  }
+
   /** Search the source of every script for a pattern. */
   async grepScriptsAsync(
     options: GrepScriptsMessage['payload']
   ): Promise<GrepScriptsResultMessage['payload']> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('grepScripts');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'grepScripts',
         sessionId: this._info.sessionId,
@@ -387,9 +461,9 @@ export class BridgeSession extends EventEmitter {
   /** Serialize the instances at `paths` into one binary model (.rbxm). */
   async exportInstancesAsync(paths: string[]): Promise<ExportInstancesResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('exportInstances');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'exportInstances',
         sessionId: this._info.sessionId,
@@ -400,7 +474,7 @@ export class BridgeSession extends EventEmitter {
     );
 
     if (result.type === 'exportInstancesResult') {
-      return { data: result.payload.data, paths: result.payload.paths };
+      return { data: result.payload.data, instances: result.payload.instances };
     }
 
     throw pluginError('exportInstancesResult', result);
@@ -412,9 +486,9 @@ export class BridgeSession extends EventEmitter {
     parentPath: string
   ): Promise<ImportInstancesResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('importInstances');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'importInstances',
         sessionId: this._info.sessionId,
@@ -425,7 +499,7 @@ export class BridgeSession extends EventEmitter {
     );
 
     if (result.type === 'importInstancesResult') {
-      return { paths: result.payload.paths };
+      return { instances: result.payload.instances };
     }
 
     throw pluginError('importInstancesResult', result);
@@ -442,12 +516,13 @@ export class BridgeSession extends EventEmitter {
     playtestId: string,
     bridgePort: number,
     timeoutMs: number,
-    players?: number
+    players?: number,
+    bridge?: PlaytestBridgePayload
   ): Promise<PlaytestEndResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('startPlaytest');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'startPlaytest',
         sessionId: this._info.sessionId,
@@ -458,6 +533,7 @@ export class BridgeSession extends EventEmitter {
           bridgePort,
           instanceId: this._info.instanceId,
           ...(players !== undefined ? { players } : {}),
+          ...(bridge ? { bridge } : {}),
         },
       },
       timeoutMs
@@ -477,9 +553,9 @@ export class BridgeSession extends EventEmitter {
   /** End the playtest this server session belongs to. */
   async endPlaytestAsync(): Promise<EndPlaytestResult> {
     this._assertConnected();
-    await this._ensureActionsAsync();
+    await this._ensureActionsAsync('endPlaytest');
 
-    const result = await this._handle.sendActionAsync<PluginMessage>(
+    const result = await this._sendAsync(
       {
         type: 'endPlaytest',
         sessionId: this._info.sessionId,
@@ -500,10 +576,95 @@ export class BridgeSession extends EventEmitter {
     throw pluginError('endPlaytestResult', result);
   }
 
+  /**
+   * Read or change the players of the playtest this session belongs to.
+   * `timeoutMs` bounds the whole request, including any wait in the plugin.
+   */
+  async playtestPlayersAsync(
+    request: PlaytestPlayersRequest,
+    timeoutMs: number
+  ): Promise<PlaytestPlayersResult> {
+    this._assertConnected();
+    await this._ensureActionsAsync('playtestPlayers');
+
+    const result = await this._sendAsync(
+      {
+        type: 'playtestPlayers',
+        sessionId: this._info.sessionId,
+        requestId: randomUUID(),
+        payload: request,
+      },
+      timeoutMs
+    );
+
+    if (result.type === 'playtestPlayersResult') {
+      return {
+        players: result.payload.players ?? [],
+        remaining: result.payload.remaining ?? [],
+      };
+    }
+
+    throw pluginError('playtestPlayersResult', result);
+  }
+
+  private async _sendAsync(
+    message: ServerMessage,
+    timeoutMs: number
+  ): Promise<PluginMessage> {
+    let reply: PluginMessage;
+    try {
+      reply = await this._handle.sendActionAsync<PluginMessage>(
+        message,
+        timeoutMs
+      );
+    } catch (err) {
+      if (err instanceof RequestTimeoutError) {
+        throw new ActionTimeoutError(
+          message.type,
+          timeoutMs,
+          this._info.sessionId
+        );
+      }
+      if (!(err instanceof StudioBridgeError) && !this._handle.isConnected) {
+        throw new SessionDisconnectedError(this._info.sessionId);
+      }
+      throw err;
+    }
+    if (reply.type === 'error' && reply.payload?.code === 'TIMEOUT') {
+      throw new ActionTimeoutError(
+        message.type,
+        timeoutMs,
+        this._info.sessionId
+      );
+    }
+    return reply;
+  }
+
   private _assertConnected(): void {
     if (!this._handle.isConnected) {
       throw new SessionDisconnectedError(this._info.sessionId);
     }
+  }
+
+  private async _ensureActionsAsync(messageType: string): Promise<void> {
+    await this._syncActionsAsync();
+
+    const command = this._outdated.get(messageType);
+    if (command === undefined || this._warnedOutdated.has(messageType)) return;
+    this._warnedOutdated.add(messageType);
+    warnUser(
+      this.context === 'edit'
+        ? {
+            code: 'ACTION_OUTDATED',
+            message: `Studio runs an older '${command}', since the update failed to load, so it may not do what this version does.`,
+            fix: 'Run the command again with --verbose to see why it failed to load.',
+          }
+        : {
+            code: 'ACTION_OUTDATED',
+            message: `This playtest runs an older '${command}', so it may not do what this version does.`,
+            fix: "Run 'studio-bridge playtest restart' to update it.",
+          }
+    );
   }
 
   /**
@@ -511,7 +672,7 @@ export class BridgeSession extends EventEmitter {
    * Uses syncActions to determine which actions need updating, then
    * registers only those that are missing or have changed hashes.
    */
-  private async _ensureActionsAsync(): Promise<void> {
+  private async _syncActionsAsync(): Promise<void> {
     if (this._actionsReady) return;
 
     // Lazy-load action sources from this process's disk
@@ -540,7 +701,7 @@ export class BridgeSession extends EventEmitter {
         Object.keys(actions).length
       } hashes) to session ${this._info.sessionId}`
     );
-    const syncResult = await this._handle.sendActionAsync<PluginMessage>(
+    const syncResult = await this._sendAsync(
       {
         type: 'syncActions',
         sessionId: this._info.sessionId,
@@ -560,12 +721,26 @@ export class BridgeSession extends EventEmitter {
         }`
       );
 
-      for (const actionName of needed) {
-        const action = this._actionSources.find((a) => a.name === actionName);
-        if (!action) continue;
+      const failed = (syncResult.payload.failed ?? {}) as Record<
+        string,
+        FailedActionInfo
+      >;
+
+      const neededSet = new Set(needed);
+      for (const action of this._actionSources) {
+        const failedAction = failed[action.name];
+        if (failedAction) {
+          this._markOutdated(action, failedAction.handlers);
+          OutputHelper.verbose(
+            `[actions]   ${action.name}: FAILED earlier: ${failedAction.error}`
+          );
+          continue;
+        }
+        if (!neededSet.has(action.name)) continue;
+        const actionName = action.name;
 
         OutputHelper.verbose(`[actions] Registering action: ${actionName}`);
-        const regResult = await this._handle.sendActionAsync<PluginMessage>(
+        const regResult = await this._sendAsync(
           {
             type: 'registerAction',
             sessionId: this._info.sessionId,
@@ -580,6 +755,9 @@ export class BridgeSession extends EventEmitter {
         );
         if (regResult.type === 'registerActionResult') {
           const p = regResult.payload;
+          if (p.outdated) {
+            this._markOutdated(action, p.handlers);
+          }
           OutputHelper.verbose(
             `[actions]   ${actionName}: ${
               p.success
@@ -608,4 +786,18 @@ export class BridgeSession extends EventEmitter {
     this._actionsReady = true;
     OutputHelper.verbose('[actions] Action sync complete');
   }
+
+  private _markOutdated(action: ActionSource, handlers: string[] | undefined) {
+    for (const handler of handlers ?? []) {
+      this._outdated.set(handler, toCommandName(action));
+    }
+  }
+}
+
+function toCommandName(action: ActionSource): string {
+  return action.relativePath.split(/[\\/]/).slice(0, -1).join(' ');
+}
+
+function _formatMiB(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }

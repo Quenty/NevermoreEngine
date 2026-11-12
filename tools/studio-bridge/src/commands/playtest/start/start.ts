@@ -94,12 +94,9 @@ export function toPlaytestStartResult(
 }
 
 export function formatPlaytestStartText(result: PlaytestStartResult): string {
-  return [
-    result.summary,
-    ...result.sessions.map(
-      (session) => `  ${session.context.padEnd(7)}${session.sessionId}`
-    ),
-  ].join('\n');
+  return result.sessions
+    .map((session) => `  ${session.context.padEnd(7)}${session.sessionId}`)
+    .join('\n');
 }
 
 export const playtestStartCommand = defineCommand<
@@ -127,7 +124,7 @@ export const playtestStartCommand = defineCommand<
     }),
   },
   cli: {
-    format: formatPlaytestStartText,
+    body: formatPlaytestStartText,
   },
   handler: async (connection, args, targeting) =>
     playtestStartHandlerAsync(connection, {

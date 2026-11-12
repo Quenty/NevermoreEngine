@@ -111,7 +111,7 @@ export abstract class BaseJobContext implements JobContext {
     );
     this._builtPlaces.add(tracked);
 
-    if (target.basePlace) {
+    if (target.basePlace && !options.deferBasePlaceMerge) {
       await this._mergeBasePlaceAsync(tracked, options);
     }
 
@@ -248,7 +248,9 @@ export abstract class BaseJobContext implements JobContext {
 
     this._reporter.onPackagePhaseChange(resolvedName, 'merging');
     const packagePath = options.packagePath;
-    const projectPath = path.resolve(packagePath, tracked.target.project);
+    const projectPath =
+      options.overrides?.projectFile ??
+      path.resolve(packagePath, tracked.target.project);
     const mergedPath = mergeContext.resolvePath('merged.rbxl');
 
     await mergeContext.executeLuneTransformScriptAsync(

@@ -3,7 +3,7 @@
  */
 
 import { execSync } from 'child_process';
-import { OutputHelper } from '@quenty/cli-output-helpers';
+import { warnUser } from '../messages/warn-user.js';
 
 export interface PrerequisiteResult {
   name: string;
@@ -126,9 +126,12 @@ export async function installDependenciesAsync(): Promise<void> {
     );
     useWineHQ = true;
   } catch {
-    OutputHelper.warn(
-      'WineHQ repo not available for this distro, using system packages'
-    );
+    warnUser({
+      code: 'WINEHQ_UNAVAILABLE',
+      message:
+        "WineHQ has no packages for this distro, so this installs the distro's own Wine, which may be too old for Studio.",
+      fix: "If Studio won't start, install Wine 9 or newer yourself.",
+    });
   }
 
   await execa('sudo', ['apt-get', 'update'], { stdio: 'inherit' });

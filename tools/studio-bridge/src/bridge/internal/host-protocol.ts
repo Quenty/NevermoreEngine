@@ -17,7 +17,7 @@ import type { SessionInfo, SessionContext, InstanceInfo } from '../types.js';
  * Raised when the host-client protocol changes, so a client can tell it is
  * relaying through an older host. Hosts before this field have none.
  */
-export const HOST_PROTOCOL_VERSION = 2;
+export const HOST_PROTOCOL_VERSION = 3;
 
 export interface HostEnvelope {
   type: 'host-envelope';
@@ -49,6 +49,23 @@ export interface ListSessionsResponse {
   sessions: SessionInfo[];
   /** Absent from hosts older than HOST_PROTOCOL_VERSION 2. */
   protocolVersion?: number;
+  host?: HostInfo;
+}
+
+/** What a host says about itself, so a client can tell it is stale. */
+export interface HostInfo {
+  version: string;
+  build?: string;
+  packagePath?: string;
+  cwd?: string;
+  pid: number;
+  argv: string[];
+  clients: number;
+  pendingRelays: number;
+  uptimeMs?: number;
+  autoStarted?: boolean;
+  idleTimeoutMs?: number;
+  logPath?: string;
 }
 
 export interface ListInstancesResponse {
@@ -110,6 +127,27 @@ const ErrorCodeSchema = z.enum([
 
 const OutputLevelSchema = z.enum(['Print', 'Info', 'Warning', 'Error']);
 
+const InstanceQueryShape = {
+  root: z.string().optional(),
+  query: z.string().optional(),
+  selector: z.string().optional(),
+  grep: z.string().optional(),
+  luaPattern: z.boolean().optional(),
+  caseSensitive: z.boolean().optional(),
+};
+
+const RecordingOptionsShape = {
+  trigger: z.string().optional(),
+  duration: z.number(),
+  fps: z.number().optional(),
+  maxFrames: z.number().optional(),
+};
+
+const ViewportReadOptionsShape = {
+  region: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
+  scale: z.number().optional(),
+};
+
 const ServerMessageSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('execute'),
@@ -141,26 +179,21 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z
       .object({
         format: z.literal('png').optional(),
+        ...ViewportReadOptionsShape,
       })
       .loose(),
   }),
   z.object({
-    type: z.literal('queryDataModel'),
+    type: z.literal('inspectInstance'),
     sessionId: z.string(),
     requestId: z.string(),
     payload: z
       .object({
-        path: z.string(),
+        ...InstanceQueryShape,
+        selection: z.boolean().optional(),
         depth: z.number().optional(),
-        properties: z.array(z.string()).optional(),
-        includeAttributes: z.boolean().optional(),
-        find: z
-          .object({
-            name: z.string(),
-            recursive: z.boolean().optional(),
-          })
-          .optional(),
-        listServices: z.boolean().optional(),
+        properties: z.boolean().optional(),
+        attributes: z.boolean().optional(),
       })
       .loose(),
   }),
@@ -170,12 +203,40 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     payload: z
       .object({
-        root: z.string().optional(),
-        name: z.string().optional(),
-        exactName: z.boolean().optional(),
-        className: z.string().optional(),
-        tag: z.string().optional(),
+        ...InstanceQueryShape,
         limit: z.number().optional(),
+      })
+      .loose(),
+  }),
+  z.object({
+    type: z.literal('sampleInstances'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z
+      .object({
+        ...InstanceQueryShape,
+        ...RecordingOptionsShape,
+        duration: z.number().optional(),
+        properties: z.array(z.string()).optional(),
+        attributes: z.array(z.string()).optional(),
+        watch: z
+          .object({
+            id: z.string(),
+            wait: z.number().optional(),
+            stop: z.boolean().optional(),
+          })
+          .optional(),
+      })
+      .loose(),
+  }),
+  z.object({
+    type: z.literal('recordViewport'),
+    sessionId: z.string(),
+    requestId: z.string(),
+    payload: z
+      .object({
+        ...RecordingOptionsShape,
+        ...ViewportReadOptionsShape,
       })
       .loose(),
   }),
@@ -185,10 +246,8 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     payload: z
       .object({
+        ...InstanceQueryShape,
         pattern: z.string(),
-        root: z.string().optional(),
-        luaPattern: z.boolean().optional(),
-        caseSensitive: z.boolean().optional(),
         limit: z.number().optional(),
       })
       .loose(),
@@ -255,6 +314,12 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
         bridgePort: z.number(),
         instanceId: z.string(),
         players: z.number().int().min(1).optional(),
+        bridge: z
+          .object({
+            precompiled: z.array(z.string()),
+            client: z.boolean().optional(),
+          })
+          .optional(),
       })
       .loose(),
   }),
@@ -265,18 +330,24 @@ const ServerMessageSchema = z.discriminatedUnion('type', [
     payload: z.object({}).loose(),
   }),
   z.object({
-    type: z.literal('runPlaytestScript'),
+    type: z.literal('playtestPlayers'),
     sessionId: z.string(),
     requestId: z.string(),
-    payload: z
-      .object({
-        mode: z.enum(['play', 'run']),
-        script: z.string(),
-        runnerSource: z.string(),
+    payload: z.discriminatedUnion('op', [
+      z.object({ op: z.literal('list') }),
+      z.object({
+        op: z.literal('add'),
+        count: z.number().int().min(1),
         timeoutSec: z.number(),
-        args: z.array(z.string()).optional(),
-      })
-      .loose(),
+      }),
+      z.object({
+        op: z.literal('remove'),
+        kick: z.array(z.string()),
+        names: z.array(z.string()),
+        timeoutSec: z.number(),
+      }),
+      z.object({ op: z.literal('leave') }),
+    ]),
   }),
   z.object({
     type: z.literal('error'),
@@ -320,6 +391,19 @@ const HostProtocolMessageSchema = z.discriminatedUnion('type', [
     requestId: z.string(),
     sessions: z.array(LooseObjectSchema),
     protocolVersion: z.number().optional(),
+    host: z
+      .object({
+        version: z.string(),
+        build: z.string().optional(),
+        packagePath: z.string().optional(),
+        cwd: z.string().optional(),
+        pid: z.number(),
+        argv: z.array(z.string()),
+        clients: z.number(),
+        pendingRelays: z.number(),
+      })
+      .loose()
+      .optional(),
   }),
   z.object({
     type: z.literal('list-instances-response'),

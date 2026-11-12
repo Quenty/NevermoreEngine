@@ -4,7 +4,7 @@
 
 import * as os from 'os';
 import * as path from 'path';
-import * as semver from 'semver';
+import semverGt from 'semver/functions/gt.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { readFile, writeFile } from 'fs/promises';
 import { Memoize } from 'typescript-memoize';
@@ -218,7 +218,7 @@ export class VersionChecker {
         cachedData.isLocalDev !== versionData.isLocalDev)
     ) {
       return {
-        updateAvailable: semver.gt(
+        updateAvailable: semverGt(
           cachedData.latestVersion,
           versionData.version
         ),
@@ -254,7 +254,7 @@ export class VersionChecker {
 
     // Return whether update is available
     return {
-      updateAvailable: semver.gt(latestVersionString, versionData.version),
+      updateAvailable: semverGt(latestVersionString, versionData.version),
       currentVersion: versionData.version,
       latestVersion: latestVersionString,
       isLocalDev: versionData.isLocalDev,

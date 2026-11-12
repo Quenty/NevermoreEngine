@@ -14,7 +14,7 @@ import type { PluginMessage } from './web-socket-protocol.js';
 export const ACTION_TIMEOUTS: Record<string, number> = {
   queryState: 5_000,
   captureScreenshot: 15_000,
-  queryDataModel: 10_000,
+  inspectInstance: 60_000,
   queryLogs: 10_000,
   execute: 120_000,
   subscribe: 5_000,

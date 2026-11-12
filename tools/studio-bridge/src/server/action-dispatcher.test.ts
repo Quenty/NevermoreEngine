@@ -155,7 +155,7 @@ describe('ActionDispatcher', () => {
 
     it('rejects pending request when plugin sends error response', async () => {
       const { requestId, responsePromise } =
-        dispatcher.createRequestAsync('queryDataModel');
+        dispatcher.createRequestAsync('inspectInstance');
 
       const errorResponse: PluginMessage = {
         type: 'error',

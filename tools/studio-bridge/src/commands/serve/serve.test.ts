@@ -4,6 +4,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventEmitter } from 'events';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 // Mock BridgeConnection before importing serve handler
 vi.mock('../../bridge/index.js', () => {
@@ -15,7 +18,7 @@ vi.mock('../../bridge/index.js', () => {
 });
 
 import { BridgeConnection } from '../../bridge/index.js';
-import { serveHandlerAsync } from './serve.js';
+import { createLogWriter, serveHandlerAsync } from './serve.js';
 
 function createMockConnection(
   port: number,
@@ -55,6 +58,7 @@ describe('serveHandlerAsync', () => {
     expect(connectAsyncMock).toHaveBeenCalledWith({
       port: 38741,
       keepAlive: true,
+      replaceStaleHost: false,
     });
   });
 
@@ -65,6 +69,7 @@ describe('serveHandlerAsync', () => {
     expect(connectAsyncMock).toHaveBeenCalledWith({
       port: 38741,
       keepAlive: true,
+      replaceStaleHost: false,
     });
   });
 
@@ -78,6 +83,7 @@ describe('serveHandlerAsync', () => {
     expect(connectAsyncMock).toHaveBeenCalledWith({
       port: 9999,
       keepAlive: true,
+      replaceStaleHost: false,
     });
   });
 
@@ -87,7 +93,7 @@ describe('serveHandlerAsync', () => {
     connectAsyncMock.mockRejectedValue(err);
 
     await expect(serveHandlerAsync({ port: 38741 })).rejects.toThrow(
-      'Port 38741 is already in use'
+      'A bridge host is already running on port 38741'
     );
   });
 
@@ -96,7 +102,7 @@ describe('serveHandlerAsync', () => {
     connectAsyncMock.mockResolvedValue(mockConnection);
 
     await expect(serveHandlerAsync({ port: 38741 })).rejects.toThrow(
-      'Port 38741 is already in use'
+      'A bridge host is already running on port 38741'
     );
     expect(mockConnection.disconnectAsync).toHaveBeenCalled();
   });
@@ -150,5 +156,56 @@ describe('serveHandlerAsync', () => {
     expect(startedCall).toBeDefined();
 
     consoleSpy.mockRestore();
+  });
+});
+
+describe('serveHandlerAsync --idle-timeout', () => {
+  it.each(['0', '0s', 0])('rejects %s before connecting', async (value) => {
+    const connectAsyncMock = BridgeConnection.connectAsync as ReturnType<
+      typeof vi.fn
+    >;
+    connectAsyncMock.mockClear();
+
+    await expect(
+      serveHandlerAsync({ idleTimeout: value as string })
+    ).rejects.toThrow(
+      '--idle-timeout 0 would stop the bridge host as soon as it starts.'
+    );
+    expect(connectAsyncMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('createLogWriter', () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-log-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('strips color and stamps each line', () => {
+    const logPath = path.join(dir, 'host.log');
+    createLogWriter(logPath)('\x1b[31mred\x1b[0m\nplain\n');
+
+    const lines = fs.readFileSync(logPath, 'utf8').trimEnd().split('\n');
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatch(/^\S+ \[\d+\] red$/);
+    expect(lines[1]).toMatch(/^\S+ \[\d+\] plain$/);
+  });
+
+  it('calls back, with or without an encoding', async () => {
+    const write = createLogWriter(path.join(dir, 'host.log'));
+
+    await new Promise<void>((resolve) => write('one\n', () => resolve()));
+    await new Promise<void>((resolve) =>
+      write('74776f0a', 'hex', () => resolve())
+    );
+
+    expect(fs.readFileSync(path.join(dir, 'host.log'), 'utf8')).toMatch(
+      /one\n.*two\n$/
+    );
   });
 });

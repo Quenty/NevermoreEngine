@@ -3,18 +3,10 @@
  * Studio's plugins folder via rojo, and cleaning it up afterwards.
  */
 
-import {
-  BuildContext,
-  TemplateHelper,
-  resolveTemplatePath,
-} from '@quenty/nevermore-template-helpers';
+import { BuildContext } from '@quenty/nevermore-template-helpers/build';
 import { findPluginsFolder } from '../process/studio-process-manager.js';
 import { getPluginBuildVersionAsync } from './plugin-build-version.js';
-
-const templateDir = resolveTemplatePath(
-  import.meta.url,
-  'studio-bridge-plugin'
-);
+import { buildPluginAsync } from './plugin-builder.js';
 
 export interface InjectPluginOptions {
   port: number;
@@ -41,24 +33,19 @@ export async function injectPluginAsync(
   });
 
   try {
-    await TemplateHelper.createDirectoryContentsAsync(
-      templateDir,
-      buildContext.buildDir,
+    const pluginPath = await buildPluginAsync(
+      buildContext,
       {
         PORT: String(port),
         SESSION_ID: sessionId,
         EPHEMERAL: 'true',
         PLUGIN_VERSION: await getPluginBuildVersionAsync(),
       },
-      false
+      {
+        plugin: `studio-bridge-${sessionId}.rbxm`,
+        pluginsFolder: findPluginsFolder(),
+      }
     );
-
-    const pluginFileName = `studio-bridge-${sessionId}.rbxm`;
-    const pluginPath = await buildContext.rojoBuildAsync({
-      projectPath: buildContext.resolvePath('default.project.json'),
-      plugin: pluginFileName,
-      pluginsFolder: findPluginsFolder(),
-    });
 
     return {
       pluginPath: pluginPath!,

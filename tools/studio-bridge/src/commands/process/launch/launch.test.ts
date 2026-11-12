@@ -15,8 +15,13 @@ vi.mock('../../../process/studio-process-manager.js', () => ({
   }),
 }));
 
+vi.mock('../../../process/studio-launch-registry.js', () => ({
+  recordStudioLaunchAsync: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { launchHandlerAsync } from './launch.js';
 import { launchStudioAsync } from '../../../process/studio-process-manager.js';
+import { recordStudioLaunchAsync } from '../../../process/studio-launch-registry.js';
 
 let tempDir: string;
 
@@ -44,12 +49,32 @@ const place = (placeId: number, name?: string) => ({
 });
 
 describe('launchHandlerAsync', () => {
-  it('launches a bare Studio outside any deploy.nevermore.json', async () => {
+  it('opens a new Baseplate outside any deploy.nevermore.json', async () => {
     const result = await launchHandlerAsync({ cwd: tempDir });
 
-    expect(launchStudioAsync).toHaveBeenCalledWith({});
+    expect(launchStudioAsync).toHaveBeenCalledWith({
+      placeId: 95206881,
+      universeId: 28220420,
+    });
     expect(result.launched).toBe(true);
-    expect(result.summary).toBe('Studio launched');
+    expect(result.summary).toBe('Studio launched with a new Baseplate');
+  });
+
+  it('records where a Baseplate was launched from', async () => {
+    vi.mocked(launchStudioAsync).mockResolvedValueOnce({
+      process: { pid: 4242 },
+      killAsync: vi.fn(),
+    } as any);
+
+    await launchHandlerAsync({ cwd: tempDir });
+
+    expect(recordStudioLaunchAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pid: 4242,
+        cwd: tempDir,
+        opened: 'a new Baseplate',
+      })
+    );
   });
 
   it('passes place path to launchStudioAsync', async () => {
@@ -152,9 +177,10 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
 
     await expect(
       launchHandlerAsync({ deployTarget: 'integration', cwd: tempDir })
-    ).rejects.toThrow(
-      "Target 'integration' has 2 places. Pick one:\n  - integration.places.hub\n  - integration.places.arena"
-    );
+    ).rejects.toMatchObject({
+      message: "Target 'integration' has 2 places.",
+      fix: 'Pick one:\n  - integration.places.hub\n  - integration.places.arena',
+    });
     expect(launchStudioAsync).not.toHaveBeenCalled();
   });
 
@@ -163,8 +189,11 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
 
     const result = await launchHandlerAsync({ cwd: tempDir });
 
-    expect(launchStudioAsync).toHaveBeenCalledWith({});
-    expect(result.summary).toBe('Studio launched');
+    expect(launchStudioAsync).toHaveBeenCalledWith({
+      placeId: 95206881,
+      universeId: 28220420,
+    });
+    expect(result.summary).toBe('Studio launched with a new Baseplate');
   });
 
   it('asks for a target when the config has no default', async () => {
@@ -172,15 +201,18 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
       targets: { alpha: place(1), beta: place(2) },
     });
 
-    await expect(launchHandlerAsync({ cwd: tempDir })).rejects.toThrow(
-      'has several targets and no default. Name one: alpha, beta'
-    );
+    await expect(launchHandlerAsync({ cwd: tempDir })).rejects.toMatchObject({
+      message: expect.stringContaining('has several targets and no default.'),
+      fix: 'Name one: alpha, beta.',
+    });
   });
 
   it('fails on a target when no deploy.nevermore.json is found', async () => {
     await expect(
       launchHandlerAsync({ deployTarget: 'test', cwd: tempDir })
-    ).rejects.toThrow(/No deploy.nevermore.json in .* to find target 'test'/);
+    ).rejects.toThrow(
+      "No deploy.nevermore.json here or above to find target 'test' in."
+    );
   });
 
   it('refuses a target together with --place', async () => {
@@ -190,7 +222,7 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
         placePath: '/tmp/game.rbxl',
         cwd: tempDir,
       })
-    ).rejects.toThrow('not both');
+    ).rejects.toMatchObject({ code: 'INVALID_INPUT', fix: 'Use one of them.' });
   });
 
   it('prefers an explicit --place over the config', async () => {

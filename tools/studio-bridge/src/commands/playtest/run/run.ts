@@ -5,26 +5,24 @@
  * `--context client`. Its output and return values come back the same way as
  * `console exec`.
  *
- * In the server, the edit session plants a runner script in the playtest
- * (playtest-runner.luau), so this works even when Studio does not load user
- * plugins into playtests. The client has no such path: it needs the
- * playtest's client session, so it needs that Studio setting on.
+ * Both run through the playtest's sessions. The server session works even
+ * when Studio does not load user plugins into playtests, since the edit
+ * session then plants it, with this code compiled ahead of time (see
+ * playtest-sessions.ts). The client session needs that Studio setting on.
  */
 
-import * as fs from 'fs/promises';
-import { resolvePackagePath } from '@quenty/nevermore-template-helpers';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.js';
 import {
   execHandlerAsync,
   formatExecText,
-  type ExecResult as CommandExecResult,
+  INPUT_ARG_DESCRIPTION,
+  readInputFilesAsync,
 } from '../../console/exec/exec.js';
 import type {
   BridgeConnection,
   BridgeSession,
-  ExecResult,
   PlaytestMode,
   SessionContext,
 } from '../../../bridge/index.js';
@@ -34,6 +32,10 @@ import {
   getPlaytestContexts,
   startPlaytestAsync,
 } from '../playtest-sessions.js';
+import {
+  invalidInput,
+  StudioBridgeError,
+} from '../../../messages/studio-bridge-error.js';
 
 export interface PlaytestRunOptions {
   scriptContent: string;
@@ -45,15 +47,15 @@ export interface PlaytestRunOptions {
   timeout?: number;
   /** Passed to the script as `...`. */
   args?: string[];
+  /** Passed to the script as buffers in `...`, before `args`. */
+  inputs?: Buffer[];
 }
 
-/** Matches `console exec`'s default execution timeout. */
-const DEFAULT_TIMEOUT_MS = 120_000;
+const PLAYER_JOIN_TIMEOUT_MS = 30_000;
 
 export interface PlaytestRunResult {
   success: boolean;
-  /** Absent when the script ran through the planted runner. */
-  playtestId?: string;
+  playtestId: string;
   output: string[];
   error?: string;
   returnValues?: SerializedReturnValue[];
@@ -66,8 +68,9 @@ interface PlaytestRunArgs {
   code?: string;
   file?: string;
   mode?: PlaytestMode;
-  timeout?: number;
+  scriptTimeout?: number;
   scriptArgs?: string[];
+  input?: string[];
 }
 
 export async function playtestRunHandlerAsync(
@@ -75,8 +78,9 @@ export async function playtestRunHandlerAsync(
   options: PlaytestRunOptions
 ): Promise<PlaytestRunResult> {
   if (!getPlaytestContexts(options.mode).includes(options.context)) {
-    throw new Error(
-      `A ${options.mode} mode playtest has no ${options.context} session to run code in`
+    throw invalidInput(
+      `A ${options.mode}-mode playtest has no ${options.context} to run code in.`,
+      'Use --mode play to run code in the client.'
     );
   }
 
@@ -85,21 +89,26 @@ export async function playtestRunHandlerAsync(
     'edit'
   );
 
-  if (options.context === 'server') {
-    return runWithPlantedRunnerAsync(editSession, options);
-  }
-
   const playtest = await startPlaytestAsync(
     connection,
     editSession,
-    options.mode
+    options.mode,
+    undefined,
+    {
+      scripts: [options.scriptContent],
+      serverOnly: options.context === 'server',
+    }
   );
 
   let result: PlaytestRunResult;
   try {
     const session = playtest.sessions[options.context];
     if (!session) {
-      throw new Error(`Playtest has no ${options.context} session`);
+      throw new Error(`The playtest has no ${options.context} session`);
+    }
+    // In play mode the server's code expects the player, who joins a moment later
+    if (options.mode === 'play' && options.context === 'server') {
+      await waitForPlayerAsync(session);
     }
 
     result = {
@@ -107,6 +116,7 @@ export async function playtestRunHandlerAsync(
         scriptContent: options.scriptContent,
         timeout: options.timeout,
         args: options.args,
+        inputs: options.inputs,
       })),
       playtestId: playtest.playtestId,
     };
@@ -123,44 +133,23 @@ export async function playtestRunHandlerAsync(
   return stopError ? { ...result, stopError } : result;
 }
 
-async function runWithPlantedRunnerAsync(
-  editSession: BridgeSession,
-  options: PlaytestRunOptions
-): Promise<PlaytestRunResult> {
-  const runnerSource = await fs.readFile(
-    resolvePackagePath(
-      import.meta.url,
-      'src',
-      'commands',
-      'playtest',
-      'run',
-      'playtest-runner.luau'
-    ),
-    'utf-8'
-  );
-
-  const result = await editSession.runPlaytestScriptAsync({
-    mode: options.mode,
-    script: options.scriptContent,
-    runnerSource,
-    timeoutSec: (options.timeout ?? DEFAULT_TIMEOUT_MS) / 1000,
-    args: options.args,
+async function waitForPlayerAsync(serverSession: BridgeSession): Promise<void> {
+  const deadline = Date.now() + PLAYER_JOIN_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const { players } = await serverSession.playtestPlayersAsync(
+      { op: 'list' },
+      PLAYER_JOIN_TIMEOUT_MS
+    );
+    if (players.length > 0) return;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new StudioBridgeError({
+    code: 'PLAYTEST_NO_PLAYER',
+    message: `No player joined the playtest within ${
+      PLAYER_JOIN_TIMEOUT_MS / 1000
+    }s, so the server code didn't run.`,
+    fix: 'Check the playtest in Studio, then run the command again.',
   });
-
-  return toCommandResult(result);
-}
-
-/** Shapes a bridge ExecResult the way `console exec` reports it. */
-function toCommandResult(result: ExecResult): CommandExecResult {
-  return {
-    success: result.success,
-    output: result.output.map((entry) => entry.body),
-    error: result.error,
-    returnValues: result.returnValues,
-    summary: result.success
-      ? 'Script executed successfully'
-      : `Script failed: ${result.error}`,
-  };
 }
 
 /** Ends the playtest, returning why it could not instead of throwing. */
@@ -207,9 +196,13 @@ export const playtestRunCommand = defineCommand<
       choices: ['play', 'run'],
       default: 'play',
     }),
-    timeout: arg.option({
-      description: 'Execution timeout in milliseconds',
+    scriptTimeout: arg.option({
+      description: 'Cancel the script after this many milliseconds',
       type: 'number',
+    }),
+    input: arg.option({
+      description: INPUT_ARG_DESCRIPTION,
+      array: true,
     }),
     scriptArgs: arg.passthrough({
       description:
@@ -217,23 +210,27 @@ export const playtestRunCommand = defineCommand<
     }),
   },
   cli: {
-    format: (result) =>
-      result.stopError
-        ? `${formatExecText(result)}\nPlaytest is still running: ${
-            result.stopError
-          }`
-        : formatExecText(result),
+    output: 'data',
+    body: (result) =>
+      [
+        formatExecText(result),
+        result.stopError && `Playtest is still running: ${result.stopError}`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
   },
   handler: async (connection, args, targeting) => {
     const { scriptContent } = await resolveScriptContentAsync(args);
+    const inputs = await readInputFilesAsync(args.input);
 
     return playtestRunHandlerAsync(connection, {
       scriptContent,
       mode: args.mode ?? 'play',
       context: targeting.context ?? 'server',
       target: targeting.target,
-      timeout: args.timeout,
+      timeout: args.scriptTimeout,
       args: args.scriptArgs,
+      inputs,
     });
   },
 });

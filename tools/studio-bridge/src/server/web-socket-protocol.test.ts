@@ -277,46 +277,43 @@ describe('decodePluginMessage', () => {
     });
   });
 
-  describe('dataModelResult', () => {
+  describe('inspectInstanceResult', () => {
     const instance = {
       name: 'Workspace',
       className: 'Workspace',
-      path: 'game.Workspace',
-      properties: {},
-      attributes: {},
+      path: 'Workspace',
+      properties: [{ name: 'Gravity', text: '196.2', value: 196.2 }],
+      attributes: [],
       childCount: 3,
       children: [],
     };
 
-    it('decodes a valid dataModelResult', () => {
+    it('decodes an inspected instance', () => {
       const msg = roundTripPlugin({
-        type: 'dataModelResult',
+        type: 'inspectInstanceResult',
         sessionId: 'sess-1',
         requestId: 'req-3',
         payload: { instance },
       });
       expect(msg).toEqual({
-        type: 'dataModelResult',
+        type: 'inspectInstanceResult',
         sessionId: 'sess-1',
         requestId: 'req-3',
         payload: { instance },
       });
     });
 
-    it('returns null without requestId', () => {
+    it('returns null without requestId or an instance', () => {
       expect(
         roundTripPlugin({
-          type: 'dataModelResult',
+          type: 'inspectInstanceResult',
           sessionId: 'sess-1',
           payload: { instance },
         })
       ).toBeNull();
-    });
-
-    it('returns null when instance is not an object', () => {
       expect(
         roundTripPlugin({
-          type: 'dataModelResult',
+          type: 'inspectInstanceResult',
           sessionId: 'sess-1',
           requestId: 'req-3',
           payload: { instance: 'not-an-object' },
@@ -326,12 +323,18 @@ describe('decodePluginMessage', () => {
   });
 
   describe('exportInstancesResult / importInstancesResult', () => {
+    const MAP = {
+      path: 'Workspace.Map',
+      segments: ['Workspace', 'Map'],
+      className: 'Model',
+    };
+
     it('decodes an exported model', () => {
       const msg = {
         type: 'exportInstancesResult',
         sessionId: 'sess-1',
         requestId: 'req-1',
-        payload: { data: 'PHJvYmxveCE=', paths: ['Workspace.Map'] },
+        payload: { data: 'PHJvYmxveCE=', instances: [MAP] },
       };
       expect(roundTripPlugin(msg)).toEqual(msg);
     });
@@ -342,19 +345,32 @@ describe('decodePluginMessage', () => {
           type: 'exportInstancesResult',
           sessionId: 'sess-1',
           requestId: 'req-1',
-          payload: { paths: ['Workspace.Map'] },
+          payload: { instances: [MAP] },
         })
       ).toBeNull();
     });
 
-    it('decodes the imported paths', () => {
+    it('decodes the imported instances', () => {
       const msg = {
         type: 'importInstancesResult',
         sessionId: 'sess-1',
         requestId: 'req-1',
-        payload: { paths: ['Workspace.Map'] },
+        payload: { instances: [MAP] },
       };
       expect(roundTripPlugin(msg)).toEqual(msg);
+    });
+
+    it('rejects an instance without segments', () => {
+      expect(
+        roundTripPlugin({
+          type: 'importInstancesResult',
+          sessionId: 'sess-1',
+          requestId: 'req-1',
+          payload: {
+            instances: [{ path: 'Workspace.Map', className: 'Model' }],
+          },
+        })
+      ).toBeNull();
     });
   });
 
@@ -545,6 +561,146 @@ describe('decodePluginMessage', () => {
   });
 });
 
+describe('decodePluginMessage (recordings)', () => {
+  const stats = {
+    frameCount: 3,
+    elapsed: 0.2,
+    truncated: false,
+    clock: 'renderStep',
+  };
+  const row = {
+    kind: 'value',
+    t: 0,
+    frame: 0,
+    path: 'A',
+    property: 'Size.X.Scale',
+    value: 1,
+  };
+  const frame = {
+    t: 0,
+    frame: 0,
+    width: 2,
+    height: 1,
+    format: 'png',
+    data: 'AAAA',
+  };
+
+  function sampleResult(payload: Record<string, unknown>) {
+    return roundTripPlugin({
+      type: 'sampleInstancesResult',
+      sessionId: 'sess-1',
+      requestId: 'req-1',
+      payload: {
+        ...stats,
+        instances: [{ path: 'A', segments: ['A'], className: 'Part' }],
+        recorded: 1,
+        ...payload,
+      },
+    });
+  }
+
+  function recordResult(payload: Record<string, unknown>) {
+    return roundTripPlugin({
+      type: 'recordViewportResult',
+      sessionId: 'sess-1',
+      requestId: 'req-1',
+      payload: { ...stats, requested: 3, ...payload },
+    });
+  }
+
+  it('decodes sample rows', () => {
+    const msg = sampleResult({ rows: [row] });
+    expect(msg?.type).toBe('sampleInstancesResult');
+    expect((msg as any).payload.rows).toEqual([row]);
+  });
+
+  it('decodes membership and rollup rows, and the scope', () => {
+    const rows = [
+      { kind: 'added', t: 0.1, frame: 1, path: 'A.B' },
+      {
+        kind: 'rollup',
+        t: 0.5,
+        frame: 30,
+        path: 'A',
+        property: 'CFrame',
+        count: 1920,
+        instances: 48,
+      },
+    ];
+    const msg = sampleResult({ rows, scope: 'place', watched: 5000 });
+    expect((msg as any).payload).toMatchObject({
+      rows,
+      scope: 'place',
+      watched: 5000,
+      omitted: 0,
+    });
+  });
+
+  it('decodes the refs, and an empty map Studio sends as an array', () => {
+    const refs = {
+      'A.B': { path: 'A.B', segments: ['A', 'B'], className: 'Part' },
+    };
+    expect((sampleResult({ rows: [], refs }) as any).payload.refs).toEqual(
+      refs
+    );
+    expect((sampleResult({ rows: [], refs: [] }) as any).payload.refs).toEqual(
+      {}
+    );
+  });
+
+  it('rejects a sample row of an unknown kind', () => {
+    expect(sampleResult({ rows: [{ ...row, kind: 'other' }] })).toBeNull();
+  });
+
+  it('decodes whether a watched sample ended', () => {
+    expect((sampleResult({ rows: [] }) as any).payload.ended).toBeUndefined();
+    expect((sampleResult({ rows: [], ended: true }) as any).payload.ended).toBe(
+      true
+    );
+  });
+
+  it('decodes a watched sample request without a duration', () => {
+    const watch = { id: 'w', wait: 0.5 };
+    const msg = roundTripServer({
+      type: 'sampleInstances',
+      sessionId: 'sess-1',
+      requestId: 'req-1',
+      payload: { watch },
+    });
+    expect((msg as any).payload.watch).toEqual(watch);
+    expect((msg as any).payload.duration).toBeUndefined();
+
+    expect(
+      roundTripServer({
+        type: 'sampleInstances',
+        sessionId: 'sess-1',
+        requestId: 'req-1',
+        payload: {},
+      })
+    ).toBeNull();
+  });
+
+  it('rejects a malformed sample row', () => {
+    expect(sampleResult({ rows: [{ ...row, value: { x: 1 } }] })).toBeNull();
+    expect(sampleResult({ rows: [{ ...row, path: 3 }] })).toBeNull();
+  });
+
+  it('decodes recorded frames and skipped captures', () => {
+    const skipped = [{ t: 0.1, frame: 1, reason: 'could not read' }];
+    const msg = recordResult({ frames: [frame], skipped });
+    expect((msg as any).payload.frames).toEqual([frame]);
+    expect((msg as any).payload.skipped).toEqual(skipped);
+    expect((msg as any).payload.requested).toBe(3);
+  });
+
+  it('rejects a malformed recorded frame', () => {
+    expect(recordResult({ frames: [{ ...frame, format: 'jpg' }] })).toBeNull();
+    expect(
+      recordResult({ frames: [{ ...frame, data: undefined }] })
+    ).toBeNull();
+  });
+});
+
 describe('encodeMessage / decodeServerMessage', () => {
   describe('basic messages', () => {
     it('round-trips execute without requestId', () => {
@@ -637,56 +793,43 @@ describe('encodeMessage / decodeServerMessage', () => {
     });
   });
 
-  describe('queryDataModel', () => {
-    it('round-trips queryDataModel with all options', () => {
+  describe('inspectInstance', () => {
+    it('round-trips inspectInstance with all options', () => {
       const msg: ServerMessage = {
-        type: 'queryDataModel',
+        type: 'inspectInstance',
         sessionId: 'sess-1',
         requestId: 'req-12',
         payload: {
-          path: 'game.Workspace',
+          root: 'Workspace',
+          query: 'Door',
+          selector: 'Part',
+          selection: false,
           depth: 2,
-          properties: ['Name', 'Position'],
-          includeAttributes: true,
-          find: { name: 'Part', recursive: true },
-          listServices: false,
+          properties: true,
+          attributes: true,
         },
       };
       expect(roundTripServer(msg)).toEqual(msg);
     });
 
-    it('round-trips queryDataModel with minimal options', () => {
-      const msg: ServerMessage = {
-        type: 'queryDataModel',
+    it('round-trips inspectInstance with no options, for the top level', () => {
+      const decoded = roundTripServer({
+        type: 'inspectInstance',
         sessionId: 'sess-1',
         requestId: 'req-12',
-        payload: { path: 'game.Workspace' },
-      };
-      const decoded = roundTripServer(msg);
+        payload: {},
+      });
       expect(decoded).not.toBeNull();
-      expect((decoded as any).payload.path).toBe('game.Workspace');
-    });
-
-    it('returns null without path', () => {
-      expect(
-        decodeServerMessage(
-          JSON.stringify({
-            type: 'queryDataModel',
-            sessionId: 'sess-1',
-            requestId: 'req-12',
-            payload: { depth: 1 },
-          })
-        )
-      ).toBeNull();
+      expect((decoded as any).payload.query).toBeUndefined();
     });
 
     it('returns null without requestId', () => {
       expect(
         decodeServerMessage(
           JSON.stringify({
-            type: 'queryDataModel',
+            type: 'inspectInstance',
             sessionId: 'sess-1',
-            payload: { path: 'game.Workspace' },
+            payload: { query: 'Workspace' },
           })
         )
       ).toBeNull();

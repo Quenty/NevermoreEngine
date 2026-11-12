@@ -48,7 +48,7 @@ describe('index barrel exports', () => {
     expect(barrel.queryStateHandlerAsync).toBeDefined();
     expect(barrel.queryLogsHandlerAsync).toBeDefined();
     expect(barrel.captureScreenshotHandlerAsync).toBeDefined();
-    expect(barrel.queryDataModelHandlerAsync).toBeDefined();
+    expect(barrel.inspectInstanceHandlerAsync).toBeDefined();
     expect(barrel.execHandlerAsync).toBeDefined();
     expect(barrel.runHandlerAsync).toBeDefined();
     expect(barrel.launchHandlerAsync).toBeDefined();

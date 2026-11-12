@@ -334,7 +334,11 @@ describe('BridgeClient', () => {
       const started = Date.now();
       await expect(
         client.getSession('session-1')!.queryStateAsync()
-      ).rejects.toThrow('The bridge host shut down before replying');
+      ).rejects.toMatchObject({
+        code: 'HOST_STOPPED',
+        message:
+          'The bridge host stopped before Studio replied, so the command may have run only in part.',
+      });
       expect(Date.now() - started).toBeLessThan(2_000);
     });
   });

@@ -6,45 +6,53 @@
  */
 
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import type { SessionInfo } from '../bridge/index.js';
+import type { BridgeConnection, SessionInfo } from '../bridge/index.js';
 import { getPluginBuildVersionAsync } from '../plugin/plugin-build-version.js';
+import { stalePluginWarning } from './plugin-freshness.js';
+import { warnUser } from '../messages/warn-user.js';
 
-let isJsonOutput = false;
-const warnings: string[] = [];
+export {
+  clearWarnings,
+  getWarnings,
+  isJsonOutputEnabled,
+  setJsonOutput,
+  warnUser,
+} from '../messages/warn-user.js';
 
-export function setJsonOutput(json: boolean): void {
-  isJsonOutput = json;
-}
+const reportedHosts = new WeakSet<BridgeConnection>();
 
-export function isJsonOutputEnabled(): boolean {
-  return isJsonOutput;
-}
-
-export function addWarning(message: string): void {
-  if (warnings.includes(message)) return;
-  warnings.push(message);
-  if (!isJsonOutput) {
-    OutputHelper.warn(message);
+export function reportStaleHost(connection: BridgeConnection): void {
+  const report = connection.staleHost;
+  if (!report || reportedHosts.has(connection)) return;
+  reportedHosts.add(connection);
+  if (report.replaced) {
+    OutputHelper.info(report.message);
+  } else {
+    warnUser({
+      code: 'STALE_HOST',
+      message: report.message,
+      fix: report.fix,
+      cause: report.cause,
+    });
   }
-}
-
-export function getWarnings(): readonly string[] {
-  return warnings;
-}
-
-export function clearWarnings(): void {
-  warnings.length = 0;
 }
 
 export async function warnIfPluginStaleAsync(
   sessions: SessionInfo[]
 ): Promise<void> {
-  const expected = await getPluginBuildVersionAsync();
-  for (const session of sessions) {
-    if (session.pluginVersion !== expected) {
-      addWarning(
-        `The studio-bridge plugin in '${session.placeName}' (${session.sessionId}) is out of date. Run 'studio-bridge plugin install' to update it.`
-      );
+  try {
+    const expected = await getPluginBuildVersionAsync();
+    for (const session of sessions) {
+      if (session.pluginVersion !== expected) {
+        warnUser(stalePluginWarning(session));
+      }
     }
+  } catch (err) {
+    warnUser({
+      code: 'PLUGIN_VERSION_UNKNOWN',
+      message: "Couldn't check whether the studio-bridge plugin is up to date.",
+      fix: 'Reinstall @quenty/studio-bridge if this keeps happening.',
+      cause: err,
+    });
   }
 }

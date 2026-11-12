@@ -29,9 +29,9 @@ describe('checkLinuxEnvironmentAsync', () => {
 
     const result = await checkLinuxEnvironmentAsync();
 
-    expect(result).toBeDefined();
-    expect(result).toContain('linux commands require a Linux environment');
-    expect(result).toContain('studio-bridge process run');
+    expect(result?.code).toBe('UNSUPPORTED_PLATFORM');
+    expect(result?.message).toContain('only run on Linux');
+    expect(result?.fix).toContain('studio-bridge process run');
     expect(mockExecFile).not.toHaveBeenCalled();
   });
 
@@ -54,9 +54,10 @@ describe('checkLinuxEnvironmentAsync', () => {
 
     const result = await checkLinuxEnvironmentAsync();
 
-    expect(result).toBeDefined();
-    expect(result).toContain('Wine is not installed');
-    expect(result).toContain('studio-bridge process run');
-    expect(result).toContain('docker run');
+    expect(result?.code).toBe('WINE_MISSING');
+    expect(result?.message).toBe(
+      "Wine isn't installed, and 'linux' commands need it."
+    );
+    expect(result?.fix).toContain('studio-bridge process run');
   });
 });

@@ -138,7 +138,7 @@ export const batchTestCommand: CommandModule<
         })
         .option('bundle', {
           describe:
-            'Run the places in a *.nevermore.tests.tar written by "batch bundle" instead of finding ' +
+            'Run the places in a *.nevermore.tests.tar written by "batch bundle --test" instead of finding ' +
             'and building packages. The bundle never chooses where it is uploaded: ' +
             'that is --batch-place-id/--batch-universe-id, or else the test place this ' +
             'checkout gives one of its packages.',
@@ -152,10 +152,14 @@ export const batchTestCommand: CommandModule<
           hidden: true,
           type: 'string',
         })
+        .option('script-file', {
+          hidden: true,
+          type: 'string',
+        })
         .check((args) => {
-          if (args.scriptText !== undefined) {
+          if (args.scriptText !== undefined || args.scriptFile !== undefined) {
             throw new Error(
-              '--script-text is not supported by "batch test", which runs one shared script for all packages.\n' +
+              '--script-text and --script-file are not supported by "batch test", which runs one shared script for all packages.\n' +
                 'Run it against a single package instead:\n' +
                 '  cd <package> && nevermore test --cloud --script-text \'print("hi")\''
             );
