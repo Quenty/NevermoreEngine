@@ -105,6 +105,13 @@ type PendingWrite = {
 -- already requires (everything goes through TranslatorService).
 local entryCachesByTable: { [LocalizationTable]: EntryCache } = setmetatable({}, { __mode = "k" }) :: any
 
+type DetachedTable = {
+	Table: LocalizationTable,
+	Holders: number,
+}
+
+local detachedTablesByName: { [string]: DetachedTable } = {}
+
 export type TranslatorService = typeof(setmetatable(
 	{} :: {
 		_maid: Maid.Maid,
@@ -125,6 +132,8 @@ export type TranslatorService = typeof(setmetatable(
 		_pendingFlushPromise: Promise.Promise<()>?,
 		_localizationWriteCount: number,
 		_localizationRebuildCount: number,
+		_isStarted: boolean,
+		_detachedTable: DetachedTable?,
 	},
 	{} :: typeof({ __index = TranslatorService })
 ))
@@ -143,6 +152,7 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._flushScheduled = false
 	self._localizationWriteCount = 0
 	self._localizationRebuildCount = 0
+	self._isStarted = false
 
 	self._forcedLocaleId = self._maid:Add(ValueObject.new(nil))
 
@@ -150,6 +160,25 @@ function TranslatorService.Init(self: TranslatorService, serviceBag: ServiceBag.
 	self._translator:Mount(self:_observeTranslatorImpl())
 end
 
+--[=[
+	Parents the localization table if it was created before the service started: writes to a
+	table under LocalizationService cost milliseconds each, and a service bag whose Init spans
+	several frames flushes once per frame. A flush already queued lands first, still unparented.
+	See docs/design.md ("The table is filled before it is parented").
+]=]
+function TranslatorService.Start(self: TranslatorService)
+	self._isStarted = true
+	if not self._flushScheduled then
+		self:_parentLocalizationTable()
+	end
+end
+
+--[=[
+	Returns the realm's generated localization table. Before [TranslatorService.Start] a newly
+	created table is not yet parented to LocalizationService.
+
+	@return LocalizationTable
+]=]
 function TranslatorService.GetLocalizationTable(self: TranslatorService): LocalizationTable
 	if self._localizationTable then
 		return self._localizationTable
@@ -159,13 +188,64 @@ function TranslatorService.GetLocalizationTable(self: TranslatorService): Locali
 	local localizationTable = LocalizationService:FindFirstChild(localizationTableName)
 
 	if not localizationTable then
-		localizationTable = Instance.new("LocalizationTable")
-		localizationTable.Name = localizationTableName
-		localizationTable.Parent = LocalizationService
+		local detached = detachedTablesByName[localizationTableName]
+		if not detached then
+			local newTable = Instance.new("LocalizationTable")
+			newTable.Name = localizationTableName
+			detached = { Table = newTable, Holders = 0 }
+			detachedTablesByName[localizationTableName] = detached
+		end
+		detached.Holders += 1
+		self._detachedTable = detached
+		localizationTable = detached.Table
 	end
 
 	self._localizationTable = localizationTable
+	if self._isStarted and not self._flushScheduled then
+		self:_parentLocalizationTable()
+	end
 	return localizationTable
+end
+
+--[=[
+	Destroys every generated table still waiting to be parented. For test isolation: a spec that
+	fails before destroying its service would leave its table, entries and all, for the next
+	service in the realm to find.
+]=]
+function TranslatorService.DestroyDetachedTablesForTesting()
+	for name, detached in detachedTablesByName do
+		detachedTablesByName[name] = nil
+		detached.Table:Destroy()
+	end
+end
+
+function TranslatorService._parentLocalizationTable(self: TranslatorService)
+	local detached = self._detachedTable
+	if not detached then
+		return
+	end
+
+	self._detachedTable = nil
+	local name = detached.Table.Name
+	if detachedTablesByName[name] == detached then
+		detachedTablesByName[name] = nil
+		detached.Table.Parent = LocalizationService
+	end
+end
+
+function TranslatorService._releaseDetachedTable(self: TranslatorService)
+	local detached = self._detachedTable
+	if not detached then
+		return
+	end
+
+	self._detachedTable = nil
+	detached.Holders -= 1
+	local name = detached.Table.Name
+	if detached.Holders <= 0 and detachedTablesByName[name] == detached then
+		detachedTablesByName[name] = nil
+		detached.Table:Destroy()
+	end
 end
 
 function TranslatorService._getLocalizationTableName(self: TranslatorService): string
@@ -878,6 +958,10 @@ function TranslatorService._flushWrites(self: TranslatorService)
 		self:_applyPendingEntries(pendingEntries)
 	end
 
+	if self._isStarted then
+		self:_parentLocalizationTable()
+	end
+
 	-- After the table is written, so an observer that re-reads on this emission sees the
 	-- landed values. Fires for every key in the batch, including ones _applyPendingEntries
 	-- skipped as already-matching -- their data is in the table either way, and a key that
@@ -1288,6 +1372,8 @@ function TranslatorService.Destroy(self: TranslatorService)
 	if promise then
 		promise:Resolve()
 	end
+
+	self:_releaseDetachedTable()
 
 	self._maid:DoCleaning()
 end

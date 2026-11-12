@@ -8,8 +8,10 @@ local require = require(script.Parent.loader).load(script)
 local LocalizationService = game:GetService("LocalizationService")
 
 local Jest = require("Jest")
+local ServiceBag = require("ServiceBag")
 local Table = require("Table")
 local TieRealms = require("TieRealms")
+local TranslatorService = require("TranslatorService")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 
 local describe = Jest.Globals.describe
@@ -17,14 +19,123 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 describe("TranslatorService:GetLocalizationTable", function()
-	it("creates a role-named LocalizationTable parented to LocalizationService", function()
+	it("creates a role-named LocalizationTable, parented to LocalizationService on Start", function()
 		local controller = TranslatorTestUtils.setup()
 
 		local localizationTable = controller.translatorService:GetLocalizationTable()
 
 		expect(localizationTable:IsA("LocalizationTable")).toBe(true)
 		expect(localizationTable.Name).toBe(TranslatorTestUtils.EXPECTED_TABLE_NAME)
+		expect(localizationTable.Parent).toBe(nil)
+
+		controller.serviceBag:Start()
 		expect(localizationTable.Parent).toBe(LocalizationService)
+		controller:Destroy()
+	end)
+
+	it("keeps entries written before Start", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+
+		service:SetEntryValue("k.one", "One", "", "en", "One")
+		controller.flushEntries()
+		controller.serviceBag:Start()
+
+		local localizationTable = service:GetLocalizationTable()
+		expect(localizationTable.Parent).toBe(LocalizationService)
+		expect(TranslatorTestUtils.getEntryMap(localizationTable)["k.one"].Values["en"]).toBe("One")
+		controller:Destroy()
+	end)
+
+	it("parents the table at once when created after Start", function()
+		local controller = TranslatorTestUtils.setup()
+		controller.serviceBag:Start()
+
+		expect(controller.translatorService:GetLocalizationTable().Parent).toBe(LocalizationService)
+		controller:Destroy()
+	end)
+
+	it("leaves a table already under LocalizationService parented", function()
+		local controller = TranslatorTestUtils.setup()
+		local existing = Instance.new("LocalizationTable")
+		existing.Name = TranslatorTestUtils.EXPECTED_TABLE_NAME
+		existing.Parent = LocalizationService
+
+		local localizationTable = controller.translatorService:GetLocalizationTable()
+
+		expect(localizationTable).toBe(existing)
+		expect(localizationTable.Parent).toBe(LocalizationService)
+		controller:Destroy()
+	end)
+
+	it("a started service parents an unparented table it shares", function()
+		local controller = TranslatorTestUtils.setup()
+		local first = controller.translatorService:GetLocalizationTable()
+
+		local otherBag = controller.track(ServiceBag.new())
+		otherBag:GetService(TranslatorService)
+		otherBag:Init()
+		otherBag:Start()
+
+		expect(otherBag:GetService(TranslatorService):GetLocalizationTable()).toBe(first)
+		expect(first.Parent).toBe(LocalizationService)
+		controller:Destroy()
+	end)
+
+	it("lands a flush queued at Start before parenting the table", function()
+		local controller = TranslatorTestUtils.setup()
+		local service = controller.translatorService
+		local localizationTable = service:GetLocalizationTable()
+		local entriesWhenParented
+		controller.track(localizationTable:GetPropertyChangedSignal("Parent"):Connect(function()
+			entriesWhenParented = #localizationTable:GetEntries()
+		end))
+
+		service:SetEntryValue("k.one", "One", "", "en", "One")
+		controller.serviceBag:Start()
+		expect(localizationTable.Parent).toBe(nil)
+
+		controller.awaitEntriesWritten()
+		expect(localizationTable.Parent).toBe(LocalizationService)
+		expect(entriesWhenParented).toBe(1)
+		controller:Destroy()
+	end)
+
+	it("destroys a table that was never parented when its last service is destroyed", function()
+		local controller = TranslatorTestUtils.setup()
+
+		local bag = ServiceBag.new()
+		bag:GetService(TranslatorService)
+		bag:Init()
+		local service = bag:GetService(TranslatorService) :: any
+		service:SetEntryValue("k.one", "One", "", "en", "One")
+		service:FlushEntriesForTesting()
+		local first = service:GetLocalizationTable()
+		bag:Destroy()
+
+		local canReparent = pcall(function()
+			first.Parent = LocalizationService
+		end)
+		expect(canReparent).toBe(false)
+		local second = controller.translatorService:GetLocalizationTable()
+		expect(second).never.toBe(first)
+		expect(#second:GetEntries()).toBe(0)
+		controller:Destroy()
+	end)
+
+	it("keeps a shared unparented table for a service that is still alive", function()
+		local controller = TranslatorTestUtils.setup()
+
+		local bag = ServiceBag.new()
+		bag:GetService(TranslatorService)
+		bag:Init()
+		local otherService = bag:GetService(TranslatorService) :: any
+		local shared = otherService:GetLocalizationTable()
+		expect(controller.translatorService:GetLocalizationTable()).toBe(shared)
+		bag:Destroy()
+
+		controller.serviceBag:Start()
+		expect(shared.Parent).toBe(LocalizationService)
 		controller:Destroy()
 	end)
 
