@@ -17,8 +17,8 @@ import { hideBin } from 'yargs/helpers';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { OutputHelper } from '@quenty/cli-output-helpers';
-import { VersionChecker } from '@quenty/nevermore-cli-helpers';
-import { addWarning, setJsonOutput } from './cli-output-context.js';
+import { VersionChecker } from '@quenty/nevermore-cli-helpers/version-checker';
+import { setJsonOutput, warnUser } from './cli-output-context.js';
 
 import { CommandRegistry } from '../commands/framework/command-registry.js';
 import { buildGroupCommands } from './adapters/group-builder.js';
@@ -26,12 +26,14 @@ import { buildGroupCommands } from './adapters/group-builder.js';
 // Command definitions (explicit imports for deterministic ordering)
 import { execCommand } from '../commands/console/exec/exec.js';
 import { logsCommand } from '../commands/console/logs/logs.js';
-import { queryCommand } from '../commands/explorer/query/query.js';
+import { inspectCommand } from '../commands/explorer/inspect/inspect.js';
 import { exportCommand } from '../commands/explorer/export/export.js';
 import { importCommand } from '../commands/explorer/import/import.js';
 import { findCommand } from '../commands/explorer/find/find.js';
+import { sampleCommand } from '../commands/explorer/sample/sample.js';
 import { grepCommand } from '../commands/explorer/grep/grep.js';
 import { screenshotCommand } from '../commands/viewport/screenshot/screenshot.js';
+import { recordCommand } from '../commands/viewport/record/record.js';
 import { infoCommand } from '../commands/process/info/info.js';
 import { listCommand } from '../commands/process/list/list.js';
 import { launchCommand } from '../commands/process/launch/launch.js';
@@ -56,12 +58,14 @@ const registry = new CommandRegistry();
 // Execution commands
 registry.register(execCommand);
 registry.register(logsCommand);
-registry.register(queryCommand);
+registry.register(inspectCommand);
 registry.register(exportCommand);
 registry.register(importCommand);
 registry.register(findCommand);
+registry.register(sampleCommand);
 registry.register(grepCommand);
 registry.register(screenshotCommand);
+registry.register(recordCommand);
 registry.register(launchCommand);
 registry.register(playtestStartCommand);
 registry.register(playtestStopCommand);
@@ -108,17 +112,21 @@ const versionData = await VersionChecker.checkForUpdatesAsync({
 
 if (isMachineReadable && versionData) {
   if (versionData.isLocalDev) {
-    addWarning(
-      `Studio Bridge is running in local development mode. Run 'npm install -g @quenty/studio-bridge@latest' to switch to production copy.`
-    );
+    warnUser({
+      code: 'LOCAL_DEV_BUILD',
+      message: 'studio-bridge is running from a local development checkout.',
+      fix: "Run 'npm install -g @quenty/studio-bridge@latest' to use the published version.",
+    });
   } else if (versionData.updateAvailable) {
-    addWarning(
-      `Studio Bridge update available: ${VersionChecker.getVersionDisplayName(
-        versionData
-      )} → ${
+    warnUser({
+      code: 'UPDATE_AVAILABLE',
+      message: `studio-bridge ${
         versionData.latestVersion
-      }. Run 'npm install -g @quenty/studio-bridge@latest' to update.`
-    );
+      } is available; this is ${VersionChecker.getVersionDisplayName(
+        versionData
+      )}.`,
+      fix: "Run 'npm install -g @quenty/studio-bridge@latest' to update.",
+    });
   }
 }
 
@@ -152,6 +160,13 @@ const cli = yargs(hideBin(process.argv))
     default: false,
     global: true,
     conflicts: 'remote',
+  })
+  .option('autohost', {
+    type: 'boolean',
+    description:
+      'With no bridge host running, start one in the background that exits once unused. --no-autohost (or STUDIO_BRIDGE_NO_AUTOHOST=1) hosts in this command instead, which is slower but leaves nothing running, e.g. for CI',
+    default: true,
+    global: true,
   })
   .middleware((argv) => {
     OutputHelper.setVerbose(argv.verbose as boolean);

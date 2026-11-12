@@ -13,6 +13,7 @@ export interface RojoBuildOptions {
   plugin?: string;
   /** Absolute path to Studio's plugins folder (required when plugin is set) */
   pluginsFolder?: string;
+  cwd?: string;
 }
 
 export interface BuildContextOptions {
@@ -60,7 +61,7 @@ export class BuildContext {
    * Returns the full plugin output path when in plugin mode, undefined otherwise.
    */
   async rojoBuildAsync(options: RojoBuildOptions): Promise<string | undefined> {
-    const { projectPath, output, plugin, pluginsFolder } = options;
+    const { projectPath, output, plugin, pluginsFolder, cwd } = options;
 
     if (output && plugin) {
       throw new Error(
@@ -91,7 +92,7 @@ export class BuildContext {
       args.push('--plugin', plugin);
     }
 
-    await execa('rojo', args);
+    await execa('rojo', args, cwd ? { cwd } : {});
 
     if (plugin && pluginsFolder) {
       const pluginPath = path.join(pluginsFolder, plugin);

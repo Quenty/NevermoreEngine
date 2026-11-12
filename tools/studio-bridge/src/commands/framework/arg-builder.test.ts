@@ -183,6 +183,22 @@ describe('toYargsOptions', () => {
     expect(opt).not.toHaveProperty('array');
   });
 
+  it('shows camelCase option names as kebab-case', () => {
+    const result = toYargsOptions({
+      maxFrames: arg.option({ description: 'Max', type: 'number' }),
+    });
+
+    expect(Object.keys(result.options)).toEqual(['max-frames']);
+  });
+
+  it('demands required options', () => {
+    const result = toYargsOptions({
+      duration: arg.option({ description: 'How long', required: true }),
+    });
+
+    expect(result.options.duration.demandOption).toBe(true);
+  });
+
   it('returns empty arrays for no args', () => {
     const result = toYargsOptions({});
     expect(result.positionals).toEqual([]);

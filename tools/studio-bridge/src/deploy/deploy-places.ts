@@ -15,6 +15,7 @@ import {
   type DeployTarget,
 } from '@quenty/nevermore-deploy';
 import type { BridgeConnection, InstanceInfo } from '../bridge/index.js';
+import { invalidInput } from '../messages/studio-bridge-error.js';
 
 export const DEPLOY_CONFIG_FILE_NAME = 'deploy.nevermore.json';
 
@@ -76,8 +77,9 @@ export async function resolveDeployPlaceAsync(
   const configPath = await findDeployConfigPathAsync(cwd);
   if (!configPath) {
     if (target !== undefined) {
-      throw new Error(
-        `No ${DEPLOY_CONFIG_FILE_NAME} in ${cwd} or its parents to find target '${target}' in`
+      throw invalidInput(
+        `No ${DEPLOY_CONFIG_FILE_NAME} here or above to find target '${target}' in.`,
+        `Run this from a package with a ${DEPLOY_CONFIG_FILE_NAME}, or pass --place.`
       );
     }
     return undefined;
@@ -89,10 +91,9 @@ export async function resolveDeployPlaceAsync(
     try {
       selector = resolveDefaultTargetName(config);
     } catch {
-      throw new Error(
-        `${configPath} has several targets and no default. Name one: ${Object.keys(
-          config.targets
-        ).join(', ')}`
+      throw invalidInput(
+        `${configPath} has several targets and no default.`,
+        `Name one: ${Object.keys(config.targets).join(', ')}.`
       );
     }
   }
@@ -106,8 +107,9 @@ export async function resolveDeployPlaceAsync(
           : `  - place ${place.placeId}`
       )
       .join('\n');
-    throw new Error(
-      `Target '${targetName}' has ${places.length} places. Pick one:\n${choices}`
+    throw invalidInput(
+      `Target '${targetName}' has ${places.length} places.`,
+      `Pick one:\n${choices}`
     );
   }
 

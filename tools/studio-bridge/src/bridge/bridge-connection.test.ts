@@ -8,6 +8,22 @@ import { WebSocket } from 'ws';
 import { BridgeConnection } from './bridge-connection.js';
 import { SessionNotFoundError, ContextNotFoundError } from './types.js';
 import type { BridgeSession } from './bridge-session.js';
+import type { HostBuild } from './internal/host-build.js';
+
+const hostBuildOverride = vi.hoisted(() => ({
+  value: undefined as HostBuild | undefined,
+}));
+
+vi.mock('./internal/host-build.js', async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import('./internal/host-build.js')
+  >();
+  return {
+    ...actual,
+    getHostBuildAsync: async () =>
+      hostBuildOverride.value ?? actual.getHostBuildAsync(),
+  };
+});
 
 function connectPlugin(port: number): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
@@ -99,6 +115,68 @@ describe('BridgeConnection', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       expect(conn.listSessions()).toHaveLength(1);
+    });
+
+    it('a client trusts a host of its own build', async () => {
+      const host = await BridgeConnection.connectAsync({
+        port: 0,
+        keepAlive: true,
+        local: true,
+      });
+      connections.push(host);
+
+      const client = await BridgeConnection.connectAsync({
+        port: host.port,
+        local: true,
+      });
+      connections.push(client);
+
+      expect(client.role).toBe('client');
+      expect(client.staleHost).toBeUndefined();
+      expect((client as any)._client.hostInfo).toMatchObject({
+        build: expect.stringMatching(/^[0-9a-f]{12}$/),
+        packagePath: expect.any(String),
+        cwd: process.cwd(),
+        pid: process.pid,
+        clients: 1,
+        pendingRelays: 0,
+      });
+    });
+
+    it('a host that cannot read its build still reports itself, and is only warned about', async () => {
+      hostBuildOverride.value = { version: '0.24.0' };
+      try {
+        const host = await BridgeConnection.connectAsync({
+          port: 0,
+          keepAlive: true,
+          local: true,
+        });
+        connections.push(host);
+
+        const client = await BridgeConnection.connectAsync({
+          port: host.port,
+          local: true,
+        });
+        connections.push(client);
+
+        const hostInfo = (client as any)._client.hostInfo;
+        expect(hostInfo).toMatchObject({
+          version: '0.24.0',
+          pid: process.pid,
+          argv: expect.any(Array),
+        });
+        expect(hostInfo.build).toBeUndefined();
+        expect(client.role).toBe('client');
+        expect(client.staleHost).toMatchObject({ replaced: false });
+        expect(client.staleHost?.message).toBe(
+          'A bridge host from another studio-bridge is running, so some commands may not work.'
+        );
+        expect(client.staleHost?.fix).toMatch(
+          /^Stop it \(pid \d+\), then run the command again\.$/
+        );
+      } finally {
+        hostBuildOverride.value = undefined;
+      }
     });
   });
 
@@ -370,7 +448,7 @@ describe('BridgeConnection', () => {
         SessionNotFoundError
       );
       await expect(conn.resolveSessionAsync()).rejects.toThrow(
-        'No sessions connected'
+        'No Studio is connected to studio-bridge.'
       );
     }, 15_000);
 
@@ -424,7 +502,7 @@ describe('BridgeConnection', () => {
         SessionNotFoundError
       );
       await expect(conn.resolveSessionAsync()).rejects.toThrow(
-        'Multiple Studio instances'
+        'Several Studios are connected, so this needs a --target.'
       );
     });
 
@@ -456,7 +534,7 @@ describe('BridgeConnection', () => {
         SessionNotFoundError
       );
       await expect(conn.resolveSessionAsync('nonexistent')).rejects.toThrow(
-        "Session 'nonexistent' not found"
+        "No connected Studio matches --target 'nonexistent'."
       );
     });
 
@@ -713,7 +791,7 @@ describe('BridgeConnection', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       await expect(conn.resolveSessionAsync('test-place')).rejects.toThrow(
-        /matches several Studio instances/
+        "--target 'test-place' matches several Studios."
       );
       await expect(conn.resolveSessionAsync('missing')).rejects.toThrow(
         SessionNotFoundError
@@ -846,7 +924,7 @@ describe('BridgeConnection', () => {
         vi.advanceTimersByTime(600);
 
         await expect(waitPromise).rejects.toThrow(
-          'Timed out waiting for a session'
+          'No Studio connected within 0.5s.'
         );
       } finally {
         vi.useRealTimers();

@@ -3,14 +3,16 @@
  * into a binary model (.rbxm).
  */
 
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
-import type { BridgeSession } from '../../../bridge/index.js';
+import type { BridgeSession, InstanceRef } from '../../../bridge/index.js';
+import { formatInstanceTree } from '../../shared/instance-tree.js';
 
 export interface ExportResult {
   /** The binary model (.rbxm), base64-encoded. */
   data: string;
-  paths: string[];
+  instances: InstanceRef[];
   bytes: number;
   summary: string;
 }
@@ -28,11 +30,13 @@ export async function exportInstancesHandlerAsync(
 
   return {
     data: result.data,
-    paths: result.paths,
+    instances: result.instances,
     bytes,
-    summary: `Exported ${
-      result.paths.length
-    } instance(s) (${bytes} bytes): ${result.paths.join(', ')}`,
+    summary: `Exported ${formatCount(
+      result.instances.length,
+      'instance',
+      'instances'
+    )} (${formatCount(bytes, 'byte', 'bytes')})`,
   };
 }
 
@@ -53,7 +57,7 @@ export const exportCommand = defineCommand<ExportArgs, ExportResult>({
   },
   cli: {
     binaryField: 'data',
-    format: (result) => result.summary,
+    body: (result) => formatInstanceTree(result.instances),
   },
   handler: async (session, args) =>
     exportInstancesHandlerAsync(session, args.paths),

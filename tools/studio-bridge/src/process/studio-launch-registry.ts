@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
-import * as os from 'os';
 import * as path from 'path';
+import { getStateDir } from '../state-dir.js';
 
 const LAUNCH_MATCH_WINDOW_MS = 10_000;
 const MAX_RECORDS = 50;
@@ -13,7 +13,7 @@ export interface StudioLaunchRecord {
 }
 
 export function defaultLaunchRegistryPath(): string {
-  return path.join(os.tmpdir(), 'studio-bridge', 'launches.json');
+  return path.join(getStateDir(), 'launches.json');
 }
 
 export async function recordStudioLaunchAsync(

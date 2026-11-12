@@ -2,9 +2,9 @@ import { describe, it, expect, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import { hashTemplateDirAsync } from './plugin-build-version.js';
+import { hashPluginPackageAsync } from './plugin-build-version.js';
 
-describe('hashTemplateDirAsync', () => {
+describe('hashPluginPackageAsync', () => {
   const dirs: string[] = [];
 
   afterEach(async () => {
@@ -14,12 +14,16 @@ describe('hashTemplateDirAsync', () => {
     dirs.length = 0;
   });
 
-  async function makeTemplateAsync(
+  async function makePackageAsync(
     files: Record<string, string>
   ): Promise<string> {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'sb-template-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'sb-plugin-'));
     dirs.push(dir);
-    for (const [name, contents] of Object.entries(files)) {
+    const allFiles: Record<string, string> = {
+      'package.json': '{}',
+      ...files,
+    };
+    for (const [name, contents] of Object.entries(allFiles)) {
       await fs.mkdir(path.dirname(path.join(dir, name)), { recursive: true });
       await fs.writeFile(path.join(dir, name), contents);
     }
@@ -27,29 +31,61 @@ describe('hashTemplateDirAsync', () => {
   }
 
   it('changes when plugin source changes', async () => {
-    const before = await makeTemplateAsync({ 'src/Plugin.lua': 'print(1)' });
-    const after = await makeTemplateAsync({ 'src/Plugin.lua': 'print(2)' });
+    const before = await makePackageAsync({ 'src/Plugin.lua': 'print(1)' });
+    const after = await makePackageAsync({ 'src/Plugin.lua': 'print(2)' });
 
-    expect(await hashTemplateDirAsync(before)).not.toBe(
-      await hashTemplateDirAsync(after)
+    expect(await hashPluginPackageAsync(before)).not.toBe(
+      await hashPluginPackageAsync(after)
     );
   });
 
-  it('ignores specs and line endings', async () => {
-    const plain = await makeTemplateAsync({ 'src/Plugin.lua': 'a\nb\n' });
-    const withSpec = await makeTemplateAsync({
+  it('ignores specs, the Jest config and line endings', async () => {
+    const plain = await makePackageAsync({ 'src/Plugin.lua': 'a\nb\n' });
+    const withTests = await makePackageAsync({
       'src/Plugin.lua': 'a\r\nb\r\n',
       'src/Plugin.spec.lua': 'test',
+      'src/jest.config.lua': 'return {}',
     });
 
-    expect(await hashTemplateDirAsync(plain)).toBe(
-      await hashTemplateDirAsync(withSpec)
+    expect(await hashPluginPackageAsync(plain)).toBe(
+      await hashPluginPackageAsync(withTests)
+    );
+  });
+
+  it('changes when a runtime dependency changes, but not a dev dependency', async () => {
+    const files = {
+      'package.json': JSON.stringify({
+        dependencies: { dep: '1' },
+        devDependencies: { devdep: '1' },
+      }),
+      'src/Plugin.lua': 'print(1)',
+      'node_modules/devdep/src/Dev.lua': 'print(1)',
+    };
+    const before = await makePackageAsync({
+      ...files,
+      'node_modules/dep/src/Dep.lua': 'print(1)',
+    });
+    const after = await makePackageAsync({
+      ...files,
+      'node_modules/dep/src/Dep.lua': 'print(2)',
+    });
+    const devChanged = await makePackageAsync({
+      ...files,
+      'node_modules/dep/src/Dep.lua': 'print(1)',
+      'node_modules/devdep/src/Dev.lua': 'print(2)',
+    });
+
+    expect(await hashPluginPackageAsync(before)).not.toBe(
+      await hashPluginPackageAsync(after)
+    );
+    expect(await hashPluginPackageAsync(before)).toBe(
+      await hashPluginPackageAsync(devChanged)
     );
   });
 
   it('is a short hex string', async () => {
-    const dir = await makeTemplateAsync({ 'src/Plugin.lua': 'print(1)' });
+    const dir = await makePackageAsync({ 'src/Plugin.lua': 'print(1)' });
 
-    expect(await hashTemplateDirAsync(dir)).toMatch(/^[0-9a-f]{12}$/);
+    expect(await hashPluginPackageAsync(dir)).toMatch(/^[0-9a-f]{12}$/);
   });
 });

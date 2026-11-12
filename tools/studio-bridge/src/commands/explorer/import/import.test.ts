@@ -4,6 +4,12 @@ import * as os from 'os';
 import * as path from 'path';
 import { importInstancesHandlerAsync } from './import.js';
 
+const MAP = {
+  path: 'Workspace.Map',
+  segments: ['Workspace', 'Map'],
+  className: 'Model',
+};
+
 describe('importInstancesHandlerAsync', () => {
   const dirs: string[] = [];
 
@@ -24,9 +30,7 @@ describe('importInstancesHandlerAsync', () => {
 
   function createSession() {
     return {
-      importInstancesAsync: vi
-        .fn()
-        .mockResolvedValue({ paths: ['Workspace.Map'] }),
+      importInstancesAsync: vi.fn().mockResolvedValue({ instances: [MAP] }),
     } as any;
   }
 
@@ -40,7 +44,8 @@ describe('importInstancesHandlerAsync', () => {
       Buffer.from('<roblox!model').toString('base64'),
       'Workspace'
     );
-    expect(result.paths).toEqual(['Workspace.Map']);
+    expect(result.instances).toEqual([MAP]);
+    expect(result.summary).toBe('Imported 1 instance');
   });
 
   it('uses the given parent', async () => {

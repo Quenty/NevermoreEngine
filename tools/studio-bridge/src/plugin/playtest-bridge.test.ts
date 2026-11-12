@@ -26,28 +26,20 @@ describe('wrapPrecompiledSource', () => {
 });
 
 describe('buildPlaytestBridgeAsync', () => {
-  it('plants the Shared modules with the plugin version filled in', async () => {
-    const bridge = await buildPlaytestBridgeAsync();
-
-    expect(Object.keys(bridge.modules)).toContain('StudioBridgeClient');
-    expect(Object.keys(bridge.modules)).toContain('PrecompiledSources');
-    expect(Object.keys(bridge.modules).some((n) => n.endsWith('.spec'))).toBe(
-      false
-    );
-    expect(bridge.modules.StudioBridgeSessionUtils).not.toContain(
-      '{{PLUGIN_VERSION}}'
-    );
-    expect(bridge.entrySource).toContain('StudioBridgeClient.start');
+  it('asks for a client copy only when told to', async () => {
+    expect((await buildPlaytestBridgeAsync()).client).toBeUndefined();
+    expect(
+      (await buildPlaytestBridgeAsync([], { withClient: true })).client
+    ).toBe(true);
   });
 
-  it('precompiles every action plus the given scripts', async () => {
-    const bridge = await buildPlaytestBridgeAsync(['return "mine"']);
+  it('precompiles only the given scripts, since the plugin plants its actions', async () => {
+    const bridge = await buildPlaytestBridgeAsync([
+      'return "mine"',
+      'return "mine"',
+    ]);
 
-    expect(bridge.precompiled.some((s) => s.includes('return "mine"'))).toBe(
-      true
-    );
-    expect(bridge.precompiled.some((s) => s.includes('ExecuteAction'))).toBe(
-      true
-    );
+    expect(bridge.precompiled).toHaveLength(1);
+    expect(bridge.precompiled[0]).toContain('return "mine"');
   });
 });

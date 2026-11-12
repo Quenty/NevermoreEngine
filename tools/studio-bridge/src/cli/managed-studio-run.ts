@@ -7,11 +7,12 @@
 
 import { randomUUID } from 'crypto';
 import * as path from 'path';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
+import { BuildContext } from '@quenty/nevermore-template-helpers/build';
 import {
-  BuildContext,
   resolvePackagePath,
   resolveTemplatePath,
-} from '@quenty/nevermore-template-helpers';
+} from '@quenty/nevermore-template-helpers/resolve-template-path';
 import { BridgeConnection } from '../bridge/index.js';
 import type { BridgeSession, ExecResult } from '../bridge/index.js';
 import type { StudioBridgePhase } from '../server/studio-bridge-server.js';
@@ -123,9 +124,13 @@ export function waitForLaunchedSessionAsync(
     const timer = setTimeout(() => {
       connection.off('session-connected', onSession);
       reject(
-        new Error(
-          `The launched Studio did not connect within ${timeoutMs}ms. Is the studio-bridge plugin installed?`
-        )
+        new StudioBridgeError({
+          code: 'NO_STUDIO_CONNECTED',
+          message: `The Studio that was launched didn't connect within ${Math.round(
+            timeoutMs / 1000
+          )}s.`,
+          fix: "Run 'studio-bridge plugin install', then run the command again.",
+        })
       );
     }, timeoutMs);
 

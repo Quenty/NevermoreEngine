@@ -16,11 +16,11 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { BuildContext } from '@quenty/nevermore-template-helpers/build';
 import {
-  BuildContext,
   resolvePackagePath,
   resolveTemplatePath,
-} from '@quenty/nevermore-template-helpers';
+} from '@quenty/nevermore-template-helpers/resolve-template-path';
 import {
   type OutputLevel,
   type Capability,
@@ -41,6 +41,7 @@ import {
   type InjectedPlugin,
 } from '../plugin/plugin-injector.js';
 import { isPersistentPluginInstalled } from '../plugin/plugin-discovery.js';
+import { StudioBridgeError } from '../messages/studio-bridge-error.js';
 import {
   launchStudioAsync,
   type StudioProcess,
@@ -194,7 +195,7 @@ function startHttpAndWsServerAsync(
 const ACTION_CAPABILITIES: Record<string, Capability> = {
   queryState: 'queryState',
   captureScreenshot: 'captureScreenshot',
-  queryDataModel: 'queryDataModel',
+  inspectInstance: 'inspectInstance',
   queryLogs: 'queryLogs',
   execute: 'execute',
 };
@@ -507,9 +508,10 @@ export class StudioBridgeServer {
         }`
       );
 
-      for (const actionName of needed) {
-        const action = this._actionSources.find((a) => a.name === actionName);
-        if (!action) continue;
+      const neededSet = new Set(needed);
+      for (const action of this._actionSources) {
+        if (!neededSet.has(action.name)) continue;
+        const actionName = action.name;
 
         OutputHelper.verbose(
           `[StudioBridge] Registering action: ${actionName}`
@@ -601,7 +603,7 @@ export class StudioBridgeServer {
       'execute',
       'queryState',
       'captureScreenshot',
-      'queryDataModel',
+      'inspectInstance',
       'queryLogs',
     ];
 
@@ -643,7 +645,7 @@ export class StudioBridgeServer {
       'execute',
       'queryState',
       'captureScreenshot',
-      'queryDataModel',
+      'inspectInstance',
       'queryLogs',
     ];
 
@@ -654,9 +656,13 @@ export class StudioBridgeServer {
         if (!settled) {
           settled = true;
           reject(
-            new Error(
-              `Timed out waiting for Studio plugin handshake after ${this._defaultTimeoutMs}ms`
-            )
+            new StudioBridgeError({
+              code: 'NO_STUDIO_CONNECTED',
+              message: `The launched Studio's studio-bridge plugin didn't connect within ${
+                this._defaultTimeoutMs / 1000
+              }s.`,
+              fix: "Check Studio opened the place and isn't stuck on a dialog, then run the command again.",
+            })
           );
         }
       }, this._defaultTimeoutMs);

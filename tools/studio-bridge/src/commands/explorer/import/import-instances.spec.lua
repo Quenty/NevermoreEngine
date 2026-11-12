@@ -51,7 +51,7 @@ describe("importInstances", function()
 		local response = controller.import({ data = controller.data, parentPath = controller.parentPath })
 
 		expect(response.type).toEqual("importInstancesResult")
-		expect(response.payload.paths).toEqual({ `{controller.parent:GetFullName()}.Score` })
+		expect(response.payload.instances[1].path).toEqual(`{controller.parent:GetFullName()}.Score`)
 		expect((controller.parent:FindFirstChild("Score") :: IntValue).Value).toEqual(42)
 
 		controller:Destroy()

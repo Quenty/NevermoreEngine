@@ -14,9 +14,9 @@ import { resolveScriptContentAsync } from '../../../cli/resolve-script-content.j
 import type { BridgeConnection, BridgeSession } from '../../../bridge/index.js';
 import type { RunAs } from '../../../bridge/types.js';
 import { tryExecuteLuauAsync } from '../../../roblox-mcp/index.js';
-import { listStudioProcessesAsync } from '../../../process/studio-process-closer.js';
-import { resolveSessionPidsAsync } from '../../../process/studio-process-identity.js';
+import { resolveStudioMcpTargetAsync } from '../../shared/studio-mcp-target.js';
 import type { SerializedReturnValue } from '../../../server/web-socket-protocol.js';
+import { invalidInput } from '../../../messages/studio-bridge-error.js';
 
 export interface ExecOptions {
   scriptContent: string;
@@ -104,9 +104,7 @@ export async function execHandlerAsync(
     traceback: result.traceback,
     returnValues: result.returnValues,
     ...(result.ranAs ? { ranAs: result.ranAs } : {}),
-    summary: result.success
-      ? 'Script executed successfully'
-      : `Script failed: ${result.error}`,
+    summary: result.success ? 'Script executed successfully' : 'Script failed.',
   };
 }
 
@@ -121,7 +119,10 @@ export async function readInputFilesAsync(
       try {
         return await fs.readFile(path.resolve(file));
       } catch {
-        throw new Error(`Input file not found: ${file}`);
+        throw invalidInput(
+          `Can't read the --input file '${file}'.`,
+          'Check the path, then run the command again.'
+        );
       }
     })
   );
@@ -133,27 +134,14 @@ async function execThroughMcpAsync(
   connection?: BridgeConnection
 ): Promise<ExecResult> {
   if (options.args?.length || options.inputs?.length) {
-    throw new Error(
-      "--run-as mcp can't pass args or --input: Studio's MCP server only takes the code."
+    throw invalidInput(
+      "--run-as mcp can't pass args or --input, since Studio's MCP server only takes the code.",
+      'Drop the args and --input, or use another --run-as.'
     );
   }
-  const processes = connection
-    ? await listStudioProcessesAsync().catch(() => [])
-    : [];
-  const sessionPids =
-    connection && processes.length > 0
-      ? await resolveSessionPidsAsync(connection, processes, [
-          session.info.instanceId,
-        ])
-      : undefined;
   const result = await tryExecuteLuauAsync(options.scriptContent, {
-    target: session.info.instanceId,
+    ...(await resolveStudioMcpTargetAsync(session, connection)),
     context: session.info.context,
-    sessions: connection?.listSessions() ?? [session.info],
-    ...(sessionPids ? { sessionPids } : {}),
-    ...(processes.length > 0
-      ? { listWindowsAsync: async () => processes }
-      : {}),
     ...(options.timeout !== undefined ? { timeoutMs: options.timeout } : {}),
   });
   return result.success
@@ -167,10 +155,15 @@ async function execThroughMcpAsync(
     : {
         success: false,
         output: [],
-        error: `Studio's MCP server: ${result.message}`,
+        error: attributeToStudioMcp(result.message),
         ranAs: 'mcp',
-        summary: `Script failed: ${result.message}`,
+        summary: 'Script failed.',
       };
+}
+
+function attributeToStudioMcp(message: string): string {
+  const source = "Studio's MCP server";
+  return message.startsWith(source) ? message : `${source}: ${message}`;
 }
 
 /**
@@ -195,7 +188,7 @@ export async function runHandlerAsync(
     returnValues: result.returnValues,
     summary: result.success
       ? `Script ${options.scriptPath} executed successfully`
-      : `Script ${options.scriptPath} failed: ${result.error}`,
+      : `Script ${options.scriptPath} failed.`,
   };
 }
 
@@ -225,7 +218,6 @@ export function formatExecText(result: {
   error?: string;
   traceback?: string;
   ranAs?: RunAs;
-  summary: string;
 }): string {
   const lines = [...result.output];
   if (result.returnValues && result.returnValues.length > 0) {
@@ -237,7 +229,7 @@ export function formatExecText(result: {
   if (result.ranAs && result.ranAs !== 'plugin') {
     lines.push(OutputHelper.formatDim(`(ran as ${result.ranAs})`));
   }
-  return lines.length > 0 ? lines.join('\n') : result.summary;
+  return lines.join('\n');
 }
 
 export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
@@ -276,7 +268,8 @@ export const execCommand = defineCommand<ConsoleExecArgs, ExecResult>({
     }),
   },
   cli: {
-    format: formatExecText,
+    body: formatExecText,
+    output: 'data',
   },
   handler: async (session, args, connection) => {
     const { scriptContent } = await resolveScriptContentAsync(args);

@@ -13,7 +13,7 @@ import {
   type StudioBridgePhase,
 } from './studio-bridge-server.js';
 
-vi.mock('@quenty/nevermore-template-helpers', () => ({
+vi.mock('@quenty/nevermore-template-helpers/build', () => ({
   BuildContext: {
     createAsync: vi.fn(async () => ({
       resolvePath: vi.fn((rel: string) => `/fake/tmp/${rel}`),
@@ -22,6 +22,8 @@ vi.mock('@quenty/nevermore-template-helpers', () => ({
       cleanupAsync: vi.fn(async () => {}),
     })),
   },
+}));
+vi.mock('@quenty/nevermore-template-helpers/resolve-template-path', () => ({
   resolvePackagePath: vi.fn((..._args: any[]) => '/fake/transform-script.lua'),
   resolveTemplatePath: vi.fn((..._args: any[]) => '/fake/default.project.json'),
 }));
@@ -202,7 +204,7 @@ describe('StudioBridgeServer', () => {
 
       // startAsync should time out
       await expect(startPromise).rejects.toThrow(
-        'Timed out waiting for Studio plugin handshake'
+        "The launched Studio's studio-bridge plugin didn't connect"
       );
     });
   });

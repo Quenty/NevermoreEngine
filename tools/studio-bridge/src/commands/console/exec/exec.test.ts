@@ -70,7 +70,7 @@ describe('execHandlerAsync', () => {
     expect(result.success).toBe(false);
     expect(result.output).toEqual([]);
     expect(result.error).toBe('Syntax error on line 1');
-    expect(result.summary).toBe('Script failed: Syntax error on line 1');
+    expect(result.summary).toBe('Script failed.');
   });
 
   it('forwards timeout to session.execAsync', async () => {
@@ -280,7 +280,7 @@ describe('execHandlerAsync', () => {
 });
 
 describe('execCommand text format', () => {
-  const format = execCommand.cli!.format!;
+  const format = execCommand.cli!.body!;
 
   function formatResult(result: Partial<ExecResult>): string {
     return format({
@@ -313,10 +313,8 @@ describe('execCommand text format', () => {
     ).toBe('nil\t[1,2]\t{"type":"Vector3","value":[1,2,3]}');
   });
 
-  it('falls back to the summary when nothing was printed or returned', () => {
-    expect(formatResult({ returnValues: [] })).toBe(
-      'Script executed successfully'
-    );
+  it('renders nothing when nothing was printed or returned', () => {
+    expect(formatResult({ returnValues: [] })).toBe('');
   });
 
   it('appends the error after any output', () => {
@@ -364,7 +362,7 @@ describe('runHandlerAsync', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('Syntax error');
-    expect(result.summary).toBe('Script /tmp/broken.lua failed: Syntax error');
+    expect(result.summary).toBe('Script /tmp/broken.lua failed.');
   });
 
   it('forwards timeout to session.execAsync', async () => {

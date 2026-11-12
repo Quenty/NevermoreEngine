@@ -9,6 +9,21 @@
     "CLI"
   ],
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./build": "./dist/build/index.js",
+    "./resolve-template-path": "./dist/scaffolding/resolve-template-path.js"
+  },
+  "typesVersions": {
+    "*": {
+      "build": [
+        "dist/build/index.d.ts"
+      ],
+      "resolve-template-path": [
+        "dist/scaffolding/resolve-template-path.d.ts"
+      ]
+    }
+  },
   "bugs": {
     "url": "https://github.com/Quenty/Nevermore/issues"
   },

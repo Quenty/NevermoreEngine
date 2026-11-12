@@ -50,7 +50,7 @@ describe("exportInstances", function()
 		local response = controller.export({ paths = { controller.rootPath } })
 
 		expect(response.type).toEqual("exportInstancesResult")
-		expect(response.payload.paths).toEqual({ controller.root:GetFullName() })
+		expect(response.payload.instances[1].path).toEqual(controller.root:GetFullName())
 
 		local decoded = game:GetService("EncodingService"):Base64Decode(buffer.fromstring(response.payload.data))
 		expect(buffer.readstring(decoded, 0, 8)).toEqual("<roblox!")

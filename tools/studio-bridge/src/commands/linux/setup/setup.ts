@@ -7,6 +7,7 @@ import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { checkLinuxEnvironmentAsync } from '../../../linux/linux-env-guard.js';
+import { StudioBridgeError } from '../../../messages/studio-bridge-error.js';
 
 interface SetupArgs {
   'install-deps': boolean;
@@ -22,98 +23,86 @@ interface SetupResult {
 }
 
 export async function setupHandlerAsync(args: SetupArgs): Promise<SetupResult> {
-  try {
-    const envError = await checkLinuxEnvironmentAsync();
-    if (envError) {
-      return { success: false, summary: envError };
-    }
-
-    const linux = await import('../../../linux/index.js');
-    const config = linux.resolveLinuxConfig();
-
-    // Override studioDir if provided
-    if (args['studio-dir']) {
-      config.studioDir = args['studio-dir'];
-    }
-
-    // Step 1: Install system deps
-    if (args['install-deps']) {
-      OutputHelper.info('Installing system dependencies...');
-      await linux.installDependenciesAsync();
-    }
-
-    // Step 2: Check prerequisites
-    OutputHelper.info('Checking prerequisites...');
-    const results = linux.checkPrerequisites();
-    const missing = results.filter((r) => !r.available);
-    if (missing.length > 0) {
-      for (const m of missing) {
-        OutputHelper.error(`Missing: ${m.name} — ${m.hint}`);
-      }
-      if (!args['install-deps']) {
-        OutputHelper.hint(
-          'Run with --install-deps to install missing dependencies'
-        );
-      }
-      return {
-        success: false,
-        summary: `Missing prerequisites: ${missing
-          .map((m) => m.name)
-          .join(', ')}`,
-      };
-    }
-    OutputHelper.info('All prerequisites satisfied.');
-
-    // Step 3: Resolve version
-    const version = await linux.resolveStudioVersionAsync(
-      args['studio-version']
-    );
-    OutputHelper.info(`Studio version: ${version}`);
-
-    // Step 4: Check if already installed
-    const { readInstalledVersionAsync } = await import(
-      '../../../linux/linux-version-resolver.js'
-    );
-    const installed = await readInstalledVersionAsync(config.studioDir);
-    if (installed === version && !args.force) {
-      OutputHelper.info(
-        `Studio ${version} already installed. Use --force to reinstall.`
-      );
-    } else {
-      await linux.installStudioAsync(config, version);
-    }
-
-    // Step 5: Patch shaders
-    if (!args['skip-shaders']) {
-      await linux.patchShadersAsync(config);
-    }
-
-    // Step 6: Write FFlags
-    await linux.writeFflagsAsync(config);
-
-    // Step 7: Compile write-cred.exe
-    const { compileWriteCredAsync } = await import(
-      '../../../linux/linux-credential-writer.js'
-    );
-    await compileWriteCredAsync(config);
-
-    // Step 8: Start display
-    await linux.ensureDisplayAsync(config);
-    await linux.ensureWindowManagerAsync(config);
-
-    OutputHelper.info('Linux setup complete.');
-    OutputHelper.hint(
-      'Next: run "studio-bridge linux inject-credentials" to inject credentials'
-    );
-
-    return {
-      success: true,
-      summary: `Studio ${version} installed and configured`,
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return { success: false, summary: message };
+  const envError = await checkLinuxEnvironmentAsync();
+  if (envError) {
+    throw envError;
   }
+
+  const linux = await import('../../../linux/index.js');
+  const config = linux.resolveLinuxConfig();
+
+  // Override studioDir if provided
+  if (args['studio-dir']) {
+    config.studioDir = args['studio-dir'];
+  }
+
+  // Step 1: Install system deps
+  if (args['install-deps']) {
+    OutputHelper.info('Installing system dependencies...');
+    await linux.installDependenciesAsync();
+  }
+
+  // Step 2: Check prerequisites
+  OutputHelper.info('Checking prerequisites...');
+  const results = linux.checkPrerequisites();
+  const missing = results.filter((r) => !r.available);
+  if (missing.length > 0) {
+    throw new StudioBridgeError({
+      code: 'LINUX_PREREQUISITES_MISSING',
+      message: `${missing.map((m) => m.name).join(', ')} ${
+        missing.length === 1 ? 'is' : 'are'
+      } missing, and Studio needs them under Wine.`,
+      fix: args['install-deps']
+        ? missing.map((m) => m.hint).join(' ')
+        : "Run 'studio-bridge linux setup --install-deps'.",
+    });
+  }
+  OutputHelper.info('All prerequisites satisfied.');
+
+  // Step 3: Resolve version
+  const version = await linux.resolveStudioVersionAsync(args['studio-version']);
+  OutputHelper.info(`Studio version: ${version}`);
+
+  // Step 4: Check if already installed
+  const { readInstalledVersionAsync } = await import(
+    '../../../linux/linux-version-resolver.js'
+  );
+  const installed = await readInstalledVersionAsync(config.studioDir);
+  if (installed === version && !args.force) {
+    OutputHelper.info(
+      `Studio ${version} already installed. Use --force to reinstall.`
+    );
+  } else {
+    await linux.installStudioAsync(config, version);
+  }
+
+  // Step 5: Patch shaders
+  if (!args['skip-shaders']) {
+    await linux.patchShadersAsync(config);
+  }
+
+  // Step 6: Write FFlags
+  await linux.writeFflagsAsync(config);
+
+  // Step 7: Compile write-cred.exe
+  const { compileWriteCredAsync } = await import(
+    '../../../linux/linux-credential-writer.js'
+  );
+  await compileWriteCredAsync(config);
+
+  // Step 8: Start display
+  await linux.ensureDisplayAsync(config);
+  await linux.ensureWindowManagerAsync(config);
+
+  OutputHelper.info('Linux setup complete.');
+  OutputHelper.hint(
+    'Next: run "studio-bridge linux inject-credentials" to inject credentials'
+  );
+
+  return {
+    success: true,
+    summary: `Studio ${version} installed and configured`,
+  };
 }
 
 export const linuxSetupCommand = defineCommand<SetupArgs, SetupResult>({

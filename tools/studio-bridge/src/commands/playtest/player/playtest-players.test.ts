@@ -146,7 +146,7 @@ describe('removePlaytestPlayersAsync', () => {
       removePlaytestPlayersAsync(createConnection([server]), server as any, [
         'Player2',
       ])
-    ).rejects.toThrow('Players still in the playtest after 60s: Player2');
+    ).rejects.toThrow('Player2 is still in the playtest after 60s.');
   });
 
   it('refuses an unknown name before removing anyone', async () => {
@@ -159,7 +159,11 @@ describe('removePlaytestPlayersAsync', () => {
         'Player1',
         'Nobody',
       ])
-    ).rejects.toThrow("No player named 'Nobody' (players: Player1)");
+    ).rejects.toMatchObject({
+      message:
+        "No player named 'Nobody' is in the playtest, so nobody was removed.",
+      fix: 'Use one of: Player1.',
+    });
     expect(server.requests).toHaveLength(1);
   });
 });

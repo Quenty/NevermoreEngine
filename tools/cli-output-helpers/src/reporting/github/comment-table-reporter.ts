@@ -4,8 +4,8 @@ import {
   type PackageStatus,
   type ProgressSummary,
   BaseReporter,
-} from '../reporter.js';
-import { type IStateTracker } from '../state/state-tracker.js';
+} from '../batch/reporter.js';
+import { type IStateTracker } from '../batch/state/state-tracker.js';
 import {
   type GithubCommentTableConfig,
   formatGithubTableBody,

@@ -35,11 +35,10 @@ export {
   type ScreenshotOptions,
 } from './viewport/screenshot/screenshot.js';
 export {
-  queryDataModelHandlerAsync,
-  type QueryResult,
-  type QueryOptions,
-  type DataModelNode,
-} from './explorer/query/query.js';
+  inspectInstanceHandlerAsync,
+  type InspectResult,
+  type InspectOptions,
+} from './explorer/inspect/inspect.js';
 export {
   exportInstancesHandlerAsync,
   type ExportResult,
@@ -54,6 +53,18 @@ export {
   type FindResult,
   type FindOptions,
 } from './explorer/find/find.js';
+export {
+  sampleInstancesHandlerAsync,
+  type SampleResult,
+  type SampleOptions,
+  type SampleRow,
+} from './explorer/sample/sample.js';
+export {
+  recordViewportHandlerAsync,
+  type RecordResult,
+  type RecordOptions,
+  type RecordedFrame,
+} from './viewport/record/record.js';
 export {
   grepScriptsHandlerAsync,
   type GrepResult,

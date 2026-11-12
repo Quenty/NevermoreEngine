@@ -45,9 +45,9 @@ export function formatPlayerRemoveText(
   result: PlaytestPlayerRemoveResult
 ): string {
   const kicked = result.players.filter((p) => p.how === 'kicked');
-  if (kicked.length === 0) return result.summary;
+  if (kicked.length === 0) return '';
 
-  return `${result.summary}\nKicked ${kicked
+  return `Kicked ${kicked
     .map((p) => p.name)
     .join(
       ', '
@@ -71,7 +71,7 @@ export const playtestPlayerRemoveCommand = defineCommand<
     }),
   },
   cli: {
-    format: formatPlayerRemoveText,
+    body: formatPlayerRemoveText,
   },
   handler: async (connection, args, targeting) =>
     playtestPlayerRemoveHandlerAsync(connection, args.names, targeting.target),

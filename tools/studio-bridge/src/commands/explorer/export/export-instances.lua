@@ -4,10 +4,14 @@
 	model (.rbxm) with SerializationService and answers with it as base64.
 
 	Request: `{ type: "exportInstances", payload: { paths: { string } } }`
-	Response: `{ type: "exportInstancesResult", payload: { data, paths } }`
+	Response: `{ type: "exportInstancesResult", payload: { data, instances } }`, `instances` being InstanceRefs
 
 	@class ExportInstancesAction
 ]=]
+
+local require = require(script.Parent.loader).load(script)
+
+local InstanceRef = require("InstanceRef")
 
 local ExportInstancesAction = {}
 
@@ -29,7 +33,6 @@ function ExportInstancesAction.register(router: any)
 			end
 
 			local instances = {}
-			local fullNames = {}
 			for _, path in paths do
 				local instance = ExportInstancesAction._resolveInstance(path)
 				if not instance then
@@ -40,7 +43,6 @@ function ExportInstancesAction.register(router: any)
 					}
 				end
 				table.insert(instances, instance)
-				table.insert(fullNames, instance:GetFullName())
 			end
 
 			local serializeOk, serialized = pcall(function()
@@ -67,7 +69,7 @@ function ExportInstancesAction.register(router: any)
 
 			return {
 				data = encoded,
-				paths = fullNames,
+				instances = InstanceRef.fromList(instances),
 			}
 		end
 	)

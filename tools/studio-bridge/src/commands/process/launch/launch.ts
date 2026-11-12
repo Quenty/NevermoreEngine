@@ -12,6 +12,7 @@ import {
   DEPLOY_CONFIG_FILE_NAME,
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
+import { invalidInput } from '../../../messages/studio-bridge-error.js';
 
 const BASEPLATE_TEMPLATE = { placeId: 95206881, universeId: 28220420 };
 
@@ -40,8 +41,9 @@ export async function launchHandlerAsync(
   const hasExplicitPlace =
     options.placePath !== undefined || options.placeId !== undefined;
   if (hasExplicitPlace && options.deployTarget !== undefined) {
-    throw new Error(
-      `Pass a deploy target or --place / --place-id, not both (got '${options.deployTarget}')`
+    throw invalidInput(
+      `Both a deploy target ('${options.deployTarget}') and --place or --place-id were given.`,
+      'Use one of them.'
     );
   }
 

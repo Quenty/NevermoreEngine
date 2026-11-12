@@ -233,7 +233,7 @@ describe('matchStudiosAsync by uptime', () => {
     const now = Date.now();
     const { client } = await startAsync([
       { id: 'mcp-old', name: 'Place1', placeId: 0, gameId: 0, uptime: 300 },
-      { id: 'mcp-new', name: 'Place1', placeId: 0, gameId: 0, uptime: 290 },
+      { id: 'mcp-new', name: 'Place1', placeId: 0, gameId: 0, uptime: 260 },
     ]);
     const windows = [
       {
@@ -244,7 +244,7 @@ describe('matchStudiosAsync by uptime', () => {
       {
         pid: 80,
         windowTitle: 'Place1 - Roblox Studio',
-        startedAt: now - 290_000,
+        startedAt: now - 260_000,
       },
     ];
 

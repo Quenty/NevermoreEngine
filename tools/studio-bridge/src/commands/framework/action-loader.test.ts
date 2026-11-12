@@ -111,6 +111,13 @@ describe('loadActionSourcesAsync', () => {
     const results = await loadActionSourcesAsync();
 
     expect(results.map((r) => r.name).sort()).toEqual([
+      'ActionReply',
+      'ChangeWatcher',
+      'FrameRecorder',
+      'InstanceQuery',
+      'InstanceRef',
+      'SampleValues',
+      'ViewportCapture',
       'capture-screenshot',
       'end-playtest',
       'execute',
@@ -118,12 +125,75 @@ describe('loadActionSourcesAsync', () => {
       'find-instances',
       'grep-scripts',
       'import-instances',
+      'inspect-instance',
       'playtest-players',
-      'query-data-model',
       'query-logs',
       'query-state',
+      'record-viewport',
+      'sample-instances',
       'start-playtest',
     ]);
+  });
+
+  it('orders every shipped module after the pushed modules it requires', async () => {
+    const results = await loadActionSourcesAsync();
+    const names = results.map((r) => r.name);
+
+    expect(names.indexOf('FrameRecorder')).toBeLessThan(
+      names.indexOf('record-viewport')
+    );
+    for (const action of [
+      'find-instances',
+      'grep-scripts',
+      'sample-instances',
+    ]) {
+      expect(names.indexOf('InstanceQuery')).toBeLessThan(
+        names.indexOf(action)
+      );
+    }
+  });
+
+  it('orders a module after the modules it requires', async () => {
+    await fs.writeFile(
+      path.join(tmpDir, 'a-action.lua'),
+      'local Lib = require("Lib")\nreturn {}'
+    );
+    await fs.writeFile(path.join(tmpDir, 'Lib.lua'), 'return {}');
+
+    const results = await loadActionSourcesAsync(tmpDir);
+
+    expect(results.map((r) => r.name)).toEqual(['Lib', 'a-action']);
+  });
+
+  it('changes a module hash when a module it requires changes', async () => {
+    const actionPath = path.join(tmpDir, 'action.lua');
+    const libPath = path.join(tmpDir, 'Lib.lua');
+    await fs.writeFile(actionPath, 'local Lib = require("Lib")\nreturn {}');
+    await fs.writeFile(libPath, 'return { version = 1 }');
+    const before = await loadActionSourcesAsync(tmpDir);
+
+    await fs.writeFile(libPath, 'return { version = 2 }');
+    const after = await loadActionSourcesAsync(tmpDir);
+
+    const hashOf = (results: typeof before, name: string) =>
+      results.find((r) => r.name === name)!.hash;
+    expect(hashOf(after, 'action')).not.toBe(hashOf(before, 'action'));
+  });
+
+  it('ignores requires of modules it does not push', async () => {
+    const source = 'local Maid = require("Maid")\nreturn {}';
+    await fs.writeFile(path.join(tmpDir, 'action.lua'), source);
+
+    const results = await loadActionSourcesAsync(tmpDir);
+
+    expect(results[0].hash).toBe(sha256(source));
+  });
+
+  it('rejects modules that require each other in a cycle', async () => {
+    await fs.writeFile(path.join(tmpDir, 'A.lua'), 'require("B")');
+    await fs.writeFile(path.join(tmpDir, 'B.lua'), 'require("A")');
+
+    await expect(loadActionSourcesAsync(tmpDir)).rejects.toThrow(/cycle/);
   });
 
   it('returns empty array for empty directory', async () => {

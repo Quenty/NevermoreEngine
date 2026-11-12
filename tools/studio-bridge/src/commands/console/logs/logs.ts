@@ -3,15 +3,24 @@
  * Studio session's ring buffer.
  */
 
-import { defineCommand } from '../../framework/define-command.js';
+import {
+  defineCommand,
+  type ResultTable,
+} from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
+import { formatCount } from '@quenty/cli-output-helpers/reporting';
 import type { BridgeConnection, BridgeSession } from '../../../bridge/index.js';
 import type {
   LogEntry,
   LogsResult as BridgeLogsResult,
 } from '../../../bridge/index.js';
 import type { OutputLevel } from '../../../server/web-socket-protocol.js';
+import { tryParseDurationSeconds } from '../../shared/duration.js';
+import {
+  invalidInput,
+  StudioBridgeError,
+} from '../../../messages/studio-bridge-error.js';
 
 export interface LogsResult {
   /** With repeats grouped, a run of identical entries is one with `repeats` and `lastTimestamp`. */
@@ -44,27 +53,21 @@ interface ConsoleLogsArgs {
   groupRepeats?: boolean;
 }
 
-const DURATION_UNITS_SEC: Record<string, number> = {
-  s: 1,
-  m: 60,
-  h: 3600,
-  d: 86400,
-};
-
 /**
  * The time `--since` names, in epoch seconds: a duration back from `nowMs`
  * (`30s`, `5m`, `2h`, `1d`) or a date (`2026-10-27T18:00:00`).
  */
 export function parseSince(value: string, nowMs: number = Date.now()): number {
-  const duration = /^(\d+(?:\.\d+)?)([smhd])$/.exec(value.trim());
-  if (duration) {
-    return nowMs / 1000 - Number(duration[1]) * DURATION_UNITS_SEC[duration[2]];
+  const durationSec = tryParseDurationSeconds(value);
+  if (durationSec !== undefined) {
+    return nowMs / 1000 - durationSec;
   }
 
   const dateMs = Date.parse(value);
   if (Number.isNaN(dateMs)) {
-    throw new Error(
-      `Can't read --since '${value}'. Use a duration like 30s, 5m, 2h or 1d, or a date.`
+    throw invalidInput(
+      `Can't read --since '${value}'.`,
+      'Give a duration like 30s, 5m, 2h or 1d, or a date.'
     );
   }
   return dateMs / 1000;
@@ -96,19 +99,23 @@ export async function getSinceRestartCutoffAsync(
     );
   const serverSession = server && connection.getSession(server.sessionId);
   if (!serverSession) {
-    throw new Error(
-      `--since-restart needs a running playtest, and '${session.info.instanceId}' has none. Use --since to read back to a time instead.`
-    );
+    throw new StudioBridgeError({
+      code: 'NO_PLAYTEST',
+      message: `--since-restart needs a running playtest, and '${session.info.placeName}' has none.`,
+      fix: 'Use --since to read back to a time instead.',
+    });
   }
 
   const result = await serverSession.execAsync(PLAYTEST_START_SCRIPT, 10_000);
   const startedAt = result.returnValues?.[0];
   if (!result.success || typeof startedAt !== 'number') {
-    throw new Error(
-      `Could not read when the playtest started: ${
-        result.error ?? 'no time returned'
-      }`
-    );
+    throw new StudioBridgeError({
+      code: 'PLAYTEST_START_UNKNOWN',
+      message:
+        "Couldn't read when the playtest started, so --since-restart has no cutoff.",
+      fix: 'Use --since to read back to a time instead.',
+      cause: result.error ?? 'no time returned',
+    });
   }
   return startedAt - PLAYTEST_START_SLACK_SEC;
 }
@@ -134,7 +141,9 @@ export async function queryLogsHandlerAsync(
     total: result.total ?? 0,
     bufferCapacity: result.bufferCapacity ?? 0,
     since: options.since,
-    summary: `${shown} entries (${result.total ?? 0} in buffer)`,
+    summary: `${formatCount(shown, 'entry', 'entries')} (${(
+      result.total ?? 0
+    ).toLocaleString('en-US')} in buffer)`,
   };
 }
 
@@ -150,20 +159,30 @@ function colorizeLevel(level: OutputLevel): string {
 }
 
 export function formatLogsText(result: LogsResult): string {
-  if (result.entries.length === 0) return result.summary;
-  const lines = result.entries.map((e) => {
-    const ts = OutputHelper.formatDim(
-      new Date(e.timestamp * 1000).toLocaleTimeString()
-    );
-    const level = colorizeLevel(e.level);
-    const repeats = e.repeats ? OutputHelper.formatDim(` (x${e.repeats})`) : '';
-    return `[${ts}] [${level}] ${e.body}${repeats}`;
-  });
-  const shown = result.entries.reduce((sum, e) => sum + (e.repeats ?? 1), 0);
-  lines.push(
-    OutputHelper.formatDim(`(${shown} shown, ${result.total} in buffer)`)
-  );
-  return lines.join('\n');
+  return result.entries
+    .map((e) => {
+      const ts = OutputHelper.formatDim(
+        new Date(e.timestamp * 1000).toLocaleTimeString()
+      );
+      const level = colorizeLevel(e.level);
+      const repeats = e.repeats
+        ? OutputHelper.formatDim(` (x${e.repeats})`)
+        : '';
+      return `[${ts}] [${level}] ${e.body}${repeats}`;
+    })
+    .join('\n');
+}
+
+export function toLogsTable(result: LogsResult): ResultTable {
+  return {
+    columns: ['timestamp', 'level', 'body', 'repeats'],
+    rows: result.entries.map((entry) => [
+      entry.timestamp,
+      entry.level,
+      entry.body,
+      entry.repeats ?? 1,
+    ]),
+  };
 }
 
 export const logsCommand = defineCommand<ConsoleLogsArgs, LogsResult>({
@@ -205,11 +224,16 @@ export const logsCommand = defineCommand<ConsoleLogsArgs, LogsResult>({
     }),
   },
   cli: {
-    format: formatLogsText,
+    body: formatLogsText,
+    rows: toLogsTable,
+    output: 'data',
   },
   handler: async (session, args, connection) => {
     if (args.since && args.sinceRestart) {
-      throw new Error('Use either --since or --since-restart, not both');
+      throw invalidInput(
+        'Both --since and --since-restart were given.',
+        'Use one of them.'
+      );
     }
 
     const since = args.sinceRestart

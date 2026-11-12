@@ -66,6 +66,6 @@ describe('waitForLaunchedSessionAsync', () => {
 
     addSession({ sessionId: 'other-edit', context: 'edit' });
 
-    await expect(promise).rejects.toThrow(/did not connect/);
+    await expect(promise).rejects.toThrow(/didn't connect within/);
   });
 });

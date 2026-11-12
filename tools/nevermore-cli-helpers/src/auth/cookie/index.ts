@@ -3,7 +3,6 @@
  * Based on Mantle: https://github.com/blake-mealey/mantle
  */
 
-import inquirer from 'inquirer';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { COOKIE_NAME } from './cookie-parser.js';
 import { readCookie as readWindowsCookie } from './windows.js';
@@ -37,6 +36,7 @@ export async function getRobloxCookieAsync(): Promise<string> {
     );
   }
 
+  const { default: inquirer } = await import('inquirer');
   const { cookie } = await inquirer.prompt([
     {
       type: 'password',

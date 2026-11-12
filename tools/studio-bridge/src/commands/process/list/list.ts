@@ -5,12 +5,14 @@
 
 import {
   defineCommand,
+  type ResultTable,
   type SessionTargeting,
 } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { formatDurationMs } from '@quenty/cli-output-helpers/cli-utils';
 import {
+  formatCount,
   formatTable,
   type TableColumn,
 } from '@quenty/cli-output-helpers/reporting';
@@ -55,10 +57,21 @@ export interface ListedSession extends SessionInfo {
   pid?: number;
 }
 
+/** The bridge host the sessions are connected through. */
+export interface ListedHost {
+  pid: number;
+  inProcess: boolean;
+  autoStarted: boolean;
+  idleTimeoutMs?: number;
+  uptimeMs?: number;
+  logPath?: string;
+}
+
 export interface SessionsResult {
   sessions: ListedSession[];
   studios?: StudioProcessRow[];
   mcp?: McpStudioState;
+  host?: ListedHost;
   summary: string;
 }
 
@@ -106,11 +119,13 @@ export async function listSessionsHandlerAsync(
     ? buildStudioRows(processes, sessionPids, launches, snapshot)
     : undefined;
   const mcp = snapshot ? toMcpStudioState(snapshot) : undefined;
+  const host = describeHost(connection);
 
   return {
     sessions,
     ...(studios ? { studios } : {}),
     ...(mcp ? { mcp } : {}),
+    ...(host ? { host } : {}),
     summary: describeSummary(
       sessions.length,
       allSessions.length,
@@ -118,6 +133,43 @@ export async function listSessionsHandlerAsync(
       options.elapsedSec?.()
     ),
   };
+}
+
+function describeHost(connection: BridgeConnection): ListedHost | undefined {
+  const info = connection.hostInfo;
+  if (!info) {
+    return undefined;
+  }
+  return {
+    pid: info.pid,
+    inProcess: connection.role === 'host',
+    autoStarted: info.autoStarted === true,
+    ...(info.idleTimeoutMs !== undefined
+      ? { idleTimeoutMs: info.idleTimeoutMs }
+      : {}),
+    ...(info.uptimeMs !== undefined ? { uptimeMs: info.uptimeMs } : {}),
+    ...(info.logPath ? { logPath: info.logPath } : {}),
+  };
+}
+
+export function formatHostLine(host: ListedHost): string {
+  if (host.inProcess) {
+    return `Bridge host: this command (pid ${host.pid}), which stops with it`;
+  }
+  const parts = [
+    `pid ${host.pid}`,
+    host.autoStarted ? 'auto-started' : "started with 'studio-bridge serve'",
+  ];
+  if (host.uptimeMs !== undefined) {
+    parts.push(`up ${formatDurationMs(host.uptimeMs)}`);
+  }
+  if (host.idleTimeoutMs !== undefined) {
+    parts.push(`exits after ${formatDurationMs(host.idleTimeoutMs)} unused`);
+  }
+  if (host.logPath) {
+    parts.push(`log ${host.logPath}`);
+  }
+  return `Bridge host: ${parts.join(', ')}`;
 }
 
 function buildStudioRows(
@@ -177,19 +229,23 @@ function describeSummary(
   elapsedSec: number | undefined
 ): string {
   if (matching > 0) {
-    return `${matching} session(s) connected.`;
+    return `${formatCount(matching, 'session', 'sessions')} connected.`;
   }
   if (connected > 0) {
-    return 'No sessions match --target/--context.';
+    return 'No connected session matches --target and --context. Run without them to see every session.';
   }
   const waited = elapsedSec !== undefined ? ` (${elapsedSec.toFixed(1)}s)` : '';
   if (!processes) {
-    return `No active sessions${waited}. Is Studio running with the studio-bridge plugin?`;
+    return `No Studio is connected${waited}. Open a place in Studio with the studio-bridge plugin installed.`;
   }
   if (processes.length === 0) {
-    return `No Roblox Studio processes are open${waited}.`;
+    return `Roblox Studio isn't open${waited}. Run 'studio-bridge process launch' to open it.`;
   }
-  return `${processes.length} Studio process(es) open, but none has the studio-bridge plugin connected${waited}. Run 'studio-bridge plugin install', and check the plugin is enabled in Studio.`;
+  return `${formatCount(
+    processes.length,
+    'Studio process',
+    'Studio processes'
+  )} open, but the studio-bridge plugin hasn't connected${waited}. Run 'studio-bridge plugin install', or enable it under Plugins > Manage Plugins.`;
 }
 
 export function toMcpStudioState(snapshot: StudioMcpSnapshot): McpStudioState {
@@ -284,11 +340,9 @@ export function formatSessionsTable(
   const lines: string[] = [];
   if (result.sessions.length > 0) {
     lines.push(formatTable(result.sessions, sessionColumns));
-  } else {
-    lines.push(result.summary);
   }
   if (result.studios && result.studios.length > 0) {
-    lines.push('');
+    if (lines.length > 0) lines.push('');
     lines.push(
       formatTable(result.studios, studioColumns(mcp?.status === 'ok', now))
     );
@@ -296,11 +350,27 @@ export function formatSessionsTable(
   if (mcp) {
     lines.push(formatMcpLine(mcp, now));
   }
+  if (result.host) {
+    lines.push(OutputHelper.formatDim(formatHostLine(result.host)));
+  }
   return lines.join('\n');
 }
 
 function formatAgo(at: number, now: number): string {
   return `${formatDurationMs(Math.max(0, now - at))} ago`;
+}
+
+export function toSessionsTable(result: SessionsResult): ResultTable {
+  return {
+    columns: ['sessionId', 'context', 'placeName', 'state', 'pid'],
+    rows: result.sessions.map((session) => [
+      session.sessionId,
+      session.context,
+      session.placeName,
+      session.state,
+      session.pid ?? '',
+    ]),
+  };
 }
 
 interface ListArgs {
@@ -324,7 +394,8 @@ export const listCommand = defineCommand<ListArgs, SessionsResult>({
     }),
   },
   cli: {
-    format: formatSessionsTable,
+    body: formatSessionsTable,
+    rows: toSessionsTable,
   },
   handler: async (connection, args, targeting) =>
     listSessionsHandlerAsync(
