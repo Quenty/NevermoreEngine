@@ -680,6 +680,7 @@ function Binder._add<T>(self: Binder<T>, inst: Instance)
 
 	local constructor: any = self._constructor
 	local class: T
+	debug.profilebegin(self._tagName)
 	if type(constructor) == "function" then
 		class = constructor(inst, unpack(self._args))
 	elseif constructor.Create then
@@ -687,6 +688,7 @@ function Binder._add<T>(self: Binder<T>, inst: Instance)
 	else
 		class = constructor.new(inst, unpack(self._args))
 	end
+	debug.profileend()
 
 	if self._pendingInstSet[inst] ~= true then
 		-- Got GCed in the process of loading?!
