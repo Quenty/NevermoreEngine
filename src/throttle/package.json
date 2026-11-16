@@ -32,7 +32,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/typeutils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "devDependencies": {
     "@quenty/loader": "workspace:*"

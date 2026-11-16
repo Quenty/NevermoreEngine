@@ -36,6 +36,6 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/vector3utils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

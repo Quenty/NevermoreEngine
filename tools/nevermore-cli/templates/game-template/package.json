@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@quenty/nevermore-test-runner": "^1.4.0",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "restricted"

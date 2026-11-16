@@ -40,7 +40,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/time": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "devDependencies": {
     "@quenty/spring": "workspace:*"

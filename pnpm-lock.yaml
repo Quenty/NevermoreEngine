@@ -145,8 +145,8 @@ importers:
         specifier: workspace:*
         version: link:../../src/nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   plugins/ui-converter-plugin:
     dependencies:
@@ -282,8 +282,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -360,8 +360,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -411,8 +411,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/adorneevalue:
     dependencies:
@@ -531,8 +531,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/animationtrackutils: {}
 
@@ -596,8 +596,8 @@ importers:
         specifier: workspace:*
         version: link:../symbol
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/avatareditorutils:
     dependencies:
@@ -704,8 +704,8 @@ importers:
         specifier: workspace:*
         version: link:../symbol
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/binder:
     dependencies:
@@ -752,8 +752,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/bindtocloseservice:
     dependencies:
@@ -831,8 +831,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/contentproviderutils':
         specifier: workspace:*
@@ -888,8 +888,8 @@ importers:
         specifier: workspace:*
         version: link:../signal
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/brine:
     dependencies:
@@ -939,8 +939,8 @@ importers:
         specifier: workspace:*
         version: link:../viewport
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/brio:
     dependencies:
@@ -966,8 +966,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/buffer-encoder:
     dependencies:
@@ -1112,8 +1112,8 @@ importers:
         specifier: workspace:*
         version: link:../vector3utils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/camerastoryutils':
         specifier: workspace:*
@@ -1202,8 +1202,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/chatproviderservice:
     dependencies:
@@ -1295,8 +1295,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/clienttranslator:
     dependencies:
@@ -1355,8 +1355,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/clipcharacters:
     dependencies:
@@ -1397,8 +1397,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/cmdrservice:
     dependencies:
@@ -1439,8 +1439,8 @@ importers:
         specifier: ^1.12.0-quenty.0
         version: 1.12.0-quenty.0
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/collectionserviceutils:
     dependencies:
@@ -1729,8 +1729,8 @@ importers:
         specifier: workspace:*
         version: link:../symbol
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/coreguiutils:
     dependencies:
@@ -1756,8 +1756,8 @@ importers:
         specifier: workspace:*
         version: link:../time
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/counter:
     dependencies:
@@ -1852,8 +1852,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/deathreport:
     dependencies:
@@ -1918,8 +1918,8 @@ importers:
         specifier: workspace:*
         version: link:../valuebaseutils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/debounce: {}
 
@@ -1996,8 +1996,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/elo:
     dependencies:
@@ -2008,8 +2008,8 @@ importers:
         specifier: workspace:*
         version: link:../probability
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/blend':
         specifier: workspace:*
@@ -2071,8 +2071,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/fakeskybox:
     dependencies:
@@ -2125,8 +2125,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/firstpersoncharactertransparency:
     dependencies:
@@ -2245,8 +2245,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/functionutils: {}
 
@@ -2286,8 +2286,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/gameconfig:
     dependencies:
@@ -2382,8 +2382,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/gameproductservice:
     dependencies:
@@ -2487,8 +2487,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/gamescalingutils:
     dependencies:
@@ -2529,8 +2529,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/generatewithmixin:
     dependencies:
@@ -2571,8 +2571,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/geometryutils:
     dependencies:
@@ -2615,8 +2615,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/guitriangle: {}
 
@@ -2807,8 +2807,8 @@ importers:
         specifier: workspace:*
         version: link:../player-mock
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/humanoidmovedirectionutils:
     dependencies:
@@ -2900,8 +2900,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/humanoidutils:
     dependencies:
@@ -2924,8 +2924,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/idleservice:
     dependencies:
@@ -3041,8 +3041,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/rigbuilderutils':
         specifier: workspace:*
@@ -3090,8 +3090,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/influxdbclient:
     dependencies:
@@ -3138,8 +3138,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/inputkeymaputils:
     dependencies:
@@ -3198,8 +3198,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/inputmode:
     dependencies:
@@ -3270,8 +3270,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/instanceutils:
     dependencies:
@@ -3294,8 +3294,8 @@ importers:
         specifier: workspace:*
         version: link:../symbol
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/iris:
     dependencies:
@@ -3312,8 +3312,8 @@ importers:
         specifier: github:QuentyStudios/Iris
         version: https://codeload.github.com/QuentyStudios/Iris/tar.gz/bf496396d7069ee7dc146d9d9696206e4ba3ab91
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/isamixin: {}
 
@@ -3359,8 +3359,8 @@ importers:
         specifier: github:QuentyStudios/jecs
         version: https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/jest-utils:
     dependencies:
@@ -3374,8 +3374,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/jsonutils:
     dependencies:
@@ -3428,8 +3428,8 @@ importers:
         specifier: workspace:*
         version: link:../string
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/maid':
         specifier: workspace:*
@@ -3473,8 +3473,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/markdownrender: {}
 
@@ -3505,8 +3505,8 @@ importers:
         specifier: workspace:*
         version: link:../servicebag
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/math: {}
 
@@ -3575,8 +3575,8 @@ importers:
         specifier: workspace:*
         version: link:../time
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/spring':
         specifier: workspace:*
@@ -3746,8 +3746,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/nevermore-test-runner:
     dependencies:
@@ -3755,8 +3755,8 @@ importers:
         specifier: workspace:*
         version: link:../loader
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/nocollisionconstraintutils:
     dependencies:
@@ -3831,8 +3831,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/blend':
         specifier: workspace:*
@@ -3850,8 +3850,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/optional:
     dependencies:
@@ -3886,8 +3886,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/particleengine:
     dependencies:
@@ -4006,8 +4006,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/physicsutils:
     dependencies:
@@ -4027,8 +4027,8 @@ importers:
         specifier: workspace:*
         version: link:../vector3utils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/pillbacking:
     dependencies:
@@ -4081,8 +4081,8 @@ importers:
         specifier: workspace:*
         version: link:../tuple
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -4111,8 +4111,8 @@ importers:
         specifier: workspace:*
         version: link:../servicebag
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/playerhumanoidbinder:
     dependencies:
@@ -4150,8 +4150,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/playerinputmode:
     dependencies:
@@ -4210,8 +4210,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/playerthumbnailutils:
     dependencies:
@@ -4228,8 +4228,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/playerutils:
     dependencies:
@@ -4264,8 +4264,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/policyserviceutils:
     dependencies:
@@ -4289,8 +4289,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/promise:
     dependencies:
@@ -4313,8 +4313,8 @@ importers:
         specifier: workspace:*
         version: link:../signal
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/promisemaid:
     dependencies:
@@ -4331,8 +4331,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/promptqueue:
     dependencies:
@@ -4580,8 +4580,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/randomutils:
     dependencies:
@@ -4595,8 +4595,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/raycaster: {}
 
@@ -4651,8 +4651,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/rectutils:
     dependencies:
@@ -4732,8 +4732,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/resetservice:
     dependencies:
@@ -4783,8 +4783,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/richtext: {}
 
@@ -4846,8 +4846,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/rodux-actions:
     dependencies:
@@ -5008,8 +5008,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -5067,8 +5067,8 @@ importers:
         specifier: workspace:*
         version: link:../typeutils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/rxbinderutils:
     dependencies:
@@ -5106,8 +5106,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/rxsignal:
     dependencies:
@@ -5204,8 +5204,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/scoredactionservice:
     dependencies:
@@ -5255,8 +5255,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/screenshothudservice:
     dependencies:
@@ -5378,8 +5378,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/selectionimageutils:
     dependencies:
@@ -5429,8 +5429,8 @@ importers:
         specifier: workspace:*
         version: link:../signal
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/setmechanismcframe:
     dependencies:
@@ -5546,8 +5546,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/settings-inputkeymap:
     dependencies:
@@ -5588,8 +5588,8 @@ importers:
         specifier: workspace:*
         version: link:../table
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/signal:
     dependencies:
@@ -5684,8 +5684,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@quentystudios/t':
         specifier: ^3.0.0
         version: 3.0.0
@@ -5819,8 +5819,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/soundplayer:
     dependencies:
@@ -6003,8 +6003,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/streamingutils:
     dependencies:
@@ -6039,8 +6039,8 @@ importers:
         specifier: workspace:*
         version: link:../statestack
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/string:
     dependencies:
@@ -6051,8 +6051,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/sunpositionutils:
     dependencies:
@@ -6118,8 +6118,8 @@ importers:
         specifier: workspace:*
         version: link:../rx
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/teleportserviceutils:
     dependencies:
@@ -6160,8 +6160,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/templateprovider:
     dependencies:
@@ -6229,8 +6229,8 @@ importers:
         specifier: workspace:*
         version: link:../tie
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/terrainutils:
     dependencies:
@@ -6319,8 +6319,8 @@ importers:
         specifier: workspace:*
         version: link:../typeutils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/tie:
     dependencies:
@@ -6388,8 +6388,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
     devDependencies:
       '@quenty/promise':
         specifier: workspace:*
@@ -6410,8 +6410,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/timedtween:
     dependencies:
@@ -6455,8 +6455,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/timesyncservice:
     dependencies:
@@ -6571,8 +6571,8 @@ importers:
         specifier: workspace:*
         version: link:../valueobject
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/transparencyservice:
     dependencies:
@@ -6702,8 +6702,8 @@ importers:
         specifier: workspace:*
         version: link:../servicebag
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/utf8: {}
 
@@ -6766,8 +6766,8 @@ importers:
         specifier: workspace:*
         version: link:../nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   src/viewport:
     dependencies:
@@ -6851,8 +6851,8 @@ importers:
         specifier: workspace:*
         version: link:../vector3utils
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
 
   tools/cli-output-helpers:
     dependencies:
@@ -7062,8 +7062,8 @@ importers:
         specifier: workspace:*
         version: link:../../src/nevermore-test-runner
       '@quentystudios/jest-lua':
-        specifier: 3.10.0-quenty.2
-        version: 3.10.0-quenty.2
+        specifier: 3.10.0-quenty.3
+        version: 3.10.0-quenty.3
       '@types/node':
         specifier: ^18.11.4
         version: 18.19.130
@@ -7955,8 +7955,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c}
     version: 0.11.0-quenty.3
 
-  '@quentystudios/jest-lua@3.10.0-quenty.2':
-    resolution: {integrity: sha512-TE7vhnYjygcBjjqeKLsmbwxhJeiDeekh/E2xcvQ0VZAwHNr+Yn1pk1n/PRJu+KtH2fWYkw20pQO4o/hKPs0lRA==}
+  '@quentystudios/jest-lua@3.10.0-quenty.3':
+    resolution: {integrity: sha512-uPKcBZ7iTY6n7HQAhPW7cZ6PWnMG3Es52kMzRZ9EjrDYN8PaJZSuznrKYChHLR43eErZXAQKhJ0Sq4AF4F5GsQ==}
 
   '@quentystudios/t@3.0.0':
     resolution: {integrity: sha512-YUBaDzrs69scFgRpzASLOpcvxKho8oaUipyHO+A9z+aRW/ursRhzCXjRtPZ08uoU+fba/cohZuZMMGDMpncg1w==}
@@ -12791,7 +12791,7 @@ snapshots:
 
   '@quentystudios/jecs@https://codeload.github.com/QuentyStudios/jecs/tar.gz/49444a19a982a0e4ae6f9cc8e3154e8eaa8b6d8c': {}
 
-  '@quentystudios/jest-lua@3.10.0-quenty.2': {}
+  '@quentystudios/jest-lua@3.10.0-quenty.3': {}
 
   '@quentystudios/t@3.0.0': {}
 

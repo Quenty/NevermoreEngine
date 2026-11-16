@@ -52,6 +52,6 @@
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }
