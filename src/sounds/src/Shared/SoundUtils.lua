@@ -107,7 +107,7 @@ function SoundUtils.applyPropertiesFromId(sound: Sound, id: SoundId): ()
 		local properties = id :: any
 
 		for property, value in properties do
-			if property ~= "Parent" and property ~= "RollOffMinDistance" then
+			if property ~= "Parent" and property ~= "RollOffMinDistance" and property ~= "SoundId" then
 				(sound :: any)[property] = value
 			end
 		end
