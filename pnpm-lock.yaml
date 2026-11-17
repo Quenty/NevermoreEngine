@@ -356,6 +356,9 @@ importers:
       '@quenty/signal':
         specifier: workspace:*
         version: link:../signal
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject

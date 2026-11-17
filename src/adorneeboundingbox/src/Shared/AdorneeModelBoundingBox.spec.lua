@@ -9,22 +9,18 @@ local AdorneeModelBoundingBox = require("AdorneeModelBoundingBox")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
+local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-type Record = {
-	count: number,
-	values: { any },
-}
-
 type Controller = {
 	newModel: () -> Model,
 	addPart: (model: Model, size: Vector3?, cframe: CFrame?) -> BasePart,
 	newBoundingBox: (model: Model) -> AdorneeModelBoundingBox.AdorneeModelBoundingBox,
-	collect: (observable: any) -> Record,
-	step: (count: number?) -> (),
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
@@ -51,26 +47,7 @@ local function setup(): Controller
 			return maid:Add(AdorneeModelBoundingBox.new(model))
 		end,
 
-		collect = function(observable)
-			local record: Record = {
-				count = 0,
-				values = {},
-			}
-
-			maid:GiveTask(observable:Subscribe(function(value)
-				record.count += 1
-				record.values[record.count] = value
-			end))
-
-			return record
-		end,
-
-		step = function(count)
-			for _ = 1, count or 1 do
-				task.wait()
-			end
-		end,
-
+		maid = maid,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -89,10 +66,10 @@ describe("AdorneeModelBoundingBox.new", function()
 		controller.addPart(model)
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		expect(record.count).toBe(1)
-		expect(record.values[1]).toBeNil()
+		expect(#sizes).toBe(1)
+		expect(sizes[1]).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -104,10 +81,10 @@ describe("AdorneeModelBoundingBox.new", function()
 		controller.addPart(model)
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveCFrame())
+		local cframes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveCFrame()))
 
-		expect(record.count).toBe(1)
-		expect(record.values[1]).toBeNil()
+		expect(#cframes).toBe(1)
+		expect(cframes[1]).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -119,15 +96,15 @@ describe("AdorneeModelBoundingBox.new", function()
 		controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new(3, 0, 0))
 
 		local boundingBox = controller.newBoundingBox(model)
-		local sizeRecord = controller.collect(boundingBox:ObserveSize())
-		local cframeRecord = controller.collect(boundingBox:ObserveCFrame())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
+		local cframes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveCFrame()))
 
-		controller.step()
+		StepUtils.deferWait()
 
 		local expectedCFrame, expectedSize = model:GetBoundingBox()
 
-		expect(sizeRecord.values[sizeRecord.count]).toEqual(expectedSize)
-		expect(cframeRecord.values[cframeRecord.count]).toEqual(expectedCFrame)
+		expect(sizes[#sizes]).toEqual(expectedSize)
+		expect(cframes[#cframes]).toEqual(expectedCFrame)
 
 		controller:Destroy()
 	end)
@@ -139,17 +116,17 @@ describe("AdorneeModelBoundingBox.new", function()
 		local part = controller.addPart(model)
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		controller.step()
-		local settledCount = record.count
+		StepUtils.deferWait()
+		local settledCount = #sizes
 
 		part.Size = Vector3.new(6, 1, 2)
 		part.Size = Vector3.new(8, 1, 2)
 		part.Size = Vector3.new(10, 1, 2)
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(record.count).toBe(settledCount + 1)
+		expect(#sizes).toBe(settledCount + 1)
 
 		controller:Destroy()
 	end)
@@ -163,15 +140,15 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 		controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new())
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		controller.step()
-		local before = record.values[record.count]
+		StepUtils.deferWait()
+		local before = sizes[#sizes]
 
 		controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new(20, 0, 0))
-		controller.step()
+		StepUtils.deferWait()
 
-		local after = record.values[record.count]
+		local after = sizes[#sizes]
 		local _, expectedSize = model:GetBoundingBox()
 
 		expect(after).toEqual(expectedSize)
@@ -187,16 +164,16 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 		local part = controller.addPart(model, Vector3.new(4, 1, 2))
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		controller.step()
+		StepUtils.deferWait()
 
 		part.Size = Vector3.new(12, 1, 2)
-		controller.step()
+		StepUtils.deferWait()
 
 		local _, expectedSize = model:GetBoundingBox()
 
-		expect(record.values[record.count]).toEqual(expectedSize)
+		expect(sizes[#sizes]).toEqual(expectedSize)
 
 		controller:Destroy()
 	end)
@@ -209,15 +186,15 @@ describe("AdorneeModelBoundingBox:ObserveSize", function()
 		local far = controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new(20, 0, 0))
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		controller.step()
-		local before = record.values[record.count]
+		StepUtils.deferWait()
+		local before = sizes[#sizes]
 
 		far:Destroy()
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(record.values[record.count]).never.toEqual(before)
+		expect(sizes[#sizes]).never.toEqual(before)
 
 		controller:Destroy()
 	end)
@@ -231,15 +208,15 @@ describe("AdorneeModelBoundingBox:ObserveCFrame", function()
 		local part = controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new())
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveCFrame())
+		local cframes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveCFrame()))
 
-		controller.step()
-		local before = record.values[record.count]
+		StepUtils.deferWait()
+		local before = cframes[#cframes]
 
 		part.CFrame = CFrame.new(0, 50, 0)
-		controller.step()
+		StepUtils.deferWait()
 
-		local after = record.values[record.count]
+		local after = cframes[#cframes]
 
 		expect(after).never.toEqual(before)
 		expect(after.Position.Y).toBeCloseTo(50, 3)
@@ -254,15 +231,14 @@ describe("AdorneeModelBoundingBox:ObserveCFrame", function()
 		local part = controller.addPart(model, Vector3.new(4, 1, 2), CFrame.new())
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveCFrame())
+		local cframes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveCFrame()))
 
 		part.Anchored = false
-		controller.step(2)
 
 		part.CFrame = CFrame.new(0, 0, 30)
-		controller.step(2)
+		StepUtils.deferWait()
 
-		expect(record.values[record.count].Position.Z).toBeCloseTo(30, 3)
+		expect(cframes[#cframes].Position.Z).toBeCloseTo(30, 3)
 
 		controller:Destroy()
 	end)
@@ -276,17 +252,17 @@ describe("AdorneeModelBoundingBox:Destroy", function()
 		local part = controller.addPart(model, Vector3.new(4, 1, 2))
 
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveSize())
+		local sizes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveSize()))
 
-		controller.step()
+		StepUtils.deferWait()
 		boundingBox:Destroy()
 
-		local settledCount = record.count
+		local settledCount = #sizes
 
 		part.Size = Vector3.new(30, 1, 2)
-		controller.step(2)
+		StepUtils.deferWait()
 
-		expect(record.count).toBe(settledCount)
+		expect(#sizes).toBe(settledCount)
 
 		controller:Destroy()
 	end)
@@ -299,13 +275,10 @@ describe("AdorneeModelBoundingBox:Destroy", function()
 		part.Anchored = false
 
 		local boundingBox = controller.newBoundingBox(model)
-		controller.step(2)
 
 		expect(function()
 			boundingBox:Destroy()
 		end).never.toThrow()
-
-		controller.step(2)
 
 		controller:Destroy()
 	end)
