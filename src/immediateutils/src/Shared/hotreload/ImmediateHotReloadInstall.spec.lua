@@ -12,11 +12,14 @@ local ImmediateCoreUtils = require("ImmediateCoreUtils")
 local ImmediateHotReloadInstall = require("ImmediateHotReloadInstall")
 local ImmediateScheduler = require("ImmediateScheduler")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local ServiceBag = require("ServiceBag")
+local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 local fixtures = script.Parent.fixtures
 
@@ -29,11 +32,6 @@ local PLAY_CLIENT = {
 	isStudioPlay = true,
 	isServer = false,
 }
-
-local function settle()
-	task.wait()
-	task.wait()
-end
 
 local function cloneFixture(fixtureName: string, canonicalName: string, parent: Instance): ModuleScript
 	local fixture = fixtures:FindFirstChild(fixtureName)
@@ -64,7 +62,7 @@ local function installLive(systems: Instance, playContext)
 	local rt, scheduler = makeRuntime()
 	local installer = ImmediateHotReloadInstall.install(systems, playContext :: any)
 	installer(rt, scheduler)
-	settle()
+	StepUtils.deferWait()
 	return rt, scheduler
 end
 
@@ -141,7 +139,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 
 		first:Destroy()
 		cloneFixture("sys_counted", "sys_counted", systems)
-		settle()
+		StepUtils.deferWait()
 
 		expect(counted.getDestroyCount()).toEqual(1)
 		expect(dictionary(scheduler).sys_counted).never.toEqual(counted)
@@ -161,7 +159,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 
 		first:Destroy()
 		cloneFixture("sys_named_v2", "sys_named", systems)
-		settle()
+		StepUtils.deferWait()
 
 		expect(dictionary(scheduler).custom).toEqual(nil)
 		expect(dictionary(scheduler).custom2).never.toEqual(nil)
@@ -183,7 +181,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 		expect(dictionary(scheduler).sharedName).never.toEqual(nil)
 
 		cloneFixture("sys_dup_b", "sys_dup_b", systems)
-		settle()
+		StepUtils.deferWait()
 
 		expect(dictionary(scheduler).sharedName).never.toEqual(nil)
 		expect(dictionary(scheduler).sys_dup_b).toEqual(nil)
@@ -202,7 +200,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 
 		first:Destroy()
 		cloneFixture("sys_fail", "sys_ok", systems)
-		settle()
+		StepUtils.deferWait()
 
 		expect(dictionary(scheduler).sys_ok).never.toEqual(nil)
 		rt.blackboard.from = nil
@@ -211,7 +209,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 
 		systems:FindFirstChild("sys_ok"):Destroy()
 		cloneFixture("sys_ok_v2", "sys_ok", systems)
-		settle()
+		StepUtils.deferWait()
 
 		rt.blackboard.from = nil
 		scheduler:Tick(rt)
@@ -230,7 +228,7 @@ describe("ImmediateHotReloadInstall live loading", function()
 		expect(dictionary(scheduler).sys_ok).never.toEqual(nil)
 
 		first:Destroy()
-		settle()
+		StepUtils.deferWait()
 
 		expect(dictionary(scheduler).sys_ok).toEqual(nil)
 
@@ -240,17 +238,25 @@ describe("ImmediateHotReloadInstall live loading", function()
 	end)
 
 	it("ignores a stale yielding require after a newer revision", function()
+		JestUtils.useFakeTimers()
 		local root, systems = makeLiveSystemsUnderRS()
 		local first = cloneFixture("sys_yield", "sys_ok", systems)
 
-		local rt, scheduler = makeRuntime()
-		local installer = ImmediateHotReloadInstall.install(systems, PLAY_CLIENT)
-		installer(rt, scheduler)
+		local rt, scheduler = installLive(systems, PLAY_CLIENT)
+		expect(dictionary(scheduler).sys_ok).toEqual(nil)
 
 		first:Destroy()
 		cloneFixture("sys_ok_v2", "sys_ok", systems)
-		task.wait(0.15)
-		task.wait()
+		StepUtils.deferWait()
+		jest.runOnlyPendingTimers()
+
+		local executionClones = 0
+		for _, child in systems:GetChildren() do
+			if string.sub(child.Name, 1, 4) == "_HR_" then
+				executionClones += 1
+			end
+		end
+		expect(executionClones).toEqual(1)
 
 		rt.blackboard.from = nil
 		scheduler:Tick(rt)
@@ -310,8 +316,8 @@ describe("ImmediateHotReloadInstall shadow publication", function()
 		addLoader(shadowSystems)
 		cloneFixture("sys_ok_v2", "sys_ok", shadowSystems)
 		shadowRoot.Parent = ServerScriptService
-		settle()
-		settle()
+		StepUtils.deferWait()
+		StepUtils.deferWait()
 
 		rt.blackboard.from = nil
 		scheduler:Tick(rt)
@@ -337,7 +343,7 @@ describe("ImmediateHotReloadInstall shadow publication", function()
 		addLoader(shadowSystems)
 		cloneFixture("sys_ok", "sys_ok", shadowSystems)
 		shadowRoot.Parent = ServerScriptService
-		settle()
+		StepUtils.deferWait()
 
 		shadowRoot:Destroy()
 		local shadowRoot2 = Instance.new("Folder")
@@ -348,8 +354,8 @@ describe("ImmediateHotReloadInstall shadow publication", function()
 		addLoader(shadowSystems2)
 		cloneFixture("sys_ok_v2", "sys_ok", shadowSystems2)
 		shadowRoot2.Parent = ServerScriptService
-		settle()
-		settle()
+		StepUtils.deferWait()
+		StepUtils.deferWait()
 
 		rt.blackboard.from = nil
 		scheduler:Tick(rt)

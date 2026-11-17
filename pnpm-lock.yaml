@@ -1096,6 +1096,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/spring':
         specifier: workspace:*
         version: link:../spring
@@ -3059,6 +3062,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3083,6 +3089,9 @@ importers:
       '@quenty/spring':
         specifier: workspace:*
         version: link:../spring
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/tie':
         specifier: workspace:*
         version: link:../tie
@@ -6321,6 +6330,9 @@ importers:
 
   src/throttle:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader

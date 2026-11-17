@@ -29,6 +29,7 @@
     "Quenty"
   ],
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/typeutils": "workspace:*",
