@@ -40,7 +40,7 @@ function RagdollableBase.new(humanoid: Humanoid): RagdollableBase
 		return (self:ObserveIsRagdolled() :: any):Pipe({
 			Rx.skip(1),
 			Rx.where(function(value): any
-				return value == true
+				return value == false
 			end),
 		})
 	end) :: any

@@ -59,6 +59,7 @@
     "@quenty/rxbinderutils": "workspace:*",
     "@quenty/rxsignal": "workspace:*",
     "@quenty/servicebag": "workspace:*",
+    "@quenty/signal": "workspace:*",
     "@quenty/spring": "workspace:*",
     "@quenty/steputils": "workspace:*",
     "@quenty/table": "workspace:*",

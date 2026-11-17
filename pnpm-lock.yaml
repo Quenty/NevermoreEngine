@@ -4570,6 +4570,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/spring':
         specifier: workspace:*
         version: link:../spring
