@@ -33,6 +33,7 @@
     "@quenty/cancellabledelay": "workspace:*",
     "@quenty/canceltoken": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",

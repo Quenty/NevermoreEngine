@@ -5039,6 +5039,9 @@ importers:
       '@quenty/ducktype':
         specifier: workspace:*
         version: link:../ducktype
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader

@@ -92,4 +92,31 @@ function JestUtils.afterThis(job: MaidTaskUtils.MaidTask): () -> ()
 	end
 end
 
+--[=[
+	Uses Jest fake timers until the current test finishes, even if it fails.
+
+	@return () -> () -- Restores real timers early
+]=]
+function JestUtils.useFakeTimers(): () -> ()
+	local jest = Jest.Globals.jest
+	jest.useFakeTimers()
+
+	local restored = false
+	local cancel: () -> ()
+
+	local function restore()
+		if restored then
+			return
+		end
+		restored = true
+
+		cancel()
+		jest.useRealTimers()
+	end
+
+	cancel = JestUtils.afterThis(restore)
+
+	return restore
+end
+
 return JestUtils

@@ -12,6 +12,7 @@ local Maid = require("Maid")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 describe("JestUtils.afterThis()", function()
 	local order = {}
@@ -97,6 +98,49 @@ describe("JestUtils.afterThis() cancelled by the maid that owns it", function()
 
 	it("unqueues the task when the maid cleans up first", function()
 		expect(order).toEqual({})
+	end)
+end)
+
+describe("JestUtils.useFakeTimers()", function()
+	it("fakes timers for the rest of the test", function()
+		JestUtils.useFakeTimers()
+
+		local fired = false
+		task.delay(1, function()
+			fired = true
+		end)
+
+		expect(fired).toBe(false)
+		jest.advanceTimersByTime(1000)
+		expect(fired).toBe(true)
+	end)
+
+	it("restores real timers once the test finishes", function()
+		expect(function()
+			jest.advanceTimersByTime(1)
+		end).toThrow()
+	end)
+end)
+
+describe("JestUtils.useFakeTimers() restored early", function()
+	local cancelled = {}
+
+	it("restores real timers when the returned function is called", function()
+		local restore = JestUtils.useFakeTimers()
+		JestUtils.afterThis(function()
+			table.insert(cancelled, "still queued")
+		end)
+
+		restore()
+		restore()
+
+		expect(function()
+			jest.advanceTimersByTime(1)
+		end).toThrow()
+	end)
+
+	it("leaves the rest of the stack queued", function()
+		expect(cancelled).toEqual({ "still queued" })
 	end)
 end)
 
