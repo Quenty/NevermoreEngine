@@ -13,16 +13,16 @@
 local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
+local BinderTestUtils = require("BinderTestUtils")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local PlayerCharacterBinder = require("PlayerCharacterBinder")
 local PlayerHumanoidBinderTestUtils = require("PlayerHumanoidBinderTestUtils")
+local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
-local makeTrackingClass = PlayerHumanoidBinderTestUtils.makeTrackingClass
-local awaitUnbound = PlayerHumanoidBinderTestUtils.awaitUnbound
 
 local function setup(constructor: any?)
 	return PlayerHumanoidBinderTestUtils.setup(PlayerCharacterBinder, "PlayerCharacterBinder", constructor)
@@ -30,7 +30,8 @@ end
 
 describe("PlayerCharacterBinder.new()", function()
 	it("is a Binder that reports its class name and tag", function()
-		local binder = PlayerCharacterBinder.new("PlayerCharacterBinderMetaSpecTag", makeTrackingClass())
+		local binder =
+			PlayerCharacterBinder.new("PlayerCharacterBinderMetaSpecTag", BinderTestUtils.makeTrackingClass())
 		expect(Binder.isBinder(binder)).toEqual(true)
 		expect((binder :: any).ClassName).toEqual("PlayerCharacterBinder")
 		expect(binder:GetTag()).toEqual("PlayerCharacterBinderMetaSpecTag")
@@ -40,25 +41,22 @@ end)
 describe("PlayerCharacterBinder automatic tagging API", function()
 	it("defaults to enabled and observes changes", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
-		local emissions = {}
-		local sub = controller.binder:ObserveAutomaticTagging():Subscribe(function(value: boolean)
-			table.insert(emissions, value)
-		end)
+		local emissions = ObservableSpy.new(controller.binder:ObserveAutomaticTagging())
 
 		expect(emissions[1]).toEqual(true)
 
 		controller.binder:SetAutomaticTagging(false)
 		expect(emissions[2]).toEqual(false)
 
-		sub:Destroy()
+		emissions:Destroy()
 		controller:Destroy()
 	end)
 
 	it("throws on a non-boolean", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			controller.binder:SetAutomaticTagging(nil :: any)
@@ -69,12 +67,9 @@ describe("PlayerCharacterBinder automatic tagging API", function()
 
 	it("ObserveAutomaticTaggingBrio kills the brio when the value changes", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
-		local brios: { any } = {}
-		local sub = controller.binder:ObserveAutomaticTaggingBrio():Subscribe(function(brio: any)
-			table.insert(brios, brio)
-		end)
+		local brios = ObservableSpy.new(controller.binder:ObserveAutomaticTaggingBrio())
 
 		expect(#brios).toEqual(1)
 		expect(brios[1]:IsDead()).toEqual(false)
@@ -85,7 +80,7 @@ describe("PlayerCharacterBinder automatic tagging API", function()
 		expect(#brios).toEqual(2)
 		expect(brios[2]:GetValue()).toEqual(false)
 
-		sub:Destroy()
+		brios:Destroy()
 		controller:Destroy()
 	end)
 end)
@@ -101,8 +96,7 @@ describe("PlayerCharacterBinder character discovery", function()
 
 		controller.start()
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 		expect(class.instance).toEqual(character)
 		expect(controller.binder:HasTag(character)).toEqual(true)
 
@@ -111,14 +105,13 @@ describe("PlayerCharacterBinder character discovery", function()
 
 	it("binds a character spawned after start", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock(2)
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 		expect(class.instance).toEqual(character)
 
 		controller:Destroy()
@@ -128,13 +121,12 @@ describe("PlayerCharacterBinder character discovery", function()
 		-- CharacterAdded only fires during avatar loading; a bare .Character assignment does not fire
 		-- it, and PlayerMock.write mirrors that -- so the binder deliberately does not see the model.
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		task.wait(0.1)
 		expect(controller.binder:Get(character)).toBeNil()
 
 		controller:Destroy()
@@ -142,21 +134,18 @@ describe("PlayerCharacterBinder character discovery", function()
 
 	it("spawning a replacement despawns and unbinds the old character", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local first = controller.newCharacter()
 		controller.loadCharacter(mock, first)
-		local okFirst, firstClass = controller.binder:Promise(first):Yield()
-		assert(okFirst, "First never bound")
+		local firstClass = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(first))
 
 		local second = controller.newCharacter()
 		controller.loadCharacter(mock, second)
-		local ok, class = controller.binder:Promise(second):Yield()
-		assert(ok, "Second never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(second))
 
-		-- LoadCharacter semantics: the old character is destroyed, so its binding tears down.
-		awaitUnbound(controller.binder, first)
+		expect(controller.binder:Get(first)).toBeNil()
 		expect(controller.binder:Get(first)).toBeNil()
 		expect(firstClass.destroyed).toEqual(true)
 		expect(controller.binder:Get(second)).toEqual(class)
@@ -166,17 +155,16 @@ describe("PlayerCharacterBinder character discovery", function()
 
 	it("unbinds and destroys the class when the character is destroyed", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 
 		character:Destroy()
-		awaitUnbound(controller.binder, character)
+		expect(controller.binder:Get(character)).toBeNil()
 
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
@@ -188,17 +176,16 @@ describe("PlayerCharacterBinder character discovery", function()
 		-- Mirrors the engine: a leaving player's character is removed, so a destroyed mock takes its
 		-- character (and therefore the binding) with it.
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 
 		mock:Destroy()
-		awaitUnbound(controller.binder, character)
+		expect(controller.binder:Get(character)).toBeNil()
 
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
@@ -210,17 +197,16 @@ end)
 describe("PlayerCharacterBinder:SetAutomaticTagging(false)", function()
 	it("unbinds existing mock characters", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 
 		controller.binder:SetAutomaticTagging(false)
-		awaitUnbound(controller.binder, character)
+		expect(controller.binder:Get(character)).toBeNil()
 
 		expect(controller.binder:Get(character)).toBeNil()
 		expect(class.destroyed).toEqual(true)
@@ -230,7 +216,7 @@ describe("PlayerCharacterBinder:SetAutomaticTagging(false)", function()
 
 	it("stops discovering while disabled and rediscovers on re-enable", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		controller.binder:SetAutomaticTagging(false)
 
@@ -238,13 +224,11 @@ describe("PlayerCharacterBinder:SetAutomaticTagging(false)", function()
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		task.wait(0.1)
 		expect(controller.binder:Get(character)).toBeNil()
 
 		controller.binder:SetAutomaticTagging(true)
 
-		local ok = controller.binder:Promise(character):Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 
 		controller:Destroy()
 	end)
@@ -253,14 +237,13 @@ end)
 describe("PlayerCharacterBinder teardown", function()
 	it("destroys bound classes when the service bag is destroyed", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter()
 		controller.loadCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(character):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(character))
 
 		controller:Destroy()
 

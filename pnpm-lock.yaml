@@ -4119,6 +4119,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
@@ -4152,6 +4155,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
       '@quenty/rx':
         specifier: workspace:*
         version: link:../rx

@@ -12,16 +12,16 @@
 local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
+local BinderTestUtils = require("BinderTestUtils")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local PlayerHumanoidBinder = require("PlayerHumanoidBinder")
 local PlayerHumanoidBinderTestUtils = require("PlayerHumanoidBinderTestUtils")
+local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
-local makeTrackingClass = PlayerHumanoidBinderTestUtils.makeTrackingClass
-local awaitUnbound = PlayerHumanoidBinderTestUtils.awaitUnbound
 
 local function setup(constructor: any?)
 	return PlayerHumanoidBinderTestUtils.setup(PlayerHumanoidBinder, "PlayerHumanoidBinder", constructor)
@@ -29,14 +29,14 @@ end
 
 describe("PlayerHumanoidBinder.new()", function()
 	it("is a Binder that reports its class name and tag", function()
-		local binder = PlayerHumanoidBinder.new("PlayerHumanoidBinderMetaSpecTag", makeTrackingClass())
+		local binder = PlayerHumanoidBinder.new("PlayerHumanoidBinderMetaSpecTag", BinderTestUtils.makeTrackingClass())
 		expect(Binder.isBinder(binder)).toEqual(true)
 		expect((binder :: any).ClassName).toEqual("PlayerHumanoidBinder")
 		expect(binder:GetTag()).toEqual("PlayerHumanoidBinderMetaSpecTag")
 	end)
 
 	it("Init throws without a serviceBag", function()
-		local binder = PlayerHumanoidBinder.new("PlayerHumanoidBinderInitSpecTag", makeTrackingClass())
+		local binder = PlayerHumanoidBinder.new("PlayerHumanoidBinderInitSpecTag", BinderTestUtils.makeTrackingClass())
 		expect(function()
 			(binder :: any):Init()
 		end).toThrow()
@@ -46,25 +46,22 @@ end)
 describe("PlayerHumanoidBinder automatic tagging API", function()
 	it("defaults to enabled and observes changes", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
-		local emissions = {}
-		local sub = controller.binder:ObserveAutomaticTagging():Subscribe(function(value: boolean)
-			table.insert(emissions, value)
-		end)
+		local emissions = ObservableSpy.new(controller.binder:ObserveAutomaticTagging())
 
 		expect(emissions[1]).toEqual(true)
 
 		controller.binder:SetAutomaticTagging(false)
 		expect(emissions[2]).toEqual(false)
 
-		sub:Destroy()
+		emissions:Destroy()
 		controller:Destroy()
 	end)
 
 	it("throws on a non-boolean", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			controller.binder:SetAutomaticTagging(nil :: any)
@@ -75,12 +72,9 @@ describe("PlayerHumanoidBinder automatic tagging API", function()
 
 	it("ObserveAutomaticTaggingBrio kills the brio when the value changes", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
-		local brios: { any } = {}
-		local sub = controller.binder:ObserveAutomaticTaggingBrio():Subscribe(function(brio: any)
-			table.insert(brios, brio)
-		end)
+		local brios = ObservableSpy.new(controller.binder:ObserveAutomaticTaggingBrio())
 
 		expect(#brios).toEqual(1)
 		expect(brios[1]:IsDead()).toEqual(false)
@@ -91,7 +85,7 @@ describe("PlayerHumanoidBinder automatic tagging API", function()
 		expect(#brios).toEqual(2)
 		expect(brios[2]:GetValue()).toEqual(false)
 
-		sub:Destroy()
+		brios:Destroy()
 		controller:Destroy()
 	end)
 end)
@@ -107,8 +101,7 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 
 		controller.start()
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 		expect(class.instance).toEqual(humanoid)
 		expect(controller.binder:HasTag(humanoid)).toEqual(true)
 
@@ -117,14 +110,13 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 
 	it("binds the humanoid when a character is assigned after start", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock(2)
 		local character, humanoid = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 		expect(class.instance).toEqual(humanoid)
 
 		controller:Destroy()
@@ -132,21 +124,16 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 
 	it("binds a humanoid added to the character later", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character = controller.newCharacter(false)
 		controller.setCharacter(mock, character)
 
-		-- Let the tracker observe the humanoid-less character first, so the ChildAdded path is the one
-		-- that discovers the humanoid.
-		task.wait()
-
 		local humanoid = Instance.new("Humanoid")
 		humanoid.Parent = character
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 		expect(class.instance).toEqual(humanoid)
 
 		controller:Destroy()
@@ -154,17 +141,16 @@ describe("PlayerHumanoidBinder humanoid discovery", function()
 
 	it("unbinds and destroys the class when the character is destroyed", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character, humanoid = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 
 		character:Destroy()
-		awaitUnbound(controller.binder, humanoid)
+		expect(controller.binder:Get(humanoid)).toBeNil()
 
 		expect(controller.binder:Get(humanoid)).toBeNil()
 		expect(class.destroyed).toEqual(true)
@@ -176,32 +162,30 @@ end)
 describe("PlayerHumanoidBinder:SetAutomaticTagging(false)", function()
 	it("unbinds existing mock humanoids and rediscovers on re-enable", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character, humanoid = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 
 		controller.binder:SetAutomaticTagging(false)
-		awaitUnbound(controller.binder, humanoid)
+		expect(controller.binder:Get(humanoid)).toBeNil()
 
 		expect(controller.binder:Get(humanoid)).toBeNil()
 		expect(class.destroyed).toEqual(true)
 
 		controller.binder:SetAutomaticTagging(true)
 
-		local rebound = controller.binder:Promise(humanoid):Yield()
-		expect(rebound).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 
 		controller:Destroy()
 	end)
 
 	it("stops discovering while disabled", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		controller.binder:SetAutomaticTagging(false)
 
@@ -209,7 +193,6 @@ describe("PlayerHumanoidBinder:SetAutomaticTagging(false)", function()
 		local character, humanoid = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		task.wait(0.1)
 		expect(controller.binder:Get(humanoid)).toBeNil()
 
 		controller:Destroy()
@@ -219,14 +202,13 @@ end)
 describe("PlayerHumanoidBinder teardown", function()
 	it("destroys bound classes when the service bag is destroyed", function()
 		local controller = setup()
-		controller.boot()
+		controller.initServiceBag()
 
 		local mock = controller.newMock()
 		local character, humanoid = controller.newCharacter()
 		controller.setCharacter(mock, character)
 
-		local ok, class = controller.binder:Promise(humanoid):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(humanoid))
 
 		controller:Destroy()
 

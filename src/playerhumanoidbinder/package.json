@@ -36,6 +36,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quenty/valueobject": "workspace:*",

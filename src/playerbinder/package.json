@@ -34,6 +34,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
     "@quenty/servicebag": "workspace:*",
     "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },

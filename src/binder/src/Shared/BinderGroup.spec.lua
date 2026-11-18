@@ -10,6 +10,7 @@ local BinderGroup = require("BinderGroup")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -40,6 +41,7 @@ local function setup()
 	end)
 
 	local controller = {
+		maid = maid,
 		newBinder = newBinder,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -87,15 +89,12 @@ describe("BinderGroup:Add()", function()
 		local controller = setup()
 
 		local group = BinderGroup.new({})
-		local fired
-		group.BinderAdded:Connect(function(binder)
-			fired = binder
-		end)
+		local addedBinders = SignalTestUtils.collectFireList(controller.maid, group.BinderAdded)
 
 		local binder = controller.newBinder()
 		group:Add(binder)
 
-		expect(fired).toEqual(binder)
+		expect(addedBinders).toEqual({ binder })
 
 		controller:Destroy()
 	end)

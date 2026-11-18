@@ -19,12 +19,14 @@ local require = require(script.Parent.loader).load(script)
 
 local Binder = require("Binder")
 local BinderProvider = require("BinderProvider")
+local BinderTestUtils = require("BinderTestUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerBinder = require("PlayerBinder")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -32,28 +34,6 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local specCounter = 0
-
-local function makeTrackingClass()
-	local Class = {}
-	Class.__index = Class
-	Class.ClassName = "TrackingClass"
-
-	function Class.new(inst)
-		return setmetatable({ instance = inst, destroyed = false }, Class)
-	end
-
-	function Class:Destroy()
-		self.destroyed = true
-	end
-
-	return Class
-end
-
-local function awaitUnbound(binder, inst)
-	if binder:Get(inst) ~= nil then
-		binder:GetClassRemovedSignal():Wait()
-	end
-end
 
 local function setup(constructor: any?)
 	specCounter += 1
@@ -71,7 +51,7 @@ local function setup(constructor: any?)
 	local started = false
 
 	local tag = string.format("PlayerBinderSpecTag_%d", suffix)
-	local binder = PlayerBinder.new(tag, constructor or makeTrackingClass())
+	local binder = PlayerBinder.new(tag, constructor or BinderTestUtils.makeTrackingClass())
 	-- Cast: the service's instance fields are assigned in Init, so its methods do not type-check
 	-- against the exported module type.
 	local playerMockService: any = serviceBag:GetService(PlayerMockService)
@@ -142,7 +122,7 @@ end
 
 describe("PlayerBinder.new()", function()
 	it("is a Binder that reports its class name and tag", function()
-		local binder = PlayerBinder.new("PlayerBinderMetaSpecTag", makeTrackingClass())
+		local binder = PlayerBinder.new("PlayerBinderMetaSpecTag", BinderTestUtils.makeTrackingClass())
 		expect(Binder.isBinder(binder)).toEqual(true)
 		expect((binder :: any).ClassName).toEqual("PlayerBinder")
 		expect(binder:GetTag()).toEqual("PlayerBinderMetaSpecTag")
@@ -166,8 +146,7 @@ describe("PlayerBinder mock discovery", function()
 		local mock = controller.newMock(1)
 		controller.start()
 
-		local ok, class = controller.binder:Promise(mock):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(mock))
 		expect(class.instance).toEqual(mock)
 
 		controller:Destroy()
@@ -179,8 +158,7 @@ describe("PlayerBinder mock discovery", function()
 
 		local mock = controller.newMock(2)
 
-		local ok, class = controller.binder:Promise(mock):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(mock))
 		expect(class.instance).toEqual(mock)
 
 		controller:Destroy()
@@ -191,7 +169,7 @@ describe("PlayerBinder mock discovery", function()
 		controller.boot()
 
 		local mock = controller.newMock()
-		assert((controller.binder:Promise(mock):Yield()), "Never bound")
+		PromiseTestUtils.awaitFulfilled(controller.binder:Promise(mock))
 
 		expect(controller.binder:HasTag(mock)).toEqual(true)
 
@@ -205,9 +183,8 @@ describe("PlayerBinder mock discovery", function()
 		local first = controller.newMock(1)
 		local second = controller.newMock(2)
 
-		local okA, classA = controller.binder:Promise(first):Yield()
-		local okB, classB = controller.binder:Promise(second):Yield()
-		assert(okA and okB, "Never bound")
+		local classA = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(first))
+		local classB = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(second))
 
 		expect(classA.instance).toEqual(first)
 		expect(classB.instance).toEqual(second)
@@ -224,8 +201,7 @@ describe("PlayerBinder mock discovery", function()
 		local foreignMock = PlayerMock.new({ UserId = 99 })
 		foreignMock.Parent = workspace
 
-		local ok, class = controller.binder:Promise(foreignMock):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(foreignMock))
 		expect(class.instance).toEqual(foreignMock)
 
 		foreignMock:Destroy()
@@ -237,11 +213,10 @@ describe("PlayerBinder mock discovery", function()
 		controller.boot()
 
 		local mock = controller.newMock()
-		local ok, class = controller.binder:Promise(mock):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(mock))
 
 		mock:Destroy()
-		awaitUnbound(controller.binder, mock)
+		expect(controller.binder:Get(mock)).toBeNil()
 
 		expect(controller.binder:Get(mock)).toBeNil()
 		expect(class.destroyed).toEqual(true)

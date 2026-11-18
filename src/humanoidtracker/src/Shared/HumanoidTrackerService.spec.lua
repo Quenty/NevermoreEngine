@@ -6,6 +6,7 @@ local HumanoidTrackerService = require("HumanoidTrackerService")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 
@@ -132,23 +133,18 @@ describe("HumanoidTrackerService.ObserveHumanoid", function()
 		local service = controller.newService()
 		local player = controller.newPlayer()
 
-		local emissions = 0
-		local lastValue = nil
-		controller.maid:GiveTask(service:ObserveHumanoid(player):Subscribe(function(value)
-			emissions += 1
-			lastValue = value
-		end))
+		local values = controller.maid:Add(ObservableSpy.new(service:ObserveHumanoid(player)))
 
-		expect(emissions).toBe(1)
-		expect(lastValue).toBeNil()
+		expect(#values).toBe(1)
+		expect(values[1]).toBeNil()
 
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
-		expect(emissions).toBe(2)
-		expect(lastValue).toBe(character:FindFirstChildOfClass("Humanoid"))
+		expect(#values).toBe(2)
+		expect(values[2]).toBe(character:FindFirstChildOfClass("Humanoid"))
 
 		PlayerMock.removeCharacter(player)
-		expect(emissions).toBe(3)
-		expect(lastValue).toBeNil()
+		expect(#values).toBe(3)
+		expect(values[3]).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -161,10 +157,7 @@ describe("HumanoidTrackerService.ObserveHumanoidBrio", function()
 		local service = controller.newService()
 		local player = controller.newPlayer()
 
-		local brios: { Brio.Brio<Humanoid> } = {}
-		controller.maid:GiveTask(service:ObserveHumanoidBrio(player):Subscribe(function(brio)
-			table.insert(brios, brio)
-		end))
+		local brios = controller.maid:Add(ObservableSpy.new(service:ObserveHumanoidBrio(player)))
 
 		expect(#brios).toBe(0)
 
@@ -189,19 +182,14 @@ describe("HumanoidTrackerService.ObserveAliveHumanoid", function()
 		local service = controller.newService()
 		local player = controller.newPlayer()
 
-		local emissions = 0
-		local lastValue = nil
-		controller.maid:GiveTask(service:ObserveAliveHumanoid(player):Subscribe(function(value)
-			emissions += 1
-			lastValue = value
-		end))
+		local values = controller.maid:Add(ObservableSpy.new(service:ObserveAliveHumanoid(player)))
 
-		expect(emissions).toBe(1)
-		expect(lastValue).toBeNil()
+		expect(#values).toBe(1)
+		expect(values[1]).toBeNil()
 
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
-		expect(emissions).toBe(2)
-		expect(lastValue).toBe(character:FindFirstChildOfClass("Humanoid"))
+		expect(#values).toBe(2)
+		expect(values[2]).toBe(character:FindFirstChildOfClass("Humanoid"))
 
 		controller:Destroy()
 	end)
@@ -214,10 +202,7 @@ describe("HumanoidTrackerService.ObserveAliveHumanoidBrio", function()
 		local service = controller.newService()
 		local player = controller.newPlayer()
 
-		local brios: { Brio.Brio<Humanoid> } = {}
-		controller.maid:GiveTask(service:ObserveAliveHumanoidBrio(player):Subscribe(function(brio)
-			table.insert(brios, brio)
-		end))
+		local brios = controller.maid:Add(ObservableSpy.new(service:ObserveAliveHumanoidBrio(player)))
 
 		PlayerMock.loadMinimalCharacterAsync(player)
 		expect(#brios).toBe(1)
