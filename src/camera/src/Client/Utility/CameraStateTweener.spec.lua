@@ -17,6 +17,8 @@ local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
+local SignalTestUtils = require("SignalTestUtils")
+local StepUtils = require("StepUtils")
 local TransitionModel = require("TransitionModel")
 
 local describe = Jest.Globals.describe
@@ -24,6 +26,7 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 type Controller = {
+	maid: Maid.Maid,
 	cameraStack: CameraStack.CameraStack,
 	cameraEffect: CustomCameraEffect.CustomCameraEffect,
 	tweener: CameraStateTweener.CameraStateTweener,
@@ -59,6 +62,7 @@ local function setup(options: { speed: number? }?): Controller
 	end
 
 	local controller: Controller = {
+		maid = maid,
 		cameraStack = cameraStack,
 		cameraEffect = cameraEffect,
 		tweener = tweener,
@@ -66,8 +70,8 @@ local function setup(options: { speed: number? }?): Controller
 		-- a frame has to pass before the transition notices it arrived.
 		advance = function(seconds: number)
 			now += seconds
-			task.wait()
-			task.wait()
+			StepUtils.getAnimationStepSignal():Wait()
+			StepUtils.deferWait()
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -341,13 +345,10 @@ describe("CameraStateTweener:SetShownTarget", function()
 
 	it("retargets and runs the show transition again when changed while shown", function()
 		local controller = setup()
-		local showingComplete = 0
-		controller.tweener.ShowingComplete:Connect(function()
-			showingComplete += 1
-		end)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.tweener.ShowingComplete)
 
 		controller.tweener:Show(true)
-		expect(showingComplete).toBe(1)
+		expect(showingComplete()).toBe(1)
 
 		controller.tweener:SetShownTarget(0.5)
 
@@ -356,7 +357,7 @@ describe("CameraStateTweener:SetShownTarget", function()
 
 		controller.advance(5)
 
-		expect(showingComplete).toBe(2)
+		expect(showingComplete()).toBe(2)
 		expect(controller.tweener:GetPercentVisible()).toBe(0.5)
 
 		controller:Destroy()
@@ -423,17 +424,14 @@ describe("CameraStateTweener as a transition model", function()
 
 	it("fires ShowingComplete only once the fade arrives", function()
 		local controller = setup()
-		local showingComplete = 0
-		controller.tweener.ShowingComplete:Connect(function()
-			showingComplete += 1
-		end)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.tweener.ShowingComplete)
 
 		controller.tweener:Show()
-		expect(showingComplete).toBe(0)
+		expect(showingComplete()).toBe(0)
 
 		controller.advance(5)
 
-		expect(showingComplete).toBe(1)
+		expect(showingComplete()).toBe(1)
 
 		controller:Destroy()
 	end)

@@ -10,8 +10,9 @@ local Teams = game:GetService("Teams")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
-local Observable = require("Observable")
+local RxBrioTestUtils = require("RxBrioTestUtils")
 local RxTeamUtils = require("RxTeamUtils")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -22,14 +23,12 @@ local BLUE = BrickColor.new("Bright blue")
 
 type Controller = {
 	newTeam: (color: BrickColor?) -> Team,
-	record: (observable: Observable.Observable<any>) -> { any },
-	live: (brios: { any }) -> { any },
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
 	local maid = Maid.new()
-	local created: { [Instance]: true } = {}
 
 	local controller: Controller = {
 		newTeam = function(color)
@@ -38,28 +37,10 @@ local function setup(): Controller
 			team.TeamColor = color or RED
 			team.Parent = Teams
 			maid:GiveTask(team)
-			created[team] = true
 			return team
 		end,
 
-		record = function(observable)
-			local brios = {}
-			maid:GiveTask(observable:Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
-			return brios
-		end,
-
-		-- The test place is shared, so only values this controller created count.
-		live = function(brios)
-			local values = {}
-			for _, brio in brios do
-				if not brio:IsDead() and created[brio:GetValue()] then
-					table.insert(values, brio:GetValue())
-				end
-			end
-			return values
-		end,
+		maid = maid,
 
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -77,25 +58,21 @@ describe("RxTeamUtils.observeTeamsBrio", function()
 		local teamA = controller.newTeam()
 		local teamB = controller.newTeam()
 
-		local brios = controller.record(RxTeamUtils.observeTeamsBrio())
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsBrio())
 
-		local live = controller.live(brios)
-		expect(#live).toBe(2)
-		expect(live).toContain(teamA)
-		expect(live).toContain(teamB)
+		expect(aliveTeams).toContain(teamA)
+		expect(aliveTeams).toContain(teamB)
 
 		controller:Destroy()
 	end)
 
 	it("emits teams added later", function()
 		local controller = setup()
-		local brios = controller.record(RxTeamUtils.observeTeamsBrio())
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsBrio())
 
 		local team = controller.newTeam()
 
-		local live = controller.live(brios)
-		expect(#live).toBe(1)
-		expect(live[1]).toBe(team)
+		expect(aliveTeams).toContain(team)
 
 		controller:Destroy()
 	end)
@@ -103,25 +80,26 @@ describe("RxTeamUtils.observeTeamsBrio", function()
 	it("kills the brio when the team is removed", function()
 		local controller = setup()
 		local team = controller.newTeam()
-		local brios = controller.record(RxTeamUtils.observeTeamsBrio())
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsBrio())
+		expect(aliveTeams).toContain(team)
 
 		team.Parent = nil
 
-		expect(#controller.live(brios)).toBe(0)
+		expect(aliveTeams).never.toContain(team)
 
 		controller:Destroy()
 	end)
 
 	it("ignores children of Teams that are not teams", function()
 		local controller = setup()
-		local brios = controller.record(RxTeamUtils.observeTeamsBrio())
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsBrio())
 
 		local folder = Instance.new("Folder")
 		folder.Parent = Teams
-		local before = #brios
-		controller.newTeam()
+		local team = controller.newTeam()
 
-		expect(#brios).toBe(before + 1)
+		expect(aliveTeams).toContain(team)
+		expect(aliveTeams).never.toContain(folder)
 
 		folder:Destroy()
 		controller:Destroy()
@@ -129,16 +107,17 @@ describe("RxTeamUtils.observeTeamsBrio", function()
 
 	it("kills every brio on unsubscribe", function()
 		local controller = setup()
-		controller.newTeam()
-		controller.newTeam()
+		local teamA = controller.newTeam()
+		local teamB = controller.newTeam()
 
-		local brios = {}
-		local subscription = RxTeamUtils.observeTeamsBrio():Subscribe(function(brio)
-			table.insert(brios, brio)
-		end)
-		subscription:Destroy()
+		local subscriptionMaid = Maid.new()
+		local aliveTeams = RxBrioTestUtils.collectAliveList(subscriptionMaid, RxTeamUtils.observeTeamsBrio())
+		expect(aliveTeams).toContain(teamA)
+		expect(aliveTeams).toContain(teamB)
 
-		expect(#controller.live(brios)).toBe(0)
+		subscriptionMaid:Destroy()
+
+		expect(aliveTeams).toEqual({})
 
 		controller:Destroy()
 	end)
@@ -154,13 +133,12 @@ describe("RxTeamUtils.observeTeamsForColorBrio", function()
 	it("emits only teams of the given color", function()
 		local controller = setup()
 		local red = controller.newTeam(RED)
-		controller.newTeam(BLUE)
+		local blue = controller.newTeam(BLUE)
 
-		local brios = controller.record(RxTeamUtils.observeTeamsForColorBrio(RED))
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsForColorBrio(RED))
 
-		local live = controller.live(brios)
-		expect(#live).toBe(1)
-		expect(live[1]).toBe(red)
+		expect(aliveTeams).toContain(red)
+		expect(aliveTeams).never.toContain(blue)
 
 		controller:Destroy()
 	end)
@@ -168,15 +146,13 @@ describe("RxTeamUtils.observeTeamsForColorBrio", function()
 	it("emits a team once its color changes to match", function()
 		local controller = setup()
 		local team = controller.newTeam(BLUE)
-		local brios = controller.record(RxTeamUtils.observeTeamsForColorBrio(RED))
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsForColorBrio(RED))
 
-		expect(#controller.live(brios)).toBe(0)
+		expect(aliveTeams).never.toContain(team)
 
 		team.TeamColor = RED
 
-		local live = controller.live(brios)
-		expect(#live).toBe(1)
-		expect(live[1]).toBe(team)
+		expect(aliveTeams).toContain(team)
 
 		controller:Destroy()
 	end)
@@ -184,11 +160,12 @@ describe("RxTeamUtils.observeTeamsForColorBrio", function()
 	it("kills the brio once the color no longer matches", function()
 		local controller = setup()
 		local team = controller.newTeam(RED)
-		local brios = controller.record(RxTeamUtils.observeTeamsForColorBrio(RED))
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsForColorBrio(RED))
+		expect(aliveTeams).toContain(team)
 
 		team.TeamColor = BLUE
 
-		expect(#controller.live(brios)).toBe(0)
+		expect(aliveTeams).never.toContain(team)
 
 		controller:Destroy()
 	end)
@@ -196,11 +173,12 @@ describe("RxTeamUtils.observeTeamsForColorBrio", function()
 	it("kills the brio when the team is removed", function()
 		local controller = setup()
 		local team = controller.newTeam(RED)
-		local brios = controller.record(RxTeamUtils.observeTeamsForColorBrio(RED))
+		local aliveTeams = RxBrioTestUtils.collectAliveList(controller.maid, RxTeamUtils.observeTeamsForColorBrio(RED))
+		expect(aliveTeams).toContain(team)
 
 		team.Parent = nil
 
-		expect(#controller.live(brios)).toBe(0)
+		expect(aliveTeams).never.toContain(team)
 
 		controller:Destroy()
 	end)
@@ -221,7 +199,7 @@ describe("RxTeamUtils.observePlayersForTeamBrio", function()
 		local controller = setup()
 		local team = controller.newTeam()
 
-		local brios = controller.record(RxTeamUtils.observePlayersForTeamBrio(team))
+		local brios = RxTestUtils.collectList(controller.maid, RxTeamUtils.observePlayersForTeamBrio(team))
 
 		expect(#brios).toBe(0)
 
@@ -240,7 +218,7 @@ describe("RxTeamUtils.observePlayersForTeamColorBrio", function()
 		local controller = setup()
 		controller.newTeam(RED)
 
-		local brios = controller.record(RxTeamUtils.observePlayersForTeamColorBrio(RED))
+		local brios = RxTestUtils.collectList(controller.maid, RxTeamUtils.observePlayersForTeamColorBrio(RED))
 
 		expect(#brios).toBe(0)
 

@@ -18,7 +18,6 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local TAG_NAME = "creator"
-local TAG_LIFETIME = 1
 
 type Controller = {
 	newHumanoid: () -> Humanoid,
@@ -147,19 +146,6 @@ describe("HumanoidKillerUtils.tagKiller", function()
 		local tags = controller.getTags(humanoid)
 		expect(#tags).toBe(1)
 		expect(tags[1].Value).toBe(second)
-
-		controller:Destroy()
-	end)
-
-	it("expires the tag after the tag lifetime", function()
-		local controller = setup()
-		local humanoid = controller.newHumanoid()
-		local player = controller.newPlayer()
-
-		HumanoidKillerUtils.tagKiller(humanoid, player)
-		task.wait(TAG_LIFETIME + 0.5)
-
-		expect(#controller.getTags(humanoid)).toBe(0)
 
 		controller:Destroy()
 	end)

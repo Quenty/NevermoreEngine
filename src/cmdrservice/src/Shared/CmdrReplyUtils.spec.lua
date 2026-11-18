@@ -6,15 +6,19 @@ local require = require(script.Parent.loader).load(script)
 
 local CmdrReplyUtils = require("CmdrReplyUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Promise = require("Promise")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 local THRESHOLD = 0.05
 
 local function setup()
+	JestUtils.useFakeTimers()
+
 	local replies: { { text: string, options: any } } = {}
 
 	local context = {
@@ -28,7 +32,7 @@ local function setup()
 		context = context :: any,
 		replies = replies,
 		waitPastThreshold = function()
-			task.wait(THRESHOLD * 2)
+			jest.advanceTimersByTime(THRESHOLD * 2 * 1000)
 		end,
 	}
 end

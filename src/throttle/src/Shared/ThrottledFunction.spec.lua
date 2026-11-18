@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local ThrottledFunction = require("ThrottledFunction")
 
 local describe = Jest.Globals.describe
@@ -30,7 +31,7 @@ end
 
 describe("ThrottledFunction", function()
 	it("should drop cooldown calls when trailing is disabled", function()
-		jest.useFakeTimers()
+		JestUtils.useFakeTimers()
 
 		local calls, callback = recordCalls()
 		local throttled = ThrottledFunction.new(TIMEOUT, callback, {
@@ -47,11 +48,10 @@ describe("ThrottledFunction", function()
 		expect(calls[1][1]).toEqual("first")
 
 		throttled:Destroy()
-		jest.useRealTimers()
 	end)
 
 	it("should dispatch the latest trailing call with all arguments", function()
-		jest.useFakeTimers()
+		JestUtils.useFakeTimers()
 
 		local calls, callback = recordCalls()
 		local throttled = ThrottledFunction.new(TIMEOUT, callback, {
@@ -72,11 +72,10 @@ describe("ThrottledFunction", function()
 		expect(calls[2][3]).toEqual("fourth")
 
 		throttled:Destroy()
-		jest.useRealTimers()
 	end)
 
 	it("should delay trailing-only calls and keep the latest arguments", function()
-		jest.useFakeTimers()
+		JestUtils.useFakeTimers()
 
 		local calls, callback = recordCalls()
 		local throttled = ThrottledFunction.new(TIMEOUT, callback, {
@@ -95,11 +94,10 @@ describe("ThrottledFunction", function()
 		expect(calls[1][1]).toEqual("second, final and dispatched")
 
 		throttled:Destroy()
-		jest.useRealTimers()
 	end)
 
 	it("should cancel pending trailing calls when destroyed, not calling after destroyed", function()
-		jest.useFakeTimers()
+		JestUtils.useFakeTimers()
 
 		local calls, callback = recordCalls()
 		local throttled = ThrottledFunction.new(TIMEOUT, callback, {
@@ -112,8 +110,6 @@ describe("ThrottledFunction", function()
 		jest.advanceTimersByTime(TIMEOUT_MS)
 
 		expect(#calls).toEqual(0)
-
-		jest.useRealTimers()
 	end)
 
 	it("should reject if leading and trailing are both false", function()

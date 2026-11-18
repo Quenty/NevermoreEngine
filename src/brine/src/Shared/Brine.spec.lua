@@ -10,6 +10,8 @@ local BrineContext = require("BrineContext")
 local BrineOptionUtils = require("BrineOptionUtils")
 local Jest = require("Jest")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
+local RxTestUtils = require("RxTestUtils")
 local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
@@ -225,8 +227,8 @@ describe("Brine.serialize / Brine.deserialize roundtrip", function()
 			local tags = result:GetTags()
 
 			expect(#tags).toEqual(2)
-			expect(table.find(tags, "First")).never.toEqual(nil)
-			expect(table.find(tags, "Second")).never.toEqual(nil)
+			expect(tags).toContain("First")
+			expect(tags).toContain("Second")
 		end)
 	end)
 
@@ -252,42 +254,33 @@ describe("Brine.observeSerialize", function()
 		local original = Instance.new("StringValue")
 		original.Value = "initial"
 
-		local emissions = {}
-		local sub = Brine.observeSerialize(original):Subscribe(function(packet)
-			table.insert(emissions, packet)
-		end)
+		local emissions = ObservableSpy.new(Brine.observeSerialize(original))
 
 		expect(#emissions).toEqual(1)
 		expect(typeof(emissions[1])).toEqual("string")
 		expect(#emissions[1] > 0).toEqual(true)
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("fires another packet when an encoded property changes", function()
 		local original = Instance.new("StringValue")
 		original.Value = "before"
 
-		local emissions = {}
-		local sub = Brine.observeSerialize(original):Subscribe(function(packet)
-			table.insert(emissions, packet)
-		end)
+		local emissions = ObservableSpy.new(Brine.observeSerialize(original))
 
 		local before = #emissions
 		original.Value = "after"
 
 		expect(#emissions > before).toEqual(true)
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("stops firing after the subscription is destroyed", function()
 		local original = Instance.new("StringValue")
 		original.Value = "pre-destroy"
 
-		local emissions = {}
-		local sub = Brine.observeSerialize(original):Subscribe(function(packet)
-			table.insert(emissions, packet)
-		end)
-		sub:Destroy()
+		local emissions = ObservableSpy.new(Brine.observeSerialize(original))
+		emissions:Destroy()
 
 		local before = #emissions
 		original.Value = "post-destroy"
@@ -302,13 +295,10 @@ describe("Brine.observeDeserialize", function()
 			return function() end
 		end)
 
-		local emitted = false
-		local sub = Brine.observeDeserialize(source :: any):Subscribe(function()
-			emitted = true
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(source :: any))
 
-		expect(emitted).toEqual(false)
-		sub:Destroy()
+		expect(#emissions).toEqual(0)
+		emissions:Destroy()
 	end)
 
 	it("emits an instance with the upstream class and properties on the full frame", function()
@@ -316,42 +306,34 @@ describe("Brine.observeDeserialize", function()
 		original.Name = "Source"
 		original.Value = "hello observable"
 
-		local result: any
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
-		expect(result).never.toEqual(nil)
-		expect(result.ClassName).toEqual("StringValue")
-		expect(result.Name).toEqual("Source")
-		expect(result.Value).toEqual("hello observable")
-		sub:Destroy()
+		local latestEmission = emissions:GetLastValue()
+		expect(latestEmission).never.toEqual(nil)
+		expect(latestEmission.ClassName).toEqual("StringValue")
+		expect(latestEmission.Name).toEqual("Source")
+		expect((latestEmission :: any).Value).toEqual("hello observable")
+		emissions:Destroy()
 	end)
 
 	it("applies upstream property changes to the deserialized instance", function()
 		local original = Instance.new("StringValue")
 		original.Value = "first"
 
-		local result: any
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
 		original.Value = "second"
 
-		expect(result).never.toEqual(nil)
-		expect(result.Value).toEqual("second")
-		sub:Destroy()
+		expect(emissions:GetLastValue()).never.toEqual(nil)
+		expect((emissions:GetLastValue() :: any).Value).toEqual("second")
+		emissions:Destroy()
 	end)
 
 	it("emits the same instance reference on each upstream packet", function()
 		local original = Instance.new("StringValue")
 		original.Value = "alpha"
 
-		local seen = {}
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			table.insert(seen, instance)
-		end)
+		local seen = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
 		original.Value = "beta"
 		original.Value = "gamma"
@@ -360,7 +342,7 @@ describe("Brine.observeDeserialize", function()
 		for index = 2, #seen do
 			expect(seen[index]).toEqual(seen[1])
 		end
-		sub:Destroy()
+		seen:Destroy()
 	end)
 end)
 
@@ -368,21 +350,18 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 	it("propagates a descendant added after subscribe", function()
 		local original = Instance.new("Folder")
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
 		local child = Instance.new("StringValue")
 		child.Name = "AddedAfterSubscribe"
 		child.Value = "fresh"
 		child.Parent = original
 
-		expect(result).never.toEqual(nil)
-		local resolvedChild = result:FindFirstChild("AddedAfterSubscribe") :: StringValue
+		expect(emissions:GetLastValue()).never.toEqual(nil)
+		local resolvedChild = emissions:GetLastValue():FindFirstChild("AddedAfterSubscribe") :: StringValue
 		expect(resolvedChild).never.toEqual(nil)
 		expect(resolvedChild.Value).toEqual("fresh")
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("propagates a descendant removed after subscribe", function()
@@ -391,19 +370,16 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		child.Name = "Removable"
 		child.Parent = original
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
-		expect(result:FindFirstChild("Removable")).never.toEqual(nil)
+		expect(emissions:GetLastValue():FindFirstChild("Removable")).never.toEqual(nil)
 
 		child.Parent = nil
 		StepUtils.deferWait()
 
-		expect(result:FindFirstChild("Removable")).toEqual(nil)
+		expect(emissions:GetLastValue():FindFirstChild("Removable")).toEqual(nil)
 
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("propagates reparenting between two folders inside the source tree", function()
@@ -421,21 +397,18 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		item.Name = "Item"
 		item.Parent = first
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(root)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(root)))
 
 		item.Parent = second
 		StepUtils.deferWait()
 
-		local resolvedFirst = result:FindFirstChild("First") :: Instance
-		local resolvedSecond = result:FindFirstChild("Second") :: Instance
+		local resolvedFirst = emissions:GetLastValue():FindFirstChild("First") :: Instance
+		local resolvedSecond = emissions:GetLastValue():FindFirstChild("Second") :: Instance
 		expect(resolvedFirst).never.toEqual(nil)
 		expect(resolvedSecond).never.toEqual(nil)
 		expect(resolvedFirst:FindFirstChild("Item")).toEqual(nil)
 		expect(resolvedSecond:FindFirstChild("Item")).never.toEqual(nil)
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("propagates an ObjectValue.Value assignment that points inside the tree", function()
@@ -450,19 +423,16 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		pointer.Name = "Pointer"
 		pointer.Parent = root
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(root)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(root)))
 
 		pointer.Value = target
 
-		local resolvedPointer = result:FindFirstChild("Pointer") :: ObjectValue
-		local resolvedTarget = result:FindFirstChild("Target")
+		local resolvedPointer = emissions:GetLastValue():FindFirstChild("Pointer") :: ObjectValue
+		local resolvedTarget = emissions:GetLastValue():FindFirstChild("Target")
 		expect(resolvedPointer).never.toEqual(nil)
 		expect(resolvedTarget).never.toEqual(nil)
 		expect(resolvedPointer.Value).toEqual(resolvedTarget)
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("propagates clearing an ObjectValue.Value back to nil", function()
@@ -477,17 +447,14 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		pointer.Value = target
 		pointer.Parent = root
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(root)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(root)))
 
 		pointer.Value = nil
 
-		local resolvedPointer = result:FindFirstChild("Pointer") :: ObjectValue
+		local resolvedPointer = emissions:GetLastValue():FindFirstChild("Pointer") :: ObjectValue
 		expect(resolvedPointer).never.toEqual(nil)
 		expect(resolvedPointer.Value).toEqual(nil)
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	-- Tag change propagation is intentionally unsupported — there is no performant
@@ -495,65 +462,53 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 	it.skip("propagates a tag added after subscribe", function()
 		local original = Instance.new("Part")
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
 		original:AddTag("LateTag")
 
-		expect(result).never.toEqual(nil)
-		expect(result:HasTag("LateTag")).toEqual(true)
-		sub:Destroy()
+		expect(emissions:GetLastValue()).never.toEqual(nil)
+		expect(emissions:GetLastValue():HasTag("LateTag")).toEqual(true)
+		emissions:Destroy()
 	end)
 
 	it.skip("propagates a tag removed after subscribe", function()
 		local original = Instance.new("Part")
 		original:AddTag("InitialTag")
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
-		expect(result:HasTag("InitialTag")).toEqual(true)
+		expect(emissions:GetLastValue():HasTag("InitialTag")).toEqual(true)
 
 		original:RemoveTag("InitialTag")
 
-		expect(result:HasTag("InitialTag")).toEqual(false)
-		sub:Destroy()
+		expect(emissions:GetLastValue():HasTag("InitialTag")).toEqual(false)
+		emissions:Destroy()
 	end)
 
 	it("propagates an attribute set after subscribe", function()
 		local original = Instance.new("Part")
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
 		original:SetAttribute("LateAttr", 99)
 
-		expect(result).never.toEqual(nil)
-		expect(result:GetAttribute("LateAttr")).toEqual(99)
-		sub:Destroy()
+		expect(emissions:GetLastValue()).never.toEqual(nil)
+		expect(emissions:GetLastValue():GetAttribute("LateAttr")).toEqual(99)
+		emissions:Destroy()
 	end)
 
 	it("propagates an attribute cleared back to nil after subscribe", function()
 		local original = Instance.new("Part")
 		original:SetAttribute("InitialAttr", 7)
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(original)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(original)))
 
-		expect(result:GetAttribute("InitialAttr")).toEqual(7)
+		expect(emissions:GetLastValue():GetAttribute("InitialAttr")).toEqual(7)
 
 		original:SetAttribute("InitialAttr", nil)
 
-		expect(result:GetAttribute("InitialAttr")).toEqual(nil)
-		sub:Destroy()
+		expect(emissions:GetLastValue():GetAttribute("InitialAttr")).toEqual(nil)
+		emissions:Destroy()
 	end)
 
 	it("propagates a descendant added two levels deep", function()
@@ -562,22 +517,19 @@ describe("Brine.observeSerialize / Brine.observeDeserialize edge cases", functio
 		middle.Name = "Middle"
 		middle.Parent = root
 
-		local result
-		local sub = Brine.observeDeserialize(Brine.observeSerialize(root)):Subscribe(function(instance)
-			result = instance
-		end)
+		local emissions = ObservableSpy.new(Brine.observeDeserialize(Brine.observeSerialize(root)))
 
 		local grandchild = Instance.new("StringValue")
 		grandchild.Name = "Grandchild"
 		grandchild.Value = "deep"
 		grandchild.Parent = middle
 
-		local resolvedMiddle = result:FindFirstChild("Middle") :: Instance
+		local resolvedMiddle = emissions:GetLastValue():FindFirstChild("Middle") :: Instance
 		expect(resolvedMiddle).never.toEqual(nil)
 		local resolvedGrandchild = resolvedMiddle:FindFirstChild("Grandchild") :: StringValue
 		expect(resolvedGrandchild).never.toEqual(nil)
 		expect(resolvedGrandchild.Value).toEqual("deep")
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 end)
 
@@ -832,11 +784,7 @@ describe("Brine direct packet roundtrip (non-Rx)", function()
 		first.Name = "First"
 		first.Parent = root
 
-		local rawPackets = {}
-		local sub = (Brine.observeSerialize(root) :: any):Subscribe(function(stream, _encodedReferences)
-			table.insert(rawPackets, stream)
-		end)
-		sub:Destroy()
+		local rawPackets = RxTestUtils.collectSynchronousList(Brine.observeSerialize(root) :: any)
 
 		expect(#rawPackets > 0).toEqual(true)
 	end)
@@ -850,11 +798,7 @@ describe("Brine direct packet roundtrip (non-Rx)", function()
 		second.Name = "Second"
 		second.Parent = root
 
-		local rawPackets = {}
-		local sub = (Brine.observeSerialize(root) :: any):Subscribe(function(stream, _encodedReferences)
-			table.insert(rawPackets, stream)
-		end)
-		sub:Destroy()
+		local rawPackets = RxTestUtils.collectSynchronousList(Brine.observeSerialize(root) :: any)
 
 		expect(#rawPackets > 0).toEqual(true)
 	end)

@@ -12,7 +12,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
-local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TaggedTemplateProvider = require("TaggedTemplateProvider")
 local TemplateProvider = require("TemplateProvider")
@@ -101,14 +100,10 @@ describe("TaggedTemplateProvider.new", function()
 		local provider = controller.newProvider()
 
 		local sword = controller.newTagged("Model", "Sword")
-		expect(PromiseTestUtils.awaitValue(function()
-			return provider:GetTemplate("Sword") == sword
-		end)).toBe(true)
+		expect(provider:GetTemplate("Sword") == sword).toBe(true)
 
 		CollectionService:RemoveTag(sword, controller.tagName)
-		expect(PromiseTestUtils.awaitValue(function()
-			return provider:GetTemplate("Sword") == nil
-		end)).toBe(true)
+		expect(provider:GetTemplate("Sword")).toBeNil()
 
 		controller:Destroy()
 	end)

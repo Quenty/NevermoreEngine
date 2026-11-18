@@ -14,6 +14,7 @@ local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -24,26 +25,41 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type FactOptions = { priority: number?, source: string? }
+
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	fakePlayer: () -> Player,
+	fact: (factName: string, initial: boolean?, options: FactOptions?) -> ValueObject.ValueObject<boolean?>,
+	abstainingFact: (factName: string, options: { priority: number, source: string }) -> (),
+	feature: (featureName: string, factNames: { string }) -> AccessFeature.AccessFeature,
+	observeFeature: (
+		player: Player,
+		feature: AccessFeature.AccessFeature
+	) -> ObservableSpy.ObservableSpy<AccessStateUtils.AccessState>,
+	observeFactReport: (
+		player: Player,
+		factName: string
+	) -> ObservableSpy.ObservableSpy<AccessDataService.AccessFactReport>,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
+
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
-		serviceBag = serviceBag,
-		accessDataService = accessDataService,
+	local controller: Controller = {
 		maid = maid,
-		fakePlayer = function(): Player
+		accessDataService = accessDataService,
+		fakePlayer = function()
 			return maid:Add(PlayerMock.new()) :: any
 		end,
-		-- Registers a fact backed by a ValueObject the test drives, and hands back the ValueObject.
-		fact = function(
-			factName: string,
-			initial: boolean?,
-			options: { priority: number?, source: string? }?
-		): ValueObject.ValueObject<boolean?>
+		fact = function(factName, initial, options)
 			local valueObject = maid:Add(ValueObject.new(initial)) :: any
 			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
@@ -54,7 +70,7 @@ local function setup()
 			}))))
 			return valueObject
 		end,
-		abstainingFact = function(factName: string, options: { priority: number, source: string })
+		abstainingFact = function(factName, options)
 			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return AccessFact.ABSTAIN
@@ -63,17 +79,16 @@ local function setup()
 				source = options.source,
 			}))))
 		end,
-		feature = function(featureName: string, factNames: { string }): AccessFeature.AccessFeature
+		feature = function(featureName, factNames)
 			local feature = maid:Add(AccessFeature.anyOf(featureName, factNames))
 			maid:GiveTask(accessDataService:RegisterFeature(feature))
 			return feature
 		end,
-		lastState = function(observable: any): AccessStateUtils.AccessState?
-			local last: AccessStateUtils.AccessState? = nil
-			maid:GiveTask(observable:Subscribe(function(state)
-				last = state
-			end))
-			return last
+		observeFeature = function(player, feature)
+			return maid:Add(ObservableSpy.new(accessDataService:ObserveFeature(player, feature)))
+		end,
+		observeFactReport = function(player, factName)
+			return maid:Add(ObservableSpy.new(accessDataService:ObserveFactReport(player, factName)))
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -87,8 +102,6 @@ end
 
 describe("AccessDataService registration", function()
 	it("refuses two layers of one fact at the same priority", function()
-		-- Equal priorities would make the winner depend on load order, which is the kind of thing nobody
-		-- can debug from a complaint.
 		local controller = setup()
 		controller.fact("ownsChapterPass", true)
 
@@ -174,13 +187,11 @@ describe("AccessDataService.AddAccessFact", function()
 		controller.maid:GiveTask(controller.accessDataService:AddAccessFact("eventIsRunning", eventRunning))
 		local feature = controller.feature("eventReward", { "eventIsRunning" })
 
-		local first =
-			controller.lastState(controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature))
-		local second =
-			controller.lastState(controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature))
+		local first = controller.observeFeature(controller.fakePlayer(), feature)
+		local second = controller.observeFeature(controller.fakePlayer(), feature)
 
-		expect(AccessStateUtils.isAllowed(first :: any)).toEqual(true)
-		expect(AccessStateUtils.isAllowed(second :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(first:GetLastValue())).toEqual(true)
+		expect(AccessStateUtils.isAllowed(second:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -188,15 +199,13 @@ end)
 
 describe("AccessDataService.ObserveFeature", function()
 	it("emits a verdict immediately rather than nothing", function()
-		-- A live surface must have something to render before any lookup lands.
 		local controller = setup()
 		controller.fact("ownsChapterPass", nil)
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
-		local state =
-			controller.lastState(controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature))
+		local states = controller.observeFeature(controller.fakePlayer(), feature)
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -206,85 +215,59 @@ describe("AccessDataService.ObserveFeature", function()
 		local ownsGame = controller.fact("ownsChapterPass", nil)
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
-		local player = controller.fakePlayer()
-		local last: AccessStateUtils.AccessState? = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(controller.fakePlayer(), feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		ownsGame.Value = true
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		ownsGame.Value = false
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(false)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(false)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
 
 	it("does not stall on a fact the feature never declared", function()
-		-- One dead mechanism must only block the features that actually read it.
 		local controller = setup()
 		controller.fact("ownsChapterPass", true)
 		controller.fact("neverAnswers", nil)
 
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
-		local state =
-			controller.lastState(controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature))
+		local states = controller.observeFeature(controller.fakePlayer(), feature)
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
 
 	it("reads a fact this realm never registered as unresolved, without taking the subscriber down", function()
-		-- A feature re-derives its fact list live, so an unregistered fact also happens when one is
-		-- removed underneath a live subscription. Throwing there kills whatever was watching.
 		local controller = setup()
 		local feature = controller.feature("chapters", { "registeredOnlyOnTheServer" })
 
-		local last = nil
-		expect(function()
-			controller.maid:GiveTask(
-				controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function(state)
-					last = state
-				end)
-			)
-		end).never.toThrow()
+		local states = controller.observeFeature(controller.fakePlayer(), feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
 
 	it("reads a fact nothing here has heard of as unresolved rather than throwing", function()
-		-- It used to throw, which made the readout die on exactly the case it exists to explain: a feature
-		-- widened by a server-only push names facts this realm may never have a resolver for. It warns
-		-- instead, once, and reports the honest answer.
 		local controller = setup()
-		local report = nil
 
-		expect(function()
-			controller.maid:GiveTask(
-				controller.accessDataService
-					:ObserveFactReport(controller.fakePlayer(), "nosuch")
-					:Subscribe(function(value)
-						report = value
-					end)
-			)
-		end).never.toThrow()
+		local reports = controller.observeFactReport(controller.fakePlayer(), "nosuch")
+		local report = reports:GetLastValue()
 
-		expect((report :: any).state).toEqual(AccessFactContributionState.UNRESOLVED)
-		expect((report :: any).value).toEqual(nil)
+		expect(report.state).toEqual(AccessFactContributionState.UNRESOLVED)
+		expect(report.value).toEqual(nil)
 
 		controller:Destroy()
 	end)
 
 	it("keeps each player's verdict to themselves", function()
 		local controller = setup()
-		local byPlayer: { [any]: boolean } = {}
+		local byPlayer: { [Player]: boolean } = {}
 
 		controller.maid:GiveTask(controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("owns", {
 			resolve = function(_bag, player)
@@ -297,16 +280,11 @@ describe("AccessDataService.ObserveFeature", function()
 		local denied = controller.fakePlayer()
 		byPlayer[allowed] = true
 
-		expect(
-			AccessStateUtils.isAllowed(
-				controller.lastState(controller.accessDataService:ObserveFeature(allowed, feature)) :: any
-			)
-		).toEqual(true)
-		expect(
-			AccessStateUtils.isAllowed(
-				controller.lastState(controller.accessDataService:ObserveFeature(denied, feature)) :: any
-			)
-		).toEqual(false)
+		local allowedStates = controller.observeFeature(allowed, feature)
+		local deniedStates = controller.observeFeature(denied, feature)
+
+		expect(AccessStateUtils.isAllowed(allowedStates:GetLastValue())).toEqual(true)
+		expect(AccessStateUtils.isAllowed(deniedStates:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -314,7 +292,6 @@ end)
 
 describe("AccessDataService.PromiseFeature", function()
 	it("stays pending while the verdict is unresolved", function()
-		-- A gate that settled on a non-answer would be deciding by coin toss.
 		local controller = setup()
 		controller.fact("ownsChapterPass", nil)
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
@@ -336,7 +313,7 @@ describe("AccessDataService.PromiseFeature", function()
 			controller.maid:GivePromise(controller.accessDataService:PromiseFeature(controller.fakePlayer(), feature))
 		ownsGame.Value = true
 
-		local state = PromiseTestUtils.awaitFulfilled(promise, 5)
+		local state = PromiseTestUtils.awaitFulfilled(promise)
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
 
 		controller:Destroy()
@@ -350,15 +327,12 @@ describe("AccessDataService.SetFactOverride", function()
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
 		local player = controller.fakePlayer()
-		local last: AccessStateUtils.AccessState? = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(false)
 
 		controller.accessDataService:SetFactOverride(player, "ownsChapterPass", true)
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -369,14 +343,11 @@ describe("AccessDataService.SetFactOverride", function()
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
 		local player = controller.fakePlayer()
-		local last: AccessStateUtils.AccessState? = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
 		controller.accessDataService:SetFactOverride(player, "ownsChapterPass", nil)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -387,16 +358,13 @@ describe("AccessDataService.SetFactOverride", function()
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
 		local player = controller.fakePlayer()
-		local last: AccessStateUtils.AccessState? = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
 		local clear = controller.accessDataService:SetFactOverride(player, "ownsChapterPass", true)
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		clear()
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -410,11 +378,9 @@ describe("AccessDataService.SetFactOverride", function()
 		local other = controller.fakePlayer()
 		controller.accessDataService:SetFactOverride(overridden, "ownsChapterPass", true)
 
-		expect(
-			AccessStateUtils.isAllowed(
-				controller.lastState(controller.accessDataService:ObserveFeature(other, feature)) :: any
-			)
-		).toEqual(false)
+		local otherStates = controller.observeFeature(other, feature)
+
+		expect(AccessStateUtils.isAllowed(otherStates:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -435,15 +401,12 @@ describe("AccessDataService.SetFactOverride", function()
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
 		local player = controller.fakePlayer()
-		local last: AccessStateUtils.AccessState? = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
 		controller.accessDataService:SetFactOverride(player, "ownsChapterPass", true)
 		controller.accessDataService:ClearFactOverrides(player)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -454,9 +417,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		local controller = setup()
 		controller.fact("ownsChapterPass", true, { source = "purchase" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "ownsChapterPass")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "ownsChapterPass"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("purchase")
@@ -469,9 +430,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		controller.fact("isStaff", false, { source = "groupRank" })
 		controller.fact("isStaff", true, { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "isStaff"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("allowlist")
@@ -484,9 +443,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		controller.fact("isStaff", true, { source = "groupRank" })
 		controller.abstainingFact("isStaff", { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "isStaff"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("groupRank")
@@ -495,15 +452,11 @@ describe("AccessDataService.ObserveFactReport", function()
 	end)
 
 	it("falls through a layer that answers unresolved to one that knows", function()
-		-- An observation of "I do not know" must not outrank a lower layer that does. This is what keeps a
-		-- fact the client cannot compute from hanging when something underneath could have settled it.
 		local controller = setup()
 		controller.fact("isStaff", true, { source = "groupRank" })
 		controller.fact("isStaff", nil, { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "isStaff"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("groupRank")
@@ -516,12 +469,8 @@ describe("AccessDataService.ObserveFactReport", function()
 		controller.fact("isStaff", false, { source = "groupRank" })
 		controller.fact("isStaff", true, { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "isStaff"):GetLastValue()
 
-		-- override on top, then the registered layers, then the replicated one -- which abstains here
-		-- because nothing has been replicated.
 		expect(#report.layers).toEqual(4)
 		expect(report.layers[1].source).toEqual("override")
 		expect(report.layers[1].contributes).toEqual(false)
@@ -538,15 +487,13 @@ describe("AccessDataService.ObserveFactReport", function()
 	end)
 
 	it("shows an override as its own layer with the real answer still underneath", function()
-		-- Collapse these and nobody can tell a genuine entitlement from an override someone left on.
 		local controller = setup()
 		controller.fact("ownsChapterPass", false, { source = "purchase" })
 
 		local player = controller.fakePlayer()
 		controller.accessDataService:SetFactOverride(player, "ownsChapterPass", true)
 
-		local report =
-			controller.lastState(controller.accessDataService:ObserveFactReport(player, "ownsChapterPass")) :: any
+		local report = controller.observeFactReport(player, "ownsChapterPass"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("override")
@@ -560,9 +507,7 @@ describe("AccessDataService.ObserveFactReport", function()
 		local controller = setup()
 		controller.abstainingFact("isStaff", { priority = AccessFactPriority.DEFAULT, source = "groupRank" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFactReport(controller.fakePlayer(), "isStaff")
-		) :: any
+		local report = controller.observeFactReport(controller.fakePlayer(), "isStaff"):GetLastValue()
 
 		expect(report.value).toEqual(nil)
 		expect(report.decidedBy).toEqual(nil)
@@ -577,9 +522,10 @@ describe("AccessDataService.ObserveFeatureReport", function()
 		controller.fact("ownsChapterPass", false, { source = "purchase" })
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
-		local report = controller.lastState(
-			controller.accessDataService:ObserveFeatureReport(controller.fakePlayer(), feature)
-		) :: any
+		local reports = controller.maid:Add(
+			ObservableSpy.new(controller.accessDataService:ObserveFeatureReport(controller.fakePlayer(), feature))
+		)
+		local report = reports:GetLastValue()
 
 		expect(report.featureName).toEqual("chapters")
 		expect(AccessStateUtils.isAllowed(report.state)).toEqual(false)
@@ -592,7 +538,6 @@ end)
 
 describe("AccessDataService.TeardownPlayer", function()
 	it("rejects a promise still waiting on a verdict", function()
-		-- Otherwise a gate outlives the session it was gating, holding the player object with it.
 		local controller = setup()
 		controller.fact("ownsChapterPass", nil)
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
@@ -615,7 +560,7 @@ describe("AccessDataService.TeardownPlayer", function()
 
 		local player = controller.fakePlayer()
 		local promise = controller.maid:GivePromise(controller.accessDataService:PromiseFeature(player, feature))
-		expect(PromiseTestUtils.awaitSettled(promise, 5)).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(promise)
 
 		controller.accessDataService:TeardownPlayer(player)
 
@@ -630,16 +575,11 @@ describe("AccessDataService.TeardownPlayer", function()
 		local feature = controller.feature("chapters", { "ownsChapterPass" })
 
 		local player = controller.fakePlayer()
-		local completed = false
-		controller.maid:GiveTask(
-			controller.accessDataService:ObserveFeature(player, feature):Subscribe(nil, nil, function()
-				completed = true
-			end)
-		)
+		local states = controller.observeFeature(player, feature)
 
-		expect(completed).toEqual(false)
+		expect(states:IsComplete()).toEqual(false)
 		controller.accessDataService:TeardownPlayer(player)
-		expect(completed).toEqual(true)
+		expect(states:IsComplete()).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -652,14 +592,9 @@ describe("AccessDataService.TeardownPlayer", function()
 		local player = controller.fakePlayer()
 		controller.accessDataService:TeardownPlayer(player)
 
-		local completed = false
-		controller.maid:GiveTask(
-			controller.accessDataService:ObserveFeature(player, feature):Subscribe(nil, nil, function()
-				completed = true
-			end)
-		)
+		local states = controller.observeFeature(player, feature)
 
-		expect(completed).toEqual(true)
+		expect(states:IsComplete()).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -682,9 +617,7 @@ describe("AccessDataService.TeardownPlayer", function()
 		controller.fact("ownsChapterPass", true)
 
 		local player = controller.fakePlayer()
-		controller.maid:GiveTask(
-			controller.accessDataService:ObserveFactReport(player, "ownsChapterPass"):Subscribe(function() end)
-		)
+		controller.observeFactReport(player, "ownsChapterPass")
 
 		controller.accessDataService:TeardownPlayer(player)
 
@@ -701,14 +634,12 @@ describe("AccessDataService.ObserveIsPlayerPresent", function()
 		local controller = setup()
 		local player = controller.fakePlayer()
 
-		local present = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveIsPlayerPresent(player):Subscribe(function(value)
-			present = value
-		end))
+		local presence =
+			controller.maid:Add(ObservableSpy.new(controller.accessDataService:ObserveIsPlayerPresent(player)))
 
-		expect(present).toEqual(true)
+		expect(presence:GetLastValue()).toEqual(true)
 		controller.accessDataService:TeardownPlayer(player)
-		expect(present).toEqual(false)
+		expect(presence:GetLastValue()).toEqual(false)
 
 		controller:Destroy()
 	end)

@@ -149,7 +149,8 @@ describe("HasSaveSlots pre-select", function()
 		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
 
-		expect(PromiseTestUtils.awaitSettled(selection, 0.5)).toEqual(false)
+		expect(#context.asks).toEqual(1)
+		expect(selection:IsPending()).toEqual(true)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
 		gate:Resolve(true)
@@ -168,8 +169,7 @@ describe("HasSaveSlots pre-select", function()
 		local slotId = PromiseTestUtils.awaitFulfilled(context.hasSaveSlots:PromiseCreateSlot(1))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(slotId)
 
-		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
-		expect(selection:IsRejected()).toEqual(true)
+		PromiseTestUtils.awaitRejected(selection, 10)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toBeNil()
 
 		context:Destroy()
@@ -185,8 +185,7 @@ describe("HasSaveSlots pre-select", function()
 		context.answerWith(Promise.resolved(false))
 		local selection = context.hasSaveSlots:PromiseSelectSlot(secondId)
 
-		assert(PromiseTestUtils.awaitSettled(selection, 10), "selection never settled")
-		expect(selection:IsRejected()).toEqual(true)
+		PromiseTestUtils.awaitRejected(selection, 10)
 		expect(context.hasSaveSlots.ActiveSlotId.Value).toEqual(firstId)
 
 		context:Destroy()

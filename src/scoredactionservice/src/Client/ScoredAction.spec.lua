@@ -8,7 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local RxTestUtils = require("RxTestUtils")
 local ScoredAction = require("ScoredAction")
+local SignalTestUtils = require("SignalTestUtils")
 local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
@@ -19,7 +21,7 @@ type Controller = {
 	newAction: () -> ScoredAction.ScoredAction,
 	newLooseAction: () -> ScoredAction.ScoredAction,
 	newValue: (boolean) -> ValueObject.ValueObject<boolean>,
-	collect: (any) -> { any },
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
@@ -39,13 +41,7 @@ local function setup(): Controller
 			return maid:Add(ValueObject.new(value, "boolean")) :: any
 		end,
 
-		collect = function(observable)
-			local results = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(results, value)
-			end))
-			return results
-		end,
+		maid = maid,
 
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -137,7 +133,7 @@ describe("ScoredAction.SetIsEnabled", function()
 		local controller = setup()
 		local action = controller.newAction()
 
-		local states = controller.collect(action:ObserveIsEnabled())
+		local states = RxTestUtils.collectList(controller.maid, action:ObserveIsEnabled())
 		action:SetIsEnabled(false)
 		action:SetIsEnabled(true)
 
@@ -152,7 +148,7 @@ describe("ScoredAction.ObserveIsEnabled", function()
 		local controller = setup()
 		local action = controller.newAction()
 
-		local states = controller.collect(action:ObserveIsEnabled())
+		local states = RxTestUtils.collectList(controller.maid, action:ObserveIsEnabled())
 		action:SetIsEnabled(false)
 
 		expect(states).toEqual({ true, false })
@@ -195,10 +191,7 @@ describe("ScoredAction.PushPreferred", function()
 		local controller = setup()
 		local action = controller.newAction()
 
-		local states = {}
-		action.PreferredChanged:Connect(function(isPreferred)
-			table.insert(states, isPreferred)
-		end)
+		local states = SignalTestUtils.collectFireList(controller.maid, action.PreferredChanged)
 
 		action:PushPreferred()()
 
@@ -225,7 +218,7 @@ describe("ScoredAction.ObservePreferred", function()
 		local controller = setup()
 		local action = controller.newAction()
 
-		local states = controller.collect(action:ObservePreferred())
+		local states = RxTestUtils.collectList(controller.maid, action:ObservePreferred())
 		action:PushPreferred()()
 
 		expect(states).toEqual({ false, true, false })
@@ -239,14 +232,11 @@ describe("ScoredAction.Destroy", function()
 		local controller = setup()
 		local action = controller.newLooseAction()
 
-		local fired = false
-		action.Removing:Connect(function()
-			fired = true
-		end)
+		local removing = SignalTestUtils.countFires(controller.maid, action.Removing)
 
 		action:Destroy()
 
-		expect(fired).toBe(true)
+		expect(removing()).toBe(1)
 
 		controller:Destroy()
 	end)

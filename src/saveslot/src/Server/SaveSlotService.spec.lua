@@ -220,7 +220,7 @@ describe("SaveSlotService:PromisePreSelect", function()
 		local verdict = controller.saveSlotService:PromisePreSelect(controller.fakePlayer(), "slot-1")
 
 		first:Resolve()
-		expect(PromiseTestUtils.awaitSettled(verdict, 0.5)).toEqual(false)
+		expect(verdict:IsPending()).toEqual(true)
 
 		second:Resolve()
 		expect(PromiseTestUtils.awaitFulfilled(verdict)).toEqual(true)
@@ -399,7 +399,8 @@ describe("SaveSlotService internal teleport", function()
 		local player = controller.fakePlayer(111)
 		player:SetAttribute("ActiveSlotId", "slot-xyz")
 
-		local data = controller.teleportDataService:PromiseBuildTeleportData({ player }):Wait()
+		local data =
+			PromiseTestUtils.awaitFulfilled(controller.teleportDataService:PromiseBuildTeleportData({ player }))
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-xyz")
 
@@ -412,7 +413,8 @@ describe("SaveSlotService internal teleport", function()
 
 		local player = controller.fakePlayer(111)
 
-		local data = controller.teleportDataService:PromiseBuildTeleportData({ player }):Wait()
+		local data =
+			PromiseTestUtils.awaitFulfilled(controller.teleportDataService:PromiseBuildTeleportData({ player }))
 		local slice = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		expect(slice and slice[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toBeNil()
 
@@ -428,7 +430,9 @@ describe("SaveSlotService internal teleport", function()
 		playerA:SetAttribute("ActiveSlotId", "slot-a")
 		playerB:SetAttribute("ActiveSlotId", "slot-b")
 
-		local data = controller.teleportDataService:PromiseBuildTeleportData({ playerA, playerB }):Wait()
+		local data = PromiseTestUtils.awaitFulfilled(
+			controller.teleportDataService:PromiseBuildTeleportData({ playerA, playerB })
+		)
 		local sliceA = TeleportDataEnvelopeUtils.readSlice(data, 111)
 		local sliceB = TeleportDataEnvelopeUtils.readSlice(data, 222)
 		expect(sliceA and sliceA[SaveSlotConstants.TELEPORT_DATA_SLOT_KEY]).toEqual("slot-a")

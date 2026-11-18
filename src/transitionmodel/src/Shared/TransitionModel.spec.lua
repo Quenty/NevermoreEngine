@@ -5,9 +5,9 @@ local BasicPane = require("BasicPane")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
-local Observable = require("Observable")
 local Promise = require("Promise")
-local Signal = require("Signal")
+local RxTestUtils = require("RxTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 local TransitionModel = require("TransitionModel")
 
 local describe = Jest.Globals.describe
@@ -22,26 +22,6 @@ local function setup(): any
 	local controller = {
 		maid = maid,
 		transitionModel = transitionModel,
-		trackFires = function(signal: Signal.Signal<()>): () -> number
-			local count = 0
-
-			maid:GiveTask(signal:Connect(function()
-				count += 1
-			end))
-
-			return function()
-				return count
-			end
-		end,
-		trackValues = function(observable: Observable.Observable<boolean>): { boolean }
-			local values = {}
-
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-
-			return values
-		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -96,7 +76,7 @@ describe("transitions without callbacks", function()
 	it("completes showing immediately", function()
 		local controller = setup()
 
-		local showingComplete = controller.trackFires(controller.transitionModel.ShowingComplete)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.ShowingComplete)
 
 		controller.transitionModel:Show()
 
@@ -112,7 +92,7 @@ describe("transitions without callbacks", function()
 
 		controller.transitionModel:Show()
 
-		local hidingComplete = controller.trackFires(controller.transitionModel.HidingComplete)
+		local hidingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.HidingComplete)
 
 		controller.transitionModel:Hide()
 
@@ -126,7 +106,7 @@ describe("transitions without callbacks", function()
 	it("does not re-run a transition set to the visibility it already has", function()
 		local controller = setup()
 
-		local showingComplete = controller.trackFires(controller.transitionModel.ShowingComplete)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.ShowingComplete)
 
 		controller.transitionModel:Show()
 		controller.transitionModel:Show()
@@ -165,7 +145,7 @@ describe("TransitionModel:SetVisible", function()
 	it("does not restart a completed transition re-set with doNotAnimate", function()
 		local controller = setup()
 
-		local showingComplete = controller.trackFires(controller.transitionModel.ShowingComplete)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.ShowingComplete)
 
 		controller.transitionModel:Show()
 		expect(showingComplete()).toBe(1)
@@ -192,10 +172,8 @@ describe("TransitionModel.SkipAnimationRequested", function()
 	it("fires when asked for the visibility already held with doNotAnimate", function()
 		local controller = setup()
 
-		local fired: { boolean } = {}
-		controller.maid:GiveTask(controller.transitionModel.SkipAnimationRequested:Connect(function(isVisible)
-			table.insert(fired, isVisible)
-		end))
+		local fired: { boolean } =
+			SignalTestUtils.collectFireList(controller.maid, controller.transitionModel.SkipAnimationRequested)
 
 		controller.transitionModel:Hide(true)
 		controller.transitionModel:Show()
@@ -209,7 +187,8 @@ describe("TransitionModel.SkipAnimationRequested", function()
 	it("does not fire when the visibility actually changes", function()
 		local controller = setup()
 
-		local fires = controller.trackFires(controller.transitionModel.SkipAnimationRequested :: any)
+		local fires =
+			SignalTestUtils.countFires(controller.maid, controller.transitionModel.SkipAnimationRequested :: any)
 
 		controller.transitionModel:Show(true)
 		controller.transitionModel:Hide(true)
@@ -222,7 +201,8 @@ describe("TransitionModel.SkipAnimationRequested", function()
 	it("does not fire without doNotAnimate", function()
 		local controller = setup()
 
-		local fires = controller.trackFires(controller.transitionModel.SkipAnimationRequested :: any)
+		local fires =
+			SignalTestUtils.countFires(controller.maid, controller.transitionModel.SkipAnimationRequested :: any)
 
 		controller.transitionModel:Show()
 		controller.transitionModel:Show()
@@ -235,10 +215,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 	it("lets a listener snap alongside the model's own transition", function()
 		local controller = setup()
 
-		local snapped = 0
-		controller.maid:GiveTask(controller.transitionModel.SkipAnimationRequested:Connect(function()
-			snapped += 1
-		end))
+		local snapped = SignalTestUtils.countFires(controller.maid, controller.transitionModel.SkipAnimationRequested)
 
 		controller.transitionModel:SetPromiseShow(function(_callbackMaid: Maid.Maid, doNotAnimate: boolean?)
 			return if doNotAnimate then Promise.resolved() else Promise.new()
@@ -249,7 +226,7 @@ describe("TransitionModel.SkipAnimationRequested", function()
 
 		controller.transitionModel:Show(true)
 
-		expect(snapped).toBe(1)
+		expect(snapped()).toBe(1)
 		expect(controller.transitionModel:IsShowingComplete()).toBe(true)
 
 		controller:Destroy()
@@ -302,7 +279,7 @@ describe("TransitionModel:_restartTransition", function()
 	it("re-fires the completion signal for the restarted transition", function()
 		local controller = setup()
 
-		local showingComplete = controller.trackFires(controller.transitionModel.ShowingComplete)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.ShowingComplete)
 
 		controller.transitionModel:Show()
 		expect(showingComplete()).toBe(1)
@@ -364,7 +341,7 @@ describe("TransitionModel:SetPromiseShow", function()
 			return callbackPromise
 		end)
 
-		local showingComplete = controller.trackFires(controller.transitionModel.ShowingComplete)
+		local showingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.ShowingComplete)
 
 		controller.transitionModel:Show()
 		expect(controller.transitionModel:IsShowingComplete()).toBe(false)
@@ -471,7 +448,7 @@ describe("TransitionModel:SetPromiseHide", function()
 			return callbackPromise
 		end)
 
-		local hidingComplete = controller.trackFires(controller.transitionModel.HidingComplete)
+		local hidingComplete = SignalTestUtils.countFires(controller.maid, controller.transitionModel.HidingComplete)
 
 		controller.transitionModel:Show()
 		controller.transitionModel:Hide()
@@ -672,7 +649,7 @@ describe("TransitionModel:ObserveIsShowingComplete", function()
 	it("emits the current state and each change", function()
 		local controller = setup()
 
-		local values = controller.trackValues(controller.transitionModel:ObserveIsShowingComplete())
+		local values = RxTestUtils.collectList(controller.maid, controller.transitionModel:ObserveIsShowingComplete())
 
 		controller.transitionModel:Show()
 		controller.transitionModel:Hide()
@@ -687,7 +664,7 @@ describe("TransitionModel:ObserveIsHidingComplete", function()
 	it("emits the current state and each change", function()
 		local controller = setup()
 
-		local values = controller.trackValues(controller.transitionModel:ObserveIsHidingComplete())
+		local values = RxTestUtils.collectList(controller.maid, controller.transitionModel:ObserveIsHidingComplete())
 
 		controller.transitionModel:Show()
 		controller.transitionModel:Hide()

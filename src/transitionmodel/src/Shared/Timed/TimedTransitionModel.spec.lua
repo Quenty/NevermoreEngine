@@ -9,6 +9,8 @@ local BasicPane = require("BasicPane")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
+local SignalTestUtils = require("SignalTestUtils")
 local TimedTransitionModel = require("TimedTransitionModel")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
@@ -16,38 +18,34 @@ local TransitionUtils = require("TransitionUtils")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 local TRANSITION_TIME = 0.05
 
 type Controller = {
+	maid: Maid.Maid,
 	model: TimedTransitionModel.TimedTransitionModel,
 	position: () -> number,
 	advance: (seconds: number) -> (),
 	Destroy: (self: Controller) -> (),
 }
 
--- Completion runs off a real task.delay inside TimedTween.PromiseFinished, so the fake clock and
--- real time have to be advanced together.
 local function setup(options: { transitionTime: number? }?): Controller
 	local maid = Maid.new()
+
+	maid:GiveTask(JestUtils.useFakeTimers())
 
 	local transitionTime = (options and options.transitionTime) or TRANSITION_TIME
 	local model: any = maid:Add(TimedTransitionModel.new(transitionTime))
 
-	local now = 0
-	model._timedTween:SetClock(function()
-		return now
-	end)
-
 	local controller: Controller = {
+		maid = maid,
 		model = model,
 		position = function()
-			return model._timedTween:_computeState(now).p
+			return model._timedTween:_computeState(model._timedTween:GetClock()()).p
 		end,
 		advance = function(seconds: number)
-			now += seconds
-			task.wait(seconds)
-			task.wait()
+			jest.advanceTimersByTime(seconds * 1000)
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -225,17 +223,14 @@ describe("TimedTransitionModel promises", function()
 
 	it("reports completion through ObserveIsShowingComplete", function()
 		local controller = setup()
-		local values = {}
-		local sub = controller.model:ObserveIsShowingComplete():Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(controller.model:ObserveIsShowingComplete())
 
 		controller.model:Show()
 		controller.advance(TRANSITION_TIME * 2)
 
-		expect(values).toEqual({ false, true })
+		expect(values.Values).toEqual({ false, true })
 
-		sub:Destroy()
+		values:Destroy()
 		controller:Destroy()
 	end)
 end)
@@ -243,33 +238,27 @@ end)
 describe("TimedTransitionModel completion signals", function()
 	it("fires ShowingComplete once the transition finishes", function()
 		local controller = setup()
-		local fires = 0
-		controller.model.ShowingComplete:Connect(function()
-			fires += 1
-		end)
+		local fires = SignalTestUtils.countFires(controller.maid, controller.model.ShowingComplete)
 
 		controller.model:Show()
-		expect(fires).toBe(0)
+		expect(fires()).toBe(0)
 
 		controller.advance(TRANSITION_TIME * 2)
-		expect(fires).toBe(1)
+		expect(fires()).toBe(1)
 
 		controller:Destroy()
 	end)
 
 	it("fires HidingComplete once the transition finishes", function()
 		local controller = setup()
-		local fires = 0
-		controller.model.HidingComplete:Connect(function()
-			fires += 1
-		end)
+		local fires = SignalTestUtils.countFires(controller.maid, controller.model.HidingComplete)
 
 		controller.model:Show(true)
 		controller.model:Hide()
-		expect(fires).toBe(0)
+		expect(fires()).toBe(0)
 
 		controller.advance(TRANSITION_TIME * 2)
-		expect(fires).toBe(1)
+		expect(fires()).toBe(1)
 
 		controller:Destroy()
 	end)

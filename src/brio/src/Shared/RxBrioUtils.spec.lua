@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Brio = require("Brio")
 local Jest = require("Jest")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
 local Rx = require("Rx")
 local RxBrioUtils = require("RxBrioUtils")
 
@@ -18,15 +19,13 @@ local it = Jest.Globals.it
 describe("RxBrioUtils.combineLatest({})", function()
 	it("should execute immediately", function()
 		local observe = RxBrioUtils.combineLatest({})
-		local brio
-		local sub = observe:Subscribe(function(result)
-			brio = result
-		end)
+		local brios = ObservableSpy.new(observe :: any)
+		local brio = brios:GetLastValue()
 		expect(brio).never.toBeNil()
 		expect(Brio.isBrio(brio)).toEqual(true)
 		expect(brio:IsDead()).toEqual(true)
 
-		sub:Destroy()
+		brios:Destroy()
 	end)
 end)
 
@@ -38,18 +37,16 @@ describe("RxBrioUtils.combineLatest({ value = Observable(Brio(5)) })", function(
 			end),
 			otherValue = 25,
 		})
-		local brio
 
-		local sub = observe:Subscribe(function(result)
-			brio = result
-		end)
+		local brios = ObservableSpy.new(observe :: any)
+		local brio = brios:GetLastValue()
 		expect(brio).never.toBeNil()
 		expect(Brio.isBrio(brio)).toEqual(true)
 		expect(not brio:IsDead()).toEqual(true)
 		expect(brio:GetValue()).toEqual(expect.any("table"))
 		expect(brio:GetValue().value).toEqual(5)
 
-		sub:Destroy()
+		brios:Destroy()
 	end)
 end)
 
@@ -66,144 +63,121 @@ describe("RxBrioUtils.flatCombineLatest", function()
 		otherValue = 25,
 	})
 
-	local lastResult = nil
-	local fireCount = 0
-
-	local sub = observe:Subscribe(function(result)
-		lastResult = result
-		fireCount = fireCount + 1
-	end)
+	local results = ObservableSpy.new(observe :: any)
 
 	it("should execute immediately", function()
-		expect(fireCount).toEqual(1)
-		expect(lastResult).toEqual(expect.any("table"))
-		expect(Brio.isBrio(lastResult)).toEqual(false)
-		expect(lastResult.value).toEqual(5)
-		expect(lastResult.otherValue).toEqual(25)
+		expect(results:GetCount()).toEqual(1)
+		expect(results:GetLastValue()).toEqual(expect.any("table"))
+		expect(Brio.isBrio(results:GetLastValue())).toEqual(false)
+		expect(results:GetLastValue().value).toEqual(5)
+		expect(results:GetLastValue().otherValue).toEqual(25)
 	end)
 
 	it("should reset when the brio is killed", function()
-		expect(fireCount).toEqual(1)
+		expect(results:GetCount()).toEqual(1)
 
 		brio:Kill()
 
-		expect(fireCount).toEqual(2)
-		expect(lastResult).toEqual(expect.any("table"))
-		expect(Brio.isBrio(lastResult)).toEqual(false)
-		expect(lastResult.value).toEqual(nil)
-		expect(lastResult.otherValue).toEqual(25)
+		expect(results:GetCount()).toEqual(2)
+		expect(results:GetLastValue()).toEqual(expect.any("table"))
+		expect(Brio.isBrio(results:GetLastValue())).toEqual(false)
+		expect(results:GetLastValue().value).toEqual(nil)
+		expect(results:GetLastValue().otherValue).toEqual(25)
 	end)
 
 	it("should allow a new value", function()
-		expect(fireCount).toEqual(2)
+		expect(results:GetCount()).toEqual(2)
 
 		doFire(Brio.new(70))
 
-		expect(fireCount).toEqual(3)
-		expect(lastResult).toEqual(expect.any("table"))
-		expect(Brio.isBrio(lastResult)).toEqual(false)
-		expect(lastResult.value).toEqual(70)
-		expect(lastResult.otherValue).toEqual(25)
+		expect(results:GetCount()).toEqual(3)
+		expect(results:GetLastValue()).toEqual(expect.any("table"))
+		expect(Brio.isBrio(results:GetLastValue())).toEqual(false)
+		expect(results:GetLastValue().value).toEqual(70)
+		expect(results:GetLastValue().otherValue).toEqual(25)
 	end)
 
 	it("should only fire once if we replace the value", function()
-		expect(fireCount).toEqual(3)
+		expect(results:GetCount()).toEqual(3)
 
 		doFire(Brio.new(75))
 
-		expect(fireCount).toEqual(4)
-		expect(lastResult).toEqual(expect.any("table"))
-		expect(Brio.isBrio(lastResult)).toEqual(false)
-		expect(lastResult.value).toEqual(75)
-		expect(lastResult.otherValue).toEqual(25)
+		expect(results:GetCount()).toEqual(4)
+		expect(results:GetLastValue()).toEqual(expect.any("table"))
+		expect(Brio.isBrio(results:GetLastValue())).toEqual(false)
+		expect(results:GetLastValue().value).toEqual(75)
+		expect(results:GetLastValue().otherValue).toEqual(25)
 	end)
 
 	it("should cleanup the sub", function()
-		sub:Destroy()
+		results:Destroy()
 	end)
 end)
 
 describe("RxBrioUtils.switchToBrio", function()
 	it("should wrap a plain value in a brio", function()
-		local result
-		local sub = Observable.new(function(innerSub): ()
+		local brios = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fire(42)
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(result).never.toBeNil()
-		expect(Brio.isBrio(result)).toEqual(true)
-		expect(result:IsDead()).toEqual(false)
-		expect(result:GetValue()).toEqual(42)
+		local latestBrio = brios:GetLastValue()
+		expect(latestBrio).never.toBeNil()
+		expect(Brio.isBrio(latestBrio)).toEqual(true)
+		expect(latestBrio:IsDead()).toEqual(false)
+		expect(latestBrio:GetValue()).toEqual(42)
 
-		sub:Destroy()
+		brios:Destroy()
 	end)
 
 	it("should wrap multiple plain values, packing them into a brio", function()
-		local result
-		local sub = Observable.new(function(innerSub): ()
+		local brios = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fire("a", "b")
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(result).never.toBeNil()
-		expect(Brio.isBrio(result)).toEqual(true)
-		expect(result:IsDead()).toEqual(false)
+		local latestBrio = brios:GetLastValue()
+		expect(latestBrio).never.toBeNil()
+		expect(Brio.isBrio(latestBrio)).toEqual(true)
+		expect(latestBrio:IsDead()).toEqual(false)
 
-		local a, b = result:GetValue()
+		local a, b = brios:GetLastValue():GetValue()
 		expect(a).toEqual("a")
 		expect(b).toEqual("b")
 
-		sub:Destroy()
+		brios:Destroy()
 	end)
 
 	it("should clone an input brio instead of forwarding it directly", function()
 		local inputBrio = Brio.new(99)
-		local result
-		local sub = Observable.new(function(innerSub): ()
+		local brios = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fire(inputBrio)
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(result).never.toBeNil()
-		expect(Brio.isBrio(result)).toEqual(true)
-		expect(result:GetValue()).toEqual(99)
+		local latestBrio = brios:GetLastValue()
+		expect(latestBrio).never.toBeNil()
+		expect(Brio.isBrio(latestBrio)).toEqual(true)
+		expect(latestBrio:GetValue()).toEqual(99)
 		-- Should be a clone, not the same object
-		expect(result).never.toEqual(inputBrio)
+		expect(brios:GetLastValue()).never.toEqual(inputBrio)
 
-		sub:Destroy()
+		brios:Destroy()
 		inputBrio:Kill()
 	end)
 
 	it("should kill the previous brio when a new value is emitted", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
 		doFire(1)
 		doFire(2)
@@ -213,25 +187,20 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(results[2]:IsDead()).toEqual(false)
 		expect(results[2]:GetValue()).toEqual(2)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should kill the previous brio even when the new value is filtered by predicate", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio(function(value)
-					return value ~= "skip"
-				end) :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio(function(value)
+				return value ~= "skip"
+			end) :: any,
+		}) :: any)
 
 		doFire("keep")
 		expect(#results).toEqual(1)
@@ -241,124 +210,90 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(#results).toEqual(1)
 		expect(results[1]:IsDead()).toEqual(true)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should ignore dead brios from the source", function()
 		local deadBrio = Brio.new(10)
 		deadBrio:Kill()
 
-		local result
-		local fireCount = 0
-		local sub = Rx.of(deadBrio)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-				fireCount = fireCount + 1
-			end)
+		local emissions = ObservableSpy.new(Rx.of(deadBrio):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(fireCount).toEqual(0)
-		expect(result).toBeNil()
+		expect(#emissions).toEqual(0)
+		expect(emissions:GetLastValue()).toBeNil()
 
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("should kill clone when the source brio dies", function()
 		local inputBrio = Brio.new(5)
-		local result
-		local sub = Observable.new(function(innerSub): ()
+		local brios = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fire(inputBrio)
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(result).never.toBeNil()
-		expect(result:IsDead()).toEqual(false)
+		expect(brios:GetLastValue()).never.toBeNil()
+		expect(brios:GetLastValue():IsDead()).toEqual(false)
 
 		inputBrio:Kill()
-		expect(result:IsDead()).toEqual(true)
+		expect(brios:GetLastValue():IsDead()).toEqual(true)
 
-		sub:Destroy()
+		brios:Destroy()
 	end)
 
 	it("should kill the last brio on unsubscribe", function()
-		local result
-		local sub = Observable.new(function(innerSub): ()
+		local brios = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fire(77)
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				result = brio
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(result).never.toBeNil()
-		expect(result:IsDead()).toEqual(false)
+		expect(brios:GetLastValue()).never.toBeNil()
+		expect(brios:GetLastValue():IsDead()).toEqual(false)
 
-		sub:Destroy()
-		expect(result:IsDead()).toEqual(true)
+		brios:Destroy()
+		expect(brios:GetLastValue():IsDead()).toEqual(true)
 	end)
 
 	it("should propagate failure from source", function()
-		local failed = false
-		local failMsg
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Fail("test error")
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function() end, function(err)
-				failed = true
-				failMsg = err
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(failed).toEqual(true)
-		expect(failMsg).toEqual("test error")
+		expect(results:HasFailed()).toEqual(true)
+		expect(results:GetError()).toEqual("test error")
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should propagate completion from source", function()
-		local completed = false
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			innerSub:Complete()
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function() end, function() end, function()
-				completed = true
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
-		expect(completed).toEqual(true)
+		expect(results:IsComplete()).toEqual(true)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should apply predicate to plain values", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio(function(value)
-					return value > 10
-				end) :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio(function(value)
+				return value > 10
+			end) :: any,
+		}) :: any)
 
 		doFire(5)
 		expect(#results).toEqual(0)
@@ -371,25 +306,20 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(#results).toEqual(1)
 		expect(results[1]:IsDead()).toEqual(true)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should apply predicate to unwrapped brio values", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio(function(value)
-					return value > 10
-				end) :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio(function(value)
+				return value > 10
+			end) :: any,
+		}) :: any)
 
 		doFire(Brio.new(5))
 		expect(#results).toEqual(0)
@@ -398,23 +328,18 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(#results).toEqual(1)
 		expect(results[1]:GetValue()).toEqual(20)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should handle rapid succession of emissions correctly", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
 		for i = 1, 100 do
 			doFire(i)
@@ -429,23 +354,18 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(results[100]:IsDead()).toEqual(false)
 		expect(results[100]:GetValue()).toEqual(100)
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should handle interleaved brio and plain value emissions", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
 		local inputBrio = Brio.new("from-brio")
 		doFire("plain")
@@ -458,23 +378,18 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(results[3]:IsDead()).toEqual(false)
 		expect(results[3]:GetValue()).toEqual("plain-again")
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should handle source brio dying while subscribed then new emission", function()
 		local doFire
-		local results = {}
-		local sub = Observable.new(function(innerSub): ()
+		local results = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio() :: any,
-			})
-			:Subscribe(function(brio)
-				table.insert(results, brio)
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio() :: any,
+		}) :: any)
 
 		local brio1 = Brio.new("first")
 		doFire(brio1)
@@ -491,7 +406,7 @@ describe("RxBrioUtils.switchToBrio", function()
 		expect(results[2]:IsDead()).toEqual(false)
 		expect(results[2]:GetValue()).toEqual("second")
 
-		sub:Destroy()
+		results:Destroy()
 	end)
 
 	it("should handle subscriber causing re-emission during fire", function()
@@ -532,29 +447,24 @@ describe("RxBrioUtils.switchToBrio", function()
 
 	it("should not emit when predicate is provided and all values are rejected", function()
 		local doFire
-		local fireCount = 0
 
-		local sub = Observable.new(function(innerSub): ()
+		local emissions = ObservableSpy.new(Observable.new(function(innerSub): ()
 			doFire = function(...)
 				innerSub:Fire(...)
 			end
-		end)
-			:Pipe({
-				RxBrioUtils.switchToBrio(function()
-					return false
-				end) :: any,
-			})
-			:Subscribe(function()
-				fireCount = fireCount + 1
-			end)
+		end):Pipe({
+			RxBrioUtils.switchToBrio(function()
+				return false
+			end) :: any,
+		}) :: any)
 
 		doFire(1)
 		doFire(2)
 		doFire(Brio.new(3))
 
-		expect(fireCount).toEqual(0)
+		expect(#emissions).toEqual(0)
 
-		sub:Destroy()
+		emissions:Destroy()
 	end)
 
 	it("should error with non-function predicate", function()

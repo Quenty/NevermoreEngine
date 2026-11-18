@@ -11,8 +11,8 @@ local HasSaveSlotsInterface = require("HasSaveSlotsInterface")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
-local PromiseTestUtils = require("PromiseTestUtils")
 local SaveSlotDataService = require("SaveSlotDataService")
 local ServiceBag = require("ServiceBag")
 local TeleportDataServiceClient = require("TeleportDataServiceClient")
@@ -82,21 +82,12 @@ describe("HasSaveSlotsClient active-slot observation", function()
 
 		playerMock:SetAttribute("ActiveSlotId", "slot-a")
 
-		local observed: string? = nil
-		maid:GiveTask(dataService:ObserveActiveSlotId(playerMock):Subscribe(function(slotId: string?)
-			observed = slotId
-		end))
+		local observedValues = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotId(playerMock)))
 
-		PromiseTestUtils.awaitValue(function()
-			return observed == "slot-a"
-		end, 5)
-		expect(observed).toEqual("slot-a")
+		expect(observedValues:GetLastValue()).toEqual("slot-a")
 
 		playerMock:SetAttribute("ActiveSlotId", "slot-b")
-		PromiseTestUtils.awaitValue(function()
-			return observed == "slot-b"
-		end, 5)
-		expect(observed).toEqual("slot-b")
+		expect(observedValues:GetLastValue()).toEqual("slot-b")
 	end)
 end)
 
@@ -121,28 +112,8 @@ local function newSlotContainer(maid: Maid.Maid): Folder
 	return container
 end
 
-type Record = { count: number, latest: any, values: { any } }
-
--- `values` collects only non-nil emissions (a Lua array cannot hold nils); streams that never emit nil
--- -- the boolean ones -- can assert their full sequence against it, everything else uses count/latest.
-local function subscribeRecording(maid: Maid.Maid, observable: any): Record
-	local record: Record = { count = 0, latest = nil, values = {} }
-
-	maid:GiveTask(observable:Subscribe(function(value)
-		record.count += 1
-		record.latest = value
-		if value ~= nil then
-			table.insert(record.values, value)
-		end
-	end))
-
-	return record
-end
-
-local function awaitLatest(record: Record, predicate: (any) -> boolean): boolean
-	return PromiseTestUtils.awaitValue(function()
-		return predicate(record.latest)
-	end, 5)
+local function latestMatches(record: ObservableSpy.ObservableSpy<any>, predicate: (any) -> boolean): boolean
+	return predicate(record:GetLastValue())
 end
 
 local function listedIds(slotList: { any }?): { [string]: boolean }
@@ -158,10 +129,10 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		local maid, _, dataService = setup()
 		local playerMock = newPlayerMock(maid, true)
 
-		local record = subscribeRecording(maid, dataService:ObserveActiveSlotMetadata(playerMock))
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotMetadata(playerMock)))
 
-		expect(record.count).toEqual(1)
-		expect(record.latest).toBeNil()
+		expect(#record).toEqual(1)
+		expect(record:GetLastValue()).toBeNil()
 	end)
 
 	it("resolves the active ephemeral slot when its folder arrives after the active-slot id", function()
@@ -170,18 +141,18 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		binder:Bind(playerMock)
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveActiveSlotMetadata(playerMock))
-		expect(record.latest).toBeNil()
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotMetadata(playerMock)))
+		expect(record:GetLastValue()).toBeNil()
 
 		local container = newSlotContainer(maid)
 		newSlot(EPHEMERAL_ID, 0, "Lobby run", true).Parent = container
 		container.Parent = playerMock
 
-		expect(awaitLatest(record, function(metadata)
+		expect(latestMatches(record, function(metadata)
 			return metadata ~= nil and metadata.SlotName == "Lobby run"
 		end)).toEqual(true)
-		expect(record.latest.SlotId).toEqual(EPHEMERAL_ID)
-		expect(record.latest.IsEphemeral).toEqual(true)
+		expect(record:GetLastValue().SlotId).toEqual(EPHEMERAL_ID)
+		expect(record:GetLastValue().IsEphemeral).toEqual(true)
 	end)
 
 	it("resolves the active ephemeral slot when the active-slot id arrives after its folder", function()
@@ -193,12 +164,12 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		newSlot(EPHEMERAL_ID, 0, "Lobby run", true).Parent = container
 		container.Parent = playerMock
 
-		local record = subscribeRecording(maid, dataService:ObserveActiveSlotMetadata(playerMock))
-		expect(record.latest).toBeNil()
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotMetadata(playerMock)))
+		expect(record:GetLastValue()).toBeNil()
 
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		expect(awaitLatest(record, function(metadata)
+		expect(latestMatches(record, function(metadata)
 			return metadata ~= nil and metadata.SlotId == EPHEMERAL_ID
 		end)).toEqual(true)
 	end)
@@ -214,15 +185,15 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveActiveSlotMetadata(playerMock))
-		expect(awaitLatest(record, function(metadata)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotMetadata(playerMock)))
+		expect(latestMatches(record, function(metadata)
 			return metadata ~= nil
 		end)).toEqual(true)
 
 		-- A retire replicates as the folder disappearing; the id can still name it for a frame.
 		ephemeralSlot:Destroy()
 
-		expect(awaitLatest(record, function(metadata)
+		expect(latestMatches(record, function(metadata)
 			return metadata == nil
 		end)).toEqual(true)
 	end)
@@ -239,18 +210,18 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveActiveSlotMetadata(playerMock))
-		expect(awaitLatest(record, function(metadata)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveActiveSlotMetadata(playerMock)))
+		expect(latestMatches(record, function(metadata)
 			return metadata ~= nil and metadata.SlotId == EPHEMERAL_ID
 		end)).toEqual(true)
 
 		playerMock:SetAttribute("ActiveSlotId", REAL_ID)
 		ephemeralSlot:Destroy()
 
-		expect(awaitLatest(record, function(metadata)
+		expect(latestMatches(record, function(metadata)
 			return metadata ~= nil and metadata.SlotId == REAL_ID
 		end)).toEqual(true)
-		expect(record.latest.IsEphemeral).toBeNil()
+		expect(record:GetLastValue().IsEphemeral).toBeNil()
 	end)
 
 	it("reads the active ephemeral slot synchronously too", function()
@@ -263,9 +234,7 @@ describe("SaveSlotDataService active-slot metadata on the client", function()
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return dataService:GetActiveSlotMetadata(playerMock) ~= nil
-		end, 5)).toEqual(true)
+		expect(dataService:GetActiveSlotMetadata(playerMock)).never.toBeNil()
 
 		local metadata = dataService:GetActiveSlotMetadata(playerMock)
 		expect(metadata.SlotId).toEqual(EPHEMERAL_ID)
@@ -286,15 +255,15 @@ describe("SaveSlotDataService ephemeral-state observation on the client", functi
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveIsActiveSlotEphemeral(playerMock))
-		expect(record.latest).toEqual(false)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveIsActiveSlotEphemeral(playerMock)))
+		expect(record:GetLastValue()).toEqual(false)
 
 		slot:SetAttribute("IsEphemeral", true)
 
-		expect(awaitLatest(record, function(isEphemeral)
+		expect(latestMatches(record, function(isEphemeral)
 			return isEphemeral == true
 		end)).toEqual(true)
-		expect(record.values).toEqual({ false, true })
+		expect(record.Values).toEqual({ false, true })
 	end)
 
 	it("does not re-emit when unrelated metadata on the active slot changes", function()
@@ -308,19 +277,17 @@ describe("SaveSlotDataService ephemeral-state observation on the client", functi
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveIsActiveSlotEphemeral(playerMock))
-		expect(awaitLatest(record, function(isEphemeral)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveIsActiveSlotEphemeral(playerMock)))
+		expect(latestMatches(record, function(isEphemeral)
 			return isEphemeral == true
 		end)).toEqual(true)
 
-		local countAfterResolve = record.count
+		local countAfterResolve = #record
 		slot:SetAttribute("SlotName", "Lobby run 2")
 		slot:SetAttribute("TimePlayed", 90)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return record.count > countAfterResolve
-		end, 1)).toEqual(false)
-		expect(record.latest).toEqual(true)
+		expect(#record).toEqual(countAfterResolve)
+		expect(record:GetLastValue()).toEqual(true)
 	end)
 
 	it("returns to false when the ephemeral slot is retired", function()
@@ -334,15 +301,15 @@ describe("SaveSlotDataService ephemeral-state observation on the client", functi
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", EPHEMERAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveIsActiveSlotEphemeral(playerMock))
-		expect(awaitLatest(record, function(isEphemeral)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveIsActiveSlotEphemeral(playerMock)))
+		expect(latestMatches(record, function(isEphemeral)
 			return isEphemeral == true
 		end)).toEqual(true)
 
 		playerMock:SetAttribute("ActiveSlotId", nil)
 		slot:Destroy()
 
-		expect(awaitLatest(record, function(isEphemeral)
+		expect(latestMatches(record, function(isEphemeral)
 			return isEphemeral == false
 		end)).toEqual(true)
 		expect(dataService:IsActiveSlotEphemeral(playerMock)).toEqual(false)
@@ -358,12 +325,10 @@ describe("SaveSlotDataService ephemeral-state observation on the client", functi
 		container.Parent = playerMock
 		playerMock:SetAttribute("ActiveSlotId", REAL_ID)
 
-		local record = subscribeRecording(maid, dataService:ObserveIsActiveSlotEphemeral(playerMock))
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveIsActiveSlotEphemeral(playerMock)))
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return dataService:GetActiveSlotMetadata(playerMock) ~= nil
-		end, 5)).toEqual(true)
-		expect(record.values).toEqual({ false })
+		expect(dataService:GetActiveSlotMetadata(playerMock)).never.toBeNil()
+		expect(record.Values).toEqual({ false })
 		expect(dataService:IsActiveSlotEphemeral(playerMock)).toEqual(false)
 	end)
 end)
@@ -374,10 +339,10 @@ describe("SaveSlotDataService slot list on the client", function()
 		local playerMock = newPlayerMock(maid, true)
 		binder:Bind(playerMock)
 
-		local record = subscribeRecording(maid, dataService:ObserveSlotList(playerMock))
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveSlotList(playerMock)))
 
-		expect(record.count).toEqual(1)
-		expect(record.latest).toBeNil()
+		expect(#record).toEqual(1)
+		expect(record:GetLastValue()).toBeNil()
 	end)
 
 	it("lists the real slot but not the ephemeral one", function()
@@ -394,11 +359,11 @@ describe("SaveSlotDataService slot list on the client", function()
 		expect(synchronous[REAL_ID]).toEqual(true)
 		expect(synchronous[EPHEMERAL_ID]).toBeNil()
 
-		local record = subscribeRecording(maid, dataService:ObserveSlotList(playerMock))
-		expect(awaitLatest(record, function(slotList)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveSlotList(playerMock)))
+		expect(latestMatches(record, function(slotList)
 			return listedIds(slotList)[REAL_ID] == true
 		end)).toEqual(true)
-		expect(listedIds(record.latest)[EPHEMERAL_ID]).toBeNil()
+		expect(listedIds(record:GetLastValue())[EPHEMERAL_ID]).toBeNil()
 	end)
 
 	it("replaces rather than appends a slot's entry when its metadata changes", function()
@@ -411,17 +376,17 @@ describe("SaveSlotDataService slot list on the client", function()
 		slot.Parent = container
 		container.Parent = playerMock
 
-		local record = subscribeRecording(maid, dataService:ObserveSlotList(playerMock))
-		expect(awaitLatest(record, function(slotList)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveSlotList(playerMock)))
+		expect(latestMatches(record, function(slotList)
 			return listedIds(slotList)[REAL_ID] == true
 		end)).toEqual(true)
 
 		slot:SetAttribute("SlotName", "Renamed")
 
-		expect(awaitLatest(record, function(slotList)
+		expect(latestMatches(record, function(slotList)
 			return slotList ~= nil and slotList[1] ~= nil and slotList[1].SlotName == "Renamed"
 		end)).toEqual(true)
-		expect(#record.latest).toEqual(1)
+		expect(#record:GetLastValue()).toEqual(1)
 	end)
 
 	it("drops the slot from the list when its IsEphemeral attribute lands after the folder", function()
@@ -435,17 +400,17 @@ describe("SaveSlotDataService slot list on the client", function()
 		slot.Parent = container
 		container.Parent = playerMock
 
-		local record = subscribeRecording(maid, dataService:ObserveSlotList(playerMock))
-		expect(awaitLatest(record, function(slotList)
+		local record = maid:Add(ObservableSpy.new(dataService:ObserveSlotList(playerMock)))
+		expect(latestMatches(record, function(slotList)
 			return listedIds(slotList)[EPHEMERAL_ID] == true
 		end)).toEqual(true)
 
 		slot:SetAttribute("IsEphemeral", true)
 
-		expect(awaitLatest(record, function(slotList)
+		expect(latestMatches(record, function(slotList)
 			return listedIds(slotList)[EPHEMERAL_ID] == nil
 		end)).toEqual(true)
-		expect(listedIds(record.latest)[REAL_ID]).toEqual(true)
+		expect(listedIds(record:GetLastValue())[REAL_ID]).toEqual(true)
 		expect(listedIds(dataService:GetSlotList(playerMock))[EPHEMERAL_ID]).toBeNil()
 	end)
 end)

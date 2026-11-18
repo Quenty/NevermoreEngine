@@ -6,6 +6,7 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -162,8 +163,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 		local promise = tracker:PromiseNextHumanoid()
 		expect(promise:IsFulfilled()).toBe(true)
 
-		local isFulfilled, humanoid = promise:Yield()
-		expect(isFulfilled).toBe(true)
+		local humanoid = PromiseTestUtils.awaitFulfilled(promise)
 		expect(humanoid).toBe(character:FindFirstChildOfClass("Humanoid"))
 
 		controller:Destroy()
@@ -180,8 +180,7 @@ describe("HumanoidTracker.PromiseNextHumanoid", function()
 
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
 
-		local isFulfilled, humanoid = promise:Yield()
-		expect(isFulfilled).toBe(true)
+		local humanoid = PromiseTestUtils.awaitFulfilled(promise)
 		expect(humanoid).toBe(character:FindFirstChildOfClass("Humanoid"))
 
 		controller:Destroy()

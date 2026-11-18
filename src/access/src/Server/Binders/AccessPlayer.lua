@@ -35,7 +35,7 @@ export type AccessPlayer =
 	& AccessPlayerBase.AccessPlayerBase
 
 function AccessPlayer.new(player: Player, serviceBag: ServiceBag.ServiceBag): AccessPlayer
-	local self: AccessPlayer = setmetatable(AccessPlayerBase.new(player, serviceBag) :: any, AccessPlayer)
+	local self: AccessPlayer = setmetatable(AccessPlayerBase.new(player :: Player, serviceBag) :: any, AccessPlayer)
 
 	self._accessPolicyService = self._serviceBag:GetService(AccessPolicyService)
 

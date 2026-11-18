@@ -16,6 +16,7 @@ local GameProductDataService = require("GameProductDataService")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
@@ -96,13 +97,10 @@ describe("GameProductDataService server-only prompting", function()
 		local context = setup()
 		local service = context.gameProductDataService
 
-		local values = {}
-		local sub = service:GetServerOnlyPromptingValue():Observe():Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(service:GetServerOnlyPromptingValue():Observe())
 
 		service:SetServerOnlyPrompting(true)
-		sub:Destroy()
+		values:Destroy()
 
 		expect(values[1]).toEqual(false)
 		expect(values[#values]).toEqual(true)

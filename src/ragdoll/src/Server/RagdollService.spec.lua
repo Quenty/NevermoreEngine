@@ -17,6 +17,7 @@ local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
+local PromiseTestUtils = require("PromiseTestUtils")
 local Ragdoll = require("Ragdoll")
 local RagdollHumanoidOnFall = require("RagdollHumanoidOnFall")
 local RagdollHumanoidOnFallConstants = require("RagdollHumanoidOnFallConstants")
@@ -94,12 +95,9 @@ describe("RagdollService with a mock player R6 character", function()
 		local state = setup()
 
 		local ragdollableBinder = state.serviceBag:GetService(Ragdollable)
-		local ok = ragdollableBinder:Promise(state.humanoid):Yield()
-		assert(ok, "Ragdollable never bound")
+		PromiseTestUtils.awaitFulfilled(ragdollableBinder:Promise(state.humanoid))
 
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.countBallSockets(state.character) == 5
-		end)).toBe(true)
+		expect(RagdollTestUtils.countBallSockets(state.character)).toEqual(5)
 
 		local torso = assert(state.character:FindFirstChild("Torso"), "No torso")
 		expect(torso:FindFirstChild("NeckAttachment")).toBeDefined()
@@ -112,22 +110,17 @@ describe("RagdollService with a mock player R6 character", function()
 		local state = setup()
 
 		local ragdollableBinder = state.serviceBag:GetService(Ragdollable)
-		local ok = ragdollableBinder:Promise(state.humanoid):Yield()
-		assert(ok, "Ragdollable never bound")
+		PromiseTestUtils.awaitFulfilled(ragdollableBinder:Promise(state.humanoid))
 
 		local ragdollBinder = state.serviceBag:GetService(Ragdoll)
 		expect(RagdollTestUtils.areMotorsEnabled(state.character, true)).toBe(true)
 
 		ragdollBinder:Bind(state.humanoid)
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.areMotorsEnabled(state.character, false)
-		end)).toBe(true)
+		expect(RagdollTestUtils.areMotorsEnabled(state.character, false)).toBe(true)
 		expect(ragdollBinder:Get(state.humanoid)).toBeDefined()
 
 		ragdollBinder:Unbind(state.humanoid)
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.areMotorsEnabled(state.character, true)
-		end)).toBe(true)
+		expect(RagdollTestUtils.areMotorsEnabled(state.character, true)).toBe(true)
 		expect(ragdollBinder:Get(state.humanoid)).toBeNil()
 
 		state:Destroy()
@@ -137,20 +130,15 @@ describe("RagdollService with a mock player R6 character", function()
 		local state = setup()
 
 		local ragdollableBinder = state.serviceBag:GetService(Ragdollable)
-		local ok = ragdollableBinder:Promise(state.humanoid):Yield()
-		assert(ok, "Ragdollable never bound")
+		PromiseTestUtils.awaitFulfilled(ragdollableBinder:Promise(state.humanoid))
 
 		state.serviceBag:GetService(Ragdoll):Bind(state.humanoid)
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.areMotorsEnabled(state.character, false)
-		end)).toBe(true)
+		expect(RagdollTestUtils.areMotorsEnabled(state.character, false)).toBe(true)
 
 		state.destroyBag()
 
 		-- The bag's PlayerMockService owns the mock, so teardown despawns the character with it.
-		expect(RagdollTestUtils.waitFor(function()
-			return state.character.Parent == nil
-		end)).toBe(true)
+		expect(state.character.Parent).toBeNil()
 
 		state:Destroy()
 	end)
@@ -163,8 +151,7 @@ describe("RagdollService with a mock player R6 character", function()
 
 		state.ragdollService:SetRagdollOnFall(true)
 
-		local ok = onFallBinder:Promise(state.humanoid):Yield()
-		assert(ok, "RagdollHumanoidOnFall never bound")
+		PromiseTestUtils.awaitFulfilled(onFallBinder:Promise(state.humanoid))
 		expect(state.humanoid:FindFirstChild(RagdollHumanoidOnFallConstants.REMOTE_EVENT_NAME)).toBeDefined()
 
 		state.ragdollService:SetRagdollOnFall(false)

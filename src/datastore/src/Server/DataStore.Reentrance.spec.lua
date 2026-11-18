@@ -20,7 +20,8 @@ describe("in-flight request cancellation (maid teardown)", function()
 		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
-		expect(PromiseTestUtils.awaitSettled(promise, 1)).toEqual(false)
+		expect(promise:IsPending()).toEqual(true)
+		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(1)
 
 		dataStore:Destroy()
 
@@ -42,7 +43,7 @@ describe("in-flight request cancellation (maid teardown)", function()
 		controller.mock:BlockRequests()
 		dataStore:Store("coins", 5)
 		local savePromise = dataStore:Save()
-		expect(PromiseTestUtils.awaitSettled(savePromise, 1)).toEqual(false)
+		expect(savePromise:IsPending()).toEqual(true)
 
 		local versionsBefore = controller.mock:GetCallCount("UpdateAsync")
 		dataStore:Destroy()
@@ -65,7 +66,7 @@ describe("lock command that does not settle", function()
 		local dataStore = controller.newSessionLockedStore()
 		local promise = dataStore:PromiseLoadSuccessful()
 
-		expect(PromiseTestUtils.awaitSettled(promise, 2)).toEqual(false)
+		expect(promise:IsPending()).toEqual(true)
 
 		controller.mock:UnblockRequests()
 		expect(PromiseTestUtils.awaitFulfilled(promise, 10)).toEqual(true)
@@ -79,7 +80,7 @@ describe("lock command that does not settle", function()
 
 		local first = controller.newSessionLockedStore()
 		local firstPromise = first:PromiseLoadSuccessful()
-		expect(PromiseTestUtils.awaitSettled(firstPromise, 1)).toEqual(false)
+		expect(firstPromise:IsPending()).toEqual(true)
 		first:Destroy()
 		controller.mock:UnblockRequests()
 

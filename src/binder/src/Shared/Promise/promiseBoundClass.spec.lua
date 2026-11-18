@@ -10,6 +10,7 @@ local BinderProvider = require("BinderProvider")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local promiseBoundClass = require("promiseBoundClass")
 
@@ -97,8 +98,7 @@ describe("promiseBoundClass()", function()
 		controller.binder:Tag(inst)
 		controller.boot()
 
-		local ok, class = promiseBoundClass(controller.binder, inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(promiseBoundClass(controller.binder, inst))
 		expect(class).toEqual(controller.binder:Get(inst))
 
 		controller:Destroy()
@@ -111,8 +111,7 @@ describe("promiseBoundClass()", function()
 		local inst = controller.newInstance()
 		controller.binder:Tag(inst)
 
-		local ok = promiseBoundClass(controller.binder, inst):Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(promiseBoundClass(controller.binder, inst))
 
 		controller:Destroy()
 	end)

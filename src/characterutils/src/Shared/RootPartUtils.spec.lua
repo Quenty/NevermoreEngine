@@ -7,6 +7,7 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local PromiseTestUtils = require("PromiseTestUtils")
 local RootPartUtils = require("RootPartUtils")
 
 local describe = Jest.Globals.describe
@@ -48,8 +49,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		local promise = controller.maid:Add(RootPartUtils.promisePlayerHumanoidRootPart(controller.player))
 		expect(promise:IsFulfilled()).toBe(true)
 
-		local ok, rootPart = promise:Yield()
-		expect(ok).toBe(true)
+		local rootPart = PromiseTestUtils.awaitFulfilled(promise)
 		expect(rootPart).toBe(getRootPart(character))
 
 		controller:Destroy()
@@ -63,8 +63,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 
 		local character = PlayerMock.loadMinimalCharacterAsync(controller.player)
 
-		local ok, rootPart = promise:Yield()
-		expect(ok).toBe(true)
+		local rootPart = PromiseTestUtils.awaitFulfilled(promise)
 		expect(rootPart).toBe(getRootPart(character))
 
 		controller:Destroy()
@@ -82,8 +81,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 
 		local secondCharacter = PlayerMock.loadMinimalCharacterAsync(controller.player)
 
-		local ok, rootPart = promise:Yield()
-		expect(ok).toBe(true)
+		local rootPart = PromiseTestUtils.awaitFulfilled(promise)
 		expect(rootPart).toBe(getRootPart(secondCharacter))
 		expect(rootPart).never.toBe(firstRootPart)
 
@@ -99,8 +97,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 
 		local promise = controller.maid:Add(RootPartUtils.promisePlayerHumanoidRootPart(controller.player))
 
-		local ok, rootPart = promise:Yield()
-		expect(ok).toBe(true)
+		local rootPart = PromiseTestUtils.awaitFulfilled(promise)
 		expect(rootPart).toBe(getRootPart(character))
 
 		controller:Destroy()
@@ -125,8 +122,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 		local humanoid = Instance.new("Humanoid")
 		humanoid.Parent = character
 
-		local ok, resolved = promise:Yield()
-		expect(ok).toBe(true)
+		local resolved = PromiseTestUtils.awaitFulfilled(promise)
 		expect(resolved).toBe(rootPart)
 
 		controller:Destroy()
@@ -140,8 +136,7 @@ describe("RootPartUtils.promisePlayerHumanoidRootPart", function()
 
 		PlayerMock.kick(controller.player)
 
-		local ok, err = promise:Yield()
-		expect(ok).toBe(false)
+		local err = PromiseTestUtils.awaitRejected(promise)
 		expect(err).toBe("Player removed from game")
 
 		controller:Destroy()

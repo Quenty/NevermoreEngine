@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
@@ -202,17 +203,14 @@ describe("ResetServiceClient.PushDisable", function()
 	it("emits each disabled state to observers", function()
 		local controller = setup()
 
-		local states = {}
-		local sub = controller.resetServiceClient:ObserveIsDisabled():Subscribe(function(disabled)
-			table.insert(states, disabled)
-		end)
+		local states = ObservableSpy.new(controller.resetServiceClient:ObserveIsDisabled())
 
 		local cancel = controller.resetServiceClient:PushDisable()
 		cancel()
 
-		expect(states).toEqual({ false, true, false })
+		expect(states.Values).toEqual({ false, true, false })
 
-		sub:Destroy()
+		states:Destroy()
 		controller:Destroy()
 	end)
 
@@ -250,9 +248,7 @@ describe("ResetServiceClient reset button callback", function()
 
 		controller.resetServiceClient._resetBindable:Fire()
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #resetPlayers == 1
-		end, 10)).toBe(true)
+		expect(#resetPlayers).toEqual(1)
 		expect(humanoid.Health).toBe(0)
 		expect(resetPlayers).toEqual({ controller.mock })
 

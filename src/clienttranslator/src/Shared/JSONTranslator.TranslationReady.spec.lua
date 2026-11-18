@@ -6,6 +6,8 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
+local RxTestUtils = require("RxTestUtils")
 local TieRealms = require("TieRealms")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 local ValueObject = require("ValueObject")
@@ -24,35 +26,20 @@ local function setupClientTranslator(jsonByLocale)
 	return controller, translator
 end
 
--- Records emissions in order. nil is a meaningful emission here (a key that is not readable
--- yet), so it is recorded as "<nil>" rather than leaving a hole in the array.
-local function collect(controller, observable)
-	local received = {}
-	local count = 0
-
-	controller.track(observable:Subscribe(function(value)
-		count += 1
-		if value == nil then
-			received[count] = "<nil>"
-		else
-			received[count] = value
-		end
-	end))
-
-	return received
-end
-
 describe("JSONTranslator:_observeTranslationReady", function()
 	it("emits nil while the key is queued, then the locale it is readable for", function()
 		local controller = TranslatorTestUtils.setup()
 		controller.setForcedLocaleId("en-us")
 		local translator = controller.newTranslator({ greeting = "Hello" })
 
-		local received = collect(controller, translator:_observeTranslationReady("greeting"))
-		expect(received).toEqual({ "<nil>" })
+		local received = controller.track(ObservableSpy.new(translator:_observeTranslationReady("greeting")))
+		expect(#received).toBe(1)
+		expect(received[1]).toBeNil()
 
 		controller.awaitEntriesWritten()
-		expect(received).toEqual({ "<nil>", "en-us" })
+		expect(#received).toBe(2)
+		expect(received[1]).toBeNil()
+		expect(received[2]).toBe("en-us")
 		controller:Destroy()
 	end)
 
@@ -62,7 +49,9 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		expect(collect(controller, translator:_observeTranslationReady("greeting"))).toEqual({ "en-us" })
+		expect(RxTestUtils.collectSynchronousList(translator:_observeTranslationReady("greeting"))).toEqual({
+			"en-us",
+		})
 		controller:Destroy()
 	end)
 
@@ -72,7 +61,9 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		expect(collect(controller, translator:_observeTranslationReady("never.registered"))).toEqual({ "en-us" })
+		expect(RxTestUtils.collectSynchronousList(translator:_observeTranslationReady("never.registered"))).toEqual({
+			"en-us",
+		})
 		controller:Destroy()
 	end)
 
@@ -83,13 +74,16 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		})
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:_observeTranslationReady("greeting"))
-		expect(received).toEqual({ "en" })
+		local received = controller.track(ObservableSpy.new(translator:_observeTranslationReady("greeting")))
+		expect(received.Values).toEqual({ "en" })
 
 		controller.setForcedLocaleId("fr")
-		task.wait()
+		controller.awaitEntriesWritten()
 
-		expect(received).toEqual({ "en", "<nil>", "fr" })
+		expect(#received).toBe(3)
+		expect(received[1]).toBe("en")
+		expect(received[2]).toBeNil()
+		expect(received[3]).toBe("fr")
 		controller:Destroy()
 	end)
 
@@ -101,11 +95,11 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		controller.setForcedLocaleId("fr")
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:_observeTranslationReady("greeting"))
-		expect(received).toEqual({ "fr" })
+		local received = controller.track(ObservableSpy.new(translator:_observeTranslationReady("greeting")))
+		expect(received.Values).toEqual({ "fr" })
 
 		controller.setForcedLocaleId("en")
-		expect(received).toEqual({ "fr", "en" })
+		expect(received.Values).toEqual({ "fr", "en" })
 		controller:Destroy()
 	end)
 
@@ -114,8 +108,8 @@ describe("JSONTranslator:_observeTranslationReady", function()
 		local translator = controller.newTranslator({ greeting = "Hello", farewell = "Bye" })
 
 		local writesBefore = controller.translatorService:GetLocalizationWriteCount()
-		collect(controller, translator:_observeTranslationReady("greeting"))
-		collect(controller, translator:_observeTranslationReady("farewell"))
+		controller.track(ObservableSpy.new(translator:_observeTranslationReady("greeting")))
+		controller.track(ObservableSpy.new(translator:_observeTranslationReady("farewell")))
 
 		expect(controller.translatorService:GetLocalizationWriteCount()).toBe(writesBefore)
 		expect(controller.translatorService:IsTranslationReady("greeting")).toBe(false)
@@ -174,7 +168,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
 
-		expect(collect(controller, service:ObserveIsTranslationReady("k.one"))).toEqual({ false })
+		expect(RxTestUtils.collectSynchronousList(service:ObserveIsTranslationReady("k.one"))).toEqual({ false })
 		controller:Destroy()
 	end)
 
@@ -182,14 +176,14 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
-		local received = collect(controller, service:ObserveIsTranslationReady("k.one"))
-		expect(received).toEqual({ true })
+		local received = controller.track(ObservableSpy.new(service:ObserveIsTranslationReady("k.one")))
+		expect(received.Values).toEqual({ true })
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		expect(received).toEqual({ true, false })
+		expect(received.Values).toEqual({ true, false })
 
 		controller.awaitEntriesWritten()
-		expect(received).toEqual({ true, false, true })
+		expect(received.Values).toEqual({ true, false, true })
 		controller:Destroy()
 	end)
 
@@ -202,8 +196,8 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		local service = controller.translatorService
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		local received = collect(controller, service:ObserveIsTranslationReady("k.one"))
-		expect(received).toEqual({ false })
+		local received = controller.track(ObservableSpy.new(service:ObserveIsTranslationReady("k.one")))
+		expect(received.Values).toEqual({ false })
 
 		-- Lands the value and dequeues that locale, leaving the entry queued for the flush.
 		service:FlushEntryForKey("k.one")
@@ -211,7 +205,7 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 
 		controller.awaitEntriesWritten()
 
-		expect(received).toEqual({ false, true })
+		expect(received.Values).toEqual({ false, true })
 		expect(service:GetLocalizationWriteCount()).toBe(writesAfterRead)
 		controller:Destroy()
 	end)
@@ -220,21 +214,18 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
-		local first = {}
-		local firstSub = service:ObserveIsTranslationReady("k.one"):Subscribe(function(value)
-			table.insert(first, value)
-		end)
-		local second = collect(controller, service:ObserveIsTranslationReady("k.one"))
+		local first = ObservableSpy.new(service:ObserveIsTranslationReady("k.one"))
+		local second = controller.track(ObservableSpy.new(service:ObserveIsTranslationReady("k.one")))
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		expect(first).toEqual({ true, false })
-		expect(second).toEqual({ true, false })
+		expect(first.Values).toEqual({ true, false })
+		expect(second.Values).toEqual({ true, false })
 
-		firstSub:Destroy()
+		first:Destroy()
 		controller.awaitEntriesWritten()
 
-		expect(first).toEqual({ true, false })
-		expect(second).toEqual({ true, false, true })
+		expect(first.Values).toEqual({ true, false })
+		expect(second.Values).toEqual({ true, false, true })
 		controller:Destroy()
 	end)
 
@@ -242,17 +233,14 @@ describe("TranslatorService:ObserveIsTranslationReady", function()
 		local controller = TranslatorTestUtils.setup()
 		local service = controller.translatorService
 
-		local received = {}
-		local sub = service:ObserveIsTranslationReady("k.one"):Subscribe(function(isReady)
-			table.insert(received, isReady)
-		end)
+		local received = ObservableSpy.new(service:ObserveIsTranslationReady("k.one"))
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		expect(received).toEqual({ true, false })
+		expect(received.Values).toEqual({ true, false })
 
-		sub:Destroy()
+		received:Destroy()
 		controller.awaitEntriesWritten()
 
-		expect(received).toEqual({ true, false })
+		expect(received.Values).toEqual({ true, false })
 		expect(service:IsTranslationReady("k.one")).toBe(true)
 		controller:Destroy()
 	end)
@@ -485,7 +473,7 @@ describe("TranslatorService teardown", function()
 		service:SetEntryValue("k.late", "Late", "ctx", "en", "Late")
 
 		expect(service:IsTranslationReady("k.late")).toBe(true)
-		expect(collect(controller, service:ObserveIsTranslationReady("k.late"))).toEqual({ true })
+		expect(RxTestUtils.collectSynchronousList(service:ObserveIsTranslationReady("k.late"))).toEqual({ true })
 		controller:Destroy()
 	end)
 
@@ -494,8 +482,8 @@ describe("TranslatorService teardown", function()
 		local service = controller.newTranslatorService()
 
 		service:SetEntryValue("k.one", "One", "ctx", "en", "One")
-		local received = collect(controller, service:ObserveIsTranslationReady("k.one"))
-		expect(received).toEqual({ false })
+		local received = controller.track(ObservableSpy.new(service:ObserveIsTranslationReady("k.one")))
+		expect(received.Values).toEqual({ false })
 
 		service:Destroy()
 
@@ -511,7 +499,7 @@ describe("TranslatorService teardown", function()
 		service:Destroy()
 		service:SetEntryValue("k.late", "Late", "ctx", "en", "Late")
 
-		task.wait()
+		controller.awaitEntriesWritten(service)
 
 		expect(TranslatorTestUtils.getEntryMap(localizationTable)["k.late"]).toBeNil()
 		controller:Destroy()
@@ -537,7 +525,7 @@ describe("TranslatorService teardown", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 		local emittedBeforeDestroy = #received
 
 		translator:Destroy()
@@ -557,7 +545,7 @@ describe("TranslatorService teardown", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 		local rewritten = false
 		controller.track(translator:_observeTranslationReady("greeting"):Subscribe(function(localeId)
 			if localeId and not rewritten then
@@ -578,7 +566,7 @@ describe("TranslatorService teardown", function()
 		controller.setForcedLocaleId("en-us")
 		local translator = controller.newTranslator({ Destroy = "Bye", GiveTask = "Task" })
 
-		local received = collect(controller, translator:ObserveFormatByKey("Destroy"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("Destroy")))
 		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Bye")
@@ -592,8 +580,8 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local controller = TranslatorTestUtils.setup()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
-		expect(received).toEqual({ "greeting" })
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
+		expect(received.Values).toEqual({ "greeting" })
 
 		controller.awaitEntriesWritten()
 
@@ -608,11 +596,11 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		})
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 		expect(received[#received]).toBe("Hello")
 
 		controller.setForcedLocaleId("fr")
-		task.wait()
+		controller.awaitEntriesWritten()
 
 		expect(received[#received]).toBe("Bonjour")
 		controller:Destroy()
@@ -625,11 +613,11 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		})
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 		local emittedBeforeSwap = #received
 
 		controller.setForcedLocaleId("it")
-		task.wait()
+		controller.awaitEntriesWritten()
 
 		for index = emittedBeforeSwap + 1, #received do
 			expect(received[index]).toBe("Ciao")
@@ -646,14 +634,14 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		})
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 
 		controller.setForcedLocaleId("fr")
-		task.wait()
+		controller.awaitEntriesWritten()
 		expect(received[#received]).toBe("Bonjour")
 
 		controller.setForcedLocaleId("it")
-		task.wait()
+		controller.awaitEntriesWritten()
 		expect(received[#received]).toBe("Ciao")
 
 		-- Nothing is queued this time, so readiness never drops and the translation runs on
@@ -661,7 +649,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		controller.setForcedLocaleId("fr")
 		expect(received[#received]).toBe("Bonjour")
 
-		task.wait()
+		controller.awaitEntriesWritten()
 		expect(received[#received]).toBe("Bonjour")
 		controller:Destroy()
 	end)
@@ -676,7 +664,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 
 		-- A translator built for another language answers fluently rather than failing, so the
 		-- target locale has to win over whichever translator is consulted first.
-		local received = collect(controller, translator:ObserveFormatByKey("greeting"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 		expect(received[#received]).toBe("Bonjour")
 
 		local enTranslator = controller.getLocalizationTable():GetTranslator("en")
@@ -691,7 +679,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("late.key"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("late.key")))
 		expect(received[#received]).toBe("late.key")
 
 		translator:SetEntryValue("late.key", "Later", "ctx", "en-us", "Later")
@@ -706,7 +694,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local translator = controller.newTranslator({ greeting = "Hello" })
 		controller.awaitEntriesWritten()
 
-		local received = collect(controller, translator:ObserveFormatByKey("does.not.exist"))
+		local received = controller.track(ObservableSpy.new(translator:ObserveFormatByKey("does.not.exist")))
 
 		expect(received[#received]).toBe("does.not.exist")
 		controller:Destroy()
@@ -725,7 +713,8 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		controller.awaitEntriesWritten()
 
 		local name = controller.track(ValueObject.new("Quenty", "string"))
-		local received = collect(controller, translator:ObserveFormatByKey("greeting", { name = name:Observe() }))
+		local received =
+			controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting", { name = name:Observe() })))
 		expect(received[#received]).toBe("Salut Quenty")
 
 		-- The swap queues the Italian data; the arg emits before that batch lands. The text
@@ -734,7 +723,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		name.Value = "James"
 		expect(received[#received]).toBe("Salut James")
 
-		task.wait()
+		controller.awaitEntriesWritten()
 		expect(received[#received]).toBe("Ciao James")
 		controller:Destroy()
 	end)
@@ -744,7 +733,7 @@ describe("JSONTranslator:ObserveFormatByKey readiness", function()
 		local translator = controller.newTranslator({ greeting = "Hello", farewell = "Bye" })
 
 		local writesBefore = controller.translatorService:GetLocalizationWriteCount()
-		collect(controller, translator:ObserveFormatByKey("greeting"))
+		controller.track(ObservableSpy.new(translator:ObserveFormatByKey("greeting")))
 
 		expect(controller.translatorService:GetLocalizationWriteCount()).toBe(writesBefore)
 		expect(controller.translatorService:IsTranslationReady("farewell")).toBe(false)

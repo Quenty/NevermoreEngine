@@ -271,7 +271,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		dataStore:SetUserIdList({ 1 })
 
 		local promise = dataStore:PromiseLoadSuccessful()
-		expect(PromiseTestUtils.awaitSettled(promise, 3)).toEqual(false)
+		expect(promise:IsPending()).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -289,7 +289,7 @@ describe("session lock cross-server scenarios (full DataStore)", function()
 		sessionB:SetUserIdList({ 1 })
 		sessionB:SetLoadRetryOptions({ exponential = 1, initialWaitTime = 0.1, maxAttempts = 100, printWarning = false })
 		local loadB = sessionB:PromiseLoadSuccessful()
-		expect(PromiseTestUtils.awaitSettled(loadB, 0.5)).toEqual(false)
+		expect(loadB:IsPending()).toEqual(true)
 
 		expect(PromiseTestUtils.awaitSettled(sessionA:SaveAndCloseSession(), 10)).toEqual(true)
 

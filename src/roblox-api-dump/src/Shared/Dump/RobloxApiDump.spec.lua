@@ -6,6 +6,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local PromiseTestUtils = require("PromiseTestUtils")
 local RobloxApiClass = require("RobloxApiClass")
 local RobloxApiDump = require("RobloxApiDump")
 local RobloxApiMember = require("RobloxApiMember")
@@ -36,41 +37,40 @@ end)
 describe("RobloxApiDump", function()
 	describe("PromiseRawDump", function()
 		it("should resolve with dump data containing Classes and Version", function()
-			local result = dump:PromiseRawDump():Wait()
+			local result = PromiseTestUtils.awaitFulfilled(dump:PromiseRawDump())
 			expect(result).toBeDefined()
 			expect(result.Version).toEqual(1)
 			expect(#result.Classes > 0).toEqual(true)
 		end)
 
 		it("should cache the result on subsequent calls", function()
-			local result1 = dump:PromiseRawDump():Wait()
-			local result2 = dump:PromiseRawDump():Wait()
+			local result1 = PromiseTestUtils.awaitFulfilled(dump:PromiseRawDump())
+			local result2 = PromiseTestUtils.awaitFulfilled(dump:PromiseRawDump())
 			expect(result1).toBe(result2)
 		end)
 	end)
 
 	describe("PromiseClass", function()
 		it("should resolve with a class object for known classes", function()
-			local class = dump:PromiseClass("Instance"):Wait()
+			local class = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("Instance"))
 			expect(class).toBeDefined()
 			expect(class:GetClassName()).toEqual("Instance")
 		end)
 
 		it.skip("should reject for unknown classes", function()
-			local ok, _ = dump:PromiseClass("NotARealClass_ZZZZZ"):Yield()
-			expect(ok).toEqual(false)
+			PromiseTestUtils.awaitRejected(dump:PromiseClass("NotARealClass_ZZZZZ"))
 		end)
 
 		it("should cache the class on subsequent calls", function()
-			local class1 = dump:PromiseClass("BasePart"):Wait()
-			local class2 = dump:PromiseClass("BasePart"):Wait()
+			local class1 = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("BasePart"))
+			local class2 = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("BasePart"))
 			expect(class1).toBe(class2)
 		end)
 	end)
 
 	describe("PromiseMembers", function()
 		it("should include own members for a root class", function()
-			local members = dump:PromiseMembers("Instance"):Wait()
+			local members = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("Instance"))
 			local nameSet = {}
 			for _, member in members do
 				nameSet[member:GetName()] = true
@@ -80,7 +80,7 @@ describe("RobloxApiDump", function()
 		end)
 
 		it("should include inherited members", function()
-			local members = dump:PromiseMembers("Part"):Wait()
+			local members = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("Part"))
 			local nameSet = {}
 			for _, member in members do
 				nameSet[member:GetName()] = true
@@ -91,7 +91,7 @@ describe("RobloxApiDump", function()
 		end)
 
 		it("should include deep inheritance chain members", function()
-			local members = dump:PromiseMembers("Workspace"):Wait()
+			local members = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("Workspace"))
 			local nameSet = {}
 			for _, member in members do
 				nameSet[member:GetName()] = true
@@ -102,8 +102,8 @@ describe("RobloxApiDump", function()
 		end)
 
 		it("should cache members on subsequent calls", function()
-			local members1 = dump:PromiseMembers("Instance"):Wait()
-			local members2 = dump:PromiseMembers("Instance"):Wait()
+			local members1 = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("Instance"))
+			local members2 = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("Instance"))
 			expect(members1).toBe(members2)
 		end)
 	end)
@@ -115,9 +115,9 @@ describe("RobloxApiClass", function()
 	local workspaceClass: RobloxApiClass.RobloxApiClass
 
 	beforeAll(function()
-		partClass = dump:PromiseClass("Part"):Wait()
-		instanceClass = dump:PromiseClass("Instance"):Wait()
-		workspaceClass = dump:PromiseClass("Workspace"):Wait()
+		partClass = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("Part"))
+		instanceClass = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("Instance"))
+		workspaceClass = PromiseTestUtils.awaitFulfilled(dump:PromiseClass("Workspace"))
 	end)
 
 	describe("GetSuperClassName", function()
@@ -135,25 +135,22 @@ describe("RobloxApiClass", function()
 
 	describe("PromiseIsA", function()
 		it("should return true for the class itself", function()
-			local result = partClass:PromiseIsA("Part"):Wait()
+			local result = PromiseTestUtils.awaitFulfilled(partClass:PromiseIsA("Part"))
 			expect(result).toEqual(true)
 		end)
 
 		it("should return true for an ancestor class", function()
-			local ok, result = partClass:PromiseIsA("BasePart"):Yield()
-			expect(ok).toEqual(true)
+			local result = PromiseTestUtils.awaitFulfilled(partClass:PromiseIsA("BasePart"))
 			expect(result).toEqual(true)
 		end)
 
 		it("should return true for deep ancestor", function()
-			local ok, result = partClass:PromiseIsA("Instance"):Yield()
-			expect(ok).toEqual(true)
+			local result = PromiseTestUtils.awaitFulfilled(partClass:PromiseIsA("Instance"))
 			expect(result).toEqual(true)
 		end)
 
 		it("should return false for unrelated classes", function()
-			local ok, result = partClass:PromiseIsA("Workspace"):Yield()
-			expect(ok).toEqual(true)
+			local result = PromiseTestUtils.awaitFulfilled(partClass:PromiseIsA("Workspace"))
 			expect(result).toEqual(false)
 		end)
 	end)
@@ -185,7 +182,8 @@ describe("RobloxApiClass", function()
 
 	describe("PromiseProperties / PromiseEvents / PromiseFunctions", function()
 		it("should filter to only properties", function()
-			local props: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseProperties():Wait()
+			local props: { RobloxApiMember.RobloxApiMember } =
+				PromiseTestUtils.awaitFulfilled(instanceClass:PromiseProperties())
 			expect(#props > 0).toEqual(true)
 			for _, prop in props do
 				expect(prop:IsProperty()).toEqual(true)
@@ -193,7 +191,8 @@ describe("RobloxApiClass", function()
 		end)
 
 		it("should filter to only events", function()
-			local events: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseEvents():Wait()
+			local events: { RobloxApiMember.RobloxApiMember } =
+				PromiseTestUtils.awaitFulfilled(instanceClass:PromiseEvents())
 			expect(#events > 0).toEqual(true)
 			for _, event in events do
 				expect(event:IsEvent()).toEqual(true)
@@ -201,7 +200,8 @@ describe("RobloxApiClass", function()
 		end)
 
 		it("should filter to only functions", function()
-			local funcs: { RobloxApiMember.RobloxApiMember } = instanceClass:PromiseFunctions():Wait()
+			local funcs: { RobloxApiMember.RobloxApiMember } =
+				PromiseTestUtils.awaitFulfilled(instanceClass:PromiseFunctions())
 			expect(#funcs > 0).toEqual(true)
 			for _, func in funcs do
 				expect(func:IsFunction()).toEqual(true)
@@ -214,7 +214,7 @@ describe("RobloxApiMember", function()
 	local membersByName
 
 	beforeAll(function()
-		local members = dump:PromiseMembers("BasePart"):Wait()
+		local members = PromiseTestUtils.awaitFulfilled(dump:PromiseMembers("BasePart"))
 		membersByName = {}
 		for _, member in members do
 			membersByName[member:GetName()] = member

@@ -1,10 +1,5 @@
 --!strict
 --[[
-	Boots the server entry point the way a game does. The test place's ServerMain returns before it builds
-	a ServiceBag when it is running tests, so without this the wiring in Init is never executed anywhere --
-	and "the package fails to start once you pull in Cmdr" is exactly the kind of break that should not
-	wait for a game to find it.
-
 	@class AccessService.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -22,15 +17,21 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	serviceBag: ServiceBag.ServiceBag,
+	accessService: AccessService.AccessService,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
-	local accessService = serviceBag:GetService(AccessService) :: any
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
 		serviceBag = serviceBag,
-		accessService = accessService,
+		accessService = serviceBag:GetService(AccessService) :: any,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -54,8 +55,6 @@ describe("AccessService", function()
 	end)
 
 	it("hands back the same registry the shared service exposes", function()
-		-- A game registers through the entry point; anything reading AccessDataService directly has to be
-		-- looking at the same registry or half the game gates on an empty one.
 		local controller = setup()
 		local direct = controller.serviceBag:GetService(AccessDataService)
 		controller.serviceBag:Init()
@@ -70,7 +69,9 @@ describe("AccessService", function()
 		controller.serviceBag:Init()
 
 		local accessDataService = controller.accessService:GetAccessDataService()
-		accessDataService:RegisterFeature(controller.maid:Add(AccessFeature.alwaysAllowed("hub")))
+		controller.maid:GiveTask(
+			accessDataService:RegisterFeature(controller.maid:Add(AccessFeature.alwaysAllowed("hub")))
+		)
 
 		expect(accessDataService:GetFeatureNames()).toEqual({ "hub", WellKnownAccessFeatureNames.OWNS_GAME })
 

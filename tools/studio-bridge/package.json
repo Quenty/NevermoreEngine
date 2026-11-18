@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/jest-lua": "3.10.0-quenty.3",
     "@types/node": "^18.11.4",
     "@types/semver": "^7.5.0",
     "@types/ws": "^8.5.13",

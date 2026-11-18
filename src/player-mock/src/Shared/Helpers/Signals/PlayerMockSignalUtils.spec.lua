@@ -6,9 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockConstants = require("PlayerMockConstants")
 local PlayerMockSignalUtils = require("PlayerMockSignalUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -17,16 +19,14 @@ local it = Jest.Globals.it
 describe("PlayerMockSignalUtils.getSignal", function()
 	it("returns a stand-in for an event only a real Player has", function()
 		local player = PlayerMock.new()
-		local seen = {}
+		local maid = Maid.new()
 
-		local connection = PlayerMockSignalUtils.getSignal(player, "Chatted"):Connect(function(message)
-			table.insert(seen, message)
-		end)
+		local seen = SignalTestUtils.collectFireList(maid, PlayerMockSignalUtils.getSignal(player, "Chatted"))
 		PlayerMockSignalUtils.fireSignal(player, "Chatted", "hello")
 
 		expect(seen).toEqual({ "hello" })
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -70,18 +70,14 @@ end)
 describe("PlayerMockSignalUtils.fireSignal", function()
 	it("delivers every argument to connected handlers", function()
 		local player = PlayerMock.new()
-		local seen = {}
+		local maid = Maid.new()
+		local seen = SignalTestUtils.collectFireListTuples(maid, PlayerMockSignalUtils.getSignal(player, "Chatted"))
 
-		local connection = PlayerMockSignalUtils.getSignal(player, "Chatted"):Connect(function(message, recipient)
-			table.insert(seen, { message = message, recipient = recipient })
-		end)
 		PlayerMockSignalUtils.fireSignal(player, "Chatted", "hello", player)
 
-		expect(#seen).toBe(1)
-		expect(seen[1].message).toBe("hello")
-		expect(seen[1].recipient).toBe(player)
+		expect(seen).toEqual({ { "hello" :: any, player } })
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -110,16 +106,15 @@ end)
 describe("PlayerMockSignalUtils service events", function()
 	it("stands in for an event of a class the mock is not", function()
 		local player = PlayerMock.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMockSignalUtils.getSignal(player, "UserInputService.WindowFocused"):Connect(function()
-			fired += 1
-		end)
+		local fired =
+			SignalTestUtils.countFires(maid, PlayerMockSignalUtils.getSignal(player, "UserInputService.WindowFocused"))
 		PlayerMockSignalUtils.fireSignal(player, "UserInputService.WindowFocused")
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -139,33 +134,32 @@ describe("PlayerMockSignalUtils service events", function()
 
 	it("agrees between both forms of the path, so a connect and a fire cannot drift", function()
 		local player = PlayerMock.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMockSignalUtils.getSignal(player, { "UserInputService", "WindowFocused" })
-			:Connect(function()
-				fired += 1
-			end)
+		local fired = SignalTestUtils.countFires(
+			maid,
+			PlayerMockSignalUtils.getSignal(player, { "UserInputService", "WindowFocused" })
+		)
 		PlayerMockSignalUtils.fireSignal(player, "UserInputService.WindowFocused")
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("keeps each mock's copy of the client-global event apart", function()
 		local first = PlayerMock.new()
 		local second = PlayerMock.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMockSignalUtils.getSignal(second, "UserInputService.WindowFocused"):Connect(function()
-			fired += 1
-		end)
+		local fired =
+			SignalTestUtils.countFires(maid, PlayerMockSignalUtils.getSignal(second, "UserInputService.WindowFocused"))
 		PlayerMockSignalUtils.fireSignal(first, "UserInputService.WindowFocused")
 
-		expect(fired).toBe(0)
+		expect(fired()).toBe(0)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		first:Destroy()
 		second:Destroy()
 	end)

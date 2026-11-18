@@ -8,53 +8,50 @@ local require = require(script.Parent.loader).load(script)
 local Binder = require("Binder")
 local BinderTestUtils = require("BinderTestUtils")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
+local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local setup = BinderTestUtils.setup
-local makeTrackingClass = BinderTestUtils.makeTrackingClass
-local awaitUnbound = BinderTestUtils.awaitUnbound
-local noopConstructor = BinderTestUtils.noopConstructor
-
 describe("Binder.new()", function()
 	it("constructs a binder", function()
-		local binder = Binder.new("BinderNewSpecTag", noopConstructor)
+		local binder = Binder.new("BinderNewSpecTag", BinderTestUtils.noopConstructor)
 		expect(Binder.isBinder(binder)).toEqual(true)
 	end)
 
 	it("derives the ServiceName from the tag", function()
-		local binder = Binder.new("BinderNameSpecTag", noopConstructor)
+		local binder = Binder.new("BinderNameSpecTag", BinderTestUtils.noopConstructor)
 		expect(binder.ServiceName).toEqual("BinderNameSpecTagBinder")
 	end)
 
 	it("throws on a non-string tag name", function()
 		expect(function()
-			Binder.new(123 :: any, noopConstructor)
+			Binder.new(123 :: any, BinderTestUtils.noopConstructor)
 		end).toThrow()
 	end)
 
 	it("throws when constructing a binder of a binder", function()
-		local inner = Binder.new("BinderOfBinderInner", noopConstructor)
+		local inner = Binder.new("BinderOfBinderInner", BinderTestUtils.noopConstructor)
 		expect(function()
 			Binder.new("BinderOfBinderOuter", inner :: any)
 		end).toThrow()
 	end)
 
 	it("captures variadic constructor args", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function(_inst, a, b)
 			return { a = a, b = b }
 		end, "a", "b")
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 		expect(class.a).toEqual("a")
 		expect(class.b).toEqual("b")
 
@@ -74,19 +71,19 @@ describe("Binder.isBinder()", function()
 	end)
 
 	it("returns true for a real binder", function()
-		local binder = Binder.new("BinderIsBinderSpecTag", noopConstructor)
+		local binder = Binder.new("BinderIsBinderSpecTag", BinderTestUtils.noopConstructor)
 		expect(Binder.isBinder(binder)).toEqual(true)
 	end)
 end)
 
 describe("Binder metadata", function()
 	it("returns the tag from GetTag()", function()
-		local binder = Binder.new("BinderGetTagSpecTag", noopConstructor)
+		local binder = Binder.new("BinderGetTagSpecTag", BinderTestUtils.noopConstructor)
 		expect(binder:GetTag()).toEqual("BinderGetTagSpecTag")
 	end)
 
 	it("returns the constructor from GetConstructor()", function()
-		local constructor = noopConstructor
+		local constructor = BinderTestUtils.noopConstructor
 		local binder = Binder.new("BinderGetConstructorSpecTag", constructor)
 		expect(binder:GetConstructor()).toEqual(constructor)
 	end)
@@ -94,18 +91,17 @@ end)
 
 describe("Binder constructor variants", function()
 	it("supports a plain function constructor", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function(inst)
 			return { instance = inst, kind = "function" }
 		end)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 		expect(class.kind).toEqual("function")
 		expect(class.instance).toEqual(inst)
 
@@ -113,24 +109,23 @@ describe("Binder constructor variants", function()
 	end)
 
 	it("supports a class table with .new", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local Class = makeTrackingClass()
+		local Class = BinderTestUtils.makeTrackingClass()
 		local binder = controller.addBinder(Class)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 		expect(class.instance).toEqual(inst)
 
 		controller:Destroy()
 	end)
 
 	it("supports a provider table with :Create", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local provider = {}
 		function provider.Create(_self, inst)
@@ -138,13 +133,12 @@ describe("Binder constructor variants", function()
 		end
 
 		local binder = controller.addBinder(provider :: any)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 		expect(class.kind).toEqual("provider")
 
 		controller:Destroy()
@@ -153,7 +147,7 @@ end)
 
 describe("Binder lifecycle guards", function()
 	it("Init is idempotent", function()
-		local binder = Binder.new("BinderInitIdempotentSpecTag", noopConstructor)
+		local binder = Binder.new("BinderInitIdempotentSpecTag", BinderTestUtils.noopConstructor)
 		binder:Init()
 		expect(function()
 			binder:Init()
@@ -162,7 +156,7 @@ describe("Binder lifecycle guards", function()
 	end)
 
 	it("Start is idempotent", function()
-		local binder = Binder.new("BinderStartIdempotentSpecTag", noopConstructor)
+		local binder = Binder.new("BinderStartIdempotentSpecTag", BinderTestUtils.noopConstructor)
 		binder:Start()
 		expect(function()
 			binder:Start()
@@ -171,7 +165,7 @@ describe("Binder lifecycle guards", function()
 	end)
 
 	it("Start initializes implicitly", function()
-		local binder = Binder.new("BinderStartInitSpecTag", noopConstructor)
+		local binder = Binder.new("BinderStartInitSpecTag", BinderTestUtils.noopConstructor)
 		binder:Start()
 		expect(binder:GetAll()).toEqual({})
 		binder:Destroy()
@@ -180,15 +174,15 @@ end)
 
 describe("Binder binding via ServiceBag", function()
 	it("binds instances tagged before start", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local Class = makeTrackingClass()
+		local Class = BinderTestUtils.makeTrackingClass()
 		local binder = controller.addBinder(Class)
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(binder:Get(inst)).never.toBeNil()
 
@@ -196,16 +190,15 @@ describe("Binder binding via ServiceBag", function()
 	end)
 
 	it("binds instances tagged after start", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
 
-		local ok = binder:Promise(inst):Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		controller:Destroy()
 	end)
@@ -213,10 +206,10 @@ end)
 
 describe("Binder:Get()", function()
 	it("returns nil for an unbound instance", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(binder:Get(controller.newInstance())).toBeNil()
 
@@ -224,10 +217,10 @@ describe("Binder:Get()", function()
 	end)
 
 	it("throws when passed a non-instance", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			binder:Get(5 :: any)
@@ -239,10 +232,10 @@ end)
 
 describe("Binder tagging", function()
 	it("Tag/HasTag/Untag manage the collection service tag", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		expect(binder:HasTag(inst)).toEqual(false)
@@ -255,17 +248,16 @@ describe("Binder tagging", function()
 	end)
 
 	it("Bind tags and Unbind untags on the server", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Bind(inst)
 		expect(binder:HasTag(inst)).toEqual(true)
 
-		local ok = binder:Promise(inst):Yield()
-		expect(ok).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		binder:Unbind(inst)
 		expect(binder:HasTag(inst)).toEqual(false)
@@ -276,7 +268,7 @@ end)
 
 describe("Binder:Create()", function()
 	it("creates a tagged, non-archivable instance named after the tag", function()
-		local binder = Binder.new("BinderCreateSpecTag", noopConstructor)
+		local binder = Binder.new("BinderCreateSpecTag", BinderTestUtils.noopConstructor)
 
 		-- Cast: Create's declared signature marks className required, but it defaults when omitted.
 		local inst = (binder :: any):Create()
@@ -289,7 +281,7 @@ describe("Binder:Create()", function()
 	end)
 
 	it("honors an explicit class name", function()
-		local binder = Binder.new("BinderCreateNamedSpecTag", noopConstructor)
+		local binder = Binder.new("BinderCreateNamedSpecTag", BinderTestUtils.noopConstructor)
 		local inst = binder:Create("BoolValue")
 		expect(inst:IsA("BoolValue")).toEqual(true)
 
@@ -297,7 +289,7 @@ describe("Binder:Create()", function()
 	end)
 
 	it("throws on a non-string class name", function()
-		local binder = Binder.new("BinderCreateBadSpecTag", noopConstructor)
+		local binder = Binder.new("BinderCreateBadSpecTag", BinderTestUtils.noopConstructor)
 		expect(function()
 			binder:Create(5 :: any)
 		end).toThrow()
@@ -306,18 +298,18 @@ end)
 
 describe("Binder:GetAll() / GetAllSet()", function()
 	it("tracks every bound class", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local instA = controller.newInstance()
 		local instB = controller.newInstance()
 		binder:Tag(instA)
 		binder:Tag(instB)
 
-		assert((binder:Promise(instA):Yield()), "A never bound")
-		assert((binder:Promise(instB):Yield()), "B never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(instA))
+		PromiseTestUtils.awaitFulfilled(binder:Promise(instB))
 
 		expect(#binder:GetAll()).toEqual(2)
 
@@ -331,10 +323,10 @@ end)
 
 describe("Binder signals", function()
 	it("memoizes the added/removing/removed signals", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(binder:GetClassAddedSignal()).toEqual(binder:GetClassAddedSignal())
 		expect(binder:GetClassRemovingSignal()).toEqual(binder:GetClassRemovingSignal())
@@ -344,32 +336,27 @@ describe("Binder signals", function()
 	end)
 
 	it("fires the added signal with the class and instance", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
-		local firedClass, firedInst
-		binder:GetClassAddedSignal():Connect(function(class, inst)
-			firedClass = class
-			firedInst = inst
-		end)
+		local added = SignalTestUtils.collectFireListTuples(controller.maid, binder:GetClassAddedSignal())
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		assert((binder:Promise(inst):Yield()), "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
-		expect(firedInst).toEqual(inst)
-		expect(firedClass).toEqual(binder:Get(inst))
+		expect(added).toEqual({ { class, inst } })
 
 		controller:Destroy()
 	end)
 
 	it("fires removing then removed on unbind", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local order = {}
 		binder:GetClassRemovingSignal():Connect(function()
@@ -381,10 +368,10 @@ describe("Binder signals", function()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		assert((binder:Promise(inst):Yield()), "Never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		binder:Untag(inst)
-		awaitUnbound(binder, inst)
+		expect(binder:Get(inst)).toBeNil()
 
 		expect(order[1]).toEqual("removing")
 		expect(order[2]).toEqual("removed")
@@ -393,18 +380,17 @@ describe("Binder signals", function()
 	end)
 
 	it("destroys the bound class when it is removed", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		binder:Untag(inst)
-		awaitUnbound(binder, inst)
+		expect(binder:Get(inst)).toBeNil()
 
 		expect(class.destroyed).toEqual(true)
 
@@ -414,10 +400,10 @@ end)
 
 describe("Binder:ObserveInstance()", function()
 	it("fires with the class on bind and nil on unbind", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 
@@ -428,11 +414,10 @@ describe("Binder:ObserveInstance()", function()
 		end)
 
 		binder:Tag(inst)
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		binder:Untag(inst)
-		awaitUnbound(binder, inst)
+		expect(binder:Get(inst)).toBeNil()
 
 		expect(#emissions).toEqual(2)
 		expect(emissions[1].value).toEqual(class)
@@ -444,10 +429,10 @@ describe("Binder:ObserveInstance()", function()
 	end)
 
 	it("returns a cleanup that stops future callbacks", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 
@@ -458,7 +443,7 @@ describe("Binder:ObserveInstance()", function()
 		cleanup()
 
 		binder:Tag(inst)
-		assert((binder:Promise(inst):Yield()), "Never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		expect(count).toEqual(0)
 
@@ -466,10 +451,10 @@ describe("Binder:ObserveInstance()", function()
 	end)
 
 	it("throws for a non-instance or non-function", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			binder:ObserveInstance(5 :: any, function() end)
@@ -484,42 +469,38 @@ end)
 
 describe("Binder:Observe()", function()
 	it("emits the current value on subscribe and updates on bind", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 
-		-- Wrap each emission so the initial nil value is still recorded.
-		local emissions = {}
-		local sub = binder:Observe(inst):Subscribe(function(class)
-			table.insert(emissions, { value = class })
-		end)
+		local classes = ObservableSpy.new(binder:Observe(inst))
 
-		expect(#emissions).toEqual(1)
-		expect(emissions[1].value).toBeNil()
+		expect(#classes).toEqual(1)
+		expect(classes[1]).toBeNil()
 
 		binder:Tag(inst)
-		assert((binder:Promise(inst):Yield()), "Never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
-		expect(#emissions).toEqual(2)
-		expect(emissions[2].value).toEqual(binder:Get(inst))
+		expect(#classes).toEqual(2)
+		expect(classes[2]).toEqual(binder:Get(inst))
 
-		sub:Destroy()
+		classes:Destroy()
 		controller:Destroy()
 	end)
 end)
 
 describe("Binder:Promise()", function()
 	it("resolves immediately when already bound", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		controller.boot()
+		controller.initServiceBag()
 
 		local promise = binder:Promise(inst)
 		expect(promise:IsFulfilled()).toEqual(true)
@@ -528,10 +509,10 @@ describe("Binder:Promise()", function()
 	end)
 
 	it("throws when passed a non-instance", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local binder = controller.addBinder(function() end)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			binder:Promise(5 :: any)
@@ -543,21 +524,20 @@ end)
 
 describe("Binder:_add() dedupe", function()
 	it("does not rebind an already-bound instance", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local constructed = 0
 		local binder = controller.addBinder(function(inst)
 			constructed += 1
 			return { instance = inst }
 		end)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		assert((binder:Promise(inst):Yield()), "Never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		binder:Tag(inst)
-		task.wait()
 
 		expect(constructed).toEqual(1)
 
@@ -567,15 +547,14 @@ end)
 
 describe("Binder teardown", function()
 	it("removes and destroys all bound classes when the service bag is destroyed", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
-		local ok, class = binder:Promise(inst):Yield()
-		assert(ok, "Never bound")
+		local class = PromiseTestUtils.awaitFulfilled(binder:Promise(inst))
 
 		controller.destroyServiceBag()
 

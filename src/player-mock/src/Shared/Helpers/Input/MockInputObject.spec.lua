@@ -6,7 +6,9 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local Maid = require("Maid")
 local MockInputObject = require("MockInputObject")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -91,17 +93,15 @@ describe("MockInputObject.SetUserInputState", function()
 
 	it("does not fire another property's signal", function()
 		local inputObject = MockInputObject.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = inputObject:GetPropertyChangedSignal("Position"):Connect(function()
-			fired += 1
-		end)
+		local fired = SignalTestUtils.countFires(maid, inputObject:GetPropertyChangedSignal("Position"))
 
 		inputObject:SetUserInputState(Enum.UserInputState.End)
 
-		expect(fired).toBe(0)
+		expect(fired()).toBe(0)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 	end)
 
 	it("throws on a state from the wrong enum", function()

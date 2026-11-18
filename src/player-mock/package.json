@@ -41,7 +41,7 @@
     "@quenty/steputils": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tuple": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/jest-lua": "3.10.0-quenty.3",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

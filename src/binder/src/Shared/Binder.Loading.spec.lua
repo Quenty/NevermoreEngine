@@ -13,11 +13,9 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local setup = BinderTestUtils.setup
-
 describe("Binder load abandonment", function()
 	it("does not bind a class when the instance is removed while the constructor yields", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
 		local entered = Signal.new()
 		local resume = Signal.new()
@@ -29,7 +27,7 @@ describe("Binder load abandonment", function()
 			resume:Wait()
 			return { instance = inst }
 		end)
-		controller.boot()
+		controller.initServiceBag()
 
 		local inst = controller.newInstance()
 		binder:Tag(inst)
@@ -44,7 +42,6 @@ describe("Binder load abandonment", function()
 
 		binder:Untag(inst)
 		resume:Fire()
-		task.wait()
 
 		expect(binder:Get(inst)).toBeNil()
 		expect(constructed).toEqual(1)

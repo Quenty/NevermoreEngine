@@ -10,15 +10,13 @@ local Workspace = game:GetService("Workspace")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PlayerMockUtils = require("PlayerMockUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
--- Sentinel standing in for a nil emission, so emissions can live in an array
-local NONE = "none"
 
 local function setup()
 	local maid = Maid.new()
@@ -33,12 +31,8 @@ local function setup()
 		designate = function(player: Player?)
 			maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
 		end,
-		subscribeSeen = function(): { any }
-			local seen: { any } = {}
-			maid:GiveTask(PlayerMockUtils.observeMockedLocalPlayer():Subscribe(function(localPlayer: Player?)
-				table.insert(seen, if localPlayer ~= nil then localPlayer else NONE)
-			end))
-			return seen
+		subscribeSeen = function(): ObservableSpy.ObservableSpy<Player?>
+			return maid:Add(ObservableSpy.new(PlayerMockUtils.observeMockedLocalPlayer()))
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -57,7 +51,7 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 		local player = controller.newPlayer()
 		controller.designate(player)
 
-		expect(controller.subscribeSeen()).toEqual({ player })
+		expect(controller.subscribeSeen().Values).toEqual({ player })
 
 		controller:Destroy()
 	end)
@@ -65,7 +59,10 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 	it("emits nil on subscribe when nothing is designated", function()
 		local controller = setup()
 
-		expect(controller.subscribeSeen()).toEqual({ NONE })
+		local seen = controller.subscribeSeen()
+
+		expect(#seen).toBe(1)
+		expect(seen[1]).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -77,10 +74,10 @@ describe("PlayerMockUtils.observeMockedLocalPlayer", function()
 		local seen = controller.subscribeSeen()
 
 		controller.designate(player)
-		expect(seen[#seen]).toBe(player)
+		expect(seen:GetLastValue()).toBe(player)
 
 		PlayerMock.setMockedLocalPlayer(nil)
-		expect(seen[#seen]).toBe(NONE)
+		expect(seen:GetLastValue()).toBeNil()
 
 		controller:Destroy()
 	end)

@@ -9,6 +9,7 @@ local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBRequestHandlerMock = require("InfluxDBRequestHandlerMock")
 local InfluxDBService = require("InfluxDBService")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
@@ -32,6 +33,8 @@ end
 
 local function setup()
 	local serviceBag = ServiceBag.new()
+	JestUtils.afterThis(serviceBag)
+
 	local influxDBService: InfluxDBService.InfluxDBService = serviceBag:GetService(InfluxDBService) :: any
 	serviceBag:Init()
 

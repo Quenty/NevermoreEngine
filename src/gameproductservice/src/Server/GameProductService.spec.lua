@@ -31,6 +31,7 @@ local PermissionProviderUtils = require("PermissionProviderUtils")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
+local SignalTestUtils = require("SignalTestUtils")
 local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
@@ -73,6 +74,7 @@ local function setup()
 	clientBag:Start()
 
 	local controller = {
+		maid = maid,
 		serverBag = serverBag,
 		clientBag = clientBag,
 		gameProductService = gameProductService,
@@ -106,10 +108,6 @@ describe("PlayerProductManager discovers a PlayerMock", function()
 	it("binds PlayerProductManager to a PlayerMock without a manual Bind", function()
 		local controller = setup()
 		local binder = controller.serverBag:GetService((require :: any)("PlayerProductManager"))
-
-		PromiseTestUtils.awaitValue(function()
-			return binder:Get(controller.playerMock) ~= nil
-		end, 10)
 
 		expect(binder:Get(controller.playerMock)).never.toBeNil()
 
@@ -294,11 +292,9 @@ describe("client-initiated gamepass prompt", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
-		local serverFired = {}
+		local serverFired =
+			SignalTestUtils.collectFireListTuples(controller.maid, controller.gameProductService.GamePassPurchased)
 		local clientFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
-			table.insert(serverFired, { player = player, gamePassId = gamePassId })
-		end)
 		-- The pass is not owned when the prompt opens, so the client genuinely prompts. Model the
 		-- purchase going through by marking the marketplace as owning it the instant the client reports
 		-- success -- the same false-before / true-after transition a real purchase produces, and what
@@ -323,13 +319,11 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		PromiseTestUtils.awaitValue(function()
-			return #serverFired > 0
-		end, 10)
+		StepUtils.deferWait()
 
 		expect(#serverFired).toEqual(1)
-		expect(serverFired[1].player).toBe(controller.playerMock)
-		expect(serverFired[1].gamePassId).toEqual(GAME_PASS_ID)
+		expect(serverFired[1][1]).toBe(controller.playerMock)
+		expect(serverFired[1][2]).toEqual(GAME_PASS_ID)
 		expect(clientFired[1]).toEqual(GAME_PASS_ID)
 		expect(
 			controller.gameProductService:HasPlayerPurchasedThisSession(
@@ -360,10 +354,8 @@ describe("client-initiated gamepass prompt", function()
 		-- that want the claim checked enable server-only prompting; see the verification describe below.
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
-		local serverFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
-			table.insert(serverFired, { player = player, gamePassId = gamePassId })
-		end)
+		local serverFired =
+			SignalTestUtils.collectFireListTuples(controller.maid, controller.gameProductService.GamePassPurchased)
 
 		expect(
 			PromiseTestUtils.awaitFulfilled(
@@ -375,9 +367,7 @@ describe("client-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		PromiseTestUtils.awaitValue(function()
-			return #serverFired > 0
-		end, 10)
+		StepUtils.deferWait()
 
 		expect(#serverFired).toEqual(1)
 		expect(
@@ -394,10 +384,7 @@ describe("client-initiated gamepass prompt", function()
 	it("resolves false on reject and marks nothing purchased on either realm", function()
 		local controller = setup()
 
-		local serverFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function()
-			table.insert(serverFired, true)
-		end)
+		local serverFired = SignalTestUtils.countFires(controller.maid, controller.gameProductService.GamePassPurchased)
 
 		expect(
 			PromiseTestUtils.awaitFulfilled(
@@ -413,7 +400,7 @@ describe("client-initiated gamepass prompt", function()
 		-- remaining work (the decline forward to the server) run before tearing down.
 		StepUtils.deferWait()
 
-		expect(#serverFired).toEqual(0)
+		expect(serverFired()).toEqual(0)
 		expect(
 			controller.gameProductService:HasPlayerPurchasedThisSession(
 				controller.playerMock,
@@ -441,9 +428,7 @@ describe("gamepass purchase verification under server-only prompting", function(
 	local function claimPurchaseFromClient(controller: any, gamePassId: number)
 		local clientBinder = controller.clientBag:GetService((require :: any)("PlayerProductManagerClient"))
 
-		PromiseTestUtils.awaitValue(function()
-			return clientBinder:Get(controller.playerMock) ~= nil
-		end, 10)
+		expect(clientBinder:Get(controller.playerMock)).never.toBeNil()
 
 		local manager: any = clientBinder:Get(controller.playerMock)
 		manager:_handleGamePassPromptFinished(gamePassId, true)
@@ -455,10 +440,8 @@ describe("gamepass purchase verification under server-only prompting", function(
 
 		-- UserOwnsGamePassAsync stays at its false default: the player never bought this pass. Any
 		-- client can fire this remote for any gamepass id, so on its own the claim must grant nothing.
-		local serverFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
-			table.insert(serverFired, { player = player, gamePassId = gamePassId })
-		end)
+		local serverFired =
+			SignalTestUtils.collectFireListTuples(controller.maid, controller.gameProductService.GamePassPurchased)
 
 		claimPurchaseFromClient(controller, GAME_PASS_ID)
 
@@ -491,20 +474,14 @@ describe("gamepass purchase verification under server-only prompting", function(
 		-- The marketplace shows the player owning the pass, as it would after a real purchase.
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.UserOwnsGamePassAsync", true, GAME_PASS_ID)
 
-		local serverFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
-			table.insert(serverFired, { player = player, gamePassId = gamePassId })
-		end)
+		local serverFired =
+			SignalTestUtils.collectFireListTuples(controller.maid, controller.gameProductService.GamePassPurchased)
 
 		claimPurchaseFromClient(controller, GAME_PASS_ID)
 
-		PromiseTestUtils.awaitValue(function()
-			return #serverFired > 0
-		end, 10)
-
 		expect(#serverFired).toEqual(1)
-		expect(serverFired[1].player).toBe(controller.playerMock)
-		expect(serverFired[1].gamePassId).toEqual(GAME_PASS_ID)
+		expect(serverFired[1][1]).toBe(controller.playerMock)
+		expect(serverFired[1][2]).toEqual(GAME_PASS_ID)
 		expect(
 			controller.gameProductService:HasPlayerPurchasedThisSession(
 				controller.playerMock,
@@ -541,10 +518,8 @@ describe("server-initiated gamepass prompt", function()
 		local controller = setup()
 		PlayerMock.writeLookup(controller.playerMock, "MarketplaceService.PromptGamePassPurchase", true, GAME_PASS_ID)
 
-		local serverFired = {}
-		controller.gameProductService.GamePassPurchased:Connect(function(player, gamePassId)
-			table.insert(serverFired, { player = player, gamePassId = gamePassId })
-		end)
+		local serverFired =
+			SignalTestUtils.collectFireListTuples(controller.maid, controller.gameProductService.GamePassPurchased)
 
 		expect(
 			PromiseTestUtils.awaitFulfilled(
@@ -556,12 +531,8 @@ describe("server-initiated gamepass prompt", function()
 			)
 		).toEqual(true)
 
-		PromiseTestUtils.awaitValue(function()
-			return #serverFired > 0
-		end, 10)
-
 		expect(#serverFired).toEqual(1)
-		expect(serverFired[1].gamePassId).toEqual(GAME_PASS_ID)
+		expect(serverFired[1][2]).toEqual(GAME_PASS_ID)
 		expect(
 			controller.gameProductService:HasPlayerPurchasedThisSession(
 				controller.playerMock,

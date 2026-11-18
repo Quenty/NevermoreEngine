@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local RxTestUtils = require("RxTestUtils")
 local TieDefinition = require("TieDefinition")
 local TieInterface = require("TieInterface")
 local TieRealms = require("TieRealms")
@@ -234,11 +235,7 @@ end)
 
 describe("TieInterface.ObserveIsImplemented", function()
 	local function record(controller, interface): { boolean }
-		local seen: { boolean } = {}
-		controller.maid:GiveTask(interface:ObserveIsImplemented():Subscribe(function(value)
-			table.insert(seen, value)
-		end))
-		return seen
+		return RxTestUtils.collectList(controller.maid, interface:ObserveIsImplemented())
 	end
 
 	it("emits for an implParent on an adornee", function()

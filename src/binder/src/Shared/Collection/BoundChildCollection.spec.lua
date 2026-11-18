@@ -11,7 +11,9 @@ local BoundChildCollection = require("BoundChildCollection")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -87,6 +89,7 @@ local function setup()
 	end)
 
 	local controller = {
+		maid = maid,
 		container = container,
 		binder = binder,
 		newInstance = newInstance,
@@ -115,14 +118,11 @@ describe("BoundChildCollection construction", function()
 		controller.binder:Tag(childB)
 		controller.boot()
 
-		local fired = 0
 		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
-		collection.ClassAdded:Connect(function()
-			fired += 1
-		end)
+		local fired = SignalTestUtils.countFires(controller.maid, collection.ClassAdded)
 
 		expect(collection:GetSize()).toEqual(2)
-		expect(fired).toEqual(0)
+		expect(fired()).toEqual(0)
 		expect(#collection:GetClasses()).toEqual(2)
 		expect(collection:HasClass(controller.binder:Get(childA))).toEqual(true)
 
@@ -141,21 +141,13 @@ describe("BoundChildCollection dynamic updates", function()
 
 		local child = controller.newInstance()
 		controller.binder:Tag(child)
-		local ok, class = controller.binder:Promise(child):Yield()
-		assert(ok, "child never bound")
+		local class = PromiseTestUtils.awaitFulfilled(controller.binder:Promise(child))
 
-		local addedClass
-		local conn = collection.ClassAdded:Connect(function(c)
-			addedClass = c
-		end)
+		local added = SignalTestUtils.collectFireList(controller.maid, collection.ClassAdded)
 
 		child.Parent = parent
-		if collection:GetSize() == 0 then
-			collection.ClassAdded:Wait()
-		end
-		conn:Disconnect()
 
-		expect(addedClass).toEqual(class)
+		expect(added).toEqual({ class })
 		expect(collection:GetSize()).toEqual(1)
 
 		controller:Destroy()
@@ -171,10 +163,7 @@ describe("BoundChildCollection dynamic updates", function()
 		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		expect(collection:GetSize()).toEqual(0)
 
-		local added = {}
-		collection.ClassAdded:Connect(function(class)
-			table.insert(added, class)
-		end)
+		local added = SignalTestUtils.collectFireList(controller.maid, collection.ClassAdded)
 
 		controller.binder:Tag(child)
 
@@ -217,15 +206,12 @@ describe("BoundChildCollection dynamic updates", function()
 		child.Parent = controller.container
 		expect(collection:GetSize()).toEqual(0)
 
-		local removed = 0
-		collection.ClassRemoved:Connect(function()
-			removed += 1
-		end)
+		local removed = SignalTestUtils.countFires(controller.maid, collection.ClassRemoved)
 
 		controller.binder:Untag(child)
 
 		expect(collection:GetSize()).toEqual(0)
-		expect(removed).toEqual(0)
+		expect(removed()).toEqual(0)
 
 		controller:Destroy()
 	end)
@@ -262,19 +248,12 @@ describe("BoundChildCollection dynamic updates", function()
 		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		expect(collection:GetSize()).toEqual(1)
 
-		local removedClass
-		local conn = collection.ClassRemoved:Connect(function(c)
-			removedClass = c
-		end)
+		local removed = SignalTestUtils.collectFireList(controller.maid, collection.ClassRemoved)
 
 		local class = controller.binder:Get(child)
 		child.Parent = controller.container
-		if collection:GetSize() == 1 then
-			collection.ClassRemoved:Wait()
-		end
-		conn:Disconnect()
 
-		expect(removedClass).toEqual(class)
+		expect(removed).toEqual({ class })
 		expect(collection:GetSize()).toEqual(0)
 
 		controller:Destroy()
@@ -291,13 +270,12 @@ describe("BoundChildCollection dynamic updates", function()
 		local collection = controller.track(BoundChildCollection.new(controller.binder, parent))
 		expect(collection:GetSize()).toEqual(1)
 
-		local conn = collection.ClassRemoved:Connect(function() end)
-		controller.binder:Untag(child)
-		if collection:GetSize() == 1 then
-			collection.ClassRemoved:Wait()
-		end
-		conn:Disconnect()
+		local removed = SignalTestUtils.collectFireList(controller.maid, collection.ClassRemoved)
 
+		local class = controller.binder:Get(child)
+		controller.binder:Untag(child)
+
+		expect(removed).toEqual({ class })
 		expect(collection:GetSize()).toEqual(0)
 
 		controller:Destroy()

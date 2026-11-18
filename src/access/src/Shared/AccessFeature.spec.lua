@@ -8,7 +8,9 @@ local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFeature = require("AccessFeature")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local Rx = require("Rx")
 
 local ALLOW = AccessFactContributionState.ALLOW
@@ -19,12 +21,33 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function lastState(observable: any, maid: any): AccessStateUtils.AccessState?
-	local last: AccessStateUtils.AccessState? = nil
-	maid:GiveTask(observable:Subscribe(function(state)
-		last = state
-	end))
-	return last
+type Controller = {
+	maid: Maid.Maid,
+	compute: (
+		feature: AccessFeature.AccessFeature,
+		facts: { [string]: string },
+		subject: any?
+	) -> AccessStateUtils.AccessState,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
+	local maid = Maid.new()
+
+	local controller: Controller = {
+		maid = maid,
+		compute = function(feature, facts, subject)
+			local states = maid:Add(ObservableSpy.new(feature:ObserveCompute(Rx.of(facts) :: any, subject)))
+			return states:GetLastValue()
+		end,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AccessFeature.new", function()
@@ -43,69 +66,71 @@ end)
 
 describe("AccessFeature.GetFactNames", function()
 	it("hands back a copy, so a caller cannot widen what the feature depends on", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("thing", { "a" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("thing", { "a" }))
 
 		local names = feature:GetFactNames()
 		table.insert(names, "sneakilyAdded")
 
 		expect(feature:GetFactNames()).toEqual({ "a" })
-		maid:DoCleaning()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature.anyOf", function()
 	it("allows when a declared fact is true", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, b = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { a = DENY, b = ALLOW })
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("stays unresolved while a declared fact is unanswered", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("thing", { "a", "b" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY }) :: any), maid)
+		local state = controller.compute(feature, { a = DENY })
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("is unaffected by a fact it did not declare", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("thing", { "a" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("thing", { "a" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ a = DENY, unrelated = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { a = DENY, unrelated = ALLOW })
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature.alwaysAllowed", function()
 	it("allows without reading any fact", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.alwaysAllowed("hub"))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.alwaysAllowed("hub"))
 
 		expect(feature:GetFactNames()).toEqual({})
-		expect(AccessStateUtils.isAllowed(lastState(feature:ObserveCompute(Rx.of({}) :: any), maid) :: any)).toEqual(
-			true
-		)
+		expect(AccessStateUtils.isAllowed(controller.compute(feature, {}))).toEqual(true)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature.ObserveCompute", function()
 	it("passes the subject through to the observeCompute", function()
-		local maid = Maid.new()
+		local controller = setup()
 		local seen = nil
 
-		local feature = maid:Add(AccessFeature.new("eggPurchase", {
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
 			facts = {},
 			observeCompute = function(_observeFacts, subject)
 				seen = subject
@@ -113,18 +138,17 @@ describe("AccessFeature.ObserveCompute", function()
 			end,
 		}))
 
-		lastState(feature:ObserveCompute(Rx.of({}) :: any, "blueEgg"), maid)
+		controller.compute(feature, {}, "blueEgg")
 
 		expect(seen).toEqual("blueEgg")
-		maid:DoCleaning()
+
+		controller:Destroy()
 	end)
 
 	it("lets a feature fold in context that is not a fact", function()
-		-- The whole reason observeCompute returns an Observable rather than a verdict: an egg's asset and whether
-		-- it has been collected are per-egg, not per-player, so they are not facts.
-		local maid = Maid.new()
+		local controller = setup()
 
-		local feature = maid:Add(AccessFeature.new("eggPurchase", {
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
 			facts = { "ownsGame" },
 			observeCompute = function(observeFacts: any): any
 				return Rx.combineLatest({
@@ -142,15 +166,16 @@ describe("AccessFeature.ObserveCompute", function()
 			end,
 		}))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { ownsGame = ALLOW })
 
-		expect((state :: any).reason).toEqual("eggNotCollected")
-		maid:DoCleaning()
+		expect(state).toEqual(AccessStateUtils.disallowed("eggNotCollected"))
+
+		controller:Destroy()
 	end)
 
 	it("refuses a observeCompute that returns a verdict instead of an observable", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.new("thing", {
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.new("thing", {
 			facts = {},
 			observeCompute = function()
 				return AccessStateUtils.allowed() :: any
@@ -160,20 +185,17 @@ describe("AccessFeature.ObserveCompute", function()
 		expect(function()
 			feature:ObserveCompute(Rx.of({}) :: any)
 		end).toThrow("must return an Observable")
-		maid:DoCleaning()
+
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature context", function()
-	--[[
-		Facts are per-player, so a per-thing input -- an egg's asset, whether it has been collected -- cannot
-		be one. Declaring them instead of closing over them is what lets a readout print them.
-	]]
 	it("hands the declared context to observeCompute, resolved against the subject", function()
-		local maid = Maid.new()
+		local controller = setup()
 		local seen = nil
 
-		local feature = maid:Add(AccessFeature.new("eggPurchase", {
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
 			facts = {},
 			context = {
 				hasCollected = function(subject)
@@ -190,15 +212,16 @@ describe("AccessFeature context", function()
 			end,
 		}))
 
-		lastState(feature:ObserveCompute(Rx.of({}) :: any, "blueEgg"), maid)
+		controller.compute(feature, {}, "blueEgg")
 
-		expect((seen :: any).hasCollected).toEqual(true)
-		maid:DoCleaning()
+		expect(seen).toEqual({ hasCollected = true })
+
+		controller:Destroy()
 	end)
 
 	it("names what it reads, so a report can print it", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.new("eggPurchase", {
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
 			facts = { "ownsGame" },
 			context = {
 				hasCollected = function()
@@ -216,22 +239,18 @@ describe("AccessFeature context", function()
 		expect(feature:GetContextNames()).toEqual({ "assetId", "hasCollected" })
 		expect(feature:GetDebugState().context).toEqual({ "assetId", "hasCollected" })
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("emits an empty table for a feature that declared none", function()
-		-- Rather than never emitting: a caller combines context in unconditionally, and a source that never
-		-- fires would leave every such feature unresolved forever.
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("thing", { "a" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("thing", { "a" }))
 
-		local seen = nil
-		maid:GiveTask(feature:ObserveContext(nil):Subscribe(function(context)
-			seen = context
-		end))
+		local contexts = controller.maid:Add(ObservableSpy.new(feature:ObserveContext(nil)))
 
-		expect(seen).toEqual({})
-		maid:DoCleaning()
+		expect(contexts:GetValues()).toEqual({ {} })
+
+		controller:Destroy()
 	end)
 
 	it("refuses a context entry that is not a resolver", function()
@@ -249,98 +268,97 @@ end)
 
 describe("AccessFeature.allOf", function()
 	it("allows only when every declared fact allows", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
 
-		local both = lastState(feature:ObserveCompute(Rx.of({ isTester = ALLOW, flagOn = ALLOW }) :: any), maid)
-		expect(AccessStateUtils.isAllowed(both :: any)).toEqual(true)
+		local both = controller.compute(feature, { isTester = ALLOW, flagOn = ALLOW })
+		expect(AccessStateUtils.isAllowed(both)).toEqual(true)
 
-		local one = lastState(feature:ObserveCompute(Rx.of({ isTester = ALLOW, flagOn = DENY }) :: any), maid)
-		expect(AccessStateUtils.isAllowed(one :: any)).toEqual(false)
+		local one = controller.compute(feature, { isTester = ALLOW, flagOn = DENY })
+		expect(AccessStateUtils.isAllowed(one)).toEqual(false)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("refuses outright on a denial rather than waiting on an unanswered one", function()
-		-- No later answer can rescue an and-of, so reporting unresolved would be a stall with a known
-		-- answer already behind it.
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ flagOn = DENY }) :: any), maid)
+		local state = controller.compute(feature, { flagOn = DENY })
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(false)
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(false)
+		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("stays unresolved while a term is unanswered and none has denied", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ isTester = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { isTester = ALLOW })
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("lets a pushed fact widen it rather than join the and", function()
-		-- PushFactAllowsFeature promises it can grant and never deny. An and-of that took pushed facts as
-		-- further terms would break that promise in the one direction nobody would expect.
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
-		maid:GiveTask(feature:PushFactNameAllowsFeature("isStaff"))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.allOf("earlyAccess", { "isTester", "flagOn" }))
+		controller.maid:GiveTask(feature:PushFactNameAllowsFeature("isStaff"))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ isTester = DENY, isStaff = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { isTester = DENY, isStaff = ALLOW })
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature.noneOf", function()
 	it("allows when the fact is definitely false", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = DENY }) :: any), maid)
+		local state = controller.compute(feature, { ownsGame = DENY })
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("refuses when the fact is true", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = ALLOW }) :: any), maid)
+		local state = controller.compute(feature, { ownsGame = ALLOW })
 
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
+
+		controller:Destroy()
 	end)
 
 	it("stays unresolved rather than reading a failed lookup as a no", function()
-		-- The bug this exists to prevent: `not value` turns unresolved into true, and a purchase gate then
-		-- offers to sell somebody what they may already own.
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({ ownsGame = UNRESOLVED }) :: any), maid)
+		local state = controller.compute(feature, { ownsGame = UNRESOLVED })
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
-		expect(AccessStateUtils.isAllowed(state :: any)).toEqual(false)
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("treats a fact nothing answered the same as an unresolved one", function()
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.noneOf("canPurchaseGame", { "ownsGame" }))
 
-		local state = lastState(feature:ObserveCompute(Rx.of({}) :: any), maid)
+		local state = controller.compute(feature, {})
 
-		expect(AccessStateUtils.isUnresolved(state :: any)).toEqual(true)
-		maid:DoCleaning()
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(true)
+
+		controller:Destroy()
 	end)
 end)

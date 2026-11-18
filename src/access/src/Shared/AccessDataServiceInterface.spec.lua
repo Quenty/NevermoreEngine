@@ -13,6 +13,7 @@ local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 local WellKnownAccessFeatureNames = require("WellKnownAccessFeatureNames")
@@ -21,28 +22,36 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	fakePlayer: () -> Player,
+	registerFeature: (featureName: string, allowed: boolean?) -> (),
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
+
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
 		accessDataService = accessDataService,
-		fakePlayer = function(): Player
+		fakePlayer = function()
 			return maid:Add(PlayerMock.new()) :: any
 		end,
-		registerAllowed = function(featureName: string, allowed: boolean)
-			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(`{featureName}Fact`, {
+		registerFeature = function(featureName, allowed)
+			local factName = `{featureName}Fact`
+			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return allowed
 				end,
 			}))))
-			maid:GiveTask(
-				accessDataService:RegisterFeature(maid:Add(AccessFeature.anyOf(featureName, { `{featureName}Fact` })))
-			)
+			maid:GiveTask(accessDataService:RegisterFeature(maid:Add(AccessFeature.anyOf(featureName, { factName }))))
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -56,7 +65,6 @@ end
 
 describe("AccessDataServiceInterface", function()
 	it("is findable without requiring the service", function()
-		-- The point of the tie: a package that gates on access should not have to depend on this one.
 		local controller = setup()
 
 		expect(AccessDataServiceInterface:HasImplementation(ReplicatedStorage)).toEqual(true)
@@ -65,15 +73,12 @@ describe("AccessDataServiceInterface", function()
 	end)
 
 	it("answers by name through the tie", function()
-		-- Asserted against the shipped feature rather than one this test registers: the tie is implemented
-		-- on ReplicatedStorage, so in a shared test place Find may resolve another live bag's service.
-		-- Every bag has the built-ins, so this holds whichever one answers.
 		local controller = setup()
 
 		local tie = assert(AccessDataServiceInterface:Find(ReplicatedStorage), "No implementation")
-		expect(type(tie:IsFeatureAllowedByName(controller.fakePlayer(), WellKnownAccessFeatureNames.OWNS_GAME))).toEqual(
-			"boolean"
-		)
+		local allowed = tie:IsFeatureAllowedByName(controller.fakePlayer(), WellKnownAccessFeatureNames.OWNS_GAME)
+
+		expect(type(allowed)).toEqual("boolean")
 
 		controller:Destroy()
 	end)
@@ -82,6 +87,7 @@ describe("AccessDataServiceInterface", function()
 		local controller = setup()
 
 		local tie = assert(AccessDataServiceInterface:Find(ReplicatedStorage), "No implementation")
+
 		expect(tie:HasFeature(WellKnownAccessFeatureNames.OWNS_GAME)).toEqual(true)
 		expect(tie:HasFeature("nosuch")).toEqual(false)
 
@@ -91,11 +97,8 @@ end)
 
 describe("AccessDataService.IsFeatureAllowedByName", function()
 	it("reads a granted feature as allowed", function()
-		-- Guards the trap that every access observable opens on unresolved: a reader that keeps the first
-		-- emission instead of the last reports "denied" for everything, and every false-expecting test
-		-- still passes.
 		local controller = setup()
-		controller.registerAllowed("chapters", true)
+		controller.registerFeature("chapters", true)
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(true)
 
@@ -104,7 +107,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 	it("reads a denial as not allowed", function()
 		local controller = setup()
-		controller.registerAllowed("chapters", false)
+		controller.registerFeature("chapters", false)
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
 
@@ -113,18 +116,7 @@ describe("AccessDataService.IsFeatureAllowedByName", function()
 
 	it("fails closed on unresolved, since a boolean cannot carry a third answer", function()
 		local controller = setup()
-		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFact(controller.maid:Add(AccessFact.new("pending", {
-				resolve = function()
-					return nil
-				end,
-			})))
-		)
-		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFeature(
-				controller.maid:Add(AccessFeature.anyOf("chapters", { "pending" }))
-			)
-		)
+		controller.registerFeature("chapters", nil)
 
 		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "chapters")).toEqual(false)
 
@@ -145,20 +137,17 @@ end)
 describe("AccessDataService.ObserveIsFeatureAllowedByName", function()
 	it("tracks the verdict as it changes", function()
 		local controller = setup()
-		controller.registerAllowed("chapters", false)
+		controller.registerFeature("chapters", false)
 
 		local player = controller.fakePlayer()
-		local last = nil
-		controller.maid:GiveTask(
-			controller.accessDataService:ObserveIsFeatureAllowedByName(player, "chapters"):Subscribe(function(value)
-				last = value
-			end)
+		local allowed = controller.maid:Add(
+			ObservableSpy.new(controller.accessDataService:ObserveIsFeatureAllowedByName(player, "chapters"))
 		)
 
-		expect(last).toEqual(false)
+		expect(allowed:GetLastValue()).toEqual(false)
 
 		controller.accessDataService:SetFactOverride(player, "chaptersFact", true)
-		expect(last).toEqual(true)
+		expect(allowed:GetLastValue()).toEqual(true)
 
 		controller:Destroy()
 	end)

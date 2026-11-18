@@ -5,9 +5,9 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Brio = require("Brio")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local TeamKillTrackerUtils = require("TeamKillTrackerUtils")
 
 local describe = Jest.Globals.describe
@@ -69,26 +69,19 @@ describe("TeamKillTrackerUtils.observeBrio(binder, team)", function()
 		local binder = controller.teamKillTrackerBinder
 		local team = controller.newTeam()
 
-		local brios: { Brio.Brio<any> } = {}
-		controller.maid:GiveTask(TeamKillTrackerUtils.observeBrio(binder, team):Subscribe(function(brio)
-			table.insert(brios, brio)
-		end))
+		local brios = controller.maid:Add(ObservableSpy.new(TeamKillTrackerUtils.observeBrio(binder, team)))
 
 		local score = TeamKillTrackerUtils.create(binder)
 		score.Parent = team
 		local tracker = DeathReportTestUtils.awaitBound(binder, score)
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return #brios == 1
-		end)).toBe(true)
+		expect(#brios).toEqual(1)
 		expect(brios[1]:GetValue()).toBe(tracker)
 		expect(brios[1]:IsDead()).toBe(false)
 
 		score:Destroy()
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return brios[1]:IsDead()
-		end)).toBe(true)
+		expect(brios[1]:IsDead()).toBe(true)
 
 		controller:Destroy()
 	end)

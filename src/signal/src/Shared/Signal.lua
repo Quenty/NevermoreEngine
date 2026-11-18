@@ -55,14 +55,32 @@ local EventHandlerUtils = require("EventHandlerUtils")
 ]=]
 local Connection = {}
 Connection.ClassName = "Connection"
-Connection.__index = Connection
+
+--[=[
+	Whether the connection is still connected, matching [RBXScriptConnection.Connected].
+
+	@prop Connected boolean
+	@readonly
+	@within Connection
+]=]
+Connection.__index = function(self, key)
+	if key == "Connected" then
+		return rawget(self, "_prev") ~= nil
+	end
+
+	return Connection[key]
+end
 
 export type SignalHandler<T...> = (T...) -> ()
 
+-- Connections form a doubly linked list whose head is the signal itself: the newest connection's
+-- _prev is the signal, so unlinking any node is O(1) without a separate reference to the signal.
+-- A connection is connected exactly while it has a _prev.
 export type Connection<T...> = typeof(setmetatable(
 	{} :: {
+		Connected: boolean,
 		_memoryCategory: string,
-		_signal: Signal<T...>?,
+		_prev: any,
 		_fn: SignalHandler<T...>?,
 	},
 	{} :: typeof({ __index = Connection })
@@ -73,14 +91,20 @@ export type Connection<T...> = typeof(setmetatable(
 
 	@param signal Signal<T...> -- The signal this connection is connected to
 	@param fn (... T) -> () -- The function handler for this connection
+	@param nextConnection Connection<T...>? -- The connection after this one, so the table is built at its final size
 	@return Connection
 ]=]
-function Connection.new<T...>(signal: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
+function Connection.new<T...>(
+	signal: Signal<T...>,
+	fn: SignalHandler<T...>,
+	nextConnection: Connection<T...>?
+): Connection<T...>
 	return setmetatable({
 		-- selene: allow(incorrect_standard_library_use)
 		_memoryCategory = debug.getmemorycategory(),
-		_signal = signal,
+		_prev = signal,
 		_fn = fn,
+		_next = nextConnection,
 	}, Connection) :: any
 end
 
@@ -91,7 +115,7 @@ end
 	@return boolean
 ]=]
 function Connection.IsConnected<T...>(self: Connection<T...>): boolean
-	return rawget(self :: any, "_signal") ~= nil
+	return rawget(self :: any, "_prev") ~= nil
 end
 
 --[=[
@@ -101,34 +125,19 @@ end
 	@return ()
 ]=]
 function Connection.Disconnect<T...>(self: Connection<T...>)
-	local signal = rawget(self :: any, "_signal")
-	if not signal then
+	local prev = rawget(self :: any, "_prev")
+	if not prev then
 		return
 	end
 
-	-- Unhook the node. Originally the good signal would not clear this signal and
-	-- rely upon GC. However, this means that connections would keep themselves and other
-	-- disconnected nodes in the chain alive, keeping the function closure alive, and in return
-	-- keeping the signal alive. This means a `Maid` could keep full object trees alive if a
-	-- connection was made to them.
-
 	local ourNext = rawget(self :: any, "_next")
-
-	if signal._handlerListHead == self then
-		signal._handlerListHead = ourNext or false
-	else
-		local prev = signal._handlerListHead
-		while prev and rawget(prev, "_next") ~= self do
-			prev = rawget(prev, "_next")
-		end
-		if prev then
-			assert(rawget(prev, "_next") == self, "Bad state")
-			rawset(prev, "_next", ourNext)
-		end
+	rawset(prev, "_next", ourNext)
+	if ourNext then
+		rawset(ourNext, "_prev", prev)
 	end
 
-	-- Clear all member variables that aren't _next so keeping a connection
-	-- indexed allows for GC of other components
+	-- Clear every field, including _next, so a disconnected connection kept around by a `Maid` or a
+	-- field holds nothing alive: not its handler, not the signal, not the rest of the chain.
 	table.clear(self :: any)
 end
 
@@ -157,7 +166,7 @@ Signal.__index = Signal
 
 export type Signal<T...> = typeof(setmetatable(
 	{} :: {
-		_handlerListHead: Connection<T...> | false,
+		_next: Connection<T...>?,
 	},
 	{} :: typeof({ __index = Signal })
 ))
@@ -168,7 +177,7 @@ export type Signal<T...> = typeof(setmetatable(
 ]=]
 function Signal.new<T...>(): Signal<T...>
 	return setmetatable({
-		_handlerListHead = false,
+		_next = false,
 	}, Signal) :: any
 end
 
@@ -189,13 +198,12 @@ end
 	@return RBXScriptConnection
 ]=]
 function Signal.Connect<T...>(self: Signal<T...>, fn: SignalHandler<T...>): Connection<T...>
-	local connection = Connection.new(self, fn)
-	if self._handlerListHead then
-		rawset(connection :: any, "_next", self._handlerListHead)
-		self._handlerListHead = connection
-	else
-		self._handlerListHead = connection
+	local head = rawget(self :: any, "_next")
+	local connection = Connection.new(self, fn, head or nil)
+	if head then
+		rawset(head, "_prev", connection)
 	end
+	rawset(self :: any, "_next", connection)
 	return connection
 end
 
@@ -206,30 +214,23 @@ end
 ]=]
 function Signal.GetConnectionCount<T...>(self: Signal<T...>): number
 	local n = 0
-	local prev: any = self._handlerListHead
-	while prev do
+	local connection: any = rawget(self :: any, "_next")
+	while connection do
 		n += 1
-		prev = rawget(prev, "_next")
+		connection = rawget(connection, "_next")
 	end
 	return n
 end
 
 --[=[
 	Disconnects all connected events to the signal.
-
-	:::info
-	Disconnect all handlers. Since we use a linked list it suffices to clear the
-	reference to the head handler.
-	:::
 ]=]
 function Signal.DisconnectAll<T...>(self: Signal<T...>): ()
-	while self._handlerListHead do
-		local last = self._handlerListHead
-		last:Disconnect()
-		assert(self._handlerListHead ~= last, "self._handlerListHead should not be last")
+	local head = rawget(self :: any, "_next")
+	while head do
+		head:Disconnect()
+		head = rawget(self :: any, "_next")
 	end
-
-	self._handlerListHead = false
 end
 
 --[=[
@@ -245,15 +246,20 @@ end
 	@param ... T -- Variable arguments to pass to handler
 ]=]
 function Signal.Fire<T...>(self: Signal<T...>, ...: T...): ()
-	local connection: any = self._handlerListHead
+	local connection: any = rawget(self :: any, "_next")
 	while connection do
 		-- capture our next node, which could after this be cleared or disconnected.
-		-- any connections occuring during fire will be added to the _handerListHead and not be fired
-		-- in this round. Any disconnections in the chain will still work here.
+		-- any connections occuring during fire will be added at the head and not be fired
+		-- in this round.
 		local nextNode = rawget(connection, "_next")
 
-		if rawget(connection, "_signal") ~= nil then -- isConnected
+		if rawget(connection, "_prev") ~= nil then -- isConnected
 			EventHandlerUtils.fire(connection._memoryCategory, connection._fn, ...)
+
+			-- A still-connected node's _next reflects any unlinking the handler did. A node the handler
+			-- disconnected has been cleared, so fall back to the next node captured before the call.
+			-- If the handler disconnected both itself and that next node, the walk stops early.
+			nextNode = rawget(connection, "_next") or nextNode
 		end
 
 		connection = nextNode

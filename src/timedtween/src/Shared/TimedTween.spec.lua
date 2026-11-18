@@ -8,11 +8,13 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local StepUtils = require("StepUtils")
 local TimedTween = require("TimedTween")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 local TRANSITION_TIME = 0.1
 
@@ -23,6 +25,8 @@ type Controller = {
 	remainingTime: () -> number,
 	setClock: (clock: () -> number) -> (),
 	advance: (seconds: number) -> (),
+	newTween: (transitionTime: number?) -> TimedTween.TimedTween,
+	useFakeTimers: () -> (),
 	Destroy: (self: Controller) -> (),
 }
 
@@ -52,6 +56,12 @@ local function setup(): Controller
 		advance = function(seconds: number)
 			now += seconds
 		end,
+		newTween = function(transitionTime: number?)
+			return maid:Add(TimedTween.new(transitionTime))
+		end,
+		useFakeTimers = function()
+			maid:GiveTask(JestUtils.useFakeTimers())
+		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -64,11 +74,12 @@ end
 
 describe("TimedTween.GetClock", function()
 	it("defaults to os.clock", function()
-		local tween = TimedTween.new()
+		local controller = setup()
+		local tween = controller.newTween()
 
 		expect(tween:GetClock()).toBe(os.clock)
 
-		tween:Destroy()
+		controller:Destroy()
 	end)
 
 	it("returns the clock that was set", function()
@@ -175,7 +186,6 @@ describe("TimedTween:SetClock", function()
 			return 5000
 		end)
 
-		-- A restart would put the position back to 0 and the time left back to the full duration
 		expect(controller.position()).never.toBe(0)
 		expect(controller.remainingTime()).never.toBeCloseTo(TRANSITION_TIME)
 
@@ -283,8 +293,6 @@ describe("TimedTween remaining time", function()
 		controller.tween:Show()
 		controller.advance(TRANSITION_TIME / 2)
 
-		-- Covering half the range takes half the transition time, and that scaling already lives
-		-- in the duration -- folding the remaining distance in again would report half of this.
 		controller.tween:Hide()
 
 		expect(controller.rtime()).toBeCloseTo(TRANSITION_TIME / 2)
@@ -393,17 +401,18 @@ describe("TimedTween:PromiseFinished", function()
 
 	it("waits on the injected clock rather than wall time", function()
 		local controller = setup()
+		controller.useFakeTimers()
 
 		controller.tween:Show()
 		local promise = controller.tween:PromiseFinished()
 		expect(promise:IsPending()).toBe(true)
 
-		task.wait(TRANSITION_TIME * 3)
+		jest.advanceTimersByTime(TRANSITION_TIME * 3 * 1000)
 		expect(promise:IsPending()).toBe(true)
 
 		controller.advance(TRANSITION_TIME * 2)
-		task.wait()
-		task.wait()
+		StepUtils.getAnimationStepSignal():Wait()
+		StepUtils.deferWait()
 
 		expect(promise:IsFulfilled()).toBe(true)
 
@@ -411,17 +420,19 @@ describe("TimedTween:PromiseFinished", function()
 	end)
 
 	it("waits on wall time under the default clock", function()
-		local tween = TimedTween.new(TRANSITION_TIME)
+		local controller = setup()
+		controller.useFakeTimers()
+		local tween = controller.newTween(TRANSITION_TIME)
 
 		tween:Show()
 		local promise = tween:PromiseFinished()
 		expect(promise:IsPending()).toBe(true)
 
-		task.wait(TRANSITION_TIME * 3)
+		jest.advanceTimersByTime(TRANSITION_TIME * 3 * 1000)
 
 		expect(promise:IsFulfilled()).toBe(true)
 
-		tween:Destroy()
+		controller:Destroy()
 	end)
 end)
 
@@ -437,10 +448,11 @@ describe("TimedTween:SetTransitionTime", function()
 	end)
 
 	it("defaults to 0.15 seconds", function()
-		local tween = TimedTween.new()
+		local controller = setup()
+		local tween = controller.newTween()
 
 		expect(tween:GetTransitionTime()).toBe(0.15)
 
-		tween:Destroy()
+		controller:Destroy()
 	end)
 end)

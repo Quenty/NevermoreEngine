@@ -160,7 +160,7 @@ describe("StudioBridgeSessionUtils.createRegisterPayload()", function()
 
 		table.insert(payload.capabilities, "extra")
 
-		expect(table.find(StudioBridgeSessionUtils.CAPABILITIES, "extra")).toBeNil()
+		expect(StudioBridgeSessionUtils.CAPABILITIES).never.toContain("extra")
 	end)
 end)
 

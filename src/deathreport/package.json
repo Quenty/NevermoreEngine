@@ -44,6 +44,7 @@
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxbinderutils": "workspace:*",
@@ -52,6 +53,6 @@
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

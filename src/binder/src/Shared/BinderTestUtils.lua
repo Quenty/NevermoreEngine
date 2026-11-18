@@ -1,34 +1,23 @@
 --!nonstrict
 --[=[
-	Shared harness for the Binder specs. [BinderTestUtils.setup] boots binders the way production code
-	boots them: registered on a [BinderProvider] that is Init/Start'd through a [ServiceBag] and torn
-	down through `serviceBag:Destroy()`. Adornees are parented into a workspace container because
-	CollectionService.GetInstanceAddedSignal only fires for instances that live in the DataModel.
-
-	Tags are global and the test place is shared across a batch run, so every binder gets a distinct
-	tag from a single module-level counter -- shared across every spec file that requires this module,
-	so tags never collide between files -- and each controller cleans up after itself via `Destroy()`.
+	Helpers for specs that register binders in a [ServiceBag] with tags unique to each spec.
 
 	@class BinderTestUtils
 ]=]
 
 local require = require(script.Parent.loader).load(script)
 
+local HttpService = game:GetService("HttpService")
+
 local Binder = require("Binder")
-local BinderProvider = require("BinderProvider")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 
 local BinderTestUtils = {}
 
-local specCounter = 0
-
 --[=[
-	A minimal bound class that records its instance and whether it was destroyed. It deliberately does
-	NOT retain its constructor varargs: the ServiceBag is injected as a constructor arg, and its object
-	graph contains Quenty Signals whose strict __index makes jest's deep-equality traversal throw.
-	Keeping the class free of them lets toEqual compare instances safely.
+	Returns a bound class that records its instance and whether it was destroyed.
 
 	@return TrackingClass
 ]=]
@@ -52,20 +41,7 @@ function BinderTestUtils.makeTrackingClass()
 end
 
 --[=[
-	Returns once `inst` is no longer bound. CollectionService tag removal is synchronous here, so the
-	class is usually already gone by the time we check; the guarded wait also covers a deferred case.
-
-	@param binder Binder
-	@param inst Instance
-]=]
-function BinderTestUtils.awaitUnbound(binder, inst)
-	if binder:Get(inst) ~= nil then
-		binder:GetClassRemovedSignal():Wait()
-	end
-end
-
---[=[
-	A no-op constructor that still returns a value, so Binder's generic bound type stays inhabited.
+	A constructor that does nothing but return an empty table.
 
 	@return table
 ]=]
@@ -74,59 +50,31 @@ function BinderTestUtils.noopConstructor()
 end
 
 --[=[
-	Builds the controller the Binder specs share. Register binders with `addBinder`, boot them all at
-	once through a ServiceBag with `boot`, create adornees with `newInstance`, and tear everything down
-	with `Destroy` (or just the service bag with `destroyServiceBag`).
-
-	Fields: `container`.
-	Builders: `addBinder(constructor, ...)` -> Binder, `newInstance(parent?, className?)` -> Instance.
-	Lifecycle: `boot()`, `destroyServiceBag()`, `Destroy()`.
-	Helpers: `uniqueTag()` -> string.
+	Builds a controller that adds binders, initializes them through a [ServiceBag], and cleans up on `Destroy`.
 
 	@return { ... }
 ]=]
 function BinderTestUtils.setup()
-	specCounter += 1
-	local suffix = specCounter
-
 	local maid = Maid.new()
 
 	local serviceBag = ServiceBag.new()
-	local serviceBagDestroyed = false
+	maid._serviceBag = serviceBag
 
 	local container = Instance.new("Folder")
 	container.Name = "BinderSpecContainer"
 	container.Parent = workspace
 
 	local instances = {}
-	local pendingBinders = {}
-	local extraTagCounter = 0
-	local booted = false
 
 	local function uniqueTag()
-		extraTagCounter += 1
-		return string.format("BinderSpecTag_%d_%d", suffix, extraTagCounter)
+		return "BinderSpecTag_" .. HttpService:GenerateGUID(false)
 	end
 
 	local function addBinder(constructor, ...)
-		assert(not booted, "Cannot add a binder after boot()")
-		local binder = Binder.new(uniqueTag(), constructor, ...)
-		table.insert(pendingBinders, binder)
-		return binder
+		return serviceBag:GetService(Binder.new(uniqueTag(), constructor, ...))
 	end
 
-	local function boot()
-		assert(not booted, "Already booted")
-		booted = true
-
-		local binders = pendingBinders
-		local provider = BinderProvider.new(string.format("BinderSpecProvider_%d", suffix), function(self)
-			for _, binder in binders do
-				self:Add(binder)
-			end
-		end)
-
-		serviceBag:GetService(provider)
+	local function initServiceBag()
 		serviceBag:Init()
 		serviceBag:Start()
 	end
@@ -138,11 +86,18 @@ function BinderTestUtils.setup()
 		return inst
 	end
 
+	local function bind(binder, inst: Instance): any
+		binder:Tag(inst)
+		return assert(binder:Get(inst), "Tagging did not bind the instance")
+	end
+
+	local function unbind(binder, inst: Instance)
+		binder:Untag(inst)
+		assert(binder:Get(inst) == nil, "Untagging did not unbind the instance")
+	end
+
 	local function destroyServiceBag()
-		if not serviceBagDestroyed then
-			serviceBagDestroyed = true
-			serviceBag:Destroy()
-		end
+		maid._serviceBag = nil
 	end
 
 	maid:GiveTask(function()
@@ -157,10 +112,13 @@ function BinderTestUtils.setup()
 
 	local controller = {
 		container = container,
+		maid = maid,
 		uniqueTag = uniqueTag,
 		addBinder = addBinder,
-		boot = boot,
+		initServiceBag = initServiceBag,
 		newInstance = newInstance,
+		bind = bind,
+		unbind = unbind,
 		destroyServiceBag = destroyServiceBag,
 		Destroy = function(_self)
 			maid:DoCleaning()

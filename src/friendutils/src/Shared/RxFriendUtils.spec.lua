@@ -13,6 +13,7 @@ local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local RxFriendUtils = require("RxFriendUtils")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -40,11 +41,7 @@ local function setup()
 	end
 
 	local function trackBrios(observer: Player): { Brio.Brio<Player> }
-		local emissions: { Brio.Brio<Player> } = {}
-		maid:GiveTask(RxFriendUtils.observeFriendsInServerAsBrios(observer):Subscribe(function(brio)
-			table.insert(emissions, brio)
-		end))
-		return emissions
+		return RxTestUtils.collectList(maid, RxFriendUtils.observeFriendsInServerAsBrios(observer))
 	end
 
 	local controller = {

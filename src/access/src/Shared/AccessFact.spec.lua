@@ -11,6 +11,7 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
@@ -19,63 +20,69 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
--- A hot source a test drives by hand. Nevermore has no Subject, and a fact has to be observed while its
--- answer is still outstanding, which no cold observable lets us stage.
-local function controllable()
-	local subs: { any } = {}
+type Contributions = ObservableSpy.ObservableSpy<AccessFact.AccessFactContribution>
 
-	local observable = Observable.new(function(sub)
-		table.insert(subs, sub)
+type Source = {
+	observable: Observable.Observable<boolean?>,
+	fire: (value: boolean?) -> (),
+	fail: () -> (),
+}
 
-		return function()
-			local index = table.find(subs, sub)
-			if index then
-				table.remove(subs, index)
-			end
-		end
-	end)
+type Controller = {
+	maid: Maid.Maid,
+	serviceBag: ServiceBag.ServiceBag,
+	fakePlayer: () -> Player,
+	source: () -> Source,
+	fact: (resolver: AccessFact.AccessFactResolver) -> AccessFact.AccessFact,
+	spy: (observable: Observable.Observable<AccessFact.AccessFactContribution>) -> Contributions,
+	Destroy: (self: Controller) -> (),
+}
 
-	return observable,
-		{
-			fire = function(value: boolean?)
-				for _, sub in table.clone(subs) do
-					sub:Fire(value)
-				end
-			end,
-			fail = function()
-				for _, sub in table.clone(subs) do
-					sub:Fail("lookup exploded")
-				end
-			end,
-		}
-end
-
-local function setup()
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 
-	local controller = {
-		serviceBag = serviceBag,
+	local controller: Controller = {
 		maid = maid,
-		fakePlayer = function(): Player
-			return maid:Add(PlayerMock.new()) :: any
+		serviceBag = serviceBag,
+		fakePlayer = function()
+			return maid:Add(PlayerMock.new())
 		end,
-		fact = function(resolver: any): AccessFact.AccessFact
-			local fact = maid:Add(AccessFact.new("fact", { resolve = resolver })) :: any
+		source = function()
+			local subs: { any } = {}
+
+			local observable = Observable.new(function(sub)
+				table.insert(subs, sub)
+
+				return function()
+					local index = table.find(subs, sub)
+					if index then
+						table.remove(subs, index)
+					end
+				end
+			end)
+
+			return {
+				observable = observable,
+				fire = function(value)
+					for _, sub in table.clone(subs) do
+						sub:Fire(value)
+					end
+				end,
+				fail = function()
+					for _, sub in table.clone(subs) do
+						sub:Fail("lookup exploded")
+					end
+				end,
+			}
+		end,
+		fact = function(resolver)
+			local fact = maid:Add(AccessFact.new("fact", { resolve = resolver }))
 			fact:Init(serviceBag)
 			return fact
 		end,
-		-- A layer emits a contribution: nil for abstained, or a box whose value may itself be nil. Neither
-		-- survives a plain list, so record every emission flattened into a table that is always present.
-		record = function(observable: any): { { value: boolean?, abstained: boolean } }
-			local emitted: { { value: boolean?, abstained: boolean } } = {}
-			maid:GiveTask(observable:Subscribe(function(contribution: any)
-				table.insert(emitted, {
-					value = contribution.value,
-					abstained = contribution.state == AccessFactContributionState.ABSTAIN,
-				})
-			end))
-			return emitted
+		spy = function(observable)
+			return maid:Add(ObservableSpy.new(observable))
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -107,56 +114,50 @@ end)
 
 describe("AccessFact.ObserveForPlayer", function()
 	it("emits unresolved before the resolver has answered", function()
-		-- Otherwise combineLatest across several facts produces nothing until the slowest lookup lands, and
-		-- a live consumer renders nothing rather than "not yet known".
 		local controller = setup()
-		local source = controllable()
+		local source = controller.source()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return source
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return source.observable
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		expect(#emitted).toEqual(1)
-		expect(emitted[1].value).toEqual(nil)
+		expect(#contributions).toEqual(1)
+		expect(contributions[1].value).toEqual(nil)
 
 		controller:Destroy()
 	end)
 
 	it("emits the resolved value after the resolver answers", function()
 		local controller = setup()
-		local source, drive = controllable()
+		local source = controller.source()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return source
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
-		drive.fire(true)
+		local fact = controller.fact(function()
+			return source.observable
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
+		source.fire(true)
 
-		expect(#emitted).toEqual(2)
-		expect(emitted[2].value).toEqual(true)
+		expect(#contributions).toEqual(2)
+		expect(contributions[2].value).toEqual(true)
 
 		controller:Destroy()
 	end)
 
 	it("falls back to unresolved when a resolved fact later fails", function()
-		-- One broken mechanism must read as "no answer", not take down every feature that asked.
 		local controller = setup()
-		local source, drive = controllable()
+		local source = controller.source()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return source
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return source.observable
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		drive.fire(true)
-		expect(emitted[#emitted].value).toEqual(true)
+		source.fire(true)
+		expect(contributions:GetLastValue().value).toEqual(true)
 
-		drive.fail()
-		expect(emitted[#emitted].value).toEqual(nil)
+		source.fail()
+		expect(contributions:GetLastValue().value).toEqual(nil)
 
 		controller:Destroy()
 	end)
@@ -164,13 +165,12 @@ describe("AccessFact.ObserveForPlayer", function()
 	it("resolves a bare boolean, so a test needs no observable", function()
 		local controller = setup()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return true
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return true
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		expect(emitted[#emitted].value).toEqual(true)
+		expect(contributions:GetLastValue().value).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -179,14 +179,13 @@ describe("AccessFact.ObserveForPlayer", function()
 		local controller = setup()
 		local valueObject = controller.maid:Add(ValueObject.new(false :: boolean?))
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return valueObject
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return valueObject
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 		valueObject.Value = true
 
-		expect(emitted[#emitted].value).toEqual(true)
+		expect(contributions:GetLastValue().value).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -200,8 +199,8 @@ describe("AccessFact.ObserveForPlayer", function()
 			return true
 		end)
 
-		controller.record(fact:ObserveForPlayer(controller.fakePlayer()))
-		controller.record(fact:ObserveForPlayer(controller.fakePlayer()))
+		controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
+		controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
 		expect(#seen).toEqual(2)
 
@@ -209,7 +208,6 @@ describe("AccessFact.ObserveForPlayer", function()
 	end)
 
 	it("runs one resolver for concurrent readers of the same player", function()
-		-- The fan-in: five surfaces asking the same question must not open five copies of the lookup.
 		local controller = setup()
 		local resolveCount = 0
 
@@ -219,9 +217,9 @@ describe("AccessFact.ObserveForPlayer", function()
 		end)
 
 		local player = controller.fakePlayer()
-		controller.record(fact:ObserveForPlayer(player))
-		controller.record(fact:ObserveForPlayer(player))
-		controller.record(fact:ObserveForPlayer(player))
+		controller.spy(fact:ObserveForPlayer(player))
+		controller.spy(fact:ObserveForPlayer(player))
+		controller.spy(fact:ObserveForPlayer(player))
 
 		expect(resolveCount).toEqual(1)
 
@@ -235,7 +233,7 @@ describe("AccessFact.ObserveForPlayer", function()
 			resolve = function()
 				return true
 			end,
-		})) :: any
+		}))
 
 		expect(function()
 			fact:ObserveForPlayer(controller.fakePlayer())
@@ -250,19 +248,19 @@ describe("AccessFact.new with a value", function()
 		local controller = setup()
 		local valueObject = controller.maid:Add(ValueObject.new(true :: boolean?))
 
-		local fact = controller.maid:Add(AccessFact.new("eventIsRunning", { value = valueObject })) :: any
+		local fact = controller.maid:Add(AccessFact.new("eventIsRunning", { value = valueObject }))
 		fact:Init(controller.serviceBag)
 
-		local first = controller.record(fact:ObserveForPlayer(controller.fakePlayer()))
-		local second = controller.record(fact:ObserveForPlayer(controller.fakePlayer()))
+		local first = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
+		local second = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		expect(first[#first].value).toEqual(true)
-		expect(second[#second].value).toEqual(true)
+		expect(first:GetLastValue().value).toEqual(true)
+		expect(second:GetLastValue().value).toEqual(true)
 
 		valueObject.Value = false
 
-		expect(first[#first].value).toEqual(false)
-		expect(second[#second].value).toEqual(false)
+		expect(first:GetLastValue().value).toEqual(false)
+		expect(second:GetLastValue().value).toEqual(false)
 
 		controller:Destroy()
 	end)
@@ -270,8 +268,8 @@ end)
 
 describe("AccessFact layering", function()
 	it("defaults to the default priority and source", function()
-		local maid = Maid.new()
-		local fact = maid:Add(AccessFact.new("owns", {
+		local controller = setup()
+		local fact = controller.maid:Add(AccessFact.new("owns", {
 			resolve = function()
 				return nil
 			end,
@@ -280,12 +278,12 @@ describe("AccessFact layering", function()
 		expect(fact:GetPriority()).toEqual(AccessFactPriority.DEFAULT)
 		expect(fact:GetSource()).toEqual("default")
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("carries the priority and source it was given", function()
-		local maid = Maid.new()
-		local fact = maid:Add(AccessFact.new("owns", {
+		local controller = setup()
+		local fact = controller.maid:Add(AccessFact.new("owns", {
 			resolve = function()
 				return nil
 			end,
@@ -296,22 +294,19 @@ describe("AccessFact layering", function()
 		expect(fact:GetPriority()).toEqual(AccessFactPriority.ELEVATED)
 		expect(fact:GetSource()).toEqual("allowlist")
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 
 	it("contributes an answer of unresolved, which is not the same as abstaining", function()
-		-- The distinction the whole merge turns on: this layer answered "nobody knows", which stops the
-		-- fall-through, rather than saying nothing and letting a lower layer decide.
 		local controller = setup()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return nil
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return nil
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		expect(emitted[#emitted].abstained).toEqual(false)
-		expect(emitted[#emitted].value).toEqual(nil)
+		expect(contributions:GetLastValue().state).never.toEqual(AccessFactContributionState.ABSTAIN)
+		expect(contributions:GetLastValue().value).toEqual(nil)
 
 		controller:Destroy()
 	end)
@@ -319,13 +314,12 @@ describe("AccessFact layering", function()
 	it("abstains when the resolver returns ABSTAIN", function()
 		local controller = setup()
 
-		local emitted = controller.record(controller
-			.fact(function()
-				return AccessFact.ABSTAIN
-			end)
-			:ObserveForPlayer(controller.fakePlayer()))
+		local fact = controller.fact(function()
+			return AccessFact.ABSTAIN
+		end)
+		local contributions = controller.spy(fact:ObserveForPlayer(controller.fakePlayer()))
 
-		expect(emitted[#emitted].abstained).toEqual(true)
+		expect(contributions:GetLastValue().state).toEqual(AccessFactContributionState.ABSTAIN)
 
 		controller:Destroy()
 	end)

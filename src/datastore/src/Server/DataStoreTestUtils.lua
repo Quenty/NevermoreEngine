@@ -1,10 +1,6 @@
---!nonstrict
+--!strict
 --[=[
-	Shared setup helpers for the DataStore server specs. The two controller builders --
-	[DataStoreTestUtils.setup] (raw DataStores) and [DataStoreTestUtils.setupDataStoreManager]
-	(a [PlayerDataStoreManager]) -- each own a [Maid] and register everything they create on it, so a
-	single `controller:Destroy()` tears it all down: the stores, the auto-save loop each starts once
-	loaded, the helpers, the manager, and the service bag.
+	Shared setup helpers for the DataStore server specs.
 
 	@class DataStoreTestUtils
 ]=]
@@ -19,60 +15,87 @@ local DataStoreMock = require("DataStoreMock")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local MessagingServiceMock = require("MessagingServiceMock")
+local PlaceMessagingService = require("PlaceMessagingService")
 local PlayerDataStoreManager = require("PlayerDataStoreManager")
 local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
 local DataStoreTestUtils = {}
 
+export type ServerOptions = {
+	key: string?,
+	messaging: boolean?,
+	autoCloseOnRequest: boolean?,
+}
+
+export type DataStoreTestController = {
+	maid: Maid.Maid,
+	mock: DataStoreMock.DataStoreMock,
+	serviceBag: ServiceBag.ServiceBag,
+	newDataStore: (key: string?) -> DataStore.DataStore,
+	newSessionLockedStore: (key: string?, userIdList: { number }?) -> DataStore.DataStore,
+	newLockHelper: (key: string?) -> (DataStoreLockHelper.DataStoreLockHelper, DataStore.DataStore),
+	newMessageHelper: (
+		dataStore: DataStore.DataStore?
+	) -> (DataStoreMessageHelper.DataStoreMessageHelper, DataStore.DataStore),
+	newServer: (opts: ServerOptions?) -> (DataStore.DataStore, DataStoreMessageHelper.DataStoreMessageHelper?),
+	awaitOwn: (dataStore: DataStore.DataStore) -> boolean,
+	Destroy: (self: DataStoreTestController) -> (),
+}
+
+export type DataStoreManagerTestController = {
+	manager: PlayerDataStoreManager.PlayerDataStoreManager,
+	mock: DataStoreMock.DataStoreMock,
+	serviceBag: ServiceBag.ServiceBag,
+	bindToCloseService: BindToCloseService.BindToCloseService,
+	storeAndAwaitLock: () -> boolean,
+	Destroy: (self: DataStoreManagerTestController) -> (),
+}
+
 --[=[
-	Builds the controller the DataStore specs share: a fresh [DataStoreMock], a [ServiceBag] with an
-	in-process [MessagingServiceMock] injected (so messaging-enabled stores never touch the real
-	MessagingService), and builder methods that own everything they create on one Maid. `Destroy()`
-	tears it all down. Every builder defaults its key to `"player_1"`; pass a key to override.
+	Builds a controller over a fresh [DataStoreMock] and a [ServiceBag] with a [MessagingServiceMock]
+	injected. Everything it builds is cleaned up on `Destroy`.
 
-	Fields: `mock`, `serviceBag`.
-	Builders: `newDataStore(key?)`, `newSessionLockedStore(key?, userIdList?)`, `newLockHelper(key?)`
-	(returns `helper, dataStore`), `newMessageHelper(dataStore?)` (returns `helper, dataStore`),
-	`newServer(opts?)` (returns `dataStore, helper?`; `opts` = `{ key?, messaging?, autoCloseOnRequest? }`).
-	Helpers: `awaitOwn(dataStore)` -> boolean (loads and reports whether we own the session).
-
-	@return { ... }
+	@return DataStoreTestController
 ]=]
-function DataStoreTestUtils.setup()
+function DataStoreTestUtils.setup(): DataStoreTestController
 	local maid = Maid.new()
 
 	local mock = DataStoreMock.new()
 	local serviceBag = DataStoreTestUtils.newServiceBag(maid, MessagingServiceMock.new())
 
-	local function newDataStore(key)
+	local function newDataStore(key: string?): DataStore.DataStore
 		return DataStoreTestUtils.newDataStore(maid, mock, key or "player_1")
 	end
 
-	local function newSessionLockedStore(key, userIdList)
+	local function newSessionLockedStore(key: string?, userIdList: { number }?): DataStore.DataStore
 		return DataStoreTestUtils.newSessionLockedStore(maid, mock, key or "player_1", userIdList)
 	end
 
-	local function newLockHelper(key)
+	local function newLockHelper(key: string?): (DataStoreLockHelper.DataStoreLockHelper, DataStore.DataStore)
 		local dataStore = newDataStore(key)
 		local helper = maid:Add(DataStoreLockHelper.new(dataStore))
 		return helper, dataStore
 	end
 
-	local function newMessageHelper(dataStore)
-		dataStore = dataStore or newDataStore()
-		return DataStoreTestUtils.newMessageHelper(maid, serviceBag, dataStore), dataStore
+	local function newMessageHelper(
+		dataStore: DataStore.DataStore?
+	): (DataStoreMessageHelper.DataStoreMessageHelper, DataStore.DataStore)
+		local store = dataStore or newDataStore()
+		return DataStoreTestUtils.newMessageHelper(maid, serviceBag, store), store
 	end
 
-	local function newServer(opts)
-		opts = opts or {}
-		local dataStore = newSessionLockedStore(opts.key)
+	local function newServer(
+		opts: ServerOptions?
+	): (DataStore.DataStore, DataStoreMessageHelper.DataStoreMessageHelper?)
+		local options: ServerOptions = opts or {}
+		local dataStore = newSessionLockedStore(options.key)
 		local helper
-		if opts.messaging then
+		if options.messaging then
 			dataStore:SetSessionMessagingEnabled(true, serviceBag)
 			helper = newMessageHelper(dataStore)
 		end
-		if opts.autoCloseOnRequest then
+		if options.autoCloseOnRequest then
 			dataStore.SessionCloseRequested:Connect(function()
 				dataStore:SaveAndCloseSession()
 			end)
@@ -80,16 +103,17 @@ function DataStoreTestUtils.setup()
 		return dataStore, helper
 	end
 
-	local function awaitOwn(dataStore)
+	local function awaitOwn(dataStore: DataStore.DataStore): boolean
 		local promise = dataStore:PromiseLoadSuccessful()
 		if not PromiseTestUtils.awaitSettled(promise, 10) then
 			return false
 		end
 		local ok, loadedOk = promise:Yield()
-		return ok and loadedOk
+		return ok and loadedOk == true
 	end
 
-	local controller = {
+	local controller: DataStoreTestController = {
+		maid = maid,
 		mock = mock,
 		serviceBag = serviceBag,
 		newDataStore = newDataStore,
@@ -109,53 +133,40 @@ function DataStoreTestUtils.setup()
 end
 
 --[=[
-	Builds the controller the [PlayerDataStoreManager] specs share: a session-locked manager wired to
-	a fresh [DataStoreMock] (keyed `user_<userId>`), all owned by a Maid.
+	Builds a controller over a [PlayerDataStoreManager] backed by a fresh [DataStoreMock], keyed
+	`user_<userId>`. `Destroy` closes the game before cleaning up.
 
-	The manager is bound to close, so `Destroy()` closes the game (see [BindToCloseService.PromiseClose])
-	before it tears the objects down. The close is not optional bookkeeping: a store the spec loaded
-	keeps its auto-save loop running until something removes it, and in the shared test place that loop
-	outlives the spec and fires inside a later package's window.
-
-	Roblox fires PlayerRemoving for every player still in a closing server before the close callbacks
-	settle, so a spec modelling a shutdown calls `manager:RemovePlayerDataStore(userId)` for those
-	players and then `bindToCloseService:PromiseClose()`.
-
-	Fields: `manager`, `mock`, `serviceBag`, `bindToCloseService`.
-	Helpers: `storeAndAwaitLock()` -> boolean -- stores a value on user 1's store and waits for the
-	session-locked load to write the lock envelope.
-
-	@return { manager: PlayerDataStoreManager, mock: DataStoreMock, ... }
+	@return DataStoreManagerTestController
 ]=]
-function DataStoreTestUtils.setupDataStoreManager()
+function DataStoreTestUtils.setupDataStoreManager(): DataStoreManagerTestController
 	local maid = Maid.new()
 
 	local mock = DataStoreMock.new()
 	local serviceBag = DataStoreTestUtils.newServiceBag(maid)
-	local bindToCloseService = serviceBag:GetService(BindToCloseService)
+	local bindToCloseService: BindToCloseService.BindToCloseService = serviceBag:GetService(BindToCloseService) :: any
 
-	local manager = maid:Add(PlayerDataStoreManager.new(serviceBag, mock, function(userId)
-		return "user_" .. tostring(userId)
-	end))
+	local manager: PlayerDataStoreManager.PlayerDataStoreManager =
+		maid:Add(PlayerDataStoreManager.new(serviceBag, mock :: any, function(userId)
+			return "user_" .. tostring(userId)
+		end))
 
 	-- Returns exactly one value: specs call this straight through expect(), which rejects a second arg.
-	local function storeAndAwaitLock()
-		local dataStore = manager:GetDataStore(1)
+	local function storeAndAwaitLock(): boolean
+		local dataStore = assert(manager:GetDataStore(1), "No dataStore")
 		dataStore:Store("coins", 5)
 		-- The session-locked load acquires the lock (writes the envelope) before we remove.
-		return PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
-			return raw ~= nil and raw.lock ~= nil
-		end, 10)
+		local raw = mock:GetRaw("user_1")
+		return raw ~= nil and raw.lock ~= nil
 	end
 
-	local controller = {
+	local controller: DataStoreManagerTestController = {
 		manager = manager,
 		mock = mock,
 		serviceBag = serviceBag,
 		bindToCloseService = bindToCloseService,
 		storeAndAwaitLock = storeAndAwaitLock,
 		Destroy = function(_self)
+			-- A loaded store's auto-save loop otherwise outlives the spec and fires in a later package's window.
 			PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 			maid:DoCleaning()
 		end,
@@ -167,17 +178,19 @@ function DataStoreTestUtils.setupDataStoreManager()
 end
 
 --[=[
-	Builds a [ServiceBag] with PlaceMessagingService and [BindToCloseService] registered and
-	Init/Start'd, owned by the maid.
-	Pass a Roblox MessagingService mock to inject it into PlaceMessagingService between Init and Start.
+	Builds a started [ServiceBag] with PlaceMessagingService and [BindToCloseService], owned by the maid.
 
 	@param maid Maid
 	@param robloxMessagingService MessagingServiceMock? -- injected when provided
 	@return ServiceBag
 ]=]
-function DataStoreTestUtils.newServiceBag(maid, robloxMessagingService)
+function DataStoreTestUtils.newServiceBag(
+	maid: Maid.Maid,
+	robloxMessagingService: MessagingServiceMock.MessagingServiceMock?
+): ServiceBag.ServiceBag
 	local serviceBag = maid:Add(ServiceBag.new())
-	local placeMessagingService = serviceBag:GetService(require("PlaceMessagingService"))
+	local placeMessagingService: PlaceMessagingService.PlaceMessagingService =
+		serviceBag:GetService(PlaceMessagingService) :: any
 	serviceBag:GetService(BindToCloseService)
 	serviceBag:Init()
 	if robloxMessagingService then
@@ -195,8 +208,12 @@ end
 	@param key string
 	@return DataStore
 ]=]
-function DataStoreTestUtils.newDataStore(maid, mock, key)
-	return maid:Add(DataStore.new(mock, key))
+function DataStoreTestUtils.newDataStore(
+	maid: Maid.Maid,
+	mock: DataStoreMock.DataStoreMock,
+	key: string
+): DataStore.DataStore
+	return maid:Add(DataStore.new(mock :: any, key))
 end
 
 --[=[
@@ -208,8 +225,13 @@ end
 	@param userIdList { number }? -- defaults to { 1 }
 	@return DataStore
 ]=]
-function DataStoreTestUtils.newSessionLockedStore(maid, mock, key, userIdList)
-	local dataStore = maid:Add(DataStore.new(mock, key))
+function DataStoreTestUtils.newSessionLockedStore(
+	maid: Maid.Maid,
+	mock: DataStoreMock.DataStoreMock,
+	key: string,
+	userIdList: { number }?
+): DataStore.DataStore
+	local dataStore = DataStoreTestUtils.newDataStore(maid, mock, key)
 	dataStore:SetSessionLockingEnabled(true)
 	dataStore:SetUserIdList(userIdList or { 1 })
 	return dataStore
@@ -223,7 +245,11 @@ end
 	@param dataStore DataStore
 	@return DataStoreMessageHelper
 ]=]
-function DataStoreTestUtils.newMessageHelper(maid, serviceBag, dataStore)
+function DataStoreTestUtils.newMessageHelper(
+	maid: Maid.Maid,
+	serviceBag: ServiceBag.ServiceBag,
+	dataStore: DataStore.DataStore
+): DataStoreMessageHelper.DataStoreMessageHelper
 	return maid:Add(DataStoreMessageHelper.new(serviceBag, dataStore))
 end
 

@@ -5,120 +5,119 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
-local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
+local Rx = require("Rx")
 local RxAccessStateUtils = require("RxAccessStateUtils")
+local Signal = require("Signal")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function controllable()
-	local subs: { any } = {}
+type Controller = {
+	maid: Maid.Maid,
+	newSignal: () -> Signal.Signal<any>,
+	Destroy: (self: Controller) -> (),
+}
 
-	local observable = Observable.new(function(sub)
-		table.insert(subs, sub)
+local function setup(): Controller
+	local maid = Maid.new()
 
-		return function()
-			local index = table.find(subs, sub)
-			if index then
-				table.remove(subs, index)
-			end
-		end
-	end)
+	local controller: Controller = {
+		maid = maid,
+		newSignal = function()
+			return maid:Add(Signal.new())
+		end,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
 
-	return observable, function(value: any)
-		for _, sub in table.clone(subs) do
-			sub:Fire(value)
-		end
-	end
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("RxAccessStateUtils.ofStatic", function()
 	it("never completes, so a share cannot drop its upstream", function()
-		local maid = Maid.new()
-		local completed = false
+		local controller = setup()
 
-		maid:GiveTask(RxAccessStateUtils.ofStatic(true):Subscribe(nil, nil, function()
-			completed = true
-		end))
+		local values = controller.maid:Add(ObservableSpy.new(RxAccessStateUtils.ofStatic(true)))
 
-		expect(completed).toEqual(false)
-		maid:DoCleaning()
+		expect(values:IsComplete()).toEqual(false)
+
+		controller:Destroy()
 	end)
 
 	it("carries a nil, which no stock Rx constructor manages", function()
-		local maid = Maid.new()
-		local emissions = 0
+		local controller = setup()
 
-		maid:GiveTask(RxAccessStateUtils.ofStatic(nil):Subscribe(function(value)
-			emissions += 1
-			expect(value).toEqual(nil)
-		end))
+		local values = controller.maid:Add(ObservableSpy.new(RxAccessStateUtils.ofStatic(nil)))
 
-		expect(emissions).toEqual(1)
-		maid:DoCleaning()
+		expect(#values).toEqual(1)
+		expect(values[1]).toEqual(nil)
+
+		controller:Destroy()
 	end)
 end)
 
 describe("RxAccessStateUtils.startUnresolved", function()
 	it("emits before the source has said anything", function()
-		local maid = Maid.new()
-		local source, fire = controllable()
-		local values = {}
+		local controller = setup()
+		local source = controller.newSignal()
 
-		maid:GiveTask(source:Pipe({ RxAccessStateUtils.startUnresolved() }):Subscribe(function(value)
-			table.insert(values, { value = value })
-		end))
+		local observable = Rx.fromSignal(source):Pipe({ RxAccessStateUtils.startUnresolved() }) :: any
+		local values = controller.maid:Add(ObservableSpy.new(observable))
 
 		expect(#values).toEqual(1)
-		expect(values[1].value).toEqual(nil)
+		expect(values[1]).toEqual(nil)
 
-		fire(true)
+		source:Fire(true)
+
 		expect(#values).toEqual(2)
-		expect(values[2].value).toEqual(true)
+		expect(values[2]).toEqual(true)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 end)
 
 describe("RxAccessStateUtils.completeOn", function()
 	it("completes the stream when the notifier fires", function()
-		-- Rx.takeUntil drops the subscription without completing, which leaves a consumer unable to tell a
-		-- finished session from a quiet one.
-		local maid = Maid.new()
-		local source = controllable()
-		local notifier, fireNotifier = controllable()
-		local completed = false
+		local controller = setup()
+		local source = controller.newSignal()
+		local notifier = controller.newSignal()
 
-		maid:GiveTask(source:Pipe({ RxAccessStateUtils.completeOn(notifier) }):Subscribe(nil, nil, function()
-			completed = true
-		end))
+		local observable = Rx.fromSignal(source):Pipe({ RxAccessStateUtils.completeOn(Rx.fromSignal(notifier)) }) :: any
+		local values = controller.maid:Add(ObservableSpy.new(observable))
 
-		expect(completed).toEqual(false)
-		fireNotifier(true)
-		expect(completed).toEqual(true)
+		expect(values:IsComplete()).toEqual(false)
 
-		maid:DoCleaning()
+		notifier:Fire(true)
+
+		expect(values:IsComplete()).toEqual(true)
+
+		controller:Destroy()
 	end)
 
 	it("stops passing values through once the notifier has fired", function()
-		local maid = Maid.new()
-		local source, fireSource = controllable()
-		local notifier, fireNotifier = controllable()
-		local received = 0
+		local controller = setup()
+		local source = controller.newSignal()
+		local notifier = controller.newSignal()
 
-		maid:GiveTask(source:Pipe({ RxAccessStateUtils.completeOn(notifier) }):Subscribe(function()
-			received += 1
-		end))
+		local observable = Rx.fromSignal(source):Pipe({ RxAccessStateUtils.completeOn(Rx.fromSignal(notifier)) }) :: any
+		local values = controller.maid:Add(ObservableSpy.new(observable))
 
-		fireSource(true)
-		expect(received).toEqual(1)
+		source:Fire(true)
 
-		fireNotifier(true)
-		fireSource(true)
-		expect(received).toEqual(1)
+		expect(#values).toEqual(1)
 
-		maid:DoCleaning()
+		notifier:Fire(true)
+		source:Fire(true)
+
+		expect(#values).toEqual(1)
+
+		controller:Destroy()
 	end)
 end)

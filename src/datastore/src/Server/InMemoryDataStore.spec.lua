@@ -8,6 +8,7 @@ local DataStoreTestUtils = require("DataStoreTestUtils")
 local InMemoryDataStore = require("InMemoryDataStore")
 local Jest = require("Jest")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
@@ -143,20 +144,13 @@ local function describeSharedBehavior(caseName: string, newController)
 			local store = c.makeStore()
 
 			local maid = Maid.new()
-			local seen = {}
-			maid:GiveTask(store:Observe("coins", 0):Subscribe(function(value)
-				table.insert(seen, value)
-			end))
+			local seen = maid:Add(ObservableSpy.new(store:Observe("coins", 0)))
 
-			expect(PromiseTestUtils.awaitValue(function()
-				return #seen >= 1
-			end, 5)).toEqual(true)
+			expect(#seen >= 1).toBe(true)
 			expect(seen[1]).toEqual(0)
 
 			store:Store("coins", 7)
-			expect(PromiseTestUtils.awaitValue(function()
-				return seen[#seen] == 7
-			end, 5)).toEqual(true)
+			expect(seen[#seen]).toEqual(7)
 
 			maid:DoCleaning()
 			c:Destroy()

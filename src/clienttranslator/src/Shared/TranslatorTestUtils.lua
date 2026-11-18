@@ -18,6 +18,7 @@ local LocalizationService = game:GetService("LocalizationService")
 local RunService = game:GetService("RunService")
 
 local JSONTranslator = require("JSONTranslator")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ServiceBag = require("ServiceBag")
 local TieRealmService = require("TieRealmService")
@@ -163,7 +164,7 @@ function TranslatorTestUtils.setup(options)
 		translatorService:FlushEntriesForTesting()
 	end
 
-	return {
+	local controller = {
 		serviceBag = serviceBag,
 		translatorService = translatorService,
 		newTranslatorService = function()
@@ -191,6 +192,10 @@ function TranslatorTestUtils.setup(options)
 			TranslatorTestUtils.clearGeneratedTables()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 return TranslatorTestUtils

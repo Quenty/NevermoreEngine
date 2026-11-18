@@ -11,6 +11,7 @@ local MetricUnitDefinitions = require("MetricUnitDefinitions")
 local MetricUnitFallbackStrings = require("MetricUnitFallbackStrings")
 local MetricUnitFormatUtils = require("MetricUnitFormatUtils")
 local PluralCategoryUtils = require("PluralCategoryUtils")
+local TranslatorTestUtils = require("TranslatorTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -234,7 +235,6 @@ describe("MetricUnitTranslator", function()
 		if typeof(script) ~= "Instance" then
 			return
 		end
-		local TranslatorTestUtils = require("TranslatorTestUtils")
 		local controller = TranslatorTestUtils.setup()
 		controller.setForcedLocaleId(language)
 		local folder = (script :: any).Parent.MetricUnitTranslator

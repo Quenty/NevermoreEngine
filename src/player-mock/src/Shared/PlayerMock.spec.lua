@@ -11,6 +11,7 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -294,15 +295,13 @@ describe("PlayerMock.write", function()
 
 	it("fires GetAttributeChangedSignal for the property", function()
 		local player = PlayerMock.new()
-		local fired = false
-		local conn = player:GetAttributeChangedSignal("AccountAge"):Connect(function()
-			fired = true
-		end)
+		local maid = Maid.new()
+		local fired = SignalTestUtils.countFires(maid, player:GetAttributeChangedSignal("AccountAge"))
 
 		PlayerMock.write(player, "AccountAge", 5)
-		expect(fired).toBe(true)
+		expect(fired()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -384,19 +383,17 @@ describe("PlayerMock Character property", function()
 		local player = PlayerMock.new()
 		local first = PlayerMock.loadCharacterAsync(player, Instance.new("Model"))
 
-		local removingFired = false
-		local conn = PlayerMock.getSignal(player, "CharacterRemoving"):Connect(function()
-			removingFired = true
-		end)
+		local maid = Maid.new()
+		local removingFired = SignalTestUtils.countFires(maid, PlayerMock.getSignal(player, "CharacterRemoving"))
 
 		local morph = Instance.new("Model")
 		PlayerMock.write(player, "Character", morph)
 
-		expect(removingFired).toBe(false)
+		expect(removingFired()).toBe(0)
 		expect(first.Parent).toBe(workspace) -- old character left in place for the caller to handle
 		expect(PlayerMock.read(player, "Character")).toBe(morph)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		first:Destroy()
 		morph:Destroy()
 		player:Destroy()
@@ -406,48 +403,42 @@ describe("PlayerMock Character property", function()
 		local player = PlayerMock.new()
 		local character = PlayerMock.loadCharacterAsync(player)
 
-		local removingFired = false
-		local conn = PlayerMock.getSignal(player, "CharacterRemoving"):Connect(function(removing)
-			removingFired = removing == character
-		end)
+		local maid = Maid.new()
+		local removed = SignalTestUtils.collectFireList(maid, PlayerMock.getSignal(player, "CharacterRemoving"))
 
 		player:Destroy()
 
-		expect(removingFired).toBe(true)
+		expect(removed).toEqual({ character })
 		expect(character.Parent).toBeNil()
 
-		conn:Disconnect()
+		maid:DoCleaning()
 	end)
 end)
 
 describe("PlayerMock.getPropertyChangedSignal", function()
 	it("fires for an attribute-backed property", function()
 		local player = PlayerMock.new()
-		local fired = false
-		local conn = PlayerMock.getPropertyChangedSignal(player, "AccountAge"):Connect(function()
-			fired = true
-		end)
+		local maid = Maid.new()
+		local fired = SignalTestUtils.countFires(maid, PlayerMock.getPropertyChangedSignal(player, "AccountAge"))
 
 		PlayerMock.write(player, "AccountAge", 5)
-		expect(fired).toBe(true)
+		expect(fired()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("fires for the ObjectValue-backed Character property", function()
 		local player = PlayerMock.new()
 		local character = Instance.new("Model")
-		local fired = false
+		local maid = Maid.new()
 		-- Connected before any write, so the lazily-created backing must be the one a later write hits.
-		local conn = PlayerMock.getPropertyChangedSignal(player, "Character"):Connect(function()
-			fired = true
-		end)
+		local fired = SignalTestUtils.countFires(maid, PlayerMock.getPropertyChangedSignal(player, "Character"))
 
 		PlayerMock.write(player, "Character", character)
-		expect(fired).toBe(true)
+		expect(fired()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		character:Destroy()
 		player:Destroy()
 	end)
@@ -766,15 +757,13 @@ describe("PlayerMock.removeCharacter", function()
 
 	it("is a no-op when no character is loaded", function()
 		local player = PlayerMock.new({ UserId = 1005 })
-		local fired = false
-		local conn = PlayerMock.getSignal(player, "CharacterRemoving"):Connect(function()
-			fired = true
-		end)
+		local maid = Maid.new()
+		local fired = SignalTestUtils.countFires(maid, PlayerMock.getSignal(player, "CharacterRemoving"))
 
 		PlayerMock.removeCharacter(player)
-		expect(fired).toBe(false)
+		expect(fired()).toBe(0)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 end)
@@ -784,18 +773,16 @@ describe("PlayerMock.kick", function()
 		local player = PlayerMock.new({ UserId = 2001 })
 		player.Parent = workspace
 
-		local ancestryChangedFired = false
-		local conn = PlayerMock.getSignal(player, "AncestryChanged"):Connect(function()
-			ancestryChangedFired = true
-		end)
+		local maid = Maid.new()
+		local ancestryChangedFired = SignalTestUtils.countFires(maid, PlayerMock.getSignal(player, "AncestryChanged"))
 
 		PlayerMock.kick(player, "You are banned")
 
 		expect(PlayerMock.getKickMessage(player)).toBe("You are banned")
-		expect(ancestryChangedFired).toBe(true)
+		expect(ancestryChangedFired()).toBeGreaterThan(0)
 		expect(player.Parent).toBeNil()
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -956,18 +943,17 @@ describe("PlayerMock domains", function()
 
 	it("backs a service signal with the same instance either way the domain is written", function()
 		local player = PlayerMock.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMock.getServiceSignal(player, { "UserInputService", "WindowFocused" })
-			:Connect(function()
-				fired += 1
-			end)
+		local fired = SignalTestUtils.countFires(
+			maid,
+			PlayerMock.getServiceSignal(player, { "UserInputService", "WindowFocused" })
+		)
 		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
-		task.wait()
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -1500,49 +1486,41 @@ end)
 describe("PlayerMock.getSignal", function()
 	it("delivers fireSignal arguments to a connected handler", function()
 		local player = PlayerMock.new()
-		local messages = {}
-		local conn = PlayerMock.getSignal(player, "Chatted"):Connect(function(message, recipient)
-			table.insert(messages, { message = message, recipient = recipient })
-		end)
+		local maid = Maid.new()
+		local messages = SignalTestUtils.collectFireListTuples(maid, PlayerMock.getSignal(player, "Chatted"))
 
 		PlayerMock.fireSignal(player, "Chatted", "hello", player)
 
-		expect(#messages).toBe(1)
-		expect(messages[1].message).toBe("hello")
-		expect(messages[1].recipient).toBe(player)
+		expect(messages).toEqual({ { "hello" :: any, player } })
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("returns the same backing signal across calls", function()
 		local player = PlayerMock.new()
-		local count = 0
-		local conn = PlayerMock.getSignal(player, "Idled"):Connect(function()
-			count += 1
-		end)
+		local maid = Maid.new()
+		local count = SignalTestUtils.countFires(maid, PlayerMock.getSignal(player, "Idled"))
 
 		-- A second lookup must not create a second backing signal the fire misses.
 		PlayerMock.getSignal(player, "Idled")
 		PlayerMock.fireSignal(player, "Idled", 5)
 
-		expect(count).toBe(1)
+		expect(count()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("returns the genuine native signal for an event inherited from Instance", function()
 		local player = PlayerMock.new()
-		local fired = false
-		local conn = PlayerMock.getSignal(player, "Destroying"):Connect(function()
-			fired = true
-		end)
+		local maid = Maid.new()
+		local fired = SignalTestUtils.countFires(maid, PlayerMock.getSignal(player, "Destroying"))
 
 		player:Destroy()
 
-		expect(fired).toBe(true)
-		conn:Disconnect()
+		expect(fired()).toBe(1)
+		maid:DoCleaning()
 	end)
 
 	it("errors on a misspelled event name", function()
@@ -1565,53 +1543,49 @@ end)
 describe("PlayerMock.getServiceSignal", function()
 	it("delivers fireServiceSignal arguments to a connected handler", function()
 		local player = PlayerMock.new()
-		local focused = {}
-		local conn = PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
-			table.insert(focused, true)
-		end)
+		local maid = Maid.new()
+		local focused =
+			SignalTestUtils.countFires(maid, PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"))
 
 		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocused")
 
-		expect(#focused).toBe(1)
+		expect(focused()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("returns the same backing signal across calls", function()
 		local player = PlayerMock.new()
-		local count = 0
-		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function()
-			count += 1
-		end)
+		local maid = Maid.new()
+		local count =
+			SignalTestUtils.countFires(maid, PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"))
 
 		-- A second lookup must not create a second backing signal the fire misses.
 		PlayerMock.getServiceSignal(player, "UserInputService.InputEnded")
 		PlayerMock.fireServiceSignal(player, "UserInputService.InputEnded")
 
-		expect(count).toBe(1)
+		expect(count()).toBe(1)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("keeps domains apart", function()
 		local player = PlayerMock.new()
-		local focusedCount = 0
-		local releasedCount = 0
 		local maid = Maid.new()
 
-		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"):Connect(function()
-			focusedCount += 1
-		end))
-		maid:GiveTask(PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusReleased"):Connect(function()
-			releasedCount += 1
-		end))
+		local focusedCount =
+			SignalTestUtils.countFires(maid, PlayerMock.getServiceSignal(player, "UserInputService.WindowFocused"))
+		local releasedCount = SignalTestUtils.countFires(
+			maid,
+			PlayerMock.getServiceSignal(player, "UserInputService.WindowFocusReleased")
+		)
 
 		PlayerMock.fireServiceSignal(player, "UserInputService.WindowFocusReleased")
 
-		expect(focusedCount).toBe(0)
-		expect(releasedCount).toBe(1)
+		expect(focusedCount()).toBe(0)
+		expect(releasedCount()).toBe(1)
 
 		maid:DoCleaning()
 		player:Destroy()
@@ -1619,10 +1593,9 @@ describe("PlayerMock.getServiceSignal", function()
 
 	it("carries EnumItem arguments through intact", function()
 		local player = PlayerMock.new()
-		local seen: any = nil
-		local conn = PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"):Connect(function(inputObject)
-			seen = inputObject
-		end)
+		local maid = Maid.new()
+		local inputs: { any } =
+			SignalTestUtils.collectFireList(maid, PlayerMock.getServiceSignal(player, "UserInputService.InputEnded"))
 
 		PlayerMock.fireServiceSignal(
 			player,
@@ -1633,11 +1606,11 @@ describe("PlayerMock.getServiceSignal", function()
 			})
 		)
 
-		expect(seen).never.toBeNil()
-		expect(seen.KeyCode).toBe(Enum.KeyCode.E)
-		expect(seen.UserInputType).toBe(Enum.UserInputType.Keyboard)
+		expect(#inputs).toBe(1)
+		expect(inputs[1].KeyCode).toBe(Enum.KeyCode.E)
+		expect(inputs[1].UserInputType).toBe(Enum.UserInputType.Keyboard)
 
-		conn:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
@@ -1907,18 +1880,16 @@ describe("PlayerMock.makeInputObject", function()
 
 	it("fires GetPropertyChangedSignal('UserInputState') on SetUserInputState", function()
 		local input = PlayerMock.makeInputObject({ UserInputType = Enum.UserInputType.Gamepad1 })
+		local maid = Maid.new()
 
-		local fired = 0
-		local connection = input:GetPropertyChangedSignal("UserInputState"):Connect(function()
-			fired += 1
-		end)
+		local fired = SignalTestUtils.countFires(maid, input:GetPropertyChangedSignal("UserInputState"))
 
 		input:SetUserInputState(Enum.UserInputState.End)
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 		expect(input.UserInputState).toBe(Enum.UserInputState.End)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 	end)
 
 	it("returns the same signal per property and rejects a bad UserInputType", function()
@@ -1955,15 +1926,13 @@ describe("PlayerMock selected GUI object", function()
 		local frame = Instance.new("Frame")
 		frame.Parent = screenGui
 
-		local fired = 0
-		local connection = PlayerMock.getSelectedGuiObjectChangedSignal(player):Connect(function()
-			fired += 1
-		end)
+		local maid = Maid.new()
+		local fired = SignalTestUtils.countFires(maid, PlayerMock.getSelectedGuiObjectChangedSignal(player))
 
 		PlayerMock.setSelectedGuiObject(player, frame)
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		screenGui:Destroy()
 		player:Destroy()
 	end)
@@ -2236,7 +2205,7 @@ describe("PlayerMock.getMocks", function()
 		local player = PlayerMock.new({ UserId = 1 })
 		player.Parent = workspace
 
-		expect(table.find(PlayerMock.getMocks(), player)).never.toBeNil()
+		expect(PlayerMock.getMocks()).toContain(player)
 
 		player:Destroy()
 	end)
@@ -2244,7 +2213,7 @@ describe("PlayerMock.getMocks", function()
 	it("does not return an unparented mock", function()
 		local player = PlayerMock.new({ UserId = 1 })
 
-		expect(table.find(PlayerMock.getMocks(), player)).toBeNil()
+		expect(PlayerMock.getMocks()).never.toContain(player)
 
 		player:Destroy()
 	end)
@@ -2254,23 +2223,19 @@ describe("PlayerMock.getMocks", function()
 		player.Parent = workspace
 		player:Destroy()
 
-		expect(table.find(PlayerMock.getMocks(), player)).toBeNil()
+		expect(PlayerMock.getMocks()).never.toContain(player)
 	end)
 end)
 
 describe("PlayerMock.getMockAddedSignal", function()
 	it("fires when a mock is parented into the DataModel", function()
 		local maid = Maid.new()
-		local added = {}
-		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(function(player)
-			table.insert(added, player)
-		end))
+		local added = SignalTestUtils.collectFireList(maid, PlayerMock.getMockAddedSignal())
 
 		local player = PlayerMock.new({ UserId = 1 })
 		player.Parent = workspace
-		task.wait()
 
-		expect(table.find(added, player)).never.toBeNil()
+		expect(added).toContain(player)
 
 		maid:DoCleaning()
 		player:Destroy()
@@ -2278,17 +2243,13 @@ describe("PlayerMock.getMockAddedSignal", function()
 
 	it("does not fire for a foreign instance carrying the tag", function()
 		local maid = Maid.new()
-		local added = {}
-		maid:GiveTask(PlayerMock.getMockAddedSignal():Connect(function(player)
-			table.insert(added, player)
-		end))
+		local added = SignalTestUtils.collectFireList(maid, PlayerMock.getMockAddedSignal())
 
 		local imposter = Instance.new("Configuration")
 		imposter:AddTag(PlayerMock.TAG)
 		imposter.Parent = workspace
-		task.wait()
 
-		expect(table.find(added, imposter :: any)).toBeNil()
+		expect(added).never.toContain(imposter :: any)
 
 		maid:DoCleaning()
 		imposter:Destroy()
@@ -2298,36 +2259,26 @@ end)
 describe("PlayerMock.getMockRemovingSignal", function()
 	it("fires when a mock is destroyed", function()
 		local maid = Maid.new()
-		local removed = {}
-		maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(function(player)
-			table.insert(removed, player)
-		end))
+		local removed = SignalTestUtils.collectFireList(maid, PlayerMock.getMockRemovingSignal())
 
 		local player = PlayerMock.new({ UserId = 1 })
 		player.Parent = workspace
-		task.wait()
 		player:Destroy()
-		task.wait()
 
-		expect(table.find(removed, player)).never.toBeNil()
+		expect(removed).toContain(player)
 
 		maid:DoCleaning()
 	end)
 
 	it("fires when a mock is kicked, which unparents rather than destroys it", function()
 		local maid = Maid.new()
-		local removed = {}
-		maid:GiveTask(PlayerMock.getMockRemovingSignal():Connect(function(player)
-			table.insert(removed, player)
-		end))
+		local removed = SignalTestUtils.collectFireList(maid, PlayerMock.getMockRemovingSignal())
 
 		local player = PlayerMock.new({ UserId = 1 })
 		player.Parent = workspace
-		task.wait()
 		PlayerMock.kick(player, "Kicked by a test")
-		task.wait()
 
-		expect(table.find(removed, player)).never.toBeNil()
+		expect(removed).toContain(player)
 
 		maid:DoCleaning()
 		player:Destroy()

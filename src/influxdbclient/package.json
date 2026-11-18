@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/httppromise": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/jsonutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
@@ -42,7 +43,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"
