@@ -52,6 +52,7 @@ export type PlayerSettings =
 			_serviceBag: ServiceBag.ServiceBag,
 			_remoting: RemotingLike,
 			_settingsDataService: SettingsDataServiceLike,
+			_expectedTypes: { [string]: string },
 		},
 		{} :: typeof({ __index = PlayerSettings })
 	))
@@ -64,6 +65,7 @@ function PlayerSettings.new(folder: Folder, serviceBag: ServiceBag.ServiceBag): 
 
 	self._serviceBag = assert(serviceBag, "No serviceBag")
 	self._settingsDataService = self._serviceBag:GetService(SettingsDataService) :: any
+	self._expectedTypes = {}
 
 	self:_setupRemoting()
 
@@ -91,6 +93,8 @@ function PlayerSettings.EnsureInitialized<T>(self: PlayerSettings, settingName: 
 	if type(defaultValue) == "string" then
 		assert(DataStoreStringUtils.isValidUTF8(defaultValue), "Bad UTF8 defaultValue")
 	end
+
+	self._expectedTypes[settingName] = typeof(PlayerSettingsUtils.encodeForAttribute(defaultValue))
 
 	if self._obj:GetAttribute(attributeName) == nil then
 		local encoded = PlayerSettingsUtils.encodeForAttribute(defaultValue)
@@ -127,8 +131,9 @@ function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap: Setti
 		end
 
 		local attributeName = PlayerSettingsUtils.getAttributeName(settingName)
+		local currentAttribute = self._obj:GetAttribute(attributeName)
 
-		if self._obj:GetAttribute(attributeName) == nil then
+		if currentAttribute == nil then
 			warn(
 				`[PlayerSettings] - Cannot set setting {attributeName} on attribute that is not defined on the server. Be sure to initialize settings on both server + client.`
 			)
@@ -145,6 +150,21 @@ function PlayerSettings._setSettingsMap(self: PlayerSettings, settingsMap: Setti
 
 		local decoded = PlayerSettingsUtils.decodeForNetwork(value)
 		local encodedAttribute = PlayerSettingsUtils.encodeForAttribute(decoded)
+
+		-- Paranoid type check. A value the data store can't hold stops all settings from saving.
+		local expectedType = self._expectedTypes[settingName] or typeof(currentAttribute)
+		if encodedAttribute ~= nil and typeof(encodedAttribute) ~= expectedType then
+			warn(string.format("[PlayerSettings] - Wrong value type for %q. Skipping setting.", settingName))
+			continue
+		end
+
+		if
+			type(encodedAttribute) == "number"
+			and (encodedAttribute ~= encodedAttribute or math.abs(encodedAttribute) == math.huge)
+		then
+			warn(string.format("[PlayerSettings] - Bad number for %q. Skipping setting.", settingName))
+			continue
+		end
 
 		if type(encodedAttribute) == "string" then
 			-- Paranoid UTF8 check. Avoid letting this value be set.
