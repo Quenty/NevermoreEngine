@@ -34,6 +34,7 @@ export class InitPluginCommand<T> implements CommandModule<T, initGameArgs> {
 
   public handler = async (args: initGameArgs) => {
     const rawPluginName = await InitPluginCommand._ensurePluginName(args);
+    await InitGameCommand.ensurePnpmAvailableAsync(args);
 
     const pluginName = TemplateHelper.toPackageName(rawPluginName);
     const pluginNameProper = TemplateHelper.camelize(rawPluginName);
