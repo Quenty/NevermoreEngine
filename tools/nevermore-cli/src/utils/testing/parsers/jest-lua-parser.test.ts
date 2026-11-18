@@ -304,7 +304,19 @@ describe('parseJestLuaOutput', () => {
     expect(result).toEqual([]);
   });
 
-  it('finds an aliased it() call by its quoted test name', () => {
+  it('finds an aliased it() call by its quoted test name', async () => {
+    // Look the line up rather than hardcoding it, so edits to the real spec don't break this test.
+    const { readFileSync } = await vi.importActual<typeof import('fs')>('fs');
+    const specLines = readFileSync(
+      `${REPO_ROOT}src/brine/src/Shared/Brine.spec.lua`,
+      'utf8'
+    ).split(/\r?\n/);
+    const expectedLine =
+      specLines.findIndex((line) =>
+        line.includes('it.skip("propagates a tag added after subscribe"')
+      ) + 1;
+    expect(expectedLine).toBeGreaterThan(0);
+
     const input = [
       '  ● Brine.serialize / Brine.deserialize roundtrip › propagates a tag added after subscribe',
       '',
@@ -320,7 +332,7 @@ describe('parseJestLuaOutput', () => {
     });
 
     expect(result[0].file).toBe('src/brine/src/Shared/Brine.spec.lua');
-    expect(result[0].line).toBe(495);
+    expect(result[0].line).toBe(expectedLine);
   });
 
   it('falls back to the enclosing describe for a generated test name', () => {
