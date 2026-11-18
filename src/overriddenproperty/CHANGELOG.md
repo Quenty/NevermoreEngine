@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.18.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/overriddenproperty@10.18.3...@quenty/overriddenproperty@10.18.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/overriddenproperty
+
 ## [10.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/overriddenproperty@10.18.2...@quenty/overriddenproperty@10.18.3) (2026-10-20)
 
 **Note:** Version bump only for package @quenty/overriddenproperty

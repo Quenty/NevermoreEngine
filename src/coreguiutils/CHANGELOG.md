@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.28.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguiutils@10.28.1...@quenty/coreguiutils@10.28.2) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/coreguiutils
+
 ## [10.28.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/coreguiutils@10.28.0...@quenty/coreguiutils@10.28.1) (2026-10-20)
 
 **Note:** Version bump only for package @quenty/coreguiutils

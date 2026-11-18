@@ -1,21 +1,11 @@
-# v3.9.4 (Wed Nov 18 2026)
-
-#### 🐛 Bug Fix
-
-- test: Faster, deterministic tests with shared test utils [#864](https://github.com/Quenty/NevermoreEngine/pull/864) ([@Quenty](https://github.com/Quenty))
-- test: Replace frame waits and real delays with fake timers in animation and timer specs ([@Quenty](https://github.com/Quenty))
-- test: Upgrade jest-lua version to timer-safe version ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.9.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.9.3...@quenty/steputils@3.9.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/steputils
 
 ## [3.9.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/steputils@3.9.2...@quenty/steputils@3.9.3) (2026-10-20)
 

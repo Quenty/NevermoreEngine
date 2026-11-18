@@ -1,20 +1,11 @@
-# v7.52.3 (Wed Nov 18 2026)
-
-#### 🐛 Bug Fix
-
-- test: Faster, deterministic tests with shared test utils [#864](https://github.com/Quenty/NevermoreEngine/pull/864) ([@Quenty](https://github.com/Quenty))
-- test: Upgrade jest-lua version to timer-safe version ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [7.52.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.52.2...@quenty/elo@7.52.3) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/elo
 
 ## [7.52.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/elo@7.52.1...@quenty/elo@7.52.2) (2026-11-03)
 
