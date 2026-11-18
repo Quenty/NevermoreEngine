@@ -1,3 +1,15 @@
+# v4.53.2 (Wed Nov 18 2026)
+
+#### 🐛 Bug Fix
+
+- fix(nevermore-cli): Stop reinstalling pnpm globally during init [#865](https://github.com/Quenty/NevermoreEngine/pull/865) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
