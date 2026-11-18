@@ -43,6 +43,7 @@
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/observablecollection": "workspace:*",
+    "@quenty/promise": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxbinderutils": "workspace:*",

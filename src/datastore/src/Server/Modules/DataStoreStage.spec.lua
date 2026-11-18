@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStore = require("DataStore")
 local DataStoreMock = require("DataStoreMock")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
 local Rx = require("Rx")
@@ -211,42 +212,28 @@ describe("DataStoreStage staging (through a DataStore root)", function()
 		it("should fire the observer with the new value after a Store on a key", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			local captured
-			local sub = dataStore:Observe("coins", 0):Subscribe(function(value)
-				captured = value
-			end)
+			local capturedValues = ObservableSpy.new(dataStore:Observe("coins", 0))
 
 			dataStore:Store("coins", 42)
 
-			expect(PromiseTestUtils.awaitValue(function()
-				return captured == 42
-			end)).toEqual(true)
+			expect(capturedValues:GetLastValue()).toEqual(42)
 
-			sub:Destroy()
+			capturedValues:Destroy()
 			dataStore:Destroy()
 		end)
 
 		it("should fire the whole-view observer with the new snapshot after a Store", function()
 			local dataStore = DataStore.new(DataStoreMock.new(), "player_1")
 
-			local emissions = 0
-			local captured
-			local sub = dataStore:Observe():Subscribe(function(snapshot)
-				emissions += 1
-				captured = snapshot
-			end)
+			local capturedValues = ObservableSpy.new(dataStore:Observe())
 
-			expect(PromiseTestUtils.awaitValue(function()
-				return emissions >= 1
-			end)).toEqual(true)
+			expect(#capturedValues >= 1).toBe(true)
 
 			dataStore:Store("coins", 1)
 
-			expect(PromiseTestUtils.awaitValue(function()
-				return type(captured) == "table" and captured.coins == 1
-			end)).toEqual(true)
+			expect(capturedValues:GetLastValue().coins).toEqual(1)
 
-			sub:Destroy()
+			capturedValues:Destroy()
 			dataStore:Destroy()
 		end)
 	end)

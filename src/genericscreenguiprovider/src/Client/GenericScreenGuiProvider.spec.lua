@@ -7,7 +7,9 @@ local require = require(script.Parent.loader).load(script)
 
 local GenericScreenGuiProvider = require("GenericScreenGuiProvider")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -16,6 +18,8 @@ local it = Jest.Globals.it
 
 local function setup(orders: { [string]: number })
 	local serviceBag = ServiceBag.new()
+	JestUtils.afterThis(serviceBag)
+
 	local provider = serviceBag:GetService(GenericScreenGuiProvider.new(orders))
 	serviceBag:Init()
 	serviceBag:Start()
@@ -98,12 +102,9 @@ describe("GenericScreenGuiProvider.ObserveDisplayOrder", function()
 		local serviceBag, provider = setup({ FOO = 5 })
 		local maid = Maid.new()
 
-		local observed: number? = nil
-		maid:GiveTask(provider:ObserveDisplayOrder("FOO"):Subscribe(function(value: number)
-			observed = value
-		end))
+		local observedValues = maid:Add(ObservableSpy.new(provider:ObserveDisplayOrder("FOO")))
 
-		expect(observed).toBe(5)
+		expect(observedValues:GetLastValue()).toBe(5)
 
 		maid:DoCleaning()
 		serviceBag:Destroy()

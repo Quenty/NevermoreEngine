@@ -11,6 +11,7 @@ local CoreGuiEnabler = require("CoreGuiEnabler")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 
 local describe = Jest.Globals.describe
@@ -80,17 +81,14 @@ describe("CoreGuiEnabler.ObserveIsEnabled", function()
 	it("emits the current state immediately and again on change", function()
 		setupLocalPlayer()
 		local key = {}
-		local seen = {}
 
-		local sub = CoreGuiEnabler:ObserveIsEnabled(Enum.CoreGuiType.EmotesMenu):Subscribe(function(isEnabled)
-			table.insert(seen, isEnabled)
-		end)
+		local seen = ObservableSpy.new(CoreGuiEnabler:ObserveIsEnabled(Enum.CoreGuiType.EmotesMenu))
 
 		CoreGuiEnabler:Disable(key, Enum.CoreGuiType.EmotesMenu)
 		CoreGuiEnabler:Enable(key, Enum.CoreGuiType.EmotesMenu)
 
-		expect(seen).toEqual({ true, false, true })
+		expect(seen.Values).toEqual({ true, false, true })
 
-		sub:Destroy()
+		seen:Destroy()
 	end)
 end)

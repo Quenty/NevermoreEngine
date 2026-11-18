@@ -17,12 +17,19 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
---[[
-	Commands are registered directly rather than through Start. CmdrService rejects its cmdr promise outright
-	when the game is not running, so Start in a test registers nothing at all, silently. A stand-in that keeps
-	the callbacks reaches what is actually worth asserting: what a handler does with the list Cmdr parsed.
-]]
-local function setup()
+type Command = {
+	definition: any,
+	run: (context: any, ...any) -> string,
+}
+
+type Controller = {
+	accessPolicyService: AccessPolicyService.AccessPolicyService,
+	command: (name: string) -> Command,
+	registerPolicy: (policyName: string) -> (),
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService = serviceBag:GetService(AccessDataService)
@@ -31,7 +38,7 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local commands = {}
+	local commands: { [string]: Command } = {}
 	local service = setmetatable({
 		_maid = maid,
 		_accessDataService = accessDataService,
@@ -45,12 +52,12 @@ local function setup()
 
 	service:_registerCommands()
 
-	local controller = {
+	local controller: Controller = {
 		accessPolicyService = accessPolicyService,
-		command = function(name: string): any
+		command = function(name)
 			return assert(commands[name], `No command registered named {name}`)
 		end,
-		registerPolicy = function(policyName: string)
+		registerPolicy = function(policyName)
 			maid:GiveTask(accessPolicyService:RegisterPolicy(maid:Add(AccessPolicy.new(serviceBag, {
 				policyName = policyName,
 				apply = function()
@@ -103,15 +110,13 @@ describe("access-policy", function()
 	end)
 
 	it("switches nothing at all when one name in the list is not registered", function()
-		-- SetPolicyEnabled throws on an unregistered name, so toggling as it goes would leave the policies
-		-- before the bad one switched and the console showing an error instead of what it managed to do.
 		local controller = setup()
 		controller.registerPolicy("kickOnNonAdmin")
 
 		local result = controller.command("access-policy").run(nil, { "kickOnNonAdmin", "nosuch" }, "on")
 
 		expect(controller.accessPolicyService:IsPolicyEnabled("kickOnNonAdmin")).toEqual(false)
-		expect(string.find(result, "nosuch") ~= nil).toEqual(true)
+		expect(result).toContain("nosuch")
 
 		controller:Destroy()
 	end)

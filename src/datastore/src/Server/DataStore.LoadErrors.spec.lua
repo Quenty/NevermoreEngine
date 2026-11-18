@@ -6,11 +6,13 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 describe("shared load promise fan-out", function()
 	it("delivers the resolution to every consumer of the shared load", function()
@@ -29,9 +31,6 @@ describe("shared load promise fan-out", function()
 			all = value
 		end)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return valueA ~= nil and valueB ~= nil and all ~= nil
-		end, 5)).toEqual(true)
 		expect(valueA).toEqual(1)
 		expect(valueB).toEqual(2)
 		expect(all).toEqual({ a = 1, b = 2 })
@@ -45,19 +44,14 @@ describe("shared load promise fan-out", function()
 		controller.mock:SetYieldTime(0.3)
 		local dataStore = controller.newDataStore("key")
 
-		local results = {}
+		local loads = {}
 		for i = 1, 3 do
-			dataStore:Load("a"):Then(function(value)
-				results[i] = value
-			end)
+			loads[i] = dataStore:Load("a")
 		end
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return results[1] ~= nil and results[2] ~= nil and results[3] ~= nil
-		end, 5)).toEqual(true)
-		expect(results[1]).toEqual(1)
-		expect(results[2]).toEqual(1)
-		expect(results[3]).toEqual(1)
+		for _, load in loads do
+			expect(PromiseTestUtils.awaitFulfilled(load)).toEqual(1)
+		end
 
 		controller:Destroy()
 	end)
@@ -75,9 +69,7 @@ describe("shared load promise fan-out", function()
 			bRejected = true
 		end)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return aRejected and bRejected
-		end, 5)).toEqual(true)
+		expect(aRejected and bRejected).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -91,33 +83,26 @@ describe("auto-save loop", function()
 
 		dataStore:Store("coins", 5)
 
-		local saved = PromiseTestUtils.awaitValue(function()
-			local raw = controller.mock:GetRaw("key")
-			return raw ~= nil and raw.coins == 5
-		end, 6)
-		expect(saved).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore.Saving:Wait())
+		expect(controller.mock:GetRaw("key").coins).toEqual(5)
 
 		controller:Destroy()
 	end)
 
 	it("stops auto-saving after the datastore is destroyed", function()
+		JestUtils.useFakeTimers()
 		local controller = DataStoreTestUtils.setup()
 		local dataStore = controller.newDataStore("key")
 		dataStore:SetAutoSaveTimeSeconds(0.2)
 		dataStore:Store("coins", 5)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = controller.mock:GetRaw("key")
-			return raw ~= nil and raw.coins == 5
-		end, 6)).toEqual(true)
+		jest.advanceTimersByTime(250)
+		expect(controller.mock:GetRaw("key").coins).toEqual(5)
 
 		dataStore:Destroy()
 
 		local before = controller.mock:GetCallCount("UpdateAsync")
-		local settled = PromiseTestUtils.awaitValue(function()
-			return false
-		end, 1)
-		expect(settled).toEqual(false)
+		jest.advanceTimersByTime(1000)
 		expect(controller.mock:GetCallCount("UpdateAsync")).toEqual(before)
 
 		controller:Destroy()

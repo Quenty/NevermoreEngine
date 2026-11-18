@@ -20,7 +20,7 @@ local it = Jest.Globals.it
 
 -- Drains the removals a test left in flight, so none of them settle during teardown. Note that this
 -- also *removes* every remaining store, so it belongs at the end of a test and nowhere else.
-local function settleSaves(controller): ()
+local function settleSaves(controller: DataStoreTestUtils.DataStoreManagerTestController): ()
 	expect(PromiseTestUtils.awaitSettled(controller.manager:PromiseAllSaves(), 10)).toEqual(true)
 end
 

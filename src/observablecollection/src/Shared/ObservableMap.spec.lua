@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local Maid = require("Maid")
 local ObservableMap = require("ObservableMap")
+local ObservableSpy = require("ObservableSpy")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -75,30 +76,25 @@ describe("ObservableMap.new()", function()
 	end)
 
 	it("should fire off events for a specific key", function()
-		local seen = {}
-		local sub = observableMap:ObserveValueForKey("c"):Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableMap:ObserveValueForKey("c"))
 		observableMap:Set("c", "Hello")
 
-		sub:Destroy()
+		seen:Destroy()
 
-		expect(#seen).toEqual(1)
-		expect(seen[1]).toEqual("Hello")
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toBeNil()
+		expect(seen[2]).toEqual("Hello")
 	end)
 
 	it("should fire off events for all keys", function()
-		local seen = {}
-		local sub = observableMap:ObserveValuesBrio():Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableMap:ObserveValuesBrio())
 		observableMap:Set("d", "Hello")
 
 		expect(#seen).toEqual(4)
 		expect(seen[4]:GetValue()).toEqual("Hello")
 		expect(seen[4]:IsDead()).toEqual(false)
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(4)
 		expect(seen[4]:IsDead()).toEqual(true)

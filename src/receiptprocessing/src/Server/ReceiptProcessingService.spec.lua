@@ -9,6 +9,7 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local ReceiptProcessingService = require("ReceiptProcessingService")
 local ServiceBag = require("ServiceBag")
@@ -36,6 +37,8 @@ local function setup()
 	local service = serviceBag:GetService(ReceiptProcessingService) :: any
 
 	serviceBag:Init()
+
+	maid:GiveTask(JestUtils.afterThis(maid))
 
 	return {
 		maid = maid,

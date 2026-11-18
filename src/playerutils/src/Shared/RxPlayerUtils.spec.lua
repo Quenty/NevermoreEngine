@@ -7,8 +7,11 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
+local RxBrioTestUtils = require("RxBrioTestUtils")
 local RxPlayerUtils = require("RxPlayerUtils")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -18,19 +21,6 @@ local TEST_USER_ID = 8675309
 
 local function isTestPlayer(player: Player): boolean
 	return PlayerMock.isMock(player) and PlayerMock.read(player, "UserId") == TEST_USER_ID
-end
-
-local function findLivingBrio(brios: { any }, value: any): any
-	for _, brio in brios do
-		if not brio:IsDead() and brio:GetValue() == value then
-			return brio
-		end
-	end
-	return nil
-end
-
-local function contains(values: { any }, value: any): boolean
-	return table.find(values, value) ~= nil
 end
 
 local function setup(): any
@@ -46,18 +36,7 @@ local function setup(): any
 		designateLocalPlayer = function(player: Player?)
 			maid:GiveTask(PlayerMock.setMockedLocalPlayer(player))
 		end,
-		record = function(observable: any): { any }
-			local values = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-			return values
-		end,
-		awaitCount = function(values: { any }, count: number): boolean
-			return PromiseTestUtils.awaitValue(function()
-				return #values >= count
-			end)
-		end,
+		maid = maid,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -73,10 +52,10 @@ describe("RxPlayerUtils.observePlayers", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local players = controller.record(RxPlayerUtils.observePlayers())
+		local players = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observePlayers())
 
-		expect(controller.awaitCount(players, 1)).toBe(true)
-		expect(contains(players, player)).toBe(true)
+		expect(#players >= 1).toBe(true)
+		expect(players).toContain(player)
 
 		controller:Destroy()
 	end)
@@ -84,11 +63,11 @@ describe("RxPlayerUtils.observePlayers", function()
 	it("emits a mock that joins after subscribing", function()
 		local controller = setup()
 
-		local players = controller.record(RxPlayerUtils.observePlayers())
+		local players = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observePlayers())
 		local player = controller.newPlayer()
 
-		expect(controller.awaitCount(players, 1)).toBe(true)
-		expect(contains(players, player)).toBe(true)
+		expect(#players >= 1).toBe(true)
+		expect(players).toContain(player)
 
 		controller:Destroy()
 	end)
@@ -98,11 +77,11 @@ describe("RxPlayerUtils.observePlayers", function()
 
 		local rejected = controller.newPlayer({ UserId = TEST_USER_ID + 1 })
 		local accepted = controller.newPlayer()
-		local players = controller.record(RxPlayerUtils.observePlayers(isTestPlayer))
+		local players = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observePlayers(isTestPlayer))
 
-		expect(controller.awaitCount(players, 1)).toBe(true)
-		expect(contains(players, accepted)).toBe(true)
-		expect(contains(players, rejected)).toBe(false)
+		expect(#players >= 1).toBe(true)
+		expect(players).toContain(accepted)
+		expect(players).never.toContain(rejected)
 
 		controller:Destroy()
 	end)
@@ -113,10 +92,10 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observePlayersBrio(isTestPlayer))
+		local alivePlayers =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observePlayersBrio(isTestPlayer))
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, player)).never.toBeNil()
+		expect(alivePlayers).toContain(player)
 
 		controller:Destroy()
 	end)
@@ -124,11 +103,11 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 	it("emits a living brio for a mock that joins after subscribing", function()
 		local controller = setup()
 
-		local brios = controller.record(RxPlayerUtils.observePlayersBrio(isTestPlayer))
+		local alivePlayers =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observePlayersBrio(isTestPlayer))
 		local player = controller.newPlayer()
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, player)).never.toBeNil()
+		expect(alivePlayers).toContain(player)
 
 		controller:Destroy()
 	end)
@@ -137,15 +116,13 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observePlayersBrio(isTestPlayer))
-		expect(controller.awaitCount(brios, 1)).toBe(true)
+		local alivePlayers =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observePlayersBrio(isTestPlayer))
 
-		local brio = findLivingBrio(brios, player)
+		expect(alivePlayers).toContain(player)
 		player:Destroy()
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return brio:IsDead()
-		end)).toBe(true)
+		expect(alivePlayers).never.toContain(player)
 
 		controller:Destroy()
 	end)
@@ -154,16 +131,14 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observePlayersBrio(isTestPlayer))
-		expect(controller.awaitCount(brios, 1)).toBe(true)
+		local alivePlayers =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observePlayersBrio(isTestPlayer))
 
-		local brio = findLivingBrio(brios, player)
+		expect(alivePlayers).toContain(player)
 		-- A kick unparents rather than destroys, which is what drops the mock out of the game
 		PlayerMock.kick(player, "Kicked by a test")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return brio:IsDead()
-		end)).toBe(true)
+		expect(alivePlayers).never.toContain(player)
 
 		controller:Destroy()
 	end)
@@ -173,10 +148,10 @@ describe("RxPlayerUtils.observePlayersBrio", function()
 
 		local rejected = controller.newPlayer({ UserId = TEST_USER_ID + 1 })
 		controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observePlayersBrio(isTestPlayer))
+		local alivePlayers =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observePlayersBrio(isTestPlayer))
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, rejected)).toBeNil()
+		expect(alivePlayers).never.toContain(rejected)
 
 		controller:Destroy()
 	end)
@@ -187,11 +162,10 @@ describe("RxPlayerUtils.observeCharactersBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observeCharactersBrio())
+		local aliveCharacters = RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observeCharactersBrio())
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, character)).never.toBeNil()
+		expect(aliveCharacters).toContain(character)
 
 		controller:Destroy()
 	end)
@@ -200,16 +174,13 @@ describe("RxPlayerUtils.observeCharactersBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observeCharactersBrio())
+		local aliveCharacters = RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observeCharactersBrio())
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
-		expect(controller.awaitCount(brios, 1)).toBe(true)
 
-		local brio = findLivingBrio(brios, character)
+		expect(aliveCharacters).toContain(character)
 		PlayerMock.removeCharacter(player)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return brio:IsDead()
-		end)).toBe(true)
+		expect(aliveCharacters).never.toContain(character)
 
 		controller:Destroy()
 	end)
@@ -220,11 +191,10 @@ describe("RxPlayerUtils.observeHumanoidsBrio", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observeHumanoidsBrio())
+		local aliveHumanoids = RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observeHumanoidsBrio())
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, character:FindFirstChildOfClass("Humanoid"))).never.toBeNil()
+		expect(aliveHumanoids).toContain(character:FindFirstChildOfClass("Humanoid"))
 
 		controller:Destroy()
 	end)
@@ -235,7 +205,7 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 		local controller = setup()
 
 		controller.newPlayer()
-		local brios = controller.record(RxPlayerUtils.observeLocalPlayerBrio())
+		local brios = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observeLocalPlayerBrio())
 
 		expect(#brios).toBe(0)
 
@@ -247,9 +217,9 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 
 		local player = controller.newPlayer()
 		controller.designateLocalPlayer(player)
-		local brios = controller.record(RxPlayerUtils.observeLocalPlayerBrio())
+		local brios = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observeLocalPlayerBrio())
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
+		expect(#brios >= 1).toBe(true)
 		expect(brios[1]:GetValue()).toBe(player)
 
 		controller:Destroy()
@@ -258,11 +228,11 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 	it("emits a living brio for a mock designated after subscribing", function()
 		local controller = setup()
 
-		local brios = controller.record(RxPlayerUtils.observeLocalPlayerBrio())
+		local brios = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observeLocalPlayerBrio())
 		local player = controller.newPlayer()
 		controller.designateLocalPlayer(player)
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
+		expect(#brios >= 1).toBe(true)
 		expect(brios[1]:GetValue()).toBe(player)
 
 		controller:Destroy()
@@ -273,14 +243,12 @@ describe("RxPlayerUtils.observeLocalPlayerBrio", function()
 
 		local player = controller.newPlayer()
 		controller.designateLocalPlayer(player)
-		local brios = controller.record(RxPlayerUtils.observeLocalPlayerBrio())
-		expect(controller.awaitCount(brios, 1)).toBe(true)
+		local brios = RxTestUtils.collectList(controller.maid, RxPlayerUtils.observeLocalPlayerBrio())
+		expect(#brios >= 1).toBe(true)
 
 		PlayerMock.setMockedLocalPlayer(nil)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return brios[1]:IsDead()
-		end)).toBe(true)
+		expect(brios[1]:IsDead()).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -292,11 +260,11 @@ describe("RxPlayerUtils.observeLocalPlayerHumanoidBrio", function()
 
 		local player = controller.newPlayer()
 		controller.designateLocalPlayer(player)
-		local brios = controller.record(RxPlayerUtils.observeLocalPlayerHumanoidBrio())
+		local aliveHumanoids =
+			RxBrioTestUtils.collectAliveList(controller.maid, RxPlayerUtils.observeLocalPlayerHumanoidBrio())
 		local character = PlayerMock.loadMinimalCharacterAsync(player)
 
-		expect(controller.awaitCount(brios, 1)).toBe(true)
-		expect(findLivingBrio(brios, character:FindFirstChildOfClass("Humanoid"))).never.toBeNil()
+		expect(aliveHumanoids).toContain(character:FindFirstChildOfClass("Humanoid"))
 
 		controller:Destroy()
 	end)
@@ -307,7 +275,8 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local fires = controller.record(RxPlayerUtils.observeFirstAppearanceLoaded(player))
+		local fires =
+			RxTestUtils.collectList(controller.maid, RxPlayerUtils.observeFirstAppearanceLoaded(player) :: any)
 
 		expect(#fires).toBe(0)
 
@@ -333,9 +302,7 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 
 		PlayerMock.loadMinimalCharacterAsync(player)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return fired == 1 and completed
-		end)).toBe(true)
+		expect(fired == 1 and completed).toBe(true)
 
 		maid:DoCleaning()
 		controller:Destroy()
@@ -371,17 +338,15 @@ describe("RxPlayerUtils.observeFirstAppearanceLoaded", function()
 		local controller = setup()
 
 		local player = controller.newPlayer()
-		local failure: any = nil
+		local failure = Promise.new()
 		local maid = Maid.new()
 		maid:GiveTask(RxPlayerUtils.observeFirstAppearanceLoaded(player):Subscribe(nil, function(err)
-			failure = err
+			failure:Resolve(err)
 		end))
 
 		PlayerMock.kick(player, "Kicked by a test")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return failure ~= nil
-		end)).toBe(true)
+		expect(PromiseTestUtils.awaitFulfilled(failure)).never.toBeNil()
 
 		maid:DoCleaning()
 		controller:Destroy()

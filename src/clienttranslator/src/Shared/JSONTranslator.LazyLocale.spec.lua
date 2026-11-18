@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local HttpService = game:GetService("HttpService")
 
 local Jest = require("Jest")
+local PromiseTestUtils = require("PromiseTestUtils")
 local TieRealms = require("TieRealms")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 
@@ -164,8 +165,7 @@ describe("JSONTranslator instance loading off the client", function()
 		})
 		controller.newTranslatorFromInstance(folder)
 
-		local isFulfilled = controller.translatorService:PromiseLoadAllLocales():Yield()
-		expect(isFulfilled).toBe(true)
+		PromiseTestUtils.awaitFulfilled(controller.translatorService:PromiseLoadAllLocales())
 
 		local entry = TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"]
 		expect(entry.Values["en"]).toBe("Hello")
@@ -178,8 +178,7 @@ describe("JSONTranslator instance loading off the client", function()
 
 		controller.newTranslator({ greeting = "Hello" })
 
-		local isFulfilled = controller.translatorService:PromiseLoadAllLocales():Yield()
-		expect(isFulfilled).toBe(true)
+		PromiseTestUtils.awaitFulfilled(controller.translatorService:PromiseLoadAllLocales())
 
 		expect(TranslatorTestUtils.getEntryMap(controller.getLocalizationTable())["greeting"].Values["en"]).toBe(
 			"Hello"

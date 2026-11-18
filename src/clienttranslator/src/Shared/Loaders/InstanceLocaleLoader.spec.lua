@@ -12,6 +12,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local LocaleLoaderTestUtils = require("LocaleLoaderTestUtils")
 local LocalizationEntryParserUtils = require("LocalizationEntryParserUtils")
+local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -188,8 +189,7 @@ describe("InstanceLocaleLoader.PromiseSourceLocale", function()
 		local controller = LocaleLoaderTestUtils.setup()
 		local loader = controller.newInstanceLoader({ en = { greeting = "Hello" } })
 
-		local ok = loader:PromiseSourceLocale():Yield()
-		expect(ok).toBe(true)
+		PromiseTestUtils.awaitFulfilled(loader:PromiseSourceLocale())
 
 		controller.flush()
 		expect(controller.valueFor("greeting", "en")).toBe("Hello")

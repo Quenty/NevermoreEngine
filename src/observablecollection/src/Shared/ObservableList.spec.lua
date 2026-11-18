@@ -7,32 +7,12 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local ObservableList = require("ObservableList")
+local ObservableSpy = require("ObservableSpy")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
-local function observe(observableList, index: number): ({ { any } }, any)
-	local seen: { { any } } = {}
-	local sub = observableList:ObserveAtIndex(index):Subscribe(function(value)
-		table.insert(seen, { value })
-	end)
-
-	return seen, sub
-end
-
-local function last(seen: { { any } }): any
-	return seen[#seen][1]
-end
-
-local function values(seen: { { any } }): { any }
-	local result = {}
-	for i, entry in seen do
-		result[i] = entry[1]
-	end
-	return result
-end
 
 describe("ObservableList.new()", function()
 	local observableList = ObservableList.new()
@@ -70,13 +50,10 @@ describe("ObservableList.new()", function()
 	end)
 
 	it("should fire off events for a specific key", function()
-		local seen = {}
-		local sub = observableList:ObserveIndex(1):Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableList:ObserveIndex(1))
 		observableList:InsertAt("c", 1)
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(2)
 		expect(seen[1]).toEqual(1)
@@ -84,10 +61,7 @@ describe("ObservableList.new()", function()
 	end)
 
 	it("should fire off events for all keys", function()
-		local seen = {}
-		local sub = observableList:ObserveItemsBrio():Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableList:ObserveItemsBrio())
 		observableList:Add("a")
 
 		local value = seen[4]:GetValue()
@@ -95,24 +69,21 @@ describe("ObservableList.new()", function()
 		expect(value).toEqual("a")
 		expect(seen[4]:IsDead()).toEqual(false)
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(4)
 		expect(seen[4]:IsDead()).toEqual(true)
 	end)
 
 	it("it should be able to observe a specific key", function()
-		local seen = {}
-		local sub = observableList:ObserveAtIndex(1):Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(1))
 
 		local originalList = observableList:GetList()
 		expect(originalList[1]).toEqual("c")
 
 		observableList:InsertAt("dragon", 1)
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(2)
 		expect(seen[1]).toEqual("c")
@@ -120,17 +91,14 @@ describe("ObservableList.new()", function()
 	end)
 
 	it("it should be able to observe a specific negative key", function()
-		local seen = {}
-		local sub = observableList:ObserveAtIndex(-1):Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		local originalList = observableList:GetList()
 		expect(originalList[#originalList]).toEqual("a")
 
 		observableList:Add("fire")
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(2)
 		expect(seen[1]).toEqual("a")
@@ -138,13 +106,10 @@ describe("ObservableList.new()", function()
 	end)
 
 	it("should fire off events on removal", function()
-		local seen = {}
-		local sub = observableList:ObserveIndex(2):Subscribe(function(value)
-			table.insert(seen, value)
-		end)
+		local seen = ObservableSpy.new(observableList:ObserveIndex(2))
 		observableList:RemoveAt(1)
 
-		sub:Destroy()
+		seen:Destroy()
 
 		expect(#seen).toEqual(2)
 		expect(seen[1]).toEqual(2)
@@ -161,16 +126,16 @@ describe("ObservableList negative index observation", function()
 		local observableList = ObservableList.new()
 		observableList:Add("a")
 
-		local seenLast, subLast = observe(observableList, -1)
-		local seenSecondLast, subSecondLast = observe(observableList, -2)
+		local seenLast = ObservableSpy.new(observableList:ObserveAtIndex(-1))
+		local seenSecondLast = ObservableSpy.new(observableList:ObserveAtIndex(-2))
 
 		observableList:Add("b")
 
-		expect(last(seenLast)).toEqual("b")
-		expect(last(seenSecondLast)).toEqual("a")
+		expect(seenLast:GetLastValue()).toEqual("b")
+		expect(seenSecondLast:GetLastValue()).toEqual("a")
 
-		subLast:Destroy()
-		subSecondLast:Destroy()
+		seenLast:Destroy()
+		seenSecondLast:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -179,15 +144,15 @@ describe("ObservableList negative index observation", function()
 		observableList:Add("a")
 		local removeB = observableList:Add("b")
 
-		local seen, sub = observe(observableList, -1)
-		expect(last(seen)).toEqual("b")
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-1))
+		expect(seen:GetLastValue()).toEqual("b")
 
 		removeB()
 
-		expect(last(seen)).toEqual("a")
+		expect(seen:GetLastValue()).toEqual("a")
 		expect(#seen).toEqual(2)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -196,15 +161,15 @@ describe("ObservableList negative index observation", function()
 		local removeA = observableList:Add("a")
 		observableList:Add("b")
 
-		local seen, sub = observe(observableList, -2)
-		expect(last(seen)).toEqual("a")
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-2))
+		expect(seen:GetLastValue()).toEqual("a")
 
 		removeA()
 
-		expect(last(seen)).toEqual(nil)
+		expect(seen:GetLastValue()).toEqual(nil)
 		expect(#seen).toEqual(2)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -213,13 +178,13 @@ describe("ObservableList negative index observation", function()
 		local removeA = observableList:Add("a")
 		observableList:Add("b")
 
-		local seen, sub = observe(observableList, -1)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 		removeA()
 
-		expect(last(seen)).toEqual("b")
+		expect(seen:GetLastValue()).toEqual("b")
 		expect(#seen).toEqual(1)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -228,17 +193,17 @@ describe("ObservableList negative index observation", function()
 		observableList:Add("a")
 		local removeB = observableList:Add("b")
 
-		local seenFirst, subFirst = observe(observableList, 1)
-		local seenSecond, subSecond = observe(observableList, 2)
+		local seenFirst = ObservableSpy.new(observableList:ObserveAtIndex(1))
+		local seenSecond = ObservableSpy.new(observableList:ObserveAtIndex(2))
 
 		removeB()
 
 		expect(#seenFirst).toEqual(1)
-		expect(last(seenFirst)).toEqual("a")
-		expect(last(seenSecond)).toEqual(nil)
+		expect(seenFirst:GetLastValue()).toEqual("a")
+		expect(seenSecond:GetLastValue()).toEqual(nil)
 
-		subFirst:Destroy()
-		subSecond:Destroy()
+		seenFirst:Destroy()
+		seenSecond:Destroy()
 		observableList:Destroy()
 	end)
 end)
@@ -250,24 +215,24 @@ describe("ObservableList negative index observation around the middle", function
 		observableList:Add("b")
 		observableList:Add("c")
 
-		local seen4, sub4 = observe(observableList, -4)
-		local seen3, sub3 = observe(observableList, -3)
-		local seen2, sub2 = observe(observableList, -2)
-		local seen1, sub1 = observe(observableList, -1)
+		local seen4 = ObservableSpy.new(observableList:ObserveAtIndex(-4))
+		local seen3 = ObservableSpy.new(observableList:ObserveAtIndex(-3))
+		local seen2 = ObservableSpy.new(observableList:ObserveAtIndex(-2))
+		local seen1 = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		observableList:InsertAt("x", 2)
 
 		expect(#seen4).toEqual(2)
-		expect(seen4[1][1]).toEqual(nil)
-		expect(seen4[2][1]).toEqual("a")
-		expect(values(seen3)).toEqual({ "a", "x" })
-		expect(values(seen2)).toEqual({ "b" })
-		expect(values(seen1)).toEqual({ "c" })
+		expect(seen4[1]).toEqual(nil)
+		expect(seen4[2]).toEqual("a")
+		expect(seen3.Values).toEqual({ "a", "x" })
+		expect(seen2.Values).toEqual({ "b" })
+		expect(seen1.Values).toEqual({ "c" })
 
-		sub4:Destroy()
-		sub3:Destroy()
-		sub2:Destroy()
-		sub1:Destroy()
+		seen4:Destroy()
+		seen3:Destroy()
+		seen2:Destroy()
+		seen1:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -277,21 +242,21 @@ describe("ObservableList negative index observation around the middle", function
 		local removeB = observableList:Add("b")
 		observableList:Add("c")
 
-		local seen3, sub3 = observe(observableList, -3)
-		local seen2, sub2 = observe(observableList, -2)
-		local seen1, sub1 = observe(observableList, -1)
+		local seen3 = ObservableSpy.new(observableList:ObserveAtIndex(-3))
+		local seen2 = ObservableSpy.new(observableList:ObserveAtIndex(-2))
+		local seen1 = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		removeB()
 
 		expect(#seen3).toEqual(2)
-		expect(seen3[1][1]).toEqual("a")
-		expect(seen3[2][1]).toEqual(nil)
-		expect(values(seen2)).toEqual({ "b", "a" })
-		expect(values(seen1)).toEqual({ "c" })
+		expect(seen3[1]).toEqual("a")
+		expect(seen3[2]).toEqual(nil)
+		expect(seen2.Values).toEqual({ "b", "a" })
+		expect(seen1.Values).toEqual({ "c" })
 
-		sub3:Destroy()
-		sub2:Destroy()
-		sub1:Destroy()
+		seen3:Destroy()
+		seen2:Destroy()
+		seen1:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -301,13 +266,13 @@ describe("ObservableList negative index observation around the middle", function
 		observableList:Add("b")
 		observableList:Add("c")
 
-		local seen, sub = observe(observableList, 2)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(2))
 
 		removeA()
 
-		expect(values(seen)).toEqual({ "b", "c" })
+		expect(seen.Values).toEqual({ "b", "c" })
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -315,7 +280,7 @@ describe("ObservableList negative index observation around the middle", function
 		local observableList = ObservableList.new()
 		observableList:Add("a")
 
-		local seenLast, subLast = observe(observableList, -1)
+		local seenLast = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		local added = false
 		local subSecondLast = observableList:ObserveAtIndex(-2):Subscribe(function(value)
@@ -328,9 +293,9 @@ describe("ObservableList negative index observation around the middle", function
 		observableList:Add("b")
 
 		expect(observableList:GetList()).toEqual({ "a", "b", "c" })
-		expect(last(seenLast)).toEqual("c")
+		expect(seenLast:GetLastValue()).toEqual("c")
 
-		subLast:Destroy()
+		seenLast:Destroy()
 		subSecondLast:Destroy()
 		observableList:Destroy()
 	end)
@@ -384,7 +349,7 @@ describe("ObservableList emission cost", function()
 
 	it("fires a bounded number of observers per Add with a last-item observer", function()
 		local observableList = ObservableList.new()
-		local _, sub = observe(observableList, -1)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		local fires = countFires(function()
 			for i = 1, ITEMS do
@@ -394,7 +359,7 @@ describe("ObservableList emission cost", function()
 
 		expect(fires).toBeLessThanOrEqual(4 * ITEMS)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -404,7 +369,7 @@ describe("ObservableList emission cost", function()
 		for i = 1, ITEMS do
 			removers[i] = observableList:Add(i)
 		end
-		local _, sub = observe(observableList, -1)
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(-1))
 
 		local fires = countFires(function()
 			for i = ITEMS, 1, -1 do
@@ -414,7 +379,7 @@ describe("ObservableList emission cost", function()
 
 		expect(fires).toBeLessThanOrEqual(4 * ITEMS)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 end)
@@ -426,20 +391,20 @@ describe("ObservableList positive index observation (mirrors ObservableSortedLis
 		observableList:Add("b")
 		observableList:Add("c")
 
-		local seen1, sub1 = observe(observableList, 1)
-		local seen2, sub2 = observe(observableList, 2)
-		local seen3, sub3 = observe(observableList, 3)
+		local seen1 = ObservableSpy.new(observableList:ObserveAtIndex(1))
+		local seen2 = ObservableSpy.new(observableList:ObserveAtIndex(2))
+		local seen3 = ObservableSpy.new(observableList:ObserveAtIndex(3))
 
 		observableList:Add("d")
 
 		expect(observableList:GetList()).toEqual({ "a", "b", "c", "d" })
-		expect(values(seen1)).toEqual({ "a" })
-		expect(values(seen2)).toEqual({ "b" })
-		expect(values(seen3)).toEqual({ "c" })
+		expect(seen1.Values).toEqual({ "a" })
+		expect(seen2.Values).toEqual({ "b" })
+		expect(seen3.Values).toEqual({ "c" })
 
-		sub1:Destroy()
-		sub2:Destroy()
-		sub3:Destroy()
+		seen1:Destroy()
+		seen2:Destroy()
+		seen3:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -451,20 +416,20 @@ describe("ObservableList positive index observation (mirrors ObservableSortedLis
 		observableList:Add("d")
 		observableList:Add("e")
 
-		local seen1, sub1 = observe(observableList, 1)
-		local seen2, sub2 = observe(observableList, 2)
-		local seen4, sub4 = observe(observableList, 4)
+		local seen1 = ObservableSpy.new(observableList:ObserveAtIndex(1))
+		local seen2 = ObservableSpy.new(observableList:ObserveAtIndex(2))
+		local seen4 = ObservableSpy.new(observableList:ObserveAtIndex(4))
 
 		removeC()
 
 		expect(observableList:GetList()).toEqual({ "a", "b", "d", "e" })
-		expect(values(seen1)).toEqual({ "a" })
-		expect(values(seen2)).toEqual({ "b" })
-		expect(values(seen4)).toEqual({ "d", "e" })
+		expect(seen1.Values).toEqual({ "a" })
+		expect(seen2.Values).toEqual({ "b" })
+		expect(seen4.Values).toEqual({ "d", "e" })
 
-		sub1:Destroy()
-		sub2:Destroy()
-		sub4:Destroy()
+		seen1:Destroy()
+		seen2:Destroy()
+		seen4:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -474,24 +439,24 @@ describe("ObservableList positive index observation (mirrors ObservableSortedLis
 		observableList:Add("c")
 		observableList:Add("d")
 
-		local seen1, sub1 = observe(observableList, 1)
-		local seen2, sub2 = observe(observableList, 2)
-		local seen3, sub3 = observe(observableList, 3)
-		local seen4, sub4 = observe(observableList, 4)
+		local seen1 = ObservableSpy.new(observableList:ObserveAtIndex(1))
+		local seen2 = ObservableSpy.new(observableList:ObserveAtIndex(2))
+		local seen3 = ObservableSpy.new(observableList:ObserveAtIndex(3))
+		local seen4 = ObservableSpy.new(observableList:ObserveAtIndex(4))
 
 		observableList:InsertAt("a", 1)
 
 		expect(observableList:GetList()).toEqual({ "a", "b", "c", "d" })
-		expect(values(seen1)).toEqual({ "b", "a" })
-		expect(values(seen2)).toEqual({ "c", "b" })
-		expect(values(seen3)).toEqual({ "d", "c" })
+		expect(seen1.Values).toEqual({ "b", "a" })
+		expect(seen2.Values).toEqual({ "c", "b" })
+		expect(seen3.Values).toEqual({ "d", "c" })
 		expect(#seen4).toEqual(2)
-		expect(seen4[2][1]).toEqual("d")
+		expect(seen4[2]).toEqual("d")
 
-		sub1:Destroy()
-		sub2:Destroy()
-		sub3:Destroy()
-		sub4:Destroy()
+		seen1:Destroy()
+		seen2:Destroy()
+		seen3:Destroy()
+		seen4:Destroy()
 		observableList:Destroy()
 	end)
 
@@ -500,15 +465,15 @@ describe("ObservableList positive index observation (mirrors ObservableSortedLis
 		local removeA = observableList:Add("a")
 		observableList:Add("b")
 
-		local seen, sub = observe(observableList, 2)
-		expect(values(seen)).toEqual({ "b" })
+		local seen = ObservableSpy.new(observableList:ObserveAtIndex(2))
+		expect(seen.Values).toEqual({ "b" })
 
 		removeA()
 
 		expect(#seen).toEqual(2)
-		expect(seen[2][1]).toEqual(nil)
+		expect(seen[2]).toEqual(nil)
 
-		sub:Destroy()
+		seen:Destroy()
 		observableList:Destroy()
 	end)
 end)

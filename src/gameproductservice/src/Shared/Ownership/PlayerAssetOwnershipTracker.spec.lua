@@ -17,11 +17,13 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
 local PlayerAssetOwnershipTracker = require("PlayerAssetOwnershipTracker")
 local PlayerMock = require("PlayerMock")
 local PlayerProductOwnershipOverrideUtils = require("PlayerProductOwnershipOverrideUtils")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
+local RxTestUtils = require("RxTestUtils")
 local Signal = require("Signal")
 
 local describe = Jest.Globals.describe
@@ -86,6 +88,7 @@ local function setup()
 	end)
 
 	local controller = {
+		maid = maid,
 		tracker = tracker,
 		marketTracker = marketTracker,
 		Destroy = function(_self)
@@ -146,13 +149,10 @@ describe("PlayerAssetOwnershipTracker:PromiseOwnsAsset()", function()
 			return Promise.resolved(true)
 		end)
 
-		local first = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(first, 5)
-		local second = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(second, 5)
+		PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))
+		local owns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))
 
 		expect(callCount).toEqual(1)
-		local _, owns = second:Yield()
 		expect(owns).toEqual(true)
 		context:Destroy()
 	end)
@@ -195,10 +195,7 @@ describe("PlayerAssetOwnershipTracker:SetQueryOwnershipCallback()", function()
 		context.tracker:SetQueryOwnershipCallback(function()
 			return Promise.resolved(false)
 		end)
-		local first = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(first, 5)
-		local _, firstOwns = first:Yield()
-		expect(firstOwns).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))).toEqual(false)
 
 		local secondCallbackCalls = 0
 		context.tracker:SetQueryOwnershipCallback(function()
@@ -206,10 +203,8 @@ describe("PlayerAssetOwnershipTracker:SetQueryOwnershipCallback()", function()
 			return Promise.resolved(true)
 		end)
 
-		local second = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(second, 5)
+		local secondOwns = PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))
 		expect(secondCallbackCalls).toEqual(1)
-		local _, secondOwns = second:Yield()
 		expect(secondOwns).toEqual(true)
 		context:Destroy()
 	end)
@@ -222,22 +217,15 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset()", function()
 			return Promise.resolved(false)
 		end)
 
-		local values = {}
-		local sub = context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey))
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #values >= 1
-		end, 5)).toEqual(true)
+		expect(#values >= 1).toBe(true)
 		expect(values[1]).toEqual(false)
 
 		context.tracker:SetOwnership(KEY_TO_ID.swordKey, true)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return values[#values] == true
-		end, 5)).toEqual(true)
-		sub:Destroy()
+		expect(values[#values]).toBe(true)
+		values:Destroy()
 		context:Destroy()
 	end)
 end)
@@ -311,8 +299,7 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() ownership wins", fu
 		end)
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
-		local promise = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(promise, 5)
+		expect(PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))).toEqual(true)
 
 		expect(callCount).toEqual(0)
 		context:Destroy()
@@ -354,16 +341,10 @@ describe("PlayerAssetOwnershipTracker:SetOwnershipOverride() lifecycle", functio
 		local context = setup()
 
 		context.tracker:SetOwnershipOverride("swordKey", true)
-		local first = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(first, 5)
-		local _, firstOwns = first:Yield()
-		expect(firstOwns).toEqual(true)
+		expect(PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))).toEqual(true)
 
 		context.tracker:SetOwnershipOverride("swordKey", false)
-		local second = context.tracker:PromiseOwnsAsset("swordKey")
-		PromiseTestUtils.awaitSettled(second, 5)
-		local _, secondOwns = second:Yield()
-		expect(secondOwns).toEqual(false)
+		expect(PromiseTestUtils.awaitFulfilled(context.tracker:PromiseOwnsAsset("swordKey"))).toEqual(false)
 		context:Destroy()
 	end)
 end)
@@ -462,32 +443,20 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 			return pending
 		end)
 
-		local values = {}
-		-- Typed `any`: the test place holds more than one copy of Subscription (a package graph
-		-- duplicated per dependent), and a list inferred from one copy rejects another.
-		local subs: { any } = {}
+		local emitted = {}
 		for _ = 1, 3 do
 			table.insert(
-				subs,
-				context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
-					table.insert(values, value)
-				end)
+				emitted,
+				RxTestUtils.collectList(context.maid, context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey))
 			)
 		end
 
 		local asked = context.tracker:PromiseOwnsAsset("swordKey")
 		pending:Reject("cloud refused")
 
-		expect(PromiseTestUtils.awaitSettled(asked, 5)).toEqual(true)
-		-- Yielded, not merely awaited: reading the outcome is this caller consuming its own copy, which is
-		-- what a real caller does with the promise it asked for. Bound first, because Yield returns the
-		-- rejection alongside the outcome and expect takes one argument.
-		local askedOk = asked:Yield()
-		expect(askedOk).toEqual(false)
+		PromiseTestUtils.awaitRejected(asked)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #consumed >= 3
-		end, 5)).toEqual(true)
+		expect(#consumed >= 3).toBe(true)
 
 		-- One report for the query, one consumption per subscriber.
 		expect(#reports).toEqual(1)
@@ -497,11 +466,8 @@ describe("PlayerAssetOwnershipTracker query failures", function()
 
 		-- An unresolvable asset emits nothing at all: silence reads as unresolved, where `false` would
 		-- read as "does not own it" and turn a failed lookup into a refusal.
-		expect(#values).toEqual(0)
+		expect(emitted).toEqual({ {}, {}, {} })
 
-		for _, sub in subs do
-			sub:Destroy()
-		end
 		context:Destroy()
 	end)
 
@@ -549,26 +515,17 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 			return Promise.resolved(false)
 		end)
 
-		local values = {}
-		local sub = context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey))
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return values[#values] == false
-		end, 5)).toEqual(true)
+		expect(values[#values]).toBe(false)
 
 		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, true)
-		expect(PromiseTestUtils.awaitValue(function()
-			return values[#values] == true
-		end, 5)).toEqual(true)
+		expect(values[#values]).toBe(true)
 
 		context.tracker:ClearOwnershipOverride(KEY_TO_ID.swordKey)
-		expect(PromiseTestUtils.awaitValue(function()
-			return values[#values] == false
-		end, 5)).toEqual(true)
+		expect(values[#values]).toBe(false)
 
-		sub:Destroy()
+		values:Destroy()
 		context:Destroy()
 	end)
 
@@ -580,16 +537,11 @@ describe("PlayerAssetOwnershipTracker:ObserveOwnsAsset() overrides", function()
 
 		context.tracker:SetOwnershipOverride(KEY_TO_ID.swordKey, false)
 
-		local values = {}
-		local sub = context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey):Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(context.tracker:ObserveOwnsAsset(KEY_TO_ID.swordKey))
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return values[#values] == false
-		end, 5)).toEqual(true)
+		expect(values[#values]).toBe(false)
 
-		sub:Destroy()
+		values:Destroy()
 		context:Destroy()
 	end)
 end)

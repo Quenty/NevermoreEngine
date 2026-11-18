@@ -9,38 +9,43 @@ local AttributeValue = require("AttributeValue")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup(): any
+type Controller = {
+	maid: Maid.Maid,
+	folder: Folder,
+	newAttributeValue: (attributeName: string, defaultValue: any) -> AttributeValue.AttributeValue<any>,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local folder = maid:Add(Instance.new("Folder"))
 
-	return {
+	local controller: Controller = {
+		maid = maid,
 		folder = folder,
-		newAttributeValue = function(attributeName: string, defaultValue: any)
+		newAttributeValue = function(attributeName, defaultValue)
 			return AttributeValue.new(folder, attributeName, defaultValue)
-		end,
-		observeInto = function(observable: any)
-			local values = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-
-			return values
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("AttributeValue.new()", function()
 	it("writes the default value to the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		controller.newAttributeValue("Version", "1.0.0")
 
@@ -49,7 +54,6 @@ describe("AttributeValue.new()", function()
 
 	it("leaves an attribute that is already set", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		controller.folder:SetAttribute("Version", "2.0.0")
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
@@ -60,7 +64,6 @@ describe("AttributeValue.new()", function()
 
 	it("writes nothing when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", nil)
 
@@ -76,7 +79,6 @@ describe("AttributeValue.new()", function()
 
 	it("rejects an attribute name that is not a string", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		expect(function()
 			AttributeValue.new(controller.folder, nil :: any, "1.0.0")
@@ -87,7 +89,6 @@ end)
 describe("AttributeValue.Value", function()
 	it("reads the attribute back", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		controller.folder:SetAttribute("Version", "2.0.0")
@@ -97,7 +98,6 @@ describe("AttributeValue.Value", function()
 
 	it("writes the attribute", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		attributeValue.Value = "2.0.0"
@@ -108,7 +108,6 @@ describe("AttributeValue.Value", function()
 
 	it("falls back to the default once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 		attributeValue.Value = nil
@@ -121,14 +120,12 @@ end)
 describe("AttributeValue.AttributeName", function()
 	it("reports the attribute it is bound to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		expect(controller.newAttributeValue("Version", "1.0.0").AttributeName).toBe("Version")
 	end)
 
 	it("cannot be assigned to", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 
@@ -141,17 +138,15 @@ end)
 describe("AttributeValue.Changed", function()
 	it("fires when the attribute changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
 
 		local seen = {}
-		JestUtils.afterThis(attributeValue.Changed:Connect(function()
+		controller.maid:GiveTask(attributeValue.Changed:Connect(function()
 			table.insert(seen, attributeValue.Value)
 		end))
 
 		attributeValue.Value = "2.0.0"
-		task.wait()
 
 		expect(seen).toEqual({ "2.0.0" })
 	end)
@@ -160,7 +155,6 @@ end)
 describe("AttributeValue members", function()
 	it("throws when reading a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue: any = controller.newAttributeValue("Version", "1.0.0")
 
@@ -171,7 +165,6 @@ describe("AttributeValue members", function()
 
 	it("throws when writing a member that does not exist", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue: any = controller.newAttributeValue("Version", "1.0.0")
 
@@ -184,55 +177,43 @@ end)
 describe("AttributeValue:Observe()", function()
 	it("fires the current value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
-		local values = controller.observeInto(attributeValue:Observe())
+		local versions = RxTestUtils.collectList(controller.maid, attributeValue:Observe())
 
 		attributeValue.Value = "2.0.0"
-		task.wait()
 
-		expect(values).toEqual({ "1.0.0", "2.0.0" })
+		expect(versions).toEqual({ "1.0.0", "2.0.0" })
 	end)
 
 	it("fires the default value once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
-		local values = controller.observeInto(attributeValue:Observe())
+		local versions = RxTestUtils.collectList(controller.maid, attributeValue:Observe())
 
 		attributeValue.Value = nil
-		task.wait()
 
-		expect(values).toEqual({ "1.0.0", "1.0.0" })
+		expect(versions).toEqual({ "1.0.0", "1.0.0" })
 	end)
 
 	it("fires nil when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", nil)
+		local versions = controller.maid:Add(ObservableSpy.new(attributeValue:Observe()))
 
-		local fireCount = 0
-		local lastValue: any = "unset"
-		JestUtils.afterThis(attributeValue:Observe():Subscribe(function(value)
-			fireCount += 1
-			lastValue = value
-		end))
-
-		expect(fireCount).toBe(1)
-		expect(lastValue).toBe(nil)
+		expect(#versions).toBe(1)
+		expect(versions[1]).toBe(nil)
 	end)
 end)
 
 describe("AttributeValue:ObserveBrio()", function()
 	it("emits a brio for the current value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
-		local brios = controller.observeInto(attributeValue:ObserveBrio())
+		local brios = RxTestUtils.collectList(controller.maid, attributeValue:ObserveBrio())
 
 		expect(#brios).toBe(1)
 		expect(brios[1]:GetValue()).toBe("1.0.0")
@@ -240,13 +221,11 @@ describe("AttributeValue:ObserveBrio()", function()
 
 	it("kills the last brio when the value changes", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Version", "1.0.0")
-		local brios = controller.observeInto(attributeValue:ObserveBrio())
+		local brios = RxTestUtils.collectList(controller.maid, attributeValue:ObserveBrio())
 
 		attributeValue.Value = "2.0.0"
-		task.wait()
 
 		expect(#brios).toBe(2)
 		expect(brios[1]:IsDead()).toBe(true)
@@ -255,17 +234,18 @@ describe("AttributeValue:ObserveBrio()", function()
 
 	it("skips values the condition rejects", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local attributeValue = controller.newAttributeValue("Count", 1)
-		local brios = controller.observeInto(attributeValue:ObserveBrio(function(value)
-			return value >= 3
-		end))
+		local brios = RxTestUtils.collectList(
+			controller.maid,
+			attributeValue:ObserveBrio(function(value)
+				return value >= 3
+			end)
+		)
 
 		expect(#brios).toBe(0)
 
 		attributeValue.Value = 3
-		task.wait()
 
 		expect(#brios).toBe(1)
 		expect(brios[1]:GetValue()).toBe(3)

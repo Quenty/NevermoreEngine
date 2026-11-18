@@ -6,9 +6,11 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockConstants = require("PlayerMockConstants")
 local PlayerMockPropertyUtils = require("PlayerMockPropertyUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -161,17 +163,17 @@ describe("PlayerMockPropertyUtils service properties", function()
 	it("fires the changed signal over the backing a later write lands on", function()
 		local player = PlayerMock.new()
 		local frame = Instance.new("Frame")
-		local fired = 0
+		local maid = Maid.new()
 
-		local signal = PlayerMockPropertyUtils.getPropertyChangedSignal(player, "GuiService.SelectedObject")
-		local connection = signal:Connect(function()
-			fired += 1
-		end)
+		local fired = SignalTestUtils.countFires(
+			maid,
+			PlayerMockPropertyUtils.getPropertyChangedSignal(player, "GuiService.SelectedObject")
+		)
 		PlayerMockPropertyUtils.write(player, "GuiService.SelectedObject", frame)
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 		frame:Destroy()
 	end)
@@ -260,32 +262,30 @@ end)
 describe("PlayerMockPropertyUtils.getPropertyChangedSignal", function()
 	it("fires for an attribute-backed property", function()
 		local player = PlayerMock.new()
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMockPropertyUtils.getPropertyChangedSignal(player, "AccountAge"):Connect(function()
-			fired += 1
-		end)
+		local fired =
+			SignalTestUtils.countFires(maid, PlayerMockPropertyUtils.getPropertyChangedSignal(player, "AccountAge"))
 		PlayerMockPropertyUtils.write(player, "AccountAge", 7)
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 
 	it("fires for an ObjectValue-backed property", function()
 		local player = PlayerMock.new()
 		local character = Instance.new("Model")
-		local fired = 0
+		local maid = Maid.new()
 
-		local connection = PlayerMockPropertyUtils.getPropertyChangedSignal(player, "Character"):Connect(function()
-			fired += 1
-		end)
+		local fired =
+			SignalTestUtils.countFires(maid, PlayerMockPropertyUtils.getPropertyChangedSignal(player, "Character"))
 		PlayerMockPropertyUtils.write(player, "Character", character)
 
-		expect(fired).toBe(1)
+		expect(fired()).toBe(1)
 
-		connection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 end)

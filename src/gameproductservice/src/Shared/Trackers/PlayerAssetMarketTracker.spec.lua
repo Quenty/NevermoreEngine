@@ -14,8 +14,10 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
 local PlayerAssetMarketTracker = require("PlayerAssetMarketTracker")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -50,12 +52,19 @@ local function observeIdsBrio(idOrKey)
 	end)
 end
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	tracker: PlayerAssetMarketTracker.PlayerAssetMarketTracker,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.PRODUCT, convertIds, observeIdsBrio)
 	maid:GiveTask(tracker)
 
-	local controller = {
+	local controller: Controller = {
+		maid = maid,
 		tracker = tracker,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -67,12 +76,13 @@ local function setup()
 	return controller
 end
 
-local function setupNonPromptable()
+local function setupNonPromptable(): Controller
 	local maid = Maid.new()
 	local tracker = PlayerAssetMarketTracker.new(GameConfigAssetTypes.GAME, convertIds, observeIdsBrio, false)
 	maid:GiveTask(tracker)
 
-	local controller = {
+	local controller: Controller = {
+		maid = maid,
 		tracker = tracker,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -84,19 +94,13 @@ local function setupNonPromptable()
 	return controller
 end
 
-local function promptAndCapture(tracker, idOrKey)
-	local capturedId
-	local conn = tracker.ShowPromptRequested:Connect(function(id)
-		capturedId = id
-	end)
+local function promptAndCapture(context: Controller, idOrKey: string | number)
+	local requestedIds = SignalTestUtils.collectFireList(context.maid, context.tracker.ShowPromptRequested)
 
-	local promise = tracker:PromisePromptPurchase(idOrKey)
-	PromiseTestUtils.awaitValue(function()
-		return capturedId ~= nil
-	end, 5)
-	conn:Disconnect()
+	local promise = context.tracker:PromisePromptPurchase(idOrKey)
+	expect(requestedIds[1]).never.toBeNil()
 
-	return promise, capturedId
+	return promise, requestedIds[1]
 end
 
 describe("PlayerAssetMarketTracker basics", function()
@@ -142,16 +146,12 @@ describe("PlayerAssetMarketTracker non-promptable asset types", function()
 	it("should reject PromisePromptPurchase for a known id without opening a prompt", function()
 		local context = setupNonPromptable()
 
-		local promptRequested = false
-		local conn = context.tracker.ShowPromptRequested:Connect(function()
-			promptRequested = true
-		end)
+		local promptRequested = SignalTestUtils.countFires(context.maid, context.tracker.ShowPromptRequested)
 
 		local outcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("swordKey"), 5)
-		conn:Disconnect()
 
 		expect(outcome).toEqual("rejected")
-		expect(promptRequested).toEqual(false)
+		expect(promptRequested()).toEqual(0)
 		expect(context.tracker:IsPromptOpen()).toEqual(false)
 		context:Destroy()
 	end)
@@ -204,13 +204,9 @@ describe("PlayerAssetMarketTracker:HandlePurchaseEvent()", function()
 	it("should fire the Purchased signal with the id on a successful purchase", function()
 		local context = setup()
 
-		local fired = {}
-		local conn = context.tracker.Purchased:Connect(function(id)
-			table.insert(fired, id)
-		end)
+		local fired = SignalTestUtils.collectFireList(context.maid, context.tracker.Purchased)
 
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, true)
-		conn:Disconnect()
 
 		expect(#fired).toEqual(1)
 		expect(fired[1]).toEqual(KEY_TO_ID.swordKey)
@@ -220,15 +216,11 @@ describe("PlayerAssetMarketTracker:HandlePurchaseEvent()", function()
 	it("should not fire Purchased on a failed purchase", function()
 		local context = setup()
 
-		local firedCount = 0
-		local conn = context.tracker.Purchased:Connect(function()
-			firedCount += 1
-		end)
+		local firedCount = SignalTestUtils.countFires(context.maid, context.tracker.Purchased)
 
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, false)
-		conn:Disconnect()
 
-		expect(firedCount).toEqual(0)
+		expect(firedCount()).toEqual(0)
 		context:Destroy()
 	end)
 end)
@@ -245,7 +237,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 	it("should request a prompt and resolve true once the purchase succeeds", function()
 		local context = setup()
 
-		local promise, capturedId = promptAndCapture(context.tracker, "swordKey")
+		local promise, capturedId = promptAndCapture(context, "swordKey")
 		expect(capturedId).toEqual(KEY_TO_ID.swordKey)
 		expect(context.tracker:IsPromptOpen()).toEqual(true)
 
@@ -260,7 +252,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 	it("should resolve false when the purchase is declined", function()
 		local context = setup()
 
-		local promise, capturedId = promptAndCapture(context.tracker, "swordKey")
+		local promise, capturedId = promptAndCapture(context, "swordKey")
 		context.tracker:HandlePurchaseEvent(capturedId, false)
 		context.tracker:HandlePromptClosedEvent(capturedId)
 
@@ -272,7 +264,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 	it("should reject a second prompt while one is already open", function()
 		local context = setup()
 
-		local firstPromise, firstId = promptAndCapture(context.tracker, "swordKey")
+		local firstPromise, firstId = promptAndCapture(context, "swordKey")
 		expect(context.tracker:IsPromptOpen()).toEqual(true)
 
 		local secondOutcome = PromiseTestUtils.awaitOutcome(context.tracker:PromisePromptPurchase("shieldKey"), 5)
@@ -280,7 +272,7 @@ describe("PlayerAssetMarketTracker:PromisePromptPurchase()", function()
 
 		context.tracker:HandlePurchaseEvent(firstId, true)
 		context.tracker:HandlePromptClosedEvent(firstId)
-		PromiseTestUtils.awaitSettled(firstPromise, 5)
+		PromiseTestUtils.awaitFulfilled(firstPromise)
 		context:Destroy()
 	end)
 end)
@@ -289,32 +281,27 @@ describe("PlayerAssetMarketTracker prompt open counting", function()
 	it("should report the prompt closed after HandlePromptClosedEvent", function()
 		local context = setup()
 
-		local promise, capturedId = promptAndCapture(context.tracker, "swordKey")
+		local promise, capturedId = promptAndCapture(context, "swordKey")
 		expect(context.tracker:IsPromptOpen()).toEqual(true)
 
 		context.tracker:HandlePurchaseEvent(capturedId, true)
 		context.tracker:HandlePromptClosedEvent(capturedId)
-		PromiseTestUtils.awaitSettled(promise, 5)
+		PromiseTestUtils.awaitFulfilled(promise)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return not context.tracker:IsPromptOpen()
-		end, 5)).toEqual(true)
+		expect(not context.tracker:IsPromptOpen()).toBe(true)
 		context:Destroy()
 	end)
 
 	it("should surface the open count through ObservePromptOpenCount", function()
 		local context = setup()
 
-		local counts = {}
-		local sub = context.tracker:ObservePromptOpenCount():Subscribe(function(value)
-			table.insert(counts, value)
-		end)
+		local counts = ObservableSpy.new(context.tracker:ObservePromptOpenCount())
 
-		local promise, capturedId = promptAndCapture(context.tracker, "swordKey")
+		local promise, capturedId = promptAndCapture(context, "swordKey")
 		context.tracker:HandlePurchaseEvent(capturedId, true)
 		context.tracker:HandlePromptClosedEvent(capturedId)
-		PromiseTestUtils.awaitSettled(promise, 5)
-		sub:Destroy()
+		PromiseTestUtils.awaitFulfilled(promise)
+		counts:Destroy()
 
 		expect(counts[1]).toEqual(0)
 		local sawOpen = false
@@ -332,33 +319,24 @@ describe("PlayerAssetMarketTracker:ObserveAssetPurchased()", function()
 	it("should fire when the tracked id is purchased", function()
 		local context = setup()
 
-		local fireCount = 0
-		local sub = context.tracker:ObserveAssetPurchased("swordKey"):Subscribe(function()
-			fireCount += 1
-		end)
+		local emissions = ObservableSpy.new(context.tracker:ObserveAssetPurchased("swordKey") :: any)
 
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.swordKey, true)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return fireCount > 0
-		end, 5)).toEqual(true)
-		sub:Destroy()
+		expect(#emissions > 0).toBe(true)
+		emissions:Destroy()
 		context:Destroy()
 	end)
 
 	it("should not fire when a different id is purchased", function()
 		local context = setup()
 
-		local fireCount = 0
-		local sub = context.tracker:ObserveAssetPurchased("swordKey"):Subscribe(function()
-			fireCount += 1
-		end)
+		local emissions = ObservableSpy.new(context.tracker:ObserveAssetPurchased("swordKey") :: any)
 
 		context.tracker:HandlePurchaseEvent(KEY_TO_ID.shieldKey, true)
-		task.wait()
-		sub:Destroy()
+		emissions:Destroy()
 
-		expect(fireCount).toEqual(0)
+		expect(#emissions).toEqual(0)
 		context:Destroy()
 	end)
 end)

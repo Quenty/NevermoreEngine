@@ -1,10 +1,6 @@
 --!strict
 --[[
-	Attribution: a fact says not just whether, but why. "You own this" is far less useful to a UI than
-	"you own this because of gamepass 12345", and a friend-granted fact is nearly useless without knowing
-	which friend.
-
-	@class AccessFactMetadata.spec.lua
+	@class AccessFact.Metadata.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
 
@@ -17,6 +13,7 @@ local AccessFeature = require("AccessFeature")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
@@ -25,21 +22,37 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	newPlayer: () -> Player,
+	attributedFact: (
+		factName: string,
+		initial: any,
+		options: { priority: number?, source: string? }?
+	) -> ValueObject.ValueObject<any>,
+	observeReport: (
+		player: Player,
+		factName: string
+	) -> ObservableSpy.ObservableSpy<AccessDataService.AccessFactReport>,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
 		accessDataService = accessDataService,
-		fakePlayer = function(): Player
-			return maid:Add(PlayerMock.new()) :: any
+		newPlayer = function()
+			return maid:Add(PlayerMock.new())
 		end,
-		attributedFact = function(factName: string, initial: any, options: { priority: number?, source: string? }?)
-			local valueObject = maid:Add(ValueObject.new(initial)) :: any
+		attributedFact = function(factName, initial, options)
+			local valueObject = maid:Add(ValueObject.new(initial))
 			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
@@ -49,12 +62,8 @@ local function setup()
 			}))))
 			return valueObject
 		end,
-		report = function(player: Player, factName: string): any
-			local last = nil
-			maid:GiveTask(accessDataService:ObserveFactReport(player, factName):Subscribe(function(value)
-				last = value
-			end))
-			return last
+		observeReport = function(player, factName)
+			return maid:Add(ObservableSpy.new(accessDataService:ObserveFactReport(player, factName)))
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -71,10 +80,10 @@ describe("AccessFact.contribution", function()
 		local controller = setup()
 		controller.attributedFact("ownsGamePass", AccessFact.contribution(true, { gamePassId = 12345 }))
 
-		local report = controller.report(controller.fakePlayer(), "ownsGamePass")
+		local report = controller.observeReport(controller.newPlayer(), "ownsGamePass"):GetLastValue()
 
 		expect(report.value).toEqual(true)
-		expect(report.metadata.gamePassId).toEqual(12345)
+		expect(report.metadata).toEqual({ gamePassId = 12345 })
 
 		controller:Destroy()
 	end)
@@ -83,13 +92,12 @@ describe("AccessFact.contribution", function()
 		local controller = setup()
 		controller.attributedFact("ownsGamePass", true)
 
-		expect(controller.report(controller.fakePlayer(), "ownsGamePass").metadata).toEqual(nil)
+		expect(controller.observeReport(controller.newPlayer(), "ownsGamePass"):GetLastValue().metadata).toBeNil()
 
 		controller:Destroy()
 	end)
 
 	it("reports the deciding layer's attribution, not an outranked one's", function()
-		-- The layers that lost did not decide anything, and their reasons would misattribute.
 		local controller = setup()
 		controller.attributedFact("isStaff", AccessFact.contribution(true, { via = "groupRank" }), {
 			source = "groupRank",
@@ -99,10 +107,10 @@ describe("AccessFact.contribution", function()
 			source = "allowlist",
 		})
 
-		local report = controller.report(controller.fakePlayer(), "isStaff")
+		local report = controller.observeReport(controller.newPlayer(), "isStaff"):GetLastValue()
 
 		expect(report.decidedBy).toEqual("allowlist")
-		expect(report.metadata.via).toEqual("allowlist")
+		expect(report.metadata).toEqual({ via = "allowlist" })
 
 		controller:Destroy()
 	end)
@@ -117,25 +125,24 @@ describe("AccessFact.contribution", function()
 			source = "allowlist",
 		})
 
-		local report = controller.report(controller.fakePlayer(), "isStaff")
+		local report = controller.observeReport(controller.newPlayer(), "isStaff"):GetLastValue()
 
-		expect(report.layers[2].metadata.via).toEqual("allowlist")
-		expect(report.layers[3].metadata.via).toEqual("groupRank")
+		expect(report.layers[2].metadata).toEqual({ via = "allowlist" })
+		expect(report.layers[3].metadata).toEqual({ via = "groupRank" })
 
 		controller:Destroy()
 	end)
 
 	it("follows attribution as it changes, which is what a UI subscribes to", function()
-		-- Which friend granted you access is not fixed for the session.
 		local controller = setup()
 		local grant = controller.attributedFact("friendAccess", AccessFact.contribution(true, { userId = 1 }))
 
-		local player = controller.fakePlayer()
-		expect(controller.report(player, "friendAccess").metadata.userId).toEqual(1)
+		local reports = controller.observeReport(controller.newPlayer(), "friendAccess")
+		expect(reports:GetLastValue().metadata).toEqual({ userId = 1 })
 
 		grant.Value = AccessFact.contribution(true, { userId = 2 })
 
-		expect(controller.report(player, "friendAccess").metadata.userId).toEqual(2)
+		expect(reports:GetLastValue().metadata).toEqual({ userId = 2 })
 
 		controller:Destroy()
 	end)
@@ -147,7 +154,7 @@ describe("AccessFact.contribution", function()
 		local feature = controller.maid:Add(AccessFeature.anyOf("shop", { "ownsGamePass" }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
-		expect(controller.accessDataService:IsFeatureAllowedByName(controller.fakePlayer(), "shop")).toEqual(true)
+		expect(controller.accessDataService:IsFeatureAllowedByName(controller.newPlayer(), "shop")).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -187,24 +194,22 @@ describe("AccessCommandUtils.describeMetadata", function()
 			},
 		})
 
-		expect(string.find(text, "gamePassId=12345") ~= nil).toEqual(true)
+		expect(text).toContain("gamePassId=12345")
 	end)
 end)
 
 describe("attribution across replication", function()
 	it("rides with a replicated answer, which is where it matters most", function()
-		-- "Which friend granted this" is resolved on the server and rendered on the client. Losing it in
-		-- transit would strand the most useful metadata the package carries on the wrong realm.
 		local controller = setup()
 
-		local player = controller.fakePlayer()
+		local player = controller.newPlayer()
 		controller.accessDataService:SetServerFactValue(player, "friendAccess", true, false, { grantedByUserId = 42 })
 
-		local report = controller.report(player, "friendAccess")
+		local report = controller.observeReport(player, "friendAccess"):GetLastValue()
 
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("replicated")
-		expect(report.metadata.grantedByUserId).toEqual(42)
+		expect(report.metadata).toEqual({ grantedByUserId = 42 })
 
 		controller:Destroy()
 	end)
@@ -212,10 +217,10 @@ describe("attribution across replication", function()
 	it("shows the replicated attribution on its own layer", function()
 		local controller = setup()
 
-		local player = controller.fakePlayer()
+		local player = controller.newPlayer()
 		controller.accessDataService:SetServerFactValue(player, "friendAccess", true, false, { grantedByUserId = 42 })
 
-		local report = controller.report(player, "friendAccess")
+		local report = controller.observeReport(player, "friendAccess"):GetLastValue()
 
 		local replicated = nil
 		for _, layer in report.layers do
@@ -224,7 +229,7 @@ describe("attribution across replication", function()
 			end
 		end
 
-		expect((replicated :: any).metadata.grantedByUserId).toEqual(42)
+		expect((replicated :: any).metadata).toEqual({ grantedByUserId = 42 })
 
 		controller:Destroy()
 	end)

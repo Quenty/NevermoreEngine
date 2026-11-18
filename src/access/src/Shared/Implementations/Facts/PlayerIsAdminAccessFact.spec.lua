@@ -12,6 +12,7 @@ local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerIsAdminAccessFact = require("PlayerIsAdminAccessFact")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
@@ -20,19 +21,25 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	newPlayer: () -> Player,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
-		serviceBag = serviceBag,
-		accessDataService = accessDataService,
+	local controller: Controller = {
 		maid = maid,
-		fakePlayer = function(): Player
-			return maid:Add(PlayerMock.new()) :: any
+		accessDataService = accessDataService,
+		newPlayer = function()
+			return maid:Add(PlayerMock.new())
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -73,8 +80,6 @@ describe("PlayerIsAdminAccessFact", function()
 	end)
 
 	it("lets a game layer its own answer over the built-in one", function()
-		-- The reason BUILT_IN is the bottom: a game with its own idea of who counts as staff should not
-		-- have to fight the package for the name.
 		local controller = setup()
 
 		controller.maid:GiveTask(controller.accessDataService:AddAccessFact(AccessFactNames.PLAYER_IS_ADMIN, true, {
@@ -85,14 +90,11 @@ describe("PlayerIsAdminAccessFact", function()
 		local feature = controller.maid:Add(AccessFeature.anyOf("staffTools", { AccessFactNames.PLAYER_IS_ADMIN }))
 		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
-		local last = nil
-		controller.maid:GiveTask(
-			controller.accessDataService:ObserveFeature(controller.fakePlayer(), feature):Subscribe(function(state)
-				last = state
-			end)
+		local states = controller.maid:Add(
+			ObservableSpy.new(controller.accessDataService:ObserveFeature(controller.newPlayer(), feature))
 		)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)

@@ -13,8 +13,11 @@ local DeathReportUtils = require("DeathReportUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
+local RxTestUtils = require("RxTestUtils")
 local ServiceBag = require("ServiceBag")
+local SignalTestUtils = require("SignalTestUtils")
 local TeamKillTrackerUtils = require("TeamKillTrackerUtils")
 
 local describe = Jest.Globals.describe
@@ -63,14 +66,6 @@ local function setup(): any
 		return character, humanoid
 	end
 
-	local function collect(observable: any): { any }
-		local emissions = {}
-		maid:GiveTask(observable:Subscribe(function(value)
-			table.insert(emissions, value)
-		end))
-		return emissions
-	end
-
 	local controller = {
 		maid = maid,
 		serviceBag = serviceBag,
@@ -78,7 +73,6 @@ local function setup(): any
 		newMock = newMock,
 		newCharacter = newCharacter,
 		newNpc = newNpc,
-		collect = collect,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -98,17 +92,18 @@ describe("DeathReportDataService.HandleDeathReport(deathReport)", function()
 		local killer = controller.newMock()
 		local killerCharacter, killerHumanoid = controller.newCharacter(killer)
 
-		local reports = {}
-		controller.maid:GiveTask(dataService.NewDeathReport:Connect(function(report)
-			table.insert(reports, report)
-		end))
-		local victimDeaths = controller.collect(dataService:ObservePlayerDeathReports(victim))
-		local victimKills = controller.collect(dataService:ObservePlayerKillerReports(victim))
-		local killerKills = controller.collect(dataService:ObservePlayerKillerReports(killer))
-		local humanoidDeaths = controller.collect(dataService:ObserveHumanoidDeathReports(victimHumanoid))
-		local characterDeaths = controller.collect(dataService:ObserveCharacterDeathReports(victimCharacter))
-		local humanoidKills = controller.collect(dataService:ObserveHumanoidKillerReports(killerHumanoid))
-		local characterKills = controller.collect(dataService:ObserveCharacterKillerReports(killerCharacter))
+		local reports = SignalTestUtils.collectFireList(controller.maid, dataService.NewDeathReport)
+		local victimDeaths = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerDeathReports(victim))
+		local victimKills = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerKillerReports(victim))
+		local killerKills = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerKillerReports(killer))
+		local humanoidDeaths =
+			RxTestUtils.collectList(controller.maid, dataService:ObserveHumanoidDeathReports(victimHumanoid))
+		local characterDeaths =
+			RxTestUtils.collectList(controller.maid, dataService:ObserveCharacterDeathReports(victimCharacter))
+		local humanoidKills =
+			RxTestUtils.collectList(controller.maid, dataService:ObserveHumanoidKillerReports(killerHumanoid))
+		local characterKills =
+			RxTestUtils.collectList(controller.maid, dataService:ObserveCharacterKillerReports(killerCharacter))
 
 		local report = DeathReportUtils.create(victimCharacter, killerHumanoid)
 		dataService:HandleDeathReport(report)
@@ -135,13 +130,16 @@ describe("DeathReportDataService.HandleDeathReport(deathReport)", function()
 		local bystander = controller.newMock()
 		local bystanderCharacter, bystanderHumanoid = controller.newCharacter(bystander)
 
-		local victimKills = controller.collect(dataService:ObservePlayerKillerReports(victim))
-		local killerDeaths = controller.collect(dataService:ObservePlayerDeathReports(killer))
-		local bystanderDeaths = controller.collect(dataService:ObservePlayerDeathReports(bystander))
-		local bystanderKills = controller.collect(dataService:ObservePlayerKillerReports(bystander))
-		local bystanderHumanoidDeaths = controller.collect(dataService:ObserveHumanoidDeathReports(bystanderHumanoid))
+		local victimKills = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerKillerReports(victim))
+		local killerDeaths = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerDeathReports(killer))
+		local bystanderDeaths =
+			RxTestUtils.collectList(controller.maid, dataService:ObservePlayerDeathReports(bystander))
+		local bystanderKills =
+			RxTestUtils.collectList(controller.maid, dataService:ObservePlayerKillerReports(bystander))
+		local bystanderHumanoidDeaths =
+			RxTestUtils.collectList(controller.maid, dataService:ObserveHumanoidDeathReports(bystanderHumanoid))
 		local bystanderCharacterKills =
-			controller.collect(dataService:ObserveCharacterKillerReports(bystanderCharacter))
+			RxTestUtils.collectList(controller.maid, dataService:ObserveCharacterKillerReports(bystanderCharacter))
 
 		dataService:HandleDeathReport(DeathReportUtils.create(victimCharacter, killerHumanoid))
 
@@ -161,7 +159,7 @@ describe("DeathReportDataService.HandleDeathReport(deathReport)", function()
 		local victim = controller.newMock()
 		local victimCharacter = controller.newCharacter(victim)
 
-		local playerDeaths = controller.collect(dataService:ObservePlayerDeathReports(victim))
+		local playerDeaths = RxTestUtils.collectList(controller.maid, dataService:ObservePlayerDeathReports(victim))
 
 		local report = DeathReportUtils.create(victimCharacter)
 		dataService:HandleDeathReport(report)
@@ -227,9 +225,7 @@ describe("DeathReportDataService observers", function()
 
 		mock:Destroy()
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return completed.deaths and completed.kills
-		end)).toBe(true)
+		expect(completed.deaths and completed.kills).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -263,15 +259,6 @@ describe("DeathReportDataService observers", function()
 	end)
 end)
 
--- Emissions may be nil, so each one is boxed
-local function collectBoxed(controller: any, observable: any): { { value: any } }
-	local emissions = {}
-	controller.maid:GiveTask(observable:Subscribe(function(value)
-		table.insert(emissions, { value = value })
-	end))
-	return emissions
-end
-
 describe("DeathReportDataService tracker observers", function()
 	it("emit nil without a tracker and the count once one is bound", function()
 		local controller = DeathReportTestUtils.setup()
@@ -283,19 +270,19 @@ describe("DeathReportDataService tracker observers", function()
 		binder:Unbind(mock)
 		DeathReportTestUtils.awaitUnbound(binder, mock)
 
-		local kills = collectBoxed(controller, dataService:ObservePlayerKillCount(mock))
+		local kills = controller.maid:Add(ObservableSpy.new(dataService:ObservePlayerKillCount(mock)))
 		expect(#kills).toEqual(1)
-		expect(kills[1].value).toBeNil()
+		expect(kills[1]).toBeNil()
 
 		binder:Bind(mock)
 		DeathReportTestUtils.awaitBound(binder, mock)
 
-		expect(kills[#kills].value).toEqual(0)
+		expect(kills:GetLastValue()).toEqual(0)
 
 		binder:Unbind(mock)
 		DeathReportTestUtils.awaitUnbound(binder, mock)
 
-		expect(kills[#kills].value).toBeNil()
+		expect(kills:GetLastValue()).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -311,15 +298,15 @@ describe("DeathReportDataService tracker observers", function()
 		DeathReportTestUtils.awaitBound(controller.playerKillTrackerBinder, killer)
 		DeathReportTestUtils.awaitBound(controller.playerDeathTrackerBinder, victim)
 
-		local kills = collectBoxed(controller, dataService:ObservePlayerKillCount(killer))
-		local deaths = collectBoxed(controller, dataService:ObservePlayerDeathCount(victim))
-		expect(kills[#kills].value).toEqual(0)
-		expect(deaths[#deaths].value).toEqual(0)
+		local kills = controller.maid:Add(ObservableSpy.new(dataService:ObservePlayerKillCount(killer)))
+		local deaths = controller.maid:Add(ObservableSpy.new(dataService:ObservePlayerDeathCount(victim)))
+		expect(kills:GetLastValue()).toEqual(0)
+		expect(deaths:GetLastValue()).toEqual(0)
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(kills[#kills].value).toEqual(1)
-		expect(deaths[#deaths].value).toEqual(1)
+		expect(kills:GetLastValue()).toEqual(1)
+		expect(deaths:GetLastValue()).toEqual(1)
 
 		controller:Destroy()
 	end)
@@ -338,12 +325,12 @@ describe("DeathReportDataService tracker observers", function()
 		local victim = controller.newMock()
 		local _victimCharacter, victimHumanoid = controller.newCharacter(victim)
 
-		local kills = collectBoxed(controller, dataService:ObserveTeamKillCount(team))
-		expect(kills[#kills].value).toEqual(0)
+		local kills = controller.maid:Add(ObservableSpy.new(dataService:ObserveTeamKillCount(team)))
+		expect(kills:GetLastValue()).toEqual(0)
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(kills[#kills].value).toEqual(1)
+		expect(kills:GetLastValue()).toEqual(1)
 
 		controller:Destroy()
 	end)
@@ -359,13 +346,11 @@ describe("DeathReportDataService tracker observers", function()
 
 		DeathReportTestUtils.awaitBound(controller.playerKillTrackerClientBinder, killer)
 
-		local kills = collectBoxed(controller, dataService:ObservePlayerKillCount(killer))
+		local kills = controller.maid:Add(ObservableSpy.new(dataService:ObservePlayerKillCount(killer)))
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return kills[#kills].value == 1
-		end)).toBe(true)
+		expect(kills:GetLastValue()).toEqual(1)
 
 		controller:Destroy()
 	end)

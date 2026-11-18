@@ -28,12 +28,8 @@ local function sliceFor(built: { [string]: any }, userId: number): TeleportDataE
 	return TeleportDataEnvelopeUtils.readSlice(built, userId)
 end
 
--- Builds and awaits the (async-only) envelope. `:Wait()` returns the built table and rethrows a
--- rejection, so the size-guard `toThrow` assertions keep working through it.
 local function buildAsync(builder: any, players: { Player }, baseData: { [string]: any }?): any
-	local promise = builder:PromiseBuildTeleportData(players, baseData)
-	assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
-	return promise:Wait()
+	return PromiseTestUtils.awaitFulfilled(builder:PromiseBuildTeleportData(players, baseData))
 end
 
 describe("TeleportDataBuilder.new", function()
@@ -288,8 +284,6 @@ describe("TeleportDataBuilder.PromiseBuildTeleportData", function()
 			return Promise.rejected("boom")
 		end)
 
-		local promise = builder:PromiseBuildTeleportData({ fakePlayer(111) })
-		assert(PromiseTestUtils.awaitSettled(promise, 10), "PromiseBuildTeleportData hung")
-		expect((promise:Yield())).toEqual(false)
+		expect(PromiseTestUtils.awaitRejected(builder:PromiseBuildTeleportData({ fakePlayer(111) }))).toEqual("boom")
 	end)
 end)

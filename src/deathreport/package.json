@@ -44,6 +44,7 @@
     "@quenty/playerbinder": "workspace:*",
     "@quenty/playerhumanoidbinder": "workspace:*",
     "@quenty/playermock": "workspace:*",
+    "@quenty/promise": "workspace:*",
     "@quenty/remoting": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/rxbinderutils": "workspace:*",

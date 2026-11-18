@@ -1,12 +1,5 @@
 --!strict
 --[[
-	Fact replication and the four ways a server answer may combine with a locally-resolved one.
-
-	The wire itself is not exercised here -- a headless test place has one realm and no client to receive
-	on -- so the transport is tested at its seam: the server side is driven to send, and the client side's
-	entry point, `SetServerFactValue`, is driven directly. The combining rules, which is where the
-	behaviour anyone can get wrong lives, are tested exhaustively as pure functions.
-
 	@class AccessReplication.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -20,6 +13,7 @@ local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local ServiceBag = require("ServiceBag")
 local ValueObject = require("ValueObject")
@@ -35,21 +29,35 @@ local ON_DISALLOW = AccessFactServerOverrideBehavior.SERVER_OVERRIDE_ON_DISALLOW
 
 local combine = AccessFactServerOverrideBehavior.combine
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	fakePlayer: () -> Player,
+	localFact: (factName: string, initial: boolean?, behavior: string?) -> ValueObject.ValueObject<boolean?>,
+	registerFeature: (featureName: string, factNames: { string }) -> AccessFeature.AccessFeature,
+	observeFeature: (
+		player: Player,
+		feature: AccessFeature.AccessFeature
+	) -> ObservableSpy.ObservableSpy<AccessStateUtils.AccessState>,
+	report: (player: Player, factName: string) -> AccessDataService.AccessFactReport,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
 		accessDataService = accessDataService,
-		fakePlayer = function(): Player
-			return maid:Add(PlayerMock.new()) :: any
+		fakePlayer = function()
+			return maid:Add(PlayerMock.new())
 		end,
-		localFact = function(factName: string, initial: boolean?, behavior: string?)
-			local valueObject = maid:Add(ValueObject.new(initial)) :: any
+		localFact = function(factName, initial, behavior)
+			local valueObject = maid:Add(ValueObject.new(initial))
 			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(factName, {
 				resolve = function()
 					return valueObject
@@ -58,12 +66,16 @@ local function setup()
 			}))))
 			return valueObject
 		end,
-		report = function(player: Player, factName: string): any
-			local last = nil
-			maid:GiveTask(accessDataService:ObserveFactReport(player, factName):Subscribe(function(value)
-				last = value
-			end))
-			return last
+		registerFeature = function(featureName, factNames)
+			local feature = maid:Add(AccessFeature.anyOf(featureName, factNames))
+			maid:GiveTask(accessDataService:RegisterFeature(feature))
+			return feature
+		end,
+		observeFeature = function(player, feature)
+			return maid:Add(ObservableSpy.new(accessDataService:ObserveFeature(player, feature)))
+		end,
+		report = function(player, factName)
+			return maid:Add(ObservableSpy.new(accessDataService:ObserveFactReport(player, factName))):GetLastValue()
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -75,10 +87,21 @@ local function setup()
 	return controller
 end
 
+local function findLayer(
+	report: AccessDataService.AccessFactReport,
+	source: string
+): AccessDataService.AccessFactLayerReport
+	for _, layer in report.layers do
+		if layer.source == source then
+			return layer
+		end
+	end
+
+	error(`No {source} layer in the report`)
+end
+
 describe("AccessFactServerOverrideBehavior.combine", function()
 	it("leaves the local answer alone until the server has actually said something", function()
-		-- NOT_YET_ARRIVED and ABSTAINED both mean silence, and neither is a denial. Confusing either with
-		-- "arrived saying no" is what would make a client worse off for having replication at all.
 		for _, behavior in { ALL, NONE, ON_ALLOW, ON_DISALLOW } do
 			expect(combine(true, nil, AccessReplicationState.NOT_YET_ARRIVED, behavior)).toEqual(true)
 			expect(combine(false, nil, AccessReplicationState.NOT_YET_ARRIVED, behavior)).toEqual(false)
@@ -87,8 +110,6 @@ describe("AccessFactServerOverrideBehavior.combine", function()
 	end)
 
 	it("settles a realm that has no answer of its own, whatever the behavior", function()
-		-- The gap this closes: a fact the client cannot compute has no local answer to protect, so the
-		-- server's answer is simply the answer. Without this it hangs unresolved forever.
 		for _, behavior in { ALL, NONE, ON_ALLOW, ON_DISALLOW } do
 			expect(combine(nil, false, AccessReplicationState.RESOLVED, behavior)).toEqual(false)
 			expect(combine(nil, true, AccessReplicationState.RESOLVED, behavior)).toEqual(true)
@@ -107,19 +128,15 @@ describe("AccessFactServerOverrideBehavior.combine", function()
 
 	it("only ever opens under SERVER_OVERRIDE_ON_ALLOW_ONLY", function()
 		expect(combine(false, true, AccessReplicationState.RESOLVED, ON_ALLOW)).toEqual(true)
-		-- and never closes
 		expect(combine(true, false, AccessReplicationState.RESOLVED, ON_ALLOW)).toEqual(true)
 	end)
 
 	it("only ever closes under SERVER_OVERRIDE_ON_DISALLOW_ONLY", function()
 		expect(combine(true, false, AccessReplicationState.RESOLVED, ON_DISALLOW)).toEqual(false)
-		-- and never opens
 		expect(combine(false, true, AccessReplicationState.RESOLVED, ON_DISALLOW)).toEqual(false)
 	end)
 
 	it("treats a server that answered unresolved as an answer", function()
-		-- UNRESOLVED is the server saying "nobody knows", which stops a local fall-through -- that is how
-		-- a console override forces a fact to unresolved.
 		expect(combine(true, nil, AccessReplicationState.UNRESOLVED, ALL)).toEqual(nil)
 	end)
 
@@ -138,8 +155,6 @@ end)
 
 describe("AccessDataService.SetServerFactValue", function()
 	it("turns a locally-unresolvable fact into a real answer", function()
-		-- The motivating case: the client cannot see the mechanism, so it reads unresolved until the
-		-- server says otherwise.
 		local controller = setup()
 		controller.localFact("serverOnly", nil)
 
@@ -160,26 +175,16 @@ describe("AccessDataService.SetServerFactValue", function()
 		local player = controller.fakePlayer()
 		controller.accessDataService:SetServerFactValue(player, "ownsGame", true)
 
-		-- The local answer is not a separate field any more: it is a layer, visible in the readout under
-		-- the replicated one that outranked it.
 		local report = controller.report(player, "ownsGame")
 		expect(report.serverValue).toEqual(true)
 		expect(report.value).toEqual(true)
 		expect(report.decidedBy).toEqual("replicated")
-
-		local localLayer = nil
-		for _, layer in report.layers do
-			if layer.source == "default" then
-				localLayer = layer
-			end
-		end
-		expect((localLayer :: any).value).toEqual(false)
+		expect(findLayer(report, "default").value).toEqual(false)
 
 		controller:Destroy()
 	end)
 
 	it("does not override under SERVER_OVERRIDE_NONE, but still reports what the server said", function()
-		-- Replication always happens; only the overriding is configurable.
 		local controller = setup()
 		controller.localFact("clientKnows", false, NONE)
 
@@ -221,21 +226,16 @@ describe("AccessDataService.SetServerFactValue", function()
 	it("reaches the feature that reads the fact", function()
 		local controller = setup()
 		controller.localFact("serverOnly", nil)
-
-		local feature = controller.maid:Add(AccessFeature.anyOf("chapters", { "serverOnly" }))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		local feature = controller.registerFeature("chapters", { "serverOnly" })
 
 		local player = controller.fakePlayer()
-		local last = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller.accessDataService:SetServerFactValue(player, "serverOnly", true)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -257,57 +257,40 @@ end)
 
 describe("facts the client cannot compute at all", function()
 	it("settles on a server denial instead of hanging forever", function()
-		-- The failure this guards is not a wrong answer, it is a screen that never fills in: a receipt
-		-- lives in a server-only DataStore, so the client resolver has nothing to read, and under a
-		-- behavior that only lets allows through a denial would never arrive.
 		local controller = setup()
 		controller.localFact("entitled", nil)
-
-		local feature = controller.maid:Add(AccessFeature.anyOf("chapter2", { "entitled" }))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		local feature = controller.registerFeature("chapter2", { "entitled" })
 
 		local player = controller.fakePlayer()
-		local last = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller.accessDataService:SetServerFactValue(player, "entitled", false)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(false)
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(false)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(false)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(false)
 
 		controller:Destroy()
 	end)
 
 	it("resolves a fact that is not registered on this realm at all", function()
-		-- A client cannot register a resolver for something it has no way to read, so the fact exists
-		-- here only as a replicated value.
 		local controller = setup()
-
-		local feature = controller.maid:Add(AccessFeature.anyOf("chapter2", { "serverOnlyEntitlement" }))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
+		local feature = controller.registerFeature("chapter2", { "serverOnlyEntitlement" })
 
 		local player = controller.fakePlayer()
-		local last = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller.accessDataService:SetServerFactValue(player, "serverOnlyEntitlement", true)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
 
 	it("still lets a local answer stand where there is one", function()
-		-- Rule 2 must not become "the server always wins": a fact this realm can answer keeps its
-		-- behavior.
 		local controller = setup()
 		controller.localFact("ownsGame", true)
 
@@ -321,20 +304,9 @@ describe("facts the client cannot compute at all", function()
 end)
 
 describe("AccessDataService.SetReplicatedFeatureFactNames", function()
-	--[[
-		A fact's value replicates per player; which facts a feature reads is game-wide. A game that widens a
-		feature only on the server would otherwise leave the client gating on the narrower rule -- the two
-		realms reaching different verdicts, which is the failure this package exists to prevent.
-	]]
-	local function registerFeature(controller: any, featureName: string, factNames: { string })
-		local feature = controller.maid:Add(AccessFeature.anyOf(featureName, factNames))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
-		return feature
-	end
-
 	it("widens a feature this realm never pushed onto", function()
 		local controller = setup()
-		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		local feature = controller.registerFeature("chapters", { "ownsGame" })
 
 		controller.accessDataService:SetReplicatedFeatureFactNames({
 			chapters = { "ownsGame", "gamePass" },
@@ -346,35 +318,29 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 	end)
 
 	it("carries a verdict through the fact it was told about", function()
-		-- The point of being told at all: the client has no resolver for the pushed fact, so its answer
-		-- can only come from the per-player replication.
 		local controller = setup()
-		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		local feature = controller.registerFeature("chapters", { "ownsGame" })
 		controller.localFact("ownsGame", false)
 
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame", "gamePass" } })
 
 		local player = controller.fakePlayer()
-		local last = nil
-		controller.maid:GiveTask(controller.accessDataService:ObserveFeature(player, feature):Subscribe(function(state)
-			last = state
-		end))
+		local states = controller.observeFeature(player, feature)
 
-		expect(AccessStateUtils.isUnresolved(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isUnresolved(states:GetLastValue())).toEqual(true)
 
 		controller.accessDataService:SetServerFactValue(player, "gamePass", true)
 
-		expect(AccessStateUtils.isAllowed(last :: any)).toEqual(true)
+		expect(AccessStateUtils.isAllowed(states:GetLastValue())).toEqual(true)
 
 		controller:Destroy()
 	end)
 
 	it("applies to a feature registered after the payload arrived", function()
-		-- Registration order is not ours to control, and either signal may land first.
 		local controller = setup()
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "gamePass" } })
 
-		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		local feature = controller.registerFeature("chapters", { "ownsGame" })
 
 		expect(feature:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
 
@@ -383,7 +349,7 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 
 	it("takes back a fact the server stops naming", function()
 		local controller = setup()
-		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		local feature = controller.registerFeature("chapters", { "ownsGame" })
 
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame", "gamePass" } })
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame" } })
@@ -394,10 +360,8 @@ describe("AccessDataService.SetReplicatedFeatureFactNames", function()
 	end)
 
 	it("never takes back a fact this realm pushed itself", function()
-		-- Replication widens a feature here, it does not own it. A game that pushed in shared code keeps
-		-- its grant whatever the server happens to be saying.
 		local controller = setup()
-		local feature = registerFeature(controller, "chapters", { "ownsGame" })
+		local feature = controller.registerFeature("chapters", { "ownsGame" })
 		controller.maid:GiveTask(feature:PushFactNameAllowsFeature("staffAllowlist"))
 
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "ownsGame" } })
@@ -420,8 +384,6 @@ end)
 
 describe("replicated feature facts across a feature's lifetime", function()
 	it("re-applies to a feature registered again under the same name", function()
-		-- The removers are keyed by name but close over the feature object. Left behind, they make the
-		-- replacement look already-pushed, and it silently gates on the narrower rule.
 		local controller = setup()
 		controller.accessDataService:SetReplicatedFeatureFactNames({ chapters = { "gamePass" } })
 
@@ -431,8 +393,7 @@ describe("replicated feature facts across a feature's lifetime", function()
 
 		unregister()
 
-		local second = controller.maid:Add(AccessFeature.anyOf("chapters", { "ownsGame" }))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(second))
+		local second = controller.registerFeature("chapters", { "ownsGame" })
 
 		expect(second:GetFactNames()).toEqual({ "ownsGame", "gamePass" })
 
@@ -441,14 +402,7 @@ describe("replicated feature facts across a feature's lifetime", function()
 end)
 
 describe("AccessDataService.SetReplicatedFactOverrides", function()
-	--[[
-		An override is a debugging instruction, not an entitlement. One that took effect in only one realm
-		would be the worst of both: the server's gate open while the client still renders it shut, and
-		nothing in either readout saying why.
-	]]
 	it("closes a gate the local answer had opened", function()
-		-- The case a replicated *value* cannot reach: under the default behaviour a server false never
-		-- overrides a local true, so without this the override simply would not land.
 		local controller = setup()
 		controller.localFact("ownsGame", true)
 
@@ -471,23 +425,12 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 
 		local report = controller.report(player, "ownsGame")
 		expect(report.decidedBy).toEqual("override")
-
-		local overrideLayer = nil
-		for _, layer in report.layers do
-			if layer.source == "override" then
-				overrideLayer = layer
-			end
-		end
-
-		-- Named as the server's, so "I cleared that override and it is still set" is a short conversation.
-		expect((overrideLayer :: any).metadata.replicated).toEqual(true)
+		expect(findLayer(report, "override").metadata).toEqual({ replicated = true })
 
 		controller:Destroy()
 	end)
 
 	it("carries a forced-unresolved override, which is a thing people deliberately do", function()
-		-- The entry exists with no value. JSON drops nil, so presence is what says an override is set at
-		-- all -- otherwise "force this to unresolved" arrives as "no override".
 		local controller = setup()
 		controller.localFact("ownsGame", true)
 
@@ -500,7 +443,6 @@ describe("AccessDataService.SetReplicatedFactOverrides", function()
 	end)
 
 	it("lets a local override shadow the server's", function()
-		-- So somebody investigating in this realm is not fighting a console session left running elsewhere.
 		local controller = setup()
 		controller.localFact("ownsGame", true)
 

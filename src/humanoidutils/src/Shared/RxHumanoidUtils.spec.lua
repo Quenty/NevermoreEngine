@@ -8,7 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local RxHumanoidUtils = require("RxHumanoidUtils")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -21,22 +23,7 @@ local function setup(): any
 		newHumanoid = function(): Humanoid
 			return maid:Add(Instance.new("Humanoid"))
 		end,
-		record = function(observable: any): { any }
-			local values = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-			return values
-		end,
-		recordUntilStopped = function(observable: any): ({ any }, () -> ())
-			local values = {}
-			local subscription = maid:Add(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-			return values, function()
-				subscription:Destroy()
-			end
-		end,
+		maid = maid,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -64,7 +51,7 @@ describe("RxHumanoidUtils.observeRunningSpeed", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local speeds = controller.record(RxHumanoidUtils.observeRunningSpeed(humanoid))
+		local speeds = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeRunningSpeed(humanoid))
 
 		expect(speeds).toEqual({ 0 })
 
@@ -77,7 +64,7 @@ describe("RxHumanoidUtils.observeHumanoidStateType", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local stateTypes = controller.record(RxHumanoidUtils.observeHumanoidStateType(humanoid))
+		local stateTypes = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeHumanoidStateType(humanoid))
 
 		expect(stateTypes).toEqual({ humanoid:GetState() })
 
@@ -111,8 +98,10 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled =
-			controller.record(RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping))
+		local enabled = RxTestUtils.collectList(
+			controller.maid,
+			RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)
+		)
 
 		expect(enabled).toEqual({ true })
 
@@ -123,8 +112,10 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled =
-			controller.record(RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping))
+		local enabled = RxTestUtils.collectList(
+			controller.maid,
+			RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)
+		)
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
@@ -138,8 +129,10 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled =
-			controller.record(RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping))
+		local enabled = RxTestUtils.collectList(
+			controller.maid,
+			RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)
+		)
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
@@ -154,8 +147,10 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled =
-			controller.record(RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping))
+		local enabled = RxTestUtils.collectList(
+			controller.maid,
+			RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)
+		)
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
@@ -169,14 +164,14 @@ describe("RxHumanoidUtils.observeHumanoidStateEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled, stop = controller.recordUntilStopped(
-			RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping)
+		local enabled = controller.maid:Add(
+			ObservableSpy.new(RxHumanoidUtils.observeHumanoidStateEnabled(humanoid, Enum.HumanoidStateType.Jumping))
 		)
 
-		stop()
+		enabled:Destroy()
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 
-		expect(enabled).toEqual({ true })
+		expect(enabled.Values).toEqual({ true })
 
 		controller:Destroy()
 	end)
@@ -197,7 +192,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		expect(enabled).toEqual({ true })
 
@@ -208,7 +203,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
@@ -224,7 +219,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		humanoid.UseJumpPower = true
 		humanoid.JumpHeight = 0
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid.JumpPower = 0
 		humanoid.JumpPower = 50
@@ -240,7 +235,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		humanoid.UseJumpPower = false
 		humanoid.JumpPower = 0
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid.JumpHeight = 0
 		humanoid.JumpHeight = 7
@@ -257,7 +252,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		humanoid.JumpPower = 50
 		humanoid.JumpHeight = 0
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid.UseJumpPower = false
 		humanoid.UseJumpPower = true
@@ -273,7 +268,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		humanoid.UseJumpPower = true
 		humanoid.JumpPower = 50
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid.JumpHeight = 0
 		humanoid.JumpHeight = 12
@@ -289,7 +284,7 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		humanoid.JumpPower = 0
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 
-		local enabled = controller.record(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = RxTestUtils.collectList(controller.maid, RxHumanoidUtils.observeJumpEnabled(humanoid))
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 		humanoid.JumpPower = 50
@@ -303,12 +298,12 @@ describe("RxHumanoidUtils.observeJumpEnabled", function()
 		local controller = setup()
 		local humanoid = controller.newHumanoid()
 
-		local enabled, stop = controller.recordUntilStopped(RxHumanoidUtils.observeJumpEnabled(humanoid))
+		local enabled = controller.maid:Add(ObservableSpy.new(RxHumanoidUtils.observeJumpEnabled(humanoid)))
 
-		stop()
+		enabled:Destroy()
 		humanoid.JumpPower = 0
 
-		expect(enabled).toEqual({ true })
+		expect(enabled.Values).toEqual({ true })
 
 		controller:Destroy()
 	end)

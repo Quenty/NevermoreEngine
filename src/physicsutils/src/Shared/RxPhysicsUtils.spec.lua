@@ -8,55 +8,50 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local RxPhysicsUtils = require("RxPhysicsUtils")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 type Controller = {
+	maid: Maid.Maid,
 	newPart: (density: number?) -> BasePart,
-	observeMass: (part: BasePart) -> { number },
 	Destroy: (self: Controller) -> (),
 }
 
 local function setup(): Controller
 	local maid = Maid.new()
 
-	local folder = Instance.new("Folder")
+	local folder = maid:Add(Instance.new("Folder"))
 	folder.Name = "RxPhysicsUtilsSpec"
 	folder.Parent = Workspace
-	maid:GiveTask(folder)
 
-	local self = {} :: Controller
+	local controller: Controller = {
+		maid = maid,
+		newPart = function(density)
+			local part = Instance.new("Part")
+			part.Anchored = true
+			part.Size = Vector3.new(2, 2, 2)
+			if density then
+				part.CustomPhysicalProperties = PhysicalProperties.new(density, 0, 0)
+			end
+			part.Parent = folder
 
-	function self.newPart(density: number?): BasePart
-		local part = Instance.new("Part")
-		part.Anchored = true
-		part.Size = Vector3.new(2, 2, 2)
-		if density then
-			part.CustomPhysicalProperties = PhysicalProperties.new(density, 0, 0)
-		end
-		part.Parent = folder
+			return part
+		end,
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
 
-		return part
-	end
+	maid:GiveTask(JestUtils.afterThis(controller))
 
-	function self.observeMass(part: BasePart): { number }
-		local values = {}
-		maid:GiveTask(RxPhysicsUtils.observePartMass(part):Subscribe(function(mass)
-			table.insert(values, mass)
-		end))
-
-		return values
-	end
-
-	function self.Destroy(_self: Controller)
-		maid:DoCleaning()
-	end
-
-	return self
+	return controller
 end
 
 describe("RxPhysicsUtils.observePartMass", function()
@@ -64,85 +59,65 @@ describe("RxPhysicsUtils.observePartMass", function()
 		local controller = setup()
 		local part = controller.newPart(1)
 
-		local values = controller.observeMass(part)
+		local masses = RxTestUtils.collectList(controller.maid, RxPhysicsUtils.observePartMass(part))
 
-		expect(values).toEqual({ 8 })
-
-		controller:Destroy()
+		expect(masses).toEqual({ 8 })
 	end)
 
 	it("emits when the size changes", function()
 		local controller = setup()
 		local part = controller.newPart(1)
-		local values = controller.observeMass(part)
+		local masses = RxTestUtils.collectList(controller.maid, RxPhysicsUtils.observePartMass(part))
 
 		part.Size = Vector3.new(1, 2, 3)
-		task.wait()
 
-		expect(values).toEqual({ 8, 6 })
-
-		controller:Destroy()
+		expect(masses).toEqual({ 8, 6 })
 	end)
 
 	it("emits when the custom physical properties change", function()
 		local controller = setup()
 		local part = controller.newPart(1)
-		local values = controller.observeMass(part)
+		local masses = RxTestUtils.collectList(controller.maid, RxPhysicsUtils.observePartMass(part))
 
 		part.CustomPhysicalProperties = PhysicalProperties.new(2, 0, 0)
-		task.wait()
 
-		expect(values).toEqual({ 8, 16 })
-
-		controller:Destroy()
+		expect(masses).toEqual({ 8, 16 })
 	end)
 
 	it("emits when the material changes the density", function()
 		local controller = setup()
 		local part = controller.newPart()
 		part.Material = Enum.Material.Plastic
-		local values = controller.observeMass(part)
+		local masses = RxTestUtils.collectList(controller.maid, RxPhysicsUtils.observePartMass(part))
 		local plasticMass = part:GetMass()
 
 		part.Material = Enum.Material.Metal
-		task.wait()
 
 		local metalMass = part:GetMass()
 		expect(metalMass).never.toBeCloseTo(plasticMass, 3)
-		expect(values).toEqual({ plasticMass, metalMass })
-
-		controller:Destroy()
+		expect(masses).toEqual({ plasticMass, metalMass })
 	end)
 
 	it("does not emit when a watched property changes but the mass does not", function()
 		local controller = setup()
 		local part = controller.newPart(1)
-		local values = controller.observeMass(part)
+		local masses = RxTestUtils.collectList(controller.maid, RxPhysicsUtils.observePartMass(part))
 
 		part.Material = Enum.Material.Metal
-		task.wait()
 
-		expect(values).toEqual({ 8 })
-
-		controller:Destroy()
+		expect(masses).toEqual({ 8 })
 	end)
 
 	it("stops emitting after unsubscribe", function()
 		local controller = setup()
 		local part = controller.newPart(1)
 
-		local values = {}
-		local subscription = RxPhysicsUtils.observePartMass(part):Subscribe(function(mass)
-			table.insert(values, mass)
-		end)
-		subscription:Destroy()
+		local masses = controller.maid:Add(ObservableSpy.new(RxPhysicsUtils.observePartMass(part)))
+		masses:Destroy()
 
 		part.Size = Vector3.new(4, 4, 4)
-		task.wait()
 
-		expect(values).toEqual({ 8 })
-
-		controller:Destroy()
+		expect(masses.Values).toEqual({ 8 })
 	end)
 
 	it("errors when given a non-part", function()

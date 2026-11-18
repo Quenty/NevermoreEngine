@@ -1,8 +1,5 @@
 --!strict
 --[[
-	The snapshot APIs. These exist so somebody writing facts, features and policies can print what is
-	actually registered instead of inferring it from the code they hoped ran.
-
 	@class AccessDebugState.spec.lua
 ]]
 local require = require(script.Parent.loader).load(script)
@@ -27,8 +24,18 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	serviceBag: ServiceBag.ServiceBag,
+	accessDataService: AccessDataService.AccessDataService,
+	accessPolicyService: AccessPolicyService.AccessPolicyService,
+	unresolvedFact: (factName: string, options: { priority: number?, source: string? }?) -> AccessFact.AccessFact,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
+
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
 	local accessPolicyService: AccessPolicyService.AccessPolicyService =
@@ -36,11 +43,20 @@ local function setup()
 	serviceBag:Init()
 	serviceBag:Start()
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
 		serviceBag = serviceBag,
 		accessDataService = accessDataService,
 		accessPolicyService = accessPolicyService,
+		unresolvedFact = function(factName, options)
+			return maid:Add(AccessFact.new(factName, {
+				resolve = function()
+					return nil
+				end,
+				priority = if options then options.priority else nil,
+				source = if options then options.source else nil,
+			}))
+		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -53,14 +69,9 @@ end
 
 describe("AccessFact.GetDebugState", function()
 	it("reports the things that decide a merge", function()
-		local maid = Maid.new()
-		local fact = maid:Add(AccessFact.new("isStaff", {
-			resolve = function()
-				return nil
-			end,
-			priority = AccessFactPriority.ELEVATED,
-			source = "allowlist",
-		}))
+		local controller = setup()
+		local fact =
+			controller.unresolvedFact("isStaff", { priority = AccessFactPriority.ELEVATED, source = "allowlist" })
 
 		expect(fact:GetDebugState()).toEqual({
 			factName = "isStaff",
@@ -69,26 +80,22 @@ describe("AccessFact.GetDebugState", function()
 			serverOverrideBehavior = AccessFactServerOverrideBehavior.DEFAULT,
 		})
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 end)
 
 describe("AccessFeature.GetDebugState", function()
 	it("includes facts pushed on after the feature was written", function()
-		-- Reading the source of a feature is no longer enough to know what it reads.
-		local maid = Maid.new()
-		local feature = maid:Add(AccessFeature.anyOf("shop", { "ownsGame" }))
-		maid:GiveTask(feature:PushFactAllowsFeature(maid:Add(AccessFact.new("isStaff", {
-			resolve = function()
-				return nil
-			end,
-		}))))
+		local controller = setup()
+		local feature = controller.maid:Add(AccessFeature.anyOf("shop", { "ownsGame" }))
+		controller.maid:GiveTask(feature:PushFactAllowsFeature(controller.unresolvedFact("isStaff")))
 
 		local state = feature:GetDebugState()
+
 		expect(state.featureName).toEqual("shop")
 		expect(#state.facts).toEqual(2)
 
-		maid:DoCleaning()
+		controller:Destroy()
 	end)
 end)
 
@@ -123,6 +130,7 @@ describe("AccessDataService.GetDebugState", function()
 		local controller = setup()
 
 		local state = controller.accessDataService:GetDebugState()
+
 		expect(#state.facts[AccessFactNames.PLAYER_IS_ADMIN]).toEqual(1)
 		expect(state.facts[AccessFactNames.PLAYER_IS_ADMIN][1].source).toEqual("permission")
 
@@ -131,19 +139,14 @@ describe("AccessDataService.GetDebugState", function()
 
 	it("shows a second layer once one is added", function()
 		local controller = setup()
-		controller.maid:GiveTask(
-			controller.accessDataService:RegisterFact(
-				controller.maid:Add(AccessFact.new(AccessFactNames.PLAYER_IS_ADMIN, {
-					resolve = function()
-						return nil
-					end,
-					priority = AccessFactPriority.ELEVATED,
-					source = "gameAllowlist",
-				}))
-			)
+		local fact = controller.unresolvedFact(
+			AccessFactNames.PLAYER_IS_ADMIN,
+			{ priority = AccessFactPriority.ELEVATED, source = "gameAllowlist" }
 		)
+		controller.maid:GiveTask(controller.accessDataService:RegisterFact(fact))
 
 		local state = controller.accessDataService:GetDebugState()
+
 		expect(#state.facts[AccessFactNames.PLAYER_IS_ADMIN]).toEqual(2)
 
 		controller:Destroy()
@@ -153,6 +156,7 @@ describe("AccessDataService.GetDebugState", function()
 		local controller = setup()
 
 		local state = controller.accessDataService:GetDebugState()
+
 		expect(state.features[WellKnownAccessFeatureNames.OWNS_GAME].facts).toEqual({ AccessFactNames.OWNS_GAME })
 
 		controller:Destroy()
@@ -163,10 +167,11 @@ describe("AccessPolicyService.GetDebugState", function()
 	it("includes disabled policies, which is most of the answer to why nothing happened", function()
 		local controller = setup()
 
-		local state = controller.accessPolicyService:GetDebugState()
-		expect(state[AccessPolicyNames.KICK_ON_NON_ADMIN].enabled).toEqual(false)
-		expect(state[AccessPolicyNames.KICK_ON_NON_ADMIN].realm).toEqual(AccessPolicyRealm.SERVER)
-		expect(state[AccessPolicyNames.KICK_ON_NON_ADMIN].facts).toEqual({ AccessFactNames.PLAYER_IS_ADMIN })
+		local state = controller.accessPolicyService:GetDebugState()[AccessPolicyNames.KICK_ON_NON_ADMIN]
+
+		expect(state.enabled).toEqual(false)
+		expect(state.realm).toEqual(AccessPolicyRealm.SERVER)
+		expect(state.facts).toEqual({ AccessFactNames.PLAYER_IS_ADMIN })
 
 		controller:Destroy()
 	end)
@@ -175,9 +180,9 @@ describe("AccessPolicyService.GetDebugState", function()
 		local controller = setup()
 		controller.accessPolicyService:SetPolicyEnabled(AccessPolicyNames.KICK_ON_NON_ADMIN, true)
 
-		expect(controller.accessPolicyService:GetDebugState()[AccessPolicyNames.KICK_ON_NON_ADMIN].enabled).toEqual(
-			true
-		)
+		local state = controller.accessPolicyService:GetDebugState()[AccessPolicyNames.KICK_ON_NON_ADMIN]
+
+		expect(state.enabled).toEqual(true)
 
 		controller:Destroy()
 	end)

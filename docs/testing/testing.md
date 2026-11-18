@@ -48,6 +48,13 @@ describe("MyUtils", function()
 end)
 ```
 
+### Performance
+
+* Never wait for frames (task.wait(), Heartbeat, Stepped) in a test. Instead, use Jest fake timers, immediate work, or other strategies to avoid yielding or busy looping. You may also use a single StepUtils.deferWait() to flush events.
+* Don't poll for a condition. Assert it right away. Attribute writes, `ObservableMap` changes and `PlayerBinder` binding a mock all happen before the next line, so a server and a client `ServiceBag` in one place replicate synchronously.
+* `StepUtils.deferWait()` flushes one deferred step. If the code under test defers twice in a chain, you need two.
+* Jest fake timers also replace `task.delay`, `task.wait` and `os.clock` inside package code, so a real delay like a retry backoff or a slow-reply threshold can be advanced with `jest.advanceTimersByTime`. This only holds for modules that the current spec file loaded first. A module an earlier spec already loaded keeps its real timers, and it does so silently. An advance followed by "nothing happened" then passes without testing anything, so check the timer actually fires (assert something happens at the deadline), not only that nothing happens before it.
+
 ### Self-documenting code
 
 Spec files should be comment-free apart from lint directives (`--!strict`, `-- selene:`) and the
@@ -83,12 +90,17 @@ local function setup()
 
 	local thing = maid:Add(SomeClass.new(serviceBag))
 
-	return {
+	local controller = {
+		maid = maid,
 		thing = thing,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 it("does a thing", function()
@@ -136,12 +148,11 @@ local JestUtils = require("JestUtils")
 
 it("does a thing", function()
 	local controller = setup()
-	JestUtils.afterThis(controller)
 
-	local thing = SomeClass.new()
-	JestUtils.afterThis(thing)
-
+	local thing = controller.maid:Add(SomeClass.new())
 	expect(thing:DoSomething()).toEqual(true)
+
+	controller:Destroy()
 end)
 ```
 
@@ -157,6 +168,23 @@ first wins and nothing is destroyed twice:
 local maid = Maid.new()
 maid:GiveTask(JestUtils.afterThis(maid))
 ```
+
+### Testing observables
+
+Collect what an observable emits with `RxTestUtils.collectList(maid, observable)` from `@quenty/rx`,
+then assert on the list. Attribute and instance changes emit synchronously, so assert right after
+the change:
+
+```luau
+local versions = RxTestUtils.collectList(controller.maid, attributeValue:Observe())
+
+attributeValue.Value = "2.0.0"
+
+expect(versions).toEqual({ "1.0.0", "2.0.0" })
+```
+
+`RxTestUtils.collectSet` checks what arrived when order doesn't matter. `ObservableSpy` adds
+completion, failure and `nil` emissions: `GetCount()`, `IsComplete()`, `PromiseOnError()`.
 
 ### Consume every rejection (or Jest passes but the run still fails)
 
@@ -513,8 +541,11 @@ Options:
 Run tests across multiple packages, with automatic change detection:
 
 ```bash
-# Test only packages changed vs origin/main
+# Test packages changed vs origin/main
 nevermore batch test
+
+# Test uncommitted changes in the working tree, plus their dependents
+nevermore batch test --cloud --base HEAD
 
 # Test all packages with test targets
 nevermore batch test --all

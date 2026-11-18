@@ -16,6 +16,7 @@ local PromiseTestUtils = require("PromiseTestUtils")
 local Remoting = require("Remoting")
 local RemotingRealms = require("RemotingRealms")
 local ServiceBag = require("ServiceBag")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -364,9 +365,6 @@ describe("Remoting dummy-mode round trip", function()
 
 		client:FireServer("Ping", 42)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return received ~= nil
-		end)).toEqual(true)
 		expect(received).toEqual(42)
 
 		server:Destroy()
@@ -385,9 +383,6 @@ describe("Remoting dummy-mode round trip", function()
 
 		client:FireServer("Ping")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return receivedPlayer ~= nil
-		end)).toEqual(true)
 		expect(receivedPlayer).toBe(playerMock)
 
 		restoreLocalPlayer()
@@ -427,9 +422,6 @@ describe("Remoting dummy-mode round trip", function()
 
 		PromiseTestUtils.awaitFulfilled(client:PromiseFireServer("Ping", 42))
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return received ~= nil
-		end)).toEqual(true)
 		expect(received).toEqual(42)
 
 		server:Destroy()
@@ -451,9 +443,6 @@ describe("Remoting dummy-mode round trip", function()
 
 		server:FireClient("Pong", playerMock, 42)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return received ~= nil
-		end)).toEqual(true)
 		expect(received).toEqual(42)
 
 		restoreLocalPlayer()
@@ -479,9 +468,7 @@ describe("Remoting dummy-mode round trip", function()
 		server:FireClient("Pong", otherPlayerMock, "dropped")
 		server:FireClient("Pong", playerMock, "delivered")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedTags >= 1
-		end)).toEqual(true)
+		expect(#receivedTags >= 1).toBe(true)
 		expect(receivedTags).toEqual({ "delivered" })
 
 		restoreLocalPlayer()
@@ -509,9 +496,7 @@ describe("Remoting dummy-mode round trip", function()
 
 		server:FireAllClients("Pong", 42)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return receivedA ~= nil and receivedB ~= nil
-		end)).toEqual(true)
+		expect(receivedA ~= nil and receivedB ~= nil).toBe(true)
 		expect(receivedA).toEqual(42)
 		expect(receivedB).toEqual(42)
 
@@ -538,9 +523,7 @@ describe("Remoting dummy-mode round trip", function()
 		server:FireAllClientsExcept("Pong", otherPlayerMock, "delivered")
 		server:FireAllClientsExcept("Pong", nil, "broadcast")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedTags >= 2
-		end)).toEqual(true)
+		expect(#receivedTags >= 2).toBe(true)
 		expect(receivedTags).toEqual({ "delivered", "broadcast" })
 
 		restoreLocalPlayer()
@@ -568,9 +551,7 @@ describe("Remoting dummy-mode round trip", function()
 		local restoreLocalPlayer = PlayerMock.setMockedLocalPlayer(playerMock)
 		server:FireClient("Pong", playerMock, "delivered")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedTags >= 1
-		end)).toEqual(true)
+		expect(#receivedTags >= 1).toBe(true)
 		expect(receivedTags).toEqual({ "delivered" })
 
 		restoreLocalPlayer()
@@ -614,9 +595,6 @@ describe("Remoting dummy-mode round trip", function()
 			result = server:InvokeClient("Compute", playerMock, 5)
 		end)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return result ~= nil
-		end)).toEqual(true)
 		expect(result).toEqual(10)
 
 		restoreLocalPlayer()
@@ -627,23 +605,19 @@ describe("Remoting dummy-mode round trip", function()
 	end)
 
 	it("supports PlayerMocks through the RemotingMember API", function()
+		local maid = Maid.new()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
 		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
 		server.Pong:DeclareEvent()
 
-		local received
-		client.Pong:Connect(function(value)
-			received = value
-		end)
+		local received = SignalTestUtils.collectFireList(maid, client.Pong)
 
 		server.Pong:FireClient(playerMock, 42)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return received ~= nil
-		end)).toEqual(true)
-		expect(received).toEqual(42)
+		expect(received).toEqual({ 42 })
 
+		maid:DoCleaning()
 		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
@@ -652,14 +626,11 @@ describe("Remoting dummy-mode round trip", function()
 	end)
 
 	it("supports client-side fires and invokes through the RemotingMember API", function()
+		local maid = Maid.new()
 		local server, client, instance = newDummyRealmPair("RoundTrip")
 		local playerMock, restoreLocalPlayer = designateLocalPlayerMock(12345)
 
-		local receivedPlayer, receivedValue
-		server.Ping:Connect(function(player, value)
-			receivedPlayer = player
-			receivedValue = value
-		end)
+		local pings = SignalTestUtils.collectFireListTuples(maid, server.Ping)
 		server.Double:Bind(function(_player, n)
 			return n * 2
 		end)
@@ -669,12 +640,11 @@ describe("Remoting dummy-mode round trip", function()
 		local result = PromiseTestUtils.awaitFulfilled(client.Double:PromiseInvokeServer(5))
 		expect(result).toEqual(10)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return receivedValue ~= nil
-		end)).toEqual(true)
-		expect(receivedPlayer).toBe(playerMock)
-		expect(receivedValue).toEqual(42)
+		expect(#pings).toEqual(1)
+		expect(pings[1][1]).toBe(playerMock)
+		expect(pings[1][2]).toEqual(42)
 
+		maid:DoCleaning()
 		restoreLocalPlayer()
 		server:Destroy()
 		client:Destroy()
@@ -737,12 +707,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 		server:DeclareEvent("Pong")
 
-		-- The client attaches when the declared channel replicates into its observable, which may
-		-- resolve on a deferred signal -- refire until the attachment lands rather than racing it.
-		expect(PromiseTestUtils.awaitValue(function()
-			server:FireClient("Pong", playerMock, 42)
-			return received ~= nil
-		end)).toEqual(true)
+		server:FireClient("Pong", playerMock, 42)
 		expect(received).toEqual(42)
 
 		restoreLocalPlayer()
@@ -786,9 +751,7 @@ describe("Remoting dummy-mode connection lifecycle", function()
 
 		server:FireClient("Pong", playerMock, "late")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedTags >= 1
-		end)).toEqual(true)
+		expect(#receivedTags >= 1).toBe(true)
 		expect(receivedTags).toEqual({ "late" })
 
 		restoreLocalPlayer()
@@ -810,16 +773,12 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		end)
 
 		client:FireServer("Ping", "first")
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedA >= 1 and #receivedB >= 1
-		end)).toEqual(true)
+		expect(#receivedA >= 1 and #receivedB >= 1).toBe(true)
 
 		connectionMaid:DoCleaning()
 		client:FireServer("Ping", "second")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedB >= 2
-		end)).toEqual(true)
+		expect(#receivedB >= 2).toBe(true)
 		expect(receivedA).toEqual({ "first" })
 		expect(receivedB).toEqual({ "first", "second" })
 
@@ -843,16 +802,12 @@ describe("Remoting dummy-mode connection lifecycle", function()
 		end)
 
 		server:FireClient("Pong", playerMock, "first")
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedA >= 1 and #receivedB >= 1
-		end)).toEqual(true)
+		expect(#receivedA >= 1 and #receivedB >= 1).toBe(true)
 
 		connectionMaid:DoCleaning()
 		server:FireClient("Pong", playerMock, "second")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedB >= 2
-		end)).toEqual(true)
+		expect(#receivedB >= 2).toBe(true)
 		expect(receivedA).toEqual({ "first" })
 		expect(receivedB).toEqual({ "first", "second" })
 
@@ -876,9 +831,6 @@ describe("Remoting dummy-mode fidelity", function()
 
 		client:FireServer("Ping", 1, nil, 3)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return receivedArgs ~= nil
-		end)).toEqual(true)
 		expect(receivedArgs.n).toEqual(3)
 		expect(receivedArgs[1]).toEqual(1)
 		expect(receivedArgs[2]).toEqual(nil)
@@ -899,10 +851,9 @@ describe("Remoting dummy-mode fidelity", function()
 		end)
 
 		local promise = client:PromiseInvokeServer("Multi")
-		expect(PromiseTestUtils.awaitSettled(promise)).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(promise)
 
-		local isFulfilled, a, b, c = promise:Yield()
-		expect(isFulfilled).toEqual(true)
+		local _, a, b, c = promise:Yield()
 		expect(a).toEqual(1)
 		expect(b).toEqual(nil)
 		expect(c).toEqual(3)
@@ -985,15 +936,11 @@ describe("Remoting dummy-mode multiple simulated clients", function()
 		-- client's fire is awaited before the next client activates.
 		clientA.activate()
 		clientA.remoting:FireServer("Ping")
-		expect(PromiseTestUtils.awaitValue(function()
-			return #received >= 1
-		end)).toEqual(true)
+		expect(#received >= 1).toBe(true)
 
 		clientB.activate()
 		clientB.remoting:FireServer("Ping")
-		expect(PromiseTestUtils.awaitValue(function()
-			return #received >= 2
-		end)).toEqual(true)
+		expect(#received >= 2).toBe(true)
 
 		expect(received[1]).toBe(clientA.player)
 		expect(received[2]).toBe(clientB.player)
@@ -1026,9 +973,7 @@ describe("Remoting dummy-mode multiple simulated clients", function()
 		server:FireClient("Pong", clientB.player, "toB")
 		server:FireClient("Pong", clientA.player, "droppedA")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #receivedA >= 2 and #receivedB >= 2
-		end)).toEqual(true)
+		expect(#receivedA >= 2 and #receivedB >= 2).toBe(true)
 
 		-- Dummy mode has one simulated client wire: a delivered fire reaches every client-realm
 		-- Connect handler, so only the active-target filter distinguishes the simulated clients.
@@ -1090,9 +1035,7 @@ describe("Remoting dummy-mode multiple simulated clients", function()
 		clientA.activate()
 		clientA.remoting:FireServer("Ping")
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return #received >= 1
-		end)).toEqual(true)
+		expect(#received >= 1).toBe(true)
 		expect(received[1]).toBe(clientA.player)
 
 		clientA:Destroy()

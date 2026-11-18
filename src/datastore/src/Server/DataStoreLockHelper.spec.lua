@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -126,16 +127,13 @@ describe("DataStore session locking", function()
 			},
 		})
 
-		local stolenBy = nil
-		dataStore.SessionStolen:Connect(function(session)
-			stolenBy = session
-		end)
+		local stolenBy = SignalTestUtils.collectFireList(controller.maid, dataStore.SessionStolen)
 
 		dataStore:Store("coins", 2)
 		expect(PromiseTestUtils.awaitSettled(dataStore:Save(), 10)).toEqual(true)
 
-		expect(stolenBy).never.toBeNil()
-		expect(stolenBy.SessionId).toEqual("thief-session-id")
+		expect(#stolenBy).toEqual(1)
+		expect(stolenBy[1].SessionId).toEqual("thief-session-id")
 
 		controller:Destroy()
 	end)

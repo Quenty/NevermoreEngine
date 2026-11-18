@@ -14,6 +14,7 @@ local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMockService = require("PlayerMockService")
 local Rx = require("Rx")
 local ServiceBag = require("ServiceBag")
@@ -25,31 +26,40 @@ local it = Jest.Globals.it
 
 local featureCounter = 0
 
-local function setup()
+type Controller = {
+	maid: Maid.Maid,
+	accessDataService: AccessDataService.AccessDataService,
+	fakePlayer: () -> Player,
+	featureOn: (
+		rawName: string,
+		initial: boolean?
+	) -> (AccessFeature.AccessFeature, ValueObject.ValueObject<boolean?>),
+	registerFeature: (feature: AccessFeature.AccessFeature) -> AccessFeature.AccessFeature,
+	accessPlayerFor: (player: Player) -> any,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local serviceBag = maid:Add(ServiceBag.new())
 	local accessDataService: AccessDataService.AccessDataService = serviceBag:GetService(AccessDataService) :: any
-	-- A binder's class resolves its services during construction, long after the bag has started, so
-	-- every dependency has to already be in the bag before Start.
 	serviceBag:GetService(AccessService)
 	local binder = serviceBag:GetService(AccessPlayer) :: any
 	serviceBag:Init()
 	serviceBag:Start()
 
-	-- A bare PlayerMock.new() is not tracked, so nothing would discover it and the binder would never bind.
 	local playerMockService = serviceBag:GetService(PlayerMockService) :: any
 
-	local controller = {
+	local controller: Controller = {
 		maid = maid,
-		binder = binder,
 		accessDataService = accessDataService,
-		fakePlayer = function(): Player
-			return maid:Add(playerMockService:CreatePlayer()) :: any
+		fakePlayer = function()
+			return maid:Add(playerMockService:CreatePlayer())
 		end,
-		featureOn = function(rawName: string, initial: boolean?)
+		featureOn = function(rawName, initial)
 			featureCounter += 1
 			local featureName = `{rawName}{featureCounter}`
-			local valueObject = maid:Add(ValueObject.new(initial)) :: any
+			local valueObject = maid:Add(ValueObject.new(initial))
 			maid:GiveTask(accessDataService:RegisterFact(maid:Add(AccessFact.new(`{featureName}Fact`, {
 				resolve = function()
 					return valueObject
@@ -61,18 +71,15 @@ local function setup()
 
 			return feature, valueObject
 		end,
-		-- Binding runs off deferred CollectionService signals, so it is waited for rather than assumed.
-		accessPlayerFor = function(player: Player)
-			local deadline = os.clock() + 2
-			while os.clock() < deadline do
-				local bound = binder:Get(player)
-				if bound then
-					return bound
-				end
-				task.wait()
-			end
-
-			error("PlayerBinder did not bind the mock player")
+		registerFeature = function(feature)
+			maid:Add(feature)
+			maid:GiveTask(accessDataService:RegisterFeature(feature))
+			return feature
+		end,
+		accessPlayerFor = function(player)
+			local accessPlayer = binder:Get(player)
+			assert(accessPlayer, "PlayerBinder did not bind the mock player")
+			return accessPlayer
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -113,11 +120,8 @@ describe("AccessPlayer", function()
 
 		expect(accessPlayer:IsFeatureAllowed(chapters)).toEqual(true)
 
-		local observed = nil
-		controller.maid:GiveTask(accessPlayer:ObserveIsFeatureAllowed(chapters):Subscribe(function(value)
-			observed = value
-		end))
-		expect(observed).toEqual(true)
+		local isAllowed = controller.maid:Add(ObservableSpy.new(accessPlayer:ObserveIsFeatureAllowed(chapters)))
+		expect(isAllowed:GetLastValue()).toEqual(true)
 
 		controller:Destroy()
 	end)
@@ -129,8 +133,7 @@ describe("AccessPlayer", function()
 		local accessPlayer = controller.accessPlayerFor(controller.fakePlayer())
 
 		expect(accessPlayer:IsFeatureAllowed(chapters)).toEqual(false)
-		expect(accessPlayer:GetFeatureAllowedState(chapters).type).toEqual("disallowed")
-		expect((accessPlayer:GetFeatureAllowedState(chapters) :: any).reason).toEqual("unresolved")
+		expect(accessPlayer:GetFeatureAllowedState(chapters)).toEqual(AccessStateUtils.unresolved())
 
 		controller:Destroy()
 	end)
@@ -141,20 +144,16 @@ describe("AccessPlayer", function()
 
 		local accessPlayer = controller.accessPlayerFor(controller.fakePlayer())
 
-		local fired = {}
+		local allowedFeatureNames: { string } = {}
 		controller.maid:GiveTask(accessPlayer.FeatureAllowedChanged:Connect(function(featureName, isAllowed)
-			table.insert(fired, { featureName = featureName, isAllowed = isAllowed })
+			if isAllowed then
+				table.insert(allowedFeatureNames, featureName)
+			end
 		end))
 
 		ownsChapters.Value = true
 
-		local sawChapters = false
-		for _, entry in fired do
-			if entry.featureName == chapters:GetFeatureName() and entry.isAllowed then
-				sawChapters = true
-			end
-		end
-		expect(sawChapters).toEqual(true)
+		expect(table.find(allowedFeatureNames, chapters:GetFeatureName())).never.toBeNil()
 
 		controller:Destroy()
 	end)
@@ -190,12 +189,10 @@ end)
 
 describe("AccessPlayer and per-thing features", function()
 	it("leaves a subject-requiring feature out of the blanket tracking", function()
-		-- The tracker walks every registered feature with no subject, and a per-thing gate has no answer
-		-- to that question.
 		local controller = setup()
 		local evaluated = false
 
-		local feature = controller.maid:Add(AccessFeature.new("eggPurchase", {
+		controller.registerFeature(AccessFeature.new("eggPurchase", {
 			facts = {},
 			requiresSubject = true,
 			observeCompute = function()
@@ -203,7 +200,6 @@ describe("AccessPlayer and per-thing features", function()
 				return Rx.of(AccessStateUtils.allowed()) :: any
 			end,
 		}))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		controller.accessPlayerFor(controller.fakePlayer())
 
@@ -215,7 +211,7 @@ describe("AccessPlayer and per-thing features", function()
 	it("still answers a per-thing feature when asked with its subject", function()
 		local controller = setup()
 
-		local feature = controller.maid:Add(AccessFeature.new("eggPurchase2", {
+		local feature = controller.registerFeature(AccessFeature.new("eggPurchase2", {
 			facts = {},
 			requiresSubject = true,
 			observeCompute = function(_observeFacts, subject)
@@ -224,7 +220,6 @@ describe("AccessPlayer and per-thing features", function()
 					) :: any
 			end,
 		}))
-		controller.maid:GiveTask(controller.accessDataService:RegisterFeature(feature))
 
 		local accessPlayer = controller.accessPlayerFor(controller.fakePlayer())
 

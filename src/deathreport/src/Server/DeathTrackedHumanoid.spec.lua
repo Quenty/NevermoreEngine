@@ -9,6 +9,7 @@ local DeathReportTestUtils = require("DeathReportTestUtils")
 local DeathTrackedHumanoid = require("DeathTrackedHumanoid")
 local Jest = require("Jest")
 local PlayerMock = require("PlayerMock")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -47,17 +48,14 @@ describe("DeathTrackedHumanoid", function()
 		local mock = controller.newMock()
 		local _character, humanoid = controller.newCharacter(mock)
 
-		local reportCount = 0
-		controller.maid:GiveTask(controller.deathReportService.NewDeathReport:Connect(function()
-			reportCount += 1
-		end))
+		local reportCount = SignalTestUtils.countFires(controller.maid, controller.deathReportService.NewDeathReport)
 
 		humanoid.Health = 0
-		expect(reportCount).toEqual(1)
+		expect(reportCount()).toEqual(1)
 
 		humanoid.Health = 100
 		humanoid.Health = 0
-		expect(reportCount).toEqual(1)
+		expect(reportCount()).toEqual(1)
 
 		controller:Destroy()
 	end)
@@ -67,14 +65,11 @@ describe("DeathTrackedHumanoid", function()
 		local mock = controller.newMock()
 		local _character, humanoid = controller.newCharacter(mock)
 
-		local reportCount = 0
-		controller.maid:GiveTask(controller.deathReportService.NewDeathReport:Connect(function()
-			reportCount += 1
-		end))
+		local reportCount = SignalTestUtils.countFires(controller.maid, controller.deathReportService.NewDeathReport)
 
 		humanoid.Health = 50
 		humanoid.Health = 1
-		expect(reportCount).toEqual(0)
+		expect(reportCount()).toEqual(0)
 
 		controller:Destroy()
 	end)

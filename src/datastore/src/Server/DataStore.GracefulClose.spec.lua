@@ -40,10 +40,7 @@ describe("clean session end releases the lock (server-shutdown path)", function(
 
 		local storeA = assert(managerA:GetDataStore(1), "No storeA")
 		storeA:Store("coins", 42)
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = mock:GetRaw("user_1")
-			return raw ~= nil and raw.lock ~= nil
-		end, 10)).toEqual(true)
+		expect(mock:GetRaw("user_1").lock).never.toBeNil()
 
 		-- Clean shutdown: Roblox fires PlayerRemoving for the player still in the server, and holds the
 		-- close open until that removal has flushed.
@@ -80,7 +77,7 @@ describe("crash-safety semantics preserved", function()
 
 		-- The holder is alive but never closes; B must still be waiting on the graceful
 		-- protocol, not stealing a fresh lock.
-		expect(PromiseTestUtils.awaitSettled(loadB, 2)).toEqual(false)
+		expect(loadB:IsPending()).toEqual(true)
 		expect(controller.mock:GetRaw("player_1").lock.ActiveSession.SessionId).toEqual(serverA:GetSessionId())
 
 		controller:Destroy()

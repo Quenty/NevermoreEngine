@@ -49,25 +49,6 @@ local USER_ID_BASE = 55210000
 local specCounter = 0
 
 --[=[
-	Polls until the condition passes or the timeout elapses. Returns the final condition result so
-	specs can `expect(...).toBe(true)` on it.
-
-	@param condition () -> boolean
-	@param timeout number?
-	@return boolean
-]=]
-function DeathReportTestUtils.waitFor(condition, timeout)
-	local deadline = os.clock() + (timeout or 5)
-	while os.clock() < deadline do
-		if condition() then
-			return true
-		end
-		task.wait()
-	end
-	return condition()
-end
-
---[=[
 	Yields until the binder has bound the instance and returns the bound class.
 
 	@param binder Binder<T>

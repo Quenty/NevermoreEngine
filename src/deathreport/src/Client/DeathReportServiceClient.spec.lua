@@ -13,6 +13,8 @@ local DeathReportDataService = require("DeathReportDataService")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local DeathReportUtils = require("DeathReportUtils")
 local Jest = require("Jest")
+local RxTestUtils = require("RxTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -29,19 +31,7 @@ local function setup(): any
 end
 
 local function collectClientReports(controller: any): { DeathReportUtils.DeathReport }
-	local reports: { DeathReportUtils.DeathReport } = {}
-	controller.maid:GiveTask(controller.deathReportServiceClient.NewDeathReport:Connect(function(report)
-		table.insert(reports, report)
-	end))
-	return reports
-end
-
-local function collect(controller: any, observable: any): { any }
-	local emissions = {}
-	controller.maid:GiveTask(observable:Subscribe(function(value)
-		table.insert(emissions, value)
-	end))
-	return emissions
+	return SignalTestUtils.collectFireList(controller.maid, controller.deathReportServiceClient.NewDeathReport)
 end
 
 describe("DeathReportServiceClient", function()
@@ -78,9 +68,7 @@ describe("DeathReportServiceClient", function()
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return #reports == 1
-		end)).toBe(true)
+		expect(#reports).toEqual(1)
 
 		expect(reports[1].adornee).toBe(victimCharacter)
 		expect(reports[1].humanoid).toBe(victimHumanoid)
@@ -100,24 +88,28 @@ describe("DeathReportServiceClient", function()
 		local killer = controller.newMock()
 		local killerCharacter, killerHumanoid = controller.newCharacter(killer)
 
-		local victimDeaths = collect(controller, client:ObservePlayerDeathReports(victim))
-		local killerKills = collect(controller, client:ObservePlayerKillerReports(killer))
-		local humanoidDeaths = collect(controller, client:ObserveHumanoidDeathReports(victimHumanoid))
-		local characterDeaths = collect(controller, client:ObserveCharacterDeathReports(victimCharacter))
-		local humanoidKills = collect(controller, client:ObserveHumanoidKillerReports(killerHumanoid))
-		local characterKills = collect(controller, client:ObserveCharacterKillerReports(killerCharacter))
-		local victimKills = collect(controller, client:ObservePlayerKillerReports(victim))
+		local victimDeaths = RxTestUtils.collectList(controller.maid, client:ObservePlayerDeathReports(victim))
+		local killerKills = RxTestUtils.collectList(controller.maid, client:ObservePlayerKillerReports(killer))
+		local humanoidDeaths =
+			RxTestUtils.collectList(controller.maid, client:ObserveHumanoidDeathReports(victimHumanoid))
+		local characterDeaths =
+			RxTestUtils.collectList(controller.maid, client:ObserveCharacterDeathReports(victimCharacter))
+		local humanoidKills =
+			RxTestUtils.collectList(controller.maid, client:ObserveHumanoidKillerReports(killerHumanoid))
+		local characterKills =
+			RxTestUtils.collectList(controller.maid, client:ObserveCharacterKillerReports(killerCharacter))
+		local victimKills = RxTestUtils.collectList(controller.maid, client:ObservePlayerKillerReports(victim))
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return #victimDeaths == 1
+		expect(
+			#victimDeaths == 1
 				and #killerKills == 1
 				and #humanoidDeaths == 1
 				and #characterDeaths == 1
 				and #humanoidKills == 1
 				and #characterKills == 1
-		end)).toBe(true)
+		).toBe(true)
 		expect(victimKills).toEqual({})
 
 		controller:Destroy()
@@ -136,9 +128,7 @@ describe("DeathReportServiceClient", function()
 			controller.deathReportService:ReportDeathReport(DeathReportUtils.create(npc))
 		end
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return #reports == 7
-		end)).toBe(true)
+		expect(#reports).toEqual(7)
 
 		local lastReports = client:GetLastDeathReports()
 		expect(#lastReports).toEqual(5)

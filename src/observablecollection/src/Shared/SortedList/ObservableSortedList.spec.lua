@@ -5,20 +5,18 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local Brio = require("Brio")
 local Jest = require("Jest")
 local Maid = require("Maid")
 local ObservableSortedList = require("ObservableSortedList")
+local ObservableSpy = require("ObservableSpy")
 local ObservableSubscriptionTable = require("ObservableSubscriptionTable")
 local Rx = require("Rx")
-local Symbol = require("Symbol")
+local SignalTestUtils = require("SignalTestUtils")
 local ValueObject = require("ValueObject")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
-local NIL_VALUE = Symbol.named("nil_placeholder")
 
 local ObservableSortedListTestUtils = {}
 
@@ -30,18 +28,6 @@ function ObservableSortedListTestUtils.fromList<string>(list: { string }): Obser
 	end
 
 	return sortedList
-end
-
-function ObservableSortedListTestUtils.collectValues(observable: any)
-	local values = {}
-	local sub = observable:Subscribe(function(value: any)
-		if value == nil then
-			table.insert(values, NIL_VALUE)
-		else
-			table.insert(values, value)
-		end
-	end)
-	return values, sub
 end
 
 describe("ObservableSortedList", function()
@@ -198,7 +184,7 @@ describe("ObservableSortedList", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
-			local seenCounts, sub = ObservableSortedListTestUtils.collectValues(list:ObserveCount())
+			local seenCounts = ObservableSpy.new(list:ObserveCount())
 
 			local removeA = list:Add("a", 1)
 			list:_testForceFireEvents()
@@ -209,7 +195,7 @@ describe("ObservableSortedList", function()
 			removeA()
 			list:_testForceFireEvents()
 
-			sub:Destroy()
+			seenCounts:Destroy()
 
 			expect(seenCounts[1]).toEqual(0)
 			expect(seenCounts[2]).toEqual(1)
@@ -228,7 +214,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local seenIndices, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(3))
+			local seenIndices = ObservableSpy.new(list:ObserveIndex(3))
 
 			expect(#seenIndices).toEqual(1)
 			expect(seenIndices[1]).toEqual(3)
@@ -236,7 +222,7 @@ describe("ObservableSortedList", function()
 			removeB()
 			list:_testForceFireEvents()
 
-			sub:Destroy()
+			seenIndices:Destroy()
 
 			expect(#seenIndices).toEqual(2)
 			expect(seenIndices[2]).toEqual(2)
@@ -255,7 +241,7 @@ describe("ObservableSortedList", function()
 
 			expect(list:GetCount()).toEqual(5)
 
-			local seenIndicesForE, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(5))
+			local seenIndicesForE = ObservableSpy.new(list:ObserveIndex(5))
 
 			expect(#seenIndicesForE).toEqual(1)
 			expect(seenIndicesForE[1]).toEqual(5)
@@ -269,7 +255,7 @@ describe("ObservableSortedList", function()
 			expect(#seenIndicesForE).toEqual(2)
 			expect(seenIndicesForE[2]).toEqual(4)
 
-			sub:Destroy()
+			seenIndicesForE:Destroy()
 			maid:Destroy()
 		end)
 	end)
@@ -283,7 +269,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local seenItems, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
+			local seenItems = ObservableSpy.new(list:ObserveAtIndex(2))
 
 			expect(#seenItems).toEqual(1)
 			expect(seenItems[1]).toEqual("b")
@@ -291,7 +277,7 @@ describe("ObservableSortedList", function()
 			removeB()
 			list:_testForceFireEvents()
 
-			sub:Destroy()
+			seenItems:Destroy()
 
 			expect(#seenItems).toEqual(2)
 			expect(seenItems[2]).toEqual("c")
@@ -305,7 +291,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
 			list:_testForceFireEvents()
 
-			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(2)
 
@@ -314,7 +300,7 @@ describe("ObservableSortedList", function()
 
 			expect(#seenBrios).toEqual(3)
 
-			sub:Destroy()
+			seenBrios:Destroy()
 			maid:Destroy()
 		end)
 
@@ -325,10 +311,7 @@ describe("ObservableSortedList", function()
 			local removeA = list:Add("a", 1)
 			list:_testForceFireEvents()
 
-			local seenBrios: { Brio.Brio<string, any> } = {}
-			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(seenBrios, brio)
-			end)
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(1)
 			expect(seenBrios[1]:IsDead()).toEqual(false)
@@ -338,7 +321,7 @@ describe("ObservableSortedList", function()
 
 			expect(seenBrios[1]:IsDead()).toEqual(true)
 
-			sub:Destroy()
+			seenBrios:Destroy()
 			maid:Destroy()
 		end)
 	end)
@@ -363,10 +346,7 @@ describe("ObservableSortedList", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
-			local seen: { { string } } = {}
-			local sub = list:Observe():Subscribe(function(items)
-				table.insert(seen, items)
-			end)
+			local seen = ObservableSpy.new(list:Observe())
 
 			list:Add("b", 2)
 			list:_testForceFireEvents()
@@ -374,7 +354,7 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:_testForceFireEvents()
 
-			sub:Destroy()
+			seen:Destroy()
 
 			expect(#seen).toEqual(3)
 			expect(#seen[1]).toEqual(0)
@@ -456,12 +436,12 @@ describe("ObservableSortedList", function()
 			local node = list:FindFirstKey("c")
 			assert(node ~= nil, "Expected to find node for 'c'")
 
-			local seenIndices, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(node))
+			local seenIndices = ObservableSpy.new(list:ObserveIndexByKey(node))
 
 			expect(#seenIndices).toEqual(1)
 			expect(seenIndices[1]).toEqual(3)
 
-			sub:Destroy()
+			seenIndices:Destroy()
 			maid:Destroy()
 		end)
 	end)
@@ -482,7 +462,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
 			list:_testForceFireEvents()
 
-			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(2)
 			expect(seenBrios[1]:IsDead()).toEqual(false)
@@ -492,7 +472,7 @@ describe("ObservableSortedList", function()
 
 			expect(seenBrios[1]:IsDead()).toEqual(true)
 			expect(seenBrios[2]:IsDead()).toEqual(true)
-			sub:Destroy()
+			seenBrios:Destroy()
 		end)
 	end)
 
@@ -591,7 +571,7 @@ describe("ObservableSortedList", function()
 			list:Add("b", 2)
 			list:_testForceFireEvents()
 
-			local seenItems, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
+			local seenItems = ObservableSpy.new(list:ObserveAtIndex(2))
 
 			expect(#seenItems).toEqual(1)
 			expect(seenItems[1]).toEqual("b")
@@ -599,10 +579,10 @@ describe("ObservableSortedList", function()
 			removeA()
 			list:_testForceFireEvents()
 
-			sub:Destroy()
+			seenItems:Destroy()
 
 			expect(#seenItems).toEqual(2)
-			expect(seenItems[2]).toEqual(NIL_VALUE)
+			expect(seenItems[2]).toBeNil()
 			maid:Destroy()
 		end)
 
@@ -619,12 +599,9 @@ describe("ObservableSortedList", function()
 			list:Add("c", sortValueC:Observe())
 			list:_testForceFireEvents()
 
-			local fireCount = 0
-			local sub = list:Observe():Subscribe(function()
-				fireCount += 1
-			end)
+			local emissions = ObservableSpy.new(list:Observe())
 
-			expect(fireCount).toEqual(1)
+			expect(#emissions).toEqual(1)
 
 			sortValueA.Value = 30
 			sortValueB.Value = 20
@@ -632,10 +609,10 @@ describe("ObservableSortedList", function()
 
 			list:_testForceFireEvents()
 
-			expect(fireCount).toEqual(2)
+			expect(#emissions).toEqual(2)
 			expect(list:GetList()).toEqual({ "c", "b", "a" })
 
-			sub:Destroy()
+			emissions:Destroy()
 			maid:Destroy()
 		end)
 
@@ -647,18 +624,15 @@ describe("ObservableSortedList", function()
 			list:Add("b", 2)
 			list:_testForceFireEvents()
 
-			local completed = false
-			local sub = list:ObserveIndex(1):Subscribe(function() end, function() end, function()
-				completed = true
-			end)
+			local indexes = ObservableSpy.new(list:ObserveIndex(1))
 
-			expect(completed).toEqual(false)
+			expect(indexes:IsComplete()).toEqual(false)
 
 			removeA()
 			list:_testForceFireEvents()
 
-			expect(completed).toEqual(true)
-			sub:Destroy()
+			expect(indexes:IsComplete()).toEqual(true)
+			indexes:Destroy()
 			maid:Destroy()
 		end)
 
@@ -667,11 +641,11 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedListTestUtils.fromList({ "a", "b" }))
 			list:_testForceFireEvents()
 
-			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(2)
 
-			sub:Destroy()
+			seenBrios:Destroy()
 			maid:Destroy()
 		end)
 
@@ -706,20 +680,17 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local fireCount = 0
-			local sub = list:Observe():Subscribe(function()
-				fireCount += 1
-			end)
+			local emissions = ObservableSpy.new(list:Observe())
 
-			expect(fireCount).toEqual(1)
+			expect(#emissions).toEqual(1)
 
 			sortValue.Value = 2
 			list:_testForceFireEvents()
 
-			expect(fireCount).toEqual(1)
+			expect(#emissions).toEqual(1)
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
-			sub:Destroy()
+			emissions:Destroy()
 			maid:Destroy()
 		end)
 
@@ -758,11 +729,8 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local fireCount = 0
-			local sub = list:Observe():Subscribe(function()
-				fireCount += 1
-			end)
-			expect(fireCount).toEqual(1)
+			local emissions = ObservableSpy.new(list:Observe())
+			expect(#emissions).toEqual(1)
 
 			sortValue.Value = 10
 			sortValue.Value = 1
@@ -772,7 +740,7 @@ describe("ObservableSortedList", function()
 
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
-			sub:Destroy()
+			emissions:Destroy()
 			maid:Destroy()
 		end)
 
@@ -842,7 +810,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 10)
 			list:_testForceFireEvents()
 
-			local seenIndices, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(2))
+			local seenIndices = ObservableSpy.new(list:ObserveIndex(2))
 			expect(seenIndices[1]).toEqual(2)
 
 			sortB.Value = 7
@@ -851,7 +819,7 @@ describe("ObservableSortedList", function()
 			expect(#seenIndices).toEqual(1)
 			expect(list:GetList()).toEqual({ "a", "b", "c" })
 
-			sub:Destroy()
+			seenIndices:Destroy()
 			maid:Destroy()
 		end)
 	end)
@@ -906,7 +874,7 @@ describe("ObservableSortedList", function()
 			list:Add("b", sortValue:Observe())
 			list:_testForceFireEvents()
 
-			local seenBrios, sub = ObservableSortedListTestUtils.collectValues(list:ObserveItemsBrio())
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 			expect(#seenBrios).toEqual(2)
 			expect(seenBrios[1]:IsDead()).toEqual(false)
 			expect(seenBrios[2]:IsDead()).toEqual(false)
@@ -917,7 +885,7 @@ describe("ObservableSortedList", function()
 			expect(seenBrios[2]:IsDead()).toEqual(true)
 			expect(seenBrios[1]:IsDead()).toEqual(false)
 
-			sub:Destroy()
+			seenBrios:Destroy()
 			maid:Destroy()
 		end)
 
@@ -993,22 +961,16 @@ describe("ObservableSortedList", function()
 			list:Add("a", 1)
 			list:_testForceFireEvents()
 
-			local addCount = 0
-			local removeCount = 0
-			maid:Add(list.ItemAdded:Connect(function()
-				addCount += 1
-			end))
-			maid:Add(list.ItemRemoved:Connect(function()
-				removeCount += 1
-			end))
+			local addCount = SignalTestUtils.countFires(maid, list.ItemAdded)
+			local removeCount = SignalTestUtils.countFires(maid, list.ItemRemoved)
 
 			local remove = list:Add("b", 2)
 			remove()
 
 			list:_testForceFireEvents()
 
-			expect(addCount).toEqual(0)
-			expect(removeCount).toEqual(0)
+			expect(addCount()).toEqual(0)
+			expect(removeCount()).toEqual(0)
 			expect(list:GetList()).toEqual({ "a" })
 
 			maid:Destroy()
@@ -1020,10 +982,7 @@ describe("ObservableSortedList", function()
 
 			local remove = list:Add("a", 1)
 
-			local brios: { any } = {}
-			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
+			local brios = maid:Add(ObservableSpy.new(list:ObserveItemsBrio()))
 
 			expect(#brios).toEqual(1)
 			expect(brios[1]:IsDead()).toEqual(false)
@@ -1047,10 +1006,7 @@ describe("ObservableSortedList", function()
 			local remove = list:Add("a", 1)
 			list:_testForceFireEvents()
 
-			local brios: { any } = {}
-			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
+			local brios = maid:Add(ObservableSpy.new(list:ObserveItemsBrio()))
 
 			expect(#brios).toEqual(1)
 
@@ -1068,10 +1024,7 @@ describe("ObservableSortedList", function()
 			local remove = list:Add("a", 1)
 			remove()
 
-			local brios: { any } = {}
-			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
+			local brios = maid:Add(ObservableSpy.new(list:ObserveItemsBrio()))
 
 			list:_testForceFireEvents()
 
@@ -1086,10 +1039,7 @@ describe("ObservableSortedList", function()
 
 			list:Add("a", 1)
 
-			local brios: { any } = {}
-			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
+			local brios = maid:Add(ObservableSpy.new(list:ObserveItemsBrio()))
 
 			expect(#brios).toEqual(1)
 
@@ -1105,10 +1055,7 @@ describe("ObservableSortedList", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
-			local brios: { any } = {}
-			maid:GiveTask(list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(brios, brio)
-			end))
+			local brios = maid:Add(ObservableSpy.new(list:ObserveItemsBrio()))
 
 			list:Add("a", 1)
 			list:_testForceFireEvents()
@@ -1144,7 +1091,7 @@ describe("ObservableSortedList", function()
 			local maid = Maid.new()
 			local list = maid:Add(ObservableSortedList.new())
 
-			local counts, countSub = ObservableSortedListTestUtils.collectValues(list:ObserveCount())
+			local counts = ObservableSpy.new(list:ObserveCount())
 
 			list:Add("a", 1)
 			list:Add("b", 2)
@@ -1156,7 +1103,7 @@ describe("ObservableSortedList", function()
 			expect(counts[2]).toEqual(3)
 			expect(#counts).toEqual(2)
 
-			countSub:Destroy()
+			counts:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1165,7 +1112,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedList.new())
 			list:_testForceFireEvents()
 
-			local counts, countSub = ObservableSortedListTestUtils.collectValues(list:ObserveCount())
+			local counts = ObservableSpy.new(list:ObserveCount())
 			expect(counts[1]).toEqual(0)
 
 			local removeA = list:Add("a", 1)
@@ -1179,7 +1126,7 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "b", "c", "d" })
 			expect(counts[2]).toEqual(3)
 
-			countSub:Destroy()
+			counts:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1237,10 +1184,7 @@ describe("ObservableSortedList", function()
 			local list = maid:Add(ObservableSortedList.new())
 			list:_testForceFireEvents()
 
-			local addedItems: { string } = {}
-			maid:Add(list.ItemAdded:Connect(function(data)
-				table.insert(addedItems, data)
-			end))
+			local addedItems = SignalTestUtils.collectFireList(maid, list.ItemAdded)
 
 			list:Add("c", 3)
 			list:Add("a", 1)
@@ -1261,7 +1205,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 10)
 			list:_testForceFireEvents()
 
-			local indexChanges, sub = ObservableSortedListTestUtils.collectValues(list:ObserveIndex(2))
+			local indexChanges = ObservableSpy.new(list:ObserveIndex(2))
 			expect(#indexChanges).toEqual(1)
 
 			sortB.Value = 8
@@ -1270,7 +1214,7 @@ describe("ObservableSortedList", function()
 			expect(#indexChanges).toEqual(1)
 			expect(list:Get(2)).toEqual("b")
 
-			sub:Destroy()
+			indexChanges:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1284,7 +1228,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local seenAtIndex1, sub = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
+			local seenAtIndex1 = ObservableSpy.new(list:ObserveAtIndex(1))
 			expect(seenAtIndex1[1]).toEqual("a")
 
 			sortA.Value = 10
@@ -1292,7 +1236,7 @@ describe("ObservableSortedList", function()
 
 			expect(seenAtIndex1[2]).toEqual("b")
 
-			sub:Destroy()
+			seenAtIndex1:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1305,10 +1249,7 @@ describe("ObservableSortedList", function()
 			list:Add("b", sortValue:Observe())
 			list:_testForceFireEvents()
 
-			local seenBrios: { Brio.Brio<string, any> } = {}
-			local sub = list:ObserveItemsBrio():Subscribe(function(brio)
-				table.insert(seenBrios, brio)
-			end)
+			local seenBrios = ObservableSpy.new(list:ObserveItemsBrio())
 
 			expect(#seenBrios).toEqual(2)
 
@@ -1323,7 +1264,7 @@ describe("ObservableSortedList", function()
 			expect(#seenBrios).toEqual(3)
 			expect(seenBrios[3]:IsDead()).toEqual(false)
 
-			sub:Destroy()
+			seenBrios:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1441,8 +1382,8 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires5, sub5 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(5))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires5 = ObservableSpy.new(list:ObserveAtIndex(5))
 
 			expect(#fires1).toEqual(1)
 			expect(#fires5).toEqual(1)
@@ -1454,8 +1395,8 @@ describe("ObservableSortedList", function()
 			expect(#fires1).toEqual(1)
 			expect(#fires5).toEqual(1)
 
-			sub1:Destroy()
-			sub5:Destroy()
+			fires1:Destroy()
+			fires5:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1475,8 +1416,8 @@ describe("ObservableSortedList", function()
 			local nodeE = list:FindFirstKey("e")
 			assert(nodeA and nodeE, "Expected nodes")
 
-			local firesA, subA = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeA))
-			local firesE, subE = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeE))
+			local firesA = ObservableSpy.new(list:ObserveIndexByKey(nodeA))
+			local firesE = ObservableSpy.new(list:ObserveIndexByKey(nodeE))
 
 			expect(#firesA).toEqual(1)
 			expect(#firesE).toEqual(1)
@@ -1487,8 +1428,8 @@ describe("ObservableSortedList", function()
 			expect(#firesA).toEqual(1)
 			expect(#firesE).toEqual(1)
 
-			subA:Destroy()
-			subE:Destroy()
+			firesA:Destroy()
+			firesE:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1503,10 +1444,10 @@ describe("ObservableSortedList", function()
 			local removeE = list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 
 			expect(#fires1).toEqual(1)
 			expect(#fires2).toEqual(1)
@@ -1522,10 +1463,10 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(1)
 			expect(#fires4).toEqual(1)
 
-			sub1:Destroy()
-			sub2:Destroy()
-			sub3:Destroy()
-			sub4:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
+			fires4:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1538,9 +1479,9 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 
 			expect(#fires1).toEqual(1)
 			expect(#fires2).toEqual(1)
@@ -1554,9 +1495,9 @@ describe("ObservableSortedList", function()
 			expect(#fires2).toEqual(1)
 			expect(#fires3).toEqual(1)
 
-			sub1:Destroy()
-			sub2:Destroy()
-			sub3:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1571,8 +1512,8 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
 
 			expect(#fires1).toEqual(1)
 			expect(#fires2).toEqual(1)
@@ -1584,8 +1525,8 @@ describe("ObservableSortedList", function()
 			expect(#fires1).toEqual(1)
 			expect(#fires2).toEqual(1)
 
-			sub1:Destroy()
-			sub2:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1600,7 +1541,7 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 			expect(#fires4).toEqual(1)
 			expect(fires4[1]).toEqual("d")
 
@@ -1611,7 +1552,7 @@ describe("ObservableSortedList", function()
 			expect(#fires4).toEqual(2)
 			expect(fires4[2]).toEqual("e")
 
-			sub4:Destroy()
+			fires4:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1630,8 +1571,8 @@ describe("ObservableSortedList", function()
 			local nodeE = list:FindFirstKey("e")
 			assert(nodeD and nodeE, "Expected nodes")
 
-			local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
-			local firesE, subE = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeE))
+			local firesD = ObservableSpy.new(list:ObserveIndexByKey(nodeD))
+			local firesE = ObservableSpy.new(list:ObserveIndexByKey(nodeE))
 
 			expect(firesD[1]).toEqual(4)
 			expect(firesE[1]).toEqual(5)
@@ -1644,8 +1585,8 @@ describe("ObservableSortedList", function()
 			expect(#firesE).toEqual(2)
 			expect(firesE[2]).toEqual(4)
 
-			subD:Destroy()
-			subE:Destroy()
+			firesD:Destroy()
+			firesE:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1660,9 +1601,9 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
-			local fires5, sub5 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(5))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
+			local fires5 = ObservableSpy.new(list:ObserveAtIndex(5))
 
 			expect(#fires3).toEqual(1)
 			expect(#fires4).toEqual(1)
@@ -1678,9 +1619,9 @@ describe("ObservableSortedList", function()
 			expect(#fires4).toEqual(1)
 			expect(#fires5).toEqual(1)
 
-			sub3:Destroy()
-			sub4:Destroy()
-			sub5:Destroy()
+			fires3:Destroy()
+			fires4:Destroy()
+			fires5:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1700,9 +1641,9 @@ describe("ObservableSortedList", function()
 			local nodeE = list:FindFirstKey("e")
 			assert(nodeC and nodeD and nodeE, "Expected nodes")
 
-			local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
-			local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
-			local firesE, subE = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeE))
+			local firesC = ObservableSpy.new(list:ObserveIndexByKey(nodeC))
+			local firesD = ObservableSpy.new(list:ObserveIndexByKey(nodeD))
+			local firesE = ObservableSpy.new(list:ObserveIndexByKey(nodeE))
 
 			expect(#firesC).toEqual(1)
 			expect(#firesD).toEqual(1)
@@ -1717,9 +1658,9 @@ describe("ObservableSortedList", function()
 			expect(#firesD).toEqual(1)
 			expect(#firesE).toEqual(1)
 
-			subC:Destroy()
-			subD:Destroy()
-			subE:Destroy()
+			firesC:Destroy()
+			firesD:Destroy()
+			firesE:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1734,7 +1675,7 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 			expect(#fires3).toEqual(1)
 			expect(fires3[1]).toEqual("c")
 
@@ -1747,7 +1688,7 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(2)
 			expect(fires3[2]).toEqual("d")
 
-			sub3:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1766,8 +1707,8 @@ describe("ObservableSortedList", function()
 			local nodeD = list:FindFirstKey("d")
 			assert(nodeC and nodeD, "Expected nodes")
 
-			local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
-			local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
+			local firesC = ObservableSpy.new(list:ObserveIndexByKey(nodeC))
+			local firesD = ObservableSpy.new(list:ObserveIndexByKey(nodeD))
 
 			expect(firesC[1]).toEqual(3)
 			expect(firesD[1]).toEqual(4)
@@ -1783,8 +1724,8 @@ describe("ObservableSortedList", function()
 			expect(#firesD).toEqual(2)
 			expect(firesD[2]).toEqual(3)
 
-			subC:Destroy()
-			subD:Destroy()
+			firesC:Destroy()
+			firesD:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1799,7 +1740,7 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 			expect(fires3[1]).toEqual("c")
 
 			removeB()
@@ -1812,7 +1753,7 @@ describe("ObservableSortedList", function()
 
 			expect(#fires3).toEqual(1)
 
-			sub3:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1826,9 +1767,9 @@ describe("ObservableSortedList", function()
 			list:Add("d", 4)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 
 			expect(fires1[1]).toEqual("a")
 			expect(fires2[1]).toEqual("b")
@@ -1845,9 +1786,9 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(2)
 			expect(fires3[2]).toEqual("d")
 
-			sub1:Destroy()
-			sub2:Destroy()
-			sub3:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1862,9 +1803,9 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 
 			expect(fires2[1]).toEqual("b")
 			expect(fires3[1]).toEqual("c")
@@ -1880,11 +1821,11 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(2)
 			expect(fires3[2]).toEqual("e")
 			expect(#fires4).toEqual(2)
-			expect(fires4[2]).toEqual(NIL_VALUE)
+			expect(fires4[2]).toBeNil()
 
-			sub2:Destroy()
-			sub3:Destroy()
-			sub4:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
+			fires4:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1897,9 +1838,9 @@ describe("ObservableSortedList", function()
 			list:Add("d", 4)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 
 			expect(fires1[1]).toEqual("b")
 			expect(fires2[1]).toEqual("c")
@@ -1916,9 +1857,9 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(2)
 			expect(fires3[2]).toEqual("c")
 
-			sub1:Destroy()
-			sub2:Destroy()
-			sub3:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1938,9 +1879,9 @@ describe("ObservableSortedList", function()
 			local nodeD = list:FindFirstKey("d")
 			assert(nodeB and nodeC and nodeD, "Expected nodes")
 
-			local firesB, subB = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeB))
-			local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
-			local firesD, subD = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeD))
+			local firesB = ObservableSpy.new(list:ObserveIndexByKey(nodeB))
+			local firesC = ObservableSpy.new(list:ObserveIndexByKey(nodeC))
+			local firesD = ObservableSpy.new(list:ObserveIndexByKey(nodeD))
 
 			expect(firesB[1]).toEqual(2)
 			expect(firesC[1]).toEqual(3)
@@ -1957,9 +1898,9 @@ describe("ObservableSortedList", function()
 			expect(#firesD).toEqual(2)
 			expect(firesD[2]).toEqual(3)
 
-			subB:Destroy()
-			subC:Destroy()
-			subD:Destroy()
+			firesB:Destroy()
+			firesC:Destroy()
+			firesD:Destroy()
 			maid:Destroy()
 		end)
 
@@ -1973,9 +1914,9 @@ describe("ObservableSortedList", function()
 			list:Add("d", 4)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 
 			expect(fires1[1]).toEqual("a")
 			expect(fires3[1]).toEqual("c")
@@ -1990,9 +1931,9 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(1)
 			expect(#fires4).toEqual(1)
 
-			sub1:Destroy()
-			sub3:Destroy()
-			sub4:Destroy()
+			fires1:Destroy()
+			fires3:Destroy()
+			fires4:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2008,9 +1949,9 @@ describe("ObservableSortedList", function()
 			list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires1, sub1 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(1))
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires1 = ObservableSpy.new(list:ObserveAtIndex(1))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 
 			expect(fires1[1]).toEqual("a")
 			expect(fires2[1]).toEqual("b")
@@ -2024,9 +1965,9 @@ describe("ObservableSortedList", function()
 			expect(#fires2).toEqual(1)
 			expect(#fires3).toEqual(1)
 
-			sub1:Destroy()
-			sub2:Destroy()
-			sub3:Destroy()
+			fires1:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2047,8 +1988,8 @@ describe("ObservableSortedList", function()
 				local nodeE = list:FindFirstKey("e")
 				assert(nodeA and nodeE, "Expected nodes")
 
-				local firesA, subA = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeA))
-				local firesE, subE = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeE))
+				local firesA = ObservableSpy.new(list:ObserveIndexByKey(nodeA))
+				local firesE = ObservableSpy.new(list:ObserveIndexByKey(nodeE))
 
 				expect(firesA[1]).toEqual(1)
 				expect(firesE[1]).toEqual(5)
@@ -2063,8 +2004,8 @@ describe("ObservableSortedList", function()
 				expect(#firesA).toEqual(1)
 				expect(#firesE).toEqual(1)
 
-				subA:Destroy()
-				subE:Destroy()
+				firesA:Destroy()
+				firesE:Destroy()
 				maid:Destroy()
 			end
 		)
@@ -2082,9 +2023,9 @@ describe("ObservableSortedList", function()
 				local removeE = list:Add("e", 5)
 				list:_testForceFireEvents()
 
-				local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-				local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-				local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+				local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+				local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+				local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 
 				expect(fires2[1]).toEqual("b")
 				expect(fires3[1]).toEqual("c")
@@ -2101,9 +2042,9 @@ describe("ObservableSortedList", function()
 				expect(#fires3).toEqual(1)
 				expect(#fires4).toEqual(1)
 
-				sub2:Destroy()
-				sub3:Destroy()
-				sub4:Destroy()
+				fires2:Destroy()
+				fires3:Destroy()
+				fires4:Destroy()
 				maid:Destroy()
 			end
 		)
@@ -2121,9 +2062,9 @@ describe("ObservableSortedList", function()
 			list:Add("e", sortE:Observe())
 			list:_testForceFireEvents()
 
-			local fires2, sub2 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(2))
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
+			local fires2 = ObservableSpy.new(list:ObserveAtIndex(2))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
 
 			expect(fires2[1]).toEqual("b")
 			expect(fires3[1]).toEqual("c")
@@ -2136,9 +2077,9 @@ describe("ObservableSortedList", function()
 			expect(list:GetList()).toEqual({ "b", "a", "c", "e", "d" })
 			expect(#fires3).toEqual(1)
 
-			sub2:Destroy()
-			sub3:Destroy()
-			sub4:Destroy()
+			fires2:Destroy()
+			fires3:Destroy()
+			fires4:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2158,7 +2099,7 @@ describe("ObservableSortedList", function()
 				local nodeC = list:FindFirstKey("c")
 				assert(nodeC, "Expected node for c")
 
-				local firesC, subC = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeC))
+				local firesC = ObservableSpy.new(list:ObserveIndexByKey(nodeC))
 				expect(firesC[1]).toEqual(3)
 
 				removeA()
@@ -2170,7 +2111,7 @@ describe("ObservableSortedList", function()
 				expect(list:GetList()).toEqual({ "f", "b", "c", "d", "g" })
 				expect(#firesC).toEqual(1)
 
-				subC:Destroy()
+				firesC:Destroy()
 				maid:Destroy()
 			end
 		)
@@ -2188,7 +2129,7 @@ describe("ObservableSortedList", function()
 			local removeE = list:Add("e", 5)
 			list:_testForceFireEvents()
 
-			local fires5, sub5 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(5))
+			local fires5 = ObservableSpy.new(list:ObserveAtIndex(5))
 			expect(fires5[1]).toEqual("e")
 
 			removeD()
@@ -2202,7 +2143,7 @@ describe("ObservableSortedList", function()
 			expect(#fires5).toEqual(2)
 			expect(fires5[2]).toEqual("c")
 
-			sub5:Destroy()
+			fires5:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2221,7 +2162,7 @@ describe("ObservableSortedList", function()
 			local nodeF = list:FindFirstKey("f")
 			assert(nodeF, "Expected node for f")
 
-			local firesF, subF = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeF))
+			local firesF = ObservableSpy.new(list:ObserveIndexByKey(nodeF))
 			expect(firesF[1]).toEqual(6)
 
 			removeD()
@@ -2233,7 +2174,7 @@ describe("ObservableSortedList", function()
 			expect(#firesF).toEqual(2)
 			expect(firesF[2]).toEqual(4)
 
-			subF:Destroy()
+			firesF:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2250,8 +2191,8 @@ describe("ObservableSortedList", function()
 			list:Add("g", 7)
 			list:_testForceFireEvents()
 
-			local fires4, sub4 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(4))
-			local fires5, sub5 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(5))
+			local fires4 = ObservableSpy.new(list:ObserveAtIndex(4))
+			local fires5 = ObservableSpy.new(list:ObserveAtIndex(5))
 
 			expect(fires4[1]).toEqual("d")
 			expect(fires5[1]).toEqual("e")
@@ -2267,10 +2208,10 @@ describe("ObservableSortedList", function()
 			expect(fires4[2]).toEqual("g")
 
 			expect(#fires5).toEqual(2)
-			expect(fires5[2]).toEqual(NIL_VALUE)
+			expect(fires5[2]).toBeNil()
 
-			sub4:Destroy()
-			sub5:Destroy()
+			fires4:Destroy()
+			fires5:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2283,7 +2224,7 @@ describe("ObservableSortedList", function()
 			list:Add("c", 3)
 			list:_testForceFireEvents()
 
-			local fires3, sub3 = ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(3))
+			local fires3 = ObservableSpy.new(list:ObserveAtIndex(3))
 			expect(fires3[1]).toEqual("c")
 
 			list:Add("x", 0.1)
@@ -2296,7 +2237,7 @@ describe("ObservableSortedList", function()
 			expect(#fires3).toEqual(2)
 			expect(fires3[2]).toEqual("z")
 
-			sub3:Destroy()
+			fires3:Destroy()
 			maid:Destroy()
 		end)
 
@@ -2314,7 +2255,7 @@ describe("ObservableSortedList", function()
 			local nodeE = list:FindFirstKey("e")
 			assert(nodeE, "Expected node for e")
 
-			local firesE, subE = ObservableSortedListTestUtils.collectValues(list:ObserveIndexByKey(nodeE))
+			local firesE = ObservableSpy.new(list:ObserveIndexByKey(nodeE))
 			expect(firesE[1]).toEqual(5)
 
 			removeA()
@@ -2327,15 +2268,11 @@ describe("ObservableSortedList", function()
 			expect(#firesE).toEqual(2)
 			expect(firesE[2]).toEqual(2)
 
-			subE:Destroy()
+			firesE:Destroy()
 			maid:Destroy()
 		end)
 	end)
 end)
-
-local function observe(list, index: number)
-	return ObservableSortedListTestUtils.collectValues(list:ObserveAtIndex(index))
-end
 
 describe("ObservableSortedList negative index observation (mirrors ObservableList)", function()
 	it("moves the last item back when a later item is added", function()
@@ -2344,17 +2281,20 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("a", 1)
 		list:_testForceFireEvents()
 
-		local seenLast, subLast = observe(list, -1)
-		local seenSecondLast, subSecondLast = observe(list, -2)
+		local seenLast = ObservableSpy.new(list:ObserveAtIndex(-1))
+		local seenSecondLast = ObservableSpy.new(list:ObserveAtIndex(-2))
 
 		list:Add("b", 2)
 		list:_testForceFireEvents()
 
-		expect(seenLast).toEqual({ "a", "b" })
-		expect(seenSecondLast).toEqual({ NIL_VALUE, "a" })
+		expect(#seenLast).toEqual(2)
+		expect(seenLast.Values).toEqual({ "a", "b" })
+		expect(#seenSecondLast).toEqual(2)
+		expect(seenSecondLast[1]).toBeNil()
+		expect(seenSecondLast[2]).toEqual("a")
 
-		subLast:Destroy()
-		subSecondLast:Destroy()
+		seenLast:Destroy()
+		seenSecondLast:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2365,14 +2305,15 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		local removeB = list:Add("b", 2)
 		list:_testForceFireEvents()
 
-		local seen, sub = observe(list, -1)
+		local seen = ObservableSpy.new(list:ObserveAtIndex(-1))
 
 		removeB()
 		list:_testForceFireEvents()
 
-		expect(seen).toEqual({ "b", "a" })
+		expect(#seen).toEqual(2)
+		expect(seen.Values).toEqual({ "b", "a" })
 
-		sub:Destroy()
+		seen:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2383,14 +2324,16 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("b", 2)
 		list:_testForceFireEvents()
 
-		local seen, sub = observe(list, -2)
+		local seen = ObservableSpy.new(list:ObserveAtIndex(-2))
 
 		removeA()
 		list:_testForceFireEvents()
 
-		expect(seen).toEqual({ "a", NIL_VALUE })
+		expect(#seen).toEqual(2)
+		expect(seen[1]).toEqual("a")
+		expect(seen[2]).toBeNil()
 
-		sub:Destroy()
+		seen:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2401,14 +2344,15 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("b", 2)
 		list:_testForceFireEvents()
 
-		local seen, sub = observe(list, -1)
+		local seen = ObservableSpy.new(list:ObserveAtIndex(-1))
 
 		removeA()
 		list:_testForceFireEvents()
 
-		expect(seen).toEqual({ "b" })
+		expect(#seen).toEqual(1)
+		expect(seen.Values).toEqual({ "b" })
 
-		sub:Destroy()
+		seen:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2419,17 +2363,20 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		local removeB = list:Add("b", 2)
 		list:_testForceFireEvents()
 
-		local seenFirst, subFirst = observe(list, 1)
-		local seenSecond, subSecond = observe(list, 2)
+		local seenFirst = ObservableSpy.new(list:ObserveAtIndex(1))
+		local seenSecond = ObservableSpy.new(list:ObserveAtIndex(2))
 
 		removeB()
 		list:_testForceFireEvents()
 
-		expect(seenFirst).toEqual({ "a" })
-		expect(seenSecond).toEqual({ "b", NIL_VALUE })
+		expect(#seenFirst).toEqual(1)
+		expect(seenFirst.Values).toEqual({ "a" })
+		expect(#seenSecond).toEqual(2)
+		expect(seenSecond[1]).toEqual("b")
+		expect(seenSecond[2]).toBeNil()
 
-		subFirst:Destroy()
-		subSecond:Destroy()
+		seenFirst:Destroy()
+		seenSecond:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2441,24 +2388,29 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("c", 3)
 		list:_testForceFireEvents()
 
-		local seen4, sub4 = observe(list, -4)
-		local seen3, sub3 = observe(list, -3)
-		local seen2, sub2 = observe(list, -2)
-		local seen1, sub1 = observe(list, -1)
+		local seen4 = ObservableSpy.new(list:ObserveAtIndex(-4))
+		local seen3 = ObservableSpy.new(list:ObserveAtIndex(-3))
+		local seen2 = ObservableSpy.new(list:ObserveAtIndex(-2))
+		local seen1 = ObservableSpy.new(list:ObserveAtIndex(-1))
 
 		list:Add("x", 1.5)
 		list:_testForceFireEvents()
 
 		expect(list:GetList()).toEqual({ "a", "x", "b", "c" })
-		expect(seen4).toEqual({ NIL_VALUE, "a" })
-		expect(seen3).toEqual({ "a", "x" })
-		expect(seen2).toEqual({ "b" })
-		expect(seen1).toEqual({ "c" })
+		expect(#seen4).toEqual(2)
+		expect(seen4[1]).toBeNil()
+		expect(seen4[2]).toEqual("a")
+		expect(#seen3).toEqual(2)
+		expect(seen3.Values).toEqual({ "a", "x" })
+		expect(#seen2).toEqual(1)
+		expect(seen2.Values).toEqual({ "b" })
+		expect(#seen1).toEqual(1)
+		expect(seen1.Values).toEqual({ "c" })
 
-		sub4:Destroy()
-		sub3:Destroy()
-		sub2:Destroy()
-		sub1:Destroy()
+		seen4:Destroy()
+		seen3:Destroy()
+		seen2:Destroy()
+		seen1:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2470,21 +2422,25 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("c", 3)
 		list:_testForceFireEvents()
 
-		local seen3, sub3 = observe(list, -3)
-		local seen2, sub2 = observe(list, -2)
-		local seen1, sub1 = observe(list, -1)
+		local seen3 = ObservableSpy.new(list:ObserveAtIndex(-3))
+		local seen2 = ObservableSpy.new(list:ObserveAtIndex(-2))
+		local seen1 = ObservableSpy.new(list:ObserveAtIndex(-1))
 
 		removeB()
 		list:_testForceFireEvents()
 
 		expect(list:GetList()).toEqual({ "a", "c" })
-		expect(seen3).toEqual({ "a", NIL_VALUE })
-		expect(seen2).toEqual({ "b", "a" })
-		expect(seen1).toEqual({ "c" })
+		expect(#seen3).toEqual(2)
+		expect(seen3[1]).toEqual("a")
+		expect(seen3[2]).toBeNil()
+		expect(#seen2).toEqual(2)
+		expect(seen2.Values).toEqual({ "b", "a" })
+		expect(#seen1).toEqual(1)
+		expect(seen1.Values).toEqual({ "c" })
 
-		sub3:Destroy()
-		sub2:Destroy()
-		sub1:Destroy()
+		seen3:Destroy()
+		seen2:Destroy()
+		seen1:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2496,14 +2452,15 @@ describe("ObservableSortedList negative index observation (mirrors ObservableLis
 		list:Add("c", 3)
 		list:_testForceFireEvents()
 
-		local seen, sub = observe(list, 2)
+		local seen = ObservableSpy.new(list:ObserveAtIndex(2))
 
 		removeA()
 		list:_testForceFireEvents()
 
-		expect(seen).toEqual({ "b", "c" })
+		expect(#seen).toEqual(2)
+		expect(seen.Values).toEqual({ "b", "c" })
 
-		sub:Destroy()
+		seen:Destroy()
 		maid:Destroy()
 	end)
 
@@ -2550,7 +2507,7 @@ describe("ObservableSortedList emission cost (mirrors ObservableList)", function
 	it("fires a bounded number of observers per Add with a last-item observer", function()
 		local maid = Maid.new()
 		local list = maid:Add(ObservableSortedList.new())
-		local _, sub = observe(list, -1)
+		local sub = list:ObserveAtIndex(-1):Subscribe()
 
 		local fires = countFires(function()
 			for i = 1, ITEMS do
@@ -2573,7 +2530,7 @@ describe("ObservableSortedList emission cost (mirrors ObservableList)", function
 			removers[i] = list:Add(i, i)
 		end
 		list:_testForceFireEvents()
-		local _, sub = observe(list, -1)
+		local sub = list:ObserveAtIndex(-1):Subscribe()
 
 		local fires = countFires(function()
 			for i = ITEMS, 1, -1 do

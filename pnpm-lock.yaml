@@ -1321,6 +1321,9 @@ importers:
       '@quenty/instanceutils':
         specifier: workspace:*
         version: link:../instanceutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -1899,6 +1902,9 @@ importers:
       '@quenty/playermock':
         specifier: workspace:*
         version: link:../player-mock
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
       '@quenty/remoting':
         specifier: workspace:*
         version: link:../remoting
@@ -2552,6 +2558,9 @@ importers:
       '@quenty/blend':
         specifier: workspace:*
         version: link:../blend
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -3113,6 +3122,9 @@ importers:
       '@quenty/httppromise':
         specifier: workspace:*
         version: link:../httppromise
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/jsonutils':
         specifier: workspace:*
         version: link:../jsonutils
@@ -4023,6 +4035,9 @@ importers:
 
   src/physicsutils:
     dependencies:
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4644,6 +4659,9 @@ importers:
       '@quenty/enumutils':
         specifier: workspace:*
         version: link:../enumutils
+      '@quenty/jestutils':
+        specifier: workspace:*
+        version: link:../jest-utils
       '@quenty/loader':
         specifier: workspace:*
         version: link:../loader
@@ -4749,6 +4767,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/signal':
+        specifier: workspace:*
+        version: link:../signal
       '@quenty/table':
         specifier: workspace:*
         version: link:../table
@@ -4992,6 +5013,9 @@ importers:
       '@quenty/observablecollection':
         specifier: workspace:*
         version: link:../observablecollection
+      '@quenty/promise':
+        specifier: workspace:*
+        version: link:../promise
       '@quenty/remoting':
         specifier: workspace:*
         version: link:../remoting
@@ -6189,6 +6213,9 @@ importers:
       '@quenty/servicebag':
         specifier: workspace:*
         version: link:../servicebag
+      '@quenty/steputils':
+        specifier: workspace:*
+        version: link:../steputils
       '@quenty/valueobject':
         specifier: workspace:*
         version: link:../valueobject

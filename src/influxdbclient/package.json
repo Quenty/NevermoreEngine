@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/httppromise": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/jsonutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",

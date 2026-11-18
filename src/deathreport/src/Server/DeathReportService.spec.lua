@@ -13,25 +13,15 @@ local DeathReportDataService = require("DeathReportDataService")
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local DeathReportUtils = require("DeathReportUtils")
 local Jest = require("Jest")
+local RxTestUtils = require("RxTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 local function collectReports(controller: any): { DeathReportUtils.DeathReport }
-	local reports: { DeathReportUtils.DeathReport } = {}
-	controller.maid:GiveTask(controller.deathReportService.NewDeathReport:Connect(function(report)
-		table.insert(reports, report)
-	end))
-	return reports
-end
-
-local function collect(controller: any, observable: any): { any }
-	local emissions = {}
-	controller.maid:GiveTask(observable:Subscribe(function(value)
-		table.insert(emissions, value)
-	end))
-	return emissions
+	return SignalTestUtils.collectFireList(controller.maid, controller.deathReportService.NewDeathReport)
 end
 
 describe("DeathReportService.NewDeathReport", function()
@@ -83,10 +73,10 @@ describe("DeathReportService observers", function()
 		local killer = controller.newMock()
 		controller.newCharacter(killer)
 
-		local victimDeaths = collect(controller, service:ObservePlayerDeathReports(victim))
-		local victimKills = collect(controller, service:ObservePlayerKillerReports(victim))
-		local killerDeaths = collect(controller, service:ObservePlayerDeathReports(killer))
-		local killerKills = collect(controller, service:ObservePlayerKillerReports(killer))
+		local victimDeaths = RxTestUtils.collectList(controller.maid, service:ObservePlayerDeathReports(victim))
+		local victimKills = RxTestUtils.collectList(controller.maid, service:ObservePlayerKillerReports(victim))
+		local killerDeaths = RxTestUtils.collectList(controller.maid, service:ObservePlayerDeathReports(killer))
+		local killerKills = RxTestUtils.collectList(controller.maid, service:ObservePlayerKillerReports(killer))
 
 		controller.kill(victimHumanoid, killer)
 
@@ -107,10 +97,14 @@ describe("DeathReportService observers", function()
 		local killer = controller.newMock()
 		local killerCharacter, killerHumanoid = controller.newCharacter(killer)
 
-		local humanoidDeaths = collect(controller, service:ObserveHumanoidDeathReports(victimHumanoid))
-		local characterDeaths = collect(controller, service:ObserveCharacterDeathReports(victimCharacter))
-		local humanoidKills = collect(controller, service:ObserveHumanoidKillerReports(killerHumanoid))
-		local characterKills = collect(controller, service:ObserveCharacterKillerReports(killerCharacter))
+		local humanoidDeaths =
+			RxTestUtils.collectList(controller.maid, service:ObserveHumanoidDeathReports(victimHumanoid))
+		local characterDeaths =
+			RxTestUtils.collectList(controller.maid, service:ObserveCharacterDeathReports(victimCharacter))
+		local humanoidKills =
+			RxTestUtils.collectList(controller.maid, service:ObserveHumanoidKillerReports(killerHumanoid))
+		local characterKills =
+			RxTestUtils.collectList(controller.maid, service:ObserveCharacterKillerReports(killerCharacter))
 
 		controller.kill(victimHumanoid, killer)
 
