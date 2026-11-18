@@ -8,21 +8,17 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local RxPartBoundingBoxUtils = require("RxPartBoundingBoxUtils")
+local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-type Record = {
-	count: number,
-	values: { any },
-}
-
 type Controller = {
 	newPart: (cframe: CFrame?) -> BasePart,
-	collect: (observable: any) -> Record,
-	step: (count: number?) -> (),
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
@@ -38,26 +34,7 @@ local function setup(): Controller
 			return part
 		end,
 
-		collect = function(observable)
-			local record: Record = {
-				count = 0,
-				values = {},
-			}
-
-			maid:GiveTask(observable:Subscribe(function(value)
-				record.count += 1
-				record.values[record.count] = value
-			end))
-
-			return record
-		end,
-
-		step = function(count)
-			for _ = 1, count or 1 do
-				task.wait()
-			end
-		end,
-
+		maid = maid,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -83,10 +60,10 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 		local controller = setup()
 
 		local part = controller.newPart(CFrame.new(1, 2, 3))
-		local record = controller.collect(RxPartBoundingBoxUtils.observePartCFrame(part))
+		local cframes = controller.maid:Add(ObservableSpy.new(RxPartBoundingBoxUtils.observePartCFrame(part)))
 
-		expect(record.count).toBe(1)
-		expect(record.values[1]).toEqual(CFrame.new(1, 2, 3))
+		expect(#cframes).toBe(1)
+		expect(cframes[1]).toEqual(CFrame.new(1, 2, 3))
 
 		controller:Destroy()
 	end)
@@ -95,13 +72,12 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 		local controller = setup()
 
 		local part = controller.newPart(CFrame.new())
-		local record = controller.collect(RxPartBoundingBoxUtils.observePartCFrame(part))
+		local cframes = controller.maid:Add(ObservableSpy.new(RxPartBoundingBoxUtils.observePartCFrame(part)))
 
 		part.CFrame = CFrame.new(0, 40, 0)
-		controller.step()
 
-		expect(record.count).toBe(2)
-		expect(record.values[2]).toEqual(CFrame.new(0, 40, 0))
+		expect(#cframes).toBe(2)
+		expect(cframes[2]).toEqual(CFrame.new(0, 40, 0))
 
 		controller:Destroy()
 	end)
@@ -111,16 +87,13 @@ describe("RxPartBoundingBoxUtils.observePartCFrame", function()
 
 		local part = controller.newPart(CFrame.new())
 
-		local count = 0
-		local sub = RxPartBoundingBoxUtils.observePartCFrame(part):Subscribe(function()
-			count += 1
-		end)
-		sub:Destroy()
+		local cframes = controller.maid:Add(ObservableSpy.new(RxPartBoundingBoxUtils.observePartCFrame(part)))
+		cframes:Destroy()
 
 		part.CFrame = CFrame.new(0, 40, 0)
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(count).toBe(1)
+		expect(#cframes).toBe(1)
 
 		controller:Destroy()
 	end)

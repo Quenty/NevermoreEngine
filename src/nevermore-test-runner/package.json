@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-test-runner",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "Unified test runner service for Nevermore packages",
   "keywords": [
     "Roblox",
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "@quenty/loader": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/weldconstraintutils",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "Utility functions to create WeldConstraint and fabric BallSocketConstraint objects in Roblox",
   "keywords": [
     "Roblox",
@@ -33,7 +33,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/nocollisionconstraintutils": "workspace:*",
     "@quenty/vector3utils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "contributors": [
     "Quenty"

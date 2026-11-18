@@ -9,38 +9,42 @@ local JSONAttributeValue = require("JSONAttributeValue")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local RxTestUtils = require("RxTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local function setup(): any
+type Controller = {
+	maid: Maid.Maid,
+	folder: Folder,
+	newJSONValue: (attributeName: string, defaultValue: any) -> JSONAttributeValue.JSONAttributeValue<any>,
+	Destroy: (self: Controller) -> (),
+}
+
+local function setup(): Controller
 	local maid = Maid.new()
 	local folder = maid:Add(Instance.new("Folder"))
 
-	return {
+	local controller: Controller = {
+		maid = maid,
 		folder = folder,
-		newJSONValue = function(attributeName: string, defaultValue: any)
+		newJSONValue = function(attributeName, defaultValue)
 			return JSONAttributeValue.new(folder, attributeName, defaultValue)
-		end,
-		observeInto = function(observable: any)
-			local values = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(values, value)
-			end))
-
-			return values
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
 	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
 end
 
 describe("JSONAttributeValue.new()", function()
 	it("encodes the default value onto the object", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		controller.newJSONValue("Facts", { "a", "b" })
 
@@ -49,7 +53,6 @@ describe("JSONAttributeValue.new()", function()
 
 	it("writes nothing when there is no default value", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", nil)
 
@@ -61,7 +64,6 @@ end)
 describe("JSONAttributeValue.Value", function()
 	it("round trips a dictionary", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		jsonValue.Value = { enabled = true, count = 3 }
@@ -71,7 +73,6 @@ describe("JSONAttributeValue.Value", function()
 
 	it("round trips a list", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		jsonValue.Value = { "a", "b" }
@@ -81,7 +82,6 @@ describe("JSONAttributeValue.Value", function()
 
 	it("decodes what another writer stored", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", {})
 		controller.folder:SetAttribute("Facts", '{"enabled":true}')
@@ -91,7 +91,6 @@ describe("JSONAttributeValue.Value", function()
 
 	it("falls back to the default once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		controller.folder:SetAttribute("Facts", nil)
@@ -101,7 +100,6 @@ describe("JSONAttributeValue.Value", function()
 
 	it("clears the attribute when written a value it cannot encode", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
 		jsonValue.Value = 5
@@ -111,7 +109,6 @@ describe("JSONAttributeValue.Value", function()
 
 	it("reads nil when the attribute is not a string", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", nil)
 		controller.folder:SetAttribute("Facts", 5)
@@ -123,27 +120,23 @@ end)
 describe("JSONAttributeValue:Observe()", function()
 	it("fires the decoded value and every change", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
-		local values = controller.observeInto(jsonValue:Observe())
+		local facts = RxTestUtils.collectList(controller.maid, jsonValue:Observe())
 
 		jsonValue.Value = { "a", "b" }
-		task.wait()
 
-		expect(values).toEqual({ { "a" }, { "a", "b" } })
+		expect(facts).toEqual({ { "a" }, { "a", "b" } })
 	end)
 
 	it("fires the default value once the attribute is cleared", function()
 		local controller = setup()
-		JestUtils.afterThis(controller)
 
 		local jsonValue = controller.newJSONValue("Facts", { "a" })
-		local values = controller.observeInto(jsonValue:Observe())
+		local facts = RxTestUtils.collectList(controller.maid, jsonValue:Observe())
 
 		controller.folder:SetAttribute("Facts", nil)
-		task.wait()
 
-		expect(values).toEqual({ { "a" }, { "a" } })
+		expect(facts).toEqual({ { "a" }, { "a" } })
 	end)
 end)

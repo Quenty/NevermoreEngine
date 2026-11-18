@@ -21,6 +21,7 @@ local Maid = require("Maid")
 local PlayerDataStoreService = require("PlayerDataStoreService")
 local PlayerMock = require("PlayerMock")
 local PromiseTestUtils = require("PromiseTestUtils")
+local Rx = require("Rx")
 local SaveSlotConstants = require("SaveSlotConstants")
 local ServiceBag = require("ServiceBag")
 
@@ -34,7 +35,7 @@ local EXISTING_SLOT_ID = "e6f0c1a2-late-settle"
 -- Every datastore read yields this long, so the spec can land the unbind inside a chosen
 -- read's in-flight window. Kept as short as the window can be while still spanning several frames:
 -- these four tests otherwise spend their whole runtime waiting out real datastore latency, and the
--- window is guarded -- a read that has already settled fails the awaitSettled assertion before the
+-- window is guarded -- a read that has already settled fails the pending assertion before the
 -- unbind, rather than quietly reducing the test to nothing.
 local READ_YIELD_SECONDS = 0.15
 
@@ -61,9 +62,6 @@ local function setup()
 		PromiseTestUtils.awaitFulfilled(bindToCloseService:PromiseClose())
 		serviceBag:Destroy()
 		maid:DoCleaning()
-		-- Any straggler continuation blows up here, inside the test that owns it, rather
-		-- than as flake in a later suite.
-		task.wait(READ_YIELD_SECONDS * 3)
 	end
 
 	local controller = {
@@ -104,9 +102,7 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 
 		local slotsLoaded = controller.join():PromiseSlotsLoaded()
 
-		-- Let the service's chain attach to the (still pending) load, then "leave".
-		task.wait()
-		expect(PromiseTestUtils.awaitSettled(slotsLoaded, 0)).toEqual(false)
+		expect(slotsLoaded:IsPending()).toEqual(true)
 		controller.leave()
 
 		controller:Destroy()
@@ -128,9 +124,14 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 
 		-- Waiting on the selection itself, rather than PromiseLastActiveSlotId (which can answer from
 		-- _lastActiveSlotId while the selection is still in flight), also quiesces the chain before teardown.
-		expect(PromiseTestUtils.awaitValue(function()
-			return hasSaveSlots.ActiveSlotId.Value == EXISTING_SLOT_ID
-		end, 10)).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(
+			Rx.toPromise((hasSaveSlots.ActiveSlotId:Observe() :: any):Pipe({
+				Rx.where(function(slotId)
+					return slotId == EXISTING_SLOT_ID
+				end),
+			})),
+			10
+		)
 
 		controller:Destroy()
 	end)
@@ -145,8 +146,7 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 
 		local slotsLoaded = controller.join():PromiseSlotsLoaded()
 
-		task.wait()
-		expect(PromiseTestUtils.awaitSettled(slotsLoaded, 0)).toEqual(false)
+		expect(slotsLoaded:IsPending()).toEqual(true)
 		controller.leave()
 
 		controller:Destroy()
@@ -160,7 +160,6 @@ describe("SaveSlotService selection chain vs a player who leaves mid-load", func
 		-- Play the chain forward to the default-slot resolution: slots loaded, teleport read
 		-- consumed, and the last-active-slot datastore read now in its in-flight window.
 		expect(PromiseTestUtils.awaitSettled(hasSaveSlots:PromiseSlotsLoaded(), 10)).toEqual(true)
-		task.wait()
 
 		-- The player leaves inside that window; the read settles after the binder is gone.
 		-- With the regression, the settle's continuation calls the destroyed binder and a

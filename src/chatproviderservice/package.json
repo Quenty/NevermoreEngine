@@ -1,6 +1,6 @@
 {
   "name": "@quenty/chatproviderservice",
-  "version": "9.76.1",
+  "version": "9.76.2",
   "description": "Provide wrapper around chat system to allow tags to be set",
   "keywords": [
     "Roblox",
@@ -57,7 +57,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

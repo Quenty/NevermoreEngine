@@ -1,6 +1,6 @@
 {
   "name": "@quenty/observablecollection",
-  "version": "12.55.0",
+  "version": "12.55.1",
   "description": "A set of observable collections, such as sets, maps, sorted lists, and more.",
   "keywords": [
     "Roblox",
@@ -45,7 +45,7 @@
     "@quenty/symbol": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "devDependencies": {
     "@quenty/blend": "workspace:*"

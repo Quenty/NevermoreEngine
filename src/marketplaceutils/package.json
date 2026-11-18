@@ -1,6 +1,6 @@
 {
   "name": "@quenty/marketplaceutils",
-  "version": "11.35.1",
+  "version": "11.35.2",
   "description": "Provides utility methods for MarketplaceService",
   "keywords": [
     "Roblox",
@@ -37,7 +37,7 @@
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/servicebag": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

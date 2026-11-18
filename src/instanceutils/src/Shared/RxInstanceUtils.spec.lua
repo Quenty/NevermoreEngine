@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Brio = require("Brio")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local RxInstanceUtils = require("RxInstanceUtils")
 
 local describe = Jest.Globals.describe
@@ -14,16 +15,15 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 describe("RxInstanceUtils.observeChildrenBrio", function()
-	local part = Instance.new("Part")
-	local observe = RxInstanceUtils.observeChildrenBrio(part)
-	local externalResult = nil
-
 	it("should not emit anything", function()
-		observe:Subscribe(function(result)
-			externalResult = result
-		end)
+		local part = Instance.new("Part")
 
-		expect(externalResult).toEqual(nil)
+		local brios = ObservableSpy.new(RxInstanceUtils.observeChildrenBrio(part))
+
+		expect(#brios).toEqual(0)
+
+		brios:Destroy()
+		part:Destroy()
 	end)
 end)
 
@@ -31,18 +31,13 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 	describe("with no children", function()
 		it("should not emit anything", function()
 			local parent = Instance.new("Folder")
-			local lastBrio = nil
-			local fireCount = 0
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			expect(fireCount).toEqual(0)
-			expect(lastBrio).toBeNil()
+			expect(#brios).toEqual(0)
+			expect(brios:GetLastValue()).toBeNil()
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -53,21 +48,15 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
+			expect(#brios).toEqual(1)
+			expect(brios[1]).never.toBeNil()
+			expect(Brio.isBrio(brios[1])).toEqual(true)
+			expect(brios[1]:IsDead()).toEqual(false)
+			expect(brios[1]:GetValue()).toEqual(child)
 
-			expect(fireCount).toEqual(1)
-			expect(lastBrio).never.toBeNil()
-			expect(Brio.isBrio(lastBrio)).toEqual(true)
-			expect(lastBrio:IsDead()).toEqual(false)
-			expect(lastBrio:GetValue()).toEqual(child)
-
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -78,15 +67,11 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function()
-				fireCount = fireCount + 1
-			end)
+			expect(#brios).toEqual(0)
 
-			expect(fireCount).toEqual(0)
-
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -97,41 +82,32 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Wrong"
 			child.Parent = parent
 
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function()
-				fireCount = fireCount + 1
-			end)
+			expect(#brios).toEqual(0)
 
-			expect(fireCount).toEqual(0)
-
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
 	describe("when a child is added after subscription", function()
 		it("should emit when a matching child is added", function()
 			local parent = Instance.new("Folder")
-			local lastBrio = nil
-			local fireCount = 0
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			expect(fireCount).toEqual(0)
+			expect(#brios).toEqual(0)
 
 			local child = Instance.new("Part")
 			child.Name = "Target"
 			child.Parent = parent
 
-			expect(fireCount).toEqual(1)
-			expect(lastBrio).never.toBeNil()
-			expect(Brio.isBrio(lastBrio)).toEqual(true)
-			expect(lastBrio:GetValue()).toEqual(child)
+			expect(#brios).toEqual(1)
+			expect(brios[1]).never.toBeNil()
+			expect(Brio.isBrio(brios[1])).toEqual(true)
+			expect(brios[1]:GetValue()).toEqual(child)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -142,22 +118,16 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
-
-			expect(fireCount).toEqual(1)
-			local firstBrio = lastBrio
+			expect(#brios).toEqual(1)
+			local firstBrio = brios:GetLastValue()
 
 			child.Parent = nil
 
 			expect(firstBrio:IsDead()).toEqual(true)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -168,23 +138,17 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Wrong"
 			child.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
-
-			expect(fireCount).toEqual(0)
+			expect(#brios).toEqual(0)
 
 			child.Name = "Target"
 
-			expect(fireCount).toEqual(1)
-			expect(lastBrio).never.toBeNil()
-			expect(lastBrio:GetValue()).toEqual(child)
+			expect(#brios).toEqual(1)
+			expect(brios[1]).never.toBeNil()
+			expect(brios[1]:GetValue()).toEqual(child)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -195,22 +159,16 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
-
-			expect(fireCount).toEqual(1)
-			local firstBrio = lastBrio
+			expect(#brios).toEqual(1)
+			local firstBrio = brios:GetLastValue()
 
 			child.Name = "NotTarget"
 
 			expect(firstBrio:IsDead()).toEqual(true)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -224,25 +182,20 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child2.Name = "Target"
 			child2.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
-
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
 			-- Should have emitted (possibly more than once as children are iterated)
-			expect(lastBrio).never.toBeNil()
-			expect(Brio.isBrio(lastBrio)).toEqual(true)
-			expect(lastBrio:IsDead()).toEqual(false)
+			local latestBrio = brios:GetLastValue()
+			expect(latestBrio).never.toBeNil()
+			expect(Brio.isBrio(latestBrio)).toEqual(true)
+			expect(latestBrio:IsDead()).toEqual(false)
 
-			local value = lastBrio:GetValue()
+			local value = brios:GetLastValue():GetValue()
 			-- The emitted child should be one of the two matching children
 			expect(value:IsA("Part")).toEqual(true)
 			expect(value.Name).toEqual("Target")
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 
 		it("should switch to remaining child when the emitted one is removed", function()
@@ -254,24 +207,21 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child2.Name = "Target"
 			child2.Parent = parent
 
-			local lastBrio = nil
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-			end)
-
-			local emittedChild = lastBrio:GetValue()
+			local emittedChild = brios:GetLastValue():GetValue()
 			local otherChild = if emittedChild == child1 then child2 else child1
 
 			-- Remove the currently emitted child
 			emittedChild.Parent = nil
 
 			-- Should now emit the other child
-			expect(lastBrio).never.toBeNil()
-			expect(lastBrio:IsDead()).toEqual(false)
-			expect(lastBrio:GetValue()).toEqual(otherChild)
+			local brio = brios:GetLastValue()
+			expect(brio).never.toBeNil()
+			expect(brio:IsDead()).toEqual(false)
+			expect(brio:GetValue()).toEqual(otherChild)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 
 		it("should emit nothing when all matching children are removed", function()
@@ -283,21 +233,17 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child2.Name = "Target"
 			child2.Parent = parent
 
-			local lastBrio = nil
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-			end)
-
-			expect(lastBrio).never.toBeNil()
+			expect(brios:GetLastValue()).never.toBeNil()
 
 			child1.Parent = nil
 			child2.Parent = nil
 
 			-- The last brio should be dead since no matching children remain
-			expect(lastBrio:IsDead()).toEqual(true)
+			expect(brios:GetLastValue():IsDead()).toEqual(true)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
@@ -308,18 +254,14 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local lastBrio = nil
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-			end)
+			expect(brios:GetLastValue()).never.toBeNil()
+			expect(brios:GetLastValue():IsDead()).toEqual(false)
 
-			expect(lastBrio).never.toBeNil()
-			expect(lastBrio:IsDead()).toEqual(false)
+			brios:Destroy()
 
-			sub:Destroy()
-
-			expect(lastBrio:IsDead()).toEqual(true)
+			expect(brios:GetLastValue():IsDead()).toEqual(true)
 		end)
 	end)
 
@@ -330,39 +272,30 @@ describe("RxInstanceUtils.observeLastNamedChildBrio", function()
 			child.Name = "Target"
 			child.Parent = parent
 
-			local lastBrio = nil
-			local fireCount = 0
-
 			-- Part IsA BasePart, so this should match
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "BasePart", "Target"):Subscribe(function(brio)
-				lastBrio = brio
-				fireCount = fireCount + 1
-			end)
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "BasePart", "Target"))
 
-			expect(fireCount).toEqual(1)
-			expect(lastBrio:GetValue()).toEqual(child)
+			expect(#brios).toEqual(1)
+			expect(brios[1]:GetValue()).toEqual(child)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 
 	describe("non-matching child added then removed", function()
 		it("should not emit for non-matching children", function()
 			local parent = Instance.new("Folder")
-			local fireCount = 0
 
-			local sub = RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"):Subscribe(function()
-				fireCount = fireCount + 1
-			end)
+			local brios = ObservableSpy.new(RxInstanceUtils.observeLastNamedChildBrio(parent, "Part", "Target"))
 
 			local child = Instance.new("Folder")
 			child.Name = "Target"
 			child.Parent = parent
 			child.Parent = nil
 
-			expect(fireCount).toEqual(0)
+			expect(#brios).toEqual(0)
 
-			sub:Destroy()
+			brios:Destroy()
 		end)
 	end)
 end)

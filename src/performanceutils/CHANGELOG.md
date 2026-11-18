@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.13.3...@quenty/performanceutils@4.13.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/performanceutils
+
 ## [4.13.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/performanceutils@4.13.2...@quenty/performanceutils@4.13.3) (2026-10-20)
 
 **Note:** Version bump only for package @quenty/performanceutils

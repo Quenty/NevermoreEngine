@@ -1,6 +1,6 @@
 {
   "name": "@quenty/playerutils",
-  "version": "8.46.1",
+  "version": "8.46.2",
   "description": "Player utility functions",
   "keywords": [
     "Roblox",
@@ -41,6 +41,6 @@
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

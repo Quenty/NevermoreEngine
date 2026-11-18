@@ -1,6 +1,6 @@
 {
   "name": "@quenty/templateprovider",
-  "version": "11.56.0",
+  "version": "11.56.1",
   "description": "Base of a template retrieval system",
   "keywords": [
     "Roblox",
@@ -49,7 +49,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

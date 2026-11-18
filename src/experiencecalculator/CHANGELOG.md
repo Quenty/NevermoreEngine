@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.14.3...@quenty/experiencecalculator@2.14.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/experiencecalculator
+
 ## [2.14.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/experiencecalculator@2.14.2...@quenty/experiencecalculator@2.14.3) (2026-10-20)
 
 ### Bug Fixes

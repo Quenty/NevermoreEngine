@@ -6,8 +6,10 @@
 local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
+local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockCoreGuiUtils = require("PlayerMockCoreGuiUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -27,25 +29,19 @@ describe("PlayerMockCoreGuiUtils.getCoreEvent", function()
 
 	it("keeps the friended and unfriended events apart", function()
 		local player = PlayerMock.new()
-		local friended = 0
-		local unfriended = 0
+		local maid = Maid.new()
 
-		local friendedConnection = PlayerMockCoreGuiUtils.getCoreEvent(player, "PlayerFriendedEvent").Event
-			:Connect(function()
-				friended += 1
-			end)
-		local unfriendedConnection = PlayerMockCoreGuiUtils.getCoreEvent(player, "PlayerUnfriendedEvent").Event
-			:Connect(function()
-				unfriended += 1
-			end)
+		local friended =
+			SignalTestUtils.countFires(maid, PlayerMockCoreGuiUtils.getCoreEvent(player, "PlayerFriendedEvent").Event)
+		local unfriended =
+			SignalTestUtils.countFires(maid, PlayerMockCoreGuiUtils.getCoreEvent(player, "PlayerUnfriendedEvent").Event)
 
 		PlayerMockCoreGuiUtils.getCoreEvent(player, "PlayerFriendedEvent"):Fire()
 
-		expect(friended).toBe(1)
-		expect(unfriended).toBe(0)
+		expect(friended()).toBe(1)
+		expect(unfriended()).toBe(0)
 
-		friendedConnection:Disconnect()
-		unfriendedConnection:Disconnect()
+		maid:DoCleaning()
 		player:Destroy()
 	end)
 

@@ -201,22 +201,14 @@ describe("FrameRecorder.recordAsync", function()
 	it("should fail rather than wait forever when no frame steps", function()
 		local timeout = FrameRecorder.FIRST_FRAME_TIMEOUT_SECONDS
 		FrameRecorder.FIRST_FRAME_TIMEOUT_SECONDS = 0
-		local result = nil
-		task.spawn(function()
-			result = FrameRecorder.recordAsync({
-				duration = 1,
-				onFrame = function()
-					return false
-				end,
-			}, { runService = createRunService("frozen") })
-		end)
-		local deadline = os.clock() + 1
-		while result == nil and os.clock() < deadline do
-			task.wait()
-		end
+		local result = FrameRecorder.recordAsync({
+			duration = 1,
+			onFrame = function()
+				return false
+			end,
+		}, { runService = createRunService("frozen") })
 		FrameRecorder.FIRST_FRAME_TIMEOUT_SECONDS = timeout
 
-		expect(result).never.toBeNil()
 		expect(result.error).toMatch("didn't step a frame")
 	end)
 end)

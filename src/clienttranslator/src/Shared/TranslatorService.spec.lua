@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local LocalizationService = game:GetService("LocalizationService")
 
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local Table = require("Table")
 local TieRealms = require("TieRealms")
 local TranslatorTestUtils = require("TranslatorTestUtils")
@@ -87,12 +88,10 @@ describe("TranslatorService forced locale", function()
 		local service = controller.translatorService
 		service:SetForcedLocaleId("de-de")
 
-		local received
-		controller.track(service:ObserveLocaleId():Subscribe(function(localeId)
-			received = localeId
-		end))
+		local receivedValues = ObservableSpy.new(service:ObserveLocaleId())
+		controller.track(receivedValues)
 
-		expect(received).toBe("de-de")
+		expect(receivedValues:GetLastValue()).toBe("de-de")
 		controller:Destroy()
 	end)
 end)

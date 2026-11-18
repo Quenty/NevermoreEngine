@@ -9,8 +9,10 @@ local InfluxDBPoint = require("InfluxDBPoint")
 local InfluxDBRequestHandlerMock = require("InfluxDBRequestHandlerMock")
 local InfluxDBWriteAPI = require("InfluxDBWriteAPI")
 local Jest = require("Jest")
+local Maid = require("Maid")
 local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -238,17 +240,16 @@ describe("InfluxDBWriteAPI.PromiseFlush", function()
 			return Promise.resolved(response)
 		end)
 
-		local finished = {}
-		api.RequestFinished:Connect(function(result)
-			table.insert(finished, result)
-		end)
+		local maid = Maid.new()
+		local finished = SignalTestUtils.collectFireList(maid, api.RequestFinished)
 
 		api:QueuePoint(newPoint())
 		local outcome = PromiseTestUtils.awaitOutcome(api:PromiseFlush())
 
 		expect(outcome).toEqual("resolved")
-		expect(finished[1]).toBe(response)
+		expect(finished).toEqual({ response })
 
+		maid:DoCleaning()
 		api:Destroy()
 	end)
 

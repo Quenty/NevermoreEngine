@@ -1,6 +1,6 @@
 {
   "name": "@quenty/datastore",
-  "version": "13.60.0",
+  "version": "13.60.1",
   "description": "Quenty's Datastore implementation for Roblox",
   "keywords": [
     "Roblox",
@@ -48,7 +48,7 @@
     "@quenty/symbol": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

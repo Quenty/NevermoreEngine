@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.14.1...@quenty/countdowntext@4.14.2) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/countdowntext
+
 ## [4.14.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/countdowntext@4.14.0...@quenty/countdowntext@4.14.1) (2026-10-24)
 
 **Note:** Version bump only for package @quenty/countdowntext

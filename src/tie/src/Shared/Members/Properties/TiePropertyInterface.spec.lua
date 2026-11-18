@@ -8,6 +8,9 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local Rx = require("Rx")
+local RxTestUtils = require("RxTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 local TieDefinition = require("TieDefinition")
 local TieRealms = require("TieRealms")
 local ValueObject = require("ValueObject")
@@ -15,6 +18,17 @@ local ValueObject = require("ValueObject")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+
+-- The values of brios that are still alive when they arrive, in arrival order. Clearing an
+-- attribute-backed value emits a brio holding nil, which these tests don't count as a value.
+local LIVE_BRIO_VALUES: { any } = {
+	Rx.where(function(brio)
+		return not brio:IsDead() and brio:GetValue() ~= nil
+	end),
+	Rx.map(function(brio)
+		return brio:GetValue()
+	end),
+}
 
 local NIL = newproxy(false)
 
@@ -293,10 +307,7 @@ describe("TiePropertyInterface.Changed", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee).Changed:Connect(function(value)
-			table.insert(seen, value)
-		end))
+		local seen = SignalTestUtils.collectFireList(controller.maid, getScore(definition, adornee).Changed)
 
 		expect(#seen).toBe(0)
 
@@ -318,10 +329,7 @@ describe("TiePropertyInterface.Changed", function()
 			Score = scoreValue,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee).Changed:Connect(function(value)
-			table.insert(seen, value)
-		end))
+		local seen = SignalTestUtils.collectFireList(controller.maid, getScore(definition, adornee).Changed)
 
 		scoreValue.Value = 7
 
@@ -339,10 +347,7 @@ describe("TiePropertyInterface.Changed", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee).Changed:Connect(function(value)
-			table.insert(seen, value)
-		end))
+		local seen = SignalTestUtils.collectFireList(controller.maid, getScore(definition, adornee).Changed)
 
 		expect(#seen).toBe(0)
 
@@ -451,14 +456,6 @@ describe("TiePropertyInterface.Observe", function()
 end)
 
 describe("TiePropertyInterface.ObserveBrio", function()
-	local function recordLive(seen)
-		return function(brio)
-			if not brio:IsDead() then
-				table.insert(seen, brio:GetValue())
-			end
-		end
-	end
-
 	it("emits the current attribute-backed value", function()
 		local controller = setup()
 
@@ -468,10 +465,10 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		controller:Destroy()
 	end)
@@ -487,10 +484,10 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = scoreValue,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		controller:Destroy()
 	end)
@@ -504,18 +501,20 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee)
-			:ObserveBrio(function(value)
-				return value >= 10
-			end)
-			:Subscribe(recordLive(seen)))
+		local scores = RxTestUtils.collectList(
+			controller.maid,
+			getScore(definition, adornee)
+				:ObserveBrio(function(value)
+					return value >= 10
+				end)
+				:Pipe(LIVE_BRIO_VALUES)
+		)
 
-		expect(#seen).toBe(0)
+		expect(#scores).toBe(0)
 
 		getScore(definition, adornee).Value = 15
 
-		expect(seen).toEqual({ 15 })
+		expect(scores).toEqual({ 15 })
 
 		controller:Destroy()
 	end)
@@ -531,10 +530,10 @@ describe("TiePropertyInterface.ObserveBrio", function()
 		container.Parent = adornee
 		controller.maid:GiveTask(container)
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
-		expect(#seen).toBe(0)
+		expect(#scores).toBe(0)
 
 		controller:Destroy()
 	end)
@@ -551,10 +550,10 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = scoreValue,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		local container = getContainer(definition, adornee)
 		expect(container).never.toBeNil()
@@ -566,7 +565,7 @@ describe("TiePropertyInterface.ObserveBrio", function()
 		-- "attempt to index nil with 'ObserveBrio'".
 		(member :: Instance):Destroy()
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		controller:Destroy()
 	end)
@@ -580,14 +579,14 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		getContainer(definition, adornee):SetAttribute("Score", nil)
 
-		expect(seen).toEqual({ 5 })
+		expect(scores).toEqual({ 5 })
 
 		controller:Destroy()
 	end)
@@ -601,14 +600,14 @@ describe("TiePropertyInterface.ObserveBrio", function()
 			Score = 5,
 		}, TieRealms.SERVER))
 
-		local seen = {}
-		controller.maid:GiveTask(getScore(definition, adornee):ObserveBrio():Subscribe(recordLive(seen)))
+		local scores =
+			RxTestUtils.collectList(controller.maid, getScore(definition, adornee):ObserveBrio():Pipe(LIVE_BRIO_VALUES))
 
 		local container = getContainer(definition, adornee)
 		container:SetAttribute("Score", nil)
 		container:SetAttribute("Score", 9)
 
-		expect(seen).toEqual({ 5, 9 })
+		expect(scores).toEqual({ 5, 9 })
 
 		controller:Destroy()
 	end)

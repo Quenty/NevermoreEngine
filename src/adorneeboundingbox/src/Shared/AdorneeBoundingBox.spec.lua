@@ -9,15 +9,12 @@ local AdorneeBoundingBox = require("AdorneeBoundingBox")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
+local StepUtils = require("StepUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
-type Record = {
-	count: number,
-	values: { any },
-}
 
 type Controller = {
 	newPart: (size: Vector3?, cframe: CFrame?) -> BasePart,
@@ -26,8 +23,7 @@ type Controller = {
 	newTool: () -> Tool,
 	newAttachment: (part: BasePart, cframe: CFrame?) -> Attachment,
 	newBoundingBox: (adornee: Instance?) -> AdorneeBoundingBox.AdorneeBoundingBox,
-	collect: (observable: any) -> Record,
-	step: (count: number?) -> (),
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
@@ -83,26 +79,7 @@ local function setup(): Controller
 			return maid:Add(AdorneeBoundingBox.new(adornee))
 		end,
 
-		collect = function(observable)
-			local record: Record = {
-				count = 0,
-				values = {},
-			}
-
-			maid:GiveTask(observable:Subscribe(function(value)
-				record.count += 1
-				record.values[record.count] = value
-			end))
-
-			return record
-		end,
-
-		step = function(count)
-			for _ = 1, count or 1 do
-				task.wait()
-			end
-		end,
-
+		maid = maid,
 		Destroy = function(_self)
 			maid:DoCleaning()
 		end,
@@ -129,11 +106,11 @@ describe("AdorneeBoundingBox.new", function()
 		local controller = setup()
 
 		local boundingBox = controller.newBoundingBox(nil)
-		local record = controller.collect(boundingBox:ObserveBoundingBox())
+		local boxes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveBoundingBox()))
 
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(record.count).toBe(0)
+		expect(#boxes).toBe(0)
 
 		controller:Destroy()
 	end)
@@ -182,11 +159,11 @@ describe("AdorneeBoundingBox with a part adornee", function()
 
 		local part = controller.newPart(Vector3.new(4, 1, 2), CFrame.new(1, 2, 3))
 		local boundingBox = controller.newBoundingBox(part)
-		local record = controller.collect(boundingBox:ObserveBoundingBox())
+		local boxes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveBoundingBox()))
 
-		expect(record.count).toBe(1)
-		expect(record.values[1].Size).toEqual(Vector3.new(4, 1, 2))
-		expect(record.values[1].CFrame).toEqual(CFrame.new(1, 2, 3))
+		expect(#boxes).toBe(1)
+		expect(boxes[1].Size).toEqual(Vector3.new(4, 1, 2))
+		expect(boxes[1].CFrame).toEqual(CFrame.new(1, 2, 3))
 
 		controller:Destroy()
 	end)
@@ -199,7 +176,6 @@ describe("AdorneeBoundingBox with a part adornee", function()
 
 		part.Size = Vector3.new(9, 9, 9)
 		part.CFrame = CFrame.new(0, 100, 0)
-		controller.step()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(9, 9, 9))
 		expect(boundingBox:GetCFrame()).toEqual(CFrame.new(0, 100, 0))
@@ -227,7 +203,7 @@ describe("AdorneeBoundingBox with a model adornee", function()
 		local model = controller.newModel(Vector3.new(4, 1, 2), CFrame.new(3, 0, 0))
 		local boundingBox = controller.newBoundingBox(model)
 
-		controller.step()
+		StepUtils.deferWait()
 
 		local expectedCFrame, expectedSize = model:GetBoundingBox()
 
@@ -242,15 +218,15 @@ describe("AdorneeBoundingBox with a model adornee", function()
 
 		local model = controller.newModel()
 		local boundingBox = controller.newBoundingBox(model)
-		local record = controller.collect(boundingBox:ObserveBoundingBox())
+		local boxes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveBoundingBox()))
 
-		controller.step()
+		StepUtils.deferWait()
 
 		local expectedCFrame, expectedSize = model:GetBoundingBox()
 
-		expect(record.count).never.toBe(0)
-		expect(record.values[record.count].Size).toEqual(expectedSize)
-		expect(record.values[record.count].CFrame).toEqual(expectedCFrame)
+		expect(#boxes).never.toBe(0)
+		expect(boxes[#boxes].Size).toEqual(expectedSize)
+		expect(boxes[#boxes].CFrame).toEqual(expectedCFrame)
 
 		controller:Destroy()
 	end)
@@ -275,7 +251,7 @@ describe("AdorneeBoundingBox with a humanoid adornee", function()
 		local model, humanoid = controller.newHumanoidModel()
 		local boundingBox = controller.newBoundingBox(humanoid)
 
-		controller.step()
+		StepUtils.deferWait()
 
 		local _expectedCFrame, expectedSize = model:GetBoundingBox()
 
@@ -292,7 +268,7 @@ describe("AdorneeBoundingBox with a tool adornee", function()
 		local tool = controller.newTool()
 		local boundingBox = controller.newBoundingBox(tool)
 
-		controller.step()
+		StepUtils.deferWait()
 
 		expect(boundingBox:GetCFrame()).toBeNil()
 
@@ -308,7 +284,6 @@ describe("AdorneeBoundingBox with a tool adornee", function()
 		local handle = controller.newPart(Vector3.new(1, 2, 3), CFrame.new(5, 0, 0))
 		handle.Name = "Handle"
 		handle.Parent = tool
-		controller.step()
 
 		expect(boundingBox:GetSize()).toEqual(Vector3.new(1, 2, 3))
 		expect(boundingBox:GetCFrame()).toEqual(CFrame.new(5, 0, 0))
@@ -325,8 +300,6 @@ describe("AdorneeBoundingBox with an attachment adornee", function()
 		local attachment = controller.newAttachment(part)
 		local boundingBox = controller.newBoundingBox(attachment)
 
-		controller.step()
-
 		expect(boundingBox:GetSize()).toEqual(Vector3.zero)
 
 		controller:Destroy()
@@ -338,8 +311,6 @@ describe("AdorneeBoundingBox with an attachment adornee", function()
 		local part = controller.newPart(nil, CFrame.new(10, 0, 0))
 		local attachment = controller.newAttachment(part, CFrame.new(0, 5, 0))
 		local boundingBox = controller.newBoundingBox(attachment)
-
-		controller.step()
 
 		local cframe = boundingBox:GetCFrame()
 
@@ -357,7 +328,7 @@ describe("AdorneeBoundingBox with an unsupported adornee", function()
 		local folder = Instance.new("Folder")
 		local boundingBox = controller.newBoundingBox(folder)
 
-		controller.step()
+		StepUtils.deferWait()
 
 		expect(boundingBox:GetCFrame()).toBeNil()
 
@@ -370,11 +341,11 @@ describe("AdorneeBoundingBox with an unsupported adornee", function()
 
 		local folder = Instance.new("Folder")
 		local boundingBox = controller.newBoundingBox(folder)
-		local record = controller.collect(boundingBox:ObserveBoundingBox())
+		local boxes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveBoundingBox()))
 
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(record.count).toBe(0)
+		expect(#boxes).toBe(0)
 
 		folder:Destroy()
 		controller:Destroy()
@@ -443,7 +414,7 @@ describe("AdorneeBoundingBox:SetAdornee", function()
 		cleanup()
 
 		part.Size = Vector3.new(20, 20, 20)
-		controller.step()
+		StepUtils.deferWait()
 
 		expect(boundingBox:GetSize()).never.toEqual(Vector3.new(20, 20, 20))
 
@@ -473,14 +444,14 @@ describe("AdorneeBoundingBox:Destroy", function()
 
 		local part = controller.newPart(Vector3.new(4, 1, 2))
 		local boundingBox = controller.newBoundingBox(part)
-		local record = controller.collect(boundingBox:ObserveBoundingBox())
+		local boxes = controller.maid:Add(ObservableSpy.new(boundingBox:ObserveBoundingBox()))
 
 		boundingBox:Destroy()
 
 		part.Size = Vector3.new(20, 20, 20)
-		controller.step()
+		StepUtils.deferWait()
 
-		expect(record.count).toBe(1)
+		expect(#boxes).toBe(1)
 
 		controller:Destroy()
 	end)
@@ -491,7 +462,7 @@ describe("AdorneeBoundingBox:Destroy", function()
 		local model = controller.newModel()
 		local boundingBox = controller.newBoundingBox(model)
 
-		controller.step()
+		StepUtils.deferWait()
 
 		expect(function()
 			boundingBox:Destroy()

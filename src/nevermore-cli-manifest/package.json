@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermoreclimanifest",
-  "version": "1.11.1",
+  "version": "1.11.2",
   "description": "Manifest of nevermore CLI-injected deploy metadata (commit, target, version, timestamp)",
   "keywords": [
     "Roblox",
@@ -31,7 +31,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

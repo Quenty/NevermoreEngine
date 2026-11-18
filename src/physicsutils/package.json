@@ -1,6 +1,6 @@
 {
   "name": "@quenty/physicsutils",
-  "version": "8.36.1",
+  "version": "8.36.2",
   "description": "General physics library for use on Roblox",
   "keywords": [
     "Roblox",
@@ -31,11 +31,12 @@
     "access": "public"
   },
   "dependencies": {
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/vector3utils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

@@ -10,6 +10,9 @@ local BasicPane = require("BasicPane")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
+local SignalTestUtils = require("SignalTestUtils")
+local StepUtils = require("StepUtils")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
 
@@ -18,6 +21,7 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 type Controller = {
+	maid: Maid.Maid,
 	model: AccelTweenTransitionModel.AccelTweenTransitionModel,
 	value: () -> number,
 	advance: (seconds: number) -> (),
@@ -38,14 +42,15 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 	end)
 
 	local controller: Controller = {
+		maid = maid,
 		model = model,
 		value = function()
 			return model:GetPosition()
 		end,
 		advance = function(seconds: number)
 			now += seconds
-			task.wait()
-			task.wait()
+			StepUtils.getAnimationStepSignal():Wait()
+			StepUtils.deferWait()
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -314,16 +319,13 @@ describe("AccelTweenTransitionModel promises", function()
 
 	it("fires ShowingComplete once the tween arrives", function()
 		local controller = setup()
-		local fires = 0
-		controller.model.ShowingComplete:Connect(function()
-			fires += 1
-		end)
+		local fires = SignalTestUtils.countFires(controller.maid, controller.model.ShowingComplete)
 
 		controller.model:Show()
-		expect(fires).toBe(0)
+		expect(fires()).toBe(0)
 
 		controller.advance(5)
-		expect(fires).toBe(1)
+		expect(fires()).toBe(1)
 
 		controller:Destroy()
 	end)
@@ -333,10 +335,7 @@ describe("AccelTweenTransitionModel:Observe", function()
 	it("emits the position while animating and stops once it arrives", function()
 		local controller = setup()
 
-		local values = {}
-		local sub = controller.model:Observe():Subscribe(function(value)
-			table.insert(values, value)
-		end)
+		local values = ObservableSpy.new(controller.model:Observe())
 
 		controller.model:Show()
 		controller.advance(5)
@@ -344,7 +343,7 @@ describe("AccelTweenTransitionModel:Observe", function()
 		expect(#values > 1).toBe(true)
 		expect(values[#values]).toBeCloseTo(1)
 
-		sub:Destroy()
+		values:Destroy()
 		controller:Destroy()
 	end)
 end)

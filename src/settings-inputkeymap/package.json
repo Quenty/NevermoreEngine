@@ -1,6 +1,6 @@
 {
   "name": "@quenty/settings-inputkeymap",
-  "version": "10.79.2",
+  "version": "10.79.3",
   "description": "Input key map setting saving for players",
   "keywords": [
     "Roblox",
@@ -43,6 +43,6 @@
     "@quenty/settings": "workspace:*",
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

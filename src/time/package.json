@@ -1,6 +1,6 @@
 {
   "name": "@quenty/time",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Time based parsing and formatting built on Roblox's DateTime, with PHP-style format codes. All calculations are in UTC.",
   "keywords": [
     "Roblox",
@@ -31,7 +31,7 @@
     "@quenty/clienttranslator": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "devDependencies": {
     "@quenty/loader": "workspace:*"

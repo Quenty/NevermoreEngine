@@ -583,8 +583,8 @@ describe("InstanceQuery.prepare", function()
 		local services = InstanceQuery.getPlaceServices()
 
 		expect(table.find(services, workspace) ~= nil).toEqual(true)
-		expect(table.find(services, game:GetService("Stats"))).toEqual(nil)
-		expect(table.find(services, game:GetService("CoreGui"))).toEqual(nil)
+		expect(services).never.toContain(game:GetService("Stats"))
+		expect(services).never.toContain(game:GetService("CoreGui"))
 		for _, service in services do
 			assert(service.ClassName ~= "", `{service:GetFullName()} has no ClassName`)
 		end

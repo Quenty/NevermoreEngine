@@ -12,6 +12,7 @@ local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PlayerDeathTrackerClient = require("PlayerDeathTrackerClient")
 local PlayerKillTrackerClient = require("PlayerKillTrackerClient")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 local TeamKillTrackerClient = require("TeamKillTrackerClient")
 
@@ -59,8 +60,7 @@ describe("DeathReportBindersClient", function()
 	it("resolves binders by tag", function()
 		local controller = setup()
 
-		local ok, binder = controller.provider:PromiseBinder("PlayerKillTracker"):Yield()
-		expect(ok).toBe(true)
+		local binder = PromiseTestUtils.awaitFulfilled(controller.provider:PromiseBinder("PlayerKillTracker"))
 		expect(binder).toBe(controller.serviceBag:GetService(PlayerKillTrackerClient))
 		expect(controller.provider:Get("Unknown")).toBeNil()
 

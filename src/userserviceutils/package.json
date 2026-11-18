@@ -1,6 +1,6 @@
 {
   "name": "@quenty/userserviceutils",
-  "version": "9.45.1",
+  "version": "9.45.2",
   "description": "Utilities involving UserService in Roblox",
   "keywords": [
     "Roblox",
@@ -38,7 +38,7 @@
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/servicebag": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

@@ -32,10 +32,6 @@ local TERMINAL: { Enum.TeleportResult } = {
 	Enum.TeleportResult.Flooded,
 }
 
-local function contains(results: { Enum.TeleportResult }, result: Enum.TeleportResult): boolean
-	return table.find(results, result) ~= nil
-end
-
 describe("TeleportFailedReportUtils.new", function()
 	it("keeps the whole of what the engine said", function()
 		local report = TeleportFailedReportUtils.new(700, Enum.TeleportResult.GameFull, "server full")
@@ -90,7 +86,7 @@ describe("TeleportFailedReportUtils classification", function()
 
 			expect({ result = result.Name, inFlight = TeleportFailedReportUtils.isInFlight(report) }).toEqual({
 				result = result.Name,
-				inFlight = contains(IN_FLIGHT, result),
+				inFlight = table.find(IN_FLIGHT, result) ~= nil,
 			})
 		end
 	end)
@@ -101,7 +97,7 @@ describe("TeleportFailedReportUtils classification", function()
 
 			expect({ result = result.Name, retry = TeleportFailedReportUtils.shouldRetry(report) }).toEqual({
 				result = result.Name,
-				retry = contains(RETRYABLE, result),
+				retry = table.find(RETRYABLE, result) ~= nil,
 			})
 		end
 	end)

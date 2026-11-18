@@ -1,6 +1,6 @@
 {
   "name": "@quenty/boundlinkutils",
-  "version": "14.49.1",
+  "version": "14.49.2",
   "description": "Utility functions involving binders and links",
   "keywords": [
     "Roblox",
@@ -35,7 +35,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/signal": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

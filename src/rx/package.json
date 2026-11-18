@@ -1,6 +1,6 @@
 {
   "name": "@quenty/rx",
-  "version": "13.35.1",
+  "version": "13.35.2",
   "description": "Quenty's reactive library for Roblox",
   "keywords": [
     "Roblox",
@@ -33,6 +33,7 @@
     "@quenty/cancellabledelay": "workspace:*",
     "@quenty/canceltoken": "workspace:*",
     "@quenty/ducktype": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
@@ -42,7 +43,7 @@
     "@quenty/table": "workspace:*",
     "@quenty/throttle": "workspace:*",
     "@quenty/typeutils": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -60,10 +61,6 @@ describe("two servers: clean handoff and crash recovery", function()
 		local loadA = serverA:PromiseLoadSuccessful()
 		local loadB = serverB:PromiseLoadSuccessful()
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return not loadA:IsPending() or not loadB:IsPending()
-		end, 5)).toEqual(true)
-
 		local aSettled = not loadA:IsPending()
 		local bSettled = not loadB:IsPending()
 		expect(aSettled ~= bSettled).toEqual(true)
@@ -88,14 +85,11 @@ describe("two servers: clean handoff and crash recovery", function()
 			},
 		})
 
-		local stolen = nil
-		serverA.SessionStolen:Connect(function(session)
-			stolen = session
-		end)
+		local stolen = SignalTestUtils.collectFireList(controller.maid, serverA.SessionStolen)
 		serverA:Store("coins", 5)
 		expect(PromiseTestUtils.awaitSettled(serverA:Save(), 10)).toEqual(true)
 
-		expect(stolen).never.toBeNil()
+		expect(#stolen).toEqual(1)
 		expect(controller.mock:GetRaw(KEY).coins).toEqual(100)
 
 		controller:Destroy()
@@ -116,10 +110,9 @@ describe("two servers: MessagingService graceful close", function()
 			15
 		)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = controller.mock:GetRaw(KEY)
-			return raw ~= nil and raw.lock == nil
-		end, 5)).toEqual(true)
+		local raw = controller.mock:GetRaw(KEY)
+		expect(raw).never.toBeNil()
+		expect(raw.lock).toBeNil()
 
 		controller:Destroy()
 	end, 30000) -- MessagingService round-trip, beyond jest's 5s default

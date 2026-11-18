@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/metricutils@2.5.0...@quenty/metricutils@2.5.1) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/metricutils
+
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/metricutils@2.4.4...@quenty/metricutils@2.5.0) (2026-11-11)
 
 ### Features

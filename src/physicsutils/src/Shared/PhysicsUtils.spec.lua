@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Workspace = game:GetService("Workspace")
 
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local PhysicsUtils = require("PhysicsUtils")
 
@@ -23,6 +24,7 @@ type PartOptions = {
 }
 
 type Controller = {
+	maid: Maid.Maid,
 	newPart: (options: PartOptions?) -> BasePart,
 	weld: (part0: BasePart, part1: BasePart) -> WeldConstraint,
 	Destroy: (self: Controller) -> (),
@@ -37,6 +39,7 @@ local function setup(): Controller
 	maid:GiveTask(folder)
 
 	local self = {} :: Controller
+	self.maid = maid
 
 	function self.newPart(options: PartOptions?): BasePart
 		local resolved: PartOptions = options or {}
@@ -64,6 +67,8 @@ local function setup(): Controller
 	function self.Destroy(_self: Controller)
 		maid:DoCleaning()
 	end
+
+	maid:GiveTask(JestUtils.afterThis(self))
 
 	return self
 end

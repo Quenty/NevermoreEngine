@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.8.1...@quenty/teleportserviceutils@10.8.2) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/teleportserviceutils
+
 ## [10.8.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/teleportserviceutils@10.8.0...@quenty/teleportserviceutils@10.8.1) (2026-10-20)
 
 ### Bug Fixes

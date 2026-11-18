@@ -7,7 +7,6 @@ local require = require(script.Parent.loader).load(script)
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
 local Promise = require("Promise")
-local PromiseTestUtils = require("PromiseTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -23,10 +22,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 		expect(controller.storeAndAwaitLock()).toEqual(true)
 		controller.manager:RemovePlayerDataStore(1)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			local raw = controller.mock:GetRaw("user_1")
-			return raw ~= nil and raw.coins == 5
-		end, 10)).toEqual(true)
+		expect(controller.mock:GetRaw("user_1").coins).toEqual(5)
 		expect(controller.mock:GetRaw("user_1").lock).toEqual(nil)
 
 		controller:Destroy()
@@ -42,10 +38,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 			controller.manager:RemovePlayerDataStore(1)
 
-			expect(PromiseTestUtils.awaitValue(function()
-				local raw = controller.mock:GetRaw("user_1")
-				return raw ~= nil and raw.coins == 5
-			end, 3)).toEqual(false)
+			expect(controller.mock:GetRaw("user_1").coins).never.toEqual(5)
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
 			controller:Destroy()
@@ -82,10 +75,7 @@ describe("PlayerDataStoreManager removal matrix (misbehaving removing callbacks)
 			expect(controller.storeAndAwaitLock()).toEqual(true)
 			controller.manager:RemovePlayerDataStore(1)
 
-			expect(PromiseTestUtils.awaitValue(function()
-				local raw = controller.mock:GetRaw("user_1")
-				return raw ~= nil and raw.coins == 5
-			end, 2)).toEqual(false)
+			expect(controller.mock:GetRaw("user_1").coins).never.toEqual(5)
 			expect(controller.mock:GetRaw("user_1").lock ~= nil).toEqual(true)
 
 			blocked:Resolve()

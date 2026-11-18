@@ -20,6 +20,7 @@ local Maid = require("Maid")
 local PlayerMock = require("PlayerMock")
 local PlayerMockService = require("PlayerMockService")
 local Promise = require("Promise")
+local PromiseTestUtils = require("PromiseTestUtils")
 local Ragdoll = require("Ragdoll")
 local RagdollCmdrService = require("RagdollCmdrService")
 local RagdollService = require("RagdollService")
@@ -91,8 +92,7 @@ local function setup()
 
 		-- Ragdolling only reaches the motors once Ragdollable has rigged the character, which mock
 		-- discovery does on its own a moment after the character loads.
-		local ok = ragdollableBinder:Promise(humanoid):Yield()
-		assert(ok, "Ragdollable never bound")
+		PromiseTestUtils.awaitFulfilled(ragdollableBinder:Promise(humanoid))
 
 		return {
 			mock = mock,
@@ -126,16 +126,12 @@ describe("RagdollCmdrService", function()
 		local output = controller.run("ragdoll", { player.mock })
 		expect(string.find(output, "Ragdolled", 1, true) ~= nil).toEqual(true)
 		expect(controller.ragdollBinder:Get(player.humanoid)).toBeDefined()
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.areMotorsEnabled(player.character, false)
-		end)).toBe(true)
+		expect(RagdollTestUtils.areMotorsEnabled(player.character, false)).toBe(true)
 
 		output = controller.run("unragdoll", { player.mock })
 		expect(string.find(output, "Unragdolled", 1, true) ~= nil).toEqual(true)
 		expect(controller.ragdollBinder:Get(player.humanoid)).toBeNil()
-		expect(RagdollTestUtils.waitFor(function()
-			return RagdollTestUtils.areMotorsEnabled(player.character, true)
-		end)).toBe(true)
+		expect(RagdollTestUtils.areMotorsEnabled(player.character, true)).toBe(true)
 
 		controller:Destroy()
 	end)

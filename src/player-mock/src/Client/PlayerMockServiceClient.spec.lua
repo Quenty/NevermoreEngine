@@ -13,6 +13,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
 local ServiceBag = require("ServiceBag")
@@ -76,15 +77,12 @@ describe("PlayerMockServiceClient", function()
 
 		local before = controller.newMock(1)
 
-		local seen = {}
-		controller.maid:GiveTask(service:ObservePlayerMocks():Subscribe(function(observed)
-			table.insert(seen, observed)
-		end))
+		local seen = controller.maid:Add(ObservableSpy.new(service:ObservePlayerMocks()))
 
 		local after = controller.newMock(2)
 		StepUtils.deferWait()
 
-		expect(seen).toEqual({ before, after })
+		expect(seen.Values).toEqual({ before, after })
 
 		controller:Destroy()
 	end)
@@ -94,16 +92,13 @@ describe("PlayerMockServiceClient", function()
 
 		local service = controller.newService()
 
-		local seen = {}
-		local subscription = service:ObservePlayerMocks():Subscribe(function(observed)
-			table.insert(seen, observed)
-		end)
-		subscription:Destroy()
+		local seen = ObservableSpy.new(service:ObservePlayerMocks())
+		seen:Destroy()
 
 		controller.newMock(1)
 		StepUtils.deferWait()
 
-		expect(seen).toEqual({})
+		expect(seen.Values).toEqual({})
 
 		controller:Destroy()
 	end)

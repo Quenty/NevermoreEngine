@@ -1,6 +1,6 @@
 {
   "name": "@quenty/vector3utils",
-  "version": "10.12.3",
+  "version": "10.12.4",
   "description": "Utilities involving Vector3 objects in Roblox",
   "keywords": [
     "Roblox",
@@ -31,7 +31,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/math": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

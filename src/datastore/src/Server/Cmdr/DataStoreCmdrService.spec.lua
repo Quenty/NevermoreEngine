@@ -23,6 +23,7 @@ local Promise = require("Promise")
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
+local jest = Jest.Globals.jest
 
 -- Short enough that the progress tests do not have to sit through the real threshold.
 local SLOW_REPLY_SECONDS = 0.05
@@ -147,11 +148,14 @@ describe("DataStoreCmdrService registration", function()
 	it("stays quiet while a command is quick", function()
 		local controller = setup()
 
+		local restoreTimers = JestUtils.useFakeTimers()
+
 		controller.run("datastore-lock-info", { 1 })
-		task.wait(SLOW_REPLY_SECONDS * 2)
+		jest.advanceTimersByTime(SLOW_REPLY_SECONDS * 2 * 1000)
 
 		expect(#controller.replies).toEqual(0)
 
+		restoreTimers()
 		controller:Destroy()
 	end)
 

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/coreguienabler",
-  "version": "12.47.1",
+  "version": "12.47.2",
   "description": "Key based CoreGuiEnabler, singleton Use this class to load/unload CoreGuis / other GUIs, by disabling based upon keys Keys are additive, so if you have more than 1 disabled, it's ok.",
   "keywords": [
     "Roblox",
@@ -35,7 +35,7 @@
     "@quenty/playermock": "workspace:*",
     "@quenty/rx": "workspace:*",
     "@quenty/symbol": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

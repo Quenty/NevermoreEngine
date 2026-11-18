@@ -1,6 +1,6 @@
 {
   "name": "@quenty/influxdbclient",
-  "version": "7.46.1",
+  "version": "7.46.2",
   "description": "Provides a Roblox Lua InfluxDB client",
   "keywords": [
     "Roblox",
@@ -30,6 +30,7 @@
   "dependencies": {
     "@quenty/baseobject": "workspace:*",
     "@quenty/httppromise": "workspace:*",
+    "@quenty/jestutils": "workspace:*",
     "@quenty/jsonutils": "workspace:*",
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
@@ -42,7 +43,7 @@
     "@quenty/string": "workspace:*",
     "@quenty/table": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

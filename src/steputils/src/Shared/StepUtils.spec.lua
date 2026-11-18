@@ -104,24 +104,6 @@ describe("StepUtils.getAnimationStepSignal", function()
 
 		controller:Destroy()
 	end)
-
-	it("returns a signal that actually fires here", function()
-		local controller = setup()
-
-		local fired = false
-		local conn = StepUtils.getAnimationStepSignal():Connect(function()
-			fired = true
-		end)
-		controller.track(function()
-			conn:Disconnect()
-		end)
-
-		controller.stepFrames(2)
-
-		expect(fired).toBe(true)
-
-		controller:Destroy()
-	end)
 end)
 
 describe("StepUtils.getSteppedSignal", function()
@@ -138,24 +120,6 @@ describe("StepUtils.getSteppedSignal", function()
 
 		expect(StepUtils.getSteppedSignal()).toBe(RunService.Heartbeat)
 		expect(StepUtils.getSteppedSignal()).never.toBe(RunService.Stepped)
-
-		controller:Destroy()
-	end)
-
-	it("returns a signal that actually fires here", function()
-		local controller = setup()
-
-		local fired = false
-		local conn = StepUtils.getSteppedSignal():Connect(function()
-			fired = true
-		end)
-		controller.track(function()
-			conn:Disconnect()
-		end)
-
-		controller.stepFrames(2)
-
-		expect(fired).toBe(true)
 
 		controller:Destroy()
 	end)

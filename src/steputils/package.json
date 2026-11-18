@@ -1,6 +1,6 @@
 {
   "name": "@quenty/steputils",
-  "version": "3.9.3",
+  "version": "3.9.4",
   "description": "Binds animations into step, where the animation only runs as needed",
   "keywords": [
     "Roblox",
@@ -32,7 +32,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

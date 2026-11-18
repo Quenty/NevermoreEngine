@@ -19,13 +19,10 @@ describe("AccessStateUtils.fromFacts", function()
 	it("lists every fact that granted, not just the first", function()
 		local state = AccessStateUtils.fromFacts({ a = ALLOW, b = ALLOW, c = DENY }, { "a", "b", "c" })
 
-		expect(state.type).toEqual("allowed")
-		expect((state :: any).grantedBy).toEqual({ "a", "b" })
+		expect(state).toEqual(AccessStateUtils.allowed({ "a", "b" }))
 	end)
 
 	it("grants on a true fact even while another is unanswered", function()
-		-- An answer that already grants cannot be taken back by one that hasn't arrived, and waiting for it
-		-- would keep an entitled player out for no reason.
 		local state = AccessStateUtils.fromFacts({ a = ALLOW }, { "a", "neverAnswers" })
 
 		expect(AccessStateUtils.isAllowed(state)).toEqual(true)
@@ -40,12 +37,10 @@ describe("AccessStateUtils.fromFacts", function()
 	it("denies only once every answer is in", function()
 		local state = AccessStateUtils.fromFacts({ a = DENY, b = DENY }, { "a", "b" })
 
-		expect(state.type).toEqual("disallowed")
-		expect((state :: any).reason).toEqual(AccessStateUtils.Reasons.NOT_GRANTED)
+		expect(state).toEqual(AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED))
 	end)
 
 	it("ignores facts the feature did not declare", function()
-		-- A feature only stalls on mechanisms it actually reads.
 		local state = AccessStateUtils.fromFacts({ a = DENY, undeclared = ALLOW }, { "a" })
 
 		expect(AccessStateUtils.isAllowed(state)).toEqual(false)
@@ -79,9 +74,9 @@ end)
 
 describe("AccessStateUtils.isUnresolved", function()
 	it("does not treat an ordinary denial as unresolved", function()
-		expect(AccessStateUtils.isUnresolved(AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED))).toEqual(
-			false
-		)
+		local state = AccessStateUtils.disallowed(AccessStateUtils.Reasons.NOT_GRANTED)
+
+		expect(AccessStateUtils.isUnresolved(state)).toEqual(false)
 	end)
 
 	it("does not treat an allowed state as unresolved", function()

@@ -13,6 +13,7 @@ local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
+local ObservableSpy = require("ObservableSpy")
 local ScoredActionServiceClient = require("ScoredActionServiceClient")
 local ServiceBag = require("ServiceBag")
 local StepUtils = require("StepUtils")
@@ -79,18 +80,13 @@ local function setup(): any
 		end,
 
 		collect = function(lists, scoreValue)
-			local actions = {}
-			local sub = (observeLists(lists) :: any)
-				:Pipe({
-					service:ObserveNewFromInputKeyMapList(scoreValue) :: any,
-				})
-				:Subscribe(function(action)
-					table.insert(actions, action)
-				end)
-			maid:GiveTask(sub)
+			local actions = ObservableSpy.new((observeLists(lists) :: any):Pipe({
+				service:ObserveNewFromInputKeyMapList(scoreValue) :: any,
+			}))
+			maid:GiveTask(actions)
 
 			return actions, function()
-				sub:Destroy()
+				actions:Destroy()
 			end
 		end,
 

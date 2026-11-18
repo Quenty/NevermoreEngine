@@ -1,6 +1,6 @@
 {
   "name": "@quenty/friendutils",
-  "version": "12.44.1",
+  "version": "12.44.2",
   "description": "Utlity functions to help find friends of a user. Also contains utility to make testing in studio easier.",
   "keywords": [
     "Roblox",
@@ -38,7 +38,7 @@
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

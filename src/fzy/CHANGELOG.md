@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.18.3...@quenty/fzy@5.18.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/fzy
+
 ## [5.18.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/fzy@5.18.2...@quenty/fzy@5.18.3) (2026-10-20)
 
 ### Bug Fixes

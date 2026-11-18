@@ -1,6 +1,6 @@
 {
   "name": "@quenty/snackbar",
-  "version": "11.57.1",
+  "version": "11.57.2",
   "description": "Snackbars provide lightweight feedback on an operation at the base of the screen. They automatically disappear after a timeout or user interaction. There can only be one on the screen at a time.",
   "keywords": [
     "Roblox",
@@ -52,7 +52,7 @@
     "@quenty/transitionmodel": "workspace:*",
     "@quenty/utf8": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/jest-lua": "3.10.0-quenty.3",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

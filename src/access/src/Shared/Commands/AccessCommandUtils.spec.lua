@@ -9,14 +9,14 @@ local AccessFactContributionState = require("AccessFactContributionState")
 local AccessFactPriority = require("AccessFactPriority")
 local AccessStateUtils = require("AccessStateUtils")
 local Jest = require("Jest")
+local JestUtils = require("JestUtils")
+local Maid = require("Maid")
+local PlayerMock = require("PlayerMock")
 local Rx = require("Rx")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
-
--- These are pure functions over reports; the player is only ever passed through to the observables.
-local PLAYER = Instance.new("Folder") :: any
 
 local function layer(source: string, priority: number, contributes: boolean, value: boolean?, decided: boolean)
 	return {
@@ -49,7 +49,6 @@ end
 
 describe("AccessCommandUtils.describeValue", function()
 	it("never renders a tri-state as blank", function()
-		-- An empty column reads as a broken readout rather than as the answer it actually is.
 		expect(AccessCommandUtils.describeValue(true)).toEqual("true")
 		expect(AccessCommandUtils.describeValue(false)).toEqual("false")
 		expect(AccessCommandUtils.describeValue(nil)).toEqual("unresolved")
@@ -60,7 +59,7 @@ describe("AccessCommandUtils.parseOverrideValue", function()
 	it("round-trips every value the console offers", function()
 		expect(AccessCommandUtils.parseOverrideValue("true")).toEqual(true)
 		expect(AccessCommandUtils.parseOverrideValue("false")).toEqual(false)
-		expect(AccessCommandUtils.parseOverrideValue("unresolved")).toEqual(nil)
+		expect(AccessCommandUtils.parseOverrideValue("unresolved")).toBeNil()
 	end)
 end)
 
@@ -79,18 +78,16 @@ describe("AccessCommandUtils.formatFactReport", function()
 	end)
 
 	it("keeps the losing layers visible", function()
-		-- "denied and the allowlist said false" and "denied and the allowlist never answered" are
-		-- different problems, and only the full list tells them apart.
 		local text = AccessCommandUtils.formatFactReport(staffReport())
 
-		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
-		expect(string.find(text, AccessFactContributionState.DENY) ~= nil).toEqual(true)
+		expect(text).toContain("groupRank")
+		expect(text).toContain(AccessFactContributionState.DENY)
 	end)
 
 	it("says a layer abstained rather than showing it as an answer", function()
 		local text = AccessCommandUtils.formatFactReport(staffReport())
 
-		expect(string.find(text, AccessFactContributionState.ABSTAIN) ~= nil).toEqual(true)
+		expect(text).toContain(AccessFactContributionState.ABSTAIN)
 	end)
 
 	it("says so plainly when nothing contributed", function()
@@ -142,8 +139,8 @@ describe("AccessCommandUtils.formatFeatureReport", function()
 			facts = { isStaff = staffReport() },
 		})
 
-		expect(string.find(text, "isStaff = " .. AccessFactContributionState.ALLOW) ~= nil).toEqual(true)
-		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
+		expect(text).toContain("isStaff = " .. AccessFactContributionState.ALLOW)
+		expect(text).toContain("groupRank")
 	end)
 
 	it("says so when a feature reads no facts at all", function()
@@ -153,7 +150,7 @@ describe("AccessCommandUtils.formatFeatureReport", function()
 			facts = {},
 		})
 
-		expect(string.find(text, "reads no facts") ~= nil).toEqual(true)
+		expect(text).toContain("reads no facts")
 	end)
 end)
 
@@ -166,28 +163,25 @@ describe("AccessCommandUtils.formatPlayerState", function()
 		local featuresAt = string.find(text, "FEATURES")
 		local factsAt = string.find(text, "FACTS")
 
-		expect(featuresAt ~= nil).toEqual(true)
-		expect((factsAt :: any) > (featuresAt :: any)).toEqual(true)
+		expect(featuresAt).never.toBeNil()
+		expect(factsAt).toBeGreaterThan(featuresAt)
 	end)
 
 	it("includes the layer breakdown, not just the answers", function()
 		local text = AccessCommandUtils.formatPlayerState({}, { isStaff = staffReport() })
 
-		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
-		expect(string.find(text, "decided") ~= nil).toEqual(true)
+		expect(text).toContain("groupRank")
+		expect(text).toContain("decided")
 	end)
 
 	it("names a per-thing gate as needing a subject instead of answering it", function()
-		-- access-state cannot pass a subject, and a verdict for a question nobody asked is worse than
-		-- saying the question takes an argument. So it is listed, and pointed at the command that can.
 		local text = AccessCommandUtils.formatPlayerState({}, {}, nil, { "canEnterWorld" })
 
-		expect(string.find(text, "canEnterWorld = needs a subject") ~= nil).toEqual(true)
-		expect(string.find(text, "access%-feature") ~= nil).toEqual(true)
+		expect(text).toContain("canEnterWorld = needs a subject")
+		expect(text).toContain("access-feature")
 	end)
 
 	it("says so plainly when there is nothing registered", function()
-		-- Features, policies and facts each say it, rather than a section silently vanishing.
 		local text = AccessCommandUtils.formatPlayerState({}, {})
 
 		local _, count = string.gsub(text, "none registered", "")
@@ -199,21 +193,23 @@ describe("AccessCommandUtils.formatPlayerState", function()
 			{ policyName = "kickOnNonAdmin", enabled = false, facts = { "playerIsAdmin" } },
 		})
 
-		expect(string.find(text, "kickOnNonAdmin") ~= nil).toEqual(true)
-		expect((string.find(text, "POLICIES") :: any) < (string.find(text, "FACTS") :: any)).toEqual(true)
+		local policiesAt = string.find(text, "POLICIES")
+		local factsAt = string.find(text, "FACTS")
+
+		expect(text).toContain("kickOnNonAdmin")
+		expect(policiesAt).never.toBeNil()
+		expect(factsAt).toBeGreaterThan(policiesAt)
 	end)
 end)
 
 describe("AccessCommandUtils.formatPolicies", function()
 	it("shows a disabled policy rather than hiding it", function()
-		-- Knowing a consequence exists but is switched off is most of the answer to "why did nothing
-		-- happen".
 		local text = AccessCommandUtils.formatPolicies({
 			{ policyName = "kickOnNonAdmin", enabled = false, facts = { "playerIsAdmin" } },
 		})
 
-		expect(string.find(text, "kickOnNonAdmin") ~= nil).toEqual(true)
-		expect(string.find(text, "disabled") ~= nil).toEqual(true)
+		expect(text).toContain("kickOnNonAdmin")
+		expect(text).toContain("disabled")
 	end)
 
 	it("makes an enabled policy stand out from a disabled one", function()
@@ -221,7 +217,7 @@ describe("AccessCommandUtils.formatPolicies", function()
 			{ policyName = "kickOnNonAdmin", enabled = true, facts = { "playerIsAdmin" } },
 		})
 
-		expect(string.find(text, "ENABLED") ~= nil).toEqual(true)
+		expect(text).toContain("ENABLED")
 	end)
 
 	it("names what each policy reads", function()
@@ -229,7 +225,7 @@ describe("AccessCommandUtils.formatPolicies", function()
 			{ policyName = "kickOnNonAdmin", enabled = true, facts = { "playerIsAdmin" } },
 		})
 
-		expect(string.find(text, "reads playerIsAdmin") ~= nil).toEqual(true)
+		expect(text).toContain("reads playerIsAdmin")
 	end)
 
 	it("says a policy that reads nothing reads nothing", function()
@@ -237,21 +233,14 @@ describe("AccessCommandUtils.formatPolicies", function()
 			{ policyName = "always", enabled = false, facts = {} },
 		})
 
-		expect(string.find(text, "reads nothing") ~= nil).toEqual(true)
+		expect(text).toContain("reads nothing")
 	end)
 end)
 
--- A Cmdr stand-in that errors on anything Cmdr does not actually have. registerTypes is otherwise
--- unreachable from a headless test -- PromiseCmdr never resolves without a real Cmdr -- which is exactly
--- how a call to a nonexistent Registry method reached a playtest.
 local function strictCmdr()
 	local registered = {}
 
 	local util = setmetatable({
-		-- Narrows, rather than handing back the whole list whatever it was given. A finder that ignores its
-		-- argument makes "resolves the name you typed" pass on any list of one, and pass on a longer one
-		-- purely by what happens to be first. Exact matches go to the front for the same reason the real one
-		-- does it: Parse takes the first, so `shop` must not resolve to `watchShop`.
 		MakeFuzzyFinder = function(list: { string })
 			return function(text: string)
 				local matches = {}
@@ -266,8 +255,6 @@ local function strictCmdr()
 				return matches
 			end
 		end,
-		-- Mirrors the real one closely enough to matter: it marks the type Listable (the flag Cmdr gates `*`
-		-- expansion on), wraps Parse to return a list, and merges the override table.
 		MakeListableType = function(typeObject: any, override: any?)
 			local listable = table.clone(typeObject)
 			listable.Listable = true
@@ -343,7 +330,7 @@ describe("AccessCommandUtils.registerTypes", function()
 				"accessToggle",
 			}
 		do
-			expect(registered[name]).never.toEqual(nil)
+			expect(registered[name]).never.toBeNil()
 		end
 	end)
 
@@ -353,7 +340,7 @@ describe("AccessCommandUtils.registerTypes", function()
 		expect(function()
 			AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService())
 		end).never.toThrow()
-		expect(registered.accessPolicyName).never.toEqual(nil)
+		expect(registered.accessPolicyName).never.toBeNil()
 	end)
 
 	it("rejects a bad policy-name source rather than failing later inside Cmdr", function()
@@ -367,8 +354,6 @@ end)
 
 describe("AccessCommandUtils.parseSubject", function()
 	it("turns typed digits into a number, which is what a subject usually is", function()
-		-- A world index or a chapter compared with `subject == 3` would silently deny for "3", and a silent
-		-- denial in a debugging tool is worse than no tool.
 		expect(AccessCommandUtils.parseSubject("3")).toEqual(3)
 	end)
 
@@ -377,8 +362,8 @@ describe("AccessCommandUtils.parseSubject", function()
 	end)
 
 	it("reads a missing argument as no subject at all", function()
-		expect(AccessCommandUtils.parseSubject("")).toEqual(nil)
-		expect(AccessCommandUtils.parseSubject(nil)).toEqual(nil)
+		expect(AccessCommandUtils.parseSubject("")).toBeNil()
+		expect(AccessCommandUtils.parseSubject(nil)).toBeNil()
 	end)
 end)
 
@@ -403,11 +388,6 @@ describe("AccessCommandUtils.describeSubject", function()
 end)
 
 describe("overriding every fact at once", function()
-	--[[
-		`access-override . * false` is how somebody shuts the whole thing down to see what breaks. Cmdr
-		builds that expansion itself, but only for a type that says it is Listable and whose autocomplete
-		over an empty segment returns everything -- so those are what is worth asserting here.
-	]]
 	local function factNamesType()
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService())
@@ -436,11 +416,6 @@ describe("overriding every fact at once", function()
 end)
 
 describe("toggling every policy at once", function()
-	--[[
-		`access-policy * off` is how somebody sees the game with every consequence switched off. Asserted
-		separately from the fact list because the two types are built from different name sources, and only
-		the policy one is optional -- a client that registers without it gets a type that suggests nothing.
-	]]
 	local function policyNamesType()
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
@@ -470,15 +445,12 @@ describe("toggling every policy at once", function()
 	end)
 
 	it("leaves the singular type alone, since both are built from the one table", function()
-		-- Nothing in this package takes accessPolicyName any more, the same way nothing takes
-		-- accessFactName. It stays registered for consumers writing their own commands, and must not be
-		-- turned listable by the registration of the plural built from it.
 		local cmdr, registered = strictCmdr()
 		AccessCommandUtils.registerTypes(cmdr, fakeAccessDataService(), function()
 			return { "kick-on-non-admin" }
 		end)
 
-		expect(registered.accessPolicyName.Listable).toEqual(nil)
+		expect(registered.accessPolicyName.Listable).toBeNil()
 	end)
 end)
 
@@ -495,7 +467,6 @@ describe("AccessCommandUtils.describeNameList", function()
 	end)
 
 	it("counts them once naming them would be a wall", function()
-		-- Which is exactly what * produces.
 		expect(AccessCommandUtils.describeNameList({ "a", "b", "c", "d", "e" }, "facts")).toEqual("5 facts")
 	end)
 
@@ -509,78 +480,108 @@ describe("AccessCommandUtils.describeNameList", function()
 	end)
 end)
 
+type CollectController = {
+	player: Player,
+	Destroy: (self: CollectController) -> (),
+}
+
+local function setupCollect(): CollectController
+	local maid = Maid.new()
+
+	local controller: CollectController = {
+		player = maid:Add(PlayerMock.new()),
+		Destroy = function(_self)
+			maid:DoCleaning()
+		end,
+	}
+
+	maid:GiveTask(JestUtils.afterThis(controller))
+
+	return controller
+end
+
+local function collectingDataService()
+	return {
+		GetFeatureNames = function()
+			return { "chapters" }
+		end,
+		GetFeature = function(_self, featureName: string)
+			return {
+				featureName = featureName,
+				RequiresSubject = function()
+					return false
+				end,
+			}
+		end,
+		ObserveFeatureReport = function()
+			return Rx.of({
+				featureName = "chapters",
+				state = AccessStateUtils.allowed({ "isStaff" }),
+				facts = { isStaff = staffReport() },
+			})
+		end,
+		ObserveFactReports = function()
+			return Rx.of({ isStaff = staffReport() })
+		end,
+	}
+end
+
+local function collectingPolicyService()
+	return {
+		GetPolicyNames = function()
+			return { "kick-on-non-admin" }
+		end,
+		GetPolicy = function()
+			return {
+				GetFactNames = function()
+					return { "isStaff" }
+				end,
+			}
+		end,
+		IsPolicyEnabled = function()
+			return true
+		end,
+	}
+end
+
 describe("AccessCommandUtils.collectPlayerState", function()
-	local function collectingDataService()
-		return {
-			GetFeatureNames = function()
-				return { "chapters" }
-			end,
-			GetFeature = function(_self, featureName: string)
-				return {
-					featureName = featureName,
-					RequiresSubject = function()
-						return false
-					end,
-				}
-			end,
-			ObserveFeatureReport = function()
-				return Rx.of({
-					featureName = "chapters",
-					state = AccessStateUtils.allowed({ "isStaff" }),
-					facts = { isStaff = staffReport() },
-				})
-			end,
-			ObserveFactReports = function()
-				return Rx.of({ isStaff = staffReport() })
-			end,
-		}
-	end
-
-	local function collectingPolicyService()
-		return {
-			GetPolicyNames = function()
-				return { "kick-on-non-admin" }
-			end,
-			GetPolicy = function()
-				return {
-					GetFactNames = function()
-						return { "isStaff" }
-					end,
-				}
-			end,
-			IsPolicyEnabled = function()
-				return true
-			end,
-		}
-	end
-
 	it("gathers what a readout needs from whichever realm it runs on", function()
+		local controller = setupCollect()
+
 		local collected =
-			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), PLAYER)
+			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), controller.player)
 
 		expect(#collected.featureReports).toEqual(1)
 		expect(collected.featureReports[1].featureName).toEqual("chapters")
-		expect(collected.factReports.isStaff).never.toEqual(nil)
+		expect(collected.factReports.isStaff).never.toBeNil()
 		expect(collected.policies[1].policyName).toEqual("kick-on-non-admin")
+
+		controller:Destroy()
 	end)
 
 	it("survives a realm with no policies, which is how a bare client comes up", function()
-		local collected = AccessCommandUtils.collectPlayerState(collectingDataService(), nil, PLAYER)
+		local controller = setupCollect()
+
+		local collected = AccessCommandUtils.collectPlayerState(collectingDataService(), nil, controller.player)
 
 		expect(collected.policies).toEqual({})
+
+		controller:Destroy()
 	end)
 
 	it("renders every section it gathered, so nothing collected goes unprinted", function()
-		-- Was written as formatCollected(x) == formatPlayerState(x...), which is the literal body of the
-		-- first -- it passed no matter what either function did. Assert the output instead.
+		local controller = setupCollect()
+
 		local collected =
-			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), PLAYER)
+			AccessCommandUtils.collectPlayerState(collectingDataService(), collectingPolicyService(), controller.player)
 		local text = AccessCommandUtils.formatCollectedPlayerState(collected)
 
-		expect(string.find(text, "chapters") ~= nil).toEqual(true)
-		expect(string.find(text, "isStaff") ~= nil).toEqual(true)
-		expect(string.find(text, "kick%-on%-non%-admin") ~= nil).toEqual(true)
-		expect(string.find(text, "groupRank") ~= nil).toEqual(true)
+		expect(text).toContain("chapters")
+		expect(text).toContain("isStaff")
+		expect(text).toContain("kick-on-non-admin")
+		expect(text).toContain("groupRank")
+
+		controller:Destroy()
 	end)
 
 	it("refuses to collect without a player rather than reading a blank state", function()

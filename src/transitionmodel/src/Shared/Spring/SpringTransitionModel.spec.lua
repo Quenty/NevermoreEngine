@@ -9,7 +9,9 @@ local BasicPane = require("BasicPane")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local SignalTestUtils = require("SignalTestUtils")
 local SpringTransitionModel = require("SpringTransitionModel")
+local StepUtils = require("StepUtils")
 local TransitionModel = require("TransitionModel")
 local TransitionUtils = require("TransitionUtils")
 
@@ -18,6 +20,7 @@ local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
 type Controller = {
+	maid: Maid.Maid,
 	model: SpringTransitionModel.SpringTransitionModel<number>,
 	value: () -> number,
 	advance: (seconds: number) -> (),
@@ -38,14 +41,15 @@ local function setup(options: { showTarget: number?, hideTarget: number? }?): Co
 	end)
 
 	local controller: Controller = {
+		maid = maid,
 		model = model,
 		value = function()
 			return model._springObject.Value
 		end,
 		advance = function(seconds: number)
 			now += seconds
-			task.wait()
-			task.wait()
+			StepUtils.getAnimationStepSignal():Wait()
+			StepUtils.deferWait()
 		end,
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -296,16 +300,13 @@ describe("SpringTransitionModel promises", function()
 
 	it("fires ShowingComplete once the spring settles", function()
 		local controller = setup()
-		local fires = 0
-		controller.model.ShowingComplete:Connect(function()
-			fires += 1
-		end)
+		local fires = SignalTestUtils.countFires(controller.maid, controller.model.ShowingComplete)
 
 		controller.model:Show()
-		expect(fires).toBe(0)
+		expect(fires()).toBe(0)
 
 		controller.advance(5)
-		expect(fires).toBe(1)
+		expect(fires()).toBe(1)
 
 		controller:Destroy()
 	end)

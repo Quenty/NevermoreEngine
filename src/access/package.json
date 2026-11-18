@@ -1,6 +1,6 @@
 {
   "name": "@quenty/access",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "description": "Feature access gating: facts about a player, features that decide",
   "keywords": [
     "Roblox",
@@ -51,7 +51,7 @@
     "@quenty/tie": "workspace:*",
     "@quenty/valuebaseutils": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2",
+    "@quentystudios/jest-lua": "3.10.0-quenty.3",
     "@quentystudios/t": "^3.0.0"
   },
   "publishConfig": {

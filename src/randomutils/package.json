@@ -1,6 +1,6 @@
 {
   "name": "@quenty/randomutils",
-  "version": "6.20.3",
+  "version": "6.20.4",
   "description": "Quenty's RandomUtils, utility functions for Roblox",
   "keywords": [
     "Roblox",
@@ -35,6 +35,6 @@
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/table": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

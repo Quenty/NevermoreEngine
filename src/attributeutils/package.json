@@ -1,6 +1,6 @@
 {
   "name": "@quenty/attributeutils",
-  "version": "14.39.1",
+  "version": "14.39.2",
   "description": "Provides utility functions to work with attributes in Roblox",
   "keywords": [
     "Roblox",
@@ -38,7 +38,7 @@
     "@quenty/rx": "workspace:*",
     "@quenty/rxsignal": "workspace:*",
     "@quenty/symbol": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

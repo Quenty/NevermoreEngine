@@ -1,6 +1,6 @@
 {
   "name": "@quenty/iris",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Nevermore-integrated Iris",
   "keywords": [
     "Roblox",
@@ -32,7 +32,7 @@
     "@quenty/loader": "workspace:*",
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quentystudios/iris": "github:QuentyStudios/Iris",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

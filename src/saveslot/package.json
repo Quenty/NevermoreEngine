@@ -1,6 +1,6 @@
 {
   "name": "@quenty/saveslot",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "description": "PlayerDataStoreService wrapper for save slots",
   "keywords": [
     "Roblox",
@@ -55,7 +55,7 @@
     "@quenty/tie": "workspace:*",
     "@quenty/time": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

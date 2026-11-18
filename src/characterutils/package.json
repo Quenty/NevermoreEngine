@@ -1,6 +1,6 @@
 {
   "name": "@quenty/characterutils",
-  "version": "12.46.1",
+  "version": "12.46.2",
   "description": "CharacterUtils",
   "keywords": [
     "Roblox",
@@ -38,7 +38,7 @@
     "@quenty/playermock": "workspace:*",
     "@quenty/promise": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local PromiseTestUtils = require("PromiseTestUtils")
 local RoguePropertyArrayUtils = require("RoguePropertyArrayUtils")
 local RoguePropertyConstants = require("RoguePropertyConstants")
 local RoguePropertyModifierData = require("RoguePropertyModifierData")
@@ -84,8 +85,7 @@ local function setup()
 	end
 
 	local function awaitBound(binder, modifier)
-		local ok = binder:Promise(modifier):Yield()
-		assert(ok, "Modifier instance was never bound")
+		PromiseTestUtils.awaitFulfilled(binder:Promise(modifier))
 		return modifier
 	end
 
@@ -105,11 +105,9 @@ local function setup()
 	end
 
 	local function awaitValue(observable, predicate)
-		local ok, value = Rx.toPromise((observable :: any):Pipe({
+		return PromiseTestUtils.awaitFulfilled(Rx.toPromise((observable :: any):Pipe({
 			Rx.where(predicate),
-		})):Yield()
-		assert(ok, "Observable never emitted a matching value")
-		return value
+		})))
 	end
 
 	local controller = {

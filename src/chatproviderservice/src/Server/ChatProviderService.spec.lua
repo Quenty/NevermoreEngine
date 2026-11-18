@@ -22,6 +22,7 @@ local Maid = require("Maid")
 local PermissionProviderUtils = require("PermissionProviderUtils")
 local PermissionService = require("PermissionService")
 local PlayerMockService = require("PlayerMockService")
+local PromiseTestUtils = require("PromiseTestUtils")
 local ServiceBag = require("ServiceBag")
 
 local describe = Jest.Globals.describe
@@ -36,18 +37,7 @@ local DEMO_TAG = ChatTagDataUtils.createChatTagData({
 
 local remoteNameCounter = 0
 
-local function waitForTagCount(player: Player, expected: number, timeout: number): number
-	local deadline = os.clock() + timeout
-
-	repeat
-		local container = player:FindFirstChild(HasChatTagsConstants.TAG_CONTAINER_NAME)
-		local count = if container then #container:GetChildren() else 0
-		if count == expected then
-			return count
-		end
-		task.wait(0.1)
-	until os.clock() > deadline
-
+local function getTagCount(player: Player): number
 	local container = player:FindFirstChild(HasChatTagsConstants.TAG_CONTAINER_NAME)
 	return if container then #container:GetChildren() else 0
 end
@@ -126,7 +116,7 @@ describe("ChatProviderService.PromiseAddChatTag", function()
 		local controller = setup()
 		local player = controller.newMock()
 
-		local tag = controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG):Wait()
+		local tag = PromiseTestUtils.awaitFulfilled(controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG))
 
 		expect(tag:GetAttribute(ChatTagConstants.TAG_TEXT_ATTRIBUTE)).toBe(DEMO_TAG.TagText)
 		expect(tag:IsDescendantOf(player)).toBe(true)
@@ -136,7 +126,7 @@ describe("ChatProviderService.PromiseAddChatTag", function()
 		local controller = setup()
 		local player = controller.newMock()
 
-		local tag = controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG):Wait()
+		local tag = PromiseTestUtils.awaitFulfilled(controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG))
 		tag:Destroy()
 
 		expect(tag:IsDescendantOf(player)).toBe(false)
@@ -150,14 +140,14 @@ describe("ChatProviderService.SetDeveloperTag", function()
 		local controller = setup(CREATOR_USER_ID)
 		local player = controller.newMock(CREATOR_USER_ID)
 
-		expect(waitForTagCount(player, 1, 10)).toBe(1)
+		expect(getTagCount(player)).toBe(1)
 	end)
 
 	it("leaves everybody else alone", function()
 		local controller = setup(CREATOR_USER_ID)
 		local player = controller.newMock(CREATOR_USER_ID + 1)
 
-		expect(waitForTagCount(player, 0, 3)).toBe(0)
+		expect(getTagCount(player)).toBe(0)
 	end)
 
 	--[[
@@ -171,7 +161,7 @@ describe("ChatProviderService.SetDeveloperTag", function()
 
 		local player = controller.newMock(CREATOR_USER_ID)
 
-		expect(waitForTagCount(player, 0, 3)).toBe(0)
+		expect(getTagCount(player)).toBe(0)
 	end)
 end)
 
@@ -180,7 +170,7 @@ describe("ChatProviderService.ClearChatTags", function()
 		local controller = setup()
 		local player = controller.newMock()
 
-		local tag = controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG):Wait()
+		local tag = PromiseTestUtils.awaitFulfilled(controller.chatProviderService:PromiseAddChatTag(player, DEMO_TAG))
 		controller.chatProviderService:ClearChatTags(player)
 
 		expect(tag.Parent).toBe(nil)

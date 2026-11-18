@@ -9,6 +9,7 @@ local HttpService = game:GetService("HttpService")
 
 local JSONTranslator = require("JSONTranslator")
 local Jest = require("Jest")
+local ObservableSpy = require("ObservableSpy")
 local Table = require("Table")
 local TranslatorTestUtils = require("TranslatorTestUtils")
 local ValueObject = require("ValueObject")
@@ -278,17 +279,14 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 			},
 		})
 
-		local received
-		controller.track(
-			translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }):Subscribe(function(text)
-				received = text
-			end)
+		local texts = controller.track(
+			ObservableSpy.new(translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }))
 		)
 
-		expect(received).toBe("actions.respawn")
+		expect(texts:GetLastValue()).toBe("actions.respawn")
 
 		controller.awaitEntriesWritten()
-		expect(received).toBe("Respawn Quenty")
+		expect(texts:GetLastValue()).toBe("Respawn Quenty")
 		controller:Destroy()
 	end)
 
@@ -301,14 +299,11 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 		})
 		controller.awaitEntriesWritten()
 
-		local received
-		controller.track(
-			translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }):Subscribe(function(text)
-				received = text
-			end)
+		local texts = controller.track(
+			ObservableSpy.new(translator:ObserveFormatByKey("actions.respawn", { playerName = "Quenty" }))
 		)
 
-		expect(received).toBe("Respawn Quenty")
+		expect(texts:GetLastValue()).toBe("Respawn Quenty")
 		controller:Destroy()
 	end)
 
@@ -323,17 +318,14 @@ describe("JSONTranslator:ObserveFormatByKey", function()
 
 		local name = controller.track(ValueObject.new("Quenty", "string"))
 
-		local received
-		controller.track(
-			translator:ObserveFormatByKey("actions.respawn", { playerName = name:Observe() }):Subscribe(function(text)
-				received = text
-			end)
+		local texts = controller.track(
+			ObservableSpy.new(translator:ObserveFormatByKey("actions.respawn", { playerName = name:Observe() }))
 		)
 
-		expect(received).toBe("Respawn Quenty")
+		expect(texts:GetLastValue()).toBe("Respawn Quenty")
 
 		name.Value = "James"
-		expect(received).toBe("Respawn James")
+		expect(texts:GetLastValue()).toBe("Respawn James")
 		controller:Destroy()
 	end)
 

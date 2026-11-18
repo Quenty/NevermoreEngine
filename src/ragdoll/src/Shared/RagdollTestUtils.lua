@@ -2,9 +2,7 @@
 --[=[
 	Shared helpers for the ragdoll specs. Rigging is asserted against the local R6 rig from
 	[RigBuilderUtils.createR6BaseRig] -- the R15 builders need InsertService, which headless test
-	places cannot reach. Suppression/restore assertions poll: motor suppression settles a couple of
-	task resumptions after the Ragdoll bind (velocity-recording promise, then the rigging
-	subscriptions).
+	places cannot reach.
 
 	@class RagdollTestUtils
 ]=]
@@ -25,25 +23,6 @@ RagdollTestUtils.R6_RAGDOLL_MOTOR_NAMES = {
 	"Left Hip",
 	"Right Hip",
 }
-
---[=[
-	Polls until the condition passes or the timeout elapses. Returns the final condition result so
-	specs can `expect(...).toBe(true)` on it.
-
-	@param condition () -> boolean
-	@param timeout number?
-	@return boolean
-]=]
-function RagdollTestUtils.waitFor(condition: () -> boolean, timeout: number?): boolean
-	local deadline = os.clock() + (timeout or 5)
-	while os.clock() < deadline do
-		if condition() then
-			return true
-		end
-		task.wait(0.05)
-	end
-	return condition()
-end
 
 --[=[
 	Returns whether every R6 ragdoll motor in the character matches the given Enabled state.

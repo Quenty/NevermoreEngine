@@ -1,6 +1,6 @@
 {
   "name": "@quenty/gameversionutils",
-  "version": "3.10.1",
+  "version": "3.10.2",
   "description": "Utility functions to automatically detect the version a game is running at",
   "keywords": [
     "Roblox",
@@ -32,7 +32,7 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/nevermoreclimanifest": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

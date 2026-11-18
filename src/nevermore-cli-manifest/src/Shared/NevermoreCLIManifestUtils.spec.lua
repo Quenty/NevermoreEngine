@@ -7,6 +7,7 @@ local require = require(script.Parent.loader).load(script)
 
 local Jest = require("Jest")
 local NevermoreCLIManifestUtils = require("NevermoreCLIManifestUtils")
+local ObservableSpy = require("ObservableSpy")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -86,16 +87,14 @@ describe("NevermoreCLIManifestUtils injection", function()
 	it("observes the injected metadata", function()
 		local instance = makeInjectedInstance()
 
-		local received
-		local sub = NevermoreCLIManifestUtils.observeGameMetadata(instance):Subscribe(function(metadata)
-			received = metadata
-		end)
+		local receivedValues = ObservableSpy.new(NevermoreCLIManifestUtils.observeGameMetadata(instance))
 
-		expect(received).never.toBeNil()
-		expect(received.deployed).toEqual(true)
-		expect(received.commit).toEqual(NevermoreCLIManifestUtils.getGameMetadata(instance).commit)
+		local receivedValue = receivedValues:GetLastValue()
+		expect(receivedValue).never.toBeNil()
+		expect(receivedValue.deployed).toEqual(true)
+		expect(receivedValue.commit).toEqual(NevermoreCLIManifestUtils.getGameMetadata(instance).commit)
 
-		sub:Destroy()
+		receivedValues:Destroy()
 	end)
 end)
 
@@ -140,15 +139,12 @@ describe("NevermoreCLIManifestUtils place table", function()
 	end)
 
 	it("observes the injected place table", function()
-		local received
-		local sub = NevermoreCLIManifestUtils.observePlaces(makeInjectedInstance()):Subscribe(function(places)
-			received = places
-		end)
+		local receivedValues = ObservableSpy.new(NevermoreCLIManifestUtils.observePlaces(makeInjectedInstance()))
 
-		expect(received).never.toBeNil()
-		expect(#received).toEqual(2)
+		expect(receivedValues:GetLastValue()).never.toBeNil()
+		expect(#receivedValues:GetLastValue()).toEqual(2)
 
-		sub:Destroy()
+		receivedValues:Destroy()
 	end)
 end)
 

@@ -12,7 +12,9 @@ local require = require(script.Parent.loader).load(script)
 
 local DataStoreTestUtils = require("DataStoreTestUtils")
 local Jest = require("Jest")
+local Promise = require("Promise")
 local PromiseTestUtils = require("PromiseTestUtils")
+local SignalTestUtils = require("SignalTestUtils")
 
 local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
@@ -29,10 +31,7 @@ describe("cross-server session messaging (close-session kick-out)", function()
 		local _helperA = controller.newMessageHelper(sessionA)
 		local helperB = controller.newMessageHelper(sessionB)
 
-		local closeRequested = false
-		sessionA.SessionCloseRequested:Connect(function()
-			closeRequested = true
-		end)
+		local closeRequested = SignalTestUtils.countFires(controller.maid, sessionA.SessionCloseRequested)
 
 		-- B asks A to close (as if A just teleported / activated on server B).
 		local sendPromise = helperB:PromiseSendSessionMessage(game.PlaceId, game.JobId, sessionA:GetSessionId(), {
@@ -42,10 +41,10 @@ describe("cross-server session messaging (close-session kick-out)", function()
 
 		expect(PromiseTestUtils.awaitSettled(sendPromise, 10)).toEqual(true)
 
-		local received = PromiseTestUtils.awaitValue(function()
-			return closeRequested
-		end, 15)
-		expect(received).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(Promise.defer(function(resolve)
+			resolve()
+		end))
+		expect(closeRequested()).toEqual(1)
 
 		controller:Destroy()
 	end)

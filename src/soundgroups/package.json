@@ -1,6 +1,6 @@
 {
   "name": "@quenty/soundgroup",
-  "version": "1.60.0",
+  "version": "1.60.1",
   "description": "Service and utility methods to working with sound groups and sounds in Roblox",
   "keywords": [
     "Roblox",
@@ -46,7 +46,7 @@
     "@quenty/table": "workspace:*",
     "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"

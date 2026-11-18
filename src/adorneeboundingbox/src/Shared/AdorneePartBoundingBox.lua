@@ -5,13 +5,13 @@
 
 local require = require(script.Parent.loader).load(script)
 
-local RunService = game:GetService("RunService")
-
 local BaseObject = require("BaseObject")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local RxInstanceUtils = require("RxInstanceUtils")
+local StepUtils = require("StepUtils")
 local ValueObject = require("ValueObject")
+
 local AdorneePartBoundingBox = setmetatable({}, BaseObject)
 AdorneePartBoundingBox.ClassName = "AdorneePartBoundingBox"
 AdorneePartBoundingBox.__index = AdorneePartBoundingBox
@@ -58,7 +58,7 @@ end
 
 function AdorneePartBoundingBox._setupUnanchoredLoop(self: AdorneePartBoundingBox, maid: Maid.Maid): ()
 	-- Paranoid
-	maid:GiveTask(RunService.Heartbeat:Connect(function()
+	maid:GiveTask(StepUtils.getSteppedSignal():Connect(function()
 		debug.profilebegin("adorneeboundingbox")
 		self._bbCFrame.Value = self._obj.CFrame
 		debug.profileend()

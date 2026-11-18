@@ -18,6 +18,7 @@ local Workspace = game:GetService("Workspace")
 local Jest = require("Jest")
 local JestUtils = require("JestUtils")
 local Maid = require("Maid")
+local ObservableSpy = require("ObservableSpy")
 local PlayerMock = require("PlayerMock")
 local PlayerSettingsInterface = require("PlayerSettingsInterface")
 local PlayerSettingsUtils = require("PlayerSettingsUtils")
@@ -131,18 +132,15 @@ describe("SettingProperty.Observe", function()
 		local controller = setup()
 		local property = controller.definition:GetSettingProperty(controller.serviceBag, controller.player)
 
-		local emissions = 0
 		local maid = Maid.new()
-		maid:GiveTask(property:Observe():Subscribe(function()
-			emissions += 1
-		end))
+		local values = maid:Add(ObservableSpy.new(property:Observe()))
 
-		expect(emissions).toBe(1)
+		expect(#values).toBe(1)
 
 		controller.reimplement()
 		controller.reimplement()
 
-		expect(emissions).toBe(1)
+		expect(#values).toBe(1)
 
 		maid:DoCleaning()
 		controller:Destroy()

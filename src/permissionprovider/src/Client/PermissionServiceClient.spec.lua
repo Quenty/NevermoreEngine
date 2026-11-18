@@ -50,10 +50,7 @@ local function setup()
 		serviceBag = serviceBag,
 		service = service,
 		stubServerAnswer = function(invokeServer: () -> any)
-			local ok, provider = service:PromisePermissionProvider():Yield()
-			assert(ok, "No provider resolved")
-
-			local anyProvider: any = provider
+			local anyProvider: any = PromiseTestUtils.awaitFulfilled(service:PromisePermissionProvider())
 			anyProvider._remoteFunctionPromise = Promise.resolved({
 				InvokeServer = function(_self)
 					return invokeServer()
@@ -80,9 +77,8 @@ describe("PermissionServiceClient initialization", function()
 		local promise = controller.service:PromisePermissionProvider()
 		expect(promise:IsPending()).toEqual(false)
 
-		local ok, provider = promise:Yield()
-		expect(ok).toEqual(true)
-		expect((provider :: any).ClassName).toEqual("PermissionProviderClient")
+		local provider = PromiseTestUtils.awaitFulfilled(promise)
+		expect(provider.ClassName).toEqual("PermissionProviderClient")
 
 		controller:Destroy()
 	end)

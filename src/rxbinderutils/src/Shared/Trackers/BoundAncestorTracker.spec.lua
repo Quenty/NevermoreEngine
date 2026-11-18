@@ -13,16 +13,6 @@ local describe = Jest.Globals.describe
 local expect = Jest.Globals.expect
 local it = Jest.Globals.it
 
-local setup = BinderTestUtils.setup
-local makeTrackingClass = BinderTestUtils.makeTrackingClass
-
-local function bind(binder, inst: Instance): any
-	binder:Tag(inst)
-	local ok, class = binder:Promise(inst):Yield()
-	assert(ok, "Never bound")
-	return class
-end
-
 describe("BoundAncestorTracker.new()", function()
 	it("throws without a binder or child", function()
 		expect(function()
@@ -33,15 +23,15 @@ end)
 
 describe("BoundAncestorTracker tracking", function()
 	it("exposes the nearest bound ancestor's class", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local grandparent = controller.newInstance()
 		local parent = controller.newInstance(grandparent)
 		local child = controller.newInstance(parent)
-		local class = bind(binder, grandparent)
+		local class = controller.bind(binder, grandparent)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toEqual(class)
@@ -51,14 +41,14 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("counts the child's direct parent as an ancestor", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local parent = controller.newInstance()
 		local child = controller.newInstance(parent)
-		local class = bind(binder, parent)
+		local class = controller.bind(binder, parent)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toEqual(class)
@@ -68,16 +58,16 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("never counts the child itself", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local parent = controller.newInstance()
 		local child = controller.newInstance(parent)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
-		bind(binder, child)
+		controller.bind(binder, child)
 
 		expect(tracker.Class.Value).toBeNil()
 
@@ -86,10 +76,10 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("has no value when no ancestor is bound", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local parent = controller.newInstance()
 		local child = controller.newInstance(parent)
@@ -102,10 +92,10 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("updates when an ancestor becomes bound", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local ancestor = controller.newInstance()
 		local parent = controller.newInstance(ancestor)
@@ -114,7 +104,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toBeNil()
 
-		local class = bind(binder, ancestor)
+		local class = controller.bind(binder, ancestor)
 		expect(tracker.Class.Value).toEqual(class)
 
 		tracker:Destroy()
@@ -122,17 +112,17 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("takes the closest bound ancestor when several are bound", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local greatGrandparent = controller.newInstance()
 		local grandparent = controller.newInstance(greatGrandparent)
 		local parent = controller.newInstance(grandparent)
 		local child = controller.newInstance(parent)
-		bind(binder, greatGrandparent)
-		local grandparentClass = bind(binder, grandparent)
+		controller.bind(binder, greatGrandparent)
+		local grandparentClass = controller.bind(binder, grandparent)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toEqual(grandparentClass)
@@ -142,25 +132,25 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("switches to a closer ancestor that binds afterwards", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local greatGrandparent = controller.newInstance()
 		local grandparent = controller.newInstance(greatGrandparent)
 		local parent = controller.newInstance(grandparent)
 		local child = controller.newInstance(parent)
-		local outerClass = bind(binder, greatGrandparent)
+		local outerClass = controller.bind(binder, greatGrandparent)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toEqual(outerClass)
 
-		local grandparentClass = bind(binder, grandparent)
+		local grandparentClass = controller.bind(binder, grandparent)
 		expect(tracker.Class.Value).toEqual(grandparentClass)
 
 		binder:Untag(grandparent)
-		BinderTestUtils.awaitUnbound(binder, grandparent)
+		expect(binder:Get(grandparent)).toBeNil()
 
 		expect(tracker.Class.Value).toEqual(outerClass)
 
@@ -169,15 +159,15 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("clears the value when the child leaves the bound ancestry", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local ancestor = controller.newInstance()
 		local parent = controller.newInstance(ancestor)
 		local child = controller.newInstance(parent)
-		local class = bind(binder, ancestor)
+		local class = controller.bind(binder, ancestor)
 
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toEqual(class)
@@ -190,10 +180,10 @@ describe("BoundAncestorTracker tracking", function()
 	end)
 
 	it("ignores an unrelated instance binding", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 
-		local binder = controller.addBinder(makeTrackingClass())
-		controller.boot()
+		local binder = controller.addBinder(BinderTestUtils.makeTrackingClass())
+		controller.initServiceBag()
 
 		local grandparent = controller.newInstance()
 		local parent = controller.newInstance(grandparent)
@@ -203,7 +193,7 @@ describe("BoundAncestorTracker tracking", function()
 		local tracker = BoundAncestorTracker.new(binder, child)
 		expect(tracker.Class.Value).toBeNil()
 
-		bind(binder, unrelated)
+		controller.bind(binder, unrelated)
 		expect(tracker.Class.Value).toBeNil()
 
 		tracker:Destroy()

@@ -15,6 +15,7 @@ local Observable = require("Observable")
 local PlayerMockService = require("PlayerMockService")
 local PlayerMockServiceClient = require("PlayerMockServiceClient")
 local PromiseTestUtils = require("PromiseTestUtils")
+local RxTestUtils = require("RxTestUtils")
 local ServiceBag = require("ServiceBag")
 local TemplateProvider = require("TemplateProvider")
 local TieRealmService = require("TieRealmService")
@@ -36,7 +37,7 @@ type Controller = {
 	newInstance: (className: string, name: string, parent: Instance?) -> Instance,
 	newMaid: () -> Maid.Maid,
 	newBrioObservable: (template: Instance) -> Observable.Observable<Brio.Brio<Instance>>,
-	collect: (observable: Observable.Observable<any>) -> { any },
+	maid: Maid.Maid,
 	Destroy: (self: Controller) -> (),
 }
 
@@ -117,13 +118,7 @@ local function setup(): Controller
 			end) :: any
 		end,
 
-		collect = function(observable)
-			local emissions = {}
-			maid:GiveTask(observable:Subscribe(function(value)
-				table.insert(emissions, value)
-			end))
-			return emissions
-		end,
+		maid = maid,
 
 		Destroy = function(_self)
 			maid:DoCleaning()
@@ -258,9 +253,7 @@ describe("TemplateProvider.GetTemplate", function()
 
 		local sword = controller.newInstance("Model", "Sword", root)
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return provider:GetTemplate("Sword") == sword
-		end)).toBe(true)
+		expect(provider:GetTemplate("Sword") == sword).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -273,9 +266,7 @@ describe("TemplateProvider.GetTemplate", function()
 
 		sword.Parent = nil
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return provider:GetTemplate("Sword") == nil
-		end)).toBe(true)
+		expect(provider:GetTemplate("Sword")).toBeNil()
 
 		controller:Destroy()
 	end)
@@ -288,9 +279,7 @@ describe("TemplateProvider.GetTemplate", function()
 
 		sword.Name = "Blade"
 
-		expect(PromiseTestUtils.awaitValue(function()
-			return provider:GetTemplate("Blade") == sword and provider:GetTemplate("Sword") == nil
-		end)).toBe(true)
+		expect(provider:GetTemplate("Blade") == sword and provider:GetTemplate("Sword") == nil).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -596,8 +585,8 @@ describe("TemplateProvider.GetTemplateList", function()
 		local list = provider:GetTemplateList()
 
 		expect(#list).toBe(2)
-		expect(table.find(list, weapons)).never.toBeNil()
-		expect(table.find(list, sword)).never.toBeNil()
+		expect(list).toContain(weapons)
+		expect(list).toContain(sword)
 
 		controller:Destroy()
 	end)
@@ -623,8 +612,8 @@ describe("TemplateProvider.GetContainerList", function()
 		local list = provider:GetContainerList()
 
 		expect(#list).toBe(2)
-		expect(table.find(list, root)).never.toBeNil()
-		expect(table.find(list, weapons)).never.toBeNil()
+		expect(list).toContain(root)
+		expect(list).toContain(weapons)
 
 		controller:Destroy()
 	end)
@@ -695,7 +684,7 @@ describe("TemplateProvider.ObserveChildTemplateNameList", function()
 		local controller = setup()
 		local provider = controller.newProvider({})
 
-		local emissions = controller.collect(provider:ObserveChildTemplateNameList("Weapons"))
+		local emissions = RxTestUtils.collectList(controller.maid, provider:ObserveChildTemplateNameList("Weapons"))
 
 		expect(emissions).toEqual({ {} })
 
@@ -709,7 +698,7 @@ describe("TemplateProvider.ObserveChildTemplateNameList", function()
 		controller.newInstance("Model", "Sword", weapons)
 		local provider = controller.newProvider({})
 
-		local emissions = controller.collect(provider:ObserveChildTemplateNameList("Weapons"))
+		local emissions = RxTestUtils.collectList(controller.maid, provider:ObserveChildTemplateNameList("Weapons"))
 		controller.newMaid():GiveTask(provider:AddTemplates(root))
 
 		expect(emissions).toEqual({ {}, { "Sword" } })
@@ -724,18 +713,14 @@ describe("TemplateProvider.ObserveChildTemplateNameList", function()
 		local sword = controller.newInstance("Model", "Sword", weapons)
 		local provider = controller.newProvider(root)
 
-		local emissions = controller.collect(provider:ObserveChildTemplateNameList("Weapons"))
+		local emissions = RxTestUtils.collectList(controller.maid, provider:ObserveChildTemplateNameList("Weapons"))
 
 		controller.newInstance("Model", "Bow", weapons)
-		expect(PromiseTestUtils.awaitValue(function()
-			return #emissions == 2
-		end)).toBe(true)
+		expect(#emissions).toEqual(2)
 		expect(sorted(emissions[2])).toEqual({ "Bow", "Sword" })
 
 		sword.Parent = nil
-		expect(PromiseTestUtils.awaitValue(function()
-			return #emissions == 3
-		end)).toBe(true)
+		expect(#emissions).toEqual(3)
 		expect(emissions[3]).toEqual({ "Bow" })
 
 		controller:Destroy()
@@ -748,11 +733,9 @@ describe("TemplateProvider.ObserveChildTemplateNameList", function()
 		local sword = controller.newInstance("Model", "Sword", weapons)
 		local provider = controller.newProvider(root)
 
-		local emissions = controller.collect(provider:ObserveChildTemplateNameList("Weapons"))
+		local emissions = RxTestUtils.collectList(controller.maid, provider:ObserveChildTemplateNameList("Weapons"))
 		local handle = controller.newInstance("Part", "Handle", sword)
 		handle.Parent = nil
-		task.wait()
-		task.wait()
 
 		expect(emissions).toEqual({ { "Sword" } })
 
@@ -820,9 +803,7 @@ describe("TemplateProvider across a server and a client", function()
 		expect(template).never.toBe(sword)
 		expect(template.Name).toBe("Sword")
 		expect(template:FindFirstChild("Handle")).never.toBeNil()
-		expect(PromiseTestUtils.awaitValue(function()
-			return realms.client:GetTemplate("Sword") == template
-		end)).toBe(true)
+		expect(realms.client:GetTemplate("Sword") == template).toBe(true)
 
 		controller:Destroy()
 	end)
@@ -908,18 +889,15 @@ describe("TemplateProvider across a server and a client", function()
 		local sword = controller.newInstance("Model", "Sword", weapons)
 		local realms = controller.newRealms(root)
 
-		local emissions = controller.collect(realms.client:ObserveChildTemplateNameList("Weapons"))
+		local emissions =
+			RxTestUtils.collectList(controller.maid, realms.client:ObserveChildTemplateNameList("Weapons"))
 		expect(emissions).toEqual({ { "Sword" } })
 
 		controller.newInstance("Model", "Bow", weapons)
-		expect(PromiseTestUtils.awaitValue(function()
-			return table.concat(sorted(emissions[#emissions]), ",") == "Bow,Sword"
-		end)).toBe(true)
+		expect(table.concat(sorted(emissions[#emissions]), ",")).toEqual("Bow,Sword")
 
 		sword:Destroy()
-		expect(PromiseTestUtils.awaitValue(function()
-			return table.concat(emissions[#emissions], ",") == "Bow"
-		end)).toBe(true)
+		expect(table.concat(emissions[#emissions], ",")).toEqual("Bow")
 
 		controller:Destroy()
 	end)

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.12.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.12.3...@quenty/vector3utils@10.12.4) (2026-11-18)
+
+**Note:** Version bump only for package @quenty/vector3utils
+
 ## [10.12.3](https://github.com/Quenty/NevermoreEngine/compare/@quenty/vector3utils@10.12.2...@quenty/vector3utils@10.12.3) (2026-10-20)
 
 ### Bug Fixes

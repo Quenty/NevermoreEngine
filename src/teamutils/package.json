@@ -1,6 +1,6 @@
 {
   "name": "@quenty/teamutils",
-  "version": "10.40.1",
+  "version": "10.40.2",
   "description": "Team utility methods",
   "keywords": [
     "Roblox",
@@ -39,6 +39,6 @@
     "@quenty/nevermore-test-runner": "workspace:*",
     "@quenty/playermock": "workspace:*",
     "@quenty/rx": "workspace:*",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   }
 }

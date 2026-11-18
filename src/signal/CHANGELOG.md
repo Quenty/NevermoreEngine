@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.13.5](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.13.4...@quenty/signal@7.13.5) (2026-11-18)
+
+### Bug Fixes
+
+- **signal:** Keep firing remaining handlers when a handler disconnects the next one ([9c9a5dc](https://github.com/Quenty/NevermoreEngine/commit/9c9a5dcf19f1c5d5ec05fad06e5a332770f90867))
+
 ## [7.13.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/signal@7.13.3...@quenty/signal@7.13.4) (2026-10-09)
 
 **Note:** Version bump only for package @quenty/signal

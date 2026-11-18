@@ -10,6 +10,7 @@ local require = require(script.Parent.loader).load(script)
 
 local DeathReportTestUtils = require("DeathReportTestUtils")
 local Jest = require("Jest")
+local SignalTestUtils = require("SignalTestUtils")
 local TeamKillTrackerInterface = require("TeamKillTrackerInterface")
 local TeamKillTrackerUtils = require("TeamKillTrackerUtils")
 
@@ -45,16 +46,11 @@ describe("TeamKillTrackerClient", function()
 	it("fires KillsChanged when the value changes", function()
 		local controller = setup()
 
-		local values = {}
-		controller.maid:GiveTask(controller.tracker.KillsChanged:Connect(function(value: number)
-			table.insert(values, value)
-		end))
+		local values = SignalTestUtils.collectFireList(controller.maid, controller.tracker.KillsChanged)
 
 		controller.score.Value = 3
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return #values == 1
-		end)).toBe(true)
+		expect(#values).toEqual(1)
 		expect(values[1]).toEqual(3)
 		expect(controller.tracker:GetKills()).toEqual(3)
 
@@ -73,9 +69,7 @@ describe("TeamKillTrackerClient", function()
 
 		controller.kill(victimHumanoid, killer)
 
-		expect(DeathReportTestUtils.waitFor(function()
-			return controller.tracker:GetKills() == 1
-		end)).toBe(true)
+		expect(controller.tracker:GetKills()).toEqual(1)
 
 		controller:Destroy()
 	end)

@@ -1,6 +1,6 @@
 {
   "name": "@quenty/jecs",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Nevermore-integrated Jecs",
   "keywords": [
     "Roblox",
@@ -41,7 +41,7 @@
     "@quenty/tie": "workspace:*",
     "@quenty/valueobject": "workspace:*",
     "@quentystudios/jecs": "github:QuentyStudios/jecs",
-    "@quentystudios/jest-lua": "3.10.0-quenty.2"
+    "@quentystudios/jest-lua": "3.10.0-quenty.3"
   },
   "publishConfig": {
     "access": "public"
