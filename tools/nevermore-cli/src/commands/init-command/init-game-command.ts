@@ -4,6 +4,7 @@
 
 import { Argv, CommandModule } from 'yargs';
 import * as path from 'path';
+import { execa } from 'execa';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   resolveTemplatePath,
@@ -31,15 +32,35 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     return args as Argv<InitGameArgs>;
   }
 
+  /**
+   * Call before scaffolding so a missing pnpm doesn't leave a half-written
+   * project behind.
+   *
+   * This deliberately never runs `npm install -g pnpm` for the user. pnpm 11+
+   * writes its native binary from an install script, and npm 12 blocks install
+   * scripts by default, so a global reinstall replaced a working pnpm with a
+   * shim pointing at a binary that was never written.
+   */
+  public static async ensurePnpmAvailableAsync(
+    args: NevermoreGlobalArgs
+  ): Promise<void> {
+    if (args.dryrun || (await InitGameCommand._isPnpmAvailableAsync())) {
+      return;
+    }
+
+    throw new Error(
+      'pnpm is not installed or not working. Install it with ' +
+        '`npm install -g --allow-scripts=pnpm pnpm` (or `corepack enable pnpm`), ' +
+        'then run this command again.'
+    );
+  }
+
   public static async initToolChainAsync(
     args: NevermoreGlobalArgs,
     srcRoot: string,
     packages: string[]
   ): Promise<void> {
-    // TODO: Something better than this so we don't spam install pnpm every time
-    await runCommandAsync(args, 'npm', ['install', 'pnpm', '-g']);
-
-    await runCommandAsync(args, 'pnpm', ['install', ...packages], {
+    await runCommandAsync(args, 'pnpm', ['add', ...packages], {
       cwd: srcRoot,
     });
 
@@ -84,6 +105,7 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
 
   public async handler(args: InitGameArgs) {
     const rawGameName = await InitGameCommand._ensureGameName(args);
+    await InitGameCommand.ensurePnpmAvailableAsync(args);
 
     const gameName = TemplateHelper.toPackageName(rawGameName);
     const gameNameProper = TemplateHelper.camelize(rawGameName);
@@ -114,6 +136,15 @@ export class InitGameCommand<T> implements CommandModule<T, InitGameArgs> {
     ];
 
     await InitGameCommand.initToolChainAsync(args, srcRoot, packages);
+  }
+
+  private static async _isPnpmAvailableAsync(): Promise<boolean> {
+    try {
+      await execa('pnpm', ['--version'], { timeout: 30_000 });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private static async _ensureGameName(args: InitGameArgs): Promise<string> {
