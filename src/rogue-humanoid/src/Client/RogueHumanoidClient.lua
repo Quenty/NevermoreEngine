@@ -22,7 +22,7 @@ function RogueHumanoidClient.new(humanoid: Humanoid, serviceBag: ServiceBag.Serv
 	local self: RogueHumanoidClient =
 		setmetatable(RogueHumanoidBase.new(humanoid, serviceBag) :: any, RogueHumanoidClient)
 
-	self._maid:GiveTask((RogueHumanoidInterface :: any).Client:Implement(self._obj, self))
+	self._maid:GiveTask(RogueHumanoidInterface.Client:Implement(self._obj, self))
 
 	return self
 end

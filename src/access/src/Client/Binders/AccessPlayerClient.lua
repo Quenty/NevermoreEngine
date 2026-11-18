@@ -34,7 +34,7 @@ export type AccessPlayerClient =
 function AccessPlayerClient.new(player: Player, serviceBag: ServiceBag.ServiceBag): AccessPlayerClient
 	local self: AccessPlayerClient = setmetatable(AccessPlayerBase.new(player, serviceBag) :: any, AccessPlayerClient)
 
-	self._maid:GiveTask((AccessPlayerInterface :: any).Client:Implement(self._obj :: Instance, self))
+	self._maid:GiveTask(AccessPlayerInterface.Client:Implement(self._obj :: Instance, self))
 
 	self:_consumeReplicatedFacts()
 	self:_consumeReplicatedOverrides()
