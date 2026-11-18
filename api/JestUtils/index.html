@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">JestUtils | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/JestUtils"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="JestUtils | Nevermore"><meta data-rh="true" name="description" content="Utility methods for writing Jest specs."><meta data-rh="true" property="og:description" content="Utility methods for writing Jest specs."><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/JestUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/JestUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/JestUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.2e9c3596.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.cf4069aa.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.8ba20e1c.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.dd241ef8.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -43,6 +43,10 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
   against the test that queued them. Tasks queued while the stack is unwinding run before the ones
   still below them.
 </p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="useFakeTimers"><code style="text-decoration:none">useFakeTimers</code><a href="#useFakeTimers" class="hash-link" aria-label="Direct link to useFakeTimers" title="Direct link to useFakeTimers" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/jest-utils/src/Shared/JestUtils.lua#L100"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>JestUtils<!-- -->.</code><code class="green_DgR4">useFakeTimers</code><code>(</code><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><span class="inlineDescription_G7Er">-- <span>
+<p>Restores real timers early</p>
+</span></span></div><div>
+<p>Uses Jest fake timers until the current test finishes, even if it fails.</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
         {
@@ -66,6 +70,22 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
                 &quot;line&quot;: 78,
                 &quot;path&quot;: &quot;src/jest-utils/src/Shared/JestUtils.lua&quot;
             }
+        },
+        {
+            &quot;name&quot;: &quot;useFakeTimers&quot;,
+            &quot;desc&quot;: &quot;Uses Jest fake timers until the current test finishes, even if it fails.&quot;,
+            &quot;params&quot;: [],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Restores real timers early&quot;,
+                    &quot;lua_type&quot;: &quot;() -&gt; ()&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 100,
+                &quot;path&quot;: &quot;src/jest-utils/src/Shared/JestUtils.lua&quot;
+            }
         }
     ],
     &quot;properties&quot;: [],
@@ -76,6 +96,6 @@ maid<span class="token punctuation">:</span><span class="token function">GiveTas
         &quot;line&quot;: 7,
         &quot;path&quot;: &quot;src/jest-utils/src/Shared/JestUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#afterThis" class="table-of-contents__link toc-highlight">.afterThis</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#afterThis" class="table-of-contents__link toc-highlight">.afterThis</a></li><li><a href="#useFakeTimers" class="table-of-contents__link toc-highlight">.useFakeTimers</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
