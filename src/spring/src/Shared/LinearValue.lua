@@ -45,28 +45,6 @@ function LinearValue.isLinear(value: any): boolean
 	return DuckTypeUtils.isImplementation(LinearValue, value)
 end
 
-local function convertUDim2(scaleX: number, offsetX: number, scaleY: number, offsetY: number): UDim2
-	-- Roblox UDim2.fromOffset(9.999, 9.999) rounds to UDim2.fromOffset(9, 9) which means small floating point
-	-- errors can cause shaking UI.
-
-	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))
-end
-
-local function convertUDim(scale: number, offset: number): UDim
-	-- Roblox UDim.new(0, 9.999) rounds to UDim.new(0, 9) which means small floating point
-	-- errors can cause shaking UI.
-
-	return UDim.new(scale, math.round(offset))
-end
-
-local function convertBoolean(value: number): boolean
-	return value ~= 0
-end
-
-local function convertColor3(r: number, g: number, b: number): Color3
-	return Color3.new(r, g, b)
-end
-
 --[=[
 	Converts an arbitrary value to a LinearValue if Roblox has not defined this value
 	for multiplication and addition.
@@ -76,16 +54,18 @@ end
 ]=]
 function LinearValue.toLinearIfNeeded<T>(value: any): LinearValue<any>
 	if typeof(value) == "Color3" then
-		return LinearValue.new(convertColor3, { value.R, value.G, value.B })
+		return LinearValue.new(LinearValue._convertColor3, { value.R, value.G, value.B })
 	elseif typeof(value) == "UDim2" then
 		return LinearValue.new(
-			convertUDim2,
+			LinearValue._convertUDim2,
 			{ value.X.Scale, math.round(value.X.Offset), value.Y.Scale, math.round(value.Y.Offset) }
 		)
 	elseif typeof(value) == "UDim" then
-		return LinearValue.new(convertUDim, { value.Scale, math.round(value.Offset) })
+		return LinearValue.new(LinearValue._convertUDim, { value.Scale, math.round(value.Offset) })
 	elseif type(value) == "boolean" then
-		return LinearValue.new(convertBoolean, { value and 1 or 0 })
+		return LinearValue.new(LinearValue._convertBoolean, { value and 1 or 0 })
+	elseif typeof(value) == "Rect" then
+		return LinearValue.new(LinearValue._convertRect, { value.Min.X, value.Min.Y, value.Max.X, value.Max.Y })
 	else
 		return value
 	end
@@ -197,7 +177,7 @@ LinearValue.__div = operation(function(a, b)
 	return a / b
 end)
 
-function LinearValue:__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
+function LinearValue.__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
 	if LinearValue.isLinear(a) and LinearValue.isLinear(b) then
 		if #a._values ~= #b._values then
 			return false
@@ -213,6 +193,32 @@ function LinearValue:__eq<T>(a: LinearValue<T>, b: LinearValue<T>): boolean
 	else
 		return false
 	end
+end
+
+function LinearValue._convertUDim2(scaleX: number, offsetX: number, scaleY: number, offsetY: number): UDim2
+	-- Roblox UDim2.fromOffset(9.999, 9.999) rounds to UDim2.fromOffset(9, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim2.new(scaleX, math.round(offsetX), scaleY, math.round(offsetY))
+end
+
+function LinearValue._convertUDim(scale: number, offset: number): UDim
+	-- Roblox UDim.new(0, 9.999) rounds to UDim.new(0, 9) which means small floating point
+	-- errors can cause shaking UI.
+
+	return UDim.new(scale, math.round(offset))
+end
+
+function LinearValue._convertBoolean(value: number): boolean
+	return value ~= 0
+end
+
+function LinearValue._convertColor3(r: number, g: number, b: number): Color3
+	return Color3.new(r, g, b)
+end
+
+function LinearValue._convertRect(x1: number, y1: number, x2: number, y2: number): Rect
+	return Rect.new(x1, y1, x2, y2)
 end
 
 return LinearValue
