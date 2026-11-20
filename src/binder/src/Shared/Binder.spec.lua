@@ -594,7 +594,7 @@ describe("Binder:SetAddFrameBudgeted()", function()
 	end
 
 	it("binds every tagged instance, a few per frame", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 		local binder = controller.addBinder(function(inst)
 			spin(0.0005)
 			return { inst = inst }
@@ -619,7 +619,7 @@ describe("Binder:SetAddFrameBudgeted()", function()
 	end)
 
 	it("skips an instance untagged before its turn", function()
-		local controller = setup()
+		local controller = BinderTestUtils.setup()
 		local built = {}
 		local binder = controller.addBinder(function(inst)
 			spin(0.0005)
@@ -650,8 +650,8 @@ describe("Binder:SetAddFrameBudgeted()", function()
 	end)
 
 	it("can't be set after Start", function()
-		local controller = setup()
-		local binder = controller.addBinder(noopConstructor)
+		local controller = BinderTestUtils.setup()
+		local binder = controller.addBinder(BinderTestUtils.noopConstructor)
 		controller.boot()
 
 		expect(function()
