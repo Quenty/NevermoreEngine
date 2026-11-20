@@ -28,6 +28,9 @@ export type Aggregator<T> =
 			_maxBatchSize: number,
 			_unsentCount: number,
 			_unsentPromises: { [number]: Promise.Promise<T> },
+			_batchDelay: number,
+			_minSendInterval: number,
+			_lastSendAt: number,
 		},
 		{} :: typeof({ __index = Aggregator })
 	))
@@ -55,7 +58,27 @@ function Aggregator.new<T>(debugName: string, promiseBulkQuery: PromiseBulkQuery
 	self._unsentCount = 0
 	self._unsentPromises = {}
 
+	self._batchDelay = 0.1
+	self._minSendInterval = 0
+	self._lastSendAt = -math.huge
+
 	return self
+end
+
+--[=[
+	Sets how long requests are collected before a batch is sent, and the least time between two
+	sends. Requests over the batch size wait for the next send. Useful for endpoints that throttle
+	frequent requests. Defaults to 0.1 seconds and no minimum.
+
+	@param batchDelay number
+	@param minSendInterval number
+]=]
+function Aggregator.SetBatchTiming<T>(self: Aggregator<T>, batchDelay: number, minSendInterval: number): ()
+	assert(type(batchDelay) == "number" and batchDelay >= 0, "Bad batchDelay")
+	assert(type(minSendInterval) == "number" and minSendInterval >= 0, "Bad minSendInterval")
+
+	self._batchDelay = batchDelay
+	self._minSendInterval = minSendInterval
 end
 
 --[=[
@@ -120,6 +143,14 @@ function Aggregator._sendBatchedPromises<T>(self: Aggregator<T>, promiseMap)
 
 	assert(#idList <= self._maxBatchSize, "Too many idList sent")
 
+	-- Don't cache failures: asking for a failed id again should retry it.
+	local function forget(id, promise)
+		if self._promisesLruCache:get(id) == promise then
+			self._promisesLruCache:delete(id)
+		end
+	end
+
+	self._lastSendAt = os.clock()
 	self._maid:GivePromise(self._promiseBatchQuery(idList)):Then(function(result)
 		assert(type(result) == "table", "Bad result")
 
@@ -134,30 +165,47 @@ function Aggregator._sendBatchedPromises<T>(self: Aggregator<T>, promiseMap)
 
 		-- Reject other ones
 		for id, promise in unresolvedMap do
+			forget(id, promise)
 			promise:Reject(string.format("[Aggregator] %s failed to get result for id %d", self._debugName, id))
 		end
 	end, function(err, ...)
 		local text = string.format("[Aggregator] %s failed to get bulk result - %q", self._debugName, tostring(err))
 
-		for _, item in unresolvedMap do
+		for id, item in unresolvedMap do
+			forget(id, item)
 			item:Reject(text, ...)
 		end
 	end)
 end
 
+-- Takes up to one batch's worth of the unsent requests off the queue.
 function Aggregator._resetQueue<T>(self: Aggregator<T>)
-	local promiseMap = self._unsentPromises
-
+	local promiseMap = {}
+	local taken = 0
+	for id, promise in self._unsentPromises do
+		if taken >= self._maxBatchSize then
+			break
+		end
+		promiseMap[id] = promise
+		taken += 1
+	end
+	for id in promiseMap do
+		self._unsentPromises[id] = nil
+	end
+	self._unsentCount -= taken
 	self._maid._queue = nil
-	self._unsentCount = 0
-	self._unsentPromises = {}
 
 	return promiseMap
 end
 
 function Aggregator._queueBatchRequests<T>(self: Aggregator<T>): ()
-	if self._unsentCount >= self._maxBatchSize then
+	local sinceLast = os.clock() - self._lastSendAt
+	if self._unsentCount >= self._maxBatchSize and sinceLast >= self._minSendInterval then
+		self._maid._queue = nil
 		self:_sendBatchedPromises(self:_resetQueue())
+		if self._unsentCount > 0 then
+			self:_queueBatchRequests()
+		end
 		return
 	end
 
@@ -165,9 +213,14 @@ function Aggregator._queueBatchRequests<T>(self: Aggregator<T>): ()
 		return
 	end
 
-	self._maid._queue = task.delay(0.1, function()
+	local wait = math.max(self._batchDelay, self._minSendInterval - sinceLast)
+	self._maid._queue = task.delay(wait, function()
 		task.spawn(function()
 			self:_sendBatchedPromises(self:_resetQueue())
+			-- More than one batch was waiting: the rest goes after the interval.
+			if self._unsentCount > 0 then
+				self:_queueBatchRequests()
+			end
 		end)
 	end)
 end
