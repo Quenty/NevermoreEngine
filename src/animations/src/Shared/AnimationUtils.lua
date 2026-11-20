@@ -11,6 +11,8 @@ local RbxAssetUtils = require("RbxAssetUtils")
 
 local AnimationUtils = {}
 
+export type AnimationTarget = Animator | Player | Model | AnimationController | Humanoid
+
 --[=[
 	Plays the animation on the target instance.
 
@@ -23,7 +25,7 @@ local AnimationUtils = {}
 	@return AnimationTrack?
 ]=]
 function AnimationUtils.playAnimation(
-	target: Animator | Player | Model | AnimationController,
+	target: AnimationTarget,
 	id: string | number,
 	fadeTime: number?,
 	weight: number?,
@@ -55,11 +57,7 @@ end
 --[=[
 	Stops the animation on the target instance.
 ]=]
-function AnimationUtils.stopAnimation(
-	target: Animator | Player | Model | AnimationController,
-	id: string | number,
-	fadeTime: number?
-): AnimationTrack?
+function AnimationUtils.stopAnimation(target: AnimationTarget, id: string | number, fadeTime: number?): AnimationTrack?
 	assert(typeof(target) == "Instance", "Bad target")
 	assert(RbxAssetUtils.isConvertableToRbxAsset(id), "Bad id")
 	assert(type(fadeTime) == "number" or fadeTime == nil, "Bad fadeTime")
@@ -77,7 +75,7 @@ end
 	Gets or creates an animation track for the player
 ]=]
 function AnimationUtils.getOrCreateAnimationTrack(
-	target: Animator | Player | Model | AnimationController,
+	target: AnimationTarget,
 	id: string | number,
 	priority: Enum.AnimationPriority?
 ): AnimationTrack?
@@ -152,7 +150,7 @@ end
 	Finds an animation track
 ]=]
 function AnimationUtils.findAnimationTrack(
-	target: Animator | Player | Model | AnimationController,
+	target: AnimationTarget,
 	id: string | number,
 	priority: Enum.AnimationPriority?
 ): AnimationTrack?
@@ -222,9 +220,7 @@ end
 --[=[
 	Finds an animator for the current instance
 ]=]
-function AnimationUtils.getOrCreateAnimator(
-	target: Animator | Player | Model | Humanoid | AnimationController
-): Animator?
+function AnimationUtils.getOrCreateAnimator(target: AnimationTarget): Animator?
 	assert(typeof(target) == "Instance", "Bad target")
 
 	if target:IsA("Animator") then
