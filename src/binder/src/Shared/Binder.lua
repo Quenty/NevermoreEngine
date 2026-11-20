@@ -73,8 +73,6 @@ export type Binder<T> = typeof(setmetatable(
 		_classAddedSignal: Signal.Signal<T, Instance>?,
 		_classRemovingSignal: Signal.Signal<T, Instance>?,
 		_classRemovedSignal: Signal.Signal<T, Instance>?,
-		_addFrameBudgeted: boolean?,
-		_queuedAdds: { [Instance]: true }?,
 	},
 	{} :: typeof({ __index = Binder })
 ))
@@ -206,6 +204,8 @@ local addQueue: { { any } } = {}
 local addQueueHead = 1
 local addQueueTail = 0
 local addQueueConnection: RBXScriptConnection? = nil
+local budgetedBinders: { [any]: true } = setmetatable({}, { __mode = "k" }) :: any
+local queuedAddsByBinder: { [any]: { [Instance]: true } } = setmetatable({}, { __mode = "k" }) :: any
 
 local function stepAddQueue()
 	local deadline = os.clock() + ADD_FRAME_BUDGET_SECONDS
@@ -215,7 +215,7 @@ local function stepAddQueue()
 		addQueueHead += 1
 
 		local binder, inst = entry[1], entry[2]
-		local queued = binder._queuedAdds
+		local queued = queuedAddsByBinder[binder]
 		if queued and queued[inst] then
 			queued[inst] = nil
 			if CollectionService:HasTag(inst, binder._tagName) then
@@ -255,23 +255,23 @@ function Binder.SetAddFrameBudgeted<T>(self: Binder<T>, isBudgeted: boolean): ()
 	assert(type(isBudgeted) == "boolean", "Bad isBudgeted")
 	assert(not self._started, "Set before Start")
 
-	self._addFrameBudgeted = isBudgeted
+	budgetedBinders[self] = if isBudgeted then true else nil
 end
 
-function Binder._queueAdd<T>(self: Binder<T>, inst: Instance): ()
-	if self._instToClass[inst] then
+local function queueAdd(binder: any, inst: Instance)
+	if binder._instToClass[inst] then
 		return
 	end
 
-	local queued: { [Instance]: true } = self._queuedAdds or {}
-	self._queuedAdds = queued
+	local queued = queuedAddsByBinder[binder] or {}
+	queuedAddsByBinder[binder] = queued
 	if queued[inst] then
 		return
 	end
 
 	queued[inst] = true
 	addQueueTail += 1
-	addQueue[addQueueTail] = { self, inst }
+	addQueue[addQueueTail] = { binder, inst }
 	if not addQueueConnection then
 		addQueueConnection = RunService.Heartbeat:Connect(stepAddQueue)
 	end
@@ -292,16 +292,16 @@ function Binder.Start<T>(self: Binder<T>)
 	self._started = true
 
 	for _, inst in CollectionService:GetTagged(self._tagName) do
-		if self._addFrameBudgeted then
-			self:_queueAdd(inst)
+		if budgetedBinders[self] then
+			queueAdd(self, inst)
 		else
 			task.spawn(self._add, self, inst)
 		end
 	end
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
-		if self._addFrameBudgeted then
-			self:_queueAdd(inst)
+		if budgetedBinders[self] then
+			queueAdd(self, inst)
 		else
 			self:_add(inst)
 		end
@@ -817,7 +817,7 @@ end
 
 function Binder._remove<T>(self: Binder<T>, inst: Instance)
 	self._pendingInstSet[inst] = nil
-	local queued = self._queuedAdds
+	local queued = queuedAddsByBinder[self]
 	if queued then
 		queued[inst] = nil
 	end
@@ -858,7 +858,7 @@ end
 	Cleans up all bound classes, and disconnects all events.
 ]=]
 function Binder.Destroy<T>(self: Binder<T>)
-	self._queuedAdds = nil
+	queuedAddsByBinder[self] = nil
 	local inst, class = next(self._instToClass)
 	while class ~= nil and inst ~= nil do
 		task.spawn(self._remove, self, inst)
