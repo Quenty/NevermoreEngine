@@ -871,6 +871,19 @@ function TemplateProvider.IsTemplateAvailable(self: TemplateProvider, templateNa
 end
 
 --[=[
+	Returns whether or not a template exists, including templates the server has not yet replicated
+	to the client. Use [TemplateProvider.PromiseTemplate] to retrieve it.
+
+	@param templateName string
+	@return boolean
+]=]
+function TemplateProvider.HasTemplate(self: TemplateProvider, templateName: string): boolean
+	assert(type(templateName) == "string", "Bad templateName")
+
+	return self:_findTemplateOrTombstone(templateName) ~= nil
+end
+
+--[=[
 	Returns all current registered items.
 
 	@return { Instance }
