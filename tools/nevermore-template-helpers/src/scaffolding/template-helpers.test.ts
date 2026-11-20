@@ -1,4 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { OutputHelper } from '@quenty/cli-output-helpers';
 import { TemplateHelper } from './template-helpers.js';
 
 describe('TemplateHelper.camelize', () => {
@@ -128,5 +132,104 @@ describe('name derivation together', () => {
     expect(TemplateHelper.camelize('adornee-editor-placement')).toBe(
       'AdorneeEditorPlacement'
     );
+  });
+});
+
+describe('TemplateHelper.createDirectoryContentsAsync', () => {
+  let templateDir: string;
+  let targetDir: string;
+
+  beforeEach(async () => {
+    templateDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'tpl-'));
+    targetDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'target-'));
+
+    await fs.promises.writeFile(
+      path.join(templateDir, 'package.json'),
+      '{"name": "{{packageName}}"}'
+    );
+    await fs.promises.mkdir(path.join(templateDir, 'src'));
+    await fs.promises.writeFile(
+      path.join(templateDir, 'src', '{{packageNameProper}}Utils.lua'),
+      '-- {{packageNameProper}}'
+    );
+  });
+
+  afterEach(async () => {
+    await fs.promises.rm(templateDir, { recursive: true, force: true });
+    await fs.promises.rm(targetDir, { recursive: true, force: true });
+  });
+
+  const input = { packageName: 'spring', packageNameProper: 'Spring' };
+
+  it('writes every template file into an empty folder', async () => {
+    await TemplateHelper.createDirectoryContentsAsync(
+      templateDir,
+      targetDir,
+      input,
+      false
+    );
+
+    expect(
+      await fs.promises.readFile(path.join(targetDir, 'package.json'), 'utf8')
+    ).toBe('{"name": "spring"}');
+    expect(
+      await fs.promises.readFile(
+        path.join(targetDir, 'src', 'SpringUtils.lua'),
+        'utf8'
+      )
+    ).toBe('-- Spring');
+  });
+
+  it('fills in missing files without overwriting existing ones', async () => {
+    await fs.promises.writeFile(
+      path.join(targetDir, 'package.json'),
+      'existing'
+    );
+
+    await TemplateHelper.createDirectoryContentsAsync(
+      templateDir,
+      targetDir,
+      input,
+      false
+    );
+
+    expect(
+      await fs.promises.readFile(path.join(targetDir, 'package.json'), 'utf8')
+    ).toBe('existing');
+    expect(fs.existsSync(path.join(targetDir, 'src', 'SpringUtils.lua'))).toBe(
+      true
+    );
+  });
+
+  it('reports existing files as skipped, not written, on a dryrun', async () => {
+    await fs.promises.writeFile(
+      path.join(targetDir, 'package.json'),
+      'existing'
+    );
+    const infoSpy = vi.spyOn(OutputHelper, 'info').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      await TemplateHelper.createDirectoryContentsAsync(
+        templateDir,
+        targetDir,
+        input,
+        true
+      );
+
+      const messages = infoSpy.mock.calls.map((call) => String(call[0]));
+      const existingPath = path.join(targetDir, 'package.json');
+      const newPath = path.join(targetDir, 'src', 'SpringUtils.lua');
+
+      expect(messages).toContain(
+        `[DRYRUN]: Skip existing file ${existingPath}`
+      );
+      expect(messages).not.toContain(`[DRYRUN]: Write file ${existingPath}`);
+      expect(messages).toContain(`[DRYRUN]: Write file ${newPath}`);
+      expect(fs.existsSync(path.join(targetDir, 'src'))).toBe(false);
+    } finally {
+      infoSpy.mockRestore();
+      logSpy.mockRestore();
+    }
   });
 });
