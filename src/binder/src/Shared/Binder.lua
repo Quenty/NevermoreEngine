@@ -204,7 +204,7 @@ local addQueue: { { any } } = {}
 local addQueueHead = 1
 local addQueueTail = 0
 local addQueueConnection: RBXScriptConnection? = nil
-local budgetedBinders: { [any]: true } = setmetatable({}, { __mode = "k" }) :: any
+local budgetedBinders: { [any]: boolean } = setmetatable({}, { __mode = "k" }) :: any
 local queuedAddsByBinder: { [any]: { [Instance]: true } } = setmetatable({}, { __mode = "k" }) :: any
 
 local function stepAddQueue()
@@ -255,7 +255,7 @@ function Binder.SetAddFrameBudgeted<T>(self: Binder<T>, isBudgeted: boolean): ()
 	assert(type(isBudgeted) == "boolean", "Bad isBudgeted")
 	assert(not self._started, "Set before Start")
 
-	budgetedBinders[self] = if isBudgeted then true else nil
+	budgetedBinders[self] = isBudgeted
 end
 
 local function queueAdd(binder: any, inst: Instance)
