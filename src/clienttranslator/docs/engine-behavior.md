@@ -58,6 +58,31 @@ What is **not** established is whether `SetEntryExample` overwrites source and c
 all. It does not need to be: no targeted call lands metadata on its own (see above), so the flush
 never asks an example write to carry it; see [`design.md`](design.md) ("Two write regimes").
 
+## A write to a parented table costs milliseconds
+
+Measured with `os.clock` on a Studio client in a game with ~1,200 PlayerGui instances, writing to a
+copy of its 93-entry client table:
+
+| | Parented to LocalizationService | Unparented |
+|---|---|---|
+| `SetEntryValue` | 6.8 ms | 0.006 ms |
+| `SetEntries` (93 entries) | 7.1 ms | 0.32 ms |
+| Parenting the filled table | | 10–14 ms |
+
+A parented write costs about the same whether it touches one entry or the whole table, which is
+consistent with the engine re-running auto-localization over the place on each change. That was not
+isolated: the GUI count was never varied, so how the cost scales with the place is not established.
+What it does establish is that the cost lands on every flush while the table is parented, which is
+why the table is filled before it is parented (see [`design.md`](design.md), "The table is filled
+before it is parented"). Pinned by `TranslatorService.spec.lua` ("lands a flush queued at Start
+before parenting the table").
+
+These numbers say nothing about `INVALIDATION_ENTRY_COST`: with a 93-entry table a full rebuild and
+a single targeted write cost the same when parented, so they cannot place the crossover below.
+
+An unparented table's own `GetTranslator` resolves its entries the same as a parented one: every
+spec in the package reads through one before its bag starts.
+
 ## Write cost: assumed, not measured
 
 The two write regimes rest on a cost model that was reasoned about rather than profiled:
