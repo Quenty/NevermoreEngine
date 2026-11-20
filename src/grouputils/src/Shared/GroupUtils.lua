@@ -169,6 +169,37 @@ function GroupUtils.promiseRoleInGroup(player: Player, groupId: number): Promise
 	end)
 end
 
+--[=[
+	Retrieves the ids of every role the player holds in the group. Empty when the player isn't a
+	member. Only public roles are listed, since that's all `GetRolesInGroupAsync` returns.
+
+	@param player Player
+	@param groupId number
+	@return Promise<{ number }>
+]=]
+function GroupUtils.promiseRoleIdsInGroup(player: Player, groupId: number): Promise.Promise<{ number }>
+	assert((typeof(player) == "Instance" and player:IsA("Player")) or PlayerMock.isMock(player), "Bad player")
+	assert(type(groupId) == "number", "Bad groupId")
+
+	return Promise.spawn(function(resolve, reject)
+		local ok, result = pcall(_getRolesInGroupAsync, player, groupId)
+		if not ok then
+			return reject(result)
+		end
+
+		local roleIds: { number } = {}
+		if result.IsMember then
+			for _, roleTable in result.Roles do
+				if type(roleTable.Id) == "number" then
+					table.insert(roleIds, roleTable.Id)
+				end
+			end
+		end
+
+		return resolve(roleIds)
+	end)
+end
+
 export type GroupRoleInfo = {
 	Name: string,
 	Rank: number,
