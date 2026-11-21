@@ -16,9 +16,15 @@ local CoreGuiUtils = require("CoreGuiUtils")
 local Maid = require("Maid")
 local Observable = require("Observable")
 local PlayerMock = require("PlayerMock")
+local Promise = require("Promise")
 
 local MAX_GET_CORE_ATTEMPTS = 5
 local GET_CORE_INITIAL_WAIT_TIME = 0.5
+local FRIENDSHIP_READ_TRIES = 3
+local FRIENDSHIP_RETRY_SECONDS = 5
+local FRIENDSHIP_KEEP_SECONDS = 30
+
+local friendshipPromises: { [Player]: { [Player]: Promise.Promise<boolean> } } = {}
 
 local RxFriendUtils = {}
 
@@ -34,6 +40,65 @@ local function readFriendship(observedPlayer: Player, otherPlayer: Player): bool
 	end
 
 	return observedPlayer:IsFriendsWithAsync(getUserId(otherPlayer))
+end
+
+local function promiseReadFriendship(observedPlayer: Player, otherPlayer: Player): Promise.Promise<boolean>
+	return Promise.spawn(function(resolve, reject)
+		local lastError = nil
+		for attempt = 1, FRIENDSHIP_READ_TRIES do
+			local ok, result = pcall(readFriendship, observedPlayer, otherPlayer)
+			if ok then
+				resolve(result == true)
+				return
+			end
+			lastError = result
+			if attempt < FRIENDSHIP_READ_TRIES then
+				task.wait(FRIENDSHIP_RETRY_SECONDS * attempt)
+			end
+		end
+		reject(if lastError == nil then "Couldn't read friendship" else lastError)
+	end)
+end
+
+local function rememberFriendship(player: Player, otherPlayer: Player, promise: Promise.Promise<boolean>): ()
+	local promises = friendshipPromises[player]
+	if not promises then
+		promises = {}
+		friendshipPromises[player] = promises
+	end
+	promises[otherPlayer] = promise
+end
+
+local function forgetFriendship(player: Player, otherPlayer: Player, promise: Promise.Promise<boolean>): ()
+	local promises = friendshipPromises[player]
+	if promises and promises[otherPlayer] == promise then
+		promises[otherPlayer] = nil
+		if next(promises) == nil then
+			friendshipPromises[player] = nil
+		end
+	end
+end
+
+-- Friendship is symmetric, so every observer shares one read per pair of players instead of each
+-- side asking Roblox. A refused read is retried before it is given up on. Reads are kept per
+-- player instance, so a player who rejoins is read again.
+local function promiseFriendship(observedPlayer: Player, otherPlayer: Player): Promise.Promise<boolean>
+	local promises = friendshipPromises[observedPlayer]
+	local existing = promises and promises[otherPlayer]
+	if existing then
+		return existing
+	end
+
+	local promise = promiseReadFriendship(observedPlayer, otherPlayer)
+	rememberFriendship(observedPlayer, otherPlayer, promise)
+	rememberFriendship(otherPlayer, observedPlayer, promise)
+	promise:Finally(function()
+		task.delay(if promise:IsRejected() then 0 else FRIENDSHIP_KEEP_SECONDS, function()
+			forgetFriendship(observedPlayer, otherPlayer, promise)
+			forgetFriendship(otherPlayer, observedPlayer, promise)
+		end)
+	end)
+	return promise
 end
 
 --[=[
@@ -91,11 +156,18 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 				return
 			end
 
-			local isFriendsWith = false
-			local ok = pcall(function()
-				isFriendsWith = readFriendship(observedPlayer, otherPlayer)
-			end)
-			if not ok then
+			maid:GivePromise(promiseFriendship(observedPlayer, otherPlayer)):Then(function(isFriendsWith: boolean)
+				if otherPlayer.Parent == nil then
+					return
+				end
+
+				handleFriendState(otherPlayer, isFriendsWith)
+			end, function(err)
+				if err == nil then
+					-- Cleaned up before the read finished
+					return
+				end
+
 				warn(
 					string.format(
 						"[RxFriendUtils.observeFriendsInServerAsBrios] Couldn't get friendship status with %q!",
@@ -103,13 +175,9 @@ function RxFriendUtils.observeFriendsInServerAsBrios(player: Player?): Observabl
 					)
 				)
 
-				-- If the call failed, then 'isFriendsWith' will be nil.
 				-- We'll assume that this player isn't a friend on failure.
 				handleFriendState(otherPlayer, false)
-				return
-			end
-
-			handleFriendState(otherPlayer, isFriendsWith)
+			end)
 		end
 
 		local function handlePlayerRemoving(otherPlayer: Player)
