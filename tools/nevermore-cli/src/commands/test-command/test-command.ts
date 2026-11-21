@@ -4,14 +4,16 @@ import { Argv, CommandModule } from 'yargs';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
-import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
-import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
-import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
 import {
-  CloudJobContext,
-  LocalJobContext,
+  createCloudJobContext,
+  createLocalJobContext,
 } from '../../utils/job-context/index.js';
+import {
+  OpenCloudClient,
+  RateLimiter,
+} from '@quenty/nevermore-job-helpers/open-cloud';
+import { createBasePlaceResolver } from '@quenty/nevermore-job-helpers/place';
+import { isCI, readPackageNameAsync } from '../../utils/nevermore-cli-utils.js';
 import { runSingleTestAsync } from '../../utils/testing/runner/test-runner.js';
 import {
   loadDeployConfigAsync,
@@ -171,8 +173,8 @@ export class TestProjectCommand<T>
       const basePlaceResolver = createBasePlaceResolver(client, args);
 
       const context = args.cloud
-        ? new CloudJobContext(reporter, client, basePlaceResolver)
-        : new LocalJobContext(reporter, client, basePlaceResolver);
+        ? createCloudJobContext({ reporter, client, basePlaceResolver })
+        : createLocalJobContext({ reporter, client, basePlaceResolver });
 
       let result;
       try {

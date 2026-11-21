@@ -31,16 +31,16 @@ import {
   type PrebuiltDeployPlace,
   readPrebuiltDeployBundleAsync,
 } from '../../utils/deploy/prebuilt-deploy-bundle.js';
-import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
 import {
+  OpenCloudClient,
   RateLimiter,
   reportRateLimitWait,
-} from '../../utils/open-cloud/rate-limiter.js';
-import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
+} from '@quenty/nevermore-job-helpers/open-cloud';
 import {
   createBasePlaceResolver,
   createLockOnlyBasePlaceResolver,
-} from '../../utils/build/base-place-resolver-factory.js';
+} from '@quenty/nevermore-job-helpers/place';
+import { createCloudJobContext } from '../../utils/job-context/index.js';
 import {
   type BatchTarget,
   discoverAllTargetPackagesAsync,
@@ -381,7 +381,11 @@ async function _runDeployAsync(
     rateLimiter: new RateLimiter(),
   });
   const basePlaceResolver = createBasePlaceResolver(client, args);
-  const context = new CloudJobContext(reporter, client, basePlaceResolver);
+  const context = createCloudJobContext({
+    reporter,
+    client,
+    basePlaceResolver,
+  });
 
   // Gathered once so every deployed package shares one timestamp and commit.
   // A bundle's places carry the commit that built them, not this checkout's.

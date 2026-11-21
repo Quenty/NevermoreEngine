@@ -15,11 +15,11 @@ import { OutputHelper } from '@quenty/cli-output-helpers';
 
 import { mergeFailureReasons, runSingleTestAsync } from './test-runner.js';
 import { TEST_RESULTS_FORMAT } from '../structured-test-results.js';
+import { type Deployment } from '@quenty/nevermore-job-helpers';
 import {
-  type Deployment,
-  type JobContext,
-  type ScriptRunResult,
-} from '../../job-context/job-context.js';
+  type TestJobContext,
+  type TestScriptRunResult,
+} from '../../job-context/test-job-context.js';
 
 const PASSING_LOGS = [
   'Test Suites: 3 passed, 3 total',
@@ -62,7 +62,7 @@ afterEach(() => {
  * A context that runs nothing: it hands back the run result and logs the test
  * wants to reason about. Everything else is the minimum the runner touches.
  */
-function createContext(run: ScriptRunResult, logs: string): JobContext {
+function createContext(run: TestScriptRunResult, logs: string): TestJobContext {
   return {
     buildPlaceAsync: async (options) => ({
       rbxlPath: 'unused.rbxl',
@@ -92,7 +92,7 @@ describe('runSingleTestAsync', () => {
     await fs.rm(packagePath, { recursive: true, force: true });
   });
 
-  async function runAsync(run: ScriptRunResult, logs: string) {
+  async function runAsync(run: TestScriptRunResult, logs: string) {
     return runSingleTestAsync(createContext(run, logs), {
       packagePath,
       packageName: 'maid',

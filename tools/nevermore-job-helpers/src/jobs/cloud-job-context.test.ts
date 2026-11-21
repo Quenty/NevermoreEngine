@@ -43,7 +43,10 @@ function createContext(completedTask: Partial<LuauTask>) {
     pollTaskCompletionAsync: vi.fn(async () => task),
   } as unknown as OpenCloudClient;
 
-  const context = new CloudJobContext(createReporter(), client);
+  const context = new CloudJobContext({
+    reporter: createReporter(),
+    openCloudClient: client,
+  });
   const deployment = {
     universeId: 1,
     placeId: 2,

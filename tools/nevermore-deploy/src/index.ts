@@ -33,7 +33,11 @@ export {
 } from './deploy-config.js';
 
 export {
+  BASE_PLACE_LOCK_MODES,
   BasePlaceResolver,
+  resolveBasePlaceLockMode,
+  type BasePlaceLockFlags,
+  type BasePlaceLockMode,
   type BasePlaceResolverOptions,
 } from './base-place-resolver.js';
 

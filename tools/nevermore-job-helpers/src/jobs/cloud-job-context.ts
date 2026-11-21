@@ -1,23 +1,27 @@
-import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 import {
   getTaskReturnValues,
   type LuauTask,
   type OpenCloudClient,
 } from '../open-cloud/open-cloud-client.js';
 import { reportRateLimitWait } from '../open-cloud/rate-limiter.js';
-import { tryRenamePlaceAsync } from '@quenty/nevermore-cli-helpers';
-import { buildPlaceNameAsync, timeoutAsync } from '../nevermore-cli-utils.js';
+import {
+  BaseJobContext,
+  type BaseJobContextOptions,
+} from './base-job-context.js';
 import {
   type Deployment,
   type DeployPlaceOptions,
   type JobLogs,
   type RunScriptOptions,
+  type ScriptJobContext,
   type ScriptRunResult,
 } from './job-context.js';
-import { type BasePlaceResolver } from '@quenty/nevermore-deploy';
-import { BaseJobContext } from './base-job-context.js';
 
-const SKIP_RENAMING_PLACE = true;
+export interface CloudJobContextOptions
+  extends Omit<BaseJobContextOptions, 'downloader'> {
+  /** Also downloads base places. */
+  openCloudClient: OpenCloudClient;
+}
 
 class CloudDeployment implements Deployment {
   universeId: number;
@@ -33,24 +37,27 @@ class CloudDeployment implements Deployment {
   }
 }
 
-export class CloudJobContext extends BaseJobContext {
-  constructor(
-    reporter: Reporter,
-    openCloudClient: OpenCloudClient,
-    basePlaceResolver?: BasePlaceResolver
-  ) {
-    super(reporter, openCloudClient, basePlaceResolver);
+/** Uploads places and runs scripts as Open Cloud Luau execution tasks. */
+export class CloudJobContext
+  extends BaseJobContext
+  implements ScriptJobContext
+{
+  private _openCloudClient: OpenCloudClient;
+
+  constructor(options: CloudJobContextOptions) {
+    super({ ...options, downloader: options.openCloudClient });
+    this._openCloudClient = options.openCloudClient;
   }
 
   async deployBuiltPlaceAsync(
     options: DeployPlaceOptions
   ): Promise<Deployment> {
-    const { builtPlace, packageName, packagePath } = options;
+    const { builtPlace, packageName } = options;
     const { rbxlPath, target } = builtPlace;
 
     this._reporter.onPackagePhaseChange(packageName, 'uploading');
 
-    const version = await this._openCloudClient!.uploadPlaceAsync(
+    const version = await this._openCloudClient.uploadPlaceAsync(
       target.universeId,
       target.placeId,
       rbxlPath,
@@ -68,12 +75,6 @@ export class CloudJobContext extends BaseJobContext {
     // Eagerly release build artifacts after upload (disposeAsync is safety net)
     await this.releaseBuiltPlaceAsync(builtPlace);
 
-    // Best-effort rename to reflect current package + commit
-    if (!SKIP_RENAMING_PLACE) {
-      const placeName = await buildPlaceNameAsync(packagePath);
-      await tryRenamePlaceAsync(target.placeId, placeName);
-    }
-
     return new CloudDeployment(target.universeId, target.placeId, version);
   }
 
@@ -87,7 +88,7 @@ export class CloudJobContext extends BaseJobContext {
     const onRateLimitWait = reportRateLimitWait(this._reporter, packageName);
 
     this._reporter.onPackagePhaseChange(packageName, 'scheduling');
-    const task = await this._openCloudClient!.createExecutionTaskAsync(
+    const task = await this._openCloudClient.createExecutionTaskAsync(
       cloudDeployment.universeId,
       cloudDeployment.placeId,
       cloudDeployment.version,
@@ -102,7 +103,7 @@ export class CloudJobContext extends BaseJobContext {
 
     let pollCount = 0;
     const completedTask = await Promise.race([
-      this._openCloudClient!.pollTaskCompletionAsync(
+      this._openCloudClient.pollTaskCompletionAsync(
         task.path,
         (state) => {
           pollCount++;
@@ -121,7 +122,7 @@ export class CloudJobContext extends BaseJobContext {
       ),
       timeoutAsync(
         timeoutMs + CLIENT_TIMEOUT_GRACE_MS,
-        `Test timed out after ${timeoutMs / 1000}s`
+        `Script timed out after ${timeoutMs / 1000}s`
       ),
     ]);
 
@@ -156,7 +157,7 @@ export class CloudJobContext extends BaseJobContext {
       throw new Error('No task has been run yet');
     }
 
-    const fetched = await this._openCloudClient!.getRawTaskLogsAsync(
+    const fetched = await this._openCloudClient.getRawTaskLogsAsync(
       cloudDeployment.taskPath
     );
 
@@ -175,8 +176,10 @@ export class CloudJobContext extends BaseJobContext {
   async releaseAsync(_deployment: Deployment): Promise<void> {
     // No-op for cloud — place stays on cloud, task metadata discarded with the handle.
   }
+}
 
-  async disposeAsync(): Promise<void> {
-    await super.disposeAsync();
-  }
+function timeoutAsync(ms: number, message: string): Promise<never> {
+  return new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(message)), ms)
+  );
 }

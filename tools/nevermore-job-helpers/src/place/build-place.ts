@@ -46,7 +46,7 @@ export interface BuildPlaceOptions {
 
 /**
  * Opaque handle representing a built place file.
- * Callers see only the path and target — lifecycle is managed by the JobContext.
+ * Callers see only the path and target — lifecycle is managed by the job context.
  */
 export interface BuiltPlace {
   rbxlPath: string;

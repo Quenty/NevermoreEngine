@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as tar from 'tar';
 import { BuildContext } from '@quenty/nevermore-template-helpers';
 import { type CombinedPlaceChunk } from './combined-project-generator.js';
-import { PLACE_UPLOAD_MAX_BYTES } from '../../open-cloud/open-cloud-client.js';
+import { PLACE_UPLOAD_MAX_BYTES } from '@quenty/nevermore-job-helpers/open-cloud';
 import {
   PACKAGE_NAME_PATTERN,
   readUntrustedTarAsync,

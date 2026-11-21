@@ -319,13 +319,26 @@ Reports on one session: its ID, context and origin; the run mode of its own Data
 ### `process launch`
 
 ```bash
-studio-bridge process launch                          # default target of the nearest deploy.nevermore.json
-studio-bridge process launch integration.places.hub   # a named target, or one place of it
+studio-bridge process launch                                  # the nearest deploy.nevermore.json's default target
+studio-bridge process launch integration.places.hub           # a named target, or one of its places
+studio-bridge process launch --from checkout                  # a build of this checkout instead
+studio-bridge process launch --from checkout --no-base-place  # the code alone, without the base place
 studio-bridge process launch --place ./build/test.rbxl
 studio-bridge process launch --place-id 123 --universe-id 456
 ```
 
-Without `--place` or `--place-id`, opens the cloud place of a target from the nearest `deploy.nevermore.json` (in the current directory or a parent), so running it in a package or game folder opens that project's place. With no target it uses the config's default (`integration`, then `test`). Outside any `deploy.nevermore.json`, or in one without targets like the repo root's, it opens a new Baseplate from Roblox's template, the same unsaved place the start page's Baseplate gives.
+Opens a target from the nearest `deploy.nevermore.json`, in the current directory or a parent, so running it in a package or game folder opens that project. Without a target name it opens the config's default (`integration`, then `test`). With no target to open, it opens a new Baseplate.
+
+`--from` picks the target's source of truth:
+
+- `studio` (the default): the place on Roblox, as edited in Studio.
+- `checkout`: this checkout, built the way `nevermore deploy` builds it (the target's rojo project, with its `basePlace` merged underneath) and opened as a throwaway file, one per agent. Saving it changes nothing on Roblox.
+
+A checkout build needs `rojo` and `lune` (`aftman install` from the repo root). A target with a `basePlace` also needs an Open Cloud API key, from `nevermore login` or `ROBLOX_OPEN_CLOUD_API_KEY`; `--no-base-place` builds the code alone, without one.
+
+It builds against the base place version in `deploy.nevermore.lock.json` and never writes the lock: a version the lock doesn't pin is looked up for that launch only ([The lock file](../../docs/deploy.md#the-lock-file)).
+
+Builds are cleaned up after their Studio closes. To keep one, save it from Studio with File > Save to File As.
 
 ### `process run`
 

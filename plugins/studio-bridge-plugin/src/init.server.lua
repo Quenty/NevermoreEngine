@@ -28,6 +28,7 @@ local require = require(loader).bootstrapPlugin(modules)
 
 local PrecompiledSources = require("PrecompiledSources")
 local StudioBridgeClient = require("StudioBridgeClient")
+local StudioBridgePlaceIdentityUtils = require("StudioBridgePlaceIdentityUtils")
 local StudioBridgeSessionUtils = require("StudioBridgeSessionUtils")
 
 local PORT = "{{PORT}}"
@@ -58,6 +59,11 @@ local function startPlugin(pluginObject: Plugin)
 		if planted then
 			planted:Destroy()
 		end
+	end
+
+	-- Before anything can press Play: a playtest takes its ids from this DataModel.
+	if not RunService:IsRunning() then
+		StudioBridgePlaceIdentityUtils.applyMarkedIdentity(game)
 	end
 
 	local pngOk, png = pcall(function()

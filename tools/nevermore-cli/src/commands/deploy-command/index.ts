@@ -16,9 +16,13 @@ import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import { getApiKeyAsync } from '@quenty/nevermore-cli-helpers';
 import { uploadPlaceAsync } from '../../utils/build/upload.js';
 import {
+  OpenCloudClient,
+  RateLimiter,
+} from '@quenty/nevermore-job-helpers/open-cloud';
+import {
   createBasePlaceResolver,
   createLockOnlyBasePlaceResolver,
-} from '../../utils/build/base-place-resolver-factory.js';
+} from '@quenty/nevermore-job-helpers/place';
 import {
   type BatchDeployResult,
   createDeployCommentConfig,
@@ -28,9 +32,8 @@ import {
   gatherGitDeployInfo,
   injectDeployMetadataAsync,
 } from '../../utils/deploy/deploy-metadata.js';
-import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
-import { CloudJobContext } from '../../utils/job-context/cloud-job-context.js';
+import { type CloudJobContext } from '@quenty/nevermore-job-helpers';
+import { createCloudJobContext } from '../../utils/job-context/index.js';
 import { runBatchAsync } from '../../utils/batch/batch-runner.js';
 import { type BatchTarget } from '../../utils/batch/changed-packages-utils.js';
 import {
@@ -578,11 +581,20 @@ export class DeployCommand<T> implements CommandModule<T, DeployArgs> {
       const reporter = _buildReporter();
       // A rebuild triggered by the base place moving must re-resolve the pin,
       // or it rebuilds the version it already shipped.
-      const basePlaceResolver = createBasePlaceResolver(client, {
-        frozenLockfile: refresh ? false : args.frozenLockfile,
-        refreshBasePlace: refresh || args.refreshBasePlace,
+      const basePlaceResolver = createBasePlaceResolver(
+        client,
+        refresh
+          ? { refreshBasePlace: true }
+          : {
+              frozenLockfile: args.frozenLockfile,
+              refreshBasePlace: args.refreshBasePlace,
+            }
+      );
+      const context = createCloudJobContext({
+        reporter,
+        client,
+        basePlaceResolver,
       });
-      const context = new CloudJobContext(reporter, client, basePlaceResolver);
 
       await reporter.startAsync();
       let failed = 0;

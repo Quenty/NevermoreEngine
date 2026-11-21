@@ -7,7 +7,10 @@ import {
 } from '../test-log-parser.js';
 import { formatTracebacks, parseTracebacks } from './traceback-parser.js';
 import { type StructuredTestResults } from '../structured-test-results.js';
-import { describeLogVolume, type LogFetchStats } from '../log-fetch-stats.js';
+import {
+  describeLogVolume,
+  type LogFetchStats,
+} from '@quenty/nevermore-job-helpers';
 
 export interface BatchPackageResult {
   slug: string;

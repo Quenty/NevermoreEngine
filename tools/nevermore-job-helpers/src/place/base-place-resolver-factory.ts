@@ -1,5 +1,10 @@
-import { BasePlaceResolver } from '@quenty/nevermore-deploy';
-import { type OpenCloudClient } from '../open-cloud/open-cloud-client.js';
+import {
+  BasePlaceResolver,
+  resolveBasePlaceLockMode,
+  type BasePlaceLockFlags,
+  type BasePlaceLockMode,
+  type PlaceVersionSource,
+} from '@quenty/nevermore-deploy';
 
 /**
  * A resolver that can only answer from the lock file.
@@ -26,24 +31,19 @@ export function createLockOnlyBasePlaceResolver(): BasePlaceResolver {
 /**
  * Build the one resolver a run shares.
  *
- * Every command that can merge a base place goes through here, so `deploy run`,
- * `batch deploy`, `test`, and `batch test` cannot end up disagreeing about lock
- * policy. `OpenCloudClient` satisfies the resolver's `PlaceVersionSource` port
- * structurally — the deploy-config package never learns about Open Cloud.
+ * Every command that can merge a base place goes through here — `deploy run`,
+ * `batch deploy`, `test`, `batch test`, and `studio-bridge process launch` — so
+ * they cannot end up disagreeing about lock policy. Each command states its
+ * default lock mode; the `--frozen-lockfile` and `--refresh-base-place` flags
+ * override it the same way everywhere.
  */
 export function createBasePlaceResolver(
-  openCloudClient: OpenCloudClient,
-  args: { frozenLockfile?: boolean; refreshBasePlace?: boolean }
+  source: PlaceVersionSource,
+  flags: BasePlaceLockFlags,
+  defaultMode: BasePlaceLockMode = 'write'
 ): BasePlaceResolver {
-  if (args.frozenLockfile && args.refreshBasePlace) {
-    throw new Error(
-      '--frozen-lockfile and --refresh-base-place contradict each other: ' +
-        'one forbids resolving base places, the other forces it.'
-    );
-  }
   return new BasePlaceResolver({
-    source: openCloudClient,
-    frozen: args.frozenLockfile ?? false,
-    refresh: args.refreshBasePlace ?? false,
+    source,
+    lockMode: resolveBasePlaceLockMode(flags, defaultMode),
   });
 }

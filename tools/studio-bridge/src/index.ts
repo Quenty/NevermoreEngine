@@ -19,6 +19,9 @@ export type {
 } from './server/studio-bridge-server.js';
 export type { OutputLevel } from './server/web-socket-protocol.js';
 
+// Studio sessions for @quenty/nevermore-job-helpers' local job contexts
+export { createStudioBridgeSessionFactory } from './jobs/studio-bridge-session-factory.js';
+
 // Bridge network layer (persistent sessions)
 export {
   BridgeConnection,

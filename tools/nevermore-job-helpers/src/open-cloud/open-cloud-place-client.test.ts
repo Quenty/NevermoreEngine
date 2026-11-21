@@ -1,0 +1,265 @@
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { OpenCloudPlaceClient } from './open-cloud-place-client.js';
+import type { RateLimiter } from './rate-limiter.js';
+
+vi.mock('@quenty/cli-output-helpers', () => ({
+  OutputHelper: {
+    verbose: vi.fn(),
+    warn: vi.fn(),
+    formatDim: (s: string) => s,
+    formatInfo: (s: string) => s,
+    formatError: (s: string) => s,
+    formatWarning: (s: string) => s,
+  },
+}));
+
+describe('OpenCloudPlaceClient.downloadPlaceAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('downloads the latest version when no version is pinned', async () => {
+    const urls: string[] = [];
+    const fakeLimiter = {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        return new Response(JSON.stringify({ location: 'https://cdn/x' }), {
+          status: 200,
+        });
+      }),
+    } as unknown as RateLimiter;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(Buffer.from([1, 2, 3]), { status: 200 }))
+    );
+
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+    const buffer = await client.downloadPlaceAsync(1, 22);
+
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/asset-delivery-api/v1/assetId/22'
+    );
+    expect(urls[0]).not.toContain('/version/');
+    expect([...buffer]).toEqual([1, 2, 3]);
+  });
+
+  it('downloads a specific version when pinned', async () => {
+    const urls: string[] = [];
+    const fakeLimiter = {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        return new Response(JSON.stringify({ location: 'https://cdn/x' }), {
+          status: 200,
+        });
+      }),
+    } as unknown as RateLimiter;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(Buffer.from([9]), { status: 200 }))
+    );
+
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+    await client.downloadPlaceAsync(1, 22, undefined, 42);
+
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/asset-delivery-api/v1/assetId/22/version/42'
+    );
+  });
+
+  it('throws a clear error when a pinned version does not exist', async () => {
+    // The Asset Delivery API reports a missing version as HTTP 200 with an
+    // errors array and no location.
+    const fakeLimiter = {
+      fetchAsync: vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              errors: [{ code: 404, message: 'Request asset was not found' }],
+            }),
+            { status: 200 }
+          )
+      ),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+
+    await expect(
+      client.downloadPlaceAsync(1, 22, undefined, 999999)
+    ).rejects.toThrowError(/no version 999999/);
+  });
+});
+
+describe('OpenCloudPlaceClient.resolveLatestPlaceVersionAsync', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** Page the Assets API newest-first, as the real endpoint does. */
+  function makeVersionsLimiter(
+    pages: Array<Array<{ version: number; published?: boolean }>>,
+    urls: string[] = []
+  ): RateLimiter {
+    return {
+      fetchAsync: vi.fn(async (url: string | URL) => {
+        urls.push(String(url));
+        const page = pages[urls.length - 1] ?? [];
+        return new Response(
+          JSON.stringify({
+            assetVersions: page.map((entry) => ({
+              path: `assets/22/versions/${entry.version}`,
+              // The real API omits `published` entirely on save-only versions.
+              ...(entry.published ? { published: true } : {}),
+            })),
+            ...(urls.length < pages.length
+              ? { nextPageToken: `token-${urls.length}` }
+              : {}),
+          }),
+          { status: 200 }
+        );
+      }),
+    } as unknown as RateLimiter;
+  }
+
+  it('resolves "saved" to the newest version of any kind', async () => {
+    const urls: string[] = [];
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(
+        [[{ version: 5781 }, { version: 5780, published: true }]],
+        urls
+      ),
+    });
+
+    expect(await client.resolveLatestPlaceVersionAsync(1, 22, 'saved')).toBe(
+      5781
+    );
+    expect(urls).toHaveLength(1);
+    expect(urls[0]).toBe(
+      'https://apis.roblox.com/assets/v1/assets/22/versions?maxPageSize=50'
+    );
+  });
+
+  it('resolves "published" past unpublished saves at the head', async () => {
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [
+          { version: 5781 },
+          { version: 5780 },
+          { version: 5779, published: true },
+        ],
+      ]),
+    });
+
+    expect(
+      await client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).toBe(5779);
+  });
+
+  it('pages only until the newest published version is found', async () => {
+    const urls: string[] = [];
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(
+        [
+          [{ version: 300 }, { version: 299 }],
+          [{ version: 298, published: true }, { version: 297 }],
+          [{ version: 296, published: true }],
+        ],
+        urls
+      ),
+    });
+
+    expect(
+      await client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).toBe(298);
+    expect(urls).toHaveLength(2);
+    expect(urls[1]).toContain('pageToken=token-1');
+  });
+
+  it('throws when the place has never been published', async () => {
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([[{ version: 2 }, { version: 1 }]]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/no published version/);
+  });
+
+  it('refuses to guess when the API stops paging newest-first', async () => {
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [{ version: 1 }, { version: 2, published: true }],
+      ]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/no longer paging newest-first/);
+  });
+
+  it('refuses a "saved" lookup when the page is not newest-first', async () => {
+    // "saved" answers from the first entry, so the ordering guard has to check
+    // the whole page before returning or this silently pins the oldest build.
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter([
+        [{ version: 1 }, { version: 2 }, { version: 3 }],
+      ]),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
+    ).rejects.toThrowError(/no longer paging newest-first/);
+  });
+
+  it('reports the scan limit when every page is unpublished', async () => {
+    const pages = Array.from({ length: 25 }, (_, page) =>
+      Array.from({ length: 2 }, (_, i) => ({ version: 1000 - page * 2 - i }))
+    );
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: makeVersionsLimiter(pages),
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'published')
+    ).rejects.toThrowError(/in its most recent 1000 versions/);
+  });
+
+  it('throws on an unparseable version path', async () => {
+    const fakeLimiter = {
+      fetchAsync: vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              assetVersions: [{ path: 'assets/22/versions/' }],
+            }),
+            { status: 200 }
+          )
+      ),
+    } as unknown as RateLimiter;
+
+    const client = new OpenCloudPlaceClient({
+      apiKey: 'test-key',
+      rateLimiter: fakeLimiter,
+    });
+
+    await expect(
+      client.resolveLatestPlaceVersionAsync(1, 22, 'saved')
+    ).rejects.toThrowError(/unparseable version path/);
+  });
+});

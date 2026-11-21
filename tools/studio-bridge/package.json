@@ -18,6 +18,7 @@
     "@quenty/cli-output-helpers": "workspace:*",
     "@quenty/nevermore-cli-helpers": "workspace:*",
     "@quenty/nevermore-deploy": "workspace:*",
+    "@quenty/nevermore-job-helpers": "workspace:*",
     "@quenty/nevermore-template-helpers": "workspace:*",
     "execa": "^9.6.1",
     "jpeg-js": "^0.4.4",

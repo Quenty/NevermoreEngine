@@ -7,7 +7,7 @@ import {
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type BatchTarget } from '../../batch/changed-packages-utils.js';
-import { recompressPlace } from '../../build/place-recompression.js';
+import { recompressPlace } from '@quenty/nevermore-job-helpers/place';
 import {
   type TestRojoProject,
   findTestProjectSlug,

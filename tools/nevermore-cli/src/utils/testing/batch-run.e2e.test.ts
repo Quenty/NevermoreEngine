@@ -17,16 +17,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import { BatchScriptJobContext } from '../job-context/batch-script-job-context.js';
+import { type TestScriptRunResult } from '../job-context/test-job-context.js';
 import {
   type BuiltPlace,
   type Deployment,
   type DeployPlaceOptions,
-  type JobContext,
   type JobLogs,
   type RunScriptOptions,
+  type ScriptJobContext,
   type ScriptRunResult,
-} from '../job-context/job-context.js';
-import { type TaskLogMessage } from '../open-cloud/open-cloud-client.js';
+} from '@quenty/nevermore-job-helpers';
+import { type TaskLogMessage } from '@quenty/nevermore-job-helpers/open-cloud';
 import { type BatchTarget } from '../batch/changed-packages-utils.js';
 import { renderBatchOutcome } from './parsers/batch-log-renderer.js';
 
@@ -138,7 +139,7 @@ const TASK_MESSAGES: TaskLogMessage[] = [
  * A transport that runs nothing and reports the messages it was handed — or,
  * with `messagesFor`, the messages for whichever packages the script ran.
  */
-class FakeTransport implements JobContext {
+class FakeTransport implements ScriptJobContext {
   public scriptContent?: string;
   public scriptContents: string[] = [];
   public deployedPaths: string[] = [];
@@ -225,7 +226,7 @@ function createBatch(
 async function runPackageAsync(
   batch: BatchScriptJobContext,
   packageName: string
-): Promise<ScriptRunResult> {
+): Promise<TestScriptRunResult> {
   const deployment = await batch.deployBuiltPlaceAsync({
     builtPlace: { rbxlPath: '/tmp/batch.rbxl', target: {} } as BuiltPlace,
     packageName,

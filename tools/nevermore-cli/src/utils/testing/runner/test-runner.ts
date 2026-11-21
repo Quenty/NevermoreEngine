@@ -3,16 +3,16 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
 import {
+  describeLogVolume,
   type BuiltPlace,
-  type JobContext,
-} from '../../job-context/job-context.js';
-import { type DeployOverrides } from '../../build/build.js';
+} from '@quenty/nevermore-job-helpers';
+import { type DeployOverrides } from '@quenty/nevermore-job-helpers/place';
+import { type TestJobContext } from '../../job-context/test-job-context.js';
 import {
   type ParsedTestCounts,
   parseTestLogs,
   parseTestCounts,
 } from '../test-log-parser.js';
-import { describeLogVolume } from '../log-fetch-stats.js';
 import {
   type StructuredTestResults,
   describeUnexplainedVerdict,
@@ -34,7 +34,7 @@ export interface SingleTestResult {
   logs: string;
   testCounts?: ParsedTestCounts;
   /**
-   * Inner script execution time, forwarded from the JobContext when it can
+   * Inner script execution time, forwarded from the job context when it can
    * measure pcall duration directly (aggregated batch mode). Undefined for
    * non-aggregated cloud/local runs — callers should fall back to wall-clock.
    */
@@ -99,12 +99,12 @@ export interface PreparedTest {
 
 /**
  * Build, deploy, and run a test for a single package using the provided
- * JobContext. The context determines the execution environment (cloud or local).
+ * TestJobContext. The context determines the execution environment (cloud or local).
  *
  * Creates and releases its own deployment handle — the caller owns the context lifetime.
  */
 export async function runSingleTestAsync(
-  context: JobContext,
+  context: TestJobContext,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {
   const prepared = await prepareTestAsync(context, options);
@@ -112,7 +112,7 @@ export async function runSingleTestAsync(
 }
 
 export async function prepareTestAsync(
-  context: JobContext,
+  context: TestJobContext,
   options: SingleTestOptions
 ): Promise<PreparedTest> {
   const { packagePath, packageName, scriptText, target, overrides } = options;
@@ -155,7 +155,7 @@ export async function prepareTestAsync(
 }
 
 export async function executePreparedTestAsync(
-  context: JobContext,
+  context: TestJobContext,
   prepared: PreparedTest,
   options: SingleTestOptions
 ): Promise<SingleTestResult> {

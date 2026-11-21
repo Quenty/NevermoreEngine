@@ -6949,6 +6949,9 @@ importers:
       '@quenty/nevermore-deploy':
         specifier: workspace:*
         version: link:../nevermore-deploy
+      '@quenty/nevermore-job-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-job-helpers
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers
@@ -6964,9 +6967,6 @@ importers:
       inquirer:
         specifier: ^13.2.0
         version: 13.4.2(@types/node@18.19.130)
-      node-fetch:
-        specifier: ^3.3.2
-        version: 3.3.2
       tar:
         specifier: ^7.5.11
         version: 7.5.11
@@ -7051,6 +7051,37 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
 
+  tools/nevermore-job-helpers:
+    dependencies:
+      '@quenty/cli-output-helpers':
+        specifier: workspace:*
+        version: link:../cli-output-helpers
+      '@quenty/nevermore-deploy':
+        specifier: workspace:*
+        version: link:../nevermore-deploy
+      '@quenty/nevermore-template-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-template-helpers
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
+    devDependencies:
+      '@quenty/nevermore-cli-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-cli-helpers
+      '@types/node':
+        specifier: ^18.11.4
+        version: 18.19.130
+      prettier:
+        specifier: 2.7.1
+        version: 2.7.1
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@18.19.130)(yaml@2.8.3)
+
   tools/nevermore-template-helpers:
     dependencies:
       '@quenty/cli-output-helpers':
@@ -7099,6 +7130,9 @@ importers:
       '@quenty/nevermore-deploy':
         specifier: workspace:*
         version: link:../nevermore-deploy
+      '@quenty/nevermore-job-helpers':
+        specifier: workspace:*
+        version: link:../nevermore-job-helpers
       '@quenty/nevermore-template-helpers':
         specifier: workspace:*
         version: link:../nevermore-template-helpers

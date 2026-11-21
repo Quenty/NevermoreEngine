@@ -1,0 +1,339 @@
+import { OutputHelper } from '@quenty/cli-output-helpers';
+import { type PlaceVersionSource } from '@quenty/nevermore-deploy';
+import { formatAuthError } from './open-cloud-errors.js';
+import { type RateLimiter } from './rate-limiter.js';
+
+export interface OpenCloudPlaceClientOptions {
+  apiKey: string | (() => Promise<string>);
+  rateLimiter: RateLimiter;
+}
+
+/**
+ * Which end of a place's version history to resolve. Mirrors the `versionType`
+ * the place-publishing API takes on upload, lowercased to match how it is
+ * written in deploy.nevermore.json.
+ */
+export type PlaceVersionType = 'saved' | 'published';
+
+/** Reads places through Open Cloud. `OpenCloudClient` extends it with uploads and execution. */
+export class OpenCloudPlaceClient implements PlaceVersionSource {
+  private _apiKey: string | undefined;
+  private _apiKeySource: string | (() => Promise<string>);
+  protected _rateLimiter: RateLimiter;
+
+  constructor(options: OpenCloudPlaceClientOptions) {
+    this._apiKeySource = options.apiKey;
+    if (typeof options.apiKey === 'string') {
+      this._apiKey = options.apiKey;
+    }
+    this._rateLimiter = options.rateLimiter;
+  }
+
+  protected async _resolveApiKeyAsync(): Promise<string> {
+    if (this._apiKey != null) {
+      return this._apiKey;
+    }
+    if (typeof this._apiKeySource === 'function') {
+      this._apiKey = await this._apiKeySource();
+      return this._apiKey;
+    }
+    return this._apiKeySource;
+  }
+
+  /**
+   * Download a place file via the Asset Delivery API.
+   * Requires the `legacy-asset:manage` scope on the API key.
+   *
+   * Two-step process: fetch a temporary CDN URL, then download the binary.
+   *
+   * Pass `version` to fetch a specific published version instead of the latest.
+   * This is how deploys pin a `basePlace` so a broken Studio edit can't leak in.
+   */
+  async downloadPlaceAsync(
+    universeId: number,
+    placeId: number,
+    onProgress?: (transferredBytes: number, totalBytes: number) => void,
+    version?: number
+  ): Promise<Buffer> {
+    const apiKey = await this._resolveApiKeyAsync();
+    const url =
+      version != null
+        ? `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}/version/${version}`
+        : `https://apis.roblox.com/asset-delivery-api/v1/assetId/${placeId}`;
+
+    OutputHelper.verbose(
+      `Downloading base place${
+        version != null ? ` v${version}` : ''
+      } from https://www.roblox.com/games/${placeId}/place ...`
+    );
+
+    const response = await this._rateLimiter.fetchAsync(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        throw new Error(
+          formatAuthError(
+            'Download place',
+            'legacy-asset:manage',
+            universeId,
+            placeId,
+            response.status,
+            response.statusText,
+            text,
+            'GET',
+            url
+          )
+        );
+      }
+      throw new Error(
+        `Download place failed: ${response.status} ${response.statusText}: ${text}`
+      );
+    }
+
+    // The Asset Delivery API reports a missing asset/version as HTTP 200 with an
+    // `errors` array rather than an error status, so a bad `version` pin lands
+    // here instead of the block above.
+    const data = (await response.json()) as {
+      location?: string;
+      errors?: Array<{ code?: number; message?: string }>;
+    };
+    if (!data.location) {
+      const apiMessage = data.errors?.[0]?.message;
+      if (version != null) {
+        throw new Error(
+          `Base place ${placeId} has no version ${version}` +
+            (apiMessage ? ` (${apiMessage})` : '') +
+            `. Run "nevermore deploy version upgrade" to re-pin, or check the pinned version in deploy.nevermore.json.`
+        );
+      }
+      throw new Error(
+        `Download place failed: no CDN location in response` +
+          (apiMessage ? `: ${apiMessage}` : '')
+      );
+    }
+
+    OutputHelper.verbose('Fetching place binary from CDN...');
+    return _fetchCdnBinaryAsync(data.location, onProgress);
+  }
+
+  /**
+   * Resolve the newest saved or published version number of a place, via the
+   * Open Cloud Assets API (`asset:read` scope). The returned number is the same
+   * value the Asset Delivery API's `/version/{n}` route expects, so it can be
+   * written straight into a `basePlace.version` pin.
+   *
+   * This used to add that `legacy-asset:manage` grants `asset:read` too. They
+   * are separate boxes on the credentials page and nothing here ever verified
+   * the implication, so the claim is gone rather than restated — it had already
+   * been copied into the `nevermore login` instructions as fact once.
+   *
+   * `saved` is the newest version of any kind — Studio saves and publishes
+   * share one increasing version sequence. `published` is the newest version
+   * that actually went live, which is what players see and what a deploy
+   * merging against a base place normally wants.
+   *
+   * The endpoint pages newest-first, which is what makes this affordable: an
+   * actively-developed place accumulates tens of thousands of versions, and we
+   * never walk the history. `saved` is the first entry of the first page, and
+   * `published` only walks back as far as the most recent live version — one
+   * page unless the place has been saved 50+ times without publishing. The scan
+   * is capped so a never-published place fails fast instead of paging forever.
+   */
+  async resolveLatestPlaceVersionAsync(
+    universeId: number,
+    placeId: number,
+    versionType: PlaceVersionType
+  ): Promise<number> {
+    const apiKey = await this._resolveApiKeyAsync();
+    let pageToken: string | undefined;
+    let previousVersion: number | undefined;
+
+    for (let page = 0; page < VERSION_SCAN_MAX_PAGES; page++) {
+      const url =
+        `https://apis.roblox.com/assets/v1/assets/${placeId}/versions` +
+        `?maxPageSize=${VERSION_SCAN_PAGE_SIZE}` +
+        (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+
+      const response = await this._rateLimiter.fetchAsync(url, {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            formatAuthError(
+              'Read place version',
+              'asset:read',
+              universeId,
+              placeId,
+              response.status,
+              response.statusText,
+              text,
+              'GET',
+              url
+            )
+          );
+        }
+        throw new Error(
+          `Read place version failed: ${response.status} ${response.statusText}: ${text}`
+        );
+      }
+
+      const data = (await response.json()) as {
+        assetVersions?: AssetVersion[];
+        nextPageToken?: string;
+      };
+
+      const page = (data.assetVersions ?? []).map((assetVersion) => ({
+        versionNumber: _parseAssetVersionNumber(placeId, assetVersion),
+        published: assetVersion.published === true,
+      }));
+
+      // Everything here rests on the API paging newest-first, and a `saved`
+      // lookup answers from the very first entry — so the whole page is checked
+      // before anything is returned. Validating only as far as the match would
+      // leave the common case unchecked and quietly pin a years-old build.
+      for (const { versionNumber } of page) {
+        if (previousVersion != null && versionNumber >= previousVersion) {
+          throw new Error(
+            `Read place version failed: place ${placeId} returned version ` +
+              `${versionNumber} after ${previousVersion}. The Assets API is no ` +
+              `longer paging newest-first, so "${versionType}" cannot be resolved ` +
+              `safely — pin an explicit version number in deploy.nevermore.json.`
+          );
+        }
+        previousVersion = versionNumber;
+      }
+
+      // `published` is omitted rather than false on save-only versions.
+      const match = page.find(
+        (entry) => versionType === 'saved' || entry.published
+      );
+      if (match) {
+        return match.versionNumber;
+      }
+
+      pageToken = data.nextPageToken;
+      if (!pageToken) {
+        break;
+      }
+    }
+
+    throw new Error(
+      `Place ${placeId} has no ${versionType} version` +
+        (pageToken
+          ? ` in its most recent ${
+              VERSION_SCAN_MAX_PAGES * VERSION_SCAN_PAGE_SIZE
+            } versions`
+          : '') +
+        `. Pin an explicit version number in deploy.nevermore.json, or publish the place once.`
+    );
+  }
+}
+
+/** How the Assets API reports one entry of a place's version history. */
+interface AssetVersion {
+  /** `assets/{assetId}/versions/{versionNumber}` */
+  path?: string;
+  /** Present and true only once the version has been published live. */
+  published?: boolean;
+}
+
+const VERSION_SCAN_PAGE_SIZE = 50;
+const VERSION_SCAN_MAX_PAGES = 20;
+
+function _parseAssetVersionNumber(
+  placeId: number,
+  version: AssetVersion
+): number {
+  const versionNumber = Number(version.path?.split('/').pop());
+  if (!Number.isInteger(versionNumber) || versionNumber < 1) {
+    throw new Error(
+      `Read place version failed: place ${placeId} returned an unparseable ` +
+        `version path "${version.path}"`
+    );
+  }
+  return versionNumber;
+}
+
+const CDN_MAX_ATTEMPTS = 4;
+
+async function _fetchCdnBinaryAsync(
+  url: string,
+  onProgress?: (transferredBytes: number, totalBytes: number) => void
+): Promise<Buffer> {
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= CDN_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        return await _readBodyWithProgressAsync(response, onProgress);
+      }
+      lastError = new Error(
+        `Download place CDN fetch failed: ${response.status} ${response.statusText}`
+      );
+      // 4xx (other than 408/429) won't fix itself — stop retrying.
+      if (
+        response.status >= 400 &&
+        response.status < 500 &&
+        response.status !== 408 &&
+        response.status !== 429
+      ) {
+        throw lastError;
+      }
+    } catch (err) {
+      lastError = err;
+    }
+
+    if (attempt === CDN_MAX_ATTEMPTS) {
+      break;
+    }
+    const waitMs = Math.min(8000, 500 * Math.pow(2, attempt - 1));
+    OutputHelper.warn(
+      `CDN download attempt ${attempt}/${CDN_MAX_ATTEMPTS} failed (${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }). Retrying in ${(waitMs / 1000).toFixed(1)}s...`
+    );
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  throw lastError ?? new Error('Download place CDN fetch failed');
+}
+
+async function _readBodyWithProgressAsync(
+  response: Response,
+  onProgress?: (transferredBytes: number, totalBytes: number) => void
+): Promise<Buffer> {
+  if (!onProgress || !response.body) {
+    return Buffer.from(await response.arrayBuffer());
+  }
+
+  // Content-Length may be absent (chunked transfer); report 0 in that case
+  // and let the formatter render "transferred so far" without a denominator.
+  const contentLength = response.headers.get('content-length');
+  const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+
+  const chunks: Uint8Array[] = [];
+  let transferred = 0;
+  const reader = response.body.getReader();
+  onProgress(0, totalBytes);
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    transferred += value.byteLength;
+    onProgress(transferred, totalBytes);
+  }
+
+  return Buffer.concat(chunks);
+}

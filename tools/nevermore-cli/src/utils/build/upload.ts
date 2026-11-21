@@ -3,9 +3,11 @@ import {
   type CredentialArgs,
 } from '@quenty/nevermore-cli-helpers';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
-import { OpenCloudClient } from '../open-cloud/open-cloud-client.js';
-import { reportRateLimitWait } from '../open-cloud/rate-limiter.js';
-import { type BuiltPlace } from './build.js';
+import { type BuiltPlace } from '@quenty/nevermore-job-helpers';
+import {
+  OpenCloudClient,
+  reportRateLimitWait,
+} from '@quenty/nevermore-job-helpers/open-cloud';
 import { type Reporter } from '@quenty/cli-output-helpers/reporting';
 
 export interface UploadPlaceOptions {

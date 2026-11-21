@@ -6,15 +6,19 @@
 import * as path from 'path';
 import { defineCommand } from '../../framework/define-command.js';
 import { arg } from '../../framework/arg-builder.js';
-import { launchStudioAsync } from '../../../process/studio-process-manager.js';
-import { recordStudioLaunchAsync } from '../../../process/studio-launch-registry.js';
+import { launchAndRecordStudioAsync } from '../../../process/launch-and-record-studio.js';
 import {
   DEPLOY_CONFIG_FILE_NAME,
   resolveDeployPlaceAsync,
 } from '../../../deploy/deploy-places.js';
+import { launchDeployPlaceAsync } from '../../../deploy/launch-deploy-place.js';
 import { invalidInput } from '../../../messages/studio-bridge-error.js';
+import { isJsonOutputEnabled } from '../../../cli/cli-output-context.js';
 
 const BASEPLATE_TEMPLATE = { placeId: 95206881, universeId: 28220420 };
+
+export const LAUNCH_SOURCES = ['studio', 'checkout'] as const;
+export type LaunchSource = typeof LAUNCH_SOURCES[number];
 
 export interface LaunchOptions {
   placePath?: string;
@@ -24,14 +28,22 @@ export interface LaunchOptions {
   deployTarget?: string;
   /** Where to start looking for `deploy.nevermore.json`. Default: the current directory. */
   cwd?: string;
+  /** Default: `studio`. */
+  from?: LaunchSource;
+  /** For `--from checkout`. Default: true. */
+  mergeBasePlace?: boolean;
 }
 
 export interface LaunchResult {
   launched: boolean;
   /** The `deploy.nevermore.json` target that was opened, if any. */
   deployTarget?: string;
+  from?: LaunchSource;
   placeId?: number;
   universeId?: number;
+  /** For `--from checkout`. */
+  placePath?: string;
+  basePlaceVersion?: number;
   summary: string;
 }
 
@@ -46,6 +58,21 @@ export async function launchHandlerAsync(
       'Use one of them.'
     );
   }
+  const targetFlags = _targetFlags(options);
+  if (hasExplicitPlace && targetFlags.length > 0) {
+    throw invalidInput(
+      `${_listFlags(targetFlags)} ${
+        targetFlags.length === 1 ? 'applies' : 'apply'
+      } to a deploy target, not to --place or --place-id.`,
+      `Drop ${_listFlags(targetFlags)}.`
+    );
+  }
+  if (options.mergeBasePlace === false && options.from !== 'checkout') {
+    throw invalidInput(
+      '--no-base-place applies to --from checkout, which builds the place.',
+      'Add --from checkout, or drop --no-base-place.'
+    );
+  }
 
   const deployPlace = hasExplicitPlace
     ? undefined
@@ -55,33 +82,69 @@ export async function launchHandlerAsync(
       );
   if (deployPlace) {
     const { placeId, universeId } = deployPlace.place;
-    await _launchAndRecordAsync(
-      { placeId, universeId },
-      `'${deployPlace.selector}' (place ${placeId})`,
-      options.cwd
+    const fromConfig = path.join(
+      path.relative(
+        options.cwd ?? process.cwd(),
+        path.dirname(deployPlace.configPath)
+      ),
+      DEPLOY_CONFIG_FILE_NAME
     );
-    const configDir = path.relative(
-      options.cwd ?? process.cwd(),
-      path.dirname(deployPlace.configPath)
-    );
+
+    if (options.from !== 'checkout') {
+      await launchAndRecordStudioAsync(
+        { placeId, universeId },
+        {
+          opened: `'${deployPlace.selector}' (place ${placeId})`,
+          deployTarget: deployPlace.selector,
+        },
+        options.cwd
+      );
+      return {
+        launched: true,
+        deployTarget: deployPlace.selector,
+        from: 'studio',
+        placeId,
+        universeId,
+        summary: `Studio launched with '${deployPlace.selector}' (place ${placeId}, universe ${universeId}) from ${fromConfig}`,
+      };
+    }
+
+    const built = await launchDeployPlaceAsync({
+      deployPlace,
+      mergeBasePlace: options.mergeBasePlace,
+      cwd: options.cwd,
+      quiet: isJsonOutputEnabled(),
+    });
+    const onBase =
+      built.basePlaceVersion !== undefined
+        ? ` on base place v${built.basePlaceVersion}`
+        : '';
     return {
       launched: true,
       deployTarget: deployPlace.selector,
+      from: 'checkout',
       placeId,
       universeId,
-      summary: `Studio launched with '${
-        deployPlace.selector
-      }' (place ${placeId}, universe ${universeId}) from ${path.join(
-        configDir,
-        DEPLOY_CONFIG_FILE_NAME
-      )}`,
+      placePath: built.rbxlPath,
+      basePlaceVersion: built.basePlaceVersion,
+      summary: `Studio launched with '${deployPlace.selector}' built from this checkout${onBase} (${fromConfig}). Saving it does not change place ${placeId}.`,
     };
   }
 
   if (!hasExplicitPlace) {
-    await _launchAndRecordAsync(
+    if (targetFlags.length > 0) {
+      throw invalidInput(
+        `${_listFlags(targetFlags)} ${
+          targetFlags.length === 1 ? 'opens' : 'open'
+        } a deploy target, and there is no ${DEPLOY_CONFIG_FILE_NAME} here or above.`,
+        `Run it in a package or game folder, or drop ${_listFlags(
+          targetFlags
+        )}.`
+      );
+    }
+    await launchAndRecordStudioAsync(
       BASEPLATE_TEMPLATE,
-      'a new Baseplate',
+      { opened: 'a new Baseplate' },
       options.cwd
     );
     return {
@@ -91,9 +154,9 @@ export async function launchHandlerAsync(
   }
 
   const { placePath, placeId, universeId } = options;
-  await _launchAndRecordAsync(
+  await launchAndRecordStudioAsync(
     { placePath, placeId, universeId },
-    placeId != null ? `place ${placeId}` : placePath ?? 'Studio',
+    { opened: placeId != null ? `place ${placeId}` : placePath ?? 'Studio' },
     options.cwd
   );
   const opened =
@@ -110,19 +173,16 @@ export async function launchHandlerAsync(
   };
 }
 
-async function _launchAndRecordAsync(
-  launch: Parameters<typeof launchStudioAsync>[0],
-  opened: string,
-  cwd = process.cwd()
-): Promise<void> {
-  const launchedAt = Date.now();
-  const studio = await launchStudioAsync(launch);
-  await recordStudioLaunchAsync({
-    pid: studio?.process?.pid,
-    cwd,
-    opened,
-    launchedAt,
-  }).catch(() => {});
+function _targetFlags(options: LaunchOptions): string[] {
+  const flags: string[] = [];
+  if (options.from !== undefined) flags.push(`--from ${options.from}`);
+  if (options.mergeBasePlace === false) flags.push('--no-base-place');
+  return flags;
+}
+
+function _listFlags(flags: string[]): string {
+  if (flags.length <= 1) return flags.join('');
+  return `${flags.slice(0, -1).join(', ')} and ${flags[flags.length - 1]}`;
 }
 
 interface LaunchArgs {
@@ -130,13 +190,15 @@ interface LaunchArgs {
   place?: string;
   placeId?: number;
   universeId?: number;
+  from?: LaunchSource;
+  basePlace?: boolean;
 }
 
 export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
   group: 'process',
   name: 'launch',
   description:
-    "Launch Roblox Studio, by default with the place of the nearest deploy.nevermore.json's default target, or else a new Baseplate",
+    "Launch Roblox Studio with the nearest deploy.nevermore.json's default target, or else a new Baseplate",
   category: 'infrastructure',
   safety: 'none',
   scope: 'standalone',
@@ -157,6 +219,17 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
         'Cloud universe id for the place (recommended with --place-id)',
       type: 'number',
     }),
+    from: arg.option({
+      description:
+        "Where the target's place comes from: studio, the place on Roblox (default), or checkout, " +
+        'a throwaway build of this checkout',
+      choices: LAUNCH_SOURCES,
+    }),
+    basePlace: arg.flag({
+      description:
+        "With --from checkout, merge the target's base place under the code. --no-base-place builds the code alone",
+      default: true,
+    }),
   },
   handler: async (args) =>
     launchHandlerAsync({
@@ -164,5 +237,7 @@ export const launchCommand = defineCommand<LaunchArgs, LaunchResult>({
       placePath: args.place,
       placeId: args.placeId,
       universeId: args.universeId,
+      from: args.from,
+      mergeBasePlace: args.basePlace,
     }),
 });
