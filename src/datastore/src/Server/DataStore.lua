@@ -603,6 +603,11 @@ function DataStore._doDataSync(
 		promise:Resolve(
 			maid:GivePromise(
 				DataStorePromises.updateAsync(self._robloxDataStore, self._key, function(original, datastoreKeyInfo)
+					if promise:IsRejected() or not self.Destroy then
+						-- Cancel if we have another request, or if we were destroyed while Roblox queued this update
+						return nil
+					end
+
 					if self._sessionLockingEnabledHelper then
 						local unlocked = self._sessionLockingEnabledHelper:ToUnlockedProfile(original)
 						if unlocked.isValid then
@@ -612,11 +617,6 @@ function DataStore._doDataSync(
 							warn("[DataStore] - Cannot save, profile is stolen by another session")
 							return nil
 						end
-					end
-
-					if promise:IsRejected() then
-						-- Cancel if we have another request
-						return nil
 					end
 
 					local diffSnapshot
