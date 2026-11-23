@@ -30,7 +30,9 @@
   "dependencies": {
     "@quenty/loader": "workspace:*",
     "@quenty/maid": "workspace:*",
-    "@quenty/numbersequenceutils": "workspace:*"
+    "@quenty/numberrangeutils": "workspace:*",
+    "@quenty/numbersequenceutils": "workspace:*",
+    "@quenty/randomutils": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
