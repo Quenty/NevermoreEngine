@@ -21,6 +21,7 @@ export type Motor6DStackHumanoidInterface = {
 		self: Motor6DStackHumanoidInterface,
 		createTransformerCallback: CreateTransformerCallback
 	) -> () -> (),
+	StepAnimations: (self: Motor6DStackHumanoidInterface, dt: number) -> (),
 }
 
 export type CreateTransformerCallback = (
@@ -32,4 +33,5 @@ return TieDefinition.new("Motor6DStackHumanoid", {
 	ObserveMotor6DsBrio = TieDefinition.Types.METHOD,
 	ObserveMotor6DStacksBrio = TieDefinition.Types.METHOD,
 	PushForEachMotor6D = TieDefinition.Types.METHOD,
+	StepAnimations = TieDefinition.Types.METHOD,
 })

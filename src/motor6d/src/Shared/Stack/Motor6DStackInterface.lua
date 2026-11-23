@@ -16,9 +16,11 @@ export type Motor6DStackInterface = {
 		speed: number?
 	) -> Motor6DPhysicsTransformer.Motor6DPhysicsTransformer,
 	Push: (self: Motor6DStackInterface, transformer: Motor6DTransformer.Motor6DTransformer) -> () -> (),
+	StepAnimations: (self: Motor6DStackInterface, dt: number) -> (),
 }
 
 return TieDefinition.new("Motor6DStack", {
 	TransformFromCFrame = TieDefinition.Types.METHOD,
 	Push = TieDefinition.Types.METHOD,
+	StepAnimations = TieDefinition.Types.METHOD,
 }) :: TieDefinition.TieDefinition<Motor6DStackInterface>
