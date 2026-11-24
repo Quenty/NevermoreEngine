@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.53.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.53.1...@quenty/nevermore-cli@4.53.2) (2026-11-18)
+
+### Bug Fixes
+
+- **nevermore-cli:** Stop reinstalling pnpm globally during init ([#865](https://github.com/Quenty/NevermoreEngine/issues/865)) ([a3a187c](https://github.com/Quenty/NevermoreEngine/commit/a3a187c44c58c32c8e6c111e836eb0599b77840f))
+
 ## [4.53.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/nevermore-cli@4.53.0...@quenty/nevermore-cli@4.53.1) (2026-11-18)
 
 **Note:** Version bump only for package @quenty/nevermore-cli

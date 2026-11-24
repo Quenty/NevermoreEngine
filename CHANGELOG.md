@@ -2,6 +2,19 @@
 
 #### 🐛 Bug Fix
 
+- `@quenty/nevermore-cli@4.53.2`
+  - fix(nevermore-cli): Stop reinstalling pnpm globally during init [#865](https://github.com/Quenty/NevermoreEngine/pull/865) ([@Quenty](https://github.com/Quenty))
+
+#### Authors: 1
+
+- James Onnen ([@Quenty](https://github.com/Quenty))
+
+---
+
+# (Wed Nov 18 2026)
+
+#### 🐛 Bug Fix
+
 - `@quenty/access@1.13.2`, `@quenty/adorneeboundingbox@8.55.1`, `@quenty/adorneeutils@3.6.4`, `@quenty/animations@8.41.2`, `@quenty/attributeutils@14.39.2`, `@quenty/bindable-utils@1.1.4`, `@quenty/binder@14.48.2`, `@quenty/blend@12.51.2`, `@quenty/boundlinkutils@14.49.2`, `@quenty/brine@1.22.2`, `@quenty/brio@14.38.2`, `@quenty/camera@14.58.2`, `@quenty/characterutils@12.46.2`, `@quenty/chatproviderservice@9.76.2`, `@quenty/clienttranslator@14.55.2`, `@quenty/clipcharacters@12.56.2`, `@quenty/cmdrservice@13.65.1`, `@quenty/coreguienabler@12.47.2`, `@quenty/countdowntext@4.14.2`, `@quenty/datastore@13.60.1`, `@quenty/deathreport@10.62.2`, `@quenty/ellipticcurvecryptography@1.15.4`, `@quenty/elo@7.52.3`, `@quenty/experiencecalculator@2.14.4`, `@quenty/fakeskybox@11.33.2`, `@quenty/friendutils@12.44.2`, `@quenty/fzy@5.18.4`, `@quenty/gameconfig@12.72.2`, `@quenty/gameproductservice@14.76.2`, `@quenty/gameversionutils@3.10.2`, `@quenty/genericscreenguiprovider@13.54.2`, `@quenty/grouputils@10.33.2`, `@quenty/humanoidkillerutils@2.5.2`, `@quenty/humanoidtracker@13.44.2`, `@quenty/humanoidutils@2.21.2`, `@quenty/ik@15.75.1`, `@quenty/immediateutils@1.10.1`, `@quenty/influxdbclient@7.46.2`, `@quenty/inputkeymaputils@14.61.3`, `@quenty/instance-path@1.2.4`, `@quenty/instanceutils@13.38.2`, `@quenty/iris@1.9.1`, `@quenty/jecs@1.11.1`, `@quenty/jestutils@1.1.4`, `@quenty/lipsum@14.51.2`, `@quenty/maid@3.12.4`, `@quenty/marketplaceutils@11.35.2`, `@quenty/metricutils@2.5.1`, `@quenty/nevermoreclimanifest@1.11.2`, `@quenty/nevermore-test-runner@1.6.4`, `@quenty/observablecollection@12.55.1`, `@quenty/octree@11.17.4`, `@quenty/pagesutils@5.26.2`, `@quenty/permissionprovider@14.54.2`, `@quenty/physicsutils@8.36.2`, `@quenty/playermock@1.11.2`, `@quenty/playerbinder@14.52.2`, `@quenty/playerhumanoidbinder@14.53.2`, `@quenty/playersservicepromises@10.31.2`, `@quenty/playerthumbnailutils@10.31.2`, `@quenty/playerutils@8.46.2`, `@quenty/probability@2.3.6`, `@quenty/promise@10.25.2`, `@quenty/promisemaid@5.25.2`, `@quenty/ragdoll@15.74.1`, `@quenty/randomutils@6.20.4`, `@quenty/receiptprocessing@7.47.2`, `@quenty/remoting@12.46.2`, `@quenty/resetservice@11.52.2`, `@quenty/roblox-api-dump@8.37.2`, `@quenty/rogue-humanoid@10.69.1`, `@quenty/rogue-properties@11.65.1`, `@quenty/rx@13.35.2`, `@quenty/rxbinderutils@14.48.2`, `@quenty/saveslot@2.16.2`, `@quenty/scoredactionservice@16.62.3`, `@quenty/secrets@7.73.1`, `@quenty/servicebag@11.21.4`, `@quenty/settings-inputkeymap@10.79.3`, `@quenty/settings@11.76.1`, `@quenty/signal@7.13.5`, `@quenty/snackbar@11.57.2`, `@quenty/soundgroup@1.60.1`, `@quenty/steputils@3.9.4`, `@quenty/streamingutils@10.33.2`, `@quenty/string@3.5.4`, `@quenty/teamutils@10.40.2`, `@quenty/teleportserviceutils@10.8.2`, `@quenty/templateprovider@11.56.1`, `@quenty/throttle@10.15.4`, `@quenty/tie@10.52.2`, `@quenty/time@2.8.2`, `@quenty/timedtween@7.51.2`, `@quenty/transitionmodel@7.53.2`, `@quenty/userserviceutils@9.45.2`, `@quenty/vector3utils@10.12.4`, `@quenty/weldconstraintutils@3.2.4`, `@quenty/nevermore-cli@4.53.1`, `@quenty/studio-bridge@0.25.1`
   - test: Faster, deterministic tests with shared test utils [#864](https://github.com/Quenty/NevermoreEngine/pull/864) ([@Quenty](https://github.com/Quenty))
 
