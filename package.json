@@ -42,7 +42,8 @@
       [
         "npm",
         {
-          "forcePublish": false
+          "forcePublish": true,
+          "setRcToken": false
         }
       ],
       [

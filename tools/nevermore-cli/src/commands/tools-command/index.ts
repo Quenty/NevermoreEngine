@@ -4,6 +4,7 @@ import { ciPostDeployResultsCommand } from './ci-post-deploy-results.js';
 import { ciPostLintResultsCommand } from './ci-post-lint-results.js';
 import { ciPostTestResultsCommand } from './ci-post-test-results.js';
 import { DownloadRobloxTypes } from './download-roblox-types.js';
+import { npmTrustCommand } from './npm-trust-command.js';
 import { stripSourcemapJestCommand } from './strip-sourcemap-jest-command.js';
 
 export class ToolsCommand<T> implements CommandModule<T, NevermoreGlobalArgs> {
@@ -15,6 +16,7 @@ export class ToolsCommand<T> implements CommandModule<T, NevermoreGlobalArgs> {
     args.command(ciPostLintResultsCommand as any);
     args.command(ciPostTestResultsCommand as any);
     args.command(new DownloadRobloxTypes() as any);
+    args.command(npmTrustCommand as any);
     args.command(stripSourcemapJestCommand as any);
     return args as Argv<NevermoreGlobalArgs>;
   };

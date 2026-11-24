@@ -1,9 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  filterByTargetAsync,
-  listWorkspacePackagesAsync,
-} from '../../batch/changed-packages-utils.js';
+import { filterByTargetAsync } from '../../batch/changed-packages-utils.js';
+import { listWorkspacePackagesAsync } from '../../workspace-utils.js';
 import {
   type TestRojoProject,
   findTestProjectSlug,

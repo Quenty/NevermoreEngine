@@ -115,7 +115,7 @@ export async function detectPackageManagerAsync(
  * `C:\Users\James Onnen` are the same directory and must compare equal.
  * Returns the input unchanged when the path does not exist.
  */
-async function resolveRealPathAsync(target: string): Promise<string> {
+export async function resolveRealPathAsync(target: string): Promise<string> {
   try {
     return await fs.realpath(target);
   } catch {
@@ -124,7 +124,7 @@ async function resolveRealPathAsync(target: string): Promise<string> {
 }
 
 /** Windows paths are case-insensitive; POSIX ones are not. */
-function isSamePath(left: string, right: string): boolean {
+export function isSamePath(left: string, right: string): boolean {
   if (process.platform === 'win32') {
     return left.toLowerCase() === right.toLowerCase();
   }

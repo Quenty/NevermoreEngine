@@ -9,6 +9,7 @@ permissions:
   contents: write        # Create releases and tags
   pull-requests: write   # Comment on PRs with release info
   packages: write        # Publish to GitHub Packages
+  id-token: write        # npm trusted publishing (OIDC); npm trusts this workflow file by name
 
 concurrency:
   group: release-${{ github.event.pull_request.number || github.ref }}
@@ -49,11 +50,8 @@ jobs:
         run: |
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> .npmrc
           echo -e "\n//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          echo -e "\n//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -64,16 +62,14 @@ jobs:
       - name: Reset .npmrc
         run: git checkout -- .npmrc
 
-      - name: Verify npm auth
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
-          npm whoami --registry=https://registry.npmjs.org/
+      # Trusted publishing can't create packages, so a new one would fail
+      # partway through lerna publish. Fail here instead, with the fix.
+      - name: Verify packages exist on npm
+        run: node tools/nevermore-cli/dist/nevermore.js tools npm-trust --check
 
+      # No npm token: lerna exchanges this job's OIDC token per package.
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.NEVERMORE_CI_PAT || secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx auto shipit
 
