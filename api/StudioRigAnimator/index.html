@@ -12,8 +12,8 @@ maid:GiveTask(StudioRigAnimator.new(humanoid))
 ```lua
 maid:GiveTask(StudioRigAnimator.new(humanoid))
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/StudioRigAnimator"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StudioRigAnimator" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/StudioRigAnimator" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.80262f70.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.bc287bad.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.faa87b13.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.8acc482c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -23,7 +23,9 @@ maid:GiveTask(StudioRigAnimator.new(humanoid))
 <p>Helps to run animations in hoarcekat or in Studio when the game isn't running.</p>
 <pre class="language-lua"><code class="language-lua">maid<span class="token punctuation">:</span><span class="token function">GiveTask</span><span class="token punctuation">(</span>StudioRigAnimator<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>humanoid<span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/animations/src/Shared/Testing/StudioRigAnimator.lua#L41"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StudioRigAnimator<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>animatorOrHumanoid<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Animator" target="_blank" rel="noopener noreferrer">Animator<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="op_lSLc"> | </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Humanoid" target="_blank" rel="noopener noreferrer">Humanoid<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StudioRigAnimator">StudioRigAnimator</a></code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="AnimationsStepped"><code style="text-decoration:none">AnimationsStepped</code><a href="#AnimationsStepped" class="hash-link" aria-label="Direct link to AnimationsStepped" title="Direct link to AnimationsStepped" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/animations/src/Shared/Testing/StudioRigAnimator.lua#L54"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StudioRigAnimator<!-- -->.<!-- -->AnimationsStepped<!-- -->:<!-- --> </code> <code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Signal">Signal</a></code><code class="op_lSLc">&lt;</code><code class="blue_P4bS">number</code><code class="op_lSLc">&gt;</code></div><div>
+<p>Fires with the delta time after the animator steps, so other animation layers can step on top.</p>
+</div><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new"><code style="text-decoration:none">new</code><a href="#new" class="hash-link" aria-label="Direct link to new" title="Direct link to new" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/animations/src/Shared/Testing/StudioRigAnimator.lua#L43"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>StudioRigAnimator<!-- -->.</code><code class="green_DgR4">new</code><code>(</code><code>animationTarget<!-- -->: </code><code class="blue_P4bS">AnimationUtils.AnimationTarget</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/StudioRigAnimator">StudioRigAnimator</a></code></div><div>
 <p>
   Constructs a new rig animator which will play the animations for the lifetime of the
   object.
@@ -35,9 +37,9 @@ maid:GiveTask(StudioRigAnimator.new(humanoid))
             &quot;desc&quot;: &quot;Constructs a new rig animator which will play the animations for the lifetime of the\nobject.&quot;,
             &quot;params&quot;: [
                 {
-                    &quot;name&quot;: &quot;animatorOrHumanoid&quot;,
+                    &quot;name&quot;: &quot;animationTarget&quot;,
                     &quot;desc&quot;: &quot;&quot;,
-                    &quot;lua_type&quot;: &quot;Animator | Humanoid&quot;
+                    &quot;lua_type&quot;: &quot;AnimationUtils.AnimationTarget&quot;
                 }
             ],
             &quot;returns&quot;: [
@@ -48,12 +50,22 @@ maid:GiveTask(StudioRigAnimator.new(humanoid))
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 41,
+                &quot;line&quot;: 43,
                 &quot;path&quot;: &quot;src/animations/src/Shared/Testing/StudioRigAnimator.lua&quot;
             }
         }
     ],
-    &quot;properties&quot;: [],
+    &quot;properties&quot;: [
+        {
+            &quot;name&quot;: &quot;AnimationsStepped&quot;,
+            &quot;desc&quot;: &quot;Fires with the delta time after the animator steps, so other animation layers can step on top.\n\n\t&quot;,
+            &quot;lua_type&quot;: &quot;Signal&lt;number&gt;&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 54,
+                &quot;path&quot;: &quot;src/animations/src/Shared/Testing/StudioRigAnimator.lua&quot;
+            }
+        }
+    ],
     &quot;types&quot;: [],
     &quot;name&quot;: &quot;StudioRigAnimator&quot;,
     &quot;desc&quot;: &quot;Helps to run animations in hoarcekat or in Studio when the game isn&#x27;t running.\n\n```lua\nmaid:GiveTask(StudioRigAnimator.new(humanoid))\n```&quot;,
@@ -61,6 +73,6 @@ maid:GiveTask(StudioRigAnimator.new(humanoid))
         &quot;line&quot;: 11,
         &quot;path&quot;: &quot;src/animations/src/Shared/Testing/StudioRigAnimator.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#AnimationsStepped" class="table-of-contents__link toc-highlight">AnimationsStepped</a></li></ul></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#new" class="table-of-contents__link toc-highlight">.new</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>

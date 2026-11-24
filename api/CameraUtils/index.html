@@ -14,7 +14,7 @@ local model = viewportFrame:FindFirstChildWhichIsA(&quot;Model&quot;)
 RunService.RenderStepped:Connect(function()
 	local cframe, size = model:GetBoundingBox()
 	local size = viewportFrame.AbsoluteSize
-	local aspectRatio = size.x/size.y
+	local aspectRatio = size.X/size.Y
 	local dist = CameraUtils.fitBoundingBoxToCamera(size, camera.FieldOfView, aspectRatio)
 	camera.CFrame = cframe.Position + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)
 		:vectorToWorldSpace(Vector3.new(0, 0, -dist))
@@ -30,14 +30,14 @@ local model = viewportFrame:FindFirstChildWhichIsA(&quot;Model&quot;)
 RunService.RenderStepped:Connect(function()
 	local cframe, size = model:GetBoundingBox()
 	local size = viewportFrame.AbsoluteSize
-	local aspectRatio = size.x/size.y
+	local aspectRatio = size.X/size.Y
 	local dist = CameraUtils.fitBoundingBoxToCamera(size, camera.FieldOfView, aspectRatio)
 	camera.CFrame = cframe.Position + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)
 		:vectorToWorldSpace(Vector3.new(0, 0, -dist))
 end)
 ```"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/CameraUtils"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CameraUtils" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/CameraUtils" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.80262f70.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.bc287bad.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.faa87b13.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.8acc482c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -53,15 +53,15 @@ end)
 RunService<span class="token punctuation">.</span>RenderStepped<span class="token punctuation">:</span><span class="token function">Connect</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	<span class="token keyword">local</span> cframe<span class="token punctuation">,</span> size <span class="token operator">=</span> model<span class="token punctuation">:</span><span class="token function">GetBoundingBox</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 	<span class="token keyword">local</span> size <span class="token operator">=</span> viewportFrame<span class="token punctuation">.</span>AbsoluteSize
-	<span class="token keyword">local</span> aspectRatio <span class="token operator">=</span> size<span class="token punctuation">.</span>x<span class="token operator">/</span>size<span class="token punctuation">.</span>y
+	<span class="token keyword">local</span> aspectRatio <span class="token operator">=</span> size<span class="token punctuation">.</span>X<span class="token operator">/</span>size<span class="token punctuation">.</span>Y
 	<span class="token keyword">local</span> dist <span class="token operator">=</span> CameraUtils<span class="token punctuation">.</span><span class="token function">fitBoundingBoxToCamera</span><span class="token punctuation">(</span>size<span class="token punctuation">,</span> camera<span class="token punctuation">.</span>FieldOfView<span class="token punctuation">,</span> aspectRatio<span class="token punctuation">)</span>
 	camera<span class="token punctuation">.</span>CFrame <span class="token operator">=</span> cframe<span class="token punctuation">.</span>Position <span class="token operator">+</span> CFrame<span class="token punctuation">.</span><span class="token function">Angles</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> math<span class="token punctuation">.</span>pi<span class="token operator">*</span>os<span class="token punctuation">.</span><span class="token function">clock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> math<span class="token punctuation">.</span>pi<span class="token punctuation">,</span> <span class="token operator">-</span>math<span class="token punctuation">.</span>pi<span class="token operator">/</span><span class="token number">8</span><span class="token punctuation">)</span>
 		<span class="token punctuation">:</span><span class="token function">vectorToWorldSpace</span><span class="token punctuation">(</span>Vector3<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>dist<span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token keyword">end</span><span class="token punctuation">)</span>
 </code></pre>
-</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getCubeoidDiameter"><code style="text-decoration:none">getCubeoidDiameter</code><a href="#getCubeoidDiameter" class="hash-link" aria-label="Direct link to getCubeoidDiameter" title="Direct link to getCubeoidDiameter" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L32"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">getCubeoidDiameter</code><code>(</code><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">number</code></div><div>
+</div></header><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="functions">Functions<a href="#functions" class="hash-link" aria-label="Direct link to Functions" title="Direct link to Functions" translate="no">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getCubeoidDiameter"><code style="text-decoration:none">getCubeoidDiameter</code><a href="#getCubeoidDiameter" class="hash-link" aria-label="Direct link to getCubeoidDiameter" title="Direct link to getCubeoidDiameter" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L51"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">getCubeoidDiameter</code><code>(</code><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>) → </code><code class="blue_P4bS">number</code></div><div>
 <p>Computes the diameter of a cubeid</p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitBoundingBoxToCamera"><code style="text-decoration:none">fitBoundingBoxToCamera</code><a href="#fitBoundingBoxToCamera" class="hash-link" aria-label="Direct link to fitBoundingBoxToCamera" title="Direct link to fitBoundingBoxToCamera" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L49"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitBoundingBoxToCamera</code><code>(</code><div class="inset_uKQm"><div><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitBoundingBoxToCamera"><code style="text-decoration:none">fitBoundingBoxToCamera</code><a href="#fitBoundingBoxToCamera" class="hash-link" aria-label="Direct link to fitBoundingBoxToCamera" title="Direct link to fitBoundingBoxToCamera" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L68"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitBoundingBoxToCamera</code><code>(</code><div class="inset_uKQm"><div><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Size of the bounding box</p>
 </span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Field of view in degrees (vertical)</p>
@@ -74,7 +74,55 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
   Use spherical bounding box to calculate how far back to move a camera
   See: <a href="https://community.khronos.org/t/zoom-to-fit-screen/59857/12">https://community.khronos.org/t/zoom-to-fit-screen/59857/12</a>
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitSphereToCamera"><code style="text-decoration:none">fitSphereToCamera</code><a href="#fitSphereToCamera" class="hash-link" aria-label="Direct link to fitSphereToCamera" title="Direct link to fitSphereToCamera" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L63"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitSphereToCamera</code><code>(</code><div class="inset_uKQm"><div><code>radius<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitBoundingBoxToCameraRect"><code style="text-decoration:none">fitBoundingBoxToCameraRect</code><a href="#fitBoundingBoxToCameraRect" class="hash-link" aria-label="Direct link to fitBoundingBoxToCameraRect" title="Direct link to fitBoundingBoxToCameraRect" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L94"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitBoundingBoxToCameraRect</code><code>(</code><div class="inset_uKQm"><div><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Size of the bounding box</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>rect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera position relative to the bounding box center, in camera space</p>
+</span></span></div><div>
+<p>
+  Like <a href="/NevermoreEngine/api/CameraUtils#fitBoundingBoxToCamera">CameraUtils.fitBoundingBoxToCamera</a>, but frames the box in a sub-rect of the viewport.
+  See <a href="/NevermoreEngine/api/CameraUtils#fitSphereToCameraRect">CameraUtils.fitSphereToCameraRect</a>.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- Keep a hat clear of a label along the bottom of a viewport frame</span>
+<span class="token keyword">local</span> viewportSize <span class="token operator">=</span> viewportFrame<span class="token punctuation">.</span>AbsoluteSize
+<span class="token keyword">local</span> labelTop <span class="token operator">=</span> label<span class="token punctuation">.</span>AbsolutePosition<span class="token punctuation">.</span>Y <span class="token operator">-</span> viewportFrame<span class="token punctuation">.</span>AbsolutePosition<span class="token punctuation">.</span>Y
+<span class="token keyword">local</span> visibleRect <span class="token operator">=</span> Rect<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> labelTop <span class="token operator">/</span> viewportSize<span class="token punctuation">.</span>Y<span class="token punctuation">)</span>
+
+<span class="token keyword">local</span> boxCFrame<span class="token punctuation">,</span> size <span class="token operator">=</span> hat<span class="token punctuation">:</span><span class="token function">GetBoundingBox</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">local</span> offset <span class="token operator">=</span> CameraUtils<span class="token punctuation">.</span><span class="token function">fitBoundingBoxToCameraRect</span><span class="token punctuation">(</span>size<span class="token punctuation">,</span> camera<span class="token punctuation">.</span>FieldOfView<span class="token punctuation">,</span> viewportSize<span class="token punctuation">.</span>X <span class="token operator">/</span> viewportSize<span class="token punctuation">.</span>Y<span class="token punctuation">,</span> visibleRect<span class="token punctuation">)</span>
+camera<span class="token punctuation">.</span>CFrame <span class="token operator">=</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>boxCFrame<span class="token punctuation">.</span>Position<span class="token punctuation">)</span> <span class="token operator">*</span> rotation <span class="token operator">*</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>offset<span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitBoundingBoxToCameraRectExact"><code style="text-decoration:none">fitBoundingBoxToCameraRectExact</code><a href="#fitBoundingBoxToCameraRectExact" class="hash-link" aria-label="Direct link to fitBoundingBoxToCameraRectExact" title="Direct link to fitBoundingBoxToCameraRectExact" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L118"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitBoundingBoxToCameraRectExact</code><code>(</code><div class="inset_uKQm"><div><code>boxCFrame<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/CFrame" target="_blank" rel="noopener noreferrer">CFrame<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>CFrame of the bounding box</p>
+</span></span></div><div><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Size of the bounding box</p>
+</span></span></div><div><code>rotation<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/CFrame" target="_blank" rel="noopener noreferrer">CFrame<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera rotation. Position is ignored.</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>subrect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera position relative to the bounding box center, in camera space</p>
+</span></span></div><div>
+<p>
+  Like <a href="/NevermoreEngine/api/CameraUtils#fitBoundingBoxToCameraRect">CameraUtils.fitBoundingBoxToCameraRect</a>, but fits the box's corners exactly for the given
+  camera rotation instead of its bounding sphere. Much tighter for boxes that aren't cube shaped,
+  but the distance changes as the camera rotates around the box.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token keyword">local</span> boxCFrame<span class="token punctuation">,</span> size <span class="token operator">=</span> model<span class="token punctuation">:</span><span class="token function">GetBoundingBox</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">local</span> offset <span class="token operator">=</span> CameraUtils<span class="token punctuation">.</span><span class="token function">fitBoundingBoxToCameraRectExact</span><span class="token punctuation">(</span>boxCFrame<span class="token punctuation">,</span> size<span class="token punctuation">,</span> rotation<span class="token punctuation">,</span> camera<span class="token punctuation">.</span>FieldOfView<span class="token punctuation">,</span> aspectRatio<span class="token punctuation">,</span> visibleRect<span class="token punctuation">)</span>
+camera<span class="token punctuation">.</span>CFrame <span class="token operator">=</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>boxCFrame<span class="token punctuation">.</span>Position<span class="token punctuation">)</span> <span class="token operator">*</span> rotation <span class="token operator">*</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>offset<span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitSphereToCamera"><code style="text-decoration:none">fitSphereToCamera</code><a href="#fitSphereToCamera" class="hash-link" aria-label="Direct link to fitSphereToCamera" title="Direct link to fitSphereToCamera" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L143"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitSphereToCamera</code><code>(</code><div class="inset_uKQm"><div><code>radius<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Radius of the sphere</p>
 </span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
 <p>Field of view in degrees (vertical)</p>
@@ -87,7 +135,109 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
   Fits a sphere to the camera, computing how far back to zoom the camera from
   the center of the sphere.
 </p>
-</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isOnScreen"><code style="text-decoration:none">isOnScreen</code><a href="#isOnScreen" class="hash-link" aria-label="Direct link to isOnScreen" title="Direct link to isOnScreen" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L79"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">isOnScreen</code><code>(</code><div class="inset_uKQm"><div><code>camera<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Camera" target="_blank" rel="noopener noreferrer">Camera<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>position<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitSphereToCameraRect"><code style="text-decoration:none">fitSphereToCameraRect</code><a href="#fitSphereToCameraRect" class="hash-link" aria-label="Direct link to fitSphereToCameraRect" title="Direct link to fitSphereToCameraRect" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L174"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitSphereToCameraRect</code><code>(</code><div class="inset_uKQm"><div><code>radius<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Radius of the sphere</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>subrect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera position relative to the sphere center, in camera space</p>
+</span></span></div><div>
+<p>
+  Like <a href="/NevermoreEngine/api/CameraUtils#fitSphereToCamera">CameraUtils.fitSphereToCamera</a>, but frames the sphere in a sub-rect of the viewport,
+  such as the space left visible by UI. Rotation is unchanged.
+</p>
+<p>
+  Returns both the distance and the sideways shift that centers the sphere in the rect.
+  The distance alone would center the sphere on the full viewport, under the UI.
+</p>
+<p>
+  Off-center spheres project stretched away from the viewport center, so the sphere's outline
+  is centered in the rect rather than its center point. It touches both edges on the limiting axis.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- Frame a sphere left of a panel covering the right 40% of the screen</span>
+<span class="token keyword">local</span> offset <span class="token operator">=</span> CameraUtils<span class="token punctuation">.</span><span class="token function">fitSphereToCameraRect</span><span class="token punctuation">(</span>radius<span class="token punctuation">,</span> camera<span class="token punctuation">.</span>FieldOfView<span class="token punctuation">,</span> aspectRatio<span class="token punctuation">,</span> Rect<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0.6</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+camera<span class="token punctuation">.</span>CFrame <span class="token operator">=</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>center<span class="token punctuation">)</span> <span class="token operator">*</span> rotation <span class="token operator">*</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>offset<span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fitPointsToCameraRect"><code style="text-decoration:none">fitPointsToCameraRect</code><a href="#fitPointsToCameraRect" class="hash-link" aria-label="Direct link to fitPointsToCameraRect" title="Direct link to fitPointsToCameraRect" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L202"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">fitPointsToCameraRect</code><code>(</code><div class="inset_uKQm"><div><code>points<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Points in camera space (x right, y up, looking down -z), relative to an origin</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>subrect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera position relative to the origin, in camera space</p>
+</span></span></div><div>
+<p>
+  Fits points into a sub-rect of the viewport exactly, without rotating the camera. Returns the
+  closest camera position that keeps every point inside the rect. On the limiting axis the points
+  touch both edges, and on the other axis they're centered between the edges.
+</p>
+<p>
+  For a fixed rotation, keeping a point inside an edge is linear in the camera position, so the
+  closest distance has a closed form per axis.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getPointsCameraSubRectShift"><code style="text-decoration:none">getPointsCameraSubRectShift</code><a href="#getPointsCameraSubRectShift" class="hash-link" aria-label="Direct link to getPointsCameraSubRectShift" title="Direct link to getPointsCameraSubRectShift" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L232"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">getPointsCameraSubRectShift</code><code>(</code><div class="inset_uKQm"><div><code>points<!-- -->: </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Points in camera space (x right, y up, looking down -z), relative to an origin</p>
+</span></span></div><div><code>depth<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Distance from the camera to the origin along the look vector</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>subrect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera-space offset</p>
+</span></span></div><div>
+<p>
+  Computes the camera-space shift that centers points in a sub-rect of the viewport at the given
+  depth, without rotating the camera. Matches <a href="/NevermoreEngine/api/CameraUtils#fitPointsToCameraRect">CameraUtils.fitPointsToCameraRect</a> at its depth.
+</p>
+<p>
+  Use this when the distance comes from elsewhere, such as a spring. Unlike
+  <a href="/NevermoreEngine/api/CameraUtils#getCameraSubRectShift">CameraUtils.getCameraSubRectShift</a>, this centers the points' projected outline.
+</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="boundingBoxPoints"><code style="text-decoration:none">boundingBoxPoints</code><a href="#boundingBoxPoints" class="hash-link" aria-label="Direct link to boundingBoxPoints" title="Direct link to boundingBoxPoints" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L251"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">boundingBoxPoints</code><code>(</code><div class="inset_uKQm"><div><code>boxCFrame<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/CFrame" target="_blank" rel="noopener noreferrer">CFrame<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>CFrame of the bounding box</p>
+</span></span></div><div><code>size<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Size of the bounding box</p>
+</span></span></div></div><code>) → </code><code class="purple_ieR2">{</code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code class="purple_ieR2">}</code></div><div>
+<p>Returns the 8 corners of a bounding box in world space.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getCameraSubRectShift"><code style="text-decoration:none">getCameraSubRectShift</code><a href="#getCameraSubRectShift" class="hash-link" aria-label="Direct link to getCameraSubRectShift" title="Direct link to getCameraSubRectShift" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L326"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">getCameraSubRectShift</code><code>(</code><div class="inset_uKQm"><div><code>depth<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Distance from the camera to the subject along the look vector</p>
+</span></span></div><div><code>fovDeg<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Field of view in degrees (vertical)</p>
+</span></span></div><div><code>aspectRatio<!-- -->: </code><code class="blue_P4bS">number</code><code>,</code><span class="inlineDescription_G7Er">-- <span>
+<p>Aspect ratio of the screen</p>
+</span></span></div><div><code>subrect<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Rect" target="_blank" rel="noopener noreferrer">Rect<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Normalized viewport rect (0 to 1, top-left origin)</p>
+</span></span></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><span class="inlineDescription_G7Er">-- <span>
+<p>Camera-space offset</p>
+</span></span></div><div>
+<p>
+  Computes the camera-space shift that centers a subject at <code>depth</code> in a sub-rect of the
+  viewport, without rotating the camera.
+</p>
+<p>
+  The subject is placed on the angle bisector of the rect's edges rather than its screen-space
+  center, since off-center objects project stretched away from the viewport center. This centers
+  the outline of a sphere at any depth and radius.
+</p>
+<p>
+  Use this when the distance comes from elsewhere, such as a spring. Otherwise prefer
+  <a href="/NevermoreEngine/api/CameraUtils#fitSphereToCameraRect">CameraUtils.fitSphereToCameraRect</a>.
+</p>
+<pre class="language-lua"><code class="language-lua"><span class="token comment">-- Center the subject above a dialog box covering the bottom 30% of the screen</span>
+<span class="token keyword">local</span> shift <span class="token operator">=</span> CameraUtils<span class="token punctuation">.</span><span class="token function">getCameraSubRectShift</span><span class="token punctuation">(</span>distance<span class="token punctuation">,</span> camera<span class="token punctuation">.</span>FieldOfView<span class="token punctuation">,</span> aspectRatio<span class="token punctuation">,</span> Rect<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0.7</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+camera<span class="token punctuation">.</span>CFrame <span class="token operator">=</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>subjectPosition<span class="token punctuation">)</span> <span class="token operator">*</span> rotation <span class="token operator">*</span> CFrame<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>shift <span class="token operator">+</span> Vector3<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> distance<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="isOnScreen"><code style="text-decoration:none">isOnScreen</code><a href="#isOnScreen" class="hash-link" aria-label="Direct link to isOnScreen" title="Direct link to isOnScreen" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/camera/src/Client/CameraUtils.lua#L358"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CameraUtils<!-- -->.</code><code class="green_DgR4">isOnScreen</code><code>(</code><div class="inset_uKQm"><div><code>camera<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/class/Camera" target="_blank" rel="noopener noreferrer">Camera<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code><code>,</code></div><div><code>position<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="https://developer.roblox.com/en-us/api-reference/datatype/Vector3" target="_blank" rel="noopener noreferrer">Vector3<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound" style="color:gray;vertical-align:middle;margin-left:2px"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></code></div></div><code>) → </code><code class="blue_P4bS">boolean</code></div><div>
 <p>Checks if a position is on screen on a camera</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
@@ -109,7 +259,7 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 32,
+                &quot;line&quot;: 51,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
             }
         },
@@ -141,7 +291,91 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 49,
+                &quot;line&quot;: 68,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;fitBoundingBoxToCameraRect&quot;,
+            &quot;desc&quot;: &quot;Like [CameraUtils.fitBoundingBoxToCamera], but frames the box in a sub-rect of the viewport.\nSee [CameraUtils.fitSphereToCameraRect].\n\n```lua\n-- Keep a hat clear of a label along the bottom of a viewport frame\nlocal viewportSize = viewportFrame.AbsoluteSize\nlocal labelTop = label.AbsolutePosition.Y - viewportFrame.AbsolutePosition.Y\nlocal visibleRect = Rect.new(0, 0, 1, labelTop / viewportSize.Y)\n\nlocal boxCFrame, size = hat:GetBoundingBox()\nlocal offset = CameraUtils.fitBoundingBoxToCameraRect(size, camera.FieldOfView, viewportSize.X / viewportSize.Y, visibleRect)\ncamera.CFrame = CFrame.new(boxCFrame.Position) * rotation * CFrame.new(offset)\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;size&quot;,
+                    &quot;desc&quot;: &quot;Size of the bounding box&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;rect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera position relative to the bounding box center, in camera space&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 94,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;fitBoundingBoxToCameraRectExact&quot;,
+            &quot;desc&quot;: &quot;Like [CameraUtils.fitBoundingBoxToCameraRect], but fits the box&#x27;s corners exactly for the given\ncamera rotation instead of its bounding sphere. Much tighter for boxes that aren&#x27;t cube shaped,\nbut the distance changes as the camera rotates around the box.\n\n```lua\nlocal boxCFrame, size = model:GetBoundingBox()\nlocal offset = CameraUtils.fitBoundingBoxToCameraRectExact(boxCFrame, size, rotation, camera.FieldOfView, aspectRatio, visibleRect)\ncamera.CFrame = CFrame.new(boxCFrame.Position) * rotation * CFrame.new(offset)\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;boxCFrame&quot;,
+                    &quot;desc&quot;: &quot;CFrame of the bounding box&quot;,
+                    &quot;lua_type&quot;: &quot;CFrame&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;size&quot;,
+                    &quot;desc&quot;: &quot;Size of the bounding box&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;rotation&quot;,
+                    &quot;desc&quot;: &quot;Camera rotation. Position is ignored.&quot;,
+                    &quot;lua_type&quot;: &quot;CFrame&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;subrect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera position relative to the bounding box center, in camera space&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 118,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
             }
         },
@@ -173,7 +407,187 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 63,
+                &quot;line&quot;: 143,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;fitSphereToCameraRect&quot;,
+            &quot;desc&quot;: &quot;Like [CameraUtils.fitSphereToCamera], but frames the sphere in a sub-rect of the viewport,\nsuch as the space left visible by UI. Rotation is unchanged.\n\nReturns both the distance and the sideways shift that centers the sphere in the rect.\nThe distance alone would center the sphere on the full viewport, under the UI.\n\nOff-center spheres project stretched away from the viewport center, so the sphere&#x27;s outline\nis centered in the rect rather than its center point. It touches both edges on the limiting axis.\n\n```lua\n-- Frame a sphere left of a panel covering the right 40% of the screen\nlocal offset = CameraUtils.fitSphereToCameraRect(radius, camera.FieldOfView, aspectRatio, Rect.new(0, 0, 0.6, 1))\ncamera.CFrame = CFrame.new(center) * rotation * CFrame.new(offset)\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;radius&quot;,
+                    &quot;desc&quot;: &quot;Radius of the sphere&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;subrect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera position relative to the sphere center, in camera space&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 174,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;fitPointsToCameraRect&quot;,
+            &quot;desc&quot;: &quot;Fits points into a sub-rect of the viewport exactly, without rotating the camera. Returns the\nclosest camera position that keeps every point inside the rect. On the limiting axis the points\ntouch both edges, and on the other axis they&#x27;re centered between the edges.\n\nFor a fixed rotation, keeping a point inside an edge is linear in the camera position, so the\nclosest distance has a closed form per axis.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;points&quot;,
+                    &quot;desc&quot;: &quot;Points in camera space (x right, y up, looking down -z), relative to an origin&quot;,
+                    &quot;lua_type&quot;: &quot;{ Vector3 }&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;subrect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera position relative to the origin, in camera space&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 202,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getPointsCameraSubRectShift&quot;,
+            &quot;desc&quot;: &quot;Computes the camera-space shift that centers points in a sub-rect of the viewport at the given\ndepth, without rotating the camera. Matches [CameraUtils.fitPointsToCameraRect] at its depth.\n\nUse this when the distance comes from elsewhere, such as a spring. Unlike\n[CameraUtils.getCameraSubRectShift], this centers the points&#x27; projected outline.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;points&quot;,
+                    &quot;desc&quot;: &quot;Points in camera space (x right, y up, looking down -z), relative to an origin&quot;,
+                    &quot;lua_type&quot;: &quot;{ Vector3 }&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;depth&quot;,
+                    &quot;desc&quot;: &quot;Distance from the camera to the origin along the look vector&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;subrect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera-space offset&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 232,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;boundingBoxPoints&quot;,
+            &quot;desc&quot;: &quot;Returns the 8 corners of a bounding box in world space.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;boxCFrame&quot;,
+                    &quot;desc&quot;: &quot;CFrame of the bounding box&quot;,
+                    &quot;lua_type&quot;: &quot;CFrame&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;size&quot;,
+                    &quot;desc&quot;: &quot;Size of the bounding box&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;{ Vector3 }&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 251,
+                &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;getCameraSubRectShift&quot;,
+            &quot;desc&quot;: &quot;Computes the camera-space shift that centers a subject at `depth` in a sub-rect of the\nviewport, without rotating the camera.\n\nThe subject is placed on the angle bisector of the rect&#x27;s edges rather than its screen-space\ncenter, since off-center objects project stretched away from the viewport center. This centers\nthe outline of a sphere at any depth and radius.\n\nUse this when the distance comes from elsewhere, such as a spring. Otherwise prefer\n[CameraUtils.fitSphereToCameraRect].\n\n```lua\n-- Center the subject above a dialog box covering the bottom 30% of the screen\nlocal shift = CameraUtils.getCameraSubRectShift(distance, camera.FieldOfView, aspectRatio, Rect.new(0, 0, 1, 0.7))\ncamera.CFrame = CFrame.new(subjectPosition) * rotation * CFrame.new(shift + Vector3.new(0, 0, distance))\n```&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;depth&quot;,
+                    &quot;desc&quot;: &quot;Distance from the camera to the subject along the look vector&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;fovDeg&quot;,
+                    &quot;desc&quot;: &quot;Field of view in degrees (vertical)&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;aspectRatio&quot;,
+                    &quot;desc&quot;: &quot;Aspect ratio of the screen&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;subrect&quot;,
+                    &quot;desc&quot;: &quot;Normalized viewport rect (0 to 1, top-left origin)&quot;,
+                    &quot;lua_type&quot;: &quot;Rect&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;Camera-space offset&quot;,
+                    &quot;lua_type&quot;: &quot;Vector3&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 326,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
             }
         },
@@ -200,7 +614,7 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
             ],
             &quot;function_type&quot;: &quot;static&quot;,
             &quot;source&quot;: {
-                &quot;line&quot;: 79,
+                &quot;line&quot;: 358,
                 &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
             }
         }
@@ -208,11 +622,11 @@ RunService<span class="token punctuation">.</span>RenderStepped<span class="toke
     &quot;properties&quot;: [],
     &quot;types&quot;: [],
     &quot;name&quot;: &quot;CameraUtils&quot;,
-    &quot;desc&quot;: &quot;Utility methods for cameras. These are great for viewport frames.\n\n```lua\n-- Sample viewport frame fitting of a model\nlocal viewportFrame = ...\nlocal camera = viewportFrame.CurrentCamera\nlocal model = viewportFrame:FindFirstChildWhichIsA(\&quot;Model\&quot;)\n\nRunService.RenderStepped:Connect(function()\n\tlocal cframe, size = model:GetBoundingBox()\n\tlocal size = viewportFrame.AbsoluteSize\n\tlocal aspectRatio = size.x/size.y\n\tlocal dist = CameraUtils.fitBoundingBoxToCamera(size, camera.FieldOfView, aspectRatio)\n\tcamera.CFrame = cframe.Position + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)\n\t\t:vectorToWorldSpace(Vector3.new(0, 0, -dist))\nend)\n```&quot;,
+    &quot;desc&quot;: &quot;Utility methods for cameras. These are great for viewport frames.\n\n```lua\n-- Sample viewport frame fitting of a model\nlocal viewportFrame = ...\nlocal camera = viewportFrame.CurrentCamera\nlocal model = viewportFrame:FindFirstChildWhichIsA(\&quot;Model\&quot;)\n\nRunService.RenderStepped:Connect(function()\n\tlocal cframe, size = model:GetBoundingBox()\n\tlocal size = viewportFrame.AbsoluteSize\n\tlocal aspectRatio = size.X/size.Y\n\tlocal dist = CameraUtils.fitBoundingBoxToCamera(size, camera.FieldOfView, aspectRatio)\n\tcamera.CFrame = cframe.Position + CFrame.Angles(0, math.pi*os.clock() % math.pi, -math.pi/8)\n\t\t:vectorToWorldSpace(Vector3.new(0, 0, -dist))\nend)\n```&quot;,
     &quot;source&quot;: {
         &quot;line&quot;: 23,
         &quot;path&quot;: &quot;src/camera/src/Client/CameraUtils.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#fitBoundingBoxToCamera" class="table-of-contents__link toc-highlight">.fitBoundingBoxToCamera</a></li><li><a href="#fitSphereToCamera" class="table-of-contents__link toc-highlight">.fitSphereToCamera</a></li><li><a href="#getCubeoidDiameter" class="table-of-contents__link toc-highlight">.getCubeoidDiameter</a></li><li><a href="#isOnScreen" class="table-of-contents__link toc-highlight">.isOnScreen</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#boundingBoxPoints" class="table-of-contents__link toc-highlight">.boundingBoxPoints</a></li><li><a href="#fitBoundingBoxToCamera" class="table-of-contents__link toc-highlight">.fitBoundingBoxToCamera</a></li><li><a href="#fitBoundingBoxToCameraRect" class="table-of-contents__link toc-highlight">.fitBoundingBoxToCameraRect</a></li><li><a href="#fitBoundingBoxToCameraRectExact" class="table-of-contents__link toc-highlight">.fitBoundingBoxToCameraRectExact</a></li><li><a href="#fitPointsToCameraRect" class="table-of-contents__link toc-highlight">.fitPointsToCameraRect</a></li><li><a href="#fitSphereToCamera" class="table-of-contents__link toc-highlight">.fitSphereToCamera</a></li><li><a href="#fitSphereToCameraRect" class="table-of-contents__link toc-highlight">.fitSphereToCameraRect</a></li><li><a href="#getCameraSubRectShift" class="table-of-contents__link toc-highlight">.getCameraSubRectShift</a></li><li><a href="#getCubeoidDiameter" class="table-of-contents__link toc-highlight">.getCubeoidDiameter</a></li><li><a href="#getPointsCameraSubRectShift" class="table-of-contents__link toc-highlight">.getPointsCameraSubRectShift</a></li><li><a href="#isOnScreen" class="table-of-contents__link toc-highlight">.isOnScreen</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>

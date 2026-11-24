@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Motor6DStackBase | Nevermore</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://quenty.github.io/NevermoreEngine/api/Motor6DStackBase"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Motor6DStackBase | Nevermore"><link data-rh="true" rel="canonical" href="https://quenty.github.io/NevermoreEngine/api/Motor6DStackBase"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Motor6DStackBase" hreflang="en"><link data-rh="true" rel="alternate" href="https://quenty.github.io/NevermoreEngine/api/Motor6DStackBase" hreflang="x-default"><link rel="stylesheet" href="/NevermoreEngine/assets/css/styles.dc2f51b8.css">
-<script src="/NevermoreEngine/assets/js/runtime~main.80262f70.js" defer="defer"></script>
-<script src="/NevermoreEngine/assets/js/main.bc287bad.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/runtime~main.faa87b13.js" defer="defer"></script>
+<script src="/NevermoreEngine/assets/js/main.8acc482c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -21,6 +21,13 @@
 <p>Creates and pushes a Motor6DPhysicsTransformer onto the stack from a current physics CFrame position.</p>
 </div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="Push"><code style="text-decoration:none">Push</code><a href="#Push" class="hash-link" aria-label="Direct link to Push" title="Direct link to Push" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/motor6d/src/Shared/Stack/Motor6DStackBase.lua#L77"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Motor6DStackBase<!-- -->.</code><code class="green_DgR4">Push</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Motor6DStackBase">Motor6DStackBase</a></code><code>,</code></div><div><code>transformer<!-- -->: </code><code class="blue_P4bS">Motor6DTransformer.Motor6DTransformer</code></div></div><code>) → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code><code class="purple_ieR2"> → </code><code class="purple_ieR2">(</code><code class="purple_ieR2">)</code></div><div>
 <p>Push a Motor6DTransformer onto the animation stack.</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="StepAnimations"><code style="text-decoration:none">StepAnimations</code><a href="#StepAnimations" class="hash-link" aria-label="Direct link to StepAnimations" title="Direct link to StepAnimations" translate="no">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/Quenty/NevermoreEngine/blob/main/src/motor6d/src/Shared/Stack/Motor6DStackBase.lua#L89"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>Motor6DStackBase<!-- -->.</code><code class="green_DgR4">StepAnimations</code><code>(</code><div class="inset_uKQm"><div><code>self<!-- -->: </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/NevermoreEngine/api/Motor6DStackBase">Motor6DStackBase</a></code><code>,</code></div><div><code>dt<!-- -->: </code><code class="blue_P4bS">number</code><span class="inlineDescription_G7Er">-- <span>
+<p>Time since the last step</p>
+</span></span></div></div><code>) → </code><code>(</code><code>)</code></div><div>
+<p>
+  Steps the animation stack immediately, outside of the usual PreSimulation update. Useful where
+  the simulation doesn't run, such as stories in edit mode.
+</p>
 </div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
     &quot;functions&quot;: [
         {
@@ -81,6 +88,28 @@
                 &quot;line&quot;: 77,
                 &quot;path&quot;: &quot;src/motor6d/src/Shared/Stack/Motor6DStackBase.lua&quot;
             }
+        },
+        {
+            &quot;name&quot;: &quot;StepAnimations&quot;,
+            &quot;desc&quot;: &quot;Steps the animation stack immediately, outside of the usual PreSimulation update. Useful where\nthe simulation doesn&#x27;t run, such as stories in edit mode.&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;self&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;Motor6DStackBase&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;dt&quot;,
+                    &quot;desc&quot;: &quot;Time since the last step&quot;,
+                    &quot;lua_type&quot;: &quot;number&quot;
+                }
+            ],
+            &quot;returns&quot;: [],
+            &quot;function_type&quot;: &quot;static&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 89,
+                &quot;path&quot;: &quot;src/motor6d/src/Shared/Stack/Motor6DStackBase.lua&quot;
+            }
         }
     ],
     &quot;properties&quot;: [],
@@ -91,6 +120,6 @@
         &quot;line&quot;: 5,
         &quot;path&quot;: &quot;src/motor6d/src/Shared/Stack/Motor6DStackBase.lua&quot;
     }
-}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Push" class="table-of-contents__link toc-highlight">.Push</a></li><li><a href="#TransformFromCFrame" class="table-of-contents__link toc-highlight">.TransformFromCFrame</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Push" class="table-of-contents__link toc-highlight">.Push</a></li><li><a href="#StepAnimations" class="table-of-contents__link toc-highlight">.StepAnimations</a></li><li><a href="#TransformFromCFrame" class="table-of-contents__link toc-highlight">.TransformFromCFrame</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2014-2025 James Onnen. Made with Moonwave.</div></div></div></footer></div>
 </body>
 </html>
