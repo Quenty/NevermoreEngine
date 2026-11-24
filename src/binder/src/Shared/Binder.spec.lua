@@ -607,7 +607,7 @@ describe("Binder:SetAddFrameBudgeted()", function()
 			binder:Tag(instances[index])
 		end
 
-		controller.boot()
+		controller.initServiceBag()
 		expect(countBound(binder, instances) < #instances).toEqual(true)
 
 		waitUntil(function()
@@ -634,7 +634,7 @@ describe("Binder:SetAddFrameBudgeted()", function()
 			binder:Tag(instances[index])
 		end
 
-		controller.boot()
+		controller.initServiceBag()
 		local last = instances[#instances]
 		binder:Untag(last)
 
@@ -652,7 +652,7 @@ describe("Binder:SetAddFrameBudgeted()", function()
 	it("can't be set after Start", function()
 		local controller = BinderTestUtils.setup()
 		local binder = controller.addBinder(BinderTestUtils.noopConstructor)
-		controller.boot()
+		controller.initServiceBag()
 
 		expect(function()
 			binder:SetAddFrameBudgeted(true)
