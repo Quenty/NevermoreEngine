@@ -335,3 +335,49 @@ describe("PlayerDataStoreManager datastore configuration", function()
 		controller:Destroy()
 	end)
 end)
+
+describe("PlayerDataStoreManager.PromiseDataStore after a removal", function()
+	it("opens the datastore again for a player who stays (a data reset)", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local player = PlayerMock.new({ UserId = 42 })
+		local first = controller.manager:GetDataStore(player)
+		controller.manager:RemovePlayerDataStore(player)
+
+		local second = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStore(player))
+		expect(second).never.toBeNil()
+		expect((second == first)).toEqual(false)
+
+		player:Destroy()
+		controller:Destroy()
+	end)
+
+	it("rejects for a player who left while their data was being removed", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local player = PlayerMock.new({ UserId = 42 })
+		controller.manager:GetDataStore(player)
+		player.Parent = nil
+		controller.manager:RemovePlayerDataStore(42)
+
+		PromiseTestUtils.awaitRejected(controller.manager:PromiseDataStore(player))
+
+		player:Destroy()
+		controller:Destroy()
+	end)
+
+	it("still opens the datastore by userId after the player left", function()
+		local controller = DataStoreTestUtils.setupDataStoreManager()
+
+		local player = PlayerMock.new({ UserId = 42 })
+		controller.manager:GetDataStore(player)
+		player.Parent = nil
+		controller.manager:RemovePlayerDataStore(42)
+
+		local dataStore = PromiseTestUtils.awaitFulfilled(controller.manager:PromiseDataStore(42))
+		expect(dataStore).never.toBeNil()
+
+		player:Destroy()
+		controller:Destroy()
+	end)
+end)
