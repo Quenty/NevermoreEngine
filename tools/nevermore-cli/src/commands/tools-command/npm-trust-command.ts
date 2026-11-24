@@ -226,7 +226,26 @@ function _reportCheck(
     OutputHelper.warn(`Could not check ${pkg.name}: ${error}`);
   }
 
+  // Trusted publishing attaches provenance, and npm rejects provenance unless
+  // repository.url names the repo that built it, so the publish fails.
+  const withoutRepository = packages.filter(
+    (pkg) => !parseGithubRepository(pkg.repository)
+  );
+  if (withoutRepository.length > 0) {
+    OutputHelper.error(
+      `${formatCount(
+        withoutRepository.length,
+        'package has',
+        'packages have'
+      )} no GitHub "repository" in package.json, which trusted publishing needs:\n` +
+        withoutRepository.map((pkg) => `  ${pkg.name}`).join('\n')
+    );
+  }
+
   if (result.missing.length === 0) {
+    if (withoutRepository.length > 0) {
+      return 1;
+    }
     OutputHelper.info(
       `${formatCount(
         packages.length - result.unknown.length,
