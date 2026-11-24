@@ -1,5 +1,9 @@
 import * as fs from 'fs/promises';
 import { execa } from 'execa';
+import {
+  listWorkspacePackagesAsync,
+  type WorkspacePackageInfo,
+} from '../workspace-utils.js';
 import { OutputHelper } from '@quenty/cli-output-helpers';
 import {
   DeployTarget,
@@ -9,11 +13,6 @@ import {
   resolveDeployTargetPlaces,
   toManifestPlaceInfo,
 } from '@quenty/nevermore-deploy';
-
-export interface WorkspacePackageInfo {
-  name: string;
-  path: string;
-}
 
 export interface TargetPackage {
   name: string;
@@ -56,18 +55,6 @@ export async function discoverAllTargetPackagesAsync(
   targetName: string
 ): Promise<TargetPackage[]> {
   return filterByTargetAsync(await listWorkspacePackagesAsync(), targetName);
-}
-
-/** Every package in the pnpm workspace, with absolute paths. */
-export async function listWorkspacePackagesAsync(
-  cwd?: string
-): Promise<WorkspacePackageInfo[]> {
-  const { stdout } = await execa(
-    'pnpm',
-    ['ls', '--json', '-r', '--depth', '-1'],
-    { cwd }
-  );
-  return JSON.parse(stdout) as WorkspacePackageInfo[];
 }
 
 /**
