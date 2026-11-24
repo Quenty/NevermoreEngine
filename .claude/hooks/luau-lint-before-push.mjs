@@ -83,7 +83,14 @@ process.stdin.on("end", () => {
   // are issued as `cd <worktree> && git push ...`, but the payload cwd is always
   // the session's primary worktree -- linting that one would check the wrong
   // branch entirely.
-  const cwd = resolvePushCwd(command, payload.cwd || process.cwd());
+  const pushCwd = resolvePushCwd(command, payload.cwd || process.cwd());
+  // The session cwd may be a subdirectory (e.g. tools/) without a lint:luau
+  // script, so always lint from the root of the worktree being pushed.
+  const toplevel = spawnSync("git", ["rev-parse", "--show-toplevel"], {
+    cwd: pushCwd,
+    encoding: "utf8",
+  });
+  const cwd = toplevel.status === 0 ? toplevel.stdout.trim() : pushCwd;
   process.stderr.write(`pre-push: running luau type check (npm run lint:luau) in ${cwd}...\n`);
 
   const res = spawnSync("npm run lint:luau", {

@@ -19,7 +19,12 @@ vi.mock('../../../process/studio-launch-registry.js', () => ({
   recordStudioLaunchAsync: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../../deploy/launch-deploy-place.js', () => ({
+  launchDeployPlaceAsync: vi.fn(),
+}));
+
 import { launchHandlerAsync } from './launch.js';
+import { launchDeployPlaceAsync } from '../../../deploy/launch-deploy-place.js';
 import { launchStudioAsync } from '../../../process/studio-process-manager.js';
 import { recordStudioLaunchAsync } from '../../../process/studio-launch-registry.js';
 
@@ -28,6 +33,11 @@ let tempDir: string;
 beforeEach(async () => {
   tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'launch-test-'));
   vi.mocked(launchStudioAsync).mockClear();
+  vi.mocked(launchDeployPlaceAsync).mockReset();
+  vi.mocked(launchDeployPlaceAsync).mockResolvedValue({
+    rbxlPath: '/state/places/abc/test.rbxl',
+    basePlaceVersion: 158,
+  });
 });
 
 afterEach(async () => {
@@ -123,7 +133,7 @@ describe('launchHandlerAsync', () => {
 });
 
 describe('launchHandlerAsync with deploy.nevermore.json', () => {
-  it("opens the default target's place from a parent directory's config", async () => {
+  it("opens the default target's live place from a parent directory's config", async () => {
     await writeDeployConfigAsync(tempDir, { targets: { test: place(111) } });
     const nested = path.join(tempDir, 'src', 'Server');
     await fs.mkdir(nested, { recursive: true });
@@ -136,9 +146,11 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
     });
     expect(result).toMatchObject({
       deployTarget: 'test',
+      from: 'studio',
       placeId: 111,
       universeId: 900,
     });
+    expect(launchDeployPlaceAsync).not.toHaveBeenCalled();
     expect(result.summary).toBe(
       `Studio launched with 'test' (place 111, universe 900) from ${path.join(
         '..',
@@ -233,5 +245,90 @@ describe('launchHandlerAsync with deploy.nevermore.json', () => {
     expect(launchStudioAsync).toHaveBeenCalledWith({
       placePath: '/tmp/game.rbxl',
     });
+  });
+});
+
+describe('launchHandlerAsync --from checkout', () => {
+  it('builds the target from this checkout and opens the result', async () => {
+    await writeDeployConfigAsync(tempDir, { targets: { test: place(111) } });
+
+    const result = await launchHandlerAsync({ cwd: tempDir, from: 'checkout' });
+
+    expect(launchDeployPlaceAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deployPlace: expect.objectContaining({ selector: 'test' }),
+        cwd: tempDir,
+      })
+    );
+    expect(launchStudioAsync).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      deployTarget: 'test',
+      from: 'checkout',
+      placeId: 111,
+      placePath: '/state/places/abc/test.rbxl',
+      basePlaceVersion: 158,
+    });
+    expect(result.summary).toBe(
+      "Studio launched with 'test' built from this checkout on base place v158 (deploy.nevermore.json). " +
+        'Saving it does not change place 111.'
+    );
+  });
+
+  it('passes --no-base-place through', async () => {
+    await writeDeployConfigAsync(tempDir, { targets: { test: place(111) } });
+
+    await launchHandlerAsync({
+      cwd: tempDir,
+      from: 'checkout',
+      mergeBasePlace: false,
+    });
+
+    expect(launchDeployPlaceAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ mergeBasePlace: false })
+    );
+  });
+
+  it('reports a failed build', async () => {
+    await writeDeployConfigAsync(tempDir, { targets: { test: place(111) } });
+    vi.mocked(launchDeployPlaceAsync).mockRejectedValueOnce(
+      new Error('rojo failed')
+    );
+
+    await expect(
+      launchHandlerAsync({ cwd: tempDir, from: 'checkout' })
+    ).rejects.toThrow('rojo failed');
+  });
+
+  it('refuses --from together with --place', async () => {
+    await expect(
+      launchHandlerAsync({
+        placePath: '/tmp/game.rbxl',
+        from: 'studio',
+        cwd: tempDir,
+      })
+    ).rejects.toMatchObject({
+      code: 'INVALID_INPUT',
+      fix: 'Drop --from studio.',
+    });
+  });
+
+  it('refuses --no-base-place without --from checkout', async () => {
+    await writeDeployConfigAsync(tempDir, { targets: { test: place(111) } });
+
+    await expect(
+      launchHandlerAsync({ cwd: tempDir, mergeBasePlace: false })
+    ).rejects.toMatchObject({
+      code: 'INVALID_INPUT',
+      fix: 'Add --from checkout, or drop --no-base-place.',
+    });
+    expect(launchStudioAsync).not.toHaveBeenCalled();
+  });
+
+  it('refuses --from where there is no deploy.nevermore.json', async () => {
+    await expect(
+      launchHandlerAsync({ cwd: tempDir, from: 'checkout' })
+    ).rejects.toMatchObject({ code: 'INVALID_INPUT' });
+    expect(launchStudioAsync).not.toHaveBeenCalled();
+    expect(launchDeployPlaceAsync).not.toHaveBeenCalled();
   });
 });

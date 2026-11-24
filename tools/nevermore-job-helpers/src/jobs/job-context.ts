@@ -1,7 +1,15 @@
-import { type BuildPlaceOptions, type BuiltPlace } from '../build/build.js';
-import { type StructuredTestResults } from '../testing/structured-test-results.js';
-import { type LogFetchStats } from '../testing/log-fetch-stats.js';
-import { type TaskLogMessage } from '../open-cloud/open-cloud-client.js';
+import {
+  type BuildPlaceOptions,
+  type BuiltPlace,
+} from '../place/build-place.js';
+import { type LogFetchStats } from './log-fetch-stats.js';
+
+export type { BuiltPlace } from '../place/build-place.js';
+
+export interface JobLogMessage {
+  message: string;
+  messageType?: string;
+}
 
 /** A run's output, with the severity and the fetch that produced it. */
 export interface JobLogs {
@@ -11,7 +19,7 @@ export interface JobLogs {
    * severity. Empty for one that does not — a local run reads its logs off the
    * Studio bridge, which says only what was printed.
    */
-  messages: TaskLogMessage[];
+  messages: JobLogMessage[];
   /**
    * What collecting them took, when the transport can say. Absent rather than
    * zeroed, so "no fetch to measure" cannot read as "a fetch that found
@@ -19,8 +27,6 @@ export interface JobLogs {
    */
   stats?: LogFetchStats;
 }
-
-export type { BuiltPlace } from '../build/build.js';
 
 export interface DeployPlaceOptions {
   builtPlace: BuiltPlace;
@@ -64,22 +70,11 @@ export interface ScriptRunResult {
    *
    * Values are JSON-shaped, but the two transports spell exotic Luau types
    * differently: Open Cloud auto-serializes them, while the Studio bridge
-   * marshals them into `{ type, value }` wrappers (`SerializedReturnValue`).
-   * Plain tables of strings, numbers and booleans come back identically on
-   * both, so structured results should stay inside that subset.
+   * marshals them into `{ type, value }` wrappers. Plain tables of strings,
+   * numbers and booleans come back identically on both, so structured results
+   * should stay inside that subset.
    */
   returnValues?: unknown[];
-  /**
-   * The run's structured test results, when the context resolved them itself
-   * rather than leaving them in `returnValues` for the caller to decode.
-   *
-   * Only aggregated batch mode sets this: one execution covers every package, so
-   * its return value belongs to no single one of them and the per-package
-   * results have to be recovered from the batch summary first. A context that
-   * sets this has also reported where the counts came from, so the caller does
-   * not report it a second time.
-   */
-  testResults?: StructuredTestResults;
   /**
    * True when this run's verdict rests on returned results alone, its log
    * output having been dropped before it reached us.
@@ -94,23 +89,34 @@ export interface ScriptRunResult {
 
 /**
  * Opaque handle representing a single deployed place.
- * Returned by `deployBuiltPlaceAsync`, threaded through `runScriptAsync`/`getLogsAsync`/`releaseAsync`.
+ * Returned by `deployBuiltPlaceAsync`, threaded through the calls that act on it.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Deployment {}
 
-export interface JobContext {
+/** Builds places and deploys them. Owns what it creates until `disposeAsync`. */
+export interface PlaceJobContext {
   /** Build a .rbxl place file. Returns an opaque handle — lifecycle managed by the context. */
   buildPlaceAsync(options: BuildPlaceOptions): Promise<BuiltPlace>;
 
   /** Deploy a built place to the execution environment. Returns a handle for subsequent operations. */
   deployBuiltPlaceAsync(options: DeployPlaceOptions): Promise<Deployment>;
 
+  /** Release a single deployment. Whether its environment is torn down is up to the context. */
+  releaseAsync(deployment: Deployment): Promise<void>;
+
+  /** Eagerly release a built place's temporary resources. Idempotent. */
+  releaseBuiltPlaceAsync(builtPlace: BuiltPlace): Promise<void>;
+
+  /** Final teardown — release all remaining deployments and built places. Called once at the end of a job. */
+  disposeAsync(): Promise<void>;
+}
+
+/** A context that can also run scripts. `R` lets a caller extend the result. */
+export interface ScriptJobContext<R extends ScriptRunResult = ScriptRunResult>
+  extends PlaceJobContext {
   /** Execute a Luau script in a deployed place. */
-  runScriptAsync(
-    deployment: Deployment,
-    options: RunScriptOptions
-  ): Promise<ScriptRunResult>;
+  runScriptAsync(deployment: Deployment, options: RunScriptOptions): Promise<R>;
 
   /**
    * Everything the most recent script execution printed.
@@ -121,13 +127,4 @@ export interface JobContext {
    * implement one and the chance of handing an accessor the wrong handle.
    */
   getLogsAsync(deployment: Deployment): Promise<JobLogs>;
-
-  /** Release a single deployment (stop bridge / clear task metadata). */
-  releaseAsync(deployment: Deployment): Promise<void>;
-
-  /** Eagerly release a built place's temporary resources. Idempotent. */
-  releaseBuiltPlaceAsync(builtPlace: BuiltPlace): Promise<void>;
-
-  /** Final teardown — release all remaining deployments and built places. Called once at end of batch. */
-  disposeAsync(): Promise<void>;
 }

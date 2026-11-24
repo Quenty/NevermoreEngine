@@ -1,4 +1,4 @@
-import { type AssetCreator } from '../open-cloud/open-cloud-client.js';
+import { type AssetCreator } from '@quenty/nevermore-job-helpers/open-cloud';
 
 /** The two lookups an owner can be inferred from; `OpenCloudClient` is one. */
 export interface AssetCreatorSource {

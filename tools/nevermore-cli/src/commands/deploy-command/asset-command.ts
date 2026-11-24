@@ -23,9 +23,9 @@ import {
 } from '../../utils/assets/asset-upload-plan.js';
 import {
   OpenCloudClient,
+  RateLimiter,
   type AssetCreator,
-} from '../../utils/open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
+} from '@quenty/nevermore-job-helpers/open-cloud';
 
 export interface AssetUploadArgs extends NevermoreGlobalArgs {
   files?: string[];

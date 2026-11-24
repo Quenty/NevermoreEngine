@@ -74,6 +74,33 @@ function Motor6DStackHumanoidBase:PushForEachMotor6D(
 end
 
 --[=[
+	Steps every Motor6DStack in the humanoid's character immediately, outside of the usual
+	simulation update. Useful where the simulation doesn't run, such as stories in edit mode.
+
+	Step after the [Animator] so the stacks layer on top of its pose, such as from
+	[StudioRigAnimator.AnimationsStepped].
+
+	@param dt number -- Time since the last step
+]=]
+function Motor6DStackHumanoidBase.StepAnimations(self: Motor6DStackHumanoidBase, dt: number): ()
+	assert(type(dt) == "number", "Bad dt")
+
+	local character = self._obj.Parent
+	if not character then
+		return
+	end
+
+	for _, descendant in character:GetDescendants() do
+		if R15Utils.isAnimationConstraintOrMotor6D(descendant) then
+			local motor6DStack = Motor6DStackInterface:Find(descendant, self._tieRealmService:GetTieRealm())
+			if motor6DStack then
+				motor6DStack:StepAnimations(dt)
+			end
+		end
+	end
+end
+
+--[=[
 	Observes Motor6D instances parented to the humanoid's character as Brio objects.
 
 	@return Observable<Brio<Motor6D>>

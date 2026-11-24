@@ -149,6 +149,14 @@ These are the types you'll use most often:
 - `Binder.new("Tag", MyClass :: any)` — binder registration
 - Rx `Pipe` chains where intermediate types can't be inferred
 - `Signal.new() :: any` — when the signal type would be too complex to annotate inline
+- `local t: any = require("t")` — `t`'s combinators are inferred from its own untyped source, so `t.optional(t.callback)` inside a `t.interface({...})` fails strict inference no matter how the call sites are annotated. One cast at the require keeps the rest of the file honest; casting the individual combinators takes more casts for the same result.
+
+When a field is `any` only because the real type can't be named, record that type in a trailing comment so the next reader knows what the field holds:
+
+```lua
+_contentStack: any, -- ContentStack.ContentStack
+_unpurchasedAssetIdList: any, -- ObservableList.ObservableList<MarketplaceLineItem>
+```
 
 **Prefer fixing upstream types** over casting. If a type is wrong, fix it in the source package.
 

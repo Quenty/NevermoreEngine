@@ -22,6 +22,9 @@
     },
     {
       "path": "../nevermore-deploy"
+    },
+    {
+      "path": "../nevermore-job-helpers"
     }
   ],
   "include": [

@@ -11,6 +11,7 @@
     { "path": "../cli-output-helpers" },
     { "path": "../nevermore-cli-helpers" },
     { "path": "../nevermore-deploy" },
+    { "path": "../nevermore-job-helpers" },
     { "path": "../nevermore-template-helpers" }
   ],
   "include": ["src/**/*", "test/**/*"]

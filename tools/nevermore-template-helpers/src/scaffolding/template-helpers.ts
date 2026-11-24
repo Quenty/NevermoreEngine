@@ -114,40 +114,43 @@ export class TemplateHelper {
       const stats = await fs.promises.stat(origFilePath);
 
       if (stats.isFile()) {
+        const newFilePath = path.join(targetPath, newName);
+
+        // Existing files are never overwritten, so filling in a package's
+        // missing files is a normal use. Dryrun must report the same decision.
+        if (await existsAsync(newFilePath)) {
+          OutputHelper.info(
+            `${dryrun ? '[DRYRUN]: ' : ''}Skip existing file ${newFilePath}`
+          );
+          continue;
+        }
+
         // read file content and transform it using template engine
         const contents = await fs.promises.readFile(origFilePath, 'utf8');
         const compiled = (Handlebars as any).default.compile(contents);
         const result = compiled(input);
-        const newFilePath = path.join(targetPath, newName);
 
         if (dryrun) {
           OutputHelper.info(`[DRYRUN]: Write file ${newFilePath}`);
           console.log(`${result}`);
         } else {
-          if (!(await existsAsync(newFilePath))) {
-            await fs.promises.writeFile(newFilePath, result, 'utf8');
-            OutputHelper.verbose(`[Template] Created '${newFilePath}'`);
-          } else {
-            OutputHelper.error(
-              `File already exists ${newFilePath} will not overwrite`
-            );
-          }
+          await fs.promises.writeFile(newFilePath, result, 'utf8');
+          OutputHelper.verbose(`[Template] Created '${newFilePath}'`);
         }
       } else if (stats.isDirectory()) {
-        const newDirPath = path.join(targetPath, originalName);
-        if (dryrun) {
-          OutputHelper.info(`[DRYRUN]: Write folder ${newDirPath}`);
-        } else {
-          // create folder in destination folder
-          if (!(await existsAsync(newDirPath))) {
+        const newDirPath = path.join(targetPath, newName);
+        if (!(await existsAsync(newDirPath))) {
+          if (dryrun) {
+            OutputHelper.info(`[DRYRUN]: Write folder ${newDirPath}`);
+          } else {
             await fs.promises.mkdir(newDirPath);
           }
         }
 
         // copy files/folder inside current folder recursively
         await TemplateHelper.createDirectoryContentsAsync(
-          path.join(templatePath, originalName),
-          path.join(targetPath, newName),
+          origFilePath,
+          newDirPath,
           input,
           dryrun
         );

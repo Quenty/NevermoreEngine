@@ -52,6 +52,8 @@ Game code is Luau (Roblox's typed Lua dialect). CLI tooling under `tools/` is Ty
 
 Every Luau file starts with the custom loader: `local require = require(script.Parent.loader).load(script)`. This enables Nevermore's module resolution, so packages can `require("ModuleName")` by string name instead of by path.
 
+Code should be self-documenting and readable. Public methods and classes can be documented with moonwave documentation style.
+
 ## Common Commands
 
 ```bash
@@ -127,12 +129,8 @@ See `docs/gotchas/tooling.md` for more.
 
 Aftman (`aftman.toml`) manages the binary toolchain. pnpm handles package management across the `src/*`, `tools/*`, `games/*`, `plugins/*` workspaces. Releases run through Auto (`auto shipit`) in GitHub CI. Don't run releases locally.
 
-## Always Maintain Documentation
+## Documentation should not include implementation details - reading code is preferred
 
-Write it down when:
-- The user gives you feedback or corrects you.
-- Something required investigation to understand (non-obvious behavior, surprising gotcha).
-- You discover something undocumented that would trip up the next person.
-- You need to remember something.
+Document things that are useful. These should pass a quality bar, and be written for AIs and Humans. Self documenting code is preferred.
 
-Update the appropriate `docs/` file. See `docs/_AI_INDEX.md` for where things go. Plans should include a "maintain documentation" step.
+When documenting, update the appropriate `docs/` file. See `docs/_AI_INDEX.md` for where things go.

@@ -8,6 +8,7 @@ local require = require(script.Parent.loader).load(script)
 local AttributeUtils = require("AttributeUtils")
 local Binder = require("Binder")
 local Brio = require("Brio")
+local GameConfigAssetConstants = require("GameConfigAssetConstants")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigConstants = require("GameConfigConstants")
@@ -52,6 +53,47 @@ function GameConfigUtils.getOrCreateAssetFolder(
 	end
 
 	return folder :: Folder
+end
+
+--[=[
+	Finds an asset in the config that matches the given type, key, id, and priority exactly
+
+	@param config Folder
+	@param assetType GameConfigAssetType
+	@param assetKey string
+	@param assetId number
+	@param priority number?
+	@return Instance?
+]=]
+function GameConfigUtils.findMatchingAsset(
+	config: Folder,
+	assetType: GameConfigAssetTypes.GameConfigAssetType,
+	assetKey: string,
+	assetId: number,
+	priority: number?
+): Instance?
+	assert(typeof(config) == "Instance", "Bad config")
+	assert(GameConfigAssetTypeUtils.isAssetType(assetType), "Bad assetType")
+	assert(type(assetKey) == "string", "Bad assetKey")
+	assert(type(assetId) == "number", "Bad assetId")
+
+	local folder = config:FindFirstChild(GameConfigAssetTypeUtils.getPlural(assetType))
+	if not folder then
+		return nil
+	end
+
+	for _, child in folder:GetChildren() do
+		if
+			child.Name == assetKey
+			and child:GetAttribute(GameConfigAssetConstants.ASSET_TYPE_ATTRIBUTE) == assetType
+			and child:GetAttribute(GameConfigAssetConstants.ASSET_ID_ATTRIBUTE) == assetId
+			and child:GetAttribute(GameConfigAssetConstants.PRIORITY_ATTRIBUTE) == priority
+		then
+			return child
+		end
+	end
+
+	return nil
 end
 
 function GameConfigUtils.observeAssetFolderBrio(

@@ -80,4 +80,16 @@ function Motor6DStackBase.Push(self: Motor6DStackBase, transformer: Motor6DTrans
 	return self._animator:Push(transformer)
 end
 
+--[=[
+	Steps the animation stack immediately, outside of the usual PreSimulation update. Useful where
+	the simulation doesn't run, such as stories in edit mode.
+
+	@param dt number -- Time since the last step
+]=]
+function Motor6DStackBase.StepAnimations(self: Motor6DStackBase, dt: number): ()
+	assert(type(dt) == "number", "Bad dt")
+
+	self._animator:StepAnimations(dt)
+end
+
 return Motor6DStackBase

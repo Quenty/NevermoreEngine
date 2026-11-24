@@ -758,6 +758,19 @@ describe("TemplateProvider across a server and a client", function()
 		controller:Destroy()
 	end)
 
+	it("reports unreplicated templates as existing on the client", function()
+		local controller = setup()
+		local root = controller.newInstance("Folder", "Templates")
+		controller.newInstance("Model", "Sword", root)
+		local realms = controller.newRealms(root)
+
+		expect(realms.client:HasTemplate("Sword")).toBe(true)
+		expect(realms.client:HasTemplate("Missing")).toBe(false)
+		expect(realms.server:HasTemplate("Sword")).toBe(true)
+
+		controller:Destroy()
+	end)
+
 	it("hands the container its templates back when the server provider is destroyed", function()
 		local controller = setup()
 		local root = controller.newInstance("Folder", "Templates")

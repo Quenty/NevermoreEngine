@@ -9,13 +9,17 @@ import {
   type BuiltPlace,
   type Deployment,
   type DeployPlaceOptions,
-  type JobContext,
-  type RunScriptOptions,
-  type ScriptRunResult,
   type JobLogs,
-} from './job-context.js';
-import { type BuildPlaceOptions } from '../build/build.js';
+  type LogFetchStats,
+  type RunScriptOptions,
+  type ScriptJobContext,
+} from '@quenty/nevermore-job-helpers';
+import { type BuildPlaceOptions } from '@quenty/nevermore-job-helpers/place';
 import { type BatchTarget } from '../batch/changed-packages-utils.js';
+import {
+  type TestJobContext,
+  type TestScriptRunResult,
+} from './test-job-context.js';
 import {
   type CombinedBuildProgress,
   type CombinedPlaceChunk,
@@ -28,7 +32,6 @@ import {
   type BatchPackageResult,
   parseBatchTestLogs,
 } from '../testing/parsers/batch-log-parser.js';
-import { type LogFetchStats } from '../testing/log-fetch-stats.js';
 import {
   toRenderableLines,
   type RenderableLogLine,
@@ -53,7 +56,7 @@ interface ChunkRun {
 }
 
 /**
- * JobContext wrapper that batches all packages into a single build, and as few
+ * Job context wrapper that batches all packages into a single build, and as few
  * uploads and executions as the place size budget allows — one, unless the
  * combined place is too big even recompressed, in which case it is split into
  * chunks that each upload and run on their own, in parallel. Wraps an inner
@@ -89,8 +92,8 @@ export interface BatchExecutionOutcome {
   slugToPackage: Map<string, string>;
 }
 
-export class BatchScriptJobContext implements JobContext {
-  private _inner: JobContext;
+export class BatchScriptJobContext implements TestJobContext {
+  private _inner: ScriptJobContext;
   private _batchTargets: BatchTarget[];
   private _repoRoot: string;
   private _batchPlaceId?: number;
@@ -108,7 +111,7 @@ export class BatchScriptJobContext implements JobContext {
   private _combinedBuildContext?: BuildContext;
 
   constructor(
-    inner: JobContext,
+    inner: ScriptJobContext,
     batchTargets: BatchTarget[],
     options?: {
       repoRoot?: string;
@@ -195,7 +198,7 @@ export class BatchScriptJobContext implements JobContext {
   async runScriptAsync(
     deployment: Deployment,
     options: RunScriptOptions
-  ): Promise<ScriptRunResult> {
+  ): Promise<TestScriptRunResult> {
     const batchDeployment = deployment as BatchDeployment;
     const { results } = await this._getBatchExecutionAsync();
     const result = results.get(batchDeployment.packageName);

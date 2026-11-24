@@ -5,7 +5,7 @@ import { BaseReporter } from '@quenty/cli-output-helpers/reporting';
 import { NevermoreGlobalArgs } from '../../args/global-args.js';
 import {
   BatchScriptJobContext,
-  LocalJobContext,
+  createLocalJobContext,
 } from '../../utils/job-context/index.js';
 import {
   discoverAllTestableBatchTargetsAsync,
@@ -139,7 +139,7 @@ async function _writeTestBundleAsync(args: BatchBundleArgs): Promise<void> {
 
   // No client: building never uploads, so there is no key to need.
   const batchContext = new BatchScriptJobContext(
-    new LocalJobContext(new BaseReporter()),
+    createLocalJobContext({ reporter: new BaseReporter() }),
     packages,
     {
       maxChunkBytes:
@@ -200,7 +200,7 @@ async function _writeDeployBundleAsync(args: BatchBundleArgs): Promise<void> {
     );
   }
 
-  const context = new LocalJobContext(new BaseReporter());
+  const context = createLocalJobContext({ reporter: new BaseReporter() });
   try {
     const places: PrebuiltDeployPlace[] = [];
     for (const buildTarget of batchTargets) {

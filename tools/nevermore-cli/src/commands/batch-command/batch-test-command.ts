@@ -13,15 +13,18 @@ import { renderBatchOutcome } from '../../utils/testing/parsers/batch-log-render
 import { emitDiagnostic } from '../../utils/testing/parsers/batch-log-parser.js';
 import { type DeployTarget } from '@quenty/nevermore-deploy';
 import { type BuildContext } from '@quenty/nevermore-template-helpers';
-import { createBasePlaceResolver } from '../../utils/build/base-place-resolver-factory.js';
+import { type ScriptJobContext } from '@quenty/nevermore-job-helpers';
 import {
-  type JobContext,
   BatchScriptJobContext,
-  CloudJobContext,
-  LocalJobContext,
+  createCloudJobContext,
+  createLocalJobContext,
+  type TestJobContext,
 } from '../../utils/job-context/index.js';
-import { OpenCloudClient } from '../../utils/open-cloud/open-cloud-client.js';
-import { RateLimiter } from '../../utils/open-cloud/rate-limiter.js';
+import {
+  OpenCloudClient,
+  RateLimiter,
+} from '@quenty/nevermore-job-helpers/open-cloud';
+import { createBasePlaceResolver } from '@quenty/nevermore-job-helpers/place';
 import {
   discoverAllTestableBatchTargetsAsync,
   discoverChangedTestableBatchTargetsAsync,
@@ -324,9 +327,17 @@ async function _runPackagesAsync(
   // touches one is not prompted for credentials.
   const basePlaceResolver = createBasePlaceResolver(client, args);
 
-  const innerContext: JobContext = cloud
-    ? new CloudJobContext(innerReporter, client, basePlaceResolver)
-    : new LocalJobContext(innerReporter, client, basePlaceResolver);
+  const innerContext: ScriptJobContext = cloud
+    ? createCloudJobContext({
+        reporter: innerReporter,
+        client,
+        basePlaceResolver,
+      })
+    : createLocalJobContext({
+        reporter: innerReporter,
+        client,
+        basePlaceResolver,
+      });
 
   const batchContext = aggregated
     ? new BatchScriptJobContext(innerContext, packages, {
@@ -348,7 +359,7 @@ async function _runPackagesAsync(
         },
       })
     : undefined;
-  const context: JobContext = batchContext ?? innerContext;
+  const context: TestJobContext = batchContext ?? innerContext;
 
   await reporter.startAsync();
 
@@ -427,7 +438,7 @@ async function _runPackagesAsync(
 
 async function _runWithRetryAsync(
   pkg: BatchTarget,
-  context: JobContext,
+  context: TestJobContext,
   timeoutMs: number,
   aggregated: boolean,
   prebuiltHasJestConfig: boolean | undefined

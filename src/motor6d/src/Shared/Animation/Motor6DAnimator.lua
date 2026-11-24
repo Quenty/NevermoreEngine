@@ -87,6 +87,18 @@ function Motor6DAnimator.Push(self: Motor6DAnimator, transformer: Motor6DTransfo
 	end
 end
 
+--[=[
+	Steps the animation stack immediately, outside of the usual PreSimulation update. Useful where
+	the simulation doesn't run, such as stories in edit mode.
+
+	@param dt number -- Time since the last step
+]=]
+function Motor6DAnimator.StepAnimations(self: Motor6DAnimator, dt: number): ()
+	assert(type(dt) == "number", "Bad dt")
+
+	self:_updateStepped()
+end
+
 function Motor6DAnimator._computeNewTransform(
 	self: Motor6DAnimator,
 	stackEntry: Motor6DTransformer.Motor6DTransformer,
@@ -113,7 +125,7 @@ function Motor6DAnimator._computeNewTransform(
 	end)
 end
 
-function Motor6DAnimator._updateStepped(self: Motor6DAnimator): ()
+function Motor6DAnimator._updateStepped(self: Motor6DAnimator): boolean
 	debug.profilebegin("motor6danimator")
 	local current: Motor6DTransformer.Motor6DTransformer? = self._stack[#self._stack] :: any
 

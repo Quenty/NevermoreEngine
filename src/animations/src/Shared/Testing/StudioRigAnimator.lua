@@ -15,6 +15,7 @@ local RunService = game:GetService("RunService")
 
 local AnimationUtils = require("AnimationUtils")
 local BaseObject = require("BaseObject")
+local Signal = require("Signal")
 
 local StudioRigAnimator = setmetatable({}, BaseObject)
 StudioRigAnimator.ClassName = "StudioRigAnimator"
@@ -23,8 +24,9 @@ StudioRigAnimator.__index = StudioRigAnimator
 export type StudioRigAnimator =
 	typeof(setmetatable(
 		{} :: {
+			AnimationsStepped: Signal.Signal<number>,
 			_animator: Animator?,
-			_obj: Animator | Humanoid,
+			_obj: AnimationUtils.AnimationTarget,
 			_lastTime: number,
 		},
 		{} :: typeof({ __index = StudioRigAnimator })
@@ -35,13 +37,21 @@ export type StudioRigAnimator =
 	Constructs a new rig animator which will play the animations for the lifetime of the
 	object.
 
-	@param animatorOrHumanoid Animator | Humanoid
+	@param animationTarget AnimationUtils.AnimationTarget
 	@return StudioRigAnimator
 ]=]
-function StudioRigAnimator.new(animatorOrHumanoid: Animator | Humanoid): StudioRigAnimator
-	local self: StudioRigAnimator = setmetatable(BaseObject.new(animatorOrHumanoid) :: any, StudioRigAnimator)
+function StudioRigAnimator.new(animationTarget: AnimationUtils.AnimationTarget): StudioRigAnimator
+	local self: StudioRigAnimator = setmetatable(BaseObject.new(animationTarget) :: any, StudioRigAnimator)
 
 	self._lastTime = 0
+
+	--[=[
+		Fires with the delta time after the animator steps, so other animation layers can step on top.
+
+		@prop AnimationsStepped Signal<number>
+		@within StudioRigAnimator
+	]=]
+	self.AnimationsStepped = self._maid:Add(Signal.new() :: any)
 
 	if RunService:IsStudio() and not RunService:IsRunning() then
 		self:_setupStudio()
@@ -64,6 +74,7 @@ function StudioRigAnimator._setupStudio(self: StudioRigAnimator): ()
 		self._lastTime = now
 
 		self._animator:StepAnimations(delta)
+		self.AnimationsStepped:Fire(delta)
 	end))
 end
 

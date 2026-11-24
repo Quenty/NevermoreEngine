@@ -20,26 +20,55 @@ import { type PlaceVersionSource } from './place-version-source.js';
  */
 const DEFAULT_VERSION_TYPE: BasePlaceVersionKeyword = 'published';
 
+/**
+ * How a run treats `deploy.nevermore.lock.json`:
+ *
+ * - `write`: use the lock, look up and record what it lacks. The default.
+ * - `frozen`: use the lock, and fail on what it lacks (`--frozen-lockfile`).
+ * - `refresh`: re-resolve keyword pins and record them (`--refresh-base-place`),
+ *   so a watch-dispatched rebuild picks up the base place that moved.
+ * - `readonly`: use the lock, look up what it lacks, never write.
+ */
+export const BASE_PLACE_LOCK_MODES = [
+  'write',
+  'frozen',
+  'refresh',
+  'readonly',
+] as const;
+
+export type BasePlaceLockMode = typeof BASE_PLACE_LOCK_MODES[number];
+
+export interface BasePlaceLockFlags {
+  /** `--frozen-lockfile` */
+  frozenLockfile?: boolean;
+  /** `--refresh-base-place` */
+  refreshBasePlace?: boolean;
+}
+
+/** The lock mode the flags ask for, or `defaultMode`. */
+export function resolveBasePlaceLockMode(
+  flags: BasePlaceLockFlags,
+  defaultMode: BasePlaceLockMode = 'write'
+): BasePlaceLockMode {
+  if (flags.frozenLockfile && flags.refreshBasePlace) {
+    throw new Error(
+      '--frozen-lockfile and --refresh-base-place contradict each other: ' +
+        'one forbids resolving base places, the other forces it.'
+    );
+  }
+  if (flags.frozenLockfile) {
+    return 'frozen';
+  }
+  if (flags.refreshBasePlace) {
+    return 'refresh';
+  }
+  return defaultMode;
+}
+
 export interface BasePlaceResolverOptions {
   source: PlaceVersionSource;
-  /**
-   * Refuse to resolve anything the lock does not already answer. CI opts into
-   * this so a moved base place fails the build instead of silently shipping.
-   */
-  frozen?: boolean;
-  /**
-   * Re-resolve `"saved"`/`"published"` pins instead of reusing the locked
-   * answer, and write what comes back.
-   *
-   * This is what makes a watch-dispatched rebuild do anything. The lock holds a
-   * keyword pin still until `deploy version upgrade` moves it, so a build
-   * triggered *because* the base place moved would otherwise download the
-   * version it was already locked to and republish an identical place. Numeric
-   * pins are untouched — those are a deliberate "hold still".
-   *
-   * Mutually exclusive with `frozen`, which says the opposite thing.
-   */
-  refresh?: boolean;
+  /** Default: `write`. */
+  lockMode?: BasePlaceLockMode;
 }
 
 interface TrackedLock {
@@ -66,8 +95,7 @@ interface TrackedLock {
  */
 export class BasePlaceResolver {
   private _source: PlaceVersionSource;
-  private _frozen: boolean;
-  private _refresh: boolean;
+  private _lockMode: BasePlaceLockMode;
   // Keyed on the promise, not the resolved value: concurrent callers for one
   // package must share the same TrackedLock, or whichever finishes second
   // replaces the first and its recorded entries are never written.
@@ -75,23 +103,12 @@ export class BasePlaceResolver {
   private _inflight = new Map<string, Promise<number>>();
 
   constructor(options: BasePlaceResolverOptions) {
-    if (options.frozen && options.refresh) {
-      throw new Error(
-        'A base place resolver cannot be both frozen and refreshing: one ' +
-          'forbids resolving base places, the other forces it.'
-      );
-    }
     this._source = options.source;
-    this._frozen = options.frozen ?? false;
-    this._refresh = options.refresh ?? false;
+    this._lockMode = options.lockMode ?? 'write';
   }
 
-  get frozen(): boolean {
-    return this._frozen;
-  }
-
-  get refreshing(): boolean {
-    return this._refresh;
+  get lockMode(): BasePlaceLockMode {
+    return this._lockMode;
   }
 
   /**
@@ -119,11 +136,11 @@ export class BasePlaceResolver {
 
     // `refresh` deliberately falls through to a live lookup: the locked answer
     // is exactly what a watch-triggered rebuild must not reuse.
-    if (entry && entry.from === versionType && !this._refresh) {
+    if (entry && entry.from === versionType && this._lockMode !== 'refresh') {
       return entry.version;
     }
 
-    if (this._frozen) {
+    if (this._lockMode === 'frozen') {
       // `deploy version upgrade` only writes the lock for an explicit keyword;
       // an absent pin is treated as a config pin and gets a number written
       // there instead, so pointing at the lock file would be a dead end.
@@ -196,9 +213,14 @@ export class BasePlaceResolver {
    * Entries for base places this run did not touch are left alone: a single
    * target's deploy must not delete the pins belonging to other targets.
    * Pruning is `deploy version upgrade`'s job, since only it walks everything.
+   *
+   * A `readonly` resolver writes nothing.
    */
   async flushAsync(): Promise<string[]> {
     const written: string[] = [];
+    if (this._lockMode === 'readonly') {
+      return written;
+    }
     for (const pending of this._locks.values()) {
       const tracked = await pending;
       if (!tracked.dirty) {

@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameConfigAssetTypeUtils = require("GameConfigAssetTypeUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameConfigAssetUtils = require("GameConfigAssetUtils")
+local GameConfigConstants = require("GameConfigConstants")
 local GameConfigPicker = require("GameConfigPicker")
 local GameConfigServiceConstants = require("GameConfigServiceConstants")
 local GameConfigUtils = require("GameConfigUtils")
@@ -157,6 +158,11 @@ function GameConfigService:AddTypedAsset(
 
 	local gameConfig = self:_getOrCreateDefaultGameConfig()
 
+	local existing = GameConfigUtils.findMatchingAsset(gameConfig, assetType, assetKey, assetId, priority)
+	if existing then
+		return existing
+	end
+
 	local asset = GameConfigAssetUtils.create(self._binders.GameConfigAsset, assetType, assetKey, assetId, priority)
 	asset.Parent = GameConfigUtils.getOrCreateAssetFolder(gameConfig, assetType)
 
@@ -188,11 +194,31 @@ function GameConfigService:_getOrCreateDefaultGameConfig()
 		end
 	end
 
+	local preferredParent = self:GetPreferredParent()
+	local unbound = self:_findUnboundDefaultGameConfig(preferredParent)
+	if unbound then
+		self._binders.GameConfig:Bind(unbound)
+		return unbound
+	end
+
 	local config = GameConfigUtils.create(self._binders.GameConfig, game.GameId)
 	config.Name = GameConfigServiceConstants.DEFAULT_CONFIG_NAME
-	config.Parent = self:GetPreferredParent()
+	config.Parent = preferredParent
 
 	return config
+end
+
+function GameConfigService:_findUnboundDefaultGameConfig(preferredParent: Instance): Folder?
+	local existing = preferredParent:FindFirstChild(GameConfigServiceConstants.DEFAULT_CONFIG_NAME)
+	if
+		existing
+		and existing:IsA("Folder")
+		and existing:GetAttribute(GameConfigConstants.GAME_ID_ATTRIBUTE) == game.GameId
+	then
+		return existing
+	end
+
+	return nil
 end
 
 --[=[

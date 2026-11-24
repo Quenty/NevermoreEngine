@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-import { BasePlaceResolver } from './base-place-resolver.js';
+import {
+  BasePlaceResolver,
+  resolveBasePlaceLockMode,
+} from './base-place-resolver.js';
 import {
   loadDeployLockAsync,
   resolveDeployLockPath,
@@ -284,7 +287,7 @@ describe('BasePlaceResolver', () => {
         basePlaces: { '33': { version: 100, from: 'published' } },
       });
       const source = makeSource();
-      const resolver = new BasePlaceResolver({ source, frozen: true });
+      const resolver = new BasePlaceResolver({ source, lockMode: 'frozen' });
 
       expect(
         await resolver.resolveAsync(
@@ -298,7 +301,7 @@ describe('BasePlaceResolver', () => {
     it('refuses to resolve a missing entry', async () => {
       const resolver = new BasePlaceResolver({
         source: makeSource(),
-        frozen: true,
+        lockMode: 'frozen',
       });
 
       await expect(
@@ -313,7 +316,7 @@ describe('BasePlaceResolver', () => {
       });
       const resolver = new BasePlaceResolver({
         source: makeSource(),
-        frozen: true,
+        lockMode: 'frozen',
       });
 
       await expect(
@@ -324,7 +327,7 @@ describe('BasePlaceResolver', () => {
     it('still serves numeric pins', async () => {
       const resolver = new BasePlaceResolver({
         source: makeSource(),
-        frozen: true,
+        lockMode: 'frozen',
       });
 
       expect(
@@ -340,7 +343,7 @@ describe('BasePlaceResolver', () => {
         basePlaces: { '33': { version: 100, from: 'published' } },
       });
       const source = makeSource();
-      const resolver = new BasePlaceResolver({ source, refresh: true });
+      const resolver = new BasePlaceResolver({ source, lockMode: 'refresh' });
 
       expect(
         await resolver.resolveAsync(
@@ -361,7 +364,7 @@ describe('BasePlaceResolver', () => {
 
     it('leaves a numeric pin alone', async () => {
       const source = makeSource();
-      const resolver = new BasePlaceResolver({ source, refresh: true });
+      const resolver = new BasePlaceResolver({ source, lockMode: 'refresh' });
 
       expect(
         await resolver.resolveAsync(packageDir, makeBasePlace({ version: 42 }))
@@ -376,7 +379,7 @@ describe('BasePlaceResolver', () => {
       });
       const resolver = new BasePlaceResolver({
         source: makeSource(),
-        refresh: true,
+        lockMode: 'refresh',
       });
 
       await resolver.resolveAsync(
@@ -386,16 +389,40 @@ describe('BasePlaceResolver', () => {
 
       expect(await resolver.flushAsync()).toEqual([]);
     });
+  });
 
-    it('cannot be combined with frozen', () => {
+  describe('readonly', () => {
+    it('serves a matching entry without a lookup', async () => {
+      await writeLockAsync({
+        lockfileVersion: 1,
+        basePlaces: { '33': { version: 100, from: 'published' } },
+      });
+      const source = makeSource();
+      const resolver = new BasePlaceResolver({ source, lockMode: 'readonly' });
+
       expect(
-        () =>
-          new BasePlaceResolver({
-            source: makeSource(),
-            frozen: true,
-            refresh: true,
-          })
-      ).toThrowError(/cannot be both frozen and refreshing/);
+        await resolver.resolveAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBe(100);
+      expect(source.resolveLatestPlaceVersionAsync).not.toHaveBeenCalled();
+    });
+
+    it('resolves a missing entry but never writes the lock', async () => {
+      const source = makeSource();
+      const resolver = new BasePlaceResolver({ source, lockMode: 'readonly' });
+
+      expect(
+        await resolver.resolveAsync(
+          packageDir,
+          makeBasePlace({ version: 'published' })
+        )
+      ).toBe(158);
+      expect(source.resolveLatestPlaceVersionAsync).toHaveBeenCalled();
+
+      expect(await resolver.flushAsync()).toEqual([]);
+      expect(await readLockAsync()).toBeUndefined();
     });
   });
 
@@ -558,5 +585,28 @@ describe('deploy lock file', () => {
     await expect(loadDeployLockAsync(lockPath)).rejects.toThrowError(
       /invalid "from"/
     );
+  });
+});
+
+describe('resolveBasePlaceLockMode', () => {
+  it('maps each flag to its mode', () => {
+    expect(resolveBasePlaceLockMode({})).toBe('write');
+    expect(resolveBasePlaceLockMode({ frozenLockfile: true })).toBe('frozen');
+    expect(resolveBasePlaceLockMode({ refreshBasePlace: true })).toBe(
+      'refresh'
+    );
+  });
+
+  it('falls back to the command default when no flag is set', () => {
+    expect(resolveBasePlaceLockMode({}, 'readonly')).toBe('readonly');
+    expect(resolveBasePlaceLockMode({ frozenLockfile: true }, 'readonly')).toBe(
+      'frozen'
+    );
+  });
+
+  it('rejects contradicting flags', () => {
+    expect(() =>
+      resolveBasePlaceLockMode({ frozenLockfile: true, refreshBasePlace: true })
+    ).toThrowError(/contradict each other/);
   });
 });

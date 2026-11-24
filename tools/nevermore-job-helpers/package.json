@@ -1,0 +1,66 @@
+{
+  "name": "@quenty/nevermore-job-helpers",
+  "version": "1.0.0",
+  "description": "Jobs for Nevermore tooling: build a deploy target into a place, upload it or open it in Studio, run scripts in it, and clean up. Includes the Open Cloud client. Shared by nevermore-cli and studio-bridge",
+  "type": "module",
+  "keywords": [
+    "Roblox",
+    "Raven",
+    "CLI"
+  ],
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./place": "./dist/place/index.js",
+    "./open-cloud": "./dist/open-cloud/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "place": [
+        "dist/place/index.d.ts"
+      ],
+      "open-cloud": [
+        "dist/open-cloud/index.d.ts"
+      ]
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/Quenty/Nevermore/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "tools/nevermore-job-helpers/"
+  },
+  "license": "UNLICENSED",
+  "contributors": [
+    "Quenty"
+  ],
+  "dependencies": {
+    "@quenty/cli-output-helpers": "workspace:*",
+    "@quenty/nevermore-deploy": "workspace:*",
+    "@quenty/nevermore-template-helpers": "workspace:*",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@quenty/nevermore-cli-helpers": "workspace:*",
+    "@types/node": "^18.11.4",
+    "prettier": "2.7.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "build:watch": "tsc --build --watch",
+    "build:clean": "tsc --build --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

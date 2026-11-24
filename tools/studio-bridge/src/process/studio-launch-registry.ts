@@ -10,6 +10,9 @@ export interface StudioLaunchRecord {
   cwd: string;
   opened: string;
   launchedAt: number;
+  deployTarget?: string;
+  /** State directory of a place built for this launch. */
+  placeDir?: string;
 }
 
 export function defaultLaunchRegistryPath(): string {
