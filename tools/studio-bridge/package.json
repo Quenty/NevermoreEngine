@@ -5,6 +5,11 @@
   "type": "module",
   "main": "dist/src/index.js",
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quenty/NevermoreEngine.git",
+    "directory": "tools/studio-bridge/"
+  },
   "publishConfig": {
     "access": "public"
   },
