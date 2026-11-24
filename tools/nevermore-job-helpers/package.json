@@ -1,6 +1,6 @@
 {
   "name": "@quenty/nevermore-job-helpers",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Jobs for Nevermore tooling: build a deploy target into a place, upload it or open it in Studio, run scripts in it, and clean up. Includes the Open Cloud client. Shared by nevermore-cli and studio-bridge",
   "type": "module",
   "keywords": [

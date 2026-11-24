@@ -1,6 +1,6 @@
 {
   "name": "@quenty/qframe",
-  "version": "10.37.2",
+  "version": "10.38.0",
   "description": "CFrame representation as a quaternion for Roblox",
   "keywords": [
     "Roblox",
