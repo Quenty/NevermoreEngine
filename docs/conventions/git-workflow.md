@@ -74,6 +74,20 @@ The best PRs include a demo — a screenshot or short video showing the change i
 - Rebase onto latest `main` before merging — the repo requires branches to be up-to-date with `main`
 - Releases are CI-driven via `auto shipit` — never release locally
 
+## Publishing new packages
+
+Releases publish to npm through [trusted publishing](https://docs.npmjs.com/trusted-publishers): npm trusts the `build.yml` workflow per package, so CI holds no npm token. npm can't attach trust to a package that doesn't exist yet, so a new package's first version is published by a maintainer:
+
+```bash
+npm login
+cd src/<package>
+nevermore tools npm-trust   # publishes the first version, then trusts build.yml
+```
+
+Run from a package directory it acts on that package; from the repo root it covers every publishable package, or the ones you name. Packages that already trust the workflow are skipped, so it is safe to re-run.
+
+The release job runs `nevermore tools npm-trust --check` first and fails with this command if any package is missing from npm. Run it close to the merge. npm expires a trust configuration that no publish uses within about two days.
+
 ## Commit authorship
 
 Commits are attributed to the person who authored them. Do not add `Co-Authored-By` trailers — Nevermore is open source and each commit should have a single clear author.
