@@ -160,6 +160,23 @@ describe("RxFriendUtils.observeFriendsInServerAsBrios", function()
 		controller:Destroy()
 	end)
 
+	it("shares one friendship read between both sides of a pair", function()
+		local controller = setup()
+
+		local first = controller.newMock(90051015)
+		local second = controller.newMock(90051016)
+		PlayerMock.writeLookup(first, "Player.IsFriendsWithAsync", true, 90051016)
+
+		local firstEmissions = controller.trackBrios(first)
+		local secondEmissions = controller.trackBrios(second)
+
+		expect(#firstEmissions).toBe(1)
+		expect(#secondEmissions).toBe(1)
+		expect(secondEmissions[1]:GetValue()).toBe(first)
+
+		controller:Destroy()
+	end)
+
 	it("kills the lifetime when the friend mock leaves", function()
 		local controller = setup()
 
