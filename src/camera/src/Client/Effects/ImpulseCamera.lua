@@ -126,6 +126,19 @@ function ImpulseCamera._aggregateSprings(self: ImpulseCamera): Vector3
 	return position
 end
 
+--[=[
+	Returns true when no impulse is playing: every spring is at rest, so this camera adds nothing.
+
+	@return boolean
+]=]
+function ImpulseCamera.IsIdle(self: ImpulseCamera): boolean
+	if #self._springs > 0 then
+		return false
+	end
+
+	return not SpringUtils.animating(self._defaultSpring, EPSILON)
+end
+
 function ImpulseCamera.__add(self: ImpulseCamera, other)
 	return SummedCamera.new(self, other)
 end
