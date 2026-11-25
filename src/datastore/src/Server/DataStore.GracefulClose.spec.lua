@@ -111,3 +111,55 @@ describe("crash-safety semantics preserved", function()
 		controller:Destroy()
 	end, 30000) -- Two full 5s graceful-close timeouts plus backoff, beyond jest's 5s default
 end)
+
+describe("saves during the session close", function()
+	it("a save started while the close is writing doesn't cancel it", function()
+		local controller = DataStoreTestUtils.setup()
+
+		local dataStore = controller.newSessionLockedStore()
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
+		dataStore:Store("coins", 42)
+
+		controller.mock:BlockRequests()
+		local closePromise = dataStore:SaveAndCloseSession()
+		local savePromise = dataStore:Save()
+		controller.mock:UnblockRequests()
+
+		PromiseTestUtils.awaitFulfilled(closePromise, 10)
+		PromiseTestUtils.awaitRejected(savePromise, 10)
+		expect(controller.mock:GetRaw("player_1").coins).toEqual(42)
+		expect(controller.mock:GetRaw("player_1").lock).toEqual(nil)
+
+		controller:Destroy()
+	end)
+
+	it("a second close shares the first", function()
+		local controller = DataStoreTestUtils.setup()
+
+		local dataStore = controller.newSessionLockedStore()
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
+
+		controller.mock:BlockRequests()
+		local first = dataStore:SaveAndCloseSession()
+		local second = dataStore:SaveAndCloseSession()
+		expect(second).toBe(first)
+		controller.mock:UnblockRequests()
+		PromiseTestUtils.awaitFulfilled(first, 10)
+
+		controller:Destroy()
+	end)
+
+	it("saves normally again once the close has finished", function()
+		local controller = DataStoreTestUtils.setup()
+
+		local dataStore = controller.newSessionLockedStore()
+		expect(PromiseTestUtils.awaitSettled(dataStore:PromiseLoadSuccessful(), 10)).toEqual(true)
+		PromiseTestUtils.awaitFulfilled(dataStore:SaveAndCloseSession(), 10)
+
+		dataStore:Store("coins", 7)
+		PromiseTestUtils.awaitFulfilled(dataStore:Save(), 10)
+		expect(controller.mock:GetRaw("player_1").coins).toEqual(7)
+
+		controller:Destroy()
+	end)
+end)

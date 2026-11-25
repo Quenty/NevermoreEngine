@@ -128,6 +128,7 @@ export type DataStore =
 			_promiseSessionLockingFailed: Promise.Promise<()>,
 			_loadRetryOptions: PromiseRetryUtils.RetryOptions,
 			_sessionMessagingCloseDelaySeconds: number,
+			_closeSessionPromise: Promise.Promise<()>?,
 
 			-- Events
 			Saving: Signal.Signal<Promise.Promise<()>>,
@@ -531,12 +532,27 @@ function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSe
 		return Promise.rejected("Load not successful, not syncing")
 	end
 
-	return self._maid
+	-- Each sync replaces the one in flight, so a save during the session close would cancel the
+	-- close. While closing, another close shares it and anything else is cancelled instead.
+	if self._closeSessionPromise then
+		if doCloseSession then
+			return self._closeSessionPromise
+		end
+
+		return Promise.rejected()
+	end
+
+	local promise = self._maid
 		:GivePromise(self:PromiseViewUpToDate())
 		:Then(function()
 			return self._maid:GivePromise(self:PromiseInvokeSavingCallbacks())
 		end)
 		:Then(function(): Promise.Promise<()>?
+			if not doCloseSession and self._closeSessionPromise then
+				-- A close started while this sync waited
+				return Promise.rejected()
+			end
+
 			if not self:HasWritableData() and not doCloseSession then
 				if doMergeNewData then
 					-- Reads are cheaper than update async calls
@@ -553,6 +569,17 @@ function DataStore._syncData(self: DataStore, doMergeNewData: boolean, doCloseSe
 				return self:_doDataSync(self:GetNewWriter(), doMergeNewData, doCloseSession)
 			end
 		end)
+
+	if doCloseSession then
+		self._closeSessionPromise = promise
+		promise:Finally(function()
+			if self._closeSessionPromise == promise then
+				self._closeSessionPromise = nil
+			end
+		end)
+	end
+
+	return promise
 end
 
 function DataStore._doDataSync(
