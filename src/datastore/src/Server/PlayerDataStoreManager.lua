@@ -389,6 +389,10 @@ function PlayerDataStoreManager._promiseDataStoreByUserId(
 	userId: PlayerUserId,
 	player: Player?
 ): Promise.Promise<DataStore.DataStore>
+	if player and self:_hasLeft(player) then
+		return Promise.rejected()
+	end
+
 	if not self._removing[userId] then
 		local dataStore = self:GetDataStore(userId)
 		if dataStore then
@@ -398,7 +402,7 @@ function PlayerDataStoreManager._promiseDataStoreByUserId(
 
 	return self:_promiseWaitForRemoving(userId):Then(function()
 		-- Don't open (and session lock) the data of a player who has gone. An empty rejection is silent.
-		if player and (self._leavingPlayers[player] or not player:IsDescendantOf(Players)) then
+		if player and self:_hasLeft(player) then
 			return Promise.rejected()
 		end
 
@@ -657,6 +661,10 @@ function PlayerDataStoreManager._createDataStore(
 	self._datastores[userId] = datastore
 
 	return datastore
+end
+
+function PlayerDataStoreManager._hasLeft(self: PlayerDataStoreManager, player: Player): boolean
+	return self._leavingPlayers[player] == true or not player:IsDescendantOf(Players)
 end
 
 function PlayerDataStoreManager._removePlayerDataStore(
