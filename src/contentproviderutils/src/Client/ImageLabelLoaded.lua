@@ -63,7 +63,6 @@ end
 function ImageLabelLoaded.PromiseLoaded(self: ImageLabelLoaded, timeout: number?): Promise.Promise<()>
 	assert(type(timeout) == "number" or timeout == nil, "Bad timeout")
 
-	local originalTimeout = timeout
 	timeout = timeout or self._defaultTimeout
 
 	if self._isLoaded.Value then
@@ -81,19 +80,17 @@ function ImageLabelLoaded.PromiseLoaded(self: ImageLabelLoaded, timeout: number?
 		end
 	end))
 
-	maid:GiveTask(self.ImageChanged:Connect(function(isVisible)
-		if not isVisible then
-			promise:Reject()
-		end
+	maid:GiveTask(self.ImageChanged:Connect(function()
+		promise:Reject("[ImageLabelLoaded] - The image label changed before the image loaded")
 	end))
 
 	if timeout then
-		maid:GiveTask(task.delay(timeout, function()
-			if originalTimeout then
-				promise:Reject("[ImageLabelLoaded] - Failed to load image after default timeout time")
-			else
-				promise:Reject()
-			end
+		local timeoutSeconds: number = timeout
+
+		maid:GiveTask(task.delay(timeoutSeconds, function()
+			promise:Reject(
+				string.format("[ImageLabelLoaded] - Failed to load image after %0.2f seconds", timeoutSeconds)
+			)
 		end))
 	end
 
