@@ -51,7 +51,6 @@ jobs:
         uses: ./.github/actions/setup-nevermore-cli
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Download integration places outside the checkout
         uses: actions/download-artifact@v4
