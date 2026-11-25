@@ -218,7 +218,10 @@ function Binder.Start<T>(self: Binder<T>)
 	end
 
 	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(self._tagName):Connect(function(inst)
-		self:_add(inst)
+		-- A deferred signal can deliver an instance that was destroyed or removed after it was tagged.
+		if inst:IsDescendantOf(game) then
+			self:_add(inst)
+		end
 	end))
 	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(self._tagName):Connect(function(inst)
 		self:_remove(inst)
