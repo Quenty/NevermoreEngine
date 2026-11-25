@@ -85,6 +85,7 @@ export type PlayerDataStoreManager =
 			_keyGenerator: KeyGenerator,
 			_datastores: { [PlayerUserId]: DataStore.DataStore },
 			_removing: { [PlayerUserId]: boolean },
+			_leavingPlayers: { [Player]: true },
 			_removingPromises: { [PlayerUserId]: Promise.Promise<any> },
 			_handleCounts: { [PlayerUserId]: number },
 			_pendingSaves: PendingPromiseTracker.PendingPromiseTracker<any>,
@@ -129,6 +130,7 @@ function PlayerDataStoreManager.new(
 
 	self._datastores = {} -- [userId] = datastore
 	self._removing = {} -- [player] = true
+	self._leavingPlayers = setmetatable({} :: any, { __mode = "k" }) -- [player] = true, leaving or kicked
 	self._removingPromises = {} -- [player] = removal promise
 	self._handleCounts = {} -- [userId] = outstanding PlayerDataStoreHandle count
 	self._pendingSaves = PendingPromiseTracker.new()
@@ -141,7 +143,7 @@ function PlayerDataStoreManager.new(
 			return
 		end
 
-		self:_removePlayerDataStore(player.UserId)
+		self:_removePlayerDataStore(player.UserId, player)
 	end))
 
 	if skipBindingToClose ~= true then
@@ -367,6 +369,9 @@ end
 	Gets the datastore for a player, waiting for any in-progress removal/save first.
 	Use this in async flows to safely support fast leave/rejoin behavior.
 
+	Given a player who left, was kicked or is on a closing server, this rejects instead of opening
+	their data again once the removal finishes. A rejoin is a new player, so it still waits and opens.
+
 	@return Promise<DataStore>
 ]=]
 function PlayerDataStoreManager.PromiseDataStore(
@@ -374,21 +379,34 @@ function PlayerDataStoreManager.PromiseDataStore(
 	playerOrUserId: Player | PlayerUserId
 ): Promise.Promise<DataStore.DataStore>
 	local userId = self:_toPlayerUserIdOrError(playerOrUserId)
+	local player: Player? = if typeof(playerOrUserId) == "Instance" then playerOrUserId else nil
 
-	return self:_promiseDataStoreByUserId(userId)
+	return self:_promiseDataStoreByUserId(userId, player)
 end
 
 function PlayerDataStoreManager._promiseDataStoreByUserId(
 	self: PlayerDataStoreManager,
-	userId: PlayerUserId
+	userId: PlayerUserId,
+	player: Player?
 ): Promise.Promise<DataStore.DataStore>
-	local dataStore = self:GetDataStore(userId)
-	if dataStore then
-		return Promise.resolved(dataStore)
+	if player and self:_hasLeft(player) then
+		return Promise.rejected()
+	end
+
+	if not self._removing[userId] then
+		local dataStore = self:GetDataStore(userId)
+		if dataStore then
+			return Promise.resolved(dataStore)
+		end
 	end
 
 	return self:_promiseWaitForRemoving(userId):Then(function()
-		return self:_promiseDataStoreByUserId(userId)
+		-- Don't open (and session lock) the data of a player who has gone. An empty rejection is silent.
+		if player and self:_hasLeft(player) then
+			return Promise.rejected()
+		end
+
+		return self:_promiseDataStoreByUserId(userId, player)
 	end)
 end
 
@@ -560,7 +578,7 @@ end
 ]=]
 function PlayerDataStoreManager.PromiseAllSaves(self: PlayerDataStoreManager): Promise.Promise<()>
 	for userId, _ in self._datastores do
-		self:_removePlayerDataStore(userId)
+		self:_removePlayerDataStore(userId, Players:GetPlayerByUserId(userId))
 	end
 
 	local promises: { Promise.Promise<any> } = {}
@@ -616,7 +634,7 @@ function PlayerDataStoreManager._createDataStore(
 			player:Kick("DataStore session lock failed to load. Please message developers.")
 		end
 
-		self:_removePlayerDataStore(userId)
+		self:_removePlayerDataStore(userId, player)
 	end)
 
 	maid:GiveTask(datastore.SessionStolen:Connect(function()
@@ -624,7 +642,7 @@ function PlayerDataStoreManager._createDataStore(
 		if player then
 			player:Kick("DataStore session stolen by another active session. Please message developers.")
 		end
-		self:_removePlayerDataStore(userId)
+		self:_removePlayerDataStore(userId, player)
 	end))
 
 	maid:GiveTask(datastore.SessionCloseRequested:Connect(function()
@@ -632,7 +650,7 @@ function PlayerDataStoreManager._createDataStore(
 		if player then
 			player:Kick("DataStore is activating in another game.")
 		end
-		self:_removePlayerDataStore(userId)
+		self:_removePlayerDataStore(userId, player)
 	end))
 
 	maid:GiveTask(datastore.Saving:Connect(function(promise)
@@ -645,7 +663,19 @@ function PlayerDataStoreManager._createDataStore(
 	return datastore
 end
 
-function PlayerDataStoreManager._removePlayerDataStore(self: PlayerDataStoreManager, userId: PlayerUserId): ()
+function PlayerDataStoreManager._hasLeft(self: PlayerDataStoreManager, player: Player): boolean
+	return self._leavingPlayers[player] == true or not player:IsDescendantOf(Players)
+end
+
+function PlayerDataStoreManager._removePlayerDataStore(
+	self: PlayerDataStoreManager,
+	userId: PlayerUserId,
+	leavingPlayer: Player?
+): ()
+	if leavingPlayer then
+		self._leavingPlayers[leavingPlayer] = true
+	end
+
 	local datastore = self._datastores[userId]
 	if not datastore then
 		return
