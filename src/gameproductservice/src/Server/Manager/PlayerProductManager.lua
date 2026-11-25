@@ -11,6 +11,7 @@ local require = require(script.Parent.loader).load(script)
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 
+local Binder = require("Binder")
 local EnumUtils = require("EnumUtils")
 local GameConfigAssetTypes = require("GameConfigAssetTypes")
 local GameProductDataService = require("GameProductDataService")
@@ -250,7 +251,4 @@ function PlayerProductManager._setupBundleTracker(self: PlayerProductManager): (
 	end))
 end
 
-return PlayerBinder.new(
-		"PlayerProductManager",
-		PlayerProductManager :: any
-	) :: PlayerBinder.PlayerBinder<PlayerProductManager>
+return PlayerBinder.new("PlayerProductManager", PlayerProductManager :: any) :: Binder.Binder<PlayerProductManager>
