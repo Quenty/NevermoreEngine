@@ -1,23 +1,11 @@
-# v2.7.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/kinematics@2.5.0...@quenty/kinematics@2.7.0) (2026-11-25)
+
+**Note:** Version bump only for package @quenty/kinematics
 
 # [2.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/kinematics@2.4.3...@quenty/kinematics@2.5.0) (2026-05-20)
 

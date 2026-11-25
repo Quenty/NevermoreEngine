@@ -1,26 +1,13 @@
-# v13.62.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-- feat: Allow i18n values ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [13.62.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.60.1...@quenty/datastore@13.62.0) (2026-11-25)
+
+### Features
+
+- Allow i18n values ([ba82deb](https://github.com/Quenty/NevermoreEngine/commit/ba82deb3007af34eef6a070cd43f4a791396ccdf))
 
 ## [13.60.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/datastore@13.60.0...@quenty/datastore@13.60.1) (2026-11-18)
 

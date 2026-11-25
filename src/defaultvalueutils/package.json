@@ -1,6 +1,6 @@
 {
   "name": "@quenty/defaultvalueutils",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Helps get the default or zero value for value types in Roblox",
   "keywords": [
     "Roblox",

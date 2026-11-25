@@ -1,3 +1,14 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.2.0 (2026-11-25)
+
+### Features
+
+- Add ability for studio-bridge to launch a place from source ([bb4c284](https://github.com/Quenty/NevermoreEngine/commit/bb4c2849f4e19494f8bdf743ffcbb626153f3023))
+
 # v1.2.0 (Wed Nov 25 2026)
 
 #### 🚀 Enhancement

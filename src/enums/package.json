@@ -1,6 +1,6 @@
 {
   "name": "@quenty/enums",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Custom Luau enum implementation",
   "keywords": [
     "Roblox",

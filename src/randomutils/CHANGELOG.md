@@ -1,23 +1,11 @@
-# v6.22.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [6.22.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.20.4...@quenty/randomutils@6.22.0) (2026-11-25)
+
+**Note:** Version bump only for package @quenty/randomutils
 
 ## [6.20.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/randomutils@6.20.3...@quenty/randomutils@6.20.4) (2026-11-18)
 

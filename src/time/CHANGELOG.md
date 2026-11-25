@@ -1,23 +1,11 @@
-# v2.10.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.10.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/time@2.8.2...@quenty/time@2.10.0) (2026-11-25)
+
+**Note:** Version bump only for package @quenty/time
 
 ## [2.8.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/time@2.8.1...@quenty/time@2.8.2) (2026-11-18)
 

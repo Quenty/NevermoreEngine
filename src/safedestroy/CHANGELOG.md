@@ -1,122 +1,64 @@
-# v1.7.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.5.1...@quenty/safedestroy@1.5.2) (2026-01-12)
+# [1.7.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.5.2...@quenty/safedestroy@1.7.0) (2026-11-25)
 
+**Note:** Version bump only for package @quenty/safedestroy
+
+## [1.5.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.5.1...@quenty/safedestroy@1.5.2) (2026-01-12)
 
 ### Bug Fixes
 
-* Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
-
-
-
-
+- Fix dependency installation process for pnpm ([9651b09](https://github.com/Quenty/NevermoreEngine/commit/9651b09af34f252ef3f9c7c539793cc878dd8cba))
 
 ## [1.5.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.5.0...@quenty/safedestroy@1.5.1) (2026-01-10)
 
 **Note:** Version bump only for package @quenty/safedestroy
 
-
-
-
-
 # [1.5.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.4.2...@quenty/safedestroy@1.5.0) (2025-05-10)
 
 **Note:** Version bump only for package @quenty/safedestroy
 
-
-
-
-
 ## [1.4.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.4.0...@quenty/safedestroy@1.4.2) (2025-04-07)
-
 
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-* Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
+- Bump package versions for republishing ([ba47c62](https://github.com/Quenty/NevermoreEngine/commit/ba47c62e32170bf74377b0c658c60b84306dc294))
 
 ## [1.4.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.4.0...@quenty/safedestroy@1.4.1) (2025-04-07)
 
-
 ### Bug Fixes
 
-* Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
-
-
-
-
+- Add types to packages ([2374fb2](https://github.com/Quenty/NevermoreEngine/commit/2374fb2b043cfbe0e9b507b3316eec46a4e353a0))
 
 # [1.4.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.3.0...@quenty/safedestroy@1.4.0) (2024-09-25)
 
-
 ### Bug Fixes
 
-* Rename `:sub()` to `string.sub` ([6874e06](https://github.com/Quenty/NevermoreEngine/commit/6874e06e456d7094a2d7f25a3a7b24a40d77fe3c))
-
-
-
-
+- Rename `:sub()` to `string.sub` ([6874e06](https://github.com/Quenty/NevermoreEngine/commit/6874e06e456d7094a2d7f25a3a7b24a40d77fe3c))
 
 # [1.3.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.2.0...@quenty/safedestroy@1.3.0) (2024-05-09)
 
-
 ### Bug Fixes
 
-* Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
-
-
-
-
+- Fix .package-lock.json replicating in packages ([75d0efe](https://github.com/Quenty/NevermoreEngine/commit/75d0efeef239f221d93352af71a5b3e930ec23c5))
 
 # [1.2.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.1.1...@quenty/safedestroy@1.2.0) (2022-03-27)
 
 **Note:** Version bump only for package @quenty/safedestroy
 
-
-
-
-
 ## [1.1.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/safedestroy@1.1.0...@quenty/safedestroy@1.1.1) (2021-12-30)
 
 **Note:** Version bump only for package @quenty/safedestroy
 
-
-
-
-
 # 1.1.0 (2021-10-02)
-
 
 ### Features
 
-* Add safeDestroy package ([718679a](https://github.com/Quenty/NevermoreEngine/commit/718679ad355cf7b9652ceff9ebc430666f01ec75))
-
-
-
-
+- Add safeDestroy package ([718679a](https://github.com/Quenty/NevermoreEngine/commit/718679ad355cf7b9652ceff9ebc430666f01ec75))
 
 # v1.1.0 (Sat Oct 02 2021)
 

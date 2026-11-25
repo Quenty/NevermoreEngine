@@ -1,23 +1,11 @@
-# v7.75.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [7.75.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.73.1...@quenty/secrets@7.75.0) (2026-11-25)
+
+**Note:** Version bump only for package @quenty/secrets
 
 ## [7.73.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/secrets@7.73.0...@quenty/secrets@7.73.1) (2026-11-18)
 

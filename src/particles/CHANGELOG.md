@@ -1,26 +1,13 @@
-# v5.20.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-- feat: Add more utility funtions to particleutils ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [5.20.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particles@5.18.4...@quenty/particles@5.20.0) (2026-11-25)
+
+### Features
+
+- Add more utility funtions to particleutils ([df7abc4](https://github.com/Quenty/NevermoreEngine/commit/df7abc4cb949b6d7bcfc91a6ec4b3d69ca006c83))
 
 ## [5.18.4](https://github.com/Quenty/NevermoreEngine/compare/@quenty/particles@5.18.3...@quenty/particles@5.18.4) (2026-11-18)
 

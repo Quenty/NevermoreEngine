@@ -1,6 +1,6 @@
 {
   "name": "@quenty/camerainfo",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Utility method to transfer camera info to and from the client",
   "keywords": [
     "Roblox",

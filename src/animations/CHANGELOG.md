@@ -1,26 +1,13 @@
-# v8.43.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-- feat: Add AnimationTarget type to the AnimationUtils package ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [8.43.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.41.2...@quenty/animations@8.43.0) (2026-11-25)
+
+### Features
+
+- Add AnimationTarget type to the AnimationUtils package ([7138be8](https://github.com/Quenty/NevermoreEngine/commit/7138be8dafb00c8fc2fd4d2f48be1602fbe4d56e))
 
 ## [8.41.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/animations@8.41.1...@quenty/animations@8.41.2) (2026-11-18)
 

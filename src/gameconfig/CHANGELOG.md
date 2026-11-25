@@ -1,26 +1,13 @@
-# v12.74.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-- fix: Game config service leaks assets ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [12.74.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.72.2...@quenty/gameconfig@12.74.0) (2026-11-25)
+
+### Bug Fixes
+
+- Game config service leaks assets ([2648032](https://github.com/Quenty/NevermoreEngine/commit/26480321efb5c38ec64351779e7af972d92c7594))
 
 ## [12.72.2](https://github.com/Quenty/NevermoreEngine/compare/@quenty/gameconfig@12.72.1...@quenty/gameconfig@12.72.2) (2026-11-18)
 

@@ -1,27 +1,17 @@
-# v0.27.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-- feat: Add ability for studio-bridge to launch a place from source ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- fix(studio-bridge): Add the repository field so it can publish ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.27.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.25.1...@quenty/studio-bridge@0.27.0) (2026-11-25)
+
+### Bug Fixes
+
+- **studio-bridge:** Add the repository field so it can publish ([d4f6037](https://github.com/Quenty/NevermoreEngine/commit/d4f60374284140ae1c4ed3b337071d89d511bad7))
+
+### Features
+
+- Add ability for studio-bridge to launch a place from source ([bb4c284](https://github.com/Quenty/NevermoreEngine/commit/bb4c2849f4e19494f8bdf743ffcbb626153f3023))
 
 ## [0.25.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/studio-bridge@0.25.0...@quenty/studio-bridge@0.25.1) (2026-11-18)
 

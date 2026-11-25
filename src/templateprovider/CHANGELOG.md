@@ -1,26 +1,13 @@
-# v11.58.0 (Wed Nov 25 2026)
-
-#### 🚀 Enhancement
-
-- fix: Finish the move to npm trusted publishing [#871](https://github.com/Quenty/NevermoreEngine/pull/871) ([@Quenty](https://github.com/Quenty))
-- feat: Camera viewport rect fitting, HasTemplate, and assorted fixes [#868](https://github.com/Quenty/NevermoreEngine/pull/868) ([@Quenty](https://github.com/Quenty))
-- feat: Add HasTemplate API ([@Quenty](https://github.com/Quenty))
-
-#### 🐛 Bug Fix
-
-- chore: Bump every package's minor version to republish through trusted publishing ([@Quenty](https://github.com/Quenty))
-- Merge branch 'main' into users/quenty/camera-viewport-rect-fit ([@Quenty](https://github.com/Quenty))
-
-#### Authors: 1
-
-- James Onnen ([@Quenty](https://github.com/Quenty))
-
----
-
 # Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [11.58.0](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.56.1...@quenty/templateprovider@11.58.0) (2026-11-25)
+
+### Features
+
+- Add HasTemplate API ([3fb60ec](https://github.com/Quenty/NevermoreEngine/commit/3fb60ec1116c7f6222a3480573d7358eff119200))
 
 ## [11.56.1](https://github.com/Quenty/NevermoreEngine/compare/@quenty/templateprovider@11.56.0...@quenty/templateprovider@11.56.1) (2026-11-18)
 
