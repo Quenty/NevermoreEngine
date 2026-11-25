@@ -48,4 +48,27 @@ describe("Binder load abandonment", function()
 
 		controller:Destroy()
 	end)
+
+	it("does not construct for an instance destroyed before its added signal runs", function()
+		local controller = BinderTestUtils.setup()
+
+		local strays = 0
+		local binder = controller.addBinder(function(inst)
+			if not inst:IsDescendantOf(game) then
+				strays += 1
+			end
+			return {}
+		end)
+		controller.initServiceBag()
+
+		local inst = controller.newInstance()
+		binder:Tag(inst)
+		inst:Destroy()
+		task.wait()
+
+		expect(strays).toEqual(0)
+		expect(binder:Get(inst)).toBeNil()
+
+		controller:Destroy()
+	end)
 end)
